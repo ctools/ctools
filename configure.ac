@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.64])
+#AC_PREREQ([2.64])
 AC_INIT([ctatools], [0.1.0], [knodlseder@cesr.fr])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_HEADERS([config.h])
