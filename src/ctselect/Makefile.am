@@ -8,7 +8,9 @@ INCLUDES = -I$(top_srcdir)/include \
            -I$(top_builddir)/src \
            -I$(top_srcdir)/src
 
-PROGRAMS = ctselect
+bin_PROGRAMS = ctselect
 
 ctselect_SOURCES = ctselect.cpp
-ctselect_LDADD = libgamma.la
+#ctselect_LDADD = libgamma.la
+ctselect_LDFLAGS = @LDFLAGS@
+ctselect_CPPFLAGS = @CPPFLAGS@
