@@ -1,0 +1,30 @@
+#############################################################################
+#                                                                           #
+#               Centre d'Etude Spatiale des Rayonnements                    #
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      ctselect.par                                                  #
+#  Version:   v1r0p0                                                        #
+#                                                                           #
+#  Author:    Jurgen Knodlseder                                             #
+#             knodlseder@cesr.fr                                            #
+#             CESR                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the ctselect application                   #
+#                                                                           #
+#############################################################################
+#
+# Test
+#=============================
+string,s,a,"../../data/3EG.fits",,,"String"
+filename,f,a,"../../data/3EG.fits",,,"File name"
+#
+# Standard parameters
+#====================
+chatter,i,h,1,0,4,"Chattiness of output"
+clobber,b,h,yes,,,"Overwrite existing output catalogue ?"
+debug,b,h,no,,,"Debugging mode activated"
+mode,s,h,"ql",,,"Mode of automatic parameters"
