@@ -1,5 +1,5 @@
 /***************************************************************************
- *                                  ctselect                               *
+ *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010 by Jurgen Knodlseder                                *
  * ----------------------------------------------------------------------- *
@@ -20,11 +20,26 @@
 #define CTSELECT_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include "GammaLib.hpp"
 
-/* __ Namespaces _________________________________________________________ */
+/* __Definitions _________________________________________________________ */
+#define APP_NAME    "ctselect"
+#define APP_VERSION "v1r0p0"
 
-/* __ Constants __________________________________________________________ */
 
-/* __ Prototypes ________________________________________________________ */
+/***********************************************************************//**
+ * @class ctselect
+ *
+ * @brief CTA data selection tool interface defintion.
+ ***************************************************************************/
+class ctselect : public GApplication  {
+public:
+    // Constructors and destructors
+    ctselect(int argc, char *argv[]) : 
+                  GApplication(APP_NAME, APP_VERSION, argc, argv) { return; }
+
+    // Methods
+    int run(void);
+};
 
 #endif /* CTSELECT_HPP */

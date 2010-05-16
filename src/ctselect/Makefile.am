@@ -11,6 +11,8 @@ INCLUDES = -I$(top_srcdir)/include \
 bin_PROGRAMS = ctselect
 
 ctselect_SOURCES = ctselect.cpp
-#ctselect_LDADD = libgamma.la
 ctselect_LDFLAGS = @LDFLAGS@
 ctselect_CPPFLAGS = @CPPFLAGS@
+
+pfilesdir = $(prefix)/syspfiles
+pfiles_DATA = ctselect.par

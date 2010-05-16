@@ -1,10 +1,13 @@
 # Process this file with autoconf to produce a configure script.
 
-#AC_PREREQ([2.64])
 AC_INIT([ctatools], [0.1.0], [knodlseder@cesr.fr])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
+
+# Set prefix
+AC_PREFIX_DEFAULT([/usr/local/gamma])
+AC_DEFINE([PREFIX], [$prefix], 'Installation prefix')
 
 # Checks for programs.
 AC_PROG_CXX
@@ -12,7 +15,7 @@ AC_PROG_INSTALL
 
 # Checks for libraries.
 if test "x$prefix" = xNONE; then
-  export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig"
+  export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/gamma/lib/pkgconfig"
 else
   export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$prefix/lib/pkgconfig"
 fi

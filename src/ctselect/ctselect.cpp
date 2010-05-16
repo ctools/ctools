@@ -1,5 +1,5 @@
 /***************************************************************************
- *                                  ctselect                               *
+ *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010 by Jurgen Knodlseder                                *
  * ----------------------------------------------------------------------- *
@@ -12,7 +12,7 @@
  ***************************************************************************/
 /**
  * @file ctselect.cpp
- * @brief CTA data selection tool
+ * @brief CTA data selection tool implementation
  * @author J. Knodlseder
  */
 
@@ -25,16 +25,32 @@
 
 
 /***********************************************************************//**
- * @brief Entry point
+ * @brief Main entry point
  *
  * @param[in] argc Number of arguments
  * @param[in] argv Arguments
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
-    // Dummy
-    printf("Hello world!\n");
+    // Create instance of application
+    ctselect application(argc, argv);
+    
+    // Run application
+    int rc = application.run();
 
+    // Return
+    return rc;
+}
+
+
+/***********************************************************************//**
+ * @brief Application
+ ***************************************************************************/
+int ctselect::run(void)
+{
+    // Test dump
+    std::cout << *this << std::endl;
+    
     // Return
     return 0;
 }
