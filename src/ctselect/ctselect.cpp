@@ -34,7 +34,7 @@ int main (int argc, char *argv[])
 {
     // Create instance of application
     ctselect application(argc, argv);
-    
+
     // Run application
     int rc = application.run();
 
@@ -50,7 +50,7 @@ int ctselect::run(void)
 {
     // Test dump
     std::cout << *this << std::endl;
-    
+
     // Return
     return 0;
 }
