@@ -32,11 +32,23 @@
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
-    // Create instance of application
-    ctselect application(argc, argv);
+    // Initialise return code
+    int rc = 0;
 
-    // Run application
-    int rc = application.run();
+    // Put all code in try-catch brackets to catch all errors
+    try {
+
+        // Create instance of application
+        ctselect application(argc, argv);
+
+        // Run application
+        rc = application.run();
+
+    }
+    catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
+        rc = -1;
+    }
 
     // Return
     return rc;
@@ -50,6 +62,15 @@ int ctselect::run(void)
 {
     // Test dump
     std::cout << *this << std::endl;
+
+    // DUMMY FOR TESTING
+    std::string value;
+    value = par("string")->value();
+    std::cout << value << std::endl;
+    value = par("chatter")->value();
+    std::cout << value << std::endl;
+    value = par("clobber")->value();
+    std::cout << value << std::endl;
 
     // Return
     return 0;

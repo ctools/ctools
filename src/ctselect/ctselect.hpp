@@ -35,7 +35,7 @@
 class ctselect : public GApplication  {
 public:
     // Constructors and destructors
-    ctselect(int argc, char *argv[]) : 
+    ctselect(int argc, char *argv[]) :
                   GApplication(APP_NAME, APP_VERSION, argc, argv) { return; }
 
     // Methods
