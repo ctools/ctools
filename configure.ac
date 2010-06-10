@@ -35,5 +35,6 @@ LDFLAGS="$LDFLAGS $GammaLib_LIBS"
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/ctselect/Makefile])
+                 src/ctselect/Makefile
+                 src/ctbin/Makefile])
 AC_OUTPUT
