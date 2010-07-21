@@ -24,8 +24,8 @@
 #include "GCTALib.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define APP_NAME    "ctbin"
-#define APP_VERSION "v1r0p0"
+#define CTBIN_NAME    "ctbin"
+#define CTBIN_VERSION "v1r0p0"
 
 
 /***********************************************************************//**
@@ -36,8 +36,10 @@
 class ctbin : public GApplication  {
 public:
     // Constructors and destructors
+    ctbin(void) : 
+          GApplication(CTBIN_NAME, CTBIN_VERSION) { return; }
     ctbin(int argc, char *argv[]) : 
-                  GApplication(APP_NAME, APP_VERSION, argc, argv) { return; }
+          GApplication(CTBIN_NAME, CTBIN_VERSION, argc, argv) { return; }
 
     // Methods
     int run(void);
