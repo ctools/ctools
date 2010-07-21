@@ -1,0 +1,39 @@
+#############################################################################
+#                                                                           #
+#               Centre d'Etude Spatiale des Rayonnements                    #
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      ctlike.par                                                    #
+#  Version:   v1r0p0                                                        #
+#                                                                           #
+#  Author:    Jurgen Knodlseder                                             #
+#             knodlseder@cesr.fr                                            #
+#             CESR                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the ctlike application                     #
+#                                                                           #
+#############################################################################
+#
+# Unbinned analysis
+#==================
+evfile, f, a, "../gammalib/inst/cta/test/data/run_00006028_eventlist_reco.fits.gz",,,"Event data file name"
+#
+# Binned analysis
+#==================
+cntmap, f, a, "../gammalib/inst/cta/test/data/run_00006028_cntmap.fits.gz",,, "Counts map"
+#
+# General parameters
+#===================
+method, s, a, "UNBINNED",,, "Maximum likelihood method"
+caldb,  s, a, "../gammalib/inst/cta/test/irf",,, "Calibration database"
+irf,    s, a, "kb_E_50h_v3",,, "Instrument response function"
+#
+# Standard parameters
+#====================
+chatter, i, h,  1,0,4, "Chattiness of output"
+clobber, b, h,  yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h,   no,,, "Debugging mode activated"
+mode,    s, h, "ql",,, "Mode of automatic parameters"
