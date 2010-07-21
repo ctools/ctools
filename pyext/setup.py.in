@@ -1,0 +1,14 @@
+from distutils.core import setup, Extension
+setup(name='@PACKAGE_NAME@',
+      version='@PACKAGE_VERSION@',
+      description='ctatools Python binding',
+      author='Jurgen Knodlseder',
+      author_email='@PACKAGE_BUGREPORT@',
+      url='http://gammalib.sourceforge.net/',
+      py_modules=['ctatools'],
+      ext_modules=[Extension('_ctatools', ['ctatools_wrap.cpp'],
+                             include_dirs=['@prefix@/include/gammalib', '@top_srcdir@/src/ctbin', '@top_srcdir@/src/ctselect'],
+                             library_dirs=['@prefix@/lib'],
+                             libraries=['ctatools','gamma','cfitsio'],
+                             runtime_library_dirs=['@prefix@/lib'])],
+     )
