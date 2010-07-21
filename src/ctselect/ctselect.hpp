@@ -23,8 +23,8 @@
 #include "GammaLib.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define APP_NAME    "ctselect"
-#define APP_VERSION "v1r0p0"
+#define CTSELECT_NAME    "ctselect"
+#define CTSELECT_VERSION "v1r0p0"
 
 
 /***********************************************************************//**
@@ -35,8 +35,10 @@
 class ctselect : public GApplication  {
 public:
     // Constructors and destructors
-    ctselect(int argc, char *argv[]) :
-                  GApplication(APP_NAME, APP_VERSION, argc, argv) { return; }
+    ctselect(void) : 
+             GApplication(CTSELECT_NAME, CTSELECT_VERSION) { return; }
+    ctselect(int argc, char *argv[]) : 
+             GApplication(CTSELECT_NAME, CTSELECT_VERSION, argc, argv) { return; }
 
     // Methods
     int run(void);
