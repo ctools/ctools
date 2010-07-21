@@ -26,28 +26,6 @@
 
 
 /***********************************************************************//**
- * @brief Main entry point of application
- *
- * @param[in] argc Number of command line arguments.
- * @param[in] argv Command line arguments.
- *
- * This is the main entry point of the gtbin application. It allocates a
- * ctbin object and runs the application.
- ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Create instance of application
-    ctbin application(argc, argv);
-    
-    // Run application
-    int rc = application.run();
-
-    // Return
-    return rc;
-}
-
-
-/***********************************************************************//**
  * @brief Run gtbin application
  ***************************************************************************/
 int ctbin::run(void)
