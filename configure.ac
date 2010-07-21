@@ -12,6 +12,7 @@ AC_DEFINE([PREFIX], [$prefix], 'Installation prefix')
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 
 # Checks for libraries.
 if test "x$prefix" = xNONE; then
@@ -27,6 +28,33 @@ CFLAGS="$CFLAGS $GammaLib_CFLAGS"
 CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
 LDFLAGS="$LDFLAGS $GammaLib_LIBS"
 
+# Checks for SWIG
+AC_PATH_PROG([SWIG], [swig])
+AM_CONDITIONAL(HAVE_SWIG, test "$SWIG")
+
+# Checks for Python
+AM_PATH_PYTHON([2.2],
+	       [],
+	       [AC_MSG_WARN([Python not found. Python is required to build python binding. Python can be obtained from http://www.python.org])])
+AM_CONDITIONAL(HAVE_PYTHON, test "$PYTHON")
+
+AC_ARG_ENABLE([python-binding],
+	      AS_HELP_STRING([--enable-python-binding],
+			     [build python binding (default=yes)]),
+			     [ac_enable_python_binding=no],
+			     [ac_enable_python_binding=yes])
+if test "x$ac_enable_python_binding" = "xyes"
+then
+    if test ! "$SWIG" -a ! "$PYTHON"
+    then
+	AC_MSG_WARN([Python binding for ctatools cannot be built. Ensure that SWIG and Python packages are available.])
+    fi
+else
+    AC_MSG_NOTICE([Python binding for ctatools will not be built.])
+    AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
+fi
+AM_CONDITIONAL(ENABLE_PYTHON_BINDING, test "x$ac_enable_python_binding" = "xyes")
+
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -36,5 +64,8 @@ LDFLAGS="$LDFLAGS $GammaLib_LIBS"
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/ctselect/Makefile
-                 src/ctbin/Makefile])
+                 src/ctbin/Makefile
+                 src/ctlike/Makefile
+                 pyext/Makefile
+                 pyext/setup.py])
 AC_OUTPUT
