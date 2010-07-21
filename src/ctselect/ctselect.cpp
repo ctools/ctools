@@ -25,37 +25,6 @@
 
 
 /***********************************************************************//**
- * @brief Main entry point
- *
- * @param[in] argc Number of arguments
- * @param[in] argv Arguments
- ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Initialise return code
-    int rc = 0;
-
-    // Put all code in try-catch brackets to catch all errors
-    try {
-
-        // Create instance of application
-        ctselect application(argc, argv);
-
-        // Run application
-        rc = application.run();
-
-    }
-    catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
-        rc = -1;
-    }
-
-    // Return
-    return rc;
-}
-
-
-/***********************************************************************//**
  * @brief Application
  ***************************************************************************/
 int ctselect::run(void)
