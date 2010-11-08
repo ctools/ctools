@@ -19,17 +19,18 @@
 #
 # Unbinned analysis
 #==================
-evfile, f, a, "../gammalib/inst/cta/test/data/run_00006028_eventlist_reco.fits.gz",,,"Event data file name"
+evfile, f, a, "test/data/run_00006028_eventlist_reco.fits.gz",,,"Event data file name"
 #
 # Binned analysis
 #==================
-cntmap, f, a, "../gammalib/inst/cta/test/data/run_00006028_cntmap.fits.gz",,, "Counts map"
+cntmap, f, a, "test/data/run_00006028_cntmap.fits.gz",,, "Counts map"
 #
 # General parameters
 #===================
 method, s, a, "UNBINNED",,, "Maximum likelihood method"
-caldb,  s, a, "../gammalib/inst/cta/test/irf",,, "Calibration database"
+caldb,  s, a, "test/irf",,, "Calibration database"
 irf,    s, a, "kb_E_50h_v3",,, "Instrument response function"
+srcmdl, f, a, "test/data/source1.xml",,, "Source model"
 #
 # Standard parameters
 #====================

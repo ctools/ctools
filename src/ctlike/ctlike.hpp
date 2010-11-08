@@ -20,6 +20,7 @@
 #define CTLIKE_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 
@@ -45,6 +46,18 @@ public:
     int run(void);
     int unbinned(void);
     int binned(void);
+
+protected:
+    // User parameters
+    std::string m_method;     //!< Likelihood fitting method (binned/unbinned)
+    std::string m_caldb;      //!< Calibration database
+    std::string m_irf;        //!< Instrument response functions
+    std::string m_srcmdl;     //!< Source model XML file
+    GModels     m_models;     //!< Source models
+
+    // Fixed parameters
+    int         m_max_iter;   //!< Maximum number of iterations
+    GOptimizer* m_opt;        //!< Optimizer
 };
 
 #endif /* CTLIKE_HPP */

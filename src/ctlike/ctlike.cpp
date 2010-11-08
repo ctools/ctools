@@ -26,54 +26,36 @@
 
 
 /***********************************************************************//**
- * @brief Setup Crab point source powerlaw model.
- ***************************************************************************/
-GModels crab_plaw(void)
-{
-    // Setup GModels for optimizing
-    GModelSpatialPtsrc point_source;
-    GModelSpectralPlaw power_law;
-    GModel             crab;
-    GModels            models;
-    try {
-        GSkyDir dir;
-        //dir.radec_deg(83.6331, +22.0145);
-        dir.radec_deg(117.0, -33.0);  // Adapt to source position in file
-        point_source = GModelSpatialPtsrc(dir);
-        power_law    = GModelSpectralPlaw(1.0e-7, -2.1);
-        power_law.par(0)->min(1.0e-12);
-        crab         = GModel(point_source, power_law);
-        crab.name("Crab");
-        models.append(crab);
-    }
-    catch (std::exception &e) {
-        std::cout << std::endl 
-                  << "TEST ERROR: Unable setup GModels for optimizing." 
-                  << std::endl;
-        std::cout << e.what() << std::endl;
-        throw;
-    }
-
-    // Return model
-    return models;
-}
-
-
-/***********************************************************************//**
  * @brief Run maximum likelihood analysis
  ***************************************************************************/
 int ctlike::run(void)
 {
     // Initialise return code
     int rc = 0;
-    
+
+    // Get standard parameters
+    m_method = toupper(par("method")->value());
+    m_caldb  = par("caldb")->value();
+    m_irf    = par("irf")->value();
+    m_srcmdl = par("srcmdl")->value();
+    m_models = GModels(m_srcmdl);
+
+    // Set fixed parameters
+    m_max_iter = 1000;
+    m_opt      = new GOptimizerLM;
+
+    // Set optimizer parameters
+    ((GOptimizerLM*)m_opt)->max_iter(m_max_iter);
+
     // Branch on method
-    std::string method = par("method")->value();
-    if (toupper(method) == "UNBINNED")
+    if (m_method == "UNBINNED")
         rc = unbinned();
     else
         rc = binned();
-    
+
+    // Free optimizer
+    delete m_opt;
+
     // Return
     return rc;
 }
@@ -89,8 +71,6 @@ int ctlike::unbinned(void)
 
     // Get parameters
     std::string evfile = par("evfile")->value();
-    std::string caldb  = par("caldb")->value();
-    std::string irf    = par("irf")->value();
 
     // Declare observations
     GObservations   obs;
@@ -118,20 +98,17 @@ int ctlike::unbinned(void)
     // Load data and response and set ROI, energy range and time range
     // for analysis
     run.load_unbinned(evfile);
-    run.response(irf,caldb);
+    run.response(m_irf, m_caldb);
     run.roi(roi);
     run.gti()->add(tstart, tstop);
     run.ebounds()->append(emin, emax);
     obs.append(run);
 
-    // Setup GModels for optimizing
-    GModels models = crab_plaw();
-    obs.models(models);
+    // Setup models for optimizing
+    obs.models(m_models);
 
     // Perform LM optimization
-    GOptimizerLM opt;
-    opt.max_iter(1000);
-    obs.optimize(opt);
+    obs.optimize(*m_opt);
     std::cout << obs << std::endl;
     
     // Return
@@ -149,8 +126,6 @@ int ctlike::binned(void)
 
     // Get parameters
     std::string cntmap = par("cntmap")->value();
-    std::string caldb  = par("caldb")->value();
-    std::string irf    = par("irf")->value();
 
     // Declare observations
     GObservations   obs;
@@ -158,17 +133,14 @@ int ctlike::binned(void)
 
     // Load binned CTA observation
     run.load_binned(cntmap);
-    run.response(irf,caldb);
+    run.response(m_irf, m_caldb);
     obs.append(run);
 
-    // Setup GModels for optimizing
-    GModels models = crab_plaw();
-    obs.models(models);
+    // Setup models for optimizing
+    obs.models(m_models);
 
     // Perform LM optimization
-    GOptimizerLM opt;
-    opt.max_iter(1000);
-    obs.optimize(opt);
+    obs.optimize(*m_opt);
     std::cout << obs << std::endl;
 
     // Return
