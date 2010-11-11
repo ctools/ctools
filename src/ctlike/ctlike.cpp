@@ -25,6 +25,67 @@
 #include "GTools.hpp"
 
 
+/*==========================================================================
+ =                                                                         =
+ =                        Constructors/destructors                         =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Void constructor
+ ***************************************************************************/
+ctlike::ctlike(void) :  GApplication(CTLIKE_NAME, CTLIKE_VERSION)
+{
+    // Initialise members
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Command line constructor
+ *
+ * @param[in] argc Number of arguments in command line.
+ * @param[in] argv Array of command line arguments.
+ ***************************************************************************/
+ctlike::ctlike(int argc, char *argv[]) : 
+                        GApplication(CTLIKE_NAME, CTLIKE_VERSION, argc, argv)
+{
+    // Initialise members
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Destructor
+ ***************************************************************************/
+ctlike::~ctlike(void)
+{
+    // Free members
+    free_members();
+
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                               Operators                                 =
+ =                                                                         =
+ ==========================================================================*/
+
+/*==========================================================================
+ =                                                                         =
+ =                            Public methods                               =
+ =                                                                         =
+ ==========================================================================*/
+
 /***********************************************************************//**
  * @brief Run maximum likelihood analysis
  ***************************************************************************/
@@ -38,11 +99,11 @@ int ctlike::run(void)
     m_caldb  = par("caldb")->value();
     m_irf    = par("irf")->value();
     m_srcmdl = par("srcmdl")->value();
+    m_outmdl = par("outmdl")->value();
     m_models = GModels(m_srcmdl);
 
     // Set fixed parameters
-    m_max_iter = 1000;
-    m_opt      = new GOptimizerLM;
+    m_opt    = new GOptimizerLM;
 
     // Set optimizer parameters
     ((GOptimizerLM*)m_opt)->max_iter(m_max_iter);
@@ -52,6 +113,13 @@ int ctlike::run(void)
         rc = unbinned();
     else
         rc = binned();
+
+    // Write result as XML model
+    if (toupper(m_outmdl) != "NONE")
+        m_models.save(m_outmdl);
+
+    // Dump results
+    std::cout << m_models << std::endl;
 
     // Free optimizer
     delete m_opt;
@@ -73,7 +141,6 @@ int ctlike::unbinned(void)
     std::string evfile = par("evfile")->value();
 
     // Declare observations
-    GObservations   obs;
     GCTAObservation run;
 
     // Setup ROI covered by data
@@ -102,14 +169,16 @@ int ctlike::unbinned(void)
     run.roi(roi);
     run.gti()->add(tstart, tstop);
     run.ebounds()->append(emin, emax);
-    obs.append(run);
+    m_obs.append(run);
 
     // Setup models for optimizing
-    obs.models(m_models);
+    m_obs.models(m_models);
 
     // Perform LM optimization
-    obs.optimize(*m_opt);
-    std::cout << obs << std::endl;
+    m_obs.optimize(*m_opt);
+    
+    // Get models back
+    m_models = *(m_obs.models());
     
     // Return
     return rc;
@@ -128,21 +197,62 @@ int ctlike::binned(void)
     std::string cntmap = par("cntmap")->value();
 
     // Declare observations
-    GObservations   obs;
     GCTAObservation run;
 
     // Load binned CTA observation
     run.load_binned(cntmap);
     run.response(m_irf, m_caldb);
-    obs.append(run);
+    m_obs.append(run);
 
     // Setup models for optimizing
-    obs.models(m_models);
+    m_obs.models(m_models);
 
     // Perform LM optimization
-    obs.optimize(*m_opt);
-    std::cout << obs << std::endl;
+    m_obs.optimize(*m_opt);
+
+    // Get models back
+    m_models = *(m_obs.models());
 
     // Return
     return rc;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctlike::init_members(void)
+{
+    // Initialise members
+    m_method.clear();
+    m_caldb.clear();
+    m_irf.clear();
+    m_srcmdl.clear();
+    m_outmdl.clear();
+    m_models.clear();
+    //m_obs.clear();     //!< NOT YET IMPLEMENTED
+    m_max_iter = 1000;
+    m_opt      = NULL;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctlike::free_members(void)
+{
+    // Free members
+    delete m_opt;
+
+    // Return
+    return;
 }

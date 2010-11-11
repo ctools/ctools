@@ -37,10 +37,9 @@
 class ctlike : public GApplication  {
 public:
     // Constructors and destructors
-    ctlike(void) : 
-           GApplication(CTLIKE_NAME, CTLIKE_VERSION) { return; }
-    ctlike(int argc, char *argv[]) : 
-           GApplication(CTLIKE_NAME, CTLIKE_VERSION, argc, argv) { return; }
+    ctlike(void);
+    ctlike(int argc, char *argv[]);
+    ~ctlike(void);
 
     // Methods
     int run(void);
@@ -48,16 +47,22 @@ public:
     int binned(void);
 
 protected:
+    // Protected methods
+    void init_members(void);
+    void free_members(void);
+
     // User parameters
-    std::string m_method;     //!< Likelihood fitting method (binned/unbinned)
-    std::string m_caldb;      //!< Calibration database
-    std::string m_irf;        //!< Instrument response functions
-    std::string m_srcmdl;     //!< Source model XML file
-    GModels     m_models;     //!< Source models
+    std::string   m_method;     //!< Likelihood fitting method (binned/unbinned)
+    std::string   m_caldb;      //!< Calibration database
+    std::string   m_irf;        //!< Instrument response functions
+    std::string   m_srcmdl;     //!< Source model XML file
+    std::string   m_outmdl;     //!< Source model output XML file
+    GModels       m_models;     //!< Source models
+    GObservations m_obs;        //!< Observations
 
     // Fixed parameters
-    int         m_max_iter;   //!< Maximum number of iterations
-    GOptimizer* m_opt;        //!< Optimizer
+    int           m_max_iter;   //!< Maximum number of iterations
+    GOptimizer*   m_opt;        //!< Optimizer
 };
 
 #endif /* CTLIKE_HPP */
