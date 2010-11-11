@@ -27,10 +27,11 @@ cntmap, f, a, "test/data/run_00006028_cntmap.fits.gz",,, "Counts map"
 #
 # General parameters
 #===================
-method, s, a, "UNBINNED",,, "Maximum likelihood method"
-caldb,  s, a, "test/irf",,, "Calibration database"
-irf,    s, a, "kb_E_50h_v3",,, "Instrument response function"
+method, s, a, "UNBINNED",,,              "Maximum likelihood method"
+caldb,  s, a, "test/irf",,,              "Calibration database"
+irf,    s, a, "kb_E_50h_v3",,,           "Instrument response function"
 srcmdl, f, a, "test/data/source1.xml",,, "Source model"
+outmdl, f, h, "none",,,                  "Source model output file"
 #
 # Standard parameters
 #====================
