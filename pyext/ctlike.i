@@ -30,10 +30,14 @@
 class ctlike : public GApplication  {
 public:
     // Constructors and destructors
-    ctlike(void) : GApplication(CTLIKE_NAME, CTLIKE_VERSION) { return; }
+    ctlike(void);
+    ctlike(int argc, char *argv[]);
+    ~ctlike(void);
 
     // Methods
     int run(void);
+    int unbinned(void);
+    int binned(void);
 };
 
 
