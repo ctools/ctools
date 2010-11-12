@@ -42,9 +42,11 @@ public:
     ~ctlike(void);
 
     // Methods
-    int run(void);
-    int unbinned(void);
-    int binned(void);
+    void run(void);
+    void get_parameters(void);
+    void optimize_lm(void);
+    void unbinned(const std::string& evfile);
+    void binned(const std::string& cntmap);
 
 protected:
     // Protected methods
@@ -60,8 +62,15 @@ protected:
     GModels       m_models;     //!< Source models
     GObservations m_obs;        //!< Observations
 
-    // Fixed parameters
+    // Unbinned likelihood parameters
+    std::string   m_evfile;     //!< Events file
+
+    // Binned likelihood parameters
+    std::string   m_cntmap;     //!< Counts map
+
+    // Internal parameters
     int           m_max_iter;   //!< Maximum number of iterations
+    double        m_logL;       //!< Maximum log likelihood
     GOptimizer*   m_opt;        //!< Optimizer
 };
 

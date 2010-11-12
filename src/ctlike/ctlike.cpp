@@ -34,10 +34,13 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctlike::ctlike(void) :  GApplication(CTLIKE_NAME, CTLIKE_VERSION)
+ctlike::ctlike(void) : GApplication(CTLIKE_NAME, CTLIKE_VERSION)
 {
     // Initialise members
     init_members();
+
+    // Write header into logger
+    log_header();
 
     // Return
     return;
@@ -55,6 +58,9 @@ ctlike::ctlike(int argc, char *argv[]) :
 {
     // Initialise members
     init_members();
+
+    // Write header into logger
+    log_header();
 
     // Return
     return;
@@ -88,75 +94,165 @@ ctlike::~ctlike(void)
 
 /***********************************************************************//**
  * @brief Run maximum likelihood analysis
+ *
+ * The following analysis steps are performed:
+ * 1. Read the parameters (and write them into logger)
+ * 2. Load observation
+ * 3. Setup models for optimizing
+ * 4. Optimize model (and write result into logger)
+ * 5. Write results out as XML model
  ***************************************************************************/
-int ctlike::run(void)
+void ctlike::run(void)
 {
-    // Initialise return code
-    int rc = 0;
+    // Get parameters
+    get_parameters();
 
+    // Write parameters into logger
+    if (logTerse()) {
+        log_parameters();
+        log << std::endl;
+    }
+
+    // Load observation
+    if (m_method == "UNBINNED")
+        unbinned(m_evfile);
+    else
+        binned(m_cntmap);
+
+    // Setup models for optimizing.
+    m_models = GModels(m_srcmdl);
+    m_obs.models(m_models);
+
+    // Optimize
+    optimize_lm();
+
+    // Write results into logger
+    if (logTerse()) {
+        log << " Maximum log likelihood ....: " << m_logL << std::endl;
+        log << " Npred .....................: " << m_obs.npred() << std::endl;
+        log << m_models << std::endl << std::endl;
+    }
+    
+    // Write results out as XML model
+    if (toupper(m_outmdl) != "NONE")
+        m_models.save(m_outmdl);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get application parameters
+ *
+ * Get all task parameters from parameter file or (if required) by querying
+ * the user.
+ ***************************************************************************/
+void ctlike::get_parameters(void)
+{
     // Get standard parameters
     m_method = toupper(par("method")->value());
     m_caldb  = par("caldb")->value();
     m_irf    = par("irf")->value();
     m_srcmdl = par("srcmdl")->value();
     m_outmdl = par("outmdl")->value();
-    m_models = GModels(m_srcmdl);
 
-    // Set fixed parameters
-    m_opt    = new GOptimizerLM;
-
-    // Set optimizer parameters
-    ((GOptimizerLM*)m_opt)->max_iter(m_max_iter);
-
-    // Branch on method
-    if (m_method == "UNBINNED")
-        rc = unbinned();
-    else
-        rc = binned();
-
-    // Write result as XML model
-    if (toupper(m_outmdl) != "NONE")
-        m_models.save(m_outmdl);
-
-    // Dump results
-    std::cout << m_models << std::endl;
-
-    // Free optimizer
-    delete m_opt;
+    // Get unbinned parameters ...
+    if (m_method == "UNBINNED") {
+        m_evfile = par("evfile")->value();
+    }
+    
+    // ... or get binned parameters
+    else if (m_method == "BINNED") {
+        m_cntmap = par("cntmap")->value();
+    }
 
     // Return
-    return rc;
+    return;
 }
 
 
 /***********************************************************************//**
- * @brief Perform unbinned maximum likelihood analysis
+ * @brief Optimize using Levenberg-Marquardt method
  ***************************************************************************/
-int ctlike::unbinned(void)
+void ctlike::optimize_lm(void)
 {
-    // Initialise return code
-    int rc = 0;
+    // Allocate optimizer. The logger is only passed to the optimizer
+    // constructor if optimizer logging is requested.
+    GOptimizerLM* opt = (logExplicit()) ? new GOptimizerLM(log) 
+                                        : new GOptimizerLM();
+    
+    // Assign optimizer
+    m_opt = opt;
 
-    // Get parameters
-    std::string evfile = par("evfile")->value();
+    // Set optimizer parameters
+    opt->max_iter(m_max_iter);
 
+    // Write Header for optimization and indent for optimizer logging
+    if (logExplicit()) {
+        log.header1("Maximum likelihood optimisation");
+        log.indent(1);
+    }
+    
+    // Perform LM optimization
+    m_obs.optimize(*m_opt);
+
+    // Get models back
+    m_models = *(m_obs.models());
+
+    // Store maximum log likelihood value
+    m_logL = -opt->value();
+
+    // Write optimization results
+    log.indent(0);
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Maximum likelihood optimisation results");
+        log << *opt << std::endl;
+    }
+
+    // Free optimizer
+    delete opt;
+    
+    // Reset optimizer pointer
+    m_opt = NULL;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Load unbinned observation
+ *
+ * @param[in] evfile Events file name.
+ *
+ * @todo ROI, energy range and time range information is hardwired. This is
+ * not needed in the future once this information is correctly extracted
+ * from the event file header.
+ ***************************************************************************/
+void ctlike::unbinned(const std::string& evfile)
+{
     // Declare observations
     GCTAObservation run;
 
-    // Setup ROI covered by data
+    // DUMMY: Setup ROI covered by data. This is needed since actual test
+    // data do not contain any ROI informations.
     GCTAInstDir instDir;
     GCTARoi     roi;
     instDir.radec_deg(117.02, -33.35);  // Adapt to file
     roi.centre(instDir);
     roi.radius(2.5);
 
-    // Setup energy range covered by data
+    // DUMMY: Setup energy range covered by data. This is needed since actual
+    // test data do not contain any energy range information
     GEnergy emin;
     GEnergy emax;
     emin.TeV(0.02);
     emax.TeV(100.0);
 
-    // Setup time range covered by data
+    // DUMMY: Setup time range covered by data. This is needed since actual
+    // test data do not contain any time range information
     GTime tstart;
     GTime tstop;
     tstart.met(0.0);
@@ -171,50 +267,32 @@ int ctlike::unbinned(void)
     run.ebounds()->append(emin, emax);
     m_obs.append(run);
 
-    // Setup models for optimizing
-    m_obs.models(m_models);
-
-    // Perform LM optimization
-    m_obs.optimize(*m_opt);
-    
-    // Get models back
-    m_models = *(m_obs.models());
-    
     // Return
-    return rc;
+    return;
 }
 
 
 /***********************************************************************//**
- * @brief Perform binned maximum likelihood analysis
+ * @brief Load binned observation
+ *
+ * @param[in] cntmap Counts map file name.
  ***************************************************************************/
-int ctlike::binned(void)
+void ctlike::binned(const std::string& cntmap)
 {
-    // Initialise return code
-    int rc = 0;
-
-    // Get parameters
-    std::string cntmap = par("cntmap")->value();
-
     // Declare observations
     GCTAObservation run;
 
     // Load binned CTA observation
     run.load_binned(cntmap);
+
+    // Set response
     run.response(m_irf, m_caldb);
+
+    // Append observation to container
     m_obs.append(run);
 
-    // Setup models for optimizing
-    m_obs.models(m_models);
-
-    // Perform LM optimization
-    m_obs.optimize(*m_opt);
-
-    // Get models back
-    m_models = *(m_obs.models());
-
     // Return
-    return rc;
+    return;
 }
 
 
@@ -236,9 +314,13 @@ void ctlike::init_members(void)
     m_srcmdl.clear();
     m_outmdl.clear();
     m_models.clear();
-    //m_obs.clear();     //!< NOT YET IMPLEMENTED
+    m_obs.clear();
     m_max_iter = 1000;
+    m_logL     = 0.0;
     m_opt      = NULL;
+
+    // Set logger properties
+    log.date(true);
 
     // Return
     return;
@@ -251,7 +333,6 @@ void ctlike::init_members(void)
 void ctlike::free_members(void)
 {
     // Free members
-    delete m_opt;
 
     // Return
     return;
