@@ -190,6 +190,7 @@ void ctlike::optimize_lm(void)
 
     // Write Header for optimization and indent for optimizer logging
     if (logExplicit()) {
+        log << std::endl;
         log.header1("Maximum likelihood optimisation");
         log.indent(1);
     }
