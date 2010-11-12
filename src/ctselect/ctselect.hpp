@@ -35,13 +35,29 @@
 class ctselect : public GApplication  {
 public:
     // Constructors and destructors
-    ctselect(void) : 
-             GApplication(CTSELECT_NAME, CTSELECT_VERSION) { return; }
-    ctselect(int argc, char *argv[]) : 
-             GApplication(CTSELECT_NAME, CTSELECT_VERSION, argc, argv) { return; }
+    ctselect(void);
+    ctselect(int argc, char *argv[]);
+    ~ctselect(void);
 
     // Methods
-    int run(void);
+    void run(void);
+    void get_parameters(void);
+
+protected:
+    // Protected methods
+    void init_members(void);
+    void free_members(void);
+
+    // User parameters
+    std::string   m_infile;     //!< Input event list
+    std::string   m_outfile;    //!< Output event list
+    double        m_ra;         //!< RA of ROI centre
+    double        m_dec;        //!< DEC of ROI centre
+    double        m_rad;        //!< ROI radius
+    double        m_tmin;       //!< Start time
+    double        m_tmax;       //!< Stop time
+    double        m_emin;       //!< Lower energy
+    double        m_emax;       //!< Upper energy
 };
 
 #endif /* CTSELECT_HPP */
