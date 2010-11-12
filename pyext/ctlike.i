@@ -35,9 +35,11 @@ public:
     ~ctlike(void);
 
     // Methods
-    int run(void);
-    int unbinned(void);
-    int binned(void);
+    void run(void);
+    void get_parameters(void);
+    void optimize_lm(void);
+    void unbinned(const std::string& evfile);
+    void binned(const std::string& cntmap);
 };
 
 
