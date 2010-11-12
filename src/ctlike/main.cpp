@@ -36,8 +36,8 @@ int main (int argc, char *argv[])
     ctlike application(argc, argv);
     
     // Run application
-    int rc = application.run();
+    application.run();
 
     // Return
-    return rc;
+    return 0;
 }
