@@ -1,7 +1,5 @@
 #############################################################################
 #                                                                           #
-#               Centre d'Etude Spatiale des Rayonnements                    #
-#                                                                           #
 #                       CTA Science Analysis Tools                          #
 #                                                                           #
 # ------------------------------------------------------------------------- #
@@ -31,11 +29,11 @@ method, s, a, "UNBINNED",,,              "Maximum likelihood method"
 caldb,  s, a, "test/irf",,,              "Calibration database"
 irf,    s, a, "kb_E_50h_v3",,,           "Instrument response function"
 srcmdl, f, a, "test/data/source1.xml",,, "Source model"
-outmdl, f, h, "none",,,                  "Source model output file"
+outmdl, f, h, "ctlike_results.xml",,,    "Source model output file"
 #
 # Standard parameters
 #====================
-chatter, i, h,  1,0,4, "Chattiness of output"
+chatter, i, h,  2,0,4, "Chattiness of output"
 clobber, b, h,  yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h,   no,,, "Debugging mode activated"
 mode,    s, h, "ql",,, "Mode of automatic parameters"
