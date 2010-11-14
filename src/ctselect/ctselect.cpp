@@ -105,6 +105,9 @@ void ctselect::run(void)
         log << std::endl;
     }
 
+    // Select events
+    select();
+
     // Return
     return;
 }
@@ -128,6 +131,45 @@ void ctselect::get_parameters(void)
     m_tmax    = par("tmax")->real();
     m_emin    = par("emin")->real();
     m_emax    = par("emax")->real();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Select events
+ *
+ * @todo An interesting alternative is the fits_select_rows routine which copies
+ * the selected rows from one FITS table to another. That's in fact the thing
+ * we want to achieve here. The only way to use this routine would be to
+ * open 2 FITS files, one for the input data and a fresh one for the output
+ * data. The events table would then be copied over using the select routine,
+ * any other tables would be copied over directly. The code would look like:
+ *
+ * GFits infile(m_infile);
+ * GFits outfile(m_outfile);
+ * for (int extno = 0; extno < infile.size(); ++extno) {
+ *     GFitsHDU* inhdu  = infile.hdu(i);
+ *     if (inhdu->extname() == "EVENTS") {
+ *         GFitsHDU* outhdu = inhdu->select("expression");
+ *         outfile.append_hdu(*outhdu);
+ *     }
+ *     else
+ *         outfile.append_hdu(*inhdu);
+ * }
+ * outfile.save();
+ * outfile.close();
+ *
+ ***************************************************************************/
+void ctselect::select(void)
+{
+    // Open FITS file
+    GFits file(m_infile);
+    //std::cout << file << std::endl;
+
+    // Save file
+    file.saveto(m_outfile, true);
 
     // Return
     return;

@@ -30,10 +30,14 @@
 class ctselect : public GApplication  {
 public:
     // Constructors and destructors
-    ctselect(void) : GApplication(CTSELECT_NAME, CTSELECT_VERSION) { return; }
+    ctselect(void);
+    ctselect(int argc, char *argv[]);
+    ~ctselect(void);
 
     // Methods
-    int run(void);
+    void run(void);
+    void get_parameters(void);
+    void select(void);
 };
 
 

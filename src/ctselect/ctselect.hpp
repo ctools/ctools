@@ -42,6 +42,7 @@ public:
     // Methods
     void run(void);
     void get_parameters(void);
+    void select(void);
 
 protected:
     // Protected methods
