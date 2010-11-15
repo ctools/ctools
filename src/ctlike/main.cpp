@@ -32,12 +32,34 @@
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
+    // Initialise return code
+    int rc = 1;
+
     // Create instance of application
     ctlike application(argc, argv);
-    
+
     // Run application
-    application.run();
+    try {
+        application.run();
+        rc = 0;
+    }
+    catch (std::exception &e) {
+
+        // Extract error message
+        std::string message = e.what();
+        std::string signal  = "*** ERROR encounterted in the execution of"
+                              "  ctlike. Run aborted ...";
+
+        // Write error in logger
+        application.log << signal  << std::endl;
+        application.log << message << std::endl;
+
+        // Write error on standard output
+        std::cout << signal  << std::endl;
+        std::cout << message << std::endl;
+
+    } // endcatch: catched any application error
 
     // Return
-    return 0;
+    return rc;
 }
