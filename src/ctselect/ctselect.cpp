@@ -23,6 +23,10 @@
 #include <stdio.h>
 #include "ctselect.hpp"
 
+/* __ Debug definitions __________________________________________________ */
+#define BIT_COLUMN_TEST    0
+#define STRING_COLUMN_TEST 1
+
 
 /*==========================================================================
  =                                                                         =
@@ -168,8 +172,50 @@ void ctselect::select(void)
     GFits file(m_infile);
     //std::cout << file << std::endl;
 
+    // Optional perform Bit column testing
+    #if BIT_COLUMN_TEST
+    GFitsTableBitCol* ptr = (GFitsTableBitCol*)file.hdu("EVENTS")->column("TELMASK");
+    for (int i = 0; i < ptr->length(); ++i) {
+        std::cout << i << ": ";
+        for (int k = 0; k < ptr->number(); ++k)
+            std::cout << (int)(*(ptr))(i, k) << " ";
+        std::cout << std::endl;
+    }
+    (*(ptr))(8507, 1) = true;
+    (*(ptr))(8508, 0) = false;
+    (*(ptr))(8509, 1) = false;
+    (*(ptr))(8509, 2) = false;
+    std::cout << "change now:" << std::endl;
+    for (int i = 8507; i < 8510; ++i) {
+        std::cout << i << ": ";
+        for (int k = 0; k < ptr->number(); ++k)
+            std::cout << (int)(*(ptr))(i, k) << " ";
+        std::cout << std::endl;
+    }
+    #endif 
+
+    // Optional perform String column testing
+    #if STRING_COLUMN_TEST
+    GFitsTableStringCol* ptr = (GFitsTableStringCol*)file.hdu("ANALYSIS")->column("UNIT");
+    std::cout << "Anynul: " << ptr->anynul() << std::endl;
+    for (int i = 0; i < ptr->length(); ++i) {
+        std::cout << "\"" << ptr->string(i) << "\"" << std::endl;
+    }
+    #endif
+
     // Save file
     file.saveto(m_outfile, true);
+    //std::cout << file << std::endl;
+
+    // Optional perform String column testing
+    #if STRING_COLUMN_TEST
+    GFits file2(m_outfile);
+    GFitsTableStringCol* ptr2 = (GFitsTableStringCol*)file2.hdu("ANALYSIS")->column("UNIT");
+    std::cout << "Anynul: " << ptr2->anynul() << std::endl;
+    for (int i = 0; i < ptr2->length(); ++i) {
+        std::cout << "\"" << ptr2->string(i) << "\"" << std::endl;
+    }
+    #endif
 
     // Return
     return;
