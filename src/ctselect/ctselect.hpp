@@ -43,6 +43,8 @@ public:
     void run(void);
     void get_parameters(void);
     void select(void);
+    void append_gti(void);
+    void copy(void);
 
 protected:
     // Protected methods

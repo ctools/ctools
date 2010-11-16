@@ -22,10 +22,16 @@
 #endif
 #include <stdio.h>
 #include "ctselect.hpp"
+#include "GTools.hpp"
 
 /* __ Debug definitions __________________________________________________ */
 #define BIT_COLUMN_TEST    0
 #define STRING_COLUMN_TEST 1
+
+/* __ Coding definitions _________________________________________________ */
+#define SELECT_TIME   0
+#define SELECT_ENERGY 1
+#define SELECT_ROI    1
 
 
 /*==========================================================================
@@ -97,6 +103,9 @@ ctselect::~ctselect(void)
 
 /***********************************************************************//**
  * @brief Select event data
+ *
+ * A GTI is appended to the FITS file as in the actual data format no GTI
+ * exists.
  ***************************************************************************/
 void ctselect::run(void)
 {
@@ -111,6 +120,13 @@ void ctselect::run(void)
 
     // Select events
     select();
+
+    // Append GTI to FITS file
+    append_gti();
+
+    // Write separator into logger
+    if (logTerse())
+        log << std::endl;
 
     // Return
     return;
@@ -144,29 +160,104 @@ void ctselect::get_parameters(void)
 /***********************************************************************//**
  * @brief Select events
  *
- * @todo An interesting alternative is the fits_select_rows routine which copies
- * the selected rows from one FITS table to another. That's in fact the thing
- * we want to achieve here. The only way to use this routine would be to
- * open 2 FITS files, one for the input data and a fresh one for the output
- * data. The events table would then be copied over using the select routine,
- * any other tables would be copied over directly. The code would look like:
+ * Select events from a FITS file by making use of the selection possibility
+ * of the cfitsio library on loading a file into memory. Event selection is
+ * kept optional (on compile time) as the data format may still evolve (for
+ * the time being the TIME information is not valid).
  *
- * GFits infile(m_infile);
- * GFits outfile(m_outfile);
- * for (int extno = 0; extno < infile.size(); ++extno) {
- *     GFitsHDU* inhdu  = infile.hdu(i);
- *     if (inhdu->extname() == "EVENTS") {
- *         GFitsHDU* outhdu = inhdu->select("expression");
- *         outfile.append_hdu(*outhdu);
- *     }
- *     else
- *         outfile.append_hdu(*inhdu);
- * }
- * outfile.save();
- * outfile.close();
- *
+ * @todo Set data selection keywords.
  ***************************************************************************/
 void ctselect::select(void)
+{
+    // Write Header for event selection
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Event selection");
+    }
+
+    // Build selection string
+    std::string selection;
+    #if SELECT_TIME
+    selection = "TIME >= "+str(m_tmin)+" && TIME <= "+str(m_tmax);
+    if (logTerse())
+        log << " Time range ................: " << m_tmin << "-" << m_tmax
+            << std::endl;
+    #endif
+    #if SELECT_ENERGY
+    if (selection.length() > 0)
+        selection += " && ";
+    selection += "ENERGY >= "+str(m_emin)+" && ENERGY <= "+str(m_emax);
+    if (logTerse())
+        log << " Energy range ..............: " << m_emin << "-" << m_emax
+            << " TeV" << std::endl;
+    #endif
+    #if SELECT_ROI
+    if (selection.length() > 0)
+        selection += " && ";
+    selection += "ANGSEP("+str(m_ra)+","+str(m_dec)+",RA,DEC) <= "+str(m_rad);
+    if (logTerse()) {
+        log << " Acceptance cone centre ....: RA=" << m_ra << ", DEC=" << m_dec
+            << " deg" << std::endl;
+        log << " Acceptance cone radius ....: " << m_rad << " deg" << std::endl;
+    }
+    #endif
+    if (logTerse())
+        log << " cfitsio selection .........: " << selection << std::endl;
+
+    // Build input filename including selection expression
+    std::string expression = m_infile;
+    if (selection.length() > 0)
+        expression += "[EVENTS]["+selection+"]";
+    if (logTerse())
+        log << " FITS filename .............: " << expression << std::endl;
+    
+    // Open FITS file
+    GFits file(expression);
+
+    // Save output FITS file
+    file.saveto(m_outfile, clobber());
+
+    // Close FITS file
+    file.close();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Append GTI to FITS file
+ ***************************************************************************/
+void ctselect::append_gti(void)
+{
+    // Allocate Gti
+    GGti gti;
+
+    // Setup single GTI covering the selected time range
+    GTime tstart;
+    GTime tstop;
+    tstart.met(m_tmin);
+    tstop.met(m_tmax);
+    gti.add(tstart, tstop);
+
+    // Save GTI
+    GFits file(m_outfile);
+    gti.write(&file);
+    file.save();
+    file.close();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy events
+ *
+ * This is some old code that is not used but that is kept for the moment
+ * for debugging purposes.
+ ***************************************************************************/
+void ctselect::copy(void)
 {
     // Open FITS file
     GFits file(m_infile);
