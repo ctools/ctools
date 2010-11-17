@@ -265,7 +265,7 @@ void ctselect::copy(void)
 
     // Optional perform Bit column testing
     #if BIT_COLUMN_TEST
-    GFitsTableBitCol* ptr = (GFitsTableBitCol*)file.hdu("EVENTS")->column("TELMASK");
+    GFitsTableBitCol* ptr = (GFitsTableBitCol*)file.table("EVENTS")->column("TELMASK");
     for (int i = 0; i < ptr->length(); ++i) {
         std::cout << i << ": ";
         for (int k = 0; k < ptr->number(); ++k)
@@ -287,7 +287,7 @@ void ctselect::copy(void)
 
     // Optional perform String column testing
     #if STRING_COLUMN_TEST
-    GFitsTableStringCol* ptr = (GFitsTableStringCol*)file.hdu("ANALYSIS")->column("UNIT");
+    GFitsTableStringCol* ptr = (GFitsTableStringCol*)file.table("ANALYSIS")->column("UNIT");
     std::cout << "Anynul: " << ptr->anynul() << std::endl;
     for (int i = 0; i < ptr->length(); ++i) {
         std::cout << "\"" << ptr->string(i) << "\"" << std::endl;
@@ -301,7 +301,7 @@ void ctselect::copy(void)
     // Optional perform String column testing
     #if STRING_COLUMN_TEST
     GFits file2(m_outfile);
-    GFitsTableStringCol* ptr2 = (GFitsTableStringCol*)file2.hdu("ANALYSIS")->column("UNIT");
+    GFitsTableStringCol* ptr2 = (GFitsTableStringCol*)file2.table("ANALYSIS")->column("UNIT");
     std::cout << "Anynul: " << ptr2->anynul() << std::endl;
     for (int i = 0; i < ptr2->length(); ++i) {
         std::cout << "\"" << ptr2->string(i) << "\"" << std::endl;
