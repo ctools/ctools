@@ -210,9 +210,16 @@ void ctselect::select(void)
         expression += "[EVENTS]["+selection+"]";
     if (logTerse())
         log << " FITS filename .............: " << expression << std::endl;
-    
+
     // Open FITS file
     GFits file(expression);
+
+    // Log selected FITS file
+    if (logExplicit()) {
+        log << std::endl;
+        log.header1("FITS file content after selection");
+        log << file << std::endl;
+    }
 
     // Save output FITS file
     file.saveto(m_outfile, clobber());
@@ -240,9 +247,20 @@ void ctselect::append_gti(void)
     tstop.met(m_tmax);
     gti.add(tstart, tstop);
 
-    // Save GTI
+    // Re-open FITS file
     GFits file(m_outfile);
+
+    // Write GTI
     gti.write(&file);
+
+    // Log final FITS file
+    if (logExplicit()) {
+        log << std::endl;
+        log.header1("Final FITS file content");
+        log << file << std::endl;
+    }
+
+    // Save and close file
     file.save();
     file.close();
 
