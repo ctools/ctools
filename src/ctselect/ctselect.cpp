@@ -124,6 +124,12 @@ void ctselect::run(void)
     // Append GTI to FITS file
     append_gti();
 
+    // Save output FITS file
+    m_file.saveto(m_outfile, clobber());
+
+    // Close FITS file
+    m_file.close();
+
     // Write separator into logger
     if (logTerse())
         log << std::endl;
@@ -212,20 +218,14 @@ void ctselect::select(void)
         log << " FITS filename .............: " << expression << std::endl;
 
     // Open FITS file
-    GFits file(expression);
+    m_file.open(expression);
 
     // Log selected FITS file
     if (logExplicit()) {
         log << std::endl;
         log.header1("FITS file content after selection");
-        log << file << std::endl;
+        log << m_file << std::endl;
     }
-
-    // Save output FITS file
-    file.saveto(m_outfile, clobber());
-
-    // Close FITS file
-    file.close();
 
     // Return
     return;
@@ -247,22 +247,15 @@ void ctselect::append_gti(void)
     tstop.met(m_tmax);
     gti.add(tstart, tstop);
 
-    // Re-open FITS file
-    GFits file(m_outfile);
-
     // Write GTI
-    gti.write(&file);
+    gti.write(&m_file);
 
     // Log final FITS file
     if (logExplicit()) {
         log << std::endl;
         log.header1("Final FITS file content");
-        log << file << std::endl;
+        log << m_file << std::endl;
     }
-
-    // Save and close file
-    file.save();
-    file.close();
 
     // Return
     return;

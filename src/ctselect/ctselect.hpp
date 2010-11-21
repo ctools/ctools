@@ -61,6 +61,7 @@ protected:
     double        m_tmax;       //!< Stop time
     double        m_emin;       //!< Lower energy
     double        m_emax;       //!< Upper energy
+    GFits         m_file;       //!< FITS file
 };
 
 #endif /* CTSELECT_HPP */
