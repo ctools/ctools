@@ -1,7 +1,9 @@
-# Process this file with autoconf to produce a configure script.
-
+dnl =============================================================
+dnl Process this file with autoconf to produce a configure script
+dnl =============================================================
 AC_INIT([ctatools], [0.1.0], [knodlseder@cesr.fr])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 
@@ -18,9 +20,11 @@ dnl =================================
 dnl Checks for debugging or profiling
 dnl =================================
 AC_MSG_CHECKING(whether to enable debugging)
-AC_ARG_ENABLE(debug,
-              [  --enable-debug          turn on debugging (default=no)],
-              [enable_debug="$enableval"])
+AC_ARG_ENABLE([debug],
+              AS_HELP_STRING([--enable-debug],
+                             [turn on debugging (default=no)]),
+              [enable_debug="$enableval"],
+              [enable_debug="no"])
 if test "x$enable_debug" = "xyes"; then
   CFLAGS="$CFLAGS -g"
   CXXFLAGS="$CXXFLAGS -g"
@@ -31,9 +35,11 @@ else
   AC_MSG_RESULT(no)
 fi
 AC_MSG_CHECKING(whether to enable profiling)
-AC_ARG_ENABLE(debug,
-              [  --enable-profiling      turn on profiling (default=no)],
-              [enable_profiling="$enableval"])
+AC_ARG_ENABLE([profiling],
+              AS_HELP_STRING([--enable-profiling],
+                             [turn on profiling (default=no)]),
+              [enable_profiling="$enableval"],
+              [enable_profiling="no"])
 if test "x$enable_profiling" = "xyes"; then
   CFLAGS="$CFLAGS -pg"
   CXXFLAGS="$CXXFLAGS -pg"
