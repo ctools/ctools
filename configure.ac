@@ -14,6 +14,36 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
+dnl =================================
+dnl Checks for debugging or profiling
+dnl =================================
+AC_MSG_CHECKING(whether to enable debugging)
+AC_ARG_ENABLE(debug,
+              [  --enable-debug          turn on debugging (default=no)],
+              [enable_debug="$enableval"])
+if test "x$enable_debug" = "xyes"; then
+  CFLAGS="$CFLAGS -g"
+  CXXFLAGS="$CXXFLAGS -g"
+  FFLAGS="$FFLAGS -g"
+  AC_DEFINE([G_DEBUG], [1], [Define if debugging is turned on])
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING(whether to enable profiling)
+AC_ARG_ENABLE(debug,
+              [  --enable-profiling      turn on profiling (default=no)],
+              [enable_profiling="$enableval"])
+if test "x$enable_profiling" = "xyes"; then
+  CFLAGS="$CFLAGS -pg"
+  CXXFLAGS="$CXXFLAGS -pg"
+  FFLAGS="$FFLAGS -pg"
+  AC_DEFINE([G_PROFILE], [1], [Define if profiling is turned on])
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
 # Checks for libraries.
 if test "x$prefix" = xNONE; then
   export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/gamma/lib/pkgconfig"
