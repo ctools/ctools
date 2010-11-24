@@ -16,6 +16,13 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+
 dnl =================================
 dnl Checks for debugging or profiling
 dnl =================================
@@ -50,19 +57,49 @@ else
   AC_MSG_RESULT(no)
 fi
 
-# Checks for libraries.
+
+dnl ====================
+dnl Checks for libraries
+dnl ====================
+
+# Get GammaLib configuration
 if test "x$prefix" = xNONE; then
   export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/gamma/lib/pkgconfig"
 else
   export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$prefix/lib/pkgconfig"
 fi
 PKG_CHECK_MODULES(GammaLib, gammalib >= 0.0,,
-AC_MSG_ERROR(
-[GammaLib library not found. Consider adjusting the PKG_CONFIG_PATH 
-environment variable if you installed GammaLib in a non-standard prefix.]))
+                  AC_MSG_ERROR([GammaLib library not found. Consider adjusting the PKG_CONFIG_PATH 
+                                environment variable if you installed GammaLib in a non-standard prefix.]))
 CFLAGS="$CFLAGS $GammaLib_CFLAGS"
 CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
 LDFLAGS="$LDFLAGS $GammaLib_LIBS"
+
+# Check for GammaLib library and determine path to library
+AC_ARG_WITH([gammalib-lib-dir],
+            AC_HELP_STRING([--with-gammalib-lib-dir],
+                           [GammaLib library directory [[/usr/(local/(gamma/))lib(64)]]]),
+            [gammalib_lib_dir=$withval])
+if test "x$gammalib_lib_dir" != "x"; then
+  test -f $gammalib_lib_dir/libgamma.a -o -f $gammalib_lib_dir/libgamma.so -o -f $gammalib_lib_dir/libgamma.dylib && LIBDIR_GAMMALIB=$gammalib_lib_dir
+else
+  for i in /usr/local/gamma/lib /usr/local/gamma/lib64 /usr/local/lib /usr/local/lib64 /usr/lib /usr/lib64 ; do
+    test -f $i/libgamma.a -o -f $i/libgamma.so -o -f $i/libgamma.dylib && LIBDIR_GAMMALIB=$i
+  done
+fi
+if test -z "$LIBDIR_GAMMALIB"; then
+  if test "x$gammalib_lib_dir" != "x"; then
+    AC_MSG_ERROR(Cannot find GammaLib library under $gammalib_lib_dir)
+  else
+    AC_MSG_ERROR(Cannot find GammaLib library. Use --with-gammalib-lib-dir= to specify non-default path.)
+  fi
+fi
+AC_SUBST(LIBDIR_GAMMALIB)
+
+
+dnl =========================
+dnl Check for Python bindings
+dnl =========================
 
 # Checks for SWIG
 AC_PATH_PROG([SWIG], [swig])
@@ -91,12 +128,33 @@ else
 fi
 AM_CONDITIONAL(ENABLE_PYTHON_BINDING, test "x$ac_enable_python_binding" = "xyes")
 
-# Checks for header files.
 
-# Checks for typedefs, structures, and compiler characteristics.
+dnl ==================
+dnl Build static code?
+dnl ==================
+if test "x$enable_profiling" = "xyes"; then
+  AC_MSG_NOTICE([Link executables statically.])
+  LIB_LINK_OPTION="-all-static"
+else
+  AC_MSG_CHECKING(whether to link executables statically)
+  AC_ARG_ENABLE([static_link],
+                AS_HELP_STRING([--enable-static-link],
+                               [link executables statically (default=no)]),
+                [static_link="$enableval"],
+                [static_link="no"])
+  if test "x$static_link" = "xyes"; then
+    AC_MSG_RESULT(yes)
+    LIB_LINK_OPTION="-all-static"
+  else
+    AC_MSG_RESULT(no)
+  fi
+fi
+AC_SUBST(LIB_LINK_OPTION)
 
-# Checks for library functions.
 
+dnl ==========================
+dnl Create configuration files
+dnl ==========================
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/ctselect/Makefile

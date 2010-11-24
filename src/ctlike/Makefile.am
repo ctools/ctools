@@ -15,15 +15,15 @@ bin_PROGRAMS = ctlike
 # Sources
 sources = ctlike.cpp
 
+# Libtool library (only needed for python bindings)
+noinst_LTLIBRARIES = libctlike.la
+libctlike_la_SOURCES = $(sources)
+
 # Program definition
 ctlike_SOURCES = main.cpp $(sources)
-ctlike_LDFLAGS = @LDFLAGS@
+ctlike_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
 ctlike_CPPFLAGS = @CPPFLAGS@
 
 # Parameter files
 pfilesdir = $(prefix)/syspfiles
 pfiles_DATA = ctlike.par
-
-# Libtool library (only needed for python bindings)
-noinst_LTLIBRARIES = libctlike.la
-libctlike_la_SOURCES = $(sources)
