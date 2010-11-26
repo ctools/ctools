@@ -55,6 +55,8 @@ protected:
 
     // User parameters
     std::string   m_method;     //!< Likelihood fitting method (binned/unbinned)
+    std::string   m_stat;       //!< Optimisation statistics (poisson/gaussian)
+    bool          m_refit;      //!< Refitting
     std::string   m_caldb;      //!< Calibration database
     std::string   m_irf;        //!< Instrument response functions
     std::string   m_srcmdl;     //!< Source model XML file

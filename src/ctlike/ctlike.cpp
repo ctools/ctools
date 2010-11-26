@@ -152,6 +152,8 @@ void ctlike::get_parameters(void)
 {
     // Get standard parameters
     m_method = toupper(par("method")->value());
+    m_stat   = toupper(par("stat")->value());
+    m_refit  = par("refit")->boolean();
     m_caldb  = par("caldb")->value();
     m_irf    = par("irf")->value();
     m_srcmdl = par("srcmdl")->value();
@@ -179,8 +181,8 @@ void ctlike::optimize_lm(void)
 {
     // Allocate optimizer. The logger is only passed to the optimizer
     // constructor if optimizer logging is requested.
-    GOptimizerLM* opt = (logExplicit()) ? new GOptimizerLM(log) 
-                                        : new GOptimizerLM();
+    GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log) 
+                                     : new GOptimizerLM();
     
     // Assign optimizer
     m_opt = opt;
@@ -189,7 +191,7 @@ void ctlike::optimize_lm(void)
     opt->max_iter(m_max_iter);
 
     // Write Header for optimization and indent for optimizer logging
-    if (logExplicit()) {
+    if (logTerse()) {
         log << std::endl;
         log.header1("Maximum likelihood optimisation");
         log.indent(1);
@@ -197,6 +199,10 @@ void ctlike::optimize_lm(void)
     
     // Perform LM optimization
     m_obs.optimize(*m_opt);
+
+    // Optionally refit
+    if (m_refit)
+        m_obs.optimize(*m_opt);
 
     // Get models back
     m_models = *(m_obs.models());
@@ -236,6 +242,7 @@ void ctlike::unbinned(const std::string& evfile)
 {
     // Declare observations
     GCTAObservation run;
+    run.statistics(m_stat);
 
     // DUMMY: Setup ROI covered by data. This is needed since actual test
     // data do not contain any ROI informations.
@@ -282,6 +289,7 @@ void ctlike::binned(const std::string& cntmap)
 {
     // Declare observations
     GCTAObservation run;
+    run.statistics(m_stat);
 
     // Load binned CTA observation
     run.load_binned(cntmap);
