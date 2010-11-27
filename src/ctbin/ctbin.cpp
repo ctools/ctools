@@ -80,8 +80,9 @@ int ctbin::run(void)
     for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
 
         // Determine sky pixel
-        GSkyDir   dir   = ((GCTAInstDir*)event->dir())->skydir();
-        GSkyPixel pixel = map.dir2xy(dir);
+        GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
+        GSkyDir      dir   = inst->skydir();
+        GSkyPixel    pixel = map.dir2xy(dir);
 
         // Skip if pixel is out of range
         if (pixel.x() < -0.5 || pixel.x() > (nx-0.5) ||
@@ -89,7 +90,7 @@ int ctbin::run(void)
             continue;
 
         // Determine energy bin. Skip if we are outside the energy range
-        int index = obs.ebounds()->index(*(event->energy()));
+        int index = obs.ebounds()->index(event->energy());
         if (index == -1)
             continue;
 
