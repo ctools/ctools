@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,10 +30,14 @@
 class ctbin : public GApplication  {
 public:
     // Constructors and destructors
-    ctbin(void) : GApplication(CTBIN_NAME, CTBIN_VERSION) { return; }
+    ctbin(void);
+    ctbin(int argc, char *argv[]);
+    ~ctbin(void);
 
     // Methods
-    int run(void);
+    void run(void);
+    void get_parameters(void);
+    void bin(void);
 };
 
 
