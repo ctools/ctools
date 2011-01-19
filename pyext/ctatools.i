@@ -18,6 +18,7 @@
 /***********************************************************************//**
  * @brief Include all CTA tools
  ***************************************************************************/
+#include "ctobssim.i"
 #include "ctselect.i"
 #include "ctbin.i"
 #include "ctlike.i"

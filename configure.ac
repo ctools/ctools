@@ -160,6 +160,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctselect/Makefile
                  src/ctbin/Makefile
                  src/ctlike/Makefile
+                 src/ctobssim/Makefile
                  pyext/Makefile
                  pyext/setup.py])
 AC_OUTPUT
