@@ -113,6 +113,10 @@ void ctbin::run(void)
     // Bin data
     bin();
 
+    // Write separator into logger
+    if (logTerse())
+        log << std::endl;
+
     // Return
     return;
 }
@@ -146,7 +150,7 @@ void ctbin::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Run gtbin application
+ * @brief Bin the data
  ***************************************************************************/
 void ctbin::bin(void)
 {
@@ -161,15 +165,8 @@ void ctbin::bin(void)
     emax.TeV(m_emax);
     obs.ebounds()->setlog(emin, emax, m_enumbins);
 
-    // Setup time range covered by data
-    GTime tstart;
-    GTime tstop;
-    tstart.met(0.0);
-    tstop.met(10000.0);
-    obs.gti()->add(tstart, tstop);
-
     // Log observation
-    if (logExplicit()) {
+    if (logTerse()) {
         log << std::endl;
         log.header1("Observation");
         log << obs << std::endl;
@@ -180,6 +177,11 @@ void ctbin::bin(void)
                           m_xref, m_yref, m_binsz, m_binsz,
                           m_nxpix, m_nypix, m_enumbins);
 
+    // Initialise binning statistics
+    int num_outside_map  = 0;
+    int num_outside_ebds = 0;
+    int num_in_map       = 0;
+    
     // Fill sky map
     GCTAEventList* events = (GCTAEventList*)obs.events();
     for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
@@ -191,18 +193,37 @@ void ctbin::bin(void)
 
         // Skip if pixel is out of range
         if (pixel.x() < -0.5 || pixel.x() > (m_nxpix-0.5) ||
-            pixel.y() < -0.5 || pixel.y() > (m_nypix-0.5))
+            pixel.y() < -0.5 || pixel.y() > (m_nypix-0.5)) {
+            num_outside_map++;
             continue;
+        }
 
         // Determine energy bin. Skip if we are outside the energy range
         int index = obs.ebounds()->index(event->energy());
-        if (index == -1)
+        if (index == -1) {
+            num_outside_ebds++;
             continue;
+        }
 
         // Fill event in skymap
         map(pixel, index) += 1.0;
+        num_in_map++;
         
     } // endfor: looped over all events
+
+    // Log binning results
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Binning");
+        log << parformat("Events in list");
+        log << obs.events()->size() << std::endl;
+        log << parformat("Events in map");
+        log << num_in_map << std::endl;
+        log << parformat("Events outside map area");
+        log << num_outside_map << std::endl;
+        log << parformat("Events outside energy bins");
+        log << num_outside_ebds << std::endl;
+    }
 
     // Log observation
     if (logTerse()) {
