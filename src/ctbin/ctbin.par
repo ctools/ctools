@@ -1,7 +1,5 @@
 #############################################################################
 #                                                                           #
-#               Centre d'Etude Spatiale des Rayonnements                    #
-#                                                                           #
 #                       CTA Science Analysis Tools                          #
 #                                                                           #
 # ------------------------------------------------------------------------- #
@@ -11,7 +9,7 @@
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             knodlseder@cesr.fr                                            #
-#             CESR                                                          #
+#             IRAP                                                          #
 #                                                                           #
 #  Purpose:   Parameter file for the ctbin application                      #
 #                                                                           #
@@ -19,7 +17,7 @@
 #
 # General parameters
 #===================
-evfile,  f, a, "../gammalib/inst/cta/test/data/run_00006028_eventlist_reco.fits.gz",,,"Event data file name"
+evfile,  f, a, "test/data/crab_events.fits.gz",,,"Event data file name"
 outfile, f, a, "cntmap.fits",,, "Output file name"
 #
 # Energy binning parameters

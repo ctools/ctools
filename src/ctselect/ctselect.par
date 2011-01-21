@@ -9,7 +9,7 @@
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             knodlseder@cesr.fr                                            #
-#             CESR                                                          #
+#             IRAP                                                          #
 #                                                                           #
 #  Purpose:   Parameter file for the ctselect application                   #
 #                                                                           #
@@ -17,7 +17,7 @@
 #
 # File information
 #=================
-infile, f, a, "test/data/run_00006028_eventlist_reco.fits.gz",,,"Input event data file"
+infile, f, a, "test/data/crab_events.fits.gz",,,"Input event data file"
 outfile,f, a, "evfile.fits",,,"Output event data file"
 #
 # Selection parameters

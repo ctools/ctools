@@ -9,7 +9,7 @@
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             knodlseder@cesr.fr                                            #
-#             CESR                                                          #
+#             IRAP                                                          #
 #                                                                           #
 #  Purpose:   Parameter file for the ctlike application                     #
 #                                                                           #
@@ -17,21 +17,21 @@
 #
 # Unbinned analysis
 #==================
-evfile, f, a, "test/data/run_00006028_eventlist_reco.fits.gz",,,"Event data file name"
+evfile, f, a, "test/data/crab_events.fits.gz",,,"Event data file name"
 #
 # Binned analysis
 #==================
-cntmap, f, a, "test/data/run_00006028_cntmap.fits.gz",,, "Counts map"
+cntmap, f, a, "test/data/crab_cntmap.fits.gz",,, "Counts map"
 #
 # General parameters
 #===================
-method, s, a, "UNBINNED",,,              "Maximum likelihood method"
-stat,   s, a, "POISSON",,,               "Optimization statistics"
-refit,  b, a,        no,,,               "Do refitting?"
-caldb,  s, a, "test/irf",,,              "Calibration database"
-irf,    s, a, "kb_E_50h_v3",,,           "Instrument response function"
-srcmdl, f, a, "test/data/source1.xml",,, "Source model"
-outmdl, f, h, "ctlike_results.xml",,,    "Source model output file"
+method, s, a, "UNBINNED",,,           "Maximum likelihood method"
+stat,   s, a, "POISSON",,,            "Optimization statistics"
+refit,  b, a,        no,,,            "Do refitting?"
+caldb,  s, a, "test/irf",,,           "Calibration database"
+irf,    s, a, "kb_E_50h_v3",,,        "Instrument response function"
+srcmdl, f, a, "test/data/crab.xml",,, "Source model"
+outmdl, f, h, "crab_results.xml",,,   "Source model output file"
 #
 # Standard parameters
 #====================
