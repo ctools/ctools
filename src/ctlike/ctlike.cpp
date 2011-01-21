@@ -248,7 +248,7 @@ void ctlike::unbinned(const std::string& evfile)
     // data do not contain any ROI informations.
     GCTAInstDir instDir;
     GCTARoi     roi;
-    instDir.radec_deg(117.02, -33.35);  // Adapt to file
+    instDir.radec_deg(83.6331, 22.0145);  // Adapt to file
     roi.centre(instDir);
     roi.radius(2.5);
 
@@ -256,22 +256,15 @@ void ctlike::unbinned(const std::string& evfile)
     // test data do not contain any energy range information
     GEnergy emin;
     GEnergy emax;
-    emin.TeV(0.02);
+    emin.TeV(0.1);
     emax.TeV(100.0);
-
-    // DUMMY: Setup time range covered by data. This is needed since actual
-    // test data do not contain any time range information
-    GTime tstart;
-    GTime tstop;
-    tstart.met(0.0);
-    tstop.met(10000.0);
 
     // Load data and response and set ROI, energy range and time range
     // for analysis
     run.load_unbinned(evfile);
     run.response(m_irf, m_caldb);
     run.roi(roi);
-    run.gti()->add(tstart, tstop);
+    //run.gti()->add(tstart, tstop);
     run.ebounds()->append(emin, emax);
     m_obs.append(run);
 
