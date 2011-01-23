@@ -201,8 +201,33 @@ GPhotons ctobssim::simulate_photons(void)
     // Load models
     GModels models(m_infile);
 
-    // Simulate photons
-    GPhotons photons = models.mc(m_area, dir, m_rad, emin, emax, tmin, tmax, m_ran);
+    // Allocate photons
+    GPhotons photons;
+
+    // Simulate photons for all sky models
+    for (int i = 0; i < models.size(); ++i) {
+
+        // Get sky model (NULL if not a sky model)
+        GModelSky* model = dynamic_cast<GModelSky*>(models(i));
+
+        // If we have a sky model then simulate photons
+        if (model != NULL) {
+
+            // Get photons
+            GPhotons p = model->mc(m_area, dir, m_rad, emin, emax, tmin, tmax, m_ran);
+
+            // Reserve new space for photons
+            photons.reserve(photons.size() + p.size());
+        
+            // Add photons to list
+            for (int k = 0; k < p.size(); ++k) {
+                p[k].mcid(i);
+                photons.push_back(p[k]);
+            }
+
+        } // endif: model was a sky model
+
+    } // endfor: looped over models
 
     // Dump simulation results
     if (logNormal()) {
