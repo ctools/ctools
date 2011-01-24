@@ -254,18 +254,19 @@ void ctlike::unbinned(const std::string& evfile)
 
     // DUMMY: Setup energy range covered by data. This is needed since actual
     // test data do not contain any energy range information
-    GEnergy emin;
-    GEnergy emax;
+    GEnergy  emin;
+    GEnergy  emax;
+    GEbounds ebds;
     emin.TeV(0.1);
     emax.TeV(100.0);
+    ebds.append(emin, emax);
 
     // Load data and response and set ROI, energy range and time range
     // for analysis
     run.load_unbinned(evfile);
     run.response(m_irf, m_caldb);
     run.roi(roi);
-    //run.gti()->add(tstart, tstop);
-    run.ebounds()->append(emin, emax);
+    run.ebounds(ebds);
     m_obs.append(run);
 
     // Return

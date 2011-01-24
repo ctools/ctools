@@ -159,11 +159,13 @@ void ctbin::bin(void)
     obs.load_unbinned(m_evfile);
 
     // Setup energy range covered by data
-    GEnergy emin;
-    GEnergy emax;
+    GEnergy  emin;
+    GEnergy  emax;
+    GEbounds ebds;
     emin.TeV(m_emin);
     emax.TeV(m_emax);
-    obs.ebounds()->setlog(emin, emax, m_enumbins);
+    ebds.setlog(emin, emax, m_enumbins);
+    obs.ebounds(ebds);
 
     // Log observation
     if (logTerse()) {
@@ -199,7 +201,7 @@ void ctbin::bin(void)
         }
 
         // Determine energy bin. Skip if we are outside the energy range
-        int index = obs.ebounds()->index(event->energy());
+        int index = obs.ebounds().index(event->energy());
         if (index == -1) {
             num_outside_ebds++;
             continue;
@@ -235,8 +237,8 @@ void ctbin::bin(void)
     // Save counts map
     GFits file;
     map.write(&file);
-    obs.ebounds()->write(&file);
-    obs.gti()->write(&file);
+    obs.ebounds().write(&file);
+    obs.gti().write(&file);
     file.saveto(m_outfile, clobber());
 
     // Return
