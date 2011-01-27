@@ -227,19 +227,21 @@ void ctbin::bin(void)
         log << num_outside_ebds << std::endl;
     }
 
-    // Log observation
+    // Log map
     if (logTerse()) {
         log << std::endl;
         log.header1("Counts map");
         log << map << std::endl;
     }
-    
-    // Save counts map
-    GFits file;
-    map.write(&file);
-    obs.ebounds().write(&file);
-    obs.gti().write(&file);
-    file.saveto(m_outfile, clobber());
+
+    // Create events cube from sky map
+    GCTAEventCube cube(map);
+
+    // Replace event list by event cube in observation
+    obs.events(&cube);
+
+    // Save observation
+    obs.save(m_outfile, clobber());
 
     // Return
     return;

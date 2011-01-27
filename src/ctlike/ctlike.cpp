@@ -104,6 +104,7 @@ ctlike::~ctlike(void)
  ***************************************************************************/
 void ctlike::run(void)
 {
+    log.cout(true);
     // Get parameters
     get_parameters();
 
@@ -118,6 +119,13 @@ void ctlike::run(void)
         unbinned(m_evfile);
     else
         binned(m_cntmap);
+
+    // Write observation into logger
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Observation");
+        log << m_obs << std::endl;
+    }
 
     // Setup models for optimizing.
     m_models = GModels(m_srcmdl);
@@ -265,7 +273,7 @@ void ctlike::unbinned(const std::string& evfile)
     // for analysis
     run.load_unbinned(evfile);
     run.response(m_irf, m_caldb);
-    run.roi(roi);
+    run.roi(&roi);
     run.ebounds(ebds);
     m_obs.append(run);
 

@@ -108,6 +108,9 @@ void ctobssim::run(void)
     if (logTerse()) {
         log_parameters();
         log << std::endl;
+        log << m_pnt << std::endl;
+        log << m_obs << std::endl;
+        log << m_models << std::endl;
     }
 
     // Write header
@@ -174,6 +177,36 @@ void ctobssim::get_parameters(void)
     // Initialise random number generator
     m_ran.seed(m_seed);
 
+    // Set CTA pointing
+    GSkyDir dir;
+    dir.radec_deg(m_ra, m_dec);
+    m_pnt.dir(dir);
+
+    // Set GTI
+    GGti  gti;
+    GTime tstart;
+    GTime tstop;
+    tstart.met(m_tmin);
+    tstop.met(m_tmax);
+    gti.append(tstart, tstop);
+
+    // Set energy boundaries
+    GEbounds ebds;
+    GEnergy  emin;
+    GEnergy  emax;
+    emin.TeV(m_emin);
+    emax.TeV(m_emax);
+    ebds.append(emin, emax);
+
+    // Set observation
+    m_obs.ebounds(ebds);
+    m_obs.gti(gti);
+    m_obs.response(m_irf, m_caldb);
+    m_obs.pointing(m_pnt);
+
+    // Load models
+    m_models.load(m_infile);
+
     // Return
     return;
 }
@@ -198,17 +231,14 @@ GPhotons ctobssim::simulate_photons(void)
     tmin.met(m_tmin);
     tmax.met(m_tmax);
 
-    // Load models
-    GModels models(m_infile);
-
     // Allocate photons
     GPhotons photons;
 
     // Simulate photons for all sky models
-    for (int i = 0; i < models.size(); ++i) {
+    for (int i = 0; i < m_models.size(); ++i) {
 
         // Get sky model (NULL if not a sky model)
-        GModelSky* model = dynamic_cast<GModelSky*>(models(i));
+        GModelSky* model = dynamic_cast<GModelSky*>(m_models(i));
 
         // If we have a sky model then simulate photons
         if (model != NULL) {
@@ -260,21 +290,15 @@ GPhotons ctobssim::simulate_photons(void)
  ***************************************************************************/
 GCTAEventList* ctobssim::simulate_events(const GPhotons& photons)
 {
-    // Setup CTA response
-    GCTAResponse rsp(m_irf, m_caldb);
-
-    // Setup CTA pointing
-    GCTAPointing pnt;
-
     // Allocate CTA event list
     GCTAEventList* events = new GCTAEventList;
 
     // Reserves space for events
     events->reserve(photons.size());
 
-    // Simulate events
+    // Simulate events from photons
     for (int i = 0; i < photons.size(); ++i) {
-        GCTAEventAtom* event = rsp.mc(m_area, photons[i], pnt, m_ran);
+        GCTAEventAtom* event = m_obs.response()->mc(m_area, photons[i], m_pnt, m_ran);
         if (event != NULL)
             events->append(*event);
         delete event;
@@ -282,8 +306,42 @@ GCTAEventList* ctobssim::simulate_events(const GPhotons& photons)
 
     // Dump simulation results
     if (logNormal()) {
-        log << parformat("Simulated events") << str(events->size()) << std::endl;
+        log << parformat("MC source events");
+        log << str(events->size()) << std::endl;
     }
+
+    // Simulate background events
+    for (int i = 0; i < m_models.size(); ++i) {
+
+        // Get model (NULL if not a radial acceptance model)
+        GCTAModelRadialAcceptance* model = 
+                 dynamic_cast<GCTAModelRadialAcceptance*>(m_models(i));
+
+        // If we have a radial acceptance model then simulate events
+        if (model != NULL) {
+
+            // Get simulated event list
+            GCTAEventList* list = model->mc(m_obs, m_ran);
+
+            // Reserves space for events
+            events->reserve(list->size()+events->size());
+
+            // Append events
+            for (int k = 0; k < list->size(); k++)
+                events->append(*(list->pointer(k)));
+
+            // Dump simulation results
+            if (logNormal()) {
+                log << parformat("MC background events");
+                log << str(list->size()) << std::endl;
+            }
+
+            // Free event list
+            delete list;
+
+        } // endif: model was valid
+
+    } // endfor: looped over all models
 
     // Return event list
     return events;
@@ -353,9 +411,13 @@ void ctobssim::set_events_keywords(GFits* file)
     hdu->card("ONTIME",   m_tmax-m_tmin, "[s] Total good time including deadtime");
     hdu->card("LIVETIME", m_tmax-m_tmin, "[s] Total livetime");
 
+    // Set target information
+    //hdu->card("RA_OBJ",  m_ra,  "[deg] Target Right Ascension");
+    //hdu->card("DEC_OBJ", m_dec, "[deg] Target Declination");
+
     // Set pointing information
-    hdu->card("RA_OBJ",  m_ra,  "[deg] Target Right Ascension");
-    hdu->card("DEC_OBJ", m_dec, "[deg] Target Declination");
+    hdu->card("RA_PNT",  m_ra,  "[deg] Pointing Right Ascension");
+    hdu->card("DEC_PNT", m_dec, "[deg] Pointing Declination");
 
     // Return
     return;
@@ -378,6 +440,8 @@ void ctobssim::init_members(void)
     m_outfile.clear();
     m_caldb.clear();
     m_irf.clear();
+    m_obs.clear();
+    m_pnt.clear();
     m_seed =   1;
     m_ra   = 0.0;
     m_dec  = 0.0;

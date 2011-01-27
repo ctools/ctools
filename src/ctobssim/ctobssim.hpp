@@ -54,20 +54,23 @@ protected:
     void free_members(void);
 
     // User parameters
-    std::string m_infile;     //!< Input model
-    std::string m_outfile;    //!< Output events file
-    std::string m_caldb;      //!< Calibration database repository
-    std::string m_irf;        //!< Instrument response function
-    int         m_seed;       //!< Random number generator seed 
-    double      m_ra;         //!< RA of ROI centre
-    double      m_dec;        //!< DEC of ROI centre
-    double      m_rad;        //!< ROI radius
-    double      m_tmin;       //!< Start time (MET)
-    double      m_tmax;       //!< Stop time (MET)
-    double      m_emin;       //!< Lower energy (TeV)
-    double      m_emax;       //!< Upper energy (TeV)
-    double      m_area;       //!< Surface area for simulation (cm2)
-    GRan        m_ran;        //!< Random number generator
+    std::string     m_infile;     //!< Input model
+    std::string     m_outfile;    //!< Output events file
+    std::string     m_caldb;      //!< Calibration database repository
+    std::string     m_irf;        //!< Instrument response function
+    int             m_seed;       //!< Random number generator seed 
+    double          m_ra;         //!< RA of pointing direction
+    double          m_dec;        //!< DEC of pointing direction
+    double          m_rad;        //!< FOV radius
+    double          m_tmin;       //!< Start time (MET)
+    double          m_tmax;       //!< Stop time (MET)
+    double          m_emin;       //!< Lower energy (TeV)
+    double          m_emax;       //!< Upper energy (TeV)
+    double          m_area;       //!< Surface area for simulation (cm2)
+    GRan            m_ran;        //!< Random number generator
+    GCTAPointing    m_pnt;        //!< CTA pointing
+    GCTAObservation m_obs;        //!< CTA observation
+    GModels         m_models;     //!< Models
 };
 
 #endif /* CTOBSSIM_HPP */
