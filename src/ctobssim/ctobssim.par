@@ -28,9 +28,9 @@ irf,    s, a, "kb_E_50h_v3",,, "Instrument response function"
 # Simulation parameters
 #======================
 seed,   i, h,        1,    ,   , "Random number generator seed"
-ra,     r, a,    83.63,   0,360, "RA for ROI centre (degrees)"
-dec,    r, a,    22.01, -90, 90, "Dec for ROI centre (degrees)"
-rad,    r, a,    10.0,    0,180, "Radius of ROI (degrees)"
+ra,     r, a,    83.63,   0,360, "RA of pointing (degrees)"
+dec,    r, a,    22.01, -90, 90, "Dec of pointing (degrees)"
+rad,    r, a,    10.0,    0,180, "Radius of FOV (degrees)"
 tmin,   r, a,     0.0,    0,   , "Start time (MET in s)"
 tmax,   r, a,  1800.0,    0,   , "End time (MET in s)"
 emin,   r, a,     0.1,    0,   , "Lower energy limit (TeV)"
