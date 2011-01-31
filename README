@@ -1,49 +1,114 @@
-This is GammaLib version 0.2.0
-==============================
+ctatools information
+====================
+Version:             01-00-00 (January 31, 2011)
+Author:              Juergen Knodlseder (knodlseder@cesr.fr)
+GammaLib dependency: 00-04-05
 
 
 License information
--------------------
-
-To be writted ...
+===================
+To be written ...
 
 
 What's new in this release?
----------------------------
+===========================
+See the files "NEWS" and "ChangeLog".
 
-See the file "NEWS".
 
+What are the ctatools anyway?
+=============================
+ctatools are ftools-like executable for the scientific analysis of
+CTA observations. They are based on GammaLib, a vesatile toolbox 
+for the high-level analysis of astronomical gamma-ray data.
 
-What is the GammaLib anyway?
-----------------------------
+The following tools are so far available:
 
-The GammaLib is a vesatile toolbox for the high-level analysis of
-astronomical gamma-ray data. It is implemented as a C++ library 
-that is fully scriptable in the Python scripting language. The library
-provides core functionalities such as data input and output, interfaces
-for parameter specifications, and a reporting and logging interface.
-It implements instruments specific functionalities such as instrument
-response functions and data formats. Instrument specific functionalities
-share a common interface to allow for extension of the GammaLib to 
-include new gamma-ray instruments. The GammaLib provides an abstract 
-data analysis framework that enables simultaneous multi-mission analysis.
+    ctobssim - simulation of CTA observations
+    ctselect - event selection
+    ctbin    - event binning
+    ctlike   - maximum likelihood model fitting
 
 
 Web sites
----------
+=========
+http://gammalib.sourceforge.net            - for GammaLib documentation
+https://sourceforge.net/projects/gammalib/ - for GammaLib downloads
 
-http://gammalib.sourceforge.net
+
+Prerequisites
+=============
+ctatools require GammaLib. Please refer to http://gammalib.sourceforge.net
+for instructions about how to install GammaLib. The GammaLib code can
+be downloaded from https://sourceforge.net/projects/gammalib/.
+
+Once GammaLib is properly installed, make sure that the environment
+variables are set correctly:
+
+    export PYTHONPATH=/usr/local/gamma/lib/python2.5/site-packages:$PYTHONPATH    export LD_LIBRARY_PATH=/usr/local/gamma/lib:$LD_LIBRARY_PATH    export PKG_CONFIG_PATH=/usr/local/gamma/lib/pkgconfig:$PKG_CONFIG_PATH
+
+This is needed as GammaLib is installed by default in /usr/local/gamma and
+not in /usr/local (this may be reconsidered eventually).
+
+
+Unix Installation
+=================
+To build and install ctatools, simply type the following:
+
+     % ./configure
+     % make
+     % make install
+
+By default ctatools installs itself in /usr/local/gamma.  If you need to
+install ctatools in a different location or in your home directory, use
+the --prefix option to ./configure.  For example:
+
+     % ./configure --prefix=/home/yourname/projects
+     % make
+     % make install
+
+The file INSTALL details more about using configure. Also try
+
+     % ./configure --help.
+
+
+Macintosh OS X Installation
+============================
+ctatools are known to work on various flavors of OS X.  Follow the Unix
+installation instructions above.
+
+
+Solaris Installation
+====================
+ctatools compile on Solairs, but there is an issue with using it as a
+shared library (see "Known problems" below).
+
+
+Getting started
+===============
+To be written ...
+
+
+Documentation
+=============
+To be written ...
 
 
 Bug reports
------------
+===========
+To be written ...
 
-To report or search for bugs, please use the GammaLib Bug Tracker at
-https://sourceforge.net/tracker/?group_id=282143&atid=1196795.
+
+Known problems
+==============
+Solaris
+  Although ctatools compile on Solaris using the Sun compiler, there are
+  problems with global symbols in the shared GammaLib library that prevent
+  the model registry to work correctly. Furthermore, GammaLib is not able
+  to catch its own exceptions, which prevents the FITS interface to work
+  correctly. If GammaLib is linked statically
 
 
 Contact
--------
-
-To get in touch with the GammaLib developers and to contribute to the
+=======
+To get in touch with the ctatools developers and to contribute to the
 project please contact Juergen Knoedlseder <knodlseder@cesr.fr>.
