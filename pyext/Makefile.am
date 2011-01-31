@@ -1,15 +1,28 @@
 ## Process this file with automake to produce Makefile.in
+#
+# The actual implemented logic is to use swig if swig is
+# available on the system
 
-if HAVE_SWIG
-if HAVE_PYTHON
 if ENABLE_PYTHON_BINDING
+if HAVE_PYTHON
+if WITH_PYTHON_BINDING
 
+# Set SWIG interface filename
 SWIG_INTERFACE = ctatools.i
-BUILT_SOURCES = ctatools_wrap.cpp ctatools.py
-CLEANFILES = ctatools_wrap.cpp ctatools.py
+
+# Define the targets that should be built before anything else.
+# These are honored by 'make all', 'make check' and 'make install'.
+if HAVE_SWIG
+  BUILT_SOURCES = ctatools_wrap.cpp ctatools.py
+endif
+
+# Set files to be removed in clean
+if HAVE_SWIG
+  CLEANFILES = ctatools_wrap.cpp ctatools.py
+endif
 
 all-local: ctatools_wrap.cpp ctatools.py
-	$(PYTHON) setup.py build
+	$(PYTHON_BUILD_PREFIX) $(PYTHON) setup.py build
 
 install-exec-local:
 	$(PYTHON) setup.py install --prefix=$(prefix)
@@ -17,13 +30,11 @@ install-exec-local:
 clean-local:
 	rm -rf build
 	
+if HAVE_SWIG
 ctatools_wrap.cpp ctatools.py: $(SWIG_INTERFACE)
 	$(SWIG) -c++ -python -Wall -includeall -I$(prefix)/share/gammalib/swig -o ctatools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
-	@if test "x`uname`" = "xCygwin"; then \
-		echo "WARNING: working around bug in SWIG on Windows/Cygwin platforms ONLY"; \
-		sed -i.bak -f $(srcdir)/fix_wrapper.sed ctatools_wrap.cpp; \
-	fi
-
-endif # ENABLE_PYTHON_BINDING
-endif # HAVE_PYTHON
 endif # HAVE_SWIG
+
+endif # WITH_PYTHON_BINDING
+endif # HAVE_PYTHON
+endif # ENABLE_PYTHON_BINDING

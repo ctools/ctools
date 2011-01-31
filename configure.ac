@@ -1,26 +1,62 @@
-dnl =============================================================
-dnl Process this file with autoconf to produce a configure script
-dnl =============================================================
-AC_INIT([ctatools], [0.1.0], [knodlseder@cesr.fr])
+# Configuration for ctatools - a set of tools for science analysis of CTA data
+#
+# Copyright (C) 2011
+#
+# Process this file with autoconf to produce a configure script
+
+AC_INIT([ctatools], [0.1.0], [knodlseder@cesr.fr], [ctatools], [])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 
-# Set prefix
-AC_PREFIX_DEFAULT([/usr/local/gamma])
-AC_DEFINE([PREFIX], [$prefix], 'Installation prefix')
 
-# Checks for programs.
+dnl ==========
+dnl Set prefix
+dnl ==========
+AC_PREFIX_DEFAULT([/usr/local/gamma])
+if test "x$prefix" = xNONE; then
+  AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], ["/usr/local/gamma"],
+                     [Location where library is installed])
+else
+  AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${prefix}",
+                     [Location where library is installed])
+fi
+
+
+dnl ===========================
+dnl things required by automake
+dnl ===========================
+dnl AC_ARG_PROGRAM
+AC_PROG_MAKE_SET
+
+
+dnl =========================
+dnl Check for system services
+dnl =========================
+AC_CANONICAL_HOST
+
+
+dnl =======================
+dnl Checks for header files
+dnl =======================
+AC_STDC_HEADERS
+
+
+dnl =============================================================
+dnl Checks for typedefs, structures, and compiler characteristics
+dnl =============================================================
+AC_TYPE_SIZE_T
+AC_C_CONST
+AC_C_INLINE
+
+
+dnl ===================
+dnl Checks for programs
+dnl ===================
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
-
-# Checks for header files.
-
-# Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
 
 
 dnl =================================
@@ -76,57 +112,100 @@ CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
 LDFLAGS="$LDFLAGS $GammaLib_LIBS"
 
 # Check for GammaLib library and determine path to library
-AC_ARG_WITH([gammalib-lib-dir],
-            AC_HELP_STRING([--with-gammalib-lib-dir],
-                           [GammaLib library directory [[/usr/(local/(gamma/))lib(64)]]]),
-            [gammalib_lib_dir=$withval])
-if test "x$gammalib_lib_dir" != "x"; then
-  test -f $gammalib_lib_dir/libgamma.a -o -f $gammalib_lib_dir/libgamma.so -o -f $gammalib_lib_dir/libgamma.dylib && LIBDIR_GAMMALIB=$gammalib_lib_dir
-else
-  for i in /usr/local/gamma/lib /usr/local/gamma/lib64 /usr/local/lib /usr/local/lib64 /usr/lib /usr/lib64 ; do
-    test -f $i/libgamma.a -o -f $i/libgamma.so -o -f $i/libgamma.dylib && LIBDIR_GAMMALIB=$i
-  done
-fi
-if test -z "$LIBDIR_GAMMALIB"; then
-  if test "x$gammalib_lib_dir" != "x"; then
-    AC_MSG_ERROR(Cannot find GammaLib library under $gammalib_lib_dir)
-  else
-    AC_MSG_ERROR(Cannot find GammaLib library. Use --with-gammalib-lib-dir= to specify non-default path.)
-  fi
-fi
-AC_SUBST(LIBDIR_GAMMALIB)
+#AC_ARG_WITH([gammalib-lib-dir],
+#            AC_HELP_STRING([--with-gammalib-lib-dir],
+#                           [GammaLib library directory [[/usr/(local/(gamma/))lib(64)]]]),
+#            [gammalib_lib_dir=$withval])
+#if test "x$gammalib_lib_dir" != "x"; then
+#  test -f $gammalib_lib_dir/libgamma.a -o -f $gammalib_lib_dir/libgamma.so -o -f $gammalib_lib_dir/libgamma.dylib && LIBDIR_GAMMALIB=$gammalib_lib_dir
+#else
+#  for i in /usr/local/gamma/lib /usr/local/gamma/lib64 /usr/local/lib /usr/local/lib64 /usr/lib /usr/lib64 ; do
+#    test -f $i/libgamma.a -o -f $i/libgamma.so -o -f $i/libgamma.dylib && LIBDIR_GAMMALIB=$i
+#  done
+#fi
+#if test -z "$LIBDIR_GAMMALIB"; then
+#  if test "x$gammalib_lib_dir" != "x"; then
+#    AC_MSG_ERROR(Cannot find GammaLib library under $gammalib_lib_dir)
+#  else
+#    AC_MSG_ERROR(Cannot find GammaLib library. Use --with-gammalib-lib-dir= to specify non-default path.)
+#  fi
+#fi
+#AC_SUBST(LIBDIR_GAMMALIB)
 
 
-dnl =========================
-dnl Check for Python bindings
-dnl =========================
+dnl ========================================================================
+dnl Checks for python binding. Python binding requires Python and either the
+dnl files gammalib_wrap.cpp and gammalib.py or SWIG to create these files.
+dnl The following conditionals are set:
+dnl  HAVE_PYTHON           - Python >= 2.2 is available
+dnl  HAVE_SWIG             - swig is available
+dnl  ENABLE_PYTHON_BINDING - Python binding is requested
+dnl  WITH_PYTHON_BINDING   - Either has swig or python wraper files
+dnl ========================================================================
+# Checks for Python (HAVE_PYTHON)
+AM_PATH_PYTHON([2.2],
+               [],
+               [AC_MSG_WARN([Python not found. Python is required to build python binding. Python can be obtained from http://www.python.org])])
+AM_CONDITIONAL(HAVE_PYTHON, test "$PYTHON")
 
-# Checks for SWIG
+# Checks for SWIG (HAVE_SWIG)
 AC_PATH_PROG([SWIG], [swig])
 AM_CONDITIONAL(HAVE_SWIG, test "$SWIG")
 
-# Checks for Python
-AM_PATH_PYTHON([2.2],
-	       [],
-	       [AC_MSG_WARN([Python not found. Python is required to build python binding. Python can be obtained from http://www.python.org])])
-AM_CONDITIONAL(HAVE_PYTHON, test "$PYTHON")
-
+# Python binding enabled?
 AC_ARG_ENABLE([python-binding],
-	      AS_HELP_STRING([--enable-python-binding],
-			     [build python binding (default=yes)]),
-			     [ac_enable_python_binding=no],
-			     [ac_enable_python_binding=yes])
-if test "x$ac_enable_python_binding" = "xyes"
-then
-    if test ! "$SWIG" -a ! "$PYTHON"
-    then
-	AC_MSG_WARN([Python binding for ctatools cannot be built. Ensure that SWIG and Python packages are available.])
-    fi
-else
-    AC_MSG_NOTICE([Python binding for ctatools will not be built.])
-    AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
-fi
+              AS_HELP_STRING([--enable-python-binding],
+                             [build python binding (default=yes)]),
+              [ac_enable_python_binding="$enableval"],
+              [ac_enable_python_binding="yes"])
 AM_CONDITIONAL(ENABLE_PYTHON_BINDING, test "x$ac_enable_python_binding" = "xyes")
+
+# Checks for ctatools_wrap.cpp and ctatools.py
+AC_CHECK_FILES([pyext/ctatools_wrap.cpp pyext/ctatools.py],,)
+has_python_wrap="no"
+if test "x$ac_cv_file_pyext_ctatools_wrap_cpp" = "xyes"; then
+  if test "x$ac_cv_file_pyext_ctatools_py" = "xyes"; then
+    has_python_wrap="yes"
+  fi
+fi
+AM_CONDITIONAL(WITH_PYTHON_BINDING, test "x$has_python_wrap" = "xyes" -o "$SWIG")
+
+# Inform about missing components and set host dependent variables
+if test "x$ac_enable_python_binding" = "xyes"; then
+  if test "$PYTHON"; then
+    if test "x$has_python_wrap" != "xyes"; then
+      if test ! "$SWIG"; then
+        AC_MSG_WARN([Neither pyext/ctatools_wrap.cpp and pyext/ctatools.py nor swig has not been found])
+        AC_MSG_WARN([Python binding for ctatools cannot be built])
+        AC_MSG_WARN([Either use a ctatools distribution with ctatools_wrap.cpp and ctatools.py shipped or install swig on your system])
+        AC_MSG_WARN([swig can be obtained from http://www.swig.org/])
+      fi
+    fi
+
+    # Set host specific build prefix (needed for Solaris pycc bug)
+    PYTHON_BUILD_PREFIX=
+    case $host in
+      sparc*-sun-solaris*)  PYTHON_BUILD_PREFIX="CC=CC" ;;
+      *)                    PYTHON_BUILD_PREFIX="" ;;
+    esac                    
+    AC_SUBST(PYTHON_BUILD_PREFIX)
+    
+    # Set host specific extra libraries. Add all host specific libraries here that
+    # need to be linked in the python module
+    PYTHON_EXTRA_LIBS=
+    case $host in
+      sparc*-sun-solaris*)  PYTHON_EXTRA_LIBS="Cstd" ;;
+      *)                    PYTHON_EXTRA_LIBS="" ;;
+    esac                    
+    AC_SUBST(PYTHON_EXTRA_LIBS)
+
+  else
+    AC_MSG_WARN([Python binding for ctatools cannot be built as Python seems not to be installed on your system])
+  fi
+else
+  AC_MSG_NOTICE([Python binding for ctatools will not be built])
+  AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
+fi
 
 
 dnl ==================
@@ -164,3 +243,40 @@ AC_CONFIG_FILES([Makefile
                  pyext/Makefile
                  pyext/setup.py])
 AC_OUTPUT
+
+
+dnl ===========================
+dnl Print configuration summary
+dnl ===========================
+echo
+echo "  ctatools configuration summary"
+echo "  =============================="
+if test ! "$SWIG"; then
+  echo "  - swig                         (no)"
+else
+  echo "  * swig                         (yes)"
+fi
+if test "x$ac_enable_python_binding" = "xyes"; then
+  if test "$PYTHON"; then
+    if test "x$has_python_wrap" = "xyes"; then
+      if test ! "$SWIG"; then
+        echo "  * Python binding               (yes)"
+      else
+        echo "  * Python binding               (yes)   use swig for updates"
+      fi
+    else
+      if test ! "$SWIG"; then
+        echo "  - Python binding               (no)    swig not installed"
+      else
+        echo "  * Python binding               (yes)   use swig for building"
+      fi
+    fi
+  else
+    echo "  - Python binding               (no)    python not installed"
+  fi
+else
+  echo "  - Python binding               (no)"
+fi
+echo
+echo "Now type 'make'"
+echo
