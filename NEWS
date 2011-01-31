@@ -1,1 +1,41 @@
-This is the first public release of the GammaLib.
+New Features and Important Changes in ctatools 01-00-00
+
+Author(s) : Juergen Knoedlseder
+
+January 31, 2011
+
+
+1. Introduction
+---------------
+This document briefly summarizes executable by executable the most important
+changes made since the last release of ctatools.
+
+
+2. Configuration
+-----------------
+None
+
+
+3. Python interface
+-------------------
+None
+
+
+4. ctobssim - CTA observation simulation
+----------------------------------------
+None
+
+
+5. ctselect - CTA event selection
+---------------------------------
+None
+
+
+6. ctbin - CTA event binning
+----------------------------
+None
+
+
+7. ctlike - CTA maximum likelihood fitting
+------------------------------------------
+None
