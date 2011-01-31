@@ -1,7 +1,7 @@
 #!/bin/sh
-autoreconf --force --install
-#autoreconf --force --install --symlink \
-#&& aclocal \
-#&& automake \
-#&& autoconf
 
+aclocal -I m4
+libtoolize --copy
+autoconf
+autoheader
+automake --add-missing --copy

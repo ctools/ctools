@@ -24,12 +24,13 @@ for extra_lib in extra_libs:
 # Get extra library paths
 extra_lib_paths = ('@LDFLAGS@').split(' ')
 for extra_lib_path in extra_lib_paths:
-	dir = extra_lib_path.lstrip('-L')
-	if len(dir) > 0:
-		library_dirs.append(extra_lib_path.lstrip('-L'))
-print include_dirs
-print libraries
-print library_dirs
+	if extra_lib_path.lstrip().find('-L') == 0:
+		dir = extra_lib_path.lstrip().lstrip('-L')
+		if len(dir) > 0:
+			library_dirs.append(extra_lib_path.lstrip('-L'))
+#print include_dirs
+#print libraries
+#print library_dirs
 
 # Setup
 setup(name='@PACKAGE_NAME@',
