@@ -31,7 +31,7 @@ refit,  b, h,        no,,,            "Do refitting?"
 caldb,  s, a, "test/irf",,,           "Calibration database"
 irf,    s, a, "kb_E_50h_v3",,,        "Instrument response function"
 srcmdl, f, a, "test/data/crab.xml",,, "Source model"
-outmdl, f, h, "crab_results.xml",,,   "Source model output file"
+outmdl, f, a, "crab_results.xml",,,   "Source model output file"
 #
 # Standard parameters
 #====================
