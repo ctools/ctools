@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,7 @@
 #define STRING_COLUMN_TEST 1
 
 /* __ Coding definitions _________________________________________________ */
-#define SELECT_TIME   0
+#define SELECT_TIME   1
 #define SELECT_ENERGY 1
 #define SELECT_ROI    1
 
@@ -123,6 +123,9 @@ void ctselect::run(void)
 
     // Append GTI to FITS file
     append_gti();
+
+    // Set data selection keywords
+    write_ds_keys();
 
     // Save output FITS file
     m_file.saveto(m_outfile, clobber());
@@ -263,61 +266,47 @@ void ctselect::append_gti(void)
 
 
 /***********************************************************************//**
- * @brief Copy events
+ * @brief Write data selection keywords
  *
- * This is some old code that is not used but that is kept for the moment
- * for debugging purposes.
+ * @todo This is a very dumb data selection keyword writing routine that does
+ *       not take into account any existing keywords. We definitely want a
+ *       more secure logic that checks for existing keywords and possible
+ *       conflicts. But for this prototype software, this code does the job.
  ***************************************************************************/
-void ctselect::copy(void)
+void ctselect::write_ds_keys(void)
 {
-    // Open FITS file
-    GFits file(m_infile);
-    //std::cout << file << std::endl;
+    // Get event list header
+    GFitsHDU* hdu = m_file.hdu("EVENTS");
 
-    // Optional perform Bit column testing
-    #if BIT_COLUMN_TEST
-    GFitsTableBitCol* ptr = (GFitsTableBitCol*)file.table("EVENTS")->column("TELMASK");
-    for (int i = 0; i < ptr->length(); ++i) {
-        std::cout << i << ": ";
-        for (int k = 0; k < ptr->number(); ++k)
-            std::cout << (int)(*(ptr))(i, k) << " ";
-        std::cout << std::endl;
-    }
-    (*(ptr))(8507, 1) = true;
-    (*(ptr))(8508, 0) = false;
-    (*(ptr))(8509, 1) = false;
-    (*(ptr))(8509, 2) = false;
-    std::cout << "change now:" << std::endl;
-    for (int i = 8507; i < 8510; ++i) {
-        std::cout << i << ": ";
-        for (int k = 0; k < ptr->number(); ++k)
-            std::cout << (int)(*(ptr))(i, k) << " ";
-        std::cout << std::endl;
-    }
-    #endif 
+    // Continue only if HDU is valid
+    if (hdu != NULL) {
 
-    // Optional perform String column testing
-    #if STRING_COLUMN_TEST
-    GFitsTableStringCol* ptr = (GFitsTableStringCol*)file.table("ANALYSIS")->column("UNIT");
-    std::cout << "Anynul: " << ptr->anynul() << std::endl;
-    for (int i = 0; i < ptr->length(); ++i) {
-        std::cout << "\"" << ptr->string(i) << "\"" << std::endl;
-    }
-    #endif
+        // Set cone selection string
+        std::string dsval2 = "CIRCLE("+str(m_ra)+","+str(m_dec)+","+str(m_rad)+")";
 
-    // Save file
-    file.saveto(m_outfile, true);
-    //std::cout << file << std::endl;
+        // Set energy selection string
+        std::string dsval3 = str(m_emin)+":"+str(m_emax);
 
-    // Optional perform String column testing
-    #if STRING_COLUMN_TEST
-    GFits file2(m_outfile);
-    GFitsTableStringCol* ptr2 = (GFitsTableStringCol*)file2.table("ANALYSIS")->column("UNIT");
-    std::cout << "Anynul: " << ptr2->anynul() << std::endl;
-    for (int i = 0; i < ptr2->length(); ++i) {
-        std::cout << "\"" << ptr2->string(i) << "\"" << std::endl;
-    }
-    #endif
+        // Add time selection keywords
+        hdu->card("DSTYP1", "TIME",  "Data selection type");
+        hdu->card("DSUNI1", "s",     "Data selection unit");
+        hdu->card("DSVAL1", "TABLE", "Data selection value");
+        hdu->card("DSREF1", ":GTI",  "Data selection reference");
+
+        // Add acceptance cone selection
+        hdu->card("DSTYP2", "POS(RA,DEC)", "Data selection type");
+        hdu->card("DSUNI2", "deg",         "Data selection unit");
+        hdu->card("DSVAL2", dsval2,        "Data selection value");
+        
+        // Add energy range selection
+        hdu->card("DSTYP3", "ENERGY", "Data selection type");
+        hdu->card("DSUNI3", "TeV",    "Data selection unit");
+        hdu->card("DSVAL3", dsval3,   "Data selection value");
+
+        // Set number of data selection keys
+        hdu->card("NDSKEYS", 3,  "Number of data selections");
+
+    } // endif: HDU was valid
 
     // Return
     return;

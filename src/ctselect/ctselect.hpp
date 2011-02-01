@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,7 +44,7 @@ public:
     void get_parameters(void);
     void select(void);
     void append_gti(void);
-    void copy(void);
+    void write_ds_keys(void);
 
 protected:
     // Protected methods
