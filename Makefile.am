@@ -12,6 +12,11 @@ INCLUDES =
 #
 CLEANFILES =
 
-# Extra files to be distributed in the tar file
-EXTRA_DIST = autogen.sh
+# Models to distribute
+models = test/data/crab.xml
+
+# Distribute models
+EXTRA_DIST = $(models)
+modelsdir = $(datadir)/models
+models_DATA = $(models)
 
