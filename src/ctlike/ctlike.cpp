@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -241,10 +241,6 @@ void ctlike::optimize_lm(void)
  * @brief Load unbinned observation
  *
  * @param[in] evfile Events file name.
- *
- * @todo ROI, energy range and time range information is hardwired. This is
- * not needed in the future once this information is correctly extracted
- * from the event file header.
  ***************************************************************************/
 void ctlike::unbinned(const std::string& evfile)
 {
@@ -252,29 +248,11 @@ void ctlike::unbinned(const std::string& evfile)
     GCTAObservation run;
     run.statistics(m_stat);
 
-    // DUMMY: Setup ROI covered by data. This is needed since actual test
-    // data do not contain any ROI informations.
-    GCTAInstDir instDir;
-    GCTARoi     roi;
-    instDir.radec_deg(83.6331, 22.0145);  // Adapt to file
-    roi.centre(instDir);
-    roi.radius(2.5);
-
-    // DUMMY: Setup energy range covered by data. This is needed since actual
-    // test data do not contain any energy range information
-    GEnergy  emin;
-    GEnergy  emax;
-    GEbounds ebds;
-    emin.TeV(0.1);
-    emax.TeV(100.0);
-    ebds.append(emin, emax);
 
     // Load data and response and set ROI, energy range and time range
     // for analysis
     run.load_unbinned(evfile);
     run.response(m_irf, m_caldb);
-    run.roi(&roi);
-    run.ebounds(ebds);
     m_obs.append(run);
 
     // Return
