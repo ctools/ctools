@@ -25,7 +25,7 @@ cntmap, f, a, "test/data/crab_cntmap.fits.gz",,, "Counts map"
 #
 # General parameters
 #===================
-method, s, a, "UNBINNED",,,           "Maximum likelihood method"
+method, s, a, "BINNED",,,             "Maximum likelihood method"
 stat,   s, h, "POISSON",,,            "Optimization statistics"
 refit,  b, h,        no,,,            "Do refitting?"
 caldb,  s, a, "test/irf",,,           "Calibration database"
