@@ -22,11 +22,11 @@ outfile, f, a, "cntmap.fits",,, "Output file name"
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, a, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
-emin,     r, a,  0.02,,,"Start value for first energy bin in TeV"
+ebinalg,  s, h, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
+emin,     r, a,  0.1,,,"Start value for first energy bin in TeV"
 emax,     r, a, 100.0,,,"Stop value for last energy bin in TeV"
 enumbins, i, a, 20,,,"Number of energy bins"
-ebinfile, f, a, "NONE",,,"Name of the file containing the energy bin definition"
+ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
@@ -34,9 +34,9 @@ nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
 coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
-xref,     r, a, 117.02,,, "First coordinate of image center in degrees (RA or galactic l)"
-yref,     r, a, -33.35,,, "Second coordinate of image center in degrees (DEC or galactic b)"
-axisrot,  r, a, 0.0,,, "Rotation angle of image axis, in degrees"
+xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
+yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
+axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
 proj,     s, a, "CAR",,, "Projection method e.g. AIT|ARC|CAR|GLS|MER|NCP|SIN|STG|TAN"
 
 #
