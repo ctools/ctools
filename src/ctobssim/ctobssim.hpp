@@ -25,7 +25,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "v1r0p0"
+#define CTOBSSIM_VERSION "00-01-00"
 
 
 /***********************************************************************//**

@@ -109,6 +109,10 @@ ctselect::~ctselect(void)
  ***************************************************************************/
 void ctselect::run(void)
 {
+    // Switch screen logging on in debug mode
+    if (logDebug())
+        log.cout(true);
+
     // Get parameters
     get_parameters();
 
@@ -237,21 +241,48 @@ void ctselect::select(void)
 
 /***********************************************************************//**
  * @brief Append GTI to FITS file
+ *
+ * @todo We implement here a dummy method that overwrites an existing GTI
+ *       entry but that only works if a single time interval exists. This
+ *       is not clean, but since we have no method so far that allows
+ *       deleting a HDU from a FITS file we have no other choice. Ideally,
+ *       we would like to first delete an existing HDU and then append
+ *       a new one. If this is not possible, we would like to delete the
+ *       rows from an existing GTI and then fill it up anew. But in any
+ *       case, the actual data selection method does not check the
+ *       existing GTI, which we have to do to merge any subselection
+ *       information in. In fact, we need a GTI merge method as well ...
  ***************************************************************************/
 void ctselect::append_gti(void)
 {
-    // Allocate Gti
-    GGti gti;
-
-    // Setup single GTI covering the selected time range
+    // Setup selected time range
     GTime tstart;
     GTime tstop;
     tstart.met(m_tmin);
     tstop.met(m_tmax);
-    gti.add(tstart, tstop);
 
-    // Write GTI
-    gti.write(&m_file);
+    // Initialise empty GTI table HDU
+    GFitsTable* hdu = NULL;
+    
+    // Write selected time interval, either in an existing GTI or in a new
+    // GTI that is appended to the FITS file
+    try {
+        hdu = m_file.table("GTI");
+        GFitsTableDoubleCol* start = (GFitsTableDoubleCol*)hdu->column("START");
+        GFitsTableDoubleCol* stop  = (GFitsTableDoubleCol*)hdu->column("STOP");
+        (*start)(0) = tstart.met();
+        (*stop)(0)  = tstop.met();
+    }
+    catch (GException::fits_hdu_not_found) {
+        // Allocate Gti
+        GGti gti;
+
+        // Setup single GTI covering the selected time range
+        gti.add(tstart, tstop);
+
+        // Write GTI
+        gti.write(&m_file);
+    }
 
     // Log final FITS file
     if (logExplicit()) {

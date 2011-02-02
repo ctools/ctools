@@ -104,7 +104,10 @@ ctlike::~ctlike(void)
  ***************************************************************************/
 void ctlike::run(void)
 {
-    log.cout(true);
+    // Switch screen logging on in debug mode
+    if (logDebug())
+        log.cout(true);
+
     // Get parameters
     get_parameters();
 
@@ -304,7 +307,7 @@ void ctlike::init_members(void)
     m_outmdl.clear();
     m_models.clear();
     m_obs.clear();
-    m_max_iter = 1000;
+    m_max_iter = 100;
     m_logL     = 0.0;
     m_opt      = NULL;
 

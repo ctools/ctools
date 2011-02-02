@@ -101,6 +101,10 @@ ctbin::~ctbin(void)
  ***************************************************************************/
 void ctbin::run(void)
 {
+    // Switch screen logging on in debug mode
+    if (logDebug())
+        log.cout(true);
+
     // Get parameters
     get_parameters();
 

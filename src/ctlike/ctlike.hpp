@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,7 +26,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTLIKE_NAME    "ctlike"
-#define CTLIKE_VERSION "v1r0p0"
+#define CTLIKE_VERSION "00-01-00"
 
 
 /***********************************************************************//**

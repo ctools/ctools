@@ -101,6 +101,10 @@ ctobssim::~ctobssim(void)
  ***************************************************************************/
 void ctobssim::run(void)
 {
+    // Switch screen logging on in debug mode
+    if (logDebug())
+        log.cout(true);
+
     // Get parameters
     get_parameters();
 
