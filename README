@@ -1,6 +1,6 @@
 ctatools information
 ====================
-Version:             01-00-00 (January 31, 2011)
+Version:             00-01-00 (February 2, 2011)
 Author:              Juergen Knodlseder (knodlseder@cesr.fr)
 GammaLib dependency: 00-04-05
 
@@ -31,6 +31,7 @@ The following tools are so far available:
 
 Web sites
 =========
+http://cta.irap.omp.eu/ctatools            - ctatools documentation
 http://gammalib.sourceforge.net            - for GammaLib documentation
 https://sourceforge.net/projects/gammalib/ - for GammaLib downloads
 
@@ -41,13 +42,24 @@ ctatools require GammaLib. Please refer to http://gammalib.sourceforge.net
 for instructions about how to install GammaLib. The GammaLib code can
 be downloaded from https://sourceforge.net/projects/gammalib/.
 
-Once GammaLib is properly installed, make sure that the environment
-variables are set correctly:
+Once GammaLib is properly installed, make sure that you added the setup
+script to your .bashrc or $HOME/.profile script:
 
-    export PYTHONPATH=/usr/local/gamma/lib/python2.5/site-packages:$PYTHONPATH    export LD_LIBRARY_PATH=/usr/local/gamma/lib:$LD_LIBRARY_PATH    export PKG_CONFIG_PATH=/usr/local/gamma/lib/pkgconfig:$PKG_CONFIG_PATH
+    export GAMMALIB=/usr/local/gamma
+    source $GAMMALIB/bin/gammalib-init.sh
 
-This is needed as GammaLib is installed by default in /usr/local/gamma and
-not in /usr/local (this may be reconsidered eventually).
+If you use C shell or a variant then add the following to your
+.cshrc or .tcshrc script:
+
+    setenv GAMMALIB /usr/local/gamma
+    source $GAMMALIB/bin/gammalib-init.csh
+
+If you have installed GammaLib in another directory than /usr/local/gamma,
+please adapt the path correspondingly.
+
+Please do NOT attempt to install ctatools in a directory different to that
+of GammaLib. The setup procedure does NOT support this feature, although
+you might manage to make it work :-)
 
 
 Unix Installation
@@ -105,7 +117,8 @@ Solaris
   problems with global symbols in the shared GammaLib library that prevent
   the model registry to work correctly. Furthermore, GammaLib is not able
   to catch its own exceptions, which prevents the FITS interface to work
-  correctly. If GammaLib is linked statically
+  correctly. Possible it will work using gcc on Solaris, yet this has not
+  so far been tested.
 
 
 Contact

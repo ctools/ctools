@@ -1,6 +1,6 @@
-2009-10-09  Juergen Knoedlseder  <knodlseder@cesr.fr>
+2011-02-02  Juergen Knoedlseder  <knodlseder@cesr.fr>
 
-        * Version 0.2.0 released
+        * Version 0.1.0 released
         ========================
 
-        Tag sources with VER-0-2-0
+        Initial release of the ctatools
