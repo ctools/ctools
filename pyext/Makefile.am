@@ -32,7 +32,10 @@ clean-local:
 	
 if HAVE_SWIG
 ctatools_wrap.cpp ctatools.py: $(SWIG_INTERFACE)
-	$(SWIG) -c++ -python -Wall -includeall -I$(prefix)/share/gammalib/swig -o ctatools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
+	$(SWIG) -c++ -python -Wall -includeall \
+	        -I$(prefix)/share/gammalib/swig \
+	        -I$(GAMMALIB)/share/gammalib/swig \
+	        -o ctatools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
 endif # HAVE_SWIG
 
 endif # WITH_PYTHON_BINDING
