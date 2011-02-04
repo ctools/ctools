@@ -20,7 +20,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "ctlike.hpp"
 #include "GTools.hpp"
 
@@ -241,22 +241,26 @@ void ctlike::optimize_lm(void)
 
 
 /***********************************************************************//**
- * @brief Load unbinned observation
+ * @brief Load unbinned observation and append to observations contained
  *
  * @param[in] evfile Events file name.
  ***************************************************************************/
 void ctlike::unbinned(const std::string& evfile)
 {
-    // Declare observations
-    GCTAObservation run;
-    run.statistics(m_stat);
+    // Declare CTA observation
+    GCTAObservation obs;
 
+    // Set statistics
+    obs.statistics(m_stat);
 
-    // Load data and response and set ROI, energy range and time range
-    // for analysis
-    run.load_unbinned(evfile);
-    run.response(m_irf, m_caldb);
-    m_obs.append(run);
+    // Load data
+    obs.load_unbinned(evfile);
+
+    // Set reponse
+    obs.response(m_irf, m_caldb);
+
+    // Append observation to contained
+    m_obs.append(obs);
 
     // Return
     return;
@@ -264,24 +268,26 @@ void ctlike::unbinned(const std::string& evfile)
 
 
 /***********************************************************************//**
- * @brief Load binned observation
+ * @brief Load binned observation and append to observations contained
  *
  * @param[in] cntmap Counts map file name.
  ***************************************************************************/
 void ctlike::binned(const std::string& cntmap)
 {
-    // Declare observations
-    GCTAObservation run;
-    run.statistics(m_stat);
+    // Declare CTA observation
+    GCTAObservation obs;
 
-    // Load binned CTA observation
-    run.load_binned(cntmap);
+    // Set statistics
+    obs.statistics(m_stat);
 
-    // Set response
-    run.response(m_irf, m_caldb);
+    // Load data
+    obs.load_binned(cntmap);
 
-    // Append observation to container
-    m_obs.append(run);
+    // Set reponse
+    obs.response(m_irf, m_caldb);
+
+    // Append observation to contained
+    m_obs.append(obs);
 
     // Return
     return;
@@ -307,7 +313,7 @@ void ctlike::init_members(void)
     m_outmdl.clear();
     m_models.clear();
     m_obs.clear();
-    m_max_iter = 100;
+    m_max_iter = 100;   // Set maximum number of iterations to 100
     m_logL     = 0.0;
     m_opt      = NULL;
 
