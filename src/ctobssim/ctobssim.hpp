@@ -25,28 +25,37 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-01-00"
+#define CTOBSSIM_VERSION "00-02-00"
 
 
 /***********************************************************************//**
  * @class ctobssim
  *
- * @brief CTA observation simulator tool interface defintion.
+ * @brief CTA observation simulator tool interface defintion
+ *
+ * This class simulates CTA observation(s) using Monte Carlo sampling of the
+ * source and background models. The class supports simulation of data of
+ * multiple CTA observations in one shot. If multiple CTA observations are
+ * processed and the save method is called, events FITS files will be written
+ * for each observation.
  ***************************************************************************/
 class ctobssim : public GApplication  {
 public:
     // Constructors and destructors
     ctobssim(void);
+    explicit ctobssim(GObservations obs);
     ctobssim(int argc, char *argv[]);
-    ~ctobssim(void);
+    virtual ~ctobssim(void);
 
     // Methods
+    void           clear(void);
     void           run(void);
+    void           save(void);
+    GObservations& obs(void) { return m_obs; }
     void           get_parameters(void);
-    GPhotons       simulate_photons(void);
-    GCTAEventList* simulate_events(const GPhotons& photons);
-    void           save_events(const GCTAEventList* events);
-    void           set_events_keywords(GFits* file);
+    GPhotons       simulate_photons(const GCTAObservation* obs, const GModels& models);
+    void           simulate_source(GCTAObservation* obs, const GPhotons& photons);
+    void           simulate_background(GCTAObservation* obs, const GModels& models);
 
 protected:
     // Protected methods
@@ -54,23 +63,23 @@ protected:
     void free_members(void);
 
     // User parameters
-    std::string     m_infile;     //!< Input model
-    std::string     m_outfile;    //!< Output events file
-    std::string     m_caldb;      //!< Calibration database repository
-    std::string     m_irf;        //!< Instrument response function
-    int             m_seed;       //!< Random number generator seed 
-    double          m_ra;         //!< RA of pointing direction
-    double          m_dec;        //!< DEC of pointing direction
-    double          m_rad;        //!< FOV radius
-    double          m_tmin;       //!< Start time (MET)
-    double          m_tmax;       //!< Stop time (MET)
-    double          m_emin;       //!< Lower energy (TeV)
-    double          m_emax;       //!< Upper energy (TeV)
-    double          m_area;       //!< Surface area for simulation (cm2)
-    GRan            m_ran;        //!< Random number generator
-    GCTAPointing    m_pnt;        //!< CTA pointing
-    GCTAObservation m_obs;        //!< CTA observation
-    GModels         m_models;     //!< Models
+    std::string   m_infile;     //!< Input model
+    std::string   m_outfile;    //!< Output events file
+    std::string   m_caldb;      //!< Calibration database repository
+    std::string   m_irf;        //!< Instrument response function
+    int           m_seed;       //!< Random number generator seed 
+    double        m_ra;         //!< RA of pointing direction
+    double        m_dec;        //!< DEC of pointing direction
+    double        m_rad;        //!< FOV radius
+    double        m_tmin;       //!< Start time (MET)
+    double        m_tmax;       //!< Stop time (MET)
+    double        m_emin;       //!< Lower energy (TeV)
+    double        m_emax;       //!< Upper energy (TeV)
+
+    // Protected members
+    double        m_area;       //!< Surface area for simulation (cm2)
+    GRan          m_ran;        //!< Random number generator
+    GObservations m_obs;        //!< Observation container
 };
 
 #endif /* CTOBSSIM_HPP */

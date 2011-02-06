@@ -31,15 +31,19 @@ class ctobssim : public GApplication  {
 public:
     // Constructors and destructors
     ctobssim(void);
+    explicit ctobssim(GObservations obs);
     ctobssim(int argc, char *argv[]);
-    ~ctobssim(void);
+    virtual ~ctobssim(void);
 
     // Methods
+    void           clear(void);
     void           run(void);
+    void           save(void);
+    GObservations& obs(void);
     void           get_parameters(void);
-    GPhotons       simulate_photons(void);
-    GCTAEventList* simulate_events(const GPhotons& photons);
-    void           save_events(const GCTAEventList* events);
+    GPhotons       simulate_photons(const GCTAObservation* obs, const GModels& models);
+    void           simulate_source(GCTAObservation* obs, const GPhotons& photons);
+    void           simulate_background(GCTAObservation* obs, const GModels& models);
 };
 
 

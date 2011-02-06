@@ -20,15 +20,15 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "ctobssim.hpp"
 
 
 /***********************************************************************//**
  * @brief Main entry point
  *
- * @param[in] argc Number of arguments
- * @param[in] argv Arguments
+ * @param[in] argc Number of arguments.
+ * @param[in] argv Arguments.
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
@@ -40,7 +40,13 @@ int main (int argc, char *argv[])
 
     // Run application
     try {
+        // Run application
         application.run();
+
+        // Save results
+        application.save();
+
+        // Signal success
         rc = 0;
     }
     catch (std::exception &e) {
@@ -48,7 +54,7 @@ int main (int argc, char *argv[])
         // Extract error message
         std::string message = e.what();
         std::string signal  = "*** ERROR encounterted in the execution of"
-                              "  ctobssim. Run aborted ...";
+                              " ctobssim. Run aborted ...";
 
         // Write error in logger
         application.log << signal  << std::endl;
