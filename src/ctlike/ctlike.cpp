@@ -216,7 +216,7 @@ void ctlike::optimize_lm(void)
         m_obs.optimize(*m_opt);
 
     // Get models back
-    m_models = *(m_obs.models());
+    m_models = m_obs.models();
 
     // Store maximum log likelihood value
     m_logL = -opt->value();
