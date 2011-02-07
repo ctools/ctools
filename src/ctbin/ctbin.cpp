@@ -24,6 +24,9 @@
 #include "ctbin.hpp"
 #include "GTools.hpp"
 
+/* __ Method name definitions ____________________________________________ */
+#define G_BIN_EVENTS                    "ctbin::bin_events(GCTAObservation*)"
+
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
@@ -49,6 +52,29 @@ ctbin::ctbin(void) : GApplication(CTBIN_NAME, CTBIN_VERSION)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Observations constructor
+ *
+ * This method creates an instance of the class by copying an existing
+ * observations container.
+ ***************************************************************************/
+ctbin::ctbin(GObservations obs) : GApplication(CTBIN_NAME, CTBIN_VERSION)
+{
+    // Initialise members
+    init_members();
+
+    // Set observations
+    m_obs = obs;
+
+    // Write header into logger
+    log_header();
+
+    // Return
+    return;
+}
+
 
 
 /***********************************************************************//**
@@ -97,7 +123,48 @@ ctbin::~ctbin(void)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Run gtbin application
+ * @brief Clear instance
+ ***************************************************************************/
+void ctbin::clear(void)
+{
+    // Free members
+    free_members();
+    this->GApplication::free_members();
+
+    // Initialise members
+    this->GApplication::init_members();
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Execute application
+ *
+ * This method bins the events data into a counts maps and saves the counts
+ * map into a FITS file.
+ ***************************************************************************/
+void ctbin::execute(void)
+{
+    // Read ahead output filename so that it gets dumped correctly in the
+    // parameters log
+    m_outfile = par("outfile")->value();
+
+    // Bin the event data
+    run();
+
+    // Save the counts map into FITS file
+    save();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Bin the event data
  ***************************************************************************/
 void ctbin::run(void)
 {
@@ -114,12 +181,95 @@ void ctbin::run(void)
         log << std::endl;
     }
 
-    // Bin data
-    bin();
-
-    // Write separator into logger
-    if (logTerse())
+    // Write observation(s) into logger
+    if (logTerse()) {
         log << std::endl;
+        if (m_obs.size() > 1)
+            log.header1("Observations");
+        else
+            log.header1("Observation");
+        log << m_obs << std::endl;
+    }
+
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        if (m_obs.size() > 1)
+            log.header1("Bin observations");
+        else
+            log.header1("Bin observation");
+    }
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+
+        // Continue only if observation is a CTA observation
+        if (obs != NULL) {
+
+            // Write header for observation
+            if (logTerse()) {
+                if (obs->name().length() > 1)
+                    log.header3("Observation "+obs->name());
+                else
+                    log.header3("Observation");
+            }
+
+            // Bin events into counts map
+            bin_events(obs);
+
+        } // endif: CTA observation found
+
+    } // endfor: looped over observations
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save observation
+ *
+ * This method saves the counts map(s) into (a) FITS file(s).
+ ***************************************************************************/
+void ctbin::save(void)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        if (m_obs.size() > 1)
+            log.header1("Save observations");
+        else
+            log.header1("Save observation");
+    }
+
+    // Get output filename
+    m_outfile = par("outfile")->value();
+
+    // Loop over all observations in the container
+    int file_num = 0;
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+
+        // Save only if observation is a CTA observation
+        if (obs != NULL) {
+
+            // Set filename. If more than one file will be created an
+            // index "_xxx" will be appended.
+            std::string filename = m_outfile;
+            if (file_num > 0)
+                filename += "_"+str(file_num);
+
+            // Save file
+            obs->save(filename, clobber());
+
+        } // endif: observation was a CTA observation
+
+    } // endfor: looped over files
 
     // Return
     return;
@@ -130,13 +280,30 @@ void ctbin::run(void)
  * @brief Get application parameters
  *
  * Get all task parameters from parameter file or (if required) by querying
- * the user.
+ * the user. Most parameters are only required if no observation exists so
+ * far in the observation container. In this case, a single CTA observation
+ * will be added to the container, using the definition provided in the
+ * parameter file.
  ***************************************************************************/
 void ctbin::get_parameters(void)
 {
-    // Get parameters
-    m_evfile   = par("evfile")->value();
-    m_outfile  = par("outfile")->value();
+    // If there are no observations in container then add a single CTA
+    // observation using the parameters from the parameter file
+    if (m_obs.size() == 0) {
+
+        // Get name of CTA events file
+        m_evfile = par("evfile")->value();
+
+        // Load unbinned CTA observation
+        GCTAObservation obs;
+        obs.load_unbinned(m_evfile);
+
+        // Append CTA observation to container
+        m_obs.append(obs);
+
+    } // endif: there was no observation in the container
+
+    // Get remaining parameters
     m_emin     = par("emin")->real();
     m_emax     = par("emax")->real();
     m_enumbins = par("enumbins")->integer();
@@ -154,98 +321,104 @@ void ctbin::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Bin the data
+ * @brief Bin events into a counts map
+ *
+ * @param[in] obs CTA observation.
+ *
+ * @exception GException::no_list
+ *            No event list found in observation.
+ *
+ * This method bins the events found in a CTA events list into a counts map
+ * and replaces the event list by the counts map in the observation. The
+ * energy boundaries of the counts map are also stored in the observation's
+ * energy boundary member.
  ***************************************************************************/
-void ctbin::bin(void)
+void ctbin::bin_events(GCTAObservation* obs)
 {
-    // Load events as unbinned data
-    GCTAObservation obs;
-    obs.load_unbinned(m_evfile);
+    // Continue only if observation pointer is valid
+    if (obs != NULL) {
 
-    // Setup energy range covered by data
-    GEnergy  emin;
-    GEnergy  emax;
-    GEbounds ebds;
-    emin.TeV(m_emin);
-    emax.TeV(m_emax);
-    ebds.setlog(emin, emax, m_enumbins);
-    obs.ebounds(ebds);
+        // Make sure that the observation holds a CTA event list. If this
+        // is not the case then throw an exception.
+        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
+            throw GException::no_list(G_BIN_EVENTS);
 
-    // Log observation
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Observation");
-        log << obs << std::endl;
-    }
+        // Create skymap
+        GSkymap map = GSkymap(m_proj, m_coordsys,
+                             m_xref, m_yref, m_binsz, m_binsz,
+                             m_nxpix, m_nypix, m_enumbins);
 
-    // Create skymap
-    GSkymap map = GSkymap(m_proj, m_coordsys,
-                          m_xref, m_yref, m_binsz, m_binsz,
-                          m_nxpix, m_nypix, m_enumbins);
-
-    // Initialise binning statistics
-    int num_outside_map  = 0;
-    int num_outside_ebds = 0;
-    int num_in_map       = 0;
+        // Initialise binning statistics
+        int num_outside_map  = 0;
+        int num_outside_ebds = 0;
+        int num_in_map       = 0;
     
-    // Fill sky map
-    GCTAEventList* events = (GCTAEventList*)obs.events();
-    for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
+        // Fill sky map
+        GCTAEventList* events = (GCTAEventList*)obs->events();
+        for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
 
-        // Determine sky pixel
-        GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
-        GSkyDir      dir   = inst->skydir();
-        GSkyPixel    pixel = map.dir2xy(dir);
+            // Determine sky pixel
+            GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
+            GSkyDir      dir   = inst->skydir();
+            GSkyPixel    pixel = map.dir2xy(dir);
 
-        // Skip if pixel is out of range
-        if (pixel.x() < -0.5 || pixel.x() > (m_nxpix-0.5) ||
-            pixel.y() < -0.5 || pixel.y() > (m_nypix-0.5)) {
-            num_outside_map++;
-            continue;
-        }
+            // Skip if pixel is out of range
+            if (pixel.x() < -0.5 || pixel.x() > (m_nxpix-0.5) ||
+                pixel.y() < -0.5 || pixel.y() > (m_nypix-0.5)) {
+                num_outside_map++;
+                continue;
+            }
 
-        // Determine energy bin. Skip if we are outside the energy range
-        int index = obs.ebounds().index(event->energy());
-        if (index == -1) {
-            num_outside_ebds++;
-            continue;
-        }
+            // Determine energy bin. Skip if we are outside the energy range
+            int index = obs->ebounds().index(event->energy());
+            if (index == -1) {
+                num_outside_ebds++;
+                continue;
+            }
 
-        // Fill event in skymap
-        map(pixel, index) += 1.0;
-        num_in_map++;
+            // Fill event in skymap
+            map(pixel, index) += 1.0;
+            num_in_map++;
         
-    } // endfor: looped over all events
+        } // endfor: looped over all events
 
-    // Log binning results
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Binning");
-        log << parformat("Events in list");
-        log << obs.events()->size() << std::endl;
-        log << parformat("Events in map");
-        log << num_in_map << std::endl;
-        log << parformat("Events outside map area");
-        log << num_outside_map << std::endl;
-        log << parformat("Events outside energy bins");
-        log << num_outside_ebds << std::endl;
-    }
+        // Log binning results
+        if (logTerse()) {
+            log << std::endl;
+            log.header1("Binning");
+            log << parformat("Events in list");
+            log << obs->events()->size() << std::endl;
+            log << parformat("Events in map");
+            log << num_in_map << std::endl;
+            log << parformat("Events outside map area");
+            log << num_outside_map << std::endl;
+            log << parformat("Events outside energy bins");
+            log << num_outside_ebds << std::endl;
+        }
 
-    // Log map
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Counts map");
-        log << map << std::endl;
-    }
+        // Log map
+        if (logTerse()) {
+            log << std::endl;
+            log.header1("Counts map");
+            log << map << std::endl;
+        }
 
-    // Create events cube from sky map
-    GCTAEventCube cube(map);
+        // Create events cube from sky map
+        GCTAEventCube cube(map);
 
-    // Replace event list by event cube in observation
-    obs.events(&cube);
+        // Replace event list by event cube in observation
+        obs->events(&cube);
 
-    // Save observation
-    obs.save(m_outfile, clobber());
+        // Setup energy range covered by data
+        GEnergy  emin;
+        GEnergy  emax;
+        GEbounds ebds;
+        emin.TeV(m_emin);
+        emax.TeV(m_emax);
+        ebds.setlog(emin, emax, m_enumbins);
+        obs->ebounds(ebds);
+
+    } // endif: observation was valid
 
     // Return
     return;
@@ -266,16 +439,17 @@ void ctbin::init_members(void)
     // Initialise members
     m_evfile.clear();
     m_outfile.clear();
+    m_proj.clear();
+    m_coordsys.clear();
+    m_obs.clear();
     m_emin     = 0.0;
     m_emax     = 0.0;
     m_enumbins = 0;
-    m_proj.clear();
-    m_coordsys.clear();
-    m_xref  = 0.0;
-    m_yref  = 0.0;
-    m_binsz = 0.0;
-    m_nxpix = 0;
-    m_nypix = 0;
+    m_xref     = 0.0;
+    m_yref     = 0.0;
+    m_binsz    = 0.0;
+    m_nxpix    = 0;
+    m_nypix    = 0;
 
     // Set logger properties
     log.date(true);
@@ -290,7 +464,9 @@ void ctbin::init_members(void)
  ***************************************************************************/
 void ctbin::free_members(void)
 {
-    // Free members
+    // Write separator into logger
+    if (logTerse())
+        log << std::endl;
 
     // Return
     return;

@@ -25,25 +25,32 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "00-01-00"
+#define CTBIN_VERSION "00-02-00"
 
 
 /***********************************************************************//**
  * @class ctbin
  *
- * @brief CTA data binning tool interface defintion.
+ * @brief CTA data binning tool interface defintion
+ *
+ * This class bins CTA events into a counts map.
  ***************************************************************************/
 class ctbin : public GApplication  {
 public:
     // Constructors and destructors
     ctbin(void);
+    explicit ctbin(GObservations obs);
     ctbin(int argc, char *argv[]);
-    ~ctbin(void);
+    virtual ~ctbin(void);
 
     // Methods
-    void run(void);
-    void get_parameters(void);
-    void bin(void);
+    void           clear(void);
+    void           execute(void);
+    void           run(void);
+    void           save(void);
+    GObservations& obs(void) { return m_obs; }
+    void           get_parameters(void);
+    void           bin_events(GCTAObservation* obs);
 
 protected:
     // Protected methods
@@ -63,6 +70,9 @@ protected:
     double        m_binsz;      //!< Pixel size
     int           m_nxpix;      //!< Number of pixels in longitude
     int           m_nypix;      //!< Number of pixels in latitude
+
+    // Protected members
+    GObservations m_obs;        //!< Observation container
 };
 
 #endif /* CTBIN_HPP */

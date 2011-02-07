@@ -12,7 +12,7 @@
  ***************************************************************************/
 /**
  * @file ctbin.i
- * @brief CTA data binning tool SWIG definition
+ * @brief CTA data binning tool Python interface definition
  * @author J. Knodlseder
  */
 %{
@@ -25,19 +25,24 @@
 /***********************************************************************//**
  * @class ctbin
  *
- * @brief CTA data binning tool SWIG interface defintion.
+ * @brief CTA data binning tool Python interface defintion
  ***************************************************************************/
 class ctbin : public GApplication  {
 public:
     // Constructors and destructors
     ctbin(void);
+    explicit ctbin(GObservations obs);
     ctbin(int argc, char *argv[]);
-    ~ctbin(void);
+    virtual ~ctbin(void);
 
     // Methods
-    void run(void);
-    void get_parameters(void);
-    void bin(void);
+    void           clear(void);
+    void           execute(void);
+    void           run(void);
+    void           save(void);
+    GObservations& obs(void) { return m_obs; }
+    void           get_parameters(void);
+    void           bin_events(GCTAObservation* obs);
 };
 
 

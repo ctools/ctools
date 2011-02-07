@@ -20,7 +20,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "ctbin.hpp"
 
 
@@ -43,7 +43,10 @@ int main (int argc, char *argv[])
 
     // Run application
     try {
-        application.run();
+        // Execute application
+        application.execute();
+
+        // Signal success
         rc = 0;
     }
     catch (std::exception &e) {
@@ -51,7 +54,7 @@ int main (int argc, char *argv[])
         // Extract error message
         std::string message = e.what();
         std::string signal  = "*** ERROR encounterted in the execution of"
-                              "  ctbin. Run aborted ...";
+                              " ctbin. Run aborted ...";
 
         // Write error in logger
         application.log << signal  << std::endl;
