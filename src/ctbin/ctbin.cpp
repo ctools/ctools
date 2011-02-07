@@ -271,6 +271,16 @@ void ctbin::run(void)
 
     } // endfor: looped over observations
 
+    // Write observation(s) into logger
+    if (logTerse()) {
+        log << std::endl;
+        if (m_obs.size() > 1)
+            log.header1("Binned observations");
+        else
+            log.header1("Binned observation");
+        log << m_obs << std::endl;
+    }
+
     // Return
     return;
 }
@@ -460,7 +470,7 @@ void ctbin::bin_events(GCTAObservation* obs)
         }
 
         // Create events cube from sky map
-        GCTAEventCube cube(map);
+        GCTAEventCube cube(map, obs->ebounds(), obs->gti());
 
         // Replace event list by event cube in observation
         obs->events(&cube);
