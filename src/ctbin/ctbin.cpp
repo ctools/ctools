@@ -98,6 +98,24 @@ ctbin::ctbin(int argc, char *argv[]) :
 
 
 /***********************************************************************//**
+ * @brief Copy constructor
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctbin::ctbin(const ctbin& app) : GApplication(app)
+{
+    // Initialise members
+    init_members();
+
+    // Copy members
+    copy_members(app);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Destructor
  ***************************************************************************/
 ctbin::~ctbin(void)
@@ -115,6 +133,35 @@ ctbin::~ctbin(void)
  =                               Operators                                 =
  =                                                                         =
  ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Assignment operator
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctbin& ctbin::operator= (const ctbin& app)
+{
+    // Execute only if object is not identical
+    if (this != &app) {
+
+        // Copy base class members
+        this->GApplication::operator=(app);
+
+        // Free members
+        free_members();
+
+        // Initialise members
+        init_members();
+
+        // Copy members
+        copy_members(app);
+
+    } // endif: object was not identical
+
+    // Return this object
+    return *this;
+}
+
 
 /*==========================================================================
  =                                                                         =
@@ -343,6 +390,15 @@ void ctbin::bin_events(GCTAObservation* obs)
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
             throw GException::no_list(G_BIN_EVENTS);
 
+        // Setup energy range covered by data
+        GEnergy  emin;
+        GEnergy  emax;
+        GEbounds ebds;
+        emin.TeV(m_emin);
+        emax.TeV(m_emax);
+        ebds.setlog(emin, emax, m_enumbins);
+        obs->ebounds(ebds);
+
         // Create skymap
         GSkymap map = GSkymap(m_proj, m_coordsys,
                              m_xref, m_yref, m_binsz, m_binsz,
@@ -409,15 +465,6 @@ void ctbin::bin_events(GCTAObservation* obs)
         // Replace event list by event cube in observation
         obs->events(&cube);
 
-        // Setup energy range covered by data
-        GEnergy  emin;
-        GEnergy  emax;
-        GEbounds ebds;
-        emin.TeV(m_emin);
-        emax.TeV(m_emax);
-        ebds.setlog(emin, emax, m_enumbins);
-        obs->ebounds(ebds);
-
     } // endif: observation was valid
 
     // Return
@@ -457,6 +504,33 @@ void ctbin::init_members(void)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctbin::copy_members(const ctbin& app)
+{
+    // Copy attributes
+    m_evfile   = app.m_evfile;
+    m_outfile  = app.m_outfile;
+    m_proj     = app.m_proj;
+    m_coordsys = app.m_coordsys;
+    m_obs      = app.m_obs;
+    m_emin     = app.m_emin;
+    m_emax     = app.m_emax;
+    m_enumbins = app.m_enumbins;
+    m_xref     = app.m_xref;
+    m_yref     = app.m_yref;
+    m_binsz    = app.m_binsz;
+    m_nxpix    = app.m_nxpix;
+    m_nypix    = app.m_nypix;
+
+    // Return
+    return;
+}    
 
 
 /***********************************************************************//**

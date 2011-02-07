@@ -41,7 +41,11 @@ public:
     ctbin(void);
     explicit ctbin(GObservations obs);
     ctbin(int argc, char *argv[]);
+    ctbin(const ctbin& app);
     virtual ~ctbin(void);
+
+    // Operators
+    ctbin& operator= (const ctbin& app);
 
     // Methods
     void           clear(void);
@@ -55,6 +59,7 @@ public:
 protected:
     // Protected methods
     void init_members(void);
+    void copy_members(const ctbin& app);
     void free_members(void);
 
     // User parameters
