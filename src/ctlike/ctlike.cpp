@@ -24,6 +24,13 @@
 #include "ctlike.hpp"
 #include "GTools.hpp"
 
+/* __ Method name definitions ____________________________________________ */
+#define G_GET_PARAMETERS                           "ctlike::get_parameters()"
+
+/* __ Debug definitions __________________________________________________ */
+
+/* __ Coding definitions _________________________________________________ */
+
 
 /*==========================================================================
  =                                                                         =
@@ -38,6 +45,28 @@ ctlike::ctlike(void) : GApplication(CTLIKE_NAME, CTLIKE_VERSION)
 {
     // Initialise members
     init_members();
+
+    // Write header into logger
+    log_header();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Observations constructor
+ *
+ * This method creates an instance of the class by copying an existing
+ * observations container.
+ ***************************************************************************/
+ctlike::ctlike(GObservations obs) : GApplication(CTLIKE_NAME, CTLIKE_VERSION)
+{
+    // Initialise members
+    init_members();
+
+    // Set observations
+    m_obs = obs;
 
     // Write header into logger
     log_header();
@@ -68,6 +97,24 @@ ctlike::ctlike(int argc, char *argv[]) :
 
 
 /***********************************************************************//**
+ * @brief Copy constructor
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctlike::ctlike(const ctlike& app) : GApplication(app)
+{
+    // Initialise members
+    init_members();
+
+    // Copy members
+    copy_members(app);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Destructor
  ***************************************************************************/
 ctlike::~ctlike(void)
@@ -86,11 +133,81 @@ ctlike::~ctlike(void)
  =                                                                         =
  ==========================================================================*/
 
+/***********************************************************************//**
+ * @brief Assignment operator
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctlike& ctlike::operator= (const ctlike& app)
+{
+    // Execute only if object is not identical
+    if (this != &app) {
+
+        // Copy base class members
+        this->GApplication::operator=(app);
+
+        // Free members
+        free_members();
+
+        // Initialise members
+        init_members();
+
+        // Copy members
+        copy_members(app);
+
+    } // endif: object was not identical
+
+    // Return this object
+    return *this;
+}
+
+
 /*==========================================================================
  =                                                                         =
  =                            Public methods                               =
  =                                                                         =
  ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Clear instance
+ ***************************************************************************/
+void ctlike::clear(void)
+{
+    // Free members
+    free_members();
+    this->GApplication::free_members();
+
+    // Initialise members
+    this->GApplication::init_members();
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Execute application
+ *
+ * This method performs a maximum likelihood analysis of a observation given
+ * in an observation container and saves the results in an XML file.
+ ***************************************************************************/
+void ctlike::execute(void)
+{
+    // Read ahead output filename so that it gets dumped correctly in the
+    // parameters log
+    m_outmdl = par("outmdl")->value();
+
+    // Bin the event data
+    run();
+
+    // Save the results into XML file
+    save();
+
+    // Return
+    return;
+}
+
 
 /***********************************************************************//**
  * @brief Run maximum likelihood analysis
@@ -100,7 +217,6 @@ ctlike::~ctlike(void)
  * 2. Load observation
  * 3. Setup models for optimizing
  * 4. Optimize model (and write result into logger)
- * 5. Write results out as XML model
  ***************************************************************************/
 void ctlike::run(void)
 {
@@ -117,36 +233,50 @@ void ctlike::run(void)
         log << std::endl;
     }
 
-    // Load observation
-    if (m_method == "UNBINNED")
-        unbinned(m_evfile);
-    else
-        binned(m_cntmap);
-
-    // Write observation into logger
+    // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        log.header1("Observation");
+        if (m_obs.size() > 1)
+            log.header1("Observations");
+        else
+            log.header1("Observation");
         log << m_obs << std::endl;
     }
 
-    // Setup models for optimizing.
-    m_models = GModels(m_srcmdl);
-    m_obs.models(m_models);
-
-    // Optimize
+    // Optimize model parameters using LM optimizer
     optimize_lm();
 
     // Write results into logger
     if (logTerse()) {
         log << " Maximum log likelihood ....: " << m_logL << std::endl;
         log << " Npred .....................: " << m_obs.npred() << std::endl;
-        log << m_models << std::endl << std::endl;
+        log << m_obs.models() << std::endl;
     }
-    
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save results
+ *
+ * This method saves the fit results in a XML file.
+ ***************************************************************************/
+void ctlike::save(void)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Save results");
+    }
+
+    // Get output filename
+    m_outmdl = par("outmdl")->value();
+
     // Write results out as XML model
     if (toupper(m_outmdl) != "NONE")
-        m_models.save(m_outmdl);
+        m_obs.models().save(m_outmdl);
 
     // Return
     return;
@@ -156,29 +286,78 @@ void ctlike::run(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all task parameters from parameter file or (if required) by querying
- * the user.
+ * GException::par_error
+ *             Invalid analysis method specified (neither BINNED nor UNBINNED).
+ *
+ * Get all required task parameters from the parameter file or (if specified)
+ * by querying the user. Observation dependent parameters will only be read
+ * if the observation container is actually empty. Observation dependent
+ * parameters are:
+ * "method" (analysis method),
+ * "stat" (statistics to be used for observation),
+ * "caldb" (calibration database),
+ * "irf" (instrument response function),
+ * "evfile" (event file name), and
+ * "cntmap" (counts map file name).
+ * The model will only be loaded if no model components exist in the
+ * observation container.
  ***************************************************************************/
 void ctlike::get_parameters(void)
 {
-    // Get standard parameters
-    m_method = toupper(par("method")->value());
-    m_stat   = toupper(par("stat")->value());
-    m_refit  = par("refit")->boolean();
-    m_caldb  = par("caldb")->value();
-    m_irf    = par("irf")->value();
-    m_srcmdl = par("srcmdl")->value();
-    m_outmdl = par("outmdl")->value();
+    // If there is are no models associated with the observations then
+    // load now the model definition
+    if (m_obs.models().size() == 0) {
 
-    // Get unbinned parameters ...
-    if (m_method == "UNBINNED") {
-        m_evfile = par("evfile")->value();
-    }
-    
-    // ... or get binned parameters
-    else if (m_method == "BINNED") {
-        m_cntmap = par("cntmap")->value();
-    }
+        // Get models XML filename
+        std::string filename = par("srcmdl")->value();
+        
+        // Setup models for optimizing.
+        m_obs.models(GModels(filename));
+
+    } // endif: no models were associated with observations
+
+    // If there are no observations in container then add a single CTA
+    // observation using the parameters from the parameter file
+    if (m_obs.size() == 0) {
+
+        // Get observation parameters
+        m_method = toupper(par("method")->value());
+        m_stat   = toupper(par("stat")->value());
+        m_caldb  = par("caldb")->value();
+        m_irf    = par("irf")->value();
+
+        // Case A: set-up unbinned CTA observation
+        if (m_method == "UNBINNED") {
+
+            // Get event file name
+            std::string filename = par("evfile")->value();
+
+            // Load and append unbinned CTA observation
+            load_unbinned(filename);
+
+        } // endif: unbinned analysis mode
+
+        // Case B: set-up binned CTA observation
+        else if (m_method == "BINNED") {
+
+            // Get counts map file name
+            std::string filename = par("cntmap")->value();
+
+            // Load and append binned CTA observation
+            load_binned(filename);
+
+        } // endif: binned analysis mode
+
+        // ... otherwise signal an invalid analysis method
+        else {
+            throw GException::par_error(G_GET_PARAMETERS, "method", 
+                  "only \"BINNED\" or \"UNBINNED\" supported.");
+        }
+
+    } // endif: there was no observation in the container
+
+    // Get standard parameters
+    m_refit  = par("refit")->boolean();
 
     // Return
     return;
@@ -186,15 +365,19 @@ void ctlike::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Optimize using Levenberg-Marquardt method
+ * @brief Optimize model parameters using Levenberg-Marquardt method
  ***************************************************************************/
 void ctlike::optimize_lm(void)
 {
+    // Free any existing optimizer
+    if (m_opt != NULL) delete m_opt;
+    m_opt = NULL;
+
     // Allocate optimizer. The logger is only passed to the optimizer
     // constructor if optimizer logging is requested.
-    GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log) 
+    GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log)
                                      : new GOptimizerLM();
-    
+
     // Assign optimizer
     m_opt = opt;
 
@@ -207,33 +390,24 @@ void ctlike::optimize_lm(void)
         log.header1("Maximum likelihood optimisation");
         log.indent(1);
     }
-    
+
     // Perform LM optimization
-    m_obs.optimize(*m_opt);
+    m_obs.optimize(*opt);
 
     // Optionally refit
     if (m_refit)
-        m_obs.optimize(*m_opt);
-
-    // Get models back
-    m_models = m_obs.models();
+        m_obs.optimize(*opt);
 
     // Store maximum log likelihood value
-    m_logL = -opt->value();
+    m_logL = -(opt->value());
 
     // Write optimization results
     log.indent(0);
     if (logTerse()) {
         log << std::endl;
-        log.header1("Maximum likelihood optimisation results");
+        log.header1("Maximum likelihood optimization results");
         log << *opt << std::endl;
     }
-
-    // Free optimizer
-    delete opt;
-    
-    // Reset optimizer pointer
-    m_opt = NULL;
 
     // Return
     return;
@@ -241,11 +415,11 @@ void ctlike::optimize_lm(void)
 
 
 /***********************************************************************//**
- * @brief Load unbinned observation and append to observations contained
+ * @brief Load unbinned observation and append it to observations container
  *
  * @param[in] evfile Events file name.
  ***************************************************************************/
-void ctlike::unbinned(const std::string& evfile)
+void ctlike::load_unbinned(const std::string& evfile)
 {
     // Declare CTA observation
     GCTAObservation obs;
@@ -268,11 +442,11 @@ void ctlike::unbinned(const std::string& evfile)
 
 
 /***********************************************************************//**
- * @brief Load binned observation and append to observations contained
+ * @brief Load binned observation and append it to observations container
  *
  * @param[in] cntmap Counts map file name.
  ***************************************************************************/
-void ctlike::binned(const std::string& cntmap)
+void ctlike::load_binned(const std::string& cntmap)
 {
     // Declare CTA observation
     GCTAObservation obs;
@@ -307,12 +481,12 @@ void ctlike::init_members(void)
 {
     // Initialise members
     m_method.clear();
+    m_stat.clear();
     m_caldb.clear();
     m_irf.clear();
-    m_srcmdl.clear();
     m_outmdl.clear();
-    m_models.clear();
     m_obs.clear();
+    m_refit    = false;
     m_max_iter = 100;   // Set maximum number of iterations to 100
     m_logL     = 0.0;
     m_opt      = NULL;
@@ -326,11 +500,43 @@ void ctlike::init_members(void)
 
 
 /***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctlike::copy_members(const ctlike& app)
+{
+    // Copy attributes
+    m_method   = app.m_method;
+    m_stat     = app.m_stat;
+    m_refit    = app.m_refit;
+    m_caldb    = app.m_caldb;
+    m_irf      = app.m_irf;
+    m_outmdl   = app.m_outmdl;
+    m_obs      = app.m_obs;
+    m_max_iter = app.m_max_iter;
+    m_logL     = app.m_logL;
+    m_opt      = app.m_opt->clone();
+
+    // Return
+    return;
+}    
+
+
+/***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
 void ctlike::free_members(void)
 {
     // Free members
+    if (m_opt != NULL) delete m_opt;
+
+    // Mark pointers as free
+    m_opt = NULL;
+
+    // Write separator into logger
+    if (logTerse())
+        log << std::endl;
 
     // Return
     return;

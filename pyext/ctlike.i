@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -12,7 +12,7 @@
  ***************************************************************************/
 /**
  * @file ctlike.i
- * @brief CTA maximum likelihood tool SWIG definition
+ * @brief CTA maximum likelihood tool Python interface definition
  * @author J. Knodlseder
  */
 %{
@@ -25,21 +25,27 @@
 /***********************************************************************//**
  * @class ctlike
  *
- * @brief CTA maximum likelihood tool SWIG interface defintion.
+ * @brief CTA maximum likelihood tool Python interface defintion
  ***************************************************************************/
 class ctlike : public GApplication  {
 public:
     // Constructors and destructors
     ctlike(void);
+    explicit ctlike(GObservations obs);
     ctlike(int argc, char *argv[]);
-    ~ctlike(void);
+    ctlike(const ctlike& app);
+    virtual ~ctlike(void);
 
     // Methods
-    void run(void);
-    void get_parameters(void);
-    void optimize_lm(void);
-    void unbinned(const std::string& evfile);
-    void binned(const std::string& cntmap);
+    void           clear(void);
+    void           execute(void);
+    void           run(void);
+    void           save(void);
+    GObservations& obs(void) { return m_obs; }
+    void           get_parameters(void);
+    void           optimize_lm(void);
+    void           load_unbinned(const std::string& evfile);
+    void           load_binned(const std::string& cntmap);
 };
 
 

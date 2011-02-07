@@ -12,7 +12,7 @@
  ***************************************************************************/
 /**
  * @file ctlike.hpp
- * @brief CTA maximum likelihood tool definition
+ * @brief CTA maximum likelihood tool interface definition
  * @author J. Knodlseder
  */
 
@@ -26,7 +26,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTLIKE_NAME    "ctlike"
-#define CTLIKE_VERSION "00-01-00"
+#define CTLIKE_VERSION "00-02-00"
 
 
 /***********************************************************************//**
@@ -38,19 +38,29 @@ class ctlike : public GApplication  {
 public:
     // Constructors and destructors
     ctlike(void);
+    explicit ctlike(GObservations obs);
     ctlike(int argc, char *argv[]);
-    ~ctlike(void);
+    ctlike(const ctlike& app);
+    virtual ~ctlike(void);
+
+    // Operators
+    ctlike& operator= (const ctlike& app);
 
     // Methods
-    void run(void);
-    void get_parameters(void);
-    void optimize_lm(void);
-    void unbinned(const std::string& evfile);
-    void binned(const std::string& cntmap);
+    void           clear(void);
+    void           execute(void);
+    void           run(void);
+    void           save(void);
+    GObservations& obs(void) { return m_obs; }
+    void           get_parameters(void);
+    void           optimize_lm(void);
+    void           load_unbinned(const std::string& evfile);
+    void           load_binned(const std::string& cntmap);
 
 protected:
     // Protected methods
     void init_members(void);
+    void copy_members(const ctlike& app);
     void free_members(void);
 
     // User parameters
@@ -59,18 +69,10 @@ protected:
     bool          m_refit;      //!< Refitting
     std::string   m_caldb;      //!< Calibration database
     std::string   m_irf;        //!< Instrument response functions
-    std::string   m_srcmdl;     //!< Source model XML file
     std::string   m_outmdl;     //!< Source model output XML file
-    GModels       m_models;     //!< Source models
+
+    // Members
     GObservations m_obs;        //!< Observations
-
-    // Unbinned likelihood parameters
-    std::string   m_evfile;     //!< Events file
-
-    // Binned likelihood parameters
-    std::string   m_cntmap;     //!< Counts map
-
-    // Internal parameters
     int           m_max_iter;   //!< Maximum number of iterations
     double        m_logL;       //!< Maximum log likelihood
     GOptimizer*   m_opt;        //!< Optimizer

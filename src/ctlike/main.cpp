@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctlike - CTA maximum likelihood tool main code            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,7 +20,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "ctlike.hpp"
 
 
@@ -29,6 +29,9 @@
  *
  * @param[in] argc Number of arguments
  * @param[in] argv Arguments
+ *
+ * This is the main entry point of the ctlike application. It allocates a
+ * ctlike object and executes the application.
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
@@ -40,7 +43,10 @@ int main (int argc, char *argv[])
 
     // Run application
     try {
-        application.run();
+        // Execute application
+        application.execute();
+
+        // Signal success
         rc = 0;
     }
     catch (std::exception &e) {
@@ -48,7 +54,7 @@ int main (int argc, char *argv[])
         // Extract error message
         std::string message = e.what();
         std::string signal  = "*** ERROR encounterted in the execution of"
-                              "  ctlike. Run aborted ...";
+                              " ctlike. Run aborted ...";
 
         // Write error in logger
         application.log << signal  << std::endl;
