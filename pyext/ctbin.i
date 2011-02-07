@@ -33,6 +33,7 @@ public:
     ctbin(void);
     explicit ctbin(GObservations obs);
     ctbin(int argc, char *argv[]);
+    ctbin(const ctbin& app);
     virtual ~ctbin(void);
 
     // Methods
