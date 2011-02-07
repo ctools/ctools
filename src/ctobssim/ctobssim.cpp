@@ -137,10 +137,31 @@ void ctobssim::clear(void)
     // Return
     return;
 }
-    
+
+
+/***********************************************************************//**
+ * @brief Execute application
+ *
+ * This method runs the simulation and saves the results.
+ ***************************************************************************/
+void ctobssim::execute(void)
+{
+    // Run the simulation
+    run();
+
+    // Save results
+    save();
+
+    // Return
+    return;
+}
+
 
 /***********************************************************************//**
  * @brief Simulate event data
+ *
+ * This method runs the simulation. Results are not saved by this method.
+ * Invoke "save" to save the results.
  ***************************************************************************/
 void ctobssim::run(void)
 {
@@ -186,8 +207,12 @@ void ctobssim::run(void)
         if (obs != NULL) {
 
             // Write header for observation
-            if (logTerse())
-                log.header3("Observation "+obs->obsname());
+            if (logTerse()) {
+                if (obs->name().length() > 1)
+                    log.header3("Observation "+obs->name());
+                else
+                    log.header3("Observation");
+            }
 
             // Allocate CTA event list and attach it to the observation.
             // Note that the events() method removes any existing event
@@ -227,6 +252,8 @@ void ctobssim::run(void)
 
 /***********************************************************************//**
  * @brief Save simulated observation
+ *
+ * This method saves the results.
  ***************************************************************************/
 void ctobssim::save(void)
 {

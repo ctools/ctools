@@ -40,11 +40,8 @@ int main (int argc, char *argv[])
 
     // Run application
     try {
-        // Run application
-        application.run();
-
-        // Save results
-        application.save();
+        // Execute application
+        application.execute();
 
         // Signal success
         rc = 0;
