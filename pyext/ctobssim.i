@@ -33,6 +33,7 @@ public:
     ctobssim(void);
     explicit ctobssim(GObservations obs);
     ctobssim(int argc, char *argv[]);
+    ctobssim(const ctobssim& app);
     virtual ~ctobssim(void);
 
     // Methods
