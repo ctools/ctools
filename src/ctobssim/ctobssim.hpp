@@ -45,7 +45,11 @@ public:
     ctobssim(void);
     explicit ctobssim(GObservations obs);
     ctobssim(int argc, char *argv[]);
+    ctobssim(const ctobssim& app);
     virtual ~ctobssim(void);
+
+    // Operators
+    ctobssim& operator= (const ctobssim& app);
 
     // Methods
     void           clear(void);
@@ -61,6 +65,7 @@ public:
 protected:
     // Protected methods
     void init_members(void);
+    void copy_members(const ctobssim& app);
     void free_members(void);
 
     // User parameters

@@ -25,7 +25,8 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_SIMULATE_SOURCE "ctobssim::simulate_source(GCTAObservation*, GPhotons&)"
+#define G_SIMULATE_SOURCE       "ctobssim::simulate_source(GCTAObservation*,"\
+                                                                " GPhotons&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -57,8 +58,8 @@ ctobssim::ctobssim(void) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * This constructor creates an instance of the class that is initialised from
+ * an observation container.
  ***************************************************************************/
 ctobssim::ctobssim(GObservations obs) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
@@ -97,6 +98,24 @@ ctobssim::ctobssim(int argc, char *argv[]) :
 
 
 /***********************************************************************//**
+ * @brief Copy constructor
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctobssim::ctobssim(const ctobssim& app) : GApplication(app)
+{
+    // Initialise members
+    init_members();
+
+    // Copy members
+    copy_members(app);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Destructor
  ***************************************************************************/
 ctobssim::~ctobssim(void)
@@ -114,6 +133,35 @@ ctobssim::~ctobssim(void)
  =                               Operators                                 =
  =                                                                         =
  ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Assignment operator
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctobssim& ctobssim::operator= (const ctobssim& app)
+{
+    // Execute only if object is not identical
+    if (this != &app) {
+
+        // Copy base class members
+        this->GApplication::operator=(app);
+
+        // Free members
+        free_members();
+
+        // Initialise members
+        init_members();
+
+        // Copy members
+        copy_members(app);
+
+    } // endif: object was not identical
+
+    // Return this object
+    return *this;
+}
+
 
 /*==========================================================================
  =                                                                         =
@@ -146,6 +194,10 @@ void ctobssim::clear(void)
  ***************************************************************************/
 void ctobssim::execute(void)
 {
+    // Read ahead output filename so that it gets dumped correctly in the
+    // parameters log
+    m_outfile = par("outfile")->value();
+
     // Run the simulation
     run();
 
@@ -266,6 +318,9 @@ void ctobssim::save(void)
             log.header1("Save observation");
     }
 
+    // Get output filename
+    m_outfile = par("outfile")->value();
+
     // Loop over all observation in the container
     int file_num = 0;
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -369,8 +424,7 @@ void ctobssim::get_parameters(void)
     } // endif: there was no observation in the container
 
     // Get other parameters
-    m_outfile = par("outfile")->value();
-    m_seed    = par("seed")->integer();
+    m_seed = par("seed")->integer();
 
     // Initialise random number generator
     m_ran.seed(m_seed);
@@ -510,7 +564,7 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
  *
  * @exception GCTAException::no_pointing
  *            No valid pointing found in CTA observation
- * @exception GException::no_response
+ * @exception GCTAException::no_response
  *            No valid response found in CTA observation
  *
  * Simulate source events from a photon list for a given CTA observation.
@@ -536,7 +590,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GPhotons& photons)
         // is not defined.
         GCTAResponse* rsp = obs->response();
         if (rsp == NULL)
-            throw GException::no_response(G_SIMULATE_SOURCE);
+            throw GCTAException::no_response(G_SIMULATE_SOURCE);
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
@@ -748,6 +802,34 @@ void ctobssim::init_members(void)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctobssim::copy_members(const ctobssim& app)
+{
+    // Copy attributes
+    m_infile  = app.m_infile;
+    m_outfile = app.m_outfile;
+    m_caldb   = app.m_caldb;
+    m_irf     = app.m_irf;
+    m_obs     = app.m_obs;
+    m_seed    = app.m_seed;
+    m_ra      = app.m_ra;
+    m_dec     = app.m_dec;
+    m_rad     = app.m_rad;
+    m_tmin    = app.m_tmin;
+    m_tmax    = app.m_tmax;
+    m_emin    = app.m_emin;
+    m_emax    = app.m_emax;
+    m_area    = app.m_area;
+
+    // Return
+    return;
+}    
 
 
 /***********************************************************************//**
