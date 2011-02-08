@@ -18,6 +18,7 @@
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctbin.hpp"
+#include "GTools.hpp"
 %}
 %include gammalib.i
 
@@ -25,7 +26,7 @@
 /***********************************************************************//**
  * @class ctbin
  *
- * @brief CTA data binning tool Python interface defintion
+ * @brief CTA data binning tool Python interface
  ***************************************************************************/
 class ctbin : public GApplication  {
 public:
@@ -48,7 +49,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA data binning tool SWIG extension
+ * @brief CTA data binning tool Python extension
  ***************************************************************************/
 %extend ctbin {
     ctbin copy() {

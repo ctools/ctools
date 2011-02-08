@@ -12,12 +12,13 @@
  ***************************************************************************/
 /**
  * @file ctobssim.i
- * @brief CTA observation simulation tool python interface definition
+ * @brief CTA observation simulation tool Python interface definition
  * @author J. Knodlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctobssim.hpp"
+#include "GTools.hpp"
 %}
 %include gammalib.i
 
@@ -25,7 +26,7 @@
 /***********************************************************************//**
  * @class ctobssim
  *
- * @brief CTA data selection tool python interface defintion.
+ * @brief CTA data selection tool Python interface
  ***************************************************************************/
 class ctobssim : public GApplication  {
 public:
@@ -51,7 +52,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA observation simulation tool extension
+ * @brief CTA observation simulation tool Python extension
  ***************************************************************************/
 %extend ctobssim {
     ctobssim copy() {

@@ -18,6 +18,7 @@
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctlike.hpp"
+#include "GTools.hpp"
 %}
 %include gammalib.i
 
@@ -25,7 +26,7 @@
 /***********************************************************************//**
  * @class ctlike
  *
- * @brief CTA maximum likelihood tool Python interface defintion
+ * @brief CTA maximum likelihood tool Python interface
  ***************************************************************************/
 class ctlike : public GApplication  {
 public:
@@ -50,7 +51,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA maximum likelihood tool SWIG extension
+ * @brief CTA maximum likelihood tool Python extension
  ***************************************************************************/
 %extend ctlike {
     ctlike copy() {
