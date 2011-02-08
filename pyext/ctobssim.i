@@ -43,6 +43,7 @@ public:
     void           save(void);
     GObservations& obs(void);
     void           get_parameters(void);
+    void           set_list(GCTAObservation* obs);
     GPhotons       simulate_photons(const GCTAObservation* obs, const GModels& models);
     void           simulate_source(GCTAObservation* obs, const GPhotons& photons);
     void           simulate_background(GCTAObservation* obs, const GModels& models);

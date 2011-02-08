@@ -20,7 +20,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "ctobssim.hpp"
 #include "GTools.hpp"
 
@@ -266,12 +266,6 @@ void ctobssim::run(void)
                     log.header3("Observation");
             }
 
-            // Allocate CTA event list and attach it to the observation.
-            // Note that the events() method removes any existing event
-            // list before attaching a new event list.
-            GCTAEventList* events = new GCTAEventList;
-            obs->events(events);
-
             // Write header for photon simulation
             //if (logTerse())
             //    log.header3("Simulate photons");
@@ -370,14 +364,63 @@ void ctobssim::get_parameters(void)
         m_irf    = par("irf")->value();
         m_ra     = par("ra")->real();
         m_dec    = par("dec")->real();
-        m_rad    = par("rad")->real();
-        m_tmin   = par("tmin")->real();
-        m_tmax   = par("tmax")->real();
-        m_emin   = par("emin")->real();
-        m_emax   = par("emax")->real();
+
+        // Set pointing direction
+        GCTAPointing pnt;
+        GSkyDir      skydir;
+        skydir.radec_deg(m_ra, m_dec);
+        pnt.dir(skydir);
 
         // Allocate CTA observation
         GCTAObservation obs;
+
+        // Set CTA observation attributes
+        obs.pointing(pnt);
+        obs.response(m_irf, m_caldb);
+
+        // Set event list (queries remaining parameters)
+        set_list(&obs);
+
+        // Append CTA observation to container
+        m_obs.append(obs);
+
+        // Load models into container
+        m_obs.models(m_infile);
+
+    } // endif: there was no observation in the container
+
+    // Get other parameters
+    m_seed = par("seed")->integer();
+
+    // Initialise random number generator
+    m_ran.seed(m_seed);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set empty CTA event list
+ *
+ * @param[in] obs Attach empty event list to CTA observation
+ ***************************************************************************/
+void ctobssim::set_list(GCTAObservation* obs)
+{
+    // Continue only if observation is valid
+    if (obs != NULL) {
+
+        // Get CTA observation parameters
+        m_ra   = par("ra")->real();
+        m_dec  = par("dec")->real();
+        m_rad  = par("rad")->real();
+        m_tmin = par("tmin")->real();
+        m_tmax = par("tmax")->real();
+        m_emin = par("emin")->real();
+        m_emax = par("emax")->real();
+
+        // Allocate CTA event list
+        GCTAEventList events;
 
         // Set pointing direction
         GCTAPointing pnt;
@@ -408,26 +451,15 @@ void ctobssim::get_parameters(void)
         emax.TeV(m_emax);
         ebounds.append(emin, emax);
 
-        // Set CTA observation attributes
-        obs.pointing(pnt);
-        obs.response(m_irf, m_caldb);
-        obs.roi(&roi);
-        obs.gti(gti);
-        obs.ebounds(ebounds);
+        // Set CTA event list attributes
+        events.roi(roi);
+        events.gti(gti);
+        events.ebounds(ebounds);
 
-        // Append CTA observation to container
-        m_obs.append(obs);
+        // Attach event list to CTA observation
+        obs->events(&events);
 
-        // Load models into container
-        m_obs.models(m_infile);
-
-    } // endif: there was no observation in the container
-
-    // Get other parameters
-    m_seed = par("seed")->integer();
-
-    // Initialise random number generator
-    m_ran.seed(m_seed);
+    } // endif: oberservation was valid
 
     // Return
     return;
@@ -455,10 +487,12 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
     // Initialise indentation for logging
     int indent = 0;
 
-    // Extract MC parameters from observation
-    const GCTARoi* roi = static_cast<const GCTARoi*>(obs->roi());
-    GSkyDir        dir = roi->centre().skydir();
-    double         rad = roi->radius();
+    // Get CTA event list
+    const GCTAEventList* events = dynamic_cast<const GCTAEventList*>(obs->events());
+
+    // Extract ROI
+    GSkyDir dir = events->roi().centre().skydir();
+    double  rad = events->roi().radius();
 
     // Dump simulation cone information
     if (logNormal()) {
@@ -476,15 +510,15 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
     GPhotons photons;
 
     // Loop over all Good Time Intervals
-    for (int it = 0; it <  obs->gti().size(); ++it) {
+    for (int it = 0; it <  events->gti().size(); ++it) {
 
         // Extract time interval
-        GTime tmin = obs->gti().tstart(it);
-        GTime tmax = obs->gti().tstop(it);
+        GTime tmin = events->gti().tstart(it);
+        GTime tmax = events->gti().tstop(it);
 
         // Dump time interval
         if (logNormal()) {
-            if (obs->gti().size() > 1) {
+            if (events->gti().size() > 1) {
                 indent++;
                 log.indent(indent);
             }
@@ -493,15 +527,15 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
         }
 
         // Loop over all energy boundaries
-        for (int ie = 0; ie <  obs->ebounds().size(); ++ie) {
+        for (int ie = 0; ie <  events->ebounds().size(); ++ie) {
 
             // Extract energy boundaries
-            GEnergy emin = obs->ebounds().emin(ie);
-            GEnergy emax = obs->ebounds().emax(ie);
+            GEnergy emin = events->ebounds().emin(ie);
+            GEnergy emax = events->ebounds().emax(ie);
 
             // Dump energy range
             if (logNormal()) {
-                if (obs->ebounds().size() > 1) {
+                if (events->ebounds().size() > 1) {
                     indent++;
                     log.indent(indent);
                 }
@@ -582,7 +616,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GPhotons& photons)
         // pointings implement we just determine the pointing from the
         // beginning of the observation. Throw an exception if the pointing
         // is not defined.
-        GCTAPointing* pnt = obs->pointing(obs->tstart());
+        GCTAPointing* pnt = obs->pointing(obs->events()->tstart());
         if (pnt == NULL)
             throw GCTAException::no_pointing(G_SIMULATE_SOURCE);
 
@@ -595,7 +629,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GPhotons& photons)
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
-            obs->events(new GCTAEventList);
+            set_list(obs);
     
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = (GCTAEventList*)(obs->events());
@@ -644,7 +678,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
-            obs->events(new GCTAEventList);
+            set_list(obs);
     
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = (GCTAEventList*)(obs->events());
@@ -667,7 +701,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
 
                 // Append events
                 for (int k = 0; k < list->size(); k++)
-                    events->append(*(list->pointer(k)));
+                    events->append(*((*list)[k]));
 
                 // Dump simulation results
                 if (logNormal()) {

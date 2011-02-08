@@ -407,8 +407,10 @@ void ctbin::bin_events(GCTAObservation* obs)
         emin.TeV(m_emin);
         emax.TeV(m_emax);
         ebds.setlog(emin, emax, m_enumbins);
-        obs->ebounds(ebds);
 
+        // Get Good Time intervals
+        GGti gti = obs->events()->gti();
+        
         // Create skymap
         GSkymap map = GSkymap(m_proj, m_coordsys,
                              m_xref, m_yref, m_binsz, m_binsz,
@@ -436,7 +438,7 @@ void ctbin::bin_events(GCTAObservation* obs)
             }
 
             // Determine energy bin. Skip if we are outside the energy range
-            int index = obs->ebounds().index(event->energy());
+            int index = ebds.index(event->energy());
             if (index == -1) {
                 num_outside_ebds++;
                 continue;
@@ -470,7 +472,7 @@ void ctbin::bin_events(GCTAObservation* obs)
         }
 
         // Create events cube from sky map
-        GCTAEventCube cube(map, obs->ebounds(), obs->gti());
+        GCTAEventCube cube(map, ebds, gti);
 
         // Replace event list by event cube in observation
         obs->events(&cube);
