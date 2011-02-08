@@ -20,7 +20,6 @@
 #include "ctselect.hpp"
 #include "GTools.hpp"
 %}
-%include gammalib.i
 
 
 /***********************************************************************//**

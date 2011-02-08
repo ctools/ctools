@@ -20,7 +20,6 @@
 #include "ctobssim.hpp"
 #include "GTools.hpp"
 %}
-%include gammalib.i
 
 
 /***********************************************************************//**

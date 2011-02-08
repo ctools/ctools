@@ -1,7 +1,7 @@
 /***************************************************************************
  *                         ctatools - SWIG file                            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -11,14 +11,17 @@
  *                                                                         *
  * ----------------------------------------------------------------------- *
  * Usage:                                                                  *
- * swig -c++ -python -Wall -includeall ctatools.i                          *
+ * swig -c++ -python -Wall ctatools.i                                      *
  ***************************************************************************/
 %module ctatools
 
-/***********************************************************************//**
- * @brief Include all CTA tools
- ***************************************************************************/
-#include "ctobssim.i"
-#include "ctselect.i"
-#include "ctbin.i"
-#include "ctlike.i"
+/* __ Support module _____________________________________________________ */
+%include "stl.i"
+%include "exception.i"
+%include "GApplication.i"
+
+/* __ CTA tools __________________________________________________________ */
+%include "ctobssim.i"
+%include "ctselect.i"
+%include "ctbin.i"
+%include "ctlike.i"

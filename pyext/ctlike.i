@@ -20,7 +20,6 @@
 #include "ctlike.hpp"
 #include "GTools.hpp"
 %}
-%include gammalib.i
 
 
 /***********************************************************************//**
