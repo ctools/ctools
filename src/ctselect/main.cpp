@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctselect - CTA data selection tool main code             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010 by Jurgen Knodlseder                                *
+ *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,7 +20,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "ctselect.hpp"
 
 
@@ -40,7 +40,10 @@ int main (int argc, char *argv[])
 
     // Run application
     try {
-        application.run();
+        // Execute application
+        application.execute();
+
+        // Signal success
         rc = 0;
     }
     catch (std::exception &e) {
@@ -48,7 +51,7 @@ int main (int argc, char *argv[])
         // Extract error message
         std::string message = e.what();
         std::string signal  = "*** ERROR encounterted in the execution of"
-                              "  ctselect. Run aborted ...";
+                              " ctselect. Run aborted ...";
 
         // Write error in logger
         application.log << signal  << std::endl;

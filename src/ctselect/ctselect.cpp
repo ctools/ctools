@@ -20,18 +20,13 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "ctselect.hpp"
 #include "GTools.hpp"
 
 /* __ Debug definitions __________________________________________________ */
-#define BIT_COLUMN_TEST    0
-#define STRING_COLUMN_TEST 1
 
 /* __ Coding definitions _________________________________________________ */
-#define SELECT_TIME   1
-#define SELECT_ENERGY 1
-#define SELECT_ROI    1
 
 
 /*==========================================================================
@@ -57,6 +52,30 @@ ctselect::ctselect(void) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
 
 
 /***********************************************************************//**
+ * @brief Observations constructor
+ *
+ * This constructor creates an instance of the class that is initialised from
+ * an observation container.
+ ***************************************************************************/
+ctselect::ctselect(GObservations obs) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
+{
+    // Initialise members
+    init_members();
+
+    // Set observations
+    m_obs = obs;
+
+    // Write header into logger
+    log_header();
+
+    // Return
+    return;
+}
+
+
+
+
+/***********************************************************************//**
  * @brief Command line constructor
  *
  * @param[in] argc Number of arguments in command line.
@@ -70,6 +89,24 @@ ctselect::ctselect(int argc, char *argv[]) :
 
     // Write header into logger
     log_header();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy constructor
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctselect::ctselect(const ctselect& app) : GApplication(app)
+{
+    // Initialise members
+    init_members();
+
+    // Copy members
+    copy_members(app);
 
     // Return
     return;
@@ -95,6 +132,35 @@ ctselect::~ctselect(void)
  =                                                                         =
  ==========================================================================*/
 
+/***********************************************************************//**
+ * @brief Assignment operator
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+ctselect& ctselect::operator= (const ctselect& app)
+{
+    // Execute only if object is not identical
+    if (this != &app) {
+
+        // Copy base class members
+        this->GApplication::operator=(app);
+
+        // Free members
+        free_members();
+
+        // Initialise members
+        init_members();
+
+        // Copy members
+        copy_members(app);
+
+    } // endif: object was not identical
+
+    // Return this object
+    return *this;
+}
+
+
 /*==========================================================================
  =                                                                         =
  =                            Public methods                               =
@@ -102,10 +168,55 @@ ctselect::~ctselect(void)
  ==========================================================================*/
 
 /***********************************************************************//**
+ * @brief Clear instance
+ ***************************************************************************/
+void ctselect::clear(void)
+{
+    // Free members
+    free_members();
+    this->GApplication::free_members();
+
+    // Initialise members
+    this->GApplication::init_members();
+    init_members();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Execute application
+ *
+ * This method performs the event selection and saves the result
+ ***************************************************************************/
+void ctselect::execute(void)
+{
+    // Read ahead output filename so that it gets dumped correctly in the
+    // parameters log
+    m_outfile = par("outfile")->value();
+
+    // Perform event selection
+    run();
+
+    // Save results
+    save();
+
+    // Return
+    return;
+}
+
+
+
+/***********************************************************************//**
  * @brief Select event data
  *
- * A GTI is appended to the FITS file as in the actual data format no GTI
- * exists.
+ * This method reads in the application parameters and loops over all
+ * observations that were found to perform an event selection. Event
+ * selection is done by writing each observation to a temporary file and
+ * re-opening the temporary file using the cfitsio event filter syntax.
+ * The temporary file is deleted after this action so that no disk overflow
+ * will occur. 
  ***************************************************************************/
 void ctselect::run(void)
 {
@@ -122,24 +233,95 @@ void ctselect::run(void)
         log << std::endl;
     }
 
-    // Select events
-    select();
-
-    // Append GTI to FITS file
-    append_gti();
-
-    // Set data selection keywords
-    write_ds_keys();
-
-    // Save output FITS file
-    m_file.saveto(m_outfile, clobber());
-
-    // Close FITS file
-    m_file.close();
-
-    // Write separator into logger
-    if (logTerse())
+    // Write observation(s) into logger
+    if (logTerse()) {
         log << std::endl;
+        log.header1("Observations before selection");
+        log << m_obs << std::endl;
+    }
+
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Event selection");
+    }
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+
+        // Continue only if observation is a CTA observation
+        if (obs != NULL) {
+
+            // Write header for observation
+            if (logTerse()) {
+                if (obs->name().length() > 1)
+                    log.header3("Observation "+obs->name());
+                else
+                    log.header3("Observation");
+            }
+
+            // Get temporary file name
+            std::string filename = std::tmpnam(NULL);
+
+            // Save observation in temporary file
+            obs->save(filename, true);
+            
+            // Load observation from temporary file, including event selection
+            select_events(obs, filename);
+
+            // Remove temporary file
+            std::remove(filename.c_str());
+
+        } // endif: had a CTA observation
+
+    } // endfor: looped over all observations
+
+    // Write observation(s) into logger
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Observations after selection");
+        log << m_obs << std::endl;
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save simulated observation
+ *
+ * This method saves the results.
+ ***************************************************************************/
+void ctselect::save(void)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Save observations");
+    }
+
+    // Get output filename
+    m_outfile = par("outfile")->value();
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+
+        // Save only if observation is a CTA observation
+        if (obs != NULL) {
+
+            // Save file
+            obs->save(m_outfile, clobber());
+
+        } // endif: observation was valid
+
+    } // endfor: looped over observations
 
     // Return
     return;
@@ -154,16 +336,32 @@ void ctselect::run(void)
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
+    // If there are no observations in container then add a single CTA
+    // observation using the parameters from the parameter file
+    if (m_obs.size() == 0) {
+
+        // Get CTA event list file name
+        m_infile = par("infile")->value();
+
+        // Allocate CTA observation
+        GCTAObservation obs;
+
+        // Load CTA observation from file
+        obs.load_unbinned(m_infile);
+
+        // Append CTA observation to container
+        m_obs.append(obs);
+
+    } // endif: there was no observation in the container
+
     // Get parameters
-    m_infile  = par("infile")->value();
-    m_outfile = par("outfile")->value();
-    m_ra      = par("ra")->real();
-    m_dec     = par("dec")->real();
-    m_rad     = par("rad")->real();
-    m_tmin    = par("tmin")->real();
-    m_tmax    = par("tmax")->real();
-    m_emin    = par("emin")->real();
-    m_emax    = par("emax")->real();
+    m_ra   = par("ra")->real();
+    m_dec  = par("dec")->real();
+    m_rad  = par("rad")->real();
+    m_tmin = par("tmin")->real();
+    m_tmax = par("tmax")->real();
+    m_emin = par("emin")->real();
+    m_emax = par("emax")->real();
 
     // Return
     return;
@@ -174,170 +372,99 @@ void ctselect::get_parameters(void)
  * @brief Select events
  *
  * Select events from a FITS file by making use of the selection possibility
- * of the cfitsio library on loading a file into memory. Event selection is
- * kept optional (on compile time) as the data format may still evolve (for
- * the time being the TIME information is not valid).
+ * of the cfitsio library on loading a file.
  *
- * @todo Set data selection keywords.
+ * @todo Implement a observation read() method to avoid saving the
+ *       observation to a temporary file.
  ***************************************************************************/
-void ctselect::select(void)
+void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 {
-    // Write Header for event selection
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Event selection");
-    }
-
-    // Build selection string
+    // Allocate selection string
     std::string selection;
-    #if SELECT_TIME
+
+    // Make time selection
     selection = "TIME >= "+str(m_tmin)+" && TIME <= "+str(m_tmax);
     if (logTerse())
         log << " Time range ................: " << m_tmin << "-" << m_tmax
             << std::endl;
-    #endif
-    #if SELECT_ENERGY
     if (selection.length() > 0)
         selection += " && ";
+
+    // Make energy selection
     selection += "ENERGY >= "+str(m_emin)+" && ENERGY <= "+str(m_emax);
     if (logTerse())
         log << " Energy range ..............: " << m_emin << "-" << m_emax
             << " TeV" << std::endl;
-    #endif
-    #if SELECT_ROI
     if (selection.length() > 0)
         selection += " && ";
+
+    // Make ROI selection
     selection += "ANGSEP("+str(m_ra)+","+str(m_dec)+",RA,DEC) <= "+str(m_rad);
     if (logTerse()) {
         log << " Acceptance cone centre ....: RA=" << m_ra << ", DEC=" << m_dec
             << " deg" << std::endl;
         log << " Acceptance cone radius ....: " << m_rad << " deg" << std::endl;
     }
-    #endif
     if (logTerse())
         log << " cfitsio selection .........: " << selection << std::endl;
 
     // Build input filename including selection expression
-    std::string expression = m_infile;
+    std::string expression = filename;
     if (selection.length() > 0)
         expression += "[EVENTS]["+selection+"]";
     if (logTerse())
         log << " FITS filename .............: " << expression << std::endl;
 
     // Open FITS file
-    m_file.open(expression);
+    GFits file(expression);
 
     // Log selected FITS file
     if (logExplicit()) {
         log << std::endl;
         log.header1("FITS file content after selection");
-        log << m_file << std::endl;
+        log << file << std::endl;
     }
 
-    // Return
-    return;
-}
+    // Get temporary file name
+    std::string tmpname = std::tmpnam(NULL);
+    
+    // Save FITS file to temporary file
+    file.saveto(tmpname, true);
+            
+    // Load observation from temporary file
+    obs->load_unbinned(tmpname);
 
+    // Get CTA event list pointer
+    GCTAEventList* list = (GCTAEventList*)(obs->events());
 
-/***********************************************************************//**
- * @brief Append GTI to FITS file
- *
- * @todo We implement here a dummy method that overwrites an existing GTI
- *       entry but that only works if a single time interval exists. This
- *       is not clean, but since we have no method so far that allows
- *       deleting a HDU from a FITS file we have no other choice. Ideally,
- *       we would like to first delete an existing HDU and then append
- *       a new one. If this is not possible, we would like to delete the
- *       rows from an existing GTI and then fill it up anew. But in any
- *       case, the actual data selection method does not check the
- *       existing GTI, which we have to do to merge any subselection
- *       information in. In fact, we need a GTI merge method as well ...
- ***************************************************************************/
-void ctselect::append_gti(void)
-{
-    // Setup selected time range
+    // Set ROI
+    GCTARoi     roi;
+    GCTAInstDir instdir;
+    instdir.radec_deg(m_ra, m_dec);
+    roi.centre(instdir);
+    roi.radius(m_rad);
+    list->roi(roi);
+
+    // Set GTI
+    GGti  gti;
     GTime tstart;
     GTime tstop;
     tstart.met(m_tmin);
     tstop.met(m_tmax);
+    gti.append(tstart, tstop);
+    list->gti(gti);
 
-    // Initialise empty GTI table HDU
-    GFitsTable* hdu = NULL;
-    
-    // Write selected time interval, either in an existing GTI or in a new
-    // GTI that is appended to the FITS file
-    try {
-        hdu = m_file.table("GTI");
-        GFitsTableDoubleCol* start = (GFitsTableDoubleCol*)hdu->column("START");
-        GFitsTableDoubleCol* stop  = (GFitsTableDoubleCol*)hdu->column("STOP");
-        (*start)(0) = tstart.met();
-        (*stop)(0)  = tstop.met();
-    }
-    catch (GException::fits_hdu_not_found) {
-        // Allocate Gti
-        GGti gti;
+    // Set energy boundaries
+    GEbounds ebounds;
+    GEnergy  emin;
+    GEnergy  emax;
+    emin.TeV(m_emin);
+    emax.TeV(m_emax);
+    ebounds.append(emin, emax);
+    list->ebounds(ebounds);
 
-        // Setup single GTI covering the selected time range
-        gti.add(tstart, tstop);
-
-        // Write GTI
-        gti.write(&m_file);
-    }
-
-    // Log final FITS file
-    if (logExplicit()) {
-        log << std::endl;
-        log.header1("Final FITS file content");
-        log << m_file << std::endl;
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Write data selection keywords
- *
- * @todo This is a very dumb data selection keyword writing routine that does
- *       not take into account any existing keywords. We definitely want a
- *       more secure logic that checks for existing keywords and possible
- *       conflicts. But for this prototype software, this code does the job.
- ***************************************************************************/
-void ctselect::write_ds_keys(void)
-{
-    // Get event list header
-    GFitsHDU* hdu = m_file.hdu("EVENTS");
-
-    // Continue only if HDU is valid
-    if (hdu != NULL) {
-
-        // Set cone selection string
-        std::string dsval2 = "CIRCLE("+str(m_ra)+","+str(m_dec)+","+str(m_rad)+")";
-
-        // Set energy selection string
-        std::string dsval3 = str(m_emin)+":"+str(m_emax);
-
-        // Add time selection keywords
-        hdu->card("DSTYP1", "TIME",  "Data selection type");
-        hdu->card("DSUNI1", "s",     "Data selection unit");
-        hdu->card("DSVAL1", "TABLE", "Data selection value");
-        hdu->card("DSREF1", ":GTI",  "Data selection reference");
-
-        // Add acceptance cone selection
-        hdu->card("DSTYP2", "POS(RA,DEC)", "Data selection type");
-        hdu->card("DSUNI2", "deg",         "Data selection unit");
-        hdu->card("DSVAL2", dsval2,        "Data selection value");
-        
-        // Add energy range selection
-        hdu->card("DSTYP3", "ENERGY", "Data selection type");
-        hdu->card("DSUNI3", "TeV",    "Data selection unit");
-        hdu->card("DSVAL3", dsval3,   "Data selection value");
-
-        // Set number of data selection keys
-        hdu->card("NDSKEYS", 3,  "Number of data selections");
-
-    } // endif: HDU was valid
+    // Remove temporary file
+    std::remove(tmpname.c_str());
 
     // Return
     return;
@@ -358,6 +485,7 @@ void ctselect::init_members(void)
     // Initialise members
     m_infile.clear();
     m_outfile.clear();
+    m_obs.clear();
     m_ra   = 0.0;
     m_dec  = 0.0;
     m_rad  = 0.0;
@@ -375,11 +503,37 @@ void ctselect::init_members(void)
 
 
 /***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctselect::copy_members(const ctselect& app)
+{
+    // Copy attributes
+    m_infile  = app.m_infile;
+    m_outfile = app.m_outfile;
+    m_obs     = app.m_obs;
+    m_ra      = app.m_ra;
+    m_dec     = app.m_dec;
+    m_rad     = app.m_rad;
+    m_tmin    = app.m_tmin;
+    m_tmax    = app.m_tmax;
+    m_emin    = app.m_emin;
+    m_emax    = app.m_emax;
+
+    // Return
+    return;
+}    
+
+
+/***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
 void ctselect::free_members(void)
 {
-    // Free members
+    // Write separator into logger
+    if (logTerse())
+        log << std::endl;
 
     // Return
     return;
