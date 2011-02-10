@@ -98,7 +98,6 @@ def pipeline_v1():
 	like["srcmdl"].filename(model_name)
 	like["outmdl"].filename(result_name)
 	like["method"].string("BINNED")
-	like["stat"].string("POISSON")
 	like["caldb"].string(caldb)
 	like["irf"].string(irf)
 	like.execute()
