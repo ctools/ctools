@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: ctatools
+Description: CTA science analysis tools
+Version: 0.2.0
+Libs: -L${libdir} -lctatools @LIBS@
+Cflags: -I${includedir}/ctatools
