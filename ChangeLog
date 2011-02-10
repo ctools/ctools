@@ -1,3 +1,12 @@
+2011-??-??  Juergen Knoedlseder  <knodlseder@cesr.fr>
+
+        * Version 0.2.0 released
+        ========================
+
+        Standardize Python interface
+        Add unit test (make check)
+        Add html documentation
+
 2011-02-02  Juergen Knoedlseder  <knodlseder@cesr.fr>
 
         * Version 0.1.0 released
