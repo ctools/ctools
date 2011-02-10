@@ -9,7 +9,7 @@ if ENABLE_PYTHON_BINDING
 if HAVE_PYTHON
 if WITH_PYTHON_BINDING
   TEST_PYTHON_SCRIPT = test_python.py
-  TEST_PYTHON_ENV    = PYTHONPATH=$(top_builddir)/pyext/build:$(PYTHONPATH)
+  TEST_PYTHON_ENV    = PYTHONPATH=$(top_builddir)/pyext/build:$(pythondir):$(PYTHONPATH)
 endif
 endif
 endif
