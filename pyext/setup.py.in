@@ -2,11 +2,30 @@ from distutils.core import setup, Extension
 import glob
 import os
 
+# Remove any existing symbolic link to libctatools.a
+# This will prevent any exception in creating the symbolic link due to
+# an already existing link.
+try:
+	os.remove('../src/.libs/libctatools_python.a')
+	print 'Removed ../src/.libs/libctatools_python.a'
+except:
+	pass
+
+# Create a symbolic link. This allows us to enforce static linking instead of
+# dynamic linking. We prefer here static linking to avoid any problems with
+# finding the gammalib shared library during checking.
+try:
+	os.symlink('libctatools.a', '../src/.libs/libctatools_python.a')
+	print 'Created ../src/.libs/libctatools_python.a'
+	libcta='ctatools_python'
+except:
+	libcta='ctatool'
+
 # Set default include directories and data files
 include_dirs = ['@prefix@/include/gammalib']
 data_files   = glob.glob('@top_srcdir@/pyext/*.i')
 library_dirs = ['../src/.libs','@prefix@/lib']
-libraries    = ['ctatools','gamma','cfitsio']
+libraries    = [libcta,'gamma','cfitsio']
 
 # Add application include files
 dirs = glob.glob('../src/ct*')
