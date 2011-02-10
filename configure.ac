@@ -227,7 +227,8 @@ AC_CONFIG_FILES([Makefile
                  src/ctobssim/Makefile
                  test/Makefile
                  pyext/Makefile
-                 pyext/setup.py])
+                 pyext/setup.py
+                 ctatools.pc])
 AC_OUTPUT
 
 
