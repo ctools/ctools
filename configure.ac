@@ -4,7 +4,7 @@
 #
 # Process this file with autoconf to produce a configure script
 
-AC_INIT([ctatools], [0.1.0], [knodlseder@cesr.fr], [ctatools], [http://cta.irap.omp.eu/ctatools])
+AC_INIT([ctatools], [0.2.0], [knodlseder@cesr.fr], [ctatools], [http://cta.irap.omp.eu/ctatools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -225,6 +225,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctbin/Makefile
                  src/ctlike/Makefile
                  src/ctobssim/Makefile
+                 test/Makefile
                  pyext/Makefile
                  pyext/setup.py])
 AC_OUTPUT
