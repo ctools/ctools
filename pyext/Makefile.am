@@ -21,7 +21,15 @@ if HAVE_SWIG
   CLEANFILES = ctatools_wrap.cpp ctatools.py
 endif
 
-all-local: ctatools_wrap.cpp ctatools.py
+all-local: build
+
+# We build the python extension twice since the install step needs the result
+# in a specific directory and the test make check has no access to the name
+# of this specific directory. So we build one instance for checking, the other
+# for installation. If we could get the name built by distutils we could avoid
+# this.
+build: ctatools_wrap.cpp ctatools.py
+	$(PYTHON_BUILD_PREFIX) $(PYTHON) setup.py build --build-platlib build
 	$(PYTHON_BUILD_PREFIX) $(PYTHON) setup.py build
 
 install-exec-local:
