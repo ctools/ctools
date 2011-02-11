@@ -196,7 +196,7 @@ void ctobssim::execute(void)
 {
     // Read ahead output filename so that it gets dumped correctly in the
     // parameters log
-    m_outfile = par("outfile")->value();
+    m_outfile = (*this)["outfile"].filename();
 
     // Run the simulation
     run();
@@ -253,7 +253,7 @@ void ctobssim::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
 
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
@@ -313,14 +313,14 @@ void ctobssim::save(void)
     }
 
     // Get output filename
-    m_outfile = par("outfile")->value();
+    m_outfile = (*this)["outfile"].filename();
 
     // Loop over all observation in the container
     int file_num = 0;
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
 
         // Save only if observation is a CTA observation
         if (obs != NULL) {
@@ -359,11 +359,11 @@ void ctobssim::get_parameters(void)
     if (m_obs.size() == 0) {
 
         // Get CTA observation parameters
-        m_infile = par("infile")->value();
-        m_caldb  = par("caldb")->value();
-        m_irf    = par("irf")->value();
-        m_ra     = par("ra")->real();
-        m_dec    = par("dec")->real();
+        m_infile = (*this)["infile"].filename();
+        m_caldb  = (*this)["caldb"].string();
+        m_irf    = (*this)["irf"].string();
+        m_ra     = (*this)["ra"].real();
+        m_dec    = (*this)["dec"].real();
 
         // Set pointing direction
         GCTAPointing pnt;
@@ -390,7 +390,7 @@ void ctobssim::get_parameters(void)
     } // endif: there was no observation in the container
 
     // Get other parameters
-    m_seed = par("seed")->integer();
+    m_seed = (*this)["seed"].integer();
 
     // Initialise random number generator
     m_ran.seed(m_seed);
@@ -411,13 +411,13 @@ void ctobssim::set_list(GCTAObservation* obs)
     if (obs != NULL) {
 
         // Get CTA observation parameters
-        m_ra   = par("ra")->real();
-        m_dec  = par("dec")->real();
-        m_rad  = par("rad")->real();
-        m_tmin = par("tmin")->real();
-        m_tmax = par("tmax")->real();
-        m_emin = par("emin")->real();
-        m_emax = par("emax")->real();
+        m_ra   = (*this)["ra"].real();
+        m_dec  = (*this)["dec"].real();
+        m_rad  = (*this)["rad"].real();
+        m_tmin = (*this)["tmin"].real();
+        m_tmax = (*this)["tmax"].real();
+        m_emin = (*this)["emin"].real();
+        m_emax = (*this)["emax"].real();
 
         // Allocate CTA event list
         GCTAEventList events;
@@ -547,7 +547,7 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
             for (int i = 0; i < models.size(); ++i) {
 
                 // Get sky model (NULL if not a sky model)
-                const GModelSky* model = dynamic_cast<const GModelSky*>(models(i));
+                const GModelSky* model = dynamic_cast<const GModelSky*>(&models[i]);
 
                 // If we have a sky model then simulate photons
                 if (model != NULL) {
@@ -688,7 +688,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
 
             // Get model (NULL if not a radial acceptance model)
             const GCTAModelRadialAcceptance* model = 
-                  dynamic_cast<const GCTAModelRadialAcceptance*>(models(i));
+                  dynamic_cast<const GCTAModelRadialAcceptance*>(&models[i]);
 
             // If we have a radial acceptance model then simulate events
             if (model != NULL) {

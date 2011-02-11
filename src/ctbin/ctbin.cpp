@@ -197,7 +197,7 @@ void ctbin::execute(void)
 {
     // Read ahead output filename so that it gets dumped correctly in the
     // parameters log
-    m_outfile = par("outfile")->value();
+    m_outfile = (*this)["outfile"].filename();
 
     // Bin the event data
     run();
@@ -251,7 +251,7 @@ void ctbin::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
 
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
@@ -303,14 +303,14 @@ void ctbin::save(void)
     }
 
     // Get output filename
-    m_outfile = par("outfile")->value();
+    m_outfile = (*this)["outfile"].filename();
 
     // Loop over all observations in the container
     int file_num = 0;
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
 
         // Save only if observation is a CTA observation
         if (obs != NULL) {
@@ -349,7 +349,7 @@ void ctbin::get_parameters(void)
     if (m_obs.size() == 0) {
 
         // Get name of CTA events file
-        m_evfile = par("evfile")->value();
+        m_evfile = (*this)["evfile"].filename();
 
         // Load unbinned CTA observation
         GCTAObservation obs;
@@ -361,16 +361,16 @@ void ctbin::get_parameters(void)
     } // endif: there was no observation in the container
 
     // Get remaining parameters
-    m_emin     = par("emin")->real();
-    m_emax     = par("emax")->real();
-    m_enumbins = par("enumbins")->integer();
-    m_proj     = par("proj")->value();
-    m_coordsys = par("coordsys")->value();
-    m_xref     = par("xref")->real();
-    m_yref     = par("yref")->real();
-    m_binsz    = par("binsz")->real();
-    m_nxpix    = par("nxpix")->integer();
-    m_nypix    = par("nypix")->integer();
+    m_emin     = (*this)["emin"].real();
+    m_emax     = (*this)["emax"].real();
+    m_enumbins = (*this)["enumbins"].integer();
+    m_proj     = (*this)["proj"].string();
+    m_coordsys = (*this)["coordsys"].string();
+    m_xref     = (*this)["xref"].real();
+    m_yref     = (*this)["yref"].real();
+    m_binsz    = (*this)["binsz"].real();
+    m_nxpix    = (*this)["nxpix"].integer();
+    m_nypix    = (*this)["nypix"].integer();
 
     // Return
     return;

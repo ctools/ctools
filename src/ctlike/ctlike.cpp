@@ -196,7 +196,7 @@ void ctlike::execute(void)
 {
     // Read ahead output filename so that it gets dumped correctly in the
     // parameters log
-    m_outmdl = par("outmdl")->value();
+    m_outmdl = (*this)["outmdl"].filename();
 
     // Bin the event data
     run();
@@ -272,7 +272,7 @@ void ctlike::save(void)
     }
 
     // Get output filename
-    m_outmdl = par("outmdl")->value();
+    m_outmdl = (*this)["outmdl"].value();
 
     // Write results out as XML model
     if (toupper(m_outmdl) != "NONE")
@@ -309,7 +309,7 @@ void ctlike::get_parameters(void)
     if (m_obs.models().size() == 0) {
 
         // Get models XML filename
-        std::string filename = par("srcmdl")->value();
+        std::string filename = (*this)["srcmdl"].filename();
         
         // Setup models for optimizing.
         m_obs.models(GModels(filename));
@@ -321,16 +321,16 @@ void ctlike::get_parameters(void)
     if (m_obs.size() == 0) {
 
         // Get observation parameters
-        m_method = toupper(par("method")->value());
-        m_stat   = toupper(par("stat")->value());
-        m_caldb  = par("caldb")->value();
-        m_irf    = par("irf")->value();
+        m_method = toupper((*this)["method"].string());
+        m_stat   = toupper((*this)["stat"].string());
+        m_caldb  = (*this)["caldb"].string();
+        m_irf    = (*this)["irf"].string();
 
         // Case A: set-up unbinned CTA observation
         if (m_method == "UNBINNED") {
 
             // Get event file name
-            std::string filename = par("evfile")->value();
+            std::string filename = (*this)["evfile"].filename();
 
             // Load and append unbinned CTA observation
             load_unbinned(filename);
@@ -341,7 +341,7 @@ void ctlike::get_parameters(void)
         else if (m_method == "BINNED") {
 
             // Get counts map file name
-            std::string filename = par("cntmap")->value();
+            std::string filename = (*this)["cntmap"].filename();
 
             // Load and append binned CTA observation
             load_binned(filename);
@@ -357,7 +357,7 @@ void ctlike::get_parameters(void)
     } // endif: there was no observation in the container
 
     // Get standard parameters
-    m_refit  = par("refit")->boolean();
+    m_refit  = (*this)["refit"].boolean();
 
     // Return
     return;

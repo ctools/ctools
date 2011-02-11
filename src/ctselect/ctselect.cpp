@@ -194,7 +194,7 @@ void ctselect::execute(void)
 {
     // Read ahead output filename so that it gets dumped correctly in the
     // parameters log
-    m_outfile = par("outfile")->value();
+    m_outfile = (*this)["outfile"].value();
 
     // Perform event selection
     run();
@@ -250,7 +250,7 @@ void ctselect::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
 
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
@@ -305,13 +305,13 @@ void ctselect::save(void)
     }
 
     // Get output filename
-    m_outfile = par("outfile")->value();
+    m_outfile = (*this)["outfile"].value();
 
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs(i));
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
 
         // Save only if observation is a CTA observation
         if (obs != NULL) {
@@ -341,7 +341,7 @@ void ctselect::get_parameters(void)
     if (m_obs.size() == 0) {
 
         // Get CTA event list file name
-        m_infile = par("infile")->value();
+        m_infile = (*this)["infile"].value();
 
         // Allocate CTA observation
         GCTAObservation obs;
@@ -355,13 +355,13 @@ void ctselect::get_parameters(void)
     } // endif: there was no observation in the container
 
     // Get parameters
-    m_ra   = par("ra")->real();
-    m_dec  = par("dec")->real();
-    m_rad  = par("rad")->real();
-    m_tmin = par("tmin")->real();
-    m_tmax = par("tmax")->real();
-    m_emin = par("emin")->real();
-    m_emax = par("emax")->real();
+    m_ra   = (*this)["ra"].real();
+    m_dec  = (*this)["dec"].real();
+    m_rad  = (*this)["rad"].real();
+    m_tmin = (*this)["tmin"].real();
+    m_tmax = (*this)["tmax"].real();
+    m_emin = (*this)["emin"].real();
+    m_emax = (*this)["emax"].real();
 
     // Return
     return;
