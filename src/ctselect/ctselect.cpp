@@ -194,7 +194,7 @@ void ctselect::execute(void)
 {
     // Read ahead output filename so that it gets dumped correctly in the
     // parameters log
-    m_outfile = (*this)["outfile"].value();
+    m_outfile = (*this)["outfile"].filename();
 
     // Perform event selection
     run();
@@ -341,7 +341,7 @@ void ctselect::get_parameters(void)
     if (m_obs.size() == 0) {
 
         // Get CTA event list file name
-        m_infile = (*this)["infile"].value();
+        m_infile = (*this)["infile"].filename();
 
         // Allocate CTA observation
         GCTAObservation obs;
