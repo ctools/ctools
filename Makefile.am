@@ -36,6 +36,7 @@ doc_DATA = \
 	   LICENSE \
 	   NEWS \
 	   README
+docdir = ${datadir}/doc/${PACKAGE}
 
 # Models installed in the package's model directory
 models      = test/data/crab.xml
