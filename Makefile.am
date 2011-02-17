@@ -39,7 +39,8 @@ doc_DATA = \
 docdir = ${datadir}/doc/${PACKAGE}
 
 # Models installed in the package's model directory
-models      = test/data/crab.xml
+models      = test/data/crab.xml \
+              test/data/disk.xml
 modelsdir   = $(datadir)/models
 models_DATA = $(models)
 
