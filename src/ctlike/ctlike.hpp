@@ -74,6 +74,7 @@ protected:
     // Members
     GObservations m_obs;        //!< Observations
     int           m_max_iter;   //!< Maximum number of iterations
+    int           m_max_stall;  //!< Maximum number of stalls
     double        m_logL;       //!< Maximum log likelihood
     GOptimizer*   m_opt;        //!< Optimizer
 };

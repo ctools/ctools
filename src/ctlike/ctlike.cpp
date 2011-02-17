@@ -383,6 +383,7 @@ void ctlike::optimize_lm(void)
 
     // Set optimizer parameters
     opt->max_iter(m_max_iter);
+    opt->max_stalls(m_max_stall);
 
     // Write Header for optimization and indent for optimizer logging
     if (logTerse()) {
@@ -486,10 +487,11 @@ void ctlike::init_members(void)
     m_irf.clear();
     m_outmdl.clear();
     m_obs.clear();
-    m_refit    = false;
-    m_max_iter = 100;   // Set maximum number of iterations to 100
-    m_logL     = 0.0;
-    m_opt      = NULL;
+    m_refit     = false;
+    m_max_iter  = 100;   // Set maximum number of iterations
+    m_max_stall = 10;    // Set maximum number of stalls
+    m_logL      = 0.0;
+    m_opt       = NULL;
 
     // Set logger properties
     log.date(true);
@@ -507,16 +509,17 @@ void ctlike::init_members(void)
 void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
-    m_method   = app.m_method;
-    m_stat     = app.m_stat;
-    m_refit    = app.m_refit;
-    m_caldb    = app.m_caldb;
-    m_irf      = app.m_irf;
-    m_outmdl   = app.m_outmdl;
-    m_obs      = app.m_obs;
-    m_max_iter = app.m_max_iter;
-    m_logL     = app.m_logL;
-    m_opt      = app.m_opt->clone();
+    m_method    = app.m_method;
+    m_stat      = app.m_stat;
+    m_refit     = app.m_refit;
+    m_caldb     = app.m_caldb;
+    m_irf       = app.m_irf;
+    m_outmdl    = app.m_outmdl;
+    m_obs       = app.m_obs;
+    m_max_iter  = app.m_max_iter;
+    m_max_stall = app.m_max_stall;
+    m_logL      = app.m_logL;
+    m_opt       = app.m_opt->clone();
 
     // Return
     return;
