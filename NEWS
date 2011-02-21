@@ -1,8 +1,8 @@
-New Features and Important Changes in ctatools 00-01-00
+New Features and Important Changes in ctatools 00-02-00
 
 Author(s) : Juergen Knoedlseder
 
-February 2, 2011
+February 21, 2011
 
 
 1. Introduction
@@ -13,7 +13,8 @@ changes made since the last release of ctatools.
 
 2. Configuration
 -----------------
-None
+Add ctatools test suite. Now supports
+> make check
 
 
 3. Python interface

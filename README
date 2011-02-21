@@ -1,8 +1,8 @@
 ctatools information
 ====================
-Version:             00-01-00 (February 2, 2011)
+Version:             00-02-00 (February 21, 2011)
 Author:              Juergen Knodlseder (knodlseder@cesr.fr)
-GammaLib dependency: 00-04-05
+GammaLib dependency: 00-04-06
 
 
 License information
@@ -93,6 +93,13 @@ Solaris Installation
 ====================
 ctatools compile on Solairs, but there is an issue with using it as a
 shared library (see "Known problems" below).
+
+
+Testing
+=======
+If you want to test ctatools before installation, type the following:
+
+     % make check
 
 
 Getting started
