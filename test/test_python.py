@@ -17,11 +17,11 @@ import sys
 def pipeline_v1():
 	"""
 	Unbinned analysis pipeline - save intermediate results.
-    
-    This function implements an analysis pipeline that successively calls
-    ctobssim, ctselect and ctlike by saving the intermediate results as FITS
-    files on disk. This replicates the way how the analysis would be done
-    in a ftools-like approach.
+ 
+	This function implements an analysis pipeline that successively calls
+	ctobssim, ctselect and ctlike by saving the intermediate results as FITS
+	files on disk. This replicates the way how the analysis would be done
+	in a ftools-like approach.
 	"""
 	# Set script parameters
 	model_name           = "data/crab.xml"
@@ -38,11 +38,11 @@ def pipeline_v1():
 	emin                 =    0.1
 	emax                 =  100.0
 	rad_select           =    3.0
-
+	
 	# Initialise timing
 	wall_seconds = 0.0
 	cpu_seconds  = 0.0
-
+	
 	# Simulate events
 	sim = ctobssim()
 	sim.logFileOpen()
@@ -59,7 +59,7 @@ def pipeline_v1():
 	sim["emax"].real(emax)
 	sim.execute()
 	sys.stdout.write(".")
-
+	
 	# Select events
 	select = ctselect()
 	select.logFileOpen()
@@ -74,7 +74,7 @@ def pipeline_v1():
 	select["emax"].real(emax)
 	select.execute()
 	sys.stdout.write(".")
-
+	
 	# Perform maximum likelihood fitting
 	like = ctlike()
 	like.logFileOpen()
@@ -86,7 +86,7 @@ def pipeline_v1():
 	like["irf"].string(irf)
 	like.execute()
 	sys.stdout.write(".")
-
+	
 	# Return
 	return
 
@@ -97,9 +97,9 @@ def pipeline_v1():
 def pipeline_v2():
 	"""
 	Unbinned analysis pipeline - keep intermediate results in memory.
-    
-    This function implements an analysis pipeline that successively calls
-    ctobssim, ctselect and ctlike without saving the intermediate results as
+ 
+	This function implements an analysis pipeline that successively calls
+	ctobssim, ctselect and ctlike without saving the intermediate results as
 	FITS files on disk. All data is only hold in memory.
 	"""
 	# Set script parameters
@@ -114,11 +114,11 @@ def pipeline_v2():
 	emin        =    0.1
 	emax        =  100.0
 	rad_select  =    3.0
-
+	
 	# Initialise timing
 	wall_seconds = 0.0
 	cpu_seconds  = 0.0
-
+	
 	# Simulate events
 	sim = ctobssim()
 	sim["infile"].filename(model_name)
@@ -133,7 +133,7 @@ def pipeline_v2():
 	sim["emax"].real(emax)
 	sim.run()
 	sys.stdout.write(".")
-
+	
 	# Select events
 	select = ctselect(sim.obs())
 	select["ra"].real(ra)
@@ -145,12 +145,12 @@ def pipeline_v2():
 	select["emax"].real(emax)
 	select.run()
 	sys.stdout.write(".")
-
+	
 	# Perform maximum likelihood fitting
 	like = ctlike(select.obs())
 	like.run()
 	sys.stdout.write(".")
-
+	
 	# Return
 	return
 
