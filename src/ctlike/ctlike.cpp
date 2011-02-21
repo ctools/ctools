@@ -310,7 +310,7 @@ void ctlike::get_parameters(void)
 
         // Get models XML filename
         std::string filename = (*this)["srcmdl"].filename();
-        
+
         // Setup models for optimizing.
         m_obs.models(GModels(filename));
 
@@ -489,7 +489,7 @@ void ctlike::init_members(void)
     m_obs.clear();
     m_refit     = false;
     m_max_iter  = 100;   // Set maximum number of iterations
-    m_max_stall = 5;     // Set maximum number of stalls
+    m_max_stall = 3;     // Set maximum number of stalls
     m_logL      = 0.0;
     m_opt       = NULL;
 
@@ -523,7 +523,7 @@ void ctlike::copy_members(const ctlike& app)
 
     // Return
     return;
-}    
+}
 
 
 /***********************************************************************//**
