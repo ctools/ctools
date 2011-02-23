@@ -193,6 +193,34 @@ CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
 LDFLAGS="$LDFLAGS $GammaLib_LIBS"
 
 
+dnl ==========================
+dnl Checks for cfitsio library
+dnl ==========================
+
+# Search for cfitsio shared library in a some standard directories
+for i in "$gammalib_prefix" /usr /usr/local /opt/local ; do
+  if test -f $i/lib/libcfitsio.so -o -f $i/lib/libcfitsio.dylib -a -f $i/include/fitsio.h; then
+    LIBDIR_CFITSIO=$i/lib
+    INCDIR_CFITSIO=$i/include
+    break
+  fi
+  if test -f $i/lib64/libcfitsio.so -o -f $i/lib64/libcfitsio.dylib -a -f $i/include/fitsio.h; then
+    LIBDIR_CFITSIO=$i/lib64
+    INCDIR_CFITSIO=$i/include
+    break
+  fi
+done
+if test -n "$LIBDIR_CFITSIO" -a -n "$INCDIR_CFITSIO"; then
+  has_cfitsio="yes"
+  LDFLAGS="$LDFLAGS -L$LIBDIR_CFITSIO"
+  CPPFLAGS="$CPPFLAGS -I$INCDIR_CFITSIO"
+  AC_SUBST(LIBDIR_CFITSIO)
+  AC_SUBST(INCDIR_CFITSIO)
+else
+  has_cfitsio="no"
+fi
+
+
 dnl ==================
 dnl Build static code?
 dnl ==================
@@ -242,6 +270,11 @@ if test "x$has_gammalib" = "xyes"; then
   echo "  * GammaLib support             (yes)"
 else
   echo "  - GammaLib support             (no)    no gammalib library found"
+fi
+if test "x$has_cfitsio" = "xyes"; then
+  echo "  * FITS I/O support             (yes)   $LIBDIR_CFITSIO $INCDIR_CFITSIO"
+else
+  echo "  - FITS I/O support             (no)    no cfitsio library found"
 fi
 if test ! "$SWIG"; then
   echo "  - swig                         (no)"
