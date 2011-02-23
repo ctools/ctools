@@ -268,7 +268,7 @@ void ctselect::run(void)
 
             // Save observation in temporary file
             obs->save(filename, true);
-            
+
             // Load observation from temporary file, including event selection
             select_events(obs, filename);
 
@@ -427,10 +427,10 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 
     // Get temporary file name
     std::string tmpname = std::tmpnam(NULL);
-    
+
     // Save FITS file to temporary file
     file.saveto(tmpname, true);
-            
+
     // Load observation from temporary file
     obs->load_unbinned(tmpname);
 
@@ -523,7 +523,7 @@ void ctselect::copy_members(const ctselect& app)
 
     // Return
     return;
-}    
+}
 
 
 /***********************************************************************//**
