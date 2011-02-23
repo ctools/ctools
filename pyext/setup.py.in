@@ -54,7 +54,7 @@ except:
 include_dirs = ['@prefix@/include/gammalib']
 data_files   = glob.glob('@top_srcdir@/pyext/*.i')
 library_dirs = ['../src/.libs','@prefix@/lib']
-libraries    = [libcta,'gamma','cfitsio']
+libraries    = [libcta,'gamma']
 
 # Add application include files
 dirs = glob.glob('../src/ct*')
