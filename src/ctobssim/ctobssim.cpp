@@ -266,23 +266,11 @@ void ctobssim::run(void)
                     log.header3("Observation");
             }
 
-            // Write header for photon simulation
-            //if (logTerse())
-            //    log.header3("Simulate photons");
-
             // Simulate photons
             GPhotons photons = simulate_photons(obs, m_obs.models());
 
-            // Write header for sky event simulation
-            //if (logTerse())
-            //    log.header3("Simulate sky events");
-
             // Simulate source events
             simulate_source(obs, photons);
-
-            // Write header for bacgkround event simulation
-            //if (logTerse())
-            //    log.header3("Simulate background events");
 
             // Simulate source events
             simulate_background(obs, m_obs.models());
@@ -558,7 +546,7 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
 
                     // Reserve new space for photons
                     photons.reserve(photons.size() + p.size());
-        
+
                     // Add photons to list
                     for (int k = 0; k < p.size(); ++k) {
                         p[k].mcid(i);
@@ -573,7 +561,7 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
                             log << " [" << model->name() << "]";
                         log << std::endl;
                     }
-                    
+
                 } // endif: model was a sky model
 
             } // endfor: looped over models
@@ -630,7 +618,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GPhotons& photons)
         // is not the case then allocate and attach a CTA event list now.
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
             set_list(obs);
-    
+
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = (GCTAEventList*)(obs->events());
 
@@ -679,7 +667,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
         // is not the case then allocate and attach a CTA event list now.
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
             set_list(obs);
-    
+
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = (GCTAEventList*)(obs->events());
 
@@ -722,84 +710,6 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
     return;
 }
 
-
-/***********************************************************************//**
- * @brief Save events
- *
- * @todo Set header keywords
- ***************************************************************************/
-/*
-void ctobssim::save_events(const GCTAEventList* events)
-{
-    // Allocate events file
-    GFits file;
-
-    // Write events
-    events->write(&file);
-
-    // Set keywords in EVENTS header
-    set_events_keywords(&file);
-
-    // Allocate Gti
-    GGti gti;
-
-    // Setup single GTI covering the selected time range
-    GTime tstart;
-    GTime tstop;
-    tstart.met(m_tmin);
-    tstop.met(m_tmax);
-    gti.add(tstart, tstop);
-
-    // Write GTI
-    gti.write(&file);
-
-    // Dump FITS file
-    if (logExplicit()) {
-        log << file << std::endl;
-    }
-
-    // Save events file. We need to use to saveto() method to make sure
-    // that any existing file is indeed overwritten
-    file.saveto(m_outfile, clobber());
-
-    // Close FITS file
-    file.close();
-
-    // Return
-    return;
-}
-*/
-
-/***********************************************************************//**
- * @brief Set keywords of EVENTS header
- *
- * @param[in] file FITS file.
- ***************************************************************************/
-/*
-void ctobssim::set_events_keywords(GFits* file)
-{
-    // Get EVENTS HDU
-    GFitsHDU* hdu = file->hdu("EVENTS");
-
-    // Set observation time information
-    hdu->card("TSTART",   m_tmin,        "[s] Mission time of start of observation");
-    hdu->card("TSTOP",    m_tmax,        "[s] Mission time of end of observation");
-    hdu->card("TELAPSE",  m_tmax-m_tmin, "[s] Mission elapsed time");
-    hdu->card("ONTIME",   m_tmax-m_tmin, "[s] Total good time including deadtime");
-    hdu->card("LIVETIME", m_tmax-m_tmin, "[s] Total livetime");
-
-    // Set target information
-    //hdu->card("RA_OBJ",  m_ra,  "[deg] Target Right Ascension");
-    //hdu->card("DEC_OBJ", m_dec, "[deg] Target Declination");
-
-    // Set pointing information
-    hdu->card("RA_PNT",  m_ra,  "[deg] Pointing Right Ascension");
-    hdu->card("DEC_PNT", m_dec, "[deg] Pointing Declination");
-
-    // Return
-    return;
-}
-*/
 
 /*==========================================================================
  =                                                                         =
@@ -863,7 +773,7 @@ void ctobssim::copy_members(const ctobssim& app)
 
     // Return
     return;
-}    
+}
 
 
 /***********************************************************************//**
