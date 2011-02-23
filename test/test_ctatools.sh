@@ -2,6 +2,11 @@
 #
 # ctatools test script
 # ====================================================================
+PFILES=$PWD/../src/ctobssim
+PFILES=$PWD/../src/ctbin:$PFILES
+PFILES=$PWD/../src/ctselect:$PFILES
+PFILES=$PWD/../src/ctlike:$PFILES
+export PFILES
 
 #
 # Print Header
