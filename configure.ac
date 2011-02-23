@@ -4,7 +4,7 @@
 #
 # Process this file with autoconf to produce a configure script
 
-AC_INIT([ctatools], [0.2.0], [knodlseder@cesr.fr], [ctatools], [http://cta.irap.omp.eu/ctatools])
+AC_INIT([ctatools], [0.2.1], [knodlseder@cesr.fr], [ctatools], [http://cta.irap.omp.eu/ctatools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -59,13 +59,14 @@ AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
 
+
 dnl =================================
 dnl Checks for debugging or profiling
 dnl =================================
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE([debug],
               AS_HELP_STRING([--enable-debug],
-                             [turn on debugging (default=no)]),
+                             [turn on debugging [default=no]]),
               [enable_debug="$enableval"],
               [enable_debug="no"])
 if test "x$enable_debug" = "xyes"; then
@@ -80,7 +81,7 @@ fi
 AC_MSG_CHECKING(whether to enable profiling)
 AC_ARG_ENABLE([profiling],
               AS_HELP_STRING([--enable-profiling],
-                             [turn on profiling (default=no)]),
+                             [turn on profiling [default=no]]),
               [enable_profiling="$enableval"],
               [enable_profiling="no"])
 if test "x$enable_profiling" = "xyes"; then
@@ -103,6 +104,7 @@ dnl  HAVE_SWIG             - swig is available
 dnl  ENABLE_PYTHON_BINDING - Python binding is requested
 dnl  WITH_PYTHON_BINDING   - Either has swig or python wraper files
 dnl ========================================================================
+
 # Checks for Python (HAVE_PYTHON)
 AM_PATH_PYTHON([2.2],
                [],
@@ -116,7 +118,7 @@ AM_CONDITIONAL(HAVE_SWIG, test "$SWIG")
 # Python binding enabled?
 AC_ARG_ENABLE([python-binding],
               AS_HELP_STRING([--enable-python-binding],
-                             [build python binding (default=yes)]),
+                             [build python binding [default=yes]]),
               [ac_enable_python_binding="$enableval"],
               [ac_enable_python_binding="yes"])
 AM_CONDITIONAL(ENABLE_PYTHON_BINDING, test "x$ac_enable_python_binding" = "xyes")
@@ -180,10 +182,10 @@ else
   export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$prefix/lib/pkgconfig"
 fi
 has_gammalib="no"
-PKG_CHECK_MODULES([GammaLib], [gammalib >= 0.4.5],
+PKG_CHECK_MODULES([GammaLib], [gammalib >= 0.4.7],
                   [has_gammalib="yes"],
                   [AC_MSG_ERROR([GammaLib library not found])
-                   AC_MSG_ERROR([Make sure that at least version 0.4.5 of GammaLib in installed])
+                   AC_MSG_ERROR([Make sure that at least version 0.4.7 of GammaLib in installed])
                    AC_MSG_ERROR([If GammaLib is not installed in the default location, please adjust the PKG_CONFIG_PATH environment variable])])
 if test "x$has_gammalib" = "xyes"; then
   AC_DEFINE([HAVE_LIBGAMMA], [1], [Define if gammalib is available])
@@ -191,34 +193,6 @@ fi
 CFLAGS="$CFLAGS $GammaLib_CFLAGS"
 CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
 LDFLAGS="$LDFLAGS $GammaLib_LIBS"
-
-
-dnl ==========================
-dnl Checks for cfitsio library
-dnl ==========================
-
-# Search for cfitsio shared library in a some standard directories
-for i in "$gammalib_prefix" /usr /usr/local /opt/local ; do
-  if test -f $i/lib/libcfitsio.so -o -f $i/lib/libcfitsio.dylib -a -f $i/include/fitsio.h; then
-    LIBDIR_CFITSIO=$i/lib
-    INCDIR_CFITSIO=$i/include
-    break
-  fi
-  if test -f $i/lib64/libcfitsio.so -o -f $i/lib64/libcfitsio.dylib -a -f $i/include/fitsio.h; then
-    LIBDIR_CFITSIO=$i/lib64
-    INCDIR_CFITSIO=$i/include
-    break
-  fi
-done
-if test -n "$LIBDIR_CFITSIO" -a -n "$INCDIR_CFITSIO"; then
-  has_cfitsio="yes"
-  LDFLAGS="$LDFLAGS -L$LIBDIR_CFITSIO"
-  CPPFLAGS="$CPPFLAGS -I$INCDIR_CFITSIO"
-  AC_SUBST(LIBDIR_CFITSIO)
-  AC_SUBST(INCDIR_CFITSIO)
-else
-  has_cfitsio="no"
-fi
 
 
 dnl ==================
@@ -270,11 +244,6 @@ if test "x$has_gammalib" = "xyes"; then
   echo "  * GammaLib support             (yes)"
 else
   echo "  - GammaLib support             (no)    no gammalib library found"
-fi
-if test "x$has_cfitsio" = "xyes"; then
-  echo "  * FITS I/O support             (yes)   $LIBDIR_CFITSIO $INCDIR_CFITSIO"
-else
-  echo "  - FITS I/O support             (no)    no cfitsio library found"
 fi
 if test ! "$SWIG"; then
   echo "  - swig                         (no)"
