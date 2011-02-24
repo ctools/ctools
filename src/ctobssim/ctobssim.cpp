@@ -322,6 +322,9 @@ void ctobssim::save(void)
             // Save file
             obs->save(filename, clobber());
 
+            // Increment file number
+            file_num++;
+
         } // endif: observation was a CTA observation
 
     } // endfor: looped over files
