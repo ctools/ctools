@@ -16,12 +16,18 @@ dnl Set prefix
 dnl ==========
 AC_PREFIX_DEFAULT([/usr/local/gamma])
 if test "x$prefix" = xNONE; then
-  AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], ["/usr/local/gamma"],
-                     [Location where library is installed])
+  ctatools_prefix="/usr/local/gamma"
 else
-  AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${prefix}",
-                     [Location where library is installed])
+  ctatools_prefix=${prefix}
 fi
+AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${ctatools_prefix}", [Location where library is installed])
+
+
+dnl ==============================================
+dnl Add pkgconfig information of install directory
+dnl ==============================================
+PKG_CONFIG_PATH="${ctatools_prefix}/lib/pkgconfig:/opt/local/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PKG_CONFIG_PATH
 
 
 dnl ===========================
@@ -150,16 +156,16 @@ if test "x$ac_enable_python_binding" = "xyes"; then
     case $host in
       sparc*-sun-solaris*)  PYTHON_BUILD_PREFIX="CC=CC" ;;
       *)                    PYTHON_BUILD_PREFIX="" ;;
-    esac                    
+    esac
     AC_SUBST(PYTHON_BUILD_PREFIX)
-    
+
     # Set host specific extra libraries. Add all host specific libraries here that
     # need to be linked in the python module
     PYTHON_EXTRA_LIBS=
     case $host in
       sparc*-sun-solaris*)  PYTHON_EXTRA_LIBS="Cstd" ;;
       *)                    PYTHON_EXTRA_LIBS="" ;;
-    esac                    
+    esac
     AC_SUBST(PYTHON_EXTRA_LIBS)
 
   else
@@ -174,13 +180,6 @@ fi
 dnl ===========================
 dnl Checks for GammaLib library
 dnl ===========================
-
-# Get GammaLib configuration
-if test "x$prefix" = xNONE; then
-  export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/gamma/lib/pkgconfig"
-else
-  export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$prefix/lib/pkgconfig"
-fi
 has_gammalib="no"
 PKG_CHECK_MODULES([GammaLib], [gammalib >= 0.4.7],
                   [has_gammalib="yes"],
@@ -189,10 +188,10 @@ PKG_CHECK_MODULES([GammaLib], [gammalib >= 0.4.7],
                    AC_MSG_ERROR([If GammaLib is not installed in the default location, please adjust the PKG_CONFIG_PATH environment variable])])
 if test "x$has_gammalib" = "xyes"; then
   AC_DEFINE([HAVE_LIBGAMMA], [1], [Define if gammalib is available])
+  CFLAGS="$CFLAGS $GammaLib_CFLAGS"
+  CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
+  LDFLAGS="$LDFLAGS $GammaLib_LIBS"
 fi
-CFLAGS="$CFLAGS $GammaLib_CFLAGS"
-CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
-LDFLAGS="$LDFLAGS $GammaLib_LIBS"
 
 
 dnl ==================
