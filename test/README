@@ -1,0 +1,24 @@
+This folder contains files used for unit testing and files that serve
+as example scripts for ctatools.
+
+test_ctatools.sh
+  Unit test for ctatools executables.
+
+test_python.py
+  Unit test for ctatools Python interface.
+
+example_binned.py
+  Example Python pipelines for binned analysis.
+  The first pipeline writes intermediate results to the disk while
+  the second pipeline keeps the results in memory.
+  If matplotlib is installed on the system the fitted spectrum
+  and the observed offset angle distribution is displayed in
+  counts space.
+
+example_unbinned.py
+  Example Python pipelines for unbinned analysis.
+  The first pipeline writes intermediate results to the disk while
+  the second pipeline keeps the results in memory.
+  If matplotlib is installed on the system the fitted spectrum
+  and the observed offset angle distribution is displayed in
+  counts space.
