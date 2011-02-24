@@ -484,8 +484,6 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
 
     // Dump simulation cone information
     if (logNormal()) {
-        log << parformat("Random number seed");
-        log << str(m_seed) << std::endl;
         log << parformat("Simulation area");
         log << str(m_area) << " cm2" << std::endl;
         log << parformat("Simulation cone");
