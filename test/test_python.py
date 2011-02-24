@@ -169,11 +169,12 @@ if __name__ == '__main__':
 	print "************************************"
 	
 	# Set PFILES environment variable
-	pfiles  = "../src/ctobssim:"
-	pfiles += "../src/ctbin:"
-	pfiles += "../src/ctselect:"
-	pfiles += "../src/ctlike:"
-	os.environ['PFILES'] = pfiles
+	try:
+		os.mkdir("pfiles")
+	except:
+		pass
+	os.system("cp -r ../src/*/*.par pfiles/")
+	os.environ['PFILES'] = "pfiles"
 	
 	# Remove any existing result files
 	list = [glob.glob("*.fits"), glob.glob("*.log"), glob.glob("*.xml")]

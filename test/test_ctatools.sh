@@ -2,11 +2,6 @@
 #
 # ctatools test script
 # ====================================================================
-PFILES=$PWD/../src/ctobssim
-PFILES=$PWD/../src/ctbin:$PFILES
-PFILES=$PWD/../src/ctselect:$PFILES
-PFILES=$PWD/../src/ctlike:$PFILES
-export PFILES
 
 #
 # Print Header
@@ -21,6 +16,13 @@ echo "*****************************"
 # ================================
 rm -rf *.fits *.log *.xml
 
+
+#
+# Creates pfiles directory
+# ========================
+mkdir -p pfiles
+cp -r ../src/*/*.par pfiles/
+export PFILES=pfiles
 
 #
 # Test ctobssim
