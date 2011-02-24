@@ -324,6 +324,9 @@ void ctbin::save(void)
             // Save file
             obs->save(filename, clobber());
 
+            // Increment file number
+            file_num++;
+
         } // endif: observation was a CTA observation
 
     } // endfor: looped over files
@@ -410,7 +413,7 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         // Get Good Time intervals
         GGti gti = obs->events()->gti();
-        
+
         // Create skymap
         GSkymap map = GSkymap(m_proj, m_coordsys,
                              m_xref, m_yref, m_binsz, m_binsz,
@@ -420,7 +423,7 @@ void ctbin::bin_events(GCTAObservation* obs)
         int num_outside_map  = 0;
         int num_outside_ebds = 0;
         int num_in_map       = 0;
-    
+
         // Fill sky map
         GCTAEventList* events = (GCTAEventList*)obs->events();
         for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
@@ -447,7 +450,7 @@ void ctbin::bin_events(GCTAObservation* obs)
             // Fill event in skymap
             map(pixel, index) += 1.0;
             num_in_map++;
-        
+
         } // endfor: looped over all events
 
         // Log binning results
@@ -542,7 +545,7 @@ void ctbin::copy_members(const ctbin& app)
 
     // Return
     return;
-}    
+}
 
 
 /***********************************************************************//**
