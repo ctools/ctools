@@ -173,7 +173,7 @@ if __name__ == '__main__':
 		os.mkdir("pfiles")
 	except:
 		pass
-	os.system("cp -r ../src/*/*.par pfiles/")
+	os.system("cp -ru ../src/*/*.par pfiles/")
 	os.environ['PFILES'] = "pfiles"
 	
 	# Remove any existing result files

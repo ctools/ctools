@@ -21,7 +21,7 @@ rm -rf *.fits *.log *.xml
 # Creates pfiles directory
 # ========================
 mkdir -p pfiles
-cp -r ../src/*/*.par pfiles/
+cp -ru ../src/*/*.par pfiles/
 export PFILES=pfiles
 
 #
