@@ -28,6 +28,7 @@
  * @brief CTA maximum likelihood tool Python interface
  ***************************************************************************/
 class ctlike : public GApplication  {
+
 public:
     // Constructors and destructors
     ctlike(void);
@@ -41,7 +42,8 @@ public:
     void           execute(void);
     void           run(void);
     void           save(void);
-    GObservations& obs(void) { return m_obs; }
+    GObservations& obs(void);
+    GOptimizer*    opt(void);
     void           get_parameters(void);
     void           optimize_lm(void);
     void           load_unbinned(const std::string& evfile);

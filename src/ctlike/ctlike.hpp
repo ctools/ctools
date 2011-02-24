@@ -26,7 +26,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTLIKE_NAME    "ctlike"
-#define CTLIKE_VERSION "00-02-00"
+#define CTLIKE_VERSION "00-02-01"
 
 
 /***********************************************************************//**
@@ -52,6 +52,7 @@ public:
     void           run(void);
     void           save(void);
     GObservations& obs(void) { return m_obs; }
+    GOptimizer*    opt(void) { return m_opt; }
     void           get_parameters(void);
     void           optimize_lm(void);
     void           load_unbinned(const std::string& evfile);
