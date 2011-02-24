@@ -14,17 +14,19 @@ echo "Create Makefile.in and configure scripts"
 cd $sourcedir
 #
 mkdir m4
-aclocal -I m4
-libtoolize --copy
-autoconf
-autoheader
-automake --add-missing --copy
+./autogen.sh
+#aclocal -I m4
+#libtoolize --copy
+#autoconf
+#autoheader
+#automake --add-missing --copy
 #
-rm -f autogen.sh      
+#rm -f autogen.sh      
 #rm -rf m4
 rm -rf autom4te.cache
 #rm -f configure.ac
 #rm -f Makefile.am
+rm -f ctatools.sh
 #
 cd ..
 
