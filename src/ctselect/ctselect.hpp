@@ -25,7 +25,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "00-02-00"
+#define CTSELECT_VERSION "00-02-01"
 
 
 /***********************************************************************//**
