@@ -203,8 +203,7 @@ def plot_counts(observations):
 	Plot counts.
 	"""
 	# Only proceed if matplotlib is available
-	if 0 == 0:
-	#try:
+	try:
 		# Import matplotlib
 		import matplotlib.pyplot as plt
 
@@ -338,8 +337,8 @@ def plot_counts(observations):
 		# Show counts spectra
 		plt.show()
 
-	#except:
-	#	print "Matplotlib is not (correctly) installed on your system. No counts spectra are shown."
+	except:
+		print "Matplotlib is not (correctly) installed on your system. No counts spectra are shown."
 
 	# Return
 	return
