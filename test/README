@@ -22,3 +22,8 @@ example_unbinned.py
   If matplotlib is installed on the system the fitted spectrum
   and the observed offset angle distribution is displayed in
   counts space.
+
+example_models.py
+  Example Python pipeline for unbind analysis that is executed
+  on a number of models (point source, disk source, Gaussian
+  source, Shell source).
