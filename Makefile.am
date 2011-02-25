@@ -33,7 +33,6 @@ doc_DATA = \
 	   ChangeLog \
 	   COPYING \
 	   INSTALL \
-	   LICENSE \
 	   NEWS \
 	   README
 docdir = ${datadir}/doc/${PACKAGE}
