@@ -1,9 +1,24 @@
 #! /usr/bin/env python
-# ===========================================================================================#
-# This script simulates CTA surveys.
+# ==========================================================================
+# This script simulates CTA surveys. It can be considered as the master
+# script for CTA science simulations. Please modify as needed.
 #
-# If matplotlib is installed, the spectrum will be displayed on the screen. 
-# ===========================================================================================#
+# Copyright (C) 2011 Jurgen Knodlseder
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ==========================================================================
 from ctatools import *
 from gammalib import *
 from math import *
@@ -20,8 +35,7 @@ def plot_counts(obs):
 	Plot counts.
 	"""
 	# Only proceed if matplotlib is available
-	if 1 == 1:
-	#try:
+	try:
 		# Import matplotlib
 		import matplotlib.pyplot as plt
 		
@@ -155,8 +169,8 @@ def plot_counts(obs):
 		# Show counts spectra
 		plt.show()
 		
-	#except:
-	#	print "Matplotlib is not (correctly) installed on your system. No counts spectra are shown."
+	except ImportError:
+		print "Matplotlib is not (correctly) installed on your system."
 
 	# Return
 	return
@@ -244,7 +258,8 @@ def make_counts_map(obs):
 # ================ #
 def make_model_map(obs):
 	"""
-	Make model map by combining all observations.
+	Make model map by combining all observations. The map will
+	be in units of [counts/(sr MeV s)].
 	"""
 	# Allocate model map
 	nxpix  = 600

@@ -1,9 +1,24 @@
 #! /usr/bin/env python
-# ===========================================================================================#
-# This script illustrates how to build a unbinned analysis chain using CTAtools.
+# ==========================================================================
+# This script illustrates how to build an unbinned analysis pipeline using
+# the ctatools.
 #
-# If matplotlib is installed, the spectrum will be displayed on the screen. 
-# ===========================================================================================#
+# Copyright (C) 2011 Jurgen Knodlseder
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ==========================================================================
 from ctatools import *
 from gammalib import *
 from math import *
@@ -173,7 +188,7 @@ if __name__ == '__main__':
 		os.mkdir("pfiles")
 	except:
 		pass
-	os.system("cp -ru ../src/*/*.par pfiles/")
+	os.system("cp -r ../src/*/*.par pfiles/")
 	os.environ['PFILES'] = "pfiles"
 	
 	# Remove any existing result files
