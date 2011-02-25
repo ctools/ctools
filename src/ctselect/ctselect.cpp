@@ -32,6 +32,9 @@
 #include "ctselect.hpp"
 #include "GTools.hpp"
 
+/* __ Method name definitions ____________________________________________ */
+#define G_RUN                                               "ctselect::run()"
+
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
@@ -277,6 +280,12 @@ void ctselect::run(void)
             // Save observation in temporary file
             obs->save(filename, true);
 
+            // Check temporary file
+            std::string message = check_infile(filename);
+            if (message.length() > 0) {
+                throw GException::app_error(G_RUN, message);
+            }
+
             // Load observation from temporary file, including event selection
             select_events(obs, filename);
 
@@ -379,10 +388,13 @@ void ctselect::get_parameters(void)
 /***********************************************************************//**
  * @brief Select events
  *
+ * @param[in] obs CTA observations.
+ * @param[in] filename File name.
+ *
  * Select events from a FITS file by making use of the selection possibility
  * of the cfitsio library on loading a file.
  *
- * @todo Implement a observation read() method to avoid saving the
+ * @todo Implement an observation read() method to avoid saving the
  *       observation to a temporary file.
  ***************************************************************************/
 void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
@@ -546,3 +558,84 @@ void ctselect::free_members(void)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Check input filename
+ *
+ * @param[in] filename File name.
+ *
+ * This method checks if the input FITS file is correct.
+ ***************************************************************************/
+std::string ctselect::check_infile(const std::string& filename) const
+{
+    // Initialise message string
+    std::string message = "";
+
+    // Open FITS file
+    GFits file(filename);
+
+    // Check for EVENTS HDU
+    GFitsTable* table = NULL;
+    try {
+
+        // Get pointer to FITS table
+        table = file.table("EVENTS");
+
+        // Initialise list of missing columns
+        std::vector<std::string> missing;
+
+        // Check for existence of TIME column
+        try {
+            GFitsTableCol* col = table->column("TIME");
+        }
+        catch (GException::fits_column_not_found& e) {
+            missing.push_back("TIME");
+        }
+
+        // Check for existence of ENERGY column
+        try {
+            GFitsTableCol* col = table->column("ENERGY");
+        }
+        catch (GException::fits_column_not_found& e) {
+            missing.push_back("ENERGY");
+        }
+
+        // Check for existence of RA column
+        try {
+            GFitsTableCol* col = table->column("RA");
+        }
+        catch (GException::fits_column_not_found& e) {
+            missing.push_back("RA");
+        }
+
+        // Check for existence of DEC column
+        try {
+            GFitsTableCol* col = table->column("DEC");
+        }
+        catch (GException::fits_column_not_found& e) {
+            missing.push_back("DEC");
+        }
+
+        // Set error message for missing columns
+        if (missing.size() > 0) {
+            message = "The following columns are missing in the"
+                      " \"EVENTS\" extension of input file \""
+                    + m_outfile + "\": ";
+            for (int i = 0; i < missing.size(); ++i) {
+                message += "\"" + missing[i] + "\"";
+                if (i < missing.size()-1)
+                    message += ", ";
+            }
+        }
+
+    }
+    catch (GException::fits_hdu_not_found& e) {
+        message = "No \"EVENTS\" extension found in input file \""
+                + m_outfile + "\".";
+    }
+
+    // Return
+    return message;
+}
+

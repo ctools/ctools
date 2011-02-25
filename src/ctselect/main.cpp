@@ -62,12 +62,12 @@ int main (int argc, char *argv[])
                               " ctselect. Run aborted ...";
 
         // Write error in logger
-        application.log << signal  << std::endl;
         application.log << message << std::endl;
+        application.log << signal  << std::endl;
 
         // Write error on standard output
-        std::cout << signal  << std::endl;
         std::cout << message << std::endl;
+        std::cout << signal  << std::endl;
 
     } // endcatch: catched any application error
 

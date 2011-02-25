@@ -64,9 +64,10 @@ public:
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctselect& app);
-    void free_members(void);
+    void        init_members(void);
+    void        copy_members(const ctselect& app);
+    void        free_members(void);
+    std::string check_infile(const std::string& filename) const;
 
     // User parameters
     std::string   m_infile;     //!< Input event list
