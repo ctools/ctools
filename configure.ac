@@ -1,10 +1,23 @@
 # Configuration for ctatools - a set of tools for science analysis of CTA data
 #
-# Copyright (C) 2011
+# Copyright (C) 2011 Jurgen Knodlseder
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Process this file with autoconf to produce a configure script
 
-AC_INIT([ctatools], [0.2.1], [knodlseder@cesr.fr], [ctatools], [http://cta.irap.omp.eu/ctatools])
+AC_INIT([ctatools], [0.2.2], [knodlseder@cesr.fr], [ctatools], [http://cta.irap.omp.eu/ctatools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
