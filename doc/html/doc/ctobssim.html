@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en"><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>ctobssim</title>
+
+<link rel="stylesheet" type="text/css" media="screen,print" href="../ctatools.css">
+<meta content="Jurgen Knodlseder" name="author">
+<meta content="CTA observation simulation tool" name="description">
+</head>
+<body>
+<p class="Header">ctobssim</p>
+<p class="Body">Observation simulator.</p>
+<br>
+<p class="Title">Synopsis</p>
+<p style="padding-top: 0pt; text-align: left;" class="Body">Generate
+photon events from astrophysical sources and process those photons
+according to the specified instrument response functions and generate
+instrumental background events.</p>
+<br>
+<p class="Title">Links</p>
+<ul class="Body">
+<li><a href="ftools_usage.html">Basic FTOOL
+Parameter Usage</a></li>
+</ul>
+<p style="padding-top: 0pt; text-align: left;" class="Body"></p>
+<br>
+<p class="Title">General parameters</p>
+<table id="table1" class="Body" border="0" cellpadding="0" cellspacing="0" width="600">
+<tbody>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>infile
+[file]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">XML file that describes the
+astrophysical sources and the instrumental background.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>outfile
+[file]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Output event list.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>caldb
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Calibration database repository.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>irf
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Instrumental response function that
+should be used for event generation.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(seed
+= 1) [integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Integer seed value to be used for
+Monte Carlo simulations.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>ra
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Right Ascension of CTA pointing
+(J2000, in degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>dec
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Declination of CTA pointing (J2000,
+in degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>rad
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Radius of CTA field of view (simulation cone radius) (in degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>tmin
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Mission elapsed start time of
+observation (in seconds).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>tmax
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Mission elapsed stop time of
+observation (in seconds).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>emin
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Lower energy limit of events (in
+TeV).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>emax
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Upper energy limit of events (in
+TeV).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p class="Title">Standard parameters</p>
+<table id="table1" class="Body" border="0" cellpadding="0" cellspacing="0" width="600">
+<tbody>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(chatter
+= 2) [integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Verbosity of the executable:<br>
+<code>chatter = 0</code>: no information will be
+logged<br>
+<code>chatter = 1</code>: only errors will be logged<br>
+<code>chatter = 2</code>: errors and actions will be
+logged<br>
+<code>chatter = 3</code>: report about the task
+execution<br>
+<code>chatter = 4</code>: detailed report about the
+task execution</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(clobber
+= yes) [boolean]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Specifies whether an existing output
+event list should be overwritten.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(debug
+= yes) [boolean]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Enables debug mode. In debug mode
+the executable will dump any log file output in the console.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(mode
+= ql) [string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Mode of automatic parameters.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<br>
+<p class="Title">Related FTOOLS</p>
+<br>
+<hr size="1">
+<p class="Body">Last updated by: J&uuml;rgen Kn&ouml;dlseder 8 March
+2011
+</p>
+<br>
+</body></html>
