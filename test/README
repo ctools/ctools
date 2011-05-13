@@ -24,7 +24,7 @@ example_unbinned.py
   counts space.
 
 example_models.py
-  Example Python pipeline for unbind analysis that is executed
+  Example Python pipeline for unbinned analysis that is executed
   on a number of models (point source, disk source, Gaussian
   source, Shell source).
 
@@ -32,3 +32,9 @@ example_survey.py
   This script illustrates how a survey can be simulated and analysed.
   The script can be easily extended to adapt specific survey
   strategies and simulated source models.
+
+test_coverage.py
+  Creates pull data for model fit parameters.
+
+pull_histogram.py
+  Creates pull histograms from pull data.
