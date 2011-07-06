@@ -1,20 +1,19 @@
-New Features and Important Changes in ctatools 00-02-00
+New Features and Important Changes in ctatools 00-02-03
 
 Author(s) : Juergen Knoedlseder
 
-February 21, 2011
+July 5, 2011
 
 
 1. Introduction
 ---------------
-This document briefly summarizes executable by executable the most important
-changes made since the last release of ctatools.
+This document briefly summarizes executable by executable the most important changes made since the last release of ctatools.
 
 
 2. Configuration
 -----------------
-Add ctatools test suite. Now supports
-> make check
+Remove pkg-config usage from configure.ac as this introduced somas
+on Mac OS X systems (by default there is no pkg-config on Mac OS X).
 
 
 3. Python interface
