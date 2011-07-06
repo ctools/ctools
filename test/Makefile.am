@@ -15,7 +15,7 @@ INCLUDES = -I$(top_srcdir)/include \
            -I$(top_builddir)/src
 
 # Test programs (those will be compiled)
-check_PROGRAMS = 
+#check_PROGRAMS = 
 
 # Set test environment
 TESTS_ENVIRONMENT = LD_LIBRARY_PATH=$(top_builddir)/src/.libs:$(prefix)/lib:$(LD_LIBRARY_PATH) \
