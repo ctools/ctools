@@ -114,22 +114,35 @@ else
 fi
 
 
-dnl ========================================================================
-dnl Checks for python binding. Python binding requires Python and either the
-dnl files gammalib_wrap.cpp and gammalib.py or SWIG to create these files.
-dnl The following conditionals are set:
-dnl  HAVE_PYTHON           - Python >= 2.2 and headers are available
-dnl  has_python            - Python >= 2.2 and headers are available
-dnl  HAVE_SWIG             - swig is available
-dnl  ENABLE_PYTHON_BINDING - Python binding is requested
-dnl  WITH_PYTHON_BINDING   - Either has swig or python wraper files
-dnl ========================================================================
+dnl =========================================================================
+dnl Checks if Python bindings are to be build. Python binding requires Python
+dnl and either the files gammalib_wrap.cpp and gammalib.py or swig to create
+dnl these files. The following conditionals are set:
+dnl  WITH_PYTHON - Python bindings will be built
+dnl  HAVE_SWIG    - swig is available
+dnl =========================================================================
 
-# Checks for Python (HAVE_PYTHON)
+# Initialise flags
+enable_python="no"
 has_python="no"
+has_swig="no"
+has_wrappers="no"
+
+# Python binding enabled?
+AC_ARG_ENABLE([python-binding],
+              AS_HELP_STRING([--enable-python-binding],
+                             [build python binding [default=yes]]),
+              [ac_enable_python_binding="$enableval"],
+              [ac_enable_python_binding="yes"])
+if test "x$ac_enable_python_binding" = "xno"; then
+  AC_MSG_NOTICE([Python binding for gammalib will not be built])
+  AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
+fi
+
+# Do we have Python and Python.h?
 AM_PATH_PYTHON([2.2],
                [has_python="yes"],
-               [AC_MSG_WARN([Python >=2.2 not found. Python >=2.2 is required to build python binding. Python can be obtained from http://www.python.org])])
+               [AC_MSG_WARN([Python >= 2.2 not found. Python >= 2.2 is required to build python binding. Python can be obtained from http://www.python.org])])
 if test "x$has_python" = "xyes"; then
 
   # Determine include path for python
@@ -150,65 +163,57 @@ if test "x$has_python" = "xyes"; then
     AC_MSG_WARN([No Python header file "$PY_INCLUDE/Python.h" found. Please install appropriate Python development package.])
   fi
 fi
-AM_CONDITIONAL(HAVE_PYTHON, test "x$has_python" = "xyes")
 
-# Checks for SWIG (HAVE_SWIG)
+# Do we have swig?
 AC_PATH_PROG([SWIG], [swig])
-AM_CONDITIONAL(HAVE_SWIG, test "$SWIG")
-
-# Python binding enabled?
-AC_ARG_ENABLE([python-binding],
-              AS_HELP_STRING([--enable-python-binding],
-                             [build python binding [default=yes]]),
-              [ac_enable_python_binding="$enableval"],
-              [ac_enable_python_binding="yes"])
-AM_CONDITIONAL(ENABLE_PYTHON_BINDING, test "x$ac_enable_python_binding" = "xyes")
-
-# Checks for ctatools_wrap.cpp and ctatools.py
-AC_CHECK_FILES([pyext/ctatools_wrap.cpp pyext/ctatools.py],,)
-has_python_wrap="no"
-if test "x$ac_cv_file_pyext_ctatools_wrap_cpp" = "xyes"; then
-  if test "x$ac_cv_file_pyext_ctatools_py" = "xyes"; then
-    has_python_wrap="yes"
+if test "$SWIG"; then
+  has_swig="yes"
+fi
+AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
+ 
+# Do we have wrappers (gammalib_wrap.cpp and gammalib.py)?
+AC_CHECK_FILES([pyext/gammalib_wrap.cpp pyext/gammalib.py],,)
+if test "x$ac_cv_file_pyext_gammalib_wrap_cpp" = "xyes"; then
+  if test "x$ac_cv_file_pyext_gammalib_py" = "xyes"; then
+    has_wrappers="yes"
   fi
 fi
-AM_CONDITIONAL(WITH_PYTHON_BINDING, test "x$has_python_wrap" = "xyes" -o "$SWIG")
 
-# Inform about missing components and set host dependent variables
-if test "x$ac_enable_python_binding" = "xyes"; then
-  if test "x$has_python" = "xyes"; then
-    if test "x$has_python_wrap" != "xyes"; then
-      if test ! "$SWIG"; then
-        AC_MSG_WARN([Neither pyext/ctatools_wrap.cpp and pyext/ctatools.py nor swig has not been found])
-        AC_MSG_WARN([Python binding for ctatools cannot be built])
-        AC_MSG_WARN([Either use a ctatools distribution with ctatools_wrap.cpp and ctatools.py shipped or install swig on your system])
-        AC_MSG_WARN([swig can be obtained from http://www.swig.org/])
-      fi
-    fi
-
-    # Set host specific build prefix (needed for Solaris pycc bug)
-    PYTHON_BUILD_PREFIX=
-    case $host in
-      sparc*-sun-solaris*)  PYTHON_BUILD_PREFIX="CC=CC" ;;
-      *)                    PYTHON_BUILD_PREFIX="" ;;
-    esac
-    AC_SUBST(PYTHON_BUILD_PREFIX)
-
-    # Set host specific extra libraries. Add all host specific libraries here that
-    # need to be linked in the python module
-    PYTHON_EXTRA_LIBS=
-    case $host in
-      sparc*-sun-solaris*)  PYTHON_EXTRA_LIBS="Cstd" ;;
-      *)                    PYTHON_EXTRA_LIBS="" ;;
-    esac
-    AC_SUBST(PYTHON_EXTRA_LIBS)
-
-  else
-    AC_MSG_WARN([Python binding for ctatools cannot be built as Python seems not to be installed on your system])
+# Signal if Python is enabled
+if test "x$ac_enable_python_binding" = "xyes" -a "x$has_python" = "xyes"; then
+  if test "x$has_swig" = "xyes" -o "x$has_wrappers" = "xyes"; then
+    enable_python="yes"
   fi
+fi
+AM_CONDITIONAL(WITH_PYTHON, test "x$enable_python" = "xyes")
+
+# Set Python environment
+if test "x$enable_python" = "xyes"; then
+
+  # Set host specific build prefix (needed for Solaris pycc bug)
+  PYTHON_BUILD_PREFIX=
+  case $host in
+    sparc*-sun-solaris*)  PYTHON_BUILD_PREFIX="CC=CC" ;;
+    *)                    PYTHON_BUILD_PREFIX="" ;;
+  esac
+  AC_SUBST(PYTHON_BUILD_PREFIX)
+
+  # Set host specific extra libraries. Add all host specific libraries here that
+  # need to be linked in the python module
+  PYTHON_EXTRA_LIBS=
+  case $host in
+    sparc*-sun-solaris*)  PYTHON_EXTRA_LIBS="Cstd" ;;
+    *)                    PYTHON_EXTRA_LIBS="" ;;
+  esac
+  AC_SUBST(PYTHON_EXTRA_LIBS)
+
 else
-  AC_MSG_NOTICE([Python binding for ctatools will not be built])
-  AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
+  if test "x$has_python_wrap" = "xno" -a "x$has_swig" = "xno"; then
+    AC_MSG_WARN([Neither pyext/ctatools_wrap.cpp and pyext/ctatools.py nor swig has not been found])
+    AC_MSG_WARN([Python binding for ctatools cannot be built])
+    AC_MSG_WARN([Either use a ctatools distribution with ctatools_wrap.cpp and ctatools.py shipped or install swig on your system])
+    AC_MSG_WARN([swig can be obtained from http://www.swig.org/])
+  fi
 fi
 
 
@@ -219,51 +224,38 @@ dnl ===========================
 # Initialise GammaLib availability
 has_gammalib="no"
 
-#PKG_CHECK_MODULES([GammaLib], [gammalib >= 0.4.7],
-#                  [has_gammalib="yes"],
-#                  [AC_MSG_ERROR([GammaLib library not found])
-#                   AC_MSG_ERROR([Make sure that at least version 0.4.7 of GammaLib in installed])
-#                   AC_MSG_ERROR([If GammaLib is not installed in the default location, please adjust the PKG_CONFIG_PATH environment variable])])
-#if test "x$has_gammalib" = "xyes"; then
-#  AC_DEFINE([HAVE_LIBGAMMA], [1], [Define if gammalib is available])
-#  CFLAGS="$CFLAGS $GammaLib_CFLAGS"
-#  CPPFLAGS="$CPPFLAGS $GammaLib_CFLAGS"
-#  LDFLAGS="$LDFLAGS $GammaLib_LIBS"
-#fi
+# First check for GammaLib in the standard path using the AC_LINK_IFELSE macro.
+# This allows also search in paths that are eventually specified by LDFAGS.
+AC_LANG(C++)
+SAVED_LDFLAGS=$LDFLAGS
+LDFLAGS="$LDFLAGS -lgamma"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <GammaLib.hpp>],
+                                [GSkyDir dir])],
+               [has_gammalib="yes"
+                AC_MSG_NOTICE([GammaLib found in standard path])],
+               [AC_MSG_WARN([GammaLib not found in any standard path])])
+LDFLAGS=$SAVED_LDFLAGS  
 
-# Search for GammaLib in a some standard directories
-for i in "$ctatools_prefix" /opt/local /usr/local /usr ; do
-  if test -f $i/lib/libgamma.so -o -f $i/lib/libgamma.dylib -a -d $i/include/gammalib; then
-    LIBDIR_GAMMALIB=$i/lib
-    INCDIR_GAMMALIB=$i/include/gammalib
-    break
-  fi
-  if test -f $i/lib64/libgamma.so -o -f $i/lib64/libgamma.so -a -d $i/include/gammalib; then
-    LIBDIR_GAMMALIB=$i/lib64
-    INCDIR_GAMMALIB=$i/include/gammalib
-    break
-  fi
-done
-if test -n "$LIBDIR_GAMMALIB" -a -n "$INCDIR_GAMMALIB"; then
-  has_gammalib="yes"
-  LDFLAGS="$LDFLAGS -L$LIBDIR_GAMMALIB"
-  CPPFLAGS="$CPPFLAGS -I$INCDIR_GAMMALIB"
-  AC_MSG_NOTICE([GammaLib found in ${LIBDIR_GAMMALIB} and ${INCDIR_GAMMALIB}.])
-else
-
-  # If GammaLib has not yet been found then search now using the AC_LINK_IFELSE
-  # macro. This allows also search in paths that are eventually specified in
-  # LDFLAGS
-  if test "x$has_gammalib" != "xyes"; then
-    AC_LANG(C++)
-    SAVED_LDFLAGS=$LDFLAGS
-    LDFLAGS="$LDFLAGS -lgamma"
-    AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <GammaLib.hpp>],
-                                    [GSkyDir dir])],
-                   [has_gammalib="yes"
-                    AC_MSG_NOTICE([GammaLib found.])],
-                   [AC_MSG_WARN([GammaLib is not installed.])])
-    LDFLAGS=$SAVED_LDFLAGS  
+# If GammaLib has not been found in any standard path then search now in a
+# number of predefined locations.
+if test "x$has_gammalib" = "xno"; then
+  for i in "$ctatools_prefix" /opt/local /usr/local /usr ; do
+    if test -f $i/lib64/libgamma.so -o -f $i/lib64/libgamma.so -a -d $i/include/gammalib; then
+      LIBDIR_GAMMALIB=$i/lib64
+      INCDIR_GAMMALIB=$i/include/gammalib
+      break
+    fi
+    if test -f $i/lib/libgamma.so -o -f $i/lib/libgamma.dylib -a -d $i/include/gammalib; then
+      LIBDIR_GAMMALIB=$i/lib
+      INCDIR_GAMMALIB=$i/include/gammalib
+      break
+    fi
+  done
+  if test -n "$LIBDIR_GAMMALIB" -a -n "$INCDIR_GAMMALIB"; then
+    has_gammalib="yes"
+    LDFLAGS="$LDFLAGS -L$LIBDIR_GAMMALIB"
+    CPPFLAGS="$CPPFLAGS -I$INCDIR_GAMMALIB"
+    AC_MSG_NOTICE([GammaLib found in ${LIBDIR_GAMMALIB} and ${INCDIR_GAMMALIB}.])
   fi
 fi
 
@@ -276,9 +268,6 @@ if test "x$has_gammalib" = "xyes"; then
   AC_SUBST(LIBDIR_GAMMALIB)
   AC_SUBST(INCDIR_GAMMALIB)
 fi
-#echo $LDFLAGS
-#echo $CPPFLAGS
-#echo $LIBS
 
 
 dnl ==================
