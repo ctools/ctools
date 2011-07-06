@@ -3,9 +3,7 @@
 # The actual implemented logic is to use swig if swig is
 # available on the system
 
-if ENABLE_PYTHON_BINDING
-if HAVE_PYTHON
-if WITH_PYTHON_BINDING
+if WITH_PYTHON
 
 # Set SWIG interface filename
 SWIG_INTERFACE = ctatools.i
@@ -43,6 +41,4 @@ ctatools_wrap.cpp ctatools.py: $(SWIG_INTERFACE)
 	$(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig -o ctatools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
 endif # HAVE_SWIG
 
-endif # WITH_PYTHON_BINDING
-endif # HAVE_PYTHON
-endif # ENABLE_PYTHON_BINDING
+endif # WITH_PYTHON
