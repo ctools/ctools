@@ -116,7 +116,7 @@ fi
 
 dnl =========================================================================
 dnl Checks if Python bindings are to be build. Python binding requires Python
-dnl and either the files gammalib_wrap.cpp and gammalib.py or swig to create
+dnl and either the files ctatools_wrap.cpp and ctatools.py or swig to create
 dnl these files. The following conditionals are set:
 dnl  WITH_PYTHON - Python bindings will be built
 dnl  HAVE_SWIG    - swig is available
@@ -125,6 +125,7 @@ dnl =========================================================================
 # Initialise flags
 enable_python="no"
 has_python="no"
+has_python_h="no"
 has_swig="no"
 has_wrappers="no"
 
@@ -135,7 +136,7 @@ AC_ARG_ENABLE([python-binding],
               [ac_enable_python_binding="$enableval"],
               [ac_enable_python_binding="yes"])
 if test "x$ac_enable_python_binding" = "xno"; then
-  AC_MSG_NOTICE([Python binding for gammalib will not be built])
+  AC_MSG_NOTICE([Python binding for ctatools will not be built])
   AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
 fi
 
@@ -151,15 +152,15 @@ if test "x$has_python" = "xyes"; then
   PY_INCLUDE="$PY_INCLUDE$PYTHON_VERSION"
   
   # Check if we have Python.h
-  AC_CHECK_HEADERS($PY_INCLUDE/Python.h, [has_python="yes"], [has_python="no"])
+  AC_CHECK_HEADERS($PY_INCLUDE/Python.h, [has_python_h="yes"], [has_python_h="no"])
   
   # Mac OS X kluge: if test before was unsuccessful then check for headers in /usr/include
-  if test "x$has_python" = "xno"; then
-    AC_CHECK_HEADERS("/usr/include/python$PYTHON_VERSION/Python.h", [has_python="yes"], [has_python="no"])
+  if test "x$has_python_h" = "xno"; then
+    AC_CHECK_HEADERS("/usr/include/python$PYTHON_VERSION/Python.h", [has_python_h="yes"], [has_python_h="no"])
   fi
 
   # Signal any problem
-  if test "x$has_python" = "xno"; then
+  if test "x$has_python_h" = "xno"; then
     AC_MSG_WARN([No Python header file "$PY_INCLUDE/Python.h" found. Please install appropriate Python development package.])
   fi
 fi
@@ -171,16 +172,16 @@ if test "$SWIG"; then
 fi
 AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
  
-# Do we have wrappers (gammalib_wrap.cpp and gammalib.py)?
-AC_CHECK_FILES([pyext/gammalib_wrap.cpp pyext/gammalib.py],,)
-if test "x$ac_cv_file_pyext_gammalib_wrap_cpp" = "xyes"; then
-  if test "x$ac_cv_file_pyext_gammalib_py" = "xyes"; then
+# Do we have wrappers (ctatools_wrap.cpp and ctatools.py)?
+AC_CHECK_FILES([pyext/ctatools_wrap.cpp pyext/ctatools.py],,)
+if test "x$ac_cv_file_pyext_ctatools_wrap_cpp" = "xyes"; then
+  if test "x$ac_cv_file_pyext_ctatools_py" = "xyes"; then
     has_wrappers="yes"
   fi
 fi
 
 # Signal if Python is enabled
-if test "x$ac_enable_python_binding" = "xyes" -a "x$has_python" = "xyes"; then
+if test "x$ac_enable_python_binding" = "xyes" -a "x$has_python" = "xyes" -a "x$has_python_h" = "xyes"; then
   if test "x$has_swig" = "xyes" -o "x$has_wrappers" = "xyes"; then
     enable_python="yes"
   fi
@@ -320,32 +321,67 @@ if test "x$has_gammalib" = "xyes"; then
 else
   echo "  - GammaLib support             (no)    no gammalib library found"
 fi
-if test ! "$SWIG"; then
-  echo "  - swig                         (no)"
+if test "x$has_python" = "xyes"; then
+  echo "  * Python                       (yes)"
 else
-  echo "  * swig                         (yes)"
+  echo "  - Python                       (no)"
 fi
+if test "x$has_python_h" = "xyes"; then
+  echo "  * Python.h                     (yes)"
+else
+  echo "  - Python.h                     (no)"
+fi
+if test "x$has_swig" = "xyes"; then
+  echo "  * swig                         (yes)"
+else
+  echo "  - swig                         (no)"
+fi
+if test "x$has_wrappers" = "xyes"; then
+  echo "  * Python wrappers              (yes)"
+else
+  echo "  - Python wrappers              (no)"
+fi
+
+# Dump Python binding information
 if test "x$ac_enable_python_binding" = "xyes"; then
   if test "x$has_python" = "xyes"; then
-    if test "x$has_python_wrap" = "xyes"; then
-      if test ! "$SWIG"; then
-        echo "  * Python binding               (yes)"
+    if test "x$has_python_h" = "xyes"; then
+      if test "x$has_wrappers" = "xyes"; then
+        if test "x$has_swig" = "xyes"; then
+          echo "  * Make Python binding          (yes)   use swig for updates"
+        else
+          echo "  * Make Python binding          (yes)   use wrappers"
+        fi
       else
-        echo "  * Python binding               (yes)   use swig for updates"
+        if test "x$has_swig" = "xyes"; then
+          echo "  * Make Python binding          (yes)   use swig for building"
+        else
+          echo "  - Make Python binding          (no)    swig required to build wrappers"
+        fi
       fi
     else
-      if test ! "$SWIG"; then
-        echo "  - Python binding               (no)    swig not installed"
-      else
-        echo "  * Python binding               (yes)   use swig for building"
-      fi
+      echo "  - Make Python binding          (no)    Python.h not installed"
     fi
   else
-    echo "  - Python binding               (no)    python not installed"
+    echo "  - Make Python binding          (no)    Python not installed"
   fi
 else
-  echo "  - Python binding               (no)"
+  echo "  - Make Python binding          (no)"
 fi
+
+# Dump compile options
+if test "x$enable_debug" = "xyes"; then
+  echo "  * Compile in debug code        (yes)"
+else
+  echo "  - Compile in debug code        (no)    (default)"
+fi
+if test "x$enable_profiling" = "xyes"; then
+  echo "  * Enable code for profiling    (yes)"
+else
+  echo "  - Enable code for profiling    (no)    (default)"
+fi
+
+# Dump next step information
 echo
 echo "Now type 'make'"
 echo
