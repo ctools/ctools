@@ -6,9 +6,9 @@ includedir=${prefix}/include
 Name: ctatools
 Description: CTA science analysis tools
 URL: http://cta.irap.omp.eu/ctatools
-Version: 0.2.1
+Version: 0.2.3
 Requires: 
-Requires.private: GammaLib >= 0.4.7
+Requires.private: GammaLib >= 0.4.9
 Conflicts: 
 Cflags: -I${includedir}/ctatools
 Libs: -L${libdir} -lctatools

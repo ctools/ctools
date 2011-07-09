@@ -2,7 +2,7 @@ New Features and Important Changes in ctatools 00-02-03
 
 Author(s) : Juergen Knoedlseder
 
-July 5, 2011
+July 9th, 2011
 
 
 1. Introduction
@@ -14,6 +14,10 @@ This document briefly summarizes executable by executable the most important cha
 -----------------
 Remove pkg-config usage from configure.ac as this introduced somas
 on Mac OS X systems (by default there is no pkg-config on Mac OS X).
+
+Test for presence of Python.h and build Python binding only if the
+file exists. This should resolve installation issues on systems that
+do not have the Python development package installed.
 
 
 3. Python interface
