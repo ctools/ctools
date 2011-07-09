@@ -132,12 +132,7 @@ if __name__ == '__main__':
 	n_trials       = int(sys.argv[2])
 	results_file   = sys.argv[3]
 	
-	print("Testing coverage for file {0} with {1} trials"
-		"".format(xml_model_file, n_trials))
 	results, colnames = test_coverage(n_trials, xml_model_file)
-	
-	print("Writing pull values for all free parameters to file {0}"
-		"".format(results_file))
 	
 	f = open(results_file, 'w')
 	writer = csv.DictWriter(f, colnames)
