@@ -56,6 +56,14 @@ dnl =========================
 AC_CANONICAL_HOST
 
 
+dnl ===================
+dnl Checks for programs
+dnl ===================
+AC_PROG_CXX
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+
+
 dnl =======================
 dnl Checks for header files
 dnl =======================
@@ -68,15 +76,6 @@ dnl =============================================================
 AC_TYPE_SIZE_T
 AC_C_CONST
 AC_C_INLINE
-
-
-dnl ===================
-dnl Checks for programs
-dnl ===================
-AC_PROG_CXX
-AC_PROG_INSTALL
-AC_PROG_LIBTOOL
-
 
 
 dnl =================================
