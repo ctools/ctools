@@ -17,7 +17,7 @@
 #
 # Process this file with autoconf to produce a configure script
 
-AC_INIT([ctatools], [0.2.3], [knodlseder@cesr.fr], [ctatools])
+AC_INIT([ctatools], [0.2.4], [knodlseder@cesr.fr], [ctatools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -267,6 +267,11 @@ if test "x$has_gammalib" = "xyes"; then
   AC_SUBST(LIBS_GAMMALIB)
   AC_SUBST(LIBDIR_GAMMALIB)
   AC_SUBST(INCDIR_GAMMALIB)
+else
+  AC_MSG_ERROR([No suitable GammaLib library found.
+ctatools require GammaLib for compilation, so please install GammaLib before or,
+if you think that it is installed, provide the location of the gammalib library
+and header files by setting the LDFLAGS and CPPFLAGS environnment variables.])
 fi
 
 
@@ -382,7 +387,13 @@ fi
 
 # Dump next step information
 echo
-echo "Now type 'make'"
-echo
-
+if test "x$has_gammalib" = "xyes"; then
+  echo "Now type 'make'"
+  echo
+else
+  AC_MSG_ERROR([No suitable GammaLib library found. ctatools require GammaLib
+for compilation, so please install GammaLib before or provide the
+location of the library and header files using the LDFLAGS and CPPFLAGS
+environnment variables.])
+fi
 
