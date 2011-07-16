@@ -1,0 +1,146 @@
+#! /bin/sh
+#    Filename: ctatools-setup(.in)
+# Description: Writes an initialization script for ctatools software
+#              which is custom fit to the user and the particular
+#              software installation. Note that this script is
+#              designed to be invoked by ctatools-init.csh/ctatools-init.sh,
+#              and should not normally be invoked directly by user.
+# Author/Date: Juergen Knoedlseder, IRAP, July 16, 2011
+#-------------------------------------------------------------------------------
+#
+# Set fixed parameters
+# ====================
+this_script=`echo $0 | sed 's:.*/::'`
+ctatools_info="$this_script:"
+
+#
+# Extract argument
+# ================
+flavor=$1
+if [ "x$flavor" != xcsh -a "x$flavor" != xsh ]; then
+  echo "$ctatools_info usage $this_script csh|sh" >&2
+  exit 3
+fi
+
+#
+# Set parameters
+# ==============
+prefix="@prefix@"
+ctatools_bin="@prefix@/bin"
+ctatools_lib="@prefix@/lib"
+uname_system=`uname`
+python_dir="@pythondir@"
+pkgconfig_dir="@prefix@/lib/pkgconfig"
+man_dir="@prefix@/share/doc/ctatools/man"
+
+#
+# Set LD_LIBRARY_PATH
+# ===================
+if [ "x$LD_LIBRARY_PATH" = x ]; then
+  LD_LIBRARY_PATH="$ctatools_lib"
+else
+  LD_LIBRARY_PATH=`echo ":$LD_LIBRARY_PATH:" | \
+    sed "s%:$ctatools_lib:%:%g" | sed "s%::*$%%"`
+  LD_LIBRARY_PATH="$ctatools_lib$LD_LIBRARY_PATH"
+fi
+
+#
+# Set DYLD_LIBRARY_PATH if required
+# =================================
+case $uname_system in
+  Darwin*)
+    if [ "x$DYLD_LIBRARY_PATH" = x ]; then
+         DYLD_LIBRARY_PATH="$ctatools_lib"
+    else
+      DYLD_LIBRARY_PATH=`echo ":$DYLD_LIBRARY_PATH:" | \
+        sed "s%:$ctatools_lib:%:%g" | sed "s%::*$%%"`
+      DYLD_LIBRARY_PATH="$ctatools_lib$DYLD_LIBRARY_PATH"
+    fi
+    ;;
+  CYGWIN*)
+    if [ "x$PATH" = x ]; then
+      PATH="$ctatools_lib"
+    else
+      PATH=`echo ":$PATH:" | sed "s%:$ctatools_lib:%:%g" | sed "s%::*$%%"`
+      PATH="$ctatools_lib$PATH"
+    fi
+    ;;
+esac
+
+#
+# Set PYTHONPATH
+# ==============
+if [ "x$PYTHONPATH" = x ]; then
+  PYTHONPATH="$python_dir"
+else
+  PYTHONPATH=`echo ":$PYTHONPATH:" | \
+    sed "s%:$python_dir:%:%g" | sed "s%::*$%%"`
+  PYTHONPATH="$python_dir$PYTHONPATH"
+fi
+
+#
+# Set PKG_CONFIG_PATH
+# ===================
+if [ "x$PKG_CONFIG_PATH" = x ]; then
+  PKG_CONFIG_PATH="$pkgconfig_dir"
+else
+  PKG_CONFIG_PATH=`echo ":$PKG_CONFIG_PATH:" | \
+    sed "s%:$pkgconfig_dir:%:%g" | sed "s%::*$%%"`
+  PKG_CONFIG_PATH="$pkgconfig_dir$PKG_CONFIG_PATH"
+fi
+
+#
+# Set PATH
+# ========
+if [ "x$PATH" = x ]; then
+  PATH="$ctatools_bin"
+else
+  PATH=`echo ":$PATH:" | \
+    sed "s%:$ctatools_bin:%:%g" | sed "s%::*$%%"`
+  PATH="$ctatools_bin$PATH"
+fi
+
+#
+# Set MANPATH
+# ==============
+if [ "x$MANPATH" = x ]; then
+  MANPATH="$man_dir"
+else
+  MANPATH=`echo ":$MANPATH:" | \
+    sed "s%:$man_dir:%:%g" | sed "s%::*$%%"`
+  MANPATH="$man_dir$MANPATH"
+fi
+
+#
+# List of variables needed in initialization script
+# =================================================
+varlist="PATH PYTHONPATH PKG_CONFIG_PATH LD_LIBRARY_PATH DYLD_LIBRARY_PATH MANPATH"
+
+#
+# Save values in output initialization shell scripts
+# ==================================================
+# Name of temporary config script
+HOST_NAME=`hostname`
+ctatools_config="$HOME/ctatools-config-$HOST_NAME"
+
+# Bourne Shell version, write only for sh flavor initialization
+if [ $flavor = sh ]; then
+  rm -f $ctatools_config$$.sh
+  touch $ctatools_config$$.sh
+  for var in $varlist; do
+    eval "if [ \"x\$$var\" != x ]; then
+            echo \"\$var=\\\"\$$var\\\"; export \$var\" >> $ctatools_config$$.sh;
+          fi"
+  done
+  echo "$ctatools_config$$.sh"
+# C Shell version, write only for csh flavor initialization
+elif [ $flavor = csh ]; then
+  rm -f $ctatools_config$$.csh
+  touch $ctatools_config$$.csh
+  for var in $varlist; do
+    eval "if [ \"x\$$var\" != x ]; then
+            echo setenv \$var \\\"\$$var\\\" >> $ctatools_config$$.csh;
+          fi"
+  done
+  echo "$ctatools_config$$.csh"
+fi
