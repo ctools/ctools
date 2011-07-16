@@ -1,33 +1,28 @@
 #! /bin/bash -f
 
-sourcedir=ctatools
+# Set parameters
 installdir=$(pwd)/build
 
-echo "Remove existing folder"
-rm -rf $sourcedir
-#rm -rf $installdir
-
 echo "Checkout latest ctatools"
+rm -rf ctatools
 cvs -Q -d /home/cvs export -N -r HEAD "ctatools"
+
+# Extract version number
+version=`cat ctatools/configure.ac | grep 'AC_INIT' | awk -F"[" '{print $3}' | sed 's/],//' | sed 's/\./ /g'`
+version=`printf "%2.2d-%2.2d-%2.2d" $version`
+echo "ctatools version: "$version
+
+# Set directory name
+sourcedir=ctatools-$version
+rm -rf $sourcedir
+mv ctatools $sourcedir
 
 echo "Create Makefile.in and configure scripts"
 cd $sourcedir
-#
 mkdir m4
 ./autogen.sh
-#aclocal -I m4
-#libtoolize --copy
-#autoconf
-#autoheader
-#automake --add-missing --copy
-#
-#rm -f autogen.sh      
-#rm -rf m4
-rm -rf autom4te.cache
-#rm -f configure.ac
-#rm -f Makefile.am
+#rm -rf autom4te.cache
 rm -f ctatools.sh
-#
 cd ..
 
 echo "Create ctatool_wrap.cpp and ctatool.py files for python binding (making swig obsolete)"
@@ -43,17 +38,13 @@ gzip $sourcedir.tar
 
 echo "Configure ctatools"
 cd $sourcedir
-export PKG_CONFIG_PATH=/home/knodlseder/export/gammalib_build/lib/pkgconfig
 ./configure --prefix=$installdir
 
 echo "Compile ctatools"
-make -j4
+make -j10
+
+echo "Check ctatools"
+make check
 
 echo "Install ctatools"
 make install
-
-#echo "Check GammaLib"
-#export PATH=$installdir/bin:$PATH
-#export LD_LIBRARY_PATH=$installdir/lib:$LD_LIBRARY_PATH
-#export PYTHONPATH=$installdir/lib/python2.5/site-packages:$PYTHONPATH
-#make check
