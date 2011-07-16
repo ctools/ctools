@@ -239,16 +239,20 @@ LDFLAGS=$SAVED_LDFLAGS
 # If GammaLib has not been found in any standard path then search now in a
 # number of predefined locations.
 if test "x$has_gammalib" = "xno"; then
-  for i in "$ctatools_prefix" /opt/local /usr/local /usr ; do
-    if test -f $i/lib64/libgamma.so -o -f $i/lib64/libgamma.so -a -d $i/include/gammalib; then
-      LIBDIR_GAMMALIB=$i/lib64
-      INCDIR_GAMMALIB=$i/include/gammalib
-      break
+  for i in "$GAMMALIB" "$ctatools_prefix" /opt/local /usr/local /usr ; do
+    if test -f $i/lib64/libgamma.so -o -f $i/lib64/libgamma.dylib; then
+      if test -d $i/include/gammalib; then
+        LIBDIR_GAMMALIB=$i/lib64
+        INCDIR_GAMMALIB=$i/include/gammalib
+        break
+      fi
     fi
-    if test -f $i/lib/libgamma.so -o -f $i/lib/libgamma.dylib -a -d $i/include/gammalib; then
-      LIBDIR_GAMMALIB=$i/lib
-      INCDIR_GAMMALIB=$i/include/gammalib
-      break
+    if test -f $i/lib/libgamma.so -o -f $i/lib/libgamma.dylib; then
+      if test -d $i/include/gammalib; then
+        LIBDIR_GAMMALIB=$i/lib
+        INCDIR_GAMMALIB=$i/include/gammalib
+        break
+      fi
     fi
   done
   if test -n "$LIBDIR_GAMMALIB" -a -n "$INCDIR_GAMMALIB"; then
@@ -270,8 +274,8 @@ if test "x$has_gammalib" = "xyes"; then
 else
   AC_MSG_ERROR([No suitable GammaLib library found.
 ctatools require GammaLib for compilation, so please install GammaLib before or,
-if you think that it is installed, provide the location of the gammalib library
-and header files by setting the LDFLAGS and CPPFLAGS environnment variables.])
+if you think that it is installed, set the GAMMALIB environment variable to the
+root directory of GammaLib.])
 fi
 
 
