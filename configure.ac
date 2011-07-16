@@ -311,6 +311,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctbin/Makefile
                  src/ctlike/Makefile
                  src/ctobssim/Makefile
+                 src/ctatools-setup
                  test/Makefile
                  pyext/Makefile
                  pyext/setup.py
