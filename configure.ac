@@ -36,13 +36,6 @@ fi
 AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${ctatools_prefix}", [Location where library is installed])
 
 
-dnl ==============================================
-dnl Add pkgconfig information of install directory
-dnl ==============================================
-# PKG_CONFIG_PATH="${ctatools_prefix}/lib/pkgconfig:/opt/local/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH"
-# export PKG_CONFIG_PATH
-
-
 dnl ===========================
 dnl things required by automake
 dnl ===========================
