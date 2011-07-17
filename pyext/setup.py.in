@@ -56,10 +56,13 @@ data_files   = glob.glob('@top_srcdir@/pyext/*.i')
 library_dirs = ['../src/.libs','@prefix@/lib']
 libraries    = [libcta,'gamma']
 
-# Add application include files
+# Add application include files. The method we use here is not very
+# intelligent as it simple will add all names that start with 'ct'
+# in the src directory. Once we added the ctatools script we had to
+# add an explicit filter to avoid appending those.
 dirs = glob.glob('../src/ct*')
 for dir in dirs:
-	if len(dir) > 0:
+	if len(dir) > 0 and 'ctatools' not in dir:
 		path = os.path.abspath(dir)
 		include_dirs.append(path)
 
