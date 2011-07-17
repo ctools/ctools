@@ -25,3 +25,10 @@ libctatools_la_LIBADD = ctbin/libctbin.la \
 EXTRA_DIST   = $(scripts)
 scriptsdir   = $(bindir)
 scripts_DATA = $(scripts)
+
+# Add hook rule to make scripts executable
+install-data-hook:
+	@list='$(scripts_DATA)';\
+	for p in $$list; do \
+	  if test -f "$$p"; then chmod +x "$(DESTDIR)$(scriptsdir)/$$p"; fi; \
+	done
