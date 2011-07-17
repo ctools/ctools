@@ -39,14 +39,31 @@ docdir = ${datadir}/doc/${PACKAGE}
 
 # Models installed in the package's model directory
 models      = test/data/crab.xml \
-              test/data/disk.xml
+              test/data/disk.xml \
+              test/data/gauss.xml \
+              test/data/shell.xml
 modelsdir   = $(datadir)/models
 models_DATA = $(models)
 
-# Models to install
-# Extra files to be distributed in the tar file
-#EXTRA_DIST = $(models)
+# Calibration files to distribute
+irfs = caldb/kb_A_50h_v3.dat \
+       caldb/kb_B_50h_v3.dat \
+       caldb/kb_C_50h_v3.dat \
+       caldb/kb_D_50h_v3.dat \
+       caldb/kb_E_50h_v3.dat \
+       caldb/kb_F_50h_v3.dat \
+       caldb/kb_G_50h_v3.dat \
+       caldb/kb_H_50h_v3.dat \
+       caldb/kb_I_50h_v3.dat \
+       caldb/kb_J_50h_v3.dat \
+       caldb/kb_K_50h_v3.dat \
+       caldb/kb_NA_50h_v3.dat \
+       caldb/kb_NB_50h_v3.dat
+caldbdir = $(datadir)/caldb/cta
+caldb_DATA = $(irfs)
 
+# Extra files to be distributed in the tar file
+EXTRA_DIST = $(irfs) $(models)
 
 install-data-local: $(HTML_INSTALL_DATA_TARGETS)
 
