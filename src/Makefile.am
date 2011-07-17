@@ -1,7 +1,15 @@
 ## Process this file with automake to produce Makefile.in
 
 # Set sub directories
-SUBDIRS = ctselect ctbin ctlike ctobssim
+SUBDIRS = ctselect \
+          ctbin \
+          ctlike \
+          ctobssim
+
+# Scripts to be distributed
+scripts = ctatools-setup \
+          ctatools-init.sh \
+          ctatools-init.csh
 
 # Build libtool library for CTA tools. This is needed to provide
 # a shared library that can be loaded for python bindings. We do
@@ -9,6 +17,11 @@ SUBDIRS = ctselect ctbin ctlike ctobssim
 lib_LTLIBRARIES = libctatools.la
 libctatools_la_SOURCES = 
 libctatools_la_LIBADD = ctbin/libctbin.la \
-		        ctselect/libctselect.la \
+                        ctselect/libctselect.la \
                         ctlike/libctlike.la \
                         ctobssim/libctobssim.la
+
+# Distribute scripts
+EXTRA_DIST   = $(scripts)
+scriptsdir   = $(bindir)
+scripts_DATA = $(scripts)
