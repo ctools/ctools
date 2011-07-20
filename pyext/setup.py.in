@@ -59,10 +59,10 @@ libraries    = [libcta,'gamma']
 # Append prefix library directory if it exists and set default runtime
 # library directories
 if os.path.exists('@prefix@/lib'):
-	library_dirs.append(['@prefix@/lib'])
+	library_dirs.append('@prefix@/lib')
 	runtime_library_dirs = ['@prefix@/lib']
 else:
-	runtime_library_dirs = []	
+	runtime_library_dirs = []
 
 # Add application include files. The method we use here is not very
 # intelligent as it simple will add all names that start with 'ct'
@@ -83,7 +83,7 @@ for extra_lib in extra_libs:
 # Get extra library paths
 extra_lib_paths = ('@LDFLAGS@').split(' ')
 for extra_lib_path in extra_lib_paths:
-	if extra_lib_path.lstrip().find('-L') != -1:
+	if extra_lib_path.lstrip().find('-L') == 0:
 		dir = extra_lib_path.lstrip().lstrip('-L')
 		if len(dir) > 0:
 			library_dirs.append(dir)
@@ -91,7 +91,7 @@ for extra_lib_path in extra_lib_paths:
 # Get extra include directories
 extra_include_dirs = ('@CPPFLAGS@').split(' ')
 for extra_include_dir in extra_include_dirs:
-	if extra_include_dir.lstrip().find('-I') != -1:
+	if extra_include_dir.lstrip().find('-I') == 0:
 		dir = extra_include_dir.lstrip().lstrip('-I')
 		if len(dir) > 0:
 			include_dirs.append(dir)
