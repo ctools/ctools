@@ -56,9 +56,13 @@ data_files   = glob.glob('@top_srcdir@/pyext/*.i')
 library_dirs = ['../src/.libs']
 libraries    = [libcta,'gamma']
 
-# Append prefix library directory if it exists
+# Append prefix library directory if it exists and set default runtime
+# library directories
 if os.path.exists('@prefix@/lib'):
 	library_dirs.append(['@prefix@/lib'])
+	runtime_library_dirs = ['@prefix@/lib']
+else:
+	runtime_library_dirs = []	
 
 # Add application include files. The method we use here is not very
 # intelligent as it simple will add all names that start with 'ct'
@@ -104,5 +108,5 @@ setup(name='@PACKAGE_NAME@',
                              include_dirs=include_dirs,
                              library_dirs=library_dirs,
                              libraries=libraries,
-                             runtime_library_dirs=['@prefix@/lib'])],
+                             runtime_library_dirs=runtime_library_dirs)],
      )
