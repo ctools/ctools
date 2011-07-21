@@ -22,6 +22,7 @@
  * swig -c++ -python -Wall ctatools.i                                      *
  ***************************************************************************/
 %module ctatools
+%feature("autodoc", "1");
 
 /* __ Support module _____________________________________________________ */
 %include "stl.i"
