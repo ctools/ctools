@@ -4,7 +4,7 @@
 binscripts = 
 
 # Scripts to be distributed in pythondir
-pythonscripts = ctautils.py
+pythonscripts = obsutils.py
 
 # Distribute scripts
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
