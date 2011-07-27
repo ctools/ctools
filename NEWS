@@ -1,8 +1,8 @@
-New Features and Important Changes in ctatools 00-02-04
+New Features and Important Changes in ctatools 00-02-05
 
 Author(s) : Juergen Knoedlseder
 
-July 20, 2011
+July 27, 2011
 
 
 1. Introduction
@@ -12,15 +12,7 @@ This document briefly summarizes executable by executable the most important cha
 
 2. Configuration
 -----------------
-The configuration script aborts now if no C++ compiler is found.
-
-Added ctatools-init.sh, ctatools-init.csh and ctatools-setup
-scripts. They needed to be called when ctatools is installed
-in a location that differs from GammaLib, so that the 
-environment is set up correctly also for this case. If ctatools
-is in the same location as GammaLib, these scripts do not need
-to be used.
-
+None
 
 3. Python interface
 -------------------
@@ -39,7 +31,11 @@ None
 
 6. ctbin - CTA event binning
 ----------------------------
-None
+If an observation container is passed to ctbin, the counts map reference
+pixel is taken from the pointing of each observation and the xref and yref
+parameters are ignored. This allows for pipeline processing of a list of
+observations using ctbin. Note that this feature is only available if cabin
+is used from Python.
 
 
 7. ctlike - CTA maximum likelihood fitting

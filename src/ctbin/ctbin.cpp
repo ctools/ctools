@@ -368,6 +368,11 @@ void ctbin::get_parameters(void)
 
         // Append CTA observation to container
         m_obs.append(obs);
+        
+        // Use the xref and yref parameters for binning (otherwise the
+        // pointing direction(s) is/are used)
+        m_xref = (*this)["xref"].real();
+        m_yref = (*this)["yref"].real();
 
     } // endif: there was no observation in the container
 
@@ -377,8 +382,6 @@ void ctbin::get_parameters(void)
     m_enumbins = (*this)["enumbins"].integer();
     m_proj     = (*this)["proj"].string();
     m_coordsys = (*this)["coordsys"].string();
-    m_xref     = (*this)["xref"].real();
-    m_yref     = (*this)["yref"].real();
     m_binsz    = (*this)["binsz"].real();
     m_nxpix    = (*this)["nxpix"].integer();
     m_nypix    = (*this)["nypix"].integer();
@@ -395,6 +398,8 @@ void ctbin::get_parameters(void)
  *
  * @exception GException::no_list
  *            No event list found in observation.
+ * @exception GCTAException::no_pointing
+ *            No valid CTA pointing found.
  *
  * This method bins the events found in a CTA events list into a counts map
  * and replaces the event list by the counts map in the observation. The
@@ -421,11 +426,38 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         // Get Good Time intervals
         GGti gti = obs->events()->gti();
+        
+        // Get map centre
+        double xref;
+        double yref;
+        if (m_xref != 9999.0 && m_yref != 9999.0) {
+            xref = m_xref;
+            yref = m_yref;
+        }
+        else {
+            
+            // Get pointer on CTA pointing
+            const GTime         srcTime; // Dummy time
+            const GCTAPointing *pnt = obs->pointing(srcTime);
+            if (pnt == NULL)
+                throw GCTAException::no_pointing(G_BIN_EVENTS);
+            
+            // Set reference point to pointing
+            if (toupper(m_coordsys) == "GAL") {
+                xref = pnt->dir().l_deg();
+                yref = pnt->dir().b_deg();
+            }
+            else {
+                xref = pnt->dir().ra_deg();
+                yref = pnt->dir().dec_deg();
+            }
+
+        } // endelse: map centre set to pointing
 
         // Create skymap
         GSkymap map = GSkymap(m_proj, m_coordsys,
-                             m_xref, m_yref, m_binsz, m_binsz,
-                             m_nxpix, m_nypix, m_enumbins);
+                              xref, yref, m_binsz, m_binsz,
+                              m_nxpix, m_nypix, m_enumbins);
 
         // Initialise binning statistics
         int num_outside_map  = 0;
@@ -515,8 +547,8 @@ void ctbin::init_members(void)
     m_emin     = 0.0;
     m_emax     = 0.0;
     m_enumbins = 0;
-    m_xref     = 0.0;
-    m_yref     = 0.0;
+    m_xref     = 9999.0; // Flags unset (use pointing direction)
+    m_yref     = 9999.0; // Flags unset (use pointing direction)
     m_binsz    = 0.0;
     m_nxpix    = 0;
     m_nypix    = 0;
