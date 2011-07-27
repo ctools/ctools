@@ -4,7 +4,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 # Subdirectories
-SUBDIRS = . src pyext test
+SUBDIRS = . src pyext test examples scripts
 
 #
 INCLUDES =
