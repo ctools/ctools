@@ -532,7 +532,7 @@ class cssens(GApplication):
 				if ts > 0:
 					correct = math.sqrt(self.m_ts_thres/ts)
 			else:
-				if eSPre_all > 0:
+				if SPre_all > 0 and eSPre_all > 0:
 					correct = math.sqrt(self.m_ts_thres)/(SPre_all/eSPre_all)
 			flux  = correct * SPre_all
 			pflux = correct * pflux
