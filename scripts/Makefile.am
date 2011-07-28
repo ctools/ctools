@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 # Scripts to be distributed in bindir
-binscripts = 
+binscripts = cssens
 
 # Scripts to be distributed in pythondir
 pythonscripts = obsutils.py
