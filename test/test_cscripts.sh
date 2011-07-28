@@ -46,7 +46,10 @@ mkdir -p pfiles
 # Test cssens
 # ===========
 echo -n "Test cssens: "
-cssens duration=3600.0
+cssens duration=3600.0 \
+       caldb="irf" \
+       irf="kb_E_50h_v3" \
+       rad=5.0
 echo -n "."
 if [ -s "sensitivity.dat" ]
 then
