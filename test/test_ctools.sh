@@ -1,6 +1,6 @@
 #! /bin/bash
 # ==========================================================================
-# This script tests all ctatools executables.
+# This script tests all ctools
 #
 # Copyright (C) 2011 Jurgen Knodlseder
 #
@@ -22,9 +22,9 @@
 #
 # Print Header
 #
-echo "*****************************"
-echo "* Test ctatools executables *"
-echo "*****************************"
+echo "***************"
+echo "* Test ctools *"
+echo "***************"
 
 
 #
@@ -42,7 +42,7 @@ export PFILES=pfiles
 
 #
 # Test ctobssim
-# ============
+# =============
 echo -n "Test ctobssim: "
 ctobssim infile="data/crab.xml" \
          outfile="events.fits" \
