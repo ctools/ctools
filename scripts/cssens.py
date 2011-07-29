@@ -119,7 +119,9 @@ class cssens(GApplication):
 			pars.append(GPar("irf","s","a","kb_E_50h_v3","","","Instrument response function"))
 			pars.append(GPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
 			pars.append(GPar("rad","r","a","5.0","","","Radius of ROI (deg)"))
-			pars.append(GPar("enumbins","i","h","0","","","Number of energy bins"))
+			pars.append(GPar("enumbins","i","h","0","","","Number of energy bins (0=unbinned)"))
+			pars.append(GPar("npix","i","h","200","","","Number of pixels for binned"))
+			pars.append(GPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
 			pars.append(GPar("sigma","r","h","5.0","","","Significance threshold"))
 			pars.append(GPar("ts_use","b","h","no","","","Use TS instead of Sigma?"))
 			pars.append(GPar("index","r","h","-2.48","","","Assumed spectral index"))
@@ -142,6 +144,8 @@ class cssens(GApplication):
 		self.m_duration = self["duration"].real()
 		self.m_roi      = self["rad"].real()
 		self.m_nbins    = self["enumbins"].integer()
+		self.m_npix     = self["npix"].integer()
+		self.m_binsz    = self["binsz"].real()
 		self.m_ts_thres = self["sigma"].real()*self["sigma"].real()
 		self.m_use_ts   = self["ts_use"].boolean()
 		self.m_index    = self["index"].real()
@@ -417,6 +421,7 @@ class cssens(GApplication):
 			
 			# Simulate events
 			sim = obsutils.sim(obs, nbins=self.m_nbins, seed=iter, \
+			                   binsz=self.m_binsz, npix=self.m_npix, \
 			                   log=self.m_log, debug=self.m_debug)
 		
 			# Determine number of events in simulation
