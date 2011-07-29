@@ -43,41 +43,24 @@ class cssens(GApplication):
 	files, command line arguments, and logging. In that way the Python
 	script behaves just as a regular ctool.
 	"""
-	def __init__(self):
+	def __init__(self, *argv):
 		"""
-		Void constructor.
+		Constructor.
 		"""
 		# Set name
 		self.name    = "cssens"
-		self.version = "0.1.0"
+		self.version = "0.1.1"
 		
 		# Make sure that parfile exists
 		file = self.parfile()
 
 		# Initialise application
-		GApplication.__init__(self, self.name, self.version)
-		
-		# Set logger properties
-		self.logFileOpen()
-		self.log_header()
-		self.log.date(True)
-		
-		# Return
-		return
-
-	def __init__(self, argv):
-		"""
-		Command line constructor.
-		"""
-		# Set name
-		self.name    = "cssens"
-		self.version = "0.1.0"
-		
-		# Make sure that parfile exists
-		file = self.parfile()
-
-		# Initialise application
-		GApplication.__init__(self, self.name, self.version, argv)
+		if len(argv) == 0:
+			GApplication.__init__(self, self.name, self.version)
+		elif len(argv) ==1:
+			GApplication.__init__(self, self.name, self.version, *argv)
+		else:
+			raise TypeError("Invalid number of arguments given.")
 
 		# Set logger properties
 		self.logFileOpen()
