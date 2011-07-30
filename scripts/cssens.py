@@ -3,11 +3,19 @@
 # This script computes the CTA sensitivity for a number of energy bins using
 # ctlike. Crab spectra are fitted in narrow energy bins to simulated data,
 # and the flux level is determined that leads to a particular significance.
+#
 # The significance can be either determined using the Test Statistic (which
 # is defined as twice the likelihood difference between fitting with and
 # without the test source) or using the source model scaling factor (or
 # Prefactor) divided by its statistical error. The latter has been turned
-# out to be more reliable, and is used as default parameter.
+# out to be more reliable, and is used as the default parameter.
+#
+# As background model, a GCTAModelRadialGauss model is used for the spatial
+# component. For the spectral component, either a file function is used
+# (specified by the "bkg" parameter), or if left blank, a power law adjusted
+# to Konrad's configuration "E" performance file is employed.
+#
+# The source is modelled as a point source
 #
 # Copyright (C) 2011 Jurgen Knodlseder
 #
@@ -49,7 +57,7 @@ class cssens(GApplication):
 		"""
 		# Set name
 		self.name    = "cssens"
-		self.version = "0.1.1"
+		self.version = "0.2.0"
 		
 		# Make sure that parfile exists
 		file = self.parfile()
@@ -100,6 +108,9 @@ class cssens(GApplication):
 			pars.append(GPar("outfile","f","h","sensitivity.dat","","","Output file name"))
 			pars.append(GPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
 			pars.append(GPar("irf","s","a","kb_E_50h_v3","","","Instrument response function"))
+			pars.append(GPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
+			pars.append(GPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
+			pars.append(GPar("bkg","s","a","$GAMMALIB/share/models/bkg_kb_E_50h_v3.txt","","","Background model file function (none=power law for E)"))
 			pars.append(GPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
 			pars.append(GPar("rad","r","a","5.0","","","Radius of ROI (deg)"))
 			pars.append(GPar("enumbins","i","h","0","","","Number of energy bins (0=unbinned)"))
@@ -124,6 +135,9 @@ class cssens(GApplication):
 		self.m_outfile  = self["outfile"].filename()
 		self.m_caldb    = self["caldb"].string()
 		self.m_irf      = self["irf"].string()
+		self.m_type     = self["type"].string()
+		self.m_offset   = self["offset"].real()
+		self.m_bkg      = self["bkg"].string()
 		self.m_duration = self["duration"].real()
 		self.m_roi      = self["rad"].real()
 		self.m_nbins    = self["enumbins"].integer()
@@ -179,7 +193,10 @@ class cssens(GApplication):
 		full_model = GModels()
 		bkg_model.append(self.set_bkg_model())
 		full_model.append(self.set_bkg_model())
-		full_model.append(self.set_src_model(0.0, 0.0, index=self.m_index))
+		full_model.append(self.set_src_model(0.0, \
+		                                     self.m_offset, \
+											 type=self.m_type, \
+		                                     index=self.m_index))
 
 		# Write models into logger
 		if self.logTerse():
@@ -271,15 +288,19 @@ class cssens(GApplication):
 		# Define radial component
 		radial = GCTAModelRadialGauss(3.0)
 		
-		# Define spectral component
-		spectrum = GModelSpectralPlaw(61.8, -1.85)
-		spectrum["Prefactor"].scale(1.0e-6)
-		spectrum["PivotEnergy"].value(1.0)
-		spectrum["PivotEnergy"].scale(1.0e6)
-		if fitidx:
-			spectrum["Index"].free()
+		# Define spectral component. If a background model is given then
+		# use a file function. Otherwise use a static power law.
+		if len(self.m_bkg) > 0:
+			spectrum = GModelSpectralFunc(self.m_bkg)
 		else:
-			spectrum["Index"].fix()
+			spectrum = GModelSpectralPlaw(61.8, -1.85)
+			spectrum["Prefactor"].scale(1.0e-6)
+			spectrum["PivotEnergy"].value(1.0)
+			spectrum["PivotEnergy"].scale(1.0e6)
+			if fitidx:
+				spectrum["Index"].free()
+			else:
+				spectrum["Index"].fix()
 		
 		# Create background model
 		model = GCTAModelRadialAcceptance(radial, spectrum)
@@ -426,14 +447,6 @@ class cssens(GApplication):
 			LogL_bgm   = like.opt().value()
 			npred_bgm  = like.obs().npred()
 
-			# Store results
-			Pre_bgm   = result_bgm[0]['Prefactor'].value()
-			ePre_bgm  = result_bgm[0]['Prefactor'].error()
-			Inx_bgm   = result_bgm[0]['Index'].value()
-			eInx_bgm  = result_bgm[0]['Index'].error()
-			Sig_bgm   = result_bgm[0]['Sigma'].value()
-			eSig_bgm  = result_bgm[0]['Sigma'].error()
-			
 			# Write background fit results
 			if self.logExplicit():
 				self.log.header3("Background model fit")
@@ -459,22 +472,11 @@ class cssens(GApplication):
 			ts         = 2.0*(LogL_bgm-LogL_all)
 
 			# Get fitted Crab, photon and energy fluxes
-			cflux = result_all[0]['Prefactor'].value()
-			pflux = cast_GModelSky(result_all["Test"]).spectral().flux(emin, emax)
-			eflux = cast_GModelSky(result_all["Test"]).spectral().eflux(emin, emax)
+			cflux     = result_all["Test"]['Prefactor'].value()
+			cflux_err = result_all["Test"]['Prefactor'].error()
+			pflux     = cast_GModelSky(result_all["Test"]).spectral().flux(emin, emax)
+			eflux     = cast_GModelSky(result_all["Test"]).spectral().eflux(emin, emax)
 
-			# Store results
-			Pre_all   = result_all[0]['Prefactor'].value()
-			ePre_all  = result_all[0]['Prefactor'].error()
-			Inx_all   = result_all[0]['Index'].value()
-			eInx_all  = result_all[0]['Index'].error()
-			Sig_all   = result_all[0]['Sigma'].value()
-			eSig_all  = result_all[0]['Sigma'].error()
-			SPre_all  = result_all[1]['Prefactor'].value()
-			eSPre_all = result_all[1]['Prefactor'].error()
-			SInx_all  = result_all[1]['Index'].value()
-			eSInx_all = result_all[1]['Index'].error()
-			
 			# Write background and test source fit results
 			if self.logExplicit():
 				self.log.header3("Background and test source model fit")
@@ -520,9 +522,9 @@ class cssens(GApplication):
 				if ts > 0:
 					correct = math.sqrt(self.m_ts_thres/ts)
 			else:
-				if SPre_all > 0 and eSPre_all > 0:
-					correct = math.sqrt(self.m_ts_thres)/(SPre_all/eSPre_all)
-			flux  = correct * SPre_all
+				if cflux > 0 and cflux_err > 0:
+					correct = math.sqrt(self.m_ts_thres)/(cflux/cflux_err)
+			flux  = correct * cflux
 			pflux = correct * pflux
 			eflux = correct * eflux
 			flux_value.append(flux)
