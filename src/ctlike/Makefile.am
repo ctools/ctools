@@ -1,28 +1,20 @@
 ## Process this file with automake to produce Makefile.in
 
-# we use srcdir/src for "private" includes
-# we use srcdir/include for the static global include files
-# we use builddir/src for the generated include files to get found
-
-# Include directories
-INCLUDES = -I$(top_srcdir)/include \
-           -I$(top_builddir)/src \
-           -I$(top_srcdir)/src
-
 # Program name
 bin_PROGRAMS = ctlike
 
 # Sources
 sources = ctlike.cpp
 
-# Libtool library (only needed for python bindings)
+# Libtool library
 noinst_LTLIBRARIES = libctlike.la
 libctlike_la_SOURCES = $(sources)
 
 # Program definition
-ctlike_SOURCES = main.cpp $(sources)
+ctlike_SOURCES = main.cpp
 ctlike_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
 ctlike_CPPFLAGS = @CPPFLAGS@
+ctlike_LDADD = libctlike.la
 
 # Parameter files
 pfilesdir = $(prefix)/syspfiles
