@@ -38,18 +38,22 @@ rm -rf *.fits *.log *.xml *.dat
 # Creates pfiles directory
 # ========================
 mkdir -p pfiles
-#cp -r ../src/*/*.par pfiles/
-#export PFILES=pfiles
+export PFILES=pfiles
 
 
 #
 # Test cssens
 # ===========
 echo -n "Test cssens: "
+rm -rf cssens
+ln -s ../scripts/cssens.py cssens
 cssens duration=3600.0 \
        caldb="irf" \
        irf="kb_E_50h_v3" \
-       rad=5.0
+       type="point" \
+       offset="0.0" \
+       bkg="data/bkg_kb_E_50h_v3.txt" \
+       rad=1.0
 echo -n "."
 if [ -s "sensitivity.dat" ]
 then
