@@ -331,6 +331,8 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  pyext/Makefile
                  pyext/setup.py
+                 caldb/Makefile
+                 models/Makefile
                  examples/Makefile
                  scripts/Makefile
                  ctatools.pc])
