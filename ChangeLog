@@ -1,9 +1,10 @@
-2011-07-27  Juergen Knoedlseder  <knodlseder@cesr.fr>
+2011-07-29  Juergen Knoedlseder  <knodlseder@cesr.fr>
 
         * Version 0.2.5 released
         ========================
 
         ctbin extracts the image centre from an observation if provided
+        Add models directory
 
 2011-07-20  Juergen Knoedlseder  <knodlseder@cesr.fr>
 
