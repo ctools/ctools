@@ -24,6 +24,7 @@ install-data-hook:
 	done
 	@linklist='$(linkscripts)';\
 	for p in $$linklist; do \
+      rm -rf "$(DESTDIR)$(bindir)/$$p"; \
       ln -s "$(DESTDIR)$(pythondir)/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
 	  chmod +x "$(DESTDIR)$(pythondir)/$$p.py"; \
 	done
