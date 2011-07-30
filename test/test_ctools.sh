@@ -36,9 +36,11 @@ rm -rf *.fits *.log *.xml
 #
 # Creates pfiles directory
 # ========================
+rm -rf pfiles
 mkdir -p pfiles
 cp -r ../src/*/*.par pfiles/
 export PFILES=pfiles
+
 
 #
 # Test ctobssim
