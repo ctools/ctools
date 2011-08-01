@@ -47,6 +47,7 @@ export PFILES=pfiles
 echo -n "Test cssens: "
 rm -rf cssens
 ln -s ../scripts/cssens.py cssens
+chmod +x ../scripts/cssens.py
 cssens duration=3600.0 \
        caldb="irf" \
        irf="kb_E_50h_v3" \
