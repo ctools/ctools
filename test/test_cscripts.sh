@@ -54,7 +54,7 @@ cssens duration=3600.0 \
        type="point" \
        offset="0.0" \
        bkg="data/bkg_kb_E_50h_v3.txt" \
-       rad=1.0
+       rad=5.0
 echo -n "."
 if [ -s "sensitivity.dat" ]
 then
