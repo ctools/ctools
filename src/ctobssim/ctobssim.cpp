@@ -728,6 +728,9 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
 
 /***********************************************************************//**
  * @brief Initialise class members
+ *
+ * The thrown area is fixed to pi*(2500^2) m2, which is the same value that
+ * is used in the Monte Carlo simulations (information from Konrad Bernloehr)
  ***************************************************************************/
 void ctobssim::init_members(void)
 {
@@ -747,7 +750,7 @@ void ctobssim::init_members(void)
     m_emax = 0.0;
 
     // Set fixed parameters
-    m_area = 3200000.0 * 1.0e4; //!< 3200000.0 m^2
+    m_area = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
 
     // Set logger properties
     log.date(true);
