@@ -57,7 +57,7 @@ class cssens(GApplication):
 		"""
 		# Set name
 		self.name    = "cssens"
-		self.version = "0.2.0"
+		self.version = "0.3.0"
 		
 		# Make sure that parfile exists
 		file = self.parfile()
@@ -117,7 +117,7 @@ class cssens(GApplication):
 			pars.append(GPar("npix","i","h","200","","","Number of pixels for binned"))
 			pars.append(GPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
 			pars.append(GPar("sigma","r","h","5.0","","","Significance threshold"))
-			pars.append(GPar("ts_use","b","h","no","","","Use TS instead of Sigma?"))
+			pars.append(GPar("ts_use","b","h","yes","","","Use TS?"))
 			pars.append(GPar("index","r","h","-2.48","","","Assumed spectral index"))
 			pars.append(GPar("max_iter","i","h","50","","","Maximum number of iterations"))
 			pars.append(GPar("num_avg","i","h","3","","","Number of iterations for sliding average"))
@@ -183,7 +183,7 @@ class cssens(GApplication):
 			self.log("\n")
 		
 		# Initialise script
-		colnames = ['loge', 'emin', 'emax', 'crab', 'pflux', 'eflux']
+		colnames = ['loge', 'emin', 'emax', 'crab', 'pflux', 'eflux', 'diffSens']
 		results  = []
 
 		# Initialise models. Note that we centre the point source at the Galactic
@@ -389,12 +389,17 @@ class cssens(GApplication):
 		 bkg_model  - Background model
 		 full_model - Source model
 		"""
+		# Set TeV->erg conversion factor
+		tev2erg = 1.6021764
+		
 		# Determine energy boundaries from first observation in
 		# the container
 		for run in obs:
-			emin = run.events().ebounds().emin()
-			emax = run.events().ebounds().emax()
-			loge = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
+			emin      = run.events().ebounds().emin()
+			emax      = run.events().ebounds().emax()
+			loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
+			erg_mean  = math.pow(10.0, loge) * tev2erg
+			erg_width = (emax.TeV()-emin.TeV()) * tev2erg
 			break
 
 		# Write header
@@ -403,11 +408,12 @@ class cssens(GApplication):
 			self.log.header2("Energies: "+str(emin)+" - "+str(emax))
 
 		# Initialise loop
-		flux_value  = []
-		pflux_value = []
-		eflux_value = []
-		iter        = 0
-		test_flux   = 0.01  # This is the initial test flux in Crab units
+		flux_value     = []
+		pflux_value    = []
+		eflux_value    = []
+		diffSens_value = []
+		iter           = 0
+		test_flux      = 0.01  # This is the initial test flux in Crab units
 		
 		# Loop until we break
 		while True:
@@ -417,10 +423,10 @@ class cssens(GApplication):
 			
 			# Write header
 			if self.logExplicit():
-				self.log.header2("Iteation "+str(iter))
+				self.log.header2("Iteration "+str(iter))
 
 			# Set test flux
-			full_model[1]['Prefactor'].value(test_flux)
+			full_model["Test"]['Prefactor'].value(test_flux)
 			obs.models(full_model)
 			
 			# Simulate events
@@ -446,6 +452,9 @@ class cssens(GApplication):
 			result_bgm = like.obs().models().copy()
 			LogL_bgm   = like.opt().value()
 			npred_bgm  = like.obs().npred()
+			
+			# Assess quality based on a comparison between Npred and Nevents
+			quality_bgm = npred_bgm-nevents
 
 			# Write background fit results
 			if self.logExplicit():
@@ -456,13 +465,25 @@ class cssens(GApplication):
 				self.log.parformat("Number of predicted events")
 				self.log(npred_bgm)
 				self.log("\n")
+				self.log.parformat("Fit quality")
+				self.log(quality_bgm)
+				self.log("\n")
+
+			# Start over if the fit quality was bad
+			if abs(quality_bgm) > 3.0:
+				if self.logExplicit():
+					self.log("Fit quality outside required range. Start over.\n")
+				continue
+			
+			# Write model fit results
+			if self.logExplicit():
 				for model in result_bgm:
 					self.log.parformat("Model")
 					self.log(model.name())
 					self.log("\n")
 					for par in model:
 						self.log(str(par)+"\n")
-
+			
 			# Fit background and test source
 			sim.models(full_model)
 			like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
@@ -471,11 +492,8 @@ class cssens(GApplication):
 			npred_all  = like.obs().npred()
 			ts         = 2.0*(LogL_bgm-LogL_all)
 
-			# Get fitted Crab, photon and energy fluxes
-			cflux     = result_all["Test"]['Prefactor'].value()
-			cflux_err = result_all["Test"]['Prefactor'].error()
-			pflux     = cast_GModelSky(result_all["Test"]).spectral().flux(emin, emax)
-			eflux     = cast_GModelSky(result_all["Test"]).spectral().eflux(emin, emax)
+			# Assess quality based on a comparison between Npred and Nevents
+			quality_all = npred_all-nevents
 
 			# Write background and test source fit results
 			if self.logExplicit():
@@ -489,6 +507,59 @@ class cssens(GApplication):
 				self.log.parformat("Number of predicted events")
 				self.log(npred_all)
 				self.log("\n")
+				self.log.parformat("Fit quality")
+				self.log(quality_all)
+				self.log("\n")
+				#
+				for model in result_all:
+					self.log.parformat("Model")
+					self.log(model.name())
+					self.log("\n")
+					for par in model:
+						self.log(str(par)+"\n")
+
+			# Start over if the fit quality was bad
+			if abs(quality_all) > 3.0:
+				if self.logExplicit():
+					self.log("Fit quality outside required range. Start over.\n")
+				continue
+
+			# Start over if TS was non-positive
+			if ts <= 0.0:
+				if self.logExplicit():
+					self.log("Non positive TS. Start over.\n")
+				continue
+
+			# Get fitted Crab, photon and energy fluxes
+			cflux     = result_all["Test"]['Prefactor'].value()
+			cflux_err = result_all["Test"]['Prefactor'].error()
+			pflux     = cast_GModelSky(result_all["Test"]).spectral().flux(emin, emax)
+			eflux     = cast_GModelSky(result_all["Test"]).spectral().eflux(emin, emax)
+
+			# Compute differential sensitivity
+			diffSens = pflux / erg_width * erg_mean*erg_mean
+
+			# Compute flux correction factor based on average TS
+			correct = 1.0
+			if self.m_use_ts:
+				if ts > 0:
+					correct = math.sqrt(self.m_ts_thres/ts)
+			else:
+				if cflux > 0 and cflux_err > 0:
+					correct = math.sqrt(self.m_ts_thres)/(cflux/cflux_err)
+			
+			# Compute extrapolated fluxes
+			flux     = correct * cflux
+			pflux    = correct * pflux
+			eflux    = correct * eflux
+			diffSens = correct * diffSens
+			flux_value.append(flux)
+			pflux_value.append(pflux)
+			eflux_value.append(eflux)
+			diffSens_value.append(diffSens)
+			
+			# Write background and test source fit results
+			if self.logExplicit():
 				self.log.parformat("Photon flux")
 				self.log(pflux)
 				self.log(" ph/cm2/s\n")
@@ -498,6 +569,9 @@ class cssens(GApplication):
 				self.log.parformat("Crab flux")
 				self.log(cflux*1000.0)
 				self.log(" mCrab\n")
+				self.log.parformat("Differential sensitivity")
+				self.log(diffSens)
+				self.log(" erg/cm2/s\n")
 				for model in result_all:
 					self.log.parformat("Model")
 					self.log(model.name())
@@ -508,52 +582,50 @@ class cssens(GApplication):
 				self.log.parformat("Iteration "+str(iter))
 				self.log("TS=")
 				self.log(ts)
+				self.log(" ")
+				self.log("corr=")
+				self.log(correct)
 				self.log("  ")
 				self.log(pflux)
 				self.log(" ph/cm2/s = ")
 				self.log(eflux)
 				self.log(" erg/cm2/s = ")
 				self.log(cflux*1000.0)
-				self.log(" mCrab\n")
-			
-			# Compute extrapolated fitted prefactor, photon and energy fluxes
-			correct = 0.0
-			if self.m_use_ts:
-				if ts > 0:
-					correct = math.sqrt(self.m_ts_thres/ts)
-			else:
-				if cflux > 0 and cflux_err > 0:
-					correct = math.sqrt(self.m_ts_thres)/(cflux/cflux_err)
-			flux  = correct * cflux
-			pflux = correct * pflux
-			eflux = correct * eflux
-			flux_value.append(flux)
-			pflux_value.append(pflux)
-			eflux_value.append(eflux)
+				self.log(" mCrab = ")
+				self.log(diffSens)
+				self.log(" erg/cm2/s\n")
 			
 			# Compute sliding average of extrapolated fitted prefactor,
 			# photon and energy flux. This damps out fluctuations and
 			# improves convergence
-			flux  = 0.0
-			pflux = 0.0
-			eflux = 0.0
-			num   = 0.0
+			flux     = 0.0
+			pflux    = 0.0
+			eflux    = 0.0
+			diffSens = 0.0
+			num      = 0.0
 			for k in range(self.m_num_avg):
-				inx = iter - k - 1
+				inx = len(flux_value) - k - 1
 				if inx >= 0:
-					flux  += flux_value[inx]
-					pflux += pflux_value[inx]
-					eflux += eflux_value[inx]
-					num  += 1.0
-			flux  /= num
-			pflux /= num
-			eflux /= num
+					flux     += flux_value[inx]
+					pflux    += pflux_value[inx]
+					eflux    += eflux_value[inx]
+					diffSens += diffSens_value[inx]
+					num      += 1.0
+			flux     /= num
+			pflux    /= num
+			eflux    /= num
+			diffSens /= num
 			
 			# Compare average flux to last average
 			if iter > self.m_num_avg:
 				if test_flux > 0:
 					ratio = flux/test_flux
-					if ratio >= 0.99 and ratio <= 1.01:
+					
+					# We have 2 convergence criteria:
+					# 1. The average flux does not change
+					# 2. The flux correction factor is small
+					if ratio   >= 0.99 and ratio   <= 1.01 and \
+					   correct >= 0.9  and correct <= 1.1:
 						if self.logTerse():
 							self.log(" Converged ("+str(ratio)+")\n")
 						break
@@ -586,6 +658,9 @@ class cssens(GApplication):
 			self.log.parformat("Crab flux")
 			self.log(cflux*1000.0)
 			self.log(" mCrab\n")
+			self.log.parformat("Differential sensitivity")
+			self.log(diffSens)
+			self.log(" erg/cm2/s\n")
 			self.log.parformat("Number of simulated events")
 			self.log(nevents)
 			self.log("\n")
@@ -618,7 +693,8 @@ class cssens(GApplication):
 			
 		# Store result
 		result = {'loge': loge, 'emin': emin.TeV(), 'emax': emax.TeV(), \
-		          'crab': flux, 'pflux': pflux, 'eflux': eflux}
+		          'crab': flux, 'pflux': pflux, 'eflux': eflux, \
+				  'diffSens': diffSens}
 		
 		# Return result
 		return result
