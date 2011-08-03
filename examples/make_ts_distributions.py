@@ -46,7 +46,7 @@ except:
 # ====================== #
 # Create TS distribution #
 # ====================== #
-def create_ts(loge, emin, emax, ntrials=3, duration=180000.0, \
+def create_ts(loge, emin, emax, ntrials=100, duration=180000.0, \
 			  enumbins=0, log=False):
 	"""
 	Create TS distribution.
@@ -98,14 +98,17 @@ if __name__ == '__main__':
 	Create TS distribution in a number of energy bands.
 	"""
 	# Get input arguments
-	usage = "make_ts_distributions [max_threads]"
-	if len(sys.argv) < 1 or len(sys.argv) > 2:
+	usage = "make_ts_distributions ntrials [max_threads]"
+	if len(sys.argv) < 2 or len(sys.argv) > 3:
 		print usage
 		sys.exit()
+	
+	# Set number of trials
+	ntrials = int(sys.argv[1])
 
 	# Set maximum number of threads (default: 1)
-	if len(sys.argv) == 2:
-		max_threads = int(sys.argv[1])
+	if len(sys.argv) == 3:
+		max_threads = int(sys.argv[2])
 	else:
 		max_threads = 1
 
@@ -118,17 +121,21 @@ if __name__ == '__main__':
 		emean = pow(10.0, loge)
 		emin  = pow(10.0, loge-0.1)
 		emax  = pow(10.0, loge+0.1)
+		if loge < 0:
+			loge = "m"+str(abs(loge))
+		else:
+			loge = "p"+str(abs(loge))
 
 		# Processing support?
 		if has_processing:
 
 			# Wait until one thread has finished
 			while len(processing.activeChildren()) >= max_threads:
-				time.sleep(60)
+				time.sleep(10)
 
 			# Set arguments
 			args   = (loge, emin, emax)
-			kwargs = {}
+			kwargs = {'ntrials': ntrials}
 
 			# Generate pull distribution
 			p = processing.Process(target=create_ts, args=args, kwargs=kwargs)
@@ -147,4 +154,4 @@ if __name__ == '__main__':
 	
 		# Wait until all threads finished
 		while len(processing.activeChildren()) > 0:
-			time.sleep(60)
+			time.sleep(10)
