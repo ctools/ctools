@@ -13,7 +13,10 @@ bkgs = bkg_kb_A_50h_v3.txt \
        bkg_kb_J_50h_v3.txt \
        bkg_kb_K_50h_v3.txt \
        bkg_kb_NA_50h_v3.txt \
-       bkg_kb_NB_50h_v3.txt
+       bkg_kb_NB_50h_v3.txt \
+       bkg_IFAE_B_50h.txt \
+       bkg_IFAE_C_50h.txt \
+       bkg_IFAE_E_50h.txt
 bkgsdir   = $(datadir)/models
 bkgs_DATA = $(bkgs)
 
