@@ -4,9 +4,9 @@
 scripts = README \
           make_binned_analysis.py \
           make_pull_at_sensitivity_limit.py \
-          make_ts_distributions.py
+          make_ts_distributions.py \
           make_unbinned_analysis.py \
-          show_pull_histogram.py \
+          show_pull_histogram.py
 
 # Set directories
 scriptsdir   = $(datadir)/examples/python
