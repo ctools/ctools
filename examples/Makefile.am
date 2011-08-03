@@ -14,3 +14,11 @@ scripts_DATA = $(scripts)
 
 # Extra files to be distributed in the tar file
 EXTRA_DIST = $(scripts)
+
+# Add hook rule to make the examples executable
+install-data-hook:
+	@list='$(scripts)';\
+	for p in $$list; do \
+	  chmod +x "$(DESTDIR)$(scriptsdir)/$$p"; \
+	done
+    
