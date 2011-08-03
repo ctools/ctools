@@ -13,7 +13,10 @@ irfs = kb_A_50h_v3.dat \
        kb_J_50h_v3.dat \
        kb_K_50h_v3.dat \
        kb_NA_50h_v3.dat \
-       kb_NB_50h_v3.dat
+       kb_NB_50h_v3.dat \
+       IFAE_B_50h.dat \
+       IFAE_C_50h.dat \
+       IFAE_E_50h.dat
 
 caldbdir = $(datadir)/caldb/cta
 caldb_DATA = $(irfs)
