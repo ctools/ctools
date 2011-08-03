@@ -106,7 +106,7 @@ if __name__ == '__main__':
 	# Set default parameters
 	ntrials     = 100
 	enumbins    = 0
-	duration    = 1800000.0
+	duration    = 180000.0
 	max_threads = 1
 	
 	# Parameter dictionnary
@@ -182,7 +182,8 @@ if __name__ == '__main__':
 		
 		# ... no
 		else:
-			create_ts(loge, emin, emax)
+			create_ts(loge, emin, emax, ntrials=ntrials, enumbins=enumbins, \
+                      duration=duration)
 	
 	# Processing support
 	if has_processing:
