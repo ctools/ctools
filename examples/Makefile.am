@@ -2,11 +2,11 @@
 
 # Scripts to be distributed
 scripts = README \
-          binned_analysis.py \
-          sensitivity_pull.py \
+          make_binned_analysis.py \
+          make_pull_at_sensitivity_limit.py \
+          make_ts_distributions.py
+          make_unbinned_analysis.py \
           show_pull_histogram.py \
-          ts_distributions.py \
-          unbinned_analysis.py
 
 # Set directories
 scriptsdir   = $(datadir)/examples/python
