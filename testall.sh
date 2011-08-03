@@ -1,6 +1,6 @@
 #!/bin/sh
-#
-# Run all test and example scripts that come with the package
+# =====================================================================
+# Run all test and example scripts that come with the package.
 #
 # Copyright (C) 2011 Jurgen Knodlseder
 #
@@ -17,22 +17,48 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # =====================================================================
+
+#
+# Save current working directory
+# ==============================
 base=$PWD
 
 
+#
 # test
 # ====
 echo
 echo "=====> test"
 cd test
-./test_coverage.py "data/crab.xml" 10 pull.dat
-./example_binned.py
-./exmaple_models.py
+./example_models.py
 ./example_survey.py
-./example_unbinned.py
 cd $base
 
 
+#
+# examples
+# ========
+echo
+echo "=====> examples"
+cd examples
+
+# Create local environment
+rm -rf gammalib
+mkdir -p gammalib/share
+mkdir -p gammalib/share/caldb
+ln -s $base/caldb gammalib/share/caldb/cta
+ln -s $base/models gammalib/share/models
+export GAMMALIB=./gammalib
+
+# Run examples
+./make_binned_analysis.py
+./make_unbinned_analysis.py
+#./make_ts_distributions.py
+#./make_pull_at_sensitivity_limit.py
+cd $base
+
+
+#
 # Signal completion
 # =================
 echo 
