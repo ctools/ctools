@@ -98,20 +98,54 @@ if __name__ == '__main__':
 	Create TS distribution in a number of energy bands.
 	"""
 	# Get input arguments
-	usage = "make_ts_distributions ntrials [max_threads]"
-	if len(sys.argv) < 2 or len(sys.argv) > 3:
+	usage = "make_ts_distributions [-n ntrials] [-e enumbins] [-m max_threads]"
+	if len(sys.argv) < 1:
 		print usage
 		sys.exit()
 	
-	# Set number of trials
-	ntrials = int(sys.argv[1])
-
-	# Set maximum number of threads (default: 1)
-	if len(sys.argv) == 3:
-		max_threads = int(sys.argv[2])
-	else:
-		max_threads = 1
-
+	# Set default parameters
+	ntrials     = 100
+	enumbins    = 0
+	duration    = 1800000.0
+	max_threads = 1
+	
+	# Parameter dictionnary
+	pars = [{'option': '-n', 'value': ntrials}, \
+	        {'option': '-e', 'value': enumbins}, \
+	        {'option': '-d', 'value': duration}, \
+			{'option': '-m', 'value': max_threads}]
+	
+	# Gather parameters from command line
+	i = 1
+	while i < len(sys.argv):
+		
+		# Search for options
+		for par in pars:
+			if sys.argv[i] == par['option']:
+				if len(sys.argv) > i+1:
+					i      += 1
+					try:
+						par['value'] = int(sys.argv[i])
+					except:
+						print usage
+						sys.exit()
+				else:
+					print usage
+					sys.exit()
+		
+		# Next item
+		i += 1
+	
+	# Recover parameters
+	ntrials     = pars[0]['value']
+	enumbins    = pars[1]['value']
+	duration    = pars[2]['value']
+	max_threads = pars[3]['value']
+	#print ntrials
+	#print enumbins
+	#print duration
+	#print max_threads
+	
 	# Loop over energy bands. The energy bands are those that are also
 	# used for sensitivity computation.
 	for ieng in range(21):
@@ -135,7 +169,8 @@ if __name__ == '__main__':
 
 			# Set arguments
 			args   = (loge, emin, emax)
-			kwargs = {'ntrials': ntrials}
+			kwargs = {'ntrials': ntrials, 'enumbins': enumbins, \
+			          'duration': duration}
 
 			# Generate pull distribution
 			p = processing.Process(target=create_ts, args=args, kwargs=kwargs)
