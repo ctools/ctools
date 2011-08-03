@@ -1,13 +1,13 @@
 ## Process this file with automake to produce Makefile.in
 
 # Scripts to be distributed in bindir
-binscripts = cta_kb_bkgrates.py
+binscripts = cta_kb_bkgrates.py cta_root2irf.py
 
 # Scripts to be distributed in pythondir
-pythonscripts = cspull.py cssens.py obsutils.py
+pythonscripts = cspull.py cssens.py cstsdist.py obsutils.py
 
 # Scripts for which symbolic links will be created in bindir
-linkscripts = cspull cssens
+linkscripts = cspull cssens cstsdist
 
 # Distribute scripts
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
