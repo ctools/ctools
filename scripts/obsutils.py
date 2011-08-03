@@ -116,6 +116,9 @@ def sim(obs, log=False, debug=True, seed=0, nbins=0, binsz=0.05, npix=200):
 		# (the ctobssim object will go out of scope one the function is
 		# left)
 		obs = sim.obs().copy()
+    
+	# Delete the simulation
+	del sim
 	
 	# Return observation container
 	return obs
