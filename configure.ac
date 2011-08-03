@@ -337,7 +337,7 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  scripts/Makefile
                  ctatools.pc],
-                [chmod +x test/test_cscripts.sh])
+                [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi])
 AC_OUTPUT
 
 
