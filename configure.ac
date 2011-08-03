@@ -329,14 +329,15 @@ AC_CONFIG_FILES([Makefile
                  src/ctobssim/Makefile
                  src/ctatools-setup
                  test/Makefile
+                 test/test_cscripts.sh
                  pyext/Makefile
                  pyext/setup.py
                  caldb/Makefile
                  models/Makefile
                  examples/Makefile
                  scripts/Makefile
-                 ctatools.pc])
-AC_CONFIG_FILES([test/test_cscripts.sh], [chmod +x test/test_cscripts.sh])
+                 ctatools.pc],
+                [chmod +x test/test_cscripts.sh])
 AC_OUTPUT
 
 
