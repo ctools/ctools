@@ -50,11 +50,18 @@ ln -s $base/caldb gammalib/share/caldb/cta
 ln -s $base/models gammalib/share/models
 export GAMMALIB=./gammalib
 
-# Run examples
+# Make binned analysis
 ./make_binned_analysis.py
+
+# Make unbinned analysis
 ./make_unbinned_analysis.py
-#./make_ts_distributions.py
+
+# Make TS distributions
+./make_ts_distributions.py 2 2
+
+# Make pull distribution at sensitivity limit
 #./make_pull_at_sensitivity_limit.py
+
 cd $base
 
 
