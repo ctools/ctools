@@ -1,0 +1,29 @@
+log(E) Area  r68  r80  ERes. BG Rate  Diff Sens
+-1.3  235.6  0.3556  0.4407 0.4446 0.4677647  1.90303e-09
+-1.1  15772.9  0.1944  0.2385 0.2267 0.0299689  7.65238e-12
+-0.9  119418.8  0.1808  0.2220 0.2090 0.0414541  1.91331e-12
+-0.7  334538.8  0.1616  0.2044 0.1698 0.0306150  9.04164e-13
+-0.5  829304.3  0.1461  0.1901 0.1632 0.0395772  5.65898e-13
+-0.3  644004.7  0.1006  0.1267 0.1224 0.0028090  3.12204e-13
+-0.1  1241697.9  0.0882  0.1122 0.1153 0.0017003  2.06435e-13
+0.1  1955892.3  0.0730  0.0941 0.1075 0.0005733  1.25438e-13
+0.3  2529417.5  0.0617  0.0775 0.0931 0.0001928  9.34007e-14
+0.5  3432092.8  0.0506  0.0636 0.0916 0.0001321  7.92035e-14
+0.7  4047530.0  0.0414  0.0515 0.0849 0.0000531  6.48515e-14
+0.9  3460864.1  0.0342  0.0431 0.0809 0.0000160  8.10926e-14
+1.1  4649140.0  0.0304  0.0388 0.0896 0.0000107  8.13465e-14
+1.3  4803454.4  0.0277  0.0355 0.0961 0.0000046  9.66378e-14
+1.5  5410889.4  0.0243  0.0316 0.1097 0.0000054  1.33521e-13
+1.7  4854603.8  0.0224  0.0295 0.1198 0.0000011  2.13362e-13
+1.9  4850087.8  0.0219  0.0276 0.1280 0.0000015  3.44414e-13
+2.1  4663399.1  0.0192  0.0242 0.1445 0.0000025  5.42614e-13
+---------------------------------------------
+ 1) log(E) = log10(E/TeV) - bin centre
+ 2) Eff Area - in square metres after background cut (no theta cut)
+ 3) Ang. Res - 68% containment radius of gamma-ray PSF post cuts - in degrees
+ 4) Ang. Res - 80% containment radius of gamma-ray PSF post cuts - in degrees
+ 5) Fractional Energy Resolution (rms)
+ 6) BG Rate  - inside point-source selection region - post call cuts - in Hz
+ 7) Diff Sens - differential sensitivity for this bin expressed as E^2 dN/dE
+ - in erg cm^-2 s^-1 - for a 50 hours exposure - 5 sigma significance including
+ systematics and statistics and at least 10 photons.
