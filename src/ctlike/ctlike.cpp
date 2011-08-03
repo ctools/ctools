@@ -497,7 +497,7 @@ void ctlike::init_members(void)
     m_obs.clear();
     m_refit     = false;
     m_max_iter  = 100;   // Set maximum number of iterations
-    m_max_stall = 3;     // Set maximum number of stalls
+    m_max_stall = 10;    // Set maximum number of stalls
     m_logL      = 0.0;
     m_opt       = NULL;
 
