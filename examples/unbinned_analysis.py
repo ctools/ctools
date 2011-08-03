@@ -4,6 +4,9 @@
 # the ctatools. If matplotlib is installed, the spectrum will be displayed
 # on the screen.
 #
+# Required 3rd party modules:
+# None
+#
 # Copyright (C) 2011 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify

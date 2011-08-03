@@ -8,7 +8,7 @@
 # and the pull histogram allows to assess possible biases in the fit
 # parameters and errors.
 #
-# Requirements:
+# Required 3rd party modules:
 # - matplotlib
 # - numpy
 #

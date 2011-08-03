@@ -9,6 +9,9 @@
 # used from within Python. It further illustrates the possibility of
 # parallel computing using the "processing" Python module.
 #
+# Required 3rd party modules:
+# - processing (optional)
+#
 # Copyright (C) 2011 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify

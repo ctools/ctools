@@ -4,6 +4,9 @@
 # ctatools. If matplotlib is installed, a counts spectrum and an offset
 # histogram will be displayed.
 #
+# Required 3rd party modules:
+# None
+#
 # Copyright (C) 2011 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify

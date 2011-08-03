@@ -5,6 +5,9 @@
 # if available, that can be used for parallel computing on multiple
 # cores/CPUs.
 #
+# Required 3rd party modules:
+# - processing (optional)
+#
 # Copyright (C) 2011 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
