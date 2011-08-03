@@ -49,7 +49,7 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
 @abs_top_srcdir@/scripts/cspull.py \
   srcmdl="data/crab.xml" \
   outfile="pull.dat" \
-  ntrials="1" \
+  ntrials="3" \
   caldb="irf" \
   irf="kb_E_50h_v3" \
   ra=83.6331 \
@@ -75,25 +75,25 @@ echo " ok"
 #
 # Test cssens
 # ===========
-echo -n "Test cssens: "
-chmod +x @abs_top_srcdir@/scripts/cssens.py
-@abs_top_srcdir@/scripts/cssens.py \
-  duration=3600.0 \
-  caldb="irf" \
-  irf="kb_E_50h_v3" \
-  type="point" \
-  offset="0.0" \
-  bkg="data/bkg_kb_E_50h_v3.txt" \
-  rad=5.0 > cssens.log
-echo -n "."
-if [ -s "sensitivity.dat" ]
-then
-  echo -n "."
-else
-  echo " sensitivity.dat file is not valid"
-  exit 1
-fi
-echo " ok"
+#echo -n "Test cssens: "
+#chmod +x @abs_top_srcdir@/scripts/cssens.py
+#@abs_top_srcdir@/scripts/cssens.py \
+#  duration=3600.0 \
+#  caldb="irf" \
+#  irf="kb_E_50h_v3" \
+#  type="point" \
+#  offset="0.0" \
+#  bkg="data/bkg_kb_E_50h_v3.txt" \
+#  rad=5.0 > cssens.log
+#echo -n "."
+#if [ -s "sensitivity.dat" ]
+#then
+#  echo -n "."
+#else
+#  echo " sensitivity.dat file is not valid"
+#  exit 1
+#fi
+#echo " ok"
 
 
 #
