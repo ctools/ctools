@@ -98,7 +98,7 @@ if __name__ == '__main__':
 	Create TS distribution in a number of energy bands.
 	"""
 	# Get input arguments
-	usage = "ts_distributions [max_threads]"
+	usage = "make_ts_distributions [max_threads]"
 	if len(sys.argv) < 1 or len(sys.argv) > 2:
 		print usage
 		sys.exit()
