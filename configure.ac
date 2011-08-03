@@ -329,6 +329,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctobssim/Makefile
                  src/ctatools-setup
                  test/Makefile
+                 test/test_cscripts.sh
                  pyext/Makefile
                  pyext/setup.py
                  caldb/Makefile
