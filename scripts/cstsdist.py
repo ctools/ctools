@@ -390,10 +390,10 @@ class cstsdist(GApplication):
 
 		# Fit background only
 		sim.models(self.bkg_model)
-		like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
-		result_bgm = like.obs().models().copy()
-		LogL_bgm   = like.opt().value()
-		npred_bgm  = like.obs().npred()
+		like_bgm   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
+		result_bgm = like_bgm.obs().models()
+		LogL_bgm   = like_bgm.opt().value()
+		npred_bgm  = like_bgm.obs().npred()
 
 		# Write background fit results
 		if self.logExplicit():
@@ -413,12 +413,12 @@ class cstsdist(GApplication):
 
 		# Fit background and test source
 		sim.models(self.full_model)
-		like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
-		result_all = like.obs().models().copy()
-		LogL_all   = like.opt().value()
-		npred_all  = like.obs().npred()
+		like_all   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
+		result_all = like_all.obs().models()
+		LogL_all   = like_all.opt().value()
+		npred_all  = like_all.obs().npred()
 		ts         = 2.0*(LogL_bgm-LogL_all)
-
+		
 		# Write background and test source fit results
 		if self.logExplicit():
 			self.log.header3("Background and test source model fit")
