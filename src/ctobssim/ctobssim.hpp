@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-02-02"
+#define CTOBSSIM_VERSION "00-03-00"
 
 
 /***********************************************************************//**
@@ -67,8 +67,7 @@ public:
     GObservations& obs(void) { return m_obs; }
     void           get_parameters(void);
     void           set_list(GCTAObservation* obs);
-    GPhotons       simulate_photons(const GCTAObservation* obs, const GModels& models);
-    void           simulate_source(GCTAObservation* obs, const GPhotons& photons);
+    void           simulate_source(GCTAObservation* obs, const GModels& models);
     void           simulate_background(GCTAObservation* obs, const GModels& models);
 
 protected:
@@ -93,6 +92,7 @@ protected:
 
     // Protected members
     double        m_area;       //!< Surface area for simulation (cm2)
+    GTime         m_time_max;   //!< Maximum length of time slice (sec)
     GRan          m_ran;        //!< Random number generator
     GObservations m_obs;        //!< Observation container
 };

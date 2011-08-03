@@ -275,10 +275,11 @@ void ctobssim::run(void)
             }
 
             // Simulate photons
-            GPhotons photons = simulate_photons(obs, m_obs.models());
+            //GPhotons photons = simulate_photons(obs, m_obs.models());
 
             // Simulate source events
-            simulate_source(obs, photons);
+            //simulate_source(obs, photons);
+            simulate_source(obs, m_obs.models());
 
             // Simulate source events
             simulate_background(obs, m_obs.models());
@@ -466,128 +467,6 @@ void ctobssim::set_list(GCTAObservation* obs)
 
 
 /***********************************************************************//**
- * @brief Simulate photons for a given CTA observation
- *
- * @param[in] obs Pointer on CTA observation.
- * @param[in] models Models.
- *
- * This method simulates photons for a given CTA observation. It will loop
- * over all energy boundaries, all Good Time Intervals and all sky models
- * to generate a list of photons.
- *
- * @todo Add margins to the data selections so that we generate also photons
- *       that fall slightly outside the ROI and the energy interval so that
- *       they can be scatter within the ROI and energy interval by the
- *       PSF and energy dispersion.
- ***************************************************************************/
-GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
-                                    const GModels&         models)
-{
-    // Initialise indentation for logging
-    int indent = 0;
-
-    // Get CTA event list
-    const GCTAEventList* events = dynamic_cast<const GCTAEventList*>(obs->events());
-
-    // Extract ROI
-    GSkyDir dir = events->roi().centre().skydir();
-    double  rad = events->roi().radius();
-
-    // Dump simulation cone information
-    if (logNormal()) {
-        log << parformat("Simulation area");
-        log << str(m_area) << " cm2" << std::endl;
-        log << parformat("Simulation cone");
-        log << "RA=" << dir.ra_deg() << " deg";
-        log << ", Dec=" << dir.dec_deg() << "deg";
-        log << ", r=" << rad << " deg" << std::endl;
-    }
-
-    // Allocate photons
-    GPhotons photons;
-
-    // Loop over all Good Time Intervals
-    for (int it = 0; it <  events->gti().size(); ++it) {
-
-        // Extract time interval
-        GTime tmin = events->gti().tstart(it);
-        GTime tmax = events->gti().tstop(it);
-
-        // Dump time interval
-        if (logNormal()) {
-            if (events->gti().size() > 1) {
-                indent++;
-                log.indent(indent);
-            }
-            log << parformat("Time interval");
-            log << tmin << " - " << tmax << std::endl;
-        }
-
-        // Loop over all energy boundaries
-        for (int ie = 0; ie <  events->ebounds().size(); ++ie) {
-
-            // Extract energy boundaries
-            GEnergy emin = events->ebounds().emin(ie);
-            GEnergy emax = events->ebounds().emax(ie);
-
-            // Dump energy range
-            if (logNormal()) {
-                if (events->ebounds().size() > 1) {
-                    indent++;
-                    log.indent(indent);
-                }
-                log << parformat("Energy range");
-                log << emin << " - " << emax << std::endl;
-            }
-
-            // Loop over all sky models
-            for (int i = 0; i < models.size(); ++i) {
-
-                // Get sky model (NULL if not a sky model)
-                const GModelSky* model = dynamic_cast<const GModelSky*>(&models[i]);
-
-                // If we have a sky model then simulate photons
-                if (model != NULL) {
-
-                    // Get photons
-                    GPhotons p = model->mc(m_area, dir, rad, emin, emax,
-                                           tmin, tmax, m_ran);
-
-                    // Reserve new space for photons
-                    photons.reserve(photons.size() + p.size());
-
-                    // Add photons to list
-                    for (int k = 0; k < p.size(); ++k) {
-                        p[k].mcid(i);
-                        photons.push_back(p[k]);
-                    }
-
-                    // Dump simulation result for model
-                    if (logNormal()) {
-                        log << parformat("MC source photons");
-                        log << str(p.size());
-                        if (model->name().length() > 0)
-                            log << " [" << model->name() << "]";
-                        log << std::endl;
-                    }
-
-                } // endif: model was a sky model
-
-            } // endfor: looped over models
-
-        } // endfor: looped over all energy boundaries
-
-    } // endfor: looped over all time intervals
-
-    // Reset indentation
-    log.indent(0);
-
-    // Return photons
-    return photons;
-}
-
-
-/***********************************************************************//**
  * @brief Simulate source events from photon list
  *
  * @param[in] obs Pointer on CTA observation.
@@ -603,8 +482,13 @@ GPhotons ctobssim::simulate_photons(const GCTAObservation* obs,
  *
  * This method does nothing if the observation pointer is NULL. It also
  * verifies if the observation has a valid pointing and response.
+ *
+ * @todo Add margins to the data selections so that we generate also photons
+ *       that fall slightly outside the ROI and the energy interval so that
+ *       they can be scatter within the ROI and energy interval by the
+ *       PSF and energy dispersion.
  ***************************************************************************/
-void ctobssim::simulate_source(GCTAObservation* obs, const GPhotons& photons)
+void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
@@ -631,23 +515,172 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GPhotons& photons)
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = (GCTAEventList*)(obs->events());
 
-        // Reserves space for source events in event list
-        events->reserve(photons.size());
+        // Extract ROI
+        GSkyDir dir = events->roi().centre().skydir();
+        double  rad = events->roi().radius();
 
-        // Simulate events from photons
-        for (int i = 0; i < photons.size(); ++i) {
-            GCTAEventAtom* event = rsp->mc(m_area, photons[i], *pnt, m_ran);
-            if (event != NULL) {
-                events->append(*event);
-                delete event;
-            }
-        }
-
-        // Dump simulation results
+        // Dump simulation cone information
         if (logNormal()) {
-            log << parformat("MC source events");
-            log << str(events->size()) << std::endl;
+            log << parformat("Simulation area");
+            log << str(m_area) << " cm2" << std::endl;
+            log << parformat("Simulation cone");
+            log << "RA=" << dir.ra_deg() << " deg";
+            log << ", Dec=" << dir.dec_deg() << "deg";
+            log << ", r=" << rad << " deg" << std::endl;
         }
+
+        // Initialise indentation for logging
+        int indent = 0;
+
+        // Loop over all Good Time Intervals
+        for (int it = 0; it <  events->gti().size(); ++it) {
+
+            // Extract time interval
+            GTime tmin = events->gti().tstart(it);
+            GTime tmax = events->gti().tstop(it);
+            
+            // Dump time interval
+            if (logNormal()) {
+                if (events->gti().size() > 1) {
+                    indent++;
+                    log.indent(indent);
+                }
+                log << parformat("Time interval");
+                log << tmin << " - " << tmax << std::endl;
+            }
+            
+            // Loop over all energy boundaries
+            for (int ie = 0; ie <  events->ebounds().size(); ++ie) {
+
+                // Extract energy boundaries
+                GEnergy emin = events->ebounds().emin(ie);
+                GEnergy emax = events->ebounds().emax(ie);
+
+                // Dump energy range
+                if (logNormal()) {
+                    if (events->ebounds().size() > 1) {
+                        indent++;
+                        log.indent(indent);
+                    }
+                    log << parformat("Energy range");
+                    log << emin << " - " << emax << std::endl;
+                }
+
+                // Loop over all sky models
+                for (int i = 0; i < models.size(); ++i) {
+                
+                    // Get sky model (NULL if not a sky model)
+                    const GModelSky* model = dynamic_cast<const GModelSky*>(&models[i]);
+
+                    // If we have a sky model then simulate photons
+                    if (model != NULL) {
+
+                        // To reduce memory requirements we split long time
+                        // intervals into several slices. The maximum length
+                        // of a slice is determined by the fixed parameter
+                        // m_time_max
+                        GTime tstart = tmin;
+                        GTime tstop  = tstart + m_time_max;
+                        
+                        // Initialise cumulative photon counter
+                        int nphotons = 0;
+                        
+                        // Loop over time slices
+                        while (tstart < tmax) {
+            
+                            // Make sure that tstop <= tmax
+                            if (tstop > tmax)
+                                tstop = tmax;
+
+                            // Dump time slice
+                            if (logExplicit()) {
+                                if (tmax - tmin > m_time_max) {
+                                    indent++;
+                                    log.indent(indent);
+                                }
+                                log << parformat("Time slice");
+                                log << tstart << " - " << tstop << std::endl;
+                            }
+
+                            // Get photons
+                            GPhotons photons = model->mc(m_area, dir, rad,
+                                                         emin, emax,
+                                                         tstart, tstop, m_ran);
+
+                            // Bookkeeping of simulated number of photons
+                            nphotons += photons.size();
+                            
+                            // Simulate events from photons
+                            for (int i = 0; i < photons.size(); ++i) {
+                                GCTAEventAtom* event = rsp->mc(m_area, photons[i], *pnt, m_ran);
+                                if (event != NULL) {
+                                    events->append(*event);
+                                    delete event;
+                                }
+                            }
+
+                            // Go to next time slice
+                            tstart = tstop;
+                            tstop  = tstart + m_time_max;
+            
+                            // Reset indentation
+                            if (logExplicit()) {
+                                if (tmax - tmin > m_time_max) {
+                                    indent--;
+                                    log.indent(indent);
+                                }
+                            }
+            
+                        } // endwhile: looped over time slices
+
+                        // Dump simulation results
+                        if (logNormal()) {
+                            log << parformat("MC source photons");
+                            log << str(nphotons);
+                            if (model->name().length() > 0)
+                                log << " [" << model->name() << "]";
+                            log << std::endl;
+                            log << parformat("MC source events");
+                            log << str(events->size());
+                            if (model->name().length() > 0)
+                                log << " [" << model->name() << "]";
+                            log << std::endl;
+                        }
+
+                    } // endif: model was a sky model
+
+                } // endfor: looped over models
+
+                // Dump simulation results
+                if (logNormal()) {
+                    log << parformat("MC source events");
+                    log << str(events->size());
+                    log << " (all source models)";
+                    log << std::endl;
+                }
+                    
+                // Reset indentation
+                if (logNormal()) {
+                    if (events->ebounds().size() > 1) {
+                        indent--;
+                        log.indent(indent);
+                    }
+                }
+                
+            } // endfor: looped over all energy boundaries
+
+            // Reset indentation
+            if (logNormal()) {
+                if (events->gti().size() > 1) {
+                    indent--;
+                    log.indent(indent);
+                }
+            }
+
+        } // endfor: looped over all time intervals
+
+        // Reset indentation
+        log.indent(0);
 
     } // endif: observation pointer was valid
 
@@ -750,7 +783,8 @@ void ctobssim::init_members(void)
     m_emax = 0.0;
 
     // Set fixed parameters
-    m_area = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
+    m_area     = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
+    m_time_max.met(1800.0);          //!< Maximum length of time slice (s)
 
     // Set logger properties
     log.date(true);
@@ -768,20 +802,21 @@ void ctobssim::init_members(void)
 void ctobssim::copy_members(const ctobssim& app)
 {
     // Copy attributes
-    m_infile  = app.m_infile;
-    m_outfile = app.m_outfile;
-    m_caldb   = app.m_caldb;
-    m_irf     = app.m_irf;
-    m_obs     = app.m_obs;
-    m_seed    = app.m_seed;
-    m_ra      = app.m_ra;
-    m_dec     = app.m_dec;
-    m_rad     = app.m_rad;
-    m_tmin    = app.m_tmin;
-    m_tmax    = app.m_tmax;
-    m_emin    = app.m_emin;
-    m_emax    = app.m_emax;
-    m_area    = app.m_area;
+    m_infile   = app.m_infile;
+    m_outfile  = app.m_outfile;
+    m_caldb    = app.m_caldb;
+    m_irf      = app.m_irf;
+    m_obs      = app.m_obs;
+    m_seed     = app.m_seed;
+    m_ra       = app.m_ra;
+    m_dec      = app.m_dec;
+    m_rad      = app.m_rad;
+    m_tmin     = app.m_tmin;
+    m_tmax     = app.m_tmax;
+    m_emin     = app.m_emin;
+    m_emax     = app.m_emax;
+    m_area     = app.m_area;
+    m_time_max = app.m_time_max;
 
     // Return
     return;
