@@ -42,24 +42,86 @@ export PFILES=pfiles
 
 
 #
+# Test cspull
+# ===========
+echo -n "Test cspull: "
+chmod +x @abs_top_srcdir@/scripts/cspull.py
+@abs_top_srcdir@/scripts/cspull.py \
+  srcmdl="data/crab.xml" \
+  outfile="pull.dat" \
+  ntrials="1" \
+  caldb="irf" \
+  irf="kb_E_50h_v3" \
+  ra=83.6331 \
+  dec=22.0145 \
+  emin=0.1 \
+  emax=100.0 \
+  enumbins=0 \
+  duration=1800.0 \
+  rad=5.0 \
+  npix=200 \
+  binsz=0.05 > cspull.log
+echo -n "."
+if [ -s "pull.dat" ]
+then
+  echo -n "."
+else
+  echo " pull.dat file is not valid"
+  exit 1
+fi
+echo " ok"
+
+
+#
 # Test cssens
 # ===========
 echo -n "Test cssens: "
-chmod +x @abs_srcdir@/scripts/cssens.py
-@abs_srcdir@/scripts/cssens.py \
+chmod +x @abs_top_srcdir@/scripts/cssens.py
+@abs_top_srcdir@/scripts/cssens.py \
   duration=3600.0 \
   caldb="irf" \
   irf="kb_E_50h_v3" \
   type="point" \
   offset="0.0" \
   bkg="data/bkg_kb_E_50h_v3.txt" \
-  rad=5.0
+  rad=5.0 > cssens.log
 echo -n "."
 if [ -s "sensitivity.dat" ]
 then
   echo -n "."
 else
   echo " sensitivity.dat file is not valid"
+  exit 1
+fi
+echo " ok"
+
+
+#
+# Test cstsdist
+# =============
+echo -n "Test cstsdist: "
+chmod +x @abs_top_srcdir@/scripts/cstsdist.py
+@abs_top_srcdir@/scripts/cstsdist.py \
+  outfile="ts.dat" \
+  ntrials="1" \
+  caldb="irf" \
+  irf="kb_E_50h_v3" \
+  type="point" \
+  offset="0.0" \
+  bkg="data/bkg_kb_E_50h_v3.txt" \
+  emin=0.1 \
+  emax=100.0 \
+  enumbins=0 \
+  duration=1800.0 \
+  rad=5.0 \
+  npix=200 \
+  binsz=0.05 > cstsdist.log
+echo -n "."
+if [ -s "ts.dat" ]
+then
+  echo -n "."
+else
+  echo " ts.dat file is not valid"
   exit 1
 fi
 echo " ok"
