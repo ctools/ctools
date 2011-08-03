@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 # Scripts to be distributed
-scripts = ts_distributions.py
+scripts = ts_distributions.py sensitivity_pull.py
 
 # Set directories
 scriptsdir   = $(datadir)/examples/python
