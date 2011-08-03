@@ -265,12 +265,16 @@ class cstsdist(GApplication):
 		# Return observation container
 		return obs
 	
-	def set_bkg_model(self):
+	def set_bkg_model(self, fitsigma=False):
 		"""
 		Setup CTA background model.
 		"""
 		# Define radial component
 		radial = GCTAModelRadialGauss(3.0)
+		if fitsigma:
+			radial["Sigma"].free()
+		else:
+			radial["Sigma"].fix()
 		
 		# Define spectral component
 		spectrum = GModelSpectralFunc(self.m_bkg)
