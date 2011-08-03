@@ -145,6 +145,3 @@ if __name__ == '__main__':
 		# Wait until all threads finished
 		while len(processing.activeChildren()) > 0:
 			time.sleep(60)
-
-	# Close file
-	file.close()
