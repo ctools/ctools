@@ -99,7 +99,7 @@ if __name__ == '__main__':
 		nbins = 30
 	
 	# Set lin/log
-	log = False
+	log = True
 	
 	# Read values from CSV file
 	values = read_ts(filename)
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 	
 	# Create histogram
 	n, bins, patches = plt.hist(values, nbins, range=[min_value, max_value], \
-	                            align='mid', normed=True, facecolor='green', \
+	                            align='mid', facecolor='green', \
 								log=log)
 
 	# Create expected distribution (onyl for positive TS). We compute the
@@ -125,11 +125,11 @@ if __name__ == '__main__':
 	x      = []
 	y_full = []
 	y_half = []
-	norm   = 1.0/(math.sqrt(2.0)*math.sqrt(math.pi))
 	width  = bins[1]-bins[0]
+	norm   = len(values)/(math.sqrt(2.0)*math.sqrt(math.pi))*width
 	x.append(0.0)
-	y_full.append(1.0/width)
-	y_half.append(0.5/width)
+	y_full.append(len(values))
+	y_half.append(0.5*len(values))
 	for bin in bins:
 		ts = bin + 0.5*width
 		if ts > 0:
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
 	# Set plot
 	plt.xlabel('TS')
-	plt.ylabel('Arbitrary units')
+	plt.ylabel('Number of trials')
 	plt.title('TS distribution')
 	plt.grid(True)
 
