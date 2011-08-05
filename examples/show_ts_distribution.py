@@ -147,7 +147,7 @@ if __name__ == '__main__':
 	# Set plot
 	plt.xlabel('TS')
 	plt.ylabel('Number of trials')
-	plt.title('TS distribution')
+	plt.title('TS distribution ('+filename+')')
 	plt.grid(True)
 
 	# Show histogram
