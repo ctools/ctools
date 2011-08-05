@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "00-02-02"
+#define CTSELECT_VERSION "00-02-03"
 
 
 /***********************************************************************//**

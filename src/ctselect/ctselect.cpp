@@ -586,34 +586,22 @@ std::string ctselect::check_infile(const std::string& filename) const
         std::vector<std::string> missing;
 
         // Check for existence of TIME column
-        try {
-            GFitsTableCol* col = table->column("TIME");
-        }
-        catch (GException::fits_column_not_found& e) {
+        if (!table->has("TIME")) {
             missing.push_back("TIME");
         }
 
         // Check for existence of ENERGY column
-        try {
-            GFitsTableCol* col = table->column("ENERGY");
-        }
-        catch (GException::fits_column_not_found& e) {
+        if (!table->has("ENERGY")) {
             missing.push_back("ENERGY");
         }
 
         // Check for existence of RA column
-        try {
-            GFitsTableCol* col = table->column("RA");
-        }
-        catch (GException::fits_column_not_found& e) {
+        if (!table->has("RA")) {
             missing.push_back("RA");
         }
 
         // Check for existence of DEC column
-        try {
-            GFitsTableCol* col = table->column("DEC");
-        }
-        catch (GException::fits_column_not_found& e) {
+        if (!table->has("DEC")) {
             missing.push_back("DEC");
         }
 
