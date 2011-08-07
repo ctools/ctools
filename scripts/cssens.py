@@ -413,7 +413,7 @@ class cssens(GApplication):
 		eflux_value    = []
 		diffSens_value = []
 		iter           = 0
-		test_flux      = 0.01  # This is the initial test flux in Crab units
+		test_flux      = 0.1  # This is the initial test flux in Crab units
 		
 		# Loop until we break
 		while True:
