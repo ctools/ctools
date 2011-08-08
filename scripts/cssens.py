@@ -349,26 +349,47 @@ class cssens(GApplication):
 		if type == "point":
 			spatial = GModelSpatialPtsrc(location)
 			if fitpos:
-				spatial[0].free()
-				spatial[1].free()
+				spatial["RA"].free()
+				spatial["DEC"].free()
+			else:
+				spatial["RA"].fix()
+				spatial["DEC"].fix()
 			source  = GModelPointSource(spatial, spectrum)
 		elif type == "gauss":
 			radial = GModelRadialGauss(location, sigma)
 			if fitpos:
-				radial[0].free()
-				radial[1].free()
+				radial["RA"].free()
+				radial["DEC"].free()
+				radial["Sigma"].free()
+			else:
+				radial["RA"].fix()
+				radial["DEC"].fix()
+				radial["Sigma"].fix()
 			source = GModelExtendedSource(radial, spectrum)
 		elif type == "disk":
 			radial = GModelRadialDisk(location, radius)
 			if fitpos:
-				radial[0].free()
-				radial[1].free()
+			if fitpos:
+				radial["RA"].free()
+				radial["DEC"].free()
+				radial["Radius"].free()
+			else:
+				radial["RA"].fix()
+				radial["DEC"].fix()
+				radial["Radius"].fix()
 			source = GModelExtendedSource(radial, spectrum)
 		elif type == "shell":
 			radial = GModelRadialShell(location, radius, width)
 			if fitpos:
-				radial[0].free()
-				radial[1].free()
+				radial["RA"].free()
+				radial["DEC"].free()
+				radial["Radius"].free()
+				radial["Width"].free()
+			else:
+				radial["RA"].fix()
+				radial["DEC"].fix()
+				radial["Radius"].fix()
+				radial["Width"].fix()
 			source = GModelExtendedSource(radial, spectrum)
 		else:
 			self.log("ERROR: Unknown source type '"+type+"'.\n")
