@@ -119,7 +119,8 @@ class cssens(GApplication):
 			pars.append(GPar("sigma","r","h","5.0","","","Significance threshold"))
 			pars.append(GPar("ts_use","b","h","yes","","","Use TS?"))
 			pars.append(GPar("index","r","h","-2.48","","","Assumed spectral index"))
-			pars.append(GPar("max_iter","i","h","50","","","Maximum number of iterations"))
+			pars.append(GPar("radius","r","h","0.1","","","Extended source model radius"))
+			pars.append(GPar("width","r","h","0.05","","","Extended source model width"))
 			pars.append(GPar("num_avg","i","h","3","","","Number of iterations for sliding average"))
 			pars.append_standard()
 			pars.save(parfile)
@@ -146,6 +147,8 @@ class cssens(GApplication):
 		self.m_ts_thres = self["sigma"].real()*self["sigma"].real()
 		self.m_use_ts   = self["ts_use"].boolean()
 		self.m_index    = self["index"].real()
+		self.m_radius   = self["radius"].real()
+		self.m_width    = self["width"].real()
 		self.m_max_iter = self["max_iter"].integer()
 		self.m_num_avg  = self["num_avg"].integer()
 
@@ -311,8 +314,7 @@ class cssens(GApplication):
 		return model
 	
 	def set_src_model(self, l, b, flux=1.0, index=-2.48, \
-                      type="point", sigma=1.0, radius=1.0, width=0.1, \
-                      fitpos=False, fitidx=False):
+                      type="point", fitpos=False, fitidx=False):
 		"""
 		Returns a single source with Crab-like spectrum. The source flux
 		can be scaled in Crab units. The Crab spectrum is based on MAGIC
@@ -325,11 +327,8 @@ class cssens(GApplication):
 		 flux   - Source flux [Crabs]
 		 index  - Spectral index
 		 type   - Source type ("point", "gauss", "disk", "shell")
-		 sigma  - Gaussian sigma (for type="gauss")
-		 radius - Disk or shell inner radius [deg] (for type="disk" and type="shell")
-		 width  - Shell width [deg] (for type="shell")
-		 fitpos - Fit position? (default: True)
-		 fitidx - Fit index? (default: True)
+		 fitpos - Fit position and size? (default: False)
+		 fitidx - Fit index? (default: False)
 		"""
 		# Set source location
 		location = GSkyDir()
@@ -356,7 +355,7 @@ class cssens(GApplication):
 				spatial["DEC"].fix()
 			source  = GModelPointSource(spatial, spectrum)
 		elif type == "gauss":
-			radial = GModelRadialGauss(location, sigma)
+			radial = GModelRadialGauss(location, self.radius)
 			if fitpos:
 				radial["RA"].free()
 				radial["DEC"].free()
@@ -367,7 +366,7 @@ class cssens(GApplication):
 				radial["Sigma"].fix()
 			source = GModelExtendedSource(radial, spectrum)
 		elif type == "disk":
-			radial = GModelRadialDisk(location, radius)
+			radial = GModelRadialDisk(location, self.radius)
 			if fitpos:
 			if fitpos:
 				radial["RA"].free()
@@ -379,7 +378,7 @@ class cssens(GApplication):
 				radial["Radius"].fix()
 			source = GModelExtendedSource(radial, spectrum)
 		elif type == "shell":
-			radial = GModelRadialShell(location, radius, width)
+			radial = GModelRadialShell(location, self.radius,  self.width)
 			if fitpos:
 				radial["RA"].free()
 				radial["DEC"].free()
