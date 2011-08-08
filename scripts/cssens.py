@@ -368,7 +368,6 @@ class cssens(GApplication):
 		elif type == "disk":
 			radial = GModelRadialDisk(location, self.radius)
 			if fitpos:
-			if fitpos:
 				radial["RA"].free()
 				radial["DEC"].free()
 				radial["Radius"].free()
