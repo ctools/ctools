@@ -121,6 +121,7 @@ class cssens(GApplication):
 			pars.append(GPar("index","r","h","-2.48","","","Assumed spectral index"))
 			pars.append(GPar("radius","r","h","0.1","","","Extended source model radius"))
 			pars.append(GPar("width","r","h","0.05","","","Extended source model width"))
+			pars.append(GPar("max_iter","i","h","50","","","Maximum number of iterations"))
 			pars.append(GPar("num_avg","i","h","3","","","Number of iterations for sliding average"))
 			pars.append_standard()
 			pars.save(parfile)
