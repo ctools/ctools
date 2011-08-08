@@ -215,7 +215,7 @@ class cspull(GApplication):
 			else:
 				file = open(self.m_outfile, 'a')
 			writer = csv.DictWriter(file, result['colnames'])
-			writer.writerow(result['pulls'])
+			writer.writerow(result['values'])
 			file.close()
 		
 		# Return
@@ -295,8 +295,6 @@ class cspull(GApplication):
 		# Gather results
 		colnames = []
 		values   = {}
-		errors   = {}
-		pulls    = {}
 		for i in range(models.size()):
 			model      = models[i]
 			model_name = model.name()
@@ -306,7 +304,11 @@ class cspull(GApplication):
 				
 					# Set parameter name
 					name = model_name+"_"+par.name()
+					
+					# Append parameter, Pull_parameter and Unc_parameter
 					colnames.append(name)
+					colnames.append("Pull_"+name)
+					colnames.append("Unc_"+name)
 				
 					# Compute pull
 					fitted_value = par.value()
@@ -317,10 +319,10 @@ class cspull(GApplication):
 					else:
 						pull = 99.0
 						
-					# Store pull
+					# Store results
 					values[name] = fitted_value
-					errors[name] = error
-					pulls[name]  = pull
+					values["Pull_"+name] = pull
+					values["Unc_"+name] = error
 
 					# Write result
 					if self.logExplicit():
@@ -333,8 +335,7 @@ class cspull(GApplication):
 						self.log(")\n")
 		
 		# Bundle together results
-		result = {'colnames': colnames, 'values': values, \
-		          'errors': errors, 'pulls': pulls}
+		result = {'colnames': colnames, 'values': values}
 		
 		# Return
 		return result
