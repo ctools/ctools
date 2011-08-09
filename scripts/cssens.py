@@ -356,7 +356,7 @@ class cssens(GApplication):
 				spatial["DEC"].fix()
 			source  = GModelPointSource(spatial, spectrum)
 		elif type == "gauss":
-			radial = GModelRadialGauss(location, self.radius)
+			radial = GModelRadialGauss(location, self.m_radius)
 			if fitpos:
 				radial["RA"].free()
 				radial["DEC"].free()
@@ -367,7 +367,7 @@ class cssens(GApplication):
 				radial["Sigma"].fix()
 			source = GModelExtendedSource(radial, spectrum)
 		elif type == "disk":
-			radial = GModelRadialDisk(location, self.radius)
+			radial = GModelRadialDisk(location, self.m_radius)
 			if fitpos:
 				radial["RA"].free()
 				radial["DEC"].free()
@@ -378,7 +378,7 @@ class cssens(GApplication):
 				radial["Radius"].fix()
 			source = GModelExtendedSource(radial, spectrum)
 		elif type == "shell":
-			radial = GModelRadialShell(location, self.radius,  self.width)
+			radial = GModelRadialShell(location, self.m_radius,  self.m_width)
 			if fitpos:
 				radial["RA"].free()
 				radial["DEC"].free()
