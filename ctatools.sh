@@ -19,7 +19,7 @@ mv ctatools $sourcedir
 
 echo "Create Makefile.in and configure scripts"
 cd $sourcedir
-mkdir m4
+#mkdir m4
 ./autogen.sh
 #rm -rf autom4te.cache
 rm -f ctatools.sh
