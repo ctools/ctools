@@ -71,10 +71,10 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0, \
 	tsdist["index"]    = -2.48
 	tsdist["offset"]   = 0.0
 	tsdist["bkg"]      = "$GAMMALIB/share/models/bkg_kb_E_50h_v3.txt"
-	tsdist["emin"]     = emin
-	tsdist["emax"]     = emax
-	tsdist["enumbins"] = enumbins
-	tsdist["duration"] = duration
+	tsdist["emin"]     = float(emin)
+	tsdist["emax"]     = float(emax)
+	tsdist["enumbins"] = int(enumbins)
+	tsdist["duration"] = float(duration)
 	tsdist["rad"]      = 5.0
 	tsdist["npix"]     = 200
 	tsdist["binsz"]    = 0.05
