@@ -216,7 +216,7 @@ def make_files(filename, prfname, bkgname):
 		area = area80/0.80
 
 		# Write results in file
-		line = "%.1f  %.1f  %.4f  %.4f %.4f %.7f  %.5e" % \
+		line = "%.1f  %.1f  %.4f  %.4f %.4f %.5e  %.5e" % \
 		      (logE, area, r68, r80, dE, bgd, diffs)
 		fprf.write(line+"\n")
 		fbkg.write(str(energy)+" "+str(bkg_rate)+"\n")
@@ -227,6 +227,7 @@ def make_files(filename, prfname, bkgname):
 
 	# Write trailer
 	fprf.write("---------------------------------------------\n")
+	fprf.write("Notes\n")
 	fprf.write(" 1) log(E) = log10(E/TeV) - bin centre\n")
 	fprf.write(" 2) Eff Area - in square metres after background cut (no theta cut)\n")
 	fprf.write(" 3) Ang. Res - 68% containment radius of gamma-ray PSF post cuts - in degrees\n")
