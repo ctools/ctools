@@ -1,8 +1,8 @@
 ctatools information
 ====================
-Version:             00-02-03 (July 5, 2011)
+Version:             00-02-05 (September 9, 2011)
 Author:              Juergen Knodlseder (knodlseder@cesr.fr)
-GammaLib dependency: 00-04-09
+GammaLib dependency: 00-04-11
 
 
 License information
@@ -98,6 +98,17 @@ Macintosh OS X Installation
 ============================
 ctatools are known to work on various flavors of OS X.  Follow the Unix
 installation instructions above.
+
+In some cases, install problems have been reported with mixed
+architectures (i386, ppc, x86_64), so you may configure and build
+as follows to enable building a bundle for various architectures:
+
+     % export CXXFLAGS="-arch ppc -arch i386 -arch x86_64"
+     % export LDFLAGS="-arch ppc -arch i386 -arch x86_64"
+     % ./configure
+     % make
+     % make check
+     % make install
 
 
 Solaris Installation
