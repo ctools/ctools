@@ -257,7 +257,8 @@ if __name__ == '__main__':
 		filename = sys.argv[1]
 	else:
 		#caldb = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/IFAEPerformanceBCE_Nov2010"
-		caldb = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/Kb_all_20deg_root"
+		#caldb = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/Kb_subarrays_root"
+		caldb = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/Kb_all_50deg_root"
 
 	# Get list of all performance files
 	files = glob.glob(caldb+"/*.root")
