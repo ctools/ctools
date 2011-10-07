@@ -3,13 +3,13 @@ exec_prefix=@exec_prefix@
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: ctatools
+Name: ctools
 Description: CTA science analysis tools
-URL: http://cta.irap.omp.eu/ctatools
+URL: http://cta.irap.omp.eu/ctools
 Version: 0.2.5
 Requires: 
 Requires.private: GammaLib >= 0.4.11
 Conflicts: 
-Cflags: -I${includedir}/ctatools
-Libs: -L${libdir} -lctatools
+Cflags: -I${includedir}/ctools
+Libs: -L${libdir} -lctools
 Libs.private: 
