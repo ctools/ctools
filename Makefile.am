@@ -22,7 +22,7 @@ noinst_HEADERS =
 pkgconfigdir = $(libdir)/pkgconfig
 
 # Files to install in Pkgconfig directory
-pkgconfig_DATA = ctatools.pc
+pkgconfig_DATA = ctools.pc
 
 # Manual pages to install
 man_MANS = 

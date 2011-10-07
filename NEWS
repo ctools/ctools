@@ -1,18 +1,19 @@
-New Features and Important Changes in ctatools 00-02-05
+New Features and Important Changes in ctools 00-03-00
 
 Author(s) : Juergen Knoedlseder
 
-October 3, 2011
+October 6, 2011
 
 
 1. Introduction
 ---------------
-This document briefly summarizes executable by executable the most important changes made since the last release of ctatools.
+This document briefly summarizes executable by executable the most important changes made since the last release of ctools.
 
 
 2. Configuration
 -----------------
-None
+Renamed package from ctatools to ctools
+
 
 3. Python interface
 -------------------
@@ -31,11 +32,7 @@ None
 
 6. ctbin - CTA event binning
 ----------------------------
-If an observation container is passed to ctbin, the counts map reference
-pixel is taken from the pointing of each observation and the xref and yref
-parameters are ignored. This allows for pipeline processing of a list of
-observations using ctbin. Note that this feature is only available if cabin
-is used from Python.
+None
 
 
 7. ctlike - CTA maximum likelihood fitting
@@ -45,17 +42,12 @@ None
 
 8. Examples
 -----------
-Add folder with example scripts. These scripts will be installed in
-$CTATOOLS/share/examples
+None
 
 
 9. Scripts
 ----------
-Add folder with python scripts. These scripts will be installed in
-$CTATOOLS/lib/pythonX.X/site-packages. In addition, symbolic link
-without the .py suffix will be created for cscripts in
-$CTATOOLS/bin so that cscripts are executable as normal ctools.
-
+None
 
 10. caldb
 ---------
@@ -64,5 +56,4 @@ None
 
 11. models
 ----------
-Add folder with background models and source model descriptions
-(XML files).
+None

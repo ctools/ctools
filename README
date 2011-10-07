@@ -1,6 +1,6 @@
-ctatools information
-====================
-Version:             00-02-05 (October 3, 2011)
+ctools information
+==================
+Version:             00-03-05 (October 6, 2011)
 Author:              Juergen Knodlseder (knodlseder@cesr.fr)
 GammaLib dependency: 00-04-11
 
@@ -26,10 +26,10 @@ What's new in this release?
 See the files "NEWS" and "ChangeLog".
 
 
-What are the ctatools anyway?
-=============================
-ctatools are ftools-like executable for the scientific analysis of
-CTA observations. They are based on GammaLib, a vesatile toolbox 
+What are the ctools anyway?
+===========================
+ctools are ftools-like executable for the scientific analysis of
+CTA observations. They are based on GammaLib, a versatile toolbox 
 for the high-level analysis of astronomical gamma-ray data.
 
 The following tools are so far available:
@@ -42,14 +42,14 @@ The following tools are so far available:
 
 Web sites
 =========
-http://cta.irap.omp.eu/ctatools            - ctatools documentation
+http://cta.irap.omp.eu/ctools              - ctools documentation
 http://gammalib.sourceforge.net            - for GammaLib documentation
 https://sourceforge.net/projects/gammalib/ - for GammaLib downloads
 
 
 Prerequisites
 =============
-ctatools require GammaLib. Please refer to http://gammalib.sourceforge.net
+ctools require GammaLib. Please refer to http://gammalib.sourceforge.net
 for instructions about how to install GammaLib. The GammaLib code can
 be downloaded from https://sourceforge.net/projects/gammalib/.
 
@@ -68,21 +68,21 @@ If you use C shell or a variant then add the following to your
 If you have installed GammaLib in another directory than /usr/local/gamma,
 please adapt the path correspondingly.
 
-Please do NOT attempt to install ctatools in a directory different to that
+Please do NOT attempt to install ctools in a directory different to that
 of GammaLib. The setup procedure does NOT support this feature, although
 you might manage to make it work :-)
 
 
 Unix Installation
 =================
-To build and install ctatools, simply type the following:
+To build and install ctools, simply type the following:
 
      % ./configure
      % make
      % make install
 
-By default ctatools installs itself in /usr/local/gamma.  If you need to
-install ctatools in a different location or in your home directory, use
+By default ctools installs itself in /usr/local/gamma.  If you need to
+install ctools in a different location or in your home directory, use
 the --prefix option to ./configure.  For example:
 
      % ./configure --prefix=/home/yourname/projects
@@ -96,7 +96,7 @@ The file INSTALL details more about using configure. Also try
 
 Macintosh OS X Installation
 ============================
-ctatools are known to work on various flavors of OS X.  Follow the Unix
+ctools are known to work on various flavors of OS X.  Follow the Unix
 installation instructions above.
 
 In some cases, install problems have been reported with mixed
@@ -113,13 +113,13 @@ as follows to enable building a bundle for various architectures:
 
 Solaris Installation
 ====================
-ctatools compile on Solairs, but there is an issue with using it as a
+ctools compile on Solairs, but there is an issue with using it as a
 shared library (see "Known problems" below).
 
 
 Testing
 =======
-If you want to test ctatools before installation, type the following:
+If you want to test ctools before installation, type the following:
 
      % make check
 
@@ -142,7 +142,7 @@ To be written ...
 Known problems
 ==============
 Solaris
-  Although ctatools compile on Solaris using the Sun compiler, there are
+  Although ctools compile on Solaris using the Sun compiler, there are
   problems with global symbols in the shared GammaLib library that prevent
   the model registry to work correctly. Furthermore, GammaLib is not able
   to catch its own exceptions, which prevents the FITS interface to work
@@ -152,5 +152,5 @@ Solaris
 
 Contact
 =======
-To get in touch with the ctatools developers and to contribute to the
+To get in touch with the ctools developers and to contribute to the
 project please contact Juergen Knoedlseder <knodlseder@cesr.fr>.

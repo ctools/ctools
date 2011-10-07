@@ -1,4 +1,4 @@
-# Configuration for ctatools - a set of tools for science analysis of CTA data
+# Configuration for ctools - a set of tools for science analysis of CTA data
 #
 # Copyright (C) 2011 Jurgen Knodlseder
 #
@@ -17,7 +17,7 @@
 #
 # Process this file with autoconf to produce a configure script
 
-AC_INIT([ctatools], [0.2.5], [knodlseder@cesr.fr], [ctatools])
+AC_INIT([ctools], [0.3.0], [knodlseder@cesr.fr], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -29,11 +29,11 @@ dnl Set prefix
 dnl ==========
 AC_PREFIX_DEFAULT([/usr/local/gamma])
 if test "x$prefix" = xNONE; then
-  ctatools_prefix="/usr/local/gamma"
+  ctools_prefix="/usr/local/gamma"
 else
-  ctatools_prefix=${prefix}
+  ctools_prefix=${prefix}
 fi
-AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${ctatools_prefix}", [Location where library is installed])
+AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${ctools_prefix}", [Location where library is installed])
 
 
 dnl ===========================
@@ -108,7 +108,7 @@ fi
 
 dnl =========================================================================
 dnl Checks if Python bindings are to be build. Python binding requires Python
-dnl and either the files ctatools_wrap.cpp and ctatools.py or swig to create
+dnl and either the files ctools_wrap.cpp and ctools.py or swig to create
 dnl these files. The following conditionals are set:
 dnl  WITH_PYTHON - Python bindings will be built
 dnl  HAVE_SWIG    - swig is available
@@ -128,7 +128,7 @@ AC_ARG_ENABLE([python-binding],
               [ac_enable_python_binding="$enableval"],
               [ac_enable_python_binding="yes"])
 if test "x$ac_enable_python_binding" = "xno"; then
-  AC_MSG_NOTICE([Python binding for ctatools will not be built])
+  AC_MSG_NOTICE([Python binding for ctools will not be built])
   AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
 fi
 
@@ -187,10 +187,10 @@ if test "$SWIG"; then
 fi
 AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
  
-# Do we have wrappers (ctatools_wrap.cpp and ctatools.py)?
-AC_CHECK_FILES([pyext/ctatools_wrap.cpp pyext/ctatools.py],,)
-if test "x$ac_cv_file_pyext_ctatools_wrap_cpp" = "xyes"; then
-  if test "x$ac_cv_file_pyext_ctatools_py" = "xyes"; then
+# Do we have wrappers (ctools_wrap.cpp and ctools.py)?
+AC_CHECK_FILES([pyext/ctools_wrap.cpp pyext/ctools.py],,)
+if test "x$ac_cv_file_pyext_ctools_wrap_cpp" = "xyes"; then
+  if test "x$ac_cv_file_pyext_ctools_py" = "xyes"; then
     has_wrappers="yes"
   fi
 fi
@@ -225,9 +225,9 @@ if test "x$enable_python" = "xyes"; then
 
 else
   if test "x$has_python_wrap" = "xno" -a "x$has_swig" = "xno"; then
-    AC_MSG_WARN([Neither pyext/ctatools_wrap.cpp and pyext/ctatools.py nor swig has not been found])
-    AC_MSG_WARN([Python binding for ctatools cannot be built])
-    AC_MSG_WARN([Either use a ctatools distribution with ctatools_wrap.cpp and ctatools.py shipped or install swig on your system])
+    AC_MSG_WARN([Neither pyext/ctools_wrap.cpp and pyext/ctools.py nor swig has not been found])
+    AC_MSG_WARN([Python binding for ctools cannot be built])
+    AC_MSG_WARN([Either use a ctools distribution with ctools_wrap.cpp and ctools.py shipped or install swig on your system])
     AC_MSG_WARN([swig can be obtained from http://www.swig.org/])
   fi
 fi
@@ -255,7 +255,7 @@ LDFLAGS=$SAVED_LDFLAGS
 # If GammaLib has not been found in any standard path then search now in a
 # number of predefined locations.
 if test "x$has_gammalib" = "xno"; then
-  for i in "$GAMMALIB" "$ctatools_prefix" /opt/local /usr/local /usr ; do
+  for i in "$GAMMALIB" "$ctools_prefix" /opt/local /usr/local /usr ; do
     if test -f $i/lib64/libgamma.so -o -f $i/lib64/libgamma.dylib; then
       if test -d $i/include/gammalib; then
         LIBDIR_GAMMALIB=$i/lib64
@@ -289,7 +289,7 @@ if test "x$has_gammalib" = "xyes"; then
   AC_SUBST(INCDIR_GAMMALIB)
 else
   AC_MSG_ERROR([No suitable GammaLib library found.
-ctatools require GammaLib for compilation, so please install GammaLib before or,
+ctools require GammaLib for compilation, so please install GammaLib before or,
 if you think that it is installed, set the GAMMALIB environment variable to the
 root directory of GammaLib.])
 fi
@@ -327,7 +327,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctbin/Makefile
                  src/ctlike/Makefile
                  src/ctobssim/Makefile
-                 src/ctatools-setup
+                 src/ctools-setup
                  test/Makefile
                  test/test_cscripts.sh
                  pyext/Makefile
@@ -336,7 +336,7 @@ AC_CONFIG_FILES([Makefile
                  models/Makefile
                  examples/Makefile
                  scripts/Makefile
-                 ctatools.pc],
+                 ctools.pc],
                 [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi])
 AC_OUTPUT
 
@@ -345,7 +345,7 @@ dnl ===========================
 dnl Print configuration summary
 dnl ===========================
 echo
-echo "  ctatools configuration summary"
+echo "  ctools configuration summary"
 echo "  =============================="
 if test "x$has_gammalib" = "xyes"; then
   echo "  * GammaLib support             (yes)   ${LIBDIR_GAMMALIB} ${INCDIR_GAMMALIB}"
@@ -418,7 +418,7 @@ if test "x$has_gammalib" = "xyes"; then
   echo "Now type 'make'"
   echo
 else
-  AC_MSG_ERROR([No suitable GammaLib library found. ctatools require GammaLib
+  AC_MSG_ERROR([No suitable GammaLib library found. ctools require GammaLib
 for compilation, so please install GammaLib before or provide the
 location of the library and header files using the LDFLAGS and CPPFLAGS
 environnment variables.])

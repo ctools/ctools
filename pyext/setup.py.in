@@ -31,12 +31,12 @@ if sys.platform.lower().startswith("darwin"):
 	# Signal darwin compiler adjustments
 	print 'Adjust default distutils compiler options for darwin.'
 
-# Remove any existing symbolic link to libctatools.a
+# Remove any existing symbolic link to libctools.a
 # This will prevent any exception in creating the symbolic link due to
 # an already existing link.
 try:
-	os.remove('../src/.libs/libctatools_python.a')
-	print 'Removed ../src/.libs/libctatools_python.a'
+	os.remove('../src/.libs/libctools_python.a')
+	print 'Removed ../src/.libs/libctools_python.a'
 except:
 	pass
 
@@ -44,9 +44,9 @@ except:
 # dynamic linking. We prefer here static linking to avoid any problems with
 # finding the gammalib shared library during checking.
 try:
-	os.symlink('libctatools.a', '../src/.libs/libctatools_python.a')
-	print 'Created ../src/.libs/libctatools_python.a'
-	libcta='ctatools_python'
+	os.symlink('libctools.a', '../src/.libs/libctools_python.a')
+	print 'Created ../src/.libs/libctools_python.a'
+	libcta='ctools_python'
 except:
 	libcta='ctatool'
 
@@ -66,11 +66,11 @@ else:
 
 # Add application include files. The method we use here is not very
 # intelligent as it simple will add all names that start with 'ct'
-# in the src directory. Once we added the ctatools script we had to
+# in the src directory. Once we added the ctools script we had to
 # add an explicit filter to avoid appending those.
 dirs = glob.glob('../src/ct*')
 for dir in dirs:
-	if len(dir) > 0 and 'ctatools' not in dir:
+	if len(dir) > 0 and 'ctools' not in dir:
 		path = os.path.abspath(dir)
 		include_dirs.append(path)
 
@@ -99,12 +99,12 @@ for extra_include_dir in extra_include_dirs:
 # Setup
 setup(name='@PACKAGE_NAME@',
       version='@PACKAGE_VERSION@',
-      description='ctatools Python binding',
+      description='ctools Python binding',
       author='Jurgen Knodlseder',
       author_email='@PACKAGE_BUGREPORT@',
       url='http://gammalib.sourceforge.net/',
-      py_modules=['ctatools'],
-      ext_modules=[Extension('_ctatools', ['ctatools_wrap.cpp'],
+      py_modules=['ctools'],
+      ext_modules=[Extension('_ctools', ['ctools_wrap.cpp'],
                              include_dirs=include_dirs,
                              library_dirs=library_dirs,
                              libraries=libraries,

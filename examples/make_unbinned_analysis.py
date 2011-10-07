@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ==========================================================================
 # This script illustrates how to build an unbinned analysis pipeline with
-# the ctatools. If matplotlib is installed, the spectrum will be displayed
+# the ctools. If matplotlib is installed, the spectrum will be displayed
 # on the screen.
 #
 # Required 3rd party modules:
@@ -23,7 +23,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctatools import *
+from ctools import *
 from gammalib import *
 from math import *
 import os

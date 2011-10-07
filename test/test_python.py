@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ==========================================================================
 # This script illustrates how to build an unbinned analysis pipeline using
-# the ctatools.
+# the ctools.
 #
 # Copyright (C) 2011 Jurgen Knodlseder
 #
@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctatools import *
+from ctools import *
 from gammalib import *
 from math import *
 import os
@@ -175,12 +175,12 @@ def pipeline_v2():
 #==========================#
 if __name__ == '__main__':
 	"""
-	Test ctatools Python modules.
+	Test ctools Python modules.
 	"""
 	# Dump header
 	print ""
 	print "*************************************"
-	print "* ctatools Python interface testing *"
+	print "* ctools Python interface testing *"
 	print "************************************"
 	
 	# Set PFILES environment variable

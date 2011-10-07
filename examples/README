@@ -1,5 +1,5 @@
 This folder contains Python example scripts that illustrate the
-usage of the ctatools.
+usage of the ctools.
 
 make_binned_analysis.py
   Example Python pipelines for binned analysis.

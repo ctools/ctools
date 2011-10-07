@@ -1,5 +1,5 @@
 This folder contains files used for unit testing and files that serve
-as example scripts for ctatools.
+as example scripts for ctools.
 
 test_cscripts.sh
   Unit test for cscripts.
@@ -8,7 +8,7 @@ test_ctools.sh
   Unit test for ctools.
 
 test_python.py
-  Unit test for ctatools Python interface.
+  Unit test for ctools Python interface.
 
 example_models.py
   Example Python pipeline for unbinned analysis that is executed

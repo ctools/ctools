@@ -28,7 +28,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctatools import *
+from ctools import *
 from gammalib import *
 from cstsdist import *
 import sys

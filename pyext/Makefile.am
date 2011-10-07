@@ -6,17 +6,17 @@
 if WITH_PYTHON
 
 # Set SWIG interface filename
-SWIG_INTERFACE = ctatools.i
+SWIG_INTERFACE = ctools.i
 
 # Define the targets that should be built before anything else.
 # These are honored by 'make all', 'make check' and 'make install'.
 if HAVE_SWIG
-  BUILT_SOURCES = ctatools_wrap.cpp ctatools.py
+  BUILT_SOURCES = ctools_wrap.cpp ctools.py
 endif
 
 # Set files to be removed in clean
 if HAVE_SWIG
-  CLEANFILES = ctatools_wrap.cpp ctatools.py
+  CLEANFILES = ctools_wrap.cpp ctools.py
 endif
 
 all-local: build
@@ -26,7 +26,7 @@ all-local: build
 # of this specific directory. So we build one instance for checking, the other
 # for installation. If we could get the name built by distutils we could avoid
 # this.
-build: ctatools_wrap.cpp ctatools.py
+build: ctools_wrap.cpp ctools.py
 	$(PYTHON_BUILD_PREFIX) $(PYTHON) setup.py build --build-platlib build
 	$(PYTHON_BUILD_PREFIX) $(PYTHON) setup.py build
 
@@ -37,8 +37,8 @@ clean-local:
 	rm -rf build
 	
 if HAVE_SWIG
-ctatools_wrap.cpp ctatools.py: $(SWIG_INTERFACE)
-	$(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig -o ctatools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
+ctools_wrap.cpp ctools.py: $(SWIG_INTERFACE)
+	$(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig -o ctools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
 endif # HAVE_SWIG
 
 endif # WITH_PYTHON

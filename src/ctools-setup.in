@@ -1,9 +1,9 @@
 #! /bin/sh
-#    Filename: ctatools-setup(.in)
-# Description: Writes an initialization script for ctatools software
+#    Filename: ctools-setup(.in)
+# Description: Writes an initialization script for ctools software
 #              which is custom fit to the user and the particular
 #              software installation. Note that this script is
-#              designed to be invoked by ctatools-init.csh/ctatools-init.sh,
+#              designed to be invoked by ctools-init.csh/ctools-init.sh,
 #              and should not normally be invoked directly by user.
 # Author/Date: Juergen Knoedlseder, IRAP, July 16, 2011
 #-------------------------------------------------------------------------------
@@ -11,15 +11,15 @@
 # Set fixed parameters
 # ====================
 this_script=`echo $0 | sed 's:.*/::'`
-ctatools_info="$this_script:"
-ctatools_error="$ctatools_info ERROR --"
+ctools_info="$this_script:"
+ctools_error="$ctools_info ERROR --"
 
 #
 # Extract argument
 # ================
 flavor=$1
 if [ "x$flavor" != xcsh -a "x$flavor" != xsh ]; then
-  echo "$ctatools_info usage $this_script csh|sh" >&2
+  echo "$ctools_info usage $this_script csh|sh" >&2
   exit 3
 fi
 
@@ -27,16 +27,16 @@ fi
 # Set parameters
 # ==============
 prefix="@prefix@"
-ctatools_bin="@prefix@/bin"
-ctatools_lib="@prefix@/lib"
+ctools_bin="@prefix@/bin"
+ctools_lib="@prefix@/lib"
 uname_system=`uname`
 python_dir="@pythondir@"
 pkgconfig_dir="@prefix@/lib/pkgconfig"
-man_dir="@prefix@/share/doc/ctatools/man"
+man_dir="@prefix@/share/doc/ctools/man"
 
 #
 # Make pfiles available (this is needed for an installation where the
-# ctatools reside in a directory different from GammaLib, as the
+# ctools reside in a directory different from GammaLib, as the
 # system does not know in this case where the syspfiles directory is
 # ===================================================================
 if [ -d $prefix/syspfiles/. ]; then
@@ -45,7 +45,7 @@ if [ -d $prefix/syspfiles/. ]; then
   if [ ! -w $HOME/pfiles/. ]; then
     mkdir $HOME/pfiles
     if [ $? -ne 0 ]; then
-      echo "$ctatools_error cannot create local pfiles directory $HOME/pfiles" >&2
+      echo "$ctools_error cannot create local pfiles directory $HOME/pfiles" >&2
       exit 3
     fi
   fi
@@ -83,11 +83,11 @@ fi
 # Set LD_LIBRARY_PATH
 # ===================
 if [ "x$LD_LIBRARY_PATH" = x ]; then
-  LD_LIBRARY_PATH="$ctatools_lib"
+  LD_LIBRARY_PATH="$ctools_lib"
 else
   LD_LIBRARY_PATH=`echo ":$LD_LIBRARY_PATH:" | \
-    sed "s%:$ctatools_lib:%:%g" | sed "s%::*$%%"`
-  LD_LIBRARY_PATH="$ctatools_lib$LD_LIBRARY_PATH"
+    sed "s%:$ctools_lib:%:%g" | sed "s%::*$%%"`
+  LD_LIBRARY_PATH="$ctools_lib$LD_LIBRARY_PATH"
 fi
 
 #
@@ -96,19 +96,19 @@ fi
 case $uname_system in
   Darwin*)
     if [ "x$DYLD_LIBRARY_PATH" = x ]; then
-         DYLD_LIBRARY_PATH="$ctatools_lib"
+         DYLD_LIBRARY_PATH="$ctools_lib"
     else
       DYLD_LIBRARY_PATH=`echo ":$DYLD_LIBRARY_PATH:" | \
-        sed "s%:$ctatools_lib:%:%g" | sed "s%::*$%%"`
-      DYLD_LIBRARY_PATH="$ctatools_lib$DYLD_LIBRARY_PATH"
+        sed "s%:$ctools_lib:%:%g" | sed "s%::*$%%"`
+      DYLD_LIBRARY_PATH="$ctools_lib$DYLD_LIBRARY_PATH"
     fi
     ;;
   CYGWIN*)
     if [ "x$PATH" = x ]; then
-      PATH="$ctatools_lib"
+      PATH="$ctools_lib"
     else
-      PATH=`echo ":$PATH:" | sed "s%:$ctatools_lib:%:%g" | sed "s%::*$%%"`
-      PATH="$ctatools_lib$PATH"
+      PATH=`echo ":$PATH:" | sed "s%:$ctools_lib:%:%g" | sed "s%::*$%%"`
+      PATH="$ctools_lib$PATH"
     fi
     ;;
 esac
@@ -139,11 +139,11 @@ fi
 # Set PATH
 # ========
 if [ "x$PATH" = x ]; then
-  PATH="$ctatools_bin"
+  PATH="$ctools_bin"
 else
   PATH=`echo ":$PATH:" | \
-    sed "s%:$ctatools_bin:%:%g" | sed "s%::*$%%"`
-  PATH="$ctatools_bin$PATH"
+    sed "s%:$ctools_bin:%:%g" | sed "s%::*$%%"`
+  PATH="$ctools_bin$PATH"
 fi
 
 #
@@ -167,26 +167,26 @@ varlist="PATH PYTHONPATH PKG_CONFIG_PATH LD_LIBRARY_PATH DYLD_LIBRARY_PATH MANPA
 # ==================================================
 # Name of temporary config script
 HOST_NAME=`hostname`
-ctatools_config="$HOME/ctatools-config-$HOST_NAME"
+ctools_config="$HOME/ctools-config-$HOST_NAME"
 
 # Bourne Shell version, write only for sh flavor initialization
 if [ $flavor = sh ]; then
-  rm -f $ctatools_config$$.sh
-  touch $ctatools_config$$.sh
+  rm -f $ctools_config$$.sh
+  touch $ctools_config$$.sh
   for var in $varlist; do
     eval "if [ \"x\$$var\" != x ]; then
-            echo \"\$var=\\\"\$$var\\\"; export \$var\" >> $ctatools_config$$.sh;
+            echo \"\$var=\\\"\$$var\\\"; export \$var\" >> $ctools_config$$.sh;
           fi"
   done
-  echo "$ctatools_config$$.sh"
+  echo "$ctools_config$$.sh"
 # C Shell version, write only for csh flavor initialization
 elif [ $flavor = csh ]; then
-  rm -f $ctatools_config$$.csh
-  touch $ctatools_config$$.csh
+  rm -f $ctools_config$$.csh
+  touch $ctools_config$$.csh
   for var in $varlist; do
     eval "if [ \"x\$$var\" != x ]; then
-            echo setenv \$var \\\"\$$var\\\" >> $ctatools_config$$.csh;
+            echo setenv \$var \\\"\$$var\\\" >> $ctools_config$$.csh;
           fi"
   done
-  echo "$ctatools_config$$.csh"
+  echo "$ctools_config$$.csh"
 fi

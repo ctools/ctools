@@ -1,6 +1,6 @@
 #! /bin/bash
 # ==========================================================================
-# This script tests all cscripts that are shipped with ctatools
+# This script tests all cscripts that are shipped with ctools
 #
 # Copyright (C) 2011 Jurgen Knodlseder
 #

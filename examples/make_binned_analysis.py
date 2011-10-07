@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ==========================================================================
 # This script illustrates how to build a binned analysis pipeline using the
-# ctatools. If matplotlib is installed, a counts spectrum and an offset
+# ctools. If matplotlib is installed, a counts spectrum and an offset
 # histogram will be displayed.
 #
 # Required 3rd party modules:
@@ -23,7 +23,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctatools import *
+from ctools import *
 from gammalib import *
 from math import *
 import os
