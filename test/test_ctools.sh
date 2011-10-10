@@ -69,6 +69,32 @@ echo " ok"
 
 
 #
+# Test ctskymap
+# =============
+echo -n "Test ctskymap: "
+ctskymap evfile="events.fits" \
+         outfile="skymap.fits" \
+         emin=0.1 \
+         emax=100.0 \
+         nxpix=200 \
+         nypix=200 \
+         binsz=0.02 \
+         coordsys="CEL" \
+         xref=83.63 \
+         yref=22.01 \
+         proj="CAR"
+echo -n "."
+if [ -s "skymap.fits" ]
+then
+  echo -n "."
+else
+  echo " skymap.fits file is not valid"
+  exit 1
+fi
+echo " ok"
+
+
+#
 # Test ctbin
 # ==========
 echo -n "Test ctbin: "

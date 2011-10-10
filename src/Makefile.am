@@ -4,7 +4,8 @@
 SUBDIRS = ctselect \
           ctbin \
           ctlike \
-          ctobssim
+          ctobssim \
+          ctskymap
 
 # Scripts to be distributed
 scripts = ctools-setup \
@@ -19,7 +20,8 @@ libctools_la_SOURCES =
 libctools_la_LIBADD = ctbin/libctbin.la \
                       ctselect/libctselect.la \
                       ctlike/libctlike.la \
-                      ctobssim/libctobssim.la
+                      ctobssim/libctobssim.la \
+                      ctskymap/libctskymap.la
 
 # Distribute scripts
 EXTRA_DIST   = $(scripts)
