@@ -33,6 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
+#define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
 #define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -198,8 +199,7 @@ void ctskymap::clear(void)
 /***********************************************************************//**
  * @brief Execute application
  *
- * This method bins the events data into a counts maps and saves the counts
- * map into a FITS file.
+ * This method creates the sky map and saves the map into a FITS file.
  ***************************************************************************/
 void ctskymap::execute(void)
 {
@@ -207,10 +207,10 @@ void ctskymap::execute(void)
     // parameters log
     m_outfile = (*this)["outfile"].filename();
 
-    // Bin the event data
+    // Create the sky map
     run();
 
-    // Save the counts map into FITS file
+    // Save the sky map into FITS file
     save();
 
     // Return
@@ -219,13 +219,22 @@ void ctskymap::execute(void)
 
 
 /***********************************************************************//**
- * @brief Bin the event data
+ * @brief Creates sky maps from data
+ *
+ * This method is the main code. It
+ * (1) reads task parameters from the par file
+ * (2) initialises the sky maps
+ * (3) loops over all observations to add its events to the sky map
  ***************************************************************************/
 void ctskymap::run(void)
 {
+    // Initialise statistics
+    int num_obs = 0;
+
     // Switch screen logging on in debug mode
-    if (logDebug())
+    if (logDebug()) {
         log.cout(true);
+    }
 
     // Get parameters
     get_parameters();
@@ -239,20 +248,24 @@ void ctskymap::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Observations");
-        else
+        }
+        else {
             log.header1("Observation");
+        }
         log << m_obs << std::endl;
     }
 
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
-            log.header1("Bin observations");
-        else
-            log.header1("Bin observation");
+        if (m_obs.size() > 1) {
+            log.header1("Map observations");
+        }
+        else {
+            log.header1("Map observation");
+        }
     }
 
     // Loop over all observation in the container
@@ -264,30 +277,45 @@ void ctskymap::run(void)
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
 
-            // Write header for observation
+            // Write header for current observation
             if (logTerse()) {
-                if (obs->name().length() > 1)
+                if (obs->name().length() > 1) {
                     log.header3("Observation "+obs->name());
-                else
+                }
+                else {
                     log.header3("Observation");
+                }
+            }
+
+            // If this is the first valid observation we're working on
+            // then initialise the sky maps
+            if (num_obs == 0) {
+                init_map(obs);
             }
 
             // Map events into sky map
             map_events(obs);
+            
+            // Increment observation counter
+            num_obs++;
 
         } // endif: CTA observation found
 
     } // endfor: looped over observations
 
     // Write observation(s) into logger
+/*
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
-            log.header1("Binned observations");
-        else
-            log.header1("Binned observation");
+        if (m_obs.size() > 1) {
+            log.header1("Map observations");
+        }
+        else {
+            log.header1("Map observation");
+        }
         log << m_obs << std::endl;
     }
+*/
 
     // Return
     return;
@@ -301,45 +329,18 @@ void ctskymap::run(void)
  ***************************************************************************/
 void ctskymap::save(void)
 {
-/*
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
-            log.header1("Save observations");
-        else
-            log.header1("Save observation");
+        log.header1("Save sky map");
     }
 
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
 
-    // Loop over all observations in the container
-    int file_num = 0;
-    for (int i = 0; i < m_obs.size(); ++i) {
+    // Save sky map
+    m_skymap.save(m_outfile, clobber());
 
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
-
-        // Save only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Set filename. If more than one file will be created an
-            // index "_xxx" will be appended.
-            std::string filename = m_outfile;
-            if (file_num > 0)
-                filename += "_"+str(file_num);
-
-            // Save file
-            obs->save(filename, clobber());
-
-            // Increment file number
-            file_num++;
-
-        } // endif: observation was a CTA observation
-
-    } // endfor: looped over files
-*/
     // Return
     return;
 }
@@ -392,6 +393,60 @@ void ctskymap::get_parameters(void)
 
 
 /***********************************************************************//**
+ * @brief Initialise sky map
+ *
+ * @param[in] obs CTA observation (no NULL pointer allowed).
+ *
+ * @exception GCTAException::no_pointing
+ *            No valid CTA pointing found.
+ *
+ * This method initialises the sky map.
+ ***************************************************************************/
+void ctskymap::init_map(GCTAObservation* obs)
+{
+    // Clear any existing sky map
+    m_skymap.clear();
+    
+    // Get map centre. If no centre is specified then extract the map centre
+    // from the pointing direction. This obviously only works for 
+    double xref;
+    double yref;
+    if (m_xref != 9999.0 && m_yref != 9999.0) {
+        xref = m_xref;
+        yref = m_yref;
+    }
+    else {
+
+
+        // Get pointer on CTA pointing
+        const GTime         srcTime; // Dummy time
+        const GCTAPointing *pnt = obs->pointing(srcTime);
+        if (pnt == NULL) {
+            throw GCTAException::no_pointing(G_INIT_MAP);
+        }
+            
+        // Set reference point to pointing
+        if (toupper(m_coordsys) == "GAL") {
+            xref = pnt->dir().l_deg();
+            yref = pnt->dir().b_deg();
+        }
+        else {
+            xref = pnt->dir().ra_deg();
+            yref = pnt->dir().dec_deg();
+        }
+
+    } // endelse: map centre set to pointing
+
+    // Create skymap
+    m_skymap = GSkymap(m_proj, m_coordsys, xref, yref, m_binsz, m_binsz,
+                       m_nxpix, m_nypix, 1);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Map events into a sky map
  *
  * @param[in] obs CTA observation.
@@ -421,38 +476,6 @@ void ctskymap::map_events(GCTAObservation* obs)
         emin.TeV(m_emin);
         emax.TeV(m_emax);
 
-        // Get map centre
-        double xref;
-        double yref;
-        if (m_xref != 9999.0 && m_yref != 9999.0) {
-            xref = m_xref;
-            yref = m_yref;
-        }
-        else {
-            
-            // Get pointer on CTA pointing
-            const GTime         srcTime; // Dummy time
-            const GCTAPointing *pnt = obs->pointing(srcTime);
-            if (pnt == NULL)
-                throw GCTAException::no_pointing(G_BIN_EVENTS);
-            
-            // Set reference point to pointing
-            if (toupper(m_coordsys) == "GAL") {
-                xref = pnt->dir().l_deg();
-                yref = pnt->dir().b_deg();
-            }
-            else {
-                xref = pnt->dir().ra_deg();
-                yref = pnt->dir().dec_deg();
-            }
-
-        } // endelse: map centre set to pointing
-
-        // Create skymap
-        GSkymap map = GSkymap(m_proj, m_coordsys,
-                              xref, yref, m_binsz, m_binsz,
-                              m_nxpix, m_nypix, 1);
-
         // Initialise binning statistics
         int num_outside_map    = 0;
         int num_outside_erange = 0;
@@ -471,7 +494,7 @@ void ctskymap::map_events(GCTAObservation* obs)
             // Determine sky pixel
             GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
             GSkyDir      dir   = inst->skydir();
-            GSkyPixel    pixel = map.dir2xy(dir);
+            GSkyPixel    pixel = m_skymap.dir2xy(dir);
 
             // Skip if pixel is out of range
             if (pixel.x() < -0.5 || pixel.x() > (m_nxpix-0.5) ||
@@ -481,7 +504,7 @@ void ctskymap::map_events(GCTAObservation* obs)
             }
 
             // Fill event in skymap
-            map(pixel) += 1.0;
+            m_skymap(pixel, 0) += 1.0;
             num_in_map++;
 
         } // endfor: looped over all events
@@ -504,7 +527,7 @@ void ctskymap::map_events(GCTAObservation* obs)
         if (logTerse()) {
             log << std::endl;
             log.header1("Sky map");
-            log << map << std::endl;
+            log << m_skymap << std::endl;
         }
 
     } // endif: observation was valid
@@ -531,6 +554,7 @@ void ctskymap::init_members(void)
     m_proj.clear();
     m_coordsys.clear();
     m_obs.clear();
+    m_skymap.clear();
     m_emin     = 0.0;
     m_emax     = 0.0;
     m_xref     = 9999.0; // Flags unset (use pointing direction)
@@ -560,6 +584,7 @@ void ctskymap::copy_members(const ctskymap& app)
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
     m_obs      = app.m_obs;
+    m_skymap   = app.m_skymap;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
     m_xref     = app.m_xref;

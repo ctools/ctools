@@ -62,6 +62,7 @@ public:
     void           save(void);
     GObservations& obs(void) { return m_obs; }
     void           get_parameters(void);
+    void           init_map(GCTAObservation* obs);
     void           map_events(GCTAObservation* obs);
 
 protected:
@@ -85,6 +86,7 @@ protected:
 
     // Protected members
     GObservations m_obs;        //!< Observation container
+    GSkymap       m_skymap;     //!< Sky map
 };
 
 #endif /* CTSKYMAP_HPP */
