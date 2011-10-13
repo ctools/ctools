@@ -22,6 +22,8 @@ bkgs_DATA = $(bkgs)
 
 # Models to distribute
 models      = crab.xml \
+              crab_poly.xml \
+              crab_profile.xml \
               disk.xml \
               gauss.xml \
               shell.xml
