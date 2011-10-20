@@ -1,59 +1,60 @@
-New Features and Important Changes in ctools 00-03-00
+New Features and Important Changes in ctools 00-04-00
 
 Author(s) : Juergen Knoedlseder
 
-October 6, 2011
+October 20, 2011
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important changes made since the last release of ctools.
 
-
 2. Configuration
 -----------------
-Renamed package from ctatools to ctools
+The configure options --enable-universalsdk and --with-universal-archs
+have been added to control building of universal libraries.  This is
+particularily required if the installed Python architecture differs from
+the default architecture created by the compiler.
 
+Remove automake dependency tracking as this conflicts with Mac OS X
+universal builds.
 
 3. Python interface
 -------------------
 None
 
-
 4. ctobssim - CTA observation simulation
 ----------------------------------------
 None
-
 
 5. ctselect - CTA event selection
 ---------------------------------
 None
 
-
 6. ctbin - CTA event binning
 ----------------------------
 None
-
 
 7. ctlike - CTA maximum likelihood fitting
 ------------------------------------------
 None
 
+8. ctskymap - CTA sky mapping
+-----------------------------
+New executable.
 
-8. Examples
+9. Examples
 -----------
 None
 
-
-9. Scripts
-----------
+10. Scripts
+-----------
 None
 
-10. caldb
+11. caldb
 ---------
 None
 
-
-11. models
+12. models
 ----------
 None

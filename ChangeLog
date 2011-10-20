@@ -1,9 +1,11 @@
-2011-10-06  Juergen Knoedlseder  <knodlseder@cesr.fr>
+2011-10-20  Juergen Knoedlseder  <knodlseder@cesr.fr>
 
         * Version 0.3.0 released
         ========================
 
         Renamed to ctools
+        Add configure options for Mac OSX universal builds
+        Remove automake dependency tracking
 
 
 2011-10-03  Juergen Knoedlseder  <knodlseder@cesr.fr>

@@ -1,8 +1,8 @@
 ctools information
 ==================
-Version:             00-03-05 (October 6, 2011)
+Version:             00-04-00 (October 20, 2011)
 Author:              Juergen Knodlseder (knodlseder@cesr.fr)
-GammaLib dependency: 00-04-11
+GammaLib dependency: 00-05-00
 
 
 License information
@@ -38,6 +38,7 @@ The following tools are so far available:
     ctselect - event selection
     ctbin    - event binning
     ctlike   - maximum likelihood model fitting
+    ctskymap - CTA sky mapping tool
 
 
 Web sites
@@ -96,19 +97,50 @@ The file INSTALL details more about using configure. Also try
 
 Macintosh OS X Installation
 ============================
-ctools are known to work on various flavors of OS X.  Follow the Unix
-installation instructions above.
+ctools is known to work on various flavors of OS X.  To cope with
+different system versions and architectures, there are two Mac
+specific configure options:
 
-In some cases, install problems have been reported with mixed
-architectures (i386, ppc, x86_64), so you may configure and build
-as follows to enable building a bundle for various architectures:
+     % ./configure --enable-universalsdk[=PATH]
 
-     % export CXXFLAGS="-arch ppc -arch i386 -arch x86_64"
-     % export LDFLAGS="-arch ppc -arch i386 -arch x86_64"
-     % ./configure
-     % make
-     % make check
-     % make install
+creates a universal build of ctools.  The optional argument specifies
+which OSX SDK should be used to perform the build.  This defaults to
+"/Developer/SDKs/MacOSX.10.4u.sdk".  Specify "/" when building on a 10.5
+system or higher, especially when building 64-bit code.
+
+     % ./configure --with-univeral-archs=VALUE
+
+specifies the kind of universal build that should be created.  Possible
+values are: "32-bit", "3-way", "intel" or "all".  By default, a "32-bit" 
+build will be made.  This option is only valid when
+"--enable-universalsdk" is specified.
+
+These options are in particular needed if your Python architecture differs
+from the default architecture of your system.  To examine the Python
+architecture you may type:
+
+     % file `which python`
+
+which will return the architectures that are compiled in the Mach-0
+executable:
+
+     i386    32-bit intel
+     ppc     32-bit powerpc
+     ppc64   64-bit powerpc
+     x86_64  64-bit intel
+
+If Python is 32-bit (ppc, i386) but the compiler produces by default
+64-bit code (ppc64, x86_64), the Python module will not work.  Using
+
+     % ./configure --enable-universalsdk=/
+
+will force a universal 32-bit build which creates code for ppc and 
+i386.  If on the other hand Python is 64-bit (ppc64, x86_64) but the
+compiler produces by default 32-bit code (ppc, i386), the option
+
+     % ./configure --enable-universalsdk=/ --with-univeral-archs=3-way
+
+will generate a universal build which contains 32-bit and 64-bit code.
 
 
 Solaris Installation
