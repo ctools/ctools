@@ -1,5 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
+# Darwin support
+MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
+export MACOSX_DEPLOYMENT_TARGET
+
 # Optional python bindings
 if WITH_PYTHON
   TEST_CSCRIPTS      = test_cscripts.sh
