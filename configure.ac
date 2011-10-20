@@ -1,32 +1,47 @@
-# Configuration for ctools - a set of tools for science analysis of CTA data
-#
-# Copyright (C) 2011 Jurgen Knodlseder
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Process this file with autoconf to produce a configure script
+#############################################################################
+# Configuration for ctools - a set of tools for science analysis of CTA     #
+#                            data                                           #
+# ------------------------------------------------------------------------- #
+# Copyright (C) 2011 Jurgen Knodlseder                                      #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  This program is free software: you can redistribute it and/or modify     #
+#  it under the terms of the GNU General Public License as published by     #
+#  the Free Software Foundation, either version 3 of the License, or        #
+#  (at your option) any later version.                                      #
+#                                                                           #
+#  This program is distributed in the hope that it will be useful,          #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+#  GNU General Public License for more details.                             #
+#                                                                           #
+#  You should have received a copy of the GNU General Public License        #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+# Process this file with autoconf to produce a configure script.            #
+# ------------------------------------------------------------------------- #
+# ToDo:                                                                     #
+# - add possibility to build as Framework on Darwin                         #
+# - strip "-Wstrict-prototypes" for C++ compiling                           #
+#############################################################################
 
+#############################################################################
+# Initialisation                                                            #
+#############################################################################
 AC_INIT([ctools], [0.3.0], [knodlseder@cesr.fr], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
+AM_INIT_AUTOMAKE([gnu no-dependencies])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
 
 
-dnl ==========
-dnl Set prefix
-dnl ==========
+#############################################################################
+# Set prefix                                                                #
+# ------------------------------------------------------------------------- #
+# By default, ctools get installed into "/usr/local/gamma".  The default    #
+# can be overwritten using the --prefix option.                             #
+#############################################################################
 AC_PREFIX_DEFAULT([/usr/local/gamma])
 if test "x$prefix" = xNONE; then
   ctools_prefix="/usr/local/gamma"
@@ -36,44 +51,294 @@ fi
 AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${ctools_prefix}", [Location where library is installed])
 
 
-dnl ===========================
-dnl things required by automake
-dnl ===========================
-dnl AC_ARG_PROGRAM
+#############################################################################
+# Check for programs that are required by automake                          #
+#############################################################################
 AC_PROG_MAKE_SET
 
 
-dnl =========================
-dnl Check for system services
-dnl =========================
+#############################################################################
+# Determine the build and host system type                                  #
+#############################################################################
 AC_CANONICAL_HOST
 
 
-dnl ===================
-dnl Checks for programs
-dnl ===================
+#############################################################################
+# Determine the C and C++ compilers.  This has to come before the check for #
+# header files, otherwise we won't detect if the C++ compiler is missing.   #
+#############################################################################
+AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_INSTALL
-AC_PROG_LIBTOOL
 
 
-dnl =======================
-dnl Checks for header files
-dnl =======================
-AC_STDC_HEADERS
+#############################################################################
+# Darwin option: Determine if a universal library should be built           #
+# ------------------------------------------------------------------------- #
+# --enable-universalsdk=PATH takes an optional argument that specifies      #
+# which OSX SDK should be used to perform the build.  This defaults to      #
+# "/Developer/SDKs/MacOSX.10.4u.sdk".  Specify "/" when building on a 10.5  #
+# system or larger, especially when building 64-bit code.                   #
+#############################################################################
+AC_MSG_CHECKING([for --enable-universalsdk])
+AC_ARG_ENABLE(universalsdk,
+	AS_HELP_STRING([--enable-universalsdk@<:@=SDKDIR@:>@], [Build against Mac OS X 10.4u SDK (ppc/i386)]),
+[
+	case $enableval in
+	yes)
+		enableval=/Developer/SDKs/MacOSX10.4u.sdk
+		if test ! -d "${enableval}"
+		then
+			enableval=/
+		fi
+		;;
+	esac
+	case $enableval in
+	no)
+		UNIVERSALSDK=
+		enable_universalsdk=
+		;;
+	*)
+		UNIVERSALSDK=$enableval
+		if test ! -d "${UNIVERSALSDK}"
+		then
+			AC_MSG_ERROR([--enable-universalsdk specifies non-existing SDK: ${UNIVERSALSDK}])
+		fi
+		;;
+	esac
+	
+],[
+   	UNIVERSALSDK=
+	enable_universalsdk=
+])
+if test -n "${UNIVERSALSDK}"
+then
+	AC_MSG_RESULT(${UNIVERSALSDK})
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(UNIVERSALSDK)
 
 
-dnl =============================================================
-dnl Checks for typedefs, structures, and compiler characteristics
-dnl =============================================================
-AC_TYPE_SIZE_T
-AC_C_CONST
-AC_C_INLINE
+#############################################################################
+# Darwin option: Determine archirecture of universal library to be built    #
+# ------------------------------------------------------------------------- #
+# --with-univeral-archs=VALUE, where VALUE is one of "32-bit", "64-bit",    #
+# "3-way", "intel" or "all".  Defaults to "32-bit".                         #
+#############################################################################
+UNIVERSAL_ARCHS="32-bit"
+AC_SUBST(LIPO_32BIT_FLAGS)
+AC_MSG_CHECKING(for --with-universal-archs)
+AC_ARG_WITH(universal-archs,
+    AS_HELP_STRING([--with-universal-archs=ARCH], [select architectures for universal build ("32-bit", "64-bit", "3-way", "intel" or "all")]),
+[
+	AC_MSG_RESULT($withval)
+	UNIVERSAL_ARCHS="$withval"
+    if test "${enable_universalsdk}" ; then
+		:
+	else
+		AC_MSG_ERROR([--with-universal-archs without --enable-universalsdk.])
+	fi
+],
+[
+ 	AC_MSG_RESULT(32-bit)
+])
 
 
-dnl =================================
-dnl Checks for debugging or profiling
-dnl =================================
+#############################################################################
+# Record MACOSX_DEPLOYMENT_TARGET                                           #
+# ------------------------------------------------------------------------- #
+# Record the configure-time value of MACOSX_DEPLOYMENT_TARGET, it may       #
+# influence the way we can build extensions, so distutils needs to check it #
+#############################################################################
+AC_SUBST(CONFIGURE_MACOSX_DEPLOYMENT_TARGET)
+AC_SUBST(EXPORT_MACOSX_DEPLOYMENT_TARGET)
+CONFIGURE_MACOSX_DEPLOYMENT_TARGET=
+EXPORT_MACOSX_DEPLOYMENT_TARGET='#'
+
+
+#############################################################################
+# Set name for machine-dependent library files                              #
+#############################################################################
+AC_SUBST(MACHDEP)
+AC_MSG_CHECKING(MACHDEP)
+if test -z "$MACHDEP"; then
+    ac_sys_system=`uname -s`
+	if test "$ac_sys_system" = "AIX" \
+	-o "$ac_sys_system" = "UnixWare" -o "$ac_sys_system" = "OpenUNIX"; then
+		ac_sys_release=`uname -v`
+	else
+		ac_sys_release=`uname -r`
+	fi
+	ac_md_system=`echo $ac_sys_system |
+			   tr -d '[/ ]' | tr '[[A-Z]]' '[[a-z]]'`
+	ac_md_release=`echo $ac_sys_release |
+			   tr -d '[/ ]' | sed 's/^[[A-Z]]\.//' | sed 's/\..*//'`
+
+    # Set MACHDEP
+    MACHDEP="$ac_md_system$ac_md_release"
+    case $MACHDEP in
+    cygwin*) MACHDEP="cygwin";;
+    darwin*) MACHDEP="darwin";;
+    atheos*) MACHDEP="atheos";;
+    irix646) MACHDEP="irix6";;
+    '')	MACHDEP="unknown";;
+    esac
+fi
+AC_MSG_CHECKING(machine type as reported by uname -m)
+ac_sys_machine=`uname -m`
+AC_MSG_RESULT($ac_sys_machine)
+
+
+#############################################################################
+# Set -arch flags for universal builds on OSX and tweak BASECFLAGS based on #
+# compiler and platform (note that BASECFLAGS are not yet used).            #
+#############################################################################
+# Initialise the -arch flags for universal builds on OSX
+UNIVERSAL_ARCH_FLAGS=
+AC_SUBST(UNIVERSAL_ARCH_FLAGS)
+
+# Tweak BASECFLAGS based on compiler and platform
+case $GCC in
+yes)
+
+    # if using gcc on alpha, use -mieee to get (near) full IEEE 754
+    # support.  Without this, treatment of subnormals doesn't follow
+    # the standard.
+    case $ac_sys_machine in
+        alpha*)
+            BASECFLAGS="$BASECFLAGS -mieee"
+            ;;
+    esac
+
+    case $ac_sys_system in
+	SCO_SV*)
+	    BASECFLAGS="$BASECFLAGS -m486 -DSCO5"
+	    ;;
+	# is there any other compiler on Darwin besides gcc?
+	Darwin*)
+	    # -Wno-long-double, -no-cpp-precomp, and -mno-fused-madd
+	    # used to be here, but non-Apple gcc doesn't accept them.
+	    if test "${CC}" = gcc; then
+            AC_MSG_CHECKING(which compiler should be used)
+		    case "${UNIVERSALSDK}" in
+		    */MacOSX10.4u.sdk)
+			    # Build using 10.4 SDK, force usage of gcc when the 
+			    # compiler is gcc, otherwise the user will get very
+			    # confusing error messages when building on OSX 10.6
+			    CC=gcc-4.0
+			    CXX=g++-4.0
+			    CPP=cpp-4.0
+                ac_ct_CC="$CC"
+                ac_ct_CXX="$CXX"
+                ac_cv_prog_ac_ct_CC="$ac_ct_CC"
+                ac_cv_prog_ac_ct_CXX="$ac_ct_CXX"
+			    ;;
+		    esac
+		    AC_MSG_RESULT($CXX)
+        fi
+
+	    # Calculate the right deployment target for this build.
+	    #
+	    cur_target=`sw_vers -productVersion | sed 's/\(10\.[[0-9]]*\).*/\1/'`
+	    if test ${cur_target} '>' 10.2; then
+		    cur_target=10.3
+		    if test ${enable_universalsdk}; then
+			    if test "${UNIVERSAL_ARCHS}" = "all"; then
+				    # Ensure that the default platform for a 
+				    # 4-way universal build is OSX 10.5, 
+				    # that's the first OS release where 
+				    # 4-way builds make sense.
+				    cur_target='10.5'
+			    elif test "${UNIVERSAL_ARCHS}" = "3-way"; then
+				    cur_target='10.5'
+			    elif test "${UNIVERSAL_ARCHS}" = "intel"; then
+				    cur_target='10.5'
+			    elif test "${UNIVERSAL_ARCHS}" = "64-bit"; then
+				    cur_target='10.5'
+			    elif test `/usr/bin/arch` = "i386"; then
+				    # On Intel macs default to a deployment
+				    # target of 10.4, that's the first OSX
+				    # release with Intel support.
+				    cur_target="10.4"
+			    fi
+		    else
+			    if test `/usr/bin/arch` = "i386"; then
+				    # On Intel macs default to a deployment
+				    # target of 10.4, that's the first OSX
+				    # release with Intel support.
+				    cur_target="10.4"
+			    fi
+		    fi
+	    fi
+	    CONFIGURE_MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET-${cur_target}}
+	    
+	    # Make sure that MACOSX_DEPLOYMENT_TARGET is set in the 
+	    # environment with a value that is the same as what we'll use
+	    # in the Makefile to ensure that we'll get the same compiler
+	    # environment during configure and build time.
+	    MACOSX_DEPLOYMENT_TARGET="$CONFIGURE_MACOSX_DEPLOYMENT_TARGET"
+	    export MACOSX_DEPLOYMENT_TARGET
+	    EXPORT_MACOSX_DEPLOYMENT_TARGET=''
+
+        # Set compile, link and pre-processor flags dependent on architecture
+	    if test "${enable_universalsdk}"; then
+		    UNIVERSAL_ARCH_FLAGS=""
+	        if test "$UNIVERSAL_ARCHS" = "32-bit" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch ppc -arch i386"
+		        ARCH_RUN_32BIT=""
+		        LIPO_32BIT_FLAGS=""
+            elif test "$UNIVERSAL_ARCHS" = "64-bit" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch ppc64 -arch x86_64"
+		        LIPO_32BIT_FLAGS=""
+		        ARCH_RUN_32BIT="true"
+            elif test "$UNIVERSAL_ARCHS" = "all" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch i386 -arch ppc -arch ppc64 -arch x86_64"
+		        LIPO_32BIT_FLAGS="-extract ppc7400 -extract i386"
+		        ARCH_RUN_32BIT="/usr/bin/arch -i386 -ppc"
+            elif test "$UNIVERSAL_ARCHS" = "intel" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch i386 -arch x86_64"
+		        LIPO_32BIT_FLAGS="-extract i386"
+		        ARCH_RUN_32BIT="/usr/bin/arch -i386"
+            elif test "$UNIVERSAL_ARCHS" = "3-way" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch i386 -arch ppc -arch x86_64"
+		        LIPO_32BIT_FLAGS="-extract ppc7400 -extract i386"
+		        ARCH_RUN_32BIT="/usr/bin/arch -i386 -ppc"
+		    else
+	            AC_MSG_ERROR([proper usage is --with-universal-arch=32-bit|64-bit|all|intel|3-way])
+		    fi
+		    CXXFLAGS="${UNIVERSAL_ARCH_FLAGS} ${CXXFLAGS}"
+		    if test "${UNIVERSALSDK}" != "/"; then
+			    CPPFLAGS="-isysroot ${UNIVERSALSDK} ${CPPFLAGS}"
+			    LDFLAGS="-isysroot ${UNIVERSALSDK} ${LDFLAGS}"
+			    CXXFLAGS="-isysroot ${UNIVERSALSDK} ${CXXFLAGS}"
+		    fi
+	    fi
+	    ;;
+	OSF*)
+	    BASECFLAGS="$BASECFLAGS -mieee"
+	    ;;
+    esac
+    ;;
+*)
+    case $ac_sys_system in
+    OpenUNIX*|UnixWare*)
+	BASECFLAGS="$BASECFLAGS -K pentium,host,inline,loop_unroll,alloca "
+	;;
+    OSF*)
+	BASECFLAGS="$BASECFLAGS -ieee -std"
+    	;;
+    SCO_SV*)
+	BASECFLAGS="$BASECFLAGS -belf -Ki486 -DSCO5"
+	;;
+    esac
+    ;;
+esac
+
+
+#############################################################################
+# Checks for debugging and profiling options                                #
+#############################################################################
+# Check for debugging option
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE([debug],
               AS_HELP_STRING([--enable-debug],
@@ -89,6 +354,8 @@ if test "x$enable_debug" = "xyes"; then
 else
   AC_MSG_RESULT(no)
 fi
+
+# Check for profiling option
 AC_MSG_CHECKING(whether to enable profiling)
 AC_ARG_ENABLE([profiling],
               AS_HELP_STRING([--enable-profiling],
@@ -106,14 +373,59 @@ else
 fi
 
 
-dnl =========================================================================
-dnl Checks if Python bindings are to be build. Python binding requires Python
-dnl and either the files ctools_wrap.cpp and ctools.py or swig to create
-dnl these files. The following conditionals are set:
-dnl  WITH_PYTHON - Python bindings will be built
-dnl  HAVE_SWIG    - swig is available
-dnl =========================================================================
+#############################################################################
+# Set linker options                                                        #
+#############################################################################
+case $ac_sys_system/$ac_sys_release in
+Darwin/*)
+    # Use -undefined dynamic_lookup whenever possible (10.3 and later).
+    # This allows an extension to be used in any Python
+    if test ${MACOSX_DEPLOYMENT_TARGET} '>' 10.2; then
+        if test "${enable_universalsdk}"; then
+            LDFLAGS="${UNIVERSAL_ARCH_FLAGS} -isysroot ${UNIVERSALSDK} ${LDFLAGS}"
+        fi
+    fi
+    ;;
+esac
 
+
+#############################################################################
+# Checks for header files                                                   #
+#############################################################################
+AC_HEADER_STDC
+
+
+#############################################################################
+# Checks for installer                                                      #
+#############################################################################
+AC_PROG_INSTALL
+
+
+#############################################################################
+# Checks for libtool.  We need to do this after the compiler has been       #
+# determined.                                                               #
+#############################################################################
+AC_PROG_LIBTOOL
+
+
+#############################################################################
+# Checks for typedefs, structures, and compiler characteristics             #
+#############################################################################
+AC_TYPE_SIZE_T
+# AC_TYPE_LONG_LONG_INT
+AC_C_CONST
+AC_C_INLINE
+
+
+#############################################################################
+# Checks if Python bindings are to be build                                 #
+# ------------------------------------------------------------------------- #
+# Python binding requires Python and either the files ctools_wrap.cpp and   #
+# ctools.py or swig to create these files.  The following conditionals are  #
+# set:                                                                      #
+# WITH_PYTHON - Python bindings will be built                               #
+# HAVE_SWIG   - swig is available                                           #
+#############################################################################
 # Initialise flags
 enable_python="no"
 has_python="no"
@@ -233,10 +545,9 @@ else
 fi
 
 
-dnl ===========================
-dnl Checks for GammaLib library
-dnl ===========================
-
+#############################################################################
+# Checks for GammaLib library                                               #
+#############################################################################
 # Initialise GammaLib availability
 has_gammalib="no"
 
@@ -295,9 +606,9 @@ root directory of GammaLib.])
 fi
 
 
-dnl ==================
-dnl Build static code?
-dnl ==================
+#############################################################################
+# Build static code?                                                        #
+#############################################################################
 if test "x$enable_profiling" = "xyes"; then
   AC_MSG_NOTICE([Link executables statically.])
   LIB_LINK_OPTION="-all-static"
@@ -318,9 +629,9 @@ fi
 AC_SUBST(LIB_LINK_OPTION)
 
 
-dnl ==========================
-dnl Create configuration files
-dnl ==========================
+#############################################################################
+# Set list of output files to be created                                    #
+#############################################################################
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/ctselect/Makefile
@@ -342,9 +653,9 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 
-dnl ===========================
-dnl Print configuration summary
-dnl ===========================
+#############################################################################
+# Print configuration summary to console                                    #
+#############################################################################
 echo
 echo "  ctools configuration summary"
 echo "  =============================="
