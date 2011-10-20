@@ -61,9 +61,11 @@ public:
     void           run(void);
     void           save(void);
     GObservations& obs(void) { return m_obs; }
+    GSkymap&       skymap(void) { return m_skymap; }
     void           get_parameters(void);
     void           init_map(GCTAObservation* obs);
     void           map_events(GCTAObservation* obs);
+
 
 protected:
     // Protected methods
