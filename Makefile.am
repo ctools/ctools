@@ -4,19 +4,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 # Subdirectories
-SUBDIRS = . src pyext test caldb models examples scripts
-
-#
-INCLUDES =
-
-# Make sure these will be cleaned even when they're not built by default
-CLEANFILES =
-
-# Headers to be installed
-include_HEADERS =
-
-# Headers which are not installed but which are distributed
-noinst_HEADERS =
+SUBDIRS = src pyext test caldb models examples scripts
 
 # Pkgconfig directory
 pkgconfigdir = $(libdir)/pkgconfig
