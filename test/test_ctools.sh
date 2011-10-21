@@ -26,6 +26,15 @@ echo "***************"
 echo "* Test ctools *"
 echo "***************"
 
+#
+# Define executables
+# ==================
+ctobssim=../src/ctobssim/ctobssim
+ctskymap=../src/ctskymap/ctskymap
+ctbin=../src/ctbin/ctbin
+ctselect=../src/ctselect/ctselect
+ctlike=../src/ctlike/ctlike
+
 
 #
 # Remove any existing result files
@@ -46,17 +55,17 @@ export PFILES=pfiles
 # Test ctobssim
 # =============
 echo -n "Test ctobssim: "
-ctobssim infile="data/crab.xml" \
-         outfile="events.fits" \
-         caldb="irf" \
-         irf="kb_E_50h_v3" \
-         ra=83.63 \
-         dec=22.01 \
-         rad=10.0 \
-         tmin=0.0 \
-         tmax=1800.0 \
-         emin=0.1 \
-         emax=100.0
+$ctobssim infile="data/crab.xml" \
+          outfile="events.fits" \
+          caldb="irf" \
+          irf="kb_E_50h_v3" \
+          ra=83.63 \
+          dec=22.01 \
+          rad=10.0 \
+          tmin=0.0 \
+          tmax=1800.0 \
+          emin=0.1 \
+          emax=100.0
 echo -n "."
 if [ -s "events.fits" ]
 then
@@ -72,17 +81,17 @@ echo " ok"
 # Test ctskymap
 # =============
 echo -n "Test ctskymap: "
-ctskymap evfile="events.fits" \
-         outfile="skymap.fits" \
-         emin=0.1 \
-         emax=100.0 \
-         nxpix=200 \
-         nypix=200 \
-         binsz=0.02 \
-         coordsys="CEL" \
-         xref=83.63 \
-         yref=22.01 \
-         proj="CAR"
+$ctskymap evfile="events.fits" \
+          outfile="skymap.fits" \
+          emin=0.1 \
+          emax=100.0 \
+          nxpix=200 \
+          nypix=200 \
+          binsz=0.02 \
+          coordsys="CEL" \
+          xref=83.63 \
+          yref=22.01 \
+          proj="CAR"
 echo -n "."
 if [ -s "skymap.fits" ]
 then
@@ -98,18 +107,18 @@ echo " ok"
 # Test ctbin
 # ==========
 echo -n "Test ctbin: "
-ctbin evfile="events.fits" \
-      outfile="cntmap.fits" \
-      emin=0.1 \
-      emax=100.0 \
-      enumbins=20 \
-      nxpix=200 \
-      nypix=200 \
-      binsz=0.02 \
-      coordsys="CEL" \
-      xref=83.63 \
-      yref=22.01 \
-      proj="CAR"
+$ctbin evfile="events.fits" \
+       outfile="cntmap.fits" \
+       emin=0.1 \
+       emax=100.0 \
+       enumbins=20 \
+       nxpix=200 \
+       nypix=200 \
+       binsz=0.02 \
+       coordsys="CEL" \
+       xref=83.63 \
+       yref=22.01 \
+       proj="CAR"
 echo -n "."
 if [ -s "cntmap.fits" ]
 then
@@ -125,15 +134,15 @@ echo " ok"
 # Test ctselect
 # =============
 echo -n "Test ctselect: "
-ctselect infile="events.fits" \
-         outfile="selected_events.fits" \
-         ra=83.63 \
-         dec=22.01 \
-         rad=10.0 \
-         tmin=0.0 \
-         tmax=1800.0 \
-         emin=0.1 \
-         emax=100.0
+$ctselect infile="events.fits" \
+          outfile="selected_events.fits" \
+          ra=83.63 \
+          dec=22.01 \
+          rad=10.0 \
+          tmin=0.0 \
+          tmax=1800.0 \
+          emin=0.1 \
+          emax=100.0
 echo -n "."
 if [ -s "selected_events.fits" ]
 then
@@ -149,12 +158,12 @@ echo " ok"
 # Test ctlike
 # ===========
 echo -n "Test ctlike: "
-ctlike cntmap="cntmap.fits" \
-       srcmdl="data/crab.xml" \
-       outmdl="results_binned.xml" \
-       method="BINNED" \
-       caldb="irf" \
-       irf="kb_E_50h_v3"
+$ctlike cntmap="cntmap.fits" \
+        srcmdl="data/crab.xml" \
+        outmdl="results_binned.xml" \
+        method="BINNED" \
+        caldb="irf" \
+        irf="kb_E_50h_v3"
 echo -n "."
 if [ -s "results_binned.xml" ]
 then
@@ -163,12 +172,12 @@ else
   echo " results_binned.xml file is not valid"
   exit 1
 fi
-ctlike evfile="selected_events.fits" \
-       srcmdl="data/crab.xml" \
-       outmdl="results_unbinned.xml" \
-       method="UNBINNED" \
-       caldb="irf" \
-       irf="kb_E_50h_v3"
+$ctlike evfile="selected_events.fits" \
+        srcmdl="data/crab.xml" \
+        outmdl="results_unbinned.xml" \
+        method="UNBINNED" \
+        caldb="irf" \
+        irf="kb_E_50h_v3"
 echo -n "."
 if [ -s "results_unbinned.xml" ]
 then
