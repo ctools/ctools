@@ -12,13 +12,7 @@ if WITH_PYTHON
 endif
 
 # Set test environment
-TESTS_ENVIRONMENT = LD_LIBRARY_PATH=$(top_builddir)/src/.libs:$(prefix)/lib:$(LD_LIBRARY_PATH) \
-                    PATH=$(top_builddir)/src/ctobssim:$(PATH) \
-                    PATH=$(top_builddir)/src/ctbin:$(PATH) \
-                    PATH=$(top_builddir)/src/ctselect:$(PATH) \
-                    PATH=$(top_builddir)/src/ctlike:$(PATH) \
-                    PATH=$(top_builddir)/src/ctskymap:$(PATH) \
-                    $(TEST_PYTHON_ENV)
+TESTS_ENVIRONMENT = $(TEST_PYTHON_ENV)
 
 # Tests (these are the tests to be executed)
 TESTS = test_ctools.sh \
