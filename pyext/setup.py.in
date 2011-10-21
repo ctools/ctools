@@ -5,31 +5,31 @@ import os
 import sys
 
 # Removes list of bad prefixes from list
-def remove_prefixes(optlist, bad_prefixes):
-	for bad_prefix in bad_prefixes:
-		for i, flag in enumerate(optlist):
-			if flag.startswith(bad_prefix):
-				optlist.pop(i)
-				break
-	return optlist
+#def remove_prefixes(optlist, bad_prefixes):
+#	for bad_prefix in bad_prefixes:
+#		for i, flag in enumerate(optlist):
+#			if flag.startswith(bad_prefix):
+#				optlist.pop(i)
+#				break
+#	return optlist
 
 # Adjust compile options for darwin
-if sys.platform.lower().startswith("darwin"):
-
-	# Remove some time consuming options
-	cvars = sysconfig.get_config_vars()
-	cflags = cvars.get('OPT')
-	if cflags:
-		cflags = remove_prefixes(cflags.split(), 
-		         ['-g', '-O', '-Wstrict-prototypes', '-DNDEBUG'])
-	cvars['OPT'] = str.join(' ', cflags)
-	cvars['CFLAGS'] = cvars['BASECFLAGS'] + ' ' + cvars['OPT']
-	
-	# Remove -arch flags. This prevents building a fat library
-	cvars['ARCHFLAGS'] = ''
-	
-	# Signal darwin compiler adjustments
-	print 'Adjust default distutils compiler options for darwin.'
+#if sys.platform.lower().startswith("darwin"):
+#
+#	# Remove some time consuming options
+#	cvars = sysconfig.get_config_vars()
+#	cflags = cvars.get('OPT')
+#	if cflags:
+#		cflags = remove_prefixes(cflags.split(), 
+#		         ['-g', '-O', '-Wstrict-prototypes', '-DNDEBUG'])
+#	cvars['OPT'] = str.join(' ', cflags)
+#	cvars['CFLAGS'] = cvars['BASECFLAGS'] + ' ' + cvars['OPT']
+#	
+#	# Remove -arch flags. This prevents building a fat library
+#	cvars['ARCHFLAGS'] = ''
+#	
+#	# Signal darwin compiler adjustments
+#	print 'Adjust default distutils compiler options for darwin.'
 
 # Remove any existing symbolic link to libctools.a
 # This will prevent any exception in creating the symbolic link due to
