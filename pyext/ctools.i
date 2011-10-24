@@ -24,10 +24,14 @@
 %module ctools
 %feature("autodoc", "1");
 
-/* __ Support module _____________________________________________________ */
-%include "stl.i"
-%include "exception.i"
-%include "GApplication.i"
+/* __ Include standard typemaps for vectors and strings __________________ */
+%include stl.i
+
+/* __ Make sure that exceptions are catched ______________________________ */
+%import(module="gammalib.support") "GException.i";
+
+/* __ Inform about base classes __________________________________________ */
+%import(module="gammalib.app") "GApplication.i";
 
 /* __ CTA tools __________________________________________________________ */
 %include "ctobssim.i"
