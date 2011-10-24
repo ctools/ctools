@@ -8,7 +8,7 @@ export MACOSX_DEPLOYMENT_TARGET
 if WITH_PYTHON
   TEST_CSCRIPTS      = test_cscripts.sh
   TEST_PYTHON_SCRIPT = test_python.py
-  TEST_PYTHON_ENV    = PYTHONPATH=$(top_builddir)/pyext/build:$(top_builddir)/scripts:$(pythondir):$(PYTHONPATH)
+  TEST_PYTHON_ENV    = PYTHONPATH=$(top_builddir)/pyext:$(top_builddir)/scripts:$(pythondir):$(PYTHONPATH)
 endif
 
 # Set test environment
