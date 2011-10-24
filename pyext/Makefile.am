@@ -1,7 +1,30 @@
-## Process this file with automake to produce Makefile.in
-#
-# The actual implemented logic is to use swig if swig is
-# available on the system
+#############################################################################
+# Makefile for ctools Python extension module                               #
+# ------------------------------------------------------------------------- #
+# Copyright (C) 2011 Jurgen Knodlseder                                      #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  This program is free software: you can redistribute it and/or modify     #
+#  it under the terms of the GNU General Public License as published by     #
+#  the Free Software Foundation, either version 3 of the License, or        #
+#  (at your option) any later version.                                      #
+#                                                                           #
+#  This program is distributed in the hope that it will be useful,          #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+#  GNU General Public License for more details.                             #
+#                                                                           #
+#  You should have received a copy of the GNU General Public License        #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+# This Makefile will build the Python interface files (*.py) and the Python #
+# wrapper files using SWIG (if available; otherwise we have to make sure    #
+# the the files exist already). The Python distutils are used to build and  #
+# install the Python modules (see file setup.py.in).                        #
+#                                                                           #
+# Process this file with automake to produce Makefile.in.                   #
+#############################################################################
 
 if WITH_PYTHON
 
@@ -26,16 +49,25 @@ all-local: build
 # of this specific directory. So we build one instance for checking, the other
 # for installation. If we could get the name built by distutils we could avoid
 # this.
+#$(PYTHON) setup.py build --build-platlib build
 build: ctools_wrap.cpp ctools.py
-	$(PYTHON_BUILD_PREFIX) $(PYTHON) setup.py build --build-platlib build
-	$(PYTHON_BUILD_PREFIX) $(PYTHON) setup.py build
+	$(PYTHON) setup.py build
+
+# If 'make check' is invoked we build the extension modules inplace, so that
+# putting the 'pyext' directory in the PYTHONPATH allows importing the gammalib
+# module. We also catch this special build in the setup script to force static
+# linking with libgamma, which will allow a successful 'make check' on systems
+# (such as Mac OS X) that have fixed shared library paths.
+check-local:
+	$(PYTHON) setup.py build_ext --inplace
 
 install-exec-local:
 	$(PYTHON) setup.py install --prefix=$(prefix)
 
 clean-local:
-	rm -rf build
-	
+	rm -rf build _ctools.so
+
+# Rule for building Python wrappers using SWIG.
 if HAVE_SWIG
 ctools_wrap.cpp ctools.py: $(SWIG_INTERFACE)
 	$(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig -o ctools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)

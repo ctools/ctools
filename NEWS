@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-04-00
 
 Author(s) : Juergen Knoedlseder
 
-October 20, 2011
+October 23, 2011
 
 
 1. Introduction
@@ -21,7 +21,10 @@ universal builds.
 
 3. Python interface
 -------------------
-None
+The Python binding building scheme from GammaLib has been adapted.
+This avoids double compilation during 'make' and performs a special
+build during 'make check' that provides a Python module which is
+statically linked to the ctools library.
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------

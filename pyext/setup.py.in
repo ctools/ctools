@@ -1,60 +1,67 @@
+#############################################################################
+# Disutils setup file for ctools Python extension module                    #
+# ------------------------------------------------------------------------- #
+# Copyright (C) 2011 Jurgen Knodlseder                                      #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  This program is free software: you can redistribute it and/or modify     #
+#  it under the terms of the GNU General Public License as published by     #
+#  the Free Software Foundation, either version 3 of the License, or        #
+#  (at your option) any later version.                                      #
+#                                                                           #
+#  This program is distributed in the hope that it will be useful,          #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+#  GNU General Public License for more details.                             #
+#                                                                           #
+#  You should have received a copy of the GNU General Public License        #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
+#                                                                           #
+#############################################################################
+
 from distutils.core import setup, Extension
 from distutils import sysconfig
 import glob
 import os
 import sys
 
-# Removes list of bad prefixes from list
-#def remove_prefixes(optlist, bad_prefixes):
-#	for bad_prefix in bad_prefixes:
-#		for i, flag in enumerate(optlist):
-#			if flag.startswith(bad_prefix):
-#				optlist.pop(i)
-#				break
-#	return optlist
+# Detect execution mode
+is_unit_test = False
+if (len(sys.argv) >= 3):
+	if (sys.argv[2] == '--inplace'):
+		print "This build is for unit testing."
+		is_unit_test = True
 
-# Adjust compile options for darwin
-#if sys.platform.lower().startswith("darwin"):
-#
-#	# Remove some time consuming options
-#	cvars = sysconfig.get_config_vars()
-#	cflags = cvars.get('OPT')
-#	if cflags:
-#		cflags = remove_prefixes(cflags.split(), 
-#		         ['-g', '-O', '-Wstrict-prototypes', '-DNDEBUG'])
-#	cvars['OPT'] = str.join(' ', cflags)
-#	cvars['CFLAGS'] = cvars['BASECFLAGS'] + ' ' + cvars['OPT']
-#	
-#	# Remove -arch flags. This prevents building a fat library
-#	cvars['ARCHFLAGS'] = ''
-#	
-#	# Signal darwin compiler adjustments
-#	print 'Adjust default distutils compiler options for darwin.'
-
-# Remove any existing symbolic link to libctools.a
-# This will prevent any exception in creating the symbolic link due to
-# an already existing link.
-try:
-	os.remove('../src/.libs/libctools_python.a')
-	print 'Removed ../src/.libs/libctools_python.a'
-except:
-	pass
-
-# Create a symbolic link. This allows us to enforce static linking instead of
-# dynamic linking. We prefer here static linking to avoid any problems with
-# finding the gammalib shared library during checking.
-try:
-	os.symlink('libctools.a', '../src/.libs/libctools_python.a')
-	print 'Created ../src/.libs/libctools_python.a'
-	libcta='ctools_python'
-except:
-	libcta='ctatool'
+# Set ctools library name. If we're about to make the test build then
+# create a symbolic link to the static library to enforce static linking.
+# This is required on some system (such as Mac OS X) to avoid problems
+# with finding the shared library during unit testing.
+libcta='ctools'
+if is_unit_test:
+	
+	# Remove any existing symbolic link to libctools.a. This will
+	# prevent any exception in creating the symbolic link due to
+	# an already existing link.
+	try:
+		os.remove('../src/.libs/libctools_python.a')
+		print 'Removed ../src/.libs/libctools_python.a'
+	except:
+		pass
+	
+	# Now create a symbolic link and set the library name to this
+	# symbolic link
+	try:
+		os.symlink('libctools.a', '../src/.libs/libctools_python.a')
+		print 'Created ../src/.libs/libctools_python.a'
+		libcta='ctools_python'
+	except:
+		print 'WARNING: Failed to create symbolic link to static library. Link dynamically.'
 
 # Set default include directories and data files
-include_dirs = ['@prefix@/include/gammalib']
-data_files   = glob.glob('@top_srcdir@/pyext/*.i')
-library_dirs = ['../src/.libs']
-libraries    = [libcta,'gamma']
+include_dirs  = ['@prefix@/include/gammalib']
+install_files = glob.glob('@top_srcdir@/pyext/*.i')
+library_dirs  = ['../src/.libs']
+libraries     = [libcta,'gamma']
 
 # Append prefix library directory if it exists and set default runtime
 # library directories
@@ -96,11 +103,17 @@ for extra_include_dir in extra_include_dirs:
 		if len(dir) > 0:
 			include_dirs.append(dir)
 
+# Set data files to install. Do not install data files in unit testing mode.
+if is_unit_test:
+	data_files=[]
+else:
+	data_files=[('@prefix@/share/ctools/swig', install_files)]
+
 # Setup
 setup(name='@PACKAGE_NAME@',
       version='@PACKAGE_VERSION@',
-      description='ctools Python binding',
-      author='Jurgen Knodlseder',
+      description='ctools Python bindings',
+      author='Juergen Knoedlseder',
       author_email='@PACKAGE_BUGREPORT@',
       url='http://gammalib.sourceforge.net/',
       py_modules=['ctools'],
@@ -109,4 +122,8 @@ setup(name='@PACKAGE_NAME@',
                              library_dirs=library_dirs,
                              libraries=libraries,
                              runtime_library_dirs=runtime_library_dirs)],
-     )
+	  data_files=data_files,
+	  license="GNU GPL v3",
+	  long_description="CTA science analysis tools",
+	  platforms=["Linux", "Solaris", "Mac OS-X", "Unix", "BSD"],
+      )
