@@ -32,6 +32,29 @@ if (len(sys.argv) >= 3):
 		print "This build is for unit testing."
 		is_unit_test = True
 
+# Darwin MacPorts kluge: Remove -L/opt/local/lib path from LDSHARED as this
+# overrides the GammaLib settings. Otherwise, MacPorts libraries would be
+# used instead of the libraries selected by GammaLib
+if sys.platform.lower().startswith("darwin"):
+	
+	# Get configuration variables
+	cvars = sysconfig.get_config_vars()
+	
+	# Extract LDSHARED
+	ldshared_old = cvars.get('LDSHARED')
+	ldshared_new = ''
+	ldshared_rm  = ''
+	for option in ldshared_old.split(' '):
+		if option.lstrip().find('-L/opt/local/lib') != 0:
+			ldshared_new += option + ' '
+		else:
+			ldshared_rm += option + ' '
+	if (len(ldshared_rm) > 0):
+		print 'Removed following option(s) from LDSHARED: '+ldshared_rm
+	
+	# Set LDSHARED
+	cvars['LDSHARED'] = ldshared_new
+
 # Set ctools library name. If we're about to make the test build then
 # create a symbolic link to the static library to enforce static linking.
 # This is required on some system (such as Mac OS X) to avoid problems
