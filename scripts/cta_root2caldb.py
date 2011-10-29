@@ -117,11 +117,13 @@ class caldb():
 		
 		# Add path (if required)
 		if len(self.path) > 0:
+			self.base_path  = self.path+"/"+self.base_dir
 			self.bcf_path   = self.path+"/"+self.bcf_dir
 			self.ea_path    = self.path+"/"+self.ea_dir
 			self.psf_path   = self.path+"/"+self.psf_dir
 			self.edisp_path = self.path+"/"+self.edisp_dir
 		else:
+			self.base_path  = self.base_dir
 			self.bcf_path   = self.bcf_dir
 			self.ea_path    = self.ea_dir
 			self.psf_path   = self.psf_dir
@@ -148,7 +150,7 @@ class caldb():
 		self.edisp_file = "edisp_"+name+".fits"
 		
 		# Open calibration database index
-		self.cif = GFits(self.bcf_path+"/caldb.indx", True)
+		self.cif = GFits(self.base_path+"/caldb.indx", True)
 		
 		# If file has no CIF extension than create it now
 		try:
