@@ -60,7 +60,8 @@ if sys.platform.lower().startswith("darwin"):
 # This is required on some system (such as Mac OS X) to avoid problems
 # with finding the shared library during unit testing.
 libcta='ctools'
-if is_unit_test:
+#if is_unit_test:
+if sys.platform.lower().startswith("darwin") and is_unit_test:
 	
 	# Remove any existing symbolic link to libctools.a. This will
 	# prevent any exception in creating the symbolic link due to
