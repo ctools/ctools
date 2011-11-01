@@ -82,18 +82,16 @@ if sys.platform.lower().startswith("darwin") and is_unit_test:
 		print 'WARNING: Failed to create symbolic link to static library. Link dynamically.'
 
 # Set default include directories and data files
-include_dirs  = ['@prefix@/include/gammalib']
-install_files = glob.glob('@top_srcdir@/pyext/*.i')
-library_dirs  = ['../src/.libs']
-libraries     = [libcta,'gamma']
+include_dirs         = ['@prefix@/include/gammalib']
+install_files        = glob.glob('@top_srcdir@/pyext/*.i')
+library_dirs         = ['../src/.libs']
+runtime_library_dirs = ['../src/.libs']
+libraries            = [libcta,'gamma']
 
-# Append prefix library directory if it exists and set default runtime
-# library directories
+# Add install directory to runtime library path
 if os.path.exists('@prefix@/lib'):
 	library_dirs.append('@prefix@/lib')
-	runtime_library_dirs = ['@prefix@/lib']
-else:
-	runtime_library_dirs = []
+	runtime_library_dirs.append('@prefix@/lib')
 
 # Add application include files. The method we use here is not very
 # intelligent as it simple will add all names that start with 'ct'
@@ -118,6 +116,7 @@ for extra_lib_path in extra_lib_paths:
 		dir = extra_lib_path.lstrip().lstrip('-L')
 		if len(dir) > 0:
 			library_dirs.append(dir)
+			runtime_library_dirs.append(dir)
 
 # Get extra include directories
 extra_include_dirs = ('@CPPFLAGS@').split(' ')
