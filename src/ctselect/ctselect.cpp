@@ -586,22 +586,22 @@ std::string ctselect::check_infile(const std::string& filename) const
         std::vector<std::string> missing;
 
         // Check for existence of TIME column
-        if (!table->has("TIME")) {
+        if (!table->hascolumn("TIME")) {
             missing.push_back("TIME");
         }
 
         // Check for existence of ENERGY column
-        if (!table->has("ENERGY")) {
+        if (!table->hascolumn("ENERGY")) {
             missing.push_back("ENERGY");
         }
 
         // Check for existence of RA column
-        if (!table->has("RA")) {
+        if (!table->hascolumn("RA")) {
             missing.push_back("RA");
         }
 
         // Check for existence of DEC column
-        if (!table->has("DEC")) {
+        if (!table->hascolumn("DEC")) {
             missing.push_back("DEC");
         }
 
