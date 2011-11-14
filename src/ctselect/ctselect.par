@@ -5,10 +5,10 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctselect.par                                                  #
-#  Version:   00-02-02                                                      #
+#  Version:   00-03-00                                                      #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
-#             knodlseder@cesr.fr                                            #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
 #             IRAP                                                          #
 #                                                                           #
 #  Purpose:   Parameter file for the ctselect application                   #
@@ -22,13 +22,14 @@ outfile,f, a, "selected_events.fits",,,"Output event data file"
 #
 # Selection parameters
 #=====================
-ra,     r, a,    83.63,   0,360, "RA for ROI centre (degrees)"
-dec,    r, a,    22.01, -90, 90, "Dec for ROI centre (degrees)"
-rad,    r, a,     3.0,    0,180, "Radius of ROI (degrees)"
-tmin,   r, a,     0.0,    0,   , "Start time (MET in s)"
-tmax,   r, a,  1800.0,    0,   , "End time (MET in s)"
-emin,   r, a,     0.1,    0,   , "Lower energy limit (TeV)"
-emax,   r, a,   100.0,    0,   , "Upper energy limit (TeV)"
+ra,   r, a,    83.63,   0,360, "RA for ROI centre (degrees)"
+dec,  r, a,    22.01, -90, 90, "Dec for ROI centre (degrees)"
+rad,  r, a,     3.0,    0,180, "Radius of ROI (degrees)"
+tmin, r, a,     0.0,    0,   , "Start time (CTA MJD in days)"
+tmax, r, a, 10000.0,    0,   , "End time (CTA MJD in days)"
+emin, r, a,     0.1,    0,   , "Lower energy limit (TeV)"
+emax, r, a,   100.0,    0,   , "Upper energy limit (TeV)"
+expr, s, h,      "",     ,   , "Additional selection expression"
 #
 # Standard parameters
 #====================
