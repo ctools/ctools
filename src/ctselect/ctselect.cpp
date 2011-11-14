@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctselect.cpp
  * @brief CTA data selection tool implementation
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -260,6 +260,9 @@ void ctselect::run(void)
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Initialise event filename
+        m_infiles.push_back("");
+
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
 
@@ -268,11 +271,16 @@ void ctselect::run(void)
 
             // Write header for observation
             if (logTerse()) {
-                if (obs->name().length() > 1)
+                if (obs->name().length() > 1) {
                     log.header3("Observation "+obs->name());
-                else
+                }
+                else {
                     log.header3("Observation");
+                }
             }
+
+            // Save event file name (for possible saving)
+            m_infiles[i] = obs->eventfile();
 
             // Get temporary file name
             std::string filename = std::tmpnam(NULL);
@@ -291,7 +299,7 @@ void ctselect::run(void)
 
             // Remove temporary file
             std::remove(filename.c_str());
-
+            
         } // endif: had a CTA observation
 
     } // endfor: looped over all observations
@@ -309,9 +317,14 @@ void ctselect::run(void)
 
 
 /***********************************************************************//**
- * @brief Save simulated observation
+ * @brief Save observation(s) into event file(s)
  *
- * This method saves the results.
+ * This method saves the observation(s) into event file(s). Each input event
+ * file will be saved in a separate output event file. If a single input
+ * event file is present, the "outfile" parameter specifies the filename of
+ * the output event file. For multiple input event files, "outfile" is used
+ * as suffix that is added to the input event file name to create the output
+ * filename.
  ***************************************************************************/
 void ctselect::save(void)
 {
@@ -321,7 +334,7 @@ void ctselect::save(void)
         log.header1("Save observations");
     }
 
-    // Get output filename
+    // Get output filename (or prefix for multiple event files)
     m_outfile = (*this)["outfile"].value();
 
     // Loop over all observation in the container
@@ -333,8 +346,34 @@ void ctselect::save(void)
         // Save only if observation is a CTA observation
         if (obs != NULL) {
 
-            // Save file
-            obs->save(m_outfile, clobber());
+            // Get filename of events file
+            std::string eventfile = m_infiles[i];
+
+            // Set filename of output events file
+            //TODO: we have to strip any path before appending the prefix
+            //We may create a special GTools function for this.
+            std::string outname = m_outfile;
+            if (m_obs.size() > 1) {
+                outname += "_" + eventfile;
+                //TODO: strip .gz suffix
+            }
+
+            // Save observation into output events file
+            obs->save(outname, clobber());
+
+            // Copy over all other extensions that were present in the
+            // input event file
+            GFits infile(eventfile);
+            GFits outfile(outname);
+            for (int extno = 1; extno < infile.size(); ++extno) {
+                GFitsHDU* hdu = infile.hdu(extno);
+                if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
+                    outfile.append(*hdu);
+                }
+            }
+            infile.close();
+            outfile.save(true);
+            outfile.close();
 
         } // endif: observation was valid
 
@@ -349,7 +388,7 @@ void ctselect::save(void)
  * @brief Get application parameters
  *
  * Get all task parameters from parameter file or (if required) by querying
- * the user.
+ * the user. Times are assumed to be in the native CTA MJD format.
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
@@ -379,6 +418,11 @@ void ctselect::get_parameters(void)
     m_tmax = (*this)["tmax"].real();
     m_emin = (*this)["emin"].real();
     m_emax = (*this)["emax"].real();
+    m_expr = (*this)["expr"].string();
+
+    // Derive time interval
+    m_timemin.time(m_tmin, G_CTA_MJDREF, "days");
+    m_timemax.time(m_tmax, G_CTA_MJDREF, "days");
 
     // Return
     return;
@@ -388,45 +432,118 @@ void ctselect::get_parameters(void)
 /***********************************************************************//**
  * @brief Select events
  *
- * @param[in] obs CTA observations.
+ * @param[in] obs CTA observation.
  * @param[in] filename File name.
  *
  * Select events from a FITS file by making use of the selection possibility
- * of the cfitsio library on loading a file.
+ * of the cfitsio library on loading a file. A selection string is created
+ * from the specified criteria that is appended to the filename so that
+ * cfitsio will automatically filter the event data. This selection string
+ * is then applied when opening the FITS file. The opened FITS file is then
+ * saved into a temporary file which is the loaded into the actual CTA
+ * observation, overwriting the old CTA observation. The ROI, GTI and EBounds
+ * of the CTA event list are then set accordingly to the specified selection.
+ * Finally, the temporary file created during this process is removed.
  *
- * @todo Implement an observation read() method to avoid saving the
- *       observation to a temporary file.
+ * Good Time Intervals of the observation will be limited to the time
+ * interval [m_tmin, m_tmax]. If m_tmin=m_tmax=0, no time selection is
+ * performed.
+ *
+ * @todo Add an arbitrary selection string.
+ * @todo Use INDEF instead of 0.0 for pointing as RA/DEC selection
  ***************************************************************************/
 void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 {
     // Allocate selection string
     std::string selection;
+    char        cmin[80];
+    char        cmax[80];
+    char        cra[80];
+    char        cdec[80];
+    char        crad[80];
+
+    // Set requested selections
+    bool select_time = (m_tmin != 0.0 || m_tmax != 0.0);
+
+    // Set RA/DEC selection
+    double ra  = m_ra;
+    double dec = m_dec;
+    if (m_ra == 0.0 && m_dec == 0.0) {
+        GTime time;
+        const GCTAPointing *pnt = obs->pointing(time);
+        ra = pnt->dir().ra_deg();
+        dec = pnt->dir().dec_deg();
+    }
+
+    // Set time selection interval. We make sure here that the time selection
+    // interval cannot be wider than the GTIs covering the data. This is done
+    // using GGti's reduce() method.
+    if (select_time) {
+
+        // Reduce GTIs to specified time interval. The complicated cast is
+        // necessary here because the gti() method is declared const, so
+        // we're not officially allowed to modify the GTIs.
+        ((GGti*)(&obs->events()->gti()))->reduce(m_timemin, m_timemax);
+
+    } // endif: time selection was required
+
+    // Save GTI for later usage
+    GGti gti = obs->events()->gti();
 
     // Make time selection
-    selection = "TIME >= "+str(m_tmin)+" && TIME <= "+str(m_tmax);
-    if (logTerse())
-        log << " Time range ................: " << m_tmin << "-" << m_tmax
-            << std::endl;
-    if (selection.length() > 0)
-        selection += " && ";
+    if (select_time) {
+    
+        // Extract effective time interval in native MJD reference
+        double tmin = gti.tstart().time();
+        double tmax = gti.tstop().time();
+
+        // Format time with sufficient accuracy and add to selection string
+        sprintf(cmin, "%.8f", tmin);
+        sprintf(cmax, "%.8f", tmax);
+        selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
+        if (logTerse()) {
+            log << " Time range ................: " << tmin << "-" << tmax
+                << std::endl;
+        }
+        if (selection.length() > 0) {
+            selection += " && ";
+        }
+    }
 
     // Make energy selection
-    selection += "ENERGY >= "+str(m_emin)+" && ENERGY <= "+str(m_emax);
-    if (logTerse())
+    sprintf(cmin, "%.8f", m_emin);
+    sprintf(cmax, "%.8f", m_emax);
+    selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+std::string(cmax);
+    if (logTerse()) {
         log << " Energy range ..............: " << m_emin << "-" << m_emax
             << " TeV" << std::endl;
-    if (selection.length() > 0)
+    }
+    if (selection.length() > 0) {
         selection += " && ";
+    }
 
     // Make ROI selection
-    selection += "ANGSEP("+str(m_ra)+","+str(m_dec)+",RA,DEC) <= "+str(m_rad);
+    sprintf(cra,  "%.6f", ra);
+    sprintf(cdec, "%.6f", dec);
+    sprintf(crad, "%.6f", m_rad);
+    selection += "ANGSEP("+std::string(cra)+"," +
+                 std::string(cdec)+",RA,DEC) <= " +
+                 std::string(crad);
     if (logTerse()) {
-        log << " Acceptance cone centre ....: RA=" << m_ra << ", DEC=" << m_dec
+        log << " Acceptance cone centre ....: RA=" << ra << ", DEC=" << dec
             << " deg" << std::endl;
         log << " Acceptance cone radius ....: " << m_rad << " deg" << std::endl;
     }
     if (logTerse())
         log << " cfitsio selection .........: " << selection << std::endl;
+
+    // Add additional expression
+    if (strip_whitespace(m_expr).length() > 0) {
+        if (selection.length() > 0) {
+            selection += " && ";
+        }
+        selection += "("+strip_whitespace(m_expr)+")";
+    }
 
     // Build input filename including selection expression
     std::string expression = filename;
@@ -460,18 +577,12 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Set ROI
     GCTARoi     roi;
     GCTAInstDir instdir;
-    instdir.radec_deg(m_ra, m_dec);
+    instdir.radec_deg(ra, dec);
     roi.centre(instdir);
     roi.radius(m_rad);
     list->roi(roi);
 
     // Set GTI
-    GGti  gti;
-    GTime tstart;
-    GTime tstop;
-    tstart.met(m_tmin);
-    tstop.met(m_tmax);
-    gti.append(tstart, tstop);
     list->gti(gti);
 
     // Set energy boundaries
@@ -506,6 +617,9 @@ void ctselect::init_members(void)
     m_infile.clear();
     m_outfile.clear();
     m_obs.clear();
+    m_infiles.clear();
+    m_timemin.clear();
+    m_timemax.clear();
     m_ra   = 0.0;
     m_dec  = 0.0;
     m_rad  = 0.0;
@@ -533,6 +647,9 @@ void ctselect::copy_members(const ctselect& app)
     m_infile  = app.m_infile;
     m_outfile = app.m_outfile;
     m_obs     = app.m_obs;
+    m_infiles = app.m_infiles;
+    m_timemin = app.m_timemin;
+    m_timemax = app.m_timemax;
     m_ra      = app.m_ra;
     m_dec     = app.m_dec;
     m_rad     = app.m_rad;

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,19 +21,21 @@
 /**
  * @file ctselect.hpp
  * @brief CTA data selection tool definition
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 #ifndef CTSELECT_HPP
 #define CTSELECT_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <vector>
+#include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "00-02-03"
+#define CTSELECT_VERSION "00-03-00"
 
 
 /***********************************************************************//**
@@ -70,18 +72,22 @@ protected:
     std::string check_infile(const std::string& filename) const;
 
     // User parameters
-    std::string   m_infile;     //!< Input event list
-    std::string   m_outfile;    //!< Output event list
-    double        m_ra;         //!< RA of ROI centre
-    double        m_dec;        //!< DEC of ROI centre
-    double        m_rad;        //!< ROI radius
-    double        m_tmin;       //!< Start time
-    double        m_tmax;       //!< Stop time
-    double        m_emin;       //!< Lower energy
-    double        m_emax;       //!< Upper energy
+    std::string m_infile;     //!< Input event list
+    std::string m_outfile;    //!< Output event list
+    double      m_ra;         //!< RA of ROI centre
+    double      m_dec;        //!< DEC of ROI centre
+    double      m_rad;        //!< ROI radius
+    double      m_tmin;       //!< Start time
+    double      m_tmax;       //!< Stop time
+    double      m_emin;       //!< Lower energy
+    double      m_emax;       //!< Upper energy
+    std::string m_expr;       //!< Selection expression
 
     // Protected members
-    GObservations m_obs;        //!< Observations container
+    GObservations            m_obs;       //!< Observations container
+    std::vector<std::string> m_infiles;   //!< Input event filenames
+    GTime                    m_timemin;   //!< Earliest time
+    GTime                    m_timemax;   //!< Latest time
 };
 
 #endif /* CTSELECT_HPP */
