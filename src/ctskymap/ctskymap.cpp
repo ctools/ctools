@@ -1,7 +1,7 @@
 /***************************************************************************
  *                     ctskymap - CTA sky mapping tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2011 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctskymap.cpp
  * @brief CTA sky mapping tool implementation
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -419,8 +419,7 @@ void ctskymap::init_map(GCTAObservation* obs)
 
 
         // Get pointer on CTA pointing
-        const GTime         srcTime; // Dummy time
-        const GCTAPointing *pnt = obs->pointing(srcTime);
+        const GCTAPointing *pnt = obs->pointing();
         if (pnt == NULL) {
             throw GCTAException::no_pointing(G_INIT_MAP);
         }

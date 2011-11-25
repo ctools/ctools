@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctbin.hpp
  * @brief CTA data binning tool definition
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 #ifndef CTBIN_HPP
@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "00-02-02"
+#define CTBIN_VERSION "00-03-00"
 
 
 /***********************************************************************//**

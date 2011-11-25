@@ -1,7 +1,7 @@
 /***************************************************************************
  *                     ctskymap - CTA sky mapping tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctskymap.hpp
  * @brief CTA sky mapping tool definition
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 #ifndef CTSKYMAP_HPP

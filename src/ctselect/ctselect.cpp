@@ -469,8 +469,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     double ra  = m_ra;
     double dec = m_dec;
     if (m_ra == 0.0 && m_dec == 0.0) {
-        GTime time;
-        const GCTAPointing *pnt = obs->pointing(time);
+        const GCTAPointing *pnt = obs->pointing();
         ra = pnt->dir().ra_deg();
         dec = pnt->dir().dec_deg();
     }

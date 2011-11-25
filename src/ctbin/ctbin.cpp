@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctbin.cpp
  * @brief CTA data binning tool implementation
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -437,10 +437,10 @@ void ctbin::bin_events(GCTAObservation* obs)
         else {
             
             // Get pointer on CTA pointing
-            const GTime         srcTime; // Dummy time
-            const GCTAPointing *pnt = obs->pointing(srcTime);
-            if (pnt == NULL)
+            const GCTAPointing *pnt = obs->pointing();
+            if (pnt == NULL) {
                 throw GCTAException::no_pointing(G_BIN_EVENTS);
+            }
             
             // Set reference point to pointing
             if (toupper(m_coordsys) == "GAL") {

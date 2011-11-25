@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctobssim - CTA observation simulator tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011 by Jurgen Knodlseder                                *
+ *  copyright (C) 2011 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctobssim.cpp
  * @brief CTA observation simulator tool implementation
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -497,15 +497,17 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
         // pointings implement we just determine the pointing from the
         // beginning of the observation. Throw an exception if the pointing
         // is not defined.
-        GCTAPointing* pnt = obs->pointing(obs->events()->tstart());
-        if (pnt == NULL)
+        GCTAPointing* pnt = obs->pointing();
+        if (pnt == NULL) {
             throw GCTAException::no_pointing(G_SIMULATE_SOURCE);
+        }
 
         // Get pointer on CTA response. Throw an exception if the response
         // is not defined.
         GCTAResponse* rsp = obs->response();
-        if (rsp == NULL)
+        if (rsp == NULL) {
             throw GCTAException::no_response(G_SIMULATE_SOURCE);
+        }
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.

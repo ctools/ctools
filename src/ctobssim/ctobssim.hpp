@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctobssim - CTA observation simulator tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011 by Jurgen Knodlseder                                *
+ *  copyright (C) 2011 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctobssim.hpp
  * @brief CTA observation simulator tool definition
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 #ifndef CTOBSSIM_HPP
@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-03-00"
+#define CTOBSSIM_VERSION "00-03-01"
 
 
 /***********************************************************************//**
