@@ -452,7 +452,7 @@ class caldb():
 		# calls of this method
 		#
 		# ENERG_LO
-		if not hdu.has("ENERG_LO"):
+		if not hdu.hascolumn("ENERG_LO"):
 			hdu.append_column(GFitsTableFloatCol("ENERG_LO", 1, neng))
 			hdu["ENERG_LO"].unit("TeV")
 			for ieng in range(neng):
@@ -460,7 +460,7 @@ class caldb():
 				hdu["ENERG_LO"][0,ieng] = e_lo
 		#
 		# ENERG_HI
-		if not hdu.has("ENERG_HI"):
+		if not hdu.hascolumn("ENERG_HI"):
 			hdu.append_column(GFitsTableFloatCol("ENERG_HI", 1, neng))
 			hdu["ENERG_HI"].unit("TeV")
 			for ieng in range(neng):
@@ -468,7 +468,7 @@ class caldb():
 				hdu["ENERG_HI"][0,ieng] = e_hi
 		#
 		# THETA_LO
-		if not hdu.has("THETA_LO"):
+		if not hdu.hascolumn("THETA_LO"):
 			hdu.append_column(GFitsTableFloatCol("THETA_LO", 1, noffset))
 			hdu["THETA_LO"].unit("deg")
 			for ioff in range(noffset):
@@ -477,7 +477,7 @@ class caldb():
 
 		#
 		# THETA_LO
-		if not hdu.has("THETA_HI"):
+		if not hdu.hascolumn("THETA_HI"):
 			hdu.append_column(GFitsTableFloatCol("THETA_HI", 1, noffset))
 			hdu["THETA_HI"].unit("deg")
 			for ioff in range(noffset):
@@ -485,7 +485,7 @@ class caldb():
 				hdu["THETA_HI"][0,ioff] = o_hi
 		#
 		# "NAME"
-		if not hdu.has(name):
+		if not hdu.hascolumn(name):
 			hdu.append_column(GFitsTableFloatCol(name, 1, neng*noffset))
 			hdu[name].unit(unit)
 			hdu[name].dim([neng, noffset])
@@ -593,8 +593,10 @@ if __name__ == '__main__':
 	CTA response.
 	"""
 	# Set ROOT filename
-	path     = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/IFAEOffaxis"
-	irf      = "SubarrayE_offaxis.root"
+	#path     = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/IFAEOffaxis"
+	#irf      = "SubarrayE_offaxis.root"
+	path     = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/IFAEOffaxisPerformanceBEI_Nov2011"
+	irf      = "SubarrayE_IFAE_50hours_20111121_offaxis.root"
 	filename = path+"/"+irf
 
 	# Allocate caldb
