@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2012 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -229,8 +229,9 @@ void ctlike::execute(void)
 void ctlike::run(void)
 {
     // Switch screen logging on in debug mode
-    if (logDebug())
+    if (logDebug()) {
         log.cout(true);
+    }
 
     // Get parameters
     get_parameters();
@@ -244,10 +245,12 @@ void ctlike::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Observations");
-        else
+        }
+        else {
             log.header1("Observation");
+        }
         log << m_obs << std::endl;
     }
 
@@ -283,8 +286,9 @@ void ctlike::save(void)
     m_outmdl = (*this)["outmdl"].value();
 
     // Write results out as XML model
-    if (toupper(m_outmdl) != "NONE")
+    if (toupper(m_outmdl) != "NONE") {
         m_obs.models().save(m_outmdl);
+    }
 
     // Return
     return;
@@ -294,24 +298,76 @@ void ctlike::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * GException::par_error
- *             Invalid analysis method specified (neither BINNED nor UNBINNED).
- *
  * Get all required task parameters from the parameter file or (if specified)
  * by querying the user. Observation dependent parameters will only be read
  * if the observation container is actually empty. Observation dependent
  * parameters are:
- * "method" (analysis method),
  * "stat" (statistics to be used for observation),
  * "caldb" (calibration database),
- * "irf" (instrument response function),
- * "evfile" (event file name), and
- * "cntmap" (counts map file name).
+ * "irf" (instrument response function), and
+ * "infile" (input file name).
  * The model will only be loaded if no model components exist in the
  * observation container.
+ *
+ * This method handles both loading of FITS files and of handling XML
+ * observation definition files.
  ***************************************************************************/
 void ctlike::get_parameters(void)
 {
+    // If there are no observations in container then add a single CTA
+    // observation using the parameters from the parameter file
+    if (m_obs.size() == 0) {
+
+        // Allocate CTA observation
+        GCTAObservation obs;
+
+        // Get event file name
+        std::string filename = (*this)["infile"].filename();
+
+        // Try first to open as unbinned FITS file
+        try {
+
+            // Determine whether FITS file has EVENTS extension
+            GFits file(filename);
+            bool  is_unbinned = file.hashdu("EVENTS");
+            file.close();
+
+            // If FITS file has an events header then load as unbinned
+            if (is_unbinned) {
+                obs.load_unbinned(filename);
+            }
+
+            // ... otherwise load as binned
+            else {
+                obs.load_binned(filename);
+            }
+
+            // Get task parameters for event file loading
+            m_stat  = toupper((*this)["stat"].string());
+            m_caldb = (*this)["caldb"].string();
+            m_irf   = (*this)["irf"].string();
+
+            // Set statistics
+            obs.statistics(m_stat);
+
+            // Set reponse
+            obs.response(m_irf, m_caldb);
+
+            // Append observation to container
+            m_obs.append(obs);
+
+        }
+
+        // ... otherwise try to open as XML file
+        catch (GException::fits_open_error) {
+
+            // Load observations from XML file
+            m_obs.load(filename);
+
+        }
+
+    } // endif: there was no observation in the container
+
     // If there is are no models associated with the observations then
     // load now the model definition
     if (m_obs.models().size() == 0) {
@@ -323,46 +379,6 @@ void ctlike::get_parameters(void)
         m_obs.models(GModels(filename));
 
     } // endif: no models were associated with observations
-
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
-    if (m_obs.size() == 0) {
-
-        // Get observation parameters
-        m_method = toupper((*this)["method"].string());
-        m_stat   = toupper((*this)["stat"].string());
-        m_caldb  = (*this)["caldb"].string();
-        m_irf    = (*this)["irf"].string();
-
-        // Case A: set-up unbinned CTA observation
-        if (m_method == "UNBINNED") {
-
-            // Get event file name
-            std::string filename = (*this)["evfile"].filename();
-
-            // Load and append unbinned CTA observation
-            load_unbinned(filename);
-
-        } // endif: unbinned analysis mode
-
-        // Case B: set-up binned CTA observation
-        else if (m_method == "BINNED") {
-
-            // Get counts map file name
-            std::string filename = (*this)["cntmap"].filename();
-
-            // Load and append binned CTA observation
-            load_binned(filename);
-
-        } // endif: binned analysis mode
-
-        // ... otherwise signal an invalid analysis method
-        else {
-            throw GException::par_error(G_GET_PARAMETERS, "method", 
-                  "only \"BINNED\" or \"UNBINNED\" supported.");
-        }
-
-    } // endif: there was no observation in the container
 
     // Get standard parameters
     m_refit  = (*this)["refit"].boolean();
@@ -404,8 +420,9 @@ void ctlike::optimize_lm(void)
     m_obs.optimize(*opt);
 
     // Optionally refit
-    if (m_refit)
+    if (m_refit) {
         m_obs.optimize(*opt);
+    }
 
     // Store maximum log likelihood value
     m_logL = -(opt->value());
@@ -417,60 +434,6 @@ void ctlike::optimize_lm(void)
         log.header1("Maximum likelihood optimization results");
         log << *opt << std::endl;
     }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Load unbinned observation and append it to observations container
- *
- * @param[in] evfile Events file name.
- ***************************************************************************/
-void ctlike::load_unbinned(const std::string& evfile)
-{
-    // Declare CTA observation
-    GCTAObservation obs;
-
-    // Set statistics
-    obs.statistics(m_stat);
-
-    // Load data
-    obs.load_unbinned(evfile);
-
-    // Set reponse
-    obs.response(m_irf, m_caldb);
-
-    // Append observation to contained
-    m_obs.append(obs);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Load binned observation and append it to observations container
- *
- * @param[in] cntmap Counts map file name.
- ***************************************************************************/
-void ctlike::load_binned(const std::string& cntmap)
-{
-    // Declare CTA observation
-    GCTAObservation obs;
-
-    // Set statistics
-    obs.statistics(m_stat);
-
-    // Load data
-    obs.load_binned(cntmap);
-
-    // Set reponse
-    obs.response(m_irf, m_caldb);
-
-    // Append observation to contained
-    m_obs.append(obs);
 
     // Return
     return;
@@ -489,7 +452,7 @@ void ctlike::load_binned(const std::string& cntmap)
 void ctlike::init_members(void)
 {
     // Initialise members
-    m_method.clear();
+    //m_method.clear();
     m_stat.clear();
     m_caldb.clear();
     m_irf.clear();
@@ -517,7 +480,7 @@ void ctlike::init_members(void)
 void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
-    m_method    = app.m_method;
+    //m_method    = app.m_method;
     m_stat      = app.m_stat;
     m_refit     = app.m_refit;
     m_caldb     = app.m_caldb;
@@ -546,8 +509,9 @@ void ctlike::free_members(void)
     m_opt = NULL;
 
     // Write separator into logger
-    if (logTerse())
+    if (logTerse()) {
         log << std::endl;
+    }
 
     // Return
     return;
