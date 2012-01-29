@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all ctools
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2012 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,10 +158,9 @@ echo " ok"
 # Test ctlike
 # ===========
 echo -n "Test ctlike: "
-$ctlike cntmap="cntmap.fits" \
+$ctlike infile="cntmap.fits" \
         srcmdl="data/crab.xml" \
         outmdl="results_binned.xml" \
-        method="BINNED" \
         caldb="irf" \
         irf="kb_E_50h_v3"
 echo -n "."
@@ -172,10 +171,9 @@ else
   echo " results_binned.xml file is not valid"
   exit 1
 fi
-$ctlike evfile="selected_events.fits" \
+$ctlike infile="selected_events.fits" \
         srcmdl="data/crab.xml" \
         outmdl="results_unbinned.xml" \
-        method="UNBINNED" \
         caldb="irf" \
         irf="kb_E_50h_v3"
 echo -n "."
