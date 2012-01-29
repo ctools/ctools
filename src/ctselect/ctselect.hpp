@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -70,10 +70,17 @@ protected:
     void        copy_members(const ctselect& app);
     void        free_members(void);
     std::string check_infile(const std::string& filename) const;
+    std::string set_outfile_name(const std::string& filename) const;
+    void        save_fits(void);
+    void        save_xml(void);
+    void        save_event_list(const GCTAObservation* obs,
+                                const std::string&     infile,
+                                const std::string&     outfile) const;
 
     // User parameters
-    std::string m_infile;     //!< Input event list
-    std::string m_outfile;    //!< Output event list
+    std::string m_infile;     //!< Input event list or XML file
+    std::string m_outfile;    //!< Output event list or XML file
+    std::string m_prefix;     //!< Prefix for multiple event lists
     double      m_ra;         //!< RA of ROI centre
     double      m_dec;        //!< DEC of ROI centre
     double      m_rad;        //!< ROI radius
@@ -88,6 +95,7 @@ protected:
     std::vector<std::string> m_infiles;   //!< Input event filenames
     GTime                    m_timemin;   //!< Earliest time
     GTime                    m_timemax;   //!< Latest time
+    bool                     m_use_xml;   //!< Use XML file instead of FITS file
 };
 
 #endif /* CTSELECT_HPP */

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -93,7 +93,7 @@ ctselect::ctselect(GObservations obs) : GApplication(CTSELECT_NAME, CTSELECT_VER
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctselect::ctselect(int argc, char *argv[]) : 
-                    GApplication(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
+                   GApplication(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -232,8 +232,9 @@ void ctselect::execute(void)
 void ctselect::run(void)
 {
     // Switch screen logging on in debug mode
-    if (logDebug())
+    if (logDebug()) {
         log.cout(true);
+    }
 
     // Get parameters
     get_parameters();
@@ -257,10 +258,13 @@ void ctselect::run(void)
         log.header1("Event selection");
     }
 
+    // Initialise counters
+    int n_observations = 0;
+
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
-        // Initialise event filename
+        // Initialise event input and output filenames
         m_infiles.push_back("");
 
         // Get CTA observation
@@ -278,6 +282,9 @@ void ctselect::run(void)
                     log.header3("Observation");
                 }
             }
+
+            // Increment counter
+            n_observations++;
 
             // Save event file name (for possible saving)
             m_infiles[i] = obs->eventfile();
@@ -304,6 +311,12 @@ void ctselect::run(void)
 
     } // endfor: looped over all observations
 
+    // If more than a single observation has been handled then make sure that
+    // an XML file will be used for storage
+    if (n_observations > 1) {
+        m_use_xml = true;
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -317,14 +330,23 @@ void ctselect::run(void)
 
 
 /***********************************************************************//**
- * @brief Save observation(s) into event file(s)
+ * @brief Save the selected event list(s)
  *
- * This method saves the observation(s) into event file(s). Each input event
- * file will be saved in a separate output event file. If a single input
- * event file is present, the "outfile" parameter specifies the filename of
- * the output event file. For multiple input event files, "outfile" is used
- * as suffix that is added to the input event file name to create the output
- * filename.
+ * This method saves the selected event list(s) into FITS file(s). There are
+ * two modes, depending on the m_use_xml flag.
+ *
+ * If m_use_xml is true, all selected event list(s) will be saved into FITS
+ * files, where the output filenames are constructued from the input
+ * filenames by prepending the m_prefix string to name. Any path information
+ * will be stripped form the input name, hence event files will be written
+ * into the local working directory (unless some path information is present
+ * in the prefix). In addition, an XML file will be created that gathers
+ * the filename information for the selected event list(s). If an XML file
+ * was present on input, all metadata information will be copied from this
+ * input file.
+ *
+ * If m_use_xml is false, the selected event list will be saved into a FITS
+ * file.
  ***************************************************************************/
 void ctselect::save(void)
 {
@@ -334,50 +356,15 @@ void ctselect::save(void)
         log.header1("Save observations");
     }
 
-    // Get output filename (or prefix for multiple event files)
-    m_outfile = (*this)["outfile"].value();
+    // Case A: Save event file(s) and XML metadata information
+    if (m_use_xml) {
+        save_xml();
+    }
 
-    // Loop over all observation in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
-
-        // Save only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Get filename of events file
-            std::string eventfile = m_infiles[i];
-
-            // Set filename of output events file
-            //TODO: we have to strip any path before appending the prefix
-            //We may create a special GTools function for this.
-            std::string outname = m_outfile;
-            if (m_obs.size() > 1) {
-                outname += "_" + eventfile;
-                //TODO: strip .gz suffix
-            }
-
-            // Save observation into output events file
-            obs->save(outname, clobber());
-
-            // Copy over all other extensions that were present in the
-            // input event file
-            GFits infile(eventfile);
-            GFits outfile(outname);
-            for (int extno = 1; extno < infile.size(); ++extno) {
-                GFitsHDU* hdu = infile.hdu(extno);
-                if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
-                    outfile.append(*hdu);
-                }
-            }
-            infile.close();
-            outfile.save(true);
-            outfile.close();
-
-        } // endif: observation was valid
-
-    } // endfor: looped over observations
+    // Case B: Save event file as FITS file
+    else {
+        save_fits();
+    }
 
     // Return
     return;
@@ -389,6 +376,10 @@ void ctselect::save(void)
  *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Times are assumed to be in the native CTA MJD format.
+ *
+ * This method also loads observations if no observations are yet allocated.
+ * Observations are either loaded from a single CTA even list, or from a
+ * XML file using the metadata information that is stored in that file.
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
@@ -402,11 +393,30 @@ void ctselect::get_parameters(void)
         // Allocate CTA observation
         GCTAObservation obs;
 
-        // Load CTA observation from file
-        obs.load_unbinned(m_infile);
+        // Try first to open as FITS file
+        try {
 
-        // Append CTA observation to container
-        m_obs.append(obs);
+            // Load event list in CTA observation
+            obs.load_unbinned(m_infile);
+
+            // Append CTA observation to container
+            m_obs.append(obs);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+            
+        }
+        
+        // ... otherwise try to open as XML file
+        catch (GException::fits_open_error) {
+
+            // Load observations from XML file
+            m_obs.load(m_infile);
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+        }
 
     } // endif: there was no observation in the container
 
@@ -612,13 +622,10 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
  ***************************************************************************/
 void ctselect::init_members(void)
 {
-    // Initialise members
+    // Initialise parameters
     m_infile.clear();
     m_outfile.clear();
-    m_obs.clear();
-    m_infiles.clear();
-    m_timemin.clear();
-    m_timemax.clear();
+    m_infile.clear();
     m_ra   = 0.0;
     m_dec  = 0.0;
     m_rad  = 0.0;
@@ -626,6 +633,14 @@ void ctselect::init_members(void)
     m_tmax = 0.0;
     m_emin = 0.0;
     m_emax = 0.0;
+    m_expr.clear();
+
+    // Initialise protected members
+    m_obs.clear();
+    m_infiles.clear();
+    m_timemin.clear();
+    m_timemax.clear();
+    m_use_xml = false;
 
     // Set logger properties
     log.date(true);
@@ -642,13 +657,10 @@ void ctselect::init_members(void)
  ***************************************************************************/
 void ctselect::copy_members(const ctselect& app)
 {
-    // Copy attributes
+    // Copy parameters
     m_infile  = app.m_infile;
     m_outfile = app.m_outfile;
-    m_obs     = app.m_obs;
-    m_infiles = app.m_infiles;
-    m_timemin = app.m_timemin;
-    m_timemax = app.m_timemax;
+    m_infile  = app.m_infile;
     m_ra      = app.m_ra;
     m_dec     = app.m_dec;
     m_rad     = app.m_rad;
@@ -656,7 +668,15 @@ void ctselect::copy_members(const ctselect& app)
     m_tmax    = app.m_tmax;
     m_emin    = app.m_emin;
     m_emax    = app.m_emax;
+    m_expr    = app.m_expr;
 
+    // Copy protected members
+    m_obs      = app.m_obs;
+    m_infiles  = app.m_infiles;
+    m_timemin  = app.m_timemin;
+    m_timemax  = app.m_timemax;
+    m_use_xml  = app.m_use_xml;
+    
     // Return
     return;
 }
@@ -668,8 +688,9 @@ void ctselect::copy_members(const ctselect& app)
 void ctselect::free_members(void)
 {
     // Write separator into logger
-    if (logTerse())
+    if (logTerse()) {
         log << std::endl;
+    }
 
     // Return
     return;
@@ -741,5 +762,142 @@ std::string ctselect::check_infile(const std::string& filename) const
 
     // Return
     return message;
+}
+
+
+/***********************************************************************//**
+ * @brief Set output file name.
+ *
+ * @param[in] filename Input file name.
+ *
+ * This converts an input filename into an output filename by prepending a
+ * prefix to the input filename. Any path will be stripped from the input
+ * filename.
+ ***************************************************************************/
+std::string ctselect::set_outfile_name(const std::string& filename) const
+{
+    // Split input filename into path elements
+    std::vector<std::string> elements = split(filename, "/");
+
+    // The last path element is the filename
+    std::string outname = m_prefix + elements[elements.size()-1];
+    
+    // Return output filename
+    return outname;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list in FITS format.
+ *
+ * Save the event list as a FITS file. The filename of the FITS file is
+ * specified by the outfile parameter.
+ ***************************************************************************/
+void ctselect::save_fits(void)
+{
+    // Get output filename
+    m_outfile = (*this)["outfile"].value();
+
+    // Get CTA observation from observation container
+    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[0]);
+
+    // Save event list
+    save_event_list(obs, m_infiles[0], m_outfile);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list(s) in XML format.
+ *
+ * Save the event list(s) into FITS files and write the file path information
+ * into a XML file. The filename of the XML file is specified by the outfile
+ * parameter, the filename(s) of the event lists are built by prepending a
+ * prefix to the input event list filenames. Any path present in the input
+ * filename will be stripped, i.e. the event list(s) will be written in the
+ * local working directory (unless a path is specified in the prefix).
+ ***************************************************************************/
+void ctselect::save_xml(void)
+{
+    // Get output filename and prefix
+    m_outfile = (*this)["outfile"].value();
+    m_prefix  = (*this)["prefix"].value();
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+
+        // Handle only CTA observations
+        if (obs != NULL) {
+
+            // Set event output file name
+            std::string outfile = set_outfile_name(m_infiles[i]);
+
+            // Store output file name in observation
+            obs->eventfile(outfile);
+
+            // Save event list
+            save_event_list(obs, m_infiles[i], outfile);
+
+        } // endif: observation was a CTA observations
+
+    } // endfor: looped over observations
+
+    // Save observations in XML file
+    m_obs.save(m_outfile);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list into FITS file
+ *
+ * @param[in] obs Pointer to CTA observation.
+ * @param[in] infile Input file name.
+ * @param[in] outfile Output file name.
+ *
+ * Saves an event list into a FITS file and copy all others extensions from
+ * the input file to the output file.
+ ***************************************************************************/
+void ctselect::save_event_list(const GCTAObservation* obs,
+                               const std::string&     infile,
+                               const std::string&     outfile) const
+{
+    // Save only if observation is valid
+    if (obs != NULL) {
+
+        // Save observation into FITS file
+        obs->save(outfile, clobber());
+
+        // Copy all extensions other than EVENTS and GTI from the input to
+        // the output event list. The EVENTS and GTI extensions are written
+        // by the save method, all others that may eventually be present
+        // have to be copied by hand.
+        GFits infits(infile);
+        GFits outfits(outfile);
+        for (int extno = 1; extno < infits.size(); ++extno) {
+            GFitsHDU* hdu = infits.hdu(extno);
+            if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
+                outfits.append(*hdu);
+            }
+        }
+
+        // Close input file
+        infits.close();
+
+        // Save file to disk and close it (we need both operations)
+        outfits.save(true);
+        outfits.close();
+
+    } // endif: observation was valid
+
+    // Return
+    return;
 }
 
