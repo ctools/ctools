@@ -113,10 +113,9 @@ def pipeline_v1():
 	# Perform maximum likelihood fitting
 	like = ctlike()
 	like.logFileOpen()  # We need this to explicitely open the log file in Python mode
-	like["cntmap"].filename(cntmap_name)
+	like["infile"].filename(cntmap_name)
 	like["srcmdl"].filename(model_name)
 	like["outmdl"].filename(result_name)
-	like["method"].string("BINNED")
 	like["caldb"].string(caldb)
 	like["irf"].string(irf)
 	like.execute()
