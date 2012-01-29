@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2012 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTLIKE_NAME    "ctlike"
-#define CTLIKE_VERSION "00-02-03"
+#define CTLIKE_VERSION "00-03-00"
 
 
 /***********************************************************************//**
@@ -63,8 +63,6 @@ public:
     GOptimizer*    opt(void) { return m_opt; }
     void           get_parameters(void);
     void           optimize_lm(void);
-    void           load_unbinned(const std::string& evfile);
-    void           load_binned(const std::string& cntmap);
 
 protected:
     // Protected methods
@@ -73,7 +71,6 @@ protected:
     void free_members(void);
 
     // User parameters
-    std::string   m_method;     //!< Likelihood fitting method (binned/unbinned)
     std::string   m_stat;       //!< Optimisation statistics (poisson/gaussian)
     bool          m_refit;      //!< Refitting
     std::string   m_caldb;      //!< Calibration database
