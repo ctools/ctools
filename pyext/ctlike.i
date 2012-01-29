@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2012 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -54,8 +54,6 @@ public:
     GOptimizer*    opt(void);
     void           get_parameters(void);
     void           optimize_lm(void);
-    void           load_unbinned(const std::string& evfile);
-    void           load_binned(const std::string& cntmap);
 };
 
 
