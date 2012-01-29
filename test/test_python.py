@@ -93,10 +93,9 @@ def pipeline_v1():
 	# Perform maximum likelihood fitting
 	like = ctlike()
 	like.logFileOpen()
-	like["evfile"].filename(selected_events_name)
+	like["infile"].filename(selected_events_name)
 	like["srcmdl"].filename(model_name)
 	like["outmdl"].filename(result_name)
-	like["method"].string("UNBINNED")
 	like["caldb"].string(caldb)
 	like["irf"].string(irf)
 	like.execute()
