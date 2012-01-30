@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -41,7 +41,11 @@
  *
  * @brief CTA data binning tool interface defintion
  *
- * This class bins CTA events into a counts map.
+ * This class bins CTA event list(s) into a counts map(s). The class can
+ * operate on predefined observation containers, on individual event list
+ * FITS files, and on observation definition XML files. Results are stored
+ * in an observation container that can be written to disk in form of FITS
+ * files (counts maps) and an updated observation definition file.
  ***************************************************************************/
 class ctbin : public GApplication  {
 public:
@@ -66,26 +70,34 @@ public:
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctbin& app);
-    void free_members(void);
+    void           init_members(void);
+    void           copy_members(const ctbin& app);
+    void           free_members(void);
+    std::string    set_outfile_name(const std::string& filename) const;
+    void           save_fits(void);
+    void           save_xml(void);
+    void           save_counts_map(const GCTAObservation* obs,
+                                   const std::string&     outfile) const;
 
     // User parameters
-    std::string   m_evfile;     //!< Input event list
-    std::string   m_outfile;    //!< Output counts map
-    double        m_emin;       //!< Lower energy
-    double        m_emax;       //!< Upper energy
-    int           m_enumbins;   //!< Number of energy bins
-    std::string   m_proj;       //!< WCS projection
-    std::string   m_coordsys;   //!< Coordinate system
-    double        m_xref;       //!< Longitude reference coordinate
-    double        m_yref;       //!< Latitude reference coordinate
-    double        m_binsz;      //!< Pixel size
-    int           m_nxpix;      //!< Number of pixels in longitude
-    int           m_nypix;      //!< Number of pixels in latitude
+    std::string              m_evfile;   //!< Input event list or XML file
+    std::string              m_outfile;  //!< Output counts map or XML file
+    std::string              m_prefix;   //!< Prefix for multiple counts maps
+    double                   m_emin;     //!< Lower energy
+    double                   m_emax;     //!< Upper energy
+    int                      m_enumbins; //!< Number of energy bins
+    std::string              m_proj;     //!< WCS projection
+    std::string              m_coordsys; //!< Coordinate system
+    double                   m_xref;     //!< Longitude reference coordinate
+    double                   m_yref;     //!< Latitude reference coordinate
+    double                   m_binsz;    //!< Pixel size
+    int                      m_nxpix;    //!< Number of pixels in longitude
+    int                      m_nypix;    //!< Number of pixels in latitude
 
     // Protected members
-    GObservations m_obs;        //!< Observation container
+    GObservations            m_obs;      //!< Observation container
+    std::vector<std::string> m_infiles;  //!< Input event filenames
+    bool                     m_use_xml;  //!< Use XML file instead of FITS file
 };
 
 #endif /* CTBIN_HPP */

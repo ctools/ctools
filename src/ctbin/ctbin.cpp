@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -198,8 +198,11 @@ void ctbin::clear(void)
 /***********************************************************************//**
  * @brief Execute application
  *
- * This method bins the events data into a counts maps and saves the counts
- * map into a FITS file.
+ * This is the main execution method of the ctbin class. It is invoked when
+ * the executable is called from command line.
+ *
+ * The method reads the task parameters, bins the event list(s) into counts
+ * map(s), and writes the results into FITS files on disk.
  ***************************************************************************/
 void ctbin::execute(void)
 {
@@ -220,14 +223,20 @@ void ctbin::execute(void)
 
 /***********************************************************************//**
  * @brief Bin the event data
+ *
+ * This method loops over all observations found in the observation conatiner
+ * and bins all events from the event list(s) into counts map(s). Note that
+ * each event list is binned in a separate counts map, hence no summing of
+ * events is done.
  ***************************************************************************/
 void ctbin::run(void)
 {
-    // Switch screen logging on in debug mode
-    if (logDebug())
+    // If we're in debug mode then all output is also dumped on the screen
+    if (logDebug()) {
         log.cout(true);
+    }
 
-    // Get parameters
+    // Get task parameters
     get_parameters();
 
     // Write parameters into logger
@@ -239,24 +248,34 @@ void ctbin::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Observations");
-        else
+        }
+        else {
             log.header1("Observation");
+        }
         log << m_obs << std::endl;
     }
 
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Bin observations");
-        else
+        }
+        else {
             log.header1("Bin observation");
+        }
     }
 
-    // Loop over all observation in the container
+    // Initialise observation counter
+    int n_observations = 0;
+
+    // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Initialise event input and output filenames
+        m_infiles.push_back("");
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
@@ -266,11 +285,19 @@ void ctbin::run(void)
 
             // Write header for observation
             if (logTerse()) {
-                if (obs->name().length() > 1)
+                if (obs->name().length() > 1) {
                     log.header3("Observation "+obs->name());
-                else
+                }
+                else {
                     log.header3("Observation");
+                }
             }
+
+            // Increment number of observations
+            n_observations++;
+
+            // Save event file name (for possible saving)
+            m_infiles[i] = obs->eventfile();
 
             // Bin events into counts map
             bin_events(obs);
@@ -279,13 +306,21 @@ void ctbin::run(void)
 
     } // endfor: looped over observations
 
+    // If more than a single observation has been handled then make sure
+    // that an XML file will be used for storage
+    if (n_observations > 1) {
+        m_use_xml = true;
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Binned observations");
-        else
+        }
+        else {
             log.header1("Binned observation");
+        }
         log << m_obs << std::endl;
     }
 
@@ -295,49 +330,44 @@ void ctbin::run(void)
 
 
 /***********************************************************************//**
- * @brief Save observation
+ * @brief Save counts map(s)
  *
- * This method saves the counts map(s) into (a) FITS file(s).
+ * This method saves the counts map(s) into FITS file(s). There are two
+ * modes, depending on the m_use_xml flag.
+ *
+ * If m_use_xml is true, all counts map(s) will be saved into FITS files,
+ * where the output filenames are constructued from the input filenames by
+ * prepending the m_prefix string to name. Any path information will be
+ * stripped form the input name, hence event files will be written into the
+ * local working directory (unless some path information is present
+ * in the prefix). In addition, an XML file will be created that gathers
+ * the filename information for the counts map(s). If an XML file was present
+ * on input, all metadata information will be copied from this input file.
+ *
+ * If m_use_xml is false, the counts map will be saved into a FITS file.
  ***************************************************************************/
 void ctbin::save(void)
 {
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Save observations");
-        else
+        }
+        else {
             log.header1("Save observation");
+        }
     }
 
-    // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    // Case A: Save counts map(s) and XML metadata information
+    if (m_use_xml) {
+        save_xml();
+    }
 
-    // Loop over all observations in the container
-    int file_num = 0;
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
-
-        // Save only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Set filename. If more than one file will be created an
-            // index "_xxx" will be appended.
-            std::string filename = m_outfile;
-            if (file_num > 0)
-                filename += "_"+str(file_num);
-
-            // Save file
-            obs->save(filename, clobber());
-
-            // Increment file number
-            file_num++;
-
-        } // endif: observation was a CTA observation
-
-    } // endfor: looped over files
+    // Case B: Save counts map as FITS file
+    else {
+        save_fits();
+    }
 
     // Return
     return;
@@ -362,13 +392,34 @@ void ctbin::get_parameters(void)
         // Get name of CTA events file
         m_evfile = (*this)["evfile"].filename();
 
-        // Load unbinned CTA observation
+        // Allocate CTA observation
         GCTAObservation obs;
-        obs.load_unbinned(m_evfile);
 
-        // Append CTA observation to container
-        m_obs.append(obs);
+        // Try first to open as FITS file
+        try {
+
+            // Load event list in CTA observation
+            obs.load_unbinned(m_evfile);
+
+            // Append CTA observation to container
+            m_obs.append(obs);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+            
+        }
         
+        // ... otherwise try to open as XML file
+        catch (GException::fits_open_error) {
+
+            // Load observations from XML file
+            m_obs.load(m_evfile);
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+        }
+
         // Use the xref and yref parameters for binning (otherwise the
         // pointing direction(s) is/are used)
         m_xref = (*this)["xref"].real();
@@ -405,6 +456,10 @@ void ctbin::get_parameters(void)
  * and replaces the event list by the counts map in the observation. The
  * energy boundaries of the counts map are also stored in the observation's
  * energy boundary member.
+ *
+ * If the reference values for the map centre (m_xref, m_yref) are 9999.0,
+ * the pointing direction of the observation is taken as the map centre.
+ * Otherwise, the specified reference value is used.
  ***************************************************************************/
 void ctbin::bin_events(GCTAObservation* obs)
 {
@@ -413,8 +468,9 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then throw an exception.
-        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
+        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
             throw GException::no_list(G_BIN_EVENTS);
+        }
 
         // Setup energy range covered by data
         GEnergy  emin;
@@ -541,9 +597,9 @@ void ctbin::init_members(void)
     // Initialise members
     m_evfile.clear();
     m_outfile.clear();
+    m_prefix.clear();
     m_proj.clear();
     m_coordsys.clear();
-    m_obs.clear();
     m_emin     = 0.0;
     m_emax     = 0.0;
     m_enumbins = 0;
@@ -552,6 +608,11 @@ void ctbin::init_members(void)
     m_binsz    = 0.0;
     m_nxpix    = 0;
     m_nypix    = 0;
+
+    // Initialise protected members
+    m_obs.clear();
+    m_infiles.clear();
+    m_use_xml = false;
 
     // Set logger properties
     log.date(true);
@@ -571,9 +632,9 @@ void ctbin::copy_members(const ctbin& app)
     // Copy attributes
     m_evfile   = app.m_evfile;
     m_outfile  = app.m_outfile;
+    m_prefix   = app.m_prefix;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
-    m_obs      = app.m_obs;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
     m_enumbins = app.m_enumbins;
@@ -582,6 +643,11 @@ void ctbin::copy_members(const ctbin& app)
     m_binsz    = app.m_binsz;
     m_nxpix    = app.m_nxpix;
     m_nypix    = app.m_nypix;
+
+    // Copy protected members
+    m_obs      = app.m_obs;
+    m_infiles  = app.m_infiles;
+    m_use_xml  = app.m_use_xml;
 
     // Return
     return;
@@ -594,8 +660,125 @@ void ctbin::copy_members(const ctbin& app)
 void ctbin::free_members(void)
 {
     // Write separator into logger
-    if (logTerse())
+    if (logTerse()) {
         log << std::endl;
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set output file name.
+ *
+ * @param[in] filename Input file name.
+ *
+ * This method converts an input filename into an output filename by
+ * prepending the prefix specified by m_prefix to the input filename. Any
+ * path will be stripped from the input filename.
+ ***************************************************************************/
+std::string ctbin::set_outfile_name(const std::string& filename) const
+{
+    // Split input filename into path elements
+    std::vector<std::string> elements = split(filename, "/");
+
+    // The last path element is the filename
+    std::string outname = m_prefix + elements[elements.size()-1];
+    
+    // Return output filename
+    return outname;
+}
+
+
+/***********************************************************************//**
+ * @brief Save counts map in FITS format.
+ *
+ * Save the counts map as a FITS file. The filename of the FITS file is
+ * specified by the m_outfile member.
+ ***************************************************************************/
+void ctbin::save_fits(void)
+{
+    // Get output filename
+    m_outfile = (*this)["outfile"].value();
+
+    // Get CTA observation from observation container
+    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[0]);
+
+    // Save event list
+    save_counts_map(obs, m_outfile);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save counts map(s) in XML format.
+ *
+ * Save the counts map(s) into FITS files and write the file path information
+ * into a XML file. The filename of the XML file is specified by the
+ * m_outfile member, the filename(s) of the counts map(s) are built by
+ * prepending the prefix given by the m_prefix member to the input counts
+ * map(s) filenames. Any path present in the input filename will be stripped,
+ * i.e. the counts map(s) will be written in the local working directory
+ * (unless a path is specified in the m_prefix member).
+ ***************************************************************************/
+void ctbin::save_xml(void)
+{
+    // Get output filename and prefix
+    m_outfile = (*this)["outfile"].value();
+    m_prefix  = (*this)["prefix"].value();
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+
+        // Handle only CTA observations
+        if (obs != NULL) {
+
+            // Set event output file name
+            std::string outfile = set_outfile_name(m_infiles[i]);
+
+            // Store output file name in observation
+            obs->eventfile(outfile);
+
+            // Save event list
+            save_counts_map(obs, outfile);
+
+        } // endif: observation was a CTA observations
+
+    } // endfor: looped over observations
+
+    // Save observations in XML file
+    m_obs.save(m_outfile);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save a single counts map into a FITS file
+ *
+ * @param[in] obs Pointer to CTA observation.
+ * @param[in] outfile Output file name.
+ *
+ * This method saves a single counts map into a FITS file. The method does
+ * nothing if the observation pointer is not valid.
+ ***************************************************************************/
+void ctbin::save_counts_map(const GCTAObservation* obs,
+                            const std::string&     outfile) const
+{
+    // Save only if observation is valid
+    if (obs != NULL) {
+
+        // Save observation into FITS file
+        obs->save(outfile, clobber());
+
+    } // endif: observation was valid
 
     // Return
     return;
