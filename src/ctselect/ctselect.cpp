@@ -353,7 +353,12 @@ void ctselect::save(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Save observations");
+        if (m_obs.size() > 1) {
+            log.header1("Save observations");
+        }
+        else {
+            log.header1("Save observation");
+        }
     }
 
     // Case A: Save event file(s) and XML metadata information
