@@ -422,8 +422,8 @@ void ctbin::get_parameters(void)
 
         // Use the xref and yref parameters for binning (otherwise the
         // pointing direction(s) is/are used)
-        m_xref = (*this)["xref"].real();
-        m_yref = (*this)["yref"].real();
+        //m_xref = (*this)["xref"].real();
+        //m_yref = (*this)["yref"].real();
 
     } // endif: there was no observation in the container
 
@@ -433,6 +433,8 @@ void ctbin::get_parameters(void)
     m_enumbins = (*this)["enumbins"].integer();
     m_proj     = (*this)["proj"].string();
     m_coordsys = (*this)["coordsys"].string();
+    m_xref     = (*this)["xref"].real();
+    m_yref     = (*this)["yref"].real();
     m_binsz    = (*this)["binsz"].real();
     m_nxpix    = (*this)["nxpix"].integer();
     m_nypix    = (*this)["nypix"].integer();
