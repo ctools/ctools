@@ -2,12 +2,14 @@ New Features and Important Changes in ctools 00-04-00
 
 Author(s) : Juergen Knoedlseder
 
-October 23, 2011
+February 28, 2012
 
 
 1. Introduction
 ---------------
-This document briefly summarizes executable by executable the most important changes made since the last release of ctools.
+This document briefly summarizes executable by executable the most
+important changes made since the last release of ctools.
+
 
 2. Configuration
 -----------------
@@ -19,6 +21,7 @@ the default architecture created by the compiler.
 Remove automake dependency tracking as this conflicts with Mac OS X
 universal builds.
 
+
 3. Python interface
 -------------------
 The Python binding building scheme from GammaLib has been adapted.
@@ -26,37 +29,80 @@ This avoids double compilation during 'make' and performs a special
 build during 'make check' that provides a Python module which is
 statically linked to the ctools library.
 
+
 4. ctobssim - CTA observation simulation
 ----------------------------------------
 None
 
+
 5. ctselect - CTA event selection
 ---------------------------------
-None
+Added handling of observation definition XML files. ctselect can now
+operate on single FITS files or on observation definition XML files.
+
+If an observation definition XML file is used on input, selected event 
+list(s) will be written in the current working directory by prepending
+a prefix to the filename after stripping any path information. The
+event list filenames in the input XML file are replaced by the selected
+event list filenames, and the result is written as XML file in the
+file specified by the outfile parameter.
+
+The output event list or observation definition file parameter is
+not queried any longer as first parameter. This gives a more logicial
+parameter interface where input parameters are queried first.
+
 
 6. ctbin - CTA event binning
 ----------------------------
-None
+Added handling of observation definition XML files. ctbin can now
+operate on single FITS files or on observation definition XML files.
+
+If an observation definition XML file is used on input, counts map(s) 
+will be written in the current working directory by prepending a prefix
+to the filename after stripping any path information from the event
+filenames. The event list filenames in the input XML file are replaced
+by the counts map filenames, and the result is written as XML file in the
+file specified by the outfile parameter.
+
+The output counts map or observation definition file parameter is
+not queried any longer as first parameter. This gives a more logicial
+parameter interface where input parameters are queried first.
+
 
 7. ctlike - CTA maximum likelihood fitting
 ------------------------------------------
-None
+Added handling of observation definition XML files. ctlike can now
+operate on single FITS files or on observation definition XML files.
+
+The analysis method is now determined from the input file type,
+and consequently, the method parameter has been removed. Furthermore,
+the evfile and cntmap parameters have been combined in a single infile
+parameter.
+
+The output model file parameter is not queried any longer as first
+parameter. This gives a more logicial parameter interface where input
+parameters are queried first.
+
 
 8. ctskymap - CTA sky mapping
 -----------------------------
 New executable.
 
+
 9. Examples
 -----------
 None
+
 
 10. Scripts
 -----------
 None
 
+
 11. caldb
 ---------
 None
+
 
 12. models
 ----------

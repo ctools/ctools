@@ -1,9 +1,13 @@
-2011-10-23  Juergen Knoedlseder  <knodlseder@cesr.fr>
+2012-02-28  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.4.0 released
         ========================
 
-        Renamed to ctools
+        Add handling of observation definition XML files to ctselect, ctbin
+          and ctlike
+        No longer query output parameters first
+        Remove method parameter from ctlike and replace evfile and cntmap
+          parameters by infile parameter 
         Add configure options for Mac OSX universal builds
         Remove automake dependency tracking
         Improve building of Python bindings
