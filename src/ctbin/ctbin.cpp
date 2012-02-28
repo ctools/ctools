@@ -206,9 +206,8 @@ void ctbin::clear(void)
  ***************************************************************************/
 void ctbin::execute(void)
 {
-    // Read ahead output filename so that it gets dumped correctly in the
-    // parameters log
-    m_outfile = (*this)["outfile"].filename();
+    // Signal that some parameters should be read ahead
+    m_read_ahead = true;
 
     // Bin the event data
     run();
@@ -439,6 +438,12 @@ void ctbin::get_parameters(void)
     m_nxpix    = (*this)["nxpix"].integer();
     m_nypix    = (*this)["nypix"].integer();
 
+    // Optionally read ahead parameters so that they get correctly
+    // dumped into the log file
+    if (m_read_ahead) {
+        m_outfile = (*this)["outfile"].filename();
+    }
+
     // Return
     return;
 }
@@ -614,7 +619,8 @@ void ctbin::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_infiles.clear();
-    m_use_xml = false;
+    m_use_xml    = false;
+    m_read_ahead = false;
 
     // Set logger properties
     log.date(true);
@@ -647,9 +653,10 @@ void ctbin::copy_members(const ctbin& app)
     m_nypix    = app.m_nypix;
 
     // Copy protected members
-    m_obs      = app.m_obs;
-    m_infiles  = app.m_infiles;
-    m_use_xml  = app.m_use_xml;
+    m_obs        = app.m_obs;
+    m_infiles    = app.m_infiles;
+    m_use_xml    = app.m_use_xml;
+    m_read_ahead = app.m_read_ahead;
 
     // Return
     return;

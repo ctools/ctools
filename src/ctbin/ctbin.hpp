@@ -80,24 +80,25 @@ protected:
                                    const std::string&     outfile) const;
 
     // User parameters
-    std::string              m_evfile;   //!< Input event list or XML file
-    std::string              m_outfile;  //!< Output counts map or XML file
-    std::string              m_prefix;   //!< Prefix for multiple counts maps
-    double                   m_emin;     //!< Lower energy
-    double                   m_emax;     //!< Upper energy
-    int                      m_enumbins; //!< Number of energy bins
-    std::string              m_proj;     //!< WCS projection
-    std::string              m_coordsys; //!< Coordinate system
-    double                   m_xref;     //!< Longitude reference coordinate
-    double                   m_yref;     //!< Latitude reference coordinate
-    double                   m_binsz;    //!< Pixel size
-    int                      m_nxpix;    //!< Number of pixels in longitude
-    int                      m_nypix;    //!< Number of pixels in latitude
+    std::string              m_evfile;     //!< Input event list or XML file
+    std::string              m_outfile;    //!< Output counts map or XML file
+    std::string              m_prefix;     //!< Prefix for multiple counts maps
+    double                   m_emin;       //!< Lower energy
+    double                   m_emax;       //!< Upper energy
+    int                      m_enumbins;   //!< Number of energy bins
+    std::string              m_proj;       //!< WCS projection
+    std::string              m_coordsys;   //!< Coordinate system
+    double                   m_xref;       //!< Longitude reference coordinate
+    double                   m_yref;       //!< Latitude reference coordinate
+    double                   m_binsz;      //!< Pixel size
+    int                      m_nxpix;      //!< Number of pixels in longitude
+    int                      m_nypix;      //!< Number of pixels in latitude
 
     // Protected members
-    GObservations            m_obs;      //!< Observation container
-    std::vector<std::string> m_infiles;  //!< Input event filenames
-    bool                     m_use_xml;  //!< Use XML file instead of FITS file
+    GObservations            m_obs;        //!< Observation container
+    std::vector<std::string> m_infiles;    //!< Input event filenames
+    bool                     m_use_xml;    //!< Use XML file instead of FITS file
+    bool                     m_read_ahead; //!< Read ahead parameters
 };
 
 #endif /* CTBIN_HPP */
