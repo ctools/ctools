@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctlike.hpp
  * @brief CTA maximum likelihood tool interface definition
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 #ifndef CTLIKE_HPP
@@ -83,6 +83,7 @@ protected:
     int           m_max_stall;  //!< Maximum number of stalls
     double        m_logL;       //!< Maximum log likelihood
     GOptimizer*   m_opt;        //!< Optimizer
+    bool          m_read_ahead; //!< Read ahead parameters
 };
 
 #endif /* CTLIKE_HPP */

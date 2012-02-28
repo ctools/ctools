@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctlike.cpp
  * @brief CTA maximum likelihood tool implementation
- * @author J. Knodlseder
+ * @author J. Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -202,9 +202,8 @@ void ctlike::clear(void)
  ***************************************************************************/
 void ctlike::execute(void)
 {
-    // Read ahead output filename so that it gets dumped correctly in the
-    // parameters log
-    m_outmdl = (*this)["outmdl"].filename();
+    // Signal that some parameters should be read ahead
+    m_read_ahead = true;
 
     // Bin the event data
     run();
@@ -383,6 +382,12 @@ void ctlike::get_parameters(void)
     // Get standard parameters
     m_refit  = (*this)["refit"].boolean();
 
+    // Optionally read ahead parameters so that they get correctly
+    // dumped into the log file
+    if (m_read_ahead) {
+        m_outmdl = (*this)["outmdl"].filename();
+    }
+
     // Return
     return;
 }
@@ -452,17 +457,17 @@ void ctlike::optimize_lm(void)
 void ctlike::init_members(void)
 {
     // Initialise members
-    //m_method.clear();
     m_stat.clear();
     m_caldb.clear();
     m_irf.clear();
     m_outmdl.clear();
     m_obs.clear();
-    m_refit     = false;
-    m_max_iter  = 100;   // Set maximum number of iterations
-    m_max_stall = 10;    // Set maximum number of stalls
-    m_logL      = 0.0;
-    m_opt       = NULL;
+    m_refit      = false;
+    m_max_iter   = 100;   // Set maximum number of iterations
+    m_max_stall  = 10;    // Set maximum number of stalls
+    m_logL       = 0.0;
+    m_opt        = NULL;
+    m_read_ahead = false;
 
     // Set logger properties
     log.date(true);
@@ -480,17 +485,17 @@ void ctlike::init_members(void)
 void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
-    //m_method    = app.m_method;
-    m_stat      = app.m_stat;
-    m_refit     = app.m_refit;
-    m_caldb     = app.m_caldb;
-    m_irf       = app.m_irf;
-    m_outmdl    = app.m_outmdl;
-    m_obs       = app.m_obs;
-    m_max_iter  = app.m_max_iter;
-    m_max_stall = app.m_max_stall;
-    m_logL      = app.m_logL;
-    m_opt       = app.m_opt->clone();
+    m_stat       = app.m_stat;
+    m_refit      = app.m_refit;
+    m_caldb      = app.m_caldb;
+    m_irf        = app.m_irf;
+    m_outmdl     = app.m_outmdl;
+    m_obs        = app.m_obs;
+    m_max_iter   = app.m_max_iter;
+    m_max_stall  = app.m_max_stall;
+    m_logL       = app.m_logL;
+    m_opt        = app.m_opt->clone();
+    m_read_ahead = app.m_read_ahead;
 
     // Return
     return;
