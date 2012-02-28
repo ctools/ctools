@@ -91,11 +91,12 @@ protected:
     std::string m_expr;       //!< Selection expression
 
     // Protected members
-    GObservations            m_obs;       //!< Observations container
-    std::vector<std::string> m_infiles;   //!< Input event filenames
-    GTime                    m_timemin;   //!< Earliest time
-    GTime                    m_timemax;   //!< Latest time
-    bool                     m_use_xml;   //!< Use XML file instead of FITS file
+    GObservations            m_obs;        //!< Observations container
+    std::vector<std::string> m_infiles;    //!< Input event filenames
+    GTime                    m_timemin;    //!< Earliest time
+    GTime                    m_timemax;    //!< Latest time
+    bool                     m_use_xml;    //!< Use XML file instead of FITS file
+    bool                     m_read_ahead; //!< Read ahead parameters
 };
 
 #endif /* CTSELECT_HPP */

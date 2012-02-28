@@ -203,10 +203,9 @@ void ctselect::clear(void)
  ***************************************************************************/
 void ctselect::execute(void)
 {
-    // Read ahead output filename so that it gets dumped correctly in the
-    // parameters log
-    m_outfile = (*this)["outfile"].filename();
-
+    // Signal that some parameters should be read ahead
+    m_read_ahead = true;
+    
     // Perform event selection
     run();
 
@@ -435,6 +434,12 @@ void ctselect::get_parameters(void)
     m_emax = (*this)["emax"].real();
     m_expr = (*this)["expr"].string();
 
+    // Optionally read ahead parameters so that they get correctly
+    // dumped into the log file
+    if (m_read_ahead) {
+        m_outfile = (*this)["outfile"].filename();
+    }
+
     // Derive time interval
     m_timemin.time(m_tmin, G_CTA_MJDREF, "days");
     m_timemax.time(m_tmax, G_CTA_MJDREF, "days");
@@ -645,7 +650,8 @@ void ctselect::init_members(void)
     m_infiles.clear();
     m_timemin.clear();
     m_timemax.clear();
-    m_use_xml = false;
+    m_use_xml    = false;
+    m_read_ahead = false;
 
     // Set logger properties
     log.date(true);
@@ -676,11 +682,12 @@ void ctselect::copy_members(const ctselect& app)
     m_expr    = app.m_expr;
 
     // Copy protected members
-    m_obs      = app.m_obs;
-    m_infiles  = app.m_infiles;
-    m_timemin  = app.m_timemin;
-    m_timemax  = app.m_timemax;
-    m_use_xml  = app.m_use_xml;
+    m_obs        = app.m_obs;
+    m_infiles    = app.m_infiles;
+    m_timemin    = app.m_timemin;
+    m_timemax    = app.m_timemax;
+    m_use_xml    = app.m_use_xml;
+    m_read_ahead = app.m_read_ahead;
     
     // Return
     return;
