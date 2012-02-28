@@ -17,8 +17,8 @@
 #
 # General parameters
 #===================
-evfile,  f, a, "test/data/crab_events.fits.gz",,,"Event list or observation definition file"
-outfile, f, a, "cntmap.fits",,, "Counts map or observation definition file"
+evfile,  f, a, "test/data/crab_events.fits.gz",,,"Input event list or observation definition file"
+outfile, f, a, "cntmap.fits",,, "Output counts map or observation definition file"
 prefix,  s, h, "cntmap_",,,"Prefix for counts maps in observation definition file"
 #
 # Energy binning parameters
