@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all cscripts that are shipped with ctools
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2012 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
   emax=100.0 \
   enumbins=0 \
   duration=1800.0 \
+  deadc=0.95 \
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cspull.log
