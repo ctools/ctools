@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctobssim - CTA observation simulator tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011 by Juergen Knoedlseder                              *
+ *  copyright (C) 2011-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-03-01"
+#define CTOBSSIM_VERSION "00-04-00"
 
 
 /***********************************************************************//**
@@ -89,6 +89,7 @@ protected:
     double        m_tmax;       //!< Stop time (MET)
     double        m_emin;       //!< Lower energy (TeV)
     double        m_emax;       //!< Upper energy (TeV)
+    double        m_deadc;      //!< Average deadtime correction
 
     // Protected members
     double        m_area;       //!< Surface area for simulation (cm2)

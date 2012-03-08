@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctobssim - CTA observation simulator tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011 by Juergen Knoedlseder                              *
+ *  copyright (C) 2011-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -241,20 +241,24 @@ void ctobssim::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Observations");
-        else
+        }
+        else {
             log.header1("Observation");
+        }
         log << m_obs << std::endl;
     }
 
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Simulate observations");
-        else
+        }
+        else {
             log.header1("Simulate observation");
+        }
     }
 
     // Loop over all observation in the container
@@ -268,17 +272,15 @@ void ctobssim::run(void)
 
             // Write header for observation
             if (logTerse()) {
-                if (obs->name().length() > 1)
+                if (obs->name().length() > 1) {
                     log.header3("Observation "+obs->name());
-                else
+                }
+                else {
                     log.header3("Observation");
+                }
             }
 
-            // Simulate photons
-            //GPhotons photons = simulate_photons(obs, m_obs.models());
-
             // Simulate source events
-            //simulate_source(obs, photons);
             simulate_source(obs, m_obs.models());
 
             // Simulate source events
@@ -297,16 +299,21 @@ void ctobssim::run(void)
  * @brief Save simulated observation
  *
  * This method saves the results.
+ *
+ * @todo Implement XML file output in case that on observation list is
+ *       provided on input.
  ***************************************************************************/
 void ctobssim::save(void)
 {
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1)
+        if (m_obs.size() > 1) {
             log.header1("Save observations");
-        else
+        }
+        else {
             log.header1("Save observation");
+        }
     }
 
     // Get output filename
@@ -325,8 +332,9 @@ void ctobssim::save(void)
             // Set filename. If more than one file will be created an
             // index "_xxx" will be appended.
             std::string filename = m_outfile;
-            if (file_num > 0)
+            if (file_num > 0) {
                 filename += "_"+str(file_num);
+            }
 
             // Save file
             obs->save(filename, clobber());
@@ -403,7 +411,13 @@ void ctobssim::get_parameters(void)
 /***********************************************************************//**
  * @brief Set empty CTA event list
  *
- * @param[in] obs Attach empty event list to CTA observation
+ * @param[in] obs CTA observation.
+ *
+ * Attaches an empty event list to CTA observation. The method also sets the
+ * pointing direction using the m_ra and m_dec members, the ROI based on
+ * m_ra, m_dec and m_rad, a single GTI based on m_tmin and m_tmax, and a
+ * single energy boundary based on m_emin and m_emax. The method furthermore
+ * sets the ontime, livetime and deadtime correction factor.
  ***************************************************************************/
 void ctobssim::set_list(GCTAObservation* obs)
 {
@@ -411,13 +425,14 @@ void ctobssim::set_list(GCTAObservation* obs)
     if (obs != NULL) {
 
         // Get CTA observation parameters
-        m_ra   = (*this)["ra"].real();
-        m_dec  = (*this)["dec"].real();
-        m_rad  = (*this)["rad"].real();
-        m_tmin = (*this)["tmin"].real();
-        m_tmax = (*this)["tmax"].real();
-        m_emin = (*this)["emin"].real();
-        m_emax = (*this)["emax"].real();
+        m_ra    = (*this)["ra"].real();
+        m_dec   = (*this)["dec"].real();
+        m_rad   = (*this)["rad"].real();
+        m_tmin  = (*this)["tmin"].real();
+        m_tmax  = (*this)["tmax"].real();
+        m_emin  = (*this)["emin"].real();
+        m_emax  = (*this)["emax"].real();
+        m_deadc = (*this)["deadc"].real();
 
         // Allocate CTA event list
         GCTAEventList events;
@@ -458,6 +473,11 @@ void ctobssim::set_list(GCTAObservation* obs)
 
         // Attach event list to CTA observation
         obs->events(&events);
+        
+        // Set observation ontime, livetime and deadtime correction factor
+        obs->ontime(gti.ontime());
+        obs->livetime(gti.ontime()*m_deadc);
+        obs->deadc(m_deadc);
 
     } // endif: oberservation was valid
 
@@ -511,8 +531,9 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
-        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
+        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
             set_list(obs);
+        }
 
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = (GCTAEventList*)(obs->events());
@@ -584,15 +605,17 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                         GTime tstart = tmin;
                         GTime tstop  = tstart + m_time_max;
                         
-                        // Initialise cumulative photon counter
+                        // Initialise cumulative photon counters
                         int nphotons = 0;
+                        int ndeadc   = 0;
                         
                         // Loop over time slices
                         while (tstart < tmax) {
             
                             // Make sure that tstop <= tmax
-                            if (tstop > tmax)
+                            if (tstop > tmax) {
                                 tstop = tmax;
+                            }
 
                             // Dump time slice
                             if (logExplicit()) {
@@ -609,17 +632,28 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                                                          emin, emax,
                                                          tstart, tstop, m_ran);
 
-                            // Bookkeeping of simulated number of photons
-                            nphotons += photons.size();
-                            
                             // Simulate events from photons
                             for (int i = 0; i < photons.size(); ++i) {
+
+                                // Apply deadtime correction
+                                if (m_deadc < 1.0) {
+                                    if (m_ran.uniform() > m_deadc) {
+                                        ndeadc++;
+                                        continue;
+                                    }
+                                }
+
+                                // Increment photon counter
+                                nphotons++;
+
+                                // Simulate event
                                 GCTAEventAtom* event = rsp->mc(m_area, photons[i], *pnt, m_ran);
                                 if (event != NULL) {
                                     events->append(*event);
                                     delete event;
                                 }
-                            }
+
+                            } // endfor: looped over events
 
                             // Go to next time slice
                             tstart = tstop;
@@ -639,13 +673,21 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                         if (logNormal()) {
                             log << parformat("MC source photons");
                             log << str(nphotons);
-                            if (model->name().length() > 0)
+                            if (model->name().length() > 0) {
                                 log << " [" << model->name() << "]";
+                            }
+                            log << std::endl;
+                            log << parformat("MC photons during deadtime");
+                            log << str(ndeadc);
+                            if (model->name().length() > 0) {
+                                log << " [" << model->name() << "]";
+                            }
                             log << std::endl;
                             log << parformat("MC source events");
                             log << str(events->size());
-                            if (model->name().length() > 0)
+                            if (model->name().length() > 0) {
                                 log << " [" << model->name() << "]";
+                            }
                             log << std::endl;
                         }
 
@@ -709,8 +751,9 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
-        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL)
+        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
             set_list(obs);
+        }
 
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = (GCTAEventList*)(obs->events());
@@ -731,14 +774,35 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
                 // Reserves space for events
                 events->reserve(list->size()+events->size());
 
+                // Initialise event counters
+                int nevents = 0;
+                int ndeadc  = 0;
+
                 // Append events
-                for (int k = 0; k < list->size(); k++)
+                for (int k = 0; k < list->size(); k++) {
+
+                    // Apply deadtime correction
+                    if (m_deadc < 1.0) {
+                        if (m_ran.uniform() > m_deadc) {
+                            ndeadc++;
+                            continue;
+                        }
+                    }
+
+                    // Increment background event counter
+                    nevents++;
+
+                    // Append event
                     events->append(*((*list)[k]));
+
+                } // endfor: looped over all events
 
                 // Dump simulation results
                 if (logNormal()) {
                     log << parformat("MC background events");
-                    log << str(list->size()) << std::endl;
+                    log << str(nevents) << std::endl;
+                    log << parformat("MC events during deadtime");
+                    log << str(ndeadc) << std::endl;
                 }
 
                 // Free event list
@@ -769,23 +833,26 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
  ***************************************************************************/
 void ctobssim::init_members(void)
 {
-    // Initialise members
+    // Initialise user parameters
     m_infile.clear();
     m_outfile.clear();
     m_caldb.clear();
     m_irf.clear();
+    m_seed  =   1;
+    m_ra    = 0.0;
+    m_dec   = 0.0;
+    m_rad   = 0.0;
+    m_tmin  = 0.0;
+    m_tmax  = 0.0;
+    m_emin  = 0.0;
+    m_emax  = 0.0;
+    m_deadc = 1.0;
+
+    // Initialise protected members
     m_obs.clear();
-    m_seed =   1;
-    m_ra   = 0.0;
-    m_dec  = 0.0;
-    m_rad  = 0.0;
-    m_tmin = 0.0;
-    m_tmax = 0.0;
-    m_emin = 0.0;
-    m_emax = 0.0;
 
     // Set fixed parameters
-    m_area     = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
+    m_area = 19634954.0 * 1.0e4;     //!< pi*(2500^2) m^2
     m_time_max.met(1800.0);          //!< Maximum length of time slice (s)
 
     // Set logger properties
@@ -803,12 +870,11 @@ void ctobssim::init_members(void)
  ***************************************************************************/
 void ctobssim::copy_members(const ctobssim& app)
 {
-    // Copy attributes
+    // Copy user parameters
     m_infile   = app.m_infile;
     m_outfile  = app.m_outfile;
     m_caldb    = app.m_caldb;
     m_irf      = app.m_irf;
-    m_obs      = app.m_obs;
     m_seed     = app.m_seed;
     m_ra       = app.m_ra;
     m_dec      = app.m_dec;
@@ -817,8 +883,13 @@ void ctobssim::copy_members(const ctobssim& app)
     m_tmax     = app.m_tmax;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
+    m_deadc    = app.m_deadc;
+    
+    // Copy protected members
     m_area     = app.m_area;
     m_time_max = app.m_time_max;
+    m_ran      = app.m_ran;
+    m_obs      = app.m_obs;
 
     // Return
     return;
@@ -831,8 +902,9 @@ void ctobssim::copy_members(const ctobssim& app)
 void ctobssim::free_members(void)
 {
     // Write separator into logger
-    if (logTerse())
+    if (logTerse()) {
         log << std::endl;
+    }
 
     // Return
     return;
