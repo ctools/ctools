@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-04-00
 
 Author(s) : Juergen Knoedlseder
 
-February 28, 2012
+March 8, 2012
 
 
 1. Introduction
@@ -32,7 +32,14 @@ statically linked to the ctools library.
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+Add deadc parameter to control the deadtime correction factor for the
+observation. The deadtime correction factor deadc is the ratio between
+livetime and ontime. A typical value of deadc=0.95 means 5% deadtime.
+
+An additional Monte Carlo process has been introduced for photons and
+background events to select only those events that fall in the livetime
+fraction of the exposure. This means that background rates are expected
+in events per real time (and not events per livetime).
 
 
 5. ctselect - CTA event selection

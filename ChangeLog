@@ -1,10 +1,11 @@
-2012-02-28  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2012-03-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.4.0 released
         ========================
 
         Add handling of observation definition XML files to ctselect, ctbin
           and ctlike
+        Add deadtime correction factor to ctobssim
         No longer query output parameters first
         Remove method parameter from ctlike and replace evfile and cntmap
           parameters by infile parameter 
