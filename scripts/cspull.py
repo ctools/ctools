@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script generates the pull distribution for all model parameters.
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2012 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class cspull(GApplication):
 		"""
 		# Set name
 		self.name    = "cspull"
-		self.version = "0.1.0"
+		self.version = "0.2.0"
 		
 		# Initialise some members
 		self.obs      = None
@@ -105,6 +105,7 @@ class cspull(GApplication):
 			pars.append(GPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
 			pars.append(GPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
 			pars.append(GPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
+			pars.append(GPar("deadc","r","a","0.95","","","Deadtime correction factor"))
 			pars.append(GPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
 			pars.append(GPar("npix","i","h","200","","","Number of pixels for binned"))
 			pars.append(GPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
@@ -131,6 +132,7 @@ class cspull(GApplication):
 		self.m_emax     = self["emax"].real()
 		self.m_enumbins = self["enumbins"].integer()
 		self.m_duration = self["duration"].real()
+		self.m_deadc    = self["deadc"].real()
 		self.m_rad      = self["rad"].real()
 		self.m_npix     = self["npix"].integer()
 		self.m_binsz    = self["binsz"].real()
@@ -240,7 +242,7 @@ class cspull(GApplication):
 		
 		# Create CTA observation
 		run = obsutils.set(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
-		                   duration=self.m_duration, \
+		                   duration=self.m_duration, deadc=self.m_deadc, \
                            emin=emin, emax=emax, rad=self.m_rad)
 		
 		# Append observation to container
