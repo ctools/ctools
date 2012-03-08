@@ -636,8 +636,9 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                             for (int i = 0; i < photons.size(); ++i) {
 
                                 // Apply deadtime correction
-                                if (m_deadc < 1.0) {
-                                    if (m_ran.uniform() > m_deadc) {
+                                double deadc = obs->deadc(photons[i].time());
+                                if (deadc < 1.0) {
+                                    if (m_ran.uniform() > deadc) {
                                         ndeadc++;
                                         continue;
                                     }
@@ -781,9 +782,13 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
                 // Append events
                 for (int k = 0; k < list->size(); k++) {
 
+                    // Get event pointer
+                    GCTAEventAtom* event = (*list)[k];
+
                     // Apply deadtime correction
-                    if (m_deadc < 1.0) {
-                        if (m_ran.uniform() > m_deadc) {
+                    double deadc = obs->deadc(event->time());
+                    if (deadc < 1.0) {
+                        if (m_ran.uniform() > deadc) {
                             ndeadc++;
                             continue;
                         }
@@ -793,7 +798,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
                     nevents++;
 
                     // Append event
-                    events->append(*((*list)[k]));
+                    events->append(*event);
 
                 } // endfor: looped over all events
 
