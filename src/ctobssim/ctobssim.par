@@ -5,10 +5,10 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctobssim.par                                                  #
-#  Version:   00-03-00                                                      #
+#  Version:   00-04-00                                                      #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
-#             knodlseder@cesr.fr                                            #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
 #             IRAP                                                          #
 #                                                                           #
 #  Purpose:   Parameter file for the ctobssim application                   #
@@ -35,6 +35,7 @@ tmin,   r, a,     0.0,    0,   , "Start time (MET in s)"
 tmax,   r, a,  1800.0,    0,   , "End time (MET in s)"
 emin,   r, a,     0.1,    0,   , "Lower energy limit (TeV)"
 emax,   r, a,   100.0,    0,   , "Upper energy limit (TeV)"
+deadc,  r, h,    0.95,    0,  1, "Average deadtime correction factor"
 #
 # Standard parameters
 #====================
