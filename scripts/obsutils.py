@@ -2,7 +2,7 @@
 # This script provides a number of functions that are useful for handling
 # CTA observations.
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2012 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,13 +20,6 @@
 # ==========================================================================
 from ctools import *
 from gammalib import *
-#from math import *
-#import os
-#import glob
-#import sys
-#import csv
-#import math
-#import random
 
 
 # ===================== #
@@ -272,7 +265,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 # ======================= #
 # Set one CTA observation #
 # ======================= #
-def set(pntdir, tstart=0.0, duration=1800.0, \
+def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
         irf="kb_E_50h_v3", caldb="$GAMMALIB/share/caldb/cta"):
 	"""
@@ -284,6 +277,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, \
 	Keywords:
 	 tstart   - Start time [seconds] (default: 0.0)
 	 duration - Duration of observation [seconds] (default: 1800.0)
+	 deadc    - Deadtime correction factor (default: 0.95)
 	 emin     - Minimum event energy [TeV] (default: 0.1)
 	 emax     - Maximum event energy [TeV] (default: 100.0)
 	 rad      - ROI radius used for analysis [deg] (default: 5.0)
@@ -330,6 +324,11 @@ def set(pntdir, tstart=0.0, duration=1800.0, \
 	
 	# Set instrument response
 	obs.response(irf, caldb)
+	
+	# Set ontime, livetime, and deadtime correction factor
+	obs.ontime(duration)
+	obs.livetime(duration*deadc)
+	obs.deadc(deadc)
 	
 	# Return observation
 	return obs
