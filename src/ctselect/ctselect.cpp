@@ -34,6 +34,8 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_RUN                                               "ctselect::run()"
+#define G_SELECT_EVENTS           "ctselect::select_events(GCTAObservation*,"\
+                                                              "std::string&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -469,7 +471,6 @@ void ctselect::get_parameters(void)
  * interval [m_tmin, m_tmax]. If m_tmin=m_tmax=0, no time selection is
  * performed.
  *
- * @todo Add an arbitrary selection string.
  * @todo Use INDEF instead of 0.0 for pointing as RA/DEC selection
  ***************************************************************************/
 void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
@@ -581,14 +582,42 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         log << file << std::endl;
     }
 
-    // Get temporary file name
-    std::string tmpname = std::tmpnam(NULL);
+    // Check if we have an EVENTS HDU
+    if (!file.hashdu("EVENTS")) {
+        std::string message = "No \"EVENTS\" extension found in FITS file "+
+                              expression+".";
+        throw GException::app_error(G_SELECT_EVENTS, message);
+    }
 
-    // Save FITS file to temporary file
-    file.saveto(tmpname, true);
+    // Determine number of events in EVENTS HDU
+    int nevents = file.table("EVENTS")->nrows();
 
-    // Load observation from temporary file
-    obs->load_unbinned(tmpname);
+    // If the selected event list is empty then append an empty event list
+    // to the observation. Otherwise load the data from the temporary file.
+    if (nevents < 1) {
+
+        // Create empty event list
+        GCTAEventList eventlist;
+
+        // Append list to observation
+        obs->events(&eventlist);
+
+    }
+    else {
+
+        // Get temporary file name
+        std::string tmpname = std::tmpnam(NULL);
+
+        // Save FITS file to temporary file
+        file.saveto(tmpname, true);
+
+        // Load observation from temporary file
+        obs->load_unbinned(tmpname);
+
+        // Remove temporary file
+        std::remove(tmpname.c_str());
+
+    }
 
     // Get CTA event list pointer
     GCTAEventList* list = (GCTAEventList*)(obs->events());
@@ -612,9 +641,6 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     emax.TeV(m_emax);
     ebounds.append(emin, emax);
     list->ebounds(ebounds);
-
-    // Remove temporary file
-    std::remove(tmpname.c_str());
 
     // Return
     return;
