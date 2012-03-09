@@ -492,8 +492,6 @@ void ctobssim::set_list(GCTAObservation* obs)
  * @param[in] obs Pointer on CTA observation.
  * @param[in] photons Photon list.
  *
- * @exception GCTAException::no_pointing
- *            No valid pointing found in CTA observation
  * @exception GCTAException::no_response
  *            No valid response found in CTA observation
  *
@@ -512,15 +510,6 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
-
-        // Get pointer on CTA pointing. As we have no time dependent
-        // pointings implement we just determine the pointing from the
-        // beginning of the observation. Throw an exception if the pointing
-        // is not defined.
-        GCTAPointing* pnt = obs->pointing();
-        if (pnt == NULL) {
-            throw GCTAException::no_pointing(G_SIMULATE_SOURCE);
-        }
 
         // Get pointer on CTA response. Throw an exception if the response
         // is not defined.
@@ -607,7 +596,6 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                         
                         // Initialise cumulative photon counters
                         int nphotons = 0;
-                        int ndeadc   = 0;
                         
                         // Loop over time slices
                         while (tstart < tmax) {
@@ -635,20 +623,15 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                             // Simulate events from photons
                             for (int i = 0; i < photons.size(); ++i) {
 
-                                // Apply deadtime correction
-                                double deadc = obs->deadc(photons[i].time());
-                                if (deadc < 1.0) {
-                                    if (m_ran.uniform() > deadc) {
-                                        ndeadc++;
-                                        continue;
-                                    }
-                                }
-
                                 // Increment photon counter
                                 nphotons++;
 
-                                // Simulate event
-                                GCTAEventAtom* event = rsp->mc(m_area, photons[i], *pnt, m_ran);
+                                // Simulate event. Note that this method
+                                // includes the deadtime correction.
+                                GCTAEventAtom* event = rsp->mc(m_area,
+                                                               photons[i],
+                                                               *obs,
+                                                               m_ran);
                                 if (event != NULL) {
                                     events->append(*event);
                                     delete event;
@@ -674,12 +657,6 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                         if (logNormal()) {
                             log << parformat("MC source photons");
                             log << str(nphotons);
-                            if (model->name().length() > 0) {
-                                log << " [" << model->name() << "]";
-                            }
-                            log << std::endl;
-                            log << parformat("MC photons during deadtime");
-                            log << str(ndeadc);
                             if (model->name().length() > 0) {
                                 log << " [" << model->name() << "]";
                             }
@@ -769,33 +746,18 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
             // If we have a radial acceptance model then simulate events
             if (model != NULL) {
 
-                // Get simulated event list
+                // Get simulated event list. Note that this method includes
+                // the deadtime correction.
                 GCTAEventList* list = model->mc(*obs, m_ran);
 
                 // Reserves space for events
                 events->reserve(list->size()+events->size());
-
-                // Initialise event counters
-                int nevents = 0;
-                int ndeadc  = 0;
 
                 // Append events
                 for (int k = 0; k < list->size(); k++) {
 
                     // Get event pointer
                     GCTAEventAtom* event = (*list)[k];
-
-                    // Apply deadtime correction
-                    double deadc = obs->deadc(event->time());
-                    if (deadc < 1.0) {
-                        if (m_ran.uniform() > deadc) {
-                            ndeadc++;
-                            continue;
-                        }
-                    }
-
-                    // Increment background event counter
-                    nevents++;
 
                     // Append event
                     events->append(*event);
@@ -805,9 +767,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
                 // Dump simulation results
                 if (logNormal()) {
                     log << parformat("MC background events");
-                    log << str(nevents) << std::endl;
-                    log << parformat("MC events during deadtime");
-                    log << str(ndeadc) << std::endl;
+                    log << str(list->size()) << std::endl;
                 }
 
                 // Free event list
