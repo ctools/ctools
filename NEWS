@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-04-00
 
 Author(s) : Juergen Knoedlseder
 
-March 8, 2012
+March 9, 2012
 
 
 1. Introduction
@@ -20,6 +20,11 @@ the default architecture created by the compiler.
 
 Remove automake dependency tracking as this conflicts with Mac OS X
 universal builds.
+
+Prefixed directory preceeds now the $GAMMALIB directory in the search
+for a valid GammaLib installation. This allows local installs on top
+of a global GammaLib installation without changing the $GAMMALIB
+environment variable.
 
 
 3. Python interface
