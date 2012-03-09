@@ -2,7 +2,7 @@
 # Configuration for ctools - a set of tools for science analysis of CTA     #
 #                            data                                           #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011 Jurgen Knodlseder                                      #
+# Copyright (C) 2011-2012 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -29,7 +29,7 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [0.4.0], [knodlseder@cesr.fr], [ctools])
+AC_INIT([ctools], [0.4.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([gnu no-dependencies])
@@ -647,7 +647,7 @@ LDFLAGS=$SAVED_LDFLAGS
 # If GammaLib has not been found in any standard path then search now in a
 # number of predefined locations.
 if test "x$has_gammalib" = "xno"; then
-  for i in "$GAMMALIB" "$ctools_prefix" /opt/local /usr/local /usr ; do
+  for i in "$ctools_prefix" "$GAMMALIB" /opt/local /usr/local /usr ; do
     if test -f $i/lib64/libgamma.so -o -f $i/lib64/libgamma.dylib; then
       if test -d $i/include/gammalib; then
         LIBDIR_GAMMALIB=$i/lib64
