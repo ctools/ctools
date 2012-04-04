@@ -35,7 +35,8 @@ Parameter Usage</a></li>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Input event list.</td>
+<td width="525">Input event list of observation
+definition XML file</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -50,7 +51,25 @@ Parameter Usage</a></li>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Output event list.</td>
+<td width="525">Output event list or observation
+definition XML file.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(prefix
+= "selected_")
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Prefix for output event lists in
+observation definition file.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -115,7 +134,8 @@ ROI) centre (in degrees).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Mission elapsed start time defining the earliest event (in
+<td width="525">Mission elapsed start time defining
+the earliest event (in
 seconds).</td>
 </tr>
 <tr>
@@ -131,7 +151,8 @@ seconds).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Mission elapsed stop time defining the latest event (in
+<td width="525">Mission elapsed stop time defining
+the latest event (in
 seconds).</td>
 </tr>
 <tr>
@@ -165,6 +186,21 @@ TeV).</td>
 <td width="25">&nbsp;</td>
 <td width="525">Upper energy limit of events (in
 TeV).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(expr = "")
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Additional event selection expression (cfitsio syntax).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -219,7 +255,7 @@ event list should be overwritten.</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>(debug
-= yes) [boolean]</strong></span></td>
+= no) [boolean]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -253,8 +289,9 @@ the executable will dump any log file output in the console.</td>
 <p class="Title">Related FTOOLS</p>
 <br>
 <hr size="1">
-<p class="Body">Last updated by: J&uuml;rgen Kn&ouml;dlseder 8 March
-2011
+<p class="Body">Last updated by: J&uuml;rgen
+Kn&ouml;dlseder 3 April
+2012
 </p>
 <br>
 </body></html>

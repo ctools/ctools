@@ -2,7 +2,8 @@
 <html><head>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"><title>Getting Started</title>
 
-<link href="ctools.css" media="screen,print" type="text/css" rel="stylesheet"></head>
+<link href="ctools.css" media="screen,print" type="text/css" rel="stylesheet">
+</head>
 <body>
 <p class="Header">Getting started</p>
 <p class="Title">First steps with ctools</p>
@@ -377,12 +378,13 @@ and we do the fit by typing:
 </p>
 <p class="Code">
 &gt; ctlike<br>
-Maximum likelihood method [BINNED] <br>
-Calibration database [test/irf] /usr/local/gamma/share/caldb/cta<br>
+Event list, counts map or observation definition
+file&nbsp;[test/data/crab_cntmap.fits.gz] cntmap.fits<br>
+Calibration
+database [test/irf] /usr/local/gamma/share/caldb/cta<br>
 Instrument response function [kb_E_50h_v3] <br>
 Source model [test/data/crab.xml] /usr/local/gamma/share/models/crab.xml<br>
-Source model output file [crab_results.xml] <br>
-Counts map [test/data/crab_cntmap.fits.gz] cntmap.fits
+Source model output file [crab_results.xml]
 </p>
 <p style="padding-top: 0pt; text-align: left;" class="Body">Fitting
 of the data is done in <span style="font-family: Courier New,Courier,monospace;">BINNED</span>
@@ -672,14 +674,12 @@ in unbinned mode, type the following:
 </p>
 <p class="Code">
 &gt; ctlike<br>
-Maximum likelihood method [BINNED] UNBINNED <br>
+Event list, counts map or observation definition
+file&nbsp;[test/data/crab_events.fits.gz] selected_events.fits<br>
 Calibration database [test/irf] /usr/local/gamma/share/caldb/cta<br>
 Instrument response function [kb_E_50h_v3] <br>
 Source model [test/data/crab.xml] /usr/local/gamma/share/models/crab.xml<br>
-Source model output file [crab_results.xml] <br>
-Event data file name [test/data/crab_events.fits.gz]
-selected_events.fits
-</p>
+Source model output file [crab_results.xml] </p>
 <p style="padding-top: 0pt; text-align: left;" class="Body">You
 will recognise that <span style="font-family: Courier New,Courier,monospace;">ctlike</span>
 runs much faster in unbinned mode compared to binned mode. This is
@@ -784,7 +784,8 @@ seconds of CPU time.<br>
 <br>
 <br>
 <p class="Title"><a name="Some_final_remarks"></a>Some
-final remarks <span style="color: red;">(updated for ctools-00-02-03)</span></p>
+final remarks <span style="color: red;">(updated for
+ctools-00-02-03)</span></p>
 <p style="padding-top: 0pt; text-align: left;" class="Body">First
 you should notice that <span style="font-weight: bold;">ctools
 are in the prototyping phase</span>. If GammaLib and ctatools are
@@ -809,7 +810,14 @@ cannot guarantee that it works.</p>
 is also only one radial acceptance model defined so far, and you should
 use the model definition that is given in the example.</p>
 <br>
-<p style="padding-top: 0pt; text-align: left;" class="Body">So far, there are four projection types supported: <span style="font-family: Courier New,Courier,monospace;">AZP</span>, <span style="font-family: Courier New,Courier,monospace;">CAR</span>, <span style="font-family: Courier New,Courier,monospace;">STG</span>, and <span style="font-family: Courier New,Courier,monospace;">TAN</span>. You can use them in Galactic (<span style="font-family: Courier New,Courier,monospace;">GAL</span>) or celestial (<span style="font-family: Courier New,Courier,monospace;">CEL</span>) coordinates.</p>
+<p style="padding-top: 0pt; text-align: left;" class="Body">So
+far, there are four projection types supported: <span style="font-family: Courier New,Courier,monospace;">AZP</span>,
+<span style="font-family: Courier New,Courier,monospace;">CAR</span>,
+<span style="font-family: Courier New,Courier,monospace;">STG</span>,
+and <span style="font-family: Courier New,Courier,monospace;">TAN</span>.
+You can use them in Galactic (<span style="font-family: Courier New,Courier,monospace;">GAL</span>)
+or celestial (<span style="font-family: Courier New,Courier,monospace;">CEL</span>)
+coordinates.</p>
 <br>
 <p style="padding-top: 0pt; text-align: left;" class="Body">The
 instrument response function that has been implemented so far in
@@ -817,14 +825,19 @@ GammaLib (yes, it is in GammaLib, not in ctatools) is very simple. It
 just reads Konrad's effective area files to get the onaxis effective
 area. It is assumed that the effective area varies with offset angle,
 and a Gaussian as function of offset angle squared has been implemented
-for the functional form of this variation. By default, the <span style="font-family: Courier New,Courier,monospace;">sigma</span> of this Gaussian is fixed to 3 deg<sup>2</sup>.
+for the functional form of this variation. By default, the <span style="font-family: Courier New,Courier,monospace;">sigma</span>
+of this Gaussian is fixed to 3 deg<sup>2</sup>.
 This value can not be modified using the ctatools, but it can be
 altered using the Python interface. In any case, this treatment of the
-offset angle dependence is only preliminary and <span style="font-weight: bold;">will be changed as soon as a format has been defined for the CTA response functions</span>.</p><p style="padding-top: 0pt; text-align: left;" class="Body"></p><p style="padding-top: 0pt; text-align: left;" class="Body"><span style="font-family: Courier New,Courier,monospace;">ctobssim</span>
+offset angle dependence is only preliminary and <span style="font-weight: bold;">will be changed as soon as a
+format has been defined for the CTA response functions</span>.</p>
+<p style="padding-top: 0pt; text-align: left;" class="Body"></p>
+<p style="padding-top: 0pt; text-align: left;" class="Body"><span style="font-family: Courier New,Courier,monospace;">ctobssim</span>
 and <span style="font-family: Courier New,Courier,monospace;">ctlike</span>
 query for the name of the instrument response function file, and you
 may specify different
-response files if you want to study the impact of array configuration on the results. To see what is available, type (adjust the
+response files if you want to study the impact of array configuration
+on the results. To see what is available, type (adjust the
 path corresponding to your installation directory):
 </p>
 <p class="Code">&gt; ls
@@ -877,12 +890,11 @@ Help</p>
 <p style="padding-top: 0pt; text-align: left;" class="Body">
 Any questions, bug reports, or suggested enhancements related to
 ctatools and GammaLib&nbsp;should be submitted
-to <a href="mailto:knodlseder@cesr.fr">knodlseder@cesr.fr</a>
-.
+to <a href="mailto:jurgen.knodlseder@irap.omp.eu">jurgen.knodlseder@irap.omp.eu</a>.
 </p>
 <br>
 <hr size="1">
 <p class="Body">Last updated by: J&uuml;rgen
-Kn&ouml;dlseder (6 October 2011)
+Kn&ouml;dlseder (4 April 2012)
 </p>
 </body></html>

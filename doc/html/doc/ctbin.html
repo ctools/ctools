@@ -4,7 +4,8 @@
 
 <link rel="stylesheet" type="text/css" media="screen,print" href="../ctools.css">
 <meta content="Jurgen Knodlseder" name="author">
-<meta content="CTA event binning tool" name="description"></head>
+<meta content="CTA event binning tool" name="description">
+</head>
 <body>
 <p class="Header">ctbin</p>
 <p class="Body">Calculates counts maps for binned maximum
@@ -34,7 +35,8 @@ Parameter Usage</a></li>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Input event list.</td>
+<td width="525">Input event list or observation
+definition XML file.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -49,7 +51,22 @@ Parameter Usage</a></li>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Output counts map.</td>
+<td width="525">Output counts map or observation definition XML file.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(prefix = "cntmap_")
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Prefix for counts maps in observation definition file.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -149,7 +166,8 @@ yet implemented</span>).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Size of the Right Ascension / Galactic longitude axis (in pixels).</td>
+<td width="525">Size of the Right Ascension /
+Galactic longitude axis (in pixels).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -164,7 +182,8 @@ yet implemented</span>).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Size of the Declination / Galactic latitude axis (in pixels).</td>
+<td width="525">Size of the Declination / Galactic
+latitude axis (in pixels).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -194,14 +213,15 @@ yet implemented</span>).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Coordinate system (<code>CEL</code> - celestial, <code>GAL</code> - galactic).</td>
+<td width="525">Coordinate system (<code>CEL</code>
+- celestial, <code>GAL</code> - galactic).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td>&nbsp;</td>
 <td width="525">&nbsp;</td>
 </tr>
- <tr>
+<tr>
 <td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>xref
 [double]</strong></span></td>
@@ -209,7 +229,8 @@ yet implemented</span>).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Right Ascension / Galactic longitude of image centre
+<td width="525">Right Ascension / Galactic longitude
+of image centre
 (J2000, in degrees).</td>
 </tr>
 <tr>
@@ -225,7 +246,8 @@ yet implemented</span>).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Declination / Galactic latitude of image centre (J2000,
+<td width="525">Declination / Galactic latitude of
+image centre (J2000,
 in degrees).</td>
 </tr>
 <tr>
@@ -235,12 +257,14 @@ in degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(axisrot = h) [double]</strong></span></td>
+<td colspan="2"><span class="irafpar"><strong>(axisrot
+= h) [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Rotation angle of image axes (in degrees).</td>
+<td width="525">Rotation angle of image axes (in
+degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -249,21 +273,20 @@ in degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>proj = CAR [string]</strong></span></td>
+<td colspan="2"><span class="irafpar"><strong>proj
+= CAR [string]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Projection method (only <code>AZP,CAR,STG,TAN</code> are supported so far).</td>
+<td width="525">Projection method (only <code>AZP,CAR,STG,TAN</code>
+are supported so far).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td>&nbsp;</td>
 <td width="525">&nbsp;</td>
 </tr>
-
-
-
 </tbody>
 </table>
 <p class="Title">Standard parameters</p>
@@ -272,7 +295,7 @@ in degrees).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>(chatter
-= 2) [integer]</strong></span></td>
+= 1) [integer]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -301,7 +324,8 @@ task execution</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Specifies whether an existing output counts map should be overwritten.</td>
+<td width="525">Specifies whether an existing output
+counts map should be overwritten.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -311,7 +335,7 @@ task execution</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>(debug
-= yes) [boolean]</strong></span></td>
+= no) [boolean]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -345,8 +369,9 @@ the executable will dump any log file output in the console.</td>
 <p class="Title">Related FTOOLS</p>
 <br>
 <hr size="1">
-<p class="Body">Last updated by: J&uuml;rgen Kn&ouml;dlseder 16 July
-2011
+<p class="Body">Last updated by: J&uuml;rgen
+Kn&ouml;dlseder 4 April
+2012
 </p>
 <br>
 </body></html>

@@ -4,7 +4,8 @@
 
 <link rel="stylesheet" type="text/css" media="screen,print" href="../ctools.css">
 <meta content="Jurgen Knodlseder" name="author">
-<meta content="CTA maximum likelihood fitting tool" name="description"></head>
+<meta content="CTA maximum likelihood fitting tool" name="description">
+</head>
 <body>
 <p class="Header">ctlike</p>
 <p class="Body">Performs binned and unbinned maximum
@@ -17,7 +18,9 @@ and source extent from a maximum likelihood analysis of CTA data. The
 analysis can be done in a binned or an unbinned formulation of the
 log-likelihood function. For binned analysis, a counts map producted by
 <a href="ctbin.html">ctbin</a> is required. For
-unbinned analysis, an events list processed by <a href="ctselect.html">ctselect</a> is required.</p>
+unbinned analysis, an events list processed by <a href="ctselect.html">ctselect</a>
+is required. Based on the input file format, ctlike automatically
+selects between binned and unbinned maximum likelihood analysis.</p>
 <br>
 <p class="Title">Links</p>
 <ul class="Body">
@@ -31,47 +34,14 @@ Parameter Usage</a></li>
 <tbody>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>evfile
+<td colspan="2"><span class="irafpar"><strong>infile
 [file]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Input event list (for unbinned
-analysis only).</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>cntfile
-[file]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Input counts map (for binned
-analysis only).</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>method
-= BINNED &lt;BINNED|UNBINNED&gt; [string]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Maximum likelihood analysis method (<code>BINNED</code>
-- for binned maximum likelihood analysis, <code>UNBINNED</code>
-- for unbinned maximum likelihood analysis).</td>
+<td width="525">Input event list, counts map or
+observation definition XML file.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -218,7 +188,7 @@ model result file should be overwritten.</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>(debug
-= yes) [boolean]</strong></span></td>
+= no) [boolean]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -256,8 +226,9 @@ the executable will dump any log file output in the console.</td>
 </ul>
 <br>
 <hr size="1">
-<p class="Body">Last updated by: J&uuml;rgen Kn&ouml;dlseder 8 March
-2011
+<p class="Body">Last updated by: J&uuml;rgen
+Kn&ouml;dlseder 3 April
+2012
 </p>
 <br>
 </body></html>
