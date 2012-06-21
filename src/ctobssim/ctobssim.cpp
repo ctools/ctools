@@ -537,7 +537,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
             log << str(m_area) << " cm2" << std::endl;
             log << parformat("Simulation cone");
             log << "RA=" << dir.ra_deg() << " deg";
-            log << ", Dec=" << dir.dec_deg() << "deg";
+            log << ", Dec=" << dir.dec_deg() << " deg";
             log << ", r=" << rad << " deg" << std::endl;
         }
 
