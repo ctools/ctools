@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 # ==========================================================================
 # This script tests all cscripts that are shipped with ctools
 #
