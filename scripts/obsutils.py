@@ -25,7 +25,7 @@ from gammalib import *
 # ===================== #
 # Simulate observations #
 # ===================== #
-def sim(obs, log=False, debug=True, seed=0, nbins=0, binsz=0.05, npix=200):
+def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
 	"""
 	Simulate events for all observations in the container.
 	
