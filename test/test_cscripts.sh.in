@@ -20,12 +20,17 @@
 # ==========================================================================
 
 #
+# Get echo command (to circumvent built-in echo on some systems)
+#
+ECHO=`which echo`
+
+#
 # Print Header
 #
-echo ""
-echo "*****************"
-echo "* Test cscripts *"
-echo "*****************"
+$ECHO ""
+$ECHO "*****************"
+$ECHO "* Test cscripts *"
+$ECHO "*****************"
 
 
 #
@@ -44,7 +49,7 @@ export PFILES=pfiles
 #
 # Test cspull
 # ===========
-echo -n "Test cspull: "
+$ECHO -n "Test cspull: "
 chmod +x @abs_top_srcdir@/scripts/cspull.py
 @abs_top_srcdir@/scripts/cspull.py \
   srcmdl="data/crab.xml" \
@@ -62,15 +67,15 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cspull.log
-echo -n "."
+$ECHO -n "."
 if [ -s "pull.dat" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
-  echo " pull.dat file is not valid"
+  $ECHO " pull.dat file is not valid"
   exit 1
 fi
-echo " ok"
+$ECHO " ok"
 
 
 #
@@ -100,7 +105,7 @@ echo " ok"
 #
 # Test cstsdist
 # =============
-echo -n "Test cstsdist: "
+$ECHO -n "Test cstsdist: "
 chmod +x @abs_top_srcdir@/scripts/cstsdist.py
 @abs_top_srcdir@/scripts/cstsdist.py \
   outfile="ts.dat" \
@@ -117,12 +122,12 @@ chmod +x @abs_top_srcdir@/scripts/cstsdist.py
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cstsdist.log
-echo -n "."
+$ECHO -n "."
 if [ -s "ts.dat" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
-  echo " ts.dat file is not valid"
+  $ECHO " ts.dat file is not valid"
   exit 1
 fi
-echo " ok"
+$ECHO " ok"

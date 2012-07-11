@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all ctools
 #
-# Copyright (C) 2011-2012 Jurgen Knodlseder
+# Copyright (C) 2011-2012 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +20,16 @@
 # ==========================================================================
 
 #
+# Get echo command (to circumvent built-in echo on some systems)
+#
+ECHO=`which echo`
+
+#
 # Print Header
 #
-echo "***************"
-echo "* Test ctools *"
-echo "***************"
+$ECHO "***************"
+$ECHO "* Test ctools *"
+$ECHO "***************"
 
 #
 # Define executables
@@ -54,7 +59,7 @@ export PFILES=pfiles
 #
 # Test ctobssim
 # =============
-echo -n "Test ctobssim: "
+$ECHO -n "Test ctobssim: "
 $ctobssim infile="data/crab.xml" \
           outfile="events.fits" \
           caldb="irf" \
@@ -66,21 +71,21 @@ $ctobssim infile="data/crab.xml" \
           tmax=1800.0 \
           emin=0.1 \
           emax=100.0
-echo -n "."
+$ECHO -n "."
 if [ -s "events.fits" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
   echo " events.fits file is not valid"
   exit 1
 fi
-echo " ok"
+$ECHO " ok"
 
 
 #
 # Test ctskymap
 # =============
-echo -n "Test ctskymap: "
+$ECHO -n "Test ctskymap: "
 $ctskymap evfile="events.fits" \
           outfile="skymap.fits" \
           emin=0.1 \
@@ -92,21 +97,21 @@ $ctskymap evfile="events.fits" \
           xref=83.63 \
           yref=22.01 \
           proj="CAR"
-echo -n "."
+$ECHO -n "."
 if [ -s "skymap.fits" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
-  echo " skymap.fits file is not valid"
+  $ECHO " skymap.fits file is not valid"
   exit 1
 fi
-echo " ok"
+$ECHO " ok"
 
 
 #
 # Test ctbin
 # ==========
-echo -n "Test ctbin: "
+$ECHO -n "Test ctbin: "
 $ctbin evfile="events.fits" \
        outfile="cntmap.fits" \
        emin=0.1 \
@@ -119,21 +124,21 @@ $ctbin evfile="events.fits" \
        xref=83.63 \
        yref=22.01 \
        proj="CAR"
-echo -n "."
+$ECHO -n "."
 if [ -s "cntmap.fits" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
-  echo " cntmap.fits file is not valid"
+  $ECHO " cntmap.fits file is not valid"
   exit 1
 fi
-echo " ok"
+$ECHO " ok"
 
 
 #
 # Test ctselect
 # =============
-echo -n "Test ctselect: "
+$ECHO -n "Test ctselect: "
 $ctselect infile="events.fits" \
           outfile="selected_events.fits" \
           ra=83.63 \
@@ -143,32 +148,32 @@ $ctselect infile="events.fits" \
           tmax=1800.0 \
           emin=0.1 \
           emax=100.0
-echo -n "."
+$ECHO -n "."
 if [ -s "selected_events.fits" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
-  echo " selected_events.fits file is not valid"
+  $ECHO " selected_events.fits file is not valid"
   exit 1
 fi
-echo " ok"
+$ECHO " ok"
 
 
 #
 # Test ctlike
 # ===========
-echo -n "Test ctlike: "
+$ECHO -n "Test ctlike: "
 $ctlike infile="cntmap.fits" \
         srcmdl="data/crab.xml" \
         outmdl="results_binned.xml" \
         caldb="irf" \
         irf="kb_E_50h_v3"
-echo -n "."
+$ECHO -n "."
 if [ -s "results_binned.xml" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
-  echo " results_binned.xml file is not valid"
+  $ECHO " results_binned.xml file is not valid"
   exit 1
 fi
 $ctlike infile="selected_events.fits" \
@@ -176,12 +181,12 @@ $ctlike infile="selected_events.fits" \
         outmdl="results_unbinned.xml" \
         caldb="irf" \
         irf="kb_E_50h_v3"
-echo -n "."
+$ECHO -n "."
 if [ -s "results_unbinned.xml" ]
 then
-  echo -n "."
+  $ECHO -n "."
 else
-  echo " results_unbinned.xml file is not valid"
+  $ECHO " results_unbinned.xml file is not valid"
   exit 1
 fi
-echo " ok"
+$ECHO " ok"
