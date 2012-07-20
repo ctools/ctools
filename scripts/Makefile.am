@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 # Scripts to be distributed in bindir
-binscripts = cta_kb_bkgrates.py cta_root2irf.py
+binscripts = cta_kb_bkgrates.py cta_root2irf.py cta_make_nodes.py
 
 # Scripts to be distributed in pythondir
 pythonscripts = cspull.py cssens.py cstsdist.py obsutils.py
