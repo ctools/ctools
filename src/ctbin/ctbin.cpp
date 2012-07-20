@@ -441,7 +441,8 @@ void ctbin::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (m_read_ahead) {
-        m_outfile = (*this)["outfile"].filename();
+        m_outfile = (*this)["outfile"].value();
+        m_prefix  = (*this)["prefix"].value();
     }
 
     // Return

@@ -439,7 +439,8 @@ void ctselect::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (m_read_ahead) {
-        m_outfile = (*this)["outfile"].filename();
+        m_outfile = (*this)["outfile"].value();
+        m_prefix  = (*this)["prefix"].value();
     }
 
     // Derive time interval
@@ -661,7 +662,7 @@ void ctselect::init_members(void)
     // Initialise parameters
     m_infile.clear();
     m_outfile.clear();
-    m_infile.clear();
+    m_prefix.clear();
     m_ra   = 0.0;
     m_dec  = 0.0;
     m_rad  = 0.0;
@@ -697,7 +698,7 @@ void ctselect::copy_members(const ctselect& app)
     // Copy parameters
     m_infile  = app.m_infile;
     m_outfile = app.m_outfile;
-    m_infile  = app.m_infile;
+    m_prefix  = app.m_prefix;
     m_ra      = app.m_ra;
     m_dec     = app.m_dec;
     m_rad     = app.m_rad;
