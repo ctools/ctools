@@ -41,7 +41,11 @@ None
 
 7. ctlike - CTA maximum likelihood fitting
 ------------------------------------------
-None
+ctlike computes now the total number of observed events and dumps
+them in the log file just before it dumps the number of predicted
+events. It also computes the difference between observed and
+predicted events so that the difference is immediately visible.
+
 
 8. ctskymap - CTA sky mapping
 -----------------------------

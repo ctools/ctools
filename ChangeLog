@@ -4,18 +4,20 @@
         ========================
 
 	Add observation definition XML files support to ctobssim
+        Improve logging information for ctlike
 
 2012-03-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.4.0 released
         ========================
 
-        Add handling of observation definition XML files to ctselect, ctbin
-          and ctlike
+        Add handling of observation definition XML files to ctselect
+        Add handling of observation definition XML files to ctbin
+        Add handling of observation definition XML files to ctlike
         Add deadtime correction factor to ctobssim
         No longer query output parameters first
-        Remove method parameter from ctlike and replace evfile and cntmap
-          parameters by infile parameter 
+        Remove method parameter from ctlike
+        Replace evfile and cntmap parameters by infile parameter in ctlike
         Add configure options for Mac OSX universal builds
         Remove automake dependency tracking
         Improve building of Python bindings

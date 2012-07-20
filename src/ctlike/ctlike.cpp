@@ -256,10 +256,19 @@ void ctlike::run(void)
     // Optimize model parameters using LM optimizer
     optimize_lm();
 
+    // Compute number of observed events in all observations
+    double num_events = 0.0;
+    for (int i = 0; i < m_obs.size(); ++i) {
+        num_events += m_obs[i].events()->number();
+    }
+
     // Write results into logger
     if (logTerse()) {
-        log << " Maximum log likelihood ....: " << m_logL << std::endl;
-        log << " Npred .....................: " << m_obs.npred() << std::endl;
+        log << parformat("Maximum log likelihood") << m_logL << std::endl;
+        log << parformat("Observed events  (Nobs)") << num_events << std::endl;
+        log << parformat("Predicted events (Npred)") << m_obs.npred();
+        log << " (Nobs - Npred = " << num_events-m_obs.npred();
+        log << ")" << std::endl;
         log << m_obs.models() << std::endl;
     }
 
@@ -282,7 +291,7 @@ void ctlike::save(void)
     }
 
     // Get output filename
-    m_outmdl = (*this)["outmdl"].value();
+    m_outmdl = (*this)["outmdl"].filename();
 
     // Write results out as XML model
     if (toupper(m_outmdl) != "NONE") {
