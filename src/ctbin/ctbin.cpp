@@ -441,8 +441,8 @@ void ctbin::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (m_read_ahead) {
-        m_outfile = (*this)["outfile"].value();
-        m_prefix  = (*this)["prefix"].value();
+        m_outfile = (*this)["outfile"].filename();
+        m_prefix  = (*this)["prefix"].string();
     }
 
     // Return
@@ -710,7 +710,7 @@ std::string ctbin::set_outfile_name(const std::string& filename) const
 void ctbin::save_fits(void)
 {
     // Get output filename
-    m_outfile = (*this)["outfile"].value();
+    m_outfile = (*this)["outfile"].filename();
 
     // Get CTA observation from observation container
     GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[0]);
@@ -737,8 +737,8 @@ void ctbin::save_fits(void)
 void ctbin::save_xml(void)
 {
     // Get output filename and prefix
-    m_outfile = (*this)["outfile"].value();
-    m_prefix  = (*this)["prefix"].value();
+    m_outfile = (*this)["outfile"].filename();
+    m_prefix  = (*this)["prefix"].string();
 
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
