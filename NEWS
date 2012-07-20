@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-05-00
 
 Author(s) : Juergen Knoedlseder
 
-July 18, 2012
+July 21, 2012
 
 
 1. Introduction
@@ -23,7 +23,10 @@ None
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+If several observations are processed at once, ctobssim now outputs
+an observation definition XML file and separate FITS files for each
+observation. The filenames of the FITS files will be written to the
+observation definition file.
 
 
 5. ctselect - CTA event selection

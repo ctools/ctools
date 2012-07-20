@@ -1,7 +1,9 @@
-2012-07-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2012-07-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.5.0 released
         ========================
+
+	Add observation definition XML files support to ctobssim
 
 2012-03-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 

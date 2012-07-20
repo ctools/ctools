@@ -202,9 +202,8 @@ void ctobssim::clear(void)
  ***************************************************************************/
 void ctobssim::execute(void)
 {
-    // Read ahead output filename so that it gets dumped correctly in the
-    // parameters log
-    m_outfile = (*this)["outfile"].filename();
+    // Signal that some parameters should be read ahead
+    m_read_ahead = true;
 
     // Run the simulation
     run();
@@ -226,8 +225,9 @@ void ctobssim::execute(void)
 void ctobssim::run(void)
 {
     // Switch screen logging on in debug mode
-    if (logDebug())
+    if (logDebug()) {
         log.cout(true);
+    }
 
     // Get parameters
     get_parameters();
@@ -261,6 +261,9 @@ void ctobssim::run(void)
         }
     }
 
+    // Initialise counters
+    int n_observations = 0;
+
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
@@ -280,6 +283,9 @@ void ctobssim::run(void)
                 }
             }
 
+            // Increment counter
+            n_observations++;
+
             // Simulate source events
             simulate_source(obs, m_obs.models());
 
@@ -290,18 +296,35 @@ void ctobssim::run(void)
 
     } // endfor: looped over observations
 
+    // If more than a single observation has been handled then make sure that
+    // an XML file will be used for storage
+    if (n_observations > 1) {
+        m_use_xml = true;
+    }
+
     // Return
     return;
 }
 
 
 /***********************************************************************//**
- * @brief Save simulated observation
+ * @brief Save the selected event list(s)
  *
- * This method saves the results.
+ * This method saves the selected event list(s) into FITS file(s). There are
+ * two modes, depending on the m_use_xml flag.
  *
- * @todo Implement XML file output in case that on observation list is
- *       provided on input.
+ * If m_use_xml is true, all selected event list(s) will be saved into FITS
+ * files, where the output filenames are constructued from the input
+ * filenames by prepending the m_prefix string to name. Any path information
+ * will be stripped form the input name, hence event files will be written
+ * into the local working directory (unless some path information is present
+ * in the prefix). In addition, an XML file will be created that gathers
+ * the filename information for the selected event list(s). If an XML file
+ * was present on input, all metadata information will be copied from this
+ * input file.
+ *
+ * If m_use_xml is false, the selected event list will be saved into a FITS
+ * file.
  ***************************************************************************/
 void ctobssim::save(void)
 {
@@ -316,35 +339,15 @@ void ctobssim::save(void)
         }
     }
 
-    // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    // Case A: Save event file(s) and XML metadata information
+    if (m_use_xml) {
+        save_xml();
+    }
 
-    // Loop over all observation in the container
-    int file_num = 0;
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
-
-        // Save only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Set filename. If more than one file will be created an
-            // index "_xxx" will be appended.
-            std::string filename = m_outfile;
-            if (file_num > 0) {
-                filename += "_"+str(file_num);
-            }
-
-            // Save file
-            obs->save(filename, clobber());
-
-            // Increment file number
-            file_num++;
-
-        } // endif: observation was a CTA observation
-
-    } // endfor: looped over files
+    // Case B: Save event file as FITS file
+    else {
+        save_fits();
+    }
 
     // Return
     return;
@@ -395,10 +398,25 @@ void ctobssim::get_parameters(void)
         // Load models into container
         m_obs.models(m_infile);
 
+        // Signal that no XML file should be used for storage
+        m_use_xml = false;
+
     } // endif: there was no observation in the container
+
+    // ... otherwise we signal that an XML file should be written
+    else {
+        m_use_xml = true;
+    }
 
     // Get other parameters
     m_seed = (*this)["seed"].integer();
+
+    // Optionally read ahead parameters so that they get correctly
+    // dumped into the log file
+    if (m_read_ahead) {
+        m_outfile = (*this)["outfile"].value();
+        m_prefix  = (*this)["prefix"].value();
+    }
 
     // Initialise random number generator
     m_ran.seed(m_seed);
@@ -801,6 +819,7 @@ void ctobssim::init_members(void)
     // Initialise user parameters
     m_infile.clear();
     m_outfile.clear();
+    m_prefix.clear();
     m_caldb.clear();
     m_irf.clear();
     m_seed  =   1;
@@ -815,6 +834,8 @@ void ctobssim::init_members(void)
 
     // Initialise protected members
     m_obs.clear();
+    m_use_xml    = false;
+    m_read_ahead = false;
 
     // Set fixed parameters
     m_area = 19634954.0 * 1.0e4;     //!< pi*(2500^2) m^2
@@ -838,6 +859,7 @@ void ctobssim::copy_members(const ctobssim& app)
     // Copy user parameters
     m_infile   = app.m_infile;
     m_outfile  = app.m_outfile;
+    m_prefix   = app.m_prefix;
     m_caldb    = app.m_caldb;
     m_irf      = app.m_irf;
     m_seed     = app.m_seed;
@@ -851,10 +873,12 @@ void ctobssim::copy_members(const ctobssim& app)
     m_deadc    = app.m_deadc;
     
     // Copy protected members
-    m_area     = app.m_area;
-    m_time_max = app.m_time_max;
-    m_ran      = app.m_ran;
-    m_obs      = app.m_obs;
+    m_area       = app.m_area;
+    m_time_max   = app.m_time_max;
+    m_ran        = app.m_ran;
+    m_obs        = app.m_obs;
+    m_use_xml    = app.m_use_xml;
+    m_read_ahead = app.m_read_ahead;
 
     // Return
     return;
@@ -870,6 +894,81 @@ void ctobssim::free_members(void)
     if (logTerse()) {
         log << std::endl;
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list in FITS format.
+ *
+ * Save the event list as a FITS file. The filename of the FITS file is
+ * specified by the outfile parameter.
+ ***************************************************************************/
+void ctobssim::save_fits(void)
+{
+    // Get output filename
+    m_outfile = (*this)["outfile"].value();
+
+    // Get CTA observation from observation container
+    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[0]);
+
+    // Save observation into FITS file
+    obs->save(m_outfile, clobber());
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list(s) in XML format.
+ *
+ * Save the event list(s) into FITS files and write the file path information
+ * into a XML file. The filename of the XML file is specified by the outfile
+ * parameter, the filename(s) of the event lists are built by prepending a
+ * prefix to the input event list filenames. Any path present in the input
+ * filename will be stripped, i.e. the event list(s) will be written in the
+ * local working directory (unless a path is specified in the prefix).
+ ***************************************************************************/
+void ctobssim::save_xml(void)
+{
+    // Get output filename and prefix
+    m_outfile = (*this)["outfile"].value();
+    m_prefix  = (*this)["prefix"].value();
+
+    // Initialise file number
+    int file_num = 0;
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+
+        // Handle only CTA observations
+        if (obs != NULL) {
+
+            // Set event output file name
+            std::string outfile = m_prefix + str(file_num) + ".fits";
+
+            // Store output file name in observation
+            obs->eventfile(outfile);
+
+            // Save observation into FITS file
+            obs->save(outfile, clobber());
+
+            // Increment file number
+            file_num++;
+
+
+        } // endif: observation was a CTA observations
+
+    } // endfor: looped over observations
+
+    // Save observations in XML file
+    m_obs.save(m_outfile);
 
     // Return
     return;

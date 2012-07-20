@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-04-00"
+#define CTOBSSIM_VERSION "00-05-00"
 
 
 /***********************************************************************//**
@@ -75,10 +75,13 @@ protected:
     void init_members(void);
     void copy_members(const ctobssim& app);
     void free_members(void);
+    void save_fits(void);
+    void save_xml(void);
 
     // User parameters
     std::string   m_infile;     //!< Input model
     std::string   m_outfile;    //!< Output events file
+    std::string   m_prefix;     //!< Prefix for multiple event lists
     std::string   m_caldb;      //!< Calibration database repository
     std::string   m_irf;        //!< Instrument response function
     int           m_seed;       //!< Random number generator seed 
@@ -96,6 +99,8 @@ protected:
     GTime         m_time_max;   //!< Maximum length of time slice (sec)
     GRan          m_ran;        //!< Random number generator
     GObservations m_obs;        //!< Observation container
+    bool          m_use_xml;    //!< Use XML file instead of FITS file
+    bool          m_read_ahead; //!< Read ahead parameters
 };
 
 #endif /* CTOBSSIM_HPP */
