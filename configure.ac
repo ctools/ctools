@@ -29,7 +29,7 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [0.5.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [0.4.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([gnu no-dependencies])
@@ -498,6 +498,7 @@ AC_C_CONST
 AC_C_INLINE
 
 
+
 #############################################################################
 # Checks if Python bindings are to be build                                 #
 # ------------------------------------------------------------------------- #
@@ -687,6 +688,57 @@ root directory of GammaLib.])
 fi
 
 
+
+#############################################################################
+# Checks for OpenMP checking option (G_OPENMP)                              #
+############################################################################
+
+openmp_ok=no
+
+# Detect if GammaLib has been compiled with OpenMP
+AC_MSG_CHECKING(if GammaLib has been compiled with OpenMP)
+AC_LINK_IFELSE(AC_LANG_PROGRAM([[#include <GObservations.hpp>]],,),			     
+		   [gammalib_with_openmp=no;AC_MSG_RESULT(no)],
+ 		   [gammalib_with_openmp=yes;AC_MSG_RESULT(yes)])
+
+# Check if openMP is available
+m4_ifdef([AC_OPENMP],[AC_OPENMP], [AX_OPENMP([openmp_ok=yes],[openmp_ok=no])])
+if test "x$ac_cv_prog_cxx_openmp" != "xunsupported" && test "x$ac_cv_prog_cxx_openmp" != "x"; then
+   openmp_ok=yes
+fi
+
+AC_MSG_CHECKING(whether to enable openMP)
+
+#openMP is available
+if test "x$openmp_ok" = "xyes"; then
+   #if gammalib is compiled with openMP, ctools must have it.
+   if test "x$gammalib_with_openmp" = "xyes"; then
+      enable_openmp="yes"
+   else
+      #Else, we propose the option
+      AC_ARG_ENABLE([openmp],
+			AS_HELP_STRING([--enable-openmp],
+				         [To active multi-threading [default=yes]]),
+					 [enable_openmp="$enableval"],
+					 [enable_openmp="yes"])
+   fi
+fi
+
+if test "x$enable_openmp" = "xyes"; then
+	CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
+        AC_MSG_RESULT(yes)
+    else
+        enable_openmp=no
+	AC_MSG_RESULT(no)
+fi
+
+if test "x$enable_openmp" = "xno" && test "x$gammalib_with_openmp" = "xyes"; then
+    #Error, we cannot compile.
+    AC_MSG_ERROR([The GammaLib library has been built with openmp option but openmp is not available on this system. Please install the libarie or re-build gammalib.])
+fi
+
+AM_CONDITIONAL(OPENMP,test "x$enable_openmp" = "xyes")
+
 #############################################################################
 # Build static code?                                                        #
 #############################################################################
@@ -794,6 +846,11 @@ else
 fi
 
 # Dump compile options
+if test "x$enable_openmp" = "xyes"; then
+  echo "  * Enable openMP                (yes)   (default)"
+else
+  echo "  - Enable openMP                (no)"
+fi
 if test "x$enable_debug" = "xyes"; then
   echo "  * Compile in debug code        (yes)"
 else
