@@ -52,8 +52,8 @@ public:
     GObservations& obs(void);
     void           get_parameters(void);
     void           set_list(GCTAObservation* obs);
-    void           simulate_source(GCTAObservation* obs, const GModels& models);
-    void           simulate_background(GCTAObservation* obs, const GModels& models);
+    void           simulate_source(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog=NULL);
+    void           simulate_background(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog=NULL);
 };
 
 

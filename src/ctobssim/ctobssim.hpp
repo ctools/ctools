@@ -67,8 +67,8 @@ public:
     GObservations& obs(void) { return m_obs; }
     void           get_parameters(void);
     void           set_list(GCTAObservation* obs);
-    void           simulate_source(GCTAObservation* obs, const GModels& models);
-    void           simulate_background(GCTAObservation* obs, const GModels& models);
+    void           simulate_source(GCTAObservation* obs, const GModels& models,GRan& ran, GLog* wrklog=NULL);
+    void           simulate_background(GCTAObservation* obs, const GModels& models,GRan& ran, GLog* wrklog=NULL);
 
 protected:
     // Protected methods
@@ -97,7 +97,8 @@ protected:
     // Protected members
     double        m_area;       //!< Surface area for simulation (cm2)
     GTime         m_time_max;   //!< Maximum length of time slice (sec)
-    GRan          m_ran;        //!< Random number generator
+    //GRan          m_ran;        //!< Random number generator
+    std::vector<GRan>  m_rans;  //!< Random number generators
     GObservations m_obs;        //!< Observation container
     bool          m_use_xml;    //!< Use XML file instead of FITS file
     bool          m_read_ahead; //!< Read ahead parameters

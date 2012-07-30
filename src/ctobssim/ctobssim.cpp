@@ -264,38 +264,44 @@ void ctobssim::run(void)
     // Initialise counters
     int n_observations = 0;
 
-    // Loop over all observation in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
+    #pragma omp parallel
+    {
+        //each thread has his own variable;
+        GLog wrklog(log);
 
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        #pragma omp for
+        // Loop over all observation in the container
+        for (int i = 0; i < m_obs.size(); ++i) {
+    
+            // Get CTA observation
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+    
+            // Continue only if observation is a CTA observation
+            if (obs != NULL) {        
+                // Write header for observation
+                if (logTerse()) {
+                    if (obs->name().length() > 1) {
+                        wrklog.header3("Observation "+obs->name());
+                    }
+                    else {
+                        wrklog.header3("Observation");
+                    }
+                }   
+                // Increment counter
+                n_observations++;
+    
+                // Simulate source events
+                simulate_source(obs, m_obs.models(),m_rans[i],&wrklog);
+    
+                // Simulate source events
+                simulate_background(obs, m_obs.models(),m_rans[i],&wrklog);
+    
+            } // endif: CTA observation found
+    
+        } // endfor: looped over observations
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
-            if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
-            }
-
-            // Increment counter
-            n_observations++;
-
-            // Simulate source events
-            simulate_source(obs, m_obs.models());
-
-            // Simulate source events
-            simulate_background(obs, m_obs.models());
-
-        } // endif: CTA observation found
-
-    } // endfor: looped over observations
-
+    } // end pragma omp parallel
+    
     // If more than a single observation has been handled then make sure that
     // an XML file will be used for storage
     if (n_observations > 1) {
@@ -419,7 +425,36 @@ void ctobssim::get_parameters(void)
     }
 
     // Initialise random number generator
-    m_ran.seed(m_seed);
+    //m_ran.seed(m_seed);
+    
+    GRan master(m_seed);
+    std::vector<unsigned long long int> seeds;
+         
+    bool repeat = false;
+    
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+        unsigned long long int new_seed;
+        
+        do {
+            // Each seed will be unique
+            new_seed = (unsigned long long int)(master.int64() * 1.0e2);
+            repeat = false;
+            for (int j = 0; j < seeds.size(); ++j) {
+                if (new_seed == seeds[j]) {
+                    repeat = true;
+                    break;
+                }
+            }
+        } while(repeat);
+        
+        //Add the seed to the vector
+        seeds.push_back(new_seed);
+        
+        //Use the seed to create a GRan for the observation number i
+        m_rans.push_back(GRan(new_seed));
+    }
+    
 
     // Return
     return;
@@ -524,11 +559,15 @@ void ctobssim::set_list(GCTAObservation* obs)
  *       they can be scatter within the ROI and energy interval by the
  *       PSF and energy dispersion.
  ***************************************************************************/
-void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
+void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
-
+        
+        if(wrklog==NULL){
+            wrklog=&log;
+        }
+        
         // Get pointer on CTA response. Throw an exception if the response
         // is not defined.
         GCTAResponse* rsp = obs->response();
@@ -551,12 +590,12 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
 
         // Dump simulation cone information
         if (logNormal()) {
-            log << parformat("Simulation area");
-            log << str(m_area) << " cm2" << std::endl;
-            log << parformat("Simulation cone");
-            log << "RA=" << dir.ra_deg() << " deg";
-            log << ", Dec=" << dir.dec_deg() << " deg";
-            log << ", r=" << rad << " deg" << std::endl;
+            *wrklog << parformat("Simulation area");
+            *wrklog << str(m_area) << " cm2" << std::endl;
+            *wrklog << parformat("Simulation cone");
+            *wrklog << "RA=" << dir.ra_deg() << " deg";
+            *wrklog << ", Dec=" << dir.dec_deg() << " deg";
+            *wrklog << ", r=" << rad << " deg" << std::endl;
         }
 
         // Initialise indentation for logging
@@ -573,10 +612,10 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
             if (logNormal()) {
                 if (events->gti().size() > 1) {
                     indent++;
-                    log.indent(indent);
+                    wrklog->indent(indent);
                 }
-                log << parformat("Time interval");
-                log << tmin << " - " << tmax << std::endl;
+                *wrklog << parformat("Time interval");
+                *wrklog << tmin << " - " << tmax << std::endl;
             }
             
             // Loop over all energy boundaries
@@ -590,10 +629,10 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                 if (logNormal()) {
                     if (events->ebounds().size() > 1) {
                         indent++;
-                        log.indent(indent);
+                        wrklog->indent(indent);
                     }
-                    log << parformat("Energy range");
-                    log << emin << " - " << emax << std::endl;
+                    *wrklog << parformat("Energy range");
+                    *wrklog << emin << " - " << emax << std::endl;
                 }
 
                 // Loop over all sky models
@@ -627,16 +666,17 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                             if (logExplicit()) {
                                 if (tmax - tmin > m_time_max) {
                                     indent++;
-                                    log.indent(indent);
+                                    wrklog->indent(indent);
                                 }
-                                log << parformat("Time slice");
-                                log << tstart << " - " << tstop << std::endl;
+                                *wrklog << parformat("Time slice");
+                                *wrklog << tstart << " - " << tstop << std::endl;
+
                             }
 
                             // Get photons
                             GPhotons photons = model->mc(m_area, dir, rad,
                                                          emin, emax,
-                                                         tstart, tstop, m_ran);
+                                                         tstart, tstop, ran);
 
                             // Simulate events from photons
                             for (int i = 0; i < photons.size(); ++i) {
@@ -649,7 +689,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                                 GCTAEventAtom* event = rsp->mc(m_area,
                                                                photons[i],
                                                                *obs,
-                                                               m_ran);
+                                                               ran);
                                 if (event != NULL) {
                                     events->append(*event);
                                     delete event;
@@ -665,7 +705,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
                             if (logExplicit()) {
                                 if (tmax - tmin > m_time_max) {
                                     indent--;
-                                    log.indent(indent);
+                                    wrklog->indent(indent);
                                 }
                             }
             
@@ -673,18 +713,19 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
 
                         // Dump simulation results
                         if (logNormal()) {
-                            log << parformat("MC source photons");
-                            log << str(nphotons);
+                            *wrklog << parformat("MC source photons");
+                            *wrklog << str(nphotons);
                             if (model->name().length() > 0) {
-                                log << " [" << model->name() << "]";
+                                *wrklog << " [" << model->name() << "]";
                             }
-                            log << std::endl;
-                            log << parformat("MC source events");
-                            log << str(events->size());
+                            *wrklog << std::endl;
+                            *wrklog << parformat("MC source events");
+                            *wrklog << str(events->size());
                             if (model->name().length() > 0) {
-                                log << " [" << model->name() << "]";
+                                *wrklog << " [" << model->name() << "]";
                             }
-                            log << std::endl;
+                            *wrklog << std::endl;
+                           
                         }
 
                     } // endif: model was a sky model
@@ -693,17 +734,18 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
 
                 // Dump simulation results
                 if (logNormal()) {
-                    log << parformat("MC source events");
-                    log << str(events->size());
-                    log << " (all source models)";
-                    log << std::endl;
+                    *wrklog << parformat("MC source events");
+                    *wrklog << str(events->size());
+                    *wrklog << " (all source models)";
+                    *wrklog << std::endl;
                 }
                     
                 // Reset indentation
                 if (logNormal()) {
                     if (events->ebounds().size() > 1) {
                         indent--;
-                        log.indent(indent);
+                        wrklog->indent(indent);
+
                     }
                 }
                 
@@ -713,14 +755,15 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
             if (logNormal()) {
                 if (events->gti().size() > 1) {
                     indent--;
-                    log.indent(indent);
+                    wrklog->indent(indent);
+                    
                 }
             }
 
         } // endfor: looped over all time intervals
 
         // Reset indentation
-        log.indent(0);
+        wrklog->indent(0);
 
     } // endif: observation pointer was valid
 
@@ -740,11 +783,15 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models)
  *
  * This method does nothing if the observation pointer is NULL.
  ***************************************************************************/
-void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
+void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
+        if(wrklog==NULL){
+            wrklog=&log;
+        }
+        
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
@@ -766,7 +813,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
 
                 // Get simulated event list. Note that this method includes
                 // the deadtime correction.
-                GCTAEventList* list = model->mc(*obs, m_ran);
+                GCTAEventList* list = model->mc(*obs, ran);
 
                 // Reserves space for events
                 events->reserve(list->size()+events->size());
@@ -784,8 +831,8 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models)
 
                 // Dump simulation results
                 if (logNormal()) {
-                    log << parformat("MC background events");
-                    log << str(list->size()) << std::endl;
+                    *wrklog << parformat("MC background events");
+                    *wrklog << str(list->size()) << std::endl;
                 }
 
                 // Free event list
@@ -875,7 +922,7 @@ void ctobssim::copy_members(const ctobssim& app)
     // Copy protected members
     m_area       = app.m_area;
     m_time_max   = app.m_time_max;
-    m_ran        = app.m_ran;
+    m_rans        = app.m_rans;
     m_obs        = app.m_obs;
     m_use_xml    = app.m_use_xml;
     m_read_ahead = app.m_read_ahead;
