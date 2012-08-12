@@ -132,10 +132,14 @@ if is_unit_test:
 else:
 	data_files=[('@prefix@/share/ctools/swig', install_files)]
 
+# Optionally add OpenMP support
 if '@OPENMP_TRUE@' != '#':
-		extra_compile_args=['-fopenmp']
-		extra_link_args=['-fopenmp']
-		
+	extra_compile_args=['-fopenmp']
+	extra_link_args=['-fopenmp']
+else:
+	extra_compile_args=[]
+	extra_link_args=[]
+
 # Setup
 setup(name='@PACKAGE_NAME@',
       version='@PACKAGE_VERSION@',
