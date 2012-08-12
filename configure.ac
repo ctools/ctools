@@ -695,6 +695,9 @@ fi
 
 openmp_ok=no
 
+# Check for C++
+AC_LANG(C++)
+
 # Detect if GammaLib has been compiled with OpenMP
 AC_MSG_CHECKING(if GammaLib has been compiled with OpenMP)
 AC_LINK_IFELSE(AC_LANG_PROGRAM([[#include <GObservations.hpp>]],,),			     
