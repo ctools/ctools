@@ -267,17 +267,23 @@ void ctobssim::run(void)
     #pragma omp parallel
     {
         //each thread has his own variable;
-        GLog wrklog(log);
+        GLog wrklog;
+
+        //Copy configuration
+        wrklog.date(log.date());
+        wrklog.name(log.name());
+
+        // Set a big value to block the flush
+        wrklog.max_size(10000000);
 
         #pragma omp for
         // Loop over all observation in the container
         for (int i = 0; i < m_obs.size(); ++i) {
-    
             // Get CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
     
             // Continue only if observation is a CTA observation
-            if (obs != NULL) {        
+            if (obs != NULL) {
                 // Write header for observation
                 if (logTerse()) {
                     if (obs->name().length() > 1) {
@@ -286,19 +292,25 @@ void ctobssim::run(void)
                     else {
                         wrklog.header3("Observation");
                     }
-                }   
+                }
                 // Increment counter
                 n_observations++;
-    
+
                 // Simulate source events
                 simulate_source(obs, m_obs.models(),m_rans[i],&wrklog);
-    
+
                 // Simulate source events
                 simulate_background(obs, m_obs.models(),m_rans[i],&wrklog);
-    
+
             } // endif: CTA observation found
-    
+
         } // endfor: looped over observations
+
+        // Add wrklog to log
+        #pragma omp critical (log)
+        {
+            log<<wrklog;
+        }
 
     } // end pragma omp parallel
     
