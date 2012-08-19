@@ -734,6 +734,19 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+# Set system specific settings
+OPENMP_LIB_LDFLAGS=
+if test "x$enable_openmp" = "xyes"; then
+    case $ac_sys_system/$ac_sys_release in
+    Darwin/*)
+        #
+        #
+        OPENMP_LIB_LDFLAGS=-lgomp
+        ;;
+    esac
+fi
+AC_SUBST(OPENMP_LIB_LDFLAGS)
+
 # Signal if ctools cannot be compiled as gammalibe requires OpenMP but ctools
 # cannot be compiled with OpenMP
 if test "x$enable_openmp" = "xno" && test "x$gammalib_with_openmp" = "xyes"; then
