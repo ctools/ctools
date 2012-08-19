@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-05-00"
+#define CTOBSSIM_VERSION "00-06-00"
 
 
 /***********************************************************************//**
@@ -95,13 +95,12 @@ protected:
     double        m_deadc;      //!< Average deadtime correction
 
     // Protected members
-    double        m_area;       //!< Surface area for simulation (cm2)
-    GTime         m_time_max;   //!< Maximum length of time slice (sec)
-    //GRan          m_ran;        //!< Random number generator
-    std::vector<GRan>  m_rans;  //!< Random number generators
-    GObservations m_obs;        //!< Observation container
-    bool          m_use_xml;    //!< Use XML file instead of FITS file
-    bool          m_read_ahead; //!< Read ahead parameters
+    double            m_area;       //!< Surface area for simulation (cm2)
+    GTime             m_time_max;   //!< Maximum length of time slice (sec)
+    std::vector<GRan> m_rans;       //!< Random number generators
+    GObservations     m_obs;        //!< Observation container
+    bool              m_use_xml;    //!< Use XML file instead of FITS file
+    bool              m_read_ahead; //!< Read ahead parameters
 };
 
 #endif /* CTOBSSIM_HPP */

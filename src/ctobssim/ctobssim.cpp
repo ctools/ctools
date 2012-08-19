@@ -264,26 +264,32 @@ void ctobssim::run(void)
     // Initialise counters
     int n_observations = 0;
 
+    // From here on the code can be parallelized if OpenMP support
+    // is enabled. The code in the following block corresponds to the
+    // code that will be executed in each thread
     #pragma omp parallel
     {
-        //each thread has his own variable;
+        // Each thread will have it's own logger to avoid conflicts
         GLog wrklog;
 
-        //Copy configuration
+        // Copy configuration from application logger to thread logger
         wrklog.date(log.date());
         wrklog.name(log.name());
 
-        // Set a big value to block the flush
+        // Set a big value to avoid flushing
         wrklog.max_size(10000000);
 
+        // Loop over all observation in the container. If OpenMP support
+        // is enabled, this looped will be parallelized.
         #pragma omp for
-        // Loop over all observation in the container
         for (int i = 0; i < m_obs.size(); ++i) {
+
             // Get CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
-    
+
             // Continue only if observation is a CTA observation
             if (obs != NULL) {
+
                 // Write header for observation
                 if (logTerse()) {
                     if (obs->name().length() > 1) {
@@ -293,23 +299,25 @@ void ctobssim::run(void)
                         wrklog.header3("Observation");
                     }
                 }
+
                 // Increment counter
                 n_observations++;
 
                 // Simulate source events
-                simulate_source(obs, m_obs.models(),m_rans[i],&wrklog);
+                simulate_source(obs, m_obs.models(), m_rans[i], &wrklog);
 
                 // Simulate source events
-                simulate_background(obs, m_obs.models(),m_rans[i],&wrklog);
+                simulate_background(obs, m_obs.models(), m_rans[i], &wrklog);
 
             } // endif: CTA observation found
 
         } // endfor: looped over observations
 
-        // Add wrklog to log
+        // At the end, the content of the thread logger is added to
+        // the application logger
         #pragma omp critical (log)
         {
-            log<<wrklog;
+            log << wrklog;
         }
 
     } // end pragma omp parallel
@@ -436,22 +444,33 @@ void ctobssim::get_parameters(void)
         m_prefix  = (*this)["prefix"].string();
     }
 
-    // Initialise random number generator
-    //m_ran.seed(m_seed);
-    
+    // Initialise random number generators. We initialise here one random
+    // number generator per observation so that each observation will
+    // get it's own random number generator. This will lead to identical
+    // results independently of code parallelization with OpenMP. The
+    // seeds for all random number generators are derived randomly but
+    // fully deterministacally from the seed parameter, so that a given
+    // seed parameter leads always to the same set of simulated events, and
+    // this independently of parallelization.
+
+    // Get a random number generator for seed determination
     GRan master(m_seed);
-    std::vector<unsigned long long int> seeds;
          
-    bool repeat = false;
+    // Allocate vector of random number generator seeds
+    std::vector<unsigned long long int> seeds;
     
-    // Loop over all observation in the container
+    // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Allocate new seed value
         unsigned long long int new_seed;
-        
+
+        // Determine new seed value. We make sure that the new seed
+        // value has not been used already for another observation.
+        bool repeat = false;
         do {
-            // Each seed will be unique
             new_seed = (unsigned long long int)(master.int64() * 1.0e2);
-            repeat = false;
+            repeat   = false;
             for (int j = 0; j < seeds.size(); ++j) {
                 if (new_seed == seeds[j]) {
                     repeat = true;
@@ -460,13 +479,14 @@ void ctobssim::get_parameters(void)
             }
         } while(repeat);
         
-        //Add the seed to the vector
+        // Add the seed to the vector for bookkeeping
         seeds.push_back(new_seed);
         
-        //Use the seed to create a GRan for the observation number i
+        // Use the seed to create a random number generator for the
+        // actual observation
         m_rans.push_back(GRan(new_seed));
-    }
-    
+
+    } // endfor: looped over observations
 
     // Return
     return;
@@ -556,6 +576,8 @@ void ctobssim::set_list(GCTAObservation* obs)
  *
  * @param[in] obs Pointer on CTA observation.
  * @param[in] photons Photon list.
+ * @param[in] ran Random number generator.
+ * @param[in] wrklog Pointer to logger.
  *
  * @exception GCTAException::no_response
  *            No valid response found in CTA observation
@@ -571,13 +593,15 @@ void ctobssim::set_list(GCTAObservation* obs)
  *       they can be scatter within the ROI and energy interval by the
  *       PSF and energy dispersion.
  ***************************************************************************/
-void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog)
+void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
+                               GRan& ran, GLog* wrklog)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
-        
-        if(wrklog==NULL){
-            wrklog=&log;
+
+        // If no logger is specified then use the default logger
+        if (wrklog == NULL) {
+            wrklog = &log;
         }
         
         // Get pointer on CTA response. Throw an exception if the response
@@ -789,19 +813,23 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models, GRan
  *
  * @param[in] obs Pointer on CTA observation.
  * @param[in] models Models.
+ * @param[in] ran Random number generator.
+ * @param[in] wrklog Pointer to logger.
  *
  * Simulate background events from models. The events are stored as event
  * list in the observation.
  *
  * This method does nothing if the observation pointer is NULL.
  ***************************************************************************/
-void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog)
+void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models,
+                                   GRan& ran, GLog* wrklog)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
-        if(wrklog==NULL){
-            wrklog=&log;
+        // If no logger is specified then use the default logger
+        if (wrklog == NULL) {
+            wrklog = &log;
         }
         
         // Make sure that the observation holds a CTA event list. If this
@@ -892,6 +920,7 @@ void ctobssim::init_members(void)
     m_deadc = 1.0;
 
     // Initialise protected members
+    m_rans.clear();
     m_obs.clear();
     m_use_xml    = false;
     m_read_ahead = false;
@@ -934,7 +963,7 @@ void ctobssim::copy_members(const ctobssim& app)
     // Copy protected members
     m_area       = app.m_area;
     m_time_max   = app.m_time_max;
-    m_rans        = app.m_rans;
+    m_rans       = app.m_rans;
     m_obs        = app.m_obs;
     m_use_xml    = app.m_use_xml;
     m_read_ahead = app.m_read_ahead;
