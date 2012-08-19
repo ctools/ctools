@@ -1,6 +1,5 @@
 #!/bin/sh
 
-aclocal -I m4
 if which libtoolize >/dev/null; then
   libtoolize --copy
 else
@@ -8,7 +7,7 @@ else
     glibtoolize --copy
   fi
 fi
-#libtoolize --copy
+aclocal -I m4
 autoconf
 autoheader
 automake --add-missing --copy

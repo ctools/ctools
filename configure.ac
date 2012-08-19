@@ -64,10 +64,10 @@ AC_CANONICAL_HOST
 
 
 #############################################################################
-# Determine the C and C++ compilers.  This has to come before the check for #
+# Check for valid C++ compiler.  This has to come before the check for      #
 # header files, otherwise we won't detect if the C++ compiler is missing.   #
 #############################################################################
-AC_PROG_CC
+AC_LANG(C++)
 AC_PROG_CXX
 
 
@@ -461,11 +461,11 @@ case $ac_sys_system/$ac_sys_release in
 Darwin/*)
     # Use -undefined dynamic_lookup whenever possible (10.3 and later).
     # This allows an extension to be used in any Python
-    if test ${MACOSX_DEPLOYMENT_TARGET} '>' 10.2; then
+    #if test ${MACOSX_DEPLOYMENT_TARGET} '>' 10.2; then
         if test "${enable_universalsdk}"; then
             LDFLAGS="${UNIVERSAL_ARCH_FLAGS} -isysroot ${UNIVERSALSDK} ${LDFLAGS}"
         fi
-    fi
+    #fi
     ;;
 esac
 
@@ -547,12 +547,11 @@ if test "x$has_python" = "xyes"; then
     python_path=`$PYTHON -c "import distutils.sysconfig; \
            		             print distutils.sysconfig.get_python_inc();"`
     if test -n "${python_path}"; then
+      AC_CHECK_HEADERS($python_path/Python.h, [has_python_h="yes"], [has_python_h="no"]) 
       python_path="-I$python_path"
-      has_python_h="yes"
     fi
     PYTHON_CPPFLAGS=$python_path
     CPPFLAGS="${CPPFLAGS} ${python_path}"
-	AC_MSG_RESULT([$python_path])
 	AC_SUBST([PYTHON_CPPFLAGS])
 
   # ... otherwise check for includes relative to exectuable (obsolete?)
@@ -635,7 +634,6 @@ has_gammalib="no"
 
 # First check for GammaLib in the standard path using the AC_LINK_IFELSE macro.
 # This allows also search in paths that are eventually specified by LDFAGS.
-AC_LANG(C++)
 SAVED_LDFLAGS=$LDFLAGS
 LDFLAGS="$LDFLAGS -lgamma"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <GammaLib.hpp>],
@@ -688,19 +686,16 @@ root directory of GammaLib.])
 fi
 
 
-
 #############################################################################
 # Checks for OpenMP checking option (G_OPENMP)                              #
-############################################################################
-
+#############################################################################
+# Initialise OpenMP availability
 openmp_ok=no
-
-# Check for C++
-AC_LANG(C++)
+gammalib_with_openmp=no
 
 # Detect if GammaLib has been compiled with OpenMP
-AC_MSG_CHECKING(if GammaLib has been compiled with OpenMP)
-AC_LINK_IFELSE(AC_LANG_PROGRAM([[#include <GObservations.hpp>]],,),			     
+AC_MSG_CHECKING(whether GammaLib has been compiled with OpenMP)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <GObservations.hpp>]],,)],			     
 		   [gammalib_with_openmp=no;AC_MSG_RESULT(no)],
  		   [gammalib_with_openmp=yes;AC_MSG_RESULT(yes)])
 
@@ -710,37 +705,42 @@ if test "x$ac_cv_prog_cxx_openmp" != "xunsupported" && test "x$ac_cv_prog_cxx_op
    openmp_ok=yes
 fi
 
-AC_MSG_CHECKING(whether to enable openMP)
+# Signal actual test
+AC_MSG_CHECKING(whether to enable OpenMP)
 
-#openMP is available
+# If OpenMP is available
 if test "x$openmp_ok" = "xyes"; then
-   #if gammalib is compiled with openMP, ctools must have it.
+   # If gammalib is compiled with OpenMP, ctools must also be compiled with
+   # openmp
    if test "x$gammalib_with_openmp" = "xyes"; then
       enable_openmp="yes"
    else
-      #Else, we propose the option
+      # ... otherwise, we use it optionally
       AC_ARG_ENABLE([openmp],
 			AS_HELP_STRING([--enable-openmp],
-				         [To active multi-threading [default=yes]]),
+				         [turn on OpenMP support [default=yes]]),
 					 [enable_openmp="$enableval"],
 					 [enable_openmp="yes"])
    fi
 fi
 
+# Set compiler flags accordingly
 if test "x$enable_openmp" = "xyes"; then
 	CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
-        AC_MSG_RESULT(yes)
-    else
-        enable_openmp=no
+    AC_DEFINE([HAVE_OPENMP], [1], [Define if OpenMP is enabled])
+    AC_MSG_RESULT(yes)
+else
+    enable_openmp=no
 	AC_MSG_RESULT(no)
 fi
 
+# Signal if ctools cannot be compiled as gammalibe requires OpenMP but ctools
+# cannot be compiled with OpenMP
 if test "x$enable_openmp" = "xno" && test "x$gammalib_with_openmp" = "xyes"; then
-    #Error, we cannot compile.
-    AC_MSG_ERROR([The GammaLib library has been built with openmp option but openmp is not available on this system. Please install the libarie or re-build gammalib.])
+    AC_MSG_ERROR([The GammaLib library has been built with openMP support but OpenMP is not available on this system. Please install OpenMP or re-build GammaLib without OpenMP support.])
 fi
-
 AM_CONDITIONAL(OPENMP,test "x$enable_openmp" = "xyes")
+
 
 #############################################################################
 # Build static code?                                                        #
@@ -850,9 +850,9 @@ fi
 
 # Dump compile options
 if test "x$enable_openmp" = "xyes"; then
-  echo "  * Enable openMP                (yes)   (default)"
+  echo "  * Enable OpenMP                (yes)   (default)"
 else
-  echo "  - Enable openMP                (no)"
+  echo "  - Enable OpenMP                (no)"
 fi
 if test "x$enable_debug" = "xyes"; then
   echo "  * Compile in debug code        (yes)"
