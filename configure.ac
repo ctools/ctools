@@ -649,6 +649,7 @@ if test "x$has_gammalib" = "xno"; then
   for i in "$ctools_prefix" "$GAMMALIB" /opt/local /usr/local /usr ; do
     if test -f $i/lib64/libgamma.so -o -f $i/lib64/libgamma.dylib; then
       if test -d $i/include/gammalib; then
+        GAMMALIB=$i
         LIBDIR_GAMMALIB=$i/lib64
         INCDIR_GAMMALIB=$i/include/gammalib
         break
@@ -656,6 +657,7 @@ if test "x$has_gammalib" = "xno"; then
     fi
     if test -f $i/lib/libgamma.so -o -f $i/lib/libgamma.dylib; then
       if test -d $i/include/gammalib; then
+        GAMMALIB=$i
         LIBDIR_GAMMALIB=$i/lib
         INCDIR_GAMMALIB=$i/include/gammalib
         break
@@ -676,6 +678,7 @@ if test "x$has_gammalib" = "xyes"; then
   LIBS="${LIBS} ${LIBS_GAMMALIB}"
   AC_DEFINE([HAVE_LIBGAMMA], [1], [Define if gammalib is available])
   AC_SUBST(LIBS_GAMMALIB)
+  AC_SUBST(GAMMALIB)
   AC_SUBST(LIBDIR_GAMMALIB)
   AC_SUBST(INCDIR_GAMMALIB)
 else
