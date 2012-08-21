@@ -12,7 +12,9 @@ if WITH_PYTHON
 endif
 
 # Set test environment
-TESTS_ENVIRONMENT = $(TEST_PYTHON_ENV)
+#TESTS_ENVIRONMENT = $(TEST_PYTHON_ENV)
+TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDIR_GAMMALIB):$(@RUNSHARED@) \
+                    $(TEST_PYTHON_ENV)
 
 # Tests (these are the tests to be executed)
 TESTS = test_ctools.sh \
