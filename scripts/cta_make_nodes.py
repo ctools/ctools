@@ -86,7 +86,8 @@ def create_nodes(emin, emax, enumbins):
 		write_node(file, energy, scale)
 		
 		# Debug
-		#print energy, math.pow(10.0, int(math.log10(scale))-1.0)
+		#sys.stdout.write(energy)
+        #sys.stdout.write(math.pow(10.0, int(math.log10(scale))-1.0)±"\n")
 	
 	# Close file
 	file.close()
@@ -105,7 +106,7 @@ if __name__ == '__main__':
 	# Check command line
 	usage = "Usage: cta_make_nodes emin emax enumbins"
 	if len(sys.argv) < 3:
-		print usage
+		sys.stdout.write(usage+"\n")
 		sys.exit()
 	
 	# Extract parameters

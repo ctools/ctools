@@ -177,10 +177,10 @@ if __name__ == '__main__':
 	Test ctools Python modules.
 	"""
 	# Dump header
-	print ""
-	print "*************************************"
-	print "* ctools Python interface testing *"
-	print "************************************"
+	sys.stdout.write("\n")
+	sys.stdout.write("***********************************\n")
+	sys.stdout.write("* ctools Python interface testing *\n")
+	sys.stdout.write("***********************************\n")
 	
 	# Set PFILES environment variable
 	try:
@@ -197,11 +197,11 @@ if __name__ == '__main__':
 			os.remove(file)
 	
 	# Save intermediate results on disk
-	print "Test executable analysis: ",
+	sys.stdout.write("Test executable analysis: ")
 	pipeline_v1()
-	print " ok"
+	sys.stdout.write(" ok\n")
 
 	# Keep results in memory
-	print "Test in-memory analysis: ",
+	sys.stdout.write("Test in-memory analysis: ")
 	pipeline_v2()
-	print " ok"
+	sys.stdout.write(" ok\n")

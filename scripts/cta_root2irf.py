@@ -149,7 +149,7 @@ def make_files(filename, prfname, bkgname):
 	
 	# Write header
 	fprf.write("log(E) Area  r68  r80  ERes. BG Rate  Diff Sens\n")
-	print "log(E) Area  Area80  r68  r80  ERes. BG Rate  Diff Sens  BGRateSqDeg  BGInt  (BGIntControl)"
+	#sys.stdout.write("log(E) Area  Area80  r68  r80  ERes. BG Rate  Diff Sens  BGRateSqDeg  BGInt  (BGIntControl)\n")
 
 	# Get histograms. Konrad's root files do not have an EffectiveArea80
 	# histogram, but his effective area is for 80% containment radius
@@ -222,8 +222,8 @@ def make_files(filename, prfname, bkgname):
 		fbkg.write(str(energy)+" "+str(bkg_rate)+"\n")
 
 		# Show performance file
-		print "%.1f  %.1f  %.1f  %.4f  %.4f %.4f %.7f  %.5e  %.5e %.5e (%.5e)" % \
-		      (logE, area, area80, r68, r80, dE, bgd, diffs, bgdsq, bkg_rate, bkg_rate2)
+		#print "%.1f  %.1f  %.1f  %.4f  %.4f %.4f %.7f  %.5e  %.5e %.5e (%.5e)" % \
+		#      (logE, area, area80, r68, r80, dE, bgd, diffs, bgdsq, bkg_rate, bkg_rate2)
 
 	# Write trailer
 	fprf.write("---------------------------------------------\n")
@@ -285,7 +285,7 @@ if __name__ == '__main__':
 		# Build output filenames
 		prfname = name + ".dat"
 		bkgname = "bkg_"+name+".txt"
-		print prfname, bkgname
+		#print prfname, bkgname
 
 		# Create files
 		make_files(file, prfname, bkgname)

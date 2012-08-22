@@ -58,11 +58,10 @@ def read_pull(filename, parname):
 			try:
 				index = row.index(parname)
 			except:
-				print 'ERROR: Parameter "'+parname+'" not found in list:'
+				sys.stdout.write('ERROR: Parameter "'+parname+'" not found in list:\n')
 				for p in row:
-					print '       "'+p+'"'
+					sys.stdout.write('       "'+p+'"\n')
 				raise NameError(parname)
-			#print index
 
 		# Handle data rows
 		else:
@@ -73,7 +72,6 @@ def read_pull(filename, parname):
 	
 	# Create numpy array
 	a = np.array(values)
-	#print a
 	
 	# Return array
 	return a
@@ -89,7 +87,7 @@ if __name__ == '__main__':
 	# Print usage information
 	usage = "Usage: show_pull_histogram filename parname [bins]"
 	if len(sys.argv) < 3:
-		print usage
+		sys.stdout.write(usage+"\n")
 		sys.exit()
 
 	# Extract parameters

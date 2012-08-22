@@ -53,10 +53,9 @@ def read_ts(filename, tsname="TS"):
 			try:
 				index = row.index(tsname)
 			except:
-				print 'ERROR: Column "TS" not found in file'
-				print row
+				sys.stdout.write('ERROR: Column "TS" not found in file\n')
+				sys.stdout.write(row+"\n")
 				raise NameError("TS")
-			#print index
 
 		# Handle data rows
 		else:
@@ -227,7 +226,7 @@ if __name__ == '__main__':
 	usage = "Usage: show_ts_distribution filename" \
 	        " [-n bins] [-c column] [-t title] [-p plot]"
 	if len(sys.argv) < 2:
-		print usage
+		sys.stdout.write(usage+"\n")
 		sys.exit()
 
 	# Extract parameters
@@ -257,10 +256,10 @@ if __name__ == '__main__':
 					try:
 						par['value'] = sys.argv[i]
 					except:
-						print usage
+						sys.stdout.write(usage+"\n")
 						sys.exit()
 				else:
-					print usage
+					sys.stdout.write(usage+"\n")
 					sys.exit()
 		
 		# Next item
@@ -274,7 +273,7 @@ if __name__ == '__main__':
 	
 	# Read values from CSV file
 	values = read_ts(filename, tsname=tsname)
-	print len(values), "values read."
+	sys.stdout.write(len(values), "values read.\n")
 	
 	# Show histogram
 	if plot == "pdf":

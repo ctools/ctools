@@ -28,6 +28,7 @@ from gammalib import *
 from math import *
 import os
 import glob
+import sys
 
 
 # ============================= #
@@ -82,7 +83,7 @@ def pipeline_v1():
 	sim["emin"].real(emin)
 	sim["emax"].real(emax)
 	sim.execute()
-	print "Simulated events ("+str(sim.celapse())+" CPU seconds)"
+	sys.stdout.write("Simulated events ("+str(sim.celapse())+" CPU seconds)\n")
 
 	# Update timing
 	wall_seconds += sim.telapse()
@@ -104,7 +105,7 @@ def pipeline_v1():
 	bin["yref"].real(dec)
 	bin["proj"].string(proj)
 	bin.execute()
-	print "Binned events into counts map ("+str(bin.celapse())+" CPU seconds)"
+	sys.stdout.write("Binned events into counts map ("+str(bin.celapse())+" CPU seconds)\n")
 
 	# Update timing
 	wall_seconds += bin.telapse()
@@ -119,15 +120,15 @@ def pipeline_v1():
 	like["caldb"].string(caldb)
 	like["irf"].string(irf)
 	like.execute()
-	print "Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)"
+	sys.stdout.write("Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)\n")
 
 	# Update timing
 	wall_seconds += like.telapse()
 	cpu_seconds  += like.celapse()
 	
 	# Show total times
-	print "Total wall time elapsed: "+str(wall_seconds)+" seconds"
-	print "Total CPU time used ...: "+str(cpu_seconds)+" seconds"
+	sys.stdout.write("Total wall time elapsed: "+str(wall_seconds)+" seconds\n")
+	sys.stdout.write("Total CPU time used ...: "+str(cpu_seconds)+" seconds\n")
 
 	# Return
 	return
@@ -181,7 +182,7 @@ def pipeline_v2():
 	sim["emin"].real(emin)
 	sim["emax"].real(emax)
 	sim.run()
-	print "Simulated events ("+str(sim.celapse())+" CPU seconds)"
+	sys.stdout.write("Simulated events ("+str(sim.celapse())+" CPU seconds)\n")
 
 	# Update timing
 	wall_seconds += sim.telapse()
@@ -200,7 +201,7 @@ def pipeline_v2():
 	bin["yref"].real(dec)
 	bin["proj"].string(proj)
 	bin.run()
-	print "Binned events into counts map ("+str(bin.celapse())+" CPU seconds)"
+	sys.stdout.write("Binned events into counts map ("+str(bin.celapse())+" CPU seconds)\n")
 
 	# Update timing
 	wall_seconds += bin.telapse()
@@ -209,18 +210,18 @@ def pipeline_v2():
 	# Perform maximum likelihood fitting
 	like = ctlike(bin.obs())
 	like.run()
-	print "Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)"
+	sys.stdout.write("Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)\n")
 
 	# Update timing
 	wall_seconds += like.telapse()
 	cpu_seconds  += like.celapse()
 		
 	# Show total times
-	print "Total wall time elapsed: "+str(wall_seconds)+" seconds"
-	print "Total CPU time used ...: "+str(cpu_seconds)+" seconds"
+	sys.stdout.write("Total wall time elapsed: "+str(wall_seconds)+" seconds\n")
+	sys.stdout.write("Total CPU time used ...: "+str(cpu_seconds)+" seconds\n")
 
 	# Show model fitting results
-	#print like.obs().models()
+	#sys.stdout.write(like.obs().models()+"\n")
 
 	# Plot counts
 	plot_counts(bin.obs())
@@ -249,9 +250,9 @@ def plot_counts(observations):
 		styles = ['b-', 'g-', 'y-', 'n-']
 
 		# Dump header
-		print ""
-		print "Make plots (using matplotlib):"
-		print "=============================="
+		sys.stdout.write("\n")
+		sys.stdout.write("Make plots (using matplotlib):\n")
+		sys.stdout.write("==============================\n")
 		
 		# Create figure 1
 		plt.figure(1,figsize=(12,6))
@@ -274,7 +275,7 @@ def plot_counts(observations):
 				energy.append(ebounds.elogmean(i).TeV())
 
 			# Create spectrum
-			print "Extract data:"
+			sys.stdout.write("Extract data:\n")
 			counts = [0.0 for i in range(ebounds.size())]
 			for bin in cube:
 				index         = ebounds.index(bin.energy())
@@ -288,10 +289,10 @@ def plot_counts(observations):
 			plt.errorbar(energy, counts, error, fmt=None, ecolor='r')
 
 			# Extract models
-			print "Extract models:"
+			sys.stdout.write("Extract models:\n")
 			sum_model = [0.0 for i in range(ebounds.size())]
 			for k, m in enumerate(observations.models()):
-				print "- "+m.name()
+				sys.stdout.write("- "+m.name()+"\n")
 				model = [0.0 for i in range(ebounds.size())]
 				for bin in cube:
 					index        = ebounds.index(bin.energy())
@@ -322,7 +323,7 @@ def plot_counts(observations):
 			cube = cast_GCTAEventCube(obs.events())
 			
 			# Create offset histogram
-			print "Extract data:"
+			sys.stdout.write("Extract data:\n")
 			nx       = 30
 			doffset2 = 0.01
 			offset2  = [(i+0.5)*doffset2 for i in range(nx)]
@@ -341,10 +342,10 @@ def plot_counts(observations):
 			plt.semilogy(offset2, counts, 'ro', label='data')
 
 			# Extract models
-			print "Extract models:"
+			sys.stdout.write("Extract models:\n")
 			sum_model = [0.0 for i in range(nx)]
 			for k, m in enumerate(observations.models()):
-				print "- "+m.name()
+				sys.stdout.write("- "+m.name()+"\n")
 				model = [0.0 for i in range(nx)]
 				for bin in cube:
 					off   = bin.dir().dist_deg(crab)
@@ -368,7 +369,7 @@ def plot_counts(observations):
 		plt.show()
 
 	except:
-		print "Matplotlib is not (correctly) installed on your system. No counts spectra are shown."
+		sys.stdout.write("Matplotlib is not (correctly) installed on your system. No counts spectra are shown.\n")
 
 	# Return
 	return
@@ -398,10 +399,10 @@ if __name__ == '__main__':
 	around the Crab has been performed.
 	"""
 	# Dump header
-	print "*************************************"
-	print "*    CTA binned analysis scripts    *"
-	print "*************************************"
-	print "... this script will take 1-2 minutes"
+	sys.stdout.write("*************************************\n")
+	sys.stdout.write("*    CTA binned analysis scripts    *\n")
+	sys.stdout.write("*************************************\n")
+	sys.stdout.write("... this script will take 1-2 minutes\n")
 
 	# Remove any existing result files
 	list = [glob.glob("*.fits"), glob.glob("*.log"), glob.glob("*.xml")]
@@ -410,14 +411,14 @@ if __name__ == '__main__':
 			os.remove(file)
 	
 	# Save intermediate results on disk
-	print ""
-	print "Executable analysis pipeline:"
-	print "============================="
+	sys.stdout.write("\n")
+	sys.stdout.write("Executable analysis pipeline:\n")
+	sys.stdout.write("=============================\n")
 	pipeline_v1()
 
 	# Do analysis in memory
-	print ""
-	print "In memory analysis pipeline:"
-	print "============================"
+	sys.stdout.write("\n")
+	sys.stdout.write("In memory analysis pipeline:\n")
+	sys.stdout.write("============================\n")
 	pipeline_v2()
-	print ""
+	sys.stdout.write("\n")

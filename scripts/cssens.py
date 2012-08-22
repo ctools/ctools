@@ -101,7 +101,7 @@ class cssens(GApplication):
 			pars = GPars(parfile)
 		except:
 			# Signal if parfile was not found
-			print "Parfile "+parfile+" not found. Create default parfile."
+			sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
 			
 			# Create default parfile
 			pars = GPars()
