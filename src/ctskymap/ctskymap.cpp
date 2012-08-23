@@ -481,7 +481,7 @@ void ctskymap::map_events(GCTAObservation* obs)
         int num_in_map         = 0;
 
         // Fill sky map
-        GCTAEventList* events = (GCTAEventList*)obs->events();
+        GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
         for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
 
             // Skip if energy is out of range

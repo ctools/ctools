@@ -618,7 +618,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         }
 
         // Get pointer on event list (circumvent const correctness)
-        GCTAEventList* events = (GCTAEventList*)(obs->events());
+        GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
         // Extract ROI
         GSkyDir dir = events->roi().centre().skydir();
@@ -839,7 +839,7 @@ void ctobssim::simulate_background(GCTAObservation* obs, const GModels& models,
         }
 
         // Get pointer on event list (circumvent const correctness)
-        GCTAEventList* events = (GCTAEventList*)(obs->events());
+        GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
         // Loop over all models
         for (int i = 0; i < models.size(); ++i) {

@@ -621,7 +621,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     }
 
     // Get CTA event list pointer
-    GCTAEventList* list = (GCTAEventList*)(obs->events());
+    GCTAEventList* list = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
     // Set ROI
     GCTARoi     roi;
