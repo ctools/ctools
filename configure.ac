@@ -612,11 +612,11 @@ fi
 AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
  
 # Do we have wrappers (ctools_wrap.cpp and ctools.py)?
-AC_CHECK_FILES([pyext/ctools_wrap.cpp pyext/ctools.py],,)
-if test "x$ac_cv_file_pyext_ctools_wrap_cpp" = "xyes"; then
-  if test "x$ac_cv_file_pyext_ctools_py" = "xyes"; then
-    has_wrappers="yes"
-  fi
+has_wrappers="yes"
+AC_CHECK_FILES([pyext/ctools_wrap.cpp pyext/ctools.py],,
+               [has_wrappers="no"])
+if test "x$has_wrappers" = "xno"; then
+  AC_MSG_WARN([Python wrapper missing. Requires swig for wrapper generation.])
 fi
 
 # Signal if Python is enabled
