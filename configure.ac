@@ -33,7 +33,7 @@ AC_INIT([ctools], [0.4.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([gnu no-dependencies])
-AC_CONFIG_HEADERS([config.h])
+AM_CONFIG_HEADER([config.h])
 
 
 #############################################################################
@@ -782,6 +782,7 @@ else
   enable_openmp=no
   AC_MSG_RESULT(no)
 fi
+AC_SUBST(OPENMP_CXXFLAGS)
 
 # Set system specific settings
 OPENMP_LIB_LDFLAGS=
