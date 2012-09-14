@@ -18,7 +18,7 @@
 # File information
 #=================
 infile, f, a, "test/data/crab.xml",,, "Model"
-outfile,f, a, "events.fits",,,        "Output event data file"
+outfile,f, a, "events.fits",,,        "Output event data file or observation definition file"
 prefix, s, h, "sim_events_",,,        "Prefix for event lists in observation definition file"
 #
 # Observation parameters
