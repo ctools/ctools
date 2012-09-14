@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-05-00
 
 Author(s) : Juergen Knoedlseder
 
-July 21, 2012
+September 14th, 2012
 
 
 1. Introduction
@@ -13,7 +13,9 @@ important changes made since the last release of ctools.
 
 2. Configuration
 -----------------
-None
+Added OpenMP support to allow for code parallelization. If available,
+OpenMP is enabled by default. OpenMP support may be disabled using
+the --disable-openmp flag.
 
 
 3. Python interface
@@ -27,6 +29,10 @@ If several observations are processed at once, ctobssim now outputs
 an observation definition XML file and separate FITS files for each
 observation. The filenames of the FITS files will be written to the
 observation definition file.
+
+The executable now also benefits from OpenMP support, allowing for
+parallelized simulation of events in the presence of multiple
+processor cores.
 
 
 5. ctselect - CTA event selection

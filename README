@@ -1,6 +1,6 @@
 ctools information
 ==================
-Version:             00-05-00 (July 18, 2012)
+Version:             00-05-00 (Septemner 14th, 2012)
 Author:              Juergen Knodlseder (jurgen.knodlseder@irap.omp.eu)
 GammaLib dependency: 00-06-00
 
@@ -43,10 +43,10 @@ The following tools are so far available:
 
 Web sites
 =========
-http://cta.irap.omp.eu/ctools              - ctools documentation
-http://gammalib.sourceforge.net            - for GammaLib documentation
-https://sourceforge.net/projects/gammalib/ - for GammaLib downloads
-
+http://cta.irap.omp.eu/ctools                   - ctools documentation
+https://cta-redmine.irap.omp.eu/projects/ctools - for ctools development
+http://gammalib.sourceforge.net                 - for GammaLib documentation
+https://sourceforge.net/projects/gammalib/      - for GammaLib downloads
 
 Prerequisites
 =============
@@ -185,4 +185,4 @@ Solaris
 Contact
 =======
 To get in touch with the ctools developers and to contribute to the
-project please contact Juergen Knoedlseder <knodlseder@cesr.fr>.
+project please contact Juergen Knoedlseder <jurgen.knodlseder@irap.omp.eu>.
