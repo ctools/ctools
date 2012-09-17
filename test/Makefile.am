@@ -8,11 +8,10 @@ MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
 if WITH_PYTHON
   TEST_CSCRIPTS      = test_cscripts.sh
   TEST_PYTHON_SCRIPT = test_python.py
-  TEST_PYTHON_ENV    = PYTHONPATH=$(top_builddir)/pyext:$(top_builddir)/scripts:$(pythondir):$(pyexecdir):$(PYTHONPATH)
+  TEST_PYTHON_ENV    = PYTHONPATH=$(top_builddir)/pyext:$(top_builddir)/pyext/build/ctools:$(top_builddir)/scripts:$(pythondir):$(pyexecdir):$(PYTHONPATH)
 endif
 
 # Set test environment
-#TESTS_ENVIRONMENT = $(TEST_PYTHON_ENV)
 TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDIR_GAMMALIB):$(@RUNSHARED@) \
                     $(TEST_PYTHON_ENV)
 
