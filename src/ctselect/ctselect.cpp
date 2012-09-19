@@ -414,7 +414,7 @@ void ctselect::get_parameters(void)
         }
         
         // ... otherwise try to open as XML file
-        catch (GException::fits_open_error) {
+        catch (GException::fits_open_error &e) {
 
             // Load observations from XML file
             m_obs.load(m_infile);
