@@ -553,8 +553,8 @@ class cssens(GApplication):
 			# Get fitted Crab, photon and energy fluxes
 			cflux     = result_all["Test"]['Prefactor'].value()
 			cflux_err = result_all["Test"]['Prefactor'].error()
-			pflux     = cast_GModelSky(result_all["Test"]).spectral().flux(emin, emax)
-			eflux     = cast_GModelSky(result_all["Test"]).spectral().eflux(emin, emax)
+			pflux     = result_all["Test"].spectral().flux(emin, emax)
+			eflux     = result_all["Test"].spectral().eflux(emin, emax)
 
 			# Compute differential sensitivity
 			diffSens = pflux / erg_width * erg_mean*erg_mean
