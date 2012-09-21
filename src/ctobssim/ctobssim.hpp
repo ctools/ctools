@@ -21,7 +21,7 @@
 /**
  * @file ctobssim.hpp
  * @brief CTA observation simulator tool definition
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 #ifndef CTOBSSIM_HPP
@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-06-00"
+#define CTOBSSIM_VERSION "00-07-00"
 
 
 /***********************************************************************//**
