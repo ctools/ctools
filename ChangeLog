@@ -1,3 +1,10 @@
+2012-10-11  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+        * Bug fix version 0.5.2 released
+        ================================
+
+        Correct gcc 4.2.x OpenMP dlopen() test
+
 2012-09-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Bug fix version 0.5.1 released
