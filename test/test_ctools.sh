@@ -34,11 +34,12 @@ $ECHO "***************"
 #
 # Define executables
 # ==================
-ctobssim=../src/ctobssim/ctobssim
-ctskymap=../src/ctskymap/ctskymap
 ctbin=../src/ctbin/ctbin
-ctselect=../src/ctselect/ctselect
 ctlike=../src/ctlike/ctlike
+ctmodel=../src/ctmodel/ctmodel
+ctobssim=../src/ctobssim/ctobssim
+ctselect=../src/ctselect/ctselect
+ctskymap=../src/ctskymap/ctskymap
 
 
 #
@@ -130,6 +131,57 @@ then
   $ECHO -n "."
 else
   $ECHO " cntmap.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test ctmodel
+# ============
+$ECHO -n "Test ctmodel: "
+#
+# Run 1
+$ctmodel infile="cntmap.fits" \
+         outfile="modmap1.fits" \
+         caldb="irf" \
+         irf="kb_E_50h_v3" \
+         srcmdl="data/crab.xml"
+$ECHO -n "."
+if [ -s "modmap1.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " modmap1.fits file is not valid"
+  exit 1
+fi
+#
+# Run 2
+$ctmodel infile="NONE" \
+         outfile="modmap2.fits" \
+         caldb="irf" \
+         irf="kb_E_50h_v3" \
+         srcmdl="data/crab.xml" \
+         ra=83.63 \
+         dec=22.01 \
+         tmin=0.0 \
+         tmax=1800.0 \
+         emin=0.1 \
+         emax=100.0 \
+         enumbins=20 \
+         nxpix=200 \
+         nypix=200 \
+         binsz=0.02 \
+         coordsys="CEL" \
+         xref=83.63 \
+         yref=22.01 \
+         proj="CAR"
+$ECHO -n "."
+if [ -s "modmap2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " modmap2.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
