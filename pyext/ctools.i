@@ -1,7 +1,7 @@
 /***************************************************************************
  *                          ctools - SWIG file                             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,6 +21,11 @@
  * Usage:                                                                  *
  * swig -c++ -python -Wall ctools.i                                        *
  ***************************************************************************/
+/**
+ * @file ctools.i
+ * @brief ctools SWIG file
+ * @author Juergen Knoedlseder
+ */
 %module ctools
 %feature("autodoc", "1");
 
@@ -31,10 +36,12 @@
 %import(module="gammalib.support") "GException.i";
 
 /* __ Inform about base classes __________________________________________ */
-%import(module="gammalib.app") "GApplication.i";
+%import(module="gammalib.base") "GBase.i";
+%import(module="gammalib.app")  "GApplication.i";
 
-/* __ CTA tools __________________________________________________________ */
-%include "ctobssim.i"
-%include "ctselect.i"
+/* __ ctools _____________________________________________________________ */
 %include "ctbin.i"
+%include "ctobssim.i"
 %include "ctlike.i"
+%include "ctmodel.i"
+%include "ctselect.i"
