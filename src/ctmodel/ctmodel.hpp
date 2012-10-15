@@ -91,9 +91,11 @@ protected:
     std::string              m_caldb;      //!< Calibration database
     std::string              m_irf;        //!< Instrument response functions
     std::string              m_srcmdl;     //!< Source model
+    double                   m_ra;         //!< RA of pointing direction
+    double                   m_dec;        //!< DEC of pointing direction
+    double                   m_deadc;      //!< Deadtime correction factor
     double                   m_tmin;       //!< Start time
     double                   m_tmax;       //!< Stop time
-    double                   m_deadc;      //!< Deadtime correction factor
     double                   m_emin;       //!< Lower energy
     double                   m_emax;       //!< Upper energy
     int                      m_enumbins;   //!< Number of energy bins

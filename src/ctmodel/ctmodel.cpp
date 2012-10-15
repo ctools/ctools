@@ -404,6 +404,9 @@ void ctmodel::get_parameters(void)
         // If there is no input filename then read all parameters that
         // are required to build a model map from scratch
         if ((m_infile == "NONE") || (strip_whitespace(m_infile) == "")) {
+            m_ra       = (*this)["ra"].real();
+            m_dec      = (*this)["dec"].real();
+            m_deadc    = (*this)["deadc"].real();
             m_tmin     = (*this)["tmin"].real();
             m_tmax     = (*this)["tmax"].real();
             m_emin     = (*this)["emin"].real();
@@ -473,6 +476,12 @@ void ctmodel::setup_obs(void)
         // from the task parameters
         if ((m_infile == "NONE") || (strip_whitespace(m_infile) == "")) {
 
+            // Set pointing direction
+            GCTAPointing pnt;
+            GSkyDir      skydir;
+            skydir.radec_deg(m_ra, m_dec);
+            pnt.dir(skydir);
+
             // Setup energy range covered by model
             GEnergy  emin;
             GEnergy  emax;
@@ -499,6 +508,12 @@ void ctmodel::setup_obs(void)
 
             // Allocate CTA observation
             GCTAObservation obs;
+
+            // Set CTA observation attributes
+            obs.pointing(pnt);
+            obs.ontime(gti.ontime());
+            obs.livetime(gti.ontime()*m_deadc);
+            obs.deadc(m_deadc);
 
             // Set event cube in observation
             obs.events(&cube);
@@ -658,9 +673,11 @@ void ctmodel::init_members(void)
     m_srcmdl.clear();
     m_proj.clear();
     m_coordsys.clear();
+    m_ra       = 0.0;
+    m_dec      = 0.0;
+    m_deadc    = 1.0;
     m_tmin     = 0.0;
     m_tmax     = 0.0;
-    m_deadc    = 1.0;
     m_emin     = 0.0;
     m_emax     = 0.0;
     m_enumbins = 0;
@@ -700,9 +717,11 @@ void ctmodel::copy_members(const ctmodel& app)
     m_srcmdl   = app.m_srcmdl;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
+    m_ra       = app.m_ra;
+    m_dec      = app.m_dec;
+    m_deadc    = app.m_deadc;
     m_tmin     = app.m_tmin;
     m_tmax     = app.m_tmax;
-    m_deadc    = app.m_deadc;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
     m_enumbins = app.m_enumbins;

@@ -24,11 +24,16 @@ caldb,    s, a, "test/irf",,, "Calibration database"
 irf,      s, a, "kb_E_50h_v3",,, "Instrument response function"
 srcmdl,   f, a, "test/data/crab.xml",,, "Source model"
 #
+# Instrument parameters
+#======================
+ra,       r, a,    83.63,   0,360, "RA of pointing (degrees)"
+dec,      r, a,    22.01, -90, 90, "Dec of pointing (degrees)"
+deadc,    r, h,    0.95,    0,  1, "Average deadtime correction factor"
+#
 # Time range parameters
 #======================
 tmin,     r, a,     0.0,    0,   , "Start time (MET in s)"
 tmax,     r, a,  1800.0,    0,   , "End time (MET in s)"
-deadc,    r, h,    0.95,    0,  1, "Average deadtime correction factor"
 #
 # Energy binning parameters
 #==========================
