@@ -25,6 +25,16 @@ import glob
 import os
 import sys
 
+# Detect execution mode
+is_build = True
+if (len(sys.argv) >= 2):
+	if (sys.argv[1] == 'install'):
+		is_build = False
+if is_build:
+	sys.stdout.write("Python extension module building:\n")
+else:
+	sys.stdout.write("Python extension module installation:\n")
+
 # Darwin MacPorts kluge: Remove -L/opt/local/lib path from LDSHARED as this
 # overrides the GammaLib settings. Otherwise, MacPorts libraries would be
 # used instead of the libraries selected by GammaLib
@@ -128,15 +138,16 @@ setup(name='@PACKAGE_NAME@',
 # Post-processing. A symbolic link is created to the directory containing the
 # shared wrapper libraries so that we can add this directory to the PYTHONPATH
 # for testing.
-try:
-	os.chdir('build')
-	os.remove('ctools')
-	sys.stdout.write("Removed symbolic link build/ctools.\n")
-except:
-	pass
-try:
-	path = glob.glob('lib.*')
-	os.symlink(path[0], 'ctools')
-	sys.stdout.write("Created symbolic link build/ctools.\n")
-except:
-	sys.stdout.write("WARNING: Failed to create symbolic link build/ctools.\n")
+if is_build:
+	try:
+		os.chdir('build')
+		os.remove('ctools')
+		sys.stdout.write("Removed symbolic link build/ctools.\n")
+	except:
+		pass
+	try:
+		path = glob.glob('lib.*')
+		os.symlink(path[0], 'ctools')
+		sys.stdout.write("Created symbolic link build/ctools.\n")
+	except:
+		sys.stdout.write("WARNING: Failed to create symbolic link build/ctools.\n")
