@@ -621,7 +621,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
         // Extract ROI
-        GSkyDir dir = events->roi().centre().skydir();
+        GSkyDir dir = events->roi().centre().dir();
         double  rad = events->roi().radius();
 
         // Dump simulation cone information
