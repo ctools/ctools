@@ -183,7 +183,7 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 			event = cast_GCTAEventAtom(event)
 			
 			# Determine sky pixel
-			skydir = event.dir().skydir()
+			skydir = event.dir().dir()
 			pixel  = map.dir2pix(skydir)
 			
 			# Set pixel
@@ -237,7 +237,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 		
 		# Get sky direction
 		skydir = map.pix2dir(pixel)
-		instdir.skydir(skydir)
+		instdir.dir(skydir)
 		
 		# Create event atom for map pixel
 		atom = GCTAEventAtom()
@@ -295,7 +295,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 	# Set ROI
 	roi     = GCTARoi()
 	instdir = GCTAInstDir()
-	instdir.skydir(pntdir)
+	instdir.dir(pntdir)
 	roi.centre(instdir)
 	roi.radius(rad)
 	
