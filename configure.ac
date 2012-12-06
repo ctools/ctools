@@ -32,7 +32,8 @@
 AC_INIT([ctools], [0.6.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([gnu no-dependencies])
+#AM_INIT_AUTOMAKE([gnu no-dependencies])
+AM_INIT_AUTOMAKE([gnu])
 AM_CONFIG_HEADER([config.h])
 
 
@@ -870,11 +871,12 @@ AC_SUBST(LIB_LINK_OPTION)
 #############################################################################
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/ctselect/Makefile
                  src/ctbin/Makefile
                  src/ctlike/Makefile
+                 src/ctmodel/Makefile
                  src/ctobssim/Makefile
                  src/ctskymap/Makefile
+                 src/ctselect/Makefile
                  src/ctools-setup
                  test/Makefile
                  test/test_cscripts.sh

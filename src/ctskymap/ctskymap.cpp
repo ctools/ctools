@@ -492,7 +492,7 @@ void ctskymap::map_events(GCTAObservation* obs)
 
             // Determine sky pixel
             GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
-            GSkyDir      dir   = inst->skydir();
+            GSkyDir      dir   = inst->dir();
             GSkyPixel    pixel = m_skymap.dir2xy(dir);
 
             // Skip if pixel is out of range

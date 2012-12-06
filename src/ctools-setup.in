@@ -29,7 +29,7 @@ fi
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 ctools_bin="@bindir@"
-ctools_lib="@libdir@@TEST_ENV_DIR@"
+ctools_lib="@libdir@"
 uname_system=`uname`
 python_dir="@pythondir@"
 python_exec_dir="@pyexecdir@"

@@ -5,10 +5,11 @@ MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
 @EXPORT_MACOSX_DEPLOYMENT_TARGET@export MACOSX_DEPLOYMENT_TARGET
 
 # Set sub directories
-SUBDIRS = ctselect \
-          ctbin \
+SUBDIRS = ctbin \
           ctlike \
+          ctmodel \
           ctobssim \
+          ctselect \
           ctskymap
 
 # Scripts to be distributed
@@ -22,9 +23,10 @@ scripts = ctools-setup \
 lib_LTLIBRARIES = libctools.la
 libctools_la_SOURCES = 
 libctools_la_LIBADD = ctbin/libctbin.la \
-                      ctselect/libctselect.la \
                       ctlike/libctlike.la \
+                      ctmodel/libctmodel.la \
                       ctobssim/libctobssim.la \
+                      ctselect/libctselect.la \
                       ctskymap/libctskymap.la
 
 # Distribute scripts

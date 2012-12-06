@@ -1,0 +1,21 @@
+## Process this file with automake to produce Makefile.in
+
+# Program name
+bin_PROGRAMS = ctmodel
+
+# Sources
+sources = ctmodel.cpp
+
+# Libtool library
+noinst_LTLIBRARIES = libctmodel.la
+libctmodel_la_SOURCES = $(sources)
+
+# Program definition
+ctmodel_SOURCES = main.cpp
+ctmodel_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
+ctmodel_CPPFLAGS = @CPPFLAGS@
+ctmodel_LDADD = libctmodel.la
+
+# Parameter files
+pfilesdir = $(prefix)/syspfiles
+pfiles_DATA = ctmodel.par
