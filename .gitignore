@@ -22,9 +22,13 @@ ltmain.sh
 m4
 missing
 .libs
+.deps
 stamp-h1
+depcomp
 
+src/ctools-setup
 pyext/build/
+pyext/setup.py
 pyext/ctools.py
 pyext/ctools_wrap.cpp
 src/ctbin/ctbin
@@ -34,3 +38,7 @@ src/ctobssim/ctobssim
 src/ctselect/ctselect
 src/ctskymap/ctskymap
 test/pfiles/
+test/*.fits
+test/*.dat
+test/*.xml
+test/test_cscripts.sh
