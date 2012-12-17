@@ -21,7 +21,7 @@
 /**
  * @file ctselect.cpp
  * @brief CTA data selection tool implementation
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -427,14 +427,17 @@ void ctselect::get_parameters(void)
     } // endif: there was no observation in the container
 
     // Get parameters
-    m_ra   = (*this)["ra"].real();
-    m_dec  = (*this)["dec"].real();
-    m_rad  = (*this)["rad"].real();
-    m_tmin = (*this)["tmin"].real();
-    m_tmax = (*this)["tmax"].real();
-    m_emin = (*this)["emin"].real();
-    m_emax = (*this)["emax"].real();
-    m_expr = (*this)["expr"].string();
+    m_usepnt = (*this)["usepnt"].boolean();
+    if (!m_usepnt) {
+        m_ra  = (*this)["ra"].real();
+        m_dec = (*this)["dec"].real();
+    }
+    m_rad    = (*this)["rad"].real();
+    m_tmin   = (*this)["tmin"].real();
+    m_tmax   = (*this)["tmax"].real();
+    m_emin   = (*this)["emin"].real();
+    m_emax   = (*this)["emax"].real();
+    m_expr   = (*this)["expr"].string();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -443,9 +446,10 @@ void ctselect::get_parameters(void)
         m_prefix  = (*this)["prefix"].string();
     }
 
-    // Derive time interval
-    m_timemin.time(m_tmin, G_CTA_MJDREF, "days");
-    m_timemax.time(m_tmax, G_CTA_MJDREF, "days");
+    // Set time interval with input times given in CTA reference
+    // time (in seconds)
+    m_timemin.set(m_tmin, m_cta_ref);
+    m_timemax.set(m_tmax, m_cta_ref);
 
     // Return
     return;
@@ -490,7 +494,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Set RA/DEC selection
     double ra  = m_ra;
     double dec = m_dec;
-    if (m_ra == 0.0 && m_dec == 0.0) {
+    if (m_usepnt) {
         const GCTAPointing *pnt = obs->pointing();
         ra = pnt->dir().ra_deg();
         dec = pnt->dir().dec_deg();
@@ -514,9 +518,10 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Make time selection
     if (select_time) {
     
-        // Extract effective time interval in native MJD reference
-        double tmin = gti.tstart().time();
-        double tmax = gti.tstop().time();
+        // Extract effective time interval in CTA reference time. We need
+        // this reference for filtering.
+        double tmin = gti.tstart().convert(m_cta_ref);
+        double tmax = gti.tstop().convert(m_cta_ref);
 
         // Format time with sufficient accuracy and add to selection string
         sprintf(cmin, "%.8f", tmin);
@@ -663,13 +668,14 @@ void ctselect::init_members(void)
     m_infile.clear();
     m_outfile.clear();
     m_prefix.clear();
-    m_ra   = 0.0;
-    m_dec  = 0.0;
-    m_rad  = 0.0;
-    m_tmin = 0.0;
-    m_tmax = 0.0;
-    m_emin = 0.0;
-    m_emax = 0.0;
+    m_usepnt = false;
+    m_ra     = 0.0;
+    m_dec    = 0.0;
+    m_rad    = 0.0;
+    m_tmin   = 0.0;
+    m_tmax   = 0.0;
+    m_emin   = 0.0;
+    m_emax   = 0.0;
     m_expr.clear();
 
     // Initialise protected members
@@ -679,6 +685,11 @@ void ctselect::init_members(void)
     m_timemax.clear();
     m_use_xml    = false;
     m_read_ahead = false;
+    
+    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
+    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
+    // a better mechanism to implement the CTA reference MJD.
+    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
     // Set logger properties
     log.date(true);
@@ -699,6 +710,7 @@ void ctselect::copy_members(const ctselect& app)
     m_infile  = app.m_infile;
     m_outfile = app.m_outfile;
     m_prefix  = app.m_prefix;
+    m_usepnt  = app.m_usepnt;
     m_ra      = app.m_ra;
     m_dec     = app.m_dec;
     m_rad     = app.m_rad;
@@ -715,6 +727,7 @@ void ctselect::copy_members(const ctselect& app)
     m_timemax    = app.m_timemax;
     m_use_xml    = app.m_use_xml;
     m_read_ahead = app.m_read_ahead;
+    m_cta_ref    = app.m_cta_ref;
     
     // Return
     return;

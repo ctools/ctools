@@ -21,7 +21,7 @@
 /**
  * @file ctselect.hpp
  * @brief CTA data selection tool definition
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 #ifndef CTSELECT_HPP
@@ -35,7 +35,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "00-03-01"
+#define CTSELECT_VERSION "00-04-00"
 
 
 /***********************************************************************//**
@@ -81,6 +81,7 @@ protected:
     std::string m_infile;     //!< Input event list or XML file
     std::string m_outfile;    //!< Output event list or XML file
     std::string m_prefix;     //!< Prefix for multiple event lists
+    bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
     double      m_ra;         //!< RA of ROI centre
     double      m_dec;        //!< DEC of ROI centre
     double      m_rad;        //!< ROI radius
@@ -97,6 +98,7 @@ protected:
     GTime                    m_timemax;    //!< Latest time
     bool                     m_use_xml;    //!< Use XML file instead of FITS file
     bool                     m_read_ahead; //!< Read ahead parameters
+    GTimeReference           m_cta_ref;    //!< CTA time reference
 };
 
 #endif /* CTSELECT_HPP */
