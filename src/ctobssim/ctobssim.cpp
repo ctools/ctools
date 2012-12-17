@@ -537,10 +537,8 @@ void ctobssim::set_list(GCTAObservation* obs)
 
         // Set GTI
         GGti  gti;
-        GTime tstart;
-        GTime tstop;
-        tstart.met(m_tmin);
-        tstop.met(m_tmax);
+        GTime tstart(m_tmin);
+        GTime tstop(m_tmax);
         gti.append(tstart, tstop);
 
         // Set energy boundaries
@@ -927,7 +925,7 @@ void ctobssim::init_members(void)
 
     // Set fixed parameters
     m_area = 19634954.0 * 1.0e4;     //!< pi*(2500^2) m^2
-    m_time_max.met(1800.0);          //!< Maximum length of time slice (s)
+    m_time_max.secs(1800.0);         //!< Maximum length of time slice (s)
 
     // Set logger properties
     log.date(true);

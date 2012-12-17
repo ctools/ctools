@@ -492,10 +492,8 @@ void ctmodel::setup_obs(void)
 
             // Setup time interval covered by model
             GGti  gti;
-            GTime tmin;
-            GTime tmax;
-            tmin.met(m_tmin);
-            tmax.met(m_tmax);
+            GTime tmin(m_tmin);
+            GTime tmax(m_tmax);
             gti.append(tmin, tmax);
 
             // Setup skymap
