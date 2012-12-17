@@ -301,10 +301,8 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 	
 	# Set GTI
 	gti   = GGti()
-	start = GTime()
-	stop  = GTime()
-	start.met(tstart)
-	stop.met(tstart+duration)
+	start = GTime(tstart)
+	stop  = GTime(tstart+duration)
 	gti.append(start, stop)
 	
 	# Set energy boundaries
