@@ -34,8 +34,8 @@ uname_system=`uname`
 python_dir="@pythondir@"
 python_exec_dir="@pyexecdir@"
 pkgconfig_dir="@libdir@/pkgconfig"
-man_dir="@datadir@/doc/ctools/man"
-caldb_dir="@datadir@/caldb"
+man_dir="@datarootdir@/doc/ctools/man"
+caldb_dir="@datarootdir@/caldb"
 
 #
 # Make pfiles available (this is needed for an installation where the
