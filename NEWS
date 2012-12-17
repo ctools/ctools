@@ -1,8 +1,8 @@
-New Features and Important Changes in ctools 00-05-02
+New Features and Important Changes in ctools 00-06-00
 
 Author(s) : Juergen Knoedlseder
 
-October 11th, 2012
+December 17th, 2012
 
 
 1. Introduction
@@ -13,11 +13,7 @@ important changes made since the last release of ctools.
 
 2. Configuration
 -----------------
-The dlopen() check on Linux systems has been corrected as it failed
-always due to a problem when loading the shared libgamma.so.1
-library. I'm now sure why this happened. Anyhow, the libgamma.so.1
-library is no longer required for the test, and now the dlopen()
-capability is correctly tested.
+None
 
 
 3. Python interface
@@ -27,11 +23,12 @@ None
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+Adapt to new GTime interface.
+
 
 5. ctselect - CTA event selection
 ---------------------------------
-None
+Adapt to new GTime interface.
 
 
 6. ctbin - CTA event binning
@@ -43,26 +40,33 @@ None
 ------------------------------------------
 None
 
+
 8. ctskymap - CTA sky mapping
 -----------------------------
 None
 
 
-9. Examples
+9. ctmodel - CTA counts map modelling
+-------------------------------------
+The executable ctmodel has been added. ctmodel takes a model XML file
+and computes the corresponding counts map.
+
+
+10. Examples
+------------
+None
+
+
+11. Scripts
 -----------
 None
 
 
-10. Scripts
------------
-None
-
-
-11. caldb
+12. caldb
 ---------
 None
 
 
-12. models
+13. models
 ----------
 None

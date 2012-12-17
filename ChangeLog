@@ -1,9 +1,10 @@
-2012-12-05  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2012-12-17  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.6.0 released
         ========================
 
         Add ctmodel tool
+        Add usepnt parameter to ctselect
         Adapt to GammaLib-00-07-00 interface
 
 2012-10-11  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
