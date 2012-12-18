@@ -3,7 +3,7 @@
 # This script performs an unbinned maximum likelihood analysis for a
 # variety of models. This allows checking the models.
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2012 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ def pipeline(model_name):
 	rad_select  =    3.0
 
 	# Write model name
-	print "Model: "+model_name
+	print("Model: "+model_name)
 
 	# Initialise timing
 	wall_seconds = 0.0
@@ -87,7 +87,7 @@ def pipeline(model_name):
 	like.run()
 
 	# Show model fitting results
-	print like.obs().models()[0]
+	print(like.obs().models()[0])
 	
 	# Return
 	return
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 	show_data = True
 	
 	# Test for command line arguments
-	print sys.argv[0]
+	print(sys.argv[0])
 	if (len(sys.argv) > 1):
 		if sys.argv[1] == "-h":
 			need_help = True
@@ -122,15 +122,15 @@ if __name__ == '__main__':
 
 	# Print help if needed and exit
 	if need_help:
-		print "Usage: example_models.py [OPTIONS]"
-		print "     -h       Display this usage message"
-		print "     -noshow  Do not show data using matplotlib"
+		print("Usage: example_models.py [OPTIONS]")
+		print("     -h       Display this usage message")
+		print("     -noshow  Do not show data using matplotlib")
 		sys.exit()
 
 	# Dump header
-	print "********************************"
-	print "* CTA unbinned analysis script *"
-	print "********************************"
+	print("********************************")
+	print("* CTA unbinned analysis script *")
+	print("********************************")
 		
 	# Perform analysis for Crab model
 	pipeline("data/crab.xml")
