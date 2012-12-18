@@ -179,11 +179,8 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 		# Loop over all events
 		for event in run.events():
 			
-			# Cast to CTA event
-			event = cast_GCTAEventAtom(event)
-			
 			# Determine sky pixel
-			skydir = event.dir().dir()
+			skydir = GCTAInstDir(event.dir()).dir()
 			pixel  = map.dir2pix(skydir)
 			
 			# Set pixel
