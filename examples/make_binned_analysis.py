@@ -4,10 +4,7 @@
 # ctools. If matplotlib is installed, a counts spectrum and an offset
 # histogram will be displayed.
 #
-# Required 3rd party modules:
-# None
-#
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2012 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +26,11 @@ from math import *
 import os
 import glob
 import sys
+try:
+	import matplotlib.pyplot as plt
+	has_matplotlib = True
+except:
+	has_matplotlib = False
 
 
 # ============================= #
@@ -224,7 +226,10 @@ def pipeline_v2():
 	#sys.stdout.write(like.obs().models()+"\n")
 
 	# Plot counts
-	plot_counts(bin.obs())
+	if has_matplotlib:
+		plot_counts(bin.obs())
+	else:
+		sys.stdout.write("Matplotlib is not (correctly) installed on your system. No counts spectra are shown.\n")
 	
 	# Return
 	return
@@ -237,139 +242,131 @@ def plot_counts(observations):
 	"""
 	Plot counts.
 	"""
-	# Only proceed if matplotlib is available
-	try:
-		# Import matplotlib
-		import matplotlib.pyplot as plt
+	# Set legend fontsize
+	params = {'legend.fontsize': 10}
+	plt.rcParams.update(params)
 
-		# Set legend fontsize
-		params = {'legend.fontsize': 10}
-		plt.rcParams.update(params)
+	# Set plot styles
+	styles = ['b-', 'g-', 'y-', 'n-']
 
-		# Set plot styles
-		styles = ['b-', 'g-', 'y-', 'n-']
+	# Dump header
+	sys.stdout.write("\n")
+	sys.stdout.write("Make plots (using matplotlib):\n")
+	sys.stdout.write("==============================\n")
+	
+	# Create figure 1
+	plt.figure(1,figsize=(12,6))
+	plt.subplots_adjust(hspace=.7)
 
-		# Dump header
-		sys.stdout.write("\n")
-		sys.stdout.write("Make plots (using matplotlib):\n")
-		sys.stdout.write("==============================\n")
+	# Create subplot 1
+	plt.subplot(121)
+	plt.title("Spectrum (summed over all pixels)")
+	
+	# Loop over observations
+	for obs in observations:
+	
+		# Get event cube
+		cube = obs.events()
 		
-		# Create figure 1
-		plt.figure(1,figsize=(12,6))
-		plt.subplots_adjust(hspace=.7)
+		# Create energy axis
+		energy  = []
+		ebounds = cube.ebounds()
+		for i in range(ebounds.size()):
+			energy.append(ebounds.elogmean(i).TeV())
 
-		# Create subplot 1
-		plt.subplot(121)
-		plt.title("Spectrum (summed over all pixels)")
-		
-		# Loop over observations
-		for obs in observations:
-		
-			# Get event cube
-			cube = cast_GCTAEventCube(obs.events())
-			
-			# Create energy axis
-			energy  = []
-			ebounds = cube.ebounds()
-			for i in range(ebounds.size()):
-				energy.append(ebounds.elogmean(i).TeV())
+		# Create spectrum
+		sys.stdout.write("Extract data:\n")
+		counts = [0.0 for i in range(ebounds.size())]
+		for bin in cube:
+			index         = ebounds.index(bin.energy())
+			counts[index] = counts[index] + bin.counts()
 
-			# Create spectrum
-			sys.stdout.write("Extract data:\n")
-			counts = [0.0 for i in range(ebounds.size())]
+		# Create error bars
+		error = [sqrt(c) for c in counts]
+
+		# Plot spectrum
+		plt.loglog(energy, counts, 'ro', label='data')
+		plt.errorbar(energy, counts, error, fmt=None, ecolor='r')
+
+		# Extract models
+		sys.stdout.write("Extract models:\n")
+		sum_model = [0.0 for i in range(ebounds.size())]
+		for k, m in enumerate(observations.models()):
+			sys.stdout.write("- "+m.name()+"\n")
+			model = [0.0 for i in range(ebounds.size())]
 			for bin in cube:
-				index         = ebounds.index(bin.energy())
+				index        = ebounds.index(bin.energy())
+				prob         = m.eval(bin, obs)
+				model[index] = model[index] + prob * bin.size()
+			for i in range(ebounds.size()):
+				sum_model[i] = sum_model[i] + model[i]
+			plt.loglog(energy, model, styles[k], label=m.name())
+		plt.loglog(energy, sum_model, 'r-', label='total')
+
+	# Put labels
+	plt.xlabel("Energy (TeV)")
+	plt.ylabel("Counts")
+	plt.legend(loc="lower left")
+
+	# Create subplot 2
+	plt.subplot(122)
+	plt.title("Offset (summed over all energies)")
+
+	# Set Crab direction
+	crab = GSkyDir()
+	crab.radec_deg(83.63, 22.01)
+	
+	# Loop over observations
+	for obs in observations:
+	
+		# Get event cube
+		cube = obs.events()
+		
+		# Create offset histogram
+		sys.stdout.write("Extract data:\n")
+		nx       = 30
+		doffset2 = 0.01
+		offset2  = [(i+0.5)*doffset2 for i in range(nx)]
+		counts   = [0.0  for i in range(nx)]
+		for bin in cube:
+			off   = GCTAInstDir(bin.dir()).dist_deg(crab)
+			off2  = off*off
+			index = int(off2/doffset2)
+			if index < nx:
 				counts[index] = counts[index] + bin.counts()
 
-			# Create error bars
-			error = [sqrt(c) for c in counts]
+		# Create error bars
+		error = [sqrt(c) for c in counts]
 
-			# Plot spectrum
-			plt.loglog(energy, counts, 'ro', label='data')
-			plt.errorbar(energy, counts, error, fmt=None, ecolor='r')
+		# Plot distribution
+		plt.semilogy(offset2, counts, 'ro', label='data')
 
-			# Extract models
-			sys.stdout.write("Extract models:\n")
-			sum_model = [0.0 for i in range(ebounds.size())]
-			for k, m in enumerate(observations.models()):
-				sys.stdout.write("- "+m.name()+"\n")
-				model = [0.0 for i in range(ebounds.size())]
-				for bin in cube:
-					index        = ebounds.index(bin.energy())
-					prob         = m.eval(bin, obs)
-					model[index] = model[index] + prob * bin.size()
-				for i in range(ebounds.size()):
-					sum_model[i] = sum_model[i] + model[i]
-				plt.loglog(energy, model, styles[k], label=m.name())
-			plt.loglog(energy, sum_model, 'r-', label='total')
-
-		# Put labels
-		plt.xlabel("Energy (TeV)")
-		plt.ylabel("Counts")
-		plt.legend(loc="lower left")
-
-		# Create subplot 2
-		plt.subplot(122)
-		plt.title("Offset (summed over all energies)")
-
-		# Set Crab direction
-		crab = GSkyDir()
-		crab.radec_deg(83.63, 22.01)
-		
-		# Loop over observations
-		for obs in observations:
-		
-			# Get event cube
-			cube = cast_GCTAEventCube(obs.events())
-			
-			# Create offset histogram
-			sys.stdout.write("Extract data:\n")
-			nx       = 30
-			doffset2 = 0.01
-			offset2  = [(i+0.5)*doffset2 for i in range(nx)]
-			counts   = [0.0  for i in range(nx)]
+		# Extract models
+		sys.stdout.write("Extract models:\n")
+		sum_model = [0.0 for i in range(nx)]
+		for k, m in enumerate(observations.models()):
+			sys.stdout.write("- "+m.name()+"\n")
+			model = [0.0 for i in range(nx)]
 			for bin in cube:
-				off   = bin.dir().dist_deg(crab)
+				off   = GCTAInstDir(bin.dir()).dist_deg(crab)
 				off2  = off*off
 				index = int(off2/doffset2)
 				if index < nx:
-					counts[index] = counts[index] + bin.counts()
+					prob         = m.eval(bin, obs)
+					model[index] = model[index] + prob * bin.size()
+			for i in range(nx):
+				sum_model[i] = sum_model[i] + model[i]
+			plt.plot(offset2, model, styles[k], label=m.name())
+		plt.plot(offset2, sum_model, 'r-', label='total')
+		plt.ylim(ymin=0.1)
 
-			# Create error bars
-			error = [sqrt(c) for c in counts]
+	# Put labels
+	plt.xlabel("Offset (deg^2)")
+	plt.ylabel("Counts")
+	plt.legend(loc="upper right")
 
-			# Plot distribution
-			plt.semilogy(offset2, counts, 'ro', label='data')
-
-			# Extract models
-			sys.stdout.write("Extract models:\n")
-			sum_model = [0.0 for i in range(nx)]
-			for k, m in enumerate(observations.models()):
-				sys.stdout.write("- "+m.name()+"\n")
-				model = [0.0 for i in range(nx)]
-				for bin in cube:
-					off   = bin.dir().dist_deg(crab)
-					off2  = off*off
-					index = int(off2/doffset2)
-					if index < nx:
-						prob         = m.eval(bin, obs)
-						model[index] = model[index] + prob * bin.size()
-				for i in range(nx):
-					sum_model[i] = sum_model[i] + model[i]
-				plt.plot(offset2, model, styles[k], label=m.name())
-			plt.plot(offset2, sum_model, 'r-', label='total')
-			plt.ylim(ymin=0.1)
-
-		# Put labels
-		plt.xlabel("Offset (deg^2)")
-		plt.ylabel("Counts")
-		plt.legend(loc="upper right")
-
-		# Show counts spectra
-		plt.show()
-
-	except:
-		sys.stdout.write("Matplotlib is not (correctly) installed on your system. No counts spectra are shown.\n")
+	# Show counts spectra
+	plt.show()
 
 	# Return
 	return
