@@ -143,7 +143,7 @@ if __name__ == '__main__':
 	# Get input arguments
 	usage = "make_pull_at_sensitivity_limit filename [max_threads]"
 	if len(sys.argv) < 2 or len(sys.argv) > 3:
-		print usage
+		print(usage)
 		sys.exit()
 
 	# Get sensitivity file
@@ -189,7 +189,7 @@ if __name__ == '__main__':
 			# Generate pull distribution
 			p = processing.Process(target=create_pull, args=args, kwargs=kwargs)
 			p.start()
-			print "Process emin=%.4f emax=%.4f started." % (emin, emax)
+			print("Process emin=%.4f emax=%.4f started." % (emin, emax))
 
 			# Wait some time
 			time.sleep(1)
