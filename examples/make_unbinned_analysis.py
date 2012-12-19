@@ -29,6 +29,11 @@ from math import *
 import os
 import glob
 import sys
+try:
+	import matplotlib.pyplot as plt
+	has_matplotlib = True
+except:
+	has_matplotlib = False
 
 
 # ============================= #
@@ -78,8 +83,8 @@ def pipeline_v1():
 	sim["emin"].real(emin)
 	sim["emax"].real(emax)
 	sim.execute()
-	print "Simulated events ("+str(sim.celapse())+" CPU seconds)"
-
+	print("Simulated events ("+str(sim.celapse())+" CPU seconds)")
+	
 	# Update timing
 	wall_seconds += sim.telapse()
 	cpu_seconds  += sim.celapse()
@@ -97,7 +102,7 @@ def pipeline_v1():
 	select["emin"].real(emin)
 	select["emax"].real(emax)
 	select.execute()
-	print "Select event ("+str(select.celapse())+" CPU seconds)"
+	print("Select event ("+str(select.celapse())+" CPU seconds)")
 
 	# Update timing
 	wall_seconds += select.telapse()
@@ -112,15 +117,15 @@ def pipeline_v1():
 	like["caldb"].string(caldb)
 	like["irf"].string(irf)
 	like.execute()
-	print "Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)"
+	print("Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)")
 
 	# Update timing
 	wall_seconds += like.telapse()
 	cpu_seconds  += like.celapse()
 	
 	# Show total times
-	print "Total wall time elapsed: "+str(wall_seconds)+" seconds"
-	print "Total CPU time used ...: "+str(cpu_seconds)+" seconds"
+	print("Total wall time elapsed: "+str(wall_seconds)+" seconds")
+	print("Total CPU time used ...: "+str(cpu_seconds)+" seconds")
 
 	# Return
 	return
@@ -167,7 +172,7 @@ def pipeline_v2(show_data):
 	sim["emin"].real(emin)
 	sim["emax"].real(emax)
 	sim.run()
-	print "Simulated events ("+str(sim.celapse())+" CPU seconds)"
+	print("Simulated events ("+str(sim.celapse())+" CPU seconds)")
 
 	# Update timing
 	wall_seconds += sim.telapse()
@@ -183,7 +188,7 @@ def pipeline_v2(show_data):
 	select["emin"].real(emin)
 	select["emax"].real(emax)
 	select.run()
-	print "Select event ("+str(select.celapse())+" CPU seconds)"
+	print("Select event ("+str(select.celapse())+" CPU seconds)")
 
 	# Update timing
 	wall_seconds += select.telapse()
@@ -192,22 +197,25 @@ def pipeline_v2(show_data):
 	# Perform maximum likelihood fitting
 	like = ctlike(select.obs())
 	like.run()
-	print "Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)"
+	print("Maximum likelihood fitting ("+str(like.celapse())+" CPU seconds)")
 
 	# Update timing
 	wall_seconds += like.telapse()
 	cpu_seconds  += like.celapse()
 		
 	# Show total times
-	print "Total wall time elapsed: "+str(wall_seconds)+" seconds"
-	print "Total CPU time used ...: "+str(cpu_seconds)+" seconds"
+	print("Total wall time elapsed: "+str(wall_seconds)+" seconds")
+	print("Total CPU time used ...: "+str(cpu_seconds)+" seconds")
 
 	# Show model fitting results
 	#print like.obs().models()
 	
 	# Optionally plot counts
 	if show_data:
-		plot_counts(like.obs())
+		if has_matplotlib:
+			plot_counts(like.obs())
+		else:
+			sys.stdout.write("Matplotlib is not (correctly) installed on your system. No counts spectra are shown.\n")
 	
 	# Return
 	return
@@ -220,143 +228,135 @@ def plot_counts(observations):
 	"""
 	Plot counts.
 	"""
-	# Only proceed if matplotlib is available
-	try:
-		# Import matplotlib
-		import matplotlib.pyplot as plt
+	# Set legend fontsize
+	params = {'legend.fontsize': 10}
+	plt.rcParams.update(params)
 
-		# Set legend fontsize
-		params = {'legend.fontsize': 10}
-		plt.rcParams.update(params)
+	# Set plot styles
+	styles = ['b-', 'g-', 'y-', 'n-']
 
-		# Set plot styles
-		styles = ['b-', 'g-', 'y-', 'n-']
+	# Dump header
+	print("")
+	print("Make plots (using matplotlib):")
+	print("==============================")
+	
+	# Create figure 1
+	plt.figure(1,figsize=(12,6))
+	plt.subplots_adjust(hspace=.7)
 
-		# Dump header
-		print ""
-		print "Make plots (using matplotlib):"
-		print "=============================="
+	# Create subplot 1
+	plt.subplot(121)
+	plt.title("Spectrum (summed over all pixels)")
+	
+	# Loop over observations
+	for obs in observations:
+	
+		# Get event list
+		list = obs.events()
 		
-		# Create figure 1
-		plt.figure(1,figsize=(12,6))
-		plt.subplots_adjust(hspace=.7)
+		# Create energy axis
+		ebounds = GEbounds()
+		emin    = GEnergy()
+		emax    = GEnergy()
+		emin.TeV(0.1)
+		emax.TeV(100.0)
+		ebounds.setlog(emin, emax, 10)
+		energy = [ebounds.elogmean(i).TeV() for i in range(ebounds.size())]
 
-		# Create subplot 1
-		plt.subplot(121)
-		plt.title("Spectrum (summed over all pixels)")
-		
-		# Loop over observations
-		for obs in observations:
-		
-			# Get event list
-			list = cast_GCTAEventList(obs.events())
-			
-			# Create energy axis
-			ebounds = GEbounds()
-			emin    = GEnergy()
-			emax    = GEnergy()
-			emin.TeV(0.1)
-			emax.TeV(100.0)
-			ebounds.setlog(emin, emax, 10)
-			energy = [ebounds.elogmean(i).TeV() for i in range(ebounds.size())]
+		# Create spectrum
+		print("Extract data:")
+		counts = [0.0 for i in range(ebounds.size())]
+		print(list.size())
+		for atom in list:
+			index         = ebounds.index(atom.energy())
+			counts[index] = counts[index] + 1.0
 
-			# Create spectrum
-			print "Extract data:"
-			counts = [0.0 for i in range(ebounds.size())]
-			print list.size()
-			for atom in list:
-				index         = ebounds.index(atom.energy())
+		# Create error bars
+		error = [sqrt(c) for c in counts]
+
+		# Plot spectrum
+		plt.loglog(energy, counts, 'ro', label='data')
+		#plt.errorbar(energy, counts, error, fmt=None, ecolor='r')
+
+		# Extract models
+		#print("Extract models:")
+		#sum_model = [0.0 for i in range(ebounds.size())]
+		#for k, m in enumerate(observations.models()):
+		#	print("- "+m.name())
+		#	model = [0.0 for i in range(ebounds.size())]
+		#	for atom in list:
+		#		index        = ebounds.index(atom.energy())
+		#		prob         = m.eval(atom, obs)
+		#		model[index] = model[index] + prob * atom.size()
+		#	for i in range(ebounds.size()):
+		#		sum_model[i] = sum_model[i] + model[i]
+		#	plt.loglog(energy, model, styles[k], label=m.name())
+		#plt.loglog(energy, sum_model, 'r-', label='total')
+
+	# Put labels
+	plt.xlabel("Energy (TeV)")
+	plt.ylabel("Counts")
+	plt.legend(loc="lower left")
+
+	# Create subplot 2
+	plt.subplot(122)
+	plt.title("Offset (summed over all energies)")
+
+	# Set Crab direction
+	crab = GSkyDir()
+	crab.radec_deg(83.63, 22.01)
+	
+	# Loop over observations
+	for obs in observations:
+	
+		# Get event cube
+		list = obs.events()
+		
+		# Create offset histogram
+		print "Extract data:"
+		nx       = 30
+		doffset2 = 0.01
+		offset2  = [(i+0.5)*doffset2 for i in range(nx)]
+		counts   = [0.0  for i in range(nx)]
+		for atom in list:
+			off   = GCTAInstDir(atom.dir()).dist_deg(crab)
+			off2  = off*off
+			index = int(off2/doffset2)
+			if index < nx:
 				counts[index] = counts[index] + 1.0
 
-			# Create error bars
-			error = [sqrt(c) for c in counts]
+		# Create error bars
+		error = [sqrt(c) for c in counts]
 
-			# Plot spectrum
-			plt.loglog(energy, counts, 'ro', label='data')
-			#plt.errorbar(energy, counts, error, fmt=None, ecolor='r')
+		# Plot distribution
+		plt.semilogy(offset2, counts, 'ro', label='data')
 
-			# Extract models
-			print "Extract models:"
-			sum_model = [0.0 for i in range(ebounds.size())]
-			for k, m in enumerate(observations.models()):
-				print "- "+m.name()
-				model = [0.0 for i in range(ebounds.size())]
-				for atom in list:
-					index        = ebounds.index(atom.energy())
-					prob         = m.eval(atom, obs)
-					model[index] = model[index] + prob * atom.size()
-				for i in range(ebounds.size()):
-					sum_model[i] = sum_model[i] + model[i]
-				#plt.loglog(energy, model, styles[k], label=m.name())
-			#plt.loglog(energy, sum_model, 'r-', label='total')
-
-		# Put labels
-		plt.xlabel("Energy (TeV)")
-		plt.ylabel("Counts")
-		plt.legend(loc="lower left")
-
-		# Create subplot 2
-		plt.subplot(122)
-		plt.title("Offset (summed over all energies)")
-
-		# Set Crab direction
-		crab = GSkyDir()
-		crab.radec_deg(83.63, 22.01)
-		
-		# Loop over observations
-		for obs in observations:
-		
-			# Get event cube
-			list = cast_GCTAEventList(obs.events())
-			
-			# Create offset histogram
-			print "Extract data:"
-			nx       = 30
-			doffset2 = 0.01
-			offset2  = [(i+0.5)*doffset2 for i in range(nx)]
-			counts   = [0.0  for i in range(nx)]
+		# Extract models
+		print "Extract models:"
+		sum_model = [0.0 for i in range(nx)]
+		for k, m in enumerate(observations.models()):
+			print "- "+m.name()
+			model = [0.0 for i in range(nx)]
 			for atom in list:
-				off   = atom.dir().dist_deg(crab)
+				off   = GCTAInstDir(atom.dir()).dist_deg(crab)
 				off2  = off*off
 				index = int(off2/doffset2)
 				if index < nx:
-					counts[index] = counts[index] + 1.0
+					prob         = m.eval(atom, obs)
+					model[index] = model[index] + prob * atom.size()
+			for i in range(nx):
+				sum_model[i] = sum_model[i] + model[i]
+			#plt.plot(offset2, model, styles[k], label=m.name())
+		#plt.plot(offset2, sum_model, 'r-', label='total')
+		#plt.ylim(ymin=0.1)
 
-			# Create error bars
-			error = [sqrt(c) for c in counts]
+	# Put labels
+	plt.xlabel("Offset (deg^2)")
+	plt.ylabel("Counts")
+	plt.legend(loc="upper right")
 
-			# Plot distribution
-			plt.semilogy(offset2, counts, 'ro', label='data')
-
-			# Extract models
-			print "Extract models:"
-			sum_model = [0.0 for i in range(nx)]
-			for k, m in enumerate(observations.models()):
-				print "- "+m.name()
-				model = [0.0 for i in range(nx)]
-				for atom in list:
-					off   = atom.dir().dist_deg(crab)
-					off2  = off*off
-					index = int(off2/doffset2)
-					if index < nx:
-						prob         = m.eval(atom, obs)
-						model[index] = model[index] + prob * atom.size()
-				for i in range(nx):
-					sum_model[i] = sum_model[i] + model[i]
-				#plt.plot(offset2, model, styles[k], label=m.name())
-			#plt.plot(offset2, sum_model, 'r-', label='total')
-			#plt.ylim(ymin=0.1)
-
-		# Put labels
-		plt.xlabel("Offset (deg^2)")
-		plt.ylabel("Counts")
-		plt.legend(loc="upper right")
-
-		# Show counts spectra
-		plt.show()
-
-	except ImportError:
-		print "Matplotlib is not (correctly) installed on your system. No counts spectra are shown."
+	# Show counts spectra
+	plt.show()
 
 	# Return
 	return
