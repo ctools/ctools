@@ -100,7 +100,7 @@ if __name__ == '__main__':
 	# Get input arguments
 	usage = "make_ts_distributions [-n ntrials] [-e enumbins] [-m max_threads]"
 	if len(sys.argv) < 1:
-		print usage
+		print(usage)
 		sys.exit()
 	
 	# Set default parameters
@@ -127,10 +127,10 @@ if __name__ == '__main__':
 					try:
 						par['value'] = int(sys.argv[i])
 					except:
-						print usage
+						print(usage)
 						sys.exit()
 				else:
-					print usage
+					print(usage)
 					sys.exit()
 		
 		# Next item
@@ -175,7 +175,7 @@ if __name__ == '__main__':
 			# Generate pull distribution
 			p = processing.Process(target=create_ts, args=args, kwargs=kwargs)
 			p.start()
-			print "Process emin=%.4f emax=%.4f started." % (emin, emax)
+			print("Process emin=%.4f emax=%.4f started." % (emin, emax))
 
 			# Wait a short time to allow process to start
 			time.sleep(1)
