@@ -42,3 +42,6 @@ test/*.fits
 test/*.dat
 test/*.xml
 test/test_cscripts.sh
+examples/*.fits
+examples/*.xml
+examples/*.dat
