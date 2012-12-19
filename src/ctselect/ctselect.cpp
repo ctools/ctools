@@ -296,6 +296,15 @@ void ctselect::run(void)
             // Save observation in temporary file
             obs->save(filename, true);
 
+            // Log saved FITS file
+            if (logExplicit()) {
+                GFits tmpfile(filename);
+                log << std::endl;
+                log.header1("FITS file content of temporary file");
+                log << tmpfile << std::endl;
+                tmpfile.close();
+            }
+
             // Check temporary file
             std::string message = check_infile(filename);
             if (message.length() > 0) {
