@@ -536,9 +536,11 @@ void ctobssim::set_list(GCTAObservation* obs)
         roi.radius(m_rad);
 
         // Set GTI
-        GGti  gti;
-        GTime tstart(m_tmin);
-        GTime tstop(m_tmax);
+        GGti  gti(m_cta_ref);
+        GTime tstart;
+        GTime tstop;
+        tstart.set(m_tmin, m_cta_ref);
+        tstop.set(m_tmax, m_cta_ref);
         gti.append(tstart, tstop);
 
         // Set energy boundaries
@@ -927,6 +929,11 @@ void ctobssim::init_members(void)
     m_area = 19634954.0 * 1.0e4;     //!< pi*(2500^2) m^2
     m_time_max.secs(1800.0);         //!< Maximum length of time slice (s)
 
+    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
+    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
+    // a better mechanism to implement the CTA reference MJD.
+    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
+
     // Set logger properties
     log.date(true);
 
@@ -965,6 +972,7 @@ void ctobssim::copy_members(const ctobssim& app)
     m_obs        = app.m_obs;
     m_use_xml    = app.m_use_xml;
     m_read_ahead = app.m_read_ahead;
+    m_cta_ref    = app.m_cta_ref;
 
     // Return
     return;

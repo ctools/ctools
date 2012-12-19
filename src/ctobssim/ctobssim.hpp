@@ -101,6 +101,7 @@ protected:
     GObservations     m_obs;        //!< Observation container
     bool              m_use_xml;    //!< Use XML file instead of FITS file
     bool              m_read_ahead; //!< Read ahead parameters
+    GTimeReference    m_cta_ref;    //!< CTA time reference
 };
 
 #endif /* CTOBSSIM_HPP */
