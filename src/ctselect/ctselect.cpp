@@ -441,12 +441,12 @@ void ctselect::get_parameters(void)
         m_ra  = (*this)["ra"].real();
         m_dec = (*this)["dec"].real();
     }
-    m_rad    = (*this)["rad"].real();
-    m_tmin   = (*this)["tmin"].real();
-    m_tmax   = (*this)["tmax"].real();
-    m_emin   = (*this)["emin"].real();
-    m_emax   = (*this)["emax"].real();
-    m_expr   = (*this)["expr"].string();
+    m_rad  = (*this)["rad"].real();
+    m_tmin = (*this)["tmin"].real();
+    m_tmax = (*this)["tmax"].real();
+    m_emin = (*this)["emin"].real();
+    m_emax = (*this)["emax"].real();
+    m_expr = (*this)["expr"].string();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -537,8 +537,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         sprintf(cmax, "%.8f", tmax);
         selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
         if (logTerse()) {
-            log << " Time range ................: " << tmin << "-" << tmax
-                << std::endl;
+            log << parformat("Time range");
+            log << tmin << " - " << tmax << " s" << std::endl;
         }
         if (selection.length() > 0) {
             selection += " && ";
@@ -550,8 +550,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     sprintf(cmax, "%.8f", m_emax);
     selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+std::string(cmax);
     if (logTerse()) {
-        log << " Energy range ..............: " << m_emin << "-" << m_emax
-            << " TeV" << std::endl;
+        log << parformat("Energy range");
+        log << m_emin << " - " << m_emax << " TeV" << std::endl;
     }
     if (selection.length() > 0) {
         selection += " && ";
@@ -565,12 +565,15 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
                  std::string(cdec)+",RA,DEC) <= " +
                  std::string(crad);
     if (logTerse()) {
-        log << " Acceptance cone centre ....: RA=" << ra << ", DEC=" << dec
-            << " deg" << std::endl;
-        log << " Acceptance cone radius ....: " << m_rad << " deg" << std::endl;
+        log << parformat("Acceptance cone centre");
+        log << "RA=" << ra << ", DEC=" << dec << " deg" << std::endl;
+        log << parformat("Acceptance cone radius");
+        log << m_rad << " deg" << std::endl;
     }
-    if (logTerse())
-        log << " cfitsio selection .........: " << selection << std::endl;
+    if (logTerse()) {
+        log << parformat("cfitsio selection");
+        log << selection << std::endl;
+    }
 
     // Add additional expression
     if (strip_whitespace(m_expr).length() > 0) {
@@ -584,8 +587,10 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     std::string expression = filename;
     if (selection.length() > 0)
         expression += "[EVENTS]["+selection+"]";
-    if (logTerse())
-        log << " FITS filename .............: " << expression << std::endl;
+    if (logTerse()) {
+        log << parformat("FITS filename");
+        log << expression << std::endl;
+    }
 
     // Open FITS file
     GFits file(expression);
@@ -635,7 +640,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     }
 
     // Get CTA event list pointer
-    GCTAEventList* list = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+    GCTAEventList* list =
+        static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
     // Set ROI
     GCTARoi     roi;
@@ -656,6 +662,11 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     emax.TeV(m_emax);
     ebounds.append(emin, emax);
     list->ebounds(ebounds);
+
+    // Recompute ontime and livetime.
+    GTime meantime = 0.5 * (gti.tstart() + gti.tstop());
+    obs->ontime(gti.ontime());
+    obs->livetime(gti.ontime() * obs->deadc(meantime));
 
     // Return
     return;
@@ -810,8 +821,9 @@ std::string ctselect::check_infile(const std::string& filename) const
                     + m_outfile + "\": ";
             for (int i = 0; i < missing.size(); ++i) {
                 message += "\"" + missing[i] + "\"";
-                if (i < missing.size()-1)
+                if (i < missing.size()-1) {
                     message += ", ";
+                }
             }
         }
 
