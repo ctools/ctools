@@ -733,8 +733,10 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                                                *obs,
                                                                ran);
                                 if (event != NULL) {
+                                    event->event_id(m_event_id);
                                     events->append(*event);
                                     delete event;
+                                    m_event_id++;
                                 }
 
                             } // endfor: looped over events
@@ -873,6 +875,10 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                     // Get event pointer
                     GCTAEventAtom* event = (*list)[k];
 
+                    // Set event identifier
+                    event->event_id(m_event_id);
+                    m_event_id++;
+
                     // Append event
                     events->append(*event);
 
@@ -943,6 +949,9 @@ void ctobssim::init_members(void)
     // a better mechanism to implement the CTA reference MJD.
     m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
+    // Initialise first event identifier
+    m_event_id = 1;
+
     // Set logger properties
     log.date(true);
 
@@ -982,6 +991,7 @@ void ctobssim::copy_members(const ctobssim& app)
     m_use_xml    = app.m_use_xml;
     m_read_ahead = app.m_read_ahead;
     m_cta_ref    = app.m_cta_ref;
+    m_event_id   = app.m_event_id;
 
     // Return
     return;

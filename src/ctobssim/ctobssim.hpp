@@ -102,6 +102,7 @@ protected:
     bool              m_use_xml;    //!< Use XML file instead of FITS file
     bool              m_read_ahead; //!< Read ahead parameters
     GTimeReference    m_cta_ref;    //!< CTA time reference
+    int               m_event_id;   //!< Event identifier
 };
 
 #endif /* CTOBSSIM_HPP */
