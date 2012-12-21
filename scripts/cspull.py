@@ -105,7 +105,7 @@ class cspull(GApplication):
 			pars.append(GPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
 			pars.append(GPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
 			pars.append(GPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
-			pars.append(GPar("deadc","r","a","0.95","","","Deadtime correction factor"))
+			pars.append(GPar("deadc","r","h","0.95","","","Deadtime correction factor"))
 			pars.append(GPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
 			pars.append(GPar("npix","i","h","200","","","Number of pixels for binned"))
 			pars.append(GPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
