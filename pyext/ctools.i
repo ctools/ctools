@@ -45,3 +45,4 @@
 %include "ctlike.i"
 %include "ctmodel.i"
 %include "ctselect.i"
+%include "ctskymap.i"
