@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-06-00
 
 Author(s) : Juergen Knoedlseder
 
-December 17th, 2012
+December 21th, 2012
 
 
 1. Introduction
@@ -23,12 +23,20 @@ None
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-Adapt to new GTime interface.
+Adapt to new GTime interface. The time parameters are now given in the CTA
+time reference.
+
+A bug was corrected that prevented correct usage of the seed value. The
+introduction of OpenMP support in version 0.5.0 led to an internal seed
+value of 0 event if different seed parameters were specified. The bug
+was corrected and the internal seed values that are used are now dumped
+into the log file.
 
 
 5. ctselect - CTA event selection
 ---------------------------------
-Adapt to new GTime interface.
+Adapt to new GTime interface. The time parameters are now given in the CTA
+time reference.
 
 
 6. ctbin - CTA event binning
@@ -49,7 +57,10 @@ None
 9. ctmodel - CTA counts map modelling
 -------------------------------------
 The executable ctmodel has been added. ctmodel takes a model XML file
-and computes the corresponding counts map.
+and computes the corresponding model map. The definiton of the model
+map is either taken from an input counts map or an observation
+definiton file, or from the task parameters with an interface that
+is similiar to that of ctbin.
 
 
 10. Examples

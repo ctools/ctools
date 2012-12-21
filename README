@@ -1,8 +1,8 @@
 ctools information
 ==================
-Version:             00-05-02 (October 11th, 2012)
+Version:             00-06-00 (December 21th, 2012)
 Author:              Juergen Knodlseder (jurgen.knodlseder@irap.omp.eu)
-GammaLib dependency: 00-06-02
+GammaLib dependency: 00-07-00
 
 
 License information
@@ -34,10 +34,11 @@ for the high-level analysis of astronomical gamma-ray data.
 
 The following tools are so far available:
 
-    ctobssim - simulation of CTA observations
-    ctselect - event selection
     ctbin    - event binning
     ctlike   - maximum likelihood model fitting
+    ctmodel  - generation of model counts map
+    ctobssim - simulation of CTA observations
+    ctselect - event selection
     ctskymap - CTA sky mapping tool
 
 
@@ -69,9 +70,9 @@ If you use C shell or a variant then add the following to your
 If you have installed GammaLib in another directory than /usr/local/gamma,
 please adapt the path correspondingly.
 
-Please do NOT attempt to install ctools in a directory different to that
-of GammaLib. The setup procedure does NOT support this feature, although
-you might manage to make it work :-)
+If you really insist, you may install ctools in a directory different to
+that hosting GammaLib, but we highly recommend to install both packages
+together.
 
 
 Unix Installation
