@@ -238,6 +238,16 @@ void ctobssim::run(void)
         log << std::endl;
     }
 
+    // Write seed values into logger
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Seed values");
+        for (int i = 0; i < m_rans.size(); ++i) {
+            log << parformat("Seed "+str(i));
+            log << str(m_rans[i].seed()) << std::endl;
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -469,7 +479,8 @@ void ctobssim::get_parameters(void)
         // value has not been used already for another observation.
         bool repeat = false;
         do {
-            new_seed = (unsigned long long int)(master.int64() * 1.0e2);
+            new_seed = (unsigned long long int)(master.uniform() * 1.0e10) +
+                       m_seed;
             repeat   = false;
             for (int j = 0; j < seeds.size(); ++j) {
                 if (new_seed == seeds[j]) {
