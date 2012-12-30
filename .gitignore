@@ -3,6 +3,12 @@
 *.o
 *.lo
 *.la
+*.aux
+*.idx
+*.out
+*.pdf
+*.synctex.gz
+*.toc
 .DS_Store
 .cproject
 .project
