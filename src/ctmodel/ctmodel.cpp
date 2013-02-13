@@ -582,10 +582,13 @@ void ctmodel::setup_obs(void)
                 throw GException::no_cube(G_SETUP_OBS);
             }
         
-            // Set response
-            obs->response(m_irf, m_caldb);
+            // Set response if it isn't set already
+            if (obs->response() == NULL) {
+            	obs->response(m_irf, m_caldb);
+            } // endif: observation already has a response
 
         } // endif: observation was a CTA observation
+
     } // endfor: looped over all observations
 
     // Return
