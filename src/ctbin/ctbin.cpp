@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctbin.cpp
  * @brief CTA data binning tool implementation
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -92,7 +92,7 @@ ctbin::ctbin(GObservations obs) : GApplication(CTBIN_NAME, CTBIN_VERSION)
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbin::ctbin(int argc, char *argv[]) : 
-                          GApplication(CTBIN_NAME, CTBIN_VERSION, argc, argv)
+       GApplication(CTBIN_NAME, CTBIN_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -481,12 +481,9 @@ void ctbin::bin_events(GCTAObservation* obs)
         }
 
         // Setup energy range covered by data
-        GEnergy  emin;
-        GEnergy  emax;
-        GEbounds ebds;
-        emin.TeV(m_emin);
-        emax.TeV(m_emax);
-        ebds.setlog(emin, emax, m_enumbins);
+        GEnergy  emin(m_emin, "TeV");
+        GEnergy  emax(m_emax, "TeV");
+        GEbounds ebds(m_enumbins, emin, emax);
 
         // Get Good Time intervals
         GGti gti = obs->events()->gti();

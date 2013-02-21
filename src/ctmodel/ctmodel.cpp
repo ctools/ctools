@@ -482,13 +482,10 @@ void ctmodel::setup_obs(void)
             skydir.radec_deg(m_ra, m_dec);
             pnt.dir(skydir);
 
-            // Setup energy range covered by model
-            GEnergy  emin;
-            GEnergy  emax;
-            GEbounds ebds;
-            emin.TeV(m_emin);
-            emax.TeV(m_emax);
-            ebds.setlog(emin, emax, m_enumbins);
+            // Setup energy range covered by data
+            GEnergy  emin(m_emin, "TeV");
+            GEnergy  emax(m_emax, "TeV");
+            GEbounds ebds(m_enumbins, emin, emax);
 
             // Setup time interval covered by model
             GGti  gti;
