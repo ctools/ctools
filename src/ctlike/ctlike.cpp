@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctlike.cpp
  * @brief CTA maximum likelihood tool implementation
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -259,7 +259,7 @@ void ctlike::run(void)
     // Compute number of observed events in all observations
     double num_events = 0.0;
     for (int i = 0; i < m_obs.size(); ++i) {
-        num_events += m_obs[i].events()->number();
+        num_events += m_obs[i]->events()->number();
     }
 
     // Write results into logger

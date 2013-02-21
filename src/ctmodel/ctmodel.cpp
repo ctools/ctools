@@ -279,7 +279,7 @@ void ctmodel::run(void)
         m_infiles.push_back("");
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
@@ -482,7 +482,7 @@ void ctmodel::setup_obs(void)
             skydir.radec_deg(m_ra, m_dec);
             pnt.dir(skydir);
 
-            // Setup energy range covered by data
+            // Setup energy range covered by model
             GEnergy  emin(m_emin, "TeV");
             GEnergy  emax(m_emax, "TeV");
             GEbounds ebds(m_enumbins, emin, emax);
@@ -568,7 +568,7 @@ void ctmodel::setup_obs(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Is this observation a CTA observation?
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Yes ...
         if (obs != NULL) {
@@ -789,7 +789,7 @@ void ctmodel::save_fits(void)
     m_outfile = (*this)["outfile"].filename();
 
     // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[0]);
+    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
     // Save model map
     save_model_map(obs, m_outfile);
@@ -820,7 +820,7 @@ void ctmodel::save_xml(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Handle only CTA observations
         if (obs != NULL) {

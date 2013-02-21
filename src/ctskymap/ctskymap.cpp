@@ -1,7 +1,7 @@
 /***************************************************************************
  *                     ctskymap - CTA sky mapping tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011 by Juergen Knoedlseder                              *
+ *  copyright (C) 2011-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctskymap.cpp
  * @brief CTA sky mapping tool implementation
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -272,7 +272,7 @@ void ctskymap::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
