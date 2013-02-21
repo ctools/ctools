@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -269,7 +269,7 @@ void ctselect::run(void)
         m_infiles.push_back("");
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
@@ -872,7 +872,7 @@ void ctselect::save_fits(void)
     m_outfile = (*this)["outfile"].filename();
 
     // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[0]);
+    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
     // Save event list
     save_event_list(obs, m_infiles[0], m_outfile);
@@ -902,7 +902,7 @@ void ctselect::save_xml(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Handle only CTA observations
         if (obs != NULL) {

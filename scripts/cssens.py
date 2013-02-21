@@ -347,53 +347,50 @@ class cssens(GApplication):
 
 		# Set source
 		if type == "point":
-			spatial = GModelSpatialPtsrc(location)
+			spatial = GModelSpatialPointSource(location)
 			if fitpos:
 				spatial["RA"].free()
 				spatial["DEC"].free()
 			else:
 				spatial["RA"].fix()
 				spatial["DEC"].fix()
-			source  = GModelPointSource(spatial, spectrum)
 		elif type == "gauss":
-			radial = GModelRadialGauss(location, self.m_radius)
+			spatial = GModelSpatialRadialGauss(location, self.m_radius)
 			if fitpos:
-				radial["RA"].free()
-				radial["DEC"].free()
-				radial["Sigma"].free()
+				spatial["RA"].free()
+				spatial["DEC"].free()
+				spatial["Sigma"].free()
 			else:
-				radial["RA"].fix()
-				radial["DEC"].fix()
-				radial["Sigma"].fix()
-			source = GModelExtendedSource(radial, spectrum)
+				spatial["RA"].fix()
+				spatial["DEC"].fix()
+				spatial["Sigma"].fix()
 		elif type == "disk":
-			radial = GModelRadialDisk(location, self.m_radius)
+			spatial = GModelSpatialRadialDisk(location, self.m_radius)
 			if fitpos:
-				radial["RA"].free()
-				radial["DEC"].free()
-				radial["Radius"].free()
+				spatial["RA"].free()
+				spatial["DEC"].free()
+				spatial["Radius"].free()
 			else:
-				radial["RA"].fix()
-				radial["DEC"].fix()
-				radial["Radius"].fix()
-			source = GModelExtendedSource(radial, spectrum)
+				spatial["RA"].fix()
+				spatial["DEC"].fix()
+				spatial["Radius"].fix()
 		elif type == "shell":
-			radial = GModelRadialShell(location, self.m_radius,  self.m_width)
+			spatial = GModelSpatialRadialShell(location, self.m_radius,  self.m_width)
 			if fitpos:
-				radial["RA"].free()
-				radial["DEC"].free()
-				radial["Radius"].free()
-				radial["Width"].free()
+				spatial["RA"].free()
+				spatial["DEC"].free()
+				spatial["Radius"].free()
+				spatial["Width"].free()
 			else:
-				radial["RA"].fix()
-				radial["DEC"].fix()
-				radial["Radius"].fix()
-				radial["Width"].fix()
-			source = GModelExtendedSource(radial, spectrum)
+				spatial["RA"].fix()
+				spatial["DEC"].fix()
+				spatial["Radius"].fix()
+				spatial["Width"].fix()
 		else:
 			self.log("ERROR: Unknown source type '"+type+"'.\n")
 			return None
-	
+		source  = GModelSky(spatial, spectrum)
+		
 		# Set source name
 		source.name("Test")
 	

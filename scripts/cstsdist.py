@@ -324,32 +324,29 @@ class cstsdist(GApplication):
 
 		# Set source
 		if type == "point":
-			spatial = GModelSpatialPtsrc(location)
+			spatial = GModelSpatialPointSource(location)
 			if fitpos:
 				spatial[0].free()
 				spatial[1].free()
-			source  = GModelPointSource(spatial, spectrum)
 		elif type == "gauss":
-			radial = GModelRadialGauss(location, sigma)
+			spatial = GModelSpatialRadialGauss(location, sigma)
 			if fitpos:
-				radial[0].free()
-				radial[1].free()
-			source = GModelExtendedSource(radial, spectrum)
+				spatial[0].free()
+				spatial[1].free()
 		elif type == "disk":
-			radial = GModelRadialDisk(location, radius)
+			spatial = GModelSpatialRadialDisk(location, radius)
 			if fitpos:
-				radial[0].free()
-				radial[1].free()
-			source = GModelExtendedSource(radial, spectrum)
+				spatial[0].free()
+				spatial[1].free()
 		elif type == "shell":
-			radial = GModelRadialShell(location, radius, width)
+			spatial = GModelSpatialRadialShell(location, radius, width)
 			if fitpos:
-				radial[0].free()
-				radial[1].free()
-			source = GModelExtendedSource(radial, spectrum)
+				spatial[0].free()
+				spatial[1].free()
 		else:
 			self.log("ERROR: Unknown source type '"+type+"'.\n")
 			return None
+		source  = GModelSky(spatial, spectrum)
 	
 		# Set source name
 		source.name("Test")

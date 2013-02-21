@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctbin.cpp
  * @brief CTA data binning tool implementation
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -277,7 +277,7 @@ void ctbin::run(void)
         m_infiles.push_back("");
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
@@ -481,12 +481,9 @@ void ctbin::bin_events(GCTAObservation* obs)
         }
 
         // Setup energy range covered by data
-        GEnergy  emin;
-        GEnergy  emax;
-        GEbounds ebds;
-        emin.TeV(m_emin);
-        emax.TeV(m_emax);
-        ebds.setlog(emin, emax, m_enumbins);
+        GEnergy  emin(m_emin, "TeV");
+        GEnergy  emax(m_emax, "TeV");
+        GEbounds ebds(m_enumbins, emin, emax);
 
         // Get Good Time intervals
         GGti gti = obs->events()->gti();
@@ -713,7 +710,7 @@ void ctbin::save_fits(void)
     m_outfile = (*this)["outfile"].filename();
 
     // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[0]);
+    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
     // Save event list
     save_counts_map(obs, m_outfile);
@@ -744,7 +741,7 @@ void ctbin::save_xml(void)
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(&m_obs[i]);
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Handle only CTA observations
         if (obs != NULL) {

@@ -2,7 +2,7 @@
 # Configuration for ctools - a set of tools for science analysis of CTA     #
 #                            data                                           #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2012 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2013 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -29,7 +29,7 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [0.6.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [0.7.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
