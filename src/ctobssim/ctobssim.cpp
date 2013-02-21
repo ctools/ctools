@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctobssim - CTA observation simulator tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2012 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -690,7 +690,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                 
                     // Get sky model (NULL if not a sky model)
                     const GModelSky* model =
-                          dynamic_cast<const GModelSky*>(models[i]);
+                          dynamic_cast<const GModelSky*>(&models[i]);
 
                     // If we have a sky model then simulate photons
                     if (model != NULL) {
@@ -868,7 +868,7 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 
             // Get model (NULL if not a radial acceptance model)
             const GCTAModelRadialAcceptance* model = 
-                  dynamic_cast<const GCTAModelRadialAcceptance*>(models[i]);
+                  dynamic_cast<const GCTAModelRadialAcceptance*>(&models[i]);
 
             // If we have a radial acceptance model then simulate events
             if (model != NULL) {
