@@ -3,7 +3,7 @@
 # This script simulates CTA surveys. It can be considered as the master
 # script for CTA science simulations. Please modify as needed.
 #
-# Copyright (C) 2011-2012 Jurgen Knodlseder
+# Copyright (C) 2011-2013 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -192,10 +192,7 @@ def add_background_model(obs):
 	
 	# Define background model
 	bgd_radial   = GCTAModelRadialGauss(3.0)
-	bgd_spectrum = GModelSpectralPlaw(61.8, -1.85)
-	bgd_spectrum["Prefactor"].scale(1.0e-6)
-	bgd_spectrum["PivotEnergy"].value(1.0)
-	bgd_spectrum["PivotEnergy"].scale(1.0e6)
+	bgd_spectrum = GModelSpectralPlaw(61.8e-6, -1.85, 1.0e6)
 	bgd_model = GCTAModelRadialAcceptance(bgd_radial, bgd_spectrum)
 	bgd_model.name("Background")
 	bgd_model.instruments("CTA")
@@ -219,10 +216,7 @@ def crab_spec():
 	(Albert et al. 2008, ApJ, 674, 1037)
 	"""
 	# Set parameters
-	spectrum = GModelSpectralPlaw(5.7, -2.48)
-	spectrum["Prefactor"].scale(1.0e-16)
-	spectrum["PivotEnergy"].value(0.3)
-	spectrum["PivotEnergy"].scale(1.0e6)
+	spectrum = GModelSpectralPlaw(5.7e-16, -2.48, 3.0e5)
 	
 	# Return spectrum
 	return spectrum
@@ -248,9 +242,9 @@ def survey_single():
 	# Define single point source with Crab flux at galactic centre
 	center = GSkyDir()
 	center.lb_deg(0.0, 0.0)
-	point_spatial  = GModelSpatialPtsrc(center)
+	point_spatial  = GModelSpatialPointSource(center)
 	point_spectrum = crab_spec()
-	point          = GModelPointSource(point_spatial, point_spectrum)
+	point          = GModelSky(point_spatial, point_spectrum)
 	point.name('GC source')
 	
 	# Create model container
@@ -289,9 +283,9 @@ def survey_gplane(lrange=10, lstep=2):
 	# Define single point source with Crab flux at galactic centre
 	center = GSkyDir()
 	center.lb_deg(0.0, 0.0)
-	point_spatial  = GModelSpatialPtsrc(center)
+	point_spatial  = GModelSpatialPointSource(center)
 	point_spectrum = crab_spec()
-	point          = GModelPointSource(point_spatial, point_spectrum)
+	point          = GModelSky(point_spatial, point_spectrum)
 	point.name('GC source')
 	
 	# Create model container
@@ -354,7 +348,7 @@ if __name__ == '__main__':
 	cntmap = obsutils.cntmap(obs)
 	
 	# Fit observations
-	print("Fit observatins")
+	print("Fit observations")
 	like = obsutils.fit(obs)
 	#print like.opt()
 	#print like.obs().models()

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script generates the pull distribution for all model parameters.
 #
-# Copyright (C) 2011-2012 Juergen Knoedlseder
+# Copyright (C) 2011-2013 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

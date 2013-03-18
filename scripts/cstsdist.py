@@ -313,10 +313,7 @@ class cstsdist(GApplication):
 		location.lb_deg(l, b)
 	
 		# Set source spectrum
-		spectrum = GModelSpectralPlaw(flux, index)
-		spectrum["Prefactor"].scale(5.7e-16)
-		spectrum["PivotEnergy"].value(0.3)
-		spectrum["PivotEnergy"].scale(1.0e6)
+		spectrum = GModelSpectralPlaw(flux*5.7e-16, index, 3.0e5)
 		if fitidx:
 			spectrum["Index"].free()
 		else:

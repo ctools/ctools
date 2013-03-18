@@ -255,13 +255,8 @@ def plot_counts(observations):
 		list = obs.events()
 		
 		# Create energy axis
-		ebounds = GEbounds()
-		emin    = GEnergy()
-		emax    = GEnergy()
-		emin.TeV(0.1)
-		emax.TeV(100.0)
-		ebounds.setlog(emin, emax, 10)
-		energy = [ebounds.elogmean(i).TeV() for i in range(ebounds.size())]
+		ebounds = GEbounds(10, GEnergy(0.1, "TeV"), GEnergy(100.0, "TeV"))
+		energy  = [ebounds.elogmean(i).TeV() for i in range(ebounds.size())]
 
 		# Create spectrum
 		print("Extract data:")
