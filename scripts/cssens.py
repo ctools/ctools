@@ -297,10 +297,7 @@ class cssens(GApplication):
 		if len(self.m_bkg) > 0:
 			spectrum = GModelSpectralFunc(self.m_bkg)
 		else:
-			spectrum = GModelSpectralPlaw(61.8, -1.85)
-			spectrum["Prefactor"].scale(1.0e-6)
-			spectrum["PivotEnergy"].value(1.0)
-			spectrum["PivotEnergy"].scale(1.0e6)
+			spectrum = GModelSpectralPlaw(61.8e-6, -1.85, GEnergy(1.0, "TeV"))
 			if fitidx:
 				spectrum["Index"].free()
 			else:
@@ -336,10 +333,7 @@ class cssens(GApplication):
 		location.lb_deg(l, b)
 	
 		# Set source spectrum
-		spectrum = GModelSpectralPlaw(flux, index)
-		spectrum["Prefactor"].scale(5.7e-16)
-		spectrum["PivotEnergy"].value(0.3)
-		spectrum["PivotEnergy"].scale(1.0e6)
+		spectrum = GModelSpectralPlaw(flux*5.7e-16, index, GEnergy(0.3, "TeV")
 		if fitidx:
 			spectrum["Index"].free()
 		else:
