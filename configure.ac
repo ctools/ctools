@@ -846,22 +846,17 @@ AM_CONDITIONAL(OPENMP,test "x$enable_openmp" = "xyes")
 #############################################################################
 # Build static code?                                                        #
 #############################################################################
-if test "x$enable_profiling" = "xyes"; then
-  AC_MSG_NOTICE([Link executables statically.])
+AC_MSG_CHECKING(whether to link executables statically)
+AC_ARG_ENABLE([static_link],
+              AS_HELP_STRING([--enable-static-link],
+                             [link executables statically (default=no)]),
+              [static_link="$enableval"],
+              [static_link="no"])
+if test "x$static_link" = "xyes"; then
+  AC_MSG_RESULT(yes)
   LIB_LINK_OPTION="-all-static"
 else
-  AC_MSG_CHECKING(whether to link executables statically)
-  AC_ARG_ENABLE([static_link],
-                AS_HELP_STRING([--enable-static-link],
-                               [link executables statically (default=no)]),
-                [static_link="$enableval"],
-                [static_link="no"])
-  if test "x$static_link" = "xyes"; then
-    AC_MSG_RESULT(yes)
-    LIB_LINK_OPTION="-all-static"
-  else
-    AC_MSG_RESULT(no)
-  fi
+  AC_MSG_RESULT(no)
 fi
 AC_SUBST(LIB_LINK_OPTION)
 
