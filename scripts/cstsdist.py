@@ -277,7 +277,7 @@ class cstsdist(GApplication):
 			radial["Sigma"].fix()
 		
 		# Define spectral component
-		spectrum = GModelSpectralFunc(self.m_bkg)
+		spectrum = GModelSpectralFunc(self.m_bkg, 1.0)
 		
 		# Create background model
 		model = GCTAModelRadialAcceptance(radial, spectrum)

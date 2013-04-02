@@ -295,7 +295,7 @@ class cssens(GApplication):
 		# Define spectral component. If a background model is given then
 		# use a file function. Otherwise use a static power law.
 		if len(self.m_bkg) > 0:
-			spectrum = GModelSpectralFunc(self.m_bkg)
+			spectrum = GModelSpectralFunc(self.m_bkg, 1.0)
 		else:
 			spectrum = GModelSpectralPlaw(61.8e-6, -1.85, GEnergy(1.0, "TeV"))
 			if fitidx:
@@ -369,7 +369,7 @@ class cssens(GApplication):
 				spatial["DEC"].fix()
 				spatial["Radius"].fix()
 		elif type == "shell":
-			spatial = GModelSpatialRadialShell(location, self.m_radius,  self.m_width)
+			spatial = GModelSpatialRadialShell(location, self.m_radius, self.m_width)
 			if fitpos:
 				spatial["RA"].free()
 				spatial["DEC"].free()
