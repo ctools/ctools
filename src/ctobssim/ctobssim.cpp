@@ -36,6 +36,9 @@
 #define G_SIMULATE_SOURCE       "ctobssim::simulate_source(GCTAObservation*,"\
                                                                 " GPhotons&)"
 
+/* __ Constants __________________________________________________________ */
+const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
+
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
@@ -66,10 +69,12 @@ ctobssim::ctobssim(void) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
- * This constructor creates an instance of the class that is initialised from
- * an observation container.
+ * @param[in] obs Observation container.
+ *
+ * Constructs application by initialising from an observation container.
  ***************************************************************************/
-ctobssim::ctobssim(GObservations obs) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
+ctobssim::ctobssim(GObservations obs) :
+          GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
     // Initialise members
     init_members();
@@ -90,9 +95,11 @@ ctobssim::ctobssim(GObservations obs) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VER
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs application using command line arguments for parameter setting.
  ***************************************************************************/
 ctobssim::ctobssim(int argc, char *argv[]) : 
-                    GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
+          GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -146,6 +153,7 @@ ctobssim::~ctobssim(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctobssim& ctobssim::operator= (const ctobssim& app)
 {
@@ -178,7 +186,7 @@ ctobssim& ctobssim::operator= (const ctobssim& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear application
  ***************************************************************************/
 void ctobssim::clear(void)
 {
@@ -598,11 +606,6 @@ void ctobssim::set_list(GCTAObservation* obs)
  *
  * This method does nothing if the observation pointer is NULL. It also
  * verifies if the observation has a valid pointing and response.
- *
- * @todo Add margins to the data selections so that we generate also photons
- *       that fall slightly outside the ROI and the energy interval so that
- *       they can be scatter within the ROI and energy interval by the
- *       PSF and energy dispersion.
  ***************************************************************************/
 void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                GRan& ran, GLog* wrklog)
@@ -631,9 +634,9 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         // Get pointer on event list (circumvent const correctness)
         GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
-        // Extract ROI
+        // Extract simulation region.
         GSkyDir dir = events->roi().centre().dir();
-        double  rad = events->roi().radius();
+        double  rad = events->roi().radius() + g_roi_margin;
 
         // Dump simulation cone information
         if (logNormal()) {
@@ -649,7 +652,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         int indent = 0;
 
         // Loop over all Good Time Intervals
-        for (int it = 0; it <  events->gti().size(); ++it) {
+        for (int it = 0; it < events->gti().size(); ++it) {
 
             // Extract time interval
             GTime tmin = events->gti().tstart(it);
@@ -744,10 +747,14 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                                                *obs,
                                                                ran);
                                 if (event != NULL) {
-                                    event->event_id(m_event_id);
-                                    events->append(*event);
+                                    // Use event only if it falls within ROI
+                                    if (event->dir().dist_deg(events->roi().centre().dir()) <=
+                                        events->roi().radius()) {
+                                        event->event_id(m_event_id);
+                                        events->append(*event);
+                                        m_event_id++;
+                                    }
                                     delete event;
-                                    m_event_id++;
                                 }
 
                             } // endfor: looped over events
@@ -886,12 +893,18 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                     // Get event pointer
                     GCTAEventAtom* event = (*list)[k];
 
-                    // Set event identifier
-                    event->event_id(m_event_id);
-                    m_event_id++;
+                    // Use event only if it falls within ROI
+                    if (event->dir().dist_deg(events->roi().centre().dir()) <=
+                        events->roi().radius()) {
 
-                    // Append event
-                    events->append(*event);
+                        // Set event identifier
+                        event->event_id(m_event_id);
+                        m_event_id++;
+
+                        // Append event
+                        events->append(*event);
+
+                    } // endif: event was within ROI
 
                 } // endfor: looped over all events
 

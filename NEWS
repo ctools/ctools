@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-07-00
 
 Author(s) : Juergen Knoedlseder
 
-February 21th, 2013
+April 9th, 2013
 
 
 1. Introduction
@@ -27,7 +27,11 @@ None
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+The application now checks for each event whether it lies within the
+circular region of interested defined by the region centre (parameters
+ra and dec) and region radius (parameter rad). A margin of 0.5 has been
+added internally to the radius so that also sources at the edge but
+slightly outside of the ROI will be simulated correctly.
 
 
 5. ctselect - CTA event selection

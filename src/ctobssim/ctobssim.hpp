@@ -57,7 +57,7 @@ public:
     virtual ~ctobssim(void);
 
     // Operators
-    ctobssim& operator= (const ctobssim& app);
+    ctobssim& operator=(const ctobssim& app);
 
     // Methods
     void           clear(void);
@@ -87,7 +87,7 @@ protected:
     int           m_seed;       //!< Random number generator seed 
     double        m_ra;         //!< RA of pointing direction
     double        m_dec;        //!< DEC of pointing direction
-    double        m_rad;        //!< FOV radius
+    double        m_rad;        //!< FOV radius (degrees)
     double        m_tmin;       //!< Start time (MET)
     double        m_tmax;       //!< Stop time (MET)
     double        m_emin;       //!< Lower energy (TeV)

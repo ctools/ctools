@@ -1,9 +1,10 @@
-2013-02-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2013-04-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.7.0 released
         ========================
 
         Adapt to GammaLib-00-08-00 interface
+        ctobssim now only simulates events within ROI
 
 2012-12-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
