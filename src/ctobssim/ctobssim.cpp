@@ -473,10 +473,10 @@ void ctobssim::get_parameters(void)
 
     // Get a random number generator for seed determination
     GRan master(m_seed);
-         
+
     // Allocate vector of random number generator seeds
     std::vector<unsigned long long int> seeds;
-    
+
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
@@ -497,10 +497,10 @@ void ctobssim::get_parameters(void)
                 }
             }
         } while(repeat);
-        
+
         // Add the seed to the vector for bookkeeping
         seeds.push_back(new_seed);
-        
+
         // Use the seed to create a random number generator for the
         // actual observation
         m_rans.push_back(GRan(new_seed));
@@ -577,7 +577,7 @@ void ctobssim::set_list(GCTAObservation* obs)
 
         // Attach event list to CTA observation
         obs->events(&events);
-        
+
         // Set observation ontime, livetime and deadtime correction factor
         obs->ontime(gti.ontime());
         obs->livetime(gti.ontime()*m_deadc);
@@ -617,7 +617,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         if (wrklog == NULL) {
             wrklog = &log;
         }
-        
+
         // Get pointer on CTA response. Throw an exception if the response
         // is not defined.
         GCTAResponse* rsp = obs->response();
@@ -657,7 +657,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
             // Extract time interval
             GTime tmin = events->gti().tstart(it);
             GTime tmax = events->gti().tstop(it);
-            
+
             // Dump time interval
             if (logNormal()) {
                 if (events->gti().size() > 1) {
@@ -670,7 +670,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                 *wrklog << tmax.convert(m_cta_ref);
                 *wrklog << " s" << std::endl;
             }
-            
+
             // Loop over all energy boundaries
             for (int ie = 0; ie <  events->ebounds().size(); ++ie) {
 
@@ -690,7 +690,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                 // Loop over all sky models
                 for (int i = 0; i < models.size(); ++i) {
-                
+
                     // Get sky model (NULL if not a sky model)
                     const GModelSky* model =
                           dynamic_cast<const GModelSky*>(models[i]);
@@ -704,13 +704,13 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         // m_time_max
                         GTime tstart = tmin;
                         GTime tstop  = tstart + m_time_max;
-                        
+
                         // Initialise cumulative photon counters
                         int nphotons = 0;
-                        
+
                         // Loop over time slices
                         while (tstart < tmax) {
-            
+
                             // Make sure that tstop <= tmax
                             if (tstop > tmax) {
                                 tstop = tmax;
@@ -762,7 +762,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                             // Go to next time slice
                             tstart = tstop;
                             tstop  = tstart + m_time_max;
-            
+
                             // Reset indentation
                             if (logExplicit()) {
                                 if (tmax - tmin > m_time_max) {
@@ -770,7 +770,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                     wrklog->indent(indent);
                                 }
                             }
-            
+
                         } // endwhile: looped over time slices
 
                         // Dump simulation results
@@ -787,7 +787,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                 *wrklog << " [" << model->name() << "]";
                             }
                             *wrklog << std::endl;
-                           
+
                         }
 
                     } // endif: model was a sky model
@@ -801,7 +801,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                     *wrklog << " (all source models)";
                     *wrklog << std::endl;
                 }
-                    
+
                 // Reset indentation
                 if (logNormal()) {
                     if (events->ebounds().size() > 1) {
@@ -810,7 +810,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                     }
                 }
-                
+
             } // endfor: looped over all energy boundaries
 
             // Reset indentation
@@ -818,7 +818,6 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                 if (events->gti().size() > 1) {
                     indent--;
                     wrklog->indent(indent);
-                    
                 }
             }
 
@@ -859,7 +858,7 @@ void ctobssim::simulate_background(GCTAObservation* obs,
         if (wrklog == NULL) {
             wrklog = &log;
         }
-        
+
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
@@ -1006,7 +1005,7 @@ void ctobssim::copy_members(const ctobssim& app)
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
     m_deadc    = app.m_deadc;
-    
+
     // Copy protected members
     m_area       = app.m_area;
     m_time_max   = app.m_time_max;
