@@ -2,7 +2,7 @@
 # This script provides a number of functions that are useful for handling
 # CTA observations.
 #
-# Copyright (C) 2011-2012 Juergen Knoedlseder
+# Copyright (C) 2011-2013 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -80,6 +80,7 @@ def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
 		bin["emin"].real(emin)
 		bin["emax"].real(emax)
 		bin["enumbins"].integer(nbins)
+		bin["usepnt"].boolean(True) # Use pointing for map centre
 		bin["nxpix"].integer(npix)
 		bin["nypix"].integer(npix)
 		bin["binsz"].real(binsz)
@@ -104,12 +105,12 @@ def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
 		obs = bin.obs().copy()
 		
 	else:
-
+		
 		# Make a deep copy of the observation that will be returned
 		# (the ctobssim object will go out of scope one the function is
 		# left)
 		obs = sim.obs().copy()
-    
+ 
 	# Delete the simulation
 	del sim
 	
