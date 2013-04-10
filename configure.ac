@@ -33,7 +33,7 @@ AC_INIT([ctools], [0.7.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
-AM_INIT_AUTOMAKE([gnu])
+AM_INIT_AUTOMAKE([gnu -Wno-portability])
 AC_CONFIG_HEADER([config.h])
 
 
