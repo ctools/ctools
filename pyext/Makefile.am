@@ -26,10 +26,15 @@
 # Process this file with automake to produce Makefile.in.                   #
 #############################################################################
 
+# Works only if Python is available
 if WITH_PYTHON
 
 # Set SWIG interface filename
 SWIG_INTERFACE = ctools.i
+
+# Dependencies. Obtain the list of dependencies by executing ls.
+DEPFILES = $(shell ls *.Pi 2> /dev/null)
+include $(DEPFILES)
 
 # Define the targets that should be built before anything else.
 # These are honored by 'make all', 'make check' and 'make install'.
@@ -37,10 +42,15 @@ if HAVE_SWIG
   BUILT_SOURCES = ctools_wrap.cpp ctools.py
 endif
 
-# Set files to be removed in clean
+# Set files to be removed in clean. We remove only the SWIG interface files
+# if SWIG is available to rebuild them. 
 if HAVE_SWIG
-  CLEANFILES = ctools_wrap.cpp ctools.py
+  CLEAN_FILES = $(BUILT_SOURCES)
 endif
+CLEANFILES = $(CLEAN_FILES) $(DEPFILES)
+
+# Set SWIG compile command
+SWIGCOMPILE = $(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig
 
 all-local: build
 
@@ -49,7 +59,6 @@ all-local: build
 # of this specific directory. So we build one instance for checking, the other
 # for installation. If we could get the name built by distutils we could avoid
 # this.
-#$(PYTHON) setup.py build --build-platlib build
 build: ctools_wrap.cpp ctools.py
 	$(PYTHON) setup.py build
 
@@ -60,9 +69,11 @@ clean-local:
 	rm -rf build _ctools.so
 
 # Rule for building Python wrappers using SWIG.
+#$(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig -o ctools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
 if HAVE_SWIG
 ctools_wrap.cpp ctools.py: $(SWIG_INTERFACE)
-	$(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig -o ctools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
+	if $(SWIGCOMPILE) -MMD -MF "ctools.Tpi" -o ctools_wrap.cpp $<; \
+	then mv -f "ctools.Tpi" "ctools.Pi"; else rm -f "ctools.Tpi"; exit 1; fi
 endif # HAVE_SWIG
 
 endif # WITH_PYTHON
