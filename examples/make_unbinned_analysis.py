@@ -54,7 +54,7 @@ def pipeline_v1():
 	selected_events_name = "selected_events.fits"
 	result_name          = "results.xml"
 	caldb                = "${GAMMALIB}/share/caldb/cta"
-	irf                  = "kb_E_50h_v3"
+	irf                  = "cta_dummy_irf"
 	ra                   =   83.63
 	dec                  =   22.01
 	rad_sim              =   10.0
@@ -145,7 +145,7 @@ def pipeline_v2(show_data):
 	# Set script parameters
 	model_name  = "${GAMMALIB}/share/models/crab.xml"
 	caldb       = "${GAMMALIB}/share/caldb/cta"
-	irf         = "kb_E_50h_v3"
+	irf         = "cta_dummy_irf"
 	ra          =   83.63
 	dec         =   22.01
 	rad_sim     =   10.0

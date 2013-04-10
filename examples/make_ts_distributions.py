@@ -66,11 +66,11 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0, \
 	tsdist["outfile"]  = outfile
 	tsdist["ntrials"]  = ntrials
 	tsdist["caldb"]    = "$GAMMALIB/share/caldb/cta"
-	tsdist["irf"]      = "kb_E_50h_v3"
+	tsdist["irf"]      = "cta_dummy_irf"
 	tsdist["type"]     = "point"
 	tsdist["index"]    = -2.48
 	tsdist["offset"]   = 0.0
-	tsdist["bkg"]      = "$GAMMALIB/share/models/bkg_kb_E_50h_v3.txt"
+	tsdist["bkg"]      = "$GAMMALIB/share/models/bkg_dummy.txt"
 	tsdist["emin"]     = float(emin)
 	tsdist["emax"]     = float(emax)
 	tsdist["enumbins"] = int(enumbins)

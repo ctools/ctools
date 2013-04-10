@@ -40,7 +40,7 @@ def pipeline(model_name):
 	"""
 	# Set script parameters
 	caldb       = "irf"
-	irf         = "kb_E_50h_v3"
+	irf         = "cta_dummy_irf"
 	ra          =   83.63
 	dec         =   22.01
 	rad_sim     =   10.0

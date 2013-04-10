@@ -62,7 +62,7 @@ def create_pull(loge, emin, emax, models, ntrials=100, duration=180000.0, \
 	pull["outfile"]  = outfile
 	pull["ntrials"]  = ntrials
 	pull["caldb"]    = "$GAMMALIB/share/caldb/cta"
-	pull["irf"]      = "kb_E_50h_v3"
+	pull["irf"]      = "cta_dummy_irf"
 	pull["ra"]       = 83.6331
 	pull["dec"]      = 22.0145
 	pull["emin"]     = emin
