@@ -69,9 +69,9 @@ clean-local:
 	rm -rf build _ctools.so
 
 # Rule for building Python wrappers using SWIG.
-#$(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig -o ctools_wrap.cpp -outdir . $(srcdir)/$(SWIG_INTERFACE)
 if HAVE_SWIG
-ctools_wrap.cpp ctools.py: $(SWIG_INTERFACE)
+ctools.py: ctools_wrap.cpp
+ctools_wrap.cpp: $(SWIG_INTERFACE)
 	if $(SWIGCOMPILE) -MMD -MF "ctools.Tpi" -o ctools_wrap.cpp $<; \
 	then mv -f "ctools.Tpi" "ctools.Pi"; else rm -f "ctools.Tpi"; exit 1; fi
 endif # HAVE_SWIG
