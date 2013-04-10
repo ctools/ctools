@@ -24,7 +24,7 @@ prefix, s, h, "sim_events_",,,        "Prefix for event lists in observation def
 # Observation parameters
 #=======================
 caldb,  s, a, "test/irf",,,    "Calibration database"
-irf,    s, a, "kb_E_50h_v3",,, "Instrument response function"
+irf,    s, a, "cta_dummy_irf",,, "Instrument response function"
 #
 # Simulation parameters
 #======================
