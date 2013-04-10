@@ -64,7 +64,7 @@ $ECHO -n "Test ctobssim: "
 $ctobssim infile="data/crab.xml" \
           outfile="events.fits" \
           caldb="irf" \
-          irf="kb_E_50h_v3" \
+          irf="cta_dummy_irf" \
           ra=83.63 \
           dec=22.01 \
           rad=10.0 \
@@ -145,7 +145,7 @@ $ECHO -n "Test ctmodel: "
 $ctmodel infile="cntmap.fits" \
          outfile="modmap1.fits" \
          caldb="irf" \
-         irf="kb_E_50h_v3" \
+         irf="cta_dummy_irf" \
          srcmdl="data/crab.xml"
 $ECHO -n "."
 if [ -s "modmap1.fits" ]
@@ -160,7 +160,7 @@ fi
 $ctmodel infile="NONE" \
          outfile="modmap2.fits" \
          caldb="irf" \
-         irf="kb_E_50h_v3" \
+         irf="cta_dummy_irf" \
          srcmdl="data/crab.xml" \
          ra=83.63 \
          dec=22.01 \
@@ -219,7 +219,7 @@ $ctlike infile="cntmap.fits" \
         srcmdl="data/crab.xml" \
         outmdl="results_binned.xml" \
         caldb="irf" \
-        irf="kb_E_50h_v3"
+        irf="cta_dummy_irf"
 $ECHO -n "."
 if [ -s "results_binned.xml" ]
 then
@@ -232,7 +232,7 @@ $ctlike infile="selected_events.fits" \
         srcmdl="data/crab.xml" \
         outmdl="results_unbinned.xml" \
         caldb="irf" \
-        irf="kb_E_50h_v3"
+        irf="cta_dummy_irf"
 $ECHO -n "."
 if [ -s "results_unbinned.xml" ]
 then
