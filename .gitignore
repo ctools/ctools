@@ -11,7 +11,7 @@
 *.synctex.gz
 *.toc
 *.Pi
-*.Ti
+*.Tpi
 .DS_Store
 .cproject
 .project
