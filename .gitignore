@@ -10,6 +10,8 @@
 *.pdf
 *.synctex.gz
 *.toc
+*.Pi
+*.Ti
 .DS_Store
 .cproject
 .project
