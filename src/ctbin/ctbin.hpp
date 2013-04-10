@@ -57,16 +57,16 @@ public:
     virtual ~ctbin(void);
 
     // Operators
-    ctbin& operator= (const ctbin& app);
+    ctbin& operator=(const ctbin& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           bin_events(GCTAObservation* obs);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    void                 get_parameters(void);
+    void                 bin_events(GCTAObservation* obs);
 
 protected:
     // Protected methods
@@ -101,5 +101,16 @@ protected:
     bool                     m_use_xml;    //!< Use XML file instead of FITS file
     bool                     m_read_ahead; //!< Read ahead parameters
 };
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GObservations& ctbin::obs(void) const
+{
+    return m_obs;
+}
 
 #endif /* CTBIN_HPP */

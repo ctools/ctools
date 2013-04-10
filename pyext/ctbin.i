@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctbin.i
  * @brief CTA data binning tool Python interface definition
- * @author J. Knodlseder
+ * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
@@ -45,13 +45,13 @@ public:
     virtual ~ctbin(void);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           bin_events(GCTAObservation* obs);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    void                 get_parameters(void);
+    void                 bin_events(GCTAObservation* obs);
 };
 
 
