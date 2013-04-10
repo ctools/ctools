@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctbin.par                                                     #
-#  Version:   00-03-00                                                      #
+#  Version:   00-04-00                                                      #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -31,13 +31,14 @@ ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
-nxpix,    i, a, 200,,, "Size of the X axis in pixels"
-nypix,    i, a, 200,,, "Size of the Y axis in pixels"
-binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
+usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
+nxpix,    i, a,   200,,, "Size of the X axis in pixels"
+nypix,    i, a,   200,,, "Size of the Y axis in pixels"
+binsz,    r, a,  0.02,,, "Image scale (in degrees/pixel)"
 coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
 xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
-axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
+axisrot,  r, h,   0.0,,, "Rotation angle of image axis, in degrees"
 proj,     s, a, "CAR",,, "Projection method e.g. AIT|ARC|CAR|GLS|MER|NCP|SIN|STG|TAN"
 
 #

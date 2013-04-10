@@ -83,6 +83,7 @@ protected:
     std::string              m_evfile;     //!< Input event list or XML file
     std::string              m_outfile;    //!< Output counts map or XML file
     std::string              m_prefix;     //!< Prefix for multiple counts maps
+    bool                     m_usepnt;     //!< Use pointing instead of xref/yref parameters
     double                   m_emin;       //!< Lower energy
     double                   m_emax;       //!< Upper energy
     int                      m_enumbins;   //!< Number of energy bins

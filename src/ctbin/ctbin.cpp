@@ -405,9 +405,9 @@ void ctbin::get_parameters(void)
 
             // Signal that no XML file should be used for storage
             m_use_xml = false;
-            
+
         }
-        
+
         // ... otherwise try to open as XML file
         catch (GException::fits_open_error &e) {
 
@@ -426,14 +426,17 @@ void ctbin::get_parameters(void)
 
     } // endif: there was no observation in the container
 
-    // Get remaining parameters
+    // Get parameters
+    m_usepnt = (*this)["usepnt"].boolean();
+    if (!m_usepnt) {
+        m_xref = (*this)["xref"].real();
+        m_yref = (*this)["yref"].real();
+    }
     m_emin     = (*this)["emin"].real();
     m_emax     = (*this)["emax"].real();
     m_enumbins = (*this)["enumbins"].integer();
     m_proj     = (*this)["proj"].string();
     m_coordsys = (*this)["coordsys"].string();
-    m_xref     = (*this)["xref"].real();
-    m_yref     = (*this)["yref"].real();
     m_binsz    = (*this)["binsz"].real();
     m_nxpix    = (*this)["nxpix"].integer();
     m_nypix    = (*this)["nypix"].integer();
@@ -487,22 +490,18 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         // Get Good Time intervals
         GGti gti = obs->events()->gti();
-        
+
         // Get map centre
-        double xref;
-        double yref;
-        if (m_xref != 9999.0 && m_yref != 9999.0) {
-            xref = m_xref;
-            yref = m_yref;
-        }
-        else {
-            
+        double xref = m_xref;
+        double yref = m_yref;
+        if (m_usepnt) {
+
             // Get pointer on CTA pointing
             const GCTAPointing *pnt = obs->pointing();
             if (pnt == NULL) {
                 throw GCTAException::no_pointing(G_BIN_EVENTS);
             }
-            
+
             // Set reference point to pointing
             if (toupper(m_coordsys) == "GAL") {
                 xref = pnt->dir().l_deg();
@@ -513,7 +512,7 @@ void ctbin::bin_events(GCTAObservation* obs)
                 yref = pnt->dir().dec_deg();
             }
 
-        } // endelse: map centre set to pointing
+        } // endif: used pointing
 
         // Create skymap
         GSkymap map = GSkymap(m_proj, m_coordsys,
@@ -526,7 +525,8 @@ void ctbin::bin_events(GCTAObservation* obs)
         int num_in_map       = 0;
 
         // Fill sky map
-        GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+        GCTAEventList* events =
+            static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
         for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
 
             // Determine sky pixel
@@ -605,11 +605,12 @@ void ctbin::init_members(void)
     m_prefix.clear();
     m_proj.clear();
     m_coordsys.clear();
+    m_usepnt   = false;
     m_emin     = 0.0;
     m_emax     = 0.0;
     m_enumbins = 0;
-    m_xref     = 9999.0; // Flags unset (use pointing direction)
-    m_yref     = 9999.0; // Flags unset (use pointing direction)
+    m_xref     = 0.0;
+    m_yref     = 0.0;
     m_binsz    = 0.0;
     m_nxpix    = 0;
     m_nypix    = 0;
@@ -641,6 +642,7 @@ void ctbin::copy_members(const ctbin& app)
     m_prefix   = app.m_prefix;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
+    m_usepnt   = app.m_usepnt;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
     m_enumbins = app.m_enumbins;
@@ -692,7 +694,7 @@ std::string ctbin::set_outfile_name(const std::string& filename) const
 
     // The last path element is the filename
     std::string outname = m_prefix + elements[elements.size()-1];
-    
+
     // Return output filename
     return outname;
 }
