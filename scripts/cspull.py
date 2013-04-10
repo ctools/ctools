@@ -98,7 +98,7 @@ class cspull(GApplication):
 			pars.append(GPar("outfile","f","a","pull.dat","","","Output file name"))
 			pars.append(GPar("ntrials","i","a","10","","","Number of trials"))
 			pars.append(GPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
-			pars.append(GPar("irf","s","a","kb_E_50h_v3","","","Instrument response function"))
+			pars.append(GPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
 			pars.append(GPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
 			pars.append(GPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
 			pars.append(GPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
