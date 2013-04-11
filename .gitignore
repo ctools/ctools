@@ -34,7 +34,9 @@ missing
 .deps
 stamp-h1
 depcomp
+test-driver
 
+doc/html/doxygen
 src/ctools-setup
 pyext/build/
 pyext/setup.py
@@ -50,6 +52,7 @@ test/pfiles/
 test/*.fits
 test/*.dat
 test/*.xml
+test/*.trs
 test/test_cscripts.sh
 examples/*.fits
 examples/*.xml
