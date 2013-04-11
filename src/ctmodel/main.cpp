@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file main.cpp
+ * @file ctmodel/main.cpp
  * @brief CTA counts model tool main code
  * @author Juergen Knoedlseder
  */

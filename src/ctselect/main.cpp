@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctselect - CTA data selection tool main code             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctselect.cpp
+ * @file ctselect/main.cpp
  * @brief CTA data selection tool main code
- * @author J. Knodlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */

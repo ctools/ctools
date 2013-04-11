@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file main.cpp
+ * @file ctlike/main.cpp
  * @brief CTA maximum likelihood tool main code
  * @author J. Knodlseder
  */
