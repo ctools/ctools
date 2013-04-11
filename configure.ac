@@ -862,6 +862,16 @@ AC_SUBST(LIB_LINK_OPTION)
 
 
 #############################################################################
+# Checks for Doxygen                                                        #
+#############################################################################
+DX_HTML_FEATURE(ON)
+DX_PS_FEATURE(OFF)
+DX_PDF_FEATURE(OFF)
+DX_MAN_FEATURE(ON)
+DX_INIT_DOXYGEN([ctools], [doc/Doxyfile], [doc/doxygen])
+
+
+#############################################################################
 # Set list of output files to be created                                    #
 #############################################################################
 AC_CONFIG_FILES([Makefile
@@ -943,6 +953,13 @@ if test "x$ac_enable_python_binding" = "xyes"; then
   fi
 else
   echo "  - Make Python binding          (no)"
+fi
+
+# Dump Doxygen information
+if test "$DX_DOXYGEN" != ""; then
+  echo "  * Doxygen                      (yes)   $DX_DOXYGEN"
+else
+  echo "  - Doxygen                      (no)"
 fi
 
 # Dump compile options

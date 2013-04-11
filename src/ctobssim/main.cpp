@@ -1,7 +1,7 @@
 /***************************************************************************
  *           ctobssim - CTA observation simulator tool main code           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2012 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctobssim.cpp
+ * @file ctobssim/main.cpp
  * @brief CTA observation simulator tool main code
- * @author J. Knoedlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */

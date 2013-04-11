@@ -21,6 +21,8 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+m4/libtool.m4
+m4/lt*m4
 config.*
 configure
 ctools.pc
@@ -28,13 +30,14 @@ ctools.pc
 install-sh
 libtool
 ltmain.sh
-m4
 missing
 .libs
 .deps
 stamp-h1
 depcomp
+test-driver
 
+doc/html/doxygen
 src/ctools-setup
 pyext/build/
 pyext/setup.py
@@ -50,6 +53,7 @@ test/pfiles/
 test/*.fits
 test/*.dat
 test/*.xml
+test/*.trs
 test/test_cscripts.sh
 examples/*.fits
 examples/*.xml

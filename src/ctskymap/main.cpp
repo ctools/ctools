@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctskymap - CTA sky mapping main code                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file main.cpp
+ * @file ctskymap/main.cpp
  * @brief CTA sky mapping tool main code
- * @author J. Knodlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */

@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file main.cpp
+ * @file ctbin/main.cpp
  * @brief CTA data binning tool main code
  * @author J. Knodlseder
  */

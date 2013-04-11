@@ -594,7 +594,7 @@ void ctobssim::set_list(GCTAObservation* obs)
  * @brief Simulate source events from photon list
  *
  * @param[in] obs Pointer on CTA observation.
- * @param[in] photons Photon list.
+ * @param[in] models Model list.
  * @param[in] ran Random number generator.
  * @param[in] wrklog Pointer to logger.
  *
