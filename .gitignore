@@ -38,6 +38,7 @@ depcomp
 test-driver
 
 doc/html/doxygen
+doc/man
 src/ctools-setup
 pyext/build/
 pyext/setup.py
