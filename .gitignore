@@ -21,6 +21,8 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+m4/libtool.m4
+m4/lt*m4
 config.*
 configure
 ctools.pc
@@ -28,7 +30,6 @@ ctools.pc
 install-sh
 libtool
 ltmain.sh
-m4
 missing
 .libs
 .deps
