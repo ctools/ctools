@@ -403,7 +403,7 @@ void ctmodel::get_parameters(void)
 
         // If there is no input filename then read all parameters that
         // are required to build a model map from scratch
-        if ((m_infile == "NONE") || (strip_whitespace(m_infile) == "")) {
+        if ((m_infile == "NONE") || (gammalib::strip_whitespace(m_infile) == "")) {
             m_ra       = (*this)["ra"].real();
             m_dec      = (*this)["dec"].real();
             m_deadc    = (*this)["deadc"].real();
@@ -474,7 +474,7 @@ void ctmodel::setup_obs(void)
         
         // If no input filename has been specified, then create a model map
         // from the task parameters
-        if ((m_infile == "NONE") || (strip_whitespace(m_infile) == "")) {
+        if ((m_infile == "NONE") || (gammalib::strip_whitespace(m_infile) == "")) {
 
             // Set pointing direction
             GCTAPointing pnt;
@@ -640,7 +640,7 @@ void ctmodel::model_map(GCTAObservation* obs, const GModels& models)
 
         // Log results
         if (logTerse()) {
-            log << parformat("Model events in cube");
+            log << gammalib::parformat("Model events in cube");
             log << sum << std::endl;
         }
 
@@ -767,7 +767,7 @@ void ctmodel::free_members(void)
 std::string ctmodel::set_outfile_name(const std::string& filename) const
 {
     // Split input filename into path elements
-    std::vector<std::string> elements = split(filename, "/");
+    std::vector<std::string> elements = gammalib::split(filename, "/");
 
     // The last path element is the filename
     std::string outname = m_prefix + elements[elements.size()-1];

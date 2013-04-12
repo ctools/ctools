@@ -264,9 +264,12 @@ void ctlike::run(void)
 
     // Write results into logger
     if (logTerse()) {
-        log << parformat("Maximum log likelihood") << m_logL << std::endl;
-        log << parformat("Observed events  (Nobs)") << num_events << std::endl;
-        log << parformat("Predicted events (Npred)") << m_obs.npred();
+        log << gammalib::parformat("Maximum log likelihood");
+        log << m_logL << std::endl;
+        log << gammalib::parformat("Observed events  (Nobs)");
+        log << num_events << std::endl;
+        log << gammalib::parformat("Predicted events (Npred)");
+        log << m_obs.npred();
         log << " (Nobs - Npred = " << num_events-m_obs.npred();
         log << ")" << std::endl;
         log << m_obs.models() << std::endl;
@@ -294,7 +297,7 @@ void ctlike::save(void)
     m_outmdl = (*this)["outmdl"].filename();
 
     // Write results out as XML model
-    if (toupper(m_outmdl) != "NONE") {
+    if (gammalib::toupper(m_outmdl) != "NONE") {
         m_obs.models().save(m_outmdl);
     }
 
@@ -351,7 +354,7 @@ void ctlike::get_parameters(void)
             }
 
             // Get task parameters for event file loading
-            m_stat  = toupper((*this)["stat"].string());
+            m_stat  = gammalib::toupper((*this)["stat"].string());
             m_caldb = (*this)["caldb"].string();
             m_irf   = (*this)["irf"].string();
 

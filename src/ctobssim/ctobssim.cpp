@@ -251,8 +251,8 @@ void ctobssim::run(void)
         log << std::endl;
         log.header1("Seed values");
         for (int i = 0; i < m_rans.size(); ++i) {
-            log << parformat("Seed "+str(i));
-            log << str(m_rans[i].seed()) << std::endl;
+            log << gammalib::parformat("Seed "+gammalib::str(i));
+            log << gammalib::str(m_rans[i].seed()) << std::endl;
         }
     }
 
@@ -640,9 +640,9 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
         // Dump simulation cone information
         if (logNormal()) {
-            *wrklog << parformat("Simulation area");
-            *wrklog << str(m_area) << " cm2" << std::endl;
-            *wrklog << parformat("Simulation cone");
+            *wrklog << gammalib::parformat("Simulation area");
+            *wrklog << m_area << " cm2" << std::endl;
+            *wrklog << gammalib::parformat("Simulation cone");
             *wrklog << "RA=" << dir.ra_deg() << " deg";
             *wrklog << ", Dec=" << dir.dec_deg() << " deg";
             *wrklog << ", r=" << rad << " deg" << std::endl;
@@ -664,7 +664,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                     indent++;
                     wrklog->indent(indent);
                 }
-                *wrklog << parformat("Time interval", indent);
+                *wrklog << gammalib::parformat("Time interval", indent);
                 *wrklog << tmin.convert(m_cta_ref);
                 *wrklog << " - ";
                 *wrklog << tmax.convert(m_cta_ref);
@@ -684,7 +684,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         indent++;
                         wrklog->indent(indent);
                     }
-                    *wrklog << parformat("Energy range", indent);
+                    *wrklog << gammalib::parformat("Energy range", indent);
                     *wrklog << emin << " - " << emax << std::endl;
                 }
 
@@ -722,7 +722,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                     indent++;
                                     wrklog->indent(indent);
                                 }
-                                *wrklog << parformat("Time slice", indent);
+                                *wrklog << gammalib::parformat("Time slice", indent);
                                 *wrklog << tstart.convert(m_cta_ref);
                                 *wrklog << " - ";
                                 *wrklog << tstop.convert(m_cta_ref);
@@ -775,14 +775,14 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                         // Dump simulation results
                         if (logNormal()) {
-                            *wrklog << parformat("MC source photons", indent);
-                            *wrklog << str(nphotons);
+                            *wrklog << gammalib::parformat("MC source photons", indent);
+                            *wrklog << nphotons;
                             if (model->name().length() > 0) {
                                 *wrklog << " [" << model->name() << "]";
                             }
                             *wrklog << std::endl;
-                            *wrklog << parformat("MC source events", indent);
-                            *wrklog << str(events->size());
+                            *wrklog << gammalib::parformat("MC source events", indent);
+                            *wrklog << events->size();
                             if (model->name().length() > 0) {
                                 *wrklog << " [" << model->name() << "]";
                             }
@@ -796,8 +796,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                 // Dump simulation results
                 if (logNormal()) {
-                    *wrklog << parformat("MC source events", indent);
-                    *wrklog << str(events->size());
+                    *wrklog << gammalib::parformat("MC source events", indent);
+                    *wrklog << events->size();
                     *wrklog << " (all source models)";
                     *wrklog << std::endl;
                 }
@@ -909,8 +909,8 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 
                 // Dump simulation results
                 if (logNormal()) {
-                    *wrklog << parformat("MC background events");
-                    *wrklog << str(list->size()) << std::endl;
+                    *wrklog << gammalib::parformat("MC background events");
+                    *wrklog << list->size() << std::endl;
                 }
 
                 // Free event list
@@ -1087,7 +1087,7 @@ void ctobssim::save_xml(void)
         if (obs != NULL) {
 
             // Set event output file name
-            std::string outfile = m_prefix + str(file_num) + ".fits";
+            std::string outfile = m_prefix + gammalib::str(file_num) + ".fits";
 
             // Store output file name in observation
             obs->eventfile(outfile);

@@ -537,7 +537,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         sprintf(cmax, "%.8f", tmax);
         selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
         if (logTerse()) {
-            log << parformat("Time range");
+            log << gammalib::parformat("Time range");
             log << tmin << " - " << tmax << " s" << std::endl;
         }
         if (selection.length() > 0) {
@@ -550,7 +550,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     sprintf(cmax, "%.8f", m_emax);
     selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+std::string(cmax);
     if (logTerse()) {
-        log << parformat("Energy range");
+        log << gammalib::parformat("Energy range");
         log << m_emin << " - " << m_emax << " TeV" << std::endl;
     }
     if (selection.length() > 0) {
@@ -565,22 +565,22 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
                  std::string(cdec)+",RA,DEC) <= " +
                  std::string(crad);
     if (logTerse()) {
-        log << parformat("Acceptance cone centre");
+        log << gammalib::parformat("Acceptance cone centre");
         log << "RA=" << ra << ", DEC=" << dec << " deg" << std::endl;
-        log << parformat("Acceptance cone radius");
+        log << gammalib::parformat("Acceptance cone radius");
         log << m_rad << " deg" << std::endl;
     }
     if (logTerse()) {
-        log << parformat("cfitsio selection");
+        log << gammalib::parformat("cfitsio selection");
         log << selection << std::endl;
     }
 
     // Add additional expression
-    if (strip_whitespace(m_expr).length() > 0) {
+    if (gammalib::strip_whitespace(m_expr).length() > 0) {
         if (selection.length() > 0) {
             selection += " && ";
         }
-        selection += "("+strip_whitespace(m_expr)+")";
+        selection += "("+gammalib::strip_whitespace(m_expr)+")";
     }
 
     // Build input filename including selection expression
@@ -588,7 +588,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     if (selection.length() > 0)
         expression += "[EVENTS]["+selection+"]";
     if (logTerse()) {
-        log << parformat("FITS filename");
+        log << gammalib::parformat("FITS filename");
         log << expression << std::endl;
     }
 
@@ -850,7 +850,7 @@ std::string ctselect::check_infile(const std::string& filename) const
 std::string ctselect::set_outfile_name(const std::string& filename) const
 {
     // Split input filename into path elements
-    std::vector<std::string> elements = split(filename, "/");
+    std::vector<std::string> elements = gammalib::split(filename, "/");
 
     // The last path element is the filename
     std::string outname = m_prefix + elements[elements.size()-1];

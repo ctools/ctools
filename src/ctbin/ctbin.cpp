@@ -503,7 +503,7 @@ void ctbin::bin_events(GCTAObservation* obs)
             }
 
             // Set reference point to pointing
-            if (toupper(m_coordsys) == "GAL") {
+            if (gammalib::toupper(m_coordsys) == "GAL") {
                 xref = pnt->dir().l_deg();
                 yref = pnt->dir().b_deg();
             }
@@ -558,13 +558,13 @@ void ctbin::bin_events(GCTAObservation* obs)
         if (logTerse()) {
             log << std::endl;
             log.header1("Binning");
-            log << parformat("Events in list");
+            log << gammalib::parformat("Events in list");
             log << obs->events()->size() << std::endl;
-            log << parformat("Events in map");
+            log << gammalib::parformat("Events in map");
             log << num_in_map << std::endl;
-            log << parformat("Events outside map area");
+            log << gammalib::parformat("Events outside map area");
             log << num_outside_map << std::endl;
-            log << parformat("Events outside energy bins");
+            log << gammalib::parformat("Events outside energy bins");
             log << num_outside_ebds << std::endl;
         }
 
@@ -690,7 +690,7 @@ void ctbin::free_members(void)
 std::string ctbin::set_outfile_name(const std::string& filename) const
 {
     // Split input filename into path elements
-    std::vector<std::string> elements = split(filename, "/");
+    std::vector<std::string> elements = gammalib::split(filename, "/");
 
     // The last path element is the filename
     std::string outname = m_prefix + elements[elements.size()-1];

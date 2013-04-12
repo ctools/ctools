@@ -425,7 +425,7 @@ void ctskymap::init_map(GCTAObservation* obs)
         }
             
         // Set reference point to pointing
-        if (toupper(m_coordsys) == "GAL") {
+        if (gammalib::toupper(m_coordsys) == "GAL") {
             xref = pnt->dir().l_deg();
             yref = pnt->dir().b_deg();
         }
@@ -512,13 +512,13 @@ void ctskymap::map_events(GCTAObservation* obs)
         if (logTerse()) {
             log << std::endl;
             log.header1("Mapping");
-            log << parformat("Events in list");
+            log << gammalib::parformat("Events in list");
             log << obs->events()->size() << std::endl;
-            log << parformat("Events in map");
+            log << gammalib::parformat("Events in map");
             log << num_in_map << std::endl;
-            log << parformat("Events outside map area");
+            log << gammalib::parformat("Events outside map area");
             log << num_outside_map << std::endl;
-            log << parformat("Events outside energy range");
+            log << gammalib::parformat("Events outside energy range");
             log << num_outside_erange << std::endl;
         }
 
