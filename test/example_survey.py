@@ -192,7 +192,7 @@ def add_background_model(obs):
 	
 	# Define background model
 	bgd_radial   = GCTAModelRadialGauss(3.0)
-	bgd_spectrum = GModelSpectralPlaw(61.8e-6, -1.85, 1.0e6)
+	bgd_spectrum = GModelSpectralPlaw(61.8e-6, -1.85, GEnergy(1.0, "TeV"))
 	bgd_model = GCTAModelRadialAcceptance(bgd_radial, bgd_spectrum)
 	bgd_model.name("Background")
 	bgd_model.instruments("CTA")
@@ -216,7 +216,7 @@ def crab_spec():
 	(Albert et al. 2008, ApJ, 674, 1037)
 	"""
 	# Set parameters
-	spectrum = GModelSpectralPlaw(5.7e-16, -2.48, 3.0e5)
+	spectrum = GModelSpectralPlaw(5.7e-16, -2.48, GEnergy(0.3, "TeV"))
 	
 	# Return spectrum
 	return spectrum
@@ -278,6 +278,7 @@ def survey_gplane(lrange=10, lstep=2):
 		pntdir.lb_deg(l, 0.0)
 		#run = set_one_obs(pntdir)
 		run = obsutils.set(pntdir)
+		run.id(str(l))
 		obs.append(run)
 	
 	# Define single point source with Crab flux at galactic centre
