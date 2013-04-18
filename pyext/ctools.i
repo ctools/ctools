@@ -1,7 +1,7 @@
 /***************************************************************************
  *                          ctools - SWIG file                             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -28,6 +28,11 @@
  */
 %module ctools
 %feature("autodoc", "1");
+
+/* __ Headers needed for compilation _____________________________________ */
+%{
+#include <stddef.h>
+%}
 
 /* __ Include standard typemaps for vectors and strings __________________ */
 %include stl.i
