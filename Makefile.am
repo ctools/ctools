@@ -29,6 +29,81 @@ install-data-local: $(HTML_INSTALL_DATA_TARGETS)
 
 uninstall-local: $(HTML_UNINSTALL_DATA_TARGETS)
 
+#
+# Additional rules
+#
+
+# Add static-analysis rule:
+static-analysis: cppcheck sloccount cppncss
+
+# Add dynamic-analysis rule:
+dynamic-analysis: coverage valgrind
+
+# Add cppcheck rule
+cppcheck:
+	@if type cppcheck >/dev/null 2>&1; then \
+		cppcheck -v --enable=all --xml \
+		src/* src 2> cppcheck-result.xml; \
+	else \
+		echo "cppcheck not found in PATH."; \
+	fi
+
+# Add sloccount rule
+sloccount:
+	@if type sloccount >/dev/null 2>&1; then \
+		sloccount --duplicates --wide --details \
+		src test > sloccount.sc; \
+	else \
+		echo "sloccount not found in PATH."; \
+	fi
+
+# Add cppncss rule
+cppncss:
+	@if type cppncss >/dev/null 2>&1; then \
+		cppncss -r -v -x -k -f=cppncss-raw-report.xml \
+		src inst/*/src; \
+	else \
+		echo "cppncss not found in PATH."; \
+	fi
+
+# Add coverage rule
+coverage:
+	@if type gcovr >/dev/null 2>&1; then \
+		gcovr -r . -x -o gcovr-reports-data.xml; \
+	else \
+		echo "gcovr script not found in PATH."; \
+	fi
+
+# Add Valgrind rule
+valgrind:
+	@if type valgrind >/dev/null 2>&1; then \
+		$(MAKE) -C test valgrind; \
+	else \
+		echo "valgrind not found in PATH."; \
+	fi
+
+# Add Sphinx rule
+sphinx:
+	@if type sphinx-build >/dev/null 2>&1; then \
+		sphinx-build -b html doc/source doc/html; \
+	else \
+		echo "sphinx-build not found in PATH."; \
+	fi
+
+# Install Sphinx files
+sphinx-install:
+	@if test -f $(srcdir)/doc/html/index.html ; then \
+	    $(mkinstalldirs) $(DESTDIR)$(docdir)/html && \
+	    for file in $(srcdir)/doc/html/*.* ; do \
+	        echo "$(INSTALL_DATA) $$file $(DESTDIR)$(docdir)/html" ; \
+	        $(INSTALL_DATA) "$$file" $(DESTDIR)$(docdir)/html ; \
+	    done ; \
+	    cp -r $(srcdir)/doc/html/_sources $(DESTDIR)$(docdir)/html/ ; \
+	    cp -r $(srcdir)/doc/html/_static $(DESTDIR)$(docdir)/html/ ; \
+	fi
+
+# Add documentation rule:
+#doc: doxygen sphinx
 
 # Non-Automake subdirectories to distribute
 DISTDIRS = doc/html doc/html/images
