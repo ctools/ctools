@@ -43,7 +43,7 @@ dynamic-analysis: coverage valgrind
 cppcheck:
 	@if type cppcheck >/dev/null 2>&1; then \
 		cppcheck -v --enable=all --xml \
-		src/* src 2> cppcheck-result.xml; \
+		src 2> cppcheck-result.xml; \
 	else \
 		echo "cppcheck not found in PATH."; \
 	fi
