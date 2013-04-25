@@ -19,3 +19,16 @@ TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDI
 TESTS = test_ctools.sh \
         $(TEST_CSCRIPTS) \
         $(TEST_PYTHON_SCRIPT)
+
+# Add Valgrind rule
+valgrind:
+	@if type valgrind >/dev/null 2>&1; then \
+		for prog in $(check_PROGRAMS) ; do \
+			valgrind --leak-check=full \
+			--xml=yes --xml-file=tmp.xml ./$$prog; \
+			sed '/<\/valgrindoutput>/d' tmp.xml > valgrind_$$prog.xml; \
+			echo '</valgrindoutput>' >> valgrind_$$prog.xml; \
+		done ; \
+	else \
+		echo "valgrind  not found in PATH."; \
+	fi
