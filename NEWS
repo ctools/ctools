@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-07-00
 
 Author(s) : Juergen Knoedlseder
 
-April 9th, 2013
+19 November 2013
 
 
 1. Introduction
@@ -32,6 +32,10 @@ circular region of interested defined by the region centre (parameters
 ra and dec) and region radius (parameter rad). A margin of 0.5 has been
 added internally to the radius so that also sources at the edge but
 slightly outside of the ROI will be simulated correctly.
+
+ctobssim now supports any kind of data space model for background
+simulations, using the abstract mc() method that is now available
+in the GModelData base class.
 
 
 5. ctselect - CTA event selection

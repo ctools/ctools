@@ -872,49 +872,56 @@ void ctobssim::simulate_background(GCTAObservation* obs,
         // Loop over all models
         for (int i = 0; i < models.size(); ++i) {
 
-            // Get model (NULL if not a radial acceptance model)
-            const GCTAModelRadialAcceptance* model = 
-                  dynamic_cast<const GCTAModelRadialAcceptance*>(models[i]);
+            // Get data model (NULL if not a data model)
+            const GModelData* model =
+                dynamic_cast<const GModelData*>(models[i]);
 
-            // If we have a radial acceptance model then simulate events
-            if (model != NULL) {
+            // If we have a data model that applies to CTA then simulate
+            // events
+            if (model != NULL && model->isvalid("CTA", "")) {
 
-                // Get simulated event list. Note that this method includes
-                // the deadtime correction.
-                GCTAEventList* list = model->mc(*obs, ran);
+                // Get simulated CTA event list. Note that this method
+                // includes the deadtime correction.
+                GCTAEventList* list =
+                    dynamic_cast<GCTAEventList*>(model->mc(*obs, ran));
 
-                // Reserves space for events
-                events->reserve(list->size()+events->size());
+                // Continue only if we got a CTA event list
+                if (list != NULL) {
 
-                // Append events
-                for (int k = 0; k < list->size(); k++) {
+                    // Reserves space for events
+                    events->reserve(list->size()+events->size());
 
-                    // Get event pointer
-                    GCTAEventAtom* event = (*list)[k];
+                    // Append events
+                    for (int k = 0; k < list->size(); k++) {
 
-                    // Use event only if it falls within ROI
-                    if (event->dir().dist_deg(events->roi().centre().dir()) <=
-                        events->roi().radius()) {
+                        // Get event pointer
+                        GCTAEventAtom* event = (*list)[k];
 
-                        // Set event identifier
-                        event->event_id(m_event_id);
-                        m_event_id++;
+                        // Use event only if it falls within ROI
+                        if (event->dir().dist_deg(events->roi().centre().dir()) <=
+                            events->roi().radius()) {
 
-                        // Append event
-                        events->append(*event);
+                            // Set event identifier
+                            event->event_id(m_event_id);
+                            m_event_id++;
 
-                    } // endif: event was within ROI
+                            // Append event
+                            events->append(*event);
 
-                } // endfor: looped over all events
+                        } // endif: event was within ROI
 
-                // Dump simulation results
-                if (logNormal()) {
-                    *wrklog << gammalib::parformat("MC background events");
-                    *wrklog << list->size() << std::endl;
-                }
+                    } // endfor: looped over all events
 
-                // Free event list
-                delete list;
+                    // Dump simulation results
+                    if (logNormal()) {
+                        *wrklog << gammalib::parformat("MC background events");
+                        *wrklog << list->size() << std::endl;
+                    }
+
+                    // Free event list
+                    delete list;
+
+                } // endif: we had a CTA event list
 
             } // endif: model was valid
 

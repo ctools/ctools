@@ -61,6 +61,8 @@ export PFILES=pfiles
 # Test ctobssim
 # =============
 $ECHO -n "Test ctobssim: "
+#
+# Run 1
 $ctobssim infile="data/crab.xml" \
           outfile="events.fits" \
           caldb="irf" \
@@ -78,6 +80,27 @@ then
   $ECHO -n "."
 else
   echo " events.fits file is not valid"
+  exit 1
+fi
+#
+# Run 2
+$ctobssim infile="data/model_background_cube.xml" \
+          outfile="events2.fits" \
+          caldb="irf" \
+          irf="cta_dummy_irf" \
+          ra=84.17263 \
+          dec=22.01444 \
+          rad=1.0 \
+          tmin=0.0 \
+          tmax=1800.0 \
+          emin=0.1 \
+          emax=100.0
+$ECHO -n "."
+if [ -s "events2.fits" ]
+then
+  $ECHO -n "."
+else
+  echo " events2.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
