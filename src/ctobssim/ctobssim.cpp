@@ -548,11 +548,7 @@ void ctobssim::set_list(GCTAObservation* obs)
         pnt.dir(skydir);
 
         // Set ROI
-        GCTARoi     roi;
-        GCTAInstDir instdir;
-        instdir.radec_deg(m_ra, m_dec);
-        roi.centre(instdir);
-        roi.radius(m_rad);
+        GCTARoi roi(GCTAInstDir(skydir), m_rad);
 
         // Set GTI
         GGti  gti(m_cta_ref);
@@ -747,9 +743,9 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                                                *obs,
                                                                ran);
                                 if (event != NULL) {
+
                                     // Use event only if it falls within ROI
-                                    if (event->dir().dist_deg(events->roi().centre().dir()) <=
-                                        events->roi().radius()) {
+                                    if (events->roi().contains(*event)) {
                                         event->event_id(m_event_id);
                                         events->append(*event);
                                         m_event_id++;
@@ -898,8 +894,7 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                         GCTAEventAtom* event = (*list)[k];
 
                         // Use event only if it falls within ROI
-                        if (event->dir().dist_deg(events->roi().centre().dir()) <=
-                            events->roi().radius()) {
+                        if (events->roi().contains(*event)) {
 
                             // Set event identifier
                             event->event_id(m_event_id);

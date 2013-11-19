@@ -505,7 +505,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     double dec = m_dec;
     if (m_usepnt) {
         const GCTAPointing *pnt = obs->pointing();
-        ra = pnt->dir().ra_deg();
+        ra  = pnt->dir().ra_deg();
         dec = pnt->dir().dec_deg();
     }
 
@@ -644,12 +644,9 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
     // Set ROI
-    GCTARoi     roi;
     GCTAInstDir instdir;
-    instdir.radec_deg(ra, dec);
-    roi.centre(instdir);
-    roi.radius(m_rad);
-    list->roi(roi);
+    instdir.dir().radec_deg(ra, dec);
+    list->roi(GCTARoi(instdir, m_rad));
 
     // Set GTI
     list->gti(gti);
