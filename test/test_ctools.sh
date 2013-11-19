@@ -92,9 +92,9 @@ $ctobssim infile="data/model_background_cube.xml" \
           dec=22.01444 \
           rad=1.0 \
           tmin=0.0 \
-          tmax=1800.0 \
+          tmax=1.0 \
           emin=0.3 \
-          emax=8.0
+          emax=8.0 chatter=4
 $ECHO -n "."
 if [ -s "events2.fits" ]
 then
