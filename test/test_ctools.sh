@@ -93,8 +93,8 @@ $ctobssim infile="data/model_background_cube.xml" \
           rad=1.0 \
           tmin=0.0 \
           tmax=1800.0 \
-          emin=0.1 \
-          emax=100.0
+          emin=0.3 \
+          emax=8.0
 $ECHO -n "."
 if [ -s "events2.fits" ]
 then
@@ -136,6 +136,8 @@ $ECHO " ok"
 # Test ctbin
 # ==========
 $ECHO -n "Test ctbin: "
+#
+# Run 1
 $ctbin evfile="events.fits" \
        outfile="cntmap.fits" \
        emin=0.1 \
@@ -154,6 +156,28 @@ then
   $ECHO -n "."
 else
   $ECHO " cntmap.fits file is not valid"
+  exit 1
+fi
+#
+# Run 2
+$ctbin evfile="events2.fits" \
+       outfile="cntmap2.fits" \
+       emin=0.3 \
+       emax=8.0 \
+       enumbins=10 \
+       nxpix=50 \
+       nypix=50 \
+       binsz=0.02 \
+       coordsys="CEL" \
+       xref=84.17263 \
+       yref=22.01444 \
+       proj="CAR"
+$ECHO -n "."
+if [ -s "cntmap2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " cntmap2.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
@@ -179,9 +203,9 @@ else
   exit 1
 fi
 #
-# Run 2
+# Run 3
 $ctmodel infile="NONE" \
-         outfile="modmap2.fits" \
+         outfile="modmap3.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          srcmdl="data/crab.xml" \
@@ -199,6 +223,21 @@ $ctmodel infile="NONE" \
          xref=83.63 \
          yref=22.01 \
          proj="CAR"
+$ECHO -n "."
+if [ -s "modmap3.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " modmap3.fits file is not valid"
+  exit 1
+fi
+#
+# Run 2
+$ctmodel infile="cntmap2.fits" \
+         outfile="modmap2.fits" \
+         caldb="irf" \
+         irf="cta_dummy_irf" \
+         srcmdl="data/model_background_cube.xml"
 $ECHO -n "."
 if [ -s "modmap2.fits" ]
 then
@@ -238,6 +277,8 @@ $ECHO " ok"
 # Test ctlike
 # ===========
 $ECHO -n "Test ctlike: "
+#
+# Run 1
 $ctlike infile="cntmap.fits" \
         srcmdl="data/crab.xml" \
         outmdl="results_binned.xml" \
@@ -251,6 +292,8 @@ else
   $ECHO " results_binned.xml file is not valid"
   exit 1
 fi
+#
+# Run 2
 $ctlike infile="selected_events.fits" \
         srcmdl="data/crab.xml" \
         outmdl="results_unbinned.xml" \
@@ -264,4 +307,35 @@ else
   $ECHO " results_unbinned.xml file is not valid"
   exit 1
 fi
+#
+# Run 3
+$ctlike infile="events2.fits" \
+        srcmdl="data/model_background_cube.xml" \
+        outmdl="results_unbinned_background_cube.xml" \
+        caldb="irf" \
+        irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "results_unbinned_background_cube.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " results_unbinned_background_cube.xml file is not valid"
+  exit 1
+fi
+#
+# Run 4
+$ctlike infile="cntmap2.fits" \
+        srcmdl="data/model_background_cube.xml" \
+        outmdl="results_binned_background_cube.xml" \
+        caldb="irf" \
+        irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "results_binned_background_cube.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " results_binned_background_cube.xml file is not valid"
+  exit 1
+fi
 $ECHO " ok"
+#sleep 100
