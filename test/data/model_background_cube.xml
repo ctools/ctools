@@ -2,8 +2,8 @@
 <source_library title="source library">
   <source name="CTABackgroundModel" type="CTABackground" instrument="CTA">
     <spectrum type="PowerLaw">	
-      <parameter name="Prefactor" scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="0"/>	
-      <parameter name="Index"     scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="0"/>	
+      <parameter name="Prefactor" scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="1"/>	
+      <parameter name="Index"     scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>	
       <parameter name="Scale"     scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>	
     </spectrum>
     <spatialModel type="MapCubeFunction" file="data/test_cube.fits">
