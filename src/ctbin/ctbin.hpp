@@ -89,6 +89,8 @@ protected:
     int                      m_enumbins;   //!< Number of energy bins
     std::string              m_proj;       //!< WCS projection
     std::string              m_coordsys;   //!< Coordinate system
+    std::string              m_ebinalg;     //!< Algorithm for energy binning
+    std::string              m_ebinfile;     //!< FITS-file containing energy binning
     double                   m_xref;       //!< Longitude reference coordinate
     double                   m_yref;       //!< Latitude reference coordinate
     double                   m_binsz;      //!< Pixel size

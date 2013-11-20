@@ -432,9 +432,21 @@ void ctbin::get_parameters(void)
         m_xref = (*this)["xref"].real();
         m_yref = (*this)["yref"].real();
     }
-    m_emin     = (*this)["emin"].real();
-    m_emax     = (*this)["emax"].real();
-    m_enumbins = (*this)["enumbins"].integer();
+    m_ebinalg = (*this)["ebinalg"].string();
+
+    // if we have the binning given by a file
+    // read in filename next
+    if (m_ebinalg=="FILE") {
+
+    	// get binning filename
+    	m_ebinfile = (*this)["ebinfile"].filename();
+    }
+    // otherwise read emin, emax and nebins
+    else{
+    	m_emin     = (*this)["emin"].real();
+    	m_emax     = (*this)["emax"].real();
+    	m_enumbins = (*this)["enumbins"].integer();
+    }
     m_proj     = (*this)["proj"].string();
     m_coordsys = (*this)["coordsys"].string();
     m_binsz    = (*this)["binsz"].real();
@@ -483,10 +495,67 @@ void ctbin::bin_events(GCTAObservation* obs)
             throw GException::no_list(G_BIN_EVENTS);
         }
 
-        // Setup energy range covered by data
-        GEnergy  emin(m_emin, "TeV");
-        GEnergy  emax(m_emax, "TeV");
-        GEbounds ebds(m_enumbins, emin, emax);
+        // Initialise empty Ebounds object
+        GEbounds ebds;
+
+        // First check wether we have FITS-file defining
+        // the binning
+        if (m_ebinalg=="FILE") {
+
+        	// open fits file to check which extension is given
+        	GFits file(m_ebinfile);
+
+        	if (file.hashdu("EBOUNDS")) {
+
+        		// Close file and load ebounds
+        		file.close();
+        		ebds.load(m_ebinfile,"EBOUNDS");
+
+        	} // endif: EBOUNDS extension was given
+
+        	else if (file.hashdu("ENERGYBINS")) {
+
+        		// Close file and load ebounds
+        		file.close();
+        		ebds.load(m_ebinfile,"ENERGYBINS");
+
+        	} // endelse: ENERGYBINS extension was given
+
+        	else {
+
+        		file.close();
+        		// throw an exception todo: get the right status
+        		int status=0;
+        		throw GException::fits_hdu_not_found(G_BIN_EVENTS, "\'EBOUNDS\' or \'ENERGYBINS\'", status);
+
+        	} // endelse: no suited extension
+
+        	// Set enumbins parameter to number of ebounds
+        	m_enumbins = ebds.size();
+
+        } //endif: ebinalg was "FILE"
+
+        else {
+
+        	// Initialise log mode for ebinning
+        	bool log = true;
+
+        	// check if algorithm is linear
+        	if (m_ebinalg == "LIN") {
+        		log = false;
+        	}
+
+        	// todo: should we also check if m_ebinalg is "LOG"
+        	// and throw an exception if neither LIN/LOG/FILE
+        	// is given?
+
+        	// Setup energy range covered by data
+			GEnergy  emin(m_emin, "TeV");
+			GEnergy  emax(m_emax, "TeV");
+        	GEbounds ebounds(m_enumbins, emin, emax,log);
+        	ebds = ebounds;
+
+        } //endif: ebinalg was not "FILE"
 
         // Get Good Time intervals
         GGti gti = obs->events()->gti();
@@ -605,6 +674,8 @@ void ctbin::init_members(void)
     m_prefix.clear();
     m_proj.clear();
     m_coordsys.clear();
+    m_ebinalg.clear();
+    m_ebinfile.clear();
     m_usepnt   = false;
     m_emin     = 0.0;
     m_emax     = 0.0;
@@ -642,6 +713,8 @@ void ctbin::copy_members(const ctbin& app)
     m_prefix   = app.m_prefix;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
+    m_ebinalg = app.m_ebinalg;
+    m_ebinfile = app.m_ebinfile;
     m_usepnt   = app.m_usepnt;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
