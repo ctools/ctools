@@ -434,14 +434,12 @@ void ctbin::get_parameters(void)
     }
     m_ebinalg = (*this)["ebinalg"].string();
 
-    // if we have the binning given by a file
-    // read in filename next
-    if (m_ebinalg=="FILE") {
-
-    	// get binning filename
+    // If we have the binning given by a file then read filename
+    if (m_ebinalg == "FILE") {
     	m_ebinfile = (*this)["ebinfile"].filename();
     }
-    // otherwise read emin, emax and nebins
+    
+    // ... otherwise read emin, emax and nebins
     else{
     	m_emin     = (*this)["emin"].real();
     	m_emax     = (*this)["emax"].real();
@@ -500,9 +498,9 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         // First check wether we have FITS-file defining
         // the binning
-        if (m_ebinalg=="FILE") {
+        if (m_ebinalg == "FILE") {
 
-        	// open fits file to check which extension is given
+        	// Open fits file to check which extension is given
         	GFits file(m_ebinfile);
 
         	if (file.hashdu("EBOUNDS")) {
@@ -523,17 +521,24 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         	else {
 
+                // Close file
         		file.close();
-        		// throw an exception todo: get the right status
-        		int status=0;
-        		throw GException::fits_hdu_not_found(G_BIN_EVENTS, "\'EBOUNDS\' or \'ENERGYBINS\'", status);
+                
+                // Signal that no energy boundaries have been found
+                std::string msg = "No extension with name \"EBOUNDS\" or"
+                                  " \"ENERGYBINS\" found in FITS file"
+                                  " \""+m_ebinfile+"\".\n"
+                                  "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
+                                  " is required if the parameter \"ebinalg\""
+                                  " is set to \"FILE\".";
+                throw GException::invalid_value(G_BIN_EVENTS, msg);
 
-        	} // endelse: no suited extension
+        	} // endelse: no suited extension found
 
         	// Set enumbins parameter to number of ebounds
         	m_enumbins = ebds.size();
 
-        } //endif: ebinalg was "FILE"
+        } // endif: ebinalg was "FILE"
 
         else {
 
@@ -713,7 +718,7 @@ void ctbin::copy_members(const ctbin& app)
     m_prefix   = app.m_prefix;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
-    m_ebinalg = app.m_ebinalg;
+    m_ebinalg  = app.m_ebinalg;
     m_ebinfile = app.m_ebinfile;
     m_usepnt   = app.m_usepnt;
     m_emin     = app.m_emin;

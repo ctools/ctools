@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-07-00
 
 Author(s) : Juergen Knoedlseder
 
-19 November 2013
+20 November 2013
 
 
 1. Introduction
@@ -45,7 +45,12 @@ None
 
 6. ctbin - CTA event binning
 ----------------------------
-None
+The ebinalg parameter is now used to specify the type of binning.
+Linear (LIN) binning and binning retrieved from a FITS file (FILE)
+is now supported. For the latter, an extension named EBOUNDS or
+ENERGYBINS is expected.
+
+The ebinalg and ebinfile parameters are now automatic.
 
 
 7. ctlike - CTA maximum likelihood fitting
