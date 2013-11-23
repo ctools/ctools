@@ -548,7 +548,8 @@ void ctobssim::set_list(GCTAObservation* obs)
         pnt.dir(skydir);
 
         // Set ROI
-        GCTARoi roi(GCTAInstDir(skydir), m_rad);
+        GCTAInstDir instdir(skydir);
+        GCTARoi     roi(instdir, m_rad);
 
         // Set GTI
         GGti  gti(m_cta_ref);
