@@ -590,7 +590,7 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         // Create skymap
         GSkymap map = GSkymap(m_proj, m_coordsys,
-                              xref, yref, m_binsz, m_binsz,
+                              xref, yref, -m_binsz, m_binsz,
                               m_nxpix, m_nypix, m_enumbins);
 
         // Initialise binning statistics

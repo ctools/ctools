@@ -34,7 +34,7 @@ coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galac
 xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
 axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
-proj,     s, a, "CAR",,, "Projection method e.g. AIT|ARC|CAR|GLS|MER|NCP|SIN|STG|TAN"
+proj,     s, a, "CAR", AZP|CAR|MER|STG|TAN,, "Projection method e.g. AZP|CAR|MER|STG|TAN"
 
 #
 # Standard parameters

@@ -1,4 +1,4 @@
-2013-11-20  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2013-11-29  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.7.0 released
         ========================
@@ -7,6 +7,8 @@
         ctobssim now only simulates events within ROI and supports
           all kinds of data space models
         ctbin now implements LIN and FILE binning algorithms
+        ctbin, ctskymap and ctmodel now generate maps with
+          increasing longitude to the left
 
 2012-12-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 

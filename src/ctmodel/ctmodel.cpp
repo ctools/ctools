@@ -495,7 +495,7 @@ void ctmodel::setup_obs(void)
 
             // Setup skymap
             GSkymap map = GSkymap(m_proj, m_coordsys,
-                                  m_xref, m_yref, m_binsz, m_binsz,
+                                  m_xref, m_yref, -m_binsz, m_binsz,
                                   m_nxpix, m_nypix, m_enumbins);
 
             // Create model cube from sky map

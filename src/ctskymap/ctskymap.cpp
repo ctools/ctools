@@ -437,7 +437,7 @@ void ctskymap::init_map(GCTAObservation* obs)
     } // endelse: map centre set to pointing
 
     // Create skymap
-    m_skymap = GSkymap(m_proj, m_coordsys, xref, yref, m_binsz, m_binsz,
+    m_skymap = GSkymap(m_proj, m_coordsys, xref, yref, -m_binsz, m_binsz,
                        m_nxpix, m_nypix, 1);
 
     // Return
