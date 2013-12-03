@@ -35,7 +35,8 @@ expr,   s, h,    "",     ,   , "Additional selection expression"
 #
 # Standard parameters
 #====================
-chatter, i, h,  2,0,4, "Chattiness of output"
-clobber, b, h,  yes,,, "Overwrite existing output files with new output files?"
-debug,   b, h,   no,,, "Debugging mode activated"
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, "ql",,, "Mode of automatic parameters"
+logfile, f, h, "ctselect.log",,, "Log filename"
