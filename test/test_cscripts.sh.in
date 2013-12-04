@@ -36,7 +36,7 @@ $ECHO "*****************"
 #
 # Remove any existing result files
 # ================================
-rm -rf *.fits *.log *.xml *.dat
+rm -rf *.fits *.xml *.dat
 
 
 #

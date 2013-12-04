@@ -208,7 +208,7 @@ if __name__ == '__main__':
     os.environ['PFILES'] = "pfiles"
     
     # Remove any existing result files
-    list = [glob.glob("*.fits"), glob.glob("*.log"), glob.glob("*.xml")]
+    list = [glob.glob("*.fits"), glob.glob("*.xml")]
     for files in list:
         for file in files:
             os.remove(file)

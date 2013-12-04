@@ -45,7 +45,7 @@ ctskymap=../src/ctskymap/ctskymap
 #
 # Remove any existing result files
 # ================================
-rm -rf *.fits *.log *.xml
+rm -rf *.fits *.xml
 
 
 #
