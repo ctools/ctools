@@ -339,9 +339,9 @@ void ctlike::get_parameters(void)
         try {
 
             // Determine whether FITS file has EVENTS extension
-            GFits file(filename);
-            bool  is_unbinned = file.hashdu("EVENTS");
-            file.close();
+            GFits fits(filename);
+            bool  is_unbinned = fits.contains("EVENTS");
+            fits.close();
 
             // If FITS file has an events header then load as unbinned
             if (is_unbinned) {

@@ -603,7 +603,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     }
 
     // Check if we have an EVENTS HDU
-    if (!file.hashdu("EVENTS")) {
+    if (!file.contains("EVENTS")) {
         std::string message = "No \"EVENTS\" extension found in FITS file "+
                               expression+".";
         throw GException::app_error(G_SELECT_EVENTS, message);
@@ -952,7 +952,7 @@ void ctselect::save_event_list(const GCTAObservation* obs,
         GFits infits(infile);
         GFits outfits(outfile);
         for (int extno = 1; extno < infits.size(); ++extno) {
-            GFitsHDU* hdu = infits.hdu(extno);
+            GFitsHDU* hdu = infits.at(extno);
             if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
                 outfits.append(*hdu);
             }

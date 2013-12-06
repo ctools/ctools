@@ -503,7 +503,7 @@ void ctbin::bin_events(GCTAObservation* obs)
         	// Open fits file to check which extension is given
         	GFits file(m_ebinfile);
 
-        	if (file.hashdu("EBOUNDS")) {
+        	if (file.contains("EBOUNDS")) {
 
         		// Close file and load ebounds
         		file.close();
@@ -511,7 +511,7 @@ void ctbin::bin_events(GCTAObservation* obs)
 
         	} // endif: EBOUNDS extension was given
 
-        	else if (file.hashdu("ENERGYBINS")) {
+        	else if (file.contains("ENERGYBINS")) {
 
         		// Close file and load ebounds
         		file.close();
