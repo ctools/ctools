@@ -511,7 +511,7 @@ void ctmodel::setup_obs(void)
             obs.deadc(m_deadc);
 
             // Set event cube in observation
-            obs.events(&cube);
+            obs.events(cube);
 
             // Append CTA observation to container
             m_obs.append(obs);
@@ -580,8 +580,9 @@ void ctmodel::setup_obs(void)
             }
         
             // Set response if it isn't set already
-            if (obs->response() == NULL) {
+            if (obs->response().aeff() == NULL) {
             	obs->response(m_irf, m_caldb);
+
             } // endif: observation already has a response
 
         } // endif: observation was a CTA observation

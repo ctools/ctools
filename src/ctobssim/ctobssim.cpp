@@ -573,7 +573,7 @@ void ctobssim::set_list(GCTAObservation* obs)
         events.ebounds(ebounds);
 
         // Attach event list to CTA observation
-        obs->events(&events);
+        obs->events(events);
 
         // Set observation ontime, livetime and deadtime correction factor
         obs->ontime(gti.ontime());
@@ -595,9 +595,6 @@ void ctobssim::set_list(GCTAObservation* obs)
  * @param[in] ran Random number generator.
  * @param[in] wrklog Pointer to logger.
  *
- * @exception GCTAException::no_response
- *            No valid response found in CTA observation
- *
  * Simulate source events from a photon list for a given CTA observation.
  * The events are stored in as event list in the observation.
  *
@@ -617,10 +614,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
         // Get pointer on CTA response. Throw an exception if the response
         // is not defined.
-        GCTAResponse* rsp = obs->response();
-        if (rsp == NULL) {
-            throw GCTAException::no_response(G_SIMULATE_SOURCE);
-        }
+        const GCTAResponse& rsp = obs->response();
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
@@ -739,10 +733,10 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                                 // Simulate event. Note that this method
                                 // includes the deadtime correction.
-                                GCTAEventAtom* event = rsp->mc(m_area,
-                                                               photons[i],
-                                                               *obs,
-                                                               ran);
+                                GCTAEventAtom* event = rsp.mc(m_area,
+                                                              photons[i],
+                                                              *obs,
+                                                              ran);
                                 if (event != NULL) {
 
                                     // Use event only if it falls within ROI

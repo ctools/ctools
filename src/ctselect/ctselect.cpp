@@ -504,9 +504,9 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     double ra  = m_ra;
     double dec = m_dec;
     if (m_usepnt) {
-        const GCTAPointing *pnt = obs->pointing();
-        ra  = pnt->dir().ra_deg();
-        dec = pnt->dir().dec_deg();
+        const GCTAPointing &pnt = obs->pointing();
+        ra  = pnt.dir().ra_deg();
+        dec = pnt.dir().dec_deg();
     }
 
     // Set time selection interval. We make sure here that the time selection
@@ -620,7 +620,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         GCTAEventList eventlist;
 
         // Append list to observation
-        obs->events(&eventlist);
+        obs->events(eventlist);
 
     }
     else {

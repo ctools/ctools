@@ -470,8 +470,6 @@ void ctbin::get_parameters(void)
  *
  * @exception GException::no_list
  *            No event list found in observation.
- * @exception GCTAException::no_pointing
- *            No valid CTA pointing found.
  *
  * This method bins the events found in a CTA events list into a counts map
  * and replaces the event list by the counts map in the observation. The
@@ -571,19 +569,16 @@ void ctbin::bin_events(GCTAObservation* obs)
         if (m_usepnt) {
 
             // Get pointer on CTA pointing
-            const GCTAPointing *pnt = obs->pointing();
-            if (pnt == NULL) {
-                throw GCTAException::no_pointing(G_BIN_EVENTS);
-            }
+            const GCTAPointing& pnt = obs->pointing();
 
             // Set reference point to pointing
             if (gammalib::toupper(m_coordsys) == "GAL") {
-                xref = pnt->dir().l_deg();
-                yref = pnt->dir().b_deg();
+                xref = pnt.dir().l_deg();
+                yref = pnt.dir().b_deg();
             }
             else {
-                xref = pnt->dir().ra_deg();
-                yref = pnt->dir().dec_deg();
+                xref = pnt.dir().ra_deg();
+                yref = pnt.dir().dec_deg();
             }
 
         } // endif: used pointing
@@ -601,7 +596,10 @@ void ctbin::bin_events(GCTAObservation* obs)
         // Fill sky map
         GCTAEventList* events =
             static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-        for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
+        for (int i = 0; i < events->size(); ++i) {
+
+            // Get event
+            GCTAEventAtom* event = (*events)[i];
 
             // Determine sky pixel
             GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
@@ -653,7 +651,7 @@ void ctbin::bin_events(GCTAObservation* obs)
         GCTAEventCube cube(map, ebds, gti);
 
         // Replace event list by event cube in observation
-        obs->events(&cube);
+        obs->events(cube);
 
     } // endif: observation was valid
 

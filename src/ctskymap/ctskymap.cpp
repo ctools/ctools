@@ -397,9 +397,6 @@ void ctskymap::get_parameters(void)
  *
  * @param[in] obs CTA observation (no NULL pointer allowed).
  *
- * @exception GCTAException::no_pointing
- *            No valid CTA pointing found.
- *
  * This method initialises the sky map.
  ***************************************************************************/
 void ctskymap::init_map(GCTAObservation* obs)
@@ -419,19 +416,16 @@ void ctskymap::init_map(GCTAObservation* obs)
 
 
         // Get pointer on CTA pointing
-        const GCTAPointing *pnt = obs->pointing();
-        if (pnt == NULL) {
-            throw GCTAException::no_pointing(G_INIT_MAP);
-        }
+        const GCTAPointing& pnt = obs->pointing();
             
         // Set reference point to pointing
         if (gammalib::toupper(m_coordsys) == "GAL") {
-            xref = pnt->dir().l_deg();
-            yref = pnt->dir().b_deg();
+            xref = pnt.dir().l_deg();
+            yref = pnt.dir().b_deg();
         }
         else {
-            xref = pnt->dir().ra_deg();
-            yref = pnt->dir().dec_deg();
+            xref = pnt.dir().ra_deg();
+            yref = pnt.dir().dec_deg();
         }
 
     } // endelse: map centre set to pointing
@@ -482,7 +476,10 @@ void ctskymap::map_events(GCTAObservation* obs)
 
         // Fill sky map
         GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-        for (GCTAEventList::iterator event = events->begin(); event != events->end(); ++event) {
+        for (int i = 0; i < events->size(); ++i) {
+
+            // Get event
+            GCTAEventAtom* event = (*events)[i];
 
             // Skip if energy is out of range
             if (event->energy() < emin || event->energy() > emax) {
