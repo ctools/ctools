@@ -286,7 +286,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 	obs = GCTAObservation()
 	
 	# Set pointing direction
-	pnt    = GCTAPointing()
+	pnt = GCTAPointing()
 	pnt.dir(pntdir)
 	obs.pointing(pnt)
 	
