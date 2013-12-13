@@ -182,7 +182,7 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 			
 			# Determine sky pixel
 			skydir = GCTAInstDir(event.dir()).dir()
-			pixel  = map.dir2pix(skydir)
+			pixel  = map.dir2inx(skydir)
 			
 			# Set pixel
 			map[pixel] += 1.0
@@ -234,7 +234,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 	for pixel in range(map.npix()):
 		
 		# Get sky direction
-		skydir = map.pix2dir(pixel)
+		skydir = map.inx2dir(pixel)
 		instdir.dir(skydir)
 		
 		# Create event atom for map pixel

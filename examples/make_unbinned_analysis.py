@@ -314,7 +314,7 @@ def plot_counts(observations):
 		offset2  = [(i+0.5)*doffset2 for i in range(nx)]
 		counts   = [0.0  for i in range(nx)]
 		for atom in list:
-			off   = GCTAInstDir(atom.dir()).dist_deg(crab)
+			off   = GCTAInstDir(atom.dir()).dir().dist_deg(crab)
 			off2  = off*off
 			index = int(off2/doffset2)
 			if index < nx:
@@ -333,7 +333,7 @@ def plot_counts(observations):
 			print "- "+m.name()
 			model = [0.0 for i in range(nx)]
 			for atom in list:
-				off   = GCTAInstDir(atom.dir()).dist_deg(crab)
+				off   = GCTAInstDir(atom.dir()).dir().dist_deg(crab)
 				off2  = off*off
 				index = int(off2/doffset2)
 				if index < nx:

@@ -329,7 +329,7 @@ def plot_counts(observations):
 		offset2  = [(i+0.5)*doffset2 for i in range(nx)]
 		counts   = [0.0  for i in range(nx)]
 		for bin in cube:
-			off   = GCTAInstDir(bin.dir()).dist_deg(crab)
+			off   = GCTAInstDir(bin.dir()).dir().dist_deg(crab)
 			off2  = off*off
 			index = int(off2/doffset2)
 			if index < nx:
@@ -348,7 +348,7 @@ def plot_counts(observations):
 			sys.stdout.write("- "+m.name()+"\n")
 			model = [0.0 for i in range(nx)]
 			for bin in cube:
-				off   = GCTAInstDir(bin.dir()).dist_deg(crab)
+				off   = GCTAInstDir(bin.dir()).dir().dist_deg(crab)
 				off2  = off*off
 				index = int(off2/doffset2)
 				if index < nx:
