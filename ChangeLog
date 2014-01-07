@@ -1,11 +1,12 @@
-2013-12-13  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.7.0 released
         ========================
 
         Adapt to GammaLib-00-08-00 interface
         ctobssim now only simulates events within ROI and supports
-          all kinds of data space models
+          all kinds of data space models; time slice durations are
+          determined based on source flux
         ctbin now implements LIN and FILE binning algorithms
         ctbin, ctskymap and ctmodel now generate maps with
           increasing longitude to the left
