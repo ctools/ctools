@@ -95,14 +95,14 @@ protected:
     double        m_deadc;      //!< Average deadtime correction
 
     // Protected members
-    double            m_area;       //!< Surface area for simulation (cm2)
-    GTime             m_time_max;   //!< Maximum length of time slice (sec)
-    std::vector<GRan> m_rans;       //!< Random number generators
-    GObservations     m_obs;        //!< Observation container
-    bool              m_use_xml;    //!< Use XML file instead of FITS file
-    bool              m_read_ahead; //!< Read ahead parameters
-    GTimeReference    m_cta_ref;    //!< CTA time reference
-    int               m_event_id;   //!< Event identifier
+    double            m_area;        //!< Surface area for simulation (cm2)
+    int               m_max_photons; //!< Maximum number of photons/slice
+    std::vector<GRan> m_rans;        //!< Random number generators
+    GObservations     m_obs;         //!< Observation container
+    bool              m_use_xml;     //!< Use XML file instead of FITS file
+    bool              m_read_ahead;  //!< Read ahead parameters
+    GTimeReference    m_cta_ref;     //!< CTA time reference
+    int               m_event_id;    //!< Event identifier
 };
 
 #endif /* CTOBSSIM_HPP */

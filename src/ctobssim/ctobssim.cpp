@@ -289,6 +289,9 @@ void ctobssim::run(void)
     {
         // Each thread will have it's own logger to avoid conflicts
         GLog wrklog;
+        if (logDebug()) {
+            wrklog.cout(true);
+        }
 
         // Copy configuration from application logger to thread logger
         wrklog.date(log.date());
@@ -689,12 +692,28 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                     // If we have a sky model then simulate photons
                     if (model != NULL) {
 
+                        // Determine duration of a time slice by limiting the
+                        // number of simulated photons to m_max_photons.
+                        // The photon rate is estimated from the model flux
+                        // and used to set the duration of the time slice.
+                        double flux     = model->spectral()->flux(emin, emax);
+                        double rate     = flux * m_area;
+                        double duration = 1800.0;  // default: 1800 sec
+                        if (rate > 0.0) {
+                            duration = m_max_photons / rate;
+                            if (duration < 1.0) {  // not <1 sec
+                                duration = 1.0;
+                            }
+                            else if (duration > 180000.0) { // not >50 hr
+                                duration = 180000.0;
+                            }
+                        }
+                        GTime tslice(duration, "sec");
+
                         // To reduce memory requirements we split long time
-                        // intervals into several slices. The maximum length
-                        // of a slice is determined by the fixed parameter
-                        // m_time_max
+                        // intervals into several slices.
                         GTime tstart = tmin;
-                        GTime tstop  = tstart + m_time_max;
+                        GTime tstop  = tstart + tslice;
 
                         // Initialise cumulative photon counters
                         int nphotons = 0;
@@ -709,7 +728,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                             // Dump time slice
                             if (logExplicit()) {
-                                if (tmax - tmin > m_time_max) {
+                                if (tmax - tmin > tslice) {
                                     indent++;
                                     wrklog->indent(indent);
                                 }
@@ -724,6 +743,16 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                             GPhotons photons = model->mc(m_area, dir, rad,
                                                          emin, emax,
                                                          tstart, tstop, ran);
+
+                            // Dump number of simulated photons
+                            if (logExplicit()) {
+                                *wrklog << gammalib::parformat("MC source photons/slice", indent);
+                                *wrklog << photons.size();
+                                if (model->name().length() > 0) {
+                                    *wrklog << " [" << model->name() << "]";
+                                }
+                                *wrklog << std::endl;
+                            }
 
                             // Simulate events from photons
                             for (int i = 0; i < photons.size(); ++i) {
@@ -752,11 +781,11 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                             // Go to next time slice
                             tstart = tstop;
-                            tstop  = tstart + m_time_max;
+                            tstop  = tstart + tslice;
 
                             // Reset indentation
                             if (logExplicit()) {
-                                if (tmax - tmin > m_time_max) {
+                                if (tmax - tmin > tslice) {
                                     indent--;
                                     wrklog->indent(indent);
                                 }
@@ -961,8 +990,8 @@ void ctobssim::init_members(void)
     m_read_ahead = false;
 
     // Set fixed parameters
-    m_area = 19634954.0 * 1.0e4;     //!< pi*(2500^2) m^2
-    m_time_max.secs(1800.0);         //!< Maximum length of time slice (s)
+    m_area        = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
+    m_max_photons = 1000000;            //!< Maximum number of photons / time slice
 
     // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
     // which is defined in GCTALib.hpp. This is somehow a kluge. We need
@@ -1004,14 +1033,14 @@ void ctobssim::copy_members(const ctobssim& app)
     m_deadc    = app.m_deadc;
 
     // Copy protected members
-    m_area       = app.m_area;
-    m_time_max   = app.m_time_max;
-    m_rans       = app.m_rans;
-    m_obs        = app.m_obs;
-    m_use_xml    = app.m_use_xml;
-    m_read_ahead = app.m_read_ahead;
-    m_cta_ref    = app.m_cta_ref;
-    m_event_id   = app.m_event_id;
+    m_area        = app.m_area;
+    m_max_photons = app.m_max_photons;
+    m_rans        = app.m_rans;
+    m_obs         = app.m_obs;
+    m_use_xml     = app.m_use_xml;
+    m_read_ahead  = app.m_read_ahead;
+    m_cta_ref     = app.m_cta_ref;
+    m_event_id    = app.m_event_id;
 
     // Return
     return;
