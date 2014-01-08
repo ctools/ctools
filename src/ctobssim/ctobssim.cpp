@@ -898,7 +898,7 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 
             // If we have a data model that applies to CTA then simulate
             // events
-            if (model != NULL && model->isvalid("CTA", "")) {
+            if (model != NULL && model->is_valid("CTA", "")) {
 
                 // Get simulated CTA event list. Note that this method
                 // includes the deadtime correction.
