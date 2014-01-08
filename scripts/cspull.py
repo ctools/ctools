@@ -302,7 +302,7 @@ class cspull(GApplication):
 			model_name = model.name()
 			for k in range(model.size()):
 				par = model[k]
-				if par.isfree():
+				if par.is_free():
 				
 					# Set parameter name
 					name = model_name+"_"+par.name()
