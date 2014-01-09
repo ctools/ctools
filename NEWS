@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-07-00
 
 Author(s) : Juergen Knoedlseder
 
-13 December 2013
+8 January 2014
 
 
 1. Introduction
@@ -36,6 +36,11 @@ slightly outside of the ROI will be simulated correctly.
 ctobssim now supports any kind of data space model for background
 simulations, using the abstract mc() method that is now available
 in the GModelData base class.
+
+The time slice duration is now computed from the source flux and
+set so that no more than 1000000 photons will be simulated in a
+given slice. This limits the memory requirements during simulations
+to about 100 MB, yet saving may still need more memory.
 
 
 5. ctselect - CTA event selection

@@ -87,28 +87,28 @@ class cspull(GApplication):
 		parfile = self.name+".par"
 		
 		try:
-			pars = GPars(parfile)
+			pars = GApplicationPars(parfile)
 		except:
 			# Signal if parfile was not found
 			sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
 			
 			# Create default parfile
-			pars = GPars()
-			pars.append(GPar("srcmdl","f","a","$GAMMALIB/share/models/crab.xml","","","Source model"))
-			pars.append(GPar("outfile","f","a","pull.dat","","","Output file name"))
-			pars.append(GPar("ntrials","i","a","10","","","Number of trials"))
-			pars.append(GPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
-			pars.append(GPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-			pars.append(GPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
-			pars.append(GPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
-			pars.append(GPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
-			pars.append(GPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
-			pars.append(GPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-			pars.append(GPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
-			pars.append(GPar("deadc","r","h","0.95","","","Deadtime correction factor"))
-			pars.append(GPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
-			pars.append(GPar("npix","i","h","200","","","Number of pixels for binned"))
-			pars.append(GPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+			pars = GApplicationPars()
+			pars.append(GApplicationPar("srcmdl","f","a","$GAMMALIB/share/models/crab.xml","","","Source model"))
+			pars.append(GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
+			pars.append(GApplicationPar("ntrials","i","a","10","","","Number of trials"))
+			pars.append(GApplicationPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
+			pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+			pars.append(GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
+			pars.append(GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
+			pars.append(GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
+			pars.append(GApplicationPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
+			pars.append(GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
+			pars.append(GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
+			pars.append(GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
+			pars.append(GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
+			pars.append(GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
+			pars.append(GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
 			pars.append_standard()
 			pars.save(parfile)
 		

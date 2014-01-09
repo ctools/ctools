@@ -88,28 +88,28 @@ class cstsdist(GApplication):
 		parfile = self.name+".par"
 		
 		try:
-			pars = GPars(parfile)
+			pars = GApplicationPars(parfile)
 		except:
 			# Signal if parfile was not found
 			sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
 			
 			# Create default parfile
-			pars = GPars()
-			pars.append(GPar("outfile","f","h","ts.dat","","","Output file name"))
-			pars.append(GPar("ntrials","i","a","10","","","Number of trials"))
-			pars.append(GPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
-			pars.append(GPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-			pars.append(GPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
-			pars.append(GPar("index","r","h","-2.48","","","Spectral index"))
-			pars.append(GPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
-			pars.append(GPar("bkg","s","a","$GAMMALIB/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
-			pars.append(GPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
-			pars.append(GPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
-			pars.append(GPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-			pars.append(GPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
-			pars.append(GPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
-			pars.append(GPar("npix","i","h","200","","","Number of pixels for binned"))
-			pars.append(GPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+			pars = GApplicationPars()
+			pars.append(GApplicationPar("outfile","f","h","ts.dat","","","Output file name"))
+			pars.append(GApplicationPar("ntrials","i","a","10","","","Number of trials"))
+			pars.append(GApplicationPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
+			pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+			pars.append(GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
+			pars.append(GApplicationPar("index","r","h","-2.48","","","Spectral index"))
+			pars.append(GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
+			pars.append(GApplicationPar("bkg","s","a","$GAMMALIB/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
+			pars.append(GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
+			pars.append(GApplicationPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
+			pars.append(GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
+			pars.append(GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
+			pars.append(GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
+			pars.append(GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
+			pars.append(GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
 			pars.append_standard()
 			pars.save(parfile)
 		
