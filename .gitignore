@@ -61,3 +61,16 @@ examples/*.fits
 examples/*.xml
 examples/*.dat
 
+# Sphinx stuff
+doc/html/.buildinfo
+doc/html/.doctrees/
+doc/html/_sources/
+doc/html/_static/
+doc/html/contents.html
+doc/html/develop.html
+doc/html/genindex.html
+doc/html/objects.inv
+doc/html/search.html
+doc/html/searchindex.js
+doc/html/test.html
+doc/html/index.html
