@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -28,13 +28,13 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <cstdio>
+#include <cstdlib>
 #include "ctselect.hpp"
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 #define G_RUN                                               "ctselect::run()"
-#define G_SELECT_EVENTS           "ctselect::select_events(GCTAObservation*,"\
+#define G_SELECT_EVENTS          "ctselect::select_events(GCTAObservation*, "\
                                                               "std::string&)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -291,7 +291,10 @@ void ctselect::run(void)
             m_infiles[i] = obs->eventfile();
 
             // Get temporary file name
-            std::string filename = std::tmpnam(NULL);
+            //std::string filename = std::tmpnam(NULL);
+            char tpl[] = "ctselectXXXXXX";
+            mkstemp(tpl);
+            std::string filename(tpl);
 
             // Save observation in temporary file
             obs->save(filename, true);
@@ -626,7 +629,10 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     else {
 
         // Get temporary file name
-        std::string tmpname = std::tmpnam(NULL);
+        //std::string tmpname = std::tmpnam(NULL);
+        char tpl[] = "ctselectXXXXXX";
+        mkstemp(tpl);
+        std::string tmpname(tpl);
 
         // Save FITS file to temporary file
         file.saveto(tmpname, true);
