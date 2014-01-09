@@ -33,6 +33,24 @@ uninstall-local: $(HTML_UNINSTALL_DATA_TARGETS)
 # Additional rules
 #
 
+# Print out all rules
+help:
+	@echo "make targets:"; \
+	echo " all       - build all"; \
+    echo " check     - unit test"; \
+    echo " clean     - clean build"; \
+    echo " install   - install build (may required admin privileges)"; \
+    echo " doxygen   - generate Doxygen documentation"; \
+    echo " sphinx    - generate Sphinx documentation"; \
+    echo " cppcheck  - perform cppcheck"; \
+    echo " sloccount - perform Source Lines of Code count"; \
+    echo " cppncss   - perform cppncss complexity check"; \
+    echo " coverage  - determine code coverage"; \
+    echo " valgrind  - search for memory leaks"; \
+    echo " doc: doxygen sphinx"; \
+    echo " static-analysis: cppcheck sloccount cppncss"; \
+    echo " dynamic-analysis: coverage valgrind"
+
 # Add static-analysis rule:
 static-analysis: cppcheck sloccount cppncss
 
@@ -103,7 +121,7 @@ sphinx-install:
 	fi
 
 # Add documentation rule:
-#doc: doxygen sphinx
+doc: doxygen sphinx
 
 # Non-Automake subdirectories to distribute
 DISTDIRS = doc/html doc/html/images
