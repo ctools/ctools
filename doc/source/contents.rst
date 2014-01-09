@@ -9,5 +9,5 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
-   test
+   user_manual/index
    develop
