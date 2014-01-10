@@ -4,18 +4,28 @@ body %}
 
 <h2 style="margin-bottom: 0">{%trans%}About{%endtrans%}</h2>
 
-<p>{%trans%} ctools are a set of ftools-like executables needed for the scientific analysis
-of Cherenkov Telescope Array data. ctools is also a Python module
-that allows for interactive data analysis and building of analysis
-scripts and pipelines. ctools includes also an observation simulator
-to enable the scientific simulation of future CTA observations. {%endtrans%}</p>
+<p>{%trans%} ctools is a software package developed for the scientific
+analysis of Cherenkov Telescope Array (CTA) data. Analysis of data from
+existing Imaging Air Cherenkov Telescopes (such as H.E.S.S., MAGIC or
+VERITAS) is also supported, provided that the data and response functions
+are available in the format defined for CTA. {%endtrans%}</p>
+
+<p>{%trans%} ctools comprises a set of ftools-like binary executables with
+a command-line interface allowing for interactive step-wise data analysis.
+ctools comprises also a Python module allowing to control all executables. 
+Creation of shell or Python scripts and pipelines is supported.
+ctools comprises also cscripts, which are Python scripts that behave like binary 
+ftools executables. Extensions of the ctools package by user defined binary 
+executable or Python scripts is supported. {%endtrans%}</p>
 
 <p>{%trans%} ctools are based on GammaLib, a versatile toolbox for
 the high-level analysis of astronomical gamma-ray data. Besides CTA,
-GammaLib supports also the analysis of Fermi-LAT data, and extensions
-to support further gamma-ray instruments are planned. This enables a
-simultaneous and coherent multi-instrument analysis of high-energy
-sources in the Universe. {%endtrans%}</p>
+GammaLib supports also the analysis of Fermi/LAT and COMPTEL data, 
+and extensions to support further gamma-ray instruments are planned.
+An interface to virtual observatory ressources is also in preparation.
+By making use of the GammaLib multi-instrument capabilities, ctools
+supports the joint analysis of CTA (or any IACT providing data in the
+CTA format), Fermi/LAT and COMPTEL data. {%endtrans%}</p>
 
 <p>{%trans%} ctools is free software distributed under the
 <a href="http://www.gnu.org/licenses/gpl.html">GNU GPL license version 3</a> {%endtrans%}</p>
