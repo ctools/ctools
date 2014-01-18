@@ -62,6 +62,10 @@ export GAMMALIB=./gammalib
 # Make pull distribution at sensitivity limit
 #./make_pull_at_sensitivity_limit.py
 
+# Remove local environment
+rm -rf gammalib
+
+# Step back to base directory
 cd $base
 
 
