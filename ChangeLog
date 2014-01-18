@@ -1,4 +1,4 @@
-2014-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-01-17  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.7.0 released
         ========================
@@ -10,6 +10,8 @@
         ctbin now implements LIN and FILE binning algorithms
         ctbin, ctskymap and ctmodel now generate maps with
           increasing longitude to the left
+        Update parameter files if necessary
+
 
 2012-12-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
