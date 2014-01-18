@@ -821,6 +821,18 @@ void ctmodel::save_xml(void)
     m_outfile = (*this)["outfile"].filename();
     m_prefix  = (*this)["prefix"].string();
 
+    // Issue warning if output filename has no .xml suffix
+    std::string suffix = gammalib::tolower(m_outfile.substr(m_outfile.length()-4,4));
+    if (suffix != ".xml") {
+        log << "*** WARNING: Name of observation definition output file \""+
+               m_outfile+"\"" << std::endl;
+        log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
+        log << "*** WARNING: This is not an error, but might be misleading."
+               " It is recommended" << std::endl;
+        log << "*** WARNING: to use the suffix \".xml\" for observation"
+               " definition files." << std::endl;
+    }
+
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 

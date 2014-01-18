@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctobssim - CTA observation simulator tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -1099,6 +1099,18 @@ void ctobssim::save_xml(void)
     // Get output filename and prefix
     m_outfile = (*this)["outfile"].filename();
     m_prefix  = (*this)["prefix"].string();
+
+    // Issue warning if output filename has no .xml suffix
+    std::string suffix = gammalib::tolower(m_outfile.substr(m_outfile.length()-4,4));
+    if (suffix != ".xml") {
+        log << "*** WARNING: Name of observation definition output file \""+
+               m_outfile+"\"" << std::endl;
+        log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
+        log << "*** WARNING: This is not an error, but might be misleading."
+               " It is recommended" << std::endl;
+        log << "*** WARNING: to use the suffix \".xml\" for observation"
+               " definition files." << std::endl;
+    }
 
     // Initialise file number
     int file_num = 0;
