@@ -846,9 +846,10 @@ std::string ctselect::check_infile(const std::string& filename) const
  *
  * @param[in] filename Input file name.
  *
- * This converts an input filename into an output filename by prepending a
- * prefix to the input filename. Any path will be stripped from the input
- * filename.
+ * Converts an input filename into an output filename by prepending the
+ * prefix stored in the member m_prefix to the input filename. Any path will
+ * be stripped from the input filename. Also a trailing ".gz" will be
+ * stripped.
  ***************************************************************************/
 std::string ctselect::set_outfile_name(const std::string& filename) const
 {
@@ -857,6 +858,9 @@ std::string ctselect::set_outfile_name(const std::string& filename) const
 
     // The last path element is the filename
     std::string outname = m_prefix + elements[elements.size()-1];
+
+    // Strip any ".gz"
+    outname = gammalib::strip_chars(outname, ".gz");
     
     // Return output filename
     return outname;

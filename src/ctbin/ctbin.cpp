@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -759,9 +759,10 @@ void ctbin::free_members(void)
  *
  * @param[in] filename Input file name.
  *
- * This method converts an input filename into an output filename by
- * prepending the prefix specified by m_prefix to the input filename. Any
- * path will be stripped from the input filename.
+ * Converts an input filename into an output filename by prepending the
+ * prefix stored in the member m_prefix to the input filename. Any path will
+ * be stripped from the input filename. Also a trailing ".gz" will be
+ * stripped.
  ***************************************************************************/
 std::string ctbin::set_outfile_name(const std::string& filename) const
 {
@@ -770,6 +771,9 @@ std::string ctbin::set_outfile_name(const std::string& filename) const
 
     // The last path element is the filename
     std::string outname = m_prefix + elements[elements.size()-1];
+
+    // Strip any ".gz"
+    outname = gammalib::strip_chars(outname, ".gz");
 
     // Return output filename
     return outname;
