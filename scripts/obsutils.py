@@ -77,6 +77,7 @@ def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
 	
 		# Allocate ctbin application and set parameters
 		bin = ctbin(sim.obs())
+		bin["ebinalg"].string("LOG")
 		bin["emin"].real(emin)
 		bin["emax"].real(emax)
 		bin["enumbins"].integer(nbins)
