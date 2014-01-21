@@ -96,6 +96,7 @@ def pipeline_v1():
 	bin.logFileOpen()  # We need this to explicitely open the log file in Python mode
 	bin["evfile"].filename(events_name)
 	bin["outfile"].filename(cntmap_name)
+	bin["ebinalg"].string("LOG")
 	bin["emin"].real(emin)
 	bin["emax"].real(emax)
 	bin["enumbins"].integer(enumbins)
@@ -192,6 +193,7 @@ def pipeline_v2():
 
 	# Bin events into counts map
 	bin = ctbin(sim.obs())
+	bin["ebinalg"].string("LOG")
 	bin["emin"].real(emin)
 	bin["emax"].real(emax)
 	bin["enumbins"].integer(enumbins)

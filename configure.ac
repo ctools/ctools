@@ -2,7 +2,7 @@
 # Configuration for ctools - a set of tools for science analysis of CTA     #
 #                            data                                           #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2013 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2014 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -891,8 +891,10 @@ AC_CONFIG_FILES([Makefile
                  models/Makefile
                  examples/Makefile
                  scripts/Makefile
-                 ctools.pc],
-                [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi])
+                 ctools.pc
+                 testconf.sh],
+                [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;
+                 if test -f testconf.sh; then chmod +x testconf.sh; fi])
 AC_OUTPUT
 
 

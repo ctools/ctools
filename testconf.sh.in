@@ -1,8 +1,9 @@
 #!/bin/sh
 # =====================================================================
-# Run all test and example scripts that come with the package.
+# Test ctools configuration script (used for continuous integration;
+# assumes that ctools have been installed)
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2014 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,60 +18,45 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # =====================================================================
+#
+# Exit on any error
+# =================
+set -e
+
+#
+# Set fixed parameters
+# ====================
+test_dir="home"
+
+#
+# Set parameters
+# ==============
+prefix="@prefix@"
 
 #
 # Save current working directory
 # ==============================
 base=$PWD
 
+#
+# Create test directory
+# =====================
+@MKDIR_P@ "$test_dir"
+cd "$test_dir"
 
 #
-# test
-# ====
-echo
-echo "=====> test"
-cd test
-./example_models.py
-./example_survey.py
-cd $base
-
-
-#
-# examples
-# ========
-echo
-echo "=====> examples"
-cd examples
-
-# Create local environment
-rm -rf gammalib
-mkdir -p gammalib/share
-mkdir -p gammalib/share/caldb
-ln -s $base/caldb gammalib/share/caldb/cta
-ln -s $base/models gammalib/share/models
-export GAMMALIB=./gammalib
-
-# Make binned analysis
-./make_binned_analysis.py
-
-# Make unbinned analysis
-./make_unbinned_analysis.py
-
-# Make TS distributions
-./make_ts_distributions.py 2 2
-
-# Make pull distribution at sensitivity limit
-#./make_pull_at_sensitivity_limit.py
-
-# Remove local environment
-rm -rf gammalib
-
-# Step back to base directory
-cd $base
-
+# Configure ctools
+# ================
+export CTOOLS="$prefix"
+. $CTOOLS/bin/ctools-init.sh > config.log 2>&1
+output=`cat config.log`
+if [ "x$output" != x ]; then
+  echo "*** Configuration script was not silent ***"
+  echo "$output"
+  exit 1
+fi
 
 #
 # Signal completion
 # =================
-echo 
-echo "All scripts completed."
+echo "Configuration test successful."
