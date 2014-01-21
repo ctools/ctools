@@ -49,7 +49,7 @@ export PFILES=pfiles
 #
 # Test cspull
 # ===========
-$ECHO -n "Test cspull: "
+$ECHO @ECHO_N@ "Test cspull: "
 chmod +x @abs_top_srcdir@/scripts/cspull.py
 @abs_top_srcdir@/scripts/cspull.py \
   srcmdl="data/crab.xml" \
@@ -67,10 +67,10 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cspull.log
-$ECHO -n "."
+$ECHO @ECHO_N@ "."
 if [ -s "pull.dat" ]
 then
-  $ECHO -n "."
+  $ECHO @ECHO_N@ "."
 else
   $ECHO " pull.dat file is not valid"
   exit 1
@@ -81,7 +81,7 @@ $ECHO " ok"
 #
 # Test cssens
 # ===========
-#echo -n "Test cssens: "
+#echo @ECHO_N@ "Test cssens: "
 #chmod +x @abs_top_srcdir@/scripts/cssens.py
 #@abs_top_srcdir@/scripts/cssens.py \
 #  duration=3600.0 \
@@ -91,10 +91,10 @@ $ECHO " ok"
 #  offset="0.0" \
 #  bkg="data/bkg_dummy.txt" \
 #  rad=5.0 > cssens.log
-#echo -n "."
+#echo @ECHO_N@ "."
 #if [ -s "sensitivity.dat" ]
 #then
-#  echo -n "."
+#  echo @ECHO_N@ "."
 #else
 #  echo " sensitivity.dat file is not valid"
 #  exit 1
@@ -105,7 +105,7 @@ $ECHO " ok"
 #
 # Test cstsdist
 # =============
-$ECHO -n "Test cstsdist: "
+$ECHO @ECHO_N@ "Test cstsdist: "
 chmod +x @abs_top_srcdir@/scripts/cstsdist.py
 @abs_top_srcdir@/scripts/cstsdist.py \
   outfile="ts.dat" \
@@ -122,10 +122,10 @@ chmod +x @abs_top_srcdir@/scripts/cstsdist.py
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cstsdist.log
-$ECHO -n "."
+$ECHO @ECHO_N@ "."
 if [ -s "ts.dat" ]
 then
-  $ECHO -n "."
+  $ECHO @ECHO_N@ "."
 else
   $ECHO " ts.dat file is not valid"
   exit 1

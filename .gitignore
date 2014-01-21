@@ -37,6 +37,7 @@ compile
 stamp-h1
 depcomp
 test-driver
+testconf.sh
 
 doc/html/doxygen
 doc/man
