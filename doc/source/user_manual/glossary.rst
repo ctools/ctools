@@ -1,6 +1,11 @@
 Glossary
 ========
 
+-  **GammaLib** (`<http://gammalib.sourceforge.net/>`_)
+
+   A versatile toolbox for scientific analysis of astronomical
+   gamma-ray data.
+
 -  **cfitsio** (`<http://heasarc.gsfc.nasa.gov/fitsio/>`_)
 
    Library of C and Fortran subroutines for reading and writing data
