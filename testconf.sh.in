@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # =====================================================================
 # Test ctools configuration script (used for continuous integration;
 # assumes that ctools have been installed)
@@ -48,7 +48,7 @@ cd "$test_dir"
 # Configure ctools
 # ================
 export CTOOLS="$prefix"
-. $CTOOLS/bin/ctools-init.sh >& config.log
+. $CTOOLS/bin/ctools-init.sh > config.log 2>&1
 output=`cat config.log`
 if [ "x$output" != x ]; then
   echo "*** Configuration script was not silent ***"
