@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # =====================================================================
 # Test ctools configuration script (used for continuous integration;
 # assumes that ctools have been installed)
