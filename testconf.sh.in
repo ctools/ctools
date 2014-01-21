@@ -53,7 +53,7 @@ output=`cat config.log`
 if [ "x$output" != x ]; then
   echo "*** Configuration script was not silent ***"
   echo "$output"
-  exit
+  exit 1
 fi
 
 #
