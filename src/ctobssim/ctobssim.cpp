@@ -689,8 +689,10 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                     const GModelSky* model =
                           dynamic_cast<const GModelSky*>(models[i]);
 
-                    // If we have a sky model then simulate photons
-                    if (model != NULL) {
+                    // If we have a sky model that applies to the present
+                    // observation then simulate events
+                    if (model != NULL &&
+                        model->is_valid(obs->instrument(), obs->id())) {
 
                         // Determine duration of a time slice by limiting the
                         // number of simulated photons to m_max_photons.
@@ -896,9 +898,10 @@ void ctobssim::simulate_background(GCTAObservation* obs,
             const GModelData* model =
                 dynamic_cast<const GModelData*>(models[i]);
 
-            // If we have a data model that applies to CTA then simulate
-            // events
-            if (model != NULL && model->is_valid("CTA", "")) {
+            // If we have a data model that applies to the present observation
+            // then simulate events
+            if (model != NULL &&
+                model->is_valid(obs->instrument(), obs->id())) {
 
                 // Get simulated CTA event list. Note that this method
                 // includes the deadtime correction.

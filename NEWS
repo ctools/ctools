@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-07-01
 
 Author(s) : Juergen Knoedlseder
 
-21 January 2014
+24 January 2014
 
 
 1. Introduction
@@ -29,7 +29,10 @@ None
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+The instrument and id attributes provided by an observation were not
+considering when simulating source and background events. This has been
+changed now that only events will be simulated when the instrument
+and id are valid for a given model.
 
 
 5. ctselect - CTA event selection

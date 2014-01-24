@@ -1,10 +1,11 @@
-2014-01-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-01-24  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
         
         * Bug fix Version 0.7.1 released
         ================================
         
         Added missing hyphens in pfiles synchronisation section (#1091)
         Add configuration test script (#1091)
+        Correctly filter instrument and id attributes in ctobssim
 
 
 2014-01-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
