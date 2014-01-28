@@ -683,18 +683,20 @@ class caldb():
         # Return boundary information
         return bounds
     
-    def root2caldb(self, filename):
+    def root2caldb(self, filename, rebin=False):
         """
         Translate ROOT to CALDB information.
         
         Parameters:
          filename - ROOT 2D performance filename.
+        Keywords:
+         rebin - Rebin Etrue histogram (useful for Prod1 IFAE runs)
         """
         # Open ROOT performance file
         file = TFile(filename)
 
         # Create effective area
-        self.root2ea(file)
+        self.root2ea(file, rebin=rebin)
         
         # Create point spread function
         self.root2psf(file)
@@ -708,7 +710,7 @@ class caldb():
         # Return
         return
 
-    def root2ea(self, file):
+    def root2ea(self, file, rebin=False):
         """
         Translate ROOT to CALDB effective area extension. The following ROOT
         histograms are used:
@@ -719,7 +721,7 @@ class caldb():
         Parameters:
          file - ROOT file.
         Keywords:
-         None
+         rebin - Rebin Etrue histogram (useful for Prod1 IFAE runs)
         """
         # Continue only if effective area HDU has been opened
         if self.hdu_ea != None:
@@ -729,17 +731,18 @@ class caldb():
             ereco = TH2F()
             file.GetObject("EffectiveAreaEtrue_offaxis", etrue)
             file.GetObject("EffectiveArea_offaxis",      ereco)
-            #print etrue.GetXaxis().GetBinLowEdge(1), etrue.GetXaxis().GetBinUpEdge(etrue.GetXaxis().GetNbins())
-            #print ereco.GetXaxis().GetBinLowEdge(1), ereco.GetXaxis().GetBinUpEdge(ereco.GetXaxis().GetNbins())
+            #print(etrue.GetXaxis().GetBinLowEdge(1), etrue.GetXaxis().GetBinUpEdge(etrue.GetXaxis().GetNbins()))
+            #print(ereco.GetXaxis().GetBinLowEdge(1), ereco.GetXaxis().GetBinUpEdge(ereco.GetXaxis().GetNbins()))
 
             # Rebin etrue histogram
-            etrue.RebinX(10)
-            neng    = etrue.GetXaxis().GetNbins()
-            noffset = etrue.GetYaxis().GetNbins()
-            for ioff in range(noffset):
-                for ieng in range(neng):
-                    value = etrue.GetBinContent(ieng+1,ioff+1) / 10.0
-                    etrue.SetBinContent(ieng+1,ioff+1,value)
+            if rebin:
+                etrue.RebinX(10)
+                neng    = etrue.GetXaxis().GetNbins()
+                noffset = etrue.GetYaxis().GetNbins()
+                for ioff in range(noffset):
+                    for ieng in range(neng):
+                        value = etrue.GetBinContent(ieng+1,ioff+1) / 10.0
+                        etrue.SetBinContent(ieng+1,ioff+1,value)
 
             # Write boundaries (use Ereco boundaries)
             bounds = self.make_2D(ereco, self.hdu_ea, None, "m2")
@@ -955,9 +958,15 @@ if __name__ == '__main__':
     - ERes_offaxis (2D) - Energy Resolution
     - Ebias_offaxis (2D) - Energy bias
     """
-    # Set ROOT filename
-    path     = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/IFAEOffaxisPerformanceBEI_May2012"
-    irf      = "SubarrayE_IFAE_50hours_20120510_offaxis.root"
+    # Set path and root file
+    #path     = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
+    #irf      = "SubarrayE_IFAE_50hours_20120510_offaxis.root"
+    #rebin    = True
+    path     = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
+    irf      = "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"
+    rebin    = False
+
+    # Set filename
     filename = path+"/"+irf
 
     # Set observation identifiers
@@ -974,5 +983,5 @@ if __name__ == '__main__':
         db.open("test")
     
         # Translate ROOT to CALDB information
-        db.root2caldb(filename)
+        db.root2caldb(filename, rebin=rebin)
     
