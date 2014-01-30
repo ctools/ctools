@@ -359,14 +359,14 @@ class caldb():
         Keywords:
          None
         """
-        # Append 3 rows to CIF extension
-        self.hdu_cif.append_rows(3)
+        # Append 4 rows to CIF extension
+        self.hdu_cif.append_rows(4)
         
-        # Add generic information for these 3 rows
-        for i in range(3):
+        # Add generic information for these 4 rows
+        for i in range(4):
         
             # Set row number
-            row = i+self.hdu_cif.nrows()-3
+            row = i+self.hdu_cif.nrows()-4
             
             # Set element
             self.hdu_cif["TELESCOP"][row] = self.cal_tel
@@ -383,7 +383,7 @@ class caldb():
             self.hdu_cif["CAL_DATE"][row] = self.cal_date
         
         # Add effective area information
-        row = self.hdu_cif.nrows()-3
+        row = self.hdu_cif.nrows()-4
         self.hdu_cif["CAL_DIR"][row]   = self.ea_dir
         self.hdu_cif["CAL_FILE"][row]  = self.ea_file
         self.hdu_cif["CAL_CNAM"][row]  = self.ea_name
@@ -396,7 +396,7 @@ class caldb():
                 self.hdu_cif["CAL_CBD"][row, n] = self.ea_bounds[n]
 
         # Add point spread function information
-        row = self.hdu_cif.nrows()-2
+        row = self.hdu_cif.nrows()-3
         self.hdu_cif["CAL_DIR"][row]   = self.psf_dir
         self.hdu_cif["CAL_FILE"][row]  = self.psf_file
         self.hdu_cif["CAL_CNAM"][row]  = self.psf_name
@@ -409,7 +409,7 @@ class caldb():
                 self.hdu_cif["CAL_CBD"][row, n] = self.psf_bounds[n]
 
         # Add energy dispersion information
-        row = self.hdu_cif.nrows()-1
+        row = self.hdu_cif.nrows()-2
         self.hdu_cif["CAL_DIR"][row]   = self.edisp_dir
         self.hdu_cif["CAL_FILE"][row]  = self.edisp_file
         self.hdu_cif["CAL_CNAM"][row]  = self.edisp_name
