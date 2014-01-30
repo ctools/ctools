@@ -933,7 +933,93 @@ class caldb():
         
         # Return
         return
-        
+
+
+#=========================#
+# Set Prod2 DESY database #
+#=========================#
+def set_prod2_desy():
+    """
+    Set Prod2 database.
+    """
+    # Set database attributes
+    path  = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
+    rebin = False
+
+    # Set database content
+    db = [{'inst': "aar", 'id':   "DESY20140105_50h",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
+          {'inst': "aar", 'id':   "DESY20140105_50h_0deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+          {'inst': "aar", 'id':   "DESY20140105_50h_180deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+
+          {'inst': "aar500", 'id':   "DESY20140105_50h",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
+          {'inst': "aar500", 'id':   "DESY20140105_50h_0deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
+          {'inst': "aar500", 'id':   "DESY20140105_50h_180deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
+
+          {'inst': "leoncito", 'id':   "DESY20140105_50h",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
+          {'inst': "leoncito", 'id':   "DESY20140105_50h_0deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
+          {'inst': "leoncito", 'id':   "DESY20140105_50h_180deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
+
+          {'inst': "sac", 'id':   "DESY20140105_50h",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SAC100-NS.S.2a.180000s.root"},
+          {'inst': "sac", 'id':   "DESY20140105_50h_0deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
+          {'inst': "sac", 'id':   "DESY20140105_50h_180deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
+
+          {'inst': "spm", 'id':   "DESY20140105_50h",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SPM-NS.N.2NN.180000s.root"},
+          {'inst': "spm", 'id':   "DESY20140105_50h_0deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
+          {'inst': "spm", 'id':   "DESY20140105_50h_180deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
+
+          {'inst': "tenerife", 'id':   "DESY20140105_50h",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
+          {'inst': "tenerife", 'id':   "DESY20140105_50h_0deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
+          {'inst': "tenerife", 'id':   "DESY20140105_50h_180deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
+
+          {'inst': "us", 'id':   "DESY20140105_50h",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-US-NS.N.2NN.180000s.root"},
+          {'inst': "us", 'id':   "DESY20140105_50h_0deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-US-NS.N.2NN.180000s.root"},
+          {'inst': "us", 'id':   "DESY20140105_50h_180deg",
+           'path': path, 'rebin': rebin,
+           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-US-NS.N.2NN.180000s.root"}]
+
+    # Return database
+    return db
+
 
 #==========================#
 # Main routine entry point #
@@ -958,30 +1044,38 @@ if __name__ == '__main__':
     - ERes_offaxis (2D) - Energy Resolution
     - Ebias_offaxis (2D) - Energy bias
     """
-    # Set path and root file
-    #path     = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
-    #irf      = "SubarrayE_IFAE_50hours_20120510_offaxis.root"
-    #rebin    = True
-    path     = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
-    irf      = "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"
-    rebin    = False
+    # Get database
+    entries = set_prod2_desy()
 
-    # Set filename
-    filename = path+"/"+irf
+    # Loop over entries
+    for entry in entries:
 
-    # Set observation identifiers
-    #obsids = ["000001", "000002", "000003"]
-    obsids = ["000001"]
+        # Get attributes
+        inst     = entry['inst']
+        path     = entry['path']
+        rebin    = entry['rebin']
+        id       = entry['id']
+        filename = path+"/"+entry['file']
 
-    # Generate CALDB entries, one for each observation (or run)
-    for obsid in obsids:
-
-        # Allocate caldb
-        db = caldb("E", obsid)
+        # Allocate caldb entry
+        irf = caldb(inst, id)
     
-        # Open calibration
-        db.open("test")
+        # Open calibration file
+        irf.open("file")
     
         # Translate ROOT to CALDB information
-        db.root2caldb(filename, rebin=rebin)
+        irf.root2caldb(filename, rebin=rebin)
+
+
+    # Generate CALDB entries, one for each observation (or run)
+    #for obsid in obsids:
+
+        # Allocate caldb
+    #    db = caldb("E", obsid)
+    
+        # Open calibration
+    #    db.open("test")
+    
+        # Translate ROOT to CALDB information
+    #    db.root2caldb(filename, rebin=rebin)
     
