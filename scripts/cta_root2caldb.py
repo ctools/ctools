@@ -78,28 +78,29 @@ class caldb():
         self.val_date     = "2014-01-30"
         self.val_time     = "00:00:00"
         self.ref_time     = 51544.0
+        self.cal_name     = "NAME("+obsid+")"
         self.cal_version  = "VERSION(Prod2)"
         self.cal_cut      = "CLASS(BEST)"
         self.cal_analysis = "ANALYSIS(DESY)"
         #
         self.ea_name      = "EFF_AREA"
         self.ea_doc       = "CAL/GEN/92-019"
-        self.ea_bounds    = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
+        self.ea_bounds    = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.ea_desc      = "CTA effective area"
         #
         self.psf_name     = "RPSF"
         self.psf_doc      = "CAL/GEN/92-020"
-        self.psf_bounds   = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
+        self.psf_bounds   = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.psf_desc     = "CTA point spread function"
         #
         self.edisp_name   = "EDISP"
         self.edisp_doc    = "???"
-        self.edisp_bounds = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
+        self.edisp_bounds = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.edisp_desc   = "CTA energy dispersion"
         #
         self.bgd_name     = "BGD"
         self.bgd_doc      = "???"
-        self.bgd_bounds   = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
+        self.bgd_bounds   = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.bgd_desc     = "CTA background"
             
         # Create directory structure
@@ -683,7 +684,7 @@ class caldb():
         # Return boundary information
         return bounds
     
-    def root2caldb(self, filename, rebin=False):
+    def root2caldb(self, filename, rebin=False, psftype="Gauss"):
         """
         Translate ROOT to CALDB information.
         
@@ -699,7 +700,7 @@ class caldb():
         self.root2ea(file, rebin=rebin)
         
         # Create point spread function
-        self.root2psf(file)
+        self.root2psf(file, psftype)
 
         # Create energy dispersion
         self.root2edisp(file)
@@ -760,7 +761,28 @@ class caldb():
         # Return
         return
 
-    def root2psf(self, file):
+    def root2psf(self, file, psftype):
+        """
+        Translate ROOT to CALDB point spread function extension.
+        Parameters:
+         file    - ROOT file.
+         psftype - PSF type (Gauss, King)
+        Keywords:
+         None
+        """
+        # Continue only if point spread function HDU has been opened
+        if self.hdu_psf != None:
+
+            # King profile PSF
+            if psftype == "King":
+                self.root2psf_king(file)
+            else:
+                self.root2psf_gauss(file)
+
+        # Return
+        return
+
+    def root2psf_gauss(self, file):
         """
         Translate ROOT to CALDB point spread function extension. The following
         ROOT histograms are used:
@@ -809,6 +831,7 @@ class caldb():
             bounds = self.make_2D(r68, self.hdu_psf, None, "deg")
             for b in bounds:
                 self.psf_bounds.append(b)
+            self.psf_bounds.append("PSF(GAUSS)")
             self.set_cif_keywords(self.hdu_psf, self.psf_name, \
                                   self.psf_bounds, self.psf_desc)
 
@@ -829,6 +852,133 @@ class caldb():
 
             # SIGMA_3
             self.make_2D(zero, self.hdu_psf, "SIGMA_3", "deg")
+
+        # Return
+        return
+
+    def root2psf_king(self, file):
+        """
+        Translate ROOT to CALDB point spread function extension. The following
+        ROOT histograms are used:
+
+        AngRes_offaxis
+        AngRes80_offaxis
+
+        Parameters:
+         file - ROOT file.
+        Keywords:
+         None
+        """
+        # Continue only if point spread function HDU has been opened
+        if self.hdu_psf != None:
+
+            # Allocate ROOT 2D arrays
+            r68  = TH2F()
+            r80  = TH2F()
+
+            # Read 68% and 80% containment histograms
+            file.GetObject("AngRes_offaxis", r68)
+            file.GetObject("AngRes80_offaxis", r80)
+            neng    = r68.GetXaxis().GetNbins()
+            noffset = r68.GetYaxis().GetNbins()
+
+            # Initialise parameter maps by cloning the r68 2D map
+            gamma2D = r68.Clone()
+            sigma2D = r68.Clone()
+
+            # Compute gamma and sigma values
+            for ioff in range(noffset):
+
+                # Initialise last results
+                last_gamma = 0.0
+                last_sigma = 0.0
+
+                for ieng in range(neng):
+
+                    # Extract radii
+                    r_68 = r68.GetBinContent(ieng+1,ioff+1)
+                    r_80 = r80.GetBinContent(ieng+1,ioff+1)
+
+                    # Initialise results
+                    gamma = 0.0
+                    sigma = 0.0
+
+                    # Continue only if both radii are positive
+                    if r_68 > 0 and r_80 > 0:
+                    
+                        # Derive constants for equation to solve
+                        a = 1.0 - 0.68
+                        b = 1.0 - 0.80
+                        c = r_68*r_68/(r_80*r_80)
+                    
+                        # Solve equation (a^x-1)/(b^x-1)=c for x using secant
+                        # method. Stop when we are better than 1e-6.
+                        x1   = -0.5
+                        x2   = -1.0
+                        f1   = (math.pow(a,x1) - 1.0)/(math.pow(b,x1) - 1.0) - c
+                        f2   = (math.pow(a,x2) - 1.0)/(math.pow(b,x2) - 1.0) - c
+                        iter = 0
+                        while True:
+                            x     = x1 - f1 * (x1-x2)/(f1-f2)
+                            f     = (math.pow(a,x) - 1.0)/(math.pow(b,x) - 1.0) - c
+                            iter += 1
+                            if abs(f) < 1.0e-6:
+                                break
+                            else:
+                                f2 = f1
+                                x2 = x1
+                                f1 = f
+                                x1 = x
+
+                        # Compute gamma.
+                        if x < 0.0:
+                            gamma = 1.0 - 1.0/x
+                        else:
+                            gamma = 1.0
+                        
+                        # Compute sigma
+                        denominator = 2.0 * gamma * (math.pow(a, x) - 1.0)
+                        if denominator > 0.0:
+                            sigma = r_68 * math.sqrt(1.0/denominator)
+                        else:
+                            denominator = 2.0 * gamma * (math.pow(b, x) - 1.0)
+                            if denominator > 0.0:
+                                sigma = r_80 * math.sqrt(1.0/denominator)
+                            else:
+                                gamma = 0.0
+                                sigma = 0.0
+
+                        # Handle special case that no results were found.
+                        # This takes care of pixels that are ill defined
+                        # in the MC file.
+                        if gamma == 0.0 and sigma == 0.0:
+                            gamma = last_gamma
+                            sigma = last_sigma
+
+                        # Store surrent result as last result
+                        last_gamma = gamma
+                        last_sigma = sigma
+
+                        # Show results on console
+                        #print(ioff,ieng,gamma,sigma,x,f,iter)
+                        
+                    # Set bin contents
+                    gamma2D.SetBinContent(ieng+1,ioff+1,gamma)
+                    sigma2D.SetBinContent(ieng+1,ioff+1,sigma)
+
+            # Set boundaries
+            bounds = self.make_2D(r68, self.hdu_psf, None, "deg")
+            for b in bounds:
+                self.psf_bounds.append(b)
+            self.psf_bounds.append("PSF(KING)")
+            self.set_cif_keywords(self.hdu_psf, self.psf_name, \
+                                  self.psf_bounds, self.psf_desc)
+
+            # GAMMA
+            self.make_2D(gamma2D, self.hdu_psf, "GAMMA", "")
+
+            # SIGMA
+            self.make_2D(sigma2D, self.hdu_psf, "SIGMA", "deg")
 
         # Return
         return
@@ -907,7 +1057,7 @@ class caldb():
         # Return
         return
 
-    def set_cif_keywords(self, hdu, name, bounds,desc):
+    def set_cif_keywords(self, hdu, name, bounds, desc):
         """
         Set standard CIF keywords for extension.
         """
@@ -935,86 +1085,137 @@ class caldb():
         return
 
 
+#===================#
+# Set test database #
+#===================#
+def set_test():
+    """
+    Set Prod1 IFAE database.
+    """
+    # Set database attributes
+    path    = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
+    rebin   = True
+
+    # Set database content
+    db = [{'inst': "e", 'id':   "IFAE20120510_50h",
+           'path': path, 'rebin': rebin, 'psftype': "Gauss",
+           'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"},
+          {'inst': "e", 'id':   "IFAE20120510_50h_King",
+           'path': path, 'rebin': rebin, 'psftype': "King",
+           'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"}]
+
+    # Return database
+    return db
+
+
+#=========================#
+# Set Prod1 IFAE database #
+#=========================#
+def set_prod1_ifae():
+    """
+    Set Prod1 IFAE database.
+    """
+    # Set database attributes
+    path    = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
+    rebin   = True
+    psftype = "Gauss"
+
+    # Set database content
+    db = [{'inst': "b", 'id':   "IFAE20120510_50h",
+           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'file': "SubarrayB_IFAE_50hours_20120510_offaxis.root"},
+          {'inst': "e", 'id':   "IFAE20120510_50h",
+           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"},
+          {'inst': "i", 'id':   "IFAE20120510_50h",
+           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'file': "SubarrayI_IFAE_50hours_20120510_offaxis.root"}]
+
+    # Return database
+    return db
+
+
 #=========================#
 # Set Prod2 DESY database #
 #=========================#
 def set_prod2_desy():
     """
-    Set Prod2 database.
+    Set Prod2 DESY database.
     """
     # Set database attributes
-    path  = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
-    rebin = False
+    path    = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
+    rebin   = False
+    psftype = "Gauss"
 
     # Set database content
     db = [{'inst': "aar", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
 
           {'inst': "aar500", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
 
           {'inst': "leoncito", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
           {'inst': "leoncito", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
           {'inst': "leoncito", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
 
           {'inst': "sac", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SAC100-NS.S.2a.180000s.root"},
           {'inst': "sac", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
           {'inst': "sac", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
 
           {'inst': "spm", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SPM-NS.N.2NN.180000s.root"},
           {'inst': "spm", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
           {'inst': "spm", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
 
           {'inst': "tenerife", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
 
           {'inst': "us", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-US-NS.N.2NN.180000s.root"},
           {'inst': "us", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-US-NS.N.2NN.180000s.root"},
           {'inst': "us", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-US-NS.N.2NN.180000s.root"}]
 
     # Return database
@@ -1045,7 +1246,9 @@ if __name__ == '__main__':
     - Ebias_offaxis (2D) - Energy bias
     """
     # Get database
-    entries = set_prod2_desy()
+    entries = set_test()
+    #entries = set_prod1_ifae()
+    #entries = set_prod2_desy()
 
     # Loop over entries
     for entry in entries:
@@ -1053,8 +1256,9 @@ if __name__ == '__main__':
         # Get attributes
         inst     = entry['inst']
         path     = entry['path']
-        rebin    = entry['rebin']
         id       = entry['id']
+        rebin    = entry['rebin']
+        psftype  = entry['psftype']
         filename = path+"/"+entry['file']
 
         # Allocate caldb entry
@@ -1064,4 +1268,4 @@ if __name__ == '__main__':
         irf.open("file")
     
         # Translate ROOT to CALDB information
-        irf.root2caldb(filename, rebin=rebin)
+        irf.root2caldb(filename, rebin=rebin, psftype=psftype)
