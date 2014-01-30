@@ -74,32 +74,32 @@ class caldb():
         self.cal_class    = "BCF"
         self.cal_type     = "DATA"
         self.cal_qual     = 0            # 0=good, 1=bad, 2=dubious, ...
-        self.cal_date     = "11/01/01"
-        self.val_date     = "2011-01-01"
+        self.cal_date     = "14/01/30"
+        self.val_date     = "2014-01-30"
         self.val_time     = "00:00:00"
         self.ref_time     = 51544.0
-        self.cal_version  = "VERSION(DC1)"
+        self.cal_version  = "VERSION(Prod2)"
         self.cal_cut      = "CLASS(BEST)"
-        self.cal_analysis = "ANALYSIS(IFAE)"
+        self.cal_analysis = "ANALYSIS(DESY)"
         #
         self.ea_name      = "EFF_AREA"
         self.ea_doc       = "CAL/GEN/92-019"
-        self.ea_bounds    = [self.cal_version, self.cal_cut, self.cal_analysis]
+        self.ea_bounds    = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
         self.ea_desc      = "CTA effective area"
         #
         self.psf_name     = "RPSF"
         self.psf_doc      = "CAL/GEN/92-020"
-        self.psf_bounds   = [self.cal_version, self.cal_cut, self.cal_analysis]
+        self.psf_bounds   = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
         self.psf_desc     = "CTA point spread function"
         #
         self.edisp_name   = "EDISP"
         self.edisp_doc    = "???"
-        self.edisp_bounds = [self.cal_version, self.cal_cut, self.cal_analysis]
+        self.edisp_bounds = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
         self.edisp_desc   = "CTA energy dispersion"
         #
         self.bgd_name     = "BGD"
         self.bgd_doc      = "???"
-        self.bgd_bounds   = [self.cal_version, self.cal_cut, self.cal_analysis]
+        self.bgd_bounds   = [self.cal_obsid, self.cal_version, self.cal_cut, self.cal_analysis]
         self.bgd_desc     = "CTA background"
             
         # Create directory structure
@@ -1065,17 +1065,3 @@ if __name__ == '__main__':
     
         # Translate ROOT to CALDB information
         irf.root2caldb(filename, rebin=rebin)
-
-
-    # Generate CALDB entries, one for each observation (or run)
-    #for obsid in obsids:
-
-        # Allocate caldb
-    #    db = caldb("E", obsid)
-    
-        # Open calibration
-    #    db.open("test")
-    
-        # Translate ROOT to CALDB information
-    #    db.root2caldb(filename, rebin=rebin)
-    
