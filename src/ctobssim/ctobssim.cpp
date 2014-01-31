@@ -544,14 +544,15 @@ void ctobssim::set_list(GCTAObservation* obs)
     if (obs != NULL) {
 
         // Get CTA observation parameters
-        m_ra    = (*this)["ra"].real();
-        m_dec   = (*this)["dec"].real();
-        m_rad   = (*this)["rad"].real();
-        m_tmin  = (*this)["tmin"].real();
-        m_tmax  = (*this)["tmax"].real();
-        m_emin  = (*this)["emin"].real();
-        m_emax  = (*this)["emax"].real();
-        m_deadc = (*this)["deadc"].real();
+        m_ra          = (*this)["ra"].real();
+        m_dec         = (*this)["dec"].real();
+        m_rad         = (*this)["rad"].real();
+        m_tmin        = (*this)["tmin"].real();
+        m_tmax        = (*this)["tmax"].real();
+        m_emin        = (*this)["emin"].real();
+        m_emax        = (*this)["emax"].real();
+        m_apply_edisp = (*this)["edisp"].boolean();
+        m_deadc       = (*this)["deadc"].real();
 
         // Allocate CTA event list
         GCTAEventList events;
@@ -629,7 +630,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
         // Get pointer on CTA response. Throw an exception if the response
         // is not defined.
-        const GCTAResponse& rsp = obs->response();
+        GCTAResponse& rsp = const_cast<GCTAResponse&>(obs->response());
+        rsp.apply_edisp(m_apply_edisp);
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
@@ -988,15 +990,16 @@ void ctobssim::init_members(void)
     m_prefix.clear();
     m_caldb.clear();
     m_irf.clear();
-    m_seed  =   1;
-    m_ra    = 0.0;
-    m_dec   = 0.0;
-    m_rad   = 0.0;
-    m_tmin  = 0.0;
-    m_tmax  = 0.0;
-    m_emin  = 0.0;
-    m_emax  = 0.0;
-    m_deadc = 1.0;
+    m_seed        =   1;
+    m_ra          = 0.0;
+    m_dec         = 0.0;
+    m_rad         = 0.0;
+    m_tmin        = 0.0;
+    m_tmax        = 0.0;
+    m_emin        = 0.0;
+    m_emax        = 0.0;
+    m_apply_edisp = true;
+    m_deadc       = 1.0;
 
     // Initialise protected members
     m_rans.clear();
@@ -1032,20 +1035,21 @@ void ctobssim::init_members(void)
 void ctobssim::copy_members(const ctobssim& app)
 {
     // Copy user parameters
-    m_infile   = app.m_infile;
-    m_outfile  = app.m_outfile;
-    m_prefix   = app.m_prefix;
-    m_caldb    = app.m_caldb;
-    m_irf      = app.m_irf;
-    m_seed     = app.m_seed;
-    m_ra       = app.m_ra;
-    m_dec      = app.m_dec;
-    m_rad      = app.m_rad;
-    m_tmin     = app.m_tmin;
-    m_tmax     = app.m_tmax;
-    m_emin     = app.m_emin;
-    m_emax     = app.m_emax;
-    m_deadc    = app.m_deadc;
+    m_infile      = app.m_infile;
+    m_outfile     = app.m_outfile;
+    m_prefix      = app.m_prefix;
+    m_caldb       = app.m_caldb;
+    m_irf         = app.m_irf;
+    m_seed        = app.m_seed;
+    m_ra          = app.m_ra;
+    m_dec         = app.m_dec;
+    m_rad         = app.m_rad;
+    m_tmin        = app.m_tmin;
+    m_tmax        = app.m_tmax;
+    m_emin        = app.m_emin;
+    m_emax        = app.m_emax;
+    m_apply_edisp = app.m_apply_edisp;
+    m_deadc       = app.m_deadc;
 
     // Copy protected members
     m_area        = app.m_area;

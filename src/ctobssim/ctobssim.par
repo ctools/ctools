@@ -36,6 +36,7 @@ tmin,   r, a,     0.0,    0,   , "Start time (MET in s)"
 tmax,   r, a,  1800.0,    0,   , "End time (MET in s)"
 emin,   r, a,     0.1,    0,   , "Lower energy limit (TeV)"
 emax,   r, a,   100.0,    0,   , "Upper energy limit (TeV)"
+edisp,  b, h,     yes,     ,   , "Apply energy dispersion?"
 deadc,  r, h,    0.95,    0,  1, "Average deadtime correction factor"
 #
 # Standard parameters
