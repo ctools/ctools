@@ -39,7 +39,7 @@
 /***********************************************************************//**
  * @class ctobssim
  *
- * @brief CTA observation simulator tool interface defintion
+ * @brief CTA observation simulator tool interface definition
  *
  * This class simulates CTA observation(s) using Monte Carlo sampling of the
  * source and background models. The class supports simulation of data of
@@ -79,20 +79,21 @@ protected:
     void save_xml(void);
 
     // User parameters
-    std::string   m_infile;     //!< Input model
-    std::string   m_outfile;    //!< Output events file
-    std::string   m_prefix;     //!< Prefix for multiple event lists
-    std::string   m_caldb;      //!< Calibration database repository
-    std::string   m_irf;        //!< Instrument response function
-    int           m_seed;       //!< Random number generator seed 
-    double        m_ra;         //!< RA of pointing direction
-    double        m_dec;        //!< DEC of pointing direction
-    double        m_rad;        //!< FOV radius (degrees)
-    double        m_tmin;       //!< Start time (MET)
-    double        m_tmax;       //!< Stop time (MET)
-    double        m_emin;       //!< Lower energy (TeV)
-    double        m_emax;       //!< Upper energy (TeV)
-    double        m_deadc;      //!< Average deadtime correction
+    std::string   m_infile;      //!< Input model
+    std::string   m_outfile;     //!< Output events file
+    std::string   m_prefix;      //!< Prefix for multiple event lists
+    std::string   m_caldb;       //!< Calibration database repository
+    std::string   m_irf;         //!< Instrument response function
+    int           m_seed;        //!< Random number generator seed
+    double        m_ra;          //!< RA of pointing direction
+    double        m_dec;         //!< DEC of pointing direction
+    double        m_rad;         //!< FOV radius (degrees)
+    double        m_tmin;        //!< Start time (MET)
+    double        m_tmax;        //!< Stop time (MET)
+    double        m_emin;        //!< Lower energy (TeV)
+    double        m_emax;        //!< Upper energy (TeV)
+    bool          m_apply_edisp; //!< Apply energy dispersion?
+    double        m_deadc;       //!< Average deadtime correction
 
     // Protected members
     double            m_area;        //!< Surface area for simulation (cm2)
