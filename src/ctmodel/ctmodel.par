@@ -20,7 +20,7 @@
 infile,   f, a, "NONE",,, "Input counts map or observation definition file"
 outfile,  f, a, "modmap.fits",,, "Output counts map or observation definition file"
 prefix,   s, h, "modmap_",,, "Prefix for counts maps in observation definition file"
-caldb,    s, h, "",,, "Calibration database"
+caldb,    s, a, "",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 srcmdl,   f, a, "test/data/crab.xml",,, "Source model"
 #
