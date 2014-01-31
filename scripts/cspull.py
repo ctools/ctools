@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script generates the pull distribution for all model parameters.
 #
-# Copyright (C) 2011-2013 Juergen Knoedlseder
+# Copyright (C) 2011-2014 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ class cspull(GApplication):
 			pars.append(GApplicationPar("srcmdl","f","a","$GAMMALIB/share/models/crab.xml","","","Source model"))
 			pars.append(GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
 			pars.append(GApplicationPar("ntrials","i","a","10","","","Number of trials"))
-			pars.append(GApplicationPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
+			pars.append(GApplicationPar("caldb","s","h","","","","Calibration database"))
 			pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
 			pars.append(GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
 			pars.append(GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))

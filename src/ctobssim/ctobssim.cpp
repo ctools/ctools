@@ -432,9 +432,21 @@ void ctobssim::get_parameters(void)
         // Allocate CTA observation
         GCTAObservation obs;
 
+        // Set calibration database. If specified parameter is a directory
+        // then use this as the pathname to the calibration database. Other-
+        // wise interpret this as the instrument name, the mission being
+        // "cta"
+        GCaldb caldb;
+        if (gammalib::dir_exists(m_caldb)) {
+            caldb.dir(m_caldb);
+        }
+        else {
+            caldb.open("cta", m_caldb);
+        }
+
         // Set CTA observation attributes
         obs.pointing(pnt);
-        obs.response(m_irf, m_caldb);
+        obs.response(m_irf, caldb);
 
         // Set event list (queries remaining parameters)
         set_list(&obs);

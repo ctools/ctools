@@ -581,7 +581,21 @@ void ctmodel::setup_obs(void)
         
             // Set response if it isn't set already
             if (obs->response().aeff() == NULL) {
-            	obs->response(m_irf, m_caldb);
+
+                // Set calibration database. If specified parameter is a
+                // directory then use this as the pathname to the calibration
+                // database. Otherwise interpret this as the instrument name,
+                // the mission being "cta"
+                GCaldb caldb;
+                if (gammalib::dir_exists(m_caldb)) {
+                    caldb.dir(m_caldb);
+                }
+                else {
+                    caldb.open("cta", m_caldb);
+                }
+
+                // Set reponse
+            	obs->response(m_irf, caldb);
 
             } // endif: observation already has a response
 

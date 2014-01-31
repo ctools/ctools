@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -361,8 +361,20 @@ void ctlike::get_parameters(void)
             // Set statistics
             obs.statistics(m_stat);
 
+            // Set calibration database. If specified parameter is a
+            // directory then use this as the pathname to the calibration
+            // database. Otherwise interpret this as the instrument name,
+            // the mission being "cta"
+            GCaldb caldb;
+            if (gammalib::dir_exists(m_caldb)) {
+                caldb.dir(m_caldb);
+            }
+            else {
+                caldb.open("cta", m_caldb);
+            }
+
             // Set reponse
-            obs.response(m_irf, m_caldb);
+            obs.response(m_irf, caldb);
 
             // Append observation to container
             m_obs.append(obs);
