@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-07-01
 
 Author(s) : Juergen Knoedlseder
 
-24 January 2014
+30 January 2014
 
 
 1. Introduction
@@ -34,6 +34,9 @@ considering when simulating source and background events. This has been
 changed now that only events will be simulated when the instrument
 and id are valid for a given model.
 
+ctobssim now has full access to the calibration database, allowing
+the use for 2D response functions in FITS files.
+
 
 5. ctselect - CTA event selection
 ---------------------------------
@@ -47,7 +50,8 @@ None
 
 7. ctlike - CTA maximum likelihood fitting
 ------------------------------------------
-None
+ctobssim now has full access to the calibration database, allowing
+the use for 2D response functions in FITS files.
 
 
 8. ctskymap - CTA sky mapping
@@ -57,7 +61,8 @@ None
 
 9. ctmodel - CTA counts map modelling
 -------------------------------------
-None
+ctobssim now has full access to the calibration database, allowing
+the use for 2D response functions in FITS files.
 
 
 10. Examples
@@ -67,7 +72,8 @@ None
 
 11. Scripts
 -----------
-None
+The obsutils.py script has been adapted to the new calibration database
+interface.
 
 
 12. caldb
