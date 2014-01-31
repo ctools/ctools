@@ -289,7 +289,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     # Set calibration database
     db = gammalib.GCaldb()
     if (gammalib.dir_exists(caldb)):
-        db.dir(caldb)
+        db.rootdir(caldb)
     else:
         db.open("cta", caldb)
     

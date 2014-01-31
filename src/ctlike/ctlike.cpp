@@ -367,7 +367,7 @@ void ctlike::get_parameters(void)
             // the mission being "cta"
             GCaldb caldb;
             if (gammalib::dir_exists(m_caldb)) {
-                caldb.dir(m_caldb);
+                caldb.rootdir(m_caldb);
             }
             else {
                 caldb.open("cta", m_caldb);
