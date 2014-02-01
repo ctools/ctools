@@ -1,3 +1,11 @@
+2014-02-01  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+        * Version 0.8.0 released
+        ========================
+
+        Support energy dispersion in ctobssim, ctlike and ctmodel	
+
+
 2014-01-30  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
         
         * Bug fix Version 0.7.1 released

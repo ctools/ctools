@@ -1,8 +1,8 @@
-New Features and Important Changes in ctools 00-07-01
+New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-30 January 2014
+1 February 2014
 
 
 1. Introduction
@@ -37,6 +37,9 @@ and id are valid for a given model.
 ctobssim now has full access to the calibration database, allowing
 the use for 2D response functions in FITS files.
 
+ctobssim now also supports the handling of energy dispersion. Energy
+dispersion can be switched on or off using the hidden edisp parameter.
+
 
 5. ctselect - CTA event selection
 ---------------------------------
@@ -50,8 +53,11 @@ None
 
 7. ctlike - CTA maximum likelihood fitting
 ------------------------------------------
-ctobssim now has full access to the calibration database, allowing
+ctlike now has full access to the calibration database, allowing
 the use for 2D response functions in FITS files.
+
+ctlike now also supports the handling of energy dispersion. Energy
+dispersion can be switched on or off using the hidden edisp parameter.
 
 
 8. ctskymap - CTA sky mapping
@@ -61,8 +67,11 @@ None
 
 9. ctmodel - CTA counts map modelling
 -------------------------------------
-ctobssim now has full access to the calibration database, allowing
+ctmodel now has full access to the calibration database, allowing
 the use for 2D response functions in FITS files.
+
+ctmodel now also supports the handling of energy dispersion. Energy
+dispersion can be switched on or off using the hidden edisp parameter.
 
 
 10. Examples
