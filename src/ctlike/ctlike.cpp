@@ -241,6 +241,18 @@ void ctlike::run(void)
         log << std::endl;
     }
 
+    // Set energy dispersion flag for all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp;
+    save_edisp.assign(m_obs.size(), false);
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            save_edisp[i] = obs->response().apply_edisp();
+            obs->response().apply_edisp(m_apply_edisp);
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -273,6 +285,14 @@ void ctlike::run(void)
         log << " (Nobs - Npred = " << num_events-m_obs.npred();
         log << ")" << std::endl;
         log << m_obs.models() << std::endl;
+    }
+
+    // Restore energy dispersion flag for all CTA observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            obs->response().apply_edisp(save_edisp[i]);
+        }
     }
 
     // Return
@@ -403,8 +423,9 @@ void ctlike::get_parameters(void)
 
     } // endif: no models were associated with observations
 
-    // Get standard parameters
-    m_refit  = (*this)["refit"].boolean();
+    // Get other parameters
+    m_refit       = (*this)["refit"].boolean();
+    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -486,12 +507,13 @@ void ctlike::init_members(void)
     m_irf.clear();
     m_outmdl.clear();
     m_obs.clear();
-    m_refit      = false;
-    m_max_iter   = 100;   // Set maximum number of iterations
-    m_max_stall  = 10;    // Set maximum number of stalls
-    m_logL       = 0.0;
-    m_opt        = NULL;
-    m_read_ahead = false;
+    m_refit       = false;
+    m_max_iter    = 100;   // Set maximum number of iterations
+    m_max_stall   = 10;    // Set maximum number of stalls
+    m_logL        = 0.0;
+    m_opt         = NULL;
+    m_read_ahead  = false;
+    m_apply_edisp = false;
 
     // Set logger properties
     log.date(true);
@@ -509,17 +531,18 @@ void ctlike::init_members(void)
 void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
-    m_stat       = app.m_stat;
-    m_refit      = app.m_refit;
-    m_caldb      = app.m_caldb;
-    m_irf        = app.m_irf;
-    m_outmdl     = app.m_outmdl;
-    m_obs        = app.m_obs;
-    m_max_iter   = app.m_max_iter;
-    m_max_stall  = app.m_max_stall;
-    m_logL       = app.m_logL;
-    m_opt        = app.m_opt->clone();
-    m_read_ahead = app.m_read_ahead;
+    m_stat        = app.m_stat;
+    m_refit       = app.m_refit;
+    m_caldb       = app.m_caldb;
+    m_irf         = app.m_irf;
+    m_outmdl      = app.m_outmdl;
+    m_obs         = app.m_obs;
+    m_max_iter    = app.m_max_iter;
+    m_max_stall   = app.m_max_stall;
+    m_logL        = app.m_logL;
+    m_opt         = app.m_opt->clone();
+    m_read_ahead  = app.m_read_ahead;
+    m_apply_edisp = app.m_apply_edisp;
 
     // Return
     return;

@@ -71,11 +71,12 @@ protected:
     void free_members(void);
 
     // User parameters
-    std::string   m_stat;       //!< Optimisation statistics (poisson/gaussian)
-    bool          m_refit;      //!< Refitting
-    std::string   m_caldb;      //!< Calibration database
-    std::string   m_irf;        //!< Instrument response functions
-    std::string   m_outmdl;     //!< Source model output XML file
+    std::string   m_stat;        //!< Optimisation statistics (poisson/gaussian)
+    bool          m_refit;       //!< Refitting
+    std::string   m_caldb;       //!< Calibration database
+    std::string   m_irf;         //!< Instrument response functions
+    std::string   m_outmdl;      //!< Source model output XML file
+    bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Members
     GObservations m_obs;        //!< Observations
