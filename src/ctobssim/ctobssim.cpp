@@ -256,6 +256,18 @@ void ctobssim::run(void)
         }
     }
 
+    // Set energy dispersion flag for all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp;
+    save_edisp.assign(m_obs.size(), false);
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            save_edisp[i] = obs->response().apply_edisp();
+            obs->response().apply_edisp(m_apply_edisp);
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -347,6 +359,14 @@ void ctobssim::run(void)
     // an XML file will be used for storage
     if (n_observations > 1) {
         m_use_xml = true;
+    }
+
+    // Restore energy dispersion flag for all CTA observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            obs->response().apply_edisp(save_edisp[i]);
+        }
     }
 
     // Return
@@ -468,7 +488,8 @@ void ctobssim::get_parameters(void)
     }
 
     // Get other parameters
-    m_seed = (*this)["seed"].integer();
+    m_seed        = (*this)["seed"].integer();
+    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -544,15 +565,14 @@ void ctobssim::set_list(GCTAObservation* obs)
     if (obs != NULL) {
 
         // Get CTA observation parameters
-        m_ra          = (*this)["ra"].real();
-        m_dec         = (*this)["dec"].real();
-        m_rad         = (*this)["rad"].real();
-        m_tmin        = (*this)["tmin"].real();
-        m_tmax        = (*this)["tmax"].real();
-        m_emin        = (*this)["emin"].real();
-        m_emax        = (*this)["emax"].real();
-        m_apply_edisp = (*this)["edisp"].boolean();
-        m_deadc       = (*this)["deadc"].real();
+        m_ra    = (*this)["ra"].real();
+        m_dec   = (*this)["dec"].real();
+        m_rad   = (*this)["rad"].real();
+        m_tmin  = (*this)["tmin"].real();
+        m_tmax  = (*this)["tmax"].real();
+        m_emin  = (*this)["emin"].real();
+        m_emax  = (*this)["emax"].real();
+        m_deadc = (*this)["deadc"].real();
 
         // Allocate CTA event list
         GCTAEventList events;
@@ -628,10 +648,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
             wrklog = &log;
         }
 
-        // Get pointer on CTA response. Throw an exception if the response
-        // is not defined.
-        GCTAResponse& rsp = const_cast<GCTAResponse&>(obs->response());
-        rsp.apply_edisp(m_apply_edisp);
+        // Get CTA response
+        const GCTAResponse& rsp = obs->response();
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
@@ -686,13 +704,24 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                 GEnergy emin = events->ebounds().emin(ie);
                 GEnergy emax = events->ebounds().emax(ie);
 
+                // Set true photon energy limits for simulation. If observation
+                // has energy dispersion then add margin
+                GEnergy e_true_min = emin;
+                GEnergy e_true_max = emax;
+                if (rsp.use_edisp()) {
+                    e_true_min = rsp.ebounds_src(e_true_min).emin();
+                    e_true_max = rsp.ebounds_src(e_true_max).emax();
+                }
+
                 // Dump energy range
                 if (logNormal()) {
                     if (events->ebounds().size() > 1) {
                         indent++;
                         wrklog->indent(indent);
                     }
-                    *wrklog << gammalib::parformat("Energy range", indent);
+                    *wrklog << gammalib::parformat("Photon energy range", indent);
+                    *wrklog << e_true_min << " - " << e_true_max << std::endl;
+                    *wrklog << gammalib::parformat("Event energy range", indent);
                     *wrklog << emin << " - " << emax << std::endl;
                 }
 
@@ -757,7 +786,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                             // Get photons
                             GPhotons photons = model->mc(m_area, dir, rad,
-                                                         emin, emax,
+                                                         e_true_min, e_true_max,
                                                          tstart, tstop, ran);
 
                             // Dump number of simulated photons
@@ -785,7 +814,12 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                 if (event != NULL) {
 
                                     // Use event only if it falls within ROI
-                                    if (events->roi().contains(*event)) {
+                                    // energy boundary and time slice
+                                    if (events->roi().contains(*event) &&
+                                        event->energy() >= emin &&
+                                        event->energy() <= emax &&
+                                        event->time() >= tstart &&
+                                        event->time() <= tstop) {
                                         event->event_id(m_event_id);
                                         events->append(*event);
                                         m_event_id++;
@@ -998,7 +1032,7 @@ void ctobssim::init_members(void)
     m_tmax        = 0.0;
     m_emin        = 0.0;
     m_emax        = 0.0;
-    m_apply_edisp = true;
+    m_apply_edisp = false;
     m_deadc       = 1.0;
 
     // Initialise protected members
