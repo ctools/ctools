@@ -246,6 +246,18 @@ void ctmodel::run(void)
         log << std::endl;
     }
 
+    // Set energy dispersion flag for all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp;
+    save_edisp.assign(m_obs.size(), false);
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            save_edisp[i] = obs->response().apply_edisp();
+            obs->response().apply_edisp(m_apply_edisp);
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -323,6 +335,14 @@ void ctmodel::run(void)
             log.header1("Observation after model map generation");
         }
         log << m_obs << std::endl;
+    }
+
+    // Restore energy dispersion flag for all CTA observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            obs->response().apply_edisp(save_edisp[i]);
+        }
     }
 
     // Return
@@ -435,6 +455,9 @@ void ctmodel::get_parameters(void)
             m_srcmdl = (*this)["srcmdl"].filename();
         }
     }
+
+    // Get other parameters
+    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Return
     return;
@@ -686,19 +709,20 @@ void ctmodel::init_members(void)
     m_srcmdl.clear();
     m_proj.clear();
     m_coordsys.clear();
-    m_ra       = 0.0;
-    m_dec      = 0.0;
-    m_deadc    = 1.0;
-    m_tmin     = 0.0;
-    m_tmax     = 0.0;
-    m_emin     = 0.0;
-    m_emax     = 0.0;
-    m_enumbins = 0;
-    m_xref     = 0.0;
-    m_yref     = 0.0;
-    m_binsz    = 0.0;
-    m_nxpix    = 0;
-    m_nypix    = 0;
+    m_ra          = 0.0;
+    m_dec         = 0.0;
+    m_deadc       = 1.0;
+    m_tmin        = 0.0;
+    m_tmax        = 0.0;
+    m_emin        = 0.0;
+    m_emax        = 0.0;
+    m_enumbins    = 0;
+    m_xref        = 0.0;
+    m_yref        = 0.0;
+    m_binsz       = 0.0;
+    m_nxpix       = 0;
+    m_nypix       = 0;
+    m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -722,27 +746,28 @@ void ctmodel::init_members(void)
 void ctmodel::copy_members(const ctmodel& app)
 {
     // Copy attributes
-    m_infile   = app.m_infile;
-    m_outfile  = app.m_outfile;
-    m_prefix   = app.m_prefix;
-    m_caldb    = app.m_caldb;
-    m_irf      = app.m_irf;
-    m_srcmdl   = app.m_srcmdl;
-    m_proj     = app.m_proj;
-    m_coordsys = app.m_coordsys;
-    m_ra       = app.m_ra;
-    m_dec      = app.m_dec;
-    m_deadc    = app.m_deadc;
-    m_tmin     = app.m_tmin;
-    m_tmax     = app.m_tmax;
-    m_emin     = app.m_emin;
-    m_emax     = app.m_emax;
-    m_enumbins = app.m_enumbins;
-    m_xref     = app.m_xref;
-    m_yref     = app.m_yref;
-    m_binsz    = app.m_binsz;
-    m_nxpix    = app.m_nxpix;
-    m_nypix    = app.m_nypix;
+    m_infile      = app.m_infile;
+    m_outfile     = app.m_outfile;
+    m_prefix      = app.m_prefix;
+    m_caldb       = app.m_caldb;
+    m_irf         = app.m_irf;
+    m_srcmdl      = app.m_srcmdl;
+    m_proj        = app.m_proj;
+    m_coordsys    = app.m_coordsys;
+    m_ra          = app.m_ra;
+    m_dec         = app.m_dec;
+    m_deadc       = app.m_deadc;
+    m_tmin        = app.m_tmin;
+    m_tmax        = app.m_tmax;
+    m_emin        = app.m_emin;
+    m_emax        = app.m_emax;
+    m_enumbins    = app.m_enumbins;
+    m_xref        = app.m_xref;
+    m_yref        = app.m_yref;
+    m_binsz       = app.m_binsz;
+    m_nxpix       = app.m_nxpix;
+    m_nypix       = app.m_nypix;
+    m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs        = app.m_obs;

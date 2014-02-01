@@ -61,7 +61,7 @@ public:
     virtual ~ctmodel(void);
 
     // Operators
-    ctmodel& operator= (const ctmodel& app);
+    ctmodel& operator=(const ctmodel& app);
 
     // Methods
     void           clear(void);
@@ -85,27 +85,28 @@ protected:
                                   const std::string&     outfile) const;
 
     // User parameters
-    std::string              m_infile;     //!< Input counts map or XML file
-    std::string              m_outfile;    //!< Output model map or XML file
-    std::string              m_prefix;     //!< Prefix for multiple model maps
-    std::string              m_caldb;      //!< Calibration database
-    std::string              m_irf;        //!< Instrument response functions
-    std::string              m_srcmdl;     //!< Source model
-    double                   m_ra;         //!< RA of pointing direction
-    double                   m_dec;        //!< DEC of pointing direction
-    double                   m_deadc;      //!< Deadtime correction factor
-    double                   m_tmin;       //!< Start time
-    double                   m_tmax;       //!< Stop time
-    double                   m_emin;       //!< Lower energy
-    double                   m_emax;       //!< Upper energy
-    int                      m_enumbins;   //!< Number of energy bins
-    std::string              m_proj;       //!< WCS projection
-    std::string              m_coordsys;   //!< Coordinate system
-    double                   m_xref;       //!< Longitude reference coordinate
-    double                   m_yref;       //!< Latitude reference coordinate
-    double                   m_binsz;      //!< Pixel size
-    int                      m_nxpix;      //!< Number of pixels in longitude
-    int                      m_nypix;      //!< Number of pixels in latitude
+    std::string m_infile;      //!< Input counts map or XML file
+    std::string m_outfile;     //!< Output model map or XML file
+    std::string m_prefix;      //!< Prefix for multiple model maps
+    std::string m_caldb;       //!< Calibration database
+    std::string m_irf;         //!< Instrument response functions
+    std::string m_srcmdl;      //!< Source model
+    double      m_ra;          //!< RA of pointing direction
+    double      m_dec;         //!< DEC of pointing direction
+    double      m_deadc;       //!< Deadtime correction factor
+    double      m_tmin;        //!< Start time
+    double      m_tmax;        //!< Stop time
+    double      m_emin;        //!< Lower energy
+    double      m_emax;        //!< Upper energy
+    int         m_enumbins;    //!< Number of energy bins
+    std::string m_proj;        //!< WCS projection
+    std::string m_coordsys;    //!< Coordinate system
+    double      m_xref;        //!< Longitude reference coordinate
+    double      m_yref;        //!< Latitude reference coordinate
+    double      m_binsz;       //!< Pixel size
+    int         m_nxpix;       //!< Number of pixels in longitude
+    int         m_nypix;       //!< Number of pixels in latitude
+    bool        m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
     GObservations            m_obs;        //!< Observation container
