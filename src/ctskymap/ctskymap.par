@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-evfile,  f, a, "test/data/crab_events.fits.gz",,,"Event data file name"
+evfile,  f, a, "events.fits",,,"Event data file name"
 outfile, f, a, "skymap.fits",,, "Output file name"
 #
 # Event selection parameters
