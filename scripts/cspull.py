@@ -94,11 +94,12 @@ class cspull(GApplication):
 			
 			# Create default parfile
 			pars = GApplicationPars()
-			pars.append(GApplicationPar("srcmdl","f","a","$GAMMALIB/share/models/crab.xml","","","Source model"))
+			pars.append(GApplicationPar("srcmdl","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
 			pars.append(GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
 			pars.append(GApplicationPar("ntrials","i","a","10","","","Number of trials"))
 			pars.append(GApplicationPar("caldb","s","h","","","","Calibration database"))
 			pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+			pars.append(GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
 			pars.append(GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
 			pars.append(GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
 			pars.append(GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
@@ -126,6 +127,7 @@ class cspull(GApplication):
 		self.m_ntrials  = self["ntrials"].integer()
 		self.m_caldb    = self["caldb"].string()
 		self.m_irf      = self["irf"].string()
+		self.m_edisp    = self["edisp"].boolean()
 		self.m_ra       = self["ra"].real()
 		self.m_dec      = self["dec"].real()
 		self.m_emin     = self["emin"].real()
@@ -268,6 +270,7 @@ class cspull(GApplication):
 		                   seed=seed, \
 		                   binsz=self.m_binsz, \
 		                   npix=self.m_npix, \
+                           edisp=self.m_edisp, \
 		                   log=self.m_log, debug=self.m_debug)
 
 		# Determine number of events in simulation
@@ -283,7 +286,8 @@ class cspull(GApplication):
 			self.log("\n")
 
 		# Fit model
-		like = obsutils.fit(obs, log=self.m_log, debug=self.m_debug)
+		like = obsutils.fit(obs, edisp=self.m_edisp, \
+                            log=self.m_log, debug=self.m_debug)
 
 		# Store results
 		logL   = like.opt().value()

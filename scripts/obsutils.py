@@ -25,7 +25,8 @@ import gammalib
 # ===================== #
 # Simulate observations #
 # ===================== #
-def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
+def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
+        binsz=0.05, npix=200):
     """
     Simulate events for all observations in the container.
     
@@ -33,7 +34,8 @@ def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
      obs   - Observation container
     Keywords:
      log   - Create log file(s)
-     debug - Create screen dump
+     debug - Create console dump?
+     edisp - Apply energy dispersion?
      seed  - Seed value for simulations (default: 0)
      nbins - Number of energy bins (default: 0=unbinned)
      binsz - Pixel size for binned simulation (deg/pixel)
@@ -50,6 +52,9 @@ def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
     # Optionally switch-on debugging model
     if debug:
         sim["debug"].boolean(True)
+
+    # Optionally apply energy dispersion
+    sim["edisp"].boolean(edisp)
     
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
@@ -122,7 +127,7 @@ def sim(obs, log=False, debug=False, seed=0, nbins=0, binsz=0.05, npix=200):
 # ================ #
 # Fit observations #
 # ================ #
-def fit(obs, log=False, debug=False):
+def fit(obs, log=False, debug=False, edisp=False):
     """
     Perform maximum likelihood fitting of observations in the container.
     
@@ -131,6 +136,7 @@ def fit(obs, log=False, debug=False):
     Keywords:
      log   - Create log file(s)
      debug - Create screen dump
+     edisp - Apply energy dispersion?
     """
     # Allocate ctlike application
     like = ctools.ctlike(obs)
@@ -142,6 +148,9 @@ def fit(obs, log=False, debug=False):
     # Optionally switch-on debugging model
     if debug:
         like["debug"].boolean(True)
+
+    # Optionally apply energy dispersion
+    like["edisp"].boolean(edisp)
 
     # Run ctlike application.
     like.run()
@@ -266,7 +275,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 # ======================= #
 def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
-        irf="cta_dummy_irf", caldb=""):
+        irf="cta_dummy_irf", caldb="$CTOOLS/share/caldb/data/cta/dummy"):
     """
     Returns a single CTA observation. By looping over this function we can
     add CTA observations to the observation container.
