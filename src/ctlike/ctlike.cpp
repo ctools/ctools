@@ -265,12 +265,13 @@ void ctlike::run(void)
     // Write results into logger
     if (logTerse()) {
         log << gammalib::parformat("Maximum log likelihood");
-        log << m_logL << std::endl;
+        log << gammalib::str(m_logL,3) << std::endl;
         log << gammalib::parformat("Observed events  (Nobs)");
-        log << num_events << std::endl;
+        log << gammalib::str(num_events, 3) << std::endl;
         log << gammalib::parformat("Predicted events (Npred)");
-        log << m_obs.npred();
-        log << " (Nobs - Npred = " << num_events-m_obs.npred();
+        log << gammalib::str(m_obs.npred(), 3);
+        log << " (Nobs - Npred = ";
+        log << gammalib::str(num_events-m_obs.npred());
         log << ")" << std::endl;
         log << m_obs.models() << std::endl;
     }
