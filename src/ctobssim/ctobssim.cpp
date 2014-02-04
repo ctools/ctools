@@ -336,11 +336,23 @@ void ctobssim::run(void)
                 // Increment counter
                 n_observations++;
 
+                // Save number of events before entering simulation
+                int events_before = obs->events()->size();
+
                 // Simulate source events
                 simulate_source(obs, m_obs.models(), m_rans[i], &wrklog);
 
                 // Simulate source events
                 simulate_background(obs, m_obs.models(), m_rans[i], &wrklog);
+
+                // Dump simulation results
+                if (logNormal()) {
+                    wrklog << gammalib::parformat("MC events");
+                    wrklog << obs->events()->size() - events_before;
+                    wrklog << " (all models)";
+                    wrklog << std::endl;
+                }
+
 
             } // endif: CTA observation found
 
