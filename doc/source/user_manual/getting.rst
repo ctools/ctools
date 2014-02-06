@@ -265,16 +265,12 @@ can be given, for example:
 Setting up the ctools environment
 ---------------------------------
 
-If you installed ctools in the same directory as GammaLib (which
-is the default) you are done.
-
-If you decided to install ctools in a different directory, you have to 
-configure ctools by setting up some environment variables. This will be 
-done automatically by an initialisation script that is found in the ``bin`` 
-directory of the directory into which ctools has been installed. Assuming
-that you have installed ctools into ``/usr/local/ctools`` you need to add
-the following to your ``$HOME/.bashrc`` or ``$HOME/.profile`` script on a
-Linux machine:
+You have to configure ctools by setting up some environment variables. This
+will be done automatically by an initialisation script that is found in the
+``bin`` directory of the directory into which ctools has been installed. 
+Assuming that you have installed ctools into ``/usr/local/ctools`` you need
+to add the following to your ``$HOME/.bashrc`` or ``$HOME/.profile`` script
+on a Linux machine:
 
 .. code-block:: bash
 
