@@ -289,6 +289,29 @@ If you use C shell or a variant then add the following to your
 Known problems
 --------------
 
+GammaLib unit tests fail
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some users have reported failure of a large fraction of the GammaLib unit
+tests after after typing ``make check``. In all cases, this was related to
+the absence of the directory where the shared ``libcfitsio`` library 
+resides in the library load path. To solve the issue, locate the directory
+where the shared ``libcfitsio`` library resides and then type
+
+.. code-block:: bash
+
+  export LD_LIBRARY_PATH=/directory/to/lib:$LD_LIBRARY_PATH
+
+on Unix based systems or
+
+.. code-block:: bash
+
+  export DYLD_LIBRARY_PATH=/directory/to/lib:$DYLD_LIBRARY_PATH
+
+on Mac OS X (``/directory/to/lib`` should be replaced by the correct
+library path on your system).
+
+
 Python support
 ~~~~~~~~~~~~~~
 
