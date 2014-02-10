@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-infile, f, a, "test/data/crab_events.fits.gz",,,"Event list, counts map or observation definition file"
+infile, f, a, "events.fits",,,"Event list, counts map or observation definition file"
 stat,   s, h, "POISSON",,,            "Optimization statistics"
 refit,  b, h,        no,,,            "Do refitting?"
 caldb,  s, a,         "",,,           "Calibration database"
