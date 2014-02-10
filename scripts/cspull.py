@@ -78,68 +78,6 @@ class cspull(GApplication):
         # Return
         return
 
-<<<<<<< HEAD
-	def parfile(self):
-		"""
-		Check if parfile exists. If parfile does not exist then create a
-		default parfile. This kluge avoids shipping the cscript with a parfile.
-		"""
-		# Set parfile name
-		parfile = self.name+".par"
-		
-		try:
-			pars = GApplicationPars(parfile)
-		except:
-			# Signal if parfile was not found
-			sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-			
-			# Create default parfile
-			pars = GApplicationPars()
-			pars.append(GApplicationPar("srcmdl","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
-			pars.append(GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
-			pars.append(GApplicationPar("ntrials","i","a","10","","","Number of trials"))
-			pars.append(GApplicationPar("caldb","s","h","","","","Calibration database"))
-			pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-			pars.append(GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
-			pars.append(GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
-			pars.append(GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
-			pars.append(GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
-			pars.append(GApplicationPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
-			pars.append(GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-			pars.append(GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
-			pars.append(GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
-			pars.append(GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
-			pars.append(GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
-			pars.append(GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
-			pars.append_standard()
-			pars.save(parfile)
-		
-		# Return
-		return
-		
-	def get_parameters(self):
-		"""
-		Get parameters from parfile and setup the observation.
-		"""
-		# Get parameters
-		if self.model == None:
-			self.m_srcmdl = self["srcmdl"].filename()
-		self.m_outfile  = self["outfile"].filename()
-		self.m_ntrials  = self["ntrials"].integer()
-		self.m_caldb    = self["caldb"].string()
-		self.m_irf      = self["irf"].string()
-		self.m_edisp    = self["edisp"].boolean()
-		self.m_ra       = self["ra"].real()
-		self.m_dec      = self["dec"].real()
-		self.m_emin     = self["emin"].real()
-		self.m_emax     = self["emax"].real()
-		self.m_enumbins = self["enumbins"].integer()
-		self.m_duration = self["duration"].real()
-		self.m_deadc    = self["deadc"].real()
-		self.m_rad      = self["rad"].real()
-		self.m_npix     = self["npix"].integer()
-		self.m_binsz    = self["binsz"].real()
-=======
     def parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
@@ -156,11 +94,12 @@ class cspull(GApplication):
             
             # Create default parfile
             pars = GApplicationPars()
-            pars.append(GApplicationPar("srcmdl","f","a","$GAMMALIB/share/models/crab.xml","","","Source model"))
+            pars.append(GApplicationPar("srcmdl","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
             pars.append(GApplicationPar("ntrials","i","a","10","","","Number of trials"))
             pars.append(GApplicationPar("caldb","s","h","","","","Calibration database"))
             pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+            pars.append(GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
             pars.append(GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
             pars.append(GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
@@ -188,6 +127,7 @@ class cspull(GApplication):
         self.m_ntrials  = self["ntrials"].integer()
         self.m_caldb    = self["caldb"].string()
         self.m_irf      = self["irf"].string()
+        self.m_edisp    = self["edisp"].boolean()
         self.m_ra       = self["ra"].real()
         self.m_dec      = self["dec"].real()
         self.m_emin     = self["emin"].real()
@@ -198,7 +138,6 @@ class cspull(GApplication):
         self.m_rad      = self["rad"].real()
         self.m_npix     = self["npix"].integer()
         self.m_binsz    = self["binsz"].real()
->>>>>>> 00-07-02
 
         # Set some fixed parameters
         self.m_log   = False # Logging in client tools
@@ -325,24 +264,14 @@ class cspull(GApplication):
         if self.logExplicit():
             self.log.header2("Trial "+str(seed+1))
 
-<<<<<<< HEAD
-		# Simulate events
-		obs = obsutils.sim(self.obs, \
-		                   nbins=self.m_enumbins, \
-		                   seed=seed, \
-		                   binsz=self.m_binsz, \
-		                   npix=self.m_npix, \
-                           edisp=self.m_edisp, \
-		                   log=self.m_log, debug=self.m_debug)
-=======
         # Simulate events
         obs = obsutils.sim(self.obs, \
                            nbins=self.m_enumbins, \
                            seed=seed, \
                            binsz=self.m_binsz, \
                            npix=self.m_npix, \
+                           edisp=self.m_edisp, \
                            log=self.m_log, debug=self.m_debug)
->>>>>>> 00-07-02
 
         # Determine number of events in simulation
         nevents = 0.0
@@ -356,14 +285,9 @@ class cspull(GApplication):
             self.log(nevents)
             self.log("\n")
 
-<<<<<<< HEAD
-		# Fit model
-		like = obsutils.fit(obs, edisp=self.m_edisp, \
-                            log=self.m_log, debug=self.m_debug)
-=======
         # Fit model
-        like = obsutils.fit(obs, log=self.m_log, debug=self.m_debug)
->>>>>>> 00-07-02
+        like = obsutils.fit(obs, edisp=self.m_edisp, \
+                            log=self.m_log, debug=self.m_debug)
 
         # Store results
         logL   = like.opt().value()
