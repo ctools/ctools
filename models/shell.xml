@@ -14,7 +14,7 @@
     </spatialModel>
   </source>
   <source name="Background" type="RadialAcceptance" instrument="CTA">
-    <spectrum type="FileFunction" file="$GAMMALIB/share/models/bkg_dummy.txt">
+    <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
       <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="1.0" free="1"/>
     </spectrum>
     <radialModel type="Gaussian">
