@@ -11,7 +11,7 @@
 # area (i.e. the area before applying any theta cut). This is required by
 # GammaLib as the maximum likelihood analysis does not imply any theta cut.
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2014 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
