@@ -164,7 +164,7 @@ class lsmodel(gammalib.GApplication):
         # Fill cube with model values
         for i in range(cube.size()):
             event = cube[i]
-            value = model.eval(event, obs)
+            value = model.eval(event, obs) * event.size()
             event.counts(value)
             cube[i] = event
 
