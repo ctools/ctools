@@ -650,7 +650,6 @@ class caldb():
             for ioff in range(noffset):
                 o_lo = offsets.GetBinLowEdge(ioff+1)
                 hdu["THETA_LO"][0,ioff] = o_lo
-
         #
         # THETA_LO
         if not hdu.contains("THETA_HI"):
@@ -683,8 +682,144 @@ class caldb():
 
         # Return boundary information
         return bounds
+
+    def make_3D(self, array, hdu, name, unit, scale=1.0):
+        """
+        Make 3D cube as function of DETX, DETY and energy from a
+        ROOT 2D histogram. If the HDU has already the energy and
+        offset angle columns, this method will simply add another data
+        column.
+        If name==None, the method will not append any data column.
+        
+        Parameters:
+         array - ROOT 2D histogram.
+         hdu   - FITS HDU.
+         name  - Data column name.
+         unit  - Data unit.
+        Keywords:
+         scale - Scaling factor for histogram values.
+        """
+        # Set constants
+        deg2sr = 0.01745329*0.01745329
+        
+        # Extract energy and offset angle vectors
+        energies = array.GetXaxis()
+        neng     = energies.GetNbins()
+        offsets  = array.GetYaxis()
+        noffset  = offsets.GetNbins()
+        ewidth   = [] # in MeV
+        for ieng in range(neng):
+            ewidth.append(pow(10.0, energies.GetBinUpEdge(ieng+1) +6.0) - \
+                          pow(10.0, energies.GetBinLowEdge(ieng+1)+6.0))
+
+        # Build DETX and DETY axes
+        ndet     = array.GetYaxis().GetNbins()
+        ndets    = 2*ndet
+        det_max  = array.GetYaxis().GetBinUpEdge(ndet)
+        det_bin  = det_max/float(ndet)
+        dets_lo  = []
+        dets_hi  = []
+        dets2    = []
+        for i in range(ndets):
+            det_lo  = -det_max + i*det_bin
+            det_hi  = det_lo + det_bin
+            det_val = 0.5*(det_lo + det_hi)
+            dets_lo.append(det_lo)
+            dets_hi.append(det_hi)
+            dets2.append(det_val*det_val)
+
+        # Attach columns to HDU. We do this only if they do not yet
+        # exist. This allows adding columns to the same HDU in successive
+        # calls of this method
+        #
+        # DETX_LO
+        if not hdu.contains("DETX_LO"):
+            hdu.append(GFitsTableFloatCol("DETX_LO", 1, ndets))
+            hdu["DETX_LO"].unit("deg")
+            for i in range(ndets):
+                hdu["DETX_LO"][0,i] = dets_lo[i]
+        #
+        # DETX_HI
+        if not hdu.contains("DETX_HI"):
+            hdu.append(GFitsTableFloatCol("DETX_HI", 1, ndets))
+            hdu["DETX_HI"].unit("deg")
+            for i in range(ndets):
+                hdu["DETX_HI"][0,i] = dets_hi[i]
+        #
+        # DETY_LO
+        if not hdu.contains("DETY_LO"):
+            hdu.append(GFitsTableFloatCol("DETY_LO", 1, ndets))
+            hdu["DETY_LO"].unit("deg")
+            for i in range(ndets):
+                hdu["DETY_LO"][0,i] = dets_lo[i]
+        #
+        # DETY_HI
+        if not hdu.contains("DETY_HI"):
+            hdu.append(GFitsTableFloatCol("DETY_HI", 1, ndets))
+            hdu["DETY_HI"].unit("deg")
+            for i in range(ndets):
+                hdu["DETY_HI"][0,i] = dets_hi[i]
+        #
+        # ENERG_LO
+        if not hdu.contains("ENERG_LO"):
+            hdu.append(GFitsTableFloatCol("ENERG_LO", 1, neng))
+            hdu["ENERG_LO"].unit("TeV")
+            for ieng in range(neng):
+                e_lo = pow(10.0, energies.GetBinLowEdge(ieng+1))
+                hdu["ENERG_LO"][0,ieng] = e_lo
+        #
+        # ENERG_HI
+        if not hdu.contains("ENERG_HI"):
+            hdu.append(GFitsTableFloatCol("ENERG_HI", 1, neng))
+            hdu["ENERG_HI"].unit("TeV")
+            for ieng in range(neng):
+                e_hi = pow(10.0, energies.GetBinUpEdge(ieng+1))
+                hdu["ENERG_HI"][0,ieng] = e_hi
+        #
+        # "NAME"
+        if name != None and not hdu.contains(name):
+            hdu.append(GFitsTableFloatCol(name, 1, ndets*ndets*neng))
+            hdu[name].unit(unit)
+            hdu[name].dim([ndets,ndets,neng])
+            for ix in range(ndets):
+                for iy in range(ndets):
+                    for ieng in range(neng):
+                        index = ix + (iy + ieng * ndets) * ndets
+                        theta = math.sqrt(dets2[ix] + dets2[iy])
+                        ioff  = offsets.FindBin(theta)
+                        if ioff > 0 and ioff <= noffset:
+                            binsq = array.GetBinContent(ieng+1,ioff)
+                            if binsq >= 0:
+                                value = binsq / deg2sr / (ewidth[ieng])
+                                hdu[name][0,index] = value * scale
+        #
+        # Debugging
+        if False:
+            for ieng in range(neng):
+                sum = 0.0
+                for ioff in range(noffset):
+                    index = ieng + ioff * neng
+                    binsq = array.GetBinContent(ieng+1,ioff+1)
+                    value = binsq / deg2sr / ewidth[ieng]
+                    sum  += value
+                    if ioff == 0:
+                        peak = value
+                        peaksq = binsq
+                print(pow(10.0, energies.GetBinLowEdge(ieng+1))+ \
+                      pow(10.0, energies.GetBinUpEdge(ieng+1)), sum, peak, peaksq)
+
+        # Collect boundary information
+        bd_detx = "DETX(%.2f-%.2f)deg" % (-det_max, det_max)
+        bd_dety = "DETY(%.2f-%.2f)deg" % (-det_max, det_max)
+        bd_eng  = "ENERG(%.4f-%.2f)TeV" % \
+                  (pow(10.0, energies.GetBinLowEdge(1)), \
+                   pow(10.0, energies.GetBinUpEdge(neng)))
+        bounds  = [bd_detx, bd_dety, bd_eng]
+
+        # Return boundary information
+        return bounds
     
-    def root2caldb(self, filename, rebin=False, psftype="Gauss"):
+    def root2caldb(self, filename, rebin=False, psftype="Gauss", scale=1.0):
         """
         Translate ROOT to CALDB information.
         
@@ -706,7 +841,8 @@ class caldb():
         self.root2edisp(file)
 
         # Create background
-        self.root2bgd(file)
+        #self.root2bgd(file)
+        self.root2bgd3D(file, scale=scale)
         
         # Return
         return
@@ -1057,6 +1193,42 @@ class caldb():
         # Return
         return
 
+    def root2bgd3D(self, file, scale=1.0):
+        """
+        Translate ROOT to CALDB background extension. The following ROOT
+        histograms are used:
+
+        BGRatePerSqDeg_offaxis -> BGD
+        BGRatePerSqDeg_offaxis -> BGD_RECO
+
+        Parameters:
+         file - ROOT file.
+        Keywords:
+         scale - Background rate scaling factor
+        """
+        # Continue only if background HDU has been opened
+        if self.hdu_bgd != None:
+
+            # Allocate ROOT 2D array
+            array = TH2F()
+            file.GetObject("BGRatePerSqDeg_offaxis", array)
+
+            # Set boundaries
+            bounds = self.make_3D(array, self.hdu_bgd, None, "deg")
+            for b in bounds:
+                self.bgd_bounds.append(b)
+            self.set_cif_keywords(self.hdu_bgd, self.bgd_name, \
+                                  self.bgd_bounds, self.bgd_desc)
+
+            # BGD
+            self.make_3D(array, self.hdu_bgd, "BGD", "1/s/MeV/sr", scale=scale)
+
+            # BGD_RECO
+            self.make_3D(array, self.hdu_bgd, "BGD_RECO", "1/s/MeV/sr", scale=scale)
+            
+        # Return
+        return
+
     def set_cif_keywords(self, hdu, name, bounds, desc):
         """
         Set standard CIF keywords for extension.
@@ -1095,13 +1267,14 @@ def set_test():
     # Set database attributes
     path    = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
     rebin   = True
+    scale   = 1.0
 
     # Set database content
     db = [{'inst': "e", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': "Gauss",
+           'path': path, 'rebin': rebin, 'psftype': "Gauss", 'scale': scale,
            'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"},
           {'inst': "e", 'id':   "IFAE20120510_50h_King",
-           'path': path, 'rebin': rebin, 'psftype': "King",
+           'path': path, 'rebin': rebin, 'psftype': "King", 'scale': scale,
            'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"}]
 
     # Return database
@@ -1119,16 +1292,17 @@ def set_prod1_ifae():
     path    = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
     rebin   = True
     psftype = "Gauss"
+    scale   = 1.0
 
     # Set database content
     db = [{'inst': "b", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "SubarrayB_IFAE_50hours_20120510_offaxis.root"},
           {'inst': "e", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"},
           {'inst': "i", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "SubarrayI_IFAE_50hours_20120510_offaxis.root"}]
 
     # Return database
@@ -1146,76 +1320,77 @@ def set_prod2_desy():
     path    = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
     rebin   = False
     psftype = "Gauss"
+    scale   = 1.0/180000.0
 
     # Set database content
     db = [{'inst': "aar", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
 
           {'inst': "aar500", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
 
           {'inst': "leoncito", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
           {'inst': "leoncito", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
           {'inst': "leoncito", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
 
           {'inst': "sac", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SAC100-NS.S.2a.180000s.root"},
           {'inst': "sac", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
           {'inst': "sac", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
 
           {'inst': "spm", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SPM-NS.N.2NN.180000s.root"},
           {'inst': "spm", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
           {'inst': "spm", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
 
           {'inst': "tenerife", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
 
           {'inst': "us", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-US-NS.N.2NN.180000s.root"},
           {'inst': "us", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-US-NS.N.2NN.180000s.root"},
           {'inst': "us", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype,
+           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
            'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-US-NS.N.2NN.180000s.root"}]
 
     # Return database
@@ -1259,6 +1434,7 @@ if __name__ == '__main__':
         id       = entry['id']
         rebin    = entry['rebin']
         psftype  = entry['psftype']
+        scale    = entry['scale']
         filename = path+"/"+entry['file']
 
         # Allocate caldb entry
@@ -1268,4 +1444,4 @@ if __name__ == '__main__':
         irf.open("file")
     
         # Translate ROOT to CALDB information
-        irf.root2caldb(filename, rebin=rebin, psftype=psftype)
+        irf.root2caldb(filename, rebin=rebin, psftype=psftype, scale=scale)
