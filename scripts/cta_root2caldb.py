@@ -1312,9 +1312,9 @@ def set_prod1_ifae():
 #=========================#
 # Set Prod2 DESY database #
 #=========================#
-def set_prod2_desy():
+def set_prod2_desy_ignore():
     """
-    Set Prod2 DESY database.
+    Set Prod2 DESY database (ignore these files).
     """
     # Set database attributes
     path    = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
@@ -1397,6 +1397,56 @@ def set_prod2_desy():
     return db
 
 
+#=========================#
+# Set Prod2 DESY database #
+#=========================#
+def set_prod2_desy():
+    """
+    Set Prod2 DESY database.
+    """
+    # Set database attributes
+    path_aar = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Aar"
+    path_ten = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Tenerife_50h"
+    rebin    = False
+    psftype  = "Gauss"
+    scale    = 1.0
+
+    # Set database content
+    db = [{'inst': "aar", 'id':   "DESY20140105_50h",
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
+          {'inst': "aar", 'id':   "DESY20140105_50h_0deg",
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+          {'inst': "aar", 'id':   "DESY20140105_50h_180deg",
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+
+          {'inst': "aar500", 'id':   "DESY20140105_50h",
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
+          {'inst': "aar500", 'id':   "DESY20140105_50h_0deg",
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+          {'inst': "aar500", 'id':   "DESY20140105_50h_180deg",
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+
+          {'inst': "tenerife", 'id':   "DESY20140105_50h",
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
+          {'inst': "tenerife", 'id':   "DESY20140105_50h_0deg",
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
+          {'inst': "tenerife", 'id':   "DESY20140105_50h_180deg",
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"}
+         ]
+
+    # Return database
+    return db
+
+
 #==========================#
 # Main routine entry point #
 #==========================#
@@ -1412,7 +1462,7 @@ if __name__ == '__main__':
     - EffectiveArea80_offaxis (2D) - Effective area for 80% source containment
     - AngRes_offaxis (2D) - Angular resolution 68% containment
     - AngRes80_offaxis (2D) - Angular resolution 80% containment
-    - BGRatePerSqDeg_offaxis (2D) - Background rate per square degree
+    - BGRatePerSqDeg_offaxis (2D) - Background rate per square degree [counts/s/deg2]
     - BGRate_offaxis (2D) - Background rate
     - EffectiveAreaEtrue_offaxis (2D) - Effective area in true energy (finer bins)
     - MigMatrix_offaxis (3D)
@@ -1421,8 +1471,8 @@ if __name__ == '__main__':
     - Ebias_offaxis (2D) - Energy bias
     """
     # Get database
-    entries = set_test()
-    #entries = set_prod1_ifae()
+    #entries = set_test()
+    entries = set_prod1_ifae()
     #entries = set_prod2_desy()
 
     # Loop over entries
