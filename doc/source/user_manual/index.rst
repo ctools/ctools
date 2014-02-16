@@ -7,7 +7,7 @@ User Manual
 
    introduction
    getting
-   quickstart
+   getting_started/index
    enhancing
    reference
    expert
