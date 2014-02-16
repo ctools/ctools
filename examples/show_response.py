@@ -189,7 +189,8 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
         if Noff > 0:
             Non        = Non_lima(sigma, Noff)
             src_counts = Non - bgd_counts
-            flux[i]    = src_counts / (aeff * duration) * E[i]*1.0e6 * gammalib.MeV2erg
+            flux[i]    = src_counts / (0.68*aeff * duration) * E[i]*1.0e6 * gammalib.MeV2erg
+        print logE[i], flux[i]
     
     # Plot data
     plt.loglog(E, flux, color+'-', label=name)
