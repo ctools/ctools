@@ -945,6 +945,13 @@ class caldb():
             file.GetObject("AngRes_offaxis", r68)
             neng    = r68.GetXaxis().GetNbins()
             noffset = r68.GetYaxis().GetNbins()
+
+            # Converts 68% -> 1 sigma
+            r68_to_sigma = 0.6624305
+            for ioff in range(noffset):
+                for ieng in range(neng):
+                    sigma = r68.GetBinContent(ieng+1,ioff+1) * r68_to_sigma
+                    r68.SetBinContent(ieng+1,ioff+1,sigma)
             
             # Compute scale histogram
             scale = r68.Clone()
@@ -1317,81 +1324,43 @@ def set_prod2_desy():
     Set Prod2 DESY database.
     """
     # Set database attributes
-    path    = "/project-data/cta/performance/prod2/Performance_DESY_20140128"
-    rebin   = False
-    psftype = "Gauss"
-    scale   = 1.0/180000.0
+    path_aar = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Aar"
+    path_ten = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Tenerife_50h"
+    rebin    = False
+    psftype  = "Gauss"
+    #scale   = 1.0/180000.0
+    scale    = 1.0
 
     # Set database content
     db = [{'inst': "aar", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
 
           {'inst': "aar500", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
-
-          {'inst': "leoncito", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
-          {'inst': "leoncito", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
-          {'inst': "leoncito", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-LeoncitoPP-NS.S.2a.180000s.root"},
-
-          {'inst': "sac", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SAC100-NS.S.2a.180000s.root"},
-          {'inst': "sac", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
-          {'inst': "sac", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SAC100-NS.S.2a.180000s.root"},
-
-          {'inst': "spm", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-SPM-NS.N.2NN.180000s.root"},
-          {'inst': "spm", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
-          {'inst': "spm", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-SPM-NS.N.2NN.180000s.root"},
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
 
           {'inst': "tenerife", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
-
-          {'inst': "us", 'id':   "DESY20140105_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0NIM2.prod2-US-NS.N.2NN.180000s.root"},
-          {'inst': "us", 'id':   "DESY20140105_50h_0deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_0degNIM2.prod2-US-NS.N.2NN.180000s.root"},
-          {'inst': "us", 'id':   "DESY20140105_50h_180deg",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-US-NS.N.2NN.180000s.root"}]
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"}]
 
     # Return database
     return db
@@ -1421,9 +1390,9 @@ if __name__ == '__main__':
     - Ebias_offaxis (2D) - Energy bias
     """
     # Get database
-    entries = set_test()
+    #entries = set_test()
     #entries = set_prod1_ifae()
-    #entries = set_prod2_desy()
+    entries = set_prod2_desy()
 
     # Loop over entries
     for entry in entries:
