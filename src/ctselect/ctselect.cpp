@@ -40,6 +40,7 @@
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
+//#define G_USE_MKSTEMP               //!< Use mkstemp for temporary filename
 
 
 /*==========================================================================
@@ -291,10 +292,13 @@ void ctselect::run(void)
             m_infiles[i] = obs->eventfile();
 
             // Get temporary file name
-            //std::string filename = std::tmpnam(NULL);
-            char tpl[] = "ctselectXXXXXX";
-            mkstemp(tpl);
+            #if G_USE_MKSTEMP
+            char tpl[]  = "ctselectXXXXXX";
+            int  fileid = mkstemp(tpl);
             std::string filename(tpl);
+            #else
+            std::string filename = std::tmpnam(NULL);
+            #endif
 
             // Save observation in temporary file
             obs->save(filename, true);
@@ -316,6 +320,11 @@ void ctselect::run(void)
 
             // Load observation from temporary file, including event selection
             select_events(obs, filename);
+
+            // Close temporary file
+            #if G_USE_MKSTEMP
+            close(fileid);
+            #endif
 
             // Remove temporary file
             std::remove(filename.c_str());
@@ -415,7 +424,7 @@ void ctselect::get_parameters(void)
         try {
 
             // Load event list in CTA observation
-            obs.load_unbinned(m_infile);
+            obs.load(m_infile);
 
             // Append CTA observation to container
             m_obs.append(obs);
@@ -628,20 +637,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     }
     else {
 
-        // Get temporary file name
-        //std::string tmpname = std::tmpnam(NULL);
-        char tpl[] = "ctselectXXXXXX";
-        mkstemp(tpl);
-        std::string tmpname(tpl);
-
-        // Save FITS file to temporary file
-        file.saveto(tmpname, true);
-
-        // Load observation from temporary file
-        obs->load_unbinned(tmpname);
-
-        // Remove temporary file
-        std::remove(tmpname.c_str());
+        // Readload observation from FITS file
+        obs->load(file);
 
     }
 
