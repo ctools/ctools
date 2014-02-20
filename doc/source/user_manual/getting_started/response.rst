@@ -49,8 +49,8 @@ Data formats
 ~~~~~~~~~~~~
 
 So far the data format of the CTA instrument response functions has not
-yet been defined, and information about instrument response functions is
-provided in various ways. Three types of data formats are so far supported:
+yet been settled, and information about instrument response functions is
+provided in various ways. Three types of data formats are supported:
 
 -  :ref:`sec_cta_rsp_perftable`
 
@@ -71,12 +71,9 @@ for any analysis.
 
 .. note ::
 
-   Instrument response functions are so far only available for a fixed
+   Instrument response functions are so far only provided for a fixed
    zenith angle of 20 deg. Therefore, no zenith or azimuth angle dependence has 
-   been implented in the CTA response functions, but the dependence can be 
-   handled by cutting the data into short time segments (typically of 30 
-   minutes in length), and by specifying specific response functions for 
-   each segment.
+   been implemented so far.
 
 
 Installing the CTA calibration database
@@ -89,13 +86,13 @@ the database is installed using
 
 .. code-block:: bash
 
-  $ [sudo] tar -C $CALDB -zxvf cta-caldb-20140216.tar.gz
+  $ [sudo] tar -C $CALDB -zxvf cta-caldb-20140220.tar.gz
 
 or
 
 .. code-block:: bash
 
-  $ [sudo] tar -C $CALDB -xvf cta-caldb-20140216.tar
+  $ [sudo] tar -C $CALDB -xvf cta-caldb-20140220.tar
 
 depending on whether the database has been retrieved as a gzipped file or 
 not. Depending on your access rights to the ``$CALDB`` directory,
@@ -110,14 +107,14 @@ enviroment variable to
 
   $CTOOLS/share/caldb
 
-but it may be that some other software installation or configuration 
-setting on your system overwrites this location. If in doubt, type
+but it may be that due to some other analysis software on your system the
+``CALDB`` environment variable points to another directory. If in doubt, type
 
 .. code-block:: bash
 
   echo $CALDB
 
-to find out to which directory your ``CALDB`` environment variable is set. 
+to find out to which directory your ``CALDB`` environment variable points. 
 You may always overwrite this setting using
 
 .. code-block:: bash
@@ -136,36 +133,123 @@ Specifying the CTA Instrument Response Functions
 
 The specification of the CTA Instrument Response Functions depends on the 
 way how ctools are used. Common to all methods is that the IRFs are 
-defined by a response name and a calibration database name. The latter 
-may in some cases be the path to a directory on your filesystem.
+defined by a response name and a calibration database name.
 
 There are different means to specify the CTA Instrument Response Functions 
 when using ctools, and the following section describe the
 
-Using individual event files
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(to be written)
+Specifying the response function as input parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ctools that require instrument response functions have two parameters
+to specify the calibration database name and the response function name.
+The following example shows a ``ctobssim`` run using the ``dummy``
+calibration database and the ``cta_dummy_irf`` response function:
+
+.. code-block:: bash
+
+  $ ctobssim
+  Model [$CTOOLS/share/models/crab.xml] 
+  Calibration database [dummy] 
+  Instrument response function [cta_dummy_irf] 
+  RA of pointing (degrees) (0-360) [83.63] 
+  Dec of pointing (degrees) (-90-90) [22.01] 
+  Radius of FOV (degrees) (0-180) [5.0] 
+  Start time (MET in s) (0) [0.0] 
+  End time (MET in s) (0) [1800.0] 
+  Lower energy limit (TeV) (0) [0.1] 
+  Upper energy limit (TeV) (0) [100.0] 
+  Output event data file or observation definition file [events.fits]
+
+Running the other tools is equivalent.
 
 
-Using observation definition files
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Specifying the response function in an observation definition file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(to be written)
+In the above example, only a single global response function can be
+used for all CTA observations. If you need to specify response functions
+per observation you can add the information directly in the XML observation 
+definition file:
+
+.. code-block:: xml
+
+  <observation_list title="observation library">
+    <observation name="Crab" id="00001" instrument="CTA">
+      <parameter name="EventList"   file="events.fits"/>
+      <parameter name="Calibration" database="dummy" response="cta_dummy_irf"/>
+    </observation>
+  </observation_list>
+
+The ``Calibration`` parameter specifies the calibration database and
+response name. You can then pass this file directly to, e.g., ``ctlike``:
+
+.. code-block:: bash
+
+  $ ctlike
+  Event list, counts map or observation definition file [events.fits] obs_rsp.xml
+  Source model [$CTOOLS/share/models/crab.xml] 
+  Source model output file [crab_results.xml]
+
+Note that ``ctlike`` does not ask for the calibration database and
+response name as it found the relevant information in the XML file.
+
+.. _sec_cta_rsp_abspath:
+
+
+Specifying individual instrument response files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you need even more control over individual response files, you can
+specify them individually in the XML observation file as follows:
+
+.. code-block:: xml
+
+  <observation_list title="observation library">
+    <observation name="Crab" id="00001" instrument="CTA">
+      <parameter name="EventList"           file="events.fits"/>
+      <parameter name="EffectiveArea"       file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
+      <parameter name="PointSpreadFunction" file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
+      <parameter name="EnergyDispersion"    file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
+      <parameter name="Background"          file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
+    </observation>
+  </observation_list>
 
 
 From within a Python script
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(to be written)
+The following example illustrates how to set the calibration database
+and response name from within Python:
 
+.. code-block:: python
 
-.. _sec_cta_rsp_abspath:
+  import gammalib
+  obs   = gammalib.GCTAObservation()
+  caldb = gammalib.GCaldb("cta", "dummy")
+  irf   = "cta_dummy_irf"
+  obs.response(irf, caldb)
 
-Using absolute path names to instrument response files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The calibration database is set by creating a ``GCaldb`` object. The
+constructor takes as argument the mission (always ``cta``) and the 
+database name, in our case ``dummy``. The response function is then set
+by passing the response name (here ``cta_dummy_irf``) and the calibration
+database object to the ``response`` method.
 
-(to be written)
+Alternatively, you can specify a specific response file by using
+
+.. code-block:: python
+
+  import gammalib
+  obs   = gammalib.GCTAObservation()
+  caldb = gammalib.GCaldb("$CALDB/data/cta/dummy/bcf")
+  irf   = "cta_dummy_irf.dat"
+  obs.response(irf, caldb)
+
+Here, the directory in which the calibration file resides is specified
+as argument to the ``GCaldb`` constructor, and the filename is passed
+as response function name to the ``response`` method.
 
 
 Data format details
