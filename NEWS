@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-5 February 2014
+10 February 2014
 
 
 1. Introduction
@@ -13,13 +13,7 @@ important changes made since the last release of ctools.
 
 2. Configuration
 -----------------
-Some hyphens were missing in the configuration script when synchronising
-the user and system parameter files. This led to an error message on the
-console, but did not impact the proper configuration. Hyphens have now
-been added as needed.
-
-The configuration test script testconf.sh has been added to allow testing
-configuration script during continous integration.
+None
 
 
 3. Python interface
@@ -29,13 +23,7 @@ None
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-The instrument and id attributes provided by an observation were not
-considering when simulating source and background events. This has been
-changed now that only events will be simulated when the instrument
-and id are valid for a given model.
-
-ctobssim now has full access to the calibration database, allowing
-the use for 2D response functions in FITS files.
+None
 
 ctobssim now also supports the handling of energy dispersion. Energy
 dispersion can be switched on or off using the hidden edisp parameter.
@@ -81,8 +69,9 @@ None
 
 11. Scripts
 -----------
-The obsutils.py script has been adapted to the new calibration database
-interface.
+Add logL and event statistics to cspull output file.
+
+Convert all tabs into spaces.
 
 
 12. caldb
