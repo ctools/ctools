@@ -252,6 +252,45 @@ as argument to the ``GCaldb`` constructor, and the filename is passed
 as response function name to the ``response`` method.
 
 
+What response functions are available?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To see what response functions are available on your system, type
+
+.. code-block:: bash
+
+  $ cscaldb
+
+This creates the file ``cscaldb.log`` in your current working directory
+that contains information about the available response functions. The 
+format of the file is:
+
+.. code-block:: bash
+
+  2014-02-20T17:15:21: +==============+
+  2014-02-20T17:15:21: | Mission: cta |
+  2014-02-20T17:15:21: +==============+
+  2014-02-20T17:15:21: === Calibration: aar ===
+  2014-02-20T17:15:21: DESY20140105_50h
+  2014-02-20T17:15:21: DESY20140105_50h_0deg
+  2014-02-20T17:15:21: DESY20140105_50h_180deg
+  2014-02-20T17:15:21: 
+  2014-02-20T17:15:21: === Calibration: aar500 ===
+  2014-02-20T17:15:21: DESY20140105_50h
+  2014-02-20T17:15:21: DESY20140105_50h_0deg
+  2014-02-20T17:15:21: DESY20140105_50h_180deg
+
+The name after ``Calibration`` is what we called earlier the calibration
+database, and the names that are following each 
+``=== Calibration: xxx ===`` header are the response file names.
+
+To get the same information also onto the console, type
+
+.. code-block:: bash
+
+  $ cscaldb debug=yes
+
+
 Data format details
 ~~~~~~~~~~~~~~~~~~~
 
