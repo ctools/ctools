@@ -1,10 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
 # Calibration files to distribute
-irfs = cta_dummy_irf.dat
+caldb_indx = caldb.indx
+caldb_irf  = cta_dummy_irf.dat
 
-caldbdir = $(datadir)/caldb/data/cta/dummy
-caldb_DATA = $(irfs)
-
-# Extra files to be distributed in the tar file
-EXTRA_DIST = $(irfs)
+# Distribute calibration database files
+EXTRA_DIST     = $(caldb_indx) $(caldb_irf)
+caldbindxdir   = $(datadir)/caldb/data/cta/dummy
+caldbindx_DATA = $(caldb_indx)
+caldbirfdir    = $(datadir)/caldb/data/cta/dummy/bcf
+caldbirf_DATA  = $(caldb_irf)
