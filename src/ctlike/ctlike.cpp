@@ -336,15 +336,18 @@ void ctlike::get_parameters(void)
         // Get event file name
         std::string filename = (*this)["infile"].filename();
 
-        // Try first to open as unbinned FITS file
+        // Try first to open as FITS file
         try {
 
             // Determine whether FITS file has EVENTS extension
+            /*
             GFits fits(filename);
             bool  is_unbinned = fits.contains("EVENTS");
             fits.close();
+            */
 
             // If FITS file has an events header then load as unbinned
+            /*
             if (is_unbinned) {
                 obs.load_unbinned(filename);
             }
@@ -353,8 +356,12 @@ void ctlike::get_parameters(void)
             else {
                 obs.load_binned(filename);
             }
+            */
 
-            // Get task parameters for event file loading
+            // Load data
+            obs.load(filename);
+
+            // Get other task parameters
             m_stat  = gammalib::toupper((*this)["stat"].string());
             m_caldb = (*this)["caldb"].string();
             m_irf   = (*this)["irf"].string();
@@ -388,7 +395,45 @@ void ctlike::get_parameters(void)
             // Load observations from XML file
             m_obs.load(filename);
 
-        }
+            // Check if all observations have response information. If
+            // not, get the calibration database parameters and set
+            // the response properly
+            bool asked_for_response = false;
+            for (int i = 0; i < m_obs.size(); ++i) {
+
+                // Get CTA observation
+                GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+                // Continue only if observation is a CTA observation
+                if (obs != NULL) {
+
+                    // If there is no effective area information then
+                    // set response from task parameters
+                    if (obs->response().aeff() == NULL) {
+
+                        // Get calibration parameters
+                        if (!asked_for_response) {
+                            m_caldb = (*this)["caldb"].string();
+                            m_irf   = (*this)["irf"].string();
+                            asked_for_response = true;
+                        }
+
+                        // Set response
+                        GCaldb caldb;
+                        if (gammalib::dir_exists(m_caldb)) {
+                            caldb.rootdir(m_caldb);
+                        }
+                        else {
+                            caldb.open("cta", m_caldb);
+                        }
+                        obs->response(m_irf, caldb);
+
+                    } // endif: there was no response
+                } // endif: observation was a CTA observation
+
+            } // endfor: looped over observations
+
+        } // endcatch: file was an XML file
 
     } // endif: there was no observation in the container
 
