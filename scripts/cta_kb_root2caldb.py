@@ -397,9 +397,6 @@ class caldb():
         # Write header
         for file in files:
             file.write("log(E) Area  r68  r80  ERes. BG Rate  Diff Sens\n")
-            file.write("log(E) Area  r68  r80  ERes. BG Rate  Diff Sens\n")
-            file.write("log(E) Area  r68  r80  ERes. BG Rate  Diff Sens\n")
-            file.write("log(E) Area  r68  r80  ERes. BG Rate  Diff Sens\n")
 
         # Get histograms. Konrad's root files do not have an EffectiveArea80
         # histogram, but his effective area is for 80% containment radius
@@ -500,122 +497,6 @@ class caldb():
     
         # Return
         return
-
-
-# ============== #
-# Generate files #
-# ============== #
-def make_files(filename, prfname, bkgname):
-    """
-    Generate files.
-    
-    Parameters:
-     filename - Performance file name
-     prfname  - Performance file name
-     bkgname  - File function filename
-    """
-    # Open performance file and file function
-    file = TFile(filename)
-    fprf = open(prfname, "w")
-    fbkg = open(bkgname, "w")
-    
-    # Write header
-    fprf.write("log(E) Area  r68  r80  ERes. BG Rate  Diff Sens\n")
-    #sys.stdout.write("log(E) Area  Area80  r68  r80  ERes. BG Rate  Diff Sens  BGRateSqDeg  BGInt  (BGIntControl)\n")
-
-    # Get histograms. Konrad's root files do not have an EffectiveArea80
-    # histogram, but his effective area is for 80% containment radius
-    # anyways, so we simply read this histogram into aeff80.
-    sens        = TH1F()
-    bgrate      = TH1F()
-    bgratesqdeg = TH1F()
-    aeff        = TH1F()
-    aeff80      = TH1F()
-    angres      = TH1F()
-    angres80    = TH1F()
-    eres        = TH1F()
-    file.GetObject("DiffSens", sens)
-    file.GetObject("BGRate", bgrate)
-    file.GetObject("BGRatePerSqDeg", bgratesqdeg)
-    file.GetObject("EffectiveArea", aeff)
-    try:
-        file.GetObject("EffectiveArea80", aeff80)
-    except:
-        file.GetObject("EffectiveArea", aeff80)
-    file.GetObject("AngRes", angres)
-    file.GetObject("AngRes80", angres80)
-    file.GetObject("ERes", eres)
-    
-    # Setup vectors
-    energies  = bgrate.GetXaxis()
-    nbins_eng = energies.GetNbins()
-    for i in range(nbins_eng):
-        
-        # Get logE and background rate per squared degree
-        logE   = energies.GetBinCenter(i+1)
-        bgd    = bgrate.GetBinContent(i+1,1)
-        bgdsq  = bgratesqdeg.GetBinContent(i+1,1)
-        area   = aeff.GetBinContent(i+1,1)
-        area80 = aeff80.GetBinContent(i+1,1)
-        r68    = angres.GetBinContent(i+1,1)
-        r80    = angres80.GetBinContent(i+1,1)
-        dE     = eres.GetBinContent(i+1,1)
-        diffs  = sens.GetBinContent(i+1,1)
-        
-        # Skip any NaNs
-        if math.isnan(area80):
-            continue
-
-        # Compute energy (in MeV)
-        energy = math.pow(10.0, logE)*1.0e6
-        emin   = math.pow(10.0, logE-0.1)*1.0e6
-        emax   = math.pow(10.0, logE+0.1)*1.0e6
-        ewidth = emax-emin
-        
-        # Convert into background rate per steradian and MeV
-        bkg_rate  = bgdsq / (0.01745329*0.01745329) / ewidth
-        
-        # Compute control background rate (this only works for KB files
-        # as they are for 80% containment radius). But we don't use this
-        # anyways, it's just for control on display ...
-        omega = 2.0 * math.pi * (1.0 - math.cos(math.radians(r80)))
-        if omega > 0.0:
-            bkg_rate2 = bgd / omega / ewidth
-        else:
-            bkg_rate2 = 0.0
-        
-        # Compute full effective area by dividing area80/0.80
-        area = area80/0.80
-
-        # Write results in file
-        line = "%.1f  %.1f  %.4f  %.4f %.4f %.5e  %.5e" % \
-              (logE, area, r68, r80, dE, bgd, diffs)
-        fprf.write(line+"\n")
-        fbkg.write(str(energy)+" "+str(bkg_rate)+"\n")
-
-        # Show performance file
-        #print "%.1f  %.1f  %.1f  %.4f  %.4f %.4f %.7f  %.5e  %.5e %.5e (%.5e)" % \
-        #      (logE, area, area80, r68, r80, dE, bgd, diffs, bgdsq, bkg_rate, bkg_rate2)
-
-    # Write trailer
-    fprf.write("---------------------------------------------\n")
-    fprf.write("Notes\n")
-    fprf.write(" 1) log(E) = log10(E/TeV) - bin centre\n")
-    fprf.write(" 2) Eff Area - in square metres after background cut (no theta cut)\n")
-    fprf.write(" 3) Ang. Res - 68% containment radius of gamma-ray PSF post cuts - in degrees\n")
-    fprf.write(" 4) Ang. Res - 80% containment radius of gamma-ray PSF post cuts - in degrees\n")
-    fprf.write(" 5) Fractional Energy Resolution (rms)\n")
-    fprf.write(" 6) BG Rate  - inside point-source selection region - post call cuts - in Hz\n")
-    fprf.write(" 7) Diff Sens - differential sensitivity for this bin expressed as E^2 dN/dE\n")
-    fprf.write(" - in erg cm^-2 s^-1 - for a 50 hours exposure - 5 sigma significance including\n")
-    fprf.write(" systematics and statistics and at least 10 photons.\n")
-
-    # Close files
-    fprf.close()
-    fbkg.close()
-    
-    # Return
-    return
 
 
 #==========================#
