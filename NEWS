@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-07-02
 
 Author(s) : Juergen Knoedlseder
 
-10 February 2014
+20 February 2014
 
 
 1. Introduction
@@ -28,7 +28,8 @@ None
 
 5. ctselect - CTA event selection
 ---------------------------------
-None
+The temporary file is now properly close to avoid file opening errors
+when iterating over ctselect (#1149).
 
 
 6. ctbin - CTA event binning

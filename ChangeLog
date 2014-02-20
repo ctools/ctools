@@ -1,9 +1,10 @@
-2014-02-10  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-02-20  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Bug fix Version 0.7.2 released
         ================================
 
         Add logL and event statistics to cspull output file
+        Properly close temporary file in ctselect (#1149)
 
 
 2014-02-05  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
