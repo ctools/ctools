@@ -18,7 +18,31 @@ CTA Instrument Response Functions
 What are instrument response functions?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(will provide a general description of what are IRFs)
+The instrument response functions provide a mathematical description that
+links the measured quantities :math:`\vec{d}` of an event to the physical
+quantities :math:`\vec{p}` of the incident photon. The following figure 
+illustrates this relationship:
+
+.. figure:: irfs.jpg
+   :width: 70%
+
+:math:`I(\vec{p})` is the gamma-ray intensity arriving at Earth as a
+function of photon properties :math:`\vec{p}` 
+(which usually are true photon energy, true photon incident direction, 
+and true photon arrival time),
+while :math:`e(\vec{d})` is the expected event rate as function of event 
+properties :math:`\vec{d}` (which usually are the measured photon energy,
+measured or reconstructued photon incident direction, and measured photon 
+arrival time). The expected event rate is obtained by integrating the
+product of 
+the instrumental response function :math:`R(\vec{d}|\vec{p},\vec{a}`)
+and the emitted intensity :math:`I(\vec{p})` over the photon properties
+:math:`\vec{p}`.
+The argument :math:`\vec{a}` in the response function comprises any 
+auxiliary parameter on which the response function may depend on (e.g. 
+pointing direction, triggered telescopes, optical efficiencies, 
+atmospheric conditions, etc.). All these quantities and hence the 
+instrument response function may depend on time.
 
 
 Data formats
@@ -26,8 +50,126 @@ Data formats
 
 So far the data format of the CTA instrument response functions has not
 yet been defined, and information about instrument response functions is
-provided in various ways.
+provided in various ways. Three types of data formats are so far supported:
 
+-  :ref:`sec_cta_rsp_perftable`
+
+-  :ref:`sec_cta_rsp_xspec`
+
+-  :ref:`sec_cta_rsp_rsptable`
+
+All formats provide the instrument response as function of true (and 
+sometimes also measured) photon energy, typically from about 20 GeV to
+about 125 TeV.
+Performance tables provide the instrument response for on-axis sources.
+ARF, RMF and PSF files provide the instrument response for a specific
+source position (and region) within the field of view.
+Response tables provide the instrument response as function of position in 
+the field of view. Response tables are thus the most universal form of 
+instrument response functions available, and we recommend using this form 
+for any analysis.
+
+.. note ::
+
+   Instrument response functions are so far only available for a fixed
+   zenith angle of 20 deg. Therefore, no zenith or azimuth angle dependence has 
+   been implented in the CTA response functions, but the dependence can be 
+   handled by cutting the data into short time segments (typically of 30 
+   minutes in length), and by specifying specific response functions for 
+   each segment.
+
+
+Installing the CTA calibration database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After `downloading 
+<https://portal.cta-observatory.org/WG/DM/DM_wiki/DATA_Access/Pages/Science%20Tools.aspx>`_
+the latest calibration database (only possible for CTA consortium members),
+the database is installed using
+
+.. code-block:: bash
+
+  $ [sudo] tar -C $CALDB -zxvf cta-caldb-20140216.tar.gz
+
+or
+
+.. code-block:: bash
+
+  $ [sudo] tar -C $CALDB -xvf cta-caldb-20140216.tar
+
+depending on whether the database has been retrieved as a gzipped file or 
+not. Depending on your access rights to the ``$CALDB`` directory,
+installation of the calibration database may require root privileges
+(type ``sudo`` in this case, otherwise omit this part of the command).
+
+The calibration database must be installed into the directory to which you 
+``CALDB`` environment variable points. By default, ctools sets this 
+enviroment variable to
+
+.. code-block:: bash
+
+  $CTOOLS/share/caldb
+
+but it may be that some other software installation or configuration 
+setting on your system overwrites this location. If in doubt, type
+
+.. code-block:: bash
+
+  echo $CALDB
+
+to find out to which directory your ``CALDB`` environment variable is set. 
+You may always overwrite this setting using
+
+.. code-block:: bash
+
+  export CALDB=/my/preferred/caldb/directory
+
+which you can add to your ``.bashrc`` file to set the directory 
+permanently.
+ctools will use the ``CALDB`` environment variable to find out where the 
+calibration database is located. If needed, this mechanism can be 
+circumvented (see :ref:`sec_cta_rsp_abspath`).
+
+
+Specifying the CTA Instrument Response Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The specification of the CTA Instrument Response Functions depends on the 
+way how ctools are used. Common to all methods is that the IRFs are 
+defined by a response name and a calibration database name. The latter 
+may in some cases be the path to a directory on your filesystem.
+
+There are different means to specify the CTA Instrument Response Functions 
+when using ctools, and the following section describe the
+
+Using individual event files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+(to be written)
+
+
+Using observation definition files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+(to be written)
+
+
+From within a Python script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+(to be written)
+
+
+.. _sec_cta_rsp_abspath:
+
+Using absolute path names to instrument response files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(to be written)
+
+
+Data format details
+~~~~~~~~~~~~~~~~~~~
 
 .. _sec_cta_rsp_perftable:
 
@@ -78,8 +220,8 @@ Below an example of a CTA performance table::
 
 .. _sec_cta_rsp_xspec:
 
-1DC Data Format
-^^^^^^^^^^^^^^^
+ARF, RMF and PSF files
+^^^^^^^^^^^^^^^^^^^^^^
 
 Instrument response information for the first CTA Data Challenge (1DC) has been
 provided in a format that was heavily inspired by the 
