@@ -1,17 +1,13 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script generates ASCII performance files and file functions for
-# background modelling from MC ROOT files. On input it takes the filename
-# of the ROOT performance file while on output it produced 2 ASCII files.
-# The file "performance.dat" contains the performance data in the usual
-# ASCII format, the file "background.txt" contains a file function that can
-# be used within GammaLib for spectral background modelling.
+# This script generates CALDB compliant performance tables from MC ROOT
+# files.
 #
 # Note that the effective area given in the ASCII file is the full effective
 # area (i.e. the area before applying any theta cut). This is required by
 # GammaLib as the maximum likelihood analysis does not imply any theta cut.
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2014 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
