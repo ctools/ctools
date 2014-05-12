@@ -57,7 +57,7 @@ class cssens(GApplication):
         """
         # Set name
         self.name    = "cssens"
-        self.version = "0.3.0"
+        self.version = "0.4.0"
         
         # Make sure that parfile exists
         file = self.parfile()
@@ -106,11 +106,11 @@ class cssens(GApplication):
             # Create default parfile
             pars = GApplicationPars()
             pars.append(GApplicationPar("outfile","f","h","sensitivity.dat","","","Output file name"))
-            pars.append(GApplicationPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
+            pars.append(GApplicationPar("caldb","s","a","$CTOOLS/share/caldb/data/cta/dummy","","","Calibration database"))
             pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
             pars.append(GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
             pars.append(GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
-            pars.append(GApplicationPar("bkg","s","a","$GAMMALIB/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
+            pars.append(GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
             pars.append(GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
             pars.append(GApplicationPar("rad","r","a","5.0","","","Radius of ROI (deg)"))
             pars.append(GApplicationPar("enumbins","i","h","0","","","Number of energy bins (0=unbinned)"))
@@ -333,7 +333,7 @@ class cssens(GApplication):
         location.lb_deg(l, b)
     
         # Set source spectrum
-        spectrum = GModelSpectralPlaw(flux*5.7e-16, index, GEnergy(0.3, "TeV")
+        spectrum = GModelSpectralPlaw(flux*5.7e-16, index, GEnergy(0.3, "TeV"))
         if fitidx:
             spectrum["Index"].free()
         else:

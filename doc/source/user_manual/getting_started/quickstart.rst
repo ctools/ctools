@@ -1,6 +1,3 @@
-Getting started
-===============
-
 A quick ctools tutorial
 -----------------------
 
@@ -641,22 +638,3 @@ the same events for both analyses.
   2014-01-09T21:47:54: +==============+
   2014-01-09T21:47:54: 
   2014-01-09T21:47:54: Application "ctlike" terminated after 6 wall clock seconds, consuming 0.163384 seconds of CPU time.
-
-
-Models available in ctools
---------------------------
-
-To be written ... (you may read
-http://gammalib.sourceforge.net/user_manual/modules/model.html#spectral-models for the time being).
-
-
-Using ctools from Python
-------------------------
-
-To be written ...
-
-
-Frequently asked questions
---------------------------
-
-To be written ...
