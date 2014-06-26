@@ -11,5 +11,6 @@ User Manual
    enhancing
    reference
    expert
+   plotting
    glossary
 
