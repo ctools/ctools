@@ -267,6 +267,39 @@ void ctlike::run(void)
 
     // Optimize model parameters using LM optimizer
     optimize_lm();
+    
+    // Store original models and max. likelihood
+    double logL_src=m_logL;
+    GModels* models_orig = m_obs.models().clone();
+    
+    //Store models whith free parameters
+    std::vector<std::string> free_srcs;
+    GModels models = m_obs.models();
+    for (int ii=0; ii < models.size();ii++){
+        GModel* model = models[ii];
+        for(int jj=0; jj < model->size();jj++){
+            GModelPar par = model->at(jj);
+            if (par.is_free()){
+                free_srcs.push_back(model->name());
+                std::cout<<"Source with free parameter "<< model->name() <<std::endl;
+                break;
+            }
+        }
+    }
+    //Loop over stored models, remove source and refit
+    for  (int ii=0; ii < free_srcs.size();ii++){
+        //std::cout<<free_srcs[ii]<<std::endl;
+        GModels* modelstmp = m_obs.models().clone();
+        modelstmp->remove(free_srcs[ii]);
+        m_obs.models(**modelstmp);        
+        optimize_lm();
+        double logL_nosrc=m_logL;
+        std::cout<<"Loglikes: "<<logL_src<<" "<<logL_nosrc<<std::endl;
+        m_obs.models(&models_orig);
+    }
+    
+    
+    
 
     // Compute number of observed events in all observations
     double num_events = 0.0;
@@ -522,8 +555,6 @@ void ctlike::optimize_lm(void)
 
     // Store maximum log likelihood value
     m_logL = -(opt->value());
-    
-    // Get TS for sources with free parameters
 
     // Write optimization results
     log.indent(0);
