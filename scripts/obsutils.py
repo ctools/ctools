@@ -279,7 +279,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 # ======================= #
 def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
-        irf="cta_dummy_irf", caldb="$CTOOLS/share/caldb/data/cta/dummy"):
+        irf="cta_dummy_irf", caldb="dummy"):
     """
     Returns a single CTA observation. By looping over this function we can
     add CTA observations to the observation container.
@@ -294,7 +294,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
      emax     - Maximum event energy [TeV] (default: 100.0)
      rad      - ROI radius used for analysis [deg] (default: 5.0)
      irf      - Instrument response function (default: cta_dummy_irf)
-     caldb    - Calibration database path (default: "")
+     caldb    - Calibration database path (default: "dummy")
     """
     # Allocate CTA observation
     obs = gammalib.GCTAObservation()
