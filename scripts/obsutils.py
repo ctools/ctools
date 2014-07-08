@@ -61,10 +61,15 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
     # events are not added together, they still apply to each observation
     # separately.
     sim.run()
+
+    # Make a deep copy of the observation that will be returned
+    # (the ctobssim object will go out of scope one the function is
+    # left)
+    obssim = sim.obs().copy()
+    obsbin = None
     
     # Binned option?
     if nbins > 0:
-    
         # Determine common energy boundaries for observations
         emin = None
         emax = None
@@ -79,7 +84,7 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
                 emax = run_emax
             elif run_emax > emax:
                 emax = run_emax
-    
+
         # Allocate ctbin application and set parameters
         bin = ctools.ctbin(sim.obs())
         bin["ebinalg"].string("LOG")
@@ -108,20 +113,13 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
         # Make a deep copy of the observation that will be returned
         # (the ctbin object will go out of scope one the function is
         # left)
-        obs = bin.obs().copy()
+        obsbin = bin.obs().copy()
         
-    else:
-        
-        # Make a deep copy of the observation that will be returned
-        # (the ctobssim object will go out of scope one the function is
-        # left)
-        obs = sim.obs().copy()
- 
     # Delete the simulation
     del sim
     
     # Return observation container
-    return obs
+    return obsbin,obssim
 
 
 # ================ #
