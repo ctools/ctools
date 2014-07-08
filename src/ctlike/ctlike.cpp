@@ -294,9 +294,12 @@ void ctlike::run(void)
         double logL_nosrc=m_logL;
         double TS = 2* (logL_src-logL_nosrc);
         std::cout<<"TS of "<<free_srcs[ii]<<" is "<<TS<<std::endl;
+        std::string name = free_srcs[ii];
+        (*models_orig)[name]->ts(TS);
         models = *models_orig;
     }
     m_obs.models(*models_orig);
+    #std::cout<<"Saved TS is "<<(m_obs.models()["CrabNebula"])->ts()<<std::endl;
     
     // Compute number of observed events in all observations
     double num_events = 0.0;
