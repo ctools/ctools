@@ -183,6 +183,9 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
     """
     # Allocate counts map
     map = gammalib.GSkymap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
+
+    # Set maximum pixel number
+    maxpixel = nxpix * nypix
     
     # Fill all observations
     for run in obs:
@@ -195,7 +198,8 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
             pixel  = map.dir2inx(skydir)
             
             # Set pixel
-            map[pixel] += 1.0
+            if pixel < maxpixel:
+                map[pixel] += 1.0
     
     # Save sky map. The clobber flag is set to True, so any existing FITS
     # file will be overwritten.
