@@ -522,6 +522,8 @@ void ctlike::optimize_lm(void)
 
     // Store maximum log likelihood value
     m_logL = -(opt->value());
+    
+    // Get TS for sources with free parameters
 
     // Write optimization results
     log.indent(0);
