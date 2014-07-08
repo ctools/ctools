@@ -288,19 +288,16 @@ void ctlike::run(void)
     }
     //Loop over stored models, remove source and refit
     for  (int ii=0; ii < free_srcs.size();ii++){
-        //std::cout<<free_srcs[ii]<<std::endl;
-        GModels* modelstmp = m_obs.models().clone();
-        modelstmp->remove(free_srcs[ii]);
-        m_obs.models(**modelstmp);        
+        models.remove(free_srcs[ii]);  
+        m_obs.models(models);    
         optimize_lm();
         double logL_nosrc=m_logL;
-        std::cout<<"Loglikes: "<<logL_src<<" "<<logL_nosrc<<std::endl;
-        m_obs.models(&models_orig);
+        double TS = 2* (logL_src-logL_nosrc);
+        std::cout<<"TS of "<<free_srcs[ii]<<" is "<<TS<<std::endl;
+        models = *models_orig;
     }
+    m_obs.models(*models_orig);
     
-    
-    
-
     // Compute number of observed events in all observations
     double num_events = 0.0;
     for (int i = 0; i < m_obs.size(); ++i) {
