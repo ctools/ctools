@@ -26,7 +26,7 @@ import gammalib
 # Simulate observations #
 # ===================== #
 def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
-        binsz=0.05, npix=200):
+        binsz=0.05, npix=200, proj="TAN", coord="GAL"):
     """
     Simulate events for all observations in the container.
     
@@ -95,8 +95,8 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
         bin["nxpix"].integer(npix)
         bin["nypix"].integer(npix)
         bin["binsz"].real(binsz)
-        bin["coordsys"].string("GAL")
-        bin["proj"].string("TAN")
+        bin["coordsys"].string(coord)
+        bin["proj"].string(proj)
         
         # Optionally open the log file
         if log:
@@ -197,7 +197,7 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
             
             # Set pixel
             if pixel < maxpixel:
-                map[pixel] += 1.0
+                map[pixel] += event.counts()
     
     # Save sky map. The clobber flag is set to True, so any existing FITS
     # file will be overwritten.
