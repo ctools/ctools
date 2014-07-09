@@ -18,8 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctools import *
-from gammalib import *
+import gammalib
 import obsutils
 import sys
 import csv
@@ -29,7 +28,7 @@ import math
 # ============ #
 # cspull class #
 # ============ #
-class cspull(GApplication):
+class cspull(gammalib.GApplication):
     """
     This class implements the pull distribution generation script. It derives
     from the GammaLib::GApplication class which provides support for parameter
@@ -42,7 +41,7 @@ class cspull(GApplication):
         """
         # Set name
         self.name    = "cspull"
-        self.version = "0.2.0"
+        self.version = "0.3.0"
         
         # Initialise some members
         self.obs      = None
@@ -54,9 +53,9 @@ class cspull(GApplication):
 
         # Initialise application
         if len(argv) == 0:
-            GApplication.__init__(self, self.name, self.version)
+            gammalib.GApplication.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            GApplication.__init__(self, self.name, self.version, *argv)
+            gammalib.GApplication.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
@@ -87,29 +86,31 @@ class cspull(GApplication):
         parfile = self.name+".par"
         
         try:
-            pars = GApplicationPars(parfile)
+            pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
             
             # Create default parfile
-            pars = GApplicationPars()
-            pars.append(GApplicationPar("srcmdl","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
-            pars.append(GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
-            pars.append(GApplicationPar("ntrials","i","a","10","","","Number of trials"))
-            pars.append(GApplicationPar("caldb","s","h","","","","Calibration database"))
-            pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-            pars.append(GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
-            pars.append(GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
-            pars.append(GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
-            pars.append(GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
-            pars.append(GApplicationPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
-            pars.append(GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-            pars.append(GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
-            pars.append(GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
-            pars.append(GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
-            pars.append(GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
-            pars.append(GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+            pars = gammalib.GApplicationPars()
+            pars.append(gammalib.GApplicationPar("srcmdl","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
+            pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
+            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
+            pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
+            pars.append(gammalib.GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
+            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
+            pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Effective exposure time (s)"))
+            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
+            pars.append(gammalib.GApplicationPar("pattern","s","h","single","","","Observation pattern (single/four)"))
+            pars.append(gammalib.GApplicationPar("offset","r","h","1.5","","","Observation pattern offset (deg)"))
+            pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
+            pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
             pars.append_standard()
             pars.save(parfile)
         
@@ -136,6 +137,8 @@ class cspull(GApplication):
         self.m_duration = self["duration"].real()
         self.m_deadc    = self["deadc"].real()
         self.m_rad      = self["rad"].real()
+        self.m_pattern  = self["pattern"].string()
+        self.m_offset   = self["offset"].real()
         self.m_npix     = self["npix"].integer()
         self.m_binsz    = self["binsz"].real()
 
@@ -143,13 +146,12 @@ class cspull(GApplication):
         self.m_log   = False # Logging in client tools
         self.m_debug = False # Debugging in client tools
         
-        # Setup observation
-        self.obs = self.set_obs(ra=self.m_ra, dec=self.m_dec, \
-                                emin=self.m_emin, emax=self.m_emax)
+        # Setup observations
+        self.obs = self.set_obs()
         
         # Load source model
         if self.m_srcmdl != None:
-            self.model = GModels(self.m_srcmdl)
+            self.model = gammalib.GModels(self.m_srcmdl)
         
         # Append source model to observation
         self.obs.models(self.model)
@@ -225,34 +227,28 @@ class cspull(GApplication):
         # Return
         return
     
-    def set_obs(self, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0):
+    def set_obs(self):
         """
-        Returns an observation container with a single CTA observation.
+        Returns an observation container with a set of CTA observations.
         
         Keywords:
-         ra   - Right Ascension of pointing [deg] (default: 83.6331)
-         dec  - Declination of pointing [deg] (default: 22.0145)
-         emin - Minimum energy [TeV] (default: 0.1)
-         emax - Maximum energy [TeV] (default: 100.0)
         """
-        # Allocate observation container
-        obs = GObservations()
-    
-        # Set single pointing
-        pntdir = GSkyDir()
-        pntdir.radec_deg(ra, dec)
+        # Setup observation definition list
+        obsdeflist = obsutils.set_obs_patterns(self.m_pattern, \
+                                               ra=self.m_ra, dec=self.m_dec, \
+                                               offset=self.m_offset)
         
-        # Create CTA observation
-        run = obsutils.set(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
-                           duration=self.m_duration, deadc=self.m_deadc, \
-                           emin=emin, emax=emax, rad=self.m_rad)
-        
-        # Append observation to container
-        obs.append(run)
+        # Create list of observations
+        obs = obsutils.set_obs_list(obsdeflist, \
+                                    tstart=0.0, duration=self.m_duration, \
+                                    deadc=self.m_deadc, \
+                                    emin=self.m_emin, emax=self.m_emax, \
+                                    rad=self.m_rad, \
+                                    irf=self.m_irf, caldb=self.m_caldb)
     
         # Return observation container
         return obs
-    
+
     def trial(self, seed):
         """
         Create the pull for a single trial.

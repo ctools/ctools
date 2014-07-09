@@ -342,8 +342,8 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
     
     # Set energy boundaries
-    ebounds = gammalib.GEbounds()
-    ebounds.append(gammalib.GEnergy(emin, "TeV"), gammalib.GEnergy(emax, "TeV"))
+    ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"), \
+                                gammalib.GEnergy(emax, "TeV"))
 
     # Allocate event list
     events = gammalib.GCTAEventList()
@@ -465,9 +465,12 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
         obs_cta = set_obs(pntdir, tstart=obs_start, duration=obs_duration, \
                           deadc=obs_deadc, emin=obs_emin, emax=obs_emax, \
                           rad=obs_rad, irf=obs_irf, caldb=obs_caldb, id=id)
+        print obs_cta.__repr__()
         
         # Append to container
         obs.append(obs_cta)
+        for r in obs:
+            print r.__repr__()
 
         # Update start time and identifier
         obs_start += obs_duration
@@ -475,3 +478,44 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
     
     # Return observation container
     return obs
+
+
+# ============================ #
+# Set CTA observation patterns #
+# ============================ #
+def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
+    """
+    Sets a number of standard patterns.
+
+    Parameters:
+     pattern - Observation pattern. Possible options are:
+               - "single": single pointing
+               - "four": four pointings 'offset' around pattern centre
+             
+    Keywords:
+     ra      - Right Ascension of pattern centre [deg] (default: 83.6331)
+     dec     - Declination of pattern centre [deg] (default: 22.0145)
+     offset  - Offset from pattern centre [deg] (default: 1.5)
+    """
+    # Initialise observation definition list
+    obsdeflist = []
+    
+    # Add patterns
+    if pattern == "single":
+        obsdef = {'ra': ra, 'dec': dec}
+        obsdeflist.append(obsdef)
+    elif pattern == "four":
+        # Set pattern centre
+        centre = gammalib.GSkyDir()
+        centre.radec_deg(ra, dec)
+        
+        # Append pointings
+        for phi in [0.0, 90.0, 180.0, 270.0]:
+            pntdir = centre.copy()
+            pntdir.rotate_deg(phi, offset)
+            obsdeflist.append({'ra': pntdir.ra_deg(), 'dec': pntdir.dec_deg()})
+    else:
+        print("Warning: Observation pattern '"+str(pattern)+"' not recognized.")
+    
+    # Return observation definition list
+    return obsdeflist
