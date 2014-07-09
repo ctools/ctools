@@ -43,7 +43,7 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
     """
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
-    sim['seed'].integer(seed)
+    sim["seed"].integer(seed)
         
     # Optionally open the log file
     if log:
@@ -106,6 +106,13 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
         # (the ctbin object will go out of scope one the function is
         # left)
         obs = bin.obs().copy()
+
+    else:
+    
+        # Make a deep copy of the observation that will be returned
+        # (the ctobssim object will go out of scope one the function is
+        # left)
+        obs = sim.obs().copy()
         
     # Delete the simulation
     del sim
@@ -264,18 +271,40 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
     return map
 
 
-# ======================= #
-# Set one CTA observation #
-# ======================= #
+# ===================================== #
+# Set one CTA observation (old version) #
+# ===================================== #
 def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
         irf="cta_dummy_irf", caldb="dummy"):
     """
-    Returns a single CTA observation. By looping over this function we can
-    add CTA observations to the observation container.
+    Obsolete function, use set_obs instead.
+    """
+    # Print warning
+    print("Warning: obsutils.set is obsolete, use obsutils.set_obs instead.")
+    
+    # Call new function
+    obs_cta = set_obs(pntdir, tstart=tstart, duration=duration, deadc=deadc, \
+                      emin=emin, emax=emax, rad=rad, \
+                      irf=irf, caldb=caldb)
+    
+    # Return CTA observation
+    return obs_cta
+    
+
+# ======================= #
+# Set one CTA observation #
+# ======================= #
+def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
+            emin=0.1, emax=100.0, rad=5.0, \
+            irf="cta_dummy_irf", caldb="dummy", id="000000"):
+    """
+    Returns a single CTA observation containing an empty CTA event list.
+    By looping over this function you can add CTA observations to the
+    observation container.
     
     Parameters:
-     pntdir   - Pointing direction
+     pntdir   - Pointing direction [GSkyDir]
     Keywords:
      tstart   - Start time [seconds] (default: 0.0)
      duration - Duration of observation [seconds] (default: 1800.0)
@@ -287,7 +316,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
      caldb    - Calibration database path (default: "dummy")
     """
     # Allocate CTA observation
-    obs = gammalib.GCTAObservation()
+    obs_cta = gammalib.GCTAObservation()
 
     # Set calibration database
     db = gammalib.GCaldb()
@@ -299,7 +328,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     # Set pointing direction
     pnt = gammalib.GCTAPointing()
     pnt.dir(pntdir)
-    obs.pointing(pnt)
+    obs_cta.pointing(pnt)
     
     # Set ROI
     roi     = gammalib.GCTARoi()
@@ -309,33 +338,140 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     roi.radius(rad)
     
     # Set GTI
-    gti   = gammalib.GGti()
-    start = gammalib.GTime(tstart)
-    stop  = gammalib.GTime(tstart+duration)
-    gti.append(start, stop)
+    gti = gammalib.GGti()
+    gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
     
     # Set energy boundaries
     ebounds = gammalib.GEbounds()
-    e_min   = gammalib.GEnergy()
-    e_max   = gammalib.GEnergy()
-    e_min.TeV(emin)
-    e_max.TeV(emax)
-    ebounds.append(e_min, e_max)
+    ebounds.append(gammalib.GEnergy(emin, "TeV"), gammalib.GEnergy(emax, "TeV"))
 
     # Allocate event list
     events = gammalib.GCTAEventList()
     events.roi(roi)
     events.gti(gti)
     events.ebounds(ebounds)
-    obs.events(events)
+    obs_cta.events(events)
     
     # Set instrument response
-    obs.response(irf, db)
+    obs_cta.response(irf, db)
     
     # Set ontime, livetime, and deadtime correction factor
-    obs.ontime(duration)
-    obs.livetime(duration*deadc)
-    obs.deadc(deadc)
+    obs_cta.ontime(duration)
+    obs_cta.livetime(duration*deadc)
+    obs_cta.deadc(deadc)
+    obs_cta.id(id)
     
-    # Return observation
+    # Return CTA observation
+    return obs_cta
+
+
+# ============================ #
+# Set list of CTA observations #
+# ============================ #
+def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
+        emin=0.1, emax=100.0, rad=5.0, \
+        irf="cta_dummy_irf", caldb="dummy"):
+    """
+    Returns an observation container filled with a list of CTA observations.
+    The list is defined by the obsdeflist parameter which is a dictionnary
+    containing the mandatory keywords 'ra' and 'dec' that specify the
+    pointing direction for a given observation. Optional keyword give control
+    over other observation proposerties, such as duration, deadtime correction,
+    energy range, etc. If an optional keyword is not specified, the function
+    keyword is used instead.
+    
+    Parameters:
+     obsdeflist - Observation definition list [{'ra': x.xx, 'dec': x.xx}]
+                  The directory can take the following optional keywords:
+                  - duration: Duration of CTA observation [seconds]
+                  - deadc: Deadtime correction factor
+                  - emin: Minimum event energy [TeV]
+                  - emax: Maximum event energy [TeV]
+                  - rad: ROI radius used for analysis [deg]
+                  - irf: Instrument response function
+                  - caldb: Calibration database path
+                  Optional keywords overwrite keywords specified in the
+                  function call.
+    Keywords:
+     tstart     - Start time [seconds] (default: 0.0)
+     duration   - Duration of one CTA observation [seconds] (default: 1800.0)
+     deadc      - Deadtime correction factor (default: 0.95)
+     emin       - Minimum event energy [TeV] (default: 0.1)
+     emax       - Maximum event energy [TeV] (default: 100.0)
+     rad        - ROI radius used for analysis [deg] (default: 5.0)
+     irf        - Instrument response function (default: cta_dummy_irf)
+     caldb      - Calibration database path (default: "dummy")
+    """
+    # Initialise empty observation container
+    obs = gammalib.GObservations()
+
+    # Initialise first time and identifier
+    obs_start = tstart
+    obs_id    = 1
+
+    # Loop over observation definition list
+    for obsdef in obsdeflist:
+
+        # Set pointing direction
+        pntdir = gammalib.GSkyDir()
+        pntdir.radec_deg(obsdef['ra'], obsdef['dec'])
+        
+        # Set duration (use default if not found in definition list)
+        if 'duration' in obsdef:
+            obs_duration = obsdef['duration']
+        else:
+            obs_duration = duration
+
+        # Set emin (use default if not found in definition list)
+        if 'emin' in obsdef:
+            obs_emin = obsdef['emin']
+        else:
+            obs_emin = emin
+
+        # Set emax (use default if not found in definition list)
+        if 'emax' in obsdef:
+            obs_emax = obsdef['emax']
+        else:
+            obs_emax = emax
+
+        # Set radius (use default if not found in definition list)
+        if 'rad' in obsdef:
+            obs_rad = obsdef['rad']
+        else:
+            obs_rad = rad
+
+        # Set deadc (use default if not found in definition list)
+        if 'deadc' in obsdef:
+            obs_deadc = obsdef['deadc']
+        else:
+            obs_deadc = deadc
+
+        # Set caldb (use default if not found in definition list)
+        if 'caldb' in obsdef:
+            obs_caldb = obsdef['caldb']
+        else:
+            obs_caldb = caldb
+
+        # Set irf (use default if not found in definition list)
+        if 'irf' in obsdef:
+            obs_irf = obsdef['irf']
+        else:
+            obs_irf = irf
+        
+        # Generate identifier string
+        id = "%6.6d" % obs_id
+
+        # Set CTA observation
+        obs_cta = set_obs(pntdir, tstart=obs_start, duration=obs_duration, \
+                          deadc=obs_deadc, emin=obs_emin, emax=obs_emax, \
+                          rad=obs_rad, irf=obs_irf, caldb=obs_caldb, id=id)
+        
+        # Append to container
+        obs.append(obs_cta)
+
+        # Update start time and identifier
+        obs_start += obs_duration
+        obs_id    += 1
+    
+    # Return observation container
     return obs
