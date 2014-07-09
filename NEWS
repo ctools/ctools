@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-26 June 2014
+9 July 2014
 
 
 1. Introduction
@@ -23,7 +23,10 @@ None
 
 4. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+ctobssim was not fully thread save as the models were shared among the
+threads which led to concurrent memory access when evaluating the Monte
+Carlo cache. The models are now copied within the parallel section,
+avoiding concurrent memory access (#1258).
 
 ctobssim now also supports the handling of energy dispersion. Energy
 dispersion can be switched on or off using the hidden edisp parameter.

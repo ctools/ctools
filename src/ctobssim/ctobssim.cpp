@@ -305,6 +305,9 @@ void ctobssim::run(void)
             wrklog.cout(true);
         }
 
+        // Allocate and initialize copies for multi-threading
+        GModels models(m_obs.models());
+
         // Copy configuration from application logger to thread logger
         wrklog.date(log.date());
         wrklog.name(log.name());
@@ -340,10 +343,10 @@ void ctobssim::run(void)
                 int events_before = obs->events()->size();
 
                 // Simulate source events
-                simulate_source(obs, m_obs.models(), m_rans[i], &wrklog);
+                simulate_source(obs, models, m_rans[i], &wrklog);
 
                 // Simulate source events
-                simulate_background(obs, m_obs.models(), m_rans[i], &wrklog);
+                simulate_background(obs, models, m_rans[i], &wrklog);
 
                 // Dump simulation results
                 if (logNormal()) {
