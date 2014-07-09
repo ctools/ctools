@@ -299,7 +299,7 @@ void ctlike::run(void)
         models = *models_orig;
     }
     m_obs.models(*models_orig);
-    #std::cout<<"Saved TS is "<<(m_obs.models()["CrabNebula"])->ts()<<std::endl;
+    std::cout<<"Saved TS is "<<(m_obs.models()["CrabNebula"])->ts()<<std::endl;
     
     // Compute number of observed events in all observations
     double num_events = 0.0;
