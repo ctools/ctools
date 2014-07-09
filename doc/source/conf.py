@@ -41,7 +41,9 @@ sys.path.append(os.path.abspath('exts'))
 # https://pypi.python.org/pypi/sphinxcontrib-rawfiles
 extensions += ['rawfiles']
 
-rawfiles = ['fhelp/ctlike.html']
+# You can list any files or folders here that should be copied 1:1 to the html
+# output directory by sphinx-build
+rawfiles = ['fhelp']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

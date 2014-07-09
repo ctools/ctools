@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ctools reference manual &mdash; ctools 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinx13.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="ctools 0.7.2 documentation" href="index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700'
+          rel='stylesheet' type='text/css'>
+    
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600'
+          rel='stylesheet' type='text/css'>
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body>
+<div class="pageheader">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="download.html">Get it</a></li>
+    <li><a href="contents.html">Docs</a></li>
+    <li><a href="develop.html">Extend/Develop</a></li>
+  </ul>
+  <div>
+    <a href="index.html">
+      <div class=banner_part>
+      <img src="_static/logo.png" height="64" alt="SPHINX" />
+      </div>
+      <div class=banner_part>
+      	<span id="banner_text1">CTA</span><br/>
+      	<span id="banner_text2">Cherenkov Telescope Array Science Analysis Software</span>
+      </div>
+    </a>
+   </div>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">Home</a>&nbsp;|</li>
+        <li><a href="contents.html">Documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ctools reference manual</a><ul>
+<li><a class="reference internal" href="#ctools">ctools</a></li>
+<li><a class="reference internal" href="#cscripts">cscripts</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ctools-reference-manual">
+<h1>ctools reference manual<a class="headerlink" href="#ctools-reference-manual" title="Permalink to this headline">¶</a></h1>
+<p>General information on FTOOLS usage can be found <a class="reference external" href="fhelp/ftools_usage.html">here</a>.</p>
+<p>Below you can find links to the command line tools help pages that are available in ctools.</p>
+<div class="section" id="ctools">
+<h2>ctools<a class="headerlink" href="#ctools" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="fhelp/ctbin.html">ctbin</a> &#8212; Calculates counts maps for binned maximum likelihood analysis.</li>
+<li><a class="reference external" href="fhelp/ctlike.html">ctlike</a> &#8212; Performs binned and unbinned maximum likelihood analysis of CTA data.</li>
+<li><a class="reference external" href="fhelp/ctmodel.html">ctmodel</a> &#8212; Calculates model counts maps.</li>
+<li><a class="reference external" href="fhelp/ctobssim.html">ctobssim</a> &#8212; Observation simulator.</li>
+<li><a class="reference external" href="fhelp/ctselect.html">ctselect</a> &#8212; Performs sub-selections of event data which are needed for unbinned maximum likelihood analysis.</li>
+<li><a class="reference external" href="fhelp/ctskymap.html">ctskymap</a> &#8212; Computes sky map from CTA data.</li>
+</ul>
+</div>
+<div class="section" id="cscripts">
+<h2>cscripts<a class="headerlink" href="#cscripts" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="fhelp/cspull.html">cspull</a> &#8212; Generates pull distribution for all model parameters.</li>
+<li><a class="reference external" href="fhelp/cssens.html">cssens</a> &#8212; Computes the CTA sensitivity for a number of energy bins.</li>
+<li><a class="reference external" href="fhelp/cstsdist.html">cstsdist</a> &#8212; Generates the TS distribution for a particular model.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">Home</a>&nbsp;|</li>
+        <li><a href="contents.html">Documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      Last updated on Jul 09, 2014.
+    </div>
+  </body>
+</html>
