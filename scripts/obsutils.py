@@ -465,12 +465,9 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
         obs_cta = set_obs(pntdir, tstart=obs_start, duration=obs_duration, \
                           deadc=obs_deadc, emin=obs_emin, emax=obs_emax, \
                           rad=obs_rad, irf=obs_irf, caldb=obs_caldb, id=id)
-        print obs_cta.__repr__()
         
         # Append to container
         obs.append(obs_cta)
-        for r in obs:
-            print r.__repr__()
 
         # Update start time and identifier
         obs_start += obs_duration
