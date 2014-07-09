@@ -34,6 +34,15 @@ except:
           'WARNING: https://pypi.python.org/pypi/sphinxcontrib-doxylink\n')
     extensions = ['sphinx.ext.mathjax']
 
+# http://sphinx-doc.org/extensions.html#where-to-put-your-own-extensions
+sys.path.append(os.path.abspath('exts'))
+
+# We bundled the `rawfiles` sphinx extension to copy over files on sphinx build
+# https://pypi.python.org/pypi/sphinxcontrib-rawfiles
+extensions += ['rawfiles']
+
+rawfiles = ['fhelp/ctlike.html']
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
