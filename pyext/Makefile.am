@@ -30,7 +30,7 @@
 if WITH_PYTHON
 
 # Set SWIG interface filename
-SWIG_INTERFACE = ctools.i
+SWIG_INTERFACE = ctools/ctools.i
 
 # Dependencies. Obtain the list of dependencies by executing ls.
 DEPFILES = $(shell ls *.Pi 2> /dev/null)
@@ -39,7 +39,7 @@ include $(DEPFILES)
 # Define the targets that should be built before anything else.
 # These are honored by 'make all', 'make check' and 'make install'.
 if HAVE_SWIG
-  BUILT_SOURCES = ctools_wrap.cpp ctools.py
+  BUILT_SOURCES = ctools_wrap.cpp ctools/ctools.py
 endif
 
 # Set files to be removed in clean. We remove only the SWIG interface files
@@ -59,7 +59,7 @@ all-local: build
 # of this specific directory. So we build one instance for checking, the other
 # for installation. If we could get the name built by distutils we could avoid
 # this.
-build: ctools_wrap.cpp ctools.py
+build: ctools_wrap.cpp ctools/ctools.py
 	$(PYTHON) setup.py build
 
 install-exec-local:
@@ -70,9 +70,9 @@ clean-local:
 
 # Rule for building Python wrappers using SWIG.
 if HAVE_SWIG
-ctools.py: ctools_wrap.cpp
+ctools/ctools.py: ctools_wrap.cpp
 ctools_wrap.cpp: $(SWIG_INTERFACE)
-	if $(SWIGCOMPILE) -MMD -MF "ctools.Tpi" -o ctools_wrap.cpp $<; \
+	if $(SWIGCOMPILE) -MMD -MF "ctools.Tpi" -o ctools/ctools_wrap.cpp $<; \
 	then mv -f "ctools.Tpi" "ctools.Pi"; else rm -f "ctools.Tpi"; exit 1; fi
 endif # HAVE_SWIG
 
