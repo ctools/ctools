@@ -31,13 +31,12 @@
 #include <cstdio>
 #include "ctexpcube.hpp"
 #include "GTools.hpp"
+#include "GWcs.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_EBOUNDS                              "ctexpcube::get_ebounds()"
-
-
-#define G_SETUP_OBS                                    "ctexpcube::setup_obs()"
-#define G_MODEL_MAP                    "ctexpcube::model_map(GCTAObservation*)"
+#define G_GET_PARAMETERS                        "ctexpcube::get_parameters()"
+#define G_SET_FROM_CNTMAP          "ctexpcube::set_from_cntmap(std::string&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -276,37 +275,8 @@ void ctexpcube::run(void)
         log.header1("Generate exposure cube");
     }
 
-    // Initialise observation counter
-    int n_observations = 0;
-
-    // Loop over all observations in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
-            if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
-            }
-
-            // Increment number of observations
-            n_observations++;
-
-            // Generate exposure cube
-            //model_map(obs, m_obs.models());
-
-        } // endif: CTA observation found
-
-    } // endfor: looped over observations
+    // Fill exposure
+    m_expcube.fill(m_obs);
 
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -349,24 +319,27 @@ void ctexpcube::save(void)
  *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
+ *
+ * @todo Setup exposure cube from counts map
  ***************************************************************************/
 void ctexpcube::get_parameters(void)
 {
     // If we do not have any observations in the container then get an
     // input file name or observation descriptor file
     if (m_obs.size() == 0) {
-        m_infile = (*this)["infile"].filename();
+        get_obs();
     }
 
-    // Read response parameters
-    m_caldb       = (*this)["caldb"].string();
-    m_irf         = (*this)["irf"].string();
+    // Make sure that response is set
+    set_response();
+
+    // Read energy dispersion flag
     m_apply_edisp = (*this)["edisp"].boolean();
 
     // If no counts map is specified then setup the exposure cube from
     // the user parameters
-    m_cntmap = (*this)["cntmap"].filename();
-    if ((m_cntmap == "NONE") || (gammalib::strip_whitespace(m_cntmap) == "")) {
+    std::string cntmap = (*this)["cntmap"].filename();
+    if ((cntmap == "NONE") || (gammalib::strip_whitespace(cntmap) == "")) {
     
         // Get user parameters for counts map definition
         std::string wcs      = (*this)["proj"].string();
@@ -388,6 +361,10 @@ void ctexpcube::get_parameters(void)
 
     // ... otherwise setup the exposure cube from the counts map
     else {
+    
+        // Set exposure cube from counts map
+        set_from_cntmap(cntmap);
+    
     }
 
     // Read output filename (if needed)
@@ -401,7 +378,97 @@ void ctexpcube::get_parameters(void)
 
 
 /***********************************************************************//**
+ * @brief Get observation definition
+ *
+ * Get observation definition from the user parameters.
+ ***************************************************************************/
+void ctexpcube::get_obs(void)
+{
+    // Get input filename
+    std::string filename = (*this)["infile"].filename();
+
+    // Try first to open as FITS file
+    try {
+
+        // Allocate CTA observation
+        GCTAObservation obs;
+        
+        // Load input file in CTA observation
+        obs.load(filename);
+
+        // Append CTA observation to container
+        m_obs.append(obs);
+
+            
+    }
+        
+    // ... otherwise try to open as XML file
+    catch (GException::fits_open_error &e) {
+
+        // Load observations from XML file
+        m_obs.load(filename);
+
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set observation response
+ *
+ * Set response for all observations that so have no response.
+ ***************************************************************************/
+void ctexpcube::set_response(void)
+{
+    // Loop over all observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Is this observation a CTA observation?
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+        // Yes ...
+        if (obs != NULL) {
+
+            // Set response if it isn't set already
+            if (obs->response().aeff() == NULL) {
+
+                // Load response information
+                std::string database = (*this)["caldb"].string();
+                std::string irf      = (*this)["irf"].string();
+
+                // Set calibration database. If specified parameter is a
+                // directory then use this as the pathname to the calibration
+                // database. Otherwise interpret this as the instrument name,
+                // the mission being "cta"
+                GCaldb caldb;
+                if (gammalib::dir_exists(database)) {
+                    caldb.rootdir(database);
+                }
+                else {
+                    caldb.open("cta", database);
+                }
+
+                // Set reponse
+            	obs->response(irf, caldb);
+
+            } // endif: observation already has a response
+
+        } // endif: observation was a CTA observation
+
+    } // endfor: looped over all observations
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Get energy boundaries from parameters
+ *
+ * @exception GException::invalid_value
+ *            Invalid extension name encountered.
  *
  * Get the energy boundaries from the user parameters.
  ***************************************************************************/
@@ -467,6 +534,74 @@ void ctexpcube::get_ebounds(void)
 }
 
 
+/***********************************************************************//**
+ * @brief Set exposure cube definition from counts map
+ *
+ * @exception GException::invalid_value
+ *            Invalid counts map projection or invalid events encountered.
+ *
+ * Set exposure cube definition from counts map.
+ ***************************************************************************/
+void ctexpcube::set_from_cntmap(const std::string& filename)
+{
+    // Allocate CTA observation
+    GCTAObservation obs;
+        
+    // Load counts map in CTA observation
+    obs.load(filename);
+
+    // Set exposure cube from counts map
+    const GCTAEventCube* cube = dynamic_cast<const GCTAEventCube*>(obs.events());
+
+    // Continue only if cube is valid
+    if (cube != NULL) {
+
+        // Get sky map projection
+        const GWcs* wcs = dynamic_cast<const GWcs*>(cube->map().projection());
+        
+        // Continue only if projection is valid
+        if (wcs != NULL) {
+            
+            // Get user parameters for counts map definition
+            std::string proj     = wcs->code();
+            std::string coordsys = wcs->coordsys();
+            double      xref     = wcs->crval(0);
+            double      yref     = wcs->crval(1);
+            double      dx       = wcs->cdelt(0);
+            double      dy       = wcs->cdelt(1);
+            int         nx       = cube->map().nx();
+            int         ny       = cube->map().ny();
+
+            // Get energy definition
+            m_ebounds = cube->ebounds();
+
+            // Define exposure cube
+            m_expcube = GCTAExposure(proj, coordsys, xref, yref,
+                                     dx, dy, nx, ny,
+                                     m_ebounds);
+        
+        } // endif: WCS projection was valid
+
+        // ... projection is not of WCS type
+        else {
+            std::string msg = "Counts map project is not of WCS type.";
+            throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
+        }
+
+    } // endif: observation contained an events cube
+
+    // ... there is not events cube
+    else {
+        std::string msg = "No events cube found in file \""
+                          ""+filename+"\".";
+        throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
+    }
+
+    // Return
+    return;
+}
+
+
 /*==========================================================================
  =                                                                         =
  =                             Private methods                             =
@@ -479,10 +614,7 @@ void ctexpcube::get_ebounds(void)
 void ctexpcube::init_members(void)
 {
     // Initialise members
-    m_infile.clear();
     m_outfile.clear();
-    m_caldb.clear();
-    m_irf.clear();
     m_apply_edisp = false;
 
     // Initialise protected members
@@ -507,10 +639,7 @@ void ctexpcube::init_members(void)
 void ctexpcube::copy_members(const ctexpcube& app)
 {
     // Copy attributes
-    m_infile      = app.m_infile;
     m_outfile     = app.m_outfile;
-    m_caldb       = app.m_caldb;
-    m_irf         = app.m_irf;
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members

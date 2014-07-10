@@ -1,7 +1,7 @@
 /***************************************************************************
  *                          ctools - SWIG file                             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -51,3 +51,4 @@
 %include "ctmodel.i"
 %include "ctselect.i"
 %include "ctskymap.i"
+%include "ctexpcube.i"
