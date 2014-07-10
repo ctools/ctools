@@ -45,9 +45,6 @@ public:
     ctexpcube(const ctexpcube& app);
     virtual ~ctexpcube(void);
 
-    // Operators
-    ctexpcube& operator=(const ctexpcube& app);
-
     // Methods
     void           clear(void);
     void           execute(void);
