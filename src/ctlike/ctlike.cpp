@@ -296,8 +296,10 @@ void ctlike::run(void)
         (*models_orig)[name]->ts(TS);
         models = *models_orig;
     }
+   // restore best fit values (parameters and errors)
     m_obs.models(*models_orig);
-    
+    optimize_lm();
+
     // Compute number of observed events in all observations
     double num_events = 0.0;
     for (int i = 0; i < m_obs.size(); ++i) {
