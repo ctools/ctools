@@ -1,8 +1,9 @@
-2014-07-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-07-10  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.8.0 released
         ========================
 
+        Add ctexpcube tool
         Support energy dispersion in ctobssim, ctlike and ctmodel	
         Correct ctobssim for thread safety
         Enhance documentation
