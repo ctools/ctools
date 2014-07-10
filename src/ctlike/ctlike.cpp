@@ -267,6 +267,39 @@ void ctlike::run(void)
 
     // Optimize model parameters using LM optimizer
     optimize_lm();
+    
+    // Store original models and max. likelihood
+    double logL_src=m_logL;
+    GModels* models_orig = m_obs.models().clone();
+    
+    //Store models whith free parameters
+    std::vector<std::string> free_srcs;
+    GModels models = m_obs.models();
+    for (int ii=0; ii < models.size();ii++){
+        GModel* model = models[ii];
+        for(int jj=0; jj < model->size();jj++){
+            GModelPar par = model->at(jj);
+            if (par.is_free()){
+                free_srcs.push_back(model->name());
+                break;
+            }
+        }
+    }
+    //Loop over stored models, remove source and refit
+    for  (int ii=0; ii < free_srcs.size();ii++){
+        models.remove(free_srcs[ii]);  
+        m_obs.models(models);    
+        optimize_lm();
+        double logL_nosrc=m_logL;
+        double TS = 2* (logL_src-logL_nosrc);
+        std::string name = free_srcs[ii];
+        (*models_orig)[name]->ts(TS);
+        models = *models_orig;
+    }
+    // Restore best fit values
+    // TODO: store fit results before and avoid refitting
+    m_obs.models(*models_orig);
+    optimize_lm();
 
     // Compute number of observed events in all observations
     double num_events = 0.0;

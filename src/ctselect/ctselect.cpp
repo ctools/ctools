@@ -511,7 +511,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 
     // Set requested selections
     bool select_time = (m_tmin != 0.0 || m_tmax != 0.0);
-
+    bool select_roi = ((m_dec != -1.0 && m_ra != -1.0 && m_rad != -1.0) || m_usepnt);
+    
     // Set RA/DEC selection
     double ra  = m_ra;
     double dec = m_dec;
@@ -520,7 +521,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         ra  = pnt.dir().ra_deg();
         dec = pnt.dir().dec_deg();
     }
-
+    
     // Set time selection interval. We make sure here that the time selection
     // interval cannot be wider than the GTIs covering the data. This is done
     // using GGti's reduce() method.
@@ -565,26 +566,29 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         log << gammalib::parformat("Energy range");
         log << m_emin << " - " << m_emax << " TeV" << std::endl;
     }
-    if (selection.length() > 0) {
-        selection += " && ";
-    }
 
     // Make ROI selection
-    sprintf(cra,  "%.6f", ra);
-    sprintf(cdec, "%.6f", dec);
-    sprintf(crad, "%.6f", m_rad);
-    selection += "ANGSEP("+std::string(cra)+"," +
-                 std::string(cdec)+",RA,DEC) <= " +
-                 std::string(crad);
-    if (logTerse()) {
-        log << gammalib::parformat("Acceptance cone centre");
-        log << "RA=" << ra << ", DEC=" << dec << " deg" << std::endl;
-        log << gammalib::parformat("Acceptance cone radius");
-        log << m_rad << " deg" << std::endl;
-    }
-    if (logTerse()) {
-        log << gammalib::parformat("cfitsio selection");
-        log << selection << std::endl;
+    if (select_roi){
+        if (selection.length() > 0) {
+            selection += " && ";
+        }
+        
+        sprintf(cra,  "%.6f", ra);
+        sprintf(cdec, "%.6f", dec);
+        sprintf(crad, "%.6f", m_rad);
+        selection += "ANGSEP("+std::string(cra)+"," +
+                     std::string(cdec)+",RA,DEC) <= " +
+                     std::string(crad);
+        if (logTerse()) {
+            log << gammalib::parformat("Acceptance cone centre");
+            log << "RA=" << ra << ", DEC=" << dec << " deg" << std::endl;
+            log << gammalib::parformat("Acceptance cone radius");
+            log << m_rad << " deg" << std::endl;
+        }
+        if (logTerse()) {
+            log << gammalib::parformat("cfitsio selection");
+            log << selection << std::endl;
+        }
     }
 
     // Add additional expression
@@ -645,11 +649,13 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Get CTA event list pointer
     GCTAEventList* list =
         static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-
-    // Set ROI
-    GCTAInstDir instdir;
-    instdir.dir().radec_deg(ra, dec);
-    list->roi(GCTARoi(instdir, m_rad));
+    
+    if (select_roi){
+        // Set ROI
+        GCTAInstDir instdir;
+        instdir.dir().radec_deg(ra, dec);
+        list->roi(GCTARoi(instdir, m_rad));
+    }
 
     // Set GTI
     list->gti(gti);
@@ -689,9 +695,9 @@ void ctselect::init_members(void)
     m_outfile.clear();
     m_prefix.clear();
     m_usepnt = false;
-    m_ra     = 0.0;
-    m_dec    = 0.0;
-    m_rad    = 0.0;
+    m_ra     = -1.0;
+    m_dec    = -1.0;
+    m_rad    = -1.0;
     m_tmin   = 0.0;
     m_tmax   = 0.0;
     m_emin   = 0.0;
