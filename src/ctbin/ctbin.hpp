@@ -73,7 +73,7 @@ protected:
     void           init_members(void);
     void           copy_members(const ctbin& app);
     void           free_members(void);
-    std::string    set_outfile_name(const std::string& filename) const;
+    std::string    set_outfile_name(const int index) const;
     void           save_fits(void);
     void           save_xml(void);
     void           save_counts_map(const GCTAObservation* obs,
