@@ -882,6 +882,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctobssim/Makefile
                  src/ctskymap/Makefile
                  src/ctselect/Makefile
+                 src/ctexpcube/Makefile
                  src/ctools-setup
                  test/Makefile
                  test/test_cscripts.sh
