@@ -52,6 +52,7 @@ src/ctmodel/ctmodel
 src/ctobssim/ctobssim
 src/ctselect/ctselect
 src/ctskymap/ctskymap
+src/ctexpcube/ctexpcube
 test/pfiles/
 test/*.fits
 test/*.dat
