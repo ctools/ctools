@@ -20,7 +20,6 @@
 # ==========================================================================
 from ctools import *
 from gammalib import *
-import obsutils
 import sys
 import csv
 import math
