@@ -9,7 +9,6 @@ User Manual
    getting
    getting_started/index
    enhancing
-   reference
    expert
    plotting
    glossary

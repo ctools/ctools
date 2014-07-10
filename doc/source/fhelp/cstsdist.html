@@ -1,23 +1,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="en"><head>
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>cspull</title>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>cstsdist</title>
 
-<link rel="stylesheet" type="text/css" media="screen,print" href="../ctools.css">
+<link rel="stylesheet" type="text/css" media="screen,print" href="ctools.css">
 <meta content="Jurgen Knodlseder" name="author">
-<meta content="CTA pull distribution generator" name="description">
+<meta content="CTA TS distribution generator" name="description">
 </head>
 <body>
-<p class="Header">cspull</p>
-<p class="Body">Generates pull distribution for all model
-parameters.</p>
+<p class="Header">cstsdist</p>
+<p class="Body">Generates the TS distribution for a
+particular model.</p>
 <br>
 <p class="Title">Synopsis</p>
 <p style="padding-top: 0pt; text-align: left;" class="Body">Generates
-pull distributions for all parameters in a model. The pull is defined
-by the fitted value minus the simulated true value, devided by the
-statistical uncertainty. For unbiased parameter estimates, the pull
-distribution should follow a Gaussian centred on 0 and a sigma
-parameter of 1.</p>
+the Test Statistics (TS) distribution for a particular model based on
+Monte-Carlo simulations.</p>
 <br>
 <p class="Title">Links</p>
 <ul class="Body">
@@ -31,30 +28,15 @@ Parameter Usage</a></li>
 <tbody>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>srcmdl
+<td colspan="2"><span class="irafpar"><strong>(outfile
+= ts.dat)
 [file]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">XML file that describes the
-astrophysical sources and the instrumental background.</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>outfile
-[file]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">ASCII file containing the individual
-pull values.</td>
+<td width="525">ASCII file containing the TS
+distribution values.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -69,8 +51,7 @@ pull values.</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Number of samples for generating the
-pull distribution.</td>
+<td width="525">Number of Monte Carlo samples.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -110,14 +91,14 @@ should be used for event generation.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>ra
-[double]</strong></span></td>
+<td colspan="2"><span class="irafpar"><strong>type
+[string]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Right Ascension of CTA pointing
-(J2000, in degrees).</td>
+<td width="525">Source model type
+(point/gauss/shell/disk).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -126,14 +107,14 @@ should be used for event generation.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>dec
+<td colspan="2"><span class="irafpar"><strong>(index
+= -2.48)
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Declination of CTA pointing (J2000,
-in degrees).</td>
+<td width="525">Spectral index for source model.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -142,14 +123,35 @@ in degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>rad
+<td colspan="2"><span class="irafpar"><strong>offset
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Radius of CTA field of view
-(simulation cone radius) (in degrees).</td>
+<td width="525">Source offset angle&nbsp;(in
+degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>bkg
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Background model file function
+(none=power law for subarray E).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -164,8 +166,7 @@ in degrees).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Lower energy limit of events (in
-TeV).</td>
+<td width="525">Lower energy limit (in TeV).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -180,8 +181,7 @@ TeV).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Upper energy limit of events (in
-TeV).</td>
+<td width="525">Upper energy limit (in TeV).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -211,24 +211,7 @@ TeV).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Duration of
-observation (in seconds).</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(deadc
-= 0.95)
-[double]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Average deadtime correction factor.</td>
+<td width="525">Effective exposure time (in seconds).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -244,7 +227,7 @@ observation (in seconds).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">ROI radius (in degrees).</td>
+<td width="525">Radius of ROI (in degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
