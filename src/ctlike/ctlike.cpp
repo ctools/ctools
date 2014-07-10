@@ -296,7 +296,8 @@ void ctlike::run(void)
         (*models_orig)[name]->ts(TS);
         models = *models_orig;
     }
-   // restore best fit values (parameters and errors)
+    // Restore best fit values
+    // TODO: store fit results before and avoid refitting
     m_obs.models(*models_orig);
     optimize_lm();
 
