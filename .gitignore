@@ -44,8 +44,8 @@ doc/man
 src/ctools-setup
 pyext/build/
 pyext/setup.py
-pyext/ctools.py
-pyext/ctools_wrap.cpp
+pyext/ctools/ctools.py
+pyext/ctools/ctools_wrap.cpp
 src/ctbin/ctbin
 src/ctlike/ctlike
 src/ctmodel/ctmodel
