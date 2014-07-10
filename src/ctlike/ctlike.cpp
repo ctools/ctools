@@ -281,7 +281,6 @@ void ctlike::run(void)
             GModelPar par = model->at(jj);
             if (par.is_free()){
                 free_srcs.push_back(model->name());
-                std::cout<<"Source with free parameter "<< model->name() <<std::endl;
                 break;
             }
         }
@@ -293,13 +292,11 @@ void ctlike::run(void)
         optimize_lm();
         double logL_nosrc=m_logL;
         double TS = 2* (logL_src-logL_nosrc);
-        std::cout<<"TS of "<<free_srcs[ii]<<" is "<<TS<<std::endl;
         std::string name = free_srcs[ii];
         (*models_orig)[name]->ts(TS);
         models = *models_orig;
     }
     m_obs.models(*models_orig);
-    std::cout<<"Saved TS is "<<(m_obs.models()["CrabNebula"])->ts()<<std::endl;
     
     // Compute number of observed events in all observations
     double num_events = 0.0;
