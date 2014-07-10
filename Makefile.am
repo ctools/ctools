@@ -267,7 +267,8 @@ endif #DX_COND_doc
 #
 
 # Install HTML files
-HTMLDIRS = html
+#HTMLDIRS = html
+HTMLDIRS =
 HTML_INSTALL_DATA_TARGETS = install-data-html
 install-data-html:
 	$(mkinstalldirs) $(DESTDIR)$(docdir)
