@@ -228,7 +228,7 @@ if __name__ == '__main__':
 
     # Test diffuse map cube with constant spectrum
     sys.stdout.write("Test diffuse map cube with constant analysis: ")
-    ref = {'CTABackgroundModel': {'Value': 1.03547}}
+    ref = {'CTABackgroundModel': {'Value': 0.242717}}
     err = pipeline_v2(model_name="data/model_background_cube_const.xml", \
                       ra_sim=84.17263, dec_sim=22.01444, rad_sim=2.0, \
                       ra_select=83.80, dec_select=22.20, rad_select=1.0, \
@@ -242,7 +242,7 @@ if __name__ == '__main__':
 
     # Test diffuse map cube with power law spectrum
     sys.stdout.write("Test diffuse map cube with power law analysis: ")
-    ref = {'CTABackgroundModel': {'Prefactor': 1.02396, 'Index': -0.00710087}}
+    ref = {'CTABackgroundModel': {'Prefactor': 0.513946, 'Index': -1.22388}}
     err = pipeline_v2(model_name="data/model_background_cube.xml", \
                       ra_sim=84.17263, dec_sim=22.01444, rad_sim=2.0, \
                       ra_select=84.00, dec_select=22.20, rad_select=1.0, \
