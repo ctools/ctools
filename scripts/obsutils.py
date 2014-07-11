@@ -517,9 +517,10 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
     # Return observation definition list
     return obsdeflist
 
-# =================================================#
-# Make spectrum for one Source in aCTA Observation #
-# ================================================ #
+# ================================================= #
+# Make spectrum for one Source in a CTA Observation #
+# ================================================= #
+
 def getlogbins(nbins=12,emin=0.1,emax=100):
     """
     Returns list with logarithmiscenergy bins in
@@ -539,6 +540,10 @@ def getlogbins(nbins=12,emin=0.1,emax=100):
         lgbins.append([lgedges[ii],lgedges[ii+1]])
     ebins=numpy.power(10,lgbins)
     return ebins
+
+#Please note that specpoints can make spectra for any given
+#spectral model, as long as it has a "Prefactor" parameter 
+#which scales the funtion
 def specpoints(obs,source,ebins):
     """
     Returns spectral points in the given binning for
