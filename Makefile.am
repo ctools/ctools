@@ -237,11 +237,13 @@ DOXYGEN_INSTALL_DATA_TARGETS = doxygen-install
 doxygen-install:
 	$(mkinstalldirs) $(DESTDIR)$(docdir)
 	@for dir in $(DOCDIRS) ; do \
-	  $(mkinstalldirs) $(DESTDIR)$(docdir)/$$dir && \
-	  for file in $(srcdir)/doc/$$dir/*.* ; do \
-	    echo "$(INSTALL_DATA) $$file $(DESTDIR)$(docdir)/$$dir" ; \
-	    $(INSTALL_DATA) "$$file" $(DESTDIR)$(docdir)/$$dir ; \
-	  done ; \
+        if test -e $(srcdir)/doc/$$dir ; then \
+            $(mkinstalldirs) $(DESTDIR)$(docdir)/$$dir && \
+            for file in $(srcdir)/doc/$$dir/*.* ; do \
+                echo "$(INSTALL_DATA) $$file $(DESTDIR)$(docdir)/$$dir" ; \
+                $(INSTALL_DATA) "$$file" $(DESTDIR)$(docdir)/$$dir ; \
+            done ; \
+        fi ; \
 	done
 
 # Uninstall Doxygen files
