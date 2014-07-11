@@ -73,6 +73,7 @@ protected:
     // User parameters
     std::string   m_stat;        //!< Optimisation statistics (poisson/gaussian)
     bool          m_refit;       //!< Refitting
+    bool          m_tscalc;      //!< TS computation
     std::string   m_caldb;       //!< Calibration database
     std::string   m_irf;         //!< Instrument response functions
     std::string   m_outmdl;      //!< Source model output XML file

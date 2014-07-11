@@ -267,39 +267,46 @@ void ctlike::run(void)
 
     // Optimize model parameters using LM optimizer
     optimize_lm();
+
+    // Optionally perform TS computation
+    if (m_tscalc) {
     
-    // Store original models and max. likelihood
-    double logL_src=m_logL;
-    GModels* models_orig = m_obs.models().clone();
+        // Store original models and max. likelihood
+        double   logL_src    = m_logL;
+        GModels* models_orig = m_obs.models().clone();
     
-    //Store models whith free parameters
-    std::vector<std::string> free_srcs;
-    GModels models = m_obs.models();
-    for (int ii=0; ii < models.size();ii++){
-        GModel* model = models[ii];
-        for(int jj=0; jj < model->size();jj++){
-            GModelPar par = model->at(jj);
-            if (par.is_free()){
-                free_srcs.push_back(model->name());
-                break;
+        // Store models whith free parameters
+        std::vector<std::string> free_srcs;
+        GModels models = m_obs.models();
+        for (int i = 0; i < models.size(); ++i) {
+            GModel* model = models[i];
+            for(int j = 0; j < model->size(); ++j) {
+                GModelPar par = model->at(j);
+                if (par.is_free()){
+                    free_srcs.push_back(model->name());
+                    break;
+                }
             }
         }
-    }
-    //Loop over stored models, remove source and refit
-    for  (int ii=0; ii < free_srcs.size();ii++){
-        models.remove(free_srcs[ii]);  
-        m_obs.models(models);    
+    
+        // Loop over stored models, remove source and refit
+        for (int i = 0; i < free_srcs.size(); ++i) {
+            models.remove(free_srcs[i]);  
+            m_obs.models(models);    
+            optimize_lm();
+            double logL_nosrc = m_logL;
+            double ts         = 2.0 * (logL_src-logL_nosrc);
+            std::string name  = free_srcs[i];
+            (*models_orig)[name]->ts(ts);
+            models = *models_orig;
+        }
+    
+        // Restore best fit values
+        // TODO: store fit results before and avoid refitting
+        m_obs.models(*models_orig);
         optimize_lm();
-        double logL_nosrc=m_logL;
-        double TS = 2* (logL_src-logL_nosrc);
-        std::string name = free_srcs[ii];
-        (*models_orig)[name]->ts(TS);
-        models = *models_orig;
-    }
-    // Restore best fit values
-    // TODO: store fit results before and avoid refitting
-    m_obs.models(*models_orig);
-    optimize_lm();
+
+    } // endif: did optional TS computation
 
     // Compute number of observed events in all observations
     double num_events = 0.0;
@@ -391,25 +398,6 @@ void ctlike::get_parameters(void)
 
         // Try first to open as FITS file
         try {
-
-            // Determine whether FITS file has EVENTS extension
-            /*
-            GFits fits(filename);
-            bool  is_unbinned = fits.contains("EVENTS");
-            fits.close();
-            */
-
-            // If FITS file has an events header then load as unbinned
-            /*
-            if (is_unbinned) {
-                obs.load_unbinned(filename);
-            }
-
-            // ... otherwise load as binned
-            else {
-                obs.load_binned(filename);
-            }
-            */
 
             // Load data
             obs.load(filename);
@@ -504,6 +492,7 @@ void ctlike::get_parameters(void)
 
     // Get other parameters
     m_refit       = (*this)["refit"].boolean();
+    m_tscalc      = (*this)["tscalc"].boolean();
     m_apply_edisp = (*this)["edisp"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
@@ -587,6 +576,7 @@ void ctlike::init_members(void)
     m_outmdl.clear();
     m_obs.clear();
     m_refit       = false;
+    m_tscalc      = false;
     m_max_iter    = 100;   // Set maximum number of iterations
     m_max_stall   = 10;    // Set maximum number of stalls
     m_logL        = 0.0;
@@ -612,6 +602,7 @@ void ctlike::copy_members(const ctlike& app)
     // Copy attributes
     m_stat        = app.m_stat;
     m_refit       = app.m_refit;
+    m_tscalc      = app.m_tscalc;
     m_caldb       = app.m_caldb;
     m_irf         = app.m_irf;
     m_outmdl      = app.m_outmdl;
