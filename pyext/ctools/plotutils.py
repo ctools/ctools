@@ -2,7 +2,7 @@
 # This script provides a number of functions that are useful for handling
 # CTA observations.
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2014 Rolf Buehler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,19 +31,21 @@ try:
 except:
         has_aplpy = False
 
-# ===================== #
-# Plot skymaps          #
-# ===================== #
+
+# ============= #
+# Plot skymaps  #
+# ============= #
 def plotskymaps(modelmap, countmap):
     """
-    Plot the model map
-    
-    Keywords:
+    Plot the model map.
+
+    Parameters:    
      modname - model input name
      evtname - events input name
+    Keywords:
+     None
     """
-
-    # load model map
+    # Load model map
     fig = plt.figure()
     f1 = aplpy.FITSFigure(countmap, figure=fig, subplot=[0.1,0.1,0.35,0.8])
     f1.set_tick_labels_font(size='small')
