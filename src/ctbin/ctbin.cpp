@@ -761,7 +761,7 @@ void ctbin::free_members(void)
 /***********************************************************************//**
  * @brief Set output file name.
  *
- * @param[in] filename Input file name.
+ * @param[in] index Index of input file.
  *
  * Converts an input filename into an output filename by prepending the
  * prefix stored in the member m_prefix to the input filename. Any path will
