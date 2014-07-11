@@ -39,19 +39,20 @@ depcomp
 test-driver
 testconf.sh
 
-doc/html/doxygen
+doc/html
 doc/man
 src/ctools-setup
 pyext/build/
 pyext/setup.py
-pyext/ctools.py
-pyext/ctools_wrap.cpp
+pyext/ctools/ctools.py
+pyext/ctools/ctools_wrap.cpp
 src/ctbin/ctbin
 src/ctlike/ctlike
 src/ctmodel/ctmodel
 src/ctobssim/ctobssim
 src/ctselect/ctselect
 src/ctskymap/ctskymap
+src/ctexpcube/ctexpcube
 test/pfiles/
 test/*.fits
 test/*.dat
@@ -61,20 +62,3 @@ test/test_cscripts.sh
 examples/*.fits
 examples/*.xml
 examples/*.dat
-
-# Sphinx stuff
-doc/html/.buildinfo
-doc/html/.doctrees/
-doc/html/_sources/
-doc/html/_static/
-doc/html/_images/
-doc/html/contents.html
-doc/html/develop.html
-doc/html/download.html
-doc/html/genindex.html
-doc/html/objects.inv
-doc/html/search.html
-doc/html/searchindex.js
-doc/html/test.html
-doc/html/index.html
-doc/html/user_manual/

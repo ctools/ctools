@@ -46,11 +46,11 @@ def pipeline_v1():
     in a ftools-like approach.
 	"""
 	# Set script parameters
-	model_name  = "${GAMMALIB}/share/models/crab.xml"
+	model_name  = "${CTOOLS}/share/models/crab.xml"
 	events_name = "events.fits"
 	cntmap_name = "cntmap.fits"
 	result_name = "results.xml"
-	caldb       = "${GAMMALIB}/share/caldb/cta"
+	caldb       = "${CALDB}/data/cta/dummy/bcf"
 	irf         = "cta_dummy_irf"
 	ra          =   83.63
 	dec         =   22.01
@@ -151,8 +151,8 @@ def pipeline_v2():
 	At the end, results are plotted (if matplotlib is installed)
 	"""
 	# Set script parameters
-	model_name  = "${GAMMALIB}/share/models/crab.xml"
-	caldb       = "${GAMMALIB}/share/caldb/cta"
+	model_name  = "${CTOOLS}/share/models/crab.xml"
+	caldb       = "${CALDB}/data/cta/dummy/bcf"
 	irf         = "cta_dummy_irf"
 	ra          =   83.63
 	dec         =   22.01

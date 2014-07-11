@@ -630,7 +630,7 @@ else
  
   # Do we have wrappers (ctools_wrap.cpp and ctools.py)?
   has_wrappers="yes"
-  AC_CHECK_FILES([pyext/ctools_wrap.cpp pyext/ctools.py],,
+  AC_CHECK_FILES([pyext/ctools/ctools_wrap.cpp pyext/ctools/ctools.py],,
                  [has_wrappers="no"])
   if test "x$has_wrappers" = "xno"; then
     AC_MSG_WARN([Python wrapper missing. Requires swig for wrapper generation.])
@@ -669,7 +669,7 @@ if test "x$enable_python" = "xyes"; then
 
 else
   if test "x$has_python_wrap" = "xno" -a "x$has_swig" = "xno"; then
-    AC_MSG_WARN([Neither pyext/ctools_wrap.cpp and pyext/ctools.py nor swig has not been found])
+    AC_MSG_WARN([Neither pyext/ctools/ctools_wrap.cpp and pyext/ctools/ctools.py nor swig has not been found])
     AC_MSG_WARN([Python binding for ctools cannot be built])
     AC_MSG_WARN([Either use a ctools distribution with ctools_wrap.cpp and ctools.py shipped or install swig on your system])
     AC_MSG_WARN([swig can be obtained from http://www.swig.org/])
@@ -882,6 +882,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctobssim/Makefile
                  src/ctskymap/Makefile
                  src/ctselect/Makefile
+                 src/ctexpcube/Makefile
                  src/ctools-setup
                  test/Makefile
                  test/test_cscripts.sh

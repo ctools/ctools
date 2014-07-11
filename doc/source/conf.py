@@ -23,9 +23,34 @@ import sys, os
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
 
+extensions = ['sphinx.ext.intersphinx', 'sphinx.ext.mathjax']
+
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.mathjax']
+try:
+    import sphinxcontrib.doxylink
+    extensions += ['sphinxcontrib.doxylink']
+except:
+    print('WARNING: Python package `sphinxcontrib.doxylink` not found.\n'
+          'WARNING: Please install it to get fully-functional Sphinx docs.\n'
+          'WARNING: https://pypi.python.org/pypi/sphinxcontrib-doxylink\n')
+
+# http://sphinx-doc.org/extensions.html#where-to-put-your-own-extensions
+sys.path.append(os.path.abspath('exts'))
+
+# We bundled the `rawfiles` sphinx extension to copy over files on sphinx build
+# https://pypi.python.org/pypi/sphinxcontrib-rawfiles
+extensions += ['rawfiles']
+
+# You can list any files or folders here that should be copied 1:1 to the html
+# output directory by sphinx-build
+rawfiles = ['fhelp']
+
+# This makes it possible to cross-link to the GammaLib Sphinx docs
+# see http://sphinx-doc.org/ext/intersphinx.html
+intersphinx_mapping = dict()
+intersphinx_mapping['gammalib'] = ('http://gammalib.sourceforge.net/', None)
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -241,3 +266,9 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+# Define connection to Doxygen API docs
+# http://pythonhosted.org/sphinxcontrib-doxylink/index.html#confval-doxylink
+doxylink = {
+        'doxy' : ('doc/html/doxygen/ctools.tag', 'doxygen/'),
+}

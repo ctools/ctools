@@ -1,20 +1,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="en"><head>
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>ctobssim</title>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>cssens</title>
 
-<link rel="stylesheet" type="text/css" media="screen,print" href="../ctools.css">
+<link rel="stylesheet" type="text/css" media="screen,print" href="ctools.css">
 <meta content="Jurgen Knodlseder" name="author">
-<meta content="CTA observation simulation tool" name="description">
+<meta content="CTA sensitivity estimator" name="description">
 </head>
 <body>
-<p class="Header">ctobssim</p>
-<p class="Body">Observation simulator.</p>
+<p class="Header">cssens</p>
+<p class="Body">Computes the CTA sensitivity for a number
+of energy bins.</p>
 <br>
 <p class="Title">Synopsis</p>
-<p style="padding-top: 0pt; text-align: left;" class="Body">Generate
-photon events from astrophysical sources and process those photons
-according to the specified instrument response functions and generate
-instrumental background events.</p>
+<p style="padding-top: 0pt; text-align: left;" class="Body">Computes
+the CTA sensitivity for a number of energy bins using <a href="ctlike.html">ctlike</a>. Crab spectra are fitted
+in narrow energy bins to simulated data, and the flux level is
+determined that leads to a particular significance.</p>
 <br>
 <p class="Title">Links</p>
 <ul class="Body">
@@ -28,29 +29,15 @@ Parameter Usage</a></li>
 <tbody>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>infile
-[file]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">XML file that describes the
-astrophysical sources and the instrumental background.</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>outfile
 [file]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Output event list or observation definition file.</td>
+<td width="525">ASCII file containing the
+sensitivity
+values.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -58,23 +45,6 @@ astrophysical sources and the instrumental background.</td>
 <td width="525">&nbsp;</td>
 </tr>
 <tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(prefix
-= "sim_")
-[string]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Prefix for event list in
-observation definition file.</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
- <tr>
 <td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>caldb
 [string]</strong></span></td>
@@ -107,14 +77,14 @@ should be used for event generation.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(seed
-= 1) [integer]</strong></span></td>
+<td colspan="2"><span class="irafpar"><strong>type
+[string]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Integer seed value to be used for
-Monte Carlo simulations.</td>
+<td width="525">Source model type
+(point/gauss/shell/disk).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -123,14 +93,14 @@ Monte Carlo simulations.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>ra
+<td colspan="2"><span class="irafpar"><strong>offset
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Right Ascension of CTA pointing
-(J2000, in degrees).</td>
+<td width="525">Source offset angle&nbsp;(in
+degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -139,14 +109,29 @@ Monte Carlo simulations.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>dec
+<td colspan="2"><span class="irafpar"><strong>bkg
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Background model file function
+(none=power law for subarray E).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>duration
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Declination of CTA pointing (J2000,
-in degrees).</td>
+<td width="525">Effective exposure time (in seconds).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -161,8 +146,7 @@ in degrees).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Radius of CTA field of view
-(simulation cone radius) (in degrees).</td>
+<td width="525">Radius of ROI (in degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -171,14 +155,43 @@ in degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>tmin
+<td colspan="2"><span class="irafpar"><strong>(enumbins = 0)
+[integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Number of energy bins (0=unbinned).</td>
+</tr>
+  <tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(npix = 200)
+[integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Number of pixels for binned analysis.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(binsz = 0.05)
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Mission elapsed start time of
-observation (in seconds).</td>
+<td width="525">Pixel size for binned analysis.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -187,14 +200,13 @@ observation (in seconds).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>tmax
+<td colspan="2"><span class="irafpar"><strong>(sigma = 5.0)
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Mission elapsed stop time of
-observation (in seconds).</td>
+<td width="525">Significance threshold.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -203,14 +215,28 @@ observation (in seconds).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>emin
+<td colspan="2"><span class="irafpar"><strong>(ts_use = yes)
+[boolean]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Use TS for signifiance estimation?</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(index = -2.48)
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Lower energy limit of events (in
-TeV).</td>
+<td width="525">Spectral index for source model.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -219,14 +245,13 @@ TeV).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>emax
+<td colspan="2"><span class="irafpar"><strong>(radius = 0.1)
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Upper energy limit of events (in
-TeV).</td>
+<td width="525">Extended source model radius (in degrees).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -235,31 +260,45 @@ TeV).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>edisp
-[bool]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Apply energy dispersion?</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(deadc
-= 0.95)
+<td colspan="2"><span class="irafpar"><strong>(width = 0.05)
 [double]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Average deadtime correction factor.</td>
+<td width="525">Extended source model width (in degrees).</td>
 </tr>
 <tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(max_iter = 50)
+[integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Maximum number of iterations.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(num_avg = 3)
+[integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Number of iterations for sliding average.</td>
+</tr>
+ <tr>
 <td width="50">&nbsp;</td>
 <td>&nbsp;</td>
 <td width="525">&nbsp;</td>
@@ -347,7 +386,7 @@ the executable will dump any log file output in the console.</td>
 <br>
 <hr size="1">
 <p class="Body">Last updated by: J&uuml;rgen
-Kn&ouml;dlseder 14 September
+Kn&ouml;dlseder 21 December
 2012
 </p>
 <br>

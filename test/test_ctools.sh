@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all ctools
 #
-# Copyright (C) 2011-2012 Juergen Knoedlseder
+# Copyright (C) 2011-2014 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ ctmodel=../src/ctmodel/ctmodel
 ctobssim=../src/ctobssim/ctobssim
 ctselect=../src/ctselect/ctselect
 ctskymap=../src/ctskymap/ctskymap
+ctexpcube=../src/ctexpcube/ctexpcube
 
 
 #
@@ -340,4 +341,49 @@ else
   exit 1
 fi
 $ECHO " ok"
-#sleep 100
+
+
+#
+# Test ctexpcube
+# ==============
+$ECHO -n "Test ctexpcube: "
+#
+# Run 1
+$ctexpcube infile="data/crab_events.fits" \
+           cntmap="NONE" \
+           outfile="expcube1.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=200 \
+           nypix=200 \
+           binsz=0.02 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR"
+$ECHO -n "."
+if [ -s "expcube1.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " expcube1.fits file is not valid"
+  exit 1
+fi
+#
+# Run 2
+$ctexpcube infile="data/crab_events.fits" \
+           cntmap="data/crab_cntmap.fits" \
+           outfile="expcube2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "expcube2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " expcube2.fits file is not valid"
+  exit 1
+fi

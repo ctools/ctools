@@ -49,11 +49,11 @@ def pipeline_v1():
     in a ftools-like approach.
 	"""
 	# Set script parameters
-	model_name           = "${GAMMALIB}/share/models/crab.xml"
+	model_name           = "${CTOOLS}/share/models/crab.xml"
 	events_name          = "events.fits"
 	selected_events_name = "selected_events.fits"
 	result_name          = "results.xml"
-	caldb                = "${GAMMALIB}/share/caldb/cta"
+	caldb                = "${CALDB}/data/cta/dummy/bcf"
 	irf                  = "cta_dummy_irf"
 	ra                   =   83.63
 	dec                  =   22.01
@@ -143,8 +143,8 @@ def pipeline_v2(show_data):
 	FITS files on disk. All data is only hold in memory.
 	"""
 	# Set script parameters
-	model_name  = "${GAMMALIB}/share/models/crab.xml"
-	caldb       = "${GAMMALIB}/share/caldb/cta"
+	model_name  = "${CTOOLS}/share/models/crab.xml"
+	caldb       = "${CALDB}/data/cta/dummy/bcf"
 	irf         = "cta_dummy_irf"
 	ra          =   83.63
 	dec         =   22.01

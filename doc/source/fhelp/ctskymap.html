@@ -1,21 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="en"><head>
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>ctselect</title>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>ctskymap</title>
 
-<link rel="stylesheet" type="text/css" media="screen,print" href="../ctools.css">
+<link rel="stylesheet" type="text/css" media="screen,print" href="ctools.css">
 <meta content="Jurgen Knodlseder" name="author">
-<meta content="CTA event sub-selection tool" name="description">
+<meta content="CTA sky mapping tool" name="description">
 </head>
 <body>
-<p class="Header">ctselect</p>
-<p class="Body">Performs sub-selections of event data
-which are needed for unbinned maximum likelihood analysis.</p>
+<p class="Header">ctskymap</p>
+<p class="Body">Computes sky map from CTA data.</p>
 <br>
 <p class="Title">Synopsis</p>
-<p style="padding-top: 0pt; text-align: left;" class="Body">Creates
-a new FITS file of selected events from an input event list based on
-spatial, temporal, and energy cuts. Event selection is mandatory for
-unbinned maximum likelihood analysis.</p>
+<p style="padding-top: 0pt; text-align: left;" class="Body">This
+tool generates a sky maps from CTA data.</p>
 <br>
 <p class="Title">Links</p>
 <ul class="Body">
@@ -29,14 +26,14 @@ Parameter Usage</a></li>
 <tbody>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>infile
+<td colspan="2"><span class="irafpar"><strong>evfile
 [file]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Input event list of observation
-definition XML file</td>
+<td width="525">Input event list or observation
+definition XML file.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -51,124 +48,7 @@ definition XML file</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Output event list or observation
-definition XML file.</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(prefix
-= "selected_")
-[string]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Prefix for output event lists in
-observation definition file.</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(usepnt = no)
-[boolean]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Use pointing instead of RA/DEC parameters?</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>ra
-[double]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Right Ascension of acceptance cone
-(or ROI) centre
-(J2000, in degrees).</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>dec
-[double]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Declination of acceptance cone (or
-ROI) centre (J2000,
-in degrees).</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>rad
-[double]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">Radius of acceptance cone (or
-ROI) centre (in degrees).</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>tmin
-[double]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">CTA mission elapsed start time defining
-the earliest event (in
-seconds).</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td>&nbsp;</td>
-<td width="525">&nbsp;</td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>tmax
-[double]</strong></span></td>
-</tr>
-<tr>
-<td width="50">&nbsp;</td>
-<td width="25">&nbsp;</td>
-<td width="525">CTA mission elapsed stop time defining
-the latest event (in
-seconds).</td>
+<td width="525">Output sky map.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -183,7 +63,7 @@ seconds).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Lower energy limit of events (in
+<td width="525">Minimum energy in map (in
 TeV).</td>
 </tr>
 <tr>
@@ -199,7 +79,7 @@ TeV).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Upper energy limit of events (in
+<td width="525">Maximum energy in map (in
 TeV).</td>
 </tr>
 <tr>
@@ -209,15 +89,127 @@ TeV).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>(expr
-= "")
-[string]</strong></span></td>
+<td colspan="2"><span class="irafpar"><strong>nxpix
+[integer]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Additional event selection
-expression (cfitsio syntax).</td>
+<td width="525">Size of the Right Ascension /
+Galactic longitude axis (in pixels).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>nypix
+[integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Size of the Declination / Galactic
+latitude axis (in pixels).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>binsz
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Pixel size (in degrees/pixel).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>coordsys
+= CEL &lt;CEL|GAL&gt; [string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Coordinate system (<code>CEL</code>
+- celestial, <code>GAL</code> - galactic).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>xref
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Right Ascension / Galactic longitude
+of image centre
+(J2000, in degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>yref
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Declination / Galactic latitude of
+image centre (J2000,
+in degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(axisrot
+= h) [double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Rotation angle of image axes (in
+degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>proj
+= CAR [string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Projection method (only <code>AZP,CAR,STG,TAN</code>
+are supported so far).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -232,7 +224,7 @@ expression (cfitsio syntax).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td colspan="2"><span class="irafpar"><strong>(chatter
-= 2) [integer]</strong></span></td>
+= 1) [integer]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -262,7 +254,7 @@ task execution</td>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
 <td width="525">Specifies whether an existing output
-event list should be overwritten.</td>
+counts map should be overwritten.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>

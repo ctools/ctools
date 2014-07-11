@@ -65,12 +65,12 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0, \
 	tsdist = cstsdist()
 	tsdist["outfile"]  = outfile
 	tsdist["ntrials"]  = ntrials
-	tsdist["caldb"]    = "$GAMMALIB/share/caldb/cta"
+	tsdist["caldb"]    = "${CALDB}/data/cta/dummy/bcf"
 	tsdist["irf"]      = "cta_dummy_irf"
 	tsdist["type"]     = "point"
 	tsdist["index"]    = -2.48
 	tsdist["offset"]   = 0.0
-	tsdist["bkg"]      = "$GAMMALIB/share/models/bkg_dummy.txt"
+	tsdist["bkg"]      = "${CTOOLS}/share/models/bkg_dummy.txt"
 	tsdist["emin"]     = float(emin)
 	tsdist["emax"]     = float(emax)
 	tsdist["enumbins"] = int(enumbins)

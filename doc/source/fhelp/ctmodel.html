@@ -1,18 +1,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="en"><head>
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>ctskymap</title>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>ctmodel</title>
 
-<link rel="stylesheet" type="text/css" media="screen,print" href="../ctools.css">
+<link rel="stylesheet" type="text/css" media="screen,print" href="ctools.css">
 <meta content="Jurgen Knodlseder" name="author">
-<meta content="CTA sky mapping tool" name="description">
+<meta content="CTA modelling tool" name="description">
 </head>
 <body>
-<p class="Header">ctskymap</p>
-<p class="Body">Computes sky map from CTA data.</p>
+<p class="Header">ctmodel</p>
+<p class="Body">Calculates model counts maps.</p>
 <br>
 <p class="Title">Synopsis</p>
 <p style="padding-top: 0pt; text-align: left;" class="Body">This
-tool generates a sky maps from CTA data.</p>
+tool computes model counts maps based on an XML model.
+The maps are data cubes in Right Ascension or Galactic longitude,
+Declination or Galactic latitude,&nbsp;and log(energy).</p>
 <br>
 <p class="Title">Links</p>
 <ul class="Body">
@@ -26,13 +28,13 @@ Parameter Usage</a></li>
 <tbody>
 <tr>
 <td width="50">&nbsp;</td>
-<td colspan="2"><span class="irafpar"><strong>evfile
+<td colspan="2"><span class="irafpar"><strong>infile
 [file]</strong></span></td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Input event list or observation
+<td width="525">Input counts map or observation
 definition XML file.</td>
 </tr>
 <tr>
@@ -48,7 +50,168 @@ definition XML file.</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Output sky map.</td>
+<td width="525">Output model counts map or
+observation definition XML file.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(prefix
+= "modmap_")
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Prefix for model counts maps in
+observation definition file.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>caldb
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Calibration database.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>irf
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Instrument response function.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>srcmdl
+[string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Source model input XML file.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>ra
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Right Ascension of pointing
+(J2000, in degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>dec
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Declination of pointing (J2000,
+in degrees).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(deadc
+= 0.95)
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Average deadtime correction factor.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>tmin
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">CTA mission elapsed start time&nbsp;(in
+seconds).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>tmax
+[double]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">CTA mission elapsed stop time
+(in
+seconds).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(ebinalg
+= LOG)
+&lt;FILE|LIN|LOG&gt; [string]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Algorithm for defining energy bins.
+Currently, only <code>LOG</code> is supported.</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>
@@ -63,7 +226,8 @@ definition XML file.</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Minimum energy in map (in
+<td width="525">Lower energy value for first energy
+bin (in
 TeV).</td>
 </tr>
 <tr>
@@ -79,8 +243,43 @@ TeV).</td>
 <tr>
 <td width="50">&nbsp;</td>
 <td width="25">&nbsp;</td>
-<td width="525">Maximum energy in map (in
+<td width="525">Upper energy value for last energy
+bin
+(in
 TeV).</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>enumbins
+[integer]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Number of energy bins.</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td>&nbsp;</td>
+<td width="525">&nbsp;</td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td colspan="2"><span class="irafpar"><strong>(ebinfile
+= NONE)
+[file]</strong></span></td>
+</tr>
+<tr>
+<td width="50">&nbsp;</td>
+<td width="25">&nbsp;</td>
+<td width="525">Name of the file containing the
+energy bin definition (<span style="font-weight: bold;">not
+yet implemented</span>).</td>
 </tr>
 <tr>
 <td width="50">&nbsp;</td>

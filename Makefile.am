@@ -25,13 +25,19 @@ doc_DATA = \
 	   README
 docdir = ${datadir}/doc/${PACKAGE}
 
-install-data-local: $(HTML_INSTALL_DATA_TARGETS)
+#install-data-local: $(HTML_INSTALL_DATA_TARGETS)
+#uninstall-local: $(HTML_UNINSTALL_DATA_TARGETS)
 
-uninstall-local: $(HTML_UNINSTALL_DATA_TARGETS)
+install-data-local: $(DOXYGEN_INSTALL_DATA_TARGETS) sphinx-install
+
+uninstall-local: $(DOXYGEN_UNINSTALL_DATA_TARGETS)
 
 #
 # Additional rules
 #
+
+# Rules
+.PHONY: doxygen-run doxygen-doc $(DX_PS_GOAL) $(DX_PDF_GOAL)
 
 # Print out all rules
 help:
@@ -227,25 +233,30 @@ doxygen: doxygen-run $(DX_PS_GOAL) $(DX_PDF_GOAL)
 
 # Install Doxygen files
 DOCDIRS = html/doxygen man/man3
+DOXYGEN_INSTALL_DATA_TARGETS = doxygen-install
 doxygen-install:
 	$(mkinstalldirs) $(DESTDIR)$(docdir)
 	@for dir in $(DOCDIRS) ; do \
-	  $(mkinstalldirs) $(DESTDIR)$(docdir)/$$dir && \
-	  for file in $(srcdir)/doc/$$dir/*.* ; do \
-	    echo "$(INSTALL_DATA) $$file $(DESTDIR)$(docdir)/$$dir" ; \
-	    $(INSTALL_DATA) "$$file" $(DESTDIR)$(docdir)/$$dir ; \
-	  done ; \
+        if test -e $(srcdir)/doc/$$dir ; then \
+            $(mkinstalldirs) $(DESTDIR)$(docdir)/$$dir && \
+            for file in $(srcdir)/doc/$$dir/*.* ; do \
+                echo "$(INSTALL_DATA) $$file $(DESTDIR)$(docdir)/$$dir" ; \
+                $(INSTALL_DATA) "$$file" $(DESTDIR)$(docdir)/$$dir ; \
+            done ; \
+        fi ; \
 	done
 
 # Uninstall Doxygen files
+DOXYGEN_UNINSTALL_DATA_TARGETS = doxygen-uninstall
 doxygen-uninstall:
 	for dir in $(DOCDIRS) ; do \
 	  rm -f -r $(DESTDIR)$(docdir)/$$dir ; \
 	done
 
 @DX_DOCDIR@/@PACKAGE@.tag: $(DX_CONFIG) $(pkginclude_HEADERS)
-	    rm -rf @DX_DOCDIR@
-	    $(DX_ENV) $(DX_DOXYGEN) $(srcdir)/$(DX_CONFIG)
+	rm -rf @DX_DOCDIR@
+	$(mkinstalldirs) $(srcdir)/doc/html/doxygen
+	$(DX_ENV) $(DX_DOXYGEN) $(srcdir)/$(DX_CONFIG)
 
 DX_CLEANFILES = \
      @DX_DOCDIR@/@PACKAGE@.tag \
@@ -267,7 +278,8 @@ endif #DX_COND_doc
 #
 
 # Install HTML files
-HTMLDIRS = html html/images
+#HTMLDIRS = html
+HTMLDIRS =
 HTML_INSTALL_DATA_TARGETS = install-data-html
 install-data-html:
 	$(mkinstalldirs) $(DESTDIR)$(docdir)

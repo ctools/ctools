@@ -358,15 +358,19 @@ void ctbin::save(void)
         }
     }
 
+    /*
     // Case A: Save counts map(s) and XML metadata information
     if (m_use_xml) {
         save_xml();
     }
-
     // Case B: Save counts map as FITS file
     else {
         save_fits();
     }
+    */
+    
+    // Always save FITS and an XML summary
+    save_xml();
 
     // Return
     return;
@@ -757,21 +761,32 @@ void ctbin::free_members(void)
 /***********************************************************************//**
  * @brief Set output file name.
  *
- * @param[in] filename Input file name.
+ * @param[in] index Index of input file.
  *
  * Converts an input filename into an output filename by prepending the
  * prefix stored in the member m_prefix to the input filename. Any path will
  * be stripped from the input filename. Also a trailing ".gz" will be
- * stripped.
+ * stripped. If no input file name exist, prefix and observation 
+ * number are used.
  ***************************************************************************/
-std::string ctbin::set_outfile_name(const std::string& filename) const
+std::string ctbin::set_outfile_name(const int index) const
 {
+    
+    // Initialize output file name
+    std::string outname="";
+    
     // Split input filename into path elements
-    std::vector<std::string> elements = gammalib::split(filename, "/");
-
-    // The last path element is the filename
-    std::string outname = m_prefix + elements[elements.size()-1];
-
+    std::vector<std::string> elements = gammalib::split(m_infiles[index], "/");
+    
+    // If there is an observation input file name
+    if (elements.size() > 0) {
+        outname = m_prefix + elements[elements.size()-1];
+    } 
+    // ...else, use observation number
+    else {
+    	outname = m_prefix + m_obs[index]->id() + ".fits";
+    }
+    
     // Strip any ".gz"
     outname = gammalib::strip_chars(outname, ".gz");
 
@@ -841,7 +856,7 @@ void ctbin::save_xml(void)
         if (obs != NULL) {
 
             // Set event output file name
-            std::string outfile = set_outfile_name(m_infiles[i]);
+            std::string outfile = set_outfile_name(i);
 
             // Store output file name in observation
             obs->eventfile(outfile);
