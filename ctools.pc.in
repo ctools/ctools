@@ -8,8 +8,8 @@ Description: CTA science analysis tools
 URL: http://cta.irap.omp.eu/ctools
 Version: 0.7.1
 Requires: 
-Requires.private: GammaLib >= 0.8.1
+Requires.private: gammalib >= 0.8.1
 Conflicts: 
-Cflags: -I${includedir}/ctools
-Libs: -L${libdir} -lctools @OPENMP_CXXFLAGS@
+Cflags: -I${includedir}/ctools @OPENMP_CXXFLAGS@
+Libs: -L${libdir} -lctools
 Libs.private: 
