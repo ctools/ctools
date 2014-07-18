@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "00-04-00"
+#define CTBIN_VERSION "00-05-00"
 
 
 /***********************************************************************//**
@@ -41,11 +41,24 @@
  *
  * @brief CTA data binning tool interface defintion
  *
- * This class bins CTA event list(s) into a counts map(s). The class can
- * operate on predefined observation containers, on individual event list
- * FITS files, and on observation definition XML files. Results are stored
- * in an observation container that can be written to disk in form of FITS
- * files (counts maps) and an updated observation definition file.
+ * This class bins CTA event list(s) into a single counts cube. The class
+ * can operate on predefined observation containers, on individual event list
+ * FITS files, and on observation definition XML files.
+ *
+ * If multiple event lists are specified in the observation container or the
+ * XML definition file, the class will merge these events into a single
+ * counts cube.
+ *
+ * Results are stored in an observation container that can be written to disk
+ * in form of a single FITS file.
+ *
+ * WARNING: Note that the pointing direction of the counts cube will be set
+ * to the skymap centre used for the counts cube definition. If usepnt=yes
+ * is used, the pointing direction will be extracted from the first
+ * observation encountered in the list. Ultimately, pointing direction
+ * information should not be removed from the counts cube and exposure and
+ * PSF cubes should be used for response computation. This is however not
+ * yet fully implemented.
  ***************************************************************************/
 class ctbin : public GApplication  {
 public:
@@ -65,19 +78,26 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
+    GCTAEventCube        cube(void) const;
     void                 get_parameters(void);
-    void                 bin_events(GCTAObservation* obs);
+    void                 init_cube(void);
+    void                 fill_cube(GCTAObservation* obs);
+    void                 obs_cube(void);
 
 protected:
     // Protected methods
     void           init_members(void);
     void           copy_members(const ctbin& app);
     void           free_members(void);
+    void           get_ebounds(void);
     std::string    set_outfile_name(const int index) const;
     void           save_fits(void);
     void           save_xml(void);
     void           save_counts_map(const GCTAObservation* obs,
                                    const std::string&     outfile) const;
+
+    // Obsolete methods (to be reomved later)
+    void           bin_events(GCTAObservation* obs);
 
     // User parameters
     std::string              m_evfile;     //!< Input event list or XML file
@@ -102,6 +122,11 @@ protected:
     std::vector<std::string> m_infiles;    //!< Input event filenames
     bool                     m_use_xml;    //!< Use XML file instead of FITS file
     bool                     m_read_ahead; //!< Read ahead parameters
+    GSkymap                  m_cube;       //!< Event cube
+    GEbounds                 m_ebounds;    //!< Energy boundaries
+    GGti                     m_gti;        //!< Good time intervals
+    double                   m_ontime;     //!< Total ontime
+    double                   m_livetime;   //!< Total livetime
 };
 
 /***********************************************************************//**
@@ -113,6 +138,24 @@ inline
 const GObservations& ctbin::obs(void) const
 {
     return m_obs;
+}
+
+
+/***********************************************************************//**
+ * @brief Return event cube
+ *
+ * @return Event cube
+ *
+ * Returns a CTA event cube built from the ctbin member information.
+ ***************************************************************************/
+inline
+GCTAEventCube ctbin::cube(void) const
+{
+    // Build event cube
+    GCTAEventCube cube(m_cube, m_ebounds, m_gti);
+    
+    // Return cube
+    return cube;
 }
 
 #endif /* CTBIN_HPP */

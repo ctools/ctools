@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctbin - CTA data binning tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -50,8 +50,11 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
+    GCTAEventCube        cube(void) const;
     void                 get_parameters(void);
-    void                 bin_events(GCTAObservation* obs);
+    void                 init_cube(void);
+    void                 fill_cube(GCTAObservation* obs);
+    void                 obs_cube(void);
 };
 
 

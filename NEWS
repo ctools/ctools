@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-10 July 2014
+18 July 2014
 
 
 1. Introduction
@@ -40,7 +40,22 @@ when iterating over ctselect (#1149).
 
 6. ctbin - CTA event binning
 ----------------------------
-None
+WARNING: The philosophy behind the ctbin tool changed fundamentally!
+
+ctbin now always produces a single counts cube on output. If a single
+event list is specified on input, the functionnality is basically
+unchanged. If multiple event lists are specified, however, events are
+now merged into a single counts cube file. No observation definition
+XML file is written anymore!
+
+So far, ctbin still writes pointing information in the counts cube,
+although this is not necessarily meaningful if merging event lists
+with different pointings. In the long run, pointing information will
+be summarized in a pointings definition file, and will be removed
+from the counts cube header. The logic is that the pointing definition
+is set to the map centre. This is only identical to the pointing in
+case of binning a single event list and using the usepnt=yes option
+(or specifying the pointing manually as the xref and yref parameters).
 
 
 7. ctlike - CTA maximum likelihood fitting

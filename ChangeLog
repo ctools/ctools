@@ -1,8 +1,9 @@
-2014-07-10  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-07-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.8.0 released
         ========================
 
+        ctbin now always merges event lists into a single counts cube
         Add ctexpcube tool
         Support energy dispersion in ctobssim, ctlike and ctmodel	
         Correct ctobssim for thread safety

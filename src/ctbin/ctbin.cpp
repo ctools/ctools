@@ -34,10 +34,14 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_BIN_EVENTS                    "ctbin::bin_events(GCTAObservation*)"
+#define G_GET_EBOUNDS                                  "ctbin::get_ebounds()"
+#define G_INIT_CUBE                                      "ctbin::init_cube()"
+#define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
+#define G_MERGE_EVENTS
 
 
 /*==========================================================================
@@ -270,6 +274,11 @@ void ctbin::run(void)
     // Initialise observation counter
     int n_observations = 0;
 
+    // Compile option: if cube merging is requested, initialise the cube
+    #if defined(G_MERGE_EVENTS)
+    init_cube();
+    #endif
+
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
@@ -298,12 +307,24 @@ void ctbin::run(void)
             // Save event file name (for possible saving)
             m_infiles[i] = obs->eventfile();
 
-            // Bin events into counts map
+            // Compile option: if cube merging is requested, fill the cube;
+            // otherwise just bin the events
+            #if defined(G_MERGE_EVENTS)
+            fill_cube(obs);
+            #else
             bin_events(obs);
+            #endif
 
         } // endif: CTA observation found
 
     } // endfor: looped over observations
+
+    // Compile option: if cube merging is requested, set a single cube in
+    // the observation container
+    #if defined(G_MERGE_EVENTS)
+    obs_cube();
+    n_observations = 1;
+    #endif
 
     // If more than a single observation has been handled then make sure
     // that an XML file will be used for storage
@@ -358,6 +379,12 @@ void ctbin::save(void)
         }
     }
 
+    // Compile option: if merging was requested, always save into a single
+    // FITS file
+    #if defined(G_MERGE_EVENTS)
+    save_fits();
+    #else
+
     /*
     // Case A: Save counts map(s) and XML metadata information
     if (m_use_xml) {
@@ -371,6 +398,7 @@ void ctbin::save(void)
     
     // Always save FITS and an XML summary
     save_xml();
+    #endif
 
     // Return
     return;
@@ -423,11 +451,6 @@ void ctbin::get_parameters(void)
 
         }
 
-        // Use the xref and yref parameters for binning (otherwise the
-        // pointing direction(s) is/are used)
-        //m_xref = (*this)["xref"].real();
-        //m_yref = (*this)["yref"].real();
-
     } // endif: there was no observation in the container
 
     // Get parameters
@@ -436,7 +459,12 @@ void ctbin::get_parameters(void)
         m_xref = (*this)["xref"].real();
         m_yref = (*this)["yref"].real();
     }
-    m_ebinalg = (*this)["ebinalg"].string();
+    m_proj     = (*this)["proj"].string();
+    m_coordsys = (*this)["coordsys"].string();
+    m_binsz    = (*this)["binsz"].real();
+    m_nxpix    = (*this)["nxpix"].integer();
+    m_nypix    = (*this)["nypix"].integer();
+    m_ebinalg  = (*this)["ebinalg"].string();
 
     // If we have the binning given by a file then read filename
     if (m_ebinalg == "FILE") {
@@ -449,11 +477,6 @@ void ctbin::get_parameters(void)
     	m_emax     = (*this)["emax"].real();
     	m_enumbins = (*this)["enumbins"].integer();
     }
-    m_proj     = (*this)["proj"].string();
-    m_coordsys = (*this)["coordsys"].string();
-    m_binsz    = (*this)["binsz"].real();
-    m_nxpix    = (*this)["nxpix"].integer();
-    m_nypix    = (*this)["nypix"].integer();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -664,6 +687,206 @@ void ctbin::bin_events(GCTAObservation* obs)
 }
 
 
+/***********************************************************************//**
+ * @brief Initialise counts cube information
+ *
+ * @exception GException::invalid_value
+ *            No valid CTA observation found to derive the counts cube
+ *            map centre.
+ *
+ * Initialises the skymap, energy boundaries and GTI for a counts cube.
+ ***************************************************************************/
+void ctbin::init_cube(void)
+{
+    // Initialse cube information
+    m_ontime   = 0.0;
+    m_livetime = 0.0;
+    m_cube.clear();
+    m_ebounds.clear();
+    m_gti.clear();
+
+    // Set event cube centre, either from the user parameters or from the
+    // pointing
+    double xref = m_xref;
+    double yref = m_yref;
+    if (m_usepnt) {
+
+        // Dummy: get pointing from first observation. Ultimately, we want
+        // to get the pointing from a kind of average
+        bool found = false;
+        for (int i = 0; i < m_obs.size(); ++i) {
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+            if (obs != NULL) {
+                const GCTAPointing& pnt = obs->pointing();
+                if (gammalib::toupper(m_coordsys) == "GAL") {
+                    xref = pnt.dir().l_deg();
+                    yref = pnt.dir().b_deg();
+                }
+                else {
+                    xref = pnt.dir().ra_deg();
+                    yref = pnt.dir().dec_deg();
+                }
+                found = true;
+                break;
+            }
+        }
+
+        // Signal if no pointing is found
+        if (!found) {
+            std::string msg = "No valid CTA observation has been found in "
+                              "observation list, hence no pointing information "
+                              "could be extracted. Use the \"usepnt=no\" "
+                              "option and specify pointing explicitly when "
+                              "running ctbin.";
+            throw GException::invalid_value(G_INIT_CUBE, msg);
+        }
+
+    } // endif: used pointing
+
+    // Create skymap
+    m_cube = GSkymap(m_proj, m_coordsys,
+                     xref, yref, -m_binsz, m_binsz,
+                     m_nxpix, m_nypix, m_enumbins);
+
+    // Set energy boundaries
+    get_ebounds();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Fill events into counts cube
+ *
+ * @param[in] obs CTA observation.
+ *
+ * @exception GException::no_list
+ *            No event list found in observation.
+ *
+ * Fills the events from an event list in the counts cube setup by init_cube.
+ ***************************************************************************/
+void ctbin::fill_cube(GCTAObservation* obs)
+{
+    // Continue only if observation pointer is valid
+    if (obs != NULL) {
+
+        // Make sure that the observation holds a CTA event list. If this
+        // is not the case then throw an exception.
+        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
+            throw GException::no_list(G_BIN_EVENTS);
+        }
+
+        // Initialise binning statistics
+        int num_outside_map  = 0;
+        int num_outside_ebds = 0;
+        int num_in_map       = 0;
+
+        // Fill sky map
+        GCTAEventList* events =
+            static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+        for (int i = 0; i < events->size(); ++i) {
+
+            // Get event
+            GCTAEventAtom* event = (*events)[i];
+
+            // Determine sky pixel
+            GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
+            GSkyDir      dir   = inst->dir();
+            GSkyPixel    pixel = m_cube.dir2pix(dir);
+
+            // Skip if pixel is out of range
+            if (pixel.x() < -0.5 || pixel.x() > (m_nxpix-0.5) ||
+                pixel.y() < -0.5 || pixel.y() > (m_nypix-0.5)) {
+                num_outside_map++;
+                continue;
+            }
+
+            // Determine energy bin. Skip if we are outside the energy range
+            int index = m_ebounds.index(event->energy());
+            if (index == -1) {
+                num_outside_ebds++;
+                continue;
+            }
+
+            // Fill event in skymap
+            m_cube(pixel, index) += 1.0;
+            num_in_map++;
+
+        } // endfor: looped over all events
+
+        // Append GTIs
+        m_gti.extend(events->gti());
+
+        // Update ontime and livetime
+        m_ontime   += obs->ontime();
+        m_livetime += obs->livetime();
+
+        // Log filling results
+        if (logTerse()) {
+            log << gammalib::parformat("Events in list");
+            log << obs->events()->size() << std::endl;
+            log << gammalib::parformat("Events in cube");
+            log << num_in_map << std::endl;
+            log << gammalib::parformat("Events outside cube area");
+            log << num_outside_map << std::endl;
+            log << gammalib::parformat("Events outside energy bins");
+            log << num_outside_ebds << std::endl;
+        }
+
+        // Log cube
+        if (logExplicit()) {
+            log.header1("Counts cube");
+            log << m_cube << std::endl;
+        }
+
+    } // endif: observation was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Put cube as single element in observation container.
+ ***************************************************************************/
+void ctbin::obs_cube(void)
+{
+    // Clear observation container
+    m_obs.clear();
+
+    // Allocate CTA observation. We need this to make sure that all
+    // attributes are set correctly
+    GCTAObservation obs;
+
+    // Attach event cube to CTA observation
+    obs.events(this->cube());
+
+    // Set map centre as pointing
+    GSkyPixel    pixel(0.5*double(m_cube.nx()), 0.5*double(m_cube.ny()));
+    GSkyDir      centre = m_cube.pix2dir(pixel);
+    GCTAPointing pointing(centre);
+
+    // Compute deadtime correction
+    double deadc = (m_ontime > 0.0) ? m_livetime / m_ontime : 0.0;
+
+    // Set CTA observation attributes
+    obs.pointing(pointing);
+    obs.obs_id(0);
+    obs.ra_obj(centre.ra_deg());   //!< Dummy
+    obs.dec_obj(centre.dec_deg()); //!< Dummy
+    obs.ontime(m_ontime);
+    obs.livetime(m_livetime);
+    obs.deadc(deadc);
+
+    // Append observation to container
+    m_obs.append(obs);
+
+    // Return
+    return;
+}
+
+
 /*==========================================================================
  =                                                                         =
  =                             Private methods                             =
@@ -698,6 +921,11 @@ void ctbin::init_members(void)
     m_infiles.clear();
     m_use_xml    = false;
     m_read_ahead = false;
+    m_cube.clear();
+    m_ebounds.clear();
+    m_gti.clear();
+    m_ontime   = 0.0;
+    m_livetime = 0.0;
 
     // Set logger properties
     log.date(true);
@@ -737,6 +965,11 @@ void ctbin::copy_members(const ctbin& app)
     m_infiles    = app.m_infiles;
     m_use_xml    = app.m_use_xml;
     m_read_ahead = app.m_read_ahead;
+    m_cube       = app.m_cube;
+    m_ebounds    = app.m_ebounds;
+    m_gti        = app.m_gti;
+    m_ontime     = app.m_ontime;
+    m_livetime   = app.m_livetime;
 
     // Return
     return;
@@ -752,6 +985,83 @@ void ctbin::free_members(void)
     if (logTerse()) {
         log << std::endl;
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get the energy boundaries
+ *
+ * @exception GException::invalid_value
+ *            No valid energy boundary extension found.
+ *
+ * Get the energy boundaries according to the user parameters. The method
+ * supports loading of energy boundary information from the EBOUNDS or
+ * ENERGYBINS extension, or setting energy boundaries using a linear
+ * or logarithmical spacing.
+ *
+ * @todo Ultimately this method should go in a support library as it is
+ * used by several ctools.
+ ***************************************************************************/
+void ctbin::get_ebounds(void)
+{
+    // Initialse energy boundary information
+    m_ebounds.clear();
+
+    // Check whether energy binning information should be read from a FITS
+    // file ...
+    if (m_ebinalg == "FILE") {
+
+        // Open energy boundary file using the EBOUNDS or ENERGYBINS
+        // extension. Throw an exception if opening fails.
+        GFits file(m_ebinfile);
+        if (file.contains("EBOUNDS")) {
+            file.close();
+            m_ebounds.load(m_ebinfile,"EBOUNDS");
+        }
+        else if (file.contains("ENERGYBINS")) {
+            file.close();
+            m_ebounds.load(m_ebinfile,"ENERGYBINS");
+        }
+        else {
+            file.close();
+            std::string msg = "No extension with name \"EBOUNDS\" or"
+                              " \"ENERGYBINS\" found in FITS file"
+                              " \""+m_ebinfile+"\".\n"
+                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
+                              " is required if the parameter \"ebinalg\""
+                              " is set to \"FILE\".";
+            throw GException::invalid_value(G_BIN_EVENTS, msg);
+        }
+        
+        // Set enumbins parameter to number of ebounds
+        m_enumbins = m_ebounds.size();
+
+    } // endif: ebinalg was "FILE"
+
+    // ... otherwise use a linear or a logarithmically-spaced energy binning
+    else {
+
+        // Initialise log mode for ebinning
+        bool log = true;
+
+        // check if algorithm is linear
+        if (m_ebinalg == "LIN") {
+            log = false;
+        }
+
+        // todo: should we also check if m_ebinalg is "LOG"
+        // and throw an exception if neither LIN/LOG/FILE
+        // is given?
+
+        // Setup energy range covered by data
+        GEnergy  emin(m_emin, "TeV");
+        GEnergy  emax(m_emax, "TeV");
+        m_ebounds = GEbounds(m_enumbins, emin, emax, log);
+
+    } //endif: ebinalg was not "FILE"
 
     // Return
     return;
