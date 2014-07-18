@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-infile, f, a, "events.fits",,, "Event list, counts map or observation definition file"
+infile, f, a, "events.fits",,, "Event list, counts cube or observation definition file"
 stat,   s, h, "POISSON",,, "Optimization statistics"
 edisp,  b, h, no,,, "Apply energy dispersion?"
 refit,  b, h, no,,, "Do refitting?"

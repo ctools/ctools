@@ -18,8 +18,8 @@
 # General parameters
 #===================
 evfile,  f, a, "events.fits",,,"Input event list or observation definition file"
-outfile, f, a, "cntmap.fits",,, "Output counts map or observation definition file"
-prefix,  s, h, "cntmap_",,,"Prefix for counts maps in observation definition file"
+outfile, f, a, "cntmap.fits",,, "Output counts cube"
+prefix,  s, h, "cntmap_",,,"Prefix (no longer used)"
 #
 # Energy binning parameters
 #==========================

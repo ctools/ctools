@@ -212,8 +212,8 @@ information to the console using
 Binning CTA data
 ~~~~~~~~~~~~~~~~
 
-As next analysis step you will bin the data in a counts map using the
-executable ctbin. A counts map is a 3 dimensional data cube, spanned by
+As next analysis step you will bin the data in a counts cube using the
+executable ctbin. A counts cube is a 3 dimensional data cube, spanned by
 Right Ascension (or Galactic longitude), Declination (or Galactic latitude),
 and the logarithm (base 10) of energy.
 
@@ -225,29 +225,29 @@ ctbin is executed by typing:
   Input event list or observation definition file [test/data/crab_events.fits.gz] events.fits
   First coordinate of image center in degrees (RA or galactic l) [83.63] 
   Second coordinate of image center in degrees (DEC or galactic b) [22.01] 
-  Algorithm for defining energy bins (FILE|LIN|LOG) [LOG] 
-  Start value for first energy bin in TeV [0.1] 
-  Stop value for last energy bin in TeV [100.0] 
-  Number of energy bins [20] 
   Projection method e.g. AIT|AZP|CAR|MER|STG|TAN (AIT|AZP|CAR|MER|STG|TAN) [CAR] 
   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
   Image scale (in degrees/pixel) [0.02] 
   Size of the X axis in pixels [200] 
   Size of the Y axis in pixels [200] 
-  Output counts map or observation definition file [cntmap.fits]
+  Algorithm for defining energy bins (FILE|LIN|LOG) [LOG] 
+  Start value for first energy bin in TeV [0.1] 
+  Stop value for last energy bin in TeV [100.0] 
+  Number of energy bins [20] 
+  Output counts cube [cntmap.fits]
 
 In this example we adjust the event data file name and accept all the
 remaining parameter defaults as they perfectly satisfy our needs. The counts
-map will be centred on the location of the Crab (Right Ascension 83.63 degrees,
+cube will be centred on the location of the Crab (Right Ascension 83.63 degrees,
 Declination 22.01 degrees) and will be aligned in celestial coordinates. A 
-cartesian projection has been selected. The counts map has 200 x 200 spatial
+cartesian projection has been selected. The counts cube has 200 x 200 spatial
 pixels of 0.02 x 0.02 degrees in size, hence it covers a total area of 4 x 4 
 degrees.
 
-A set of 20 counts maps will be created, which are logarithmically spaced
+The counts cube will contain 20 maps, which are logarithmically spaced
 in energy, and which cover the energy range from 0.1 TeV to 100 TeV. In this
-example, the counts map will be saved as ``cntmap.fits`` in the working
-directory. In addition to the counts map, that is stored as the primary
+example, the counts cube will be saved as ``cntmap.fits`` in the working
+directory. In addition to the counts cube, that is stored as the primary
 image extension, the FITS file also contains an extension named ``EBOUNDS``
 that defines the energy boundaries that were used, and an extension ``GTI``
 that defines the Good Time Intervals that have been used. The following
@@ -258,7 +258,7 @@ the start and stop time of the simulated data.
 .. figure:: cntmap-fits.jpg
    :width: 100%
 
-   *Counts map FITS file*
+   *Counts cube FITS file*
 
 
 An image of the first bin, covering the energy range 100 - 141 GeV, is 
@@ -267,7 +267,7 @@ shown below:
 .. figure:: cntmap-map.jpg
    :width: 50%
 
-   *Counts map for first energy bin*
+   *Counts cube for first energy bin*
 
 
 For illustration, the last few lines of the log file ``ctbin.log`` are 
@@ -311,8 +311,8 @@ reproduced below:
   2014-01-09T21:16:18: Application "ctbin" terminated after 37 wall clock seconds, consuming 0.242495 seconds of CPU time.
 
 From the 6141 events that have been simulated and stored in the 
-``events.fits`` file, 5542 lie within the map boundaries and are thus put
-into the resulting counts map. The counts map is stored in a cartesian
+``events.fits`` file, 5542 lie within the cube boundaries and are thus put
+into the resulting counts cube. The counts cube is stored in a cartesian
 projection in a World Coordinate System (WCS) compliant format.
 
 
@@ -329,17 +329,17 @@ do the fit by typing:
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts map or observation definition file [test/data/crab_events.fits.gz] cntmap.fits
+  Event list, counts cube or observation definition file [test/data/crab_events.fits.gz] cntmap.fits
   Calibration database [test/irf] $GAMMALIB/share/caldb/cta
   Instrument response function [cta_dummy_irf] 
   Source model [test/data/crab.xml] $GAMMALIB/share/models/crab.xml
   Source model output file [crab_results.xml]
 
 Fitting of the data is done in *binned* mode, which means that the events
-have been binned into a counts map and the fit computes the log-likelihood
-function by summing over all 200 x 200 x 20 bins of the counts map. There is
+have been binned into a counts cube and the fit computes the log-likelihood
+function by summing over all 200 x 200 x 20 bins of the counts cube. There is
 an alternative method, the so called *unbinned* mode, where the events are
-not binned into a counts map and the log-likelihood is computed directly by
+not binned into a counts cube and the log-likelihood is computed directly by
 summing over all events. We will explore the *unbinned* mode later.
 
 One of the parameters given to ctlike is a source model output file
@@ -468,17 +468,17 @@ are not too far of the best fitting values).
 Doing an unbinned analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As gamma-ray events are rare, the counts maps generated by ctbin will in
+As gamma-ray events are rare, the counts cubes generated by ctbin will in
 general be sparse, having many empty pixels, in particular at high energies.
 An alternative analysis technique consists of working directly on the event
-list without binning the events in a counts map. We will see the benefit of
+list without binning the events in a counts cube. We will see the benefit of
 such an analysis later once you re-run ctlike in unbinned mode.
 
 For unbinned analysis you first have to define the data space region over
 which the analysis is done. This is similiar to the ctbin step in binned
-analysis where you defined the size of the counts map, the energy range, and
+analysis where you defined the size of the counts cube, the energy range, and
 the time interval. For unbinned analysis you have no such thing as a counts
-map, but you have to define over which region of the data space the selected
+cube, but you have to define over which region of the data space the selected
 events are spread (because the ctools have to integrate over this region to
 compute the total number of predicted events in the data space that you
 analyse). Furthermore, you have to define what energy range is covered, and
@@ -542,12 +542,12 @@ part:
  
 Now that you have selected the events of interest, you can run ctlike in 
 unbinned mode. To do this you have to specify the selected event list 
-instead of the counts map:
+instead of the counts cube:
 
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts map or observation definition file [cntmap.fits] selected_events.fits
+  Event list, counts cube or observation definition file [cntmap.fits] selected_events.fits
   Calibration database [$GAMMALIB/share/caldb/cta] 
   Instrument response function [cta_dummy_irf] 
   Source model [$GAMMALIB/share/models/crab.xml] 
@@ -555,7 +555,7 @@ instead of the counts map:
 
 You will recognise that ctlike runs much faster in unbinned mode compared
 to binned mode. This is understandable as the selected event list contains
-only 6127 events, while the binned counts map we used before had 
+only 6127 events, while the binned counts cube we used before had 
 200 x 200 x 20 = 800000 pixels. As unbinned maximum likelihood fitting loops
 over the events (while binned maximum likelihood loops over the pixels),
 there are much less operations to perform in unbinned than in binned mode
@@ -570,7 +570,7 @@ Below you see the corresponding output from the ctlike.log file. The fitted
 parameters are essentially identical to the ones found in binned mode.
 The slight difference with respect to the binned analysis may be explained
 by the different event sample that has been used for the analysis: while 
-binned likelihood works on rectangular counts maps, unbinned likelihood works
+binned likelihood works on rectangular counts cubes, unbinned likelihood works
 on circular event selection regions. It is thus not possible to select exactly
 the same events for both analyses.
 
