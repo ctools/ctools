@@ -430,7 +430,7 @@ void ctbin::get_parameters(void)
         try {
 
             // Load event list in CTA observation
-            obs.load_unbinned(m_evfile);
+            obs.load(m_evfile);
 
             // Append CTA observation to container
             m_obs.append(obs);
