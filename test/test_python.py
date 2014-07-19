@@ -43,7 +43,7 @@ def pipeline_v1():
     events_name          = "events.fits"
     selected_events_name = "selected_events.fits"
     result_name          = "results.xml"
-    caldb                = "dummy"
+    caldb                = "irf"
     irf                  = "cta_dummy_irf"
     ra                   =   83.63
     dec                  =   22.01
@@ -122,7 +122,7 @@ def pipeline_v2(model_name="data/crab.xml", \
     FITS files on disk. All data is only hold in memory.
     """
     # Set script parameters
-    caldb = "dummy"
+    caldb = "irf"
     irf   = "cta_dummy_irf"
     
     # Simulate events
