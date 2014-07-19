@@ -248,8 +248,8 @@ void ctlike::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            save_edisp[i] = obs->response().apply_edisp();
-            obs->response().apply_edisp(m_apply_edisp);
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
         }
     }
 
@@ -332,7 +332,7 @@ void ctlike::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            obs->response().apply_edisp(save_edisp[i]);
+            obs->response()->apply_edisp(save_edisp[i]);
         }
     }
 
@@ -448,9 +448,9 @@ void ctlike::get_parameters(void)
                 // Continue only if observation is a CTA observation
                 if (obs != NULL) {
 
-                    // If there is no effective area information then
-                    // set response from task parameters
-                    if (obs->response().aeff() == NULL) {
+                    // If response is not valid then set response from
+                    // task parameters
+                    if (!obs->hasresponse()) {
 
                         // Get calibration parameters
                         if (!asked_for_response) {

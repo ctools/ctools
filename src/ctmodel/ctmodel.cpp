@@ -253,8 +253,8 @@ void ctmodel::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            save_edisp[i] = obs->response().apply_edisp();
-            obs->response().apply_edisp(m_apply_edisp);
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
         }
     }
 
@@ -341,7 +341,7 @@ void ctmodel::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            obs->response().apply_edisp(save_edisp[i]);
+            obs->response()->apply_edisp(save_edisp[i]);
         }
     }
 
@@ -554,7 +554,7 @@ void ctmodel::setup_obs(void)
                 GCTAObservation obs;
 
                 // Load counts map in CTA observation
-                obs.load_binned(m_infile);
+                obs.load(m_infile);
 
                 // Append CTA observation to container
                 m_obs.append(obs);
@@ -602,8 +602,8 @@ void ctmodel::setup_obs(void)
                 throw GException::no_cube(G_SETUP_OBS);
             }
         
-            // Set response if it isn't set already
-            if (obs->response().aeff() == NULL) {
+            // Set response if we don't have one
+            if (!obs->hasresponse()) {
 
                 // Set calibration database. If specified parameter is a
                 // directory then use this as the pathname to the calibration

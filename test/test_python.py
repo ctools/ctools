@@ -3,7 +3,7 @@
 # This script illustrates how to build an unbinned analysis pipeline using
 # the ctools.
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2014 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -122,17 +122,8 @@ def pipeline_v2(model_name="data/crab.xml", \
     FITS files on disk. All data is only hold in memory.
     """
     # Set script parameters
-    #model_name  = "data/crab.xml"
-    caldb       = "irf"
-    irf         = "cta_dummy_irf"
-    #ra          =   83.63
-    #dec         =   22.01
-    #rad_sim     =   10.0
-    #tstart      =    0.0
-    #tstop       = 1800.0
-    #emin        =    0.1
-    #emax        =  100.0
-    #rad_select  =    3.0
+    caldb = "irf"
+    irf   = "cta_dummy_irf"
     
     # Simulate events
     sim = ctobssim()

@@ -641,8 +641,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     }
     else {
 
-        // Readload observation from FITS file
-        obs->load(file);
+        // Re-read observation from FITS object
+        obs->read(file);
 
     }
 

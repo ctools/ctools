@@ -252,8 +252,8 @@ void ctexpcube::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            save_edisp[i] = obs->response().apply_edisp();
-            obs->response().apply_edisp(m_apply_edisp);
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
         }
     }
 
@@ -282,7 +282,7 @@ void ctexpcube::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            obs->response().apply_edisp(save_edisp[i]);
+            obs->response()->apply_edisp(save_edisp[i]);
         }
     }
 
@@ -431,8 +431,8 @@ void ctexpcube::set_response(void)
         // Yes ...
         if (obs != NULL) {
 
-            // Set response if it isn't set already
-            if (obs->response().aeff() == NULL) {
+            // Set response if we don't have one
+            if (!obs->hasresponse()) {
 
                 // Load response information
                 std::string database = (*this)["caldb"].string();

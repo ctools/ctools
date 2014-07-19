@@ -1,7 +1,7 @@
 /***************************************************************************
  *                     ctskymap - CTA sky mapping tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -366,7 +366,7 @@ void ctskymap::get_parameters(void)
 
         // Load unbinned CTA observation
         GCTAObservation obs;
-        obs.load_unbinned(m_evfile);
+        obs.load(m_evfile);
 
         // Append CTA observation to container
         m_obs.append(obs);

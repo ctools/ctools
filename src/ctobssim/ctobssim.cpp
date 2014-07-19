@@ -33,8 +33,8 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_SIMULATE_SOURCE       "ctobssim::simulate_source(GCTAObservation*,"\
-                                                                " GPhotons&)"
+#define G_SIMULATE_SOURCE      "ctobssim::simulate_source(GCTAObservation*, "\
+                                                    "GModels&, GRan&, GLog*)"
 
 /* __ Constants __________________________________________________________ */
 const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
@@ -263,8 +263,8 @@ void ctobssim::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            save_edisp[i] = obs->response().apply_edisp();
-            obs->response().apply_edisp(m_apply_edisp);
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
         }
     }
 
@@ -380,7 +380,7 @@ void ctobssim::run(void)
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            obs->response().apply_edisp(save_edisp[i]);
+            obs->response()->apply_edisp(save_edisp[i]);
         }
     }
 
@@ -664,7 +664,12 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         }
 
         // Get CTA response
-        const GCTAResponse& rsp = obs->response();
+        const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+        if (rsp == NULL) {
+            std::string msg = "Response is not an IRF response.\n" +
+                              obs->response()->print();
+            throw GException::invalid_value(G_SIMULATE_SOURCE, msg);
+        }
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then allocate and attach a CTA event list now.
@@ -723,9 +728,9 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                 // has energy dispersion then add margin
                 GEnergy e_true_min = emin;
                 GEnergy e_true_max = emax;
-                if (rsp.use_edisp()) {
-                    e_true_min = rsp.ebounds_src(e_true_min).emin();
-                    e_true_max = rsp.ebounds_src(e_true_max).emax();
+                if (rsp->use_edisp()) {
+                    e_true_min = rsp->ebounds_src(e_true_min).emin();
+                    e_true_max = rsp->ebounds_src(e_true_max).emax();
                 }
 
                 // Dump energy range
@@ -822,10 +827,10 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
                                 // Simulate event. Note that this method
                                 // includes the deadtime correction.
-                                GCTAEventAtom* event = rsp.mc(m_area,
-                                                              photons[i],
-                                                              *obs,
-                                                              ran);
+                                GCTAEventAtom* event = rsp->mc(m_area,
+                                                               photons[i],
+                                                               *obs,
+                                                               ran);
                                 if (event != NULL) {
 
                                     // Use event only if it falls within ROI
