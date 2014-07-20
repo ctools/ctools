@@ -388,6 +388,7 @@ else
   $ECHO " expcube2.fits file is not valid"
   exit 1
 fi
+$ECHO " ok"
 
 
 #
@@ -410,3 +411,4 @@ else
   $ECHO " filtered_cube.fits file is not valid"
   exit 1
 fi
+$ECHO " ok"
