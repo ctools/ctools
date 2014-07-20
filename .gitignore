@@ -61,6 +61,7 @@ test/*.dat
 test/*.xml
 test/*.trs
 test/test_cscripts.sh
+test/reports/*.xml
 examples/*.fits
 examples/*.xml
 examples/*.dat
