@@ -52,3 +52,5 @@
 %include "ctselect.i"
 %include "ctskymap.i"
 %include "ctexpcube.i"
+%include "ctpsfcube.i"
+%include "ctcubemask.i"
