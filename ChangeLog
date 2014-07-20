@@ -5,8 +5,9 @@
 
 	Adapt to GammaLib 0.9.0 interface
         ctbin now always merges event lists into a single counts cube
-        Add ctexpcube tool
-        Add ctcubemask tool
+        Add ctexpcube tool (generates exposure cube)
+        Add ctpsfcube tool (generated PSF cube)
+        Add ctcubemask tool (masks event bins in event cube)
         Support energy dispersion in ctobssim, ctlike and ctmodel	
         Correct ctobssim for thread safety
         Enhance documentation

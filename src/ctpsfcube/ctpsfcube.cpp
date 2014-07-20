@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctpsfcube - CTA PSF cube tool                         *
+ *                    ctpsfcube - CTA PSF cube tool                        *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -68,10 +68,12 @@ ctpsfcube::ctpsfcube(void) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
+ * @param[in] obs Observation container.
+ *
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(GObservations obs) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+ctpsfcube::ctpsfcube(const GObservations& obs) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -293,7 +295,6 @@ void ctpsfcube::run(void)
 
 /***********************************************************************//**
  * @brief Save PSF cube
- *
  ***************************************************************************/
 void ctpsfcube::save(void)
 {
@@ -349,19 +350,20 @@ void ctpsfcube::get_parameters(void)
         double      binsz    = (*this)["binsz"].real();
         int         nxpix    = (*this)["nxpix"].integer();
         int         nypix    = (*this)["nypix"].integer();
-	double      dmax     = (*this)["dmax"].real();
-	int         ndbins   = (*this)["ndbins"].integer();
+        double      dmax     = (*this)["amax"].real();
+        int         ndbins   = (*this)["anumbins"].integer();
 
         // Get energy definition
         get_ebounds();
 
-        // Define exposure cube
+        // Define PSF cube
         m_psfcube = GCTAMeanPsf(wcs, coordsys, xref, yref,
-				-binsz, binsz, nxpix, nypix,
-				m_ebounds, dmax, ndbins);
-    }
+                                -binsz, binsz, nxpix, nypix,
+                                m_ebounds, dmax, ndbins);
 
-    // ... otherwise setup the exposure cube from the counts map
+    } // endif: PSF cube set from user parameters
+
+    // ... otherwise setup the PSF cube from the counts map
     else {
     
         // Set PSF cube from counts map
@@ -401,7 +403,6 @@ void ctpsfcube::get_obs(void)
         // Append CTA observation to container
         m_obs.append(obs);
 
-            
     }
         
     // ... otherwise try to open as XML file
@@ -420,7 +421,7 @@ void ctpsfcube::get_obs(void)
 /***********************************************************************//**
  * @brief Set observation response
  *
- * Set response for all observations that so have no response.
+ * Set response for all observations that have no response.
  ***************************************************************************/
 void ctpsfcube::set_response(void)
 {
@@ -537,12 +538,12 @@ void ctpsfcube::get_ebounds(void)
 
 
 /***********************************************************************//**
- * @brief Set exposure cube definition from counts map
+ * @brief Set PSF cube definition from counts map
  *
  * @exception GException::invalid_value
  *            Invalid counts map projection or invalid events encountered.
  *
- * Set exposure cube definition from counts map.
+ * Set PSF cube definition from counts map.
  ***************************************************************************/
 void ctpsfcube::set_from_cntmap(const std::string& filename)
 {
@@ -552,7 +553,7 @@ void ctpsfcube::set_from_cntmap(const std::string& filename)
     // Load counts map in CTA observation
     obs.load(filename);
 
-    // Set exposure cube from counts map
+    // Set PSF cube from counts map
     const GCTAEventCube* cube = dynamic_cast<const GCTAEventCube*>(obs.events());
 
     // Continue only if cube is valid
@@ -573,16 +574,16 @@ void ctpsfcube::set_from_cntmap(const std::string& filename)
             double      dy       = wcs->cdelt(1);
             int         nx       = cube->map().nx();
             int         ny       = cube->map().ny();
-	    double      dmax     = (*this)["dmax"].real();
-	    int         ndbins   = (*this)["ndbins"].integer();
+            double      amax     = (*this)["amax"].real();
+            int         anumbins = (*this)["anumbins"].integer();
 
             // Get energy definition
             m_ebounds = cube->ebounds();
 
-            // Define exposure cube
+            // Define PSF cube
             m_psfcube = GCTAMeanPsf(proj, coordsys, xref, yref,
-				    dx, dy, nx, ny,
-				    m_ebounds, dmax, ndbins);
+                                    dx, dy, nx, ny,
+                                    m_ebounds, amax, anumbins);
         
         } // endif: WCS projection was valid
 

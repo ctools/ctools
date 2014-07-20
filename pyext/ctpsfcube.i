@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctpsfcube - CTA PSF cube tool                         *
+ *                     ctpsfcube - CTA PSF cube tool                       *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -40,7 +40,7 @@ class ctpsfcube : public GApplication  {
 public:
     // Constructors and destructors
     ctpsfcube(void);
-    explicit ctpsfcube(GObservations obs);
+    explicit ctpsfcube(const GObservations& obs);
     ctpsfcube(int argc, char *argv[]);
     ctpsfcube(const ctpsfcube& app);
     virtual ~ctpsfcube(void);

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                  ctcubemask.cpp - CTA cube filter tool                  *
+ *                    ctcubemask - CTA cube filter tool                    *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -70,7 +70,8 @@ ctcubemask::ctcubemask(void) : GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
  * This constructor creates an instance of the class that is initialised from
  * an observation container.
  ***************************************************************************/
-ctcubemask::ctcubemask(GObservations obs) : GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
+ctcubemask::ctcubemask(const GObservations& obs) :
+            GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
 {
     // Initialise members
     init_members();
@@ -302,7 +303,7 @@ void ctcubemask::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        log.header1("Observations after masked");
+        log.header1("Observations after event bin masking");
         log << m_obs << std::endl;
     }
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctcubemask.i - CTA mask cube tool                     *
+ *                    ctcubemask - CTA mask cube tool                      *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 Chia-Chun Lu                                        *
  * ----------------------------------------------------------------------- *
@@ -39,7 +39,7 @@ class ctcubemask : public GApplication  {
 public:
     // Constructors and destructors
     ctcubemask(void);
-    explicit ctcubemask(GObservations obs);
+    explicit ctcubemask(const GObservations& obs);
     ctcubemask(int argc, char *argv[]);
     ctcubemask(const ctcubemask& app);
     virtual ~ctcubemask(void);

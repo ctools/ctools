@@ -41,6 +41,7 @@ ctobssim=../src/ctobssim/ctobssim
 ctselect=../src/ctselect/ctselect
 ctskymap=../src/ctskymap/ctskymap
 ctexpcube=../src/ctexpcube/ctexpcube
+ctpsfcube=../src/ctpsfcube/ctpsfcube
 ctcubemask=../src/ctcubemask/ctcubemask
 
 
@@ -386,6 +387,53 @@ then
   $ECHO -n "."
 else
   $ECHO " expcube2.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test ctpsfcube
+# ==============
+$ECHO -n "Test ctpsfcube: "
+#
+# Run 1
+$ctpsfcube infile="data/crab_events.fits" \
+           cntmap="NONE" \
+           outfile="psfcube1.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=200 \
+           nypix=200 \
+           binsz=0.02 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR"
+$ECHO -n "."
+if [ -s "psfcube1.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " psfcube1.fits file is not valid"
+  exit 1
+fi
+#
+# Run 2
+$ctpsfcube infile="data/crab_events.fits" \
+           cntmap="data/crab_cntmap.fits" \
+           outfile="psfcube2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "psfcube2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " psfcube2.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"

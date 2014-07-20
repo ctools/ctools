@@ -4,14 +4,14 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      ctexpcube.par                                                 #
+#  File:      ctpsfcube.par                                                 #
 #  Version:   00-01-00                                                      #
 #                                                                           #
-#  Author:    Juergen Knoedlseder                                           #
-#             Jurgen.Knodlseder@irap.omp.eu                                 #
-#             IRAP                                                          #
+#  Author:    Chia-Chun Lu                                                  #
+#             c.lu@mpi-hd.mpg.de                                            #
+#             MPIK                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the ctexpcube application                  #
+#  Purpose:   Parameter file for the ctpsfcube application                  #
 #                                                                           #
 #############################################################################
 #
@@ -19,7 +19,7 @@
 #===================
 infile,   f, a, "NONE",,, "Observation definition file"
 cntmap,   f, a, "NONE",,, "Counts map for exposure cube definition"
-outfile,  f, a, "expcube.fits",,, "Output exposure cube file"
+outfile,  f, a, "psfcube.fits",,, "Output exposure cube file"
 caldb,    s, a, "dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
@@ -43,10 +43,10 @@ yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or g
 axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
 proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
 #
-# Histogram binning parameters
-#=============================
-dmax,     r, a, 0.3,,, "Upper bound of delta"
-ndbins,   i, a, 60,,,  "Number of delta bins"
+# Angular separation binning parameters
+#======================================
+amax,     r, h, 0.3,,, "Upper bound of angular separation between true and measued photon direction (degrees)"
+anumbins, i, h, 60,,,  "Number of angular separation bins"
 #
 # Standard parameters
 #====================
@@ -54,4 +54,4 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctexpcube.log",,, "Log filename"
+logfile, f, h, "ctpsfcube.log",,, "Log filename"
