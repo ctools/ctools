@@ -23,6 +23,14 @@ import ctools
 import sys
 import os
 import test_ctobssim
+import test_ctselect
+import test_ctbin
+import test_ctlike
+import test_ctmodel
+import test_ctskymap
+import test_ctcubemask
+import test_ctexpcube
+import test_ctpsfcube
 import test_pipelines
 
 
@@ -37,15 +45,39 @@ if __name__ == '__main__':
     suites = gammalib.GTestSuites("ctools unit testing")
 
     # Allocate test suites and append them to the container
-    suite_ctobssim  = test_ctobssim.Test()
-    suite_pipelines = test_pipelines.Test()
+    suite_ctobssim   = test_ctobssim.Test()
+    suite_ctselect   = test_ctselect.Test()
+    suite_ctbin      = test_ctbin.Test()
+    suite_ctlike     = test_ctlike.Test()
+    suite_ctmodel    = test_ctmodel.Test()
+    suite_ctskymap   = test_ctskymap.Test()
+    suite_ctcubemask = test_ctcubemask.Test()
+    suite_ctexpcube  = test_ctexpcube.Test()
+    suite_ctpsfcube  = test_ctpsfcube.Test()
+    suite_pipelines  = test_pipelines.Test()
 
     # Setup unit tests
     suite_ctobssim.set()
+    suite_ctselect.set()
+    suite_ctbin.set()
+    suite_ctlike.set()
+    suite_ctmodel.set()
+    suite_ctskymap.set()
+    suite_ctcubemask.set()
+    suite_ctexpcube.set()
+    suite_ctpsfcube.set()
     suite_pipelines.set()
 
     # Append tests to container
     suites.append(suite_ctobssim)
+    suites.append(suite_ctselect)
+    suites.append(suite_ctbin)
+    suites.append(suite_ctlike)
+    suites.append(suite_ctmodel)
+    suites.append(suite_ctskymap)
+    suites.append(suite_ctcubemask)
+    suites.append(suite_ctexpcube)
+    suites.append(suite_ctpsfcube)
     suites.append(suite_pipelines)
 
     # Set PFILES environment variable
