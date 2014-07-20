@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctfilter - CTA cube filter tool                      *
+ *                  ctcubemask.cpp - CTA cube filter tool                  *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -34,9 +34,8 @@
 
 
 /* __ Method name definitions ____________________________________________ */
-#define G_RUN                                               "ctcubemask::run()"
-#define G_APPLY_MASK                "ctcubemask::apply_mask(GCTAObservation*,"\
-                                                              "std::string&)"
+#define G_RUN                                             "ctcubemask::run()"
+#define G_APPLY_MASK               "ctcubemask::apply_mask(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -96,7 +95,7 @@ ctcubemask::ctcubemask(GObservations obs) : GApplication(CTCUBEMASK_NAME, CTCUBE
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctcubemask::ctcubemask(int argc, char *argv[]) : 
-                   GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
+            GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -151,7 +150,7 @@ ctcubemask::~ctcubemask(void)
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctcubemask& ctcubemask::operator= (const ctcubemask& app)
+ctcubemask& ctcubemask::operator=(const ctcubemask& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
@@ -287,33 +286,9 @@ void ctcubemask::run(void)
             // Save event file name (for possible saving)
             m_infiles[i] = obs->eventfile();
 
-            // Get temporary file name
-            std::string filename = std::tmpnam(NULL);
-
-            // Save observation in temporary file
-            obs->save(filename, true);
-
-            // Log saved FITS file
-            if (logExplicit()) {
-                GFits tmpfile(filename);
-                log << std::endl;
-                log.header1("FITS file content of temporary file");
-                log << tmpfile << std::endl;
-                tmpfile.close();
-            }
-
-            // Check temporary file
-            std::string message = check_infile(filename);
-            if (message.length() > 0) {
-                throw GException::app_error(G_RUN, message);
-            }
-
             // Load observation from temporary file, including event selection
-            apply_mask(obs, filename);
+            apply_mask(obs);
 
-            // Remove temporary file
-            std::remove(filename.c_str());
-            
         } // endif: had a CTA observation
 
     } // endfor: looped over all observations
@@ -409,7 +384,7 @@ void ctcubemask::get_parameters(void)
         try {
 
             // Load event list in CTA observation
-            obs.load_binned(m_infile);
+            obs.load(m_infile);
 
             // Append CTA observation to container
             m_obs.append(obs);
@@ -455,115 +430,119 @@ void ctcubemask::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Select events
+ * @brief Apply mask to counts cube
  *
  * @param[in] obs CTA observation.
- * @param[in] filename File name.
  *
- * Select events from a FITS file by making use of the selection possibility
- * of the cfitsio library on loading a file. A selection string is created
- * from the specified criteria that is appended to the filename so that
- * cfitsio will automatically filter the event data. This selection string
- * is then applied when opening the FITS file. The opened FITS file is then
- * saved into a temporary file which is the loaded into the actual CTA
- * observation, overwriting the old CTA observation. The ROI, GTI and EBounds
- * of the CTA event list are then set accordingly to the specified selection.
- * Finally, the temporary file created during this process is removed.
- *
- * Good Time Intervals of the observation will be limited to the time
- * interval [m_tmin, m_tmax]. If m_tmin=m_tmax=0, no time selection is
- * performed.
- *
- * @todo Use INDEF instead of 0.0 for pointing as RA/DEC selection
+ * Masks out event bins by setting their content to -1.
  ***************************************************************************/
-void ctcubemask::apply_mask(GCTAObservation* obs, const std::string& filename)
+void ctcubemask::apply_mask(GCTAObservation* obs)
 {
-  std::cout<< "start appply filter" << std::endl;
-    // Open FITS file
-    GFits file(filename);
-    GCTAEventCube* cube = (GCTAEventCube*) obs->events();
-    GEbounds ebounds = cube->ebounds();
-    GSkymap map = cube->map();
+    // Get pointer to CTA event cube. Continue only if we have a cube
+    GCTAEventCube* cube = dynamic_cast<GCTAEventCube*>(const_cast<GEvents*>(obs->events()));
+    if (cube != NULL) {
 
-    // Apply energy selection
-    int e_idx1 = 0;
-    int e_idx2 = 0;
-    int n_ebin = ebounds.size();
+        // Extract event cube and energy boundaries
+        GSkymap         map     = cube->map();
+        const GEbounds& ebounds = cube->ebounds();
 
-    // Loop over ebounds to find the first energy band
-    for ( int i = 0 ; i < ebounds.size() ; i++){
-      double emin = ebounds.emin(i).TeV();
-      if ( emin > m_emin ){
-	e_idx1 = i;
-	break;
-      }
-    }
+        // Initialise energy selection
+        int n_ebin = ebounds.size();
+        int e_idx1 = 0;
+        int e_idx2 = n_ebin;
 
-    std::cout << "finish looping over ebounds to find 1st" << std::endl;
-    std::cout << "e_ix1 " << e_idx1 << std::endl;
+        // Loop over ebounds to find the first valid energy band
+        for (int i = 0; i < n_ebin; ++i) {
+            double emin = ebounds.emin(i).TeV() + 1.0e-6; // Rounding tolerance
+            if (emin >= m_emin) {
+                e_idx1 = i;
+                break;
+            }
+        }
 
-    // Loop over ebounds to find the last energy band
-    for ( int i = ebounds.size()-1 ; i < ebounds.size() ; i--){
-      double emin = ebounds.emin(i).TeV();
-      if ( emin < m_emax ){
-	e_idx2 = i-1;
-	break;
-      }
-    }
-     std::cout << "finish looping over ebounds to find 1st" << std::endl;
-     std::cout << "e_ix2 " << e_idx2 << std::endl;
+        // Loop over ebounds to find the last valid energy band
+        for (int i = n_ebin-1; i >= 0; i--) {
+            double emax = ebounds.emax(i).TeV() - 1.0e-6; // Rounding tolerance
+            if (emax <= m_emax) {
+                e_idx2 = i;
+                break;
+            }
+        }
 
-    // Set all pixels outside the desired energy bands negative
-    int npix = map.npix();
-    for ( int i = 0 ; i < e_idx1 ; i++){
-      for ( int pixel = 0 ; pixel < npix ; pixel++){
-		  map(pixel,i) = -1;
-      }
-    }
-    for ( int i = e_idx2 ; i < ebounds.size() ; i++){
-      for ( int pixel = 0 ; pixel < npix ; pixel++){
-		  map(pixel,i) = -1;
-      }
-    }
-    std::cout << "finish energy band filter" << std::endl;
+        // Set all pixels outside the desired energy bands to -1.0
+        int npix = map.npix();
+        for (int i = 0; i < e_idx1; ++i) {
+            for (int pixel = 0; pixel < npix; ++pixel) {
+                map(pixel,i) = -1.0;
+            }
+        }
+        for (int i = e_idx2 + 1; i < n_ebin; ++i) {
+            for (int pixel = 0; pixel < npix; ++pixel) {
+                map(pixel,i) = -1.0;
+            }
+        }
 
+        // Log selected energy band
+        if (logTerse()) {
+            log << gammalib::parformat("Selected energy band");
+            log << ebounds.emin(e_idx1).TeV() << " - ";
+            log << ebounds.emax(e_idx2).TeV() << " TeV";
+            log << std::endl;
+        }
 
-   
-    // Set all pixels inside the desired energy bands 
-    // but outside ROI or inside exlusion regions negative
-    GSkyRegions regs = GSkyRegions(m_regfile);
-	GSkyRegionCircle roi = GSkyRegionCircle(m_ra, m_dec, m_rad);
-    for ( int i = e_idx1 ; i <= e_idx2 ; i++){
-      for ( int pixel = 0 ; pixel < npix ; pixel++){
-		  GSkyDir dir = map.inx2dir(pixel);
-		  if ( roi.contains(dir) == false || 
-			   regs.contains(dir) == true){
-			  map(pixel,i) = -1;
-		  }
-      }
-    }
-    std::cout << "finish roi selection" << std::endl;
-   
-    GCTAEventCube newcube( map, ebounds, obs->events()->gti());
-    obs->events(newcube);
+        // Set all pixels inside selected energy bands but outside ROI
+        // to -1.0
+        GSkyRegionCircle roi(m_ra, m_dec, m_rad);
+        for (int i = e_idx1; i <= e_idx2; ++i) {
+            for (int pixel = 0; pixel < npix; ++pixel) {
+                GSkyDir dir = map.inx2dir(pixel);
+                if (!roi.contains(dir)) {
+                    map(pixel,i) = -1.0;
+                }
+            }
+        }
 
-    // Log selected FITS file
-    if (logExplicit()) {
-        log << std::endl;
-        log.header1("FITS file content after filter");
-        log << file << std::endl;
-    }
+        // Log selected energy band
+        if (logTerse()) {
+            log << gammalib::parformat("Selected ROI");
+            log << "RA=" << m_ra << " deg, ";
+            log << "DEC=" << m_dec << " deg, ";
+            log << "Radius=" << m_rad << " deg";
+            log << std::endl;
+        }
 
-    // Check if we have an IMAGE HDU
-    if (!file.contains("IMAGE")) {
-        std::string message = "No \"IMAGE\" extension found in FITS file. ";
-        throw GException::app_error(G_APPLY_MASK, message);
-    }
+        // Set all pixels inside selected energy bands and inside exclusion
+        // regions to -1.0
+        if (m_regfile != "NONE") {
+            GSkyRegions regions = GSkyRegions(m_regfile);
+            for (int i = e_idx1; i <= e_idx2; ++i) {
+                for (int pixel = 0; pixel < npix; ++pixel) {
+                    GSkyDir dir = map.inx2dir(pixel);
+                    if (regions.contains(dir)) {
+                        map(pixel,i) = -1.0;
+                    }
+                }
+            }
+            if (logTerse()) {
+                log << gammalib::parformat("Exclusion regions");
+                log << std::endl;
+                log.indent(1);
+                log << regions.print();
+                log << std::endl;
+                log.indent(0);
+            }
+        }
+        else {
+            if (logTerse()) {
+                log << gammalib::parformat("Exclusion regions");
+                log << "None" << std::endl;
+            }
+        }
 
+        // Put back map into the event cube
+        cube->map(map);
 
-    // Get CTA event list pointer
-    GCTAEventList* list =
-        static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+    } // endif: observation contained an event cube
 
     // Return
     return;
@@ -798,7 +777,7 @@ void ctcubemask::save_xml(void)
  * nothing if the observation pointer is not valid.
  ***************************************************************************/
 void ctcubemask::save_counts_map(const GCTAObservation* obs,
-                            const std::string&     outfile) const
+                                 const std::string&     outfile) const
 {
     // Save only if observation is valid
     if (obs != NULL) {

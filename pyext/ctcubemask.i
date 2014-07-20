@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctcubemask - CTA mask cube tool                      *
+ *                   ctcubemask.i - CTA mask cube tool                     *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 Chia-Chun Lu                                        *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctcubemask.i
- * @brief CTA data selection tool Python interface definition
+ * @brief CTA mask cube interface definition
  * @author Chia-Chun Lu
  */
 %{
@@ -49,9 +49,9 @@ public:
     void           execute(void);
     void           run(void);
     void           save(void);
-    GObservations& obs(void) { return m_obs; }
+    GObservations& obs(void);
     void           get_parameters(void);
-    void           apply_mask(GCTAObservation* obs, const std::string& filename);
+    void           apply_mask(GCTAObservation* obs);
 };
 
 

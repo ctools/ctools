@@ -4,23 +4,23 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      ctfilter.par                                                  #
-#  Version:   00-04-00                                                      #
+#  File:      ctcubemask.par                                                #
+#  Version:   00-01-00                                                      #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
 #             IRAP                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the ctselect application                   #
+#  Purpose:   Parameter file for the ctcubemask application                 #
 #                                                                           #
 #############################################################################
 #
 # File information
 #=================
-infile,  f, a, "test/data/crab_events.fits.gz",,,"Input event list or observation definition file"
-regfile, f, a, "exlusion.reg",,,"exclusion region file in ds9 format"
-outfile, f, a, "filtered_cube.fits",,,"Output event list or observation definition file"
-prefix,  s, h, "filtered_",,,"Prefix for counts maps in observation definition file"
+infile,  f, a, "cntmap.fits",,,"Input counts cube or observation definition file"
+regfile, f, a, "NONE",,,"Exclusion region file in ds9 format"
+outfile, f, a, "filtered_cube.fits",,,"Output event cube or observation definition file"
+prefix,  s, h, "filtered_",,,"Prefix for counts cube in observation definition file"
 #
 # Selection parameters
 #=====================

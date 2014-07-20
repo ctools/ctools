@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctcubemask - CTA cube filter tool                      *
+ *                  ctcubemask.hpp - CTA cube filter tool                  *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -35,7 +35,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME    "ctcubemask"
-#define CTCUBEMASK_VERSION "00-05-00"
+#define CTCUBEMASK_VERSION "00-01-00"
 
 
 /***********************************************************************//**
@@ -53,7 +53,7 @@ public:
     virtual ~ctcubemask(void);
 
     // Operators
-    ctcubemask& operator= (const ctcubemask& app);
+    ctcubemask& operator=(const ctcubemask& app);
 
     // Methods
     void           clear(void);
@@ -62,7 +62,7 @@ public:
     void           save(void);
     GObservations& obs(void) { return m_obs; }
     void           get_parameters(void);
-    void           apply_mask(GCTAObservation* obs, const std::string& filename);
+    void           apply_mask(GCTAObservation* obs);
 
 protected:
     // Protected methods

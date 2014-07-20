@@ -41,6 +41,7 @@ ctobssim=../src/ctobssim/ctobssim
 ctselect=../src/ctselect/ctselect
 ctskymap=../src/ctskymap/ctskymap
 ctexpcube=../src/ctexpcube/ctexpcube
+ctcubemask=../src/ctcubemask/ctcubemask
 
 
 #
@@ -385,5 +386,27 @@ then
   $ECHO -n "."
 else
   $ECHO " expcube2.fits file is not valid"
+  exit 1
+fi
+
+
+#
+# Test ctcubemask
+# ===============
+$ECHO -n "Test ctcubemask: "
+$ctcubemask infile="data/crab_events.fits" \
+            regfile="data/exclusion.reg" \
+            outfile="filtered_cube.fits" \
+            ra=83.63 \
+            dec=22.01 \
+            rad=2.0 \
+            emin=0.1 \
+            emax=100.0
+$ECHO -n "."
+if [ -s "filtered_cube.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " filtered_cube.fits file is not valid"
   exit 1
 fi
