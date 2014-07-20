@@ -51,7 +51,7 @@ class ctobssim : public GApplication  {
 public:
     // Constructors and destructors
     ctobssim(void);
-    explicit ctobssim(GObservations obs);
+    explicit ctobssim(const GObservations& obs);
     ctobssim(int argc, char *argv[]);
     ctobssim(const ctobssim& app);
     virtual ~ctobssim(void);

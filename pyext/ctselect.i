@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    ctselect - CTA data selection tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2014 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -39,7 +39,7 @@ class ctselect : public GApplication  {
 public:
     // Constructors and destructors
     ctselect(void);
-    explicit ctselect(GObservations obs);
+    explicit ctselect(const GObservations& obs);
     ctselect(int argc, char *argv[]);
     ctselect(const ctselect& app);
     virtual ~ctselect(void);

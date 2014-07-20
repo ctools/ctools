@@ -55,7 +55,7 @@ class ctmodel : public GApplication  {
 public:
     // Constructors and destructors
     ctmodel(void);
-    explicit ctmodel(GObservations obs);
+    explicit ctmodel(const GObservations& obs);
     ctmodel(int argc, char *argv[]);
     ctmodel(const ctmodel& app);
     virtual ~ctmodel(void);

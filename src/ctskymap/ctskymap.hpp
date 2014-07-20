@@ -47,7 +47,7 @@ class ctskymap : public GApplication  {
 public:
     // Constructors and destructors
     ctskymap(void);
-    explicit ctskymap(GObservations obs);
+    explicit ctskymap(const GObservations& obs);
     ctskymap(int argc, char *argv[]);
     ctskymap(const ctskymap& app);
     virtual ~ctskymap(void);

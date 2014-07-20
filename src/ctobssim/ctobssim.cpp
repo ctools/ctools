@@ -73,7 +73,7 @@ ctobssim::ctobssim(void) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
  *
  * Constructs application by initialising from an observation container.
  ***************************************************************************/
-ctobssim::ctobssim(GObservations obs) :
+ctobssim::ctobssim(const GObservations& obs) :
           GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
     // Initialise members

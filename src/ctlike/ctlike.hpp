@@ -46,7 +46,7 @@ class ctlike : public GApplication  {
 public:
     // Constructors and destructors
     ctlike(void);
-    explicit ctlike(GObservations obs);
+    explicit ctlike(const GObservations& obs);
     ctlike(int argc, char *argv[]);
     ctlike(const ctlike& app);
     virtual ~ctlike(void);

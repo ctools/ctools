@@ -64,7 +64,7 @@ class ctbin : public GApplication  {
 public:
     // Constructors and destructors
     ctbin(void);
-    explicit ctbin(GObservations obs);
+    explicit ctbin(const GObservations& obs);
     ctbin(int argc, char *argv[]);
     ctbin(const ctbin& app);
     virtual ~ctbin(void);

@@ -65,10 +65,13 @@ ctlike::ctlike(void) : GApplication(CTLIKE_NAME, CTLIKE_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
+ * param[in] obs Observation container.
+ *
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctlike::ctlike(GObservations obs) : GApplication(CTLIKE_NAME, CTLIKE_VERSION)
+ctlike::ctlike(const GObservations& obs) :
+        GApplication(CTLIKE_NAME, CTLIKE_VERSION)
 {
     // Initialise members
     init_members();

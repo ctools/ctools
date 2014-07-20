@@ -406,13 +406,15 @@ $ctpsfcube infile="data/crab_events.fits" \
            emin=0.1 \
            emax=100.0 \
            enumbins=20 \
-           nxpix=200 \
-           nypix=200 \
-           binsz=0.02 \
+           nxpix=10 \
+           nypix=10 \
+           binsz=0.4 \
            coordsys="CEL" \
            xref=83.63 \
            yref=22.01 \
-           proj="CAR"
+           proj="CAR" \
+           amax=0.3 \
+           anumbins=10
 $ECHO -n "."
 if [ -s "psfcube1.fits" ]
 then
@@ -427,7 +429,9 @@ $ctpsfcube infile="data/crab_events.fits" \
            cntmap="data/crab_cntmap.fits" \
            outfile="psfcube2.fits" \
            caldb="irf" \
-           irf="cta_dummy_irf"
+           irf="cta_dummy_irf" \
+           amax=0.3 \
+           anumbins=10
 $ECHO -n "."
 if [ -s "psfcube2.fits" ]
 then

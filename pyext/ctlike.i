@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctlike - CTA maximum likelihood tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2012 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2014 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -40,7 +40,7 @@ class ctlike : public GApplication  {
 public:
     // Constructors and destructors
     ctlike(void);
-    explicit ctlike(GObservations obs);
+    explicit ctlike(const GObservations& obs);
     ctlike(int argc, char *argv[]);
     ctlike(const ctlike& app);
     virtual ~ctlike(void);

@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctobssim - CTA observation simulation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011 by Jurgen Knodlseder                                *
+ *  copyright (C) 2011-2014 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -39,7 +39,7 @@ class ctobssim : public GApplication  {
 public:
     // Constructors and destructors
     ctobssim(void);
-    explicit ctobssim(GObservations obs);
+    explicit ctobssim(const GObservations& obs);
     ctobssim(int argc, char *argv[]);
     ctobssim(const ctobssim& app);
     virtual ~ctobssim(void);

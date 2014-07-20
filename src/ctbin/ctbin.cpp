@@ -69,10 +69,13 @@ ctbin::ctbin(void) : GApplication(CTBIN_NAME, CTBIN_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
+ * param[in] obs Observation container.
+ *
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctbin::ctbin(GObservations obs) : GApplication(CTBIN_NAME, CTBIN_VERSION)
+ctbin::ctbin(const GObservations& obs) :
+       GApplication(CTBIN_NAME, CTBIN_VERSION)
 {
     // Initialise members
     init_members();

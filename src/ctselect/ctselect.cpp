@@ -68,10 +68,13 @@ ctselect::ctselect(void) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
+ * param[in] obs Observation container.
+ *
  * This constructor creates an instance of the class that is initialised from
  * an observation container.
  ***************************************************************************/
-ctselect::ctselect(GObservations obs) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
+ctselect::ctselect(const GObservations& obs) :
+          GApplication(CTSELECT_NAME, CTSELECT_VERSION)
 {
     // Initialise members
     init_members();

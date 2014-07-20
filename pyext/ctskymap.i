@@ -1,7 +1,7 @@
 /***************************************************************************
  *                     ctskymap - CTA sky mapping tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012 by Juergen Knoedlseder                              *
+ *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -39,7 +39,7 @@ class ctskymap : public GApplication  {
 public:
     // Constructors and destructors
     ctskymap(void);
-    explicit ctskymap(GObservations obs);
+    explicit ctskymap(const GObservations& obs);
     ctskymap(int argc, char *argv[]);
     ctskymap(const ctskymap& app);
     virtual ~ctskymap(void);

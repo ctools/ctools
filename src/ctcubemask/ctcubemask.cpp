@@ -67,6 +67,8 @@ ctcubemask::ctcubemask(void) : GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
+ * param[in] obs Observation container.
+ *
  * This constructor creates an instance of the class that is initialised from
  * an observation container.
  ***************************************************************************/

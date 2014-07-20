@@ -40,7 +40,7 @@ class ctexpcube : public GApplication  {
 public:
     // Constructors and destructors
     ctexpcube(void);
-    explicit ctexpcube(GObservations obs);
+    explicit ctexpcube(const GObservations& obs);
     ctexpcube(int argc, char *argv[]);
     ctexpcube(const ctexpcube& app);
     virtual ~ctexpcube(void);

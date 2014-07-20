@@ -66,10 +66,13 @@ ctmodel::ctmodel(void) : GApplication(CTMODEL_NAME, CTMODEL_VERSION)
 /***********************************************************************//**
  * @brief Observations constructor
  *
+ * param[in] obs Observation container.
+ *
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctmodel::ctmodel(GObservations obs) : GApplication(CTMODEL_NAME, CTMODEL_VERSION)
+ctmodel::ctmodel(const GObservations& obs) :
+         GApplication(CTMODEL_NAME, CTMODEL_VERSION)
 {
     // Initialise members
     init_members();

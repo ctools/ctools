@@ -1,7 +1,7 @@
 /***************************************************************************
  *                     ctmodel - CTA counts model tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012 by Juergen Knoedlseder                              *
+ *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -40,7 +40,7 @@ class ctmodel : public GApplication  {
 public:
     // Constructors and destructors
     ctmodel(void);
-    explicit ctmodel(GObservations obs);
+    explicit ctmodel(const GObservations& obs);
     ctmodel(int argc, char *argv[]);
     ctmodel(const ctmodel& app);
     virtual ~ctmodel(void);
