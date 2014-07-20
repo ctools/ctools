@@ -1,7 +1,7 @@
 /***************************************************************************
- *                   ctexpcube - CTA exposure cube tool                    *
+ *                   ctpsfcube - CTA PSF cube tool                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,38 +19,41 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctexpcube.i
- * @brief CTA exposure cube tool definition
- * @author Juergen Knoedlseder
+ * @file ctpsfcube.i
+ * @brief CTA PSF cube tool definition
+ * @author Chia-Chun Lu
  */
+
 %{
 /* Put headers and other declarations here that are needed for compilation */
-#include "ctexpcube.hpp"
+#include "ctpsfcube.hpp"
 #include "GTools.hpp"
 %}
 
-
 /***********************************************************************//**
- * @class ctexpcube
+ * @class ctpsfcube
  *
- * @brief CTA exposure cube tool
+ * @brief CTA PSF cube tool
  ***************************************************************************/
-class ctexpcube : public GApplication  {
+class ctpsfcube : public GApplication  {
 
 public:
     // Constructors and destructors
-    ctexpcube(void);
-    explicit ctexpcube(GObservations obs);
-    ctexpcube(int argc, char *argv[]);
-    ctexpcube(const ctexpcube& app);
-    virtual ~ctexpcube(void);
+    ctpsfcube(void);
+    explicit ctpsfcube(GObservations obs);
+    ctpsfcube(int argc, char *argv[]);
+    ctpsfcube(const ctpsfcube& app);
+    virtual ~ctpsfcube(void);
+
+    // Operators
+    ctpsfcube& operator=(const ctpsfcube& app);
 
     // Methods
     void           clear(void);
     void           execute(void);
     void           run(void);
     void           save(void);
-    GObservations& obs(void);
+    GObservations& obs(void) { return m_obs; }
     void           get_parameters(void);
     void           get_obs(void);
     void           set_response(void);
@@ -58,12 +61,11 @@ public:
     void           set_from_cntmap(const std::string& filename);
 };
 
-
 /***********************************************************************//**
- * @brief CTA exposure cube tool Python extension
+ * @brief CTA PSF cube tool Python extension
  ***************************************************************************/
-%extend ctexpcube {
-    ctexpcube copy() {
+%extend ctpsfcube {
+    ctpsfcube copy() {
         return (*self);
     }
 }

@@ -1,7 +1,7 @@
 /***************************************************************************
- *                   ctexpcube - CTA exposure cube tool                    *
+ *                  ctpsfcube - CTA PSF cube tool                          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,51 +19,61 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctexpcube.i
- * @brief CTA exposure cube tool definition
- * @author Juergen Knoedlseder
+ * @file ctpsfcube/main.cpp
+ * @brief CTA PSF cube tool main code
+ * @author Chia-Chun Lu
  */
-%{
-/* Put headers and other declarations here that are needed for compilation */
-#include "ctexpcube.hpp"
-#include "GTools.hpp"
-%}
+
+/* __ Includes ___________________________________________________________ */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include <cstdio>
+#include "ctpsfcube.hpp"
 
 
 /***********************************************************************//**
- * @class ctexpcube
+ * @brief Main entry point of application
  *
- * @brief CTA exposure cube tool
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
+ *
+ * This is the main entry point of the ctpsfcube application. It allocates a
+ * ctpsfcube object and runs the application.
  ***************************************************************************/
-class ctexpcube : public GApplication  {
+int main (int argc, char *argv[])
+{
+    // Initialise return code
+    int rc = 1;
 
-public:
-    // Constructors and destructors
-    ctexpcube(void);
-    explicit ctexpcube(GObservations obs);
-    ctexpcube(int argc, char *argv[]);
-    ctexpcube(const ctexpcube& app);
-    virtual ~ctexpcube(void);
+    // Create instance of application
+    ctpsfcube application(argc, argv);
 
-    // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void);
-    void           get_parameters(void);
-    void           get_obs(void);
-    void           set_response(void);
-    void           get_ebounds(void);
-    void           set_from_cntmap(const std::string& filename);
-};
+    // Run application
+    try {
+        // Execute application
+        application.execute();
 
-
-/***********************************************************************//**
- * @brief CTA exposure cube tool Python extension
- ***************************************************************************/
-%extend ctexpcube {
-    ctexpcube copy() {
-        return (*self);
+        // Signal success
+        rc = 0;
     }
+    catch (std::exception &e) {
+
+        // Extract error message
+        std::string message = e.what();
+        std::string signal  = "*** ERROR encounterted in the execution of"
+                              " ctpsfcube. Run aborted ...";
+
+        // Write error in logger
+        application.log << signal  << std::endl;
+        application.log << message << std::endl;
+
+        // Write error on standard output
+        std::cout << signal  << std::endl;
+        std::cout << message << std::endl;
+
+    } // endcatch: catched any application error
+
+    // Return
+    return rc;
 }

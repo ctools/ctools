@@ -12,7 +12,8 @@ SUBDIRS = ctbin \
           ctselect \
           ctskymap \
           ctexpcube \
-          ctcubemask
+          ctpsfcube \
+          ctcubemask 
 
 # Scripts to be distributed
 scripts = ctools-setup \
@@ -31,6 +32,7 @@ libctools_la_LIBADD = ctbin/libctbin.la \
                       ctselect/libctselect.la \
                       ctskymap/libctskymap.la \
                       ctexpcube/libctexpcube.la \
+                      ctpsfcube/libctpsfcube.la \
                       ctcubemask/libctcubemask.la
 
 # Distribute scripts

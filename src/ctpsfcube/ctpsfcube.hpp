@@ -1,7 +1,7 @@
 /***************************************************************************
- *                   ctexpcube - CTA exposure cube tool                    *
+ *                   ctpsfcube - CTA PSF cube tool                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,51 +19,68 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctexpcube.i
- * @brief CTA exposure cube tool definition
- * @author Juergen Knoedlseder
+ * @file ctpsfcube.hpp
+ * @brief CTA PSF cube tool definition
+ * @author Chia-Chun Lu
  */
-%{
-/* Put headers and other declarations here that are needed for compilation */
-#include "ctexpcube.hpp"
-#include "GTools.hpp"
-%}
+
+#ifndef CTPSFCUBE_HPP
+#define CTPSFCUBE_HPP
+
+/* __ Includes ___________________________________________________________ */
+#include "GammaLib.hpp"
+#include "GCTALib.hpp"
+
+/* __Definitions _________________________________________________________ */
+#define CTPSFCUBE_NAME    "ctpsfcube"
+#define CTPSFCUBE_VERSION "00-01-00"
 
 
 /***********************************************************************//**
- * @class ctexpcube
+ * @class ctpsfcube
  *
- * @brief CTA exposure cube tool
+ * @brief CTA PSF cube tool
  ***************************************************************************/
-class ctexpcube : public GApplication  {
+class ctpsfcube : public GApplication  {
 
 public:
     // Constructors and destructors
-    ctexpcube(void);
-    explicit ctexpcube(GObservations obs);
-    ctexpcube(int argc, char *argv[]);
-    ctexpcube(const ctexpcube& app);
-    virtual ~ctexpcube(void);
+    ctpsfcube(void);
+    explicit ctpsfcube(GObservations obs);
+    ctpsfcube(int argc, char *argv[]);
+    ctpsfcube(const ctpsfcube& app);
+    virtual ~ctpsfcube(void);
+
+    // Operators
+    ctpsfcube& operator=(const ctpsfcube& app);
 
     // Methods
     void           clear(void);
     void           execute(void);
     void           run(void);
     void           save(void);
-    GObservations& obs(void);
+    GObservations& obs(void) { return m_obs; }
     void           get_parameters(void);
     void           get_obs(void);
     void           set_response(void);
     void           get_ebounds(void);
     void           set_from_cntmap(const std::string& filename);
+
+protected:
+    // Protected methods
+    void           init_members(void);
+    void           copy_members(const ctpsfcube& app);
+    void           free_members(void);
+
+    // User parameters
+    std::string   m_outfile;     //!< Output PSF cube file
+    bool          m_apply_edisp; //!< Apply energy dispersion?
+
+    // Protected members
+    bool          m_read_ahead;  //!< Read ahead parameters
+    GObservations m_obs;         //!< Observation container
+    GCTAMeanPsf   m_psfcube;     //!< PSF cube
+    GEbounds      m_ebounds;     //!< Energy boundaries
 };
 
-
-/***********************************************************************//**
- * @brief CTA exposure cube tool Python extension
- ***************************************************************************/
-%extend ctexpcube {
-    ctexpcube copy() {
-        return (*self);
-    }
-}
+#endif /* CTPSFCUBE_HPP */

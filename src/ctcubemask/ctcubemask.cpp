@@ -201,7 +201,7 @@ void ctcubemask::clear(void)
 /***********************************************************************//**
  * @brief Execute application
  *
- * This method performs the event selection and saves the result
+ * This method applies the cube mask and saves the result.
  ***************************************************************************/
 void ctcubemask::execute(void)
 {
@@ -286,7 +286,7 @@ void ctcubemask::run(void)
             // Save event file name (for possible saving)
             m_infiles[i] = obs->eventfile();
 
-            // Load observation from temporary file, including event selection
+            // Apply mask on the event cube
             apply_mask(obs);
 
         } // endif: had a CTA observation
@@ -302,7 +302,7 @@ void ctcubemask::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        log.header1("Observations after selection");
+        log.header1("Observations after masked");
         log << m_obs << std::endl;
     }
 
@@ -312,22 +312,22 @@ void ctcubemask::run(void)
 
 
 /***********************************************************************//**
- * @brief Save the selected event list(s)
+ * @brief Save the masked event cube(s)
  *
- * This method saves the selected event list(s) into FITS file(s). There are
+ * This method saves the masked event cube(s) into FITS file(s). There are
  * two modes, depending on the m_use_xml flag.
  *
- * If m_use_xml is true, all selected event list(s) will be saved into FITS
+ * If m_use_xml is true, all masked event cube(s) will be saved into FITS
  * files, where the output filenames are constructued from the input
  * filenames by prepending the m_prefix string to name. Any path information
- * will be stripped form the input name, hence event files will be written
+ * will be stripped form the input name, hence event cube files will be written
  * into the local working directory (unless some path information is present
  * in the prefix). In addition, an XML file will be created that gathers
- * the filename information for the selected event list(s). If an XML file
+ * the filename information for the masked event cube(s). If an XML file
  * was present on input, all metadata information will be copied from this
  * input file.
  *
- * If m_use_xml is false, the selected event list will be saved into a FITS
+ * If m_use_xml is false, the masked event cubes will be saved into a FITS
  * file.
  ***************************************************************************/
 void ctcubemask::save(void)
@@ -362,10 +362,10 @@ void ctcubemask::save(void)
  * @brief Get application parameters
  *
  * Get all task parameters from parameter file or (if required) by querying
- * the user. Times are assumed to be in the native CTA MJD format.
+ * the user. 
  *
  * This method also loads observations if no observations are yet allocated.
- * Observations are either loaded from a single CTA even list, or from a
+ * Observations are either loaded from a single CTA even cube, or from a
  * XML file using the metadata information that is stored in that file.
  ***************************************************************************/
 void ctcubemask::get_parameters(void)
@@ -383,7 +383,7 @@ void ctcubemask::get_parameters(void)
         // Try first to open as FITS file
         try {
 
-            // Load event list in CTA observation
+            // Load event cube in CTA observation
             obs.load(m_infile);
 
             // Append CTA observation to container
@@ -430,11 +430,13 @@ void ctcubemask::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Apply mask to counts cube
+ * @brief Mask event cube
  *
  * @param[in] obs CTA observation.
  *
- * Masks out event bins by setting their content to -1.
+ * Mask an event cube. The mask sets pixel values outside the region of interest
+ * or the energy of interest to -1. These pixels will be ignored in likelihood
+ * fitting.
  ***************************************************************************/
 void ctcubemask::apply_mask(GCTAObservation* obs)
 {

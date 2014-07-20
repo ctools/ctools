@@ -1,7 +1,7 @@
 /***************************************************************************
- *                   ctexpcube - CTA exposure cube tool                    *
+ *                   ctpsfcube - CTA PSF cube tool                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctexpcube.cpp
- * @brief CTA exposure cube tool implementation
- * @author Juergen Knoedlseder
+ * @file ctpsfcube.cpp
+ * @brief CTA PSF cube tool implementation
+ * @author Chia-Chun Lu
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -29,14 +29,14 @@
 #include <config.h>
 #endif
 #include <cstdio>
-#include "ctexpcube.hpp"
+#include "ctpsfcube.hpp"
 #include "GTools.hpp"
 #include "GWcs.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_EBOUNDS                              "ctexpcube::get_ebounds()"
-#define G_GET_PARAMETERS                        "ctexpcube::get_parameters()"
-#define G_SET_FROM_CNTMAP          "ctexpcube::set_from_cntmap(std::string&)"
+#define G_GET_EBOUNDS                              "ctpsfcube::get_ebounds()"
+#define G_GET_PARAMETERS                        "ctpsfcube::get_parameters()"
+#define G_SET_FROM_CNTMAP          "ctpsfcube::set_from_cntmap(std::string&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -52,7 +52,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctexpcube::ctexpcube(void) : GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
+ctpsfcube::ctpsfcube(void) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -71,7 +71,7 @@ ctexpcube::ctexpcube(void) : GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctexpcube::ctexpcube(GObservations obs) : GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
+ctpsfcube::ctpsfcube(GObservations obs) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -94,8 +94,8 @@ ctexpcube::ctexpcube(GObservations obs) : GApplication(CTEXPCUBE_NAME, CTEXPCUBE
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
-ctexpcube::ctexpcube(int argc, char *argv[]) :
-           GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, argc, argv)
+ctpsfcube::ctpsfcube(int argc, char *argv[]) :
+           GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -111,9 +111,9 @@ ctexpcube::ctexpcube(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app ctexpcube application.
+ * @param[in] app ctpsfcube application.
  ***************************************************************************/
-ctexpcube::ctexpcube(const ctexpcube& app) : GApplication(app)
+ctpsfcube::ctpsfcube(const ctpsfcube& app) : GApplication(app)
 {
     // Initialise members
     init_members();
@@ -129,7 +129,7 @@ ctexpcube::ctexpcube(const ctexpcube& app) : GApplication(app)
 /***********************************************************************//**
  * @brief Destructor
  ***************************************************************************/
-ctexpcube::~ctexpcube(void)
+ctpsfcube::~ctpsfcube(void)
 {
     // Free members
     free_members();
@@ -148,10 +148,10 @@ ctexpcube::~ctexpcube(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app ctexpcube application.
- * @return Returns ctexpcube application.
+ * @param[in] app ctpsfcube application.
+ * @return Returns ctpsfcube application.
  ***************************************************************************/
-ctexpcube& ctexpcube::operator=(const ctexpcube& app)
+ctpsfcube& ctpsfcube::operator=(const ctpsfcube& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
@@ -184,7 +184,7 @@ ctexpcube& ctexpcube::operator=(const ctexpcube& app)
 /***********************************************************************//**
  * @brief Clear instance
  ***************************************************************************/
-void ctexpcube::clear(void)
+void ctpsfcube::clear(void)
 {
     // Free members
     free_members();
@@ -202,19 +202,19 @@ void ctexpcube::clear(void)
 /***********************************************************************//**
  * @brief Execute application
  *
- * This is the main execution method of the ctexpcube class. It is invoked
+ * This is the main execution method of the ctpsfcube class. It is invoked
  * when the executable is called from command line. The method generates
- * the exposure cube and saves the result.
+ * the PSF cube and saves the result.
  ***************************************************************************/
-void ctexpcube::execute(void)
+void ctpsfcube::execute(void)
 {
     // Signal that some parameters should be read ahead
     m_read_ahead = true;
 
-    // Create the exposure cube
+    // Create the PSF cube
     run();
 
-    // Save the exposure cube into the output FITS file
+    // Save the PSF cube into the output FITS file
     save();
 
     // Return
@@ -223,13 +223,13 @@ void ctexpcube::execute(void)
 
 
 /***********************************************************************//**
- * @brief Generate the exposure cube(s).
+ * @brief Generate the model map(s)
  *
  * This method reads the task parameters from the parfile, sets up the
  * observation container, loops over all CTA observations in the container
- * and generates an exposure cube from the CTA observations.
+ * and generates a PSF cube from the CTA observations.
  ***************************************************************************/
-void ctexpcube::run(void)
+void ctpsfcube::run(void)
 {
     // If we're in debug mode then all output is also dumped on the screen
     if (logDebug()) {
@@ -272,11 +272,11 @@ void ctexpcube::run(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Generate exposure cube");
+        log.header1("Generate PSF cube");
     }
 
-    // Fill exposure
-    m_expcube.fill(m_obs);
+    // Fill PSF 
+    m_psfcube.fill(m_obs);
 
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -292,22 +292,22 @@ void ctexpcube::run(void)
 
 
 /***********************************************************************//**
- * @brief Save exposure cube
+ * @brief Save PSF cube
  *
  ***************************************************************************/
-void ctexpcube::save(void)
+void ctpsfcube::save(void)
 {
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Save exposure cube");
+        log.header1("Save PSF cube");
     }
 
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
 
-    // Save exposure cube
-    m_expcube.save(m_outfile, clobber());
+    // Save PSF cube
+    m_psfcube.save(m_outfile, clobber());
 
     // Return
     return;
@@ -320,9 +320,9 @@ void ctexpcube::save(void)
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
  *
- * @todo Setup exposure cube from counts map
+ * @todo Setup PSF cube from counts map
  ***************************************************************************/
-void ctexpcube::get_parameters(void)
+void ctpsfcube::get_parameters(void)
 {
     // If we do not have any observations in the container then get an
     // input file name or observation descriptor file
@@ -336,7 +336,7 @@ void ctexpcube::get_parameters(void)
     // Read energy dispersion flag
     m_apply_edisp = (*this)["edisp"].boolean();
 
-    // If no counts map is specified then setup the exposure cube from
+    // If no counts map is specified then setup the PSF cube from
     // the user parameters
     std::string cntmap = (*this)["cntmap"].filename();
     if ((cntmap == "NONE") || (gammalib::strip_whitespace(cntmap) == "")) {
@@ -349,20 +349,22 @@ void ctexpcube::get_parameters(void)
         double      binsz    = (*this)["binsz"].real();
         int         nxpix    = (*this)["nxpix"].integer();
         int         nypix    = (*this)["nypix"].integer();
+	double      dmax     = (*this)["dmax"].real();
+	int         ndbins   = (*this)["ndbins"].integer();
 
         // Get energy definition
         get_ebounds();
 
         // Define exposure cube
-        m_expcube = GCTAExposure(wcs, coordsys, xref, yref,
-                                 -binsz, binsz, nxpix, nypix,
-                                 m_ebounds);
+        m_psfcube = GCTAMeanPsf(wcs, coordsys, xref, yref,
+				-binsz, binsz, nxpix, nypix,
+				m_ebounds, dmax, ndbins);
     }
 
     // ... otherwise setup the exposure cube from the counts map
     else {
     
-        // Set exposure cube from counts map
+        // Set PSF cube from counts map
         set_from_cntmap(cntmap);
     
     }
@@ -382,7 +384,7 @@ void ctexpcube::get_parameters(void)
  *
  * Get observation definition from the user parameters.
  ***************************************************************************/
-void ctexpcube::get_obs(void)
+void ctpsfcube::get_obs(void)
 {
     // Get input filename
     std::string filename = (*this)["infile"].filename();
@@ -420,7 +422,7 @@ void ctexpcube::get_obs(void)
  *
  * Set response for all observations that so have no response.
  ***************************************************************************/
-void ctexpcube::set_response(void)
+void ctpsfcube::set_response(void)
 {
     // Loop over all observations
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -472,7 +474,7 @@ void ctexpcube::set_response(void)
  *
  * Get the energy boundaries from the user parameters.
  ***************************************************************************/
-void ctexpcube::get_ebounds(void)
+void ctpsfcube::get_ebounds(void)
 {
     // Determine the energy binning alogrithm
     std::string ebinalg = (*this)["ebinalg"].string();
@@ -542,7 +544,7 @@ void ctexpcube::get_ebounds(void)
  *
  * Set exposure cube definition from counts map.
  ***************************************************************************/
-void ctexpcube::set_from_cntmap(const std::string& filename)
+void ctpsfcube::set_from_cntmap(const std::string& filename)
 {
     // Allocate CTA observation
     GCTAObservation obs;
@@ -571,14 +573,16 @@ void ctexpcube::set_from_cntmap(const std::string& filename)
             double      dy       = wcs->cdelt(1);
             int         nx       = cube->map().nx();
             int         ny       = cube->map().ny();
+	    double      dmax     = (*this)["dmax"].real();
+	    int         ndbins   = (*this)["ndbins"].integer();
 
             // Get energy definition
             m_ebounds = cube->ebounds();
 
             // Define exposure cube
-            m_expcube = GCTAExposure(proj, coordsys, xref, yref,
-                                     dx, dy, nx, ny,
-                                     m_ebounds);
+            m_psfcube = GCTAMeanPsf(proj, coordsys, xref, yref,
+				    dx, dy, nx, ny,
+				    m_ebounds, dmax, ndbins);
         
         } // endif: WCS projection was valid
 
@@ -611,7 +615,7 @@ void ctexpcube::set_from_cntmap(const std::string& filename)
 /***********************************************************************//**
  * @brief Initialise class members
  ***************************************************************************/
-void ctexpcube::init_members(void)
+void ctpsfcube::init_members(void)
 {
     // Initialise members
     m_outfile.clear();
@@ -620,7 +624,7 @@ void ctexpcube::init_members(void)
     // Initialise protected members
     m_read_ahead = false;
     m_obs.clear();
-    m_expcube.clear();
+    m_psfcube.clear();
     m_ebounds.clear();
 
     // Set logger properties
@@ -636,7 +640,7 @@ void ctexpcube::init_members(void)
  *
  * @param[in] app Application.
  ***************************************************************************/
-void ctexpcube::copy_members(const ctexpcube& app)
+void ctpsfcube::copy_members(const ctpsfcube& app)
 {
     // Copy attributes
     m_outfile     = app.m_outfile;
@@ -645,7 +649,7 @@ void ctexpcube::copy_members(const ctexpcube& app)
     // Copy protected members
     m_read_ahead = app.m_read_ahead;
     m_obs        = app.m_obs;
-    m_expcube    = app.m_expcube;
+    m_psfcube    = app.m_psfcube;
     m_ebounds    = app.m_ebounds;
 
     // Return
@@ -656,7 +660,7 @@ void ctexpcube::copy_members(const ctexpcube& app)
 /***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
-void ctexpcube::free_members(void)
+void ctpsfcube::free_members(void)
 {
     // Write separator into logger
     if (logTerse()) {
