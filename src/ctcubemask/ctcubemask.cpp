@@ -430,13 +430,13 @@ void ctcubemask::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Mask event cube
+ * @brief Apply mask to event cube
  *
  * @param[in] obs CTA observation.
  *
- * Mask an event cube. The mask sets pixel values outside the region of interest
- * or the energy of interest to -1. These pixels will be ignored in likelihood
- * fitting.
+ * Apply mask to an event cube. The mask sets content of event bins 
+ * outside the region of interest or the energy of interest to -1. 
+ * These pixels will be ignored in likelihood fitting.
  ***************************************************************************/
 void ctcubemask::apply_mask(GCTAObservation* obs)
 {
