@@ -38,10 +38,9 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
-        self.model_name  = "data/crab.xml"
-        self.events_name = "events.fits"
-        self.caldb       = "irf"
-        self.irf         = "cta_dummy_irf"
+        self.model_name = "data/crab.xml"
+        self.caldb      = "irf"
+        self.irf        = "cta_dummy_irf"
 
         # Return
         return

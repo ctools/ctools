@@ -38,6 +38,9 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.events_name = "data/crab_events.fits"
+        self.caldb       = "irf"
+        self.irf         = "cta_dummy_irf"
 
         # Return
         return
@@ -61,5 +64,40 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctexpcube functionnality.
         """
+        # Set-up ctexpcube
+        expcube = ctools.ctexpcube()
+        expcube["infile"].filename(self.events_name)
+        expcube["cntmap"].filename("NONE")
+        expcube["outfile"].filename("expcube.fits")
+        expcube["caldb"].string(self.caldb)
+        expcube["irf"].string(self.irf)
+        expcube["ebinalg"].string("LOG")
+        expcube["emin"].real(0.1)
+        expcube["emax"].real(100.0)
+        expcube["enumbins"].integer(20)
+        expcube["nxpix"].integer(200)
+        expcube["nypix"].integer(200)
+        expcube["binsz"].real(0.02)
+        expcube["coordsys"].string("CEL")
+        expcube["proj"].string("CAR")
+        expcube["xref"].real(83.63)
+        expcube["yref"].real(22.01)
+        
+        # Run tool
+        self.test_try("Run ctexpcube")
+        try:
+            expcube.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctexpcube.")
+
+        # Save exposure cube
+        self.test_try("Save exposure cube")
+        try:
+            expcube.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving exposure cube.")
+
         # Return
         return

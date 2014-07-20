@@ -38,6 +38,7 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.events_name = "data/crab_events.fits"
 
         # Return
         return
@@ -61,5 +62,33 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctselect functionnality.
         """
+        # Set-up ctselect
+        select = ctools.ctselect()
+        select["infile"].filename(self.events_name)
+        select["outfile"].filename("selected_events.fits")
+        select["ra"].real(83.63)
+        select["dec"].real(22.01)
+        select["rad"].real(3.0)
+        select["tmin"].real(0.0)
+        select["tmax"].real(1800.0)
+        select["emin"].real(0.1)
+        select["emax"].real(100.0)
+
+        # Run tool
+        self.test_try("Run ctselect")
+        try:
+            select.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctselect.")
+
+        # Save events
+        self.test_try("Save events")
+        try:
+            select.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving events.")
+        
         # Return
         return

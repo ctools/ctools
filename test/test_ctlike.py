@@ -38,6 +38,10 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.events_name = "data/crab_events.fits"
+        self.model_name  = "data/crab.xml"
+        self.caldb       = "irf"
+        self.irf         = "cta_dummy_irf"
 
         # Return
         return
@@ -61,5 +65,29 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctlike functionnality.
         """
+        # Set-up ctlike
+        like = ctools.ctlike()
+        like["infile"].filename(self.events_name)
+        like["srcmdl"].filename(self.model_name)
+        like["caldb"].string(self.caldb)
+        like["irf"].string(self.irf)
+        like["outmdl"].filename("result.xml")
+
+        # Run tool
+        self.test_try("Run ctlike")
+        try:
+            like.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctlike.")
+
+        # Save results
+        self.test_try("Save results")
+        try:
+            like.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving results.")
+        
         # Return
         return

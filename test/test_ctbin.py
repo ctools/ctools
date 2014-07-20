@@ -38,6 +38,7 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.events_name = "data/crab_events.fits"
 
         # Return
         return
@@ -61,5 +62,37 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctbin functionnality.
         """
+        # Set-up ctbin
+        bin = ctools.ctbin()
+        bin["evfile"].filename(self.events_name)
+        bin["outfile"].filename("cntmap.fits")
+        bin["ebinalg"].string("LOG")
+        bin["emin"].real(0.1)
+        bin["emax"].real(100.0)
+        bin["enumbins"].integer(20)
+        bin["nxpix"].integer(200)
+        bin["nypix"].integer(200)
+        bin["binsz"].real(0.02)
+        bin["coordsys"].string("CEL")
+        bin["proj"].string("CAR")
+        bin["xref"].real(83.63)
+        bin["yref"].real(22.01)
+        
+        # Run tool
+        self.test_try("Run ctbin")
+        try:
+            bin.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctbin.")
+
+        # Save counts cube
+        self.test_try("Save counts cube")
+        try:
+            bin.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving counts cube.")
+
         # Return
         return

@@ -447,7 +447,7 @@ $ECHO " ok"
 # Test ctcubemask
 # ===============
 $ECHO -n "Test ctcubemask: "
-$ctcubemask infile="data/crab_events.fits" \
+$ctcubemask infile="data/crab_cntmap.fits" \
             regfile="data/exclusion.reg" \
             outfile="filtered_cube.fits" \
             ra=83.63 \

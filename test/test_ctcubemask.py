@@ -38,6 +38,8 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.cntmap_name = "data/crab_cntmap.fits"
+        self.regfile     = "data/exclusion.reg"
 
         # Return
         return
@@ -61,5 +63,32 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctcubemask functionnality.
         """
+        # Set-up ctcubemask
+        mask = ctools.ctcubemask()
+        mask["infile"].filename(self.cntmap_name)
+        mask["regfile"].filename(self.regfile)
+        mask["outfile"].filename("filtered_cntmap.fits")
+        mask["ra"].real(83.63)
+        mask["dec"].real(22.01)
+        mask["rad"].real(2.0)
+        mask["emin"].real(0.1)
+        mask["emax"].real(100.0)
+        
+        # Run tool
+        self.test_try("Run ctcubemask")
+        try:
+            mask.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctcubemask.")
+
+        # Save counts cube
+        self.test_try("Save counts cube")
+        try:
+            mask.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving counts cube.")
+
         # Return
         return

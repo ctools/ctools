@@ -38,6 +38,7 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.events_name = "data/crab_events.fits"
 
         # Return
         return
@@ -61,5 +62,35 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctskymap functionnality.
         """
+        # Set-up ctskymap
+        skymap = ctools.ctskymap()
+        skymap["evfile"].filename(self.events_name)
+        skymap["outfile"].filename("skymap.fits")
+        skymap["emin"].real(0.1)
+        skymap["emax"].real(100.0)
+        skymap["nxpix"].integer(200)
+        skymap["nypix"].integer(200)
+        skymap["binsz"].real(0.02)
+        skymap["coordsys"].string("CEL")
+        skymap["proj"].string("CAR")
+        skymap["xref"].real(83.63)
+        skymap["yref"].real(22.01)
+        
+        # Run tool
+        self.test_try("Run ctskymap")
+        try:
+            skymap.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctskymap.")
+
+        # Save counts cube
+        self.test_try("Save sky map")
+        try:
+            skymap.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving sky map.")
+
         # Return
         return

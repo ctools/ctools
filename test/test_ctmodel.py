@@ -38,6 +38,9 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.model_name = "data/crab.xml"
+        self.caldb      = "irf"
+        self.irf        = "cta_dummy_irf"
 
         # Return
         return
@@ -61,5 +64,43 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctmodel functionnality.
         """
+        # Set-up ctmodel from scratch
+        model = ctools.ctmodel()
+        model["infile"].filename("NONE")
+        model["outfile"].filename("modmap.fits")
+        model["caldb"].string(self.caldb)
+        model["irf"].string(self.irf)
+        model["srcmdl"].filename(self.model_name)
+        model["ra"].real(83.63)
+        model["dec"].real(22.01)
+        model["tmin"].real(0.0)
+        model["tmax"].real(1800.0)
+        model["emin"].real(0.1)
+        model["emax"].real(100.0)
+        model["enumbins"].integer(20)
+        model["nxpix"].integer(200)
+        model["nypix"].integer(200)
+        model["binsz"].real(0.02)
+        model["coordsys"].string("CEL")
+        model["proj"].string("CAR")
+        model["xref"].real(83.63)
+        model["yref"].real(22.01)
+        
+        # Run tool
+        self.test_try("Run ctmodel")
+        try:
+            model.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctmodel.")
+
+        # Save counts cube
+        self.test_try("Save model cube")
+        try:
+            model.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving model cube.")
+
         # Return
         return

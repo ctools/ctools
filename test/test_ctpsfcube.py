@@ -38,6 +38,9 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
+        self.events_name = "data/crab_events.fits"
+        self.caldb       = "irf"
+        self.irf         = "cta_dummy_irf"
 
         # Return
         return
@@ -61,5 +64,42 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctpsfcube functionnality.
         """
+        # Set-up ctpsfcube
+        psfcube = ctools.ctpsfcube()
+        psfcube["infile"].filename(self.events_name)
+        psfcube["cntmap"].filename("NONE")
+        psfcube["outfile"].filename("psfcube.fits")
+        psfcube["caldb"].string(self.caldb)
+        psfcube["irf"].string(self.irf)
+        psfcube["ebinalg"].string("LOG")
+        psfcube["emin"].real(0.1)
+        psfcube["emax"].real(100.0)
+        psfcube["enumbins"].integer(20)
+        psfcube["nxpix"].integer(10)
+        psfcube["nypix"].integer(10)
+        psfcube["binsz"].real(0.4)
+        psfcube["coordsys"].string("CEL")
+        psfcube["proj"].string("CAR")
+        psfcube["xref"].real(83.63)
+        psfcube["yref"].real(22.01)
+        psfcube["amax"].real(0.3)
+        psfcube["anumbins"].integer(10)
+        
+        # Run tool
+        self.test_try("Run ctpsfcube")
+        try:
+            psfcube.run()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in ctpsfcube.")
+
+        # Save PSF cube
+        self.test_try("Save PSF cube")
+        try:
+            psfcube.save()
+            self.test_try_success()
+        except:
+            self.test_try_failure("Exception occured in saving PSF cube.")
+
         # Return
         return
