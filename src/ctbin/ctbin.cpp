@@ -777,7 +777,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then throw an exception.
         if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
-            throw GException::no_list(G_BIN_EVENTS);
+            throw GException::no_list(G_FILL_CUBE);
         }
 
         // Initialise binning statistics

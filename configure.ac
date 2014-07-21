@@ -884,6 +884,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctselect/Makefile
                  src/ctexpcube/Makefile
                  src/ctpsfcube/Makefile
+                 src/ctbkgcube/Makefile
                  src/ctcubemask/Makefile
                  src/ctools-setup
                  test/Makefile
