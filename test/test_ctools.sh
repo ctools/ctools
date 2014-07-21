@@ -431,7 +431,7 @@ $ctpsfcube infile="data/crab_events.fits" \
            caldb="irf" \
            irf="cta_dummy_irf" \
            amax=0.3 \
-           anumbins=10
+           anumbins=2
 $ECHO -n "."
 if [ -s "psfcube2.fits" ]
 then
