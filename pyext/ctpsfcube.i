@@ -45,9 +45,6 @@ public:
     ctpsfcube(const ctpsfcube& app);
     virtual ~ctpsfcube(void);
 
-    // Operators
-    ctpsfcube& operator=(const ctpsfcube& app);
-
     // Methods
     void           clear(void);
     void           execute(void);
