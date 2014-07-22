@@ -46,16 +46,17 @@ public:
     virtual ~ctpsfcube(void);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           get_obs(void);
-    void           set_response(void);
-    void           get_ebounds(void);
-    void           set_from_cntmap(const std::string& filename);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    const GCTAMeanPsf&   psfcube(void) const;
+    void                 get_parameters(void);
+    void                 get_obs(void);
+    void                 set_response(void);
+    void                 get_ebounds(void);
+    void                 set_from_cntmap(const std::string& filename);
 };
 
 /***********************************************************************//**

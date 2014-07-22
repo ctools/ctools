@@ -55,16 +55,17 @@ public:
     ctexpcube& operator=(const ctexpcube& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           get_obs(void);
-    void           set_response(void);
-    void           get_ebounds(void);
-    void           set_from_cntmap(const std::string& filename);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    const GCTAExposure&  expcube(void) const;
+    void                 get_parameters(void);
+    void                 get_obs(void);
+    void                 set_response(void);
+    void                 get_ebounds(void);
+    void                 set_from_cntmap(const std::string& filename);
 
 protected:
     // Protected methods
@@ -82,5 +83,29 @@ protected:
     GCTAExposure  m_expcube;     //!< Exposure cube
     GEbounds      m_ebounds;     //!< Energy boundaries
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Observation container
+ ***************************************************************************/
+inline
+const GObservations& ctexpcube::obs(void) const
+{
+    return (m_obs);
+}
+
+
+/***********************************************************************//**
+ * @brief Return exposure cube
+ *
+ * @return Exposure cube
+ ***************************************************************************/
+inline
+const GCTAExposure& ctexpcube::expcube(void) const
+{
+    return (m_expcube);
+}
 
 #endif /* CTEXPCUBE_HPP */
