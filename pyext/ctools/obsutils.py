@@ -580,8 +580,9 @@ def specpoints(obs,source,ebins):
     opt_spectral[normpar].free()
     
     #Define spectrum dictionary, units are in format readable by astropy
-    pars = {"value":[],"eu_value":[],"ed_value":[],"unit":[]}
-    spec = {"energy":pars.copy(),"flux":pars.copy(),"TS":[]}
+    spec = {"energy":{"value":[],"eu_value":[],"ed_value":[],"unit":"none"},
+            "flux"  :{"value":[],"eu_value":[],"ed_value":[],"unit":"none"},
+            "TS"    :{"value":[],"eu_value":[],"ed_value":[],"unit":"none"}}
     
     #Loop over energy bins, fit and write result to spectrum
     for ebin in ebins:
@@ -614,14 +615,16 @@ def specpoints(obs,source,ebins):
         spec["energy"]["value"].append(ecenter)
         spec["energy"]["ed_value"].append(ecenter-ebin[0])
         spec["energy"]["eu_value"].append(ebin[1]-ecenter)
-        spec["energy"]["unit"].append("1e12 eV")
+        spec["energy"]["unit"]="1e12 eV"
         
         spec["flux"]["value"].append(binflux*1e6)
         spec["flux"]["ed_value"].append(relerr*binflux*1e6)
         spec["flux"]["eu_value"].append(relerr*binflux*1e6)
-        spec["flux"]["unit"].append("cm-2 1e-12 eV-1")
+        spec["flux"]["unit"]="cm-2 1e-12 eV-1"
         
-        spec["TS"].append(binlike.obs().models()[source].ts())
+        spec["TS"]["value"].append(binlike.obs().models()[source].ts())
     
+    print spec["energy"]["value"]
+    print spec["flux"]["value"]
     #Return spectrum
     return spec
