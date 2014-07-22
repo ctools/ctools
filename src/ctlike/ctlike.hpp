@@ -63,6 +63,7 @@ public:
     GOptimizer*    opt(void) { return m_opt; }
     void           get_parameters(void);
     void           optimize_lm(void);
+    double         reoptimize_lm(void);
 
 protected:
     // Protected methods

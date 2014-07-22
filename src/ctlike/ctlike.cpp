@@ -274,16 +274,16 @@ void ctlike::run(void)
     // Optionally perform TS computation
     if (m_tscalc) {
     
-        // Store original models and max. likelihood
-        double   logL_src    = m_logL;
-        GModels* models_orig = m_obs.models().clone();
+        // Store original maximum likelihood and models
+        double  logL_src    = m_logL;
+        GModels models_orig = m_obs.models();
     
-        // Store models whith free parameters
+        // Store models with free parameters
         std::vector<std::string> free_srcs;
         GModels models = m_obs.models();
         for (int i = 0; i < models.size(); ++i) {
             GModel* model = models[i];
-            for(int j = 0; j < model->size(); ++j) {
+            for (int j = 0; j < model->size(); ++j) {
                 GModelPar par = model->at(j);
                 if (par.is_free()){
                     free_srcs.push_back(model->name());
@@ -296,18 +296,14 @@ void ctlike::run(void)
         for (int i = 0; i < free_srcs.size(); ++i) {
             models.remove(free_srcs[i]);  
             m_obs.models(models);    
-            optimize_lm();
-            double logL_nosrc = m_logL;
+            double logL_nosrc = reoptimize_lm();
             double ts         = 2.0 * (logL_src-logL_nosrc);
-            std::string name  = free_srcs[i];
-            (*models_orig)[name]->ts(ts);
-            models = *models_orig;
+            models_orig[free_srcs[i]]->ts(ts);
+            models = models_orig;
         }
     
         // Restore best fit values
-        // TODO: store fit results before and avoid refitting
-        m_obs.models(*models_orig);
-        optimize_lm();
+        m_obs.models(models_orig);
 
     } // endif: did optional TS computation
 
@@ -558,6 +554,52 @@ void ctlike::optimize_lm(void)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Re-optimize model parameters using Levenberg-Marquardt method
+ *        for TS computation
+ ***************************************************************************/
+double ctlike::reoptimize_lm(void)
+{
+    // Allocate optimizer. The logger is only passed to the optimizer
+    // constructor if optimizer logging is requested.
+    GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log)
+                                     : new GOptimizerLM();
+
+    // Set optimizer parameters
+    opt->max_iter(m_max_iter);
+    opt->max_stalls(m_max_stall);
+
+    // Write Header for optimization and indent for optimizer logging
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Maximum likelihood re-optimisation");
+        log.indent(1);
+    }
+
+    // Perform LM optimization
+    m_obs.optimize(*opt);
+
+    // Optionally refit
+    if (m_refit) {
+        m_obs.optimize(*opt);
+    }
+
+    // Store maximum log likelihood value
+    double logL = -(opt->value());
+
+    // Write optimization results
+    log.indent(0);
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Maximum likelihood re-optimization results");
+        log << *opt << std::endl;
+    }
+
+    // Return
+    return (logL);
 }
 
 
