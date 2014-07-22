@@ -20,6 +20,7 @@
 # ==========================================================================
 import ctools
 import gammalib
+import math
 
 
 # ===================== #
@@ -124,7 +125,7 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
 # ================ #
 # Fit observations #
 # ================ #
-def fit(obs, log=False, debug=False, edisp=False):
+def fit(obs, log=False, debug=False, edisp=False, tscalc=False):
     """
     Perform maximum likelihood fitting of observations in the container.
     
@@ -145,8 +146,13 @@ def fit(obs, log=False, debug=False, edisp=False):
     # Optionally switch-on debugging model
     if debug:
         like["debug"].boolean(True)
+    
+    # Optionally turn on TS calculation
+    if tscalc:
+        like["tscalc"].boolean(True)
 
     # Optionally apply energy dispersion
+    like["edisp"].boolean(edisp)
     like["edisp"].boolean(edisp)
 
     # Run ctlike application.
@@ -516,3 +522,106 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
     
     # Return observation definition list
     return obsdeflist
+    
+# ================================================= #
+# Make spectrum for one Source in a CTA Observation #
+# ================================================= #
+
+def getlogbins(nbins=12,emin=0.1,emax=100):
+    """
+    Returns list with logarithmiscenergy bins in
+    format [[emin1,emax1],[emin2,emax2],..]
+    
+    Parameters:
+       nbins   Number of bins
+       emin    Minimum energy
+       emax    Maximum energy
+    """
+    lgemin=math.log10(emin)
+    lgemax=math.log10(emax)
+    lgsize=(lgemax-lgemin)/nbins
+    ebins=[]
+    for ii in range(0,nbins):
+        ebins.append([math.pow(10,lgemin),math.pow(10,lgemin+lgsize)])
+        lgemin=lgemin+lgsize
+    return ebins
+
+# Please note that specpoints can make spectra for any given
+# spectral model, as long as it has a "Prefactor" or "Integral"
+# parameter which scales the function
+def specpoints(obs,source,ebins):
+    """
+    Returns spectral points in the given binning for
+    the passed observations and source.
+    
+    Parameters:
+     obs    - Pointing direction
+     source - Source name for which spectrum should be done
+     ebins  - Binning passed as a list in units of TeV as
+              [[emin1,emax1],[emin2,emax2],..]
+    Keywords:
+    """
+    #Check if parameters Prefactor or Integral exist to scale mdoel
+    normpar = "Prefactor"
+    srcmodel = obs.models()[source]
+    if not srcmodel.has_par(normpar):
+        if srcmodel.has_par("Integral"):
+            normpar = "Integral"
+        else:
+            print "Error: your spectral model of ",source,"does not\
+            have a scaling parameter named 'Prefactor' or 'Integral'"
+            return
+            
+    #Fix all parameters except prefactor
+    opt_spectral = srcmodel.spectral()
+    for model in obs.models():
+        for par in range(model.size()):
+            model[par].fix()
+    opt_spectral[normpar].free()
+    
+    #Define spectrum dictionary, units are in format readable by astropy
+    pars = {"value":[],"eu_value":[],"ed_value":[],"unit":[]}
+    spec = {"energy":pars.copy(),"flux":pars.copy(),"TS":[]}
+    
+    #Loop over energy bins, fit and write result to spectrum
+    for ebin in ebins:
+        #Get logarithmic bin center and flux value of all energy fit 
+        ecenter = math.pow(10,(math.log10(ebin[1])+math.log10(ebin[0]))/2.)
+        allflux = opt_spectral.eval(gammalib.GEnergy(ecenter,"TeV"),gammalib.GTime(0))
+
+        #Clone observations and reset energy thresholds
+        select = ctools.ctselect(obs)
+        select["ra"].real(-1.0)
+        select["dec"].real(-1.0)
+        select["rad"].real(-1.0)
+        select["tmin"].real(0)
+        select["tmax"].real(0)
+        select["emin"].real(ebin[0])
+        select["emax"].real(ebin[1])
+        select.run()
+        obsclone = select.obs()
+        
+        #Refit and write out to spectrum
+        binlike=fit(obsclone,log=False, debug=False, edisp=False,tscalc=True)
+        binopt_spectral = binlike.obs().models()[source].spectral()
+        binflux=binopt_spectral.eval(gammalib.GEnergy(ecenter,"TeV"),gammalib.GTime(0))
+        if binopt_spectral[normpar].value()>0:
+            relerr=binopt_spectral[normpar].error()/binopt_spectral[normpar].value()
+        else:
+            relerr=0
+
+        #Store and convert to TeV from MeV
+        spec["energy"]["value"].append(ecenter)
+        spec["energy"]["ed_value"].append(ecenter-ebin[0])
+        spec["energy"]["eu_value"].append(ebin[1]-ecenter)
+        spec["energy"]["unit"].append("1e12 eV")
+        
+        spec["flux"]["value"].append(binflux*1e6)
+        spec["flux"]["ed_value"].append(relerr*binflux*1e6)
+        spec["flux"]["eu_value"].append(relerr*binflux*1e6)
+        spec["flux"]["unit"].append("cm-2 1e-12 eV-1")
+        
+        spec["TS"].append(binlike.obs().models()[source].ts())
+    
+    #Return spectrum
+    return spec
