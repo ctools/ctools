@@ -42,6 +42,7 @@ ctselect=../src/ctselect/ctselect
 ctskymap=../src/ctskymap/ctskymap
 ctexpcube=../src/ctexpcube/ctexpcube
 ctpsfcube=../src/ctpsfcube/ctpsfcube
+ctbkgcube=../src/ctbkgcube/ctbkgcube
 ctcubemask=../src/ctcubemask/ctcubemask
 
 
@@ -438,6 +439,51 @@ then
   $ECHO -n "."
 else
   $ECHO " psfcube2.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test ctbkgcube
+# ==============
+$ECHO -n "Test ctbkgcube: "
+#
+# Run 1
+$ctbkgcube infile="data/crab_events.fits" \
+           bkgmdl="data/crab.xml" \
+           cntmap="NONE" \
+           outfile="bkgcube1.fits" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=10 \
+           nypix=10 \
+           binsz=0.4 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR"
+$ECHO -n "."
+if [ -s "bkgcube1.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " bkgcube1.fits file is not valid"
+  exit 1
+fi
+#
+# Run 2
+$ctbkgcube infile="data/crab_events.fits" \
+           bkgmdl="data/crab.xml" \
+           cntmap="data/crab_cntmap.fits" \
+           outfile="bkgcube2.fits"
+$ECHO -n "."
+if [ -s "bkgcube2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " bkgcube2.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
