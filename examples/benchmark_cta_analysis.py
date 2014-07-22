@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
 # This script peforms a benchmark of the various CTA analysis styles
-# (unbinned, binned, cube-style).
+# (unbinned, binned, cube-style), and if matplotlib is installed, creates
+# a plot of the benchmark results.
 #
 # Copyright (C) 2014 Jurgen Knodlseder
 #
@@ -23,10 +24,10 @@ import gammalib
 import ctools
 import time
 try:
-	import matplotlib.pyplot as plt
-	has_matplotlib = True
+    import matplotlib.pyplot as plt
+    has_matplotlib = True
 except:
-	has_matplotlib = False
+    has_matplotlib = False
 
 
 # ========================== #
