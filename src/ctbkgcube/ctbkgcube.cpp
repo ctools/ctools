@@ -320,42 +320,35 @@ void ctbkgcube::run(void)
  ***************************************************************************/
 void ctbkgcube::fill_cube(GCTAObservation* obs, const GModels& models)
 {
-  
-    // Get pointing to do coordinate transformation
-    GCTAPointing pnt = obs->pointing();
-    GTime time = (*obs->events())[0]->time();
-    double ontime = obs->ontime();
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
-       // Initialise statistics
-      double sum = 0.0;
-
-      // Loop over all pixels in sky map
-      for (int pixel = 0; pixel < m_bkgcube.npix(); ++pixel) {
-
-	  GSkyDir dir     = m_bkgcube.inx2dir(pixel);
-	  GCTAInstDir instdir = pnt.instdir(dir);
-	  
-	  // Loop over all background cube energy bins
-	  for (int iebin = 0; iebin < m_ebounds.size(); ++iebin){
+        obs->events(m_bkgcube);      
+	GCTAEventCube* cube = 
+	  const_cast<GCTAEventCube*>(dynamic_cast<const GCTAEventCube*>(obs->events()));
+        // Initialise statistics
+        double sum = 0.0;
+	GCTAEventBin* bin = (*cube)[10000];
+	std::cout << bin->counts() << std::endl;
+        // Loop over all events in counts map
+        for (int i = 0; i < cube->size(); ++i) {
 	 
             // Get event bin
-            GCTAEventBin* bin = new GCTAEventBin();
-
+            GCTAEventBin* bin = (*cube)[i];
+            
             // Compute model value for event bin
             double model = 
                    models.eval(*(const_cast<const GCTAEventBin*>(bin)), *obs) *
                    bin->size();
-	  
-            // Store value
-            bin->counts( bin->counts() + model );
+	    
+	  // Store value
+	  bin->counts( bin->counts() + model );
+	 
+	  // Sum all events
+	  sum += model;	 
 
-            // Sum all events
-            sum += model;
         }
-      }
-
+     
         // Log results
         if (logTerse()) {
             log << gammalib::parformat("Model events in cube");
@@ -384,7 +377,7 @@ void ctbkgcube::save(void)
     m_outfile = (*this)["outfile"].filename();
 
     // Save background cube
-    m_bkgcube.save(m_outfile, clobber());
+    m_map.save(m_outfile, clobber());
 
     // Return
     return;
@@ -431,9 +424,20 @@ void ctbkgcube::get_parameters(void)
         get_ebounds();
 
         // Define background cube
-        m_bkgcube = GSkymap(wcs, coordsys, xref, yref,
-			    -binsz, binsz, nxpix, nypix,
-			    m_ebounds.size());
+        m_map = GSkymap(wcs, coordsys, xref, yref,
+			-binsz, binsz, nxpix, nypix,
+			m_ebounds.size());
+	GGti gti = m_obs[0]->events()->gti();
+	m_bkgcube = GCTAEventCube(m_map, m_ebounds, gti);
+
+	// Loop over all events in background cube and 
+        // set all pixels to 0
+        for (int i = 0; i < m_bkgcube.size(); ++i) 
+	    {
+	      // Get event bin
+	      GCTAEventBin* bin = m_bkgcube[i]; 
+	      bin->counts(0);
+	    }
     }
 
     // ... otherwise setup the background cube from the counts map
@@ -651,12 +655,23 @@ void ctbkgcube::set_from_cntmap(const std::string& filename)
 
             // Get energy definition
             m_ebounds = cube->ebounds();
-
+	    
+	   
             // Define background cube
-            m_bkgcube = GSkymap(proj, coordsys, xref, yref,
-				dx, dy, nx, ny,
-				m_ebounds.size());
-        
+            m_map = GSkymap(proj, coordsys, xref, yref,
+			    dx, dy, nx, ny,
+			    m_ebounds.size());
+	    GGti gti = m_obs[0]->events()->gti();
+	    m_bkgcube = GCTAEventCube(m_map, m_ebounds, gti);
+	    // Loop over all events in background cube and 
+	    // set all pixels to 0
+	    for (int i = 0; i < m_bkgcube.size(); ++i) 
+	        {
+		// Get event bin
+		GCTAEventBin* bin = m_bkgcube[i]; 
+		bin->counts(0);
+		}
+
         } // endif: WCS projection was valid
 
         // ... projection is not of WCS type
@@ -698,6 +713,7 @@ void ctbkgcube::init_members(void)
     m_read_ahead = false;
     m_obs.clear();
     m_bkgcube.clear();
+    m_map.clear();
     m_ebounds.clear();
 
     // Set logger properties
@@ -723,6 +739,7 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
     m_read_ahead = app.m_read_ahead;
     m_obs        = app.m_obs;
     m_bkgcube    = app.m_bkgcube;
+    m_map        = app.m_map;
     m_ebounds    = app.m_ebounds;
 
     // Return

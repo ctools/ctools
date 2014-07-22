@@ -81,7 +81,8 @@ protected:
     // Protected members
     bool          m_read_ahead;  //!< Read ahead parameters
     GObservations m_obs;         //!< Observation container
-    GSkymap       m_bkgcube;     //!< Background cube
+    GCTAEventCube m_bkgcube;     //!< Background cube
+    GSkymap       m_map;         //!< Background map
     GEbounds      m_ebounds;     //!< Energy boundaries
     
 };
