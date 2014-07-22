@@ -28,9 +28,10 @@ import test_ctbin
 import test_ctlike
 import test_ctmodel
 import test_ctskymap
-import test_ctcubemask
 import test_ctexpcube
 import test_ctpsfcube
+import test_ctbkgcube
+import test_ctcubemask
 import test_pipelines
 
 
@@ -51,9 +52,10 @@ if __name__ == '__main__':
     suite_ctlike     = test_ctlike.Test()
     suite_ctmodel    = test_ctmodel.Test()
     suite_ctskymap   = test_ctskymap.Test()
-    suite_ctcubemask = test_ctcubemask.Test()
     suite_ctexpcube  = test_ctexpcube.Test()
     suite_ctpsfcube  = test_ctpsfcube.Test()
+    suite_ctbkgcube  = test_ctbkgcube.Test()
+    suite_ctcubemask = test_ctcubemask.Test()
     suite_pipelines  = test_pipelines.Test()
 
     # Setup unit tests
@@ -63,9 +65,10 @@ if __name__ == '__main__':
     suite_ctlike.set()
     suite_ctmodel.set()
     suite_ctskymap.set()
-    suite_ctcubemask.set()
     suite_ctexpcube.set()
     suite_ctpsfcube.set()
+    suite_ctbkgcube.set()
+    suite_ctcubemask.set()
     suite_pipelines.set()
 
     # Append tests to container
@@ -75,9 +78,10 @@ if __name__ == '__main__':
     suites.append(suite_ctlike)
     suites.append(suite_ctmodel)
     suites.append(suite_ctskymap)
-    suites.append(suite_ctcubemask)
     suites.append(suite_ctexpcube)
     suites.append(suite_ctpsfcube)
+    suites.append(suite_ctbkgcube)
+    suites.append(suite_ctcubemask)
     suites.append(suite_pipelines)
 
     # Set PFILES environment variable

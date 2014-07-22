@@ -22,9 +22,9 @@ import gammalib
 import ctools
 
 
-# ============================ #
-# Test class for ctobssim tool #
-# ============================ #
+# ============================== #
+# Test class for ctcubemask tool #
+# ============================== #
 class Test(gammalib.GPythonTestSuite):
     """
     Test class for ctcubemask tool.

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctbkgcube - CTA background cube tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -55,36 +55,42 @@ public:
     ctbkgcube& operator=(const ctbkgcube& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           get_obs(void);
-    void           set_response(void);
-    void           get_ebounds(void);
-    void           set_from_cntmap(const std::string& filename);
-  void           fill_cube(GCTAObservation* obs, const GModels& models);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    void                 get_parameters(void);
+    void                 get_obs(void);
+    void                 get_ebounds(void);
+    void                 set_from_cntmap(const std::string& filename);
+    void                 fill_cube(GCTAObservation* obs);
 
 protected:
     // Protected methods
-    void           init_members(void);
-    void           copy_members(const ctbkgcube& app);
-    void           free_members(void);
-
-    // User parameters
-    std::string   m_outfile;     //!< Output background cube file
-    std::string   m_bgmdl;       //!< background model
-    bool          m_apply_edisp; //!< Apply energy dispersion?
+    void init_members(void);
+    void copy_members(const ctbkgcube& app);
+    void free_members(void);
 
     // Protected members
     bool          m_read_ahead;  //!< Read ahead parameters
     GObservations m_obs;         //!< Observation container
     GCTAEventCube m_bkgcube;     //!< Background cube
-    GSkymap       m_map;         //!< Background map
+    GModels       m_bkgmdl;      //!< CTA background models
     GEbounds      m_ebounds;     //!< Energy boundaries
-    
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Observation container.
+ ***************************************************************************/
+inline
+const GObservations& ctbkgcube::obs(void) const
+{
+    // Return observation container
+    return m_obs;
+}
 
 #endif /* CTBKGCUBE_HPP */

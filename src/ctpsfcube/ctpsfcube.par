@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-infile,   f, a, "NONE",,, "Observation definition file"
+infile,   f, a, "NONE",,, "Event list, counts cube or observation definition file"
 cntmap,   f, a, "NONE",,, "Counts map for exposure cube definition"
 outfile,  f, a, "psfcube.fits",,, "Output exposure cube file"
 caldb,    s, a, "dummy",,, "Calibration database"

@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-20 July 2014
+22 July 2014
 
 
 1. Introduction
@@ -97,7 +97,15 @@ definition file. The cube definition may be taken from a counts cube
 or may be specified by user parameters.
 
 
-12. ctcubemask - CTA cube filtering
+12. ctbkgcube - CTA background cube generation
+----------------------------------------------
+The first version of the ctbkgcube tool is included in the release.
+ctbkgcube computes the background cube for an observation definition 
+file. The cube definition may be taken from a counts cube or may be
+specified by user parameters.
+
+
+13. ctcubemask - CTA cube filtering
 -----------------------------------
 The first version of the ctcubemask tool is included in the release.
 ctcubemask allows filtering of bins in a counts cube by setting the
@@ -105,12 +113,12 @@ bin content to -1. Filtering can be done by energy, for a circular
 Region of Interest (ROI) or using ds9 exclusion regions.
 
 
-13. Examples
+14. Examples
 ------------
 None
 
 
-14. Scripts
+15. Scripts
 -----------
 Add logL and event statistics to cspull output file.
 
@@ -119,11 +127,11 @@ Convert all tabs into spaces.
 The obsutils script has now been moved into the ctools module namespace.
 
 
-15. caldb
+16. caldb
 ---------
 None
 
 
-16. models
+17. models
 ----------
 None

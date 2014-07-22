@@ -31,11 +31,11 @@
 #include <cstdio>
 #include "ctbkgcube.hpp"
 #include "GTools.hpp"
-#include "GWcs.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_EBOUNDS                              "ctbkgcube::get_ebounds()"
 #define G_GET_PARAMETERS                        "ctbkgcube::get_parameters()"
+#define G_GET_OBS                                      "ctbkgcube::get_obs()"
+#define G_GET_EBOUNDS                              "ctbkgcube::get_ebounds()"
 #define G_SET_FROM_CNTMAP          "ctbkgcube::set_from_cntmap(std::string&)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -230,7 +230,7 @@ void ctbkgcube::execute(void)
  *
  * This method reads the task parameters from the parfile, sets up the
  * observation container, loops over all CTA observations in the container
- * and generates an background cube from the CTA observations.
+ * and generates a background cube from the CTA observations.
  ***************************************************************************/
 void ctbkgcube::run(void)
 {
@@ -248,18 +248,6 @@ void ctbkgcube::run(void)
         log << std::endl;
     }
 
-    // Set energy dispersion flag for all CTA observations and save old
-    // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
-    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -275,83 +263,149 @@ void ctbkgcube::run(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
+        log.header1("Prepare model");
+    }
+
+    // Copy models from observation container
+    m_bkgmdl = m_obs.models();
+
+    // Remove all model that are not CTA background models from the
+    // container
+    int num = m_bkgmdl.size();
+    for (int i = num-1; i >= 0; --i) {
+
+        // Flag removal
+        bool remove = true;
+
+        // Do we have a CTA, HESS or VERITAS specific model?
+        if (m_bkgmdl[i]->is_valid("CTA", "") ||
+            m_bkgmdl[i]->is_valid("HESS", "") ||
+            m_bkgmdl[i]->is_valid("VERITAS", "")) {
+
+            // Do we have a background model?
+            if (dynamic_cast<GModelData*>(m_bkgmdl[i]) != NULL) {
+
+                // ... then keep model
+                remove = false;
+
+            } // endif: had a background model
+        } // endif: had a CTA, HESS or VERITAS model
+
+        // Log results
+        if (logTerse()) {
+            if (remove) {
+                log << gammalib::parformat("Remove model");
+            }
+            else {
+                log << gammalib::parformat("Keep model");
+            }
+            log << m_bkgmdl[i]->name();
+            log << " ";
+            log << m_bkgmdl[i]->type();
+            log << "(";
+            log << m_bkgmdl[i]->instruments();
+            log << ")";
+            log << std::endl;
+        }
+
+        // Remove model if requested
+        if (remove) {
+            m_bkgmdl.remove(i);
+        }
+
+    } // endfor: looped over all background models
+
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
         log.header1("Generate background cube");
     }
 
-    // If there are no models associated with the observations then
-    // load now the model definition from the XML file
-    if (m_obs.models().size() == 0) {
-        m_bgmdl = (*this)["bgmdl"].filename();
-        m_obs.models(GModels(m_bgmdl));
-	
-	// TODO: throw a message when no background definition file is given
-    }
+    // Initialise observation counter
+    int n_observations = 0;
 
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
       
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
- 
-	// Fill background cube
-	fill_cube(obs, m_obs.models());
 
-    }
-
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        // Continue only if observation is a CTA observation
         if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
+
+            // Write header for observation
+            if (logTerse()) {
+                if (obs->name().length() > 1) {
+                    log.header3("Observation "+obs->name());
+                }
+                else {
+                    log.header3("Observation "+gammalib::str(i));
+                }
+            }
+
+            // Increment number of observations
+            n_observations++;
+
+            // Fill the cube
+            fill_cube(obs);
+
+        } // endif: CTA observation found
+
+    } // endfor: looped over observations
+
+    // Log results
+    if (logTerse()) {
+        log << gammalib::parformat("Number of observations");
+        log << n_observations << std::endl;
     }
 
     // Return
     return;
 }
 
+
 /***********************************************************************//**
  * @brief Generate background cube
  *
- * @param[in] obs CTA observation pointer.
- * @param[in] models Model container.
+ * @param[in] obs Pointer to CTA observation.
  *
- *
+ * Fills
  ***************************************************************************/
-void ctbkgcube::fill_cube(GCTAObservation* obs, const GModels& models)
+void ctbkgcube::fill_cube(GCTAObservation* obs)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
-        obs->events(m_bkgcube);      
-	GCTAEventCube* cube = 
-	  const_cast<GCTAEventCube*>(dynamic_cast<const GCTAEventCube*>(obs->events()));
         // Initialise statistics
         double sum = 0.0;
-	GCTAEventBin* bin = (*cube)[10000];
-	std::cout << bin->counts() << std::endl;
-        // Loop over all events in counts map
-        for (int i = 0; i < cube->size(); ++i) {
-	 
+
+        // Set GTI of actual observations as the GTI of the event cube
+        m_bkgcube.gti(obs->events()->gti());
+
+        // Loop over all bins in background cube
+        for (int i = 0; i < m_bkgcube.size(); ++i) {
+
             // Get event bin
-            GCTAEventBin* bin = (*cube)[i];
+            GCTAEventBin* bin = m_bkgcube[i];
             
             // Compute model value for event bin
             double model = 
-                   models.eval(*(const_cast<const GCTAEventBin*>(bin)), *obs) *
+                   m_bkgmdl.eval(*(const_cast<const GCTAEventBin*>(bin)), *obs) *
                    bin->size();
-	    
-	  // Store value
-	  bin->counts( bin->counts() + model );
-	 
-	  // Sum all events
-	  sum += model;	 
 
+            // Add existing number of counts
+            model += bin->counts();
+
+            // Store cumulated value
+            bin->counts(model);
+
+            // Sum all events
+            sum += model;
         }
-     
+
         // Log results
         if (logTerse()) {
-            log << gammalib::parformat("Model events in cube");
+            log << gammalib::parformat("Background events in cube");
             log << sum << std::endl;
         }
 
@@ -361,9 +415,11 @@ void ctbkgcube::fill_cube(GCTAObservation* obs, const GModels& models)
     return;
 }
 
+
 /***********************************************************************//**
  * @brief Save background cube
  *
+ * Save the background cube into the file specified by the outfile parameter.
  ***************************************************************************/
 void ctbkgcube::save(void)
 {
@@ -373,11 +429,26 @@ void ctbkgcube::save(void)
         log.header1("Save background cube");
     }
 
-    // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    // Create energies container from energy boundaries
+    GEnergies energies;
+    for (int i = 0; i < m_ebounds.size(); ++i) {
+        energies.append(m_ebounds.elogmean(i));
+    }
 
-    // Save background cube
-    m_map.save(m_outfile, clobber());
+    // Get output filename
+    std::string filename = (*this)["outfile"].filename();
+
+    // Create empty FITS file
+    GFits fits;
+
+    // Write background cube
+    m_bkgcube.map().write(fits);
+
+    // Write energies
+    energies.write(fits);
+    
+    // Save FITS file
+    fits.saveto(filename, clobber());
 
     // Return
     return;
@@ -387,32 +458,43 @@ void ctbkgcube::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
+ * @exception GException::invalid_value
+ *            No background model definition XML file specified.
+ *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
- *
- * @todo Setup background cube from counts map
  ***************************************************************************/
 void ctbkgcube::get_parameters(void)
 {
-    // If we do not have any observations in the container then get an
-    // input file name or observation descriptor file
+    // If we do not have any observations in the container then load them
+    // using the "infile" parameter
     if (m_obs.size() == 0) {
         get_obs();
     }
 
-    // Make sure that response is set
-    set_response();
-
-    // Read energy dispersion flag
-    m_apply_edisp = (*this)["edisp"].boolean();
+    // If there are no models associated with the observations then load now
+    // the model definition from the XML file
+    if (m_obs.models().size() == 0) {
+        if ((*this)["bkgmdl"].is_undefined()) {
+            std::string msg = "No background model definition XML file "
+                              "specified. Please set the \"bkgmdl\" parameter "
+                              "to the background model definition XML "
+                              "filename.";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        }
+        std::string bkgmdl = (*this)["bkgmdl"].filename();
+        GModels     models(bkgmdl);
+        m_obs.models(models);
+    }
 
     // If no counts map is specified then setup the background cube from
     // the user parameters
     std::string cntmap = (*this)["cntmap"].filename();
-    if ((cntmap == "NONE") || (gammalib::strip_whitespace(cntmap) == "")) {
+    if ((gammalib::toupper(cntmap) == "NONE") ||
+        (gammalib::strip_whitespace(cntmap) == "")) {
     
         // Get user parameters for counts map definition
-        std::string wcs      = (*this)["proj"].string();
+        std::string proj     = (*this)["proj"].string();
         std::string coordsys = (*this)["coordsys"].string();
         double      xref     = (*this)["xref"].real();
         double      yref     = (*this)["yref"].real();
@@ -423,21 +505,16 @@ void ctbkgcube::get_parameters(void)
         // Get energy definition
         get_ebounds();
 
-        // Define background cube
-        m_map = GSkymap(wcs, coordsys, xref, yref,
-			-binsz, binsz, nxpix, nypix,
-			m_ebounds.size());
-	GGti gti = m_obs[0]->events()->gti();
-	m_bkgcube = GCTAEventCube(m_map, m_ebounds, gti);
+        // Define skymap for background cube
+        GSkymap map(proj, coordsys, xref, yref,
+                    -binsz, binsz, nxpix, nypix,
+                    m_ebounds.size());
 
-	// Loop over all events in background cube and 
-        // set all pixels to 0
-        for (int i = 0; i < m_bkgcube.size(); ++i) 
-	    {
-	      // Get event bin
-	      GCTAEventBin* bin = m_bkgcube[i]; 
-	      bin->counts(0);
-	    }
+        // Allocate background cube using a dummy GTI
+        GGti gti;
+        gti.append(GTime(0.0), GTime(1.0)); // Dummy GTI
+        m_bkgcube = GCTAEventCube(map, m_ebounds, gti);
+
     }
 
     // ... otherwise setup the background cube from the counts map
@@ -450,7 +527,7 @@ void ctbkgcube::get_parameters(void)
 
     // Read output filename (if needed)
     if (m_read_ahead) {
-        m_outfile = (*this)["outfile"].filename();
+        std::string filename = (*this)["outfile"].filename();
     }
 
     // Return
@@ -461,12 +538,25 @@ void ctbkgcube::get_parameters(void)
 /***********************************************************************//**
  * @brief Get observation definition
  *
+ * @exception GException::invalid_value
+ *            No event list, counts cube or observation definition file
+ *            specified.
+ *
  * Get observation definition from the user parameters.
  ***************************************************************************/
 void ctbkgcube::get_obs(void)
 {
     // Get input filename
     std::string filename = (*this)["infile"].filename();
+
+    // Check whether infile parameter is undefined
+    if (gammalib::toupper(filename) == "NONE") {
+        std::string msg = "No event list, counts cube or observation definition "
+                          "file specified. Please set the \"infile\" parameter "
+                          "to either an event list filename, a counts cube "
+                          "filename or an observation definition filename.";
+        throw GException::invalid_value(G_GET_OBS, msg);
+    }
 
     // Try first to open as FITS file
     try {
@@ -479,7 +569,6 @@ void ctbkgcube::get_obs(void)
 
         // Append CTA observation to container
         m_obs.append(obs);
-
             
     }
         
@@ -497,59 +586,11 @@ void ctbkgcube::get_obs(void)
 
 
 /***********************************************************************//**
- * @brief Set observation response
- *
- * Set response for all observations that so have no response.
- ***************************************************************************/
-void ctbkgcube::set_response(void)
-{
-    // Loop over all observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Is this observation a CTA observation?
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Yes ...
-        if (obs != NULL) {
-
-            // Set response if we don't have one
-            if (!obs->hasresponse()) {
-
-                // Load response information
-                std::string database = (*this)["caldb"].string();
-                std::string irf      = (*this)["irf"].string();
-
-                // Set calibration database. If specified parameter is a
-                // directory then use this as the pathname to the calibration
-                // database. Otherwise interpret this as the instrument name,
-                // the mission being "cta"
-                GCaldb caldb;
-                if (gammalib::dir_exists(database)) {
-                    caldb.rootdir(database);
-                }
-                else {
-                    caldb.open("cta", database);
-                }
-
-                // Set reponse
-            	obs->response(irf, caldb);
-
-            } // endif: observation already has a response
-
-        } // endif: observation was a CTA observation
-
-    } // endfor: looped over all observations
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
  * @brief Get energy boundaries from parameters
  *
  * @exception GException::invalid_value
- *            Invalid extension name encountered.
+ *            Energy bin definition file not defined or invalid extension
+ *            name encountered.
  *
  * Get the energy boundaries from the user parameters.
  ***************************************************************************/
@@ -561,9 +602,17 @@ void ctbkgcube::get_ebounds(void)
     // If we have the binning given by a file then try to get the boundaries
     // from that file
     if (ebinalg == "FILE") {
-    
+
         // Get filename
         std::string filename = (*this)["ebinfile"].filename();
+
+        // Check whether infile parameter is undefined
+        if (gammalib::toupper(filename) == "NONE") {
+            std::string msg = "No energy bin definition file specified. "
+                              "Please set the \"ebinfile\" parameter to a "
+                              "file containing the energy bin definition.";
+            throw GException::invalid_value(G_GET_EBOUNDS, msg);
+        }
 
         // Open fits file to check which extension is given
         GFits file(filename);
@@ -655,22 +704,14 @@ void ctbkgcube::set_from_cntmap(const std::string& filename)
 
             // Get energy definition
             m_ebounds = cube->ebounds();
-	    
-	   
-            // Define background cube
-            m_map = GSkymap(proj, coordsys, xref, yref,
-			    dx, dy, nx, ny,
-			    m_ebounds.size());
-	    GGti gti = m_obs[0]->events()->gti();
-	    m_bkgcube = GCTAEventCube(m_map, m_ebounds, gti);
-	    // Loop over all events in background cube and 
-	    // set all pixels to 0
-	    for (int i = 0; i < m_bkgcube.size(); ++i) 
-	        {
-		// Get event bin
-		GCTAEventBin* bin = m_bkgcube[i]; 
-		bin->counts(0);
-		}
+
+            // Define skymap for background cube
+            GSkymap map(proj, coordsys, xref, yref,
+                        dx, dy, nx, ny,
+                        m_ebounds.size());
+
+            // Allocate background cube
+            m_bkgcube = GCTAEventCube(map, m_ebounds, obs.events()->gti());
 
         } // endif: WCS projection was valid
 
@@ -706,14 +747,10 @@ void ctbkgcube::set_from_cntmap(const std::string& filename)
 void ctbkgcube::init_members(void)
 {
     // Initialise members
-    m_outfile.clear();
-    m_apply_edisp = false;
-
-    // Initialise protected members
     m_read_ahead = false;
     m_obs.clear();
     m_bkgcube.clear();
-    m_map.clear();
+    m_bkgmdl.clear();
     m_ebounds.clear();
 
     // Set logger properties
@@ -731,15 +768,11 @@ void ctbkgcube::init_members(void)
  ***************************************************************************/
 void ctbkgcube::copy_members(const ctbkgcube& app)
 {
-    // Copy attributes
-    m_outfile     = app.m_outfile;
-    m_apply_edisp = app.m_apply_edisp;
-
-    // Copy protected members
+    // Copy members
     m_read_ahead = app.m_read_ahead;
     m_obs        = app.m_obs;
     m_bkgcube    = app.m_bkgcube;
-    m_map        = app.m_map;
+    m_bkgmdl     = app.m_bkgmdl;
     m_ebounds    = app.m_ebounds;
 
     // Return

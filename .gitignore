@@ -54,6 +54,7 @@ src/ctselect/ctselect
 src/ctskymap/ctskymap
 src/ctexpcube/ctexpcube
 src/ctpsfcube/ctpsfcube
+src/ctbkgcube/ctbkgcube
 src/ctcubemask/ctcubemask
 test/pfiles/
 test/*.fits

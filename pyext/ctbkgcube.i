@@ -19,61 +19,50 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctbkgcube/main.cpp
- * @brief CTA background cube tool main code
+ * @file ctbkgcube.i
+ * @brief CTA background cube tool definition
  * @author Chia-Chun Lu
  */
 
-/* __ Includes ___________________________________________________________ */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#include <cstdio>
+%{
+/* Put headers and other declarations here that are needed for compilation */
 #include "ctbkgcube.hpp"
-
+#include "GTools.hpp"
+%}
 
 /***********************************************************************//**
- * @brief Main entry point of application
+ * @class ctbkgcube
  *
- * @param[in] argc Number of command line arguments.
- * @param[in] argv Command line arguments.
- *
- * This is the main entry point of the ctbkgcube application. It allocates a
- * ctbkgcube object and runs the application.
+ * @brief CTA background cube tool
  ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Initialise return code
-    int rc = 1;
+class ctbkgcube : public GApplication  {
 
-    // Create instance of application
-    ctbkgcube application(argc, argv);
+public:
+    // Constructors and destructors
+    ctbkgcube(void);
+    explicit ctbkgcube(const GObservations& obs);
+    ctbkgcube(int argc, char *argv[]);
+    ctbkgcube(const ctbkgcube& app);
+    virtual ~ctbkgcube(void);
 
-    // Run application
-    try {
-        // Execute application
-        application.execute();
+    // Methods
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    void                 get_parameters(void);
+    void                 get_obs(void);
+    void                 get_ebounds(void);
+    void                 set_from_cntmap(const std::string& filename);
+    void                 fill_cube(GCTAObservation* obs);
+};
 
-        // Signal success
-        rc = 0;
+/***********************************************************************//**
+ * @brief CTA background cube tool Python extension
+ ***************************************************************************/
+%extend ctbkgcube {
+    ctbkgcube copy() {
+        return (*self);
     }
-    catch (std::exception &e) {
-
-        // Extract error message
-        std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " ctbkgcube. Run aborted ...";
-
-        // Write error in logger
-        application.log << signal  << std::endl;
-        application.log << message << std::endl;
-
-        // Write error on standard output
-        std::cout << signal  << std::endl;
-        std::cout << message << std::endl;
-
-    } // endcatch: catched any application error
-
-    // Return
-    return rc;
 }

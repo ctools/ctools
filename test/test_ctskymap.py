@@ -23,7 +23,7 @@ import ctools
 
 
 # ============================ #
-# Test class for ctobssim tool #
+# Test class for ctskymap tool #
 # ============================ #
 class Test(gammalib.GPythonTestSuite):
     """
