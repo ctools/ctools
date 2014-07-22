@@ -11,6 +11,8 @@
         Add ctcubemask tool (masks event bins in event cube)
         Support energy dispersion in ctobssim, ctlike and ctmodel	
         Correct ctobssim for thread safety
+        Move obsutils to ctools namespace
+        Add several functions to obsutils
         Enhance documentation
 
 
