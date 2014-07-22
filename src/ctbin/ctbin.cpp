@@ -851,39 +851,75 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
 
 /***********************************************************************//**
- * @brief Put cube as single element in observation container.
+ * @brief Create output observation container.
+ *
+ * Creates an output observation container that combines all input CTA
+ * observation into a single cube-style observation. All non CTA observations
+ * present in the observation container are kept. The method furthermore
+ * conserves any response information in case that a single CTA observation
+ * is provided. This supports the original binned analysis.
  ***************************************************************************/
 void ctbin::obs_cube(void)
 {
-    // Clear observation container
-    m_obs.clear();
+    // If we have only a single CTA observation in the container, then
+    // keep that observation and just attach the event cube to it
+    if (m_obs.size() == 1) {
 
-    // Allocate CTA observation. We need this to make sure that all
-    // attributes are set correctly
-    GCTAObservation obs;
+        // Attach event cube to CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+        if (obs != NULL) {
+            obs->events(this->cube());
+        }
 
-    // Attach event cube to CTA observation
-    obs.events(this->cube());
+    }
 
-    // Set map centre as pointing
-    GSkyPixel    pixel(0.5*double(m_cube.nx()), 0.5*double(m_cube.ny()));
-    GSkyDir      centre = m_cube.pix2dir(pixel);
-    GCTAPointing pointing(centre);
+    // ... otherwise put a single CTA observation in container
+    else {
 
-    // Compute deadtime correction
-    double deadc = (m_ontime > 0.0) ? m_livetime / m_ontime : 0.0;
+        // Allocate observation container
+        GObservations container;
 
-    // Set CTA observation attributes
-    obs.pointing(pointing);
-    obs.obs_id(0);
-    obs.ra_obj(centre.ra_deg());   //!< Dummy
-    obs.dec_obj(centre.dec_deg()); //!< Dummy
-    obs.ontime(m_ontime);
-    obs.livetime(m_livetime);
-    obs.deadc(deadc);
+        // Allocate CTA observation.
+        GCTAObservation obs;
 
-    // Append observation to container
-    m_obs.append(obs);
+        // Attach event cube to CTA observation
+        obs.events(this->cube());
+
+        // Set map centre as pointing
+        GSkyPixel    pixel(0.5*double(m_cube.nx()), 0.5*double(m_cube.ny()));
+        GSkyDir      centre = m_cube.pix2dir(pixel);
+        GCTAPointing pointing(centre);
+
+        // Compute deadtime correction
+        double deadc = (m_ontime > 0.0) ? m_livetime / m_ontime : 0.0;
+
+        // Set CTA observation attributes
+        obs.pointing(pointing);
+        obs.obs_id(0);
+        obs.ra_obj(centre.ra_deg());   //!< Dummy
+        obs.dec_obj(centre.dec_deg()); //!< Dummy
+        obs.ontime(m_ontime);
+        obs.livetime(m_livetime);
+        obs.deadc(deadc);
+
+        // Set models in observation container
+        container.models(m_obs.models());
+
+        // Append CTA observation
+        m_obs.append(obs);
+        
+        // Copy over all remaining non-CTA observations
+        for (int i = 0; i < m_obs.size(); ++i) {
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+            if (obs == NULL) {
+                container.append(*m_obs[i]);
+            }
+        }
+
+        // Set observation container
+        m_obs = container;
+
+    } // endelse: there was not a single CTA observation
 
     // Return
     return;
