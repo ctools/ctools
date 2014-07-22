@@ -271,6 +271,9 @@ void ctlike::run(void)
     // Optimize model parameters using LM optimizer
     optimize_lm();
 
+    // Store Npred
+    double npred = m_obs.npred();
+
     // Optionally perform TS computation
     if (m_tscalc) {
     
@@ -315,14 +318,17 @@ void ctlike::run(void)
 
     // Write results into logger
     if (logTerse()) {
+        log << std::endl;
+        log.header1("Maximum likelihood optimization results");
+        log << *m_opt << std::endl;
         log << gammalib::parformat("Maximum log likelihood");
         log << gammalib::str(m_logL,3) << std::endl;
         log << gammalib::parformat("Observed events  (Nobs)");
         log << gammalib::str(num_events, 3) << std::endl;
         log << gammalib::parformat("Predicted events (Npred)");
-        log << gammalib::str(m_obs.npred(), 3);
+        log << gammalib::str(npred, 3);
         log << " (Nobs - Npred = ";
-        log << gammalib::str(num_events-m_obs.npred());
+        log << gammalib::str(num_events-npred);
         log << ")" << std::endl;
         log << m_obs.models() << std::endl;
     }
