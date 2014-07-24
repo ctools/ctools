@@ -788,7 +788,7 @@ void ctbkgcube::fill_cube(GCTAObservation* obs)
             std::string msg = "CTA Observation does not contain an event "
                               "list. Event list information is needed to "
                               "retrieve the Region of Interest for each "
-                              "CTA observation. Please profile an event list "
+                              "CTA observation. Please provide an event list "
                               "or an observation definition file containing "
                               "event lists as \"infile\" parameter.";
             throw GException::invalid_value(G_FILL_CUBE, msg);

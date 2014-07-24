@@ -645,7 +645,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
             GSkyDir      dir   = inst->dir();
             GSkyPixel    pixel = m_cube.dir2pix(dir);
 
-            // Skip is pixel is outside RoI
+            // Skip if pixel is outside RoI
             if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
                 num_outside_roi++;
                 continue;
