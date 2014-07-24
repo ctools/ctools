@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-infile,   f, a, "NONE",,, "Event list, counts cube or observation definition file"
+infile,   f, a, "NONE",,, "Event list or observation definition file"
 bkgmdl,   f, a, "NONE",,, "Background model XML file"
 cntmap,   f, a, "NONE",,, "Counts cube for background cube definition"
 outfile,  f, a, "bkgcube.fits",,, "Output background cube file"

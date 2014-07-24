@@ -37,6 +37,7 @@
 #define G_GET_OBS                                      "ctbkgcube::get_obs()"
 #define G_GET_EBOUNDS                              "ctbkgcube::get_ebounds()"
 #define G_SET_FROM_CNTMAP          "ctbkgcube::set_from_cntmap(std::string&)"
+#define G_FILL_CUBE                  "ctbkgcube::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -239,6 +240,9 @@ void ctbkgcube::run(void)
         log.cout(true);
     }
 
+    // Initialise run parameters
+    m_livetime = 0.0;
+
     // Get task parameters
     get_parameters();
 
@@ -353,63 +357,24 @@ void ctbkgcube::run(void)
 
     } // endfor: looped over observations
 
+    // Re-normalize cube to get units of counts/MeV/s/sr
+    if (m_livetime > 0.0) {
+    
+        // Loop over all bins in background cube and divide the content
+        // by the total livetime.
+        for (int i = 0; i < m_bkgcube.size(); ++i) {
+            GCTAEventBin* bin  = m_bkgcube[i];
+            double        rate = bin->counts() / m_livetime;
+            bin->counts(rate);
+        }
+
+    } // endif: livetime was positive
+
     // Log results
     if (logTerse()) {
         log << gammalib::parformat("Number of observations");
         log << n_observations << std::endl;
     }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Generate background cube
- *
- * @param[in] obs Pointer to CTA observation.
- *
- * Fills
- ***************************************************************************/
-void ctbkgcube::fill_cube(GCTAObservation* obs)
-{
-    // Continue only if observation pointer is valid
-    if (obs != NULL) {
-
-        // Initialise statistics
-        double sum = 0.0;
-
-        // Set GTI of actual observations as the GTI of the event cube
-        m_bkgcube.gti(obs->events()->gti());
-
-        // Loop over all bins in background cube
-        for (int i = 0; i < m_bkgcube.size(); ++i) {
-
-            // Get event bin
-            GCTAEventBin* bin = m_bkgcube[i];
-            
-            // Compute model value for event bin
-            double model = 
-                   m_bkgmdl.eval(*(const_cast<const GCTAEventBin*>(bin)), *obs) *
-                   bin->size();
-
-            // Add existing number of counts
-            model += bin->counts();
-
-            // Store cumulated value
-            bin->counts(model);
-
-            // Sum all events
-            sum += model;
-        }
-
-        // Log results
-        if (logTerse()) {
-            log << gammalib::parformat("Background events in cube");
-            log << sum << std::endl;
-        }
-
-    } // endif: observation pointer was not valid
 
     // Return
     return;
@@ -449,6 +414,68 @@ void ctbkgcube::save(void)
     
     // Save FITS file
     fits.saveto(filename, clobber());
+
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctbkgcube::init_members(void)
+{
+    // Initialise members
+    m_read_ahead = false;
+    m_obs.clear();
+    m_bkgcube.clear();
+    m_bkgmdl.clear();
+    m_ebounds.clear();
+    m_livetime = 0.0;
+
+    // Set logger properties
+    log.date(true);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctbkgcube::copy_members(const ctbkgcube& app)
+{
+    // Copy members
+    m_read_ahead = app.m_read_ahead;
+    m_obs        = app.m_obs;
+    m_bkgcube    = app.m_bkgcube;
+    m_bkgmdl     = app.m_bkgmdl;
+    m_ebounds    = app.m_ebounds;
+    m_livetime   = app.m_livetime;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctbkgcube::free_members(void)
+{
+    // Write separator into logger
+    if (logTerse()) {
+        log << std::endl;
+    }
 
     // Return
     return;
@@ -735,60 +762,100 @@ void ctbkgcube::set_from_cntmap(const std::string& filename)
 }
 
 
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
 /***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctbkgcube::init_members(void)
-{
-    // Initialise members
-    m_read_ahead = false;
-    m_obs.clear();
-    m_bkgcube.clear();
-    m_bkgmdl.clear();
-    m_ebounds.clear();
-
-    // Set logger properties
-    log.date(true);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
+ * @brief Generate background cube
  *
- * @param[in] app Application.
+ * @param[in] obs Pointer to CTA observation.
+ *
+ * @exception GException::invalid_value
+ *            No event list found in CTA observation.
+ *
+ * Fills the background cube with the model value for a CTA observation.
  ***************************************************************************/
-void ctbkgcube::copy_members(const ctbkgcube& app)
+void ctbkgcube::fill_cube(GCTAObservation* obs)
 {
-    // Copy members
-    m_read_ahead = app.m_read_ahead;
-    m_obs        = app.m_obs;
-    m_bkgcube    = app.m_bkgcube;
-    m_bkgmdl     = app.m_bkgmdl;
-    m_ebounds    = app.m_ebounds;
+    // Continue only if observation pointer is valid
+    if (obs != NULL) {
 
-    // Return
-    return;
-}
+        // Initialise statistics
+        double sum            = 0.0;
+        int    n_bins_inside  = 0;
+        int    n_bins_outside = 0;
 
+        // Extract region of interest from CTA observation
+        const GCTAEventList* list = dynamic_cast<const GCTAEventList*>(obs->events());
+        if (list == NULL) {
+            std::string msg = "CTA Observation does not contain an event "
+                              "list. Event list information is needed to "
+                              "retrieve the Region of Interest for each "
+                              "CTA observation. Please profile an event list "
+                              "or an observation definition file containing "
+                              "event lists as \"infile\" parameter.";
+            throw GException::invalid_value(G_FILL_CUBE, msg);
+        }
+        const GCTARoi& roi = list->roi();
 
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctbkgcube::free_members(void)
-{
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
+        // Set GTI of actual observations as the GTI of the event cube
+        m_bkgcube.gti(obs->events()->gti());
+
+        // Get observation livetime
+        double livetime = obs->livetime();
+
+        // Loop over all bins in background cube
+        for (int i = 0; i < m_bkgcube.size(); ++i) {
+
+            // Get event bin
+            GCTAEventBin* bin = m_bkgcube[i];
+
+            // Continue only if binned in contained in ROI
+            if (roi.contains(*bin)) {
+            
+                // Compute model value for event bin. The model value is
+                // given in counts/MeV/s/sr.
+                double model = m_bkgmdl.eval(*bin, *obs);
+
+                // Compute number events
+                sum += model * bin->size();
+
+                // Multiply by livetime to get the correct weighting for
+                // each observation. We divide by the total livetime later
+                // to get the background model in units of counts/MeV/s/sr.
+                model *= livetime;
+
+                // Add existing number of counts
+                model += bin->counts();
+
+                // Store cumulated value (units: counts/MeV/sr)
+                bin->counts(model);
+
+                // Increment contained bin counter
+                n_bins_inside++;
+                
+            } // endif: bin was contained in RoI
+            
+            // ... otherwise count bin as an outsider
+            else {
+                n_bins_outside++;
+            }
+
+        } // endfor: looped over all bins
+
+        // Accumulate livetime
+        m_livetime += livetime;
+
+        // Log results
+        if (logTerse()) {
+            log << gammalib::parformat("Bins within RoI");
+            log << n_bins_inside << std::endl;
+            log << gammalib::parformat("Bins outside RoI");
+            log << n_bins_outside << std::endl;
+            log << gammalib::parformat("Background events in cube");
+            log << sum << std::endl;
+            log << gammalib::parformat("Cube livetime");
+            log << livetime << " sec" << std::endl;
+        }
+
+    } // endif: observation pointer was not valid
 
     // Return
     return;

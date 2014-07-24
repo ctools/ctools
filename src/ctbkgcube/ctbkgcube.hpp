@@ -59,18 +59,18 @@ public:
     void                 execute(void);
     void                 run(void);
     void                 save(void);
-    const GObservations& obs(void) const;
-    void                 get_parameters(void);
-    void                 get_obs(void);
-    void                 get_ebounds(void);
-    void                 set_from_cntmap(const std::string& filename);
-    void                 fill_cube(GCTAObservation* obs);
+    const GCTAEventCube& cube(void) const;
 
 protected:
     // Protected methods
     void init_members(void);
     void copy_members(const ctbkgcube& app);
     void free_members(void);
+    void get_parameters(void);
+    void get_obs(void);
+    void get_ebounds(void);
+    void set_from_cntmap(const std::string& filename);
+    void fill_cube(GCTAObservation* obs);
 
     // Protected members
     bool          m_read_ahead;  //!< Read ahead parameters
@@ -78,19 +78,20 @@ protected:
     GCTAEventCube m_bkgcube;     //!< Background cube
     GModels       m_bkgmdl;      //!< CTA background models
     GEbounds      m_ebounds;     //!< Energy boundaries
+    double        m_livetime;    //!< Total livetime for normalization
 };
 
 
 /***********************************************************************//**
- * @brief Return observation container
+ * @brief Return CTA event cube containing background rate
  *
- * @return Observation container.
+ * @return CTA event cube.
  ***************************************************************************/
 inline
-const GObservations& ctbkgcube::obs(void) const
+const GCTAEventCube& ctbkgcube::cube(void) const
 {
-    // Return observation container
-    return m_obs;
+    // Return background cube
+    return (m_bkgcube);
 }
 
 #endif /* CTBKGCUBE_HPP */
