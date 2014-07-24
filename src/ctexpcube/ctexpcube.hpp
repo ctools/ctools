@@ -55,12 +55,11 @@ public:
     ctexpcube& operator=(const ctexpcube& app);
 
     // Methods
-    void                 clear(void);
-    void                 execute(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GCTAExposure&  expcube(void) const;
+    void                clear(void);
+    void                execute(void);
+    void                run(void);
+    void                save(void);
+    const GCTAExposure& expcube(void) const;
 
 protected:
     // Protected methods
@@ -83,18 +82,6 @@ protected:
     GCTAExposure  m_expcube;     //!< Exposure cube
     GEbounds      m_ebounds;     //!< Energy boundaries
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Observation container
- ***************************************************************************/
-inline
-const GObservations& ctexpcube::obs(void) const
-{
-    return (m_obs);
-}
 
 
 /***********************************************************************//**

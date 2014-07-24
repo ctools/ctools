@@ -45,13 +45,11 @@ public:
     virtual ~ctcubemask(void);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void);
-    void           get_parameters(void);
-    void           apply_mask(GCTAObservation* obs);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 };
 
 

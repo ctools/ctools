@@ -56,19 +56,19 @@ public:
     ctcubemask& operator=(const ctcubemask& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           apply_mask(GCTAObservation* obs);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 
 protected:
     // Protected methods
     void        init_members(void);
     void        copy_members(const ctcubemask& app);
     void        free_members(void);
+    void        get_parameters(void);
+    void        apply_mask(GCTAObservation* obs);
     std::string check_infile(const std::string& filename) const;
     std::string set_outfile_name(const std::string& filename) const;
     void        save_fits(void);
@@ -94,5 +94,17 @@ protected:
     bool                     m_use_xml;    //!< Use XML file instead of FITS file
     bool                     m_read_ahead; //!< Read ahead parameters
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GObservations& ctcubemask::obs(void) const
+{
+    return m_obs;
+}
 
 #endif /* CTCUBEMASK_HPP */

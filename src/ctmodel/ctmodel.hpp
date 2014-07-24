@@ -64,20 +64,20 @@ public:
     ctmodel& operator=(const ctmodel& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           setup_obs(void);
-    void           model_map(GCTAObservation* obs, const GModels& models);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 
 protected:
     // Protected methods
     void           init_members(void);
     void           copy_members(const ctmodel& app);
     void           free_members(void);
+    void           get_parameters(void);
+    void           setup_obs(void);
+    void           model_map(GCTAObservation* obs, const GModels& models);
     std::string    set_outfile_name(const std::string& filename) const;
     void           save_fits(void);
     void           save_xml(void);
@@ -114,5 +114,17 @@ protected:
     bool                     m_use_xml;    //!< Use XML file instead of FITS file
     bool                     m_read_ahead; //!< Read ahead parameters
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GObservations& ctmodel::obs(void) const
+{
+    return m_obs;
+}
 
 #endif /* CTMODEL_HPP */

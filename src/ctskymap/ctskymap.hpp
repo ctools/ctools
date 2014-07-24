@@ -53,25 +53,23 @@ public:
     virtual ~ctskymap(void);
 
     // Operators
-    ctskymap& operator= (const ctskymap& app);
+    ctskymap& operator=(const ctskymap& app);
 
     // Methods
     void           clear(void);
     void           execute(void);
     void           run(void);
     void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    GSkymap&       skymap(void) { return m_skymap; }
-    void           get_parameters(void);
-    void           init_map(GCTAObservation* obs);
-    void           map_events(GCTAObservation* obs);
-
+    const GSkymap& map(void) const;
 
 protected:
     // Protected methods
     void init_members(void);
     void copy_members(const ctskymap& app);
     void free_members(void);
+    void get_parameters(void);
+    void init_map(GCTAObservation* obs);
+    void map_events(GCTAObservation* obs);
 
     // User parameters
     std::string   m_evfile;     //!< Input event list
@@ -90,5 +88,17 @@ protected:
     GObservations m_obs;        //!< Observation container
     GSkymap       m_skymap;     //!< Sky map
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GSkymap& ctskymap::map(void) const
+{
+    return m_skymap;
+}
 
 #endif /* CTSKYMAP_HPP */

@@ -46,14 +46,12 @@ public:
     virtual ~ctlike(void);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void);
-    GOptimizer*    opt(void);
-    void           get_parameters(void);
-    void           optimize_lm(void);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    const GOptimizer*    opt(void) const;
 };
 
 

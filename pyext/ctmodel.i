@@ -46,14 +46,11 @@ public:
     virtual ~ctmodel(void);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           setup_obs(void);
-    void           model_map(GCTAObservation* obs, const GModels& models);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 };
 
 

@@ -21,7 +21,7 @@
 /**
  * @file ctselect.i
  * @brief CTA data selection tool Python interface definition
- * @author J. Knodlseder
+ * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
@@ -45,13 +45,11 @@ public:
     virtual ~ctselect(void);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           select_events(GCTAObservation* obs, const std::string& filename);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 };
 
 

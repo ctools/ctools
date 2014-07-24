@@ -49,11 +49,7 @@ public:
     void           execute(void);
     void           run(void);
     void           save(void);
-    GObservations& obs(void);
-    GSkymap&       skymap(void);
-    void           get_parameters(void);
-    void           init_map(GCTAObservation* obs);
-    void           map_events(GCTAObservation* obs);
+    const GSkymap& map(void) const;
 };
 
 

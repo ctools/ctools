@@ -2,13 +2,19 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-22 July 2014
+24 July 2014
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most
 important changes made since the last release of ctools.
+
+For all ctools, the public method interface was cleaned up so that
+only methods that are really useful for an outside client are
+exposed. Low-level methods that are used by the application are now
+protected, as improper usage of these methods may lead to
+unpredictable results.
 
 
 2. Configuration

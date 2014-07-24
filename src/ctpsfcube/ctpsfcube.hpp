@@ -55,23 +55,22 @@ public:
     ctpsfcube& operator=(const ctpsfcube& app);
 
     // Methods
-    void                 clear(void);
-    void                 execute(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GCTAMeanPsf&   psfcube(void) const;
-    void                 get_parameters(void);
-    void                 get_obs(void);
-    void                 set_response(void);
-    void                 get_ebounds(void);
-    void                 set_from_cntmap(const std::string& filename);
+    void               clear(void);
+    void               execute(void);
+    void               run(void);
+    void               save(void);
+    const GCTAMeanPsf& psfcube(void) const;
 
 protected:
     // Protected methods
-    void           init_members(void);
-    void           copy_members(const ctpsfcube& app);
-    void           free_members(void);
+    void init_members(void);
+    void copy_members(const ctpsfcube& app);
+    void free_members(void);
+    void get_parameters(void);
+    void get_obs(void);
+    void set_response(void);
+    void get_ebounds(void);
+    void set_from_cntmap(const std::string& filename);
 
     // User parameters
     std::string   m_outfile;     //!< Output PSF cube file
@@ -83,18 +82,6 @@ protected:
     GCTAMeanPsf   m_psfcube;     //!< PSF cube
     GEbounds      m_ebounds;     //!< Energy boundaries
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Observation container
- ***************************************************************************/
-inline
-const GObservations& ctpsfcube::obs(void) const
-{
-    return (m_obs);
-}
 
 
 /***********************************************************************//**

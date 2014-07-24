@@ -55,21 +55,21 @@ public:
     ctlike& operator= (const ctlike& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    GOptimizer*    opt(void) { return m_opt; }
-    void           get_parameters(void);
-    void           optimize_lm(void);
-    double         reoptimize_lm(void);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    const GOptimizer*    opt(void) const;
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctlike& app);
-    void free_members(void);
+    void   init_members(void);
+    void   copy_members(const ctlike& app);
+    void   free_members(void);
+    void   get_parameters(void);
+    void   optimize_lm(void);
+    double reoptimize_lm(void);
 
     // User parameters
     std::string   m_stat;        //!< Optimisation statistics (poisson/gaussian)
@@ -88,5 +88,29 @@ protected:
     GOptimizer*   m_opt;        //!< Optimizer
     bool          m_read_ahead; //!< Read ahead parameters
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GObservations& ctlike::obs(void) const
+{
+    return m_obs;
+}
+
+
+/***********************************************************************//**
+ * @brief Return optimizer
+ *
+ * @return Pointer to optimizer
+ ***************************************************************************/
+inline
+const GOptimizer* ctlike::opt(void) const
+{
+    return m_opt;
+}
 
 #endif /* CTLIKE_HPP */

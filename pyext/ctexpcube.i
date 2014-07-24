@@ -46,12 +46,11 @@ public:
     virtual ~ctexpcube(void);
 
     // Methods
-    void                 clear(void);
-    void                 execute(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GCTAExposure&  expcube(void) const;
+    void                clear(void);
+    void                execute(void);
+    void                run(void);
+    void                save(void);
+    const GCTAExposure& expcube(void) const;
 };
 
 

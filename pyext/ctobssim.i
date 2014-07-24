@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctobssim - CTA observation simulation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2014 by Jurgen Knodlseder                           *
+ *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctobssim.i
  * @brief CTA observation simulation tool Python interface definition
- * @author J. Knodlseder
+ * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
@@ -45,15 +45,11 @@ public:
     virtual ~ctobssim(void);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void);
-    void           get_parameters(void);
-    void           set_list(GCTAObservation* obs);
-    void           simulate_source(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog=NULL);
-    void           simulate_background(GCTAObservation* obs, const GModels& models, GRan& ran, GLog* wrklog=NULL);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 };
 
 

@@ -53,22 +53,22 @@ public:
     virtual ~ctselect(void);
 
     // Operators
-    ctselect& operator= (const ctselect& app);
+    ctselect& operator=(const ctselect& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           select_events(GCTAObservation* obs, const std::string& filename);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 
 protected:
     // Protected methods
     void        init_members(void);
     void        copy_members(const ctselect& app);
     void        free_members(void);
+    void        get_parameters(void);
+    void        select_events(GCTAObservation* obs, const std::string& filename);
     std::string check_infile(const std::string& filename) const;
     std::string set_outfile_name(const std::string& filename) const;
     void        save_fits(void);
@@ -100,5 +100,17 @@ protected:
     bool                     m_read_ahead; //!< Read ahead parameters
     GTimeReference           m_cta_ref;    //!< CTA time reference
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GObservations& ctselect::obs(void) const
+{
+    return m_obs;
+}
 
 #endif /* CTSELECT_HPP */

@@ -60,21 +60,27 @@ public:
     ctobssim& operator=(const ctobssim& app);
 
     // Methods
-    void           clear(void);
-    void           execute(void);
-    void           run(void);
-    void           save(void);
-    GObservations& obs(void) { return m_obs; }
-    void           get_parameters(void);
-    void           set_list(GCTAObservation* obs);
-    void           simulate_source(GCTAObservation* obs, const GModels& models,GRan& ran, GLog* wrklog=NULL);
-    void           simulate_background(GCTAObservation* obs, const GModels& models,GRan& ran, GLog* wrklog=NULL);
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 
 protected:
     // Protected methods
     void init_members(void);
     void copy_members(const ctobssim& app);
     void free_members(void);
+    void get_parameters(void);
+    void set_list(GCTAObservation* obs);
+    void simulate_source(GCTAObservation* obs,
+                         const GModels&   models,
+                         GRan&            ran, 
+                         GLog*            wrklog = NULL);
+    void simulate_background(GCTAObservation* obs,
+                             const GModels&   models,
+                             GRan&            ran,
+                             GLog*            wrklog = NULL);
     void save_fits(void);
     void save_xml(void);
 
@@ -105,5 +111,17 @@ protected:
     GTimeReference    m_cta_ref;     //!< CTA time reference
     int               m_event_id;    //!< Event identifier
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GObservations& ctobssim::obs(void) const
+{
+    return m_obs;
+}
 
 #endif /* CTOBSSIM_HPP */
