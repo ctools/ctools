@@ -51,10 +51,6 @@ public:
     void                 save(void);
     const GObservations& obs(void) const;
     GCTAEventCube        cube(void) const;
-    void                 get_parameters(void);
-    void                 init_cube(void);
-    void                 fill_cube(GCTAObservation* obs);
-    void                 obs_cube(void);
 };
 
 

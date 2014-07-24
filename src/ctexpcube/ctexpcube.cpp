@@ -296,7 +296,6 @@ void ctexpcube::run(void)
 
 /***********************************************************************//**
  * @brief Save exposure cube
- *
  ***************************************************************************/
 void ctexpcube::save(void)
 {
@@ -311,6 +310,72 @@ void ctexpcube::save(void)
 
     // Save exposure cube
     m_expcube.save(m_outfile, clobber());
+
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctexpcube::init_members(void)
+{
+    // Initialise members
+    m_outfile.clear();
+    m_apply_edisp = false;
+
+    // Initialise protected members
+    m_read_ahead = false;
+    m_obs.clear();
+    m_expcube.clear();
+    m_ebounds.clear();
+
+    // Set logger properties
+    log.date(true);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctexpcube::copy_members(const ctexpcube& app)
+{
+    // Copy attributes
+    m_outfile     = app.m_outfile;
+    m_apply_edisp = app.m_apply_edisp;
+
+    // Copy protected members
+    m_read_ahead = app.m_read_ahead;
+    m_obs        = app.m_obs;
+    m_expcube    = app.m_expcube;
+    m_ebounds    = app.m_ebounds;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctexpcube::free_members(void)
+{
+    // Write separator into logger
+    if (logTerse()) {
+        log << std::endl;
+    }
 
     // Return
     return;
@@ -598,72 +663,6 @@ void ctexpcube::set_from_cntmap(const std::string& filename)
         std::string msg = "No events cube found in file \""
                           ""+filename+"\".";
         throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
-    }
-
-    // Return
-    return;
-}
-
-
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
-/***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctexpcube::init_members(void)
-{
-    // Initialise members
-    m_outfile.clear();
-    m_apply_edisp = false;
-
-    // Initialise protected members
-    m_read_ahead = false;
-    m_obs.clear();
-    m_expcube.clear();
-    m_ebounds.clear();
-
-    // Set logger properties
-    log.date(true);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
- *
- * @param[in] app Application.
- ***************************************************************************/
-void ctexpcube::copy_members(const ctexpcube& app)
-{
-    // Copy attributes
-    m_outfile     = app.m_outfile;
-    m_apply_edisp = app.m_apply_edisp;
-
-    // Copy protected members
-    m_read_ahead = app.m_read_ahead;
-    m_obs        = app.m_obs;
-    m_expcube    = app.m_expcube;
-    m_ebounds    = app.m_ebounds;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctexpcube::free_members(void)
-{
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
     }
 
     // Return

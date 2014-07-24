@@ -61,17 +61,17 @@ public:
     void                 save(void);
     const GObservations& obs(void) const;
     const GCTAExposure&  expcube(void) const;
-    void                 get_parameters(void);
-    void                 get_obs(void);
-    void                 set_response(void);
-    void                 get_ebounds(void);
-    void                 set_from_cntmap(const std::string& filename);
 
 protected:
     // Protected methods
-    void           init_members(void);
-    void           copy_members(const ctexpcube& app);
-    void           free_members(void);
+    void init_members(void);
+    void copy_members(const ctexpcube& app);
+    void free_members(void);
+    void get_parameters(void);
+    void get_obs(void);
+    void set_response(void);
+    void get_ebounds(void);
+    void set_from_cntmap(const std::string& filename);
 
     // User parameters
     std::string   m_outfile;     //!< Output exposure cube file

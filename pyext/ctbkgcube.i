@@ -50,12 +50,7 @@ public:
     void                 execute(void);
     void                 run(void);
     void                 save(void);
-    const GObservations& obs(void) const;
-    void                 get_parameters(void);
-    void                 get_obs(void);
-    void                 get_ebounds(void);
-    void                 set_from_cntmap(const std::string& filename);
-    void                 fill_cube(GCTAObservation* obs);
+    const GCTAEventCube& cube(void) const;
 };
 
 /***********************************************************************//**

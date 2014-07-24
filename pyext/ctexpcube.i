@@ -52,11 +52,6 @@ public:
     void                 save(void);
     const GObservations& obs(void) const;
     const GCTAExposure&  expcube(void) const;
-    void                 get_parameters(void);
-    void                 get_obs(void);
-    void                 set_response(void);
-    void                 get_ebounds(void);
-    void                 set_from_cntmap(const std::string& filename);
 };
 
 
