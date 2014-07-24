@@ -79,30 +79,21 @@ public:
     void                 save(void);
     const GObservations& obs(void) const;
     GCTAEventCube        cube(void) const;
-    void                 get_parameters(void);
-    void                 init_cube(void);
-    void                 fill_cube(GCTAObservation* obs);
-    void                 obs_cube(void);
 
 protected:
     // Protected methods
-    void           init_members(void);
-    void           copy_members(const ctbin& app);
-    void           free_members(void);
-    void           get_ebounds(void);
-    std::string    set_outfile_name(const int index) const;
-    void           save_fits(void);
-    void           save_xml(void);
-    void           save_counts_map(const GCTAObservation* obs,
-                                   const std::string&     outfile) const;
-
-    // Obsolete methods (to be reomved later)
-    void           bin_events(GCTAObservation* obs);
+    void init_members(void);
+    void copy_members(const ctbin& app);
+    void free_members(void);
+    void get_parameters(void);
+    void init_cube(void);
+    void fill_cube(GCTAObservation* obs);
+    void obs_cube(void);
+    void get_ebounds(void);
 
     // User parameters
     std::string              m_evfile;     //!< Input event list or XML file
     std::string              m_outfile;    //!< Output counts map or XML file
-    std::string              m_prefix;     //!< Prefix for multiple counts maps
     bool                     m_usepnt;     //!< Use pointing instead of xref/yref parameters
     double                   m_emin;       //!< Lower energy
     double                   m_emax;       //!< Upper energy
@@ -119,8 +110,6 @@ protected:
 
     // Protected members
     GObservations            m_obs;        //!< Observation container
-    std::vector<std::string> m_infiles;    //!< Input event filenames
-    bool                     m_use_xml;    //!< Use XML file instead of FITS file
     bool                     m_read_ahead; //!< Read ahead parameters
     GSkymap                  m_cube;       //!< Event cube
     GEbounds                 m_ebounds;    //!< Energy boundaries
