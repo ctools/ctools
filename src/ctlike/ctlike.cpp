@@ -455,7 +455,7 @@ void ctlike::get_parameters(void)
 
                     // If response is not valid then set response from
                     // task parameters
-                    if (!obs->hasresponse()) {
+                    if (!obs->has_response()) {
 
                         // Get calibration parameters
                         if (!asked_for_response) {

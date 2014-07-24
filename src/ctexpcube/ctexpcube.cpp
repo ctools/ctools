@@ -435,7 +435,7 @@ void ctexpcube::set_response(void)
         if (obs != NULL) {
 
             // Set response if we don't have one
-            if (!obs->hasresponse()) {
+            if (!obs->has_response()) {
 
                 // Load response information
                 std::string database = (*this)["caldb"].string();

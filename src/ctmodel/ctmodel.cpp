@@ -606,7 +606,7 @@ void ctmodel::setup_obs(void)
             }
         
             // Set response if we don't have one
-            if (!obs->hasresponse()) {
+            if (!obs->has_response()) {
 
                 // Set calibration database. If specified parameter is a
                 // directory then use this as the pathname to the calibration
