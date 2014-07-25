@@ -45,8 +45,8 @@ proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP
 #
 # Angular separation binning parameters
 #======================================
-amax,     r, h, 0.3,,, "Upper bound of angular separation between true and measued photon direction (degrees)"
-anumbins, i, h, 60,,,  "Number of angular separation bins"
+amax,     r, h,  0.3,,, "Upper bound of angular separation between true and measued photon direction (degrees)"
+anumbins, i, h, 200,,,  "Number of angular separation bins"
 #
 # Standard parameters
 #====================
