@@ -153,7 +153,6 @@ def fit(obs, log=False, debug=False, edisp=False, tscalc=False):
 
     # Optionally apply energy dispersion
     like["edisp"].boolean(edisp)
-    like["edisp"].boolean(edisp)
 
     # Run ctlike application.
     like.run()
