@@ -302,7 +302,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf="cta_dummy_irf", caldb="dummy", id="000000"):
+            irf="cta_dummy_irf", caldb="dummy", id="000000", instrument="CTA"):
     """
     Returns a single CTA observation containing an empty CTA event list.
     By looping over this function you can add CTA observations to the
@@ -311,17 +311,19 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     Parameters:
      pntdir   - Pointing direction [GSkyDir]
     Keywords:
-     tstart   - Start time [seconds] (default: 0.0)
-     duration - Duration of observation [seconds] (default: 1800.0)
-     deadc    - Deadtime correction factor (default: 0.95)
-     emin     - Minimum event energy [TeV] (default: 0.1)
-     emax     - Maximum event energy [TeV] (default: 100.0)
-     rad      - ROI radius used for analysis [deg] (default: 5.0)
-     irf      - Instrument response function (default: cta_dummy_irf)
-     caldb    - Calibration database path (default: "dummy")
+     tstart     - Start time [seconds] (default: 0.0)
+     duration   - Duration of observation [seconds] (default: 1800.0)
+     deadc      - Deadtime correction factor (default: 0.95)
+     emin       - Minimum event energy [TeV] (default: 0.1)
+     emax       - Maximum event energy [TeV] (default: 100.0)
+     rad        - ROI radius used for analysis [deg] (default: 5.0)
+     irf        - Instrument response function (default: cta_dummy_irf)
+     caldb      - Calibration database path (default: "dummy")
+     id         - Run identifier (default: "000000")
+     instrument - Intrument (default: "CTA")
     """
     # Allocate CTA observation
-    obs_cta = gammalib.GCTAObservation()
+    obs_cta = gammalib.GCTAObservation(instrument)
 
     # Set calibration database
     db = gammalib.GCaldb()
