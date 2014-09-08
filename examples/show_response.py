@@ -222,7 +222,7 @@ def show_one_response(rspname, dbname, name, color="r"):
         caldb.open("cta", dbname)
 
     # Load response function
-    rsp = gammalib.GCTAResponse(rspname, caldb)
+    rsp = gammalib.GCTAResponseIrf(rspname, caldb)
 
     # Show effective area
     show_one_effective_area(rsp, name, color=color)
@@ -262,7 +262,7 @@ if __name__ == '__main__':
 
     # Set response dictionary
     rsps = [
-            {'dbname':  "/usr/local/gamma/share/caldb/data/cta/dummy", \
+            {'dbname':  "dummy", \
              'rspname': "cta_dummy_irf", \
              'name':    "Prod1 (Array E, MPIK)", \
              'color':   "b"}, \
