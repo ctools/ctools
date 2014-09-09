@@ -587,13 +587,13 @@ void ctbin::init_cube(void)
 
     } // endif: used pointing
 
+    // Set energy boundaries
+    get_ebounds();
+
     // Create skymap
     m_cube = GSkymap(m_proj, m_coordsys,
                      xref, yref, -m_binsz, m_binsz,
                      m_nxpix, m_nypix, m_enumbins);
-
-    // Set energy boundaries
-    get_ebounds();
 
     // Return
     return;
