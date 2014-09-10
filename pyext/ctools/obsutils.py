@@ -196,7 +196,7 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
         for event in run.events():
             
             # Determine sky pixel
-            skydir = gammalib.GCTAInstDir(event.dir()).dir()
+            skydir = event.dir().dir()
             pixel  = map.dir2inx(skydir)
             
             # Set pixel
