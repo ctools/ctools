@@ -281,27 +281,23 @@ void ctlike::run(void)
         double  logL_src    = m_logL;
         GModels models_orig = m_obs.models();
     
-        // Store models with free parameters
-        std::vector<std::string> free_srcs;
+        // Store models for which TS should be computed
+        std::vector<std::string> ts_srcs;
         GModels models = m_obs.models();
         for (int i = 0; i < models.size(); ++i) {
             GModel* model = models[i];
-            for (int j = 0; j < model->size(); ++j) {
-                GModelPar par = model->at(j);
-                if (par.is_free()){
-                    free_srcs.push_back(model->name());
-                    break;
-                }
+            if (model->tscalc()) {
+            	ts_srcs.push_back(model->name());
             }
         }
     
         // Loop over stored models, remove source and refit
-        for (int i = 0; i < free_srcs.size(); ++i) {
-            models.remove(free_srcs[i]);  
+        for (int i = 0; i < ts_srcs.size(); ++i) {
+            models.remove(ts_srcs[i]);
             m_obs.models(models);    
             double logL_nosrc = reoptimize_lm();
             double ts         = 2.0 * (logL_src-logL_nosrc);
-            models_orig[free_srcs[i]]->ts(ts);
+            models_orig[ts_srcs[i]]->ts(ts);
             models = models_orig;
         }
     
