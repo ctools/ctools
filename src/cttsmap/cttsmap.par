@@ -1,0 +1,63 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      cttsmap.par                                                   #
+#  Version:   00-01-00                                                      #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@desy.de                                         #
+#             DESY                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the cttsmap application                    #
+#                                                                           #
+#############################################################################
+#
+# General parameters
+#===================
+evfile,  f, a, "events.fits",,,"Input event list or observation definition file"
+srcmdl, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+outfile, f, a, "tsmap.fits",,, "Output counts cube"
+
+#
+# Spatial binning parameters
+#===========================
+nxpix,    i, a,   200,,, "Size of the X axis in pixels"
+nypix,    i, a,   200,,, "Size of the Y axis in pixels"
+binsz,    r, a,  0.02,,, "Image scale (in degrees/pixel)"
+coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
+xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
+yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
+proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
+
+#
+# Test source parameters
+#===========================
+source_integral,    r, h,  1e-10,,, "Integral start parameter [cm-2 s-1]"
+source_integral_min,    r, h,  1e-16,,, "Integral minimum boundary [cm-2 s-1]"
+source_integral_max,    r, h,  1e-3,,, "Integral maximum boundary [cm-2 s-1]"
+source_index,    r, h,  -2.5,,, "Index start parameter"
+source_index_min,    r, h,  -5.0,,, "Index minimum boundary"
+source_index_max,    r, h,  -1.0,,, "Index maximum boundary"
+source_emin,    r, h,  1.0,,, "Minimum energy for flux computation"
+source_emax,    r, h,  100.0,,, "Maximum energy for flux computation"
+free_index,    b, h,  no,,, "leave source index free?"
+
+#
+# Parameters for splitting and speed purpose
+#===========================
+binmin,    i, h,   -1,,, "First bin to compute"
+binmax,   i, h,   -1,,, "Last bin to compute"
+logL0,    r, h,  0.0,,, "LogLikelihood value of null hypothesis"
+
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, "ql",,, "Mode of automatic parameters"
+logfile, f, h, "ctbin.log",,, "Log filename"

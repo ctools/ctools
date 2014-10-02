@@ -886,6 +886,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctpsfcube/Makefile
                  src/ctbkgcube/Makefile
                  src/ctcubemask/Makefile
+		 src/cttsmap/Makefile
                  src/ctools-setup
                  test/Makefile
                  test/test_cscripts.sh

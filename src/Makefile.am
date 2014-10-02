@@ -14,7 +14,8 @@ SUBDIRS = ctbin \
           ctexpcube \
           ctpsfcube \
           ctbkgcube \
-          ctcubemask 
+          ctcubemask \
+          cttsmap
 
 # Scripts to be distributed
 scripts = ctools-setup \
@@ -35,7 +36,8 @@ libctools_la_LIBADD = ctbin/libctbin.la \
                       ctexpcube/libctexpcube.la \
                       ctpsfcube/libctpsfcube.la \
                       ctbkgcube/libctbkgcube.la \
-                      ctcubemask/libctcubemask.la
+                      ctcubemask/libctcubemask.la \
+                      cttsmap/libcttsmap.la
 
 # Distribute scripts
 EXTRA_DIST   = $(scripts)
