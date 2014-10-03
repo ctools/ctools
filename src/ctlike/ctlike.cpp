@@ -543,6 +543,9 @@ void ctlike::optimize_lm(void)
         m_obs.optimize(*opt);
     }
 
+    // Compute errors
+    m_obs.errors(*opt);
+
     // Store maximum log likelihood value
     m_logL = -(opt->value());
 
