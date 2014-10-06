@@ -36,6 +36,7 @@ $ECHO "***************"
 # ==================
 ctbin=../src/ctbin/ctbin
 ctlike=../src/ctlike/ctlike
+cttsmap=../src/cttsmap/cttsmap
 ctmodel=../src/ctmodel/ctmodel
 ctobssim=../src/ctobssim/ctobssim
 ctselect=../src/ctselect/ctselect
@@ -341,6 +342,34 @@ then
   $ECHO -n "."
 else
   $ECHO " results_binned_background_cube.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cttsmap
+# ============
+$ECHO -n "Test cttsmap: "
+$cttsmap infile="selected_events.fits" \
+         srcmdl="data/crab.xml" \
+         srcname="Crab" \
+         caldb="irf" \
+         irf="cta_dummy_irf" \
+         outfile="tsmap.fits" \
+         nxpix=5 \
+         nypix=5 \
+         binsz=0.05 \
+         coordsys="CEL" \
+         xref=83.63 \
+         yref=22.01 \
+         proj="CAR"
+$ECHO -n "."
+if [ -s "tsmap.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " tsmap.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"

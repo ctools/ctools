@@ -26,6 +26,7 @@ import test_ctobssim
 import test_ctselect
 import test_ctbin
 import test_ctlike
+import test_cttsmap
 import test_ctmodel
 import test_ctskymap
 import test_ctexpcube
@@ -50,6 +51,7 @@ if __name__ == '__main__':
     suite_ctselect   = test_ctselect.Test()
     suite_ctbin      = test_ctbin.Test()
     suite_ctlike     = test_ctlike.Test()
+    suite_cttsmap    = test_cttsmap.Test()
     suite_ctmodel    = test_ctmodel.Test()
     suite_ctskymap   = test_ctskymap.Test()
     suite_ctexpcube  = test_ctexpcube.Test()
@@ -63,6 +65,7 @@ if __name__ == '__main__':
     suite_ctselect.set()
     suite_ctbin.set()
     suite_ctlike.set()
+    suite_cttsmap.set()
     suite_ctmodel.set()
     suite_ctskymap.set()
     suite_ctexpcube.set()
@@ -76,6 +79,7 @@ if __name__ == '__main__':
     suites.append(suite_ctselect)
     suites.append(suite_ctbin)
     suites.append(suite_ctlike)
+    suites.append(suite_cttsmap)
     suites.append(suite_ctmodel)
     suites.append(suite_ctskymap)
     suites.append(suite_ctexpcube)
