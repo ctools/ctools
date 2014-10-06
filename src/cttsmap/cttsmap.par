@@ -19,6 +19,7 @@
 #===================
 evfile,  f, a, "events.fits",,,"Input event list or observation definition file"
 srcmdl, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+srcname, s,a,"TestSource",,,"Test source"
 outfile, f, a, "tsmap.fits",,, "Output counts cube"
 
 #
@@ -31,19 +32,6 @@ coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galac
 xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
 proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
-
-#
-# Test source parameters
-#===========================
-source_integral,    r, h,  1e-10,,, "Integral start parameter [cm-2 s-1]"
-source_integral_min,    r, h,  1e-16,,, "Integral minimum boundary [cm-2 s-1]"
-source_integral_max,    r, h,  1e-3,,, "Integral maximum boundary [cm-2 s-1]"
-source_index,    r, h,  -2.5,,, "Index start parameter"
-source_index_min,    r, h,  -5.0,,, "Index minimum boundary"
-source_index_max,    r, h,  -1.0,,, "Index maximum boundary"
-source_emin,    r, h,  1.0,,, "Minimum energy for flux computation"
-source_emax,    r, h,  100.0,,, "Maximum energy for flux computation"
-free_index,    b, h,  no,,, "leave source index free?"
 
 #
 # Parameters for splitting and speed purpose

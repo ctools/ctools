@@ -33,6 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
+#define G_GET_PARAMETERS                           "cttsmap::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -272,9 +273,6 @@ void cttsmap::run(void)
     // Initialise maps
     init_maps();
 
-    // Initialise point source model
-    init_testsource();
-
     // Get bins to be computed
     // To split the computation on several jobs,
     // the user is able to provide a subset of bins
@@ -282,17 +280,27 @@ void cttsmap::run(void)
     int binmin = (m_binmin == -1) ? 0 : m_binmin;
     int binmax = (m_binmax == -1) ? m_tsmap.npix() : m_binmax;
 
+    // Initialise optimizer
     GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log)
         	                                     : new GOptimizerLM();
 
-    // Get likelihood of null hypothesis if not given before
-    if (m_logL0 == 0.0) {
-    	m_obs.optimize(*opt);
-    	m_logL0 = -(opt->value());
-    }
-
+    // Store initial models
     GModels models_orig = m_obs.models();
+
+    // Get model instance for further computations
     GModels models = m_obs.models();
+
+    // Remove test source
+    models.remove(m_srcname);
+
+    // Get likelihood of null hypothesis if not given before
+	if (m_logL0 == 0.0) {
+
+		// Compute likelihood without the test source
+		m_obs.models(models);
+		m_obs.optimize(*opt);
+		m_logL0 = -(opt->value());
+	}
 
     // Loop over all observations in the container
     for (int i = binmin; i < binmax; ++i) {
@@ -309,10 +317,10 @@ void cttsmap::run(void)
     	m_testsource["RA"].value(bincentre.ra_deg());
     	m_testsource["DEC"].value(bincentre.dec_deg());
 
-    	// append test source to model container
+    	// Add test source to model container
     	models.append(m_testsource);
 
-    	// Assign models to observation
+    	// Assign models to observations
     	m_obs.models(models);
 
     	// Optimize observation container
@@ -326,21 +334,28 @@ void cttsmap::run(void)
 
     	// Get test source model instance
     	GModels best_fit_model = m_obs.models();
-    	GModel* testsource = best_fit_model["TestSource"];
+    	GModel* testsource = best_fit_model[m_srcname];
 
     	// Assign values to the maps
     	m_tsmap(i) = ts;
-    	m_fluxmap(i) = (*testsource)["Integral"].value();
-    	m_indexmap(i) = (*testsource)["Index"].value();
+
+    	// Get fit values
+    	for (int j = 0; j < m_mapnames.size(); j++) {
+
+    		// get best fit values and assign to maps
+    		m_maps[j](i) = (*testsource)[m_mapnames[j]].value();
+    	}
+
+    	// Set status of bin to true
     	m_statusmap(i) = 1.0;
 
-    	// Remove test source from container
-    	models.remove("TestSource");
-
-    	// Bring models to initial state
-    	m_obs.models(models_orig);
+    	// Remove model from container
+    	models.remove(m_srcname);
 
     } // endfor: looped over bins
+
+    // Bring models to initial state
+    m_obs.models(models_orig);
 
     // Return
     return;
@@ -373,18 +388,19 @@ void cttsmap::save(void)
 
     // Write the sky maps to the FITS file
     m_tsmap.write(fitsfile);
-    m_fluxmap.write(fitsfile);
-    m_indexmap.write(fitsfile);
 
-    // Change names of extensions
-	fitsfile[0]->extname("TS MAP");
-	fitsfile[1]->extname("FLUX MAP");
-	fitsfile[2]->extname("SPECTRAL INDEX MAP");
+    for (int i = 0; i < m_mapnames.size(); i++) {
+    	m_maps[i].write(fitsfile);
+    }
+
+    for (int i = 0; i < m_mapnames.size(); i++) {
+    	fitsfile[i+1]->extname(m_mapnames[i]);
+    }
 
 	// Add computation log if not all bins are computed
     if (m_binmin != -1 || m_binmax != -1) {
     	m_statusmap.write(fitsfile);
-    	fitsfile[3]->extname("STATUS MAP");
+    	fitsfile[m_mapnames.size()+1]->extname("STATUS MAP");
     }
 
     // Save FITS file
@@ -424,19 +440,10 @@ void cttsmap::init_members(void)
     m_binmax = -1;
     m_logL0 = 0.0;
     m_tsmap.clear();
-    m_fluxmap.clear();
-    m_indexmap.clear();
+    m_maps.clear();
+    m_mapnames.clear();
     m_statusmap.clear();
     m_testsource.clear();
-    m_source_integral = 1e-12;
-    m_source_integral_min = 1e-16;
-    m_source_integral_max = 1e-8;
-    m_source_index = -2.5;
-    m_source_index_min = - 5.0;
-    m_source_index_max = -1.0;
-    m_source_emin = GEnergy(1,"TeV");
-    m_source_emax = GEnergy(100, "TeV");
-    m_free_index = false;
 
     // Set logger properties
     log.date(true);
@@ -471,20 +478,10 @@ void cttsmap::copy_members(const cttsmap& app)
     m_obs        = app.m_obs;
     m_read_ahead = app.m_read_ahead;
     m_tsmap       = app.m_tsmap;
-    m_fluxmap       = app.m_fluxmap;
-    m_indexmap       = app.m_indexmap;
+    m_mapnames       = app.m_mapnames;
+    m_maps       = app.m_maps;
     m_statusmap    = app.m_statusmap;
-    m_testsource = app.m_testsource;
-    m_source_integral = app.m_source_integral;
-    m_source_integral_min = app.m_source_integral_min;
-    m_source_integral_max = app.m_source_integral_max;
-    m_source_index = app.m_source_integral_max;
-    m_source_index_min = app.m_source_index_min;
-    m_source_index_max = app.m_source_index_max;
-    m_source_emin = app.m_source_emin;
-    m_source_emax = app.m_source_emax;
-    m_free_index = app.m_free_index;
-
+    m_testsource    = app.m_testsource;
     // Return
     return;
 }
@@ -549,6 +546,27 @@ void cttsmap::get_parameters(void)
 
     } // endif: there was no observation in the container
 
+    // Get name of test source and check container for this name
+    m_srcname = (*this)["srcname"].string();
+    if (!m_obs.models().contains(m_srcname)) {
+    	throw GException::model_not_found(G_GET_PARAMETERS, m_srcname);
+    }
+
+    // Get Model and store it as protected member
+    GModel* model = m_obs.models()[m_srcname]->clone();
+    m_testsource = *dynamic_cast<GModelSky*>(model);
+
+    // Check if model has RA and DEC parameters which are necessary to continue
+    if (!m_testsource.has_par("RA") || !m_testsource.has_par("DEC")) {
+
+    	// Is this the correct exception? Do we need a new one?
+    	throw GException::model_invalid(G_GET_PARAMETERS, m_srcname, "RA and DEC parameters required! ");
+    }
+
+    // Fix the spatial parameters
+    m_testsource["RA"].fix();
+    m_testsource["DEC"].fix();
+
     // Get map parameters
     m_xref = (*this)["xref"].real();
     m_yref = (*this)["yref"].real();
@@ -557,17 +575,6 @@ void cttsmap::get_parameters(void)
     m_binsz    = (*this)["binsz"].real();
     m_nxpix    = (*this)["nxpix"].integer();
     m_nypix    = (*this)["nypix"].integer();
-
-    // Get test source parameters
-    m_source_integral = (*this)["source_integral"].real();
-    m_source_integral_min = (*this)["source_integral_min"].real();
-    m_source_integral_max = (*this)["source_integral_max"].real();
-    m_source_index = (*this)["source_index"].real();
-    m_source_index_min = (*this)["source_index_min"].real();
-    m_source_index_max = (*this)["source_index_max"].real();
-    m_source_emin = GEnergy((*this)["source_emin"].real(),"TeV");
-    m_source_emax = GEnergy((*this)["source_emax"].real(),"TeV");
-    m_free_index = (*this)["free_index"].boolean();
 
     // Get optional splitting parameters
     m_binmin = (*this)["binmin"].integer();
@@ -601,65 +608,27 @@ void cttsmap::init_maps(void)
                      m_nxpix, m_nypix, 1);
 
     // Initialise map information
-    m_fluxmap.clear();
+	m_statusmap.clear();
 
-    // Create skymap
-    m_fluxmap = GSkymap(m_proj, m_coordsys,
-                     m_xref, m_yref, -m_binsz, m_binsz,
-                     m_nxpix, m_nypix, 1);
+	// Create status map
+	m_statusmap = GSkymap(m_proj, m_coordsys,
+					 m_xref, m_yref, -m_binsz, m_binsz,
+					 m_nxpix, m_nypix, 1);
 
-    // Initialise map information
-    m_indexmap.clear();
+	// Initialise maps of other free parameters
+	for (int i = 0; i < m_testsource.size(); i++) {
+		if (m_testsource[i].is_fixed()) {
+			continue;
+		}
 
-    // Create skymap
-    m_indexmap = GSkymap(m_proj, m_coordsys,
-                     m_xref, m_yref, -m_binsz, m_binsz,
-                     m_nxpix, m_nypix, 1);
+		// create sky map
+		GSkymap map = GSkymap(m_proj, m_coordsys,
+				 m_xref, m_yref, -m_binsz, m_binsz,
+				 m_nxpix, m_nypix, 1);
+		m_maps.push_back(map);
 
-    // Initialise map information
-    m_statusmap.clear();
-
-    // Create status map
-    m_statusmap = GSkymap(m_proj, m_coordsys,
-                     m_xref, m_yref, -m_binsz, m_binsz,
-                     m_nxpix, m_nypix, 1);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Initialise the test source
- *
- * Initialises the test point source model.
- ***************************************************************************/
-void cttsmap::init_testsource(void)
-{
-	// Create spatial model
-	GModelSpatialPointSource spat = GModelSpatialPointSource(m_tsmap.inx2dir(0));
-	spat["RA"].fix();
-	spat["DEC"].fix();
-
-	// Create spectral model
-	GModelSpectralPlaw2 plaw2 = GModelSpectralPlaw2(m_source_integral,m_source_index,m_source_emin,m_source_emax);
-
-	// Create sky model
-	m_testsource = GModelSky(spat,plaw2);
-	m_testsource.name("TestSource");
-
-	// Set source parameter boundaries
-	m_testsource["Integral"].min(m_source_integral_min);
-	m_testsource["Integral"].max(m_source_integral_max);
-	m_testsource["Index"].min(m_source_index_min);
-	m_testsource["Index"].max(m_source_index_max);
-
-	// Free spectral index if required
-	if (m_free_index) {
-		m_testsource["Index"].free();
-	}
-	else {
-		m_testsource["Index"].fix();
+		// Store name of parameter
+		m_mapnames.push_back(m_testsource[i].name());
 	}
 
     // Return

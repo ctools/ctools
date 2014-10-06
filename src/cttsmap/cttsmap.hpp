@@ -72,9 +72,6 @@ public:
     void                 save(void);
     const GObservations& obs(void) const;
     const GSkymap& tsmap(void) const;
-    const GSkymap& fluxmap(void) const;
-    const GSkymap& indexmap(void) const;
-    const GSkymap& statusmap(void) const;
 
 protected:
     // Protected methods
@@ -83,10 +80,10 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void init_maps(void);
-    void init_testsource(void);
 
     // User parameters
     std::string              m_evfile;     //!< Input event list or XML file
+    std::string              m_srcname; //!< Name of source which is moved around
     std::string              m_outfile;    //!< Output counts map or XML file
     std::string              m_proj;       //!< WCS projection
     std::string              m_coordsys;   //!< Coordinate system
@@ -104,20 +101,11 @@ protected:
     // Protected members
     GObservations            m_obs;        //!< Observation container
     bool                     m_read_ahead; //!< Read ahead parameters
-    GSkymap                  m_tsmap;       //!< ts map
-    GSkymap                  m_fluxmap;    //!< flux map
-    GSkymap                  m_indexmap; //!< spectral index map
+    GSkymap                  m_tsmap;   //!< ts map
     GSkymap                  m_statusmap; //!< map of computed bins
+    std::vector<std::string> m_mapnames; // names of free parameters
+    std::vector<GSkymap> m_maps; // sky maps for each free parameter
     GModelSky               m_testsource; //!< test source for TS computation
-    double               m_source_integral; //!< Integral flux of test source
-    double			   m_source_integral_min; //!< minimum boundary of integral flux
-    double			   m_source_integral_max; //!< maximum boundary of integral flux
-    double               m_source_index; //!< assumed spectral index of test source
-    double               m_source_index_min; //!< minimum boundary of spectral index of test source
-    double               m_source_index_max; //!< maximum boundary of spectral index of test source
-    GEnergy             m_source_emin; //!< Minimum energy for source integral
-    GEnergy             m_source_emax; //!< Maximum energy for source integral
-    bool                   m_free_index; //!< flag if spectral index of test source is left free or fixed
 
 };
 
@@ -141,39 +129,6 @@ inline
 const GSkymap& cttsmap::tsmap(void) const
 {
     return m_tsmap;
-}
-
-/***********************************************************************//**
- * @brief Return flux skymap
- *
- * @return Reference to flux skymap
- ***************************************************************************/
-inline
-const GSkymap& cttsmap::fluxmap(void) const
-{
-    return m_fluxmap;
-}
-
-/***********************************************************************//**
- * @brief Return spectral index skymap
- *
- * @return Reference to spectral index skymap
- ***************************************************************************/
-inline
-const GSkymap& cttsmap::indexmap(void) const
-{
-    return m_indexmap;
-}
-
-/***********************************************************************//**
- * @brief Return status skymap
- *
- * @return Reference to status skymap
- ***************************************************************************/
-inline
-const GSkymap& cttsmap::statusmap(void) const
-{
-    return m_statusmap;
 }
 
 
