@@ -1,7 +1,7 @@
 /***************************************************************************
- *                          ctools - SWIG file                             *
+ *                      cttsmap - TS map calculation tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -17,42 +17,48 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  *                                                                         *
- * ----------------------------------------------------------------------- *
- * Usage:                                                                  *
- * swig -c++ -python -Wall ctools.i                                        *
  ***************************************************************************/
 /**
- * @file ctools.i
- * @brief ctools SWIG file
- * @author Juergen Knoedlseder
+ * @file cttsmap.i
+ * @brief TS map calculation tool interface definition
+ * @author Michael Mayer
  */
-%module ctools
-%feature("autodoc", "1");
-
-/* __ Headers needed for compilation _____________________________________ */
 %{
-#include <stddef.h>
+/* Put headers and other declarations here that are needed for compilation */
+#include "cttsmap.hpp"
+#include "GTools.hpp"
 %}
 
-/* __ Include standard typemaps for vectors and strings __________________ */
-%include stl.i
 
-/* __ Make sure that exceptions are catched ______________________________ */
-%import(module="gammalib.support") "GException.i";
+/***********************************************************************//**
+ * @class cttsmap
+ *
+ * @brief TS map calculation
+ ***************************************************************************/
+class cttsmap : public GApplication  {
+public:
+    // Constructors and destructors
+    cttsmap(void);
+    explicit cttsmap(const GObservations& obs);
+    cttsmap(int argc, char *argv[]);
+    cttsmap(const cttsmap& app);
+    virtual ~cttsmap(void);
+    
+    // Methods
+    void                 clear(void);
+    void                 execute(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    const GSkymap&       tsmap(void) const;
+};
 
-/* __ Inform about base classes __________________________________________ */
-%import(module="gammalib.base") "GBase.i";
-%import(module="gammalib.app")  "GApplication.i";
 
-/* __ ctools _____________________________________________________________ */
-%include "ctbin.i"
-%include "ctobssim.i"
-%include "ctlike.i"
-%include "ctmodel.i"
-%include "ctselect.i"
-%include "ctskymap.i"
-%include "ctexpcube.i"
-%include "ctpsfcube.i"
-%include "ctbkgcube.i"
-%include "ctcubemask.i"
-%include "cttsmap.i"
+/***********************************************************************//**
+ * @brief TS map calculation tool Python extensions
+ ***************************************************************************/
+%extend cttsmap {
+    cttsmap copy() {
+        return (*self);
+    }
+}

@@ -48,6 +48,7 @@ pyext/ctools/ctools.py
 pyext/ctools/ctools_wrap.cpp
 src/ctbin/ctbin
 src/ctlike/ctlike
+src/cttsmap/cttsmap
 src/ctmodel/ctmodel
 src/ctobssim/ctobssim
 src/ctselect/ctselect
