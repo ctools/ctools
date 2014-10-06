@@ -17,10 +17,12 @@
 #
 # General parameters
 #===================
-evfile,  f, a, "events.fits",,,"Input event list or observation definition file"
-srcmdl, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
-srcname, s,a,"TestSource",,,"Test source"
-outfile, f, a, "tsmap.fits",,, "Output counts cube"
+infile,   f, a, "events.fits",,,"Input event list, cube or observation definition file"
+srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+srcname,  s, a, "TestSource",,,"Test source"
+caldb,    s, a, "dummy",,, "Calibration database"
+irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
+outfile,  f, a, "tsmap.fits",,, "Output counts cube"
 
 #
 # Spatial binning parameters
@@ -36,7 +38,7 @@ proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP
 #
 # Parameters for splitting and speed purpose
 #===========================
-binmin,    i, h,   -1,,, "First bin to compute"
+binmin,   i, h,   -1,,, "First bin to compute"
 binmax,   i, h,   -1,,, "Last bin to compute"
 logL0,    r, h,  0.0,,, "LogLikelihood value of null hypothesis"
 
@@ -48,4 +50,4 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctbin.log",,, "Log filename"
+logfile, f, h, "cttsmap.log",,, "Log filename"

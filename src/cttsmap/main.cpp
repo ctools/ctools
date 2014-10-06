@@ -1,7 +1,7 @@
 /***************************************************************************
- *                    ctbin - CTA data binning main code                   *
+ *                      cttsmap - TS map calculation tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctbin/main.cpp
- * @brief CTA data binning tool main code
- * @author J. Knodlseder
+ * @file cttsmap/main.cpp
+ * @brief CTA TS map generation
+ * @author Michael Mayer
  */
 
 /* __ Includes ___________________________________________________________ */

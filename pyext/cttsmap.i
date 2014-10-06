@@ -1,7 +1,7 @@
 /***************************************************************************
- *                      cttsmap - CTA data binning tool                    *
+ *                      cttsmap - TS map calculation tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,8 +20,8 @@
  ***************************************************************************/
 /**
  * @file cttsmap.i
- * @brief CTA data binning tool Python interface definition
- * @author Juergen Knoedlseder
+ * @brief TS map calculation tool interface definition
+ * @author Michael Mayer
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
@@ -30,12 +30,11 @@
 %}
 
 
-/***********************************************************************
-//**
-* @class cttsmap
-*
-* @brief CTA data binning tool Python interface
-***************************************************************************/
+/***********************************************************************//**
+ * @class cttsmap
+ *
+ * @brief TS map calculation
+ ***************************************************************************/
 class cttsmap : public GApplication  {
 public:
     // Constructors and destructors
@@ -51,19 +50,13 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    const GSkymap& tsmap(void) const;
-    const GSkymap& fluxmap(void) const;
-    const GSkymap& indexmap(void) const;
-    const GSkymap& statusmap(void) const;
-
-    
+    const GSkymap&       tsmap(void) const;
 };
 
 
-/***********************************************************************
- //**
-* @brief CTA data binning tool Python extension
-***************************************************************************/
+/***********************************************************************//**
+ * @brief TS map calculation tool Python extensions
+ ***************************************************************************/
 %extend cttsmap {
     cttsmap copy() {
         return (*self);

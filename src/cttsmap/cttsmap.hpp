@@ -1,7 +1,7 @@
 /***************************************************************************
- *                      cttsmap - TS map tool                      *
+ *                      cttsmap - TS map calculation tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file cttsmap.hpp
- * @brief TS map calculation tool
+ * @brief TS map calculation tool interface definition
  * @author Michael Mayer
  */
 
@@ -39,19 +39,20 @@
 /***********************************************************************//**
  * @class cttsmap
  *
- * @brief TS map calculation interface
+ * @brief TS map calculation
  *
  * This class computes a set of maps from any kind of observations:
- *  - TS map
- *  - flux map
- *  - map of spectral index
- *  The class operates on predefined observation containers, an individual
- *   event list or an observation definition XML file.
  *
- *  During the computation a putative point-like source is moved along a
- *  grid of coordinates. The best fit results (TS, flux, index) are stored in maps
- *  which are saved in the output FITS files.
+ *      - TS map
+ *      - Flux map
+ *      - Map of spectral index
  *
+ * The class operates on predefined observation containers, an individual
+ * event list or an observation definition XML file.
+ *
+ * During the computation a putative point-like source is moved along a
+ * grid of coordinates. The best fit results (TS, flux, index) are stored in
+ * maps which are saved in the output FITS files.
  ***************************************************************************/
 class cttsmap : public GApplication  {
 public:
@@ -71,7 +72,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    const GSkymap& tsmap(void) const;
+    const GSkymap&       tsmap(void) const;
 
 protected:
     // Protected methods
@@ -82,8 +83,10 @@ protected:
     void init_maps(void);
 
     // User parameters
-    std::string              m_evfile;     //!< Input event list or XML file
-    std::string              m_srcname; //!< Name of source which is moved around
+    std::string              m_infile;     //!< Input file
+    std::string              m_srcname;    //!< Name of source which is moved around
+    std::string              m_caldb;      //!< Calibration database
+    std::string              m_irf;        //!< Instrument response functions
     std::string              m_outfile;    //!< Output counts map or XML file
     std::string              m_proj;       //!< WCS projection
     std::string              m_coordsys;   //!< Coordinate system
@@ -96,18 +99,18 @@ protected:
     // Parameters to control speed and job splitting
     int                      m_binmin;  //!< Map bin number from which computation should start
     int                      m_binmax;  //!< Map bin number where map computation should end
-    double              m_logL0; //!< Likelihood value of null hypothesis
+    double                   m_logL0;   //!< Likelihood value of null hypothesis
 
     // Protected members
     GObservations            m_obs;        //!< Observation container
     bool                     m_read_ahead; //!< Read ahead parameters
-    GSkymap                  m_tsmap;   //!< ts map
-    GSkymap                  m_statusmap; //!< map of computed bins
-    std::vector<std::string> m_mapnames; // names of free parameters
-    std::vector<GSkymap> m_maps; // sky maps for each free parameter
-    GModelSky               m_testsource; //!< test source for TS computation
-
+    GSkymap                  m_tsmap;      //!< TS map
+    GSkymap                  m_statusmap;  //!< Map of computed bins
+    std::vector<std::string> m_mapnames;   //!< Names of free parameters
+    std::vector<GSkymap>     m_maps;       //!< Sky maps for each free parameter
+    GModel*                  m_testsource; //!< Pointer to test source for TS computation
 };
+
 
 /***********************************************************************//**
  * @brief Return observation container
@@ -120,6 +123,7 @@ const GObservations& cttsmap::obs(void) const
     return m_obs;
 }
 
+
 /***********************************************************************//**
  * @brief Return TS skymap
  *
@@ -130,6 +134,5 @@ const GSkymap& cttsmap::tsmap(void) const
 {
     return m_tsmap;
 }
-
 
 #endif /* CTTSMAP_HPP */

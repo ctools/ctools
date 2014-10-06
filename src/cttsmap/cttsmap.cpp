@@ -1,7 +1,7 @@
 /***************************************************************************
- *                      cttsmap - TS map computation tool                      *
+ *                      cttsmap - TS map calculation tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,8 +19,8 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file cttsmap.cpp
- * @brief TS map computation tool
+ * @file cttsmap.hpp
+ * @brief TS map calculation tool interface implementation
  * @author Michael Mayer
  */
 
@@ -33,7 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                           "cttsmap::get_parameters()"
+#define G_GET_PARAMETERS                          "cttsmap::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -71,7 +71,7 @@ cttsmap::cttsmap(void) : GApplication(CTTSMAP_NAME, CTTSMAP_VERSION)
  * observations container.
  ***************************************************************************/
 cttsmap::cttsmap(const GObservations& obs) :
-       GApplication(CTTSMAP_NAME, CTTSMAP_VERSION)
+         GApplication(CTTSMAP_NAME, CTTSMAP_VERSION)
 {
     // Initialise members
     init_members();
@@ -95,7 +95,7 @@ cttsmap::cttsmap(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 cttsmap::cttsmap(int argc, char *argv[]) :
-       GApplication(CTTSMAP_NAME, CTTSMAP_VERSION, argc, argv)
+         GApplication(CTTSMAP_NAME, CTTSMAP_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -204,8 +204,8 @@ void cttsmap::clear(void)
  * This is the main execution method of the cttsmap class. It is invoked when
  * the executable is called from command line.
  *
- * The method reads the task parameters, computed the TS values
- * and stores it into map(s), and writes the results into FITS files on disk.
+ * The method reads the task parameters, computes the TS values, stores the
+ * results into map(s), and writes the maps into a FITS file on disk.
  ***************************************************************************/
 void cttsmap::execute(void)
 {
@@ -226,10 +226,9 @@ void cttsmap::execute(void)
 /***********************************************************************//**
  * @brief Computes the TS maps
  *
- * This method moves a point-like source along a grid of coordinates
- * and refits the given models including this additional source.
- * The fit parameters of the source and its TS values are filled into
- * respective position in the map.
+ * This method moves a source along a grid of coordinates and refits the
+ * given models including this additional source. The fit parameters of the
+ * source and its TS values are filled into respective position in the map.
  ***************************************************************************/
 void cttsmap::run(void)
 {
@@ -262,12 +261,7 @@ void cttsmap::run(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Bin observations");
-        }
-        else {
-            log.header1("Bin observation");
-        }
+        log.header1("Initialise TS map");
     }
 
     // Initialise maps
@@ -281,8 +275,8 @@ void cttsmap::run(void)
     int binmax = (m_binmax == -1) ? m_tsmap.npix() : m_binmax;
 
     // Initialise optimizer
-    GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log)
-        	                                     : new GOptimizerLM();
+    GOptimizerLM* opt = (logExplicit()) ? new GOptimizerLM(log)
+        	                            : new GOptimizerLM();
 
     // Store initial models
     GModels models_orig = m_obs.models();
@@ -296,29 +290,45 @@ void cttsmap::run(void)
     // Get likelihood of null hypothesis if not given before
 	if (m_logL0 == 0.0) {
 
+        // Write header
+        if (logTerse()) {
+            log << std::endl;
+            log.header1("Compute NULL Hypothesis for TS computation");
+        }
+
 		// Compute likelihood without the test source
 		m_obs.models(models);
 		m_obs.optimize(*opt);
 		m_logL0 = -(opt->value());
+
 	}
 
-    // Loop over all observations in the container
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Generate TS map");
+    }
+
+    // Loop over grid positions
     for (int i = binmin; i < binmax; ++i) {
 
     	// Get the coordinate of current bin
     	GSkyDir bincentre = m_tsmap.inx2dir(i);
 
-    	// Verbosity option
-    	if ((*this)["chatter"].integer()>2) {
-    		std::cout<<"Computing TS for bin number "<<i<<" at "<<bincentre.print()<<std::endl;
+    	// Header for verbose logging
+    	if (logExplicit()) {
+            std::string msg = "Computing TS for bin number "+gammalib::str(i)+
+                              " at "+bincentre.print();
+            log << std::endl;
+            log.header2(msg);
     	}
 
-    	// Set the point source at current bin position
-    	m_testsource["RA"].value(bincentre.ra_deg());
-    	m_testsource["DEC"].value(bincentre.dec_deg());
-
-    	// Add test source to model container
-    	models.append(m_testsource);
+    	// Add test source at current bin position
+        if (m_testsource != NULL) {
+            (*m_testsource)["RA"].value(bincentre.ra_deg());
+            (*m_testsource)["DEC"].value(bincentre.dec_deg());
+            models.append(*m_testsource);
+        }
 
     	// Assign models to observations
     	m_obs.models(models);
@@ -330,20 +340,34 @@ void cttsmap::run(void)
     	double logL1 = -(opt->value());
 
     	// Compute TS value
-    	double ts         = 2.0 * (logL1-m_logL0);
+    	double ts = 2.0 * (logL1 - m_logL0);
+
+    	// Log information
+    	if (logExplicit()) {
+    		log << " TS value ....: ";
+            log << ts << std::endl;
+    	}
+        else if (logTerse()) {
+    		log << "TS for bin number ";
+            log << i;
+            log << " at ";
+            log << bincentre.print();
+            log << ": ";
+            log << ts << std::endl;
+        }
 
     	// Get test source model instance
     	GModels best_fit_model = m_obs.models();
-    	GModel* testsource = best_fit_model[m_srcname];
+    	GModel* testsource     = best_fit_model[m_srcname];
 
     	// Assign values to the maps
     	m_tsmap(i) = ts;
 
-    	// Get fit values
-    	for (int j = 0; j < m_mapnames.size(); j++) {
-
-    		// get best fit values and assign to maps
-    		m_maps[j](i) = (*testsource)[m_mapnames[j]].value();
+    	// Extract fitted test source parameters
+        if (m_testsource != NULL) {
+            for (int j = 0; j < m_mapnames.size(); ++j) {
+                m_maps[j](i) = (*testsource)[m_mapnames[j]].value();
+            }
     	}
 
     	// Set status of bin to true
@@ -352,7 +376,7 @@ void cttsmap::run(void)
     	// Remove model from container
     	models.remove(m_srcname);
 
-    } // endfor: looped over bins
+    } // endfor: looped over grid positions
 
     // Bring models to initial state
     m_obs.models(models_orig);
@@ -372,12 +396,7 @@ void cttsmap::save(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Save observations");
-        }
-        else {
-            log.header1("Save observation");
-        }
+        log.header1("Save TS map");
     }
 
     // Get output filename
@@ -388,11 +407,11 @@ void cttsmap::save(void)
 
     // Write the sky maps to the FITS file
     m_tsmap.write(fitsfile);
-
     for (int i = 0; i < m_mapnames.size(); i++) {
     	m_maps[i].write(fitsfile);
     }
 
+    // Set extension name for all maps
     for (int i = 0; i < m_mapnames.size(); i++) {
     	fitsfile[i+1]->extname(m_mapnames[i]);
     }
@@ -423,7 +442,9 @@ void cttsmap::save(void)
 void cttsmap::init_members(void)
 {
     // Initialise members
-    m_evfile.clear();
+    m_infile.clear();
+    m_caldb.clear();
+    m_irf.clear();
     m_outfile.clear();
     m_proj.clear();
     m_coordsys.clear();
@@ -436,14 +457,14 @@ void cttsmap::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_read_ahead = false;
-    m_binmin = -1;
-    m_binmax = -1;
-    m_logL0 = 0.0;
+    m_binmin     = -1;
+    m_binmax     = -1;
+    m_logL0      = 0.0;
     m_tsmap.clear();
-    m_maps.clear();
-    m_mapnames.clear();
     m_statusmap.clear();
-    m_testsource.clear();
+    m_mapnames.clear();
+    m_maps.clear();
+    m_testsource = NULL;
 
     // Set logger properties
     log.date(true);
@@ -461,7 +482,9 @@ void cttsmap::init_members(void)
 void cttsmap::copy_members(const cttsmap& app)
 {
     // Copy attributes
-    m_evfile   = app.m_evfile;
+    m_infile   = app.m_infile;
+    m_caldb    = app.m_caldb;
+    m_irf      = app.m_irf;
     m_outfile  = app.m_outfile;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
@@ -472,16 +495,19 @@ void cttsmap::copy_members(const cttsmap& app)
     m_nypix    = app.m_nypix;
 
     // Copy protected members
-    m_binmin = app.m_binmin;
-    m_binmax = app.m_binmax;
-    m_logL0 = app.m_logL0;
+    m_binmin     = app.m_binmin;
+    m_binmax     = app.m_binmax;
+    m_logL0      = app.m_logL0;
     m_obs        = app.m_obs;
     m_read_ahead = app.m_read_ahead;
-    m_tsmap       = app.m_tsmap;
-    m_mapnames       = app.m_mapnames;
+    m_tsmap      = app.m_tsmap;
+    m_mapnames   = app.m_mapnames;
     m_maps       = app.m_maps;
-    m_statusmap    = app.m_statusmap;
-    m_testsource    = app.m_testsource;
+    m_statusmap  = app.m_statusmap;
+
+    // Clone protected members
+    m_testsource = (app.m_testsource != NULL) ? app.m_testsource->clone() : NULL;
+
     // Return
     return;
 }
@@ -505,6 +531,10 @@ void cttsmap::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
+ * @exception GException::invalid_value
+ *            Test source not found or no RA/DEC parameters found for test
+ *            source.
+ *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Most parameters are only required if no observation exists so
  * far in the observation container. In this case, a single CTA observation
@@ -517,19 +547,38 @@ void cttsmap::get_parameters(void)
     // observation using the parameters from the parameter file
     if (m_obs.size() == 0) {
 
-        // Get name of CTA events file
-        m_evfile = (*this)["evfile"].filename();
-
         // Allocate CTA observation
         GCTAObservation obs;
+
+        // Get event file name
+        std::string filename = (*this)["infile"].filename();
 
         // Try first to open as FITS file
         try {
 
-            // Load event list in CTA observation
-            obs.load(m_evfile);
+            // Load data
+            obs.load(filename);
 
-            // Append CTA observation to container
+            // Get other task parameters
+            m_caldb = (*this)["caldb"].string();
+            m_irf   = (*this)["irf"].string();
+
+            // Set calibration database. If specified parameter is a
+            // directory then use this as the pathname to the calibration
+            // database. Otherwise interpret this as the instrument name,
+            // the mission being "cta"
+            GCaldb caldb;
+            if (gammalib::dir_exists(m_caldb)) {
+                caldb.rootdir(m_caldb);
+            }
+            else {
+                caldb.open("cta", m_caldb);
+            }
+
+            // Set reponse
+            obs.response(m_irf, caldb);
+
+            // Append observation to container
             m_obs.append(obs);
 
         }
@@ -538,38 +587,95 @@ void cttsmap::get_parameters(void)
         catch (GException::fits_open_error &e) {
 
             // Load observations from XML file
-            m_obs.load(m_evfile);
+            m_obs.load(filename);
 
-        }
+            // Check if all observations have response information. If
+            // not, get the calibration database parameters and set
+            // the response properly
+            bool asked_for_response = false;
+            for (int i = 0; i < m_obs.size(); ++i) {
 
-        m_obs.models((*this)["srcmdl"].filename());
+                // Get CTA observation
+                GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+                // Continue only if observation is a CTA observation
+                if (obs != NULL) {
+
+                    // If response is not valid then set response from
+                    // task parameters
+                    if (!obs->has_response()) {
+
+                        // Get calibration parameters
+                        if (!asked_for_response) {
+                            m_caldb = (*this)["caldb"].string();
+                            m_irf   = (*this)["irf"].string();
+                            asked_for_response = true;
+                        }
+
+                        // Set response
+                        GCaldb caldb;
+                        if (gammalib::dir_exists(m_caldb)) {
+                            caldb.rootdir(m_caldb);
+                        }
+                        else {
+                            caldb.open("cta", m_caldb);
+                        }
+                        obs->response(m_irf, caldb);
+
+                    } // endif: there was no response
+                } // endif: observation was a CTA observation
+
+            } // endfor: looped over observations
+
+        } // endcatch: file was an XML file
 
     } // endif: there was no observation in the container
+
+    // If there is are no models associated with the observations then
+    // load now the model definition
+    if (m_obs.models().size() == 0) {
+
+        // Get models XML filename
+        std::string filename = (*this)["srcmdl"].filename();
+
+        // Setup models for optimizing.
+        m_obs.models(GModels(filename));
+
+    } // endif: no models were associated with observations
 
     // Get name of test source and check container for this name
     m_srcname = (*this)["srcname"].string();
     if (!m_obs.models().contains(m_srcname)) {
-    	throw GException::model_not_found(G_GET_PARAMETERS, m_srcname);
+        std::string msg = "Source \""+m_srcname+"\" not found in model "
+                          "container. Please add a source with that name "
+                          "or check for a possible typos.";
+    	throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
     // Get Model and store it as protected member
-    GModel* model = m_obs.models()[m_srcname]->clone();
-    m_testsource = *dynamic_cast<GModelSky*>(model);
+    m_testsource = m_obs.models()[m_srcname]->clone();
 
-    // Check if model has RA and DEC parameters which are necessary to continue
-    if (!m_testsource.has_par("RA") || !m_testsource.has_par("DEC")) {
-
-    	// Is this the correct exception? Do we need a new one?
-    	throw GException::model_invalid(G_GET_PARAMETERS, m_srcname, "RA and DEC parameters required! ");
+    // Check if model has RA and DEC parameters which are necessary to
+    // continue
+    if (m_testsource != NULL) {
+        if (!m_testsource->has_par("RA") || !m_testsource->has_par("DEC")) {
+            std::string msg = "Source \""+m_srcname+"\" has no \"RA\" and "
+                              "\"DEC\" parameters. Only sources with \"RA\" "
+                              " and \"DEC\" parameters can be used as test "
+                              "sources.";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        }
     }
 
-    // Fix the spatial parameters
-    m_testsource["RA"].fix();
-    m_testsource["DEC"].fix();
+    // Fix the spatial parameters of the test source
+    if (m_testsource != NULL) {
+        (*m_testsource)["RA"].fix();
+        (*m_testsource)["DEC"].fix();
+    }
 
     // Get map parameters
-    m_xref = (*this)["xref"].real();
-    m_yref = (*this)["yref"].real();
+    m_xref     = (*this)["xref"].real();
+    m_yref     = (*this)["yref"].real();
     m_proj     = (*this)["proj"].string();
     m_coordsys = (*this)["coordsys"].string();
     m_binsz    = (*this)["binsz"].real();
@@ -579,7 +685,7 @@ void cttsmap::get_parameters(void)
     // Get optional splitting parameters
     m_binmin = (*this)["binmin"].integer();
     m_binmax = (*this)["binmax"].integer();
-    m_logL0 = (*this)["logL0"].real();
+    m_logL0  = (*this)["logL0"].real();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -593,9 +699,9 @@ void cttsmap::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Initialise map information
+ * @brief Initialise skymaps
  *
- * Initialises the skymaps.
+ * Initialises skymaps that will contain map information.
  ***************************************************************************/
 void cttsmap::init_maps(void)
 {
@@ -604,34 +710,39 @@ void cttsmap::init_maps(void)
 
     // Create skymap
     m_tsmap = GSkymap(m_proj, m_coordsys,
-                     m_xref, m_yref, -m_binsz, m_binsz,
-                     m_nxpix, m_nypix, 1);
+                      m_xref, m_yref, -m_binsz, m_binsz,
+                      m_nxpix, m_nypix, 1);
 
     // Initialise map information
 	m_statusmap.clear();
 
 	// Create status map
 	m_statusmap = GSkymap(m_proj, m_coordsys,
-					 m_xref, m_yref, -m_binsz, m_binsz,
-					 m_nxpix, m_nypix, 1);
+					      m_xref, m_yref, -m_binsz, m_binsz,
+					      m_nxpix, m_nypix, 1);
 
-	// Initialise maps of other free parameters
-	for (int i = 0; i < m_testsource.size(); i++) {
-		if (m_testsource[i].is_fixed()) {
-			continue;
-		}
+	// Initialise maps of free parameters
+    if (m_testsource != NULL) {
 
-		// create sky map
-		GSkymap map = GSkymap(m_proj, m_coordsys,
-				 m_xref, m_yref, -m_binsz, m_binsz,
-				 m_nxpix, m_nypix, 1);
-		m_maps.push_back(map);
+        // Loop over all model parameters
+        for (int i = 0; i < m_testsource->size(); i++) {
+        
+            // Skip fixed parameters
+            if ((*m_testsource)[i].is_fixed()) {
+                continue;
+            }
 
-		// Store name of parameter
-		m_mapnames.push_back(m_testsource[i].name());
-	}
+            // Add sky map for free parameters. Note that push_back will
+            // create a copy.
+            m_maps.push_back(m_tsmap);
+
+            // Store parameter name
+            m_mapnames.push_back((*m_testsource)[i].name());
+        
+        } // endfor: looped over all model parameters
+
+	} // endif: test source was valid
 
     // Return
     return;
 }
-
