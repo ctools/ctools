@@ -547,8 +547,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         // this reference for filtering.
         //double tmin = gti.tstart().convert(m_cta_ref);
         //double tmax = gti.tstop().convert(m_cta_ref);
-        double tmin = gti.tstart().convert( obs->events()->gti()->tstart()->reference() ) ;
-        double tmax = gti.tstop( ).convert( obs->events()->gti()->tstart()->reference() ) ;
+        double tmin = gti.tstart().convert( obs->events()->gti().tstart().reference() ) ;
+        double tmax = gti.tstop( ).convert( obs->events()->gti().tstart().reference() ) ;
 
         // Format time with sufficient accuracy and add to selection string
         sprintf(cmin, "%.8f", tmin);
