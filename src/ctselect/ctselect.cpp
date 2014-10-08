@@ -59,6 +59,7 @@ ctselect::ctselect(void) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
 
     // Write header into logger
     log_header();
+    printf( "ctselect::ctselect() BLAHBLAHBLAH\n" ) ;
 
     // Return
     return;
