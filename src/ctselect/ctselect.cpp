@@ -59,7 +59,6 @@ ctselect::ctselect(void) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
 
     // Write header into logger
     log_header();
-    printf( "ctselect::ctselect() BLAHBLAHBLAH\n" ) ;
 
     // Return
     return;
@@ -546,8 +545,10 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     
         // Extract effective time interval in CTA reference time. We need
         // this reference for filtering.
-        double tmin = gti.tstart().convert(m_cta_ref);
-        double tmax = gti.tstop().convert(m_cta_ref);
+        //double tmin = gti.tstart().convert(m_cta_ref);
+        //double tmax = gti.tstop().convert(m_cta_ref);
+        double tmin = gti.tstart().convert(gti.reference()).secs() ;
+        double tmax = gti.tstop( ).convert(gti.reference()).secs() ;
 
         // Format time with sufficient accuracy and add to selection string
         sprintf(cmin, "%.8f", tmin);
