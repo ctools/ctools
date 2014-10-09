@@ -547,7 +547,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         // this reference for filtering.
         //double tmin = gti.tstart().convert(m_cta_ref);
         //double tmax = gti.tstop().convert(m_cta_ref);
-        GTimeReference ref = gti.tstart().reference() ;
+        //GTimeReference ref = gti.tstart().reference() ;
+        GTimeReference ref = gti.reference() ;
         printf("ctselect::select_events() NKH convert timref %f\n", ref.mjdref() ) ;
         double tmin = gti.tstart().convert( ref ) ;
         double tmax = gti.tstop( ).convert( ref ) ;
