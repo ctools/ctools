@@ -543,10 +543,10 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Make time selection
     if (select_time) {
     
-        // Extract effective time interval in CTA reference time. We need
-        // this reference for filtering.
-        double tmin = gti.tstart().convert(m_cta_ref);
-        double tmax = gti.tstop().convert(m_cta_ref);
+        // Extract effective time interval in the reference time of the
+        // event list. We get this reference time from gti.reference().
+        double tmin = gti.tstart().convert(gti.reference());
+        double tmax = gti.tstop().convert(gti.reference());
 
         // Format time with sufficient accuracy and add to selection string
         sprintf(cmin, "%.8f", tmin);
