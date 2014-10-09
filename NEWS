@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-6 October 2014
+9 October 2014
 
 
 1. Introduction
@@ -42,6 +42,11 @@ dispersion can be switched on or off using the hidden edisp parameter.
 ---------------------------------
 The temporary file is now properly close to avoid file opening errors
 when iterating over ctselect (#1149).
+
+Non-CTA time references are now correctly handled by ctselect. While the
+tmin and tmax parameters are given in CTA reference time, they are
+internally converted to the reference time of the GTI before event
+selection (#1329).
 
 
 6. ctbin - CTA event binning

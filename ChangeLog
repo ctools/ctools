@@ -1,4 +1,4 @@
-2014-10-06  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-10-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.8.0 released
         ========================
@@ -13,6 +13,7 @@
         Add cttsmap tool (generates TS map)
         Support energy dispersion in ctobssim, ctlike and ctmodel	
         Correct ctobssim for thread safety
+        Correctly apply time references in ctselect
         Move obsutils to ctools namespace
         Add several functions to obsutils
         Enhance documentation
