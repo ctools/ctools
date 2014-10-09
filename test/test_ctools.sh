@@ -197,6 +197,7 @@ $ECHO -n "Test ctmodel: "
 #
 # Run 1
 $ctmodel infile="cntmap.fits" \
+         obsfile="cntmap.fits" \
          outfile="modmap1.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \
@@ -212,6 +213,7 @@ fi
 #
 # Run 3
 $ctmodel infile="NONE" \
+         obsfile="NONE" \
          outfile="modmap3.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \
@@ -241,6 +243,7 @@ fi
 #
 # Run 2
 $ctmodel infile="cntmap2.fits" \
+         obsfile="cntmap2.fits" \
          outfile="modmap2.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \

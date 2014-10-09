@@ -1,5 +1,5 @@
 /***************************************************************************
- *                     ctmodel - CTA counts model tool                     *
+ *                ctmodel - CTA model cube generation tool                 *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctmodel.hpp
- * @brief CTA counts model tool definition
+ * @brief CTA model cube tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -69,25 +69,23 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
+    const GCTAEventCube& cube(void) const;
 
 protected:
     // Protected methods
-    void           init_members(void);
-    void           copy_members(const ctmodel& app);
-    void           free_members(void);
-    void           get_parameters(void);
-    void           setup_obs(void);
-    void           model_map(GCTAObservation* obs, const GModels& models);
-    std::string    set_outfile_name(const std::string& filename) const;
-    void           save_fits(void);
-    void           save_xml(void);
-    void           save_model_map(const GCTAObservation* obs,
-                                  const std::string&     outfile) const;
-
+    void init_members(void);
+    void copy_members(const ctmodel& app);
+    void free_members(void);
+    void get_parameters(void);
+    void setup_obs(void);
+    void init_cube(void);
+    void fill_cube(const GCTAObservation* obs);
+    void get_ebounds(void);
+    
     // User parameters
-    std::string m_infile;      //!< Input counts map or XML file
-    std::string m_outfile;     //!< Output model map or XML file
-    std::string m_prefix;      //!< Prefix for multiple model maps
+    std::string m_infile;      //!< Input counts cube
+    std::string m_obsfile;     //!< Event list, counts map or observation definition XML file
+    std::string m_outfile;     //!< Output model cube
     std::string m_caldb;       //!< Calibration database
     std::string m_irf;         //!< Instrument response functions
     std::string m_srcmdl;      //!< Source model
@@ -96,6 +94,8 @@ protected:
     double      m_deadc;       //!< Deadtime correction factor
     double      m_tmin;        //!< Start time
     double      m_tmax;        //!< Stop time
+    std::string m_ebinalg;     //!< Algorithm for energy binning
+    std::string m_ebinfile;    //!< FITS-file containing energy binning
     double      m_emin;        //!< Lower energy
     double      m_emax;        //!< Upper energy
     int         m_enumbins;    //!< Number of energy bins
@@ -109,10 +109,11 @@ protected:
     bool        m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
-    GObservations            m_obs;        //!< Observation container
-    std::vector<std::string> m_infiles;    //!< Input event filenames
-    bool                     m_use_xml;    //!< Use XML file instead of FITS file
-    bool                     m_read_ahead; //!< Read ahead parameters
+    GObservations m_obs;        //!< Observation container
+    GCTAEventCube m_cube;       //!< Model cube
+    GEbounds      m_ebounds;    //!< Energy boundaries
+    GGti          m_gti;        //!< Model cube GTIs
+    bool          m_read_ahead; //!< Read ahead parameters
 };
 
 
@@ -125,6 +126,18 @@ inline
 const GObservations& ctmodel::obs(void) const
 {
     return m_obs;
+}
+
+
+/***********************************************************************//**
+ * @brief Return model cube
+ *
+ * @return Reference to model cube
+ ***************************************************************************/
+inline
+const GCTAEventCube& ctmodel::cube(void) const
+{
+    return m_cube;
 }
 
 #endif /* CTMODEL_HPP */

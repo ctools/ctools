@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctmodel.par                                                   #
-#  Version:   00-02-00                                                      #
+#  Version:   00-03-00                                                      #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -19,22 +19,19 @@
 #===================
 infile,   f, a, "NONE",,, "Input counts map or observation definition file"
 outfile,  f, a, "modmap.fits",,, "Output counts map or observation definition file"
-prefix,   s, h, "modmap_",,, "Prefix for counts maps in observation definition file"
+srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+edisp,    b, h, no,,, "Apply energy dispersion?"
+#
+# Observation parameters
+#=======================
+obsfile,  f, a, "NONE",,, "Observation definition file"
 caldb,    s, a, "$CTOOLS/share/caldb/data/cta/dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
-edisp,    b, h, no,,, "Apply energy dispersion?"
-srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
-#
-# Instrument parameters
-#======================
-ra,       r, a,    83.63,   0,360, "RA of pointing (degrees)"
-dec,      r, a,    22.01, -90, 90, "Dec of pointing (degrees)"
-deadc,    r, h,    0.95,    0,  1, "Average deadtime correction factor"
-#
-# Time range parameters
-#======================
-tmin,     r, a,     0.0,    0,   , "Start time (MET in s)"
-tmax,     r, a,  1800.0,    0,   , "End time (MET in s)"
+ra,       r, a, 83.63,0,360, "RA of pointing (degrees)"
+dec,      r, a, 22.01,-90,90, "Dec of pointing (degrees)"
+tmin,     r, a, 0.0,0,, "Start time (MET in s)"
+tmax,     r, a, 1800.0,0,, "End time (MET in s)"
+deadc,    r, h, 0.95,0,1, "Average deadtime correction factor"
 #
 # Energy binning parameters
 #==========================

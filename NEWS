@@ -98,8 +98,26 @@ extension in the FITS file.
 None
 
 
-10. ctmodel - CTA counts map modelling
---------------------------------------
+10. ctmodel - CTA counts cube modelling
+---------------------------------------
+WARNING: The philosophy behind the ctmodel tool changed fundamentally!
+
+ctmodel now always produces a single model cube on output. There are
+two important input parameters: "infile" and "obsfile". "infile"
+specifies a counts or model cube that is used to define the binning
+of the model cube. The functionnality for this parameter is as before.
+If "infile=NONE", the cube will be defined according to task parameters
+that specify the spatial and the energy binning. The "obsfile"
+parameter is new and allows specifying the observation definition
+for which the model cube should be computed. If an event list or a
+counts cube is presented, the pointing and Good Time Intervals will
+be extracted from the FITS file header. If an observation definition
+XML file is presented, ctmodel will now loop over all CTA observations
+in the file and add the model values to the model cube. If no
+response information is associated to the "obsfile" (which is typically
+the case for event lists or counts cubes), the "caldb" and "irf"
+parameters will be used to identify the response.
+
 ctmodel now has full access to the calibration database, allowing
 the use for 2D response functions in FITS files.
 
