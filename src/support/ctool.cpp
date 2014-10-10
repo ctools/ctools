@@ -303,6 +303,39 @@ GEbounds ctool::get_ebounds(void)
 
 
 /***********************************************************************//**
+ * @brief Set response for all CTA observations in container
+ *
+ * @param[in,out] obs Observation container
+ *
+ * Set the response for a CTA observations in the container that so far have
+ * no response using the "database" and "irf" task parameters.
+ ***************************************************************************/
+void ctool::set_response(GObservations& obs)
+{
+    // Setup response for all observations
+    for (int i = 0; i < obs.size(); ++i) {
+
+        // Is this observation a CTA observation?
+        GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
+
+        // Yes ...
+        if (cta != NULL) {
+
+            // Set response if we don't have one
+            if (!cta->has_response()) {
+                set_obs_response(cta);
+            }
+
+        } // endif: observation was a CTA observation
+
+    } // endfor: looped over all observations
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Set response for CTA observation
  *
  * @param[in,out] obs CTA observation

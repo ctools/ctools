@@ -415,26 +415,9 @@ void ctlike::get_parameters(void)
             // Load observations from XML file
             m_obs.load(filename);
 
-            // Check if all observations have response information. If
-            // not, get the calibration database parameters and set
-            // the response properly
-            for (int i = 0; i < m_obs.size(); ++i) {
-
-                // Get CTA observation
-                GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-                // Continue only if observation is a CTA observation
-                if (obs != NULL) {
-
-                    // If response is not valid then set response from
-                    // task parameters
-                    if (!obs->has_response()) {
-                        set_obs_response(obs);
-                    }
-
-                } // endif: observation was a CTA observation
-
-            } // endfor: looped over observations
+            // For all observations that have no response, set the response
+            // from the task parameters
+            set_response(m_obs);
 
         } // endcatch: file was an XML file
 

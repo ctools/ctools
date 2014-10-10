@@ -1,5 +1,5 @@
 /***************************************************************************
- *                ctmodel - CTA model cube generation tool                 *
+ *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctmodel.cpp
- * @brief CTA model cube tool implementation
+ * @brief Model cube generation tool implementation
  * @author Juergen Knoedlseder
  */
 
@@ -33,7 +33,6 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_EBOUNDS                                "ctmodel::get_ebounds()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -49,13 +48,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctmodel::ctmodel(void) : GApplication(CTMODEL_NAME, CTMODEL_VERSION)
+ctmodel::ctmodel(void) : ctool(CTMODEL_NAME, CTMODEL_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -70,17 +66,13 @@ ctmodel::ctmodel(void) : GApplication(CTMODEL_NAME, CTMODEL_VERSION)
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctmodel::ctmodel(const GObservations& obs) :
-         GApplication(CTMODEL_NAME, CTMODEL_VERSION)
+ctmodel::ctmodel(const GObservations& obs) : ctool(CTMODEL_NAME, CTMODEL_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -95,13 +87,10 @@ ctmodel::ctmodel(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctmodel::ctmodel(int argc, char *argv[]) :
-         GApplication(CTMODEL_NAME, CTMODEL_VERSION, argc, argv)
+         ctool(CTMODEL_NAME, CTMODEL_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -113,7 +102,7 @@ ctmodel::ctmodel(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctmodel::ctmodel(const ctmodel& app) : GApplication(app)
+ctmodel::ctmodel(const ctmodel& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -151,13 +140,13 @@ ctmodel::~ctmodel(void)
  * @param[in] app ctmodel application.
  * @return Returns ctmodel application.
  ***************************************************************************/
-ctmodel& ctmodel::operator= (const ctmodel& app)
+ctmodel& ctmodel::operator=(const ctmodel& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -188,10 +177,12 @@ void ctmodel::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -454,11 +445,6 @@ void ctmodel::copy_members(const ctmodel& app)
  ***************************************************************************/
 void ctmodel::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }
@@ -654,38 +640,9 @@ void ctmodel::setup_obs(void)
         m_obs.models(GModels(m_srcmdl));
     }
 
-    // Setup response for all observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Is this observation a CTA observation?
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Yes ...
-        if (obs != NULL) {
-
-            // Set response if we don't have one
-            if (!obs->has_response()) {
-
-                // Set calibration database. If specified parameter is a
-                // directory then use this as the pathname to the calibration
-                // database. Otherwise interpret this as the instrument name,
-                // the mission being "cta"
-                GCaldb caldb;
-                if (gammalib::dir_exists(m_caldb)) {
-                    caldb.rootdir(m_caldb);
-                }
-                else {
-                    caldb.open("cta", m_caldb);
-                }
-
-                // Set reponse
-            	obs->response(m_irf, caldb);
-
-            } // endif: observation already has a response
-
-        } // endif: observation was a CTA observation
-
-    } // endfor: looped over all observations
+    // For all observations that have no response, set the response
+    // from the task parameters
+    set_response(m_obs);
 
     // Return
     return;
@@ -716,7 +673,7 @@ void ctmodel::init_cube(void)
         gti.append(GTime(0.0), GTime(0.1234));
     
         // Set energy boundaries
-        get_ebounds();
+        m_ebounds = get_ebounds();
 
         // Setup skymap
         GSkymap map = GSkymap(m_proj, m_coordsys,
@@ -820,83 +777,6 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         }
 
     } // endif: observation was valid
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get the energy boundaries
- *
- * @exception GException::invalid_value
- *            No valid energy boundary extension found.
- *
- * Get the energy boundaries according to the user parameters. The method
- * supports loading of energy boundary information from the EBOUNDS or
- * ENERGYBINS extension, or setting energy boundaries using a linear
- * or logarithmical spacing.
- *
- * @todo Ultimately this method should go in a support library as it is
- * used by several ctools.
- ***************************************************************************/
-void ctmodel::get_ebounds(void)
-{
-    // Initialse energy boundary information
-    m_ebounds.clear();
-
-    // Check whether energy binning information should be read from a FITS
-    // file ...
-    if (m_ebinalg == "FILE") {
-
-        // Open energy boundary file using the EBOUNDS or ENERGYBINS
-        // extension. Throw an exception if opening fails.
-        GFits file(m_ebinfile);
-        if (file.contains("EBOUNDS")) {
-            file.close();
-            m_ebounds.load(m_ebinfile,"EBOUNDS");
-        }
-        else if (file.contains("ENERGYBINS")) {
-            file.close();
-            m_ebounds.load(m_ebinfile,"ENERGYBINS");
-        }
-        else {
-            file.close();
-            std::string msg = "No extension with name \"EBOUNDS\" or"
-                              " \"ENERGYBINS\" found in FITS file"
-                              " \""+m_ebinfile+"\".\n"
-                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                              " is required if the parameter \"ebinalg\""
-                              " is set to \"FILE\".";
-            throw GException::invalid_value(G_GET_EBOUNDS, msg);
-        }
-        
-        // Set enumbins parameter to number of ebounds
-        m_enumbins = m_ebounds.size();
-
-    } // endif: ebinalg was "FILE"
-
-    // ... otherwise use a linear or a logarithmically-spaced energy binning
-    else {
-
-        // Initialise log mode for ebinning
-        bool log = true;
-
-        // check if algorithm is linear
-        if (m_ebinalg == "LIN") {
-            log = false;
-        }
-
-        // todo: should we also check if m_ebinalg is "LOG"
-        // and throw an exception if neither LIN/LOG/FILE
-        // is given?
-
-        // Setup energy range covered by data
-        GEnergy  emin(m_emin, "TeV");
-        GEnergy  emax(m_emax, "TeV");
-        m_ebounds = GEbounds(m_enumbins, emin, emax, log);
-
-    } //endif: ebinalg was not "FILE"
 
     // Return
     return;

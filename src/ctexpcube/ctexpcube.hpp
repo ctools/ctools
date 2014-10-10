@@ -69,7 +69,6 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void get_obs(void);
-    void set_response(void);
     void set_from_cntmap(const std::string& filename);
 
     // User parameters

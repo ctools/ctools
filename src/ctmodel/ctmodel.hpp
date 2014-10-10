@@ -1,5 +1,5 @@
 /***************************************************************************
- *                ctmodel - CTA model cube generation tool                 *
+ *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctmodel.hpp
- * @brief CTA model cube tool definition
+ * @brief Model cube generation tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTMODEL_NAME    "ctmodel"
@@ -39,7 +40,7 @@
 /***********************************************************************//**
  * @class ctmodel
  *
- * @brief CTA counts model tool interface defintion
+ * @brief Model cube generation tool
  *
  * This class creates counts model map(s). The definition of the counts model
  * can be taken from a predefined observation container, from the counts maps
@@ -50,7 +51,7 @@
  * in form of FITS files (model maps) and an updated observation definition
  * XML file.
  ***************************************************************************/
-class ctmodel : public GApplication  {
+class ctmodel : public ctool {
 
 public:
     // Constructors and destructors
@@ -80,7 +81,6 @@ protected:
     void setup_obs(void);
     void init_cube(void);
     void fill_cube(const GCTAObservation* obs);
-    void get_ebounds(void);
     
     // User parameters
     std::string m_infile;      //!< Input counts cube

@@ -60,6 +60,7 @@ protected:
     void     copy_members(const ctool& app);
     void     free_members(void);
     GEbounds get_ebounds(void);
+    void     set_response(GObservations& obs);
     void     set_obs_response(GCTAObservation* obs);
 };
 

@@ -394,8 +394,9 @@ void ctexpcube::get_parameters(void)
         get_obs();
     }
 
-    // Make sure that response is set
-    set_response();
+    // For all observations that have no response, set the response
+    // from the task parameters
+    set_response(m_obs);
 
     // Read energy dispersion flag
     m_apply_edisp = (*this)["edisp"].boolean();
@@ -473,37 +474,6 @@ void ctexpcube::get_obs(void)
         m_obs.load(filename);
 
     }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Set observation response
- *
- * Set response for all observations that so have no response.
- ***************************************************************************/
-void ctexpcube::set_response(void)
-{
-    // Loop over all observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Is this observation a CTA observation?
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Yes ...
-        if (obs != NULL) {
-
-            // If the observation has no response, then set it from
-            // the task parameters
-            if (!obs->has_response()) {
-                set_obs_response(obs);
-            }
-
-        } // endif: observation was a CTA observation
-
-    } // endfor: looped over all observations
 
     // Return
     return;
