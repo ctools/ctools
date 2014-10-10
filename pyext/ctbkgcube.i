@@ -1,5 +1,5 @@
 /***************************************************************************
- *                  ctbkgcube - CTA background cube tool                   *
+ *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,23 +20,21 @@
  ***************************************************************************/
 /**
  * @file ctbkgcube.i
- * @brief CTA background cube tool definition
+ * @brief Background cube generation tool definition
  * @author Chia-Chun Lu
  */
 
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctbkgcube.hpp"
-#include "GTools.hpp"
 %}
 
 /***********************************************************************//**
  * @class ctbkgcube
  *
- * @brief CTA background cube tool
+ * @brief Background cube generation tool
  ***************************************************************************/
 class ctbkgcube : public GApplication  {
-
 public:
     // Constructors and destructors
     ctbkgcube(void);
@@ -54,7 +52,7 @@ public:
 };
 
 /***********************************************************************//**
- * @brief CTA background cube tool Python extension
+ * @brief Background cube generation tool Python extension
  ***************************************************************************/
 %extend ctbkgcube {
     ctbkgcube copy() {

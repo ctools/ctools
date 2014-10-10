@@ -35,7 +35,6 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_CUBE                                      "ctbin::init_cube()"
 #define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
-#define G_GET_EBOUNDS                                  "ctbin::get_ebounds()"
 
 /* __ Debug definitions __________________________________________________ */
 

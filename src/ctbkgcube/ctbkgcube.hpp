@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctbkgcube - CTA background cube tool                  *
+ *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctbkgcube.hpp
- * @brief CTA background cube tool definition
+ * @brief Background cube generation tool definition
  * @author Chia-Chun Lu
  */
 
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTBKGCUBE_NAME    "ctbkgcube"
@@ -39,9 +40,9 @@
 /***********************************************************************//**
  * @class ctbkgcube
  *
- * @brief CTA background cube tool
+ * @brief Background cube generation tool
  ***************************************************************************/
-class ctbkgcube : public GApplication  {
+class ctbkgcube : public ctool {
 
 public:
     // Constructors and destructors
@@ -68,7 +69,6 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void get_obs(void);
-    void get_ebounds(void);
     void set_from_cntmap(const std::string& filename);
     void fill_cube(GCTAObservation* obs);
 
@@ -83,9 +83,9 @@ protected:
 
 
 /***********************************************************************//**
- * @brief Return CTA event cube containing background rate
+ * @brief Return event cube containing background rate
  *
- * @return CTA event cube.
+ * @return Background event cube.
  ***************************************************************************/
 inline
 const GCTAEventCube& ctbkgcube::cube(void) const

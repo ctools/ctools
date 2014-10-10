@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctbkgcube - CTA background cube tool                  *
+ *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctbkgcube.cpp
- * @brief CTA background cube tool implementation
+ * @brief Background cube generation tool definition
  * @author Chia-Chun Lu
  */
 
@@ -35,7 +35,6 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                        "ctbkgcube::get_parameters()"
 #define G_GET_OBS                                      "ctbkgcube::get_obs()"
-#define G_GET_EBOUNDS                              "ctbkgcube::get_ebounds()"
 #define G_SET_FROM_CNTMAP          "ctbkgcube::set_from_cntmap(std::string&)"
 #define G_FILL_CUBE                  "ctbkgcube::fill_cube(GCTAObservation*)"
 
@@ -53,13 +52,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctbkgcube::ctbkgcube(void) : GApplication(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
+ctbkgcube::ctbkgcube(void) : ctool(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -75,16 +71,13 @@ ctbkgcube::ctbkgcube(void) : GApplication(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctbkgcube::ctbkgcube(const GObservations& obs) :
-           GApplication(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
+           ctool(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -99,13 +92,10 @@ ctbkgcube::ctbkgcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbkgcube::ctbkgcube(int argc, char *argv[]) :
-           GApplication(CTBKGCUBE_NAME, CTBKGCUBE_VERSION, argc, argv)
+           ctool(CTBKGCUBE_NAME, CTBKGCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -117,7 +107,7 @@ ctbkgcube::ctbkgcube(int argc, char *argv[]) :
  *
  * @param[in] app ctbkgcube application.
  ***************************************************************************/
-ctbkgcube::ctbkgcube(const ctbkgcube& app) : GApplication(app)
+ctbkgcube::ctbkgcube(const ctbkgcube& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -161,7 +151,7 @@ ctbkgcube& ctbkgcube::operator=(const ctbkgcube& app)
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -192,10 +182,12 @@ void ctbkgcube::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -472,11 +464,6 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
  ***************************************************************************/
 void ctbkgcube::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }
@@ -530,7 +517,7 @@ void ctbkgcube::get_parameters(void)
         int         nypix    = (*this)["nypix"].integer();
 
         // Get energy definition
-        get_ebounds();
+        m_ebounds = get_ebounds();
 
         // Define skymap for background cube
         GSkymap map(proj, coordsys, xref, yref,
@@ -604,85 +591,6 @@ void ctbkgcube::get_obs(void)
 
         // Load observations from XML file
         m_obs.load(filename);
-
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get energy boundaries from parameters
- *
- * @exception GException::invalid_value
- *            Energy bin definition file not defined or invalid extension
- *            name encountered.
- *
- * Get the energy boundaries from the user parameters.
- ***************************************************************************/
-void ctbkgcube::get_ebounds(void)
-{
-    // Determine the energy binning alogrithm
-    std::string ebinalg = (*this)["ebinalg"].string();
-
-    // If we have the binning given by a file then try to get the boundaries
-    // from that file
-    if (ebinalg == "FILE") {
-
-        // Get filename
-        std::string filename = (*this)["ebinfile"].filename();
-
-        // Check whether infile parameter is undefined
-        if (gammalib::toupper(filename) == "NONE") {
-            std::string msg = "No energy bin definition file specified. "
-                              "Please set the \"ebinfile\" parameter to a "
-                              "file containing the energy bin definition.";
-            throw GException::invalid_value(G_GET_EBOUNDS, msg);
-        }
-
-        // Open fits file to check which extension is given
-        GFits file(filename);
-
-        // Check first for EBOUNDS extension
-        if (file.contains("EBOUNDS")) {
-            file.close();
-            m_ebounds.load(filename, "EBOUNDS");
-        }
-
-        // ... then check for ENERGYBINS extension
-        else if (file.contains("ENERGYBINS")) {
-            file.close();
-            m_ebounds.load(filename, "ENERGYBINS");
-        }
-
-        // ... otherwise throw an exception
-        else {
-            file.close();
-            std::string msg = "No extension with name \"EBOUNDS\" or"
-                              " \"ENERGYBINS\" found in FITS file"
-                              " \""+filename+"\".\n"
-                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                              " is required if the parameter \"ebinalg\""
-                              " is set to \"FILE\".";
-            throw GException::invalid_value(G_GET_EBOUNDS, msg);
-        }
-    }
-    
-    // ... otherwise read emin, emax and nebins
-    else {
-
-        // Get the relevant parameters
-    	double emin     = (*this)["emin"].real();
-    	double emax     = (*this)["emax"].real();
-    	int    enumbins = (*this)["enumbins"].integer();
-        bool   log      = ((*this)["ebinalg"].string() == "LIN") ? false : true;
-
-        // Create energy boundaries
-        m_ebounds = GEbounds(enumbins,
-                             GEnergy(emin, "TeV"),
-                             GEnergy(emax, "TeV"),
-                             log);
 
     }
 
