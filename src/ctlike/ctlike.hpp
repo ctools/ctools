@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctlike - CTA maximum likelihood tool                  *
+ *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctlike.hpp
- * @brief CTA maximum likelihood tool interface definition
+ * @brief Maximum likelihood fitting tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -31,6 +31,7 @@
 #include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTLIKE_NAME    "ctlike"
@@ -40,9 +41,10 @@
 /***********************************************************************//**
  * @class ctlike
  *
- * @brief CTA maximum likelihood tool interface defintion.
+ * @brief Maximum likelihood fitting tool
  ***************************************************************************/
-class ctlike : public GApplication  {
+class ctlike : public ctool {
+
 public:
     // Constructors and destructors
     ctlike(void);
@@ -52,7 +54,7 @@ public:
     virtual ~ctlike(void);
 
     // Operators
-    ctlike& operator= (const ctlike& app);
+    ctlike& operator=(const ctlike& app);
 
     // Methods
     void                 clear(void);
@@ -72,11 +74,8 @@ protected:
     double reoptimize_lm(void);
 
     // User parameters
-    std::string   m_stat;        //!< Optimisation statistics (poisson/gaussian)
     bool          m_refit;       //!< Refitting
     bool          m_tscalc;      //!< TS computation
-    std::string   m_caldb;       //!< Calibration database
-    std::string   m_irf;         //!< Instrument response functions
     std::string   m_outmdl;      //!< Source model output XML file
     bool          m_apply_edisp; //!< Apply energy dispersion?
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctlike - CTA maximum likelihood tool                  *
+ *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctlike.cpp
- * @brief CTA maximum likelihood tool implementation
+ * @brief Maximum likelihood fitting tool implementation
  * @author Juergen Knoedlseder
  */
 
@@ -49,13 +49,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctlike::ctlike(void) : GApplication(CTLIKE_NAME, CTLIKE_VERSION)
+ctlike::ctlike(void) : ctool(CTLIKE_NAME, CTLIKE_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -70,17 +67,13 @@ ctlike::ctlike(void) : GApplication(CTLIKE_NAME, CTLIKE_VERSION)
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctlike::ctlike(const GObservations& obs) :
-        GApplication(CTLIKE_NAME, CTLIKE_VERSION)
+ctlike::ctlike(const GObservations& obs) : ctool(CTLIKE_NAME, CTLIKE_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -94,13 +87,10 @@ ctlike::ctlike(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctlike::ctlike(int argc, char *argv[]) : 
-                        GApplication(CTLIKE_NAME, CTLIKE_VERSION, argc, argv)
+        ctool(CTLIKE_NAME, CTLIKE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -112,7 +102,7 @@ ctlike::ctlike(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctlike::ctlike(const ctlike& app) : GApplication(app)
+ctlike::ctlike(const ctlike& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -149,13 +139,13 @@ ctlike::~ctlike(void)
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctlike& ctlike::operator= (const ctlike& app)
+ctlike& ctlike::operator=(const ctlike& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -186,10 +176,12 @@ void ctlike::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -404,27 +396,13 @@ void ctlike::get_parameters(void)
             obs.load(filename);
 
             // Get other task parameters
-            m_stat  = gammalib::toupper((*this)["stat"].string());
-            m_caldb = (*this)["caldb"].string();
-            m_irf   = (*this)["irf"].string();
+            std::string statistics = gammalib::toupper((*this)["stat"].string());
 
             // Set statistics
-            obs.statistics(m_stat);
+            obs.statistics(statistics);
 
-            // Set calibration database. If specified parameter is a
-            // directory then use this as the pathname to the calibration
-            // database. Otherwise interpret this as the instrument name,
-            // the mission being "cta"
-            GCaldb caldb;
-            if (gammalib::dir_exists(m_caldb)) {
-                caldb.rootdir(m_caldb);
-            }
-            else {
-                caldb.open("cta", m_caldb);
-            }
-
-            // Set reponse
-            obs.response(m_irf, caldb);
+            // Set response
+            set_obs_response(&obs);
 
             // Append observation to container
             m_obs.append(obs);
@@ -440,7 +418,6 @@ void ctlike::get_parameters(void)
             // Check if all observations have response information. If
             // not, get the calibration database parameters and set
             // the response properly
-            bool asked_for_response = false;
             for (int i = 0; i < m_obs.size(); ++i) {
 
                 // Get CTA observation
@@ -452,25 +429,9 @@ void ctlike::get_parameters(void)
                     // If response is not valid then set response from
                     // task parameters
                     if (!obs->has_response()) {
+                        set_obs_response(obs);
+                    }
 
-                        // Get calibration parameters
-                        if (!asked_for_response) {
-                            m_caldb = (*this)["caldb"].string();
-                            m_irf   = (*this)["irf"].string();
-                            asked_for_response = true;
-                        }
-
-                        // Set response
-                        GCaldb caldb;
-                        if (gammalib::dir_exists(m_caldb)) {
-                            caldb.rootdir(m_caldb);
-                        }
-                        else {
-                            caldb.open("cta", m_caldb);
-                        }
-                        obs->response(m_irf, caldb);
-
-                    } // endif: there was no response
                 } // endif: observation was a CTA observation
 
             } // endfor: looped over observations
@@ -620,9 +581,6 @@ double ctlike::reoptimize_lm(void)
 void ctlike::init_members(void)
 {
     // Initialise members
-    m_stat.clear();
-    m_caldb.clear();
-    m_irf.clear();
     m_outmdl.clear();
     m_obs.clear();
     m_refit       = false;
@@ -650,11 +608,8 @@ void ctlike::init_members(void)
 void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
-    m_stat        = app.m_stat;
     m_refit       = app.m_refit;
     m_tscalc      = app.m_tscalc;
-    m_caldb       = app.m_caldb;
-    m_irf         = app.m_irf;
     m_outmdl      = app.m_outmdl;
     m_obs         = app.m_obs;
     m_max_iter    = app.m_max_iter;

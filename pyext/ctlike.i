@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctlike - CTA maximum likelihood tool                  *
+ *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
@@ -20,13 +20,12 @@
  ***************************************************************************/
 /**
  * @file ctlike.i
- * @brief CTA maximum likelihood tool Python interface definition
- * @author J. Knodlseder
+ * @brief Maximum likelihood fitting tool definition
+ * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctlike.hpp"
-#include "GTools.hpp"
 %}
 
 
@@ -35,8 +34,7 @@
  *
  * @brief CTA maximum likelihood tool Python interface
  ***************************************************************************/
-class ctlike : public GApplication  {
-
+class ctlike : public ctool {
 public:
     // Constructors and destructors
     ctlike(void);
@@ -56,7 +54,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA maximum likelihood tool Python extension
+ * @brief Maximum likelihood fitting tool Python extension
  ***************************************************************************/
 %extend ctlike {
     ctlike copy() {
