@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-9 October 2014
+10 October 2014
 
 
 1. Introduction
@@ -16,6 +16,10 @@ exposed. Low-level methods that are used by the application are now
 protected, as improper usage of these methods may lead to
 unpredictable results.
 
+The ctool base class has been introduced and all tools now derive
+from ctool instead of GApplication. This allows to avoid code
+duplications and makes the code generally slimmer and more readable.
+
 
 2. Configuration
 -----------------
@@ -27,7 +31,14 @@ None
 None
 
 
-4. ctobssim - CTA observation simulation
+4. Support model
+----------------
+A support module has been introduced that will contain common classes
+and functions. For the moment the only class in this module is the
+ctool base class.
+
+
+5. ctobssim - CTA observation simulation
 ----------------------------------------
 ctobssim was not fully thread save as the models were shared among the
 threads which led to concurrent memory access when evaluating the Monte
@@ -38,7 +49,7 @@ ctobssim now also supports the handling of energy dispersion. Energy
 dispersion can be switched on or off using the hidden edisp parameter.
 
 
-5. ctselect - CTA event selection
+6. ctselect - CTA event selection
 ---------------------------------
 The temporary file is now properly close to avoid file opening errors
 when iterating over ctselect (#1149).
@@ -49,7 +60,7 @@ internally converted to the reference time of the GTI before event
 selection (#1329).
 
 
-6. ctbin - CTA event binning
+7. ctbin - CTA event binning
 ----------------------------
 WARNING: The philosophy behind the ctbin tool changed fundamentally!
 
@@ -69,7 +80,7 @@ case of binning a single event list and using the usepnt=yes option
 (or specifying the pointing manually as the xref and yref parameters).
 
 
-7. ctlike - Maximum likelihood fitting
+8. ctlike - Maximum likelihood fitting
 --------------------------------------
 ctlike now has full access to the calibration database, allowing
 the use for 2D response functions in FITS files.
@@ -78,7 +89,7 @@ ctlike now also supports the handling of energy dispersion. Energy
 dispersion can be switched on or off using the hidden edisp parameter.
 
 
-8. cttsmap - Generation of Test Statistics map
+9. cttsmap - Generation of Test Statistics map
 ----------------------------------------------
 The cttsmap tool has been added that provides a test statistics map
 for a given set of observations. This tool is not restricted to CTA
@@ -93,12 +104,12 @@ TS map. Also the value of the fitted parameters are stored as
 extension in the FITS file.
 
 
-9. ctskymap - CTA sky mapping
------------------------------
+10. ctskymap - CTA sky mapping
+------------------------------
 None
 
 
-10. ctmodel - CTA counts cube modelling
+11. ctmodel - CTA counts cube modelling
 ---------------------------------------
 WARNING: The philosophy behind the ctmodel tool changed fundamentally!
 
@@ -125,7 +136,7 @@ ctmodel now also supports the handling of energy dispersion. Energy
 dispersion can be switched on or off using the hidden edisp parameter.
 
 
-11. ctexpcube - CTA exposure cube generation
+12. ctexpcube - CTA exposure cube generation
 --------------------------------------------
 The first version of the ctexpcube tool is included in the release.
 ctexpcube computes the exposure cube for an observation definition
@@ -133,7 +144,7 @@ file. The cube definition may be taken from a counts cube or may be
 specified by user parameters.
 
 
-12. ctpsfcube - CTA point spread function cube generation
+13. ctpsfcube - CTA point spread function cube generation
 ---------------------------------------------------------
 The first version of the ctpsfcube tool is included in the release.
 ctpsfcube computes the point spread function cube for an observation
@@ -141,7 +152,7 @@ definition file. The cube definition may be taken from a counts cube
 or may be specified by user parameters.
 
 
-13. ctbkgcube - CTA background cube generation
+14. ctbkgcube - CTA background cube generation
 ----------------------------------------------
 The first version of the ctbkgcube tool is included in the release.
 ctbkgcube computes the background cube for an observation definition 
@@ -149,7 +160,7 @@ file. The cube definition may be taken from a counts cube or may be
 specified by user parameters.
 
 
-14. ctcubemask - CTA cube filtering
+15. ctcubemask - CTA cube filtering
 -----------------------------------
 The first version of the ctcubemask tool is included in the release.
 ctcubemask allows filtering of bins in a counts cube by setting the
@@ -157,12 +168,12 @@ bin content to -1. Filtering can be done by energy, for a circular
 Region of Interest (ROI) or using ds9 exclusion regions.
 
 
-15. Examples
+16. Examples
 ------------
 None
 
 
-16. Scripts
+17. Scripts
 -----------
 Add logL and event statistics to cspull output file.
 
@@ -182,11 +193,11 @@ The following functions have been added to obsutils:
   specified energy bins.
 
 
-17. caldb
+18. caldb
 ---------
 None
 
 
-18. models
+19. models
 ----------
 None

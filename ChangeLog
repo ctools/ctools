@@ -1,10 +1,11 @@
-2014-10-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-10-10  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.8.0 released
         ========================
 
         Clean-up public interface
 	Adapt to GammaLib 0.9.0 interface
+        Introduce ctool base class
         ctbin now always merges event lists into a single counts cube
         ctmodel now always creates a single model cube
         Add ctexpcube tool (generates exposure cube)
