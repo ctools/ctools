@@ -1,5 +1,5 @@
 /***************************************************************************
- *                      ctbin - CTA data binning tool                      *
+ *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctbin.i
- * @brief CTA data binning tool Python interface definition
+ * @brief Event binning tool definition
  * @author Juergen Knoedlseder
  */
 %{
@@ -33,9 +33,9 @@
 /***********************************************************************//**
  * @class ctbin
  *
- * @brief CTA data binning tool Python interface
+ * @brief Event binning tool
  ***************************************************************************/
-class ctbin : public GApplication  {
+class ctbin : public ctool {
 public:
     // Constructors and destructors
     ctbin(void);
@@ -55,7 +55,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA data binning tool Python extension
+ * @brief Event binning tool Python extension
  ***************************************************************************/
 %extend ctbin {
     ctbin copy() {

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                      ctbin - CTA data binning tool                      *
+ *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctbin.cpp
- * @brief CTA data binning tool implementation
+ * @brief Event binning tool implementation
  * @author Juergen Knoedlseder
  */
 
@@ -51,13 +51,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctbin::ctbin(void) : GApplication(CTBIN_NAME, CTBIN_VERSION)
+ctbin::ctbin(void) : ctool(CTBIN_NAME, CTBIN_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -72,17 +69,13 @@ ctbin::ctbin(void) : GApplication(CTBIN_NAME, CTBIN_VERSION)
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctbin::ctbin(const GObservations& obs) :
-       GApplication(CTBIN_NAME, CTBIN_VERSION)
+ctbin::ctbin(const GObservations& obs) : ctool(CTBIN_NAME, CTBIN_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -97,13 +90,10 @@ ctbin::ctbin(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbin::ctbin(int argc, char *argv[]) : 
-       GApplication(CTBIN_NAME, CTBIN_VERSION, argc, argv)
+       ctool(CTBIN_NAME, CTBIN_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -115,7 +105,7 @@ ctbin::ctbin(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctbin::ctbin(const ctbin& app) : GApplication(app)
+ctbin::ctbin(const ctbin& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -158,7 +148,7 @@ ctbin& ctbin::operator=(const ctbin& app)
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -189,10 +179,12 @@ void ctbin::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -371,12 +363,7 @@ void ctbin::init_members(void)
     m_outfile.clear();
     m_proj.clear();
     m_coordsys.clear();
-    m_ebinalg.clear();
-    m_ebinfile.clear();
     m_usepnt   = false;
-    m_emin     = 0.0;
-    m_emax     = 0.0;
-    m_enumbins = 0;
     m_xref     = 0.0;
     m_yref     = 0.0;
     m_binsz    = 0.0;
@@ -412,12 +399,7 @@ void ctbin::copy_members(const ctbin& app)
     m_outfile  = app.m_outfile;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
-    m_ebinalg  = app.m_ebinalg;
-    m_ebinfile = app.m_ebinfile;
     m_usepnt   = app.m_usepnt;
-    m_emin     = app.m_emin;
-    m_emax     = app.m_emax;
-    m_enumbins = app.m_enumbins;
     m_xref     = app.m_xref;
     m_yref     = app.m_yref;
     m_binsz    = app.m_binsz;
@@ -443,11 +425,6 @@ void ctbin::copy_members(const ctbin& app)
  ***************************************************************************/
 void ctbin::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }
@@ -464,6 +441,9 @@ void ctbin::free_members(void)
  ***************************************************************************/
 void ctbin::get_parameters(void)
 {
+    // Initialize energy boundaries
+    m_ebounds.clear();
+
     // If there are no observations in container then add a single CTA
     // observation using the parameters from the parameter file
     if (m_obs.size() == 0) {
@@ -506,19 +486,9 @@ void ctbin::get_parameters(void)
     m_binsz    = (*this)["binsz"].real();
     m_nxpix    = (*this)["nxpix"].integer();
     m_nypix    = (*this)["nypix"].integer();
-    m_ebinalg  = (*this)["ebinalg"].string();
-
-    // If we have the binning given by a file then read filename
-    if (m_ebinalg == "FILE") {
-    	m_ebinfile = (*this)["ebinfile"].filename();
-    }
     
-    // ... otherwise read emin, emax and nebins
-    else{
-    	m_emin     = (*this)["emin"].real();
-    	m_emax     = (*this)["emax"].real();
-    	m_enumbins = (*this)["enumbins"].integer();
-    }
+    // Set energy boundaries
+    m_ebounds  = get_ebounds();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -546,7 +516,6 @@ void ctbin::init_cube(void)
     m_ontime   = 0.0;
     m_livetime = 0.0;
     m_cube.clear();
-    m_ebounds.clear();
     m_gti.clear();
 
     // Set event cube centre, either from the user parameters or from the
@@ -587,13 +556,10 @@ void ctbin::init_cube(void)
 
     } // endif: used pointing
 
-    // Set energy boundaries
-    get_ebounds();
-
     // Create skymap
     m_cube = GSkymap(m_proj, m_coordsys,
                      xref, yref, -m_binsz, m_binsz,
-                     m_nxpix, m_nypix, m_enumbins);
+                     m_nxpix, m_nypix, m_ebounds.size());
 
     // Return
     return;
@@ -775,83 +741,6 @@ void ctbin::obs_cube(void)
         m_obs = container;
 
     } // endelse: there was not a single CTA observation
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get the energy boundaries
- *
- * @exception GException::invalid_value
- *            No valid energy boundary extension found.
- *
- * Get the energy boundaries according to the user parameters. The method
- * supports loading of energy boundary information from the EBOUNDS or
- * ENERGYBINS extension, or setting energy boundaries using a linear
- * or logarithmical spacing.
- *
- * @todo Ultimately this method should go in a support library as it is
- * used by several ctools.
- ***************************************************************************/
-void ctbin::get_ebounds(void)
-{
-    // Initialse energy boundary information
-    m_ebounds.clear();
-
-    // Check whether energy binning information should be read from a FITS
-    // file ...
-    if (m_ebinalg == "FILE") {
-
-        // Open energy boundary file using the EBOUNDS or ENERGYBINS
-        // extension. Throw an exception if opening fails.
-        GFits file(m_ebinfile);
-        if (file.contains("EBOUNDS")) {
-            file.close();
-            m_ebounds.load(m_ebinfile,"EBOUNDS");
-        }
-        else if (file.contains("ENERGYBINS")) {
-            file.close();
-            m_ebounds.load(m_ebinfile,"ENERGYBINS");
-        }
-        else {
-            file.close();
-            std::string msg = "No extension with name \"EBOUNDS\" or"
-                              " \"ENERGYBINS\" found in FITS file"
-                              " \""+m_ebinfile+"\".\n"
-                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                              " is required if the parameter \"ebinalg\""
-                              " is set to \"FILE\".";
-            throw GException::invalid_value(G_GET_EBOUNDS, msg);
-        }
-        
-        // Set enumbins parameter to number of ebounds
-        m_enumbins = m_ebounds.size();
-
-    } // endif: ebinalg was "FILE"
-
-    // ... otherwise use a linear or a logarithmically-spaced energy binning
-    else {
-
-        // Initialise log mode for ebinning
-        bool log = true;
-
-        // check if algorithm is linear
-        if (m_ebinalg == "LIN") {
-            log = false;
-        }
-
-        // todo: should we also check if m_ebinalg is "LOG"
-        // and throw an exception if neither LIN/LOG/FILE
-        // is given?
-
-        // Setup energy range covered by data
-        GEnergy  emin(m_emin, "TeV");
-        GEnergy  emax(m_emax, "TeV");
-        m_ebounds = GEbounds(m_enumbins, emin, emax, log);
-
-    } //endif: ebinalg was not "FILE"
 
     // Return
     return;

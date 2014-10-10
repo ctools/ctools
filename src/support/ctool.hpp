@@ -43,19 +43,23 @@ class ctool : public GApplication  {
 public:
     // Constructors and destructors
     ctool(void);
+    ctool(const std::string& name, const std::string& version);
+    ctool(const std::string& name, const std::string& version,
+          int argc, char* argv[]);
     ctool(const ctool& app);
     virtual ~ctool(void);
 
     // Operators
     ctool& operator=(const ctool& app);
 
-    // Methods
+    // Public methods
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctool& app);
-    void free_members(void);
+    void     init_members(void);
+    void     copy_members(const ctool& app);
+    void     free_members(void);
+    GEbounds get_ebounds(void);
 };
 
 #endif /* CTOOL_HPP */

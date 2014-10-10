@@ -28,10 +28,10 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-//#include <cstdio>
 #include "ctool.hpp"
 
 /* __ Method name definitions ____________________________________________ */
+#define G_GET_EBOUNDS                                  "ctool::get_ebounds()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -51,6 +51,52 @@ ctool::ctool(void) : GApplication()
 {
     // Initialise members
     init_members();
+
+    // Write header into logger
+    log_header();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Name constructor
+ *
+ * @param[in] name Application name.
+ * @param[in] version Application version.
+ ***************************************************************************/
+ctool::ctool(const std::string& name, const std::string& version) :
+       GApplication(name, version)
+{
+    // Initialise members
+    init_members();
+
+    // Write header into logger
+    log_header();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Command line constructor
+ *
+ * @param[in] name Application name.
+ * @param[in] version Application version.
+ * @param[in] argc Number of arguments in command line.
+ * @param[in] argv Array of command line arguments.
+ ***************************************************************************/
+ctool::ctool(const std::string& name, const std::string& version,
+             int argc, char *argv[]) : 
+       GApplication(name, version, argc, argv)
+{
+    // Initialise members
+    init_members();
+
+    // Write header into logger
+    log_header();
 
     // Return
     return;
@@ -168,6 +214,88 @@ void ctool::copy_members(const ctool& app)
  ***************************************************************************/
 void ctool::free_members(void)
 {
+    // Write separator into logger
+    if (logTerse()) {
+        log << std::endl;
+    }
+
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get the energy boundaries
+ *
+ * @exception GException::invalid_value
+ *            No valid energy boundary extension found.
+ *
+ * Get the energy boundaries according to the user parameters. The method
+ * supports loading of energy boundary information from the EBOUNDS or
+ * ENERGYBINS extension, or setting energy boundaries using a linear
+ * or logarithmical spacing.
+ ***************************************************************************/
+GEbounds ctool::get_ebounds(void)
+{
+    // Allocate energy boundaries
+    GEbounds ebounds;
+
+    // Get energy binning algorithm
+    std::string ebinalg = (*this)["ebinalg"].string();
+
+    // If energy binning algorithm is of type "FILE" (case sensitive), then
+    // read energy boundaries from FITS file ...
+    if (ebinalg == "FILE") {
+
+        // Get filename
+        std::string ebinfile = (*this)["ebinfile"].filename();
+
+        // Open energy boundary file using the EBOUNDS or ENERGYBINS
+        // extension. Throw an exception if opening fails.
+        GFits file(ebinfile);
+        if (file.contains("EBOUNDS")) {
+            file.close();
+            ebounds.load(ebinfile,"EBOUNDS");
+        }
+        else if (file.contains("ENERGYBINS")) {
+            file.close();
+            ebounds.load(ebinfile,"ENERGYBINS");
+        }
+        else {
+            file.close();
+            std::string msg = "No extension with name \"EBOUNDS\" or"
+                              " \"ENERGYBINS\" found in FITS file"
+                              " \""+ebinfile+"\".\n"
+                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
+                              " is required if the parameter \"ebinalg\""
+                              " is set to \"FILE\".";
+            throw GException::invalid_value(G_GET_EBOUNDS, msg);
+        }
+        
+    } // endif: ebinalg was "FILE"
+
+    // ... otherwise use a linear or a logarithmically-spaced energy binning
+    else {
+
+        // Get task parameters
+    	double emin     = (*this)["emin"].real();
+    	double emax     = (*this)["emax"].real();
+    	int    enumbins = (*this)["enumbins"].integer();
+
+        // Initialise log mode for ebinning
+        bool log = true;
+
+        // Check if algorithm is linear
+        if (ebinalg == "LIN") {
+            log = false;
+        }
+
+        // Setup energy bins
+        ebounds = GEbounds(enumbins, GEnergy(emin, "TeV"),
+                                     GEnergy(emax, "TeV"), log);
+
+    } // endelse: ebinalg was not "FILE"
+
+    // Return energy boundaries
+    return ebounds;
 }

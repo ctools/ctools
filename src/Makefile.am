@@ -5,7 +5,8 @@ MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
 @EXPORT_MACOSX_DEPLOYMENT_TARGET@export MACOSX_DEPLOYMENT_TARGET
 
 # Set sub directories
-SUBDIRS = ctbin \
+SUBDIRS = support \
+          ctbin \
           ctlike \
           ctmodel \
           ctobssim \
@@ -15,8 +16,7 @@ SUBDIRS = ctbin \
           ctpsfcube \
           ctbkgcube \
           ctcubemask \
-          cttsmap \
-          support
+          cttsmap
 
 # Scripts to be distributed
 scripts = ctools-setup \
@@ -28,7 +28,8 @@ scripts = ctools-setup \
 # not have to build this library if no python bindings are used.
 lib_LTLIBRARIES = libctools.la
 libctools_la_SOURCES = 
-libctools_la_LIBADD = ctbin/libctbin.la \
+libctools_la_LIBADD = support/libsupport.la \
+                      ctbin/libctbin.la \
                       ctlike/libctlike.la \
                       ctmodel/libctmodel.la \
                       ctobssim/libctobssim.la \
@@ -38,8 +39,8 @@ libctools_la_LIBADD = ctbin/libctbin.la \
                       ctpsfcube/libctpsfcube.la \
                       ctbkgcube/libctbkgcube.la \
                       ctcubemask/libctcubemask.la \
-                      cttsmap/libcttsmap.la \
-                      support/libsupport.la
+                      cttsmap/libcttsmap.la
+                      
 
 # Distribute scripts
 EXTRA_DIST   = $(scripts)

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                      ctbin - CTA data binning tool                      *
+ *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctbin.hpp
- * @brief CTA data binning tool definition
+ * @brief Event binning tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
@@ -39,10 +40,10 @@
 /***********************************************************************//**
  * @class ctbin
  *
- * @brief CTA data binning tool interface defintion
+ * @brief Event binning tool
  *
- * This class bins CTA event list(s) into a single counts cube. The class
- * can operate on predefined observation containers, on individual event list
+ * This class bins event list(s) into a single counts cube. The class can
+ * operate on predefined observation containers, on individual event list
  * FITS files, and on observation definition XML files.
  *
  * If multiple event lists are specified in the observation container or the
@@ -60,7 +61,7 @@
  * PSF cubes should be used for response computation. This is however not
  * yet fully implemented.
  ***************************************************************************/
-class ctbin : public GApplication  {
+class ctbin : public ctool {
 public:
     // Constructors and destructors
     ctbin(void);
@@ -89,33 +90,27 @@ protected:
     void init_cube(void);
     void fill_cube(GCTAObservation* obs);
     void obs_cube(void);
-    void get_ebounds(void);
 
     // User parameters
-    std::string              m_evfile;     //!< Input event list or XML file
-    std::string              m_outfile;    //!< Output counts map or XML file
-    bool                     m_usepnt;     //!< Use pointing instead of xref/yref parameters
-    double                   m_emin;       //!< Lower energy
-    double                   m_emax;       //!< Upper energy
-    int                      m_enumbins;   //!< Number of energy bins
-    std::string              m_proj;       //!< WCS projection
-    std::string              m_coordsys;   //!< Coordinate system
-    std::string              m_ebinalg;    //!< Algorithm for energy binning
-    std::string              m_ebinfile;   //!< FITS-file containing energy binning
-    double                   m_xref;       //!< Longitude reference coordinate
-    double                   m_yref;       //!< Latitude reference coordinate
-    double                   m_binsz;      //!< Pixel size
-    int                      m_nxpix;      //!< Number of pixels in longitude
-    int                      m_nypix;      //!< Number of pixels in latitude
+    std::string   m_evfile;     //!< Input event list or XML file
+    std::string   m_outfile;    //!< Output counts map or XML file
+    bool          m_usepnt;     //!< Use pointing instead of xref/yref parameters
+    std::string   m_proj;       //!< WCS projection
+    std::string   m_coordsys;   //!< Coordinate system
+    double        m_xref;       //!< Longitude reference coordinate
+    double        m_yref;       //!< Latitude reference coordinate
+    double        m_binsz;      //!< Pixel size
+    int           m_nxpix;      //!< Number of pixels in longitude
+    int           m_nypix;      //!< Number of pixels in latitude
 
     // Protected members
-    GObservations            m_obs;        //!< Observation container
-    bool                     m_read_ahead; //!< Read ahead parameters
-    GSkymap                  m_cube;       //!< Event cube
-    GEbounds                 m_ebounds;    //!< Energy boundaries
-    GGti                     m_gti;        //!< Good time intervals
-    double                   m_ontime;     //!< Total ontime
-    double                   m_livetime;   //!< Total livetime
+    GObservations m_obs;        //!< Observation container
+    bool          m_read_ahead; //!< Read ahead parameters
+    GSkymap       m_cube;       //!< Event cube
+    GEbounds      m_ebounds;    //!< Energy boundaries
+    GGti          m_gti;        //!< Good time intervals
+    double        m_ontime;     //!< Total ontime
+    double        m_livetime;   //!< Total livetime
 };
 
 /***********************************************************************//**
@@ -135,7 +130,7 @@ const GObservations& ctbin::obs(void) const
  *
  * @return Event cube
  *
- * Returns a CTA event cube built from the ctbin member information.
+ * Returns a event cube built from the ctbin member information.
  ***************************************************************************/
 inline
 GCTAEventCube ctbin::cube(void) const
