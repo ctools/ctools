@@ -1,5 +1,5 @@
 /***************************************************************************
- *                     ctpsfcube - CTA PSF cube tool                       *
+ *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,22 +20,21 @@
  ***************************************************************************/
 /**
  * @file ctpsfcube.i
- * @brief CTA PSF cube tool definition
+ * @brief PSF cube generation tool definition
  * @author Chia-Chun Lu
  */
 
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctpsfcube.hpp"
-#include "GTools.hpp"
 %}
 
 /***********************************************************************//**
  * @class ctpsfcube
  *
- * @brief CTA PSF cube tool
+ * @brief PSF cube generation tool
  ***************************************************************************/
-class ctpsfcube : public GApplication  {
+class ctpsfcube : public ctool {
 
 public:
     // Constructors and destructors
@@ -54,7 +53,7 @@ public:
 };
 
 /***********************************************************************//**
- * @brief CTA PSF cube tool Python extension
+ * @brief PSF cube generation tool Python extension
  ***************************************************************************/
 %extend ctpsfcube {
     ctpsfcube copy() {

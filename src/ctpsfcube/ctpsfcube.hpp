@@ -1,5 +1,5 @@
 /***************************************************************************
- *                     ctpsfcube - CTA PSF cube tool                       *
+ *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctpsfcube.hpp
- * @brief CTA PSF cube tool definition
+ * @brief PSF cube generation tool definition
  * @author Chia-Chun Lu
  */
 
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTPSFCUBE_NAME    "ctpsfcube"
@@ -39,9 +40,9 @@
 /***********************************************************************//**
  * @class ctpsfcube
  *
- * @brief CTA PSF cube tool
+ * @brief PSF cube generation tool
  ***************************************************************************/
-class ctpsfcube : public GApplication  {
+class ctpsfcube : public ctool {
 
 public:
     // Constructors and destructors
@@ -68,8 +69,6 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void get_obs(void);
-    void set_response(void);
-    void get_ebounds(void);
     void set_from_cntmap(const std::string& filename);
 
     // User parameters

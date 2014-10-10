@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctpsfcube - CTA PSF cube tool                        *
+ *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctpsfcube.cpp
- * @brief CTA PSF cube tool implementation
+ * @brief PSF cube generation tool implementation
  * @author Chia-Chun Lu
  */
 
@@ -34,7 +34,6 @@
 #include "GWcs.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_EBOUNDS                              "ctpsfcube::get_ebounds()"
 #define G_GET_PARAMETERS                        "ctpsfcube::get_parameters()"
 #define G_SET_FROM_CNTMAP          "ctpsfcube::set_from_cntmap(std::string&)"
 
@@ -52,13 +51,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctpsfcube::ctpsfcube(void) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+ctpsfcube::ctpsfcube(void) : ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -73,16 +69,14 @@ ctpsfcube::ctpsfcube(void) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(const GObservations& obs) : GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+ctpsfcube::ctpsfcube(const GObservations& obs) :
+           ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -97,13 +91,10 @@ ctpsfcube::ctpsfcube(const GObservations& obs) : GApplication(CTPSFCUBE_NAME, CT
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctpsfcube::ctpsfcube(int argc, char *argv[]) :
-           GApplication(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, argc, argv)
+           ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -115,7 +106,7 @@ ctpsfcube::ctpsfcube(int argc, char *argv[]) :
  *
  * @param[in] app ctpsfcube application.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(const ctpsfcube& app) : GApplication(app)
+ctpsfcube::ctpsfcube(const ctpsfcube& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -159,7 +150,7 @@ ctpsfcube& ctpsfcube::operator=(const ctpsfcube& app)
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -190,10 +181,12 @@ void ctpsfcube::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -315,6 +308,67 @@ void ctpsfcube::save(void)
 }
 
 
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctpsfcube::init_members(void)
+{
+    // Initialise members
+    m_outfile.clear();
+    m_apply_edisp = false;
+
+    // Initialise protected members
+    m_read_ahead = false;
+    m_obs.clear();
+    m_psfcube.clear();
+    m_ebounds.clear();
+
+    // Set logger properties
+    log.date(true);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctpsfcube::copy_members(const ctpsfcube& app)
+{
+    // Copy attributes
+    m_outfile     = app.m_outfile;
+    m_apply_edisp = app.m_apply_edisp;
+
+    // Copy protected members
+    m_read_ahead = app.m_read_ahead;
+    m_obs        = app.m_obs;
+    m_psfcube    = app.m_psfcube;
+    m_ebounds    = app.m_ebounds;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctpsfcube::free_members(void)
+{
+    // Return
+    return;
+}
+
+
 /***********************************************************************//**
  * @brief Get application parameters
  *
@@ -332,7 +386,7 @@ void ctpsfcube::get_parameters(void)
     }
 
     // Make sure that response is set
-    set_response();
+    set_response(m_obs);
 
     // Read energy dispersion flag
     m_apply_edisp = (*this)["edisp"].boolean();
@@ -354,7 +408,7 @@ void ctpsfcube::get_parameters(void)
         int         ndbins   = (*this)["anumbins"].integer();
 
         // Get energy definition
-        get_ebounds();
+        m_ebounds = get_ebounds();
 
         // Define PSF cube
         m_psfcube = GCTAMeanPsf(wcs, coordsys, xref, yref,
@@ -410,125 +464,6 @@ void ctpsfcube::get_obs(void)
 
         // Load observations from XML file
         m_obs.load(filename);
-
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Set observation response
- *
- * Set response for all observations that have no response.
- ***************************************************************************/
-void ctpsfcube::set_response(void)
-{
-    // Loop over all observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Is this observation a CTA observation?
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Yes ...
-        if (obs != NULL) {
-
-            // Set response if we don't have one
-            if (!obs->has_response()) {
-
-                // Load response information
-                std::string database = (*this)["caldb"].string();
-                std::string irf      = (*this)["irf"].string();
-
-                // Set calibration database. If specified parameter is a
-                // directory then use this as the pathname to the calibration
-                // database. Otherwise interpret this as the instrument name,
-                // the mission being "cta"
-                GCaldb caldb;
-                if (gammalib::dir_exists(database)) {
-                    caldb.rootdir(database);
-                }
-                else {
-                    caldb.open("cta", database);
-                }
-
-                // Set reponse
-            	obs->response(irf, caldb);
-
-            } // endif: observation already has a response
-
-        } // endif: observation was a CTA observation
-
-    } // endfor: looped over all observations
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get energy boundaries from parameters
- *
- * @exception GException::invalid_value
- *            Invalid extension name encountered.
- *
- * Get the energy boundaries from the user parameters.
- ***************************************************************************/
-void ctpsfcube::get_ebounds(void)
-{
-    // Determine the energy binning alogrithm
-    std::string ebinalg = (*this)["ebinalg"].string();
-
-    // If we have the binning given by a file then try to get the boundaries
-    // from that file
-    if (ebinalg == "FILE") {
-    
-        // Get filename
-        std::string filename = (*this)["ebinfile"].filename();
-
-        // Open fits file to check which extension is given
-        GFits file(filename);
-
-        // Check first for EBOUNDS extension
-        if (file.contains("EBOUNDS")) {
-            file.close();
-            m_ebounds.load(filename, "EBOUNDS");
-        }
-
-        // ... then check for ENERGYBINS extension
-        else if (file.contains("ENERGYBINS")) {
-            file.close();
-            m_ebounds.load(filename, "ENERGYBINS");
-        }
-
-        // ... otherwise throw an exception
-        else {
-            file.close();
-            std::string msg = "No extension with name \"EBOUNDS\" or"
-                              " \"ENERGYBINS\" found in FITS file"
-                              " \""+filename+"\".\n"
-                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                              " is required if the parameter \"ebinalg\""
-                              " is set to \"FILE\".";
-            throw GException::invalid_value(G_GET_EBOUNDS, msg);
-        }
-    }
-    
-    // ... otherwise read emin, emax and nebins
-    else {
-
-        // Get the relevant parameters
-    	double emin     = (*this)["emin"].real();
-    	double emax     = (*this)["emax"].real();
-    	int    enumbins = (*this)["enumbins"].integer();
-        bool   log      = ((*this)["ebinalg"].string() == "LIN") ? false : true;
-
-        // Create energy boundaries
-        m_ebounds = GEbounds(enumbins,
-                             GEnergy(emin, "TeV"),
-                             GEnergy(emax, "TeV"),
-                             log);
 
     }
 
@@ -600,72 +535,6 @@ void ctpsfcube::set_from_cntmap(const std::string& filename)
         std::string msg = "No events cube found in file \""
                           ""+filename+"\".";
         throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
-    }
-
-    // Return
-    return;
-}
-
-
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
-/***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctpsfcube::init_members(void)
-{
-    // Initialise members
-    m_outfile.clear();
-    m_apply_edisp = false;
-
-    // Initialise protected members
-    m_read_ahead = false;
-    m_obs.clear();
-    m_psfcube.clear();
-    m_ebounds.clear();
-
-    // Set logger properties
-    log.date(true);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
- *
- * @param[in] app Application.
- ***************************************************************************/
-void ctpsfcube::copy_members(const ctpsfcube& app)
-{
-    // Copy attributes
-    m_outfile     = app.m_outfile;
-    m_apply_edisp = app.m_apply_edisp;
-
-    // Copy protected members
-    m_read_ahead = app.m_read_ahead;
-    m_obs        = app.m_obs;
-    m_psfcube    = app.m_psfcube;
-    m_ebounds    = app.m_ebounds;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctpsfcube::free_members(void)
-{
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
     }
 
     // Return
