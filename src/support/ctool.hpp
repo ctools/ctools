@@ -52,16 +52,38 @@ public:
     // Operators
     ctool& operator=(const ctool& app);
 
+    // Pure virtual methods
+    virtual void clear(void) = 0;
+    virtual void run(void) = 0;
+    virtual void save(void) = 0;
+
     // Public methods
+    virtual void execute(void);
 
 protected:
     // Protected methods
-    void     init_members(void);
-    void     copy_members(const ctool& app);
-    void     free_members(void);
-    GEbounds get_ebounds(void);
-    void     set_response(GObservations& obs);
-    void     set_obs_response(GCTAObservation* obs);
+    void        init_members(void);
+    void        copy_members(const ctool& app);
+    void        free_members(void);
+    const bool& read_ahead(void) const;
+    GEbounds    get_ebounds(void);
+    void        set_response(GObservations& obs);
+    void        set_obs_response(GCTAObservation* obs);
+
+    // Protected members
+    bool m_read_ahead;   //!< Read ahead parameters
 };
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const bool& ctool::read_ahead(void) const
+{
+    return (m_read_ahead);
+}
 
 #endif /* CTOOL_HPP */

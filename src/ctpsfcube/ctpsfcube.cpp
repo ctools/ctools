@@ -104,7 +104,7 @@ ctpsfcube::ctpsfcube(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app ctpsfcube application.
+ * @param[in] app Application.
  ***************************************************************************/
 ctpsfcube::ctpsfcube(const ctpsfcube& app) : ctool(app)
 {
@@ -141,8 +141,8 @@ ctpsfcube::~ctpsfcube(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app ctpsfcube application.
- * @return Returns ctpsfcube application.
+ * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctpsfcube& ctpsfcube::operator=(const ctpsfcube& app)
 {
@@ -188,29 +188,6 @@ void ctpsfcube::clear(void)
     this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This is the main execution method of the ctpsfcube class. It is invoked
- * when the executable is called from command line. The method generates
- * the PSF cube and saves the result.
- ***************************************************************************/
-void ctpsfcube::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Create the PSF cube
-    run();
-
-    // Save the PSF cube into the output FITS file
-    save();
 
     // Return
     return;
@@ -324,13 +301,9 @@ void ctpsfcube::init_members(void)
     m_apply_edisp = false;
 
     // Initialise protected members
-    m_read_ahead = false;
     m_obs.clear();
     m_psfcube.clear();
     m_ebounds.clear();
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -349,7 +322,6 @@ void ctpsfcube::copy_members(const ctpsfcube& app)
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
-    m_read_ahead = app.m_read_ahead;
     m_obs        = app.m_obs;
     m_psfcube    = app.m_psfcube;
     m_ebounds    = app.m_ebounds;
@@ -426,7 +398,7 @@ void ctpsfcube::get_parameters(void)
     }
 
     // Read output filename (if needed)
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
 

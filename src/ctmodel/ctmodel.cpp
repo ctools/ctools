@@ -137,8 +137,8 @@ ctmodel::~ctmodel(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app ctmodel application.
- * @return Returns ctmodel application.
+ * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctmodel& ctmodel::operator=(const ctmodel& app)
 {
@@ -184,29 +184,6 @@ void ctmodel::clear(void)
     this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This is the main execution method of the ctmodel class. It is invoked
- * when the executable is called from command line. The method generates
- * the model maps and saves the results.
- ***************************************************************************/
-void ctmodel::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Create model cube
-    run();
-
-    // Save model cube into FITS file
-    save();
 
     // Return
     return;
@@ -385,10 +362,6 @@ void ctmodel::init_members(void)
     m_cube.clear();
     m_ebounds.clear();
     m_gti.clear();
-    m_read_ahead = false;
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -433,7 +406,6 @@ void ctmodel::copy_members(const ctmodel& app)
     m_cube       = app.m_cube;
     m_ebounds    = app.m_ebounds;
     m_gti        = app.m_gti;
-    m_read_ahead = app.m_read_ahead;
 
     // Return
     return;
@@ -460,7 +432,7 @@ void ctmodel::get_parameters(void)
 {
     // Read input and optionally output cube filenames
     m_infile = (*this)["infile"].filename();
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
 

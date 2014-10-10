@@ -58,7 +58,6 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 execute(void);
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
@@ -85,7 +84,6 @@ protected:
     int           m_max_stall;  //!< Maximum number of stalls
     double        m_logL;       //!< Maximum log likelihood
     GOptimizer*   m_opt;        //!< Optimizer
-    bool          m_read_ahead; //!< Read ahead parameters
 };
 
 

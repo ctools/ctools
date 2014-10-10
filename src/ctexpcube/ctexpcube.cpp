@@ -113,7 +113,7 @@ ctexpcube::ctexpcube(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app ctexpcube application.
+ * @param[in] app Application.
  ***************************************************************************/
 ctexpcube::ctexpcube(const ctexpcube& app) : ctool(app)
 {
@@ -150,8 +150,8 @@ ctexpcube::~ctexpcube(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app ctexpcube application.
- * @return Returns ctexpcube application.
+ * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctexpcube& ctexpcube::operator=(const ctexpcube& app)
 {
@@ -197,29 +197,6 @@ void ctexpcube::clear(void)
     this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This is the main execution method of the ctexpcube class. It is invoked
- * when the executable is called from command line. The method generates
- * the exposure cube and saves the result.
- ***************************************************************************/
-void ctexpcube::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Create the exposure cube
-    run();
-
-    // Save the exposure cube into the output FITS file
-    save();
 
     // Return
     return;
@@ -333,13 +310,9 @@ void ctexpcube::init_members(void)
     m_apply_edisp = false;
 
     // Initialise protected members
-    m_read_ahead = false;
     m_obs.clear();
     m_expcube.clear();
     m_ebounds.clear();
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -358,7 +331,6 @@ void ctexpcube::copy_members(const ctexpcube& app)
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
-    m_read_ahead = app.m_read_ahead;
     m_obs        = app.m_obs;
     m_expcube    = app.m_expcube;
     m_ebounds    = app.m_ebounds;
@@ -433,7 +405,7 @@ void ctexpcube::get_parameters(void)
     }
 
     // Read output filename (if needed)
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
 

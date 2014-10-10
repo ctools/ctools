@@ -57,7 +57,6 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 execute(void);
     void                 run(void);
     void                 save(void);
     const GCTAEventCube& cube(void) const;
@@ -73,7 +72,6 @@ protected:
     void fill_cube(GCTAObservation* obs);
 
     // Protected members
-    bool          m_read_ahead;  //!< Read ahead parameters
     GObservations m_obs;         //!< Observation container
     GCTAEventCube m_bkgcube;     //!< Background cube
     GModels       m_bkgmdl;      //!< CTA background models

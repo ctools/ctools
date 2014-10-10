@@ -105,7 +105,7 @@ ctbkgcube::ctbkgcube(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app ctbkgcube application.
+ * @param[in] app Application.
  ***************************************************************************/
 ctbkgcube::ctbkgcube(const ctbkgcube& app) : ctool(app)
 {
@@ -142,8 +142,8 @@ ctbkgcube::~ctbkgcube(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app ctbkgcube application.
- * @return Returns ctbkgcube application.
+ * @param[in] app Application.
+ * @return Returns application.
  ***************************************************************************/
 ctbkgcube& ctbkgcube::operator=(const ctbkgcube& app)
 {
@@ -189,29 +189,6 @@ void ctbkgcube::clear(void)
     this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This is the main execution method of the ctbkgcube class. It is invoked
- * when the executable is called from command line. The method generates
- * the background cube and saves the result.
- ***************************************************************************/
-void ctbkgcube::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Create the background cube
-    run();
-
-    // Save the background cube into the output FITS file
-    save();
 
     // Return
     return;
@@ -424,15 +401,11 @@ void ctbkgcube::save(void)
 void ctbkgcube::init_members(void)
 {
     // Initialise members
-    m_read_ahead = false;
     m_obs.clear();
     m_bkgcube.clear();
     m_bkgmdl.clear();
     m_ebounds.clear();
     m_livetime = 0.0;
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -447,12 +420,11 @@ void ctbkgcube::init_members(void)
 void ctbkgcube::copy_members(const ctbkgcube& app)
 {
     // Copy members
-    m_read_ahead = app.m_read_ahead;
-    m_obs        = app.m_obs;
-    m_bkgcube    = app.m_bkgcube;
-    m_bkgmdl     = app.m_bkgmdl;
-    m_ebounds    = app.m_ebounds;
-    m_livetime   = app.m_livetime;
+    m_obs      = app.m_obs;
+    m_bkgcube  = app.m_bkgcube;
+    m_bkgmdl   = app.m_bkgmdl;
+    m_ebounds  = app.m_ebounds;
+    m_livetime = app.m_livetime;
 
     // Return
     return;
@@ -540,7 +512,7 @@ void ctbkgcube::get_parameters(void)
     }
 
     // Read output filename (if needed)
-    if (m_read_ahead) {
+    if (read_ahead()) {
         std::string filename = (*this)["outfile"].filename();
     }
 

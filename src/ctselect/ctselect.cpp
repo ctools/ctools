@@ -144,6 +144,7 @@ ctselect::~ctselect(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctselect& ctselect::operator=(const ctselect& app)
 {
@@ -193,28 +194,6 @@ void ctselect::clear(void)
     // Return
     return;
 }
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This method performs the event selection and saves the result
- ***************************************************************************/
-void ctselect::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-    
-    // Perform event selection
-    run();
-
-    // Save results
-    save();
-
-    // Return
-    return;
-}
-
 
 
 /***********************************************************************//**
@@ -458,7 +437,7 @@ void ctselect::get_parameters(void)
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
         m_prefix  = (*this)["prefix"].string();
     }
@@ -706,15 +685,11 @@ void ctselect::init_members(void)
     m_timemin.clear();
     m_timemax.clear();
     m_use_xml    = false;
-    m_read_ahead = false;
     
     // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
     // which is defined in GCTALib.hpp. This is somehow a kluge. We need
     // a better mechanism to implement the CTA reference MJD.
     m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -748,7 +723,6 @@ void ctselect::copy_members(const ctselect& app)
     m_timemin    = app.m_timemin;
     m_timemax    = app.m_timemax;
     m_use_xml    = app.m_use_xml;
-    m_read_ahead = app.m_read_ahead;
     m_cta_ref    = app.m_cta_ref;
     
     // Return

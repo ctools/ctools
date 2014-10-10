@@ -57,7 +57,6 @@ public:
 
     // Methods
     void                clear(void);
-    void                execute(void);
     void                run(void);
     void                save(void);
     const GCTAExposure& expcube(void) const;
@@ -76,7 +75,6 @@ protected:
     bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
-    bool          m_read_ahead;  //!< Read ahead parameters
     GObservations m_obs;         //!< Observation container
     GCTAExposure  m_expcube;     //!< Exposure cube
     GEbounds      m_ebounds;     //!< Energy boundaries

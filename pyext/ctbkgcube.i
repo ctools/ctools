@@ -45,7 +45,6 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 execute(void);
     void                 run(void);
     void                 save(void);
     const GCTAEventCube& cube(void) const;

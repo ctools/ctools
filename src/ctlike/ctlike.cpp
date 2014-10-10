@@ -138,6 +138,7 @@ ctlike::~ctlike(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctlike& ctlike::operator=(const ctlike& app)
 {
@@ -183,28 +184,6 @@ void ctlike::clear(void)
     this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This method performs a maximum likelihood analysis of a observation given
- * in an observation container and saves the results in an XML file.
- ***************************************************************************/
-void ctlike::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Bin the event data
-    run();
-
-    // Save the results into XML file
-    save();
 
     // Return
     return;
@@ -442,7 +421,7 @@ void ctlike::get_parameters(void)
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outmdl = (*this)["outmdl"].filename();
     }
 
@@ -572,7 +551,6 @@ void ctlike::init_members(void)
     m_max_stall   = 10;    // Set maximum number of stalls
     m_logL        = 0.0;
     m_opt         = NULL;
-    m_read_ahead  = false;
     m_apply_edisp = false;
 
     // Set logger properties
@@ -599,7 +577,6 @@ void ctlike::copy_members(const ctlike& app)
     m_max_stall   = app.m_max_stall;
     m_logL        = app.m_logL;
     m_opt         = app.m_opt->clone();
-    m_read_ahead  = app.m_read_ahead;
     m_apply_edisp = app.m_apply_edisp;
 
     // Return
@@ -617,11 +594,6 @@ void ctlike::free_members(void)
 
     // Mark pointers as free
     m_opt = NULL;
-
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
 
     // Return
     return;

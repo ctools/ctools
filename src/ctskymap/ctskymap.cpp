@@ -141,6 +141,7 @@ ctskymap::~ctskymap(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctskymap& ctskymap::operator=(const ctskymap& app)
 {
@@ -186,28 +187,6 @@ void ctskymap::clear(void)
     this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This method creates the sky map and saves the map into a FITS file.
- ***************************************************************************/
-void ctskymap::execute(void)
-{
-    // Read ahead output filename so that it gets dumped correctly in the
-    // parameters log
-    m_outfile = (*this)["outfile"].filename();
-
-    // Create the sky map
-    run();
-
-    // Save the sky map into FITS file
-    save();
 
     // Return
     return;
@@ -383,6 +362,11 @@ void ctskymap::get_parameters(void)
     m_nxpix    = (*this)["nxpix"].integer();
     m_nypix    = (*this)["nypix"].integer();
 
+    // Read ahead parameters
+    if (read_ahead()) {
+        m_outfile = (*this)["outfile"].filename();
+    }
+
     // Return
     return;
 }
@@ -554,9 +538,6 @@ void ctskymap::init_members(void)
     m_binsz    = 0.0;
     m_nxpix    = 0;
     m_nypix    = 0;
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;

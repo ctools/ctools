@@ -143,6 +143,7 @@ ctcubemask::~ctcubemask(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 ctcubemask& ctcubemask::operator=(const ctcubemask& app)
 {
@@ -192,28 +193,6 @@ void ctcubemask::clear(void)
     // Return
     return;
 }
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This method applies the cube mask and saves the result.
- ***************************************************************************/
-void ctcubemask::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-    
-    // Perform event selection
-    run();
-
-    // Save results
-    save();
-
-    // Return
-    return;
-}
-
 
 
 /***********************************************************************//**
@@ -416,7 +395,7 @@ void ctcubemask::get_parameters(void)
 	
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
 
@@ -574,10 +553,6 @@ void ctcubemask::init_members(void)
     m_obs.clear();
     m_infiles.clear();
     m_use_xml    = false;
-    m_read_ahead = false;
-    
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -607,7 +582,6 @@ void ctcubemask::copy_members(const ctcubemask& app)
     m_obs        = app.m_obs;
     m_infiles    = app.m_infiles;
     m_use_xml    = app.m_use_xml;
-    m_read_ahead = app.m_read_ahead;
     
     // Return
     return;
@@ -619,11 +593,6 @@ void ctcubemask::copy_members(const ctcubemask& app)
  ***************************************************************************/
 void ctcubemask::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }

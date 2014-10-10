@@ -59,7 +59,6 @@ public:
 
     // Methods
     void                  clear(void);
-    void                  execute(void);
     void                  run(void);
     void                  save(void);
     const GObservations&  obs(void) const;
@@ -100,7 +99,6 @@ protected:
     GTime                    m_timemin;    //!< Earliest time
     GTime                    m_timemax;    //!< Latest time
     bool                     m_use_xml;    //!< Use XML file instead of FITS file
-    bool                     m_read_ahead; //!< Read ahead parameters
     GTimeReference           m_cta_ref;    //!< CTA time reference
 };
 

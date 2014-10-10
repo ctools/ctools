@@ -70,7 +70,6 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 execute(void);
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
@@ -103,7 +102,6 @@ protected:
 
     // Protected members
     GObservations            m_obs;        //!< Observation container
-    bool                     m_read_ahead; //!< Read ahead parameters
     GSkymap                  m_tsmap;      //!< TS map
     GSkymap                  m_statusmap;  //!< Map of computed bins
     std::vector<std::string> m_mapnames;   //!< Names of free parameters

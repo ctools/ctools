@@ -197,27 +197,6 @@ void ctobssim::clear(void)
 
 
 /***********************************************************************//**
- * @brief Execute application
- *
- * This method runs the simulation and saves the results.
- ***************************************************************************/
-void ctobssim::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Run the simulation
-    run();
-
-    // Save results
-    save();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
  * @brief Simulate event data
  *
  * This method runs the simulation. Results are not saved by this method.
@@ -489,7 +468,7 @@ void ctobssim::get_parameters(void)
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
         m_prefix  = (*this)["prefix"].string();
     }
@@ -1038,7 +1017,6 @@ void ctobssim::init_members(void)
     m_rans.clear();
     m_obs.clear();
     m_use_xml    = false;
-    m_read_ahead = false;
 
     // Set fixed parameters
     m_area        = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
@@ -1051,9 +1029,6 @@ void ctobssim::init_members(void)
 
     // Initialise first event identifier
     m_event_id = 1;
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -1088,7 +1063,6 @@ void ctobssim::copy_members(const ctobssim& app)
     m_rans        = app.m_rans;
     m_obs         = app.m_obs;
     m_use_xml     = app.m_use_xml;
-    m_read_ahead  = app.m_read_ahead;
     m_cta_ref     = app.m_cta_ref;
     m_event_id    = app.m_event_id;
 

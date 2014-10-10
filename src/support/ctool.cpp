@@ -176,6 +176,26 @@ ctool& ctool::operator=(const ctool& app)
  =                                                                         =
  ==========================================================================*/
 
+/***********************************************************************//**
+ * @brief Execute application
+ *
+ * This is the main execution method of a ctool. The method is invoked when
+ * the executable is called from command line.
+ ***************************************************************************/
+void ctool::execute(void)
+{
+    // Signal that some parameters should be read ahead
+    m_read_ahead = true;
+
+    // Run the tool
+    run();
+
+    // Save the results
+    save();
+
+    // Return
+    return;
+}
 
 
 /*==========================================================================
@@ -190,6 +210,10 @@ ctool& ctool::operator=(const ctool& app)
 void ctool::init_members(void)
 {
     // Initialise members
+    m_read_ahead = false;
+
+    // Set logger properties
+    log.date(true);
 
     // Return
     return;
@@ -203,7 +227,8 @@ void ctool::init_members(void)
  ***************************************************************************/
 void ctool::copy_members(const ctool& app)
 {
-    // Copy attributes
+    // Copy members
+    m_read_ahead = app.m_read_ahead;
 
     // Return
     return;

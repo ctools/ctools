@@ -59,7 +59,6 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 execute(void);
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
@@ -94,7 +93,6 @@ protected:
     GObservations            m_obs;        //!< Observations container
     std::vector<std::string> m_infiles;    //!< Input event filenames
     bool                     m_use_xml;    //!< Use XML file instead of FITS file
-    bool                     m_read_ahead; //!< Read ahead parameters
 };
 
 

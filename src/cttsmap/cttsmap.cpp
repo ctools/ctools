@@ -140,6 +140,7 @@ cttsmap::~cttsmap(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ * @return Application.
  ***************************************************************************/
 cttsmap& cttsmap::operator=(const cttsmap& app)
 {
@@ -185,31 +186,6 @@ void cttsmap::clear(void)
     this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Execute application
- *
- * This is the main execution method of the cttsmap class. It is invoked when
- * the executable is called from command line.
- *
- * The method reads the task parameters, computes the TS values, stores the
- * results into map(s), and writes the maps into a FITS file on disk.
- ***************************************************************************/
-void cttsmap::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Compute the maps
-    run();
-
-    // Save the maps into FITS file
-    save();
 
     // Return
     return;
@@ -447,7 +423,6 @@ void cttsmap::init_members(void)
 
     // Initialise protected members
     m_obs.clear();
-    m_read_ahead = false;
     m_binmin     = -1;
     m_binmax     = -1;
     m_logL0      = 0.0;
@@ -456,9 +431,6 @@ void cttsmap::init_members(void)
     m_mapnames.clear();
     m_maps.clear();
     m_testsource = NULL;
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -488,7 +460,6 @@ void cttsmap::copy_members(const cttsmap& app)
     m_binmax     = app.m_binmax;
     m_logL0      = app.m_logL0;
     m_obs        = app.m_obs;
-    m_read_ahead = app.m_read_ahead;
     m_tsmap      = app.m_tsmap;
     m_mapnames   = app.m_mapnames;
     m_maps       = app.m_maps;
@@ -624,7 +595,7 @@ void cttsmap::get_parameters(void)
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
 

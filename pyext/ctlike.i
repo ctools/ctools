@@ -32,7 +32,7 @@
 /***********************************************************************//**
  * @class ctlike
  *
- * @brief CTA maximum likelihood tool Python interface
+ * @brief Maximum likelihood fitting tool
  ***************************************************************************/
 class ctlike : public ctool {
 public:
@@ -45,7 +45,6 @@ public:
 
     // Methods
     void                 clear(void);
-    void                 execute(void);
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;

@@ -192,31 +192,6 @@ void ctbin::clear(void)
 
 
 /***********************************************************************//**
- * @brief Execute application
- *
- * This is the main execution method of the ctbin class. It is invoked when
- * the executable is called from command line.
- *
- * The method reads the task parameters, bins the event list(s) into counts
- * map(s), and writes the results into FITS files on disk.
- ***************************************************************************/
-void ctbin::execute(void)
-{
-    // Signal that some parameters should be read ahead
-    m_read_ahead = true;
-
-    // Bin the event data
-    run();
-
-    // Save the counts map into FITS file
-    save();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
  * @brief Bin the event data
  *
  * This method loops over all observations found in the observation conatiner
@@ -371,15 +346,11 @@ void ctbin::init_members(void)
 
     // Initialise protected members
     m_obs.clear();
-    m_read_ahead = false;
     m_cube.clear();
     m_ebounds.clear();
     m_gti.clear();
     m_ontime   = 0.0;
     m_livetime = 0.0;
-
-    // Set logger properties
-    log.date(true);
 
     // Return
     return;
@@ -407,7 +378,6 @@ void ctbin::copy_members(const ctbin& app)
 
     // Copy protected members
     m_obs        = app.m_obs;
-    m_read_ahead = app.m_read_ahead;
     m_cube       = app.m_cube;
     m_ebounds    = app.m_ebounds;
     m_gti        = app.m_gti;
@@ -491,7 +461,7 @@ void ctbin::get_parameters(void)
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
-    if (m_read_ahead) {
+    if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
 

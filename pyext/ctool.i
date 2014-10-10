@@ -44,5 +44,11 @@ public:
     ctool(const ctool& app);
     virtual ~ctool(void);
 
-    // Methods
+    // Pure virtual methods
+    virtual void clear(void) = 0;
+    virtual void run(void) = 0;
+    virtual void save(void) = 0;
+
+    // Public methods
+    virtual void execute(void);
 };
