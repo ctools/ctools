@@ -1,5 +1,5 @@
 /***************************************************************************
- *                     ctskymap - CTA sky mapping tool                     *
+ *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,22 +20,21 @@
  ***************************************************************************/
 /**
  * @file ctskymap.i
- * @brief CTA sky mapping tool definition
+ * @brief Sky mapping tool definition
  * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctskymap.hpp"
-#include "GTools.hpp"
 %}
 
 
 /***********************************************************************//**
  * @class ctskymap
  *
- * @brief CTA sky mapping tool interface defintion
+ * @brief Sky mapping tool
  ***************************************************************************/
-class ctskymap : public GApplication  {
+class ctskymap : public ctool {
 public:
     // Constructors and destructors
     ctskymap(void);
@@ -54,7 +53,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA sky mapping tool Python extension
+ * @brief Sky mapping tool Python extension
  ***************************************************************************/
 %extend ctskymap {
     ctskymap copy() {

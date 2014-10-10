@@ -1,5 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
+# Set include directories
+INCLUDES = -I$(top_srcdir)/src/support
+
 # Program name
 bin_PROGRAMS = ctskymap
 
@@ -14,7 +17,7 @@ libctskymap_la_SOURCES = $(sources)
 ctskymap_SOURCES = main.cpp
 ctskymap_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
 ctskymap_CPPFLAGS = @CPPFLAGS@
-ctskymap_LDADD = libctskymap.la
+ctskymap_LDADD = libctskymap.la $(top_srcdir)/src/support/libsupport.la
 
 # Parameter files
 pfilesdir = $(prefix)/syspfiles

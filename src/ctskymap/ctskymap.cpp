@@ -1,5 +1,5 @@
 /***************************************************************************
- *                     ctskymap - CTA sky mapping tool                     *
+ *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctskymap.cpp
- * @brief CTA sky mapping tool implementation
+ * @brief Sky mapping tool implementation
  * @author Juergen Knoedlseder
  */
 
@@ -50,13 +50,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctskymap::ctskymap(void) : GApplication(CTSKYMAP_NAME, CTSKYMAP_VERSION)
+ctskymap::ctskymap(void) : ctool(CTSKYMAP_NAME, CTSKYMAP_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -72,16 +69,13 @@ ctskymap::ctskymap(void) : GApplication(CTSKYMAP_NAME, CTSKYMAP_VERSION)
  * observations container.
  ***************************************************************************/
 ctskymap::ctskymap(const GObservations& obs) :
-          GApplication(CTSKYMAP_NAME, CTSKYMAP_VERSION)
+          ctool(CTSKYMAP_NAME, CTSKYMAP_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -96,13 +90,10 @@ ctskymap::ctskymap(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctskymap::ctskymap(int argc, char *argv[]) : 
-                    GApplication(CTSKYMAP_NAME, CTSKYMAP_VERSION, argc, argv)
+          ctool(CTSKYMAP_NAME, CTSKYMAP_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -114,7 +105,7 @@ ctskymap::ctskymap(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctskymap::ctskymap(const ctskymap& app) : GApplication(app)
+ctskymap::ctskymap(const ctskymap& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -151,13 +142,13 @@ ctskymap::~ctskymap(void)
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctskymap& ctskymap::operator= (const ctskymap& app)
+ctskymap& ctskymap::operator=(const ctskymap& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -188,10 +179,12 @@ void ctskymap::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -602,10 +595,6 @@ void ctskymap::copy_members(const ctskymap& app)
  ***************************************************************************/
 void ctskymap::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse())
-        log << std::endl;
-
     // Return
     return;
 }

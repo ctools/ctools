@@ -1,5 +1,5 @@
 /***************************************************************************
- *                     ctskymap - CTA sky mapping tool                     *
+ *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctskymap.hpp
- * @brief CTA sky mapping tool definition
+ * @brief Sky mapping tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTSKYMAP_NAME    "ctskymap"
@@ -39,11 +40,12 @@
 /***********************************************************************//**
  * @class ctskymap
  *
- * @brief CTA sky mapping tool interface defintion
+ * @brief Sky mapping tool
  *
  * This class creates a sky map from a CTA event list.
  ***************************************************************************/
-class ctskymap : public GApplication  {
+class ctskymap : public ctool {
+
 public:
     // Constructors and destructors
     ctskymap(void);

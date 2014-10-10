@@ -761,11 +761,6 @@ void ctselect::copy_members(const ctselect& app)
  ***************************************************************************/
 void ctselect::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }
