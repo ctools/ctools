@@ -1,5 +1,5 @@
 /***************************************************************************
- *                      cttsmap - TS map calculation tool                  *
+ *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
@@ -49,13 +49,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-cttsmap::cttsmap(void) : GApplication(CTTSMAP_NAME, CTTSMAP_VERSION)
+cttsmap::cttsmap(void) : ctool(CTTSMAP_NAME, CTTSMAP_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -71,16 +68,13 @@ cttsmap::cttsmap(void) : GApplication(CTTSMAP_NAME, CTTSMAP_VERSION)
  * observations container.
  ***************************************************************************/
 cttsmap::cttsmap(const GObservations& obs) :
-         GApplication(CTTSMAP_NAME, CTTSMAP_VERSION)
+         ctool(CTTSMAP_NAME, CTTSMAP_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -95,13 +89,10 @@ cttsmap::cttsmap(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 cttsmap::cttsmap(int argc, char *argv[]) :
-         GApplication(CTTSMAP_NAME, CTTSMAP_VERSION, argc, argv)
+         ctool(CTTSMAP_NAME, CTTSMAP_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -113,7 +104,7 @@ cttsmap::cttsmap(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-cttsmap::cttsmap(const cttsmap& app) : GApplication(app)
+cttsmap::cttsmap(const cttsmap& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -156,7 +147,7 @@ cttsmap& cttsmap::operator=(const cttsmap& app)
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -187,10 +178,12 @@ void cttsmap::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -443,8 +436,6 @@ void cttsmap::init_members(void)
 {
     // Initialise members
     m_infile.clear();
-    m_caldb.clear();
-    m_irf.clear();
     m_outfile.clear();
     m_proj.clear();
     m_coordsys.clear();
@@ -483,8 +474,6 @@ void cttsmap::copy_members(const cttsmap& app)
 {
     // Copy attributes
     m_infile   = app.m_infile;
-    m_caldb    = app.m_caldb;
-    m_irf      = app.m_irf;
     m_outfile  = app.m_outfile;
     m_proj     = app.m_proj;
     m_coordsys = app.m_coordsys;
@@ -518,11 +507,6 @@ void cttsmap::copy_members(const cttsmap& app)
  ***************************************************************************/
 void cttsmap::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }
@@ -559,24 +543,8 @@ void cttsmap::get_parameters(void)
             // Load data
             obs.load(filename);
 
-            // Get other task parameters
-            m_caldb = (*this)["caldb"].string();
-            m_irf   = (*this)["irf"].string();
-
-            // Set calibration database. If specified parameter is a
-            // directory then use this as the pathname to the calibration
-            // database. Otherwise interpret this as the instrument name,
-            // the mission being "cta"
-            GCaldb caldb;
-            if (gammalib::dir_exists(m_caldb)) {
-                caldb.rootdir(m_caldb);
-            }
-            else {
-                caldb.open("cta", m_caldb);
-            }
-
-            // Set reponse
-            obs.response(m_irf, caldb);
+            // Set response
+            set_obs_response(&obs);
 
             // Append observation to container
             m_obs.append(obs);
@@ -592,40 +560,7 @@ void cttsmap::get_parameters(void)
             // Check if all observations have response information. If
             // not, get the calibration database parameters and set
             // the response properly
-            bool asked_for_response = false;
-            for (int i = 0; i < m_obs.size(); ++i) {
-
-                // Get CTA observation
-                GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-                // Continue only if observation is a CTA observation
-                if (obs != NULL) {
-
-                    // If response is not valid then set response from
-                    // task parameters
-                    if (!obs->has_response()) {
-
-                        // Get calibration parameters
-                        if (!asked_for_response) {
-                            m_caldb = (*this)["caldb"].string();
-                            m_irf   = (*this)["irf"].string();
-                            asked_for_response = true;
-                        }
-
-                        // Set response
-                        GCaldb caldb;
-                        if (gammalib::dir_exists(m_caldb)) {
-                            caldb.rootdir(m_caldb);
-                        }
-                        else {
-                            caldb.open("cta", m_caldb);
-                        }
-                        obs->response(m_irf, caldb);
-
-                    } // endif: there was no response
-                } // endif: observation was a CTA observation
-
-            } // endfor: looped over observations
+            set_response(m_obs);
 
         } // endcatch: file was an XML file
 

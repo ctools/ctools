@@ -1,5 +1,5 @@
 /***************************************************************************
- *                      cttsmap - TS map calculation tool                  *
+ *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTTSMAP_NAME    "cttsmap"
@@ -39,7 +40,7 @@
 /***********************************************************************//**
  * @class cttsmap
  *
- * @brief TS map calculation
+ * @brief TS map calculation tool
  *
  * This class computes a set of maps from any kind of observations:
  *
@@ -54,7 +55,8 @@
  * grid of coordinates. The best fit results (TS, flux, index) are stored in
  * maps which are saved in the output FITS files.
  ***************************************************************************/
-class cttsmap : public GApplication  {
+class cttsmap : public ctool {
+
 public:
     // Constructors and destructors
 	cttsmap(void);
@@ -85,8 +87,6 @@ protected:
     // User parameters
     std::string              m_infile;     //!< Input file
     std::string              m_srcname;    //!< Name of source which is moved around
-    std::string              m_caldb;      //!< Calibration database
-    std::string              m_irf;        //!< Instrument response functions
     std::string              m_outfile;    //!< Output counts map or XML file
     std::string              m_proj;       //!< WCS projection
     std::string              m_coordsys;   //!< Coordinate system

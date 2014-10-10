@@ -1,5 +1,5 @@
 /***************************************************************************
- *                      cttsmap - TS map calculation tool                  *
+ *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
@@ -26,16 +26,15 @@
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "cttsmap.hpp"
-#include "GTools.hpp"
 %}
 
 
 /***********************************************************************//**
  * @class cttsmap
  *
- * @brief TS map calculation
+ * @brief TS map calculation tool
  ***************************************************************************/
-class cttsmap : public GApplication  {
+class cttsmap : public ctool {
 public:
     // Constructors and destructors
     cttsmap(void);
