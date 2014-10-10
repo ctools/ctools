@@ -79,6 +79,7 @@ for dir in dirs:
 	if len(dir) > 0 and 'ctools' not in dir:
 		path = os.path.abspath(dir)
 		include_dirs.append(path)
+include_dirs.append(os.path.abspath('../src/support'))
 
 # Add extra libraries
 extra_libs = ('@PYTHON_EXTRA_LIBS@').split(',')
