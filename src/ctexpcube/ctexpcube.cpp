@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctexpcube - CTA exposure cube tool                    *
+ *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctexpcube.cpp
- * @brief CTA exposure cube tool implementation
+ * @brief Exposure cube generation tool implementation
  * @author Juergen Knoedlseder
  */
 
@@ -34,7 +34,6 @@
 #include "GWcs.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_EBOUNDS                              "ctexpcube::get_ebounds()"
 #define G_GET_PARAMETERS                        "ctexpcube::get_parameters()"
 #define G_SET_FROM_CNTMAP          "ctexpcube::set_from_cntmap(std::string&)"
 
@@ -52,7 +51,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctexpcube::ctexpcube(void) : GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
+ctexpcube::ctexpcube(void) : ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -74,7 +73,7 @@ ctexpcube::ctexpcube(void) : GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctexpcube::ctexpcube(const GObservations& obs) :
-           GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
+           ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -98,7 +97,7 @@ ctexpcube::ctexpcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctexpcube::ctexpcube(int argc, char *argv[]) :
-           GApplication(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, argc, argv)
+           ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -116,7 +115,7 @@ ctexpcube::ctexpcube(int argc, char *argv[]) :
  *
  * @param[in] app ctexpcube application.
  ***************************************************************************/
-ctexpcube::ctexpcube(const ctexpcube& app) : GApplication(app)
+ctexpcube::ctexpcube(const ctexpcube& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -160,7 +159,7 @@ ctexpcube& ctexpcube::operator=(const ctexpcube& app)
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -191,10 +190,12 @@ void ctexpcube::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -372,11 +373,6 @@ void ctexpcube::copy_members(const ctexpcube& app)
  ***************************************************************************/
 void ctexpcube::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }
@@ -419,7 +415,7 @@ void ctexpcube::get_parameters(void)
         int         nypix    = (*this)["nypix"].integer();
 
         // Get energy definition
-        get_ebounds();
+        m_ebounds = get_ebounds();
 
         // Define exposure cube
         m_expcube = GCTAExposure(wcs, coordsys, xref, yref,
@@ -499,103 +495,15 @@ void ctexpcube::set_response(void)
         // Yes ...
         if (obs != NULL) {
 
-            // Set response if we don't have one
+            // If the observation has no response, then set it from
+            // the task parameters
             if (!obs->has_response()) {
-
-                // Load response information
-                std::string database = (*this)["caldb"].string();
-                std::string irf      = (*this)["irf"].string();
-
-                // Set calibration database. If specified parameter is a
-                // directory then use this as the pathname to the calibration
-                // database. Otherwise interpret this as the instrument name,
-                // the mission being "cta"
-                GCaldb caldb;
-                if (gammalib::dir_exists(database)) {
-                    caldb.rootdir(database);
-                }
-                else {
-                    caldb.open("cta", database);
-                }
-
-                // Set reponse
-            	obs->response(irf, caldb);
-
-            } // endif: observation already has a response
+                set_obs_response(obs);
+            }
 
         } // endif: observation was a CTA observation
 
     } // endfor: looped over all observations
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get energy boundaries from parameters
- *
- * @exception GException::invalid_value
- *            Invalid extension name encountered.
- *
- * Get the energy boundaries from the user parameters.
- ***************************************************************************/
-void ctexpcube::get_ebounds(void)
-{
-    // Determine the energy binning alogrithm
-    std::string ebinalg = (*this)["ebinalg"].string();
-
-    // If we have the binning given by a file then try to get the boundaries
-    // from that file
-    if (ebinalg == "FILE") {
-    
-        // Get filename
-        std::string filename = (*this)["ebinfile"].filename();
-
-        // Open fits file to check which extension is given
-        GFits file(filename);
-
-        // Check first for EBOUNDS extension
-        if (file.contains("EBOUNDS")) {
-            file.close();
-            m_ebounds.load(filename, "EBOUNDS");
-        }
-
-        // ... then check for ENERGYBINS extension
-        else if (file.contains("ENERGYBINS")) {
-            file.close();
-            m_ebounds.load(filename, "ENERGYBINS");
-        }
-
-        // ... otherwise throw an exception
-        else {
-            file.close();
-            std::string msg = "No extension with name \"EBOUNDS\" or"
-                              " \"ENERGYBINS\" found in FITS file"
-                              " \""+filename+"\".\n"
-                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                              " is required if the parameter \"ebinalg\""
-                              " is set to \"FILE\".";
-            throw GException::invalid_value(G_GET_EBOUNDS, msg);
-        }
-    }
-    
-    // ... otherwise read emin, emax and nebins
-    else {
-
-        // Get the relevant parameters
-    	double emin     = (*this)["emin"].real();
-    	double emax     = (*this)["emax"].real();
-    	int    enumbins = (*this)["enumbins"].integer();
-        bool   log      = ((*this)["ebinalg"].string() == "LIN") ? false : true;
-
-        // Create energy boundaries
-        m_ebounds = GEbounds(enumbins,
-                             GEnergy(emin, "TeV"),
-                             GEnergy(emax, "TeV"),
-                             log);
-
-    }
 
     // Return
     return;

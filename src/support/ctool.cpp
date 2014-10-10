@@ -29,6 +29,7 @@
 #include <config.h>
 #endif
 #include "ctool.hpp"
+#include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_EBOUNDS                                  "ctool::get_ebounds()"
@@ -298,4 +299,37 @@ GEbounds ctool::get_ebounds(void)
 
     // Return energy boundaries
     return ebounds;
+}
+
+
+/***********************************************************************//**
+ * @brief Set response for CTA observation
+ *
+ * @param[in,out] obs CTA observation
+ *
+ * Set the response for a CTA observation using the "database" and "irf"
+ * task parameters.
+ ***************************************************************************/
+void ctool::set_obs_response(GCTAObservation* obs)
+{
+    // Load response information
+    std::string database = (*this)["caldb"].string();
+    std::string irf      = (*this)["irf"].string();
+
+    // Set calibration database. If "database" is a valid directory then use
+    // this as the pathname to the calibration database. Otherwise, interpret
+    // "database" as the instrument name, the mission being "cta"
+    GCaldb caldb;
+    if (gammalib::dir_exists(database)) {
+        caldb.rootdir(database);
+    }
+    else {
+        caldb.open("cta", database);
+    }
+
+    // Set reponse
+    obs->response(irf, caldb);
+
+    // Return
+    return;
 }

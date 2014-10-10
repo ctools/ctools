@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctexpcube - CTA exposure cube tool                    *
+ *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
@@ -20,23 +20,21 @@
  ***************************************************************************/
 /**
  * @file ctexpcube.i
- * @brief CTA exposure cube tool definition
+ * @brief Exposure cube generation tool definition
  * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctexpcube.hpp"
-#include "GTools.hpp"
 %}
 
 
 /***********************************************************************//**
  * @class ctexpcube
  *
- * @brief CTA exposure cube tool
+ * @brief Exposure cube generation tool
  ***************************************************************************/
-class ctexpcube : public GApplication  {
-
+class ctexpcube : public ctool {
 public:
     // Constructors and destructors
     ctexpcube(void);
@@ -55,7 +53,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA exposure cube tool Python extension
+ * @brief Exposure cube generation tool Python extension
  ***************************************************************************/
 %extend ctexpcube {
     ctexpcube copy() {

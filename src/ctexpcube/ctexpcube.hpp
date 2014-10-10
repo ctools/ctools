@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   ctexpcube - CTA exposure cube tool                    *
+ *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctexpcube.hpp
- * @brief CTA exposure cube tool definition
+ * @brief Exposure cube generation tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTEXPCUBE_NAME    "ctexpcube"
@@ -39,9 +40,9 @@
 /***********************************************************************//**
  * @class ctexpcube
  *
- * @brief CTA exposure cube tool
+ * @brief Exposure cube generation tool
  ***************************************************************************/
-class ctexpcube : public GApplication  {
+class ctexpcube : public ctool {
 
 public:
     // Constructors and destructors
@@ -69,7 +70,6 @@ protected:
     void get_parameters(void);
     void get_obs(void);
     void set_response(void);
-    void get_ebounds(void);
     void set_from_cntmap(const std::string& filename);
 
     // User parameters
