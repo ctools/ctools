@@ -504,9 +504,8 @@ void ctmodel::get_parameters(void)
             m_deadc = (*this)["deadc"].real();
             m_tmin  = (*this)["tmin"].real();
             m_tmax  = (*this)["tmax"].real();
-            if (m_obs.models().size() == 0) {
-                m_srcmdl = (*this)["srcmdl"].filename();
-            }
+            m_emin  = (*this)["emin"].real();
+            m_emax  = (*this)["emax"].real();
         }
 
     }
@@ -592,13 +591,20 @@ void ctmodel::setup_obs(void)
             GTime tmax(m_tmax);
             gti.append(tmin, tmax);
 
+            // Setup energy range covered by model
+            GEnergy  emin(m_emin, "TeV");
+            GEnergy  emax(m_emax, "TeV");
+            GEbounds ebounds(1, emin, emax);
+
             // Allocate CTA observation and empty event list
             GCTAObservation obs;
             GCTAEventList   list;
 
-            // Set event list GTI and append event list to observation
-            // (we need in fact only the GTI for the computations)
+            // Set event list GTI and energy boundaries and append event list
+            // to observation (we need in fact only the GTI for the
+            // computations)
             list.gti(gti);
+            list.ebounds(ebounds);
             obs.events(list);
 
             // Set CTA observation attributes
@@ -755,8 +761,13 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
+        // Get energy boundaries and GTI references for observation
+        const GEbounds& ebounds = obs->events()->ebounds();
+        const GGti&     gti     = obs->events()->gti();
+
         // Initialise statistics
-        double sum = 0.0;
+        double sum              = 0.0;
+        int    num_outside_ebds = 0;
 
         // Setup cube GTIs for this observation
         m_cube.gti(obs->events()->gti());
@@ -764,9 +775,17 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         // Loop over all cube bins
         for (int i = 0; i < m_cube.size(); ++i) {
 
-            // Get cube bin and actual value
-            GCTAEventBin* bin   = m_cube[i];
-            double        value = bin->counts();
+            // Get cube bin
+            GCTAEventBin* bin = m_cube[i];
+
+            // Skip bin if it is outside the energy range of the observation
+            if (!ebounds.contains(bin->energy())) {
+                num_outside_ebds++;
+                continue;
+            }
+
+            // Get actual bin value
+            double value = bin->counts();
             
             // Compute model value for cube bin
             double model = m_obs.models().eval(*bin, *obs) * bin->size();
@@ -781,7 +800,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         } // endfor: looped over all cube bins
 
         // Append GTIs of observation to list of GTIs
-        m_gti.extend(obs->events()->gti());
+        m_gti.extend(gti);
 
         // Update GTIs
         m_cube.gti(m_gti);
@@ -790,6 +809,8 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         if (logTerse()) {
             log << gammalib::parformat("Model events in cube");
             log << sum << std::endl;
+            log << gammalib::parformat("Cube bins outside energy range");
+            log << num_outside_ebds << std::endl;
         }
 
         // Log cube
