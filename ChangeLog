@@ -6,6 +6,7 @@
         Clean-up public interface
 	Adapt to GammaLib 0.9.0 interface
         ctbin now always merges event lists into a single counts cube
+        ctmodel now always creates a single model cube
         Add ctexpcube tool (generates exposure cube)
         Add ctpsfcube tool (generates PSF cube)
         Add ctbkgcube tool (generates background cube)

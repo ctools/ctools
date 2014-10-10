@@ -1,5 +1,5 @@
 /***************************************************************************
- *                     ctmodel - CTA counts model tool                     *
+ *                ctmodel - CTA model cube generation tool                 *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctmodel.i
- * @brief CTA counts model tool definition
+ * @brief CTA model cube tool definition
  * @author Juergen Knoedlseder
  */
 %{
@@ -51,6 +51,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
+    const GCTAEventCube& cube(void) const;
 };
 
 
