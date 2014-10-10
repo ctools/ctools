@@ -1,5 +1,5 @@
 /***************************************************************************
- *                ctobssim - CTA observation simulator tool                *
+ *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctobssim.hpp
- * @brief CTA observation simulator tool definition
+ * @brief Observation simulator tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -30,6 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
@@ -39,7 +40,7 @@
 /***********************************************************************//**
  * @class ctobssim
  *
- * @brief CTA observation simulator tool interface definition
+ * @brief Observation simulator tool
  *
  * This class simulates CTA observation(s) using Monte Carlo sampling of the
  * source and background models. The class supports simulation of data of
@@ -47,7 +48,8 @@
  * processed and the save method is called, events FITS files will be written
  * for each observation.
  ***************************************************************************/
-class ctobssim : public GApplication  {
+class ctobssim : public ctool {
+
 public:
     // Constructors and destructors
     ctobssim(void);
@@ -85,21 +87,19 @@ protected:
     void save_xml(void);
 
     // User parameters
-    std::string   m_infile;      //!< Input model
-    std::string   m_outfile;     //!< Output events file
-    std::string   m_prefix;      //!< Prefix for multiple event lists
-    std::string   m_caldb;       //!< Calibration database repository
-    std::string   m_irf;         //!< Instrument response function
-    int           m_seed;        //!< Random number generator seed
-    double        m_ra;          //!< RA of pointing direction
-    double        m_dec;         //!< DEC of pointing direction
-    double        m_rad;         //!< FOV radius (degrees)
-    double        m_tmin;        //!< Start time (MET)
-    double        m_tmax;        //!< Stop time (MET)
-    double        m_emin;        //!< Lower energy (TeV)
-    double        m_emax;        //!< Upper energy (TeV)
-    bool          m_apply_edisp; //!< Apply energy dispersion?
-    double        m_deadc;       //!< Average deadtime correction
+    std::string m_infile;      //!< Input model
+    std::string m_outfile;     //!< Output events file
+    std::string m_prefix;      //!< Prefix for multiple event lists
+    int         m_seed;        //!< Random number generator seed
+    double      m_ra;          //!< RA of pointing direction
+    double      m_dec;         //!< DEC of pointing direction
+    double      m_rad;         //!< FOV radius (degrees)
+    double      m_tmin;        //!< Start time (MET)
+    double      m_tmax;        //!< Stop time (MET)
+    double      m_emin;        //!< Lower energy (TeV)
+    double      m_emax;        //!< Upper energy (TeV)
+    bool        m_apply_edisp; //!< Apply energy dispersion?
+    double      m_deadc;       //!< Average deadtime correction
 
     // Protected members
     double            m_area;        //!< Surface area for simulation (cm2)

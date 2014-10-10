@@ -1,5 +1,5 @@
 /***************************************************************************
- *                ctobssim - CTA observation simulator tool                *
+ *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctobssim.cpp
- * @brief CTA observation simulator tool implementation
+ * @brief Observation simulator tool implementation
  * @author Juergen Knoedlseder
  */
 
@@ -53,13 +53,10 @@ const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctobssim::ctobssim(void) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
+ctobssim::ctobssim(void) : ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -74,16 +71,13 @@ ctobssim::ctobssim(void) : GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
  * Constructs application by initialising from an observation container.
  ***************************************************************************/
 ctobssim::ctobssim(const GObservations& obs) :
-          GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION)
+          ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -99,13 +93,10 @@ ctobssim::ctobssim(const GObservations& obs) :
  * Constructs application using command line arguments for parameter setting.
  ***************************************************************************/
 ctobssim::ctobssim(int argc, char *argv[]) : 
-          GApplication(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
+          ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -117,7 +108,7 @@ ctobssim::ctobssim(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctobssim::ctobssim(const ctobssim& app) : GApplication(app)
+ctobssim::ctobssim(const ctobssim& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -155,13 +146,13 @@ ctobssim::~ctobssim(void)
  * @param[in] app Application.
  * @return Application.
  ***************************************************************************/
-ctobssim& ctobssim::operator= (const ctobssim& app)
+ctobssim& ctobssim::operator=(const ctobssim& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -192,10 +183,12 @@ void ctobssim::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
@@ -453,8 +446,6 @@ void ctobssim::get_parameters(void)
 
         // Get CTA observation parameters
         m_infile = (*this)["infile"].filename();
-        m_caldb  = (*this)["caldb"].string();
-        m_irf    = (*this)["irf"].string();
         m_ra     = (*this)["ra"].real();
         m_dec    = (*this)["dec"].real();
 
@@ -467,21 +458,11 @@ void ctobssim::get_parameters(void)
         // Allocate CTA observation
         GCTAObservation obs;
 
-        // Set calibration database. If specified parameter is a directory
-        // then use this as the pathname to the calibration database. Other-
-        // wise interpret this as the instrument name, the mission being
-        // "cta"
-        GCaldb caldb;
-        if (gammalib::dir_exists(m_caldb)) {
-            caldb.rootdir(m_caldb);
-        }
-        else {
-            caldb.open("cta", m_caldb);
-        }
+        // Set response
+        set_obs_response(&obs);
 
-        // Set CTA observation attributes
+        // Set pointing
         obs.pointing(pnt);
-        obs.response(m_irf, caldb);
 
         // Set event list (queries remaining parameters)
         set_list(&obs);
@@ -1042,8 +1023,6 @@ void ctobssim::init_members(void)
     m_infile.clear();
     m_outfile.clear();
     m_prefix.clear();
-    m_caldb.clear();
-    m_irf.clear();
     m_seed        =   1;
     m_ra          = 0.0;
     m_dec         = 0.0;
@@ -1092,8 +1071,6 @@ void ctobssim::copy_members(const ctobssim& app)
     m_infile      = app.m_infile;
     m_outfile     = app.m_outfile;
     m_prefix      = app.m_prefix;
-    m_caldb       = app.m_caldb;
-    m_irf         = app.m_irf;
     m_seed        = app.m_seed;
     m_ra          = app.m_ra;
     m_dec         = app.m_dec;
@@ -1125,11 +1102,6 @@ void ctobssim::copy_members(const ctobssim& app)
  ***************************************************************************/
 void ctobssim::free_members(void)
 {
-    // Write separator into logger
-    if (logTerse()) {
-        log << std::endl;
-    }
-
     // Return
     return;
 }

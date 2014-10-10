@@ -1,5 +1,5 @@
 /***************************************************************************
- *               ctobssim - CTA observation simulation tool                *
+ *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,22 +20,21 @@
  ***************************************************************************/
 /**
  * @file ctobssim.i
- * @brief CTA observation simulation tool Python interface definition
+ * @brief Observation simulator tool definition
  * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctobssim.hpp"
-#include "GTools.hpp"
 %}
 
 
 /***********************************************************************//**
  * @class ctobssim
  *
- * @brief CTA data selection tool Python interface
+ * @brief Observation simulator tool
  ***************************************************************************/
-class ctobssim : public GApplication  {
+class ctobssim : public ctool {
 public:
     // Constructors and destructors
     ctobssim(void);
@@ -54,7 +53,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA observation simulation tool Python extension
+ * @brief Observation simulation tool Python extension
  ***************************************************************************/
 %extend ctobssim {
     ctobssim copy() {
