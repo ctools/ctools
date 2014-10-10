@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctcubemask - CTA cube filter tool                    *
+ *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctcubemask.cpp
- * @brief CTA mask cube implementation
+ * @brief Cube filter tool implementation
  * @author Chia-Chun Lu
  */
 
@@ -51,13 +51,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctcubemask::ctcubemask(void) : GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
+ctcubemask::ctcubemask(void) : ctool(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -73,16 +70,13 @@ ctcubemask::ctcubemask(void) : GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
  * an observation container.
  ***************************************************************************/
 ctcubemask::ctcubemask(const GObservations& obs) :
-            GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
+            ctool(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -98,13 +92,10 @@ ctcubemask::ctcubemask(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctcubemask::ctcubemask(int argc, char *argv[]) : 
-            GApplication(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
+            ctool(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -116,7 +107,7 @@ ctcubemask::ctcubemask(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctcubemask::ctcubemask(const ctcubemask& app) : GApplication(app)
+ctcubemask::ctcubemask(const ctcubemask& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -159,7 +150,7 @@ ctcubemask& ctcubemask::operator=(const ctcubemask& app)
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -190,10 +181,12 @@ void ctcubemask::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return

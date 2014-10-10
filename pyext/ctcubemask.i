@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctcubemask - CTA mask cube tool                      *
+ *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 Chia-Chun Lu                                        *
  * ----------------------------------------------------------------------- *
@@ -20,22 +20,21 @@
  ***************************************************************************/
 /**
  * @file ctcubemask.i
- * @brief CTA mask cube interface definition
+ * @brief Cube filter tool definition
  * @author Chia-Chun Lu
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctcubemask.hpp"
-#include "GTools.hpp"
 %}
 
 
 /***********************************************************************//**
  * @class ctcubemask
  *
- * @brief CTA data selection tool Python interface
+ * @brief Cube filter tool
  ***************************************************************************/
-class ctcubemask : public GApplication  {
+class ctcubemask : public ctool {
 public:
     // Constructors and destructors
     ctcubemask(void);
@@ -54,7 +53,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA data selection tool Python extension
+ * @brief Cube filter tool Python extension
  ***************************************************************************/
 %extend ctcubemask {
     ctcubemask copy() {

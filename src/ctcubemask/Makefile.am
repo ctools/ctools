@@ -1,5 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
+# Set include directories
+INCLUDES = -I$(top_srcdir)/src/support
+
 # Program name
 bin_PROGRAMS = ctcubemask
 
@@ -14,7 +17,7 @@ libctcubemask_la_SOURCES = $(sources)
 ctcubemask_SOURCES = main.cpp
 ctcubemask_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
 ctcubemask_CPPFLAGS = @CPPFLAGS@
-ctcubemask_LDADD = libctcubemask.la
+ctcubemask_LDADD = libctcubemask.la $(top_srcdir)/src/support/libsupport.la
 
 # Parameter files
 pfilesdir = $(prefix)/syspfiles

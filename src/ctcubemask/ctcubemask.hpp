@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctcubemask - CTA cube filter tool                    *
+ *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Chia-Chun Lu                                     *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctcubemask.hpp
- * @brief CTA mask cube tool definition
+ * @brief Cube filter tool definition
  * @author Chia-Chun Lu
  */
 
@@ -32,6 +32,7 @@
 #include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME    "ctcubemask"
@@ -41,9 +42,10 @@
 /***********************************************************************//**
  * @class ctcubemask
  *
- * @brief CTA mask cube tool interface defintion.
+ * @brief Cube filter tool
  ***************************************************************************/
-class ctcubemask : public GApplication  {
+class ctcubemask : public ctool {
+
 public:
     // Constructors and destructors
     ctcubemask(void);
