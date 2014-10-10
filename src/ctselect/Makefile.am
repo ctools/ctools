@@ -1,5 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
+# Set include directories
+INCLUDES = -I$(top_srcdir)/src/support
+
 # Program name
 bin_PROGRAMS = ctselect
 
@@ -14,7 +17,7 @@ libctselect_la_SOURCES = $(sources)
 ctselect_SOURCES = main.cpp
 ctselect_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
 ctselect_CPPFLAGS = @CPPFLAGS@
-ctselect_LDADD = libctselect.la
+ctselect_LDADD = libctselect.la $(top_srcdir)/src/support/libsupport.la
 
 # Parameter files
 pfilesdir = $(prefix)/syspfiles

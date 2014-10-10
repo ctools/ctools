@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctselect - CTA data selection tool                   *
+ *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
@@ -20,22 +20,21 @@
  ***************************************************************************/
 /**
  * @file ctselect.i
- * @brief CTA data selection tool Python interface definition
+ * @brief Data selection tool definition
  * @author Juergen Knoedlseder
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */
 #include "ctselect.hpp"
-#include "GTools.hpp"
 %}
 
 
 /***********************************************************************//**
  * @class ctselect
  *
- * @brief CTA data selection tool Python interface
+ * @brief Data selection tool
  ***************************************************************************/
-class ctselect : public GApplication  {
+class ctselect : public ctool {
 public:
     // Constructors and destructors
     ctselect(void);
@@ -55,7 +54,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief CTA data selection tool Python extension
+ * @brief Data selection tool Python extension
  ***************************************************************************/
 %extend ctselect {
     ctselect copy() {

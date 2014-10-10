@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctselect - CTA data selection tool                   *
+ *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctselect.hpp
- * @brief CTA data selection tool definition
+ * @brief Data selection tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -32,6 +32,7 @@
 #include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
+#include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
@@ -41,9 +42,10 @@
 /***********************************************************************//**
  * @class ctselect
  *
- * @brief CTA data selection tool interface defintion.
+ * @brief Data selection tool
  ***************************************************************************/
-class ctselect : public GApplication  {
+class ctselect : public ctool {
+
 public:
     // Constructors and destructors
     ctselect(void);

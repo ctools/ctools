@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctselect - CTA data selection tool                   *
+ *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctselect.cpp
- * @brief CTA data selection tool implementation
+ * @brief Data selection tool definition
  * @author Juergen Knoedlseder
  */
 
@@ -52,13 +52,10 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctselect::ctselect(void) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
+ctselect::ctselect(void) : ctool(CTSELECT_NAME, CTSELECT_VERSION)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -74,16 +71,13 @@ ctselect::ctselect(void) : GApplication(CTSELECT_NAME, CTSELECT_VERSION)
  * an observation container.
  ***************************************************************************/
 ctselect::ctselect(const GObservations& obs) :
-          GApplication(CTSELECT_NAME, CTSELECT_VERSION)
+          ctool(CTSELECT_NAME, CTSELECT_VERSION)
 {
     // Initialise members
     init_members();
 
     // Set observations
     m_obs = obs;
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -99,13 +93,10 @@ ctselect::ctselect(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctselect::ctselect(int argc, char *argv[]) : 
-                   GApplication(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
+          ctool(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -117,7 +108,7 @@ ctselect::ctselect(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctselect::ctselect(const ctselect& app) : GApplication(app)
+ctselect::ctselect(const ctselect& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -154,13 +145,13 @@ ctselect::~ctselect(void)
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctselect& ctselect::operator= (const ctselect& app)
+ctselect& ctselect::operator=(const ctselect& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
 
         // Copy base class members
-        this->GApplication::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -191,10 +182,12 @@ void ctselect::clear(void)
 {
     // Free members
     free_members();
+    this->ctool::free_members();
     this->GApplication::free_members();
 
     // Initialise members
     this->GApplication::init_members();
+    this->ctool::init_members();
     init_members();
 
     // Return
