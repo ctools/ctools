@@ -1,9 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script generates the TS distribution for a particular model based
-# on Monte-Carlo simulations.
+# This script generates a residual map.
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2014 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,6 +54,7 @@ class csresmap(GApplication):
         else:      
             self.obs      = GObservations()   
         self.outfile = ""
+        
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -300,8 +300,6 @@ class csresmap(GApplication):
         # Return
         return
 
-    
-    
 
 # ======================== #
 # Main routine entry point #
