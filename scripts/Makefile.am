@@ -5,12 +5,12 @@ binscripts = cta_kb_bkgrates.py cta_root2irf.py cta_make_nodes.py \
              tsmerge.py
 
 # Scripts to be distributed in pythondir
-pythonscripts = cspull.py cssens.py cstsdist.py cscaldb.py \
+pythonscripts = cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py \
                 lsmodel.py \
 				obsutils.py
 
 # Scripts for which symbolic links will be created in bindir
-linkscripts = cspull cssens cstsdist cscaldb \
+linkscripts = cspull cssens cstsdist cscaldb csresmap\
               lsmodel
 
 # Distribute scripts
