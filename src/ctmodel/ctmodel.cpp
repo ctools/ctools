@@ -246,8 +246,10 @@ void ctmodel::run(void)
         log.header1("Generate model cube");
     }
 
-    // Initialise counts cube
-    init_cube();
+    // Initialise counts cube if cube has not yet been set
+    if (!has_cube()) {
+        init_cube();
+    }
 
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -320,6 +322,31 @@ void ctmodel::save(void)
 }
 
 
+/***********************************************************************//**
+ * @brief Set model cube
+ *
+ * @param[in] cube Model cube.
+ *
+ * Set model cube and set all cube bins to zero.
+ ***************************************************************************/
+void ctmodel::cube(const GCTAEventCube& cube)
+{
+    // Set cube
+    m_cube = cube;
+
+    // Set all cube bins to zero
+    for (int i = 0; i < m_cube.size(); ++i) {
+        m_cube[i]->counts(0.0);
+    }
+
+    // Signal that cube has been set
+    m_has_cube = true;
+
+    // Return
+    return;
+}
+
+
 /*==========================================================================
  =                                                                         =
  =                             Private methods                             =
@@ -362,6 +389,7 @@ void ctmodel::init_members(void)
     m_cube.clear();
     m_ebounds.clear();
     m_gti.clear();
+    m_has_cube = false;
 
     // Return
     return;
@@ -406,6 +434,7 @@ void ctmodel::copy_members(const ctmodel& app)
     m_cube       = app.m_cube;
     m_ebounds    = app.m_ebounds;
     m_gti        = app.m_gti;
+    m_has_cube   = app.m_has_cube;
 
     // Return
     return;
@@ -431,7 +460,9 @@ void ctmodel::free_members(void)
 void ctmodel::get_parameters(void)
 {
     // Read input and optionally output cube filenames
-    m_infile = (*this)["infile"].filename();
+    if (!has_cube()) {
+        m_infile = (*this)["infile"].filename();
+    }
     if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
@@ -482,7 +513,8 @@ void ctmodel::get_parameters(void)
 
     // If no cube file has been specified then read all parameters that
     // are necessary to create the cube from scratch (see method init_cube)
-    if ((m_infile == "NONE") || (gammalib::strip_whitespace(m_infile) == "")) {
+    if ((!has_cube()) &&
+        ((m_infile == "NONE") || (gammalib::strip_whitespace(m_infile) == ""))) {
         m_ebinalg  = (*this)["ebinalg"].string();
         if (m_ebinalg == "FILE") {
             m_ebinfile = (*this)["ebinfile"].filename();
@@ -670,6 +702,9 @@ void ctmodel::init_cube(void)
 
     }
 
+    // Signal that cube has been set
+    m_has_cube = true;
+
     // Return
     return;
 }
@@ -738,7 +773,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         if (logTerse()) {
             log << gammalib::parformat("Model events in cube");
             log << sum << std::endl;
-            log << gammalib::parformat("Cube bins outside energy range");
+            log << gammalib::parformat("Bins outside energy range");
             log << num_outside_ebds << std::endl;
         }
 

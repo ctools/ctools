@@ -1,18 +1,19 @@
-2014-10-10  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-10-15  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.8.0 released
         ========================
 
         Clean-up public interface
-	Adapt to GammaLib 0.9.0 interface
-        Introduce ctool base class
-        ctbin now always merges event lists into a single counts cube
-        ctmodel now always creates a single model cube
+        Adapt to GammaLib 0.9.0 interface
         Add ctexpcube tool (generates exposure cube)
         Add ctpsfcube tool (generates PSF cube)
         Add ctbkgcube tool (generates background cube)
         Add ctcubemask tool (masks event bins in event cube)
         Add cttsmap tool (generates TS map)
+        Add csresmap script (generates residual map)
+        Introduce ctool base class
+        ctbin now always merges event lists into a single counts cube
+        ctmodel now always creates a single model cube
         Support energy dispersion in ctobssim, ctlike and ctmodel	
         Correct ctobssim for thread safety
         Correctly apply time references in ctselect

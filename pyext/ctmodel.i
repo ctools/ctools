@@ -49,6 +49,7 @@ public:
     void                 save(void);
     const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
+    void                 cube(const GCTAEventCube& cube);
 };
 
 
