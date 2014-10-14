@@ -44,8 +44,9 @@ class csresmap(gammalib.GApplication):
         self.version = "0.1.0"
         
         # Initialise some members
-        self.obs        = None 
-        self.algorithm = "SUB" 
+        self.obs       = None 
+        self.algorithm = "SUB"
+        self.resmap    = None
               
         # Initialise some members
         if isinstance(argv[0],gammalib.GObservations):
@@ -144,8 +145,8 @@ class csresmap(gammalib.GApplication):
                 observation = gammalib.GCTAObservation()
                 observation.load(obsfile)
                 
-                self.m_irf       = self["irf"].string()
-                self.m_caldb     = self["caldb"].string()
+                self.m_irf   = self["irf"].string()
+                self.m_caldb = self["caldb"].string()
                 
                 caldb = gammalib.GCaldb()
                 if os.path.isdir(self.m_caldb):
@@ -204,6 +205,9 @@ class csresmap(gammalib.GApplication):
         """
         # Run the script
         self.run()
+
+        # Save residual map
+        self.resmap.save(self.m_outfile, self.m_clobber)
         
         # Return
         return
@@ -238,6 +242,7 @@ class csresmap(gammalib.GApplication):
 
         # Create countsmap
         bin = ctools.ctbin(self.obs)
+        bin["debug"].boolean(True)
         bin["nxpix"].integer(self.m_nxpix)
         bin["nypix"].integer(self.m_nypix)
         bin["proj"].string(self.m_proj)
@@ -250,68 +255,55 @@ class csresmap(gammalib.GApplication):
         bin["emax"].real(self.m_emax)
         bin["binsz"].real(self.m_binsz)
         bin["clobber"].boolean(self.m_clobber)
-        if not self.m_binfile == "NONE":
-            bin["outfile"].filename(self.m_binfile)
-        else:
-            os,filename = tempfile.mkstemp()
-            bin["outfile"].filename(filename)
-        bin.execute()
+        bin.run()
+
+        # Store counts map as residual map. Note that we need a
+        # special construct here to avoid memory leaks. This seems
+        # to be a SWIG feature as SWIG creates a new object when
+        # calling bin.cube()
+        #residualmap = bin.cube().map()
+        counts_cube = bin.cube()
+        self.resmap = counts_cube.map().copy()
+        self.resmap.stack_maps()
  
         # Write header
         if self.logTerse():
             self.log("\n")
             self.log.header1("Generate model map")
     
-        # create model map
+        # Create model map
         model = ctools.ctmodel(self.obs)
-        model["infile"].filename(bin["outfile"].filename())
+        model["debug"].boolean(True)
+        model.cube(bin.cube())
         model["clobber"].boolean(self.m_clobber)
-        if not self.m_modfile == "NONE":
-            model["outfile"].filename(self.m_modfile)
-        else:
-            os,filename = tempfile.mkstemp()
-            model["outfile"].filename(filename)
-        model.execute()
+        model.run()
 
         # Get model map into GSkymap object
-        modelmap = gammalib.GSkymap(model["outfile"].filename())
+        modelmap = model.cube().map()
         modelmap.stack_maps()
-
-        # Initialise resiudalmap from countmap
-        residualmap = gammalib.GSkymap(bin["outfile"].filename())
-        residualmap.stack_maps()
         
-        # continue calculations depending on given algorithm
+        # Continue calculations depending on given algorithm
         if self.m_algorithm == "SUB":
             
             # Subtract maps 
-            residualmap -= modelmap
+            self.resmap -= modelmap
         
         elif self.m_algorithm == "SUBDIV":
             
             # Subtract and divide by model map
-            residualmap -= modelmap
-            residualmap /= modelmap
+            self.resmap -= modelmap
+            self.resmap /= modelmap
             
         elif self.m_algorithm == "SUBDIVSQRT":
 
             # subtract and divide by sqrt of model map
-            residualmap -= modelmap
-            residualmap /= modelmap.sqrt()
+            self.resmap -= modelmap
+            self.resmap /= modelmap.sqrt()
             
         else:
             
-            # Rais error if algorithm is unkown
+            # Raise error if algorithm is unkown
             raise TypeError("Algorithm \""+self.m_algorithm+"\" not known")
-        
-        # Save files
-        residualmap.save(self.m_outfile,self.m_clobber)
-        
-        # Remove binned and model files in case they shouldnt be saved
-        if self.m_binfile == "NONE":
-            os.remove(bin["outfile"].filename())
-        if self.m_modfile == "NONE":
-            os.remove(model["outfile"].filename())
         
         # Return
         return
