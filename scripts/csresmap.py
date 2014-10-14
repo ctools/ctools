@@ -1,9 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script generates the TS distribution for a particular model based
-# on Monte-Carlo simulations.
+# Residual map generation script.
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2014 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,6 +55,7 @@ class csresmap(gammalib.GApplication):
             self.obs      = gammalib.GObservations()
             self.obs.clear()   
         self.outfile = ""
+        
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -281,9 +281,6 @@ class csresmap(gammalib.GApplication):
         residualmap = gammalib.GSkymap(bin["outfile"].filename())
         residualmap.stack_maps()
         
-       
-        
-        
         # continue calculations depending on given algorithm
         if self.m_algorithm == "SUB":
             
@@ -318,8 +315,6 @@ class csresmap(gammalib.GApplication):
         
         # Return
         return
-
-    
     
 
 # ======================== #
