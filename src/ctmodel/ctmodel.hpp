@@ -70,6 +70,7 @@ public:
     void                 save(void);
     const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
+    void                 cube(const GCTAEventCube& cube);
 
 protected:
     // Protected methods
@@ -80,6 +81,7 @@ protected:
     void setup_obs(void);
     void init_cube(void);
     void fill_cube(const GCTAObservation* obs);
+    bool has_cube(void) const;
     
     // User parameters
     std::string m_infile;      //!< Input counts cube
@@ -112,13 +114,14 @@ protected:
     GCTAEventCube m_cube;       //!< Model cube
     GEbounds      m_ebounds;    //!< Energy boundaries
     GGti          m_gti;        //!< Model cube GTIs
+    bool          m_has_cube;   //!< Signal if cube has been set or loaded
 };
 
 
 /***********************************************************************//**
  * @brief Return observation container
  *
- * @return Reference to observation container
+ * @return Reference to observation container.
  ***************************************************************************/
 inline
 const GObservations& ctmodel::obs(void) const
@@ -130,12 +133,24 @@ const GObservations& ctmodel::obs(void) const
 /***********************************************************************//**
  * @brief Return model cube
  *
- * @return Reference to model cube
+ * @return Reference to model cube.
  ***************************************************************************/
 inline
 const GCTAEventCube& ctmodel::cube(void) const
 {
     return m_cube;
+}
+
+
+/***********************************************************************//**
+ * @brief Signal if cube has been set or loaded
+ *
+ * @return True if cube has been set or loaded.
+ ***************************************************************************/
+inline
+bool ctmodel::has_cube(void) const
+{
+    return m_has_cube;
 }
 
 #endif /* CTMODEL_HPP */
