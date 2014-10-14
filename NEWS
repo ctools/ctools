@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-10 October 2014
+15 October 2014
 
 
 1. Introduction
@@ -191,6 +191,9 @@ The following functions have been added to obsutils:
   - "four": four pointings offset by specific angle around centre
 * spectrum() generates spectral points by fitting a source model in
   specified energy bins.
+
+Add the csresmap script that uses ctbin and ctmodel to generate a
+residual counts cube for a given model.
 
 
 18. caldb
