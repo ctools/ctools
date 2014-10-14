@@ -773,7 +773,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         if (logTerse()) {
             log << gammalib::parformat("Model events in cube");
             log << sum << std::endl;
-            log << gammalib::parformat("Cube bins outside energy range");
+            log << gammalib::parformat("Bins outside energy range");
             log << num_outside_ebds << std::endl;
         }
 
