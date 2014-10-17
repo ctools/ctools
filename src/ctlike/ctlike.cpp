@@ -244,7 +244,6 @@ void ctlike::run(void)
 
     // Store Npred
     double npred = m_obs.npred();
-
     
     // Store models for which TS should be computed
     std::vector<std::string> ts_srcs;
@@ -257,7 +256,7 @@ void ctlike::run(void)
     }
 
     // Compute TS values if requested
-    if (ts_srcs.size()) {
+    if (ts_srcs.size() > 0) {
 
         // Store original maximum likelihood and models
         double  logL_src    = m_logL;
