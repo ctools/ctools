@@ -74,7 +74,6 @@ protected:
 
     // User parameters
     bool          m_refit;       //!< Refitting
-    bool          m_tscalc;      //!< TS computation
     std::string   m_outmdl;      //!< Source model output XML file
     bool          m_apply_edisp; //!< Apply energy dispersion?
 

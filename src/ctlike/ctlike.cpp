@@ -245,23 +245,24 @@ void ctlike::run(void)
     // Store Npred
     double npred = m_obs.npred();
 
-    // Optionally perform TS computation
-    if (m_tscalc) {
     
+    // Store models for which TS should be computed
+    std::vector<std::string> ts_srcs;
+    GModels models_orig = m_obs.models();
+    for (int i = 0; i < models_orig.size(); ++i) {
+        GModel* model = models_orig[i];
+        if (model->tscalc()) {
+            ts_srcs.push_back(model->name());
+        }
+    }
+
+    // Compute TS values if requested
+    if (ts_srcs.size()) {
+
         // Store original maximum likelihood and models
         double  logL_src    = m_logL;
-        GModels models_orig = m_obs.models();
-    
-        // Store models for which TS should be computed
-        std::vector<std::string> ts_srcs;
         GModels models = m_obs.models();
-        for (int i = 0; i < models.size(); ++i) {
-            GModel* model = models[i];
-            if (model->tscalc()) {
-            	ts_srcs.push_back(model->name());
-            }
-        }
-    
+
         // Loop over stored models, remove source and refit
         for (int i = 0; i < ts_srcs.size(); ++i) {
             models.remove(ts_srcs[i]);
@@ -271,11 +272,10 @@ void ctlike::run(void)
             models_orig[ts_srcs[i]]->ts(ts);
             models = models_orig;
         }
-    
+
         // Restore best fit values
         m_obs.models(models_orig);
-
-    } // endif: did optional TS computation
+    }
 
     // Compute number of observed events in all observations
     double num_events = 0.0;
@@ -416,7 +416,6 @@ void ctlike::get_parameters(void)
 
     // Get other parameters
     m_refit       = (*this)["refit"].boolean();
-    m_tscalc      = (*this)["tscalc"].boolean();
     m_apply_edisp = (*this)["edisp"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
@@ -546,7 +545,6 @@ void ctlike::init_members(void)
     m_outmdl.clear();
     m_obs.clear();
     m_refit       = false;
-    m_tscalc      = false;
     m_max_iter    = 100;   // Set maximum number of iterations
     m_max_stall   = 10;    // Set maximum number of stalls
     m_logL        = 0.0;
@@ -570,7 +568,6 @@ void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
     m_refit       = app.m_refit;
-    m_tscalc      = app.m_tscalc;
     m_outmdl      = app.m_outmdl;
     m_obs         = app.m_obs;
     m_max_iter    = app.m_max_iter;

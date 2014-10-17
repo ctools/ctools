@@ -21,7 +21,6 @@ infile, f, a, "events.fits",,, "Event list, counts cube or observation definitio
 stat,   s, h, "POISSON",,, "Optimization statistics"
 edisp,  b, h, no,,, "Apply energy dispersion?"
 refit,  b, h, no,,, "Do refitting?"
-tscalc, b, h, no,,, "Compute TS values?"
 caldb,  s, a, "dummy",,, "Calibration database"
 irf,    s, a, "cta_dummy_irf",,, "Instrument response function"
 srcmdl, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
