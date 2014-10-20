@@ -791,6 +791,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                                                photons[i],
                                                                *obs,
                                                                ran);
+
                                 if (event != NULL) {
 
                                     // Use event only if it falls within ROI
