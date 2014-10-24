@@ -34,7 +34,7 @@
  *
  * @brief Background cube generation tool
  ***************************************************************************/
-class ctbkgcube : public GApplication  {
+class ctbkgcube : public ctool  {
 public:
     // Constructors and destructors
     ctbkgcube(void);
