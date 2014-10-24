@@ -380,8 +380,12 @@ void ctobssim::run(void)
                     // Store output file name in original observation
                     obs->eventfile(outfile);
 
-                    // Save observation into FITS file
-                    obs_clone.save(outfile, clobber());
+                    // Save observation into FITS file. This is a critical zone
+                    // to avoid multiple threads writing simultaneously
+                    #pragma omp critical
+                    {
+                        obs_clone.save(outfile, clobber());
+                    }
 
                 }
 
