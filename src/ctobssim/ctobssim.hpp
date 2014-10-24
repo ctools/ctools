@@ -101,25 +101,14 @@ protected:
     double      m_deadc;       //!< Average deadtime correction
 
     // Protected members
-    double            m_area;        //!< Surface area for simulation (cm2)
-    int               m_max_photons; //!< Maximum number of photons/slice
-    std::vector<GRan> m_rans;        //!< Random number generators
-    GObservations     m_obs;         //!< Observation container
-    bool              m_use_xml;     //!< Use XML file instead of FITS file
-    GTimeReference    m_cta_ref;     //!< CTA time reference
-    int               m_event_id;    //!< Event identifier
+    mutable GObservations m_obs;              //!< Observation container
+    mutable bool          m_save_and_dispose; //!< Save and dispose immediately
+    double                m_area;             //!< Surface area for simulation (cm2)
+    int                   m_max_photons;      //!< Maximum number of photons/slice
+    std::vector<GRan>     m_rans;             //!< Random number generators
+    bool                  m_use_xml;          //!< Use XML file instead of FITS file
+    GTimeReference        m_cta_ref;          //!< CTA time reference
+    int                   m_event_id;         //!< Event identifier
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-inline
-const GObservations& ctobssim::obs(void) const
-{
-    return m_obs;
-}
 
 #endif /* CTOBSSIM_HPP */

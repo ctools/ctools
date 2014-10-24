@@ -92,7 +92,7 @@ ctobssim::ctobssim(const GObservations& obs) :
  *
  * Constructs application using command line arguments for parameter setting.
  ***************************************************************************/
-ctobssim::ctobssim(int argc, char *argv[]) : 
+ctobssim::ctobssim(int argc, char *argv[]) :
           ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
 {
     // Initialise members
@@ -218,18 +218,16 @@ void ctobssim::run(void)
         log << std::endl;
     }
 
-    // Write seed values into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Seed values");
-        for (int i = 0; i < m_rans.size(); ++i) {
-            log << gammalib::parformat("Seed "+gammalib::str(i));
-            log << gammalib::str(m_rans[i].seed()) << std::endl;
-        }
+    // Special mode: if read ahead is specified we know that we called
+    // the execute() method, hence files are saved immediately and event
+    // lists are disposed afterwards.
+    if (read_ahead()) {
+        m_save_and_dispose = true;
     }
 
-    // Set energy dispersion flag for all CTA observations and save old
-    // values in save_edisp vector
+    // Determine the number of valid CTA observations, set energy dispersion flag
+    // for all CTA observations and save old values in save_edisp vector
+    int               n_observations = 0;
     std::vector<bool> save_edisp;
     save_edisp.assign(m_obs.size(), false);
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -237,6 +235,43 @@ void ctobssim::run(void)
         if (obs != NULL) {
             save_edisp[i] = obs->response()->apply_edisp();
             obs->response()->apply_edisp(m_apply_edisp);
+            n_observations++;
+        }
+    }
+
+    // If more than a single observation has been handled then make sure that
+    // an XML file will be used for storage
+    if (n_observations > 1) {
+        m_use_xml = true;
+    }
+
+    // Write execution mode into logger
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Execution mode");
+        log << gammalib::parformat("Event list management");
+        if (m_save_and_dispose) {
+            log << "Save and dispose (reduces memory needs)" << std::endl;
+        }
+        else {
+            log << "Keep events in memory" << std::endl;
+        }
+        log << gammalib::parformat("Output format");
+        if (m_use_xml) {
+            log << "Write Observation Definition XML file" << std::endl;
+        }
+        else {
+            log << "Write single event list FITS file" << std::endl;
+        }
+    }
+
+    // Write seed values into logger
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Seed values");
+        for (int i = 0; i < m_rans.size(); ++i) {
+            log << gammalib::parformat("Seed "+gammalib::str(i));
+            log << gammalib::str(m_rans[i].seed()) << std::endl;
         }
     }
 
@@ -263,9 +298,6 @@ void ctobssim::run(void)
         }
     }
 
-    // Initialise counters
-    int n_observations = 0;
-
     // From here on the code can be parallelized if OpenMP support
     // is enabled. The code in the following block corresponds to the
     // code that will be executed in each thread
@@ -288,11 +320,11 @@ void ctobssim::run(void)
         wrklog.max_size(10000000);
 
         // Loop over all observation in the container. If OpenMP support
-        // is enabled, this looped will be parallelized.
+        // is enabled, this loop will be parallelized.
         #pragma omp for
         for (int i = 0; i < m_obs.size(); ++i) {
 
-            // Get CTA observation
+            // Get pointer on CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
             // Continue only if observation is a CTA observation
@@ -308,26 +340,55 @@ void ctobssim::run(void)
                     }
                 }
 
-                // Increment counter
-                n_observations++;
+                // Work on a clone of the CTA observation. This makes sure that
+                // any memory allocated for computing (for example a response
+                // cache) is properly de-allocated on exit of this run
+                GCTAObservation obs_clone = *obs;
 
                 // Save number of events before entering simulation
-                int events_before = obs->events()->size();
+                int events_before = obs_clone.events()->size();
 
                 // Simulate source events
-                simulate_source(obs, models, m_rans[i], &wrklog);
+                simulate_source(&obs_clone, models, m_rans[i], &wrklog);
 
                 // Simulate source events
-                simulate_background(obs, models, m_rans[i], &wrklog);
+                simulate_background(&obs_clone, models, m_rans[i], &wrklog);
 
                 // Dump simulation results
                 if (logNormal()) {
                     wrklog << gammalib::parformat("MC events");
-                    wrklog << obs->events()->size() - events_before;
+                    wrklog << obs_clone.events()->size() - events_before;
                     wrklog << " (all models)";
                     wrklog << std::endl;
                 }
 
+                // If requested, event lists are saved immediately
+                if (m_save_and_dispose) {
+
+                    // Set event output file name. If multiple observations are
+                    // handled, build the filename from prefix and observation
+                    // index. Otherwise use the outfile parameter.
+                    std::string outfile;
+                    if (m_use_xml) {
+                        m_prefix = (*this)["prefix"].string();
+                        outfile  = m_prefix + gammalib::str(i) + ".fits";
+                    }
+                    else {
+                        outfile  = (*this)["outfile"].filename();
+                    }
+
+                    // Store output file name in original observation
+                    obs->eventfile(outfile);
+
+                    // Save observation into FITS file
+                    obs_clone.save(outfile, clobber());
+
+                }
+
+                // ... otherwise append the event list to the original observation
+                else {
+                    obs->events(*(obs_clone.events()));
+                }
 
             } // endif: CTA observation found
 
@@ -341,12 +402,6 @@ void ctobssim::run(void)
         }
 
     } // end pragma omp parallel
-    
-    // If more than a single observation has been handled then make sure that
-    // an XML file will be used for storage
-    if (n_observations > 1) {
-        m_use_xml = true;
-    }
 
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -403,6 +458,142 @@ void ctobssim::save(void)
         save_fits();
     }
 
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+const GObservations& ctobssim::obs(void) const
+{
+    // If event lists have been disposed, load them now into the observation
+    // container
+    if (m_save_and_dispose) {
+
+        // Loop over all observation in the container
+        for (int i = 0; i < m_obs.size(); ++i) {
+
+            // Get CTA observation
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+            // Handle only CTA observations
+            if (obs != NULL) {
+
+                // Load observation from FITS file
+                obs->load(obs->eventfile());
+
+            } // endif: observation was a CTA observations
+
+        } // endfor: looped over CTA observations
+
+        // Now we have the event lists hence we can reset the disposal flag
+        m_save_and_dispose = false;
+
+    } // endif: event lists have been disposed
+
+    // Return observation container
+    return m_obs;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ *
+ * The thrown area is fixed to pi*(2500^2) m2, which is the same value that
+ * is used in the Monte Carlo simulations (information from Konrad Bernloehr)
+ ***************************************************************************/
+void ctobssim::init_members(void)
+{
+    // Initialise user parameters
+    m_infile.clear();
+    m_outfile.clear();
+    m_prefix.clear();
+    m_seed        =   1;
+    m_ra          = 0.0;
+    m_dec         = 0.0;
+    m_rad         = 0.0;
+    m_tmin        = 0.0;
+    m_tmax        = 0.0;
+    m_emin        = 0.0;
+    m_emax        = 0.0;
+    m_apply_edisp = false;
+    m_deadc       = 1.0;
+
+    // Initialise protected members
+    m_rans.clear();
+    m_obs.clear();
+    m_use_xml          = false;
+    m_save_and_dispose = false;
+
+    // Set fixed parameters
+    m_area        = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
+    m_max_photons = 1000000;            //!< Maximum number of photons / time slice
+
+    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
+    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
+    // a better mechanism to implement the CTA reference MJD.
+    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
+
+    // Initialise first event identifier
+    m_event_id = 1;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctobssim::copy_members(const ctobssim& app)
+{
+    // Copy user parameters
+    m_infile      = app.m_infile;
+    m_outfile     = app.m_outfile;
+    m_prefix      = app.m_prefix;
+    m_seed        = app.m_seed;
+    m_ra          = app.m_ra;
+    m_dec         = app.m_dec;
+    m_rad         = app.m_rad;
+    m_tmin        = app.m_tmin;
+    m_tmax        = app.m_tmax;
+    m_emin        = app.m_emin;
+    m_emax        = app.m_emax;
+    m_apply_edisp = app.m_apply_edisp;
+    m_deadc       = app.m_deadc;
+
+    // Copy protected members
+    m_area             = app.m_area;
+    m_max_photons      = app.m_max_photons;
+    m_rans             = app.m_rans;
+    m_obs              = app.m_obs;
+    m_use_xml          = app.m_use_xml;
+    m_save_and_dispose = app.m_save_and_dispose;
+    m_cta_ref          = app.m_cta_ref;
+    m_event_id         = app.m_event_id;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctobssim::free_members(void)
+{
     // Return
     return;
 }
@@ -471,6 +662,16 @@ void ctobssim::get_parameters(void)
     if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
         m_prefix  = (*this)["prefix"].string();
+    }
+
+    // Make sure that all observations hold a CTA event list
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
+                set_list(obs);
+            }
+        }
     }
 
     // Initialise random number generators. We initialise here one random
@@ -624,21 +825,17 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         }
 
         // Get CTA response
-        const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+        const GCTAResponseIrf* rsp =
+            dynamic_cast<const GCTAResponseIrf*>(obs->response());
         if (rsp == NULL) {
             std::string msg = "Response is not an IRF response.\n" +
                               obs->response()->print();
             throw GException::invalid_value(G_SIMULATE_SOURCE, msg);
         }
 
-        // Make sure that the observation holds a CTA event list. If this
-        // is not the case then allocate and attach a CTA event list now.
-        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
-            set_list(obs);
-        }
-
         // Get pointer on event list (circumvent const correctness)
-        GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+        GCTAEventList* events =
+            static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
         // Extract simulation region.
         GSkyDir dir = events->roi().centre().dir();
@@ -898,7 +1095,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  ***************************************************************************/
 void ctobssim::simulate_background(GCTAObservation* obs,
                                    const GModels&   models,
-                                   GRan&            ran, 
+                                   GRan&            ran,
                                    GLog*            wrklog)
 {
     // Continue only if observation pointer is valid
@@ -907,12 +1104,6 @@ void ctobssim::simulate_background(GCTAObservation* obs,
         // If no logger is specified then use the default logger
         if (wrklog == NULL) {
             wrklog = &log;
-        }
-
-        // Make sure that the observation holds a CTA event list. If this
-        // is not the case then allocate and attach a CTA event list now.
-        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
-            set_list(obs);
         }
 
         // Get pointer on event list (circumvent const correctness)
@@ -934,7 +1125,7 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                 // Get simulated CTA event list. Note that this method
                 // includes the deadtime correction.
                 GCTAEventList* list =
-                    dynamic_cast<GCTAEventList*>(model->mc(*obs, ran));
+                     dynamic_cast<GCTAEventList*>(model->mc(*obs, ran));
 
                 // Continue only if we got a CTA event list
                 if (list != NULL) {
@@ -984,103 +1175,6 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 }
 
 
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
-/***********************************************************************//**
- * @brief Initialise class members
- *
- * The thrown area is fixed to pi*(2500^2) m2, which is the same value that
- * is used in the Monte Carlo simulations (information from Konrad Bernloehr)
- ***************************************************************************/
-void ctobssim::init_members(void)
-{
-    // Initialise user parameters
-    m_infile.clear();
-    m_outfile.clear();
-    m_prefix.clear();
-    m_seed        =   1;
-    m_ra          = 0.0;
-    m_dec         = 0.0;
-    m_rad         = 0.0;
-    m_tmin        = 0.0;
-    m_tmax        = 0.0;
-    m_emin        = 0.0;
-    m_emax        = 0.0;
-    m_apply_edisp = false;
-    m_deadc       = 1.0;
-
-    // Initialise protected members
-    m_rans.clear();
-    m_obs.clear();
-    m_use_xml    = false;
-
-    // Set fixed parameters
-    m_area        = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
-    m_max_photons = 1000000;            //!< Maximum number of photons / time slice
-
-    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
-    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
-    // a better mechanism to implement the CTA reference MJD.
-    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
-
-    // Initialise first event identifier
-    m_event_id = 1;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
- *
- * @param[in] app Application.
- ***************************************************************************/
-void ctobssim::copy_members(const ctobssim& app)
-{
-    // Copy user parameters
-    m_infile      = app.m_infile;
-    m_outfile     = app.m_outfile;
-    m_prefix      = app.m_prefix;
-    m_seed        = app.m_seed;
-    m_ra          = app.m_ra;
-    m_dec         = app.m_dec;
-    m_rad         = app.m_rad;
-    m_tmin        = app.m_tmin;
-    m_tmax        = app.m_tmax;
-    m_emin        = app.m_emin;
-    m_emax        = app.m_emax;
-    m_apply_edisp = app.m_apply_edisp;
-    m_deadc       = app.m_deadc;
-
-    // Copy protected members
-    m_area        = app.m_area;
-    m_max_photons = app.m_max_photons;
-    m_rans        = app.m_rans;
-    m_obs         = app.m_obs;
-    m_use_xml     = app.m_use_xml;
-    m_cta_ref     = app.m_cta_ref;
-    m_event_id    = app.m_event_id;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctobssim::free_members(void)
-{
-    // Return
-    return;
-}
-
-
 /***********************************************************************//**
  * @brief Save event list in FITS format.
  *
@@ -1089,14 +1183,19 @@ void ctobssim::free_members(void)
  ***************************************************************************/
 void ctobssim::save_fits(void)
 {
-    // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    // Save only if event list has not yet been saved and disposed
+    if (!m_save_and_dispose) {
 
-    // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+        // Get output filename
+        m_outfile = (*this)["outfile"].filename();
 
-    // Save observation into FITS file
-    obs->save(m_outfile, clobber());
+        // Get CTA observation from observation container
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+
+        // Save observation into FITS file
+        obs->save(m_outfile, clobber());
+
+    } // endif: event list has not yet been saved and disposed
 
     // Return
     return;
@@ -1131,34 +1230,37 @@ void ctobssim::save_xml(void)
                " definition files." << std::endl;
     }
 
-    // Initialise file number
-    int file_num = 0;
+    // Save only if event lists have not yet been saved and disposed
+    if (!m_save_and_dispose) {
 
-    // Loop over all observation in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
+        // Loop over all observation in the container
+        for (int i = 0; i < m_obs.size(); ++i) {
 
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+            // Get CTA observation
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Handle only CTA observations
-        if (obs != NULL) {
+            // Handle only CTA observations
+            if (obs != NULL) {
 
-            // Set event output file name
-            std::string outfile = m_prefix + gammalib::str(file_num) + ".fits";
+                // Continue only if there is an event list (it may have been disposed)
+                if (obs->events()->size() != 0) {
 
-            // Store output file name in observation
-            obs->eventfile(outfile);
+                    // Set event output file name
+                    std::string outfile = m_prefix + gammalib::str(i) + ".fits";
 
-            // Save observation into FITS file
-            obs->save(outfile, clobber());
+                    // Store output file name in observation
+                    obs->eventfile(outfile);
 
-            // Increment file number
-            file_num++;
+                    // Save observation into FITS file
+                    obs->save(outfile, clobber());
 
+                }
 
-        } // endif: observation was a CTA observations
+            } // endif: observation was a CTA observations
 
-    } // endfor: looped over observations
+        } // endfor: looped over observations
+
+    } // endif: event list has not yet been saved and disposed
 
     // Save observations in XML file
     m_obs.save(m_outfile);

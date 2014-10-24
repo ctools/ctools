@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-17 October 2014
+24 October 2014
 
 
 1. Introduction
@@ -47,6 +47,12 @@ avoiding concurrent memory access (#1258).
 
 ctobssim now also supports the handling of energy dispersion. Energy
 dispersion can be switched on or off using the hidden edisp parameter.
+
+The memory needs for ctobssim have been reduced by first working on a
+local copy of the CTA observation (this de-allocates properly and memory
+cache associated to the response functions), and by saving and disposing
+the event lists immediately if called using the execute() method (this
+is the method called when the tool is run from the command line).
 
 
 6. ctselect - CTA event selection
