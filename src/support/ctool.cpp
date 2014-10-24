@@ -421,12 +421,21 @@ size_t ctool::get_current_rss(void)
     // Determine resident set size (architecture dependent)
     // OSX
     #if defined(__APPLE__) && defined(__MACH__)
+    #ifdef MACH_TASK_BASIC_INFO
     struct mach_task_basic_info info;
     mach_msg_type_number_t      infoCount = MACH_TASK_BASIC_INFO_COUNT;
     if (task_info(mach_task_self( ), MACH_TASK_BASIC_INFO,
         (task_info_t)&info, &infoCount) == KERN_SUCCESS) {
         rss = (size_t)info.resident_size;
     }
+    #else
+    struct task_basic_info info;
+    mach_msg_type_number_t info_count = TASK_BASIC_INFO_COUNT;
+    if (task_info(mach_task_self(), TASK_BASIC_INFO,
+        (task_info_t)&info, &info_count) == KERN_SUCCESS) {
+        rss = (size_t)info.resident_size;
+    }
+    #endif
     // Linux
     #elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
     FILE* fp = NULL;
