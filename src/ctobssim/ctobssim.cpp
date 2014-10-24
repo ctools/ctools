@@ -323,7 +323,6 @@ void ctobssim::run(void)
         // is enabled, this loop will be parallelized.
         #pragma omp for
         for (int i = 0; i < m_obs.size(); ++i) {
-std::cout << "Observation " << i << ": " << get_current_rss() << std::endl;
 
             // Get pointer on CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);

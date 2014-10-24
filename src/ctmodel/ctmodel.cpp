@@ -273,6 +273,9 @@ void ctmodel::run(void)
             // Fill the cube
             fill_cube(obs);
 
+            // Dispose events to free memory
+            obs->dispose_events();
+
         } // endif: CTA observation found
 
     } // endfor: looped over observations
@@ -481,8 +484,6 @@ void ctmodel::get_parameters(void)
     
         // Read observation definition filename and response parameters
         m_obsfile = (*this)["obsfile"].filename();
-        m_caldb   = (*this)["caldb"].string();
-        m_irf     = (*this)["irf"].string();
 
         // If no observation definition file has been specified then read all
         // parameters that are necessary to create an observation from scratch

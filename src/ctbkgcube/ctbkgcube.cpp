@@ -322,6 +322,9 @@ void ctbkgcube::run(void)
             // Fill the cube
             fill_cube(obs);
 
+            // Dispose events to free memory
+            obs->dispose_events();
+
         } // endif: CTA observation found
 
     } // endfor: looped over observations

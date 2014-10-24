@@ -85,6 +85,9 @@ is set to the map centre. This is only identical to the pointing in
 case of binning a single event list and using the usepnt=yes option
 (or specifying the pointing manually as the xref and yref parameters).
 
+Memory usage has been reduced by disposing the event lists after their
+usage.
+
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
@@ -141,6 +144,9 @@ the use for 2D response functions in FITS files.
 ctmodel now also supports the handling of energy dispersion. Energy
 dispersion can be switched on or off using the hidden edisp parameter.
 
+Memory usage has been reduced by disposing the event lists after their
+usage.
+
 
 12. ctexpcube - CTA exposure cube generation
 --------------------------------------------
@@ -164,6 +170,9 @@ The first version of the ctbkgcube tool is included in the release.
 ctbkgcube computes the background cube for an observation definition 
 file. The cube definition may be taken from a counts cube or may be
 specified by user parameters.
+
+Memory usage has been reduced by disposing the event lists after their
+usage.
 
 
 15. ctcubemask - CTA cube filtering
