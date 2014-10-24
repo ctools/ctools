@@ -31,6 +31,21 @@
 #include "ctool.hpp"
 #include "GTools.hpp"
 
+/* __ Includes for memory usage determination ____________________________ */
+#if defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
+#include <unistd.h>
+#include <sys/resource.h>
+#if defined(__APPLE__) && defined(__MACH__)
+#include <mach/mach.h>
+#elif (defined(_AIX) || defined(__TOS__AIX__)) || (defined(__sun__) || defined(__sun) || defined(sun) && (defined(__SVR4) || defined(__svr4__)))
+#include <fcntl.h>
+#include <procfs.h>
+#elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
+#include <stdio.h>
+#endif
+#endif
+
+
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_EBOUNDS                                  "ctool::get_ebounds()"
 
@@ -390,4 +405,42 @@ void ctool::set_obs_response(GCTAObservation* obs)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get current resident set size (physical memory use) in Bytes
+ *
+ * @return Physical memory use in Bytes.
+ ***************************************************************************/
+size_t ctool::get_current_rss(void)
+{
+    // Initialize resident set size
+    size_t rss = 0;
+
+    // Determine resident set size (architecture dependent)
+    // OSX
+    #if defined(__APPLE__) && defined(__MACH__)
+    struct mach_task_basic_info info;
+    mach_msg_type_number_t      infoCount = MACH_TASK_BASIC_INFO_COUNT;
+    if (task_info(mach_task_self( ), MACH_TASK_BASIC_INFO,
+        (task_info_t)&info, &infoCount) == KERN_SUCCESS) {
+        rss = (size_t)info.resident_size;
+    }
+    // Linux
+    #elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
+    FILE* fp = NULL;
+    if ((fp = fopen( "/proc/self/statm", "r" )) != NULL) {
+        if (fscanf( fp, "%*s%ld", &rss ) == 1) {
+            rss *= (size_t)sysconf(_SC_PAGESIZE);
+        }
+        fclose(fp);
+    }
+    // AIX, BSD, Solaris, and Unknown OS
+    #else
+    rss = 0;
+    #endif
+
+    // Return resident set size
+    return rss;
 }

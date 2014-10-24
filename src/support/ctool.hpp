@@ -69,6 +69,7 @@ protected:
     GEbounds    get_ebounds(void);
     void        set_response(GObservations& obs);
     void        set_obs_response(GCTAObservation* obs);
+    size_t      get_current_rss(void);
 
     // Protected members
     bool m_read_ahead;   //!< Read ahead parameters
