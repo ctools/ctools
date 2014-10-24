@@ -323,6 +323,7 @@ void ctobssim::run(void)
         // is enabled, this loop will be parallelized.
         #pragma omp for
         for (int i = 0; i < m_obs.size(); ++i) {
+std::cout << "Observation " << i << ": " << get_current_rss() << std::endl;
 
             // Get pointer on CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
@@ -362,6 +363,9 @@ void ctobssim::run(void)
                     wrklog << std::endl;
                 }
 
+                // Append the event list to the original observation
+                obs->events(*(obs_clone.events()));
+
                 // If requested, event lists are saved immediately
                 if (m_save_and_dispose) {
 
@@ -387,12 +391,17 @@ void ctobssim::run(void)
                         obs_clone.save(outfile, clobber());
                     }
 
+                    // Dispose events
+                    obs->dispose_events();
+
                 }
 
                 // ... otherwise append the event list to the original observation
+                /*
                 else {
                     obs->events(*(obs_clone.events()));
                 }
+                */
 
             } // endif: CTA observation found
 
@@ -464,43 +473,6 @@ void ctobssim::save(void)
 
     // Return
     return;
-}
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-const GObservations& ctobssim::obs(void) const
-{
-    // If event lists have been disposed, load them now into the observation
-    // container
-    if (m_save_and_dispose) {
-
-        // Loop over all observation in the container
-        for (int i = 0; i < m_obs.size(); ++i) {
-
-            // Get CTA observation
-            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-            // Handle only CTA observations
-            if (obs != NULL) {
-
-                // Load observation from FITS file
-                obs->load(obs->eventfile());
-
-            } // endif: observation was a CTA observations
-
-        } // endfor: looped over CTA observations
-
-        // Now we have the event lists hence we can reset the disposal flag
-        m_save_and_dispose = false;
-
-    } // endif: event lists have been disposed
-
-    // Return observation container
-    return m_obs;
 }
 
 

@@ -111,4 +111,17 @@ protected:
     int                   m_event_id;         //!< Event identifier
 };
 
+
+/***********************************************************************//**
+ * @brief Return observation container
+ *
+ * @return Reference to observation container
+ ***************************************************************************/
+inline
+const GObservations& ctobssim::obs(void) const
+{
+    // Return observation container
+    return m_obs;
+}
+
 #endif /* CTOBSSIM_HPP */
