@@ -7,18 +7,18 @@ import glob
 import json
 
 def print_help():
-    print ""
-    print "tsmerge.py expects two keyword argumens: use via command line as follows"
-    print "tsmerge.py files=<list of files> outfile=<desired outfile name>"
-    print "-------------------------------------------------------------------------"
-    print "*** \"outfile\" should be a path to a fits file"
-    print "*** \"files\" should be either be:"
-    print "     - an ascii-file listing the files your want to merge"
-    print "  OR - a wildcard string describing the files for merging"
-    print "-------------------------------------------------------------------------"
-    print ""
-    print "Example: python tsmerge,py files=tsmap*.fits outfile=tsmap.fits"
-    print ""
+    print("")
+    print("tsmerge.py expects two keyword argumens: use via command line as follows")
+    print("tsmerge.py files=<list of files> outfile=<desired outfile name>")
+    print("-------------------------------------------------------------------------")
+    print("*** \"outfile\" should be a path to a fits file")
+    print("*** \"files\" should be either be:")
+    print("     - an ascii-file listing the files your want to merge")
+    print("  OR - a wildcard string describing the files for merging")
+    print("-------------------------------------------------------------------------")
+    print("")
+    print("Example: python tsmerge,py files=tsmap*.fits outfile=tsmap.fits")
+    print("")
     sys.exit(-1)
 
 
@@ -105,7 +105,7 @@ class maps:
                     self.maps[j][i] = addmaps[j][i]
     # Unify error messages
     def error(self,message):  
-        print "*** ERROR ***: "+message
+        print("*** ERROR ***: "+message)
         sys.exit(-1)
         
         
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     # Initialise list of files
 
     kwargs = get_kwargs(sys.argv[1:])
-    if not kwargs.has_key("outfile") or not kwargs.has_key("files"):
+    if "outfile" not in kwargs or "files" not in kwargs:
         print_help()
     outfile = kwargs["outfile"]
     files = kwargs["files"]
