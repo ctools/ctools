@@ -1,0 +1,44 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      ctbutterfly                                                   #
+#  Version:   00-01-00                                                      #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
+#                                                                           #
+#  Purpose:   Parameter file for the ctbutterfly application                #
+#                                                                           #
+#############################################################################
+#
+# General parameters
+#===================
+infile,   f, a, "events.fits",,,"Input event list, cube or observation definition file"
+srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+srcname,  s, a, "Crab",,,"Source of interest"
+caldb,    s, a, "dummy",,, "Calibration database"
+irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
+outfile,  f, a, "butterfly.txt",,, "Output ascii file"
+matrix,   f, h, "NONE",,, "Input covariance Matrix FITS file"
+
+#
+# Energy binning parameters
+#==========================
+ebinalg,  s, h, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
+emin,     r, a,  0.1,,,"Start value for first energy bin in TeV"
+emax,     r, a, 100.0,,,"Stop value for last energy bin in TeV"
+enumbins, i, h, 100,,,"Number of energy bins"
+ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, "ql",,, "Mode of automatic parameters"
+logfile, f, h, "ctbutterfly.log",,, "Log filename"

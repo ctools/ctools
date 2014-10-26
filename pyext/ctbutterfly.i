@@ -1,7 +1,7 @@
 /***************************************************************************
- *                          ctools - SWIG file                             *
+ *                  ctbutterfly - butterfly calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -17,44 +17,45 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  *                                                                         *
- * ----------------------------------------------------------------------- *
- * Usage:                                                                  *
- * swig -c++ -python -Wall ctools.i                                        *
  ***************************************************************************/
 /**
- * @file ctools.i
- * @brief ctools SWIG file
- * @author Juergen Knoedlseder
+ * @file ctbutterfly.i
+ * @brief Butterfly calculation tool
+ * @author Michael Mayer
  */
-%module ctools
-%feature("autodoc", "1");
-
-/* __ Headers needed for compilation _____________________________________ */
 %{
-#include <stddef.h>
+/* Put headers and other declarations here that are needed for compilation */
+#include "ctbutterfly.hpp"
 %}
 
-/* __ Include standard typemaps for vectors and strings __________________ */
-%include stl.i
 
-/* __ Make sure that exceptions are catched ______________________________ */
-%import(module="gammalib.support") "GException.i";
+/***********************************************************************//**
+ * @class ctbutterfly
+ *
+ * @brief Butterfly calculation tool
+ ***************************************************************************/
+class ctbutterfly : public ctool {
+public:
+    // Constructors and destructors
+    ctbutterfly(void);
+    explicit ctbutterfly(const GObservations& obs);
+    ctbutterfly(int argc, char *argv[]);
+    ctbutterfly(const ctbutterfly& app);
+    virtual ~ctbutterfly(void);
+    
+    // Methods
+    void                 clear(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+};
 
-/* __ Inform about base classes __________________________________________ */
-%import(module="gammalib.base") "GBase.i";
-%import(module="gammalib.app")  "GApplication.i";
 
-/* __ ctools _____________________________________________________________ */
-%include "ctool.i"
-%include "ctbin.i"
-%include "ctobssim.i"
-%include "ctlike.i"
-%include "ctmodel.i"
-%include "ctselect.i"
-%include "ctskymap.i"
-%include "ctexpcube.i"
-%include "ctpsfcube.i"
-%include "ctbkgcube.i"
-%include "ctcubemask.i"
-%include "cttsmap.i"
-%include "ctbutterfly.i"
+/***********************************************************************//**
+ * @brief butterfly calculation tool Python extensions
+ ***************************************************************************/
+%extend ctbutterfly {
+    ctbutterfly copy() {
+        return (*self);
+    }
+}

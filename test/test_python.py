@@ -34,6 +34,7 @@ import test_ctpsfcube
 import test_ctbkgcube
 import test_ctcubemask
 import test_pipelines
+import test_ctbutterfly
 
 
 # ======================== #
@@ -59,6 +60,7 @@ if __name__ == '__main__':
     suite_ctbkgcube  = test_ctbkgcube.Test()
     suite_ctcubemask = test_ctcubemask.Test()
     suite_pipelines  = test_pipelines.Test()
+    suite_ctbutterfly  = test_ctbutterfly.Test()
 
     # Setup unit tests
     suite_ctobssim.set()
@@ -73,6 +75,7 @@ if __name__ == '__main__':
     suite_ctbkgcube.set()
     suite_ctcubemask.set()
     suite_pipelines.set()
+    suite_ctbutterfly.set()
 
     # Append tests to container
     suites.append(suite_ctobssim)
@@ -87,6 +90,7 @@ if __name__ == '__main__':
     suites.append(suite_ctbkgcube)
     suites.append(suite_ctcubemask)
     suites.append(suite_pipelines)
+    suites.append(suite_ctbutterfly)
 
     # Set PFILES environment variable
     try:

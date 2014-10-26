@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cttsmap tool.
+# This scripts performs unit tests for the ctbutterfly tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014 Michal Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@ import gammalib
 import ctools
 
 
-# ========================== #
-# Test class for cttsmap tool #
-# ========================== #
+# =============================== #
+# Test class for ctbutterfly tool #
+# =============================== #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for cttsmap tool.
+    Test class for ctbutterfly tool.
     """
     # Constructor
     def __init__(self):
@@ -40,7 +40,7 @@ class Test(gammalib.GPythonTestSuite):
         # Set members
         self.events_name = "data/crab_events.fits"
         self.model_name  = "data/crab.xml"
-        self.caldb       = "dummy"
+        self.caldb       = "irf"
         self.irf         = "cta_dummy_irf"
 
         # Return
@@ -52,47 +52,42 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("cttsmap")
+        self.name("ctbutterfly")
 
         # Append tests
-        self.append(self.test_functional, "Test cttsmap functionality")
+        self.append(self.test_functional, "Test ctbutterfly functionality")
 
         # Return
         return
 
-    # Test cttsmap functionnality
+    # Test ctbutterfly functionnality
     def test_functional(self):
         """
-        Test cttsmap functionnality.
+        Test ctbutterfly functionnality.
         """
-        # Set-up cttsmap
-        tsmap = ctools.cttsmap()
-        tsmap["infile"].filename(self.events_name)
-        tsmap["srcmdl"].filename(self.model_name)
-        tsmap["srcname"].string("Crab")
-        tsmap["caldb"].string(self.caldb)
-        tsmap["irf"].string(self.irf)
-        tsmap["outfile"].filename("tsmap.fits")
-        tsmap["nxpix"].integer(5)
-        tsmap["nypix"].integer(5)
-        tsmap["binsz"].real(0.02)
-        tsmap["coordsys"].string("CEL")
-        tsmap["proj"].string("CAR")
-        tsmap["xref"].real(83.63)
-        tsmap["yref"].real(22.01)
-
+        # Set-up ctbutterfly
+        butterfly = ctools.ctbutterfly()
+        butterfly["infile"].filename(self.events_name)
+        butterfly["srcmdl"].filename(self.model_name)
+        butterfly["srcname"].string("Crab")
+        butterfly["caldb"].string(self.caldb)
+        butterfly["irf"].string(self.irf)
+        butterfly["emin"].real(0.1)
+        butterfly["emax"].real(100)
+        butterfly["outfile"].filename("butterfly.txt")
+        
         # Run tool
-        self.test_try("Run cttsmap")
+        self.test_try("Run ctbutterfly")
         try:
-            tsmap.run()
+            butterfly.run()
             self.test_try_success()
         except:
-            self.test_try_failure("Exception occured in cttsmap.")
+            self.test_try_failure("Exception occured in butterfly.")
 
         # Save results
         self.test_try("Save results")
         try:
-            tsmap.save()
+            butterfly.save()
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in saving results.")

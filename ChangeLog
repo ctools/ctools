@@ -1,4 +1,4 @@
-2014-10-24  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-10-26  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.8.0 released
         ========================
@@ -10,6 +10,7 @@
         Add ctbkgcube tool (generates background cube)
         Add ctcubemask tool (masks event bins in event cube)
         Add cttsmap tool (generates TS map)
+        Add ctbutterfly tool (generates butterfly diagram)
         Add csresmap script (generates residual map)
         Introduce ctool base class
         ctbin now always merges event lists into a single counts cube
