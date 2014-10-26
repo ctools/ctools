@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctbutterfly.hpp
+ * @file ctbutterfly.cpp
  * @brief Butterfly computation tool
  * @author Michael Mayer
  */
@@ -232,7 +232,7 @@ void ctbutterfly::run(void)
     GModels models = m_obs.models();
 
     // Compute covariance matrix if necessary
-	if (m_covariance.size() == 0) {
+    if (m_covariance.size() == 0) {
 
         // Write header
         if (logTerse()) {
@@ -241,14 +241,14 @@ void ctbutterfly::run(void)
         }
 
         // Evaluate curvature matrix at the actual parameters
-		GOptimizerPars            pars       = models.pars();
-		GObservations::likelihood likelihood = m_obs.function();
-		likelihood.eval(pars);
+        GOptimizerPars            pars       = models.pars();
+        GObservations::likelihood likelihood = m_obs.function();
+        likelihood.eval(pars);
 
         // Get covariance matrix by inverting the curvature matrix
         m_covariance = likelihood.curvature()->invert();
 
-	}
+    }
 
     // Write header
     if (logTerse()) {
@@ -268,73 +268,73 @@ void ctbutterfly::run(void)
         // Initialise number of gradients
         int num_gradient = 0;
 
-    	// Get the energy of current bin
+        // Get the energy of current bin
         GEnergy energy = m_ebounds.elogmean(i);
 
-    	// Header for verbose logging
-    	if (logExplicit()) {
+        // Header for verbose logging
+        if (logExplicit()) {
             std::string msg = "Computing butterfly for bin number "+
                               gammalib::str(i)+" at "+energy.print();
             log << std::endl;
             log.header2(msg);
-    	}
+        }
 
-    	// Initialise model flux value
-    	double model_flux = 0.0;
+        // Initialise model flux value
+        double model_flux = 0.0;
 
-    	// Loop over models
-    	for (int j = 0; j < models.size(); ++j) {
+        // Loop over models
+        for (int j = 0; j < models.size(); ++j) {
 
-    	    // Check wether model is a skymodel
-    	    GModelSky* skymodel = dynamic_cast<GModelSky*>(models[j]);
+            // Check wether model is a skymodel
+            GModelSky* skymodel = dynamic_cast<GModelSky*>(models[j]);
 
-    	    // Yes ...
-    	    if (skymodel != NULL) {
+            // Yes ...
+            if (skymodel != NULL) {
 
-    	        // Skip spatial models
-    	        num_gradient += skymodel->spatial()->size();
+                // Skip spatial models
+                num_gradient += skymodel->spatial()->size();
 
-    	        // Get pointer to spectral model
-    	        GModelSpectral* spectral = skymodel->spectral();
+                // Get pointer to spectral model
+                GModelSpectral* spectral = skymodel->spectral();
 
-    	        // Set flux value of source of interest
-    	        if (skymodel->name() == m_srcname) {
+                // Set flux value of source of interest
+                if (skymodel->name() == m_srcname) {
                     model_flux = spectral->eval_gradients(energy, time);
-    	        } // endif: model was source of interest
+                } // endif: model was source of interest
+                
+                // Loop over model parameters, get gradients
+                // and assign them to the vector
+                for (int k = 0; k < spectral->size(); ++k) {
+                    grad[num_gradient] = (*spectral)[k].gradient();
+                    num_gradient++;
+                } // endfor: looped over spectral parameters
 
-    	        // Loop over model parameters, get gradients
-    	        // and assign them to the vector
-    	        for (int k = 0; k < spectral->size(); ++k) {
-    	            grad[num_gradient] = (*spectral)[k].gradient();
-    	            num_gradient++;
-    	        } // endfor: looped over spectral parameters
+                // Skip temporal models
+                num_gradient += skymodel->temporal()->size();
 
-    	        // Skip temporal models
-    	        num_gradient += skymodel->temporal()->size();
+            } // endif: model was sky model
 
-    	    } // endif: model was sky model
+            else {
 
-    	    else {
+                // Skip other models (e.g. GModelData instances)
+                num_gradient += models[j]->size();
 
-    	        // Skip other models (e.g. GModelData instances)
-    	        num_gradient += models[j]->size();
+            } // endelse: Model was not GModelSky
 
-    	    } // endelse: Model was not GModelSky
+        } // endfor: Looped over models
 
-    	} // endfor: Looped over models
+        // Multiply covariance to the gradient vector
+        GVector vector = m_covariance * grad;
 
-    	// Multiply covariance to the gradient vector
-    	GVector vector = m_covariance * grad;
+        // Get the error from the scalar product
+        double error = std::sqrt(grad * vector);
 
-    	// Get the error from the scalar product
-    	double error = std::sqrt(grad * vector);
+        // Store flux, value and energy for saving
+        m_fluxes.push_back(model_flux);
+        m_energies.push_back(energy.MeV());
+        m_errors.push_back(error);
 
-    	// Store flux, value and energy for saving
-    	m_fluxes.push_back(model_flux);
-    	m_energies.push_back(energy.MeV());
-    	m_errors.push_back(error);
-
-    	 // Log information
+        // Log information
         if (logExplicit()) {
             log << " Flux at ";
             log << energy.print();
