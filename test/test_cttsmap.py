@@ -40,7 +40,7 @@ class Test(gammalib.GPythonTestSuite):
         # Set members
         self.events_name = "data/crab_events.fits"
         self.model_name  = "data/crab.xml"
-        self.caldb       = "dummy"
+        self.caldb       = "irf"
         self.irf         = "cta_dummy_irf"
 
         # Return
