@@ -67,7 +67,6 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up cttsmap
         tsmap = ctools.cttsmap()
-        tsmap["debug"].boolean(True)
         tsmap["infile"].filename(self.events_name)
         tsmap["srcmdl"].filename(self.model_name)
         tsmap["srcname"].string("Crab")
