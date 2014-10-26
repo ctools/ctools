@@ -353,12 +353,10 @@ void ctbutterfly::run(void)
 
 
 /***********************************************************************//**
- * @brief Save butterfly
+ * @brief Save butterfly diagram
  *
- * @exception GException::invalid_value
- *            File exists already and clobber is false
- *
- * This method saves the butterfly into an ascii file
+ * Saves the butterfly diagram into an ascii file using a column separated
+ * value (CSV) format with blanks as separators.
  ***************************************************************************/
 void ctbutterfly::save(void)
 {
@@ -371,37 +369,18 @@ void ctbutterfly::save(void)
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
 
-    // If file exists already then delete it in case the clobber parameter
-    // is true
-    if (gammalib::file_exists(m_outfile)) {
-        if ((*this)["clobber"].boolean()) {
-            std::remove(m_outfile.c_str());
-        }
-        else {
-            std::string msg = "Output file \""+m_outfile+"\" already exists "
-                              "and clobber parameters is set to \"false\".";
-            throw GException::invalid_value(G_SAVE, msg);
-        }
-    }
+    // Create CSV table with 3 columns
+    GCsv table(m_fluxes.size(), 3);
 
-    // Create file instance
-    std::fstream file;
-
-    // Open file
-    file.open(m_outfile.c_str(), std::fstream::out | std::fstream::app);
-
-    // Write short header
-    file << "# Energy [MeV] | flux [ph/cm2/s/MeV] | e_flux [ph/cm2/s/MeV]";
-    file << std::endl;
-
-    // Write values to file
+    // Fill CSV table
     for (int i = 0; i < m_fluxes.size(); ++i) {
-        file << m_energies[i] << " " << m_fluxes[i] << " " << m_errors[i];
-        file << std::endl;
+        table.real(i, 0, m_energies[i]);
+        table.real(i, 1, m_fluxes[i]);
+        table.real(i, 2, m_errors[i]);
     }
 
-    // Close file
-    file.close();
+    // Save CSV table
+    table.save(m_outfile, " ", clobber());
 
     // Return
     return;
