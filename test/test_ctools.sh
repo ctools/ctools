@@ -545,19 +545,18 @@ fi
 $ECHO " ok"
 
 
-
 #
 # Test ctbutterfly
 # ===============
 $ECHO -n "Test ctbutterfly: "
 $ctbutterfly infile="data/crab_events.fits.gz" \
-srcmdl="data/crab.xml" \
-srcname="Crab" \
-outfile="butterfly.txt" \
-caldb="irf" \
-irf="cta_dummy_irf" \
-emin=0.1 \
-emax=100.0
+             srcmdl="data/crab.xml" \
+             srcname="Crab" \
+             outfile="butterfly.txt" \
+             caldb="irf" \
+             irf="cta_dummy_irf" \
+             emin=0.1 \
+             emax=100.0
 $ECHO -n "."
 if [ -s "butterfly.txt" ]
 then

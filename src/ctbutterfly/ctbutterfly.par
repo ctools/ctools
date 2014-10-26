@@ -19,7 +19,7 @@
 #===================
 infile,   f, a, "events.fits",,,"Input event list, cube or observation definition file"
 srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
-srcname,  s, a, "CrabNebula",,,"Source of interest"
+srcname,  s, a, "Crab",,,"Source of interest"
 caldb,    s, a, "dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 outfile,  f, a, "butterfly.txt",,, "Output ascii file"

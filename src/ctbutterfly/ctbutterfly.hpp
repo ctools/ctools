@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctbutterfly - butterfly calculation tool                    *
+ *                ctbutterfly - butterfly calculation tool                 *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
@@ -40,17 +40,18 @@
 /***********************************************************************//**
  * @class ctbutterfly
  *
- * @brief butterfly calculation tool
+ * @brief Butterfly calculation tool
  *
  * This class computes the confidence interval of a fitted spectrum
- * (butterfly) for a given set of observations
+ * (butterfly) for a given set of observations.
  *
  * The class operates on predefined observation containers, an individual
  * event list or an observation definition XML file.
  *
- * During the computation the covariance matrix of the fit is used to propagate
- * uncertainties and their correlations through the entire energy range.
- * The output is saved as an ascii files containing the confidence band boundaries
+ * During the computation the covariance matrix of the fit is used to
+ * propagate uncertainties and their correlations through the entire energy
+ * range. The output is saved as an ascii files containing the confidence
+ * band boundaries
  ***************************************************************************/
 class ctbutterfly : public ctool {
 
@@ -79,19 +80,17 @@ protected:
     void get_parameters(void);
 
     // User parameters
-    std::string              m_infile;     //!< Input file
-    std::string              m_srcname;    //!< Name of source to compute butterfly
-    std::string              m_outfile;    //!< Output ascii file
-
-    GEbounds            m_ebounds; //!< Energy binning definition
+    std::string m_infile;     //!< Input file
+    std::string m_srcname;    //!< Name of source to compute butterfly
+    std::string m_outfile;    //!< Output ascii file
+    GEbounds    m_ebounds;    //!< Energy binning definition
 
       // Protected members
-    GObservations            m_obs;        //!< Observation container
-    GMatrixSparse           m_covariance; //!< covariance matrix
-
-    std::vector<double>   m_energies; //!< energy values for storage
-    std::vector<double>   m_fluxes; //!< flux values per energy bin
-    std::vector<double>   m_errors; //!< flux errors per energy bin
+    GObservations       m_obs;        //!< Observation container
+    GMatrixSparse       m_covariance; //!< Covariance matrix
+    std::vector<double> m_energies;   //!< Energy values for storage
+    std::vector<double> m_fluxes;     //!< Flux values per energy bin
+    std::vector<double> m_errors;     //!< Flux errors per energy bin
 };
 
 /***********************************************************************//**
