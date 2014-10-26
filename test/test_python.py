@@ -33,8 +33,8 @@ import test_ctexpcube
 import test_ctpsfcube
 import test_ctbkgcube
 import test_ctcubemask
-import test_pipelines
 import test_ctbutterfly
+import test_pipelines
 
 
 # ======================== #
@@ -48,19 +48,19 @@ if __name__ == '__main__':
     suites = gammalib.GTestSuites("ctools unit testing")
 
     # Allocate test suites and append them to the container
-    suite_ctobssim   = test_ctobssim.Test()
-    suite_ctselect   = test_ctselect.Test()
-    suite_ctbin      = test_ctbin.Test()
-    suite_ctlike     = test_ctlike.Test()
-    suite_cttsmap    = test_cttsmap.Test()
-    suite_ctmodel    = test_ctmodel.Test()
-    suite_ctskymap   = test_ctskymap.Test()
-    suite_ctexpcube  = test_ctexpcube.Test()
-    suite_ctpsfcube  = test_ctpsfcube.Test()
-    suite_ctbkgcube  = test_ctbkgcube.Test()
-    suite_ctcubemask = test_ctcubemask.Test()
-    suite_pipelines  = test_pipelines.Test()
-    suite_ctbutterfly  = test_ctbutterfly.Test()
+    suite_ctobssim    = test_ctobssim.Test()
+    suite_ctselect    = test_ctselect.Test()
+    suite_ctbin       = test_ctbin.Test()
+    suite_ctlike      = test_ctlike.Test()
+    suite_cttsmap     = test_cttsmap.Test()
+    suite_ctmodel     = test_ctmodel.Test()
+    suite_ctskymap    = test_ctskymap.Test()
+    suite_ctexpcube   = test_ctexpcube.Test()
+    suite_ctpsfcube   = test_ctpsfcube.Test()
+    suite_ctbkgcube   = test_ctbkgcube.Test()
+    suite_ctcubemask  = test_ctcubemask.Test()
+    suite_ctbutterfly = test_ctbutterfly.Test()
+    suite_pipelines   = test_pipelines.Test()
 
     # Setup unit tests
     suite_ctobssim.set()
@@ -74,8 +74,8 @@ if __name__ == '__main__':
     suite_ctpsfcube.set()
     suite_ctbkgcube.set()
     suite_ctcubemask.set()
-    suite_pipelines.set()
     suite_ctbutterfly.set()
+    suite_pipelines.set()
 
     # Append tests to container
     suites.append(suite_ctobssim)
@@ -89,8 +89,8 @@ if __name__ == '__main__':
     suites.append(suite_ctpsfcube)
     suites.append(suite_ctbkgcube)
     suites.append(suite_ctcubemask)
-    suites.append(suite_pipelines)
     suites.append(suite_ctbutterfly)
+    suites.append(suite_pipelines)
 
     # Set PFILES environment variable
     try:
