@@ -1,3 +1,3 @@
-from ctools import *
+from .ctools import *
 import obsutils
 
