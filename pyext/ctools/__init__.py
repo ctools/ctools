@@ -10,7 +10,6 @@ for entry in bad_entries:
 
 # Clean-up
 del tools
-del ctools
 del gammalib
 del bad_entries
 del entry
