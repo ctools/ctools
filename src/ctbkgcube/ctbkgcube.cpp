@@ -322,9 +322,6 @@ void ctbkgcube::run(void)
             // Fill the cube
             fill_cube(obs);
 
-            // Dispose events to free memory
-            obs->dispose_events();
-
         } // endif: CTA observation found
 
     } // endfor: looped over observations
@@ -650,10 +647,9 @@ void ctbkgcube::set_from_cntmap(const std::string& filename)
  *
  * @param[in] obs Pointer to CTA observation.
  *
- * @exception GException::invalid_value
- *            No event list found in CTA observation.
- *
  * Fills the background cube with the model value for a CTA observation.
+ * This method will not need to load the event file as it gets the event
+ * ROI and GTI directly from the observation.
  ***************************************************************************/
 void ctbkgcube::fill_cube(GCTAObservation* obs)
 {
@@ -666,20 +662,10 @@ void ctbkgcube::fill_cube(GCTAObservation* obs)
         int    n_bins_outside = 0;
 
         // Extract region of interest from CTA observation
-        const GCTAEventList* list = dynamic_cast<const GCTAEventList*>(obs->events());
-        if (list == NULL) {
-            std::string msg = "CTA Observation does not contain an event "
-                              "list. Event list information is needed to "
-                              "retrieve the Region of Interest for each "
-                              "CTA observation. Please provide an event list "
-                              "or an observation definition file containing "
-                              "event lists as \"infile\" parameter.";
-            throw GException::invalid_value(G_FILL_CUBE, msg);
-        }
-        const GCTARoi& roi = list->roi();
+        GCTARoi roi = obs->roi();
 
         // Set GTI of actual observations as the GTI of the event cube
-        m_bkgcube.gti(obs->events()->gti());
+        m_bkgcube.gti(obs->gti());
 
         // Get observation livetime
         double livetime = obs->livetime();
