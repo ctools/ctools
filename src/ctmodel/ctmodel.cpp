@@ -273,8 +273,11 @@ void ctmodel::run(void)
             // Fill the cube
             fill_cube(obs);
 
-            // Dispose events to free memory
-            obs->dispose_events();
+            // Dispose events to free memory if event file exists on disk
+            if (obs->eventfile().length() > 0 &&
+                gammalib::file_exists(obs->eventfile())) {
+                obs->dispose_events();
+            }
 
         } // endif: CTA observation found
 
