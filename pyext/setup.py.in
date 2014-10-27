@@ -1,7 +1,7 @@
 #############################################################################
 # Disutils setup file for ctools Python extension module                    #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2012 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2014 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -18,7 +18,6 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 #                                                                           #
 #############################################################################
-
 from distutils.core import setup, Extension
 from distutils import sysconfig
 import glob
@@ -122,8 +121,8 @@ setup(name='@PACKAGE_NAME@',
       author='Juergen Knoedlseder',
       author_email='@PACKAGE_BUGREPORT@',
       url='http://gammalib.sourceforge.net/',
-      py_modules=['ctools.ctools', 'ctools.obsutils'],
-      ext_modules=[Extension('ctools._ctools', ['ctools/ctools_wrap.cpp'],
+      py_modules=['ctools.tools', 'ctools.obsutils'],
+      ext_modules=[Extension('ctools._tools', ['ctools/tools_wrap.cpp'],
                              include_dirs=include_dirs,
                              library_dirs=library_dirs,
                              libraries=libraries,

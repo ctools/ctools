@@ -522,8 +522,8 @@ AC_C_INLINE
 #############################################################################
 # Checks if Python bindings are to be build                                 #
 # ------------------------------------------------------------------------- #
-# Python binding requires Python and either the files ctools_wrap.cpp and   #
-# ctools.py or swig to create these files.  The following conditionals are  #
+# Python binding requires Python and either the files tools_wrap.cpp and    #
+# tools.py or swig to create these files.  The following conditionals are   #
 # set:                                                                      #
 # WITH_PYTHON - Python bindings will be built                               #
 # HAVE_SWIG   - swig is available                                           #
@@ -628,9 +628,9 @@ else
     has_swig="yes"
   fi
  
-  # Do we have wrappers (ctools_wrap.cpp and ctools.py)?
+  # Do we have wrappers (tools_wrap.cpp and tools.py)?
   has_wrappers="yes"
-  AC_CHECK_FILES([pyext/ctools/ctools_wrap.cpp pyext/ctools/ctools.py],,
+  AC_CHECK_FILES([pyext/ctools/tools_wrap.cpp pyext/ctools/tools.py],,
                  [has_wrappers="no"])
   if test "x$has_wrappers" = "xno"; then
     AC_MSG_WARN([Python wrapper missing. Requires swig for wrapper generation.])
@@ -669,9 +669,9 @@ if test "x$enable_python" = "xyes"; then
 
 else
   if test "x$has_python_wrap" = "xno" -a "x$has_swig" = "xno"; then
-    AC_MSG_WARN([Neither pyext/ctools/ctools_wrap.cpp and pyext/ctools/ctools.py nor swig has not been found])
+    AC_MSG_WARN([Neither pyext/ctools/tools_wrap.cpp and pyext/ctools/tools.py nor swig has not been found])
     AC_MSG_WARN([Python binding for ctools cannot be built])
-    AC_MSG_WARN([Either use a ctools distribution with ctools_wrap.cpp and ctools.py shipped or install swig on your system])
+    AC_MSG_WARN([Either use a ctools distribution with tools_wrap.cpp and tools.py shipped or install swig on your system])
     AC_MSG_WARN([swig can be obtained from http://www.swig.org/])
   fi
 fi

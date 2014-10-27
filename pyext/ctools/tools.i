@@ -1,5 +1,5 @@
 /***************************************************************************
- *                          ctools - SWIG file                             *
+ *                           ctools - SWIG file                            *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
@@ -19,14 +19,14 @@
  *                                                                         *
  * ----------------------------------------------------------------------- *
  * Usage:                                                                  *
- * swig -c++ -python -Wall ctools.i                                        *
+ * swig -c++ -python -Wall tools.i                                         *
  ***************************************************************************/
 /**
- * @file ctools.i
+ * @file tools.i
  * @brief ctools SWIG file
  * @author Juergen Knoedlseder
  */
-%module ctools
+%module tools
 %feature("autodoc", "1");
 
 /* __ Headers needed for compilation _____________________________________ */

@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2012 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2014 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -30,7 +30,7 @@
 if WITH_PYTHON
 
 # Set SWIG interface filename
-SWIG_INTERFACE = ctools/ctools.i
+SWIG_INTERFACE = ctools/tools.i
 
 # Dependencies. Obtain the list of dependencies by executing ls.
 DEPFILES = $(shell ls *.Pi 2> /dev/null)
@@ -39,7 +39,7 @@ include $(DEPFILES)
 # Define the targets that should be built before anything else.
 # These are honored by 'make all', 'make check' and 'make install'.
 if HAVE_SWIG
-  BUILT_SOURCES = ctools/ctools_wrap.cpp ctools/ctools.py
+  BUILT_SOURCES = ctools/tools_wrap.cpp ctools/tools.py
 endif
 
 # Set files to be removed in clean. We remove only the SWIG interface files
@@ -59,21 +59,21 @@ all-local: build
 # of this specific directory. So we build one instance for checking, the other
 # for installation. If we could get the name built by distutils we could avoid
 # this.
-build: ctools/ctools_wrap.cpp ctools/ctools.py
+build: ctools/tools_wrap.cpp ctools/tools.py
 	$(PYTHON) setup.py build
 
 install-exec-local:
 	$(PYTHON) setup.py install --prefix=$(prefix)
 
 clean-local:
-	rm -rf build _ctools.so
+	rm -rf build _tools.so
 
 # Rule for building Python wrappers using SWIG.
 if HAVE_SWIG
-ctools/ctools.py: ctools/ctools_wrap.cpp
-ctools/ctools_wrap.cpp: $(SWIG_INTERFACE)
-	if $(SWIGCOMPILE) -MMD -MF "ctools.Tpi" -o ctools/ctools_wrap.cpp $<; \
-	then mv -f "ctools.Tpi" "ctools.Pi"; else rm -f "ctools.Tpi"; exit 1; fi
+ctools/tools.py: ctools/tools_wrap.cpp
+ctools/tools_wrap.cpp: $(SWIG_INTERFACE)
+	if $(SWIGCOMPILE) -MMD -MF "tools.Tpi" -o ctools/tools_wrap.cpp $<; \
+	then mv -f "tools.Tpi" "tools.Pi"; else rm -f "tools.Tpi"; exit 1; fi
 endif # HAVE_SWIG
 
 endif # WITH_PYTHON
