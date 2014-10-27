@@ -51,7 +51,8 @@
  * counts cube.
  *
  * Results are stored in an observation container that can be written to disk
- * in form of a single FITS file.
+ * in form of a single FITS file. On output, the observation container will
+ * have merged the input event lists into a single observation.
  *
  * WARNING: Note that the pointing direction of the counts cube will be set
  * to the skymap centre used for the counts cube definition. If usepnt=yes
