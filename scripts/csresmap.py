@@ -23,6 +23,7 @@ import gammalib
 import sys
 import tempfile
 import os
+import math
 
 
 # ============== #
@@ -163,11 +164,9 @@ class csresmap(gammalib.GApplication):
         # meaningful residual map    
         if self.obs.models().size() == 0:
             self.obs.models(self["srcmdl"].filename())
-        self.m_outfile  = self["outfile"].filename()
-        
-        self.m_modfile  = self["modfile"].filename()
-        self.m_binfile  = self["binfile"].filename()
-
+        self.m_outfile   = self["outfile"].filename()
+        self.m_modfile   = self["modfile"].filename()
+        self.m_binfile   = self["binfile"].filename()
         self.m_xref      = self["xref"].real()
         self.m_yref      = self["yref"].real()
         self.m_emin      = self["emin"].real()
@@ -292,13 +291,21 @@ class csresmap(gammalib.GApplication):
             
             # Subtract and divide by model map
             self.resmap -= modelmap
-            self.resmap /= modelmap
+            #self.resmap /= modelmap   # Python 3.x does not like this !!!
+            for pixel in modelmap:
+                if pixel != 0.0:
+                    pixel = 1.0/pixel
+            self.resmap *= modelmap
             
         elif self.m_algorithm == "SUBDIVSQRT":
 
             # subtract and divide by sqrt of model map
             self.resmap -= modelmap
-            self.resmap /= modelmap.sqrt()
+            #self.resmap /= modelmap.sqrt()   # Python 3.x does not like this !!!
+            for pixel in modelmap:
+                if pixel != 0.0:
+                    pixel = 1.0/math.sqrt(pixel)
+            self.resmap *= modelmap
             
         else:
             
