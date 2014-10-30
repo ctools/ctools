@@ -641,6 +641,7 @@ the same events for both analyses.
   2014-01-09T21:47:54: 
   2014-01-09T21:47:54: Application "ctlike" terminated after 6 wall clock seconds, consuming 0.163384 seconds of CPU time.
 
+
  .. _sec_butterfly_cta:
 
 Calculate and visualise butterfly
@@ -649,119 +650,52 @@ Calculate and visualise butterfly
 To visualise the analysis results retrieved above, one can calculate the
 confidence band of the spectral fit. The tool ctbutterfly takes the optimised
 source model as input. It takes the covariance matrix from the fit to conduct a
-Gaussian error propagation for each energy value.
-The following example shows how to compute such a butterfly from the command line
-and subsequently shows how to visualise the spectral fit using matplotlib.
+Gaussian error propagation for each energy value. It will write the 
+butterfly information into an ASCII file.
+The following example shows how to compute such a butterfly from the command
+line.
 
 .. code-block:: bash
 
   $ ctbutterfly
   Input event list, cube or observation definition file [$CTOOLS/test/data/crab_events.fits.gz] 
-	Calibration database [share/caldb/data/cta/dummy//cta_dummy_irf] share/caldb/data/cta/dummy/bcf/
-	Instrument response function [cta_dummy_irf] 
-	Source model [$CTOOLS/test/data/crab.xml] 
-	Source of interest [CrabNebula] Crab
-	Start value for first energy bin in TeV [0.1] 
-	Stop value for last energy bin in TeV [100.] 
-	Output ascii file [butterfly.txt] 
+  Calibration database [share/caldb/data/cta/dummy//cta_dummy_irf] share/caldb/data/cta/dummy/bcf/
+  Instrument response function [cta_dummy_irf] 
+  Source model [$CTOOLS/test/data/crab.xml] 
+  Source of interest [CrabNebula] Crab
+  Start value for first energy bin in TeV [0.1] 
+  Stop value for last energy bin in TeV [100.] 
+  Output ascii file [butterfly.txt] 
 
 Below some lines of the ``ctbutterfly.log``:
 
 .. code-block:: xml
 
-  2014-10-30T17:51:24: ********************************************************************************
-	2014-10-30T17:51:24: *                                  ctbutterfly                                 *
-	2014-10-30T17:51:24: * ---------------------------------------------------------------------------- *
-	2014-10-30T17:51:24: * Version: 00-01-00                                                            *
-	2014-10-30T17:51:24: ********************************************************************************
-	2014-10-30T17:51:39: +============+
-	2014-10-30T17:51:39: | Parameters |
-	2014-10-30T17:51:39: +============+
-	2014-10-30T17:51:39:  infile ....................: $CTOOLS/test/data/crab_events.fits.gz
-	2014-10-30T17:51:39:  srcmdl ....................: $CTOOLS/test/data/crab.xml
-	2014-10-30T17:51:39:  srcname ...................: Crab
-	2014-10-30T17:51:39:  caldb .....................: share/caldb/data/cta/dummy/bcf/
-	2014-10-30T17:51:39:  irf .......................: cta_dummy_irf
-	2014-10-30T17:51:39:  outfile ...................: butterfly.txt
-	2014-10-30T17:51:39:  matrix ....................: NONE
-	2014-10-30T17:51:39:  ebinalg ...................: LOG
-	2014-10-30T17:51:39:  emin ......................: 0.1
-	2014-10-30T17:51:39:  emax ......................: 100.
-	2014-10-30T17:51:39:  enumbins ..................: 100
-	2014-10-30T17:51:39:  ebinfile ..................: NONE
-	2014-10-30T17:51:39:  chatter ...................: 2
-	2014-10-30T17:51:39:  clobber ...................: yes
-	2014-10-30T17:51:39:  debug .....................: no
-	2014-10-30T17:51:39:  mode ......................: ql
-	2014-10-30T17:51:39:  logfile ...................: ctbutterfly.log
-	2014-10-30T17:51:39: 
-	2014-10-30T17:51:39: +=============+
-	2014-10-30T17:51:39: | Observation |
-	2014-10-30T17:51:39: +=============+
-	2014-10-30T17:51:39: === GObservations ===
-	2014-10-30T17:51:39:  Number of observations ....: 1
-	2014-10-30T17:51:39:  Number of predicted events : 0
-	2014-10-30T17:51:39: === GCTAObservation ===
-	2014-10-30T17:51:39:  Name ......................: 
-	2014-10-30T17:51:39:  Identifier ................: 
-	2014-10-30T17:51:39:  Instrument ................: CTA
-	2014-10-30T17:51:39:  Event file ................: test/data/crab_events.fits.gz
-	2014-10-30T17:51:39:  Event type ................: EventList
-	2014-10-30T17:51:39:  Statistics ................: Poisson
-	2014-10-30T17:51:39:  Ontime ....................: 1800 s
-	2014-10-30T17:51:39:  Livetime ..................: 1710 s
-	2014-10-30T17:51:39:  Deadtime correction .......: 0.95
-	2014-10-30T17:51:39: === GCTAPointing ===
-	2014-10-30T17:51:39:  Pointing direction ........: (RA,Dec)=(83.63,22.01)
-	2014-10-30T17:51:39: === GCTAResponseIrf ===
-	2014-10-30T17:51:39:  Response name .............: cta_dummy_irf
-	2014-10-30T17:51:39:  Energy dispersion .........: Not used
-	2014-10-30T17:51:39: === GCaldb ===
-	2014-10-30T17:51:39:  Database root .............: share/caldb/data/cta/dummy/bcf/
-	2014-10-30T17:51:39: === GCTAAeffPerfTable ===
-	2014-10-30T17:51:39:  Filename ..................: share/caldb/data/cta/dummy/bcf//cta_dummy_irf.dat
-	2014-10-30T17:51:39:  Number of energy bins .....: 20
-	2014-10-30T17:51:39:  Log10(Energy) range .......: 0.0199526 - 125.893 TeV
-	2014-10-30T17:51:39:  Offset angle dependence ...: Fixed sigma=3
-	2014-10-30T17:51:39: === GCTAPsfPerfTable ===
-	2014-10-30T17:51:39:  Filename ..................: share/caldb/data/cta/dummy/bcf//cta_dummy_irf.dat
-	2014-10-30T17:51:39:  Number of energy bins .....: 20
-	2014-10-30T17:51:39:  Log10(Energy) range .......: 0.0199526 - 125.893 TeV
-	2014-10-30T17:51:39: === GCTAEdispPerfTable ===
-	2014-10-30T17:51:39:  Filename ..................: share/caldb/data/cta/dummy/bcf//cta_dummy_irf.dat
-	2014-10-30T17:51:39:  Number of energy bins .....: 20
-	2014-10-30T17:51:39:  Log10(Energy) range .......: 0.0199526 - 125.893 TeV
-	2014-10-30T17:51:39: === GCTABackgroundPerfTable ===
-	2014-10-30T17:51:39:  Filename ..................: share/caldb/data/cta/dummy/bcf//cta_dummy_irf.dat
-	2014-10-30T17:51:39:  Number of energy bins .....: 20
-	2014-10-30T17:51:39:  Log10(Energy) range .......: 0.0199526 - 125.893 TeV
-	2014-10-30T17:51:39:  Offset angle dependence ...: Fixed sigma=3
-	2014-10-30T17:51:39: === GCTAEventList ===
-	2014-10-30T17:51:39:  Number of events ..........: 6141
-	2014-10-30T17:51:39:  Time interval .............: 51544.5 - 51544.5 days
-	2014-10-30T17:51:39: 
-	2014-10-30T17:51:39: +===========================+
-	2014-10-30T17:51:39: | Compute covariance matrix |
-	2014-10-30T17:51:39: +===========================+
-	2014-10-30T17:51:39: 
-	2014-10-30T17:51:39: +====================+
-	2014-10-30T17:51:39: | Generate butterfly |
-	2014-10-30T17:51:39: +====================+
-	2014-10-30T17:51:39: 
-	2014-10-30T17:51:39: +========================+
-	2014-10-30T17:51:39: | Save Butterfly to file |
-	2014-10-30T17:51:39: +========================+
-	2014-10-30T17:51:39: 
-	2014-10-30T17:51:39: Application "ctbutterfly" terminated after 15 wall clock seconds, consuming 0.051253 seconds of CPU time.
+  2014-10-30T17:51:39: +===========================+
+  2014-10-30T17:51:39: | Compute covariance matrix |
+  2014-10-30T17:51:39: +===========================+
+  2014-10-30T17:51:39: 
+  2014-10-30T17:51:39: +====================+
+  2014-10-30T17:51:39: | Generate butterfly |
+  2014-10-30T17:51:39: +====================+
+  2014-10-30T17:51:39: 
+  2014-10-30T17:51:39: +========================+
+  2014-10-30T17:51:39: | Save Butterfly to file |
+  2014-10-30T17:51:39: +========================+
+  2014-10-30T17:51:39: 
+  2014-10-30T17:51:39: Application "ctbutterfly" terminated after 15 wall clock seconds, consuming 0.051253 seconds of CPU time.
 
-Now that you have computed the confidence band of the spectral fit, you can visualise
-file with an example script. The script is located in the "examples" folder. Make sure you
-have installed matplotlib on your system. Then run the following script:
+Now that you have computed the confidence band of the spectral fit and 
+that you will have an ASCII file named ``butterfly.txt'' on disk you can
+visualise the butterfly using the script ``show_butterfly.py'' that is 
+in the ctools ``example'' folder. You will need matplotlib on your system
+to make this work. To launch the script, type:
 
 .. code-block:: bash
-	python $CTOOLS/examples/show_butterfly.py butterfly.txt
+	python $CTOOLS/examples/python/show_butterfly.py butterfly.txt
 	
 This will result in a canvas which should look like the following:
+
 .. figure:: butterfly.jpg
    :width: 60%
 
