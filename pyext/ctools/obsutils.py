@@ -125,7 +125,7 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
 # ================ #
 # Fit observations #
 # ================ #
-def fit(obs, log=False, debug=False, edisp=False, tscalc=False):
+def fit(obs, log=False, debug=False, edisp=False):
     """
     Perform maximum likelihood fitting of observations in the container.
     
@@ -147,10 +147,6 @@ def fit(obs, log=False, debug=False, edisp=False, tscalc=False):
     if debug:
         like["debug"].boolean(True)
     
-    # Optionally turn on TS calculation
-    if tscalc:
-        like["tscalc"].boolean(True)
-
     # Optionally apply energy dispersion
     like["edisp"].boolean(edisp)
 
