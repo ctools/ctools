@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-26 October 2014
+30 October 2014
 
 
 1. Introduction
@@ -169,10 +169,11 @@ or may be specified by user parameters.
 The first version of the ctbkgcube tool is included in the release.
 ctbkgcube computes the background cube for an observation definition 
 file. The cube definition may be taken from a counts cube or may be
-specified by user parameters.
-
-Memory usage has been reduced by disposing the event lists after their
-usage.
+specified by user parameters. The tools also updates the input model
+by replacing all IACT background model components by a single
+background cube background model with a power law as spectral
+parameter. The model container is available to Python using the
+models() method or can be written into an XML file on disk.
 
 
 15. ctcubemask - CTA cube filtering
@@ -193,7 +194,8 @@ file.
 
 17. Examples
 ------------
-None
+Added the following example scripts:
+* pipeline_stacked.py (simulation and stacked analysis)
 
 
 18. Scripts
