@@ -14,6 +14,7 @@ ctools
 * `ctobssim <fhelp/ctobssim.html>`__ --- Observation simulator.
 * `ctselect <fhelp/ctselect.html>`__ --- Performs sub-selections of event data which are needed for unbinned maximum likelihood analysis.
 * `ctskymap <fhelp/ctskymap.html>`__ --- Computes sky map from CTA data.
+* `ctbutterfly <fhelp/ctbutterfly.html>`__ --- Computes a butterfly from a spectral model.
 
 cscripts
 --------
