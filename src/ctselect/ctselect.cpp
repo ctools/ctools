@@ -373,6 +373,92 @@ void ctselect::save(void)
 }
 
 
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctselect::init_members(void)
+{
+    // Initialise parameters
+    m_infile.clear();
+    m_outfile.clear();
+    m_prefix.clear();
+    m_usepnt = false;
+    m_ra     = -1.0;
+    m_dec    = -1.0;
+    m_rad    = -1.0;
+    m_tmin   = 0.0;
+    m_tmax   = 0.0;
+    m_emin   = 0.0;
+    m_emax   = 0.0;
+    m_expr.clear();
+
+    // Initialise protected members
+    m_obs.clear();
+    m_infiles.clear();
+    m_timemin.clear();
+    m_timemax.clear();
+    m_use_xml    = false;
+    
+    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
+    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
+    // a better mechanism to implement the CTA reference MJD.
+    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctselect::copy_members(const ctselect& app)
+{
+    // Copy parameters
+    m_infile  = app.m_infile;
+    m_outfile = app.m_outfile;
+    m_prefix  = app.m_prefix;
+    m_usepnt  = app.m_usepnt;
+    m_ra      = app.m_ra;
+    m_dec     = app.m_dec;
+    m_rad     = app.m_rad;
+    m_tmin    = app.m_tmin;
+    m_tmax    = app.m_tmax;
+    m_emin    = app.m_emin;
+    m_emax    = app.m_emax;
+    m_expr    = app.m_expr;
+
+    // Copy protected members
+    m_obs        = app.m_obs;
+    m_infiles    = app.m_infiles;
+    m_timemin    = app.m_timemin;
+    m_timemax    = app.m_timemax;
+    m_use_xml    = app.m_use_xml;
+    m_cta_ref    = app.m_cta_ref;
+    
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctselect::free_members(void)
+{
+    // Return
+    return;
+}
+
+
 /***********************************************************************//**
  * @brief Get application parameters
  *
@@ -458,44 +544,55 @@ void ctselect::get_parameters(void)
  * @param[in] obs CTA observation.
  * @param[in] filename File name.
  *
+ * @exception GException::invalid_value
+ *            No EVENTS extension found in FITS file.
+ *
  * Select events from a FITS file by making use of the selection possibility
  * of the cfitsio library on loading a file. A selection string is created
  * from the specified criteria that is appended to the filename so that
  * cfitsio will automatically filter the event data. This selection string
  * is then applied when opening the FITS file. The opened FITS file is then
  * saved into a temporary file which is the loaded into the actual CTA
- * observation, overwriting the old CTA observation. The ROI, GTI and EBounds
+ * observation, overwriting the old CTA observation. The ROI, GTI and Ebounds
  * of the CTA event list are then set accordingly to the specified selection.
  * Finally, the temporary file created during this process is removed.
  *
  * Good Time Intervals of the observation will be limited to the time
  * interval [m_tmin, m_tmax]. If m_tmin=m_tmax=0, no time selection is
  * performed.
- *
- * @todo Use INDEF instead of 0.0 for pointing as RA/DEC selection
  ***************************************************************************/
 void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 {
-    // Allocate selection string
+    // Initialise selection string
     std::string selection;
-    char        cmin[80];
-    char        cmax[80];
-    char        cra[80];
-    char        cdec[80];
-    char        crad[80];
 
-    // Set requested selections
-    bool select_time = (m_tmin != 0.0 || m_tmax != 0.0);
-    bool select_roi = ((m_dec != -1.0 && m_ra != -1.0 && m_rad != -1.0) || m_usepnt);
+    // Initialise selection flags
+    bool remove_all = false;
+
+    // Analyse task parameters to see what selections are required
+    bool select_time   = (m_tmin != 0.0 || m_tmax != 0.0);
+    bool select_energy = true;
+    bool select_roi    = ((m_dec != -1.0 && m_ra != -1.0 && m_rad != -1.0) || m_usepnt);
+    bool select_expr   = (gammalib::strip_whitespace(m_expr).length() > 0);
+
+    // Set energy selection
+    double emin = m_emin;
+    double emax = m_emax;
     
-    // Set RA/DEC selection
+    // Set RA/DEC selection. If the "usepnt" parameter is set to true then
+    // use the pointing direction as the ROI centre.
     double ra  = m_ra;
     double dec = m_dec;
+    double rad = m_rad;
     if (m_usepnt) {
         const GCTAPointing &pnt = obs->pointing();
         ra  = pnt.dir().ra_deg();
         dec = pnt.dir().dec_deg();
     }
+
+    // Get CTA event list pointer
+    GCTAEventList* list =
+        static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
     
     // Set time selection interval. We make sure here that the time selection
     // interval cannot be wider than the GTIs covering the data. This is done
@@ -505,12 +602,12 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         // Reduce GTIs to specified time interval. The complicated cast is
         // necessary here because the gti() method is declared const, so
         // we're not officially allowed to modify the GTIs.
-        ((GGti*)(&obs->events()->gti()))->reduce(m_timemin, m_timemax);
+        ((GGti*)(&list->gti()))->reduce(m_timemin, m_timemax);
 
     } // endif: time selection was required
 
     // Save GTI for later usage
-    GGti gti = obs->events()->gti();
+    GGti gti = list->gti();
 
     // Make time selection
     if (select_time) {
@@ -521,6 +618,8 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         double tmax = gti.tstop().convert(gti.reference());
 
         // Format time with sufficient accuracy and add to selection string
+        char cmin[80];
+        char cmax[80];
         sprintf(cmin, "%.8f", tmin);
         sprintf(cmax, "%.8f", tmax);
         selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
@@ -528,56 +627,147 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
             log << gammalib::parformat("Time range");
             log << tmin << " - " << tmax << " s" << std::endl;
         }
-        if (selection.length() > 0) {
-            selection += " && ";
-        }
-    }
+
+    } // endif: made time selection
 
     // Make energy selection
-    sprintf(cmin, "%.8f", m_emin);
-    sprintf(cmax, "%.8f", m_emax);
-    selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+std::string(cmax);
-    if (logTerse()) {
-        log << gammalib::parformat("Energy range");
-        log << m_emin << " - " << m_emax << " TeV" << std::endl;
-    }
+    if (select_energy) {
 
-    // Make ROI selection
-    if (select_roi){
+        // If we have aready a selection than add an "&&" operator
         if (selection.length() > 0) {
             selection += " && ";
         }
+
+        // Log the requested energy range
+        if (logTerse()) {
+            log << gammalib::parformat("Requested energy range");
+            log << m_emin << " - " << m_emax << " TeV" << std::endl;
+        }
+
+        // Set the energy boundaries. Make sure that they overlap with any
+        // existing energy boundaries
+        const GEbounds& ebounds = list->ebounds();
+        if (ebounds.size() >= 1) {
+            if (logTerse()) {
+                log << gammalib::parformat("Energy range of data");
+                log << ebounds.emin(0).TeV() << " - ";
+                log << ebounds.emax(0).TeV() << " TeV" << std::endl;
+            }
+            if (emin < ebounds.emin(0).TeV()) {
+                emin = ebounds.emin(0).TeV();
+            }
+            if (emax > ebounds.emax(0).TeV()) {
+                emax = ebounds.emax(0).TeV();
+            }
+        }
+
+        // Log the selected energy range
+        if (logTerse()) {
+            log << gammalib::parformat("Selected energy range");
+            if (emin >= emax) {
+                log << "None. There is no overlap between existing ";
+                log << "and requested energy range." << std::endl;
+            }
+            else {
+                log << emin << " - " << emax << " TeV" << std::endl;
+            }
+        }
+
+        // Format energy selection
+        char cmin[80];
+        char cmax[80];
+        sprintf(cmin, "%.8f", emin);
+        sprintf(cmax, "%.8f", emax);
+        selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+std::string(cmax);
         
+    } // endif: made energy selection
+
+    // Make ROI selection
+    if (select_roi) {
+
+        // If we have aready a selection than add an "&&" operator
+        if (selection.length() > 0) {
+            selection += " && ";
+        }
+
+        // Log the requested ROI
+        if (logTerse()) {
+            log << gammalib::parformat("Requested ROI");
+            log << "Centre(RA,DEC)=(" << ra << ", " << dec << ") deg, ";
+            log << "Radius=" << m_rad << " deg" << std::endl;
+        }
+
+        // If we have already an ROI then make sure that the selected
+        // ROI overlaps with the existing ROI
+        double roi_radius = list->roi().radius();
+        if (roi_radius > 0.0) {
+            GSkyDir roi_centre = list->roi().centre().dir();
+            if (logTerse()) {
+                log << gammalib::parformat("ROI of data");
+                log << "Centre(RA,DEC)=(" << roi_centre.ra_deg() << ", ";
+                log << roi_centre.dec_deg() << ") deg, ";
+                log << "Radius=" << roi_radius << " deg" << std::endl;
+            }
+            GSkyDir centre;
+            centre.radec_deg(ra, dec);
+            double distance = centre.dist_deg(roi_centre);
+            if (distance + rad > roi_radius) {
+                rad = roi_radius - distance;
+            }
+        }
+
+        // Log the selected ROI
+        if (logTerse()) {
+            log << gammalib::parformat("Selected ROI");
+            if (rad <= 0.0) {
+                log << "None. There is no overlap between existing ";
+                log << "and requested ROI." << std::endl;
+            }
+            else {
+                log << "Centre(RA,DEC)=(" << ra << ", " << dec << ") deg, ";
+                log << "Radius=" << rad << " deg" << std::endl;
+            }
+        }
+        
+        // Format ROI selection
+        char cra[80];
+        char cdec[80];
+        char crad[80];
         sprintf(cra,  "%.6f", ra);
         sprintf(cdec, "%.6f", dec);
-        sprintf(crad, "%.6f", m_rad);
+        sprintf(crad, "%.6f", rad);
         selection += "ANGSEP("+std::string(cra)+"," +
                      std::string(cdec)+",RA,DEC) <= " +
                      std::string(crad);
-        if (logTerse()) {
-            log << gammalib::parformat("Acceptance cone centre");
-            log << "RA=" << ra << ", DEC=" << dec << " deg" << std::endl;
-            log << gammalib::parformat("Acceptance cone radius");
-            log << m_rad << " deg" << std::endl;
-        }
-        if (logTerse()) {
-            log << gammalib::parformat("cfitsio selection");
-            log << selection << std::endl;
-        }
-    }
 
-    // Add additional expression
-    if (gammalib::strip_whitespace(m_expr).length() > 0) {
+    } // endif: made ROI selection
+
+    // Make an expression selection
+    if (select_expr) {
+
+        // If we have aready a selection than add an "&&" operator
         if (selection.length() > 0) {
             selection += " && ";
         }
+
+        // Append the expression
         selection += "("+gammalib::strip_whitespace(m_expr)+")";
+
+    } // endif: made expression selection
+
+    // Dump cfitsio selection string
+    if (logTerse()) {
+        log << gammalib::parformat("cfitsio selection");
+        log << selection << std::endl;
     }
 
     // Build input filename including selection expression
     std::string expression = filename;
-    if (selection.length() > 0)
+    if (selection.length() > 0) {
         expression += "[EVENTS]["+selection+"]";
+    }
+
+    // Dump FITS filename including selection expression
     if (logTerse()) {
         log << gammalib::parformat("FITS filename");
         log << expression << std::endl;
@@ -595,17 +785,17 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 
     // Check if we have an EVENTS HDU
     if (!file.contains("EVENTS")) {
-        std::string message = "No \"EVENTS\" extension found in FITS file "+
-                              expression+".";
-        throw GException::app_error(G_SELECT_EVENTS, message);
+        std::string msg = "No \"EVENTS\" extension found in FITS file \""+
+                          expression+"\".";
+        throw GException::invalid_value(G_SELECT_EVENTS, msg);
     }
 
     // Determine number of events in EVENTS HDU
     int nevents = file.table("EVENTS")->nrows();
 
-    // If the selected event list is empty then append an empty event list
-    // to the observation. Otherwise load the data from the temporary file.
-    if (nevents < 1) {
+    // If the selected event list is empty or if removal of all events
+    // has been requesten then append an empty event list to the observation.
+    if ((nevents < 1) || (remove_all)) {
 
         // Create empty event list
         GCTAEventList eventlist;
@@ -614,127 +804,37 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         obs->events(eventlist);
 
     }
+
+    // ... otherwise load the data from the temporary file
     else {
-
-        // Re-read observation from FITS object
         obs->read(file);
-
     }
 
     // Get CTA event list pointer
-    GCTAEventList* list =
-        static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-    
-    if (select_roi){
-        // Set ROI
+    list = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+
+    // If ROI selection has been applied then set the event list ROI
+    if (select_roi) {
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
-        list->roi(GCTARoi(instdir, m_rad));
+        list->roi(GCTARoi(instdir, rad));
     }
 
-    // Set GTI
+    // Set event list GTI (in any case as any event list has a GTI)
     list->gti(gti);
 
-    // Set energy boundaries
-    GEbounds ebounds;
-    GEnergy  emin;
-    GEnergy  emax;
-    emin.TeV(m_emin);
-    emax.TeV(m_emax);
-    ebounds.append(emin, emax);
-    list->ebounds(ebounds);
+    // If an energy selection has been applied then set the energy boundaries
+    if (select_energy) {
+        GEbounds ebounds;
+        ebounds.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+        list->ebounds(ebounds);
+    }
 
     // Recompute ontime and livetime.
-    GTime meantime = 0.5 * (gti.tstart() + gti.tstop());
-    obs->ontime(gti.ontime());
-    obs->livetime(gti.ontime() * obs->deadc(meantime));
+    GTime meantime = 0.5 * (list->gti().tstart() + list->gti().tstop());
+    obs->ontime(list->gti().ontime());
+    obs->livetime(list->gti().ontime() * obs->deadc(meantime));
 
-    // Return
-    return;
-}
-
-
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
-/***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctselect::init_members(void)
-{
-    // Initialise parameters
-    m_infile.clear();
-    m_outfile.clear();
-    m_prefix.clear();
-    m_usepnt = false;
-    m_ra     = -1.0;
-    m_dec    = -1.0;
-    m_rad    = -1.0;
-    m_tmin   = 0.0;
-    m_tmax   = 0.0;
-    m_emin   = 0.0;
-    m_emax   = 0.0;
-    m_expr.clear();
-
-    // Initialise protected members
-    m_obs.clear();
-    m_infiles.clear();
-    m_timemin.clear();
-    m_timemax.clear();
-    m_use_xml    = false;
-    
-    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
-    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
-    // a better mechanism to implement the CTA reference MJD.
-    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
- *
- * @param[in] app Application.
- ***************************************************************************/
-void ctselect::copy_members(const ctselect& app)
-{
-    // Copy parameters
-    m_infile  = app.m_infile;
-    m_outfile = app.m_outfile;
-    m_prefix  = app.m_prefix;
-    m_usepnt  = app.m_usepnt;
-    m_ra      = app.m_ra;
-    m_dec     = app.m_dec;
-    m_rad     = app.m_rad;
-    m_tmin    = app.m_tmin;
-    m_tmax    = app.m_tmax;
-    m_emin    = app.m_emin;
-    m_emax    = app.m_emax;
-    m_expr    = app.m_expr;
-
-    // Copy protected members
-    m_obs        = app.m_obs;
-    m_infiles    = app.m_infiles;
-    m_timemin    = app.m_timemin;
-    m_timemax    = app.m_timemax;
-    m_use_xml    = app.m_use_xml;
-    m_cta_ref    = app.m_cta_ref;
-    
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctselect::free_members(void)
-{
     // Return
     return;
 }
