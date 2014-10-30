@@ -263,9 +263,10 @@ void ctbkgcube::run(void)
         // Flag removal
         bool remove = true;
 
-        // Do we have a CTA, HESS or VERITAS specific model?
+        // Do we have a CTA, HESS, MAGIC or VERITAS specific model?
         if (m_bkgmdl[i]->is_valid("CTA", "") ||
             m_bkgmdl[i]->is_valid("HESS", "") ||
+            m_bkgmdl[i]->is_valid("MAGIC", "") ||
             m_bkgmdl[i]->is_valid("VERITAS", "")) {
 
             // Do we have a background model?
@@ -275,7 +276,7 @@ void ctbkgcube::run(void)
                 remove = false;
 
             } // endif: had a background model
-        } // endif: had a CTA, HESS or VERITAS model
+        } // endif: had a CTA, HESS, MAGIC or VERITAS model
 
         // Log results
         if (logTerse()) {
