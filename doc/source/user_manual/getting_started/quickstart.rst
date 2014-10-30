@@ -692,7 +692,7 @@ in the ctools ``example'' folder. You will need matplotlib on your system
 to make this work. To launch the script, type:
 
 .. code-block:: bash
-	python $CTOOLS/examples/python/show_butterfly.py butterfly.txt
+	python $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
 	
 This will result in a canvas which should look like the following:
 
