@@ -642,7 +642,7 @@ the same events for both analyses.
   2014-01-09T21:47:54: Application "ctlike" terminated after 6 wall clock seconds, consuming 0.163384 seconds of CPU time.
 
 
- .. _sec_butterfly_cta:
+.. _sec_butterfly_cta:
 
 Calculate and visualise butterfly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -686,9 +686,9 @@ Below some lines of the ``ctbutterfly.log``:
   2014-10-30T17:51:39: Application "ctbutterfly" terminated after 15 wall clock seconds, consuming 0.051253 seconds of CPU time.
 
 Now that you have computed the confidence band of the spectral fit and 
-that you will have an ASCII file named ``butterfly.txt'' on disk you can
-visualise the butterfly using the script ``show_butterfly.py'' that is 
-in the ctools ``example'' folder. You will need matplotlib on your system
+that you will have an ASCII file named ``butterfly.txt`` on disk you can
+visualise the butterfly using the script ``show_butterfly.py`` that is 
+in the ctools ``example`` folder. You will need matplotlib on your system
 to make this work. To launch the script, type:
 
 .. code-block:: bash
