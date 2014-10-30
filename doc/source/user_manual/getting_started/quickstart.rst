@@ -19,6 +19,8 @@ The example consists of the following analysis steps:
 
 - :ref:`sec_unbinned_cta`
 
+- :ref:`sec_butterfly_cta`
+
 
 .. _sec_simulating_cta:
 
@@ -638,3 +640,64 @@ the same events for both analyses.
   2014-01-09T21:47:54: +==============+
   2014-01-09T21:47:54: 
   2014-01-09T21:47:54: Application "ctlike" terminated after 6 wall clock seconds, consuming 0.163384 seconds of CPU time.
+
+
+ .. _sec_butterfly_cta:
+
+Calculate and visualise butterfly
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To visualise the analysis results retrieved above, one can calculate the
+confidence band of the spectral fit. The tool ctbutterfly takes the optimised
+source model as input. It takes the covariance matrix from the fit to conduct a
+Gaussian error propagation for each energy value. It will write the 
+butterfly information into an ASCII file.
+The following example shows how to compute such a butterfly from the command
+line.
+
+.. code-block:: bash
+
+  $ ctbutterfly
+  Input event list, cube or observation definition file [$CTOOLS/test/data/crab_events.fits.gz] 
+  Calibration database [share/caldb/data/cta/dummy//cta_dummy_irf] share/caldb/data/cta/dummy/bcf/
+  Instrument response function [cta_dummy_irf] 
+  Source model [$CTOOLS/test/data/crab.xml] 
+  Source of interest [CrabNebula] Crab
+  Start value for first energy bin in TeV [0.1] 
+  Stop value for last energy bin in TeV [100.] 
+  Output ascii file [butterfly.txt] 
+
+Below some lines of the ``ctbutterfly.log``:
+
+.. code-block:: xml
+
+  2014-10-30T17:51:39: +===========================+
+  2014-10-30T17:51:39: | Compute covariance matrix |
+  2014-10-30T17:51:39: +===========================+
+  2014-10-30T17:51:39: 
+  2014-10-30T17:51:39: +====================+
+  2014-10-30T17:51:39: | Generate butterfly |
+  2014-10-30T17:51:39: +====================+
+  2014-10-30T17:51:39: 
+  2014-10-30T17:51:39: +========================+
+  2014-10-30T17:51:39: | Save Butterfly to file |
+  2014-10-30T17:51:39: +========================+
+  2014-10-30T17:51:39: 
+  2014-10-30T17:51:39: Application "ctbutterfly" terminated after 15 wall clock seconds, consuming 0.051253 seconds of CPU time.
+
+Now that you have computed the confidence band of the spectral fit and 
+that you will have an ASCII file named ``butterfly.txt'' on disk you can
+visualise the butterfly using the script ``show_butterfly.py'' that is 
+in the ctools ``example'' folder. You will need matplotlib on your system
+to make this work. To launch the script, type:
+
+.. code-block:: bash
+	python $CTOOLS/examples/python/show_butterfly.py butterfly.txt
+	
+This will result in a canvas which should look like the following:
+
+.. figure:: butterfly.jpg
+   :width: 60%
+
+   *Confidence band of the fit*
+ 
