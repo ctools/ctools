@@ -2,6 +2,7 @@
 
 # Scripts to be distributed
 scripts = README \
+          pipeline_stacked_mem.py \
           make_binned_analysis.py \
           make_pull_at_sensitivity_limit.py \
           make_ts_distributions.py \
