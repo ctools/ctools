@@ -48,6 +48,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GCTAEventCube& cube(void) const;
+    const GModels&       models(void) const;
 };
 
 /***********************************************************************//**

@@ -85,7 +85,7 @@ if [ -s "events.fits" ]
 then
   $ECHO -n "."
 else
-  echo " events.fits file is not valid"
+  echo " events.fits file is not found"
   exit 1
 fi
 #
@@ -106,7 +106,7 @@ if [ -s "events2.fits" ]
 then
   $ECHO -n "."
 else
-  echo " events2.fits file is not valid"
+  echo " events2.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -132,7 +132,7 @@ if [ -s "skymap.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " skymap.fits file is not valid"
+  $ECHO " skymap.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -162,7 +162,7 @@ if [ -s "cntmap.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " cntmap.fits file is not valid"
+  $ECHO " cntmap.fits file is not found"
   exit 1
 fi
 #
@@ -185,7 +185,7 @@ if [ -s "cntmap2.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " cntmap2.fits file is not valid"
+  $ECHO " cntmap2.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -208,7 +208,7 @@ if [ -s "modmap1.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " modmap1.fits file is not valid"
+  $ECHO " modmap1.fits file is not found"
   exit 1
 fi
 #
@@ -238,7 +238,7 @@ if [ -s "modmap3.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " modmap3.fits file is not valid"
+  $ECHO " modmap3.fits file is not found"
   exit 1
 fi
 #
@@ -254,7 +254,7 @@ if [ -s "modmap2.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " modmap2.fits file is not valid"
+  $ECHO " modmap2.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -278,7 +278,7 @@ if [ -s "selected_events.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " selected_events.fits file is not valid"
+  $ECHO " selected_events.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -300,7 +300,7 @@ if [ -s "results_binned.xml" ]
 then
   $ECHO -n "."
 else
-  $ECHO " results_binned.xml file is not valid"
+  $ECHO " results_binned.xml file is not found"
   exit 1
 fi
 #
@@ -315,7 +315,7 @@ if [ -s "results_unbinned.xml" ]
 then
   $ECHO -n "."
 else
-  $ECHO " results_unbinned.xml file is not valid"
+  $ECHO " results_unbinned.xml file is not found"
   exit 1
 fi
 #
@@ -330,7 +330,7 @@ if [ -s "results_unbinned_background_cube.xml" ]
 then
   $ECHO -n "."
 else
-  $ECHO " results_unbinned_background_cube.xml file is not valid"
+  $ECHO " results_unbinned_background_cube.xml file is not found"
   exit 1
 fi
 #
@@ -345,7 +345,7 @@ if [ -s "results_binned_background_cube.xml" ]
 then
   $ECHO -n "."
 else
-  $ECHO " results_binned_background_cube.xml file is not valid"
+  $ECHO " results_binned_background_cube.xml file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -373,7 +373,7 @@ if [ -s "tsmap.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " tsmap.fits file is not valid"
+  $ECHO " tsmap.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -405,7 +405,7 @@ if [ -s "expcube1.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " expcube1.fits file is not valid"
+  $ECHO " expcube1.fits file is not found"
   exit 1
 fi
 #
@@ -420,7 +420,7 @@ if [ -s "expcube2.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " expcube2.fits file is not valid"
+  $ECHO " expcube2.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -454,7 +454,7 @@ if [ -s "psfcube1.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " psfcube1.fits file is not valid"
+  $ECHO " psfcube1.fits file is not found"
   exit 1
 fi
 #
@@ -471,7 +471,7 @@ if [ -s "psfcube2.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " psfcube2.fits file is not valid"
+  $ECHO " psfcube2.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -484,9 +484,10 @@ $ECHO -n "Test ctbkgcube: "
 #
 # Run 1
 $ctbkgcube infile="data/crab_events.fits" \
-           bkgmdl="data/crab.xml" \
+           inmodel="data/crab.xml" \
            cntmap="NONE" \
            outfile="bkgcube1.fits" \
+           outmodel="bkgcube1.xml" \
            emin=0.1 \
            emax=100.0 \
            enumbins=20 \
@@ -502,21 +503,36 @@ if [ -s "bkgcube1.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " bkgcube1.fits file is not valid"
+  $ECHO " bkgcube1.fits file is not found"
+  exit 1
+fi
+if [ -s "bkgcube1.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " bkgcube1.xml file is not found"
   exit 1
 fi
 #
 # Run 2
 $ctbkgcube infile="data/crab_events.fits" \
-           bkgmdl="data/crab.xml" \
+           inmodel="data/crab.xml" \
            cntmap="data/crab_cntmap.fits" \
-           outfile="bkgcube2.fits"
+           outfile="bkgcube2.fits" \
+           outmodel="bkgcube2.xml"
 $ECHO -n "."
 if [ -s "bkgcube2.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " bkgcube2.fits file is not valid"
+  $ECHO " bkgcube2.fits file is not found"
+  exit 1
+fi
+if [ -s "bkgcube2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " bkgcube2.xml file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -539,7 +555,7 @@ if [ -s "filtered_cube.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " filtered_cube.fits file is not valid"
+  $ECHO " filtered_cube.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -562,7 +578,7 @@ if [ -s "butterfly.txt" ]
 then
     $ECHO -n "."
 else
-    $ECHO " butterfly.txt file is not valid"
+    $ECHO " butterfly.txt file is not found"
     exit 1
 fi
 $ECHO " ok"

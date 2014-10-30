@@ -66,9 +66,10 @@ class Test(gammalib.GPythonTestSuite):
         # Set-up ctbkgcube
         bkgcube = ctools.ctbkgcube()
         bkgcube["infile"].filename(self.events_name)
-        bkgcube["bkgmdl"].filename(self.bkg_model)
+        bkgcube["inmodel"].filename(self.bkg_model)
         bkgcube["cntmap"].filename("NONE")
-        bkgcube["outfile"].filename("psfcube.fits")
+        bkgcube["outfile"].filename("bkgcube.fits")
+        bkgcube["outmodel"].filename("bkgcube.xml")
         bkgcube["ebinalg"].string("LOG")
         bkgcube["emin"].real(0.1)
         bkgcube["emax"].real(100.0)

@@ -42,6 +42,8 @@
 
 /* __ Coding definitions _________________________________________________ */
 
+/* __ Constants __________________________________________________________ */
+
 
 /*==========================================================================
  =                                                                         =
@@ -233,16 +235,27 @@ void ctbkgcube::run(void)
         log << m_obs << std::endl;
     }
 
+    // Log input model
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Input model");
+        log << m_obs.models() << std::endl;
+    }
+
     // Write header
     if (logTerse()) {
         log << std::endl;
         log.header1("Prepare model");
     }
 
-    // Copy models from observation container
+    // Copy models from observation container and reset output model
+    // container
     m_bkgmdl = m_obs.models();
+    m_outmdl.clear();
+    m_cube_model = -1;
 
-    // Remove all model that are not CTA background models from the
+    // Remove all models that are not CTA background models from the
+    // container and put all removed components in the output
     // container
     int num = m_bkgmdl.size();
     for (int i = num-1; i >= 0; --i) {
@@ -281,8 +294,10 @@ void ctbkgcube::run(void)
             log << std::endl;
         }
 
-        // Remove model if requested
+        // If removal is requested, append model to output container and
+        // remove it from the background model container ...
         if (remove) {
+            m_outmdl.append(*(m_bkgmdl[i]));
             m_bkgmdl.remove(i);
         }
 
@@ -345,6 +360,27 @@ void ctbkgcube::run(void)
         log << n_observations << std::endl;
     }
 
+    // Create a background model for output background cube and append
+    // that model to the input model in place of the original
+    // background model
+    GEnergies energies;
+    for (int i = 0; i < m_bkgcube.ebins(); ++i) {
+        energies.append(m_bkgcube.energy(i));
+    }
+    GModelSpatialDiffuseCube spatial(m_bkgcube.map(), energies, 1.0);
+    GModelSpectralPlaw       spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
+    GCTAModelCubeBackground  model(spatial, spectral);
+    model.name("ctbkgcube default background model");
+    m_cube_model = m_outmdl.size(); // Store the slot number for save()
+    m_outmdl.append(model);
+
+    // Log output model
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Output model");
+        log << m_outmdl << std::endl;
+    }
+
     // Return
     return;
 }
@@ -369,8 +405,9 @@ void ctbkgcube::save(void)
         energies.append(m_ebounds.elogmean(i));
     }
 
-    // Get output filename
-    std::string filename = (*this)["outfile"].filename();
+    // Get output filenames
+    std::string outfile  = (*this)["outfile"].filename();
+    std::string outmodel = (*this)["outmodel"].filename();
 
     // Create empty FITS file
     GFits fits;
@@ -382,7 +419,28 @@ void ctbkgcube::save(void)
     energies.write(fits);
     
     // Save FITS file
-    fits.saveto(filename, clobber());
+    fits.saveto(outfile, clobber());
+
+    // Write output models if filename is valid
+    if ((outmodel.length() > 0) && (gammalib::tolower(outmodel) != "none")) {
+
+        // Set filename of map cube.
+        if (m_cube_model >= 0) {
+            GCTAModelCubeBackground* model =
+                dynamic_cast<GCTAModelCubeBackground*>(m_outmdl[m_cube_model]);
+            if (model != NULL) {
+                GModelSpatialDiffuseCube* spatial =
+                    dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
+                if (spatial != NULL) {
+                    spatial->filename(outfile);
+                }
+            }
+        }
+
+        // Save output model container
+        m_outmdl.save(outmodel);
+        
+    }
 
     // Return
     return;
@@ -404,8 +462,10 @@ void ctbkgcube::init_members(void)
     m_obs.clear();
     m_bkgcube.clear();
     m_bkgmdl.clear();
+    m_outmdl.clear();
     m_ebounds.clear();
-    m_livetime = 0.0;
+    m_livetime   = 0.0;
+    m_cube_model = -1;
 
     // Return
     return;
@@ -420,11 +480,13 @@ void ctbkgcube::init_members(void)
 void ctbkgcube::copy_members(const ctbkgcube& app)
 {
     // Copy members
-    m_obs      = app.m_obs;
-    m_bkgcube  = app.m_bkgcube;
-    m_bkgmdl   = app.m_bkgmdl;
-    m_ebounds  = app.m_ebounds;
-    m_livetime = app.m_livetime;
+    m_obs        = app.m_obs;
+    m_bkgcube    = app.m_bkgcube;
+    m_bkgmdl     = app.m_bkgmdl;
+    m_outmdl     = app.m_outmdl;
+    m_ebounds    = app.m_ebounds;
+    m_livetime   = app.m_livetime;
+    m_cube_model = app.m_cube_model;
 
     // Return
     return;
@@ -461,15 +523,15 @@ void ctbkgcube::get_parameters(void)
     // If there are no models associated with the observations then load now
     // the model definition from the XML file
     if (m_obs.models().size() == 0) {
-        if ((*this)["bkgmdl"].is_undefined()) {
-            std::string msg = "No background model definition XML file "
-                              "specified. Please set the \"bkgmdl\" parameter "
-                              "to the background model definition XML "
-                              "filename.";
+        if ((*this)["inmodel"].is_undefined()) {
+            std::string msg = "No model definition XML file specified. "
+                              "Please set the \"inmodel\" parameter to the "
+                              "XML file that contains the background model "
+                              "definition.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
-        std::string bkgmdl = (*this)["bkgmdl"].filename();
-        GModels     models(bkgmdl);
+        std::string inmodel = (*this)["inmodel"].filename();
+        GModels     models(inmodel);
         m_obs.models(models);
     }
 
@@ -511,9 +573,10 @@ void ctbkgcube::get_parameters(void)
     
     }
 
-    // Read output filename (if needed)
+    // Read output filenames (if needed)
     if (read_ahead()) {
-        std::string filename = (*this)["outfile"].filename();
+        (*this)["outfile"].filename();
+        (*this)["outmodel"].filename();
     }
 
     // Return

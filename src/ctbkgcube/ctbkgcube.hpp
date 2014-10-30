@@ -60,6 +60,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GCTAEventCube& cube(void) const;
+    const GModels&       models(void) const;
 
 protected:
     // Protected methods
@@ -75,8 +76,10 @@ protected:
     GObservations m_obs;         //!< Observation container
     GCTAEventCube m_bkgcube;     //!< Background cube
     GModels       m_bkgmdl;      //!< CTA background models
+    GModels       m_outmdl;      //!< Output models
     GEbounds      m_ebounds;     //!< Energy boundaries
     double        m_livetime;    //!< Total livetime for normalization
+    int           m_cube_model;  //!< Cube model index
 };
 
 
@@ -90,6 +93,19 @@ const GCTAEventCube& ctbkgcube::cube(void) const
 {
     // Return background cube
     return (m_bkgcube);
+}
+
+
+/***********************************************************************//**
+ * @brief Return background model container
+ *
+ * @return Background model container.
+ ***************************************************************************/
+inline
+const GModels& ctbkgcube::models(void) const
+{
+    // Return background model container
+    return (m_outmdl);
 }
 
 #endif /* CTBKGCUBE_HPP */
