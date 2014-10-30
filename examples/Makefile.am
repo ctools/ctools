@@ -9,7 +9,7 @@ scripts = README \
           make_unbinned_analysis.py \
           show_pull_histogram.py \
           show_ts_distribution.py \
-          show_butterfly
+          show_butterfly.py
 
 # Set directories
 scriptsdir   = $(datadir)/examples/python
