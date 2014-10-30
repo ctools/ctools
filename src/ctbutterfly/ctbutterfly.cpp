@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctbutterfly - butterfly calculation tool                    *
+ *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
@@ -34,8 +34,8 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                          "ctbutterfly::get_parameters()"
-#define G_SAVE                                                  "ctbutterfly::save()"
+#define G_GET_PARAMETERS                      "ctbutterfly::get_parameters()"
+#define G_SAVE                                          "ctbutterfly::save()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -70,7 +70,7 @@ ctbutterfly::ctbutterfly(void) : ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION)
  * observations container.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(const GObservations& obs) :
-         ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION)
+             ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION)
 {
     // Initialise members
     init_members();
@@ -91,7 +91,7 @@ ctbutterfly::ctbutterfly(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(int argc, char *argv[]) :
-         ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
+             ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -240,11 +240,13 @@ void ctbutterfly::run(void)
             log.header1("Compute covariance matrix");
         }
 
-		GOptimizerPars pars = models.pars();
+        // Evaluate curvature matrix at the actual parameters
+		GOptimizerPars            pars       = models.pars();
 		GObservations::likelihood likelihood = m_obs.function();
 		likelihood.eval(pars);
-		GMatrixSparse* curvature = dynamic_cast<GMatrixSparse*>(likelihood.curvature());
-		m_covariance = curvature->invert();
+
+        // Get covariance matrix by inverting the curvature matrix
+        m_covariance = likelihood.curvature()->invert();
 
 	}
 
@@ -263,6 +265,7 @@ void ctbutterfly::run(void)
     // Loop over energy bins positions
     for (int i = 0; i < m_ebounds.size(); ++i) {
 
+        // Initialise number of gradients
         int num_gradient = 0;
 
     	// Get the energy of current bin
@@ -270,8 +273,8 @@ void ctbutterfly::run(void)
 
     	// Header for verbose logging
     	if (logExplicit()) {
-            std::string msg = "Computing butterfly for bin number "+gammalib::str(i)+
-                              " at "+energy.print();
+            std::string msg = "Computing butterfly for bin number "+
+                              gammalib::str(i)+" at "+energy.print();
             log << std::endl;
             log.header2(msg);
     	}
@@ -280,7 +283,7 @@ void ctbutterfly::run(void)
     	double model_flux = 0.0;
 
     	// Loop over models
-    	for (int j = 0; j < models.size(); ++j ) {
+    	for (int j = 0; j < models.size(); ++j) {
 
     	    // Check wether model is a skymodel
     	    GModelSky* skymodel = dynamic_cast<GModelSky*>(models[j]);
@@ -296,17 +299,15 @@ void ctbutterfly::run(void)
 
     	        // Set flux value of source of interest
     	        if (skymodel->name() == m_srcname) {
-    	               model_flux = spectral->eval_gradients(energy, time);
+                    model_flux = spectral->eval_gradients(energy, time);
     	        } // endif: model was source of interest
 
     	        // Loop over model parameters, get gradients
     	        // and assign them to the vector
     	        for (int k = 0; k < spectral->size(); ++k) {
-
-    	            grad[num_gradient] =  (*spectral)[k].gradient();
-    	            num_gradient += 1;
-
-    	        }// endfor: loop over spectral parameters
+    	            grad[num_gradient] = (*spectral)[k].gradient();
+    	            num_gradient++;
+    	        } // endfor: looped over spectral parameters
 
     	        // Skip temporal models
     	        num_gradient += skymodel->temporal()->size();
@@ -352,9 +353,10 @@ void ctbutterfly::run(void)
 
 
 /***********************************************************************//**
- * @brief Save maps
+ * @brief Save butterfly diagram
  *
- * This method saves the butterfly into an ascii file
+ * Saves the butterfly diagram into an ascii file using a column separated
+ * value (CSV) format with blanks as separators.
  ***************************************************************************/
 void ctbutterfly::save(void)
 {
@@ -367,33 +369,18 @@ void ctbutterfly::save(void)
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
 
-    if (gammalib::file_exists(m_outfile)) {
+    // Create CSV table with 3 columns
+    GCsv table(m_fluxes.size(), 3);
 
-        if ((*this)["clobber"].boolean()) {
-            std::remove(m_outfile.c_str());
-        }
-        else {
-            std::string msg = "File \""+m_outfile+"\" already exists and clobber is set to \"false\"";
-            throw GException::file_open_error(G_SAVE,msg);
-        }
-    }
-
-    // Create  file instance
-    std::fstream file;
-
-    file.open(m_outfile, std::fstream::out | std::fstream::app);
-
-    // Write short header
-    file << "# Energy [MeV] | flux [ph/cm2/s/MeV] | e_flux [ph/cm2/s/MeV]" << std::endl;
-
-    // Write values to file
+    // Fill CSV table
     for (int i = 0; i < m_fluxes.size(); ++i) {
-
-        file << m_energies[i] << " " << m_fluxes[i] << " " << m_errors[i] << std::endl;
+        table.real(i, 0, m_energies[i]);
+        table.real(i, 1, m_fluxes[i]);
+        table.real(i, 2, m_errors[i]);
     }
 
-    // close file
-    file.close();
+    // Save CSV table
+    table.save(m_outfile, " ", clobber());
 
     // Return
     return;
@@ -413,15 +400,15 @@ void ctbutterfly::init_members(void)
 {
     // Initialise members
     m_infile.clear();
-    m_outfile.clear();
     m_srcname.clear();
+    m_outfile.clear();
     m_ebounds.clear();
 
     // Initialise protected members
     m_obs.clear();
     m_covariance.clear();
-    m_fluxes.clear();
     m_energies.clear();
+    m_fluxes.clear();
     m_errors.clear();
 
     // Return
@@ -437,17 +424,17 @@ void ctbutterfly::init_members(void)
 void ctbutterfly::copy_members(const ctbutterfly& app)
 {
     // Copy attributes
-    m_infile   = app.m_infile;
-    m_outfile  = app.m_outfile;
-    m_srcname     = app.m_srcname;
-    m_ebounds     = app.m_ebounds;
+    m_infile  = app.m_infile;
+    m_srcname = app.m_srcname;
+    m_outfile = app.m_outfile;
+    m_ebounds = app.m_ebounds;
 
     // Copy protected members
     m_obs        = app.m_obs;
     m_covariance = app.m_covariance;
-    m_fluxes         = app.m_fluxes;
-    m_energies    = app.m_energies;
-    m_errors         = app.m_errors;
+    m_energies   = app.m_energies;
+    m_fluxes     = app.m_fluxes;
+    m_errors     = app.m_errors;
 
     // Return
     return;
@@ -535,11 +522,11 @@ void ctbutterfly::get_parameters(void)
     if (!m_obs.models().contains(m_srcname)) {
         std::string msg = "Source \""+m_srcname+"\" not found in model "
                           "container. Please add a source with that name "
-                          "or check for a possible typos.";
+                          "or check for possible typos.";
     	throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
-    // get binning information
+    // Get energy binning information
     m_ebounds  = get_ebounds();
 
     // Get matrix file name and load if possible
@@ -561,4 +548,3 @@ void ctbutterfly::get_parameters(void)
     // Return
     return;
 }
-

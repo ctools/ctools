@@ -57,6 +57,7 @@ src/ctexpcube/ctexpcube
 src/ctpsfcube/ctpsfcube
 src/ctbkgcube/ctbkgcube
 src/ctcubemask/ctcubemask
+src/ctbutterfly/ctbutterfly
 test/pfiles/
 test/*.fits
 test/*.dat
@@ -64,6 +65,7 @@ test/*.xml
 test/*.trs
 test/test_cscripts.sh
 test/reports/*.xml
+test/butterfly.txt
 examples/*.fits
 examples/*.xml
 examples/*.dat

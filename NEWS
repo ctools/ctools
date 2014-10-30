@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-15 October 2014
+26 October 2014
 
 
 1. Introduction
@@ -168,12 +168,20 @@ bin content to -1. Filtering can be done by energy, for a circular
 Region of Interest (ROI) or using ds9 exclusion regions.
 
 
-16. Examples
+16. ctbutterfly - Generate butterfly diagrams
+=============================================
+The first version of the ctbutterfly tool is included in the release.
+This tools derives a butterfly diagram from the fitted model parameters
+for one specified source. The result will be written into an ASCII
+file.
+
+
+17. Examples
 ------------
 None
 
 
-17. Scripts
+18. Scripts
 -----------
 Add logL and event statistics to cspull output file.
 
@@ -196,11 +204,11 @@ Add the csresmap script that uses ctbin and ctmodel to generate a
 residual counts cube for a given model.
 
 
-18. caldb
+19. caldb
 ---------
 None
 
 
-19. models
+20. models
 ----------
 None

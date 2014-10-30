@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctbutterfly - butterfly calculation tool             *
+ *                  ctbutterfly - butterfly calculation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2014 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctbutterfly.i
- * @brief tool for butterfly calculations
+ * @brief Butterfly calculation tool
  * @author Michael Mayer
  */
 %{
@@ -32,7 +32,7 @@
 /***********************************************************************//**
  * @class ctbutterfly
  *
- * @brief butterfly calculation tool
+ * @brief Butterfly calculation tool
  ***************************************************************************/
 class ctbutterfly : public ctool {
 public:
@@ -48,7 +48,6 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    
 };
 
 

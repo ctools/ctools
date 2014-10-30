@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctbutterfly tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014 Michal Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@ import gammalib
 import ctools
 
 
-# ========================== #
+# =============================== #
 # Test class for ctbutterfly tool #
-# ========================== #
+# =============================== #
 class Test(gammalib.GPythonTestSuite):
     """
     Test class for ctbutterfly tool.
