@@ -254,9 +254,9 @@ class cstsdist(GApplication):
         pntdir.lb_deg(lpnt, bpnt)
         
         # Create CTA observation
-        run = obsutils.set(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
-                           duration=self.m_duration, \
-                           emin=emin, emax=emax, rad=self.m_rad)
+        run = obsutils.set_obs(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
+                               duration=self.m_duration, \
+                               emin=emin, emax=emax, rad=self.m_rad)
         
         # Append observation to container
         obs.append(run)

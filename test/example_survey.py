@@ -25,7 +25,7 @@ from math import *
 import os
 import glob
 import sys
-import obsutils
+from ctools import obsutils
 
 
 # =========== #
@@ -235,8 +235,7 @@ def survey_single():
     # Set single pointing at galactic centre
     pntdir = GSkyDir()
     pntdir.lb_deg(0.0, 0.0)
-    #run = set_one_obs(pntdir)
-    run = obsutils.set(pntdir)
+    run = obsutils.set_obs(pntdir)
     obs.append(run)
     
     # Define single point source with Crab flux at galactic centre
@@ -276,8 +275,7 @@ def survey_gplane(lrange=10, lstep=2):
         # Set pointing
         pntdir = GSkyDir()
         pntdir.lb_deg(l, 0.0)
-        #run = set_one_obs(pntdir)
-        run = obsutils.set(pntdir)
+        run = obsutils.set_obs(pntdir)
         run.id(str(l))
         obs.append(run)
     
