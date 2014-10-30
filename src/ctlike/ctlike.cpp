@@ -461,7 +461,18 @@ void ctlike::optimize_lm(void)
 
     // Optionally refit
     if (m_refit) {
+
+        // Dump new header
+        log.indent(0);
+        if (logTerse()) {
+            log << std::endl;
+            log.header1("Maximum likelihood re-optimisation");
+            log.indent(1);
+        }
+
+        // Optimise again
         m_obs.optimize(*opt);
+
     }
 
     // Compute errors
@@ -470,13 +481,8 @@ void ctlike::optimize_lm(void)
     // Store maximum log likelihood value
     m_logL = -(opt->value());
 
-    // Write optimization results
+    // Remove indent
     log.indent(0);
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Maximum likelihood optimization results");
-        log << *opt << std::endl;
-    }
 
     // Return
     return;
