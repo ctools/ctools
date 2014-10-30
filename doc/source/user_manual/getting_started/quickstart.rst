@@ -34,17 +34,17 @@ will query for a number of parameters:
 .. code-block:: bash
 
   $ ctobssim
-  Model [test/data/crab.xml] $GAMMALIB/share/models/crab.xml
-  Calibration database [test/irf] $GAMMALIB/share/caldb/cta
-  Instrument response function [cta_dummy_irf] 
+  Model [$CTOOLS/share/models/crab.xml] 
   RA of pointing (degrees) (0-360) [83.63] 
   Dec of pointing (degrees) (-90-90) [22.01] 
-  Radius of FOV (degrees) (0-180) [10.0] 
+  Calibration database [dummy] 
+  Instrument response function [cta_dummy_irf] 
+  Radius of FOV (degrees) (0-180) [5.0] 
   Start time (MET in s) (0) [0.0] 
   End time (MET in s) (0) [1800.0] 
   Lower energy limit (TeV) (0) [0.1] 
   Upper energy limit (TeV) (0) [100.0] 
-  Output event data file or observation definition file [events.fits]
+  Output event data file or observation definition file [events.fits] 
 
 Each line represents a query for one parameter. The line starts with a short
 description of the parameter, followed by the default parameter value proposed
@@ -53,13 +53,13 @@ is the case for the majority of parameters shown here), the default parameter
 will be used. Otherwise, the specified parameter will overwrite the
 default parameter.
 
-You may have recognised that the environment variable ``$GAMMALIB`` has 
+You may have recognised that the environment variable ``$CTOOLS`` has 
 been used in the path names of the first two parameters. ctools will 
 automatically expand the environment variables.
 
 The CTA instrument properties (effective area, PSF width) are taken for
-the moment from Konrad Bernloehrs sensitivity files which are stored in 
-``$GAMMALIB/share/caldb/cta``.
+the moment from a dummy performance table that is located in
+``$CTOOLS/share/caldb/cta``.
 
 Events are simulated based on the instrument properties and based on a
 source and background model. Only events that fall within the specified
@@ -69,13 +69,13 @@ event data file. The duration of the simulation is taken here to 30 minutes
 (or 1800 seconds). Events are simulated for energies between 0.1 and 100 TeV.
 
 The source and background model is defined by the XML file
-``$GAMMALIB/share/models/crab.xml``:
+``$CTOOLS/share/models/crab.xml``:
 
 .. code-block:: xml
 
   <?xml version="1.0" standalone="no"?>
   <source_library title="source library">
-    <source name="MAGIC Crab (Albert et al. 2008, ApJ, 674, 1037)" type="PointSource">
+    <source name="Crab" type="PointSource">
       <spectrum type="PowerLaw">
          <parameter name="Prefactor" scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
          <parameter name="Index"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
@@ -87,7 +87,7 @@ The source and background model is defined by the XML file
       </spatialModel>
     </source>
     <source name="Background" type="RadialAcceptance" instrument="CTA">
-      <spectrum type="FileFunction" file="$GAMMALIB/share/models/bkg_dummy.txt">
+      <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
         <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="1.0" free="1"/>
       </spectrum>
       <radialModel type="Gaussian">
@@ -161,24 +161,26 @@ from this file are shown here:
 
 .. code-block:: xml
 
-  2014-01-09T20:51:36: +======================+
-  2014-01-09T20:51:36: | Simulate observation |
-  2014-01-09T20:51:36: +======================+
-  2014-01-09T20:51:36: === Observation ===
-  2014-01-09T20:51:36:  Simulation area ...........: 1.9635e+11 cm2
-  2014-01-09T20:51:36:  Simulation cone ...........: RA=83.63 deg, Dec=22.01 deg, r=10.5 deg
-  2014-01-09T20:51:36:  Time interval .............: 0 - 1800 s
-  2014-01-09T20:51:36:  Energy range ..............: 100 GeV - 100 TeV
-  2014-01-09T20:51:36:  MC source photons .........: 207547 [Crab]
-  2014-01-09T20:51:36:  MC source events ..........: 995 [Crab]
-  2014-01-09T20:51:36:  MC source events ..........: 995 (all source models)
-  2014-01-09T20:51:36:  MC background events ......: 5146
-  2014-01-09T20:51:36: 
-  2014-01-09T20:51:36: +==================+
-  2014-01-09T20:51:36: | Save observation |
-  2014-01-09T20:51:36: +==================+
-  2014-01-09T20:51:37: 
-  2014-01-09T20:51:37: Application "ctobssim" terminated after 24 wall clock seconds, consuming 0.307116 seconds of CPU time.
+  2014-10-30T22:35:06: +======================+
+  2014-10-30T22:35:06: | Simulate observation |
+  2014-10-30T22:35:06: +======================+
+  2014-10-30T22:35:06: === Observation ===
+  2014-10-30T22:35:06:  Simulation area ...........: 1.9635e+11 cm2
+  2014-10-30T22:35:06:  Simulation cone ...........: RA=83.63 deg, Dec=22.01 deg, r=5.5 deg
+  2014-10-30T22:35:06:  Time interval .............: 0 - 1800 s
+  2014-10-30T22:35:06:  Photon energy range .......: 100 GeV - 100 TeV
+  2014-10-30T22:35:06:  Event energy range ........: 100 GeV - 100 TeV
+  2014-10-30T22:35:06:  MC source photons .........: 207547 [Crab]
+  2014-10-30T22:35:06:  MC source events ..........: 995 [Crab]
+  2014-10-30T22:35:06:  MC source events ..........: 995 (all source models)
+  2014-10-30T22:35:06:  MC background events ......: 5146
+  2014-10-30T22:35:06:  MC events .................: 6141 (all models)
+  2014-10-30T22:35:06: 
+  2014-10-30T22:35:06: +==================+
+  2014-10-30T22:35:06: | Save observation |
+  2014-10-30T22:35:06: +==================+
+  2014-10-30T22:35:06: 
+  2014-10-30T22:35:06: Application "ctobssim" terminated after 10 wall clock seconds, consuming 0.3604 seconds of CPU time.
 
 Each line starts with the UTC time at which the line has been written. In
 this run, 207547 Crab photons have been thrown over an area of 19.6 square
@@ -224,7 +226,7 @@ ctbin is executed by typing:
 .. code-block:: bash
 
   $ ctbin
-  Input event list or observation definition file [test/data/crab_events.fits.gz] events.fits
+  Input event list or observation definition file [events.fits]
   First coordinate of image center in degrees (RA or galactic l) [83.63] 
   Second coordinate of image center in degrees (DEC or galactic b) [22.01] 
   Projection method e.g. AIT|AZP|CAR|MER|STG|TAN (AIT|AZP|CAR|MER|STG|TAN) [CAR] 
@@ -277,40 +279,37 @@ reproduced below:
 
 .. code-block:: xml
 
-  2014-01-09T21:16:18: +====================+
-  2014-01-09T21:16:18: | Binned observation |
-  2014-01-09T21:16:18: +====================+
-  2014-01-09T21:16:18: === GObservations ===
-  2014-01-09T21:16:18:  Number of observations ....: 1
-  2014-01-09T21:16:18:  Number of predicted events : 0
-  2014-01-09T21:16:18: === GCTAObservation ===
-  2014-01-09T21:16:18:  Name ......................: 
-  2014-01-09T21:16:18:  Identifier ................: 
-  2014-01-09T21:16:18:  Instrument ................: CTA
-  2014-01-09T21:16:18:  Statistics ................: Poisson
-  2014-01-09T21:16:18:  Ontime ....................: 1800 s
-  2014-01-09T21:16:18:  Livetime ..................: 1710 s
-  2014-01-09T21:16:18:  Deadtime correction .......: 0.95
-  2014-01-09T21:16:18: === GCTAPointing ===
-  2014-01-09T21:16:18:  Pointing direction ........: 
-  2014-01-09T21:16:18: === GCTAResponse ===
-  2014-01-09T21:16:18:  Calibration database ......: 
-  2014-01-09T21:16:18:  Response name .............: 
-  2014-01-09T21:16:18:  RMF file name .............: 
-  2014-01-09T21:16:18: === GCTAEventCube ===
-  2014-01-09T21:16:18:  Number of events ..........: 5542
-  2014-01-09T21:16:18:  Number of elements ........: 800000
-  2014-01-09T21:16:18:  Number of pixels ..........: 40000
-  2014-01-09T21:16:18:  Number of energy bins .....: 20
-  2014-01-09T21:16:18:  Time interval .............: -3.15576e+08 - -3.15574e+08 sec
-  2014-01-09T21:16:18: 
-  2014-01-09T21:16:18: 
-  2014-01-09T21:16:18: 
-  2014-01-09T21:16:18: +==================+
-  2014-01-09T21:16:18: | Save observation |
-  2014-01-09T21:16:18: +==================+
-  2014-01-09T21:16:18: 
-  2014-01-09T21:16:18: Application "ctbin" terminated after 37 wall clock seconds, consuming 0.242495 seconds of CPU time.
+  2014-10-30T22:39:35: +====================+
+  2014-10-30T22:39:35: | Binned observation |
+  2014-10-30T22:39:35: +====================+
+  2014-10-30T22:39:35: === GObservations ===
+  2014-10-30T22:39:35:  Number of observations ....: 1
+  2014-10-30T22:39:35:  Number of predicted events : 0
+  2014-10-30T22:39:35: === GCTAObservation ===
+  2014-10-30T22:39:35:  Name ......................: 
+  2014-10-30T22:39:35:  Identifier ................: 
+  2014-10-30T22:39:35:  Instrument ................: CTA
+  2014-10-30T22:39:35:  Event file ................: events.fits
+  2014-10-30T22:39:35:  Event type ................: CountsMap
+  2014-10-30T22:39:35:  Statistics ................: Poisson
+  2014-10-30T22:39:35:  Ontime ....................: 1800 s
+  2014-10-30T22:39:35:  Livetime ..................: 1710 s
+  2014-10-30T22:39:35:  Deadtime correction .......: 0.95
+  2014-10-30T22:39:35: === GCTAPointing ===
+  2014-10-30T22:39:35:  Pointing direction ........: (RA,Dec)=(83.63,22.01)
+  2014-10-30T22:39:35:  Response function .........: undefined
+  2014-10-30T22:39:35: === GCTAEventCube ===
+  2014-10-30T22:39:35:  Number of events ..........: 5542
+  2014-10-30T22:39:35:  Number of elements ........: 800000
+  2014-10-30T22:39:35:  Number of pixels ..........: 40000
+  2014-10-30T22:39:35:  Number of energy bins .....: 20
+  2014-10-30T22:39:35:  Time interval .............: 0 - 1800 sec
+  2014-10-30T22:39:35: 
+  2014-10-30T22:39:35: +==================+
+  2014-10-30T22:39:35: | Save observation |
+  2014-10-30T22:39:35: +==================+
+  2014-10-30T22:39:36: 
+  2014-10-30T22:39:36: Application "ctbin" terminated after 18 wall clock seconds, consuming 0.308684 seconds of CPU time.
 
 From the 6141 events that have been simulated and stored in the 
 ``events.fits`` file, 5542 lie within the cube boundaries and are thus put
@@ -331,10 +330,10 @@ do the fit by typing:
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts cube or observation definition file [test/data/crab_events.fits.gz] cntmap.fits
-  Calibration database [test/irf] $GAMMALIB/share/caldb/cta
+  Event list, counts cube or observation definition file [events.fits] cntmap.fits
+  Calibration database [dummy] 
   Instrument response function [cta_dummy_irf] 
-  Source model [test/data/crab.xml] $GAMMALIB/share/models/crab.xml
+  Source model [$CTOOLS/share/models/crab.xml] 
   Source model output file [crab_results.xml]
 
 Fitting of the data is done in *binned* mode, which means that the events
@@ -357,8 +356,8 @@ result file that has been produced by the run:
   <source_library title="source library">
     <source name="Crab" type="PointSource">
       <spectrum type="PowerLaw">
-        <parameter name="Prefactor" value="6.07927" error="0.204581" scale="1e-16" min="1e-07" max="1000" free="1" />
-        <parameter name="Index" value="2.5009" error="0.0252056" scale="-1" min="0" max="5" free="1" />
+        <parameter name="Prefactor" value="6.07928" error="0.204582" scale="1e-16" min="1e-07" max="1000" free="1" />
+        <parameter name="Index" value="2.5009" error="0.0252057" scale="-1" min="0" max="5" free="1" />
         <parameter name="Scale" value="0.3" scale="1e+06" min="0.01" max="1000" free="0" />
       </spectrum>
       <spatialModel type="SkyDirFunction">
@@ -367,11 +366,11 @@ result file that has been produced by the run:
       </spatialModel>
     </source>
     <source name="Background" type="RadialAcceptance" instrument="CTA">
-      <spectrum type="FileFunction" file="$GAMMALIB/share/models/bkg_dummy.txt">
-        <parameter name="Normalization" value="0.99069" error="0.0192887" scale="1" min="0" max="1000" free="1" />
+      <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
+        <parameter name="Normalization" value="0.990708" error="0.0192887" scale="1" min="0" max="1000" free="1" />
       </spectrum>
       <radialModel type="Gaussian">
-        <parameter name="Sigma" value="3.02527" error="0.0594142" scale="1" min="0.01" max="10" free="1" />
+        <parameter name="Sigma" value="3.02523" error="0.0594117" scale="1" min="0.01" max="10" free="1" />
       </radialModel>
     </source>
   </source_library>
@@ -387,74 +386,81 @@ this run:
 
 .. code-block:: xml
 
-  2014-01-09T21:26:56: +=================================+
-  2014-01-09T21:26:56: | Maximum likelihood optimisation |
-  2014-01-09T21:26:56: +=================================+
-  2014-01-09T21:26:57:  Initial iteration: func=22752.5, Lambda=0.001
-  2014-01-09T21:26:59:  Iteration 1: func=22750.6, Lambda=0.0001, delta=1.91297, max(grad)=0 [-1]
-  2014-01-09T21:27:00:  Iteration 2: func=22750.6, Lambda=1e-05, delta=0.00782419, max(grad)=0.000463786 [6]
-  2014-01-09T21:27:01:  Iteration 3: func=22750.6, Lambda=1e-06, delta=2.49478e-06, max(grad)=0 [-1]
-  2014-01-09T21:27:03:  Iteration 4: func=22750.6, Lambda=1e-05, delta=0, max(grad)=7.93613e-08 [6] (stalled)
-  2014-01-09T21:27:04:  Iteration 5: func=22750.6, Lambda=0.0001, delta=0, max(grad)=7.91125e-08 [6] (stalled)
-  2014-01-09T21:27:05:  Iteration 6: func=22750.6, Lambda=0.001, delta=0, max(grad)=7.66376e-08 [6] (stalled)
-  2014-01-09T21:27:07:  Iteration 7: func=22750.6, Lambda=0.01, delta=0, max(grad)=1.28271e-07 [7] (stalled)
-  2014-01-09T21:27:08:  Iteration 8: func=22750.6, Lambda=0.001, delta=2.98678e-09, max(grad)=1.23881e-06 [7]
-  2014-01-09T21:27:09: 
-  2014-01-09T21:27:09: +=========================================+
-  2014-01-09T21:27:09: | Maximum likelihood optimization results |
-  2014-01-09T21:27:09: +=========================================+
-  2014-01-09T21:27:09: === GOptimizerLM ===
-  2014-01-09T21:27:09:  Optimized function value ..: 22750.6
-  2014-01-09T21:27:09:  Absolute precision ........: 1e-06
-  2014-01-09T21:27:09:  Optimization status .......: converged
-  2014-01-09T21:27:09:  Number of parameters ......: 9
-  2014-01-09T21:27:09:  Number of free parameters .: 4
-  2014-01-09T21:27:09:  Number of iterations ......: 8
-  2014-01-09T21:27:09:  Lambda ....................: 0.001
-  2014-01-09T21:27:09:  Maximum log likelihood ....: -22750.6
-  2014-01-09T21:27:09:  Observed events  (Nobs) ...: 5542
-  2014-01-09T21:27:09:  Predicted events (Npred) ..: 5542 (Nobs - Npred = 5.52808e-06)
-  2014-01-09T21:27:09: === GModels ===
-  2014-01-09T21:27:09:  Number of models ..........: 2
-  2014-01-09T21:27:09:  Number of parameters ......: 9
-  2014-01-09T21:27:09: === GModelSky ===
-  2014-01-09T21:27:09:  Name ......................: Crab
-  2014-01-09T21:27:09:  Instruments ...............: all
-  2014-01-09T21:27:09:  Instrument scale factors ..: unity
-  2014-01-09T21:27:09:  Observation identifiers ...: all
-  2014-01-09T21:27:09:  Model type ................: PointSource
-  2014-01-09T21:27:09:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
-  2014-01-09T21:27:09:  Number of parameters ......: 6
-  2014-01-09T21:27:09:  Number of spatial par's ...: 2
-  2014-01-09T21:27:09:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-  2014-01-09T21:27:09:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-  2014-01-09T21:27:09:  Number of spectral par's ..: 3
-  2014-01-09T21:27:09:   Prefactor ................: 6.07927e-16 +/- 2.04581e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-  2014-01-09T21:27:09:   Index ....................: -2.5009 +/- 0.0252056 [-0,-5]  (free,scale=-1,gradient)
-  2014-01-09T21:27:09:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
-  2014-01-09T21:27:09:  Number of temporal par's ..: 1
-  2014-01-09T21:27:09:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2014-01-09T21:27:09: === GCTAModelRadialAcceptance ===
-  2014-01-09T21:27:09:  Name ......................: Background
-  2014-01-09T21:27:09:  Instruments ...............: CTA
-  2014-01-09T21:27:09:  Instrument scale factors ..: unity
-  2014-01-09T21:27:09:  Observation identifiers ...: all
-  2014-01-09T21:27:09:  Model type ................: "Gaussian" * "FileFunction" * "Constant"
-  2014-01-09T21:27:09:  Number of parameters ......: 3
-  2014-01-09T21:27:09:  Number of radial par's ....: 1
-  2014-01-09T21:27:09:   Sigma ....................: 3.02527 +/- 0.0594142 [0.01,10] deg2 (free,scale=1,gradient)
-  2014-01-09T21:27:09:  Number of spectral par's ..: 1
-  2014-01-09T21:27:09:   Normalization ............: 0.99069 +/- 0.0192887 [0,1000]  (free,scale=1,gradient)
-  2014-01-09T21:27:09:  Number of temporal par's ..: 1
-  2014-01-09T21:27:09:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2014-01-09T21:27:09: 
-  2014-01-09T21:27:09: +==============+
-  2014-01-09T21:27:09: | Save results |
-  2014-01-09T21:27:09: +==============+
-  2014-01-09T21:27:09: 
-  2014-01-09T21:27:09: Application "ctlike" terminated after 55 wall clock seconds, consuming 13.4985 seconds of CPU time.
+  2014-10-30T22:41:08: +=================================+
+  2014-10-30T22:41:08: | Maximum likelihood optimisation |
+  2014-10-30T22:41:08: +=================================+
+  2014-10-30T22:41:09:  >Iteration   0: -logL=22752.553, Lambda=1.0e-03
+  2014-10-30T22:41:11:  >Iteration   1: -logL=22750.640, Lambda=1.0e-03, delta=1.913, max(|grad|)=-0.941594 [Index:3]
+  2014-10-30T22:41:12:  >Iteration   2: -logL=22750.632, Lambda=1.0e-04, delta=0.008, max(|grad|)=-0.079270 [Index:3]
+  2014-10-30T22:41:14:  >Iteration   3: -logL=22750.632, Lambda=1.0e-05, delta=0.000, max(|grad|)=-0.003073 [Index:3]
+  2014-10-30T22:41:16: 
+  2014-10-30T22:41:16: +=========================================+
+  2014-10-30T22:41:16: | Maximum likelihood optimization results |
+  2014-10-30T22:41:16: +=========================================+
+  2014-10-30T22:41:16: === GOptimizerLM ===
+  2014-10-30T22:41:16:  Optimized function value ..: 22750.632
+  2014-10-30T22:41:16:  Absolute precision ........: 0.005
+  2014-10-30T22:41:16:  Optimization status .......: converged
+  2014-10-30T22:41:16:  Number of parameters ......: 9
+  2014-10-30T22:41:16:  Number of free parameters .: 4
+  2014-10-30T22:41:16:  Number of iterations ......: 3
+  2014-10-30T22:41:16:  Lambda ....................: 1e-06
+  2014-10-30T22:41:16: 
+  2014-10-30T22:41:16: +=========================================+
+  2014-10-30T22:41:16: | Maximum likelihood optimization results |
+  2014-10-30T22:41:16: +=========================================+
+  2014-10-30T22:41:16: === GOptimizerLM ===
+  2014-10-30T22:41:16:  Optimized function value ..: 22750.632
+  2014-10-30T22:41:16:  Absolute precision ........: 0.005
+  2014-10-30T22:41:16:  Optimization status .......: converged
+  2014-10-30T22:41:16:  Number of parameters ......: 9
+  2014-10-30T22:41:16:  Number of free parameters .: 4
+  2014-10-30T22:41:16:  Number of iterations ......: 3
+  2014-10-30T22:41:16:  Lambda ....................: 1e-06
+  2014-10-30T22:41:16:  Maximum log likelihood ....: -22750.632
+  2014-10-30T22:41:16:  Observed events  (Nobs) ...: 5542.000
+  2014-10-30T22:41:16:  Predicted events (Npred) ..: 5542.000 (Nobs - Npred = 3.3498e-06)
+  2014-10-30T22:41:16: === GModels ===
+  2014-10-30T22:41:16:  Number of models ..........: 2
+  2014-10-30T22:41:16:  Number of parameters ......: 9
+  2014-10-30T22:41:16: === GModelSky ===
+  2014-10-30T22:41:16:  Name ......................: Crab
+  2014-10-30T22:41:16:  Instruments ...............: all
+  2014-10-30T22:41:16:  Instrument scale factors ..: unity
+  2014-10-30T22:41:16:  Observation identifiers ...: all
+  2014-10-30T22:41:16:  Model type ................: PointSource
+  2014-10-30T22:41:16:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2014-10-30T22:41:16:  Number of parameters ......: 6
+  2014-10-30T22:41:16:  Number of spatial par's ...: 2
+  2014-10-30T22:41:16:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+  2014-10-30T22:41:16:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+  2014-10-30T22:41:16:  Number of spectral par's ..: 3
+  2014-10-30T22:41:16:   Prefactor ................: 6.07928e-16 +/- 2.04582e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+  2014-10-30T22:41:16:   Index ....................: -2.5009 +/- 0.0252057 [-0,-5]  (free,scale=-1,gradient)
+  2014-10-30T22:41:16:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
+  2014-10-30T22:41:16:  Number of temporal par's ..: 1
+  2014-10-30T22:41:16:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
+  2014-10-30T22:41:16: === GCTAModelRadialAcceptance ===
+  2014-10-30T22:41:16:  Name ......................: Background
+  2014-10-30T22:41:16:  Instruments ...............: CTA
+  2014-10-30T22:41:16:  Instrument scale factors ..: unity
+  2014-10-30T22:41:16:  Observation identifiers ...: all
+  2014-10-30T22:41:16:  Model type ................: "Gaussian" * "FileFunction" * "Constant"
+  2014-10-30T22:41:16:  Number of parameters ......: 3
+  2014-10-30T22:41:16:  Number of radial par's ....: 1
+  2014-10-30T22:41:16:   Sigma ....................: 3.02523 +/- 0.0594117 [0.01,10] deg2 (free,scale=1,gradient)
+  2014-10-30T22:41:16:  Number of spectral par's ..: 1
+  2014-10-30T22:41:16:   Normalization ............: 0.990708 +/- 0.0192887 [0,1000]  (free,scale=1,gradient)
+  2014-10-30T22:41:16:  Number of temporal par's ..: 1
+  2014-10-30T22:41:16:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
+  2014-10-30T22:41:16: 
+  2014-10-30T22:41:16: +==============+
+  2014-10-30T22:41:16: | Save results |
+  2014-10-30T22:41:16: +==============+
+  2014-10-30T22:41:16: 
+  2014-10-30T22:41:16: Application "ctlike" terminated after 22 wall clock seconds, consuming 8.54182 seconds of CPU time.
 
-The maximum likelihood optimizer required 8 iterations to converge. This
+The maximum likelihood optimizer required 3 iterations to converge. This
 is pretty fast, but recall that we used the same model file for the simulation
 and for fitting, hence the initial parameter values were already very close
 to the best fitting values. To see the impact of the initial parameters on
@@ -498,7 +504,7 @@ following example shows how to run ctselect:
 .. code-block:: bash
 
   $ ctselect
-  Input event list or observation definition file [test/data/crab_events.fits.gz] events.fits
+  Input event list or observation definition file [events.fits] 
   RA for ROI centre (degrees) (0-360) [83.63] 
   Dec for ROI centre (degrees) (-90-90) [22.01] 
   Radius of ROI (degrees) (0-180) [3.0] 
@@ -532,15 +538,18 @@ part:
 
 .. code-block:: xml
 
-  2014-01-09T21:36:20: +=================+
-  2014-01-09T21:36:20: | Event selection |
-  2014-01-09T21:36:20: +=================+
-  2014-01-09T21:36:20: === Observation ===
-  2014-01-09T21:36:21:  Energy range ..............: 0.1 - 100 TeV
-  2014-01-09T21:36:21:  Acceptance cone centre ....: RA=83.63, DEC=22.01 deg
-  2014-01-09T21:36:21:  Acceptance cone radius ....: 3 deg
-  2014-01-09T21:36:21:  cfitsio selection .........: ENERGY >= 0.10000000 && ENERGY <= 100.00000000 && ANGSEP(83.630000,22.010000,RA,DEC) <= 3.000000
-  2014-01-09T21:36:21:  FITS filename .............: ctselectKKHEiF[EVENTS][ENERGY >= 0.10000000 && ENERGY <= 100.00000000 && ANGSEP(83.630000,22.010000,RA,DEC) <= 3.000000]
+  2014-10-30T22:44:01: +=================+
+  2014-10-30T22:44:01: | Event selection |
+  2014-10-30T22:44:01: +=================+
+  2014-10-30T22:44:01: === Observation ===
+  2014-10-30T22:44:02:  Requested energy range ....: 0.1 - 100 TeV
+  2014-10-30T22:44:02:  Energy range of data ......: 0.1 - 100 TeV
+  2014-10-30T22:44:02:  Selected energy range .....: 0.1 - 100 TeV
+  2014-10-30T22:44:02:  Requested ROI .............: Centre(RA,DEC)=(83.63, 22.01) deg, Radius=3 deg
+  2014-10-30T22:44:02:  ROI of data ...............: Centre(RA,DEC)=(83.63, 22.01) deg, Radius=5 deg
+  2014-10-30T22:44:02:  Selected ROI ..............: Centre(RA,DEC)=(83.63, 22.01) deg, Radius=3 deg
+  2014-10-30T22:44:02:  cfitsio selection .........: ENERGY >= 0.10000000 && ENERGY <= 100.00000000 && ANGSEP(83.630000,22.010000,RA,DEC) <= 3.000000
+  2014-10-30T22:44:02:  FITS filename .............: /var/tmp/tmp.0.VSaNXN[EVENTS][ENERGY >= 0.10000000 && ENERGY <= 100.00000000 && ANGSEP(83.630000,22.010000,RA,DEC) <= 3.000000]
  
 Now that you have selected the events of interest, you can run ctlike in 
 unbinned mode. To do this you have to specify the selected event list 
@@ -550,9 +559,9 @@ instead of the counts cube:
 
   $ ctlike
   Event list, counts cube or observation definition file [cntmap.fits] selected_events.fits
-  Calibration database [$GAMMALIB/share/caldb/cta] 
+  Calibration database [dummy] 
   Instrument response function [cta_dummy_irf] 
-  Source model [$GAMMALIB/share/models/crab.xml] 
+  Source model [$CTOOLS/share/models/crab.xml] 
   Source model output file [crab_results.xml] 
 
 You will recognise that ctlike runs much faster in unbinned mode compared
@@ -578,68 +587,67 @@ the same events for both analyses.
 
 .. code-block:: xml
 
-  2014-01-09T21:47:54: +=================================+
-  2014-01-09T21:47:54: | Maximum likelihood optimisation |
-  2014-01-09T21:47:54: +=================================+
-  2014-01-09T21:47:54:  Initial iteration: func=44393.9, Lambda=0.001
-  2014-01-09T21:47:54:  Iteration 1: func=44392.2, Lambda=0.001, delta=1.7034, max(grad)=9.60142 [6]
-  2014-01-09T21:47:54:  Iteration 2: func=44392.1, Lambda=0.0001, delta=0.099482, max(grad)=0 [-1]
-  2014-01-09T21:47:54:  Iteration 3: func=44392.1, Lambda=1e-05, delta=6.63429e-05, max(grad)=0.00559314 [6]
-  2014-01-09T21:47:54:  Iteration 4: func=44392.1, Lambda=1e-06, delta=4.7803e-08, max(grad)=0 [-1]
-  2014-01-09T21:47:54: 
-  2014-01-09T21:47:54: +=========================================+
-  2014-01-09T21:47:54: | Maximum likelihood optimization results |
-  2014-01-09T21:47:54: +=========================================+
-  2014-01-09T21:47:54: === GOptimizerLM ===
-  2014-01-09T21:47:54:  Optimized function value ..: 44392.1
-  2014-01-09T21:47:54:  Absolute precision ........: 1e-06
-  2014-01-09T21:47:54:  Optimization status .......: converged
-  2014-01-09T21:47:54:  Number of parameters ......: 9
-  2014-01-09T21:47:54:  Number of free parameters .: 4
-  2014-01-09T21:47:54:  Number of iterations ......: 4
-  2014-01-09T21:47:54:  Lambda ....................: 1e-07
-  2014-01-09T21:47:54:  Maximum log likelihood ....: -44392.1
-  2014-01-09T21:47:54:  Observed events  (Nobs) ...: 6127
-  2014-01-09T21:47:54:  Predicted events (Npred) ..: 6127 (Nobs - Npred = 1.01613e-07)
-  2014-01-09T21:47:54: === GModels ===
-  2014-01-09T21:47:54:  Number of models ..........: 2
-  2014-01-09T21:47:54:  Number of parameters ......: 9
-  2014-01-09T21:47:54: === GModelSky ===
-  2014-01-09T21:47:54:  Name ......................: Crab
-  2014-01-09T21:47:54:  Instruments ...............: all
-  2014-01-09T21:47:54:  Instrument scale factors ..: unity
-  2014-01-09T21:47:54:  Observation identifiers ...: all
-  2014-01-09T21:47:54:  Model type ................: PointSource
-  2014-01-09T21:47:54:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
-  2014-01-09T21:47:54:  Number of parameters ......: 6
-  2014-01-09T21:47:54:  Number of spatial par's ...: 2
-  2014-01-09T21:47:54:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-  2014-01-09T21:47:54:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-  2014-01-09T21:47:54:  Number of spectral par's ..: 3
-  2014-01-09T21:47:54:   Prefactor ................: 6.13416e-16 +/- 2.05772e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-  2014-01-09T21:47:54:   Index ....................: -2.50585 +/- 0.0250821 [-0,-5]  (free,scale=-1,gradient)
-  2014-01-09T21:47:54:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
-  2014-01-09T21:47:54:  Number of temporal par's ..: 1
-  2014-01-09T21:47:54:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2014-01-09T21:47:54: === GCTAModelRadialAcceptance ===
-  2014-01-09T21:47:54:  Name ......................: Background
-  2014-01-09T21:47:54:  Instruments ...............: CTA
-  2014-01-09T21:47:54:  Instrument scale factors ..: unity
-  2014-01-09T21:47:54:  Observation identifiers ...: all
-  2014-01-09T21:47:54:  Model type ................: "Gaussian" * "FileFunction" * "Constant"
-  2014-01-09T21:47:54:  Number of parameters ......: 3
-  2014-01-09T21:47:54:  Number of radial par's ....: 1
-  2014-01-09T21:47:54:   Sigma ....................: 3.04429 +/- 0.0330229 [0.01,10] deg2 (free,scale=1,gradient)
-  2014-01-09T21:47:54:  Number of spectral par's ..: 1
-  2014-01-09T21:47:54:   Normalization ............: 0.997516 +/- 0.0175361 [0,1000]  (free,scale=1,gradient)
-  2014-01-09T21:47:54:  Number of temporal par's ..: 1
-  2014-01-09T21:47:54:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2014-01-09T21:47:54: 
-  2014-01-09T21:47:54: +==============+
-  2014-01-09T21:47:54: | Save results |
-  2014-01-09T21:47:54: +==============+
-  2014-01-09T21:47:54: 
-  2014-01-09T21:47:54: Application "ctlike" terminated after 6 wall clock seconds, consuming 0.163384 seconds of CPU time.
+  2014-10-30T22:55:43: +=================================+
+  2014-10-30T22:55:43: | Maximum likelihood optimisation |
+  2014-10-30T22:55:43: +=================================+
+  2014-10-30T22:55:43:  >Iteration   0: -logL=44400.561, Lambda=1.0e-03
+  2014-10-30T22:55:43:  >Iteration   1: -logL=44396.253, Lambda=1.0e-03, delta=4.308, max(|grad|)=9.645475 [Sigma:6]
+  2014-10-30T22:55:43:  >Iteration   2: -logL=44396.162, Lambda=1.0e-04, delta=0.091, max(|grad|)=-0.336139 [Sigma:6]
+  2014-10-30T22:55:43:  >Iteration   3: -logL=44396.162, Lambda=1.0e-05, delta=0.000, max(|grad|)=0.005603 [Sigma:6]
+  2014-10-30T22:55:43: 
+  2014-10-30T22:55:43: +=========================================+
+  2014-10-30T22:55:43: | Maximum likelihood optimization results |
+  2014-10-30T22:55:43: +=========================================+
+  2014-10-30T22:55:43: === GOptimizerLM ===
+  2014-10-30T22:55:43:  Optimized function value ..: 44396.162
+  2014-10-30T22:55:43:  Absolute precision ........: 0.005
+  2014-10-30T22:55:43:  Optimization status .......: converged
+  2014-10-30T22:55:43:  Number of parameters ......: 9
+  2014-10-30T22:55:43:  Number of free parameters .: 4
+  2014-10-30T22:55:43:  Number of iterations ......: 3
+  2014-10-30T22:55:43:  Lambda ....................: 1e-06
+  2014-10-30T22:55:43:  Maximum log likelihood ....: -44396.162
+  2014-10-30T22:55:43:  Observed events  (Nobs) ...: 6127.000
+  2014-10-30T22:55:43:  Predicted events (Npred) ..: 6127.000 (Nobs - Npred = 0.000141861)
+  2014-10-30T22:55:43: === GModels ===
+  2014-10-30T22:55:43:  Number of models ..........: 2
+  2014-10-30T22:55:43:  Number of parameters ......: 9
+  2014-10-30T22:55:43: === GModelSky ===
+  2014-10-30T22:55:43:  Name ......................: Crab
+  2014-10-30T22:55:43:  Instruments ...............: all
+  2014-10-30T22:55:43:  Instrument scale factors ..: unity
+  2014-10-30T22:55:43:  Observation identifiers ...: all
+  2014-10-30T22:55:43:  Model type ................: PointSource
+  2014-10-30T22:55:43:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2014-10-30T22:55:43:  Number of parameters ......: 6
+  2014-10-30T22:55:43:  Number of spatial par's ...: 2
+  2014-10-30T22:55:43:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+  2014-10-30T22:55:43:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+  2014-10-30T22:55:43:  Number of spectral par's ..: 3
+  2014-10-30T22:55:43:   Prefactor ................: 6.13326e-16 +/- 2.05738e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+  2014-10-30T22:55:43:   Index ....................: -2.5057 +/- 0.0250818 [-0,-5]  (free,scale=-1,gradient)
+  2014-10-30T22:55:43:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
+  2014-10-30T22:55:43:  Number of temporal par's ..: 1
+  2014-10-30T22:55:43:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
+  2014-10-30T22:55:43: === GCTAModelRadialAcceptance ===
+  2014-10-30T22:55:43:  Name ......................: Background
+  2014-10-30T22:55:43:  Instruments ...............: CTA
+  2014-10-30T22:55:43:  Instrument scale factors ..: unity
+  2014-10-30T22:55:43:  Observation identifiers ...: all
+  2014-10-30T22:55:43:  Model type ................: "Gaussian" * "FileFunction" * "Constant"
+  2014-10-30T22:55:43:  Number of parameters ......: 3
+  2014-10-30T22:55:43:  Number of radial par's ....: 1
+  2014-10-30T22:55:43:   Sigma ....................: 3.04429 +/- 0.0330229 [0.01,10] deg2 (free,scale=1,gradient)
+  2014-10-30T22:55:43:  Number of spectral par's ..: 1
+  2014-10-30T22:55:43:   Normalization ............: 0.996765 +/- 0.0175227 [0,1000]  (free,scale=1,gradient)
+  2014-10-30T22:55:43:  Number of temporal par's ..: 1
+  2014-10-30T22:55:43:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
+  2014-10-30T22:55:43: 
+  2014-10-30T22:55:43: +==============+
+  2014-10-30T22:55:43: | Save results |
+  2014-10-30T22:55:43: +==============+
+  2014-10-30T22:55:43: 
+  2014-10-30T22:55:43: Application "ctlike" terminated after 5 wall clock seconds, consuming 0.246747 seconds of CPU time.
 
 
 .. _sec_butterfly_cta:
@@ -658,14 +666,14 @@ line.
 .. code-block:: bash
 
   $ ctbutterfly
-  Input event list, cube or observation definition file [$CTOOLS/test/data/crab_events.fits.gz] 
-  Calibration database [share/caldb/data/cta/dummy//cta_dummy_irf] share/caldb/data/cta/dummy/bcf/
+  Input event list, cube or observation definition file [events.fits] 
+  Calibration database [dummy] 
   Instrument response function [cta_dummy_irf] 
-  Source model [$CTOOLS/test/data/crab.xml] 
-  Source of interest [CrabNebula] Crab
+  Source model [$CTOOLS/share/models/crab.xml] crab_results.xml
+  Source of interest [Crab] 
   Start value for first energy bin in TeV [0.1] 
-  Stop value for last energy bin in TeV [100.] 
-  Output ascii file [butterfly.txt] 
+  Stop value for last energy bin in TeV [100.0] 
+  Output ascii file [butterfly.txt]
 
 Below some lines of the ``ctbutterfly.log``:
 
@@ -692,7 +700,8 @@ in the ctools ``example`` folder. You will need matplotlib on your system
 to make this work. To launch the script, type:
 
 .. code-block:: bash
-	python $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
+
+  python $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
 	
 This will result in a canvas which should look like the following:
 
