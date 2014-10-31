@@ -587,67 +587,68 @@ the same events for both analyses.
 
 .. code-block:: xml
 
-  2014-10-30T22:55:43: +=================================+
-  2014-10-30T22:55:43: | Maximum likelihood optimisation |
-  2014-10-30T22:55:43: +=================================+
-  2014-10-30T22:55:43:  >Iteration   0: -logL=44400.561, Lambda=1.0e-03
-  2014-10-30T22:55:43:  >Iteration   1: -logL=44396.253, Lambda=1.0e-03, delta=4.308, max(|grad|)=9.645475 [Sigma:6]
-  2014-10-30T22:55:43:  >Iteration   2: -logL=44396.162, Lambda=1.0e-04, delta=0.091, max(|grad|)=-0.336139 [Sigma:6]
-  2014-10-30T22:55:43:  >Iteration   3: -logL=44396.162, Lambda=1.0e-05, delta=0.000, max(|grad|)=0.005603 [Sigma:6]
-  2014-10-30T22:55:43: 
-  2014-10-30T22:55:43: +=========================================+
-  2014-10-30T22:55:43: | Maximum likelihood optimization results |
-  2014-10-30T22:55:43: +=========================================+
-  2014-10-30T22:55:43: === GOptimizerLM ===
-  2014-10-30T22:55:43:  Optimized function value ..: 44396.162
-  2014-10-30T22:55:43:  Absolute precision ........: 0.005
-  2014-10-30T22:55:43:  Optimization status .......: converged
-  2014-10-30T22:55:43:  Number of parameters ......: 9
-  2014-10-30T22:55:43:  Number of free parameters .: 4
-  2014-10-30T22:55:43:  Number of iterations ......: 3
-  2014-10-30T22:55:43:  Lambda ....................: 1e-06
-  2014-10-30T22:55:43:  Maximum log likelihood ....: -44396.162
-  2014-10-30T22:55:43:  Observed events  (Nobs) ...: 6127.000
-  2014-10-30T22:55:43:  Predicted events (Npred) ..: 6127.000 (Nobs - Npred = 0.000141861)
-  2014-10-30T22:55:43: === GModels ===
-  2014-10-30T22:55:43:  Number of models ..........: 2
-  2014-10-30T22:55:43:  Number of parameters ......: 9
-  2014-10-30T22:55:43: === GModelSky ===
-  2014-10-30T22:55:43:  Name ......................: Crab
-  2014-10-30T22:55:43:  Instruments ...............: all
-  2014-10-30T22:55:43:  Instrument scale factors ..: unity
-  2014-10-30T22:55:43:  Observation identifiers ...: all
-  2014-10-30T22:55:43:  Model type ................: PointSource
-  2014-10-30T22:55:43:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
-  2014-10-30T22:55:43:  Number of parameters ......: 6
-  2014-10-30T22:55:43:  Number of spatial par's ...: 2
-  2014-10-30T22:55:43:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-  2014-10-30T22:55:43:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-  2014-10-30T22:55:43:  Number of spectral par's ..: 3
-  2014-10-30T22:55:43:   Prefactor ................: 6.13326e-16 +/- 2.05738e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-  2014-10-30T22:55:43:   Index ....................: -2.5057 +/- 0.0250818 [-0,-5]  (free,scale=-1,gradient)
-  2014-10-30T22:55:43:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
-  2014-10-30T22:55:43:  Number of temporal par's ..: 1
-  2014-10-30T22:55:43:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2014-10-30T22:55:43: === GCTAModelRadialAcceptance ===
-  2014-10-30T22:55:43:  Name ......................: Background
-  2014-10-30T22:55:43:  Instruments ...............: CTA
-  2014-10-30T22:55:43:  Instrument scale factors ..: unity
-  2014-10-30T22:55:43:  Observation identifiers ...: all
-  2014-10-30T22:55:43:  Model type ................: "Gaussian" * "FileFunction" * "Constant"
-  2014-10-30T22:55:43:  Number of parameters ......: 3
-  2014-10-30T22:55:43:  Number of radial par's ....: 1
-  2014-10-30T22:55:43:   Sigma ....................: 3.04429 +/- 0.0330229 [0.01,10] deg2 (free,scale=1,gradient)
-  2014-10-30T22:55:43:  Number of spectral par's ..: 1
-  2014-10-30T22:55:43:   Normalization ............: 0.996765 +/- 0.0175227 [0,1000]  (free,scale=1,gradient)
-  2014-10-30T22:55:43:  Number of temporal par's ..: 1
-  2014-10-30T22:55:43:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2014-10-30T22:55:43: 
-  2014-10-30T22:55:43: +==============+
-  2014-10-30T22:55:43: | Save results |
-  2014-10-30T22:55:43: +==============+
-  2014-10-30T22:55:43: 
-  2014-10-30T22:55:43: Application "ctlike" terminated after 5 wall clock seconds, consuming 0.246747 seconds of CPU time.
+  2014-10-31T14:45:29: +=================================+
+  2014-10-31T14:45:29: | Maximum likelihood optimisation |
+  2014-10-31T14:45:29: +=================================+
+  2014-10-31T14:45:29:  >Iteration   0: -logL=44395.244, Lambda=1.0e-03
+  2014-10-31T14:45:29:   Iteration   1: -logL=44396.223, Lambda=1.0e-03, delta=-0.979, max(|grad|)=9.644743 [Sigma:6] (stalled)
+  2014-10-31T14:45:29:  >Iteration   2: -logL=44396.162, Lambda=1.0e-02, delta=0.061, max(|grad|)=-0.309683 [Normalization:7]
+  2014-10-31T14:45:29:  >Iteration   3: -logL=44396.162, Lambda=1.0e-03, delta=0.000, max(|grad|)=-0.008931 [Index:3]
+  2014-10-31T14:45:29: 
+  2014-10-31T14:45:29: +=========================================+
+  2014-10-31T14:45:29: | Maximum likelihood optimization results |
+  2014-10-31T14:45:29: +=========================================+
+  2014-10-31T14:45:29: === GOptimizerLM ===
+  2014-10-31T14:45:29:  Optimized function value ..: 44396.162
+  2014-10-31T14:45:29:  Absolute precision ........: 0.005
+  2014-10-31T14:45:29:  Acceptable value decrease .: 1
+  2014-10-31T14:45:29:  Optimization status .......: converged
+  2014-10-31T14:45:29:  Number of parameters ......: 9
+  2014-10-31T14:45:29:  Number of free parameters .: 4
+  2014-10-31T14:45:29:  Number of iterations ......: 3
+  2014-10-31T14:45:29:  Lambda ....................: 0.0001
+  2014-10-31T14:45:29:  Maximum log likelihood ....: -44396.162
+  2014-10-31T14:45:29:  Observed events  (Nobs) ...: 6127.000
+  2014-10-31T14:45:29:  Predicted events (Npred) ..: 6127.000 (Nobs - Npred = 0.000303534)
+  2014-10-31T14:45:29: === GModels ===
+  2014-10-31T14:45:29:  Number of models ..........: 2
+  2014-10-31T14:45:29:  Number of parameters ......: 9
+  2014-10-31T14:45:29: === GModelSky ===
+  2014-10-31T14:45:29:  Name ......................: Crab
+  2014-10-31T14:45:29:  Instruments ...............: all
+  2014-10-31T14:45:29:  Instrument scale factors ..: unity
+  2014-10-31T14:45:29:  Observation identifiers ...: all
+  2014-10-31T14:45:29:  Model type ................: PointSource
+  2014-10-31T14:45:29:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2014-10-31T14:45:29:  Number of parameters ......: 6
+  2014-10-31T14:45:29:  Number of spatial par's ...: 2
+  2014-10-31T14:45:29:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+  2014-10-31T14:45:29:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+  2014-10-31T14:45:29:  Number of spectral par's ..: 3
+  2014-10-31T14:45:29:   Prefactor ................: 6.13325e-16 +/- 2.05738e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+  2014-10-31T14:45:29:   Index ....................: -2.5057 +/- 0.0250818 [-0,-5]  (free,scale=-1,gradient)
+  2014-10-31T14:45:29:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
+  2014-10-31T14:45:29:  Number of temporal par's ..: 1
+  2014-10-31T14:45:29:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
+  2014-10-31T14:45:29: === GCTAModelRadialAcceptance ===
+  2014-10-31T14:45:29:  Name ......................: Background
+  2014-10-31T14:45:29:  Instruments ...............: CTA
+  2014-10-31T14:45:29:  Instrument scale factors ..: unity
+  2014-10-31T14:45:29:  Observation identifiers ...: all
+  2014-10-31T14:45:29:  Model type ................: "Gaussian" * "FileFunction" * "Constant"
+  2014-10-31T14:45:29:  Number of parameters ......: 3
+  2014-10-31T14:45:29:  Number of radial par's ....: 1
+  2014-10-31T14:45:29:   Sigma ....................: 3.04429 +/- 0.0330227 [0.01,10] deg2 (free,scale=1,gradient)
+  2014-10-31T14:45:29:  Number of spectral par's ..: 1
+  2014-10-31T14:45:29:   Normalization ............: 0.996767 +/- 0.0175227 [0,1000]  (free,scale=1,gradient)
+  2014-10-31T14:45:29:  Number of temporal par's ..: 1
+  2014-10-31T14:45:29:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
+  2014-10-31T14:45:29: 
+  2014-10-31T14:45:29: +==============+
+  2014-10-31T14:45:29: | Save results |
+  2014-10-31T14:45:29: +==============+
+  2014-10-31T14:45:29: 
+  2014-10-31T14:45:29: Application "ctlike" terminated after 2 wall clock seconds, consuming 0.255421 seconds of CPU time.
 
 
 .. _sec_butterfly_cta:
