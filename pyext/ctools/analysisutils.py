@@ -20,7 +20,7 @@
 # ==========================================================================
 import ctools as ct
 import gammalib as gl
-from math import log10,floor
+from math import sqrt,log10,floor
 import sys
 
 class base(object):
@@ -74,9 +74,14 @@ class ResultsSorage(dict,base):
         base.__init__(self)
         self["dnde"]      = {}
         self["ulim_dnde"] = []
+        self["time"]      = {}
         self["ener"]      = {}
         self["TS"]        = []
         self["Iflux"]     = {}
+        
+        self["time"]["tmin_value"]   = []
+        self["time"]["tmax_value"]   = []
+        self["time"]["unit"]       = "sec"
         
         self["ener"]["value"]      = []
         self["ener"]["ed_value"]   = []
@@ -111,39 +116,98 @@ class Analyser(base):
         self.m_obs = None
         self.like  = None
         
-        self.m_evtfile  = "events_selected.fits"        
-        self.m_raw_evt  = "events.fits"
-        self.m_cntfile  = "cntmap.fits"
         self.m_ebinalg  = "LOG"
         self.m_eunit    = "TeV"
-        self.m_ra       = 83.63
-        self.m_dec      = 22.01
-        self.m_roi      = 2.
-        self.m_tmin     = 0.
-        self.m_tmax     = 0.
-        self.m_emin     = 0.1#emin
-        self.m_emax     = 10.#emax
         self.m_enumbins = 10#nbins
         self.m_usepnt   = True # Use pointing for map centre
-        self.m_nxpix    = 200#npix
-        self.m_nypix    = 200#npix
-        self.m_binsz    = 0.05#binsz
-        self.m_coordsys = "GAL"#coord
+        self.m_coordsys = "CEL"#coord
         self.m_proj     = "TAN"#proj
         self.m_binned   = False
-        
-        self.m_stat     = "POISSON"#stat
-        self.m_caldb    = "dummy"
-        self.m_irf      = "cta_dummy_irf"
         self.m_edisp    = False
-        self.m_xml      = "$PWD/crab.xml"
-        self.m_xml_out  = "$PWD/crab_results.xml"
+        self.m_stat     = "POISSON"#stat
+
+        self.m_source_set = False
+        self.m_files_set  = False
+        self.m_time_set   = False
+        self.m_energy_set = False
+        self.m_irfs_set   = False
+        self.m_roi_set    = False
+        self.m_xml_set    = False
+        
+    def set_xml(self,xml):
+        self.m_xml     = xml
+        ind = xml.find(".xml")
+        if not ind==-1:
+            self.m_xml_out = xml[:xml.find(".xml")]+"_results"+xml[xml.find(".xml"):]
+        self.m_xml_set = True
+        
+    def set_roi(self,roi):
+        self.m_roi      = float(roi)
+        self.m_nxpix    = int(self.m_roi*100)#npix
+        self.m_nypix    = int(self.m_roi*100)#npix
+        self.m_binsz    = 0.05#binsz
+        self.m_roi_set  = True
+
+    def set_irfs(self,caldb,irf):
+        self.m_caldb    = caldb
+        self.m_irf      = irf
+        self.m_irfs_set = True
+
+    def set_Fitsfiles(self,evtfile,tag="CTA_analysis"):
+        self.m_evtfile   = "event_selected_"+tag+".fits"    
+        self.m_raw_evt   = evtfile
+        self.m_cntfile   = "countmap_"+tag+".fits"
+        self.m_files_set = True
+
+    def set_source(self,name,ra,dec):
+        self.m_ra         = ra
+        self.m_dec        = dec
+        self.m_name       = name
+        self.m_source_set = True
+
+    def validate(self):
+        if not self.m_time_set :
+            self.error("Time range of the observations not set")
+
+        if not self.m_files_set :
+            self.error("FITS files of the observations not set")
+
+        if not self.m_source_set :
+            self.error("Source not set")
+
+        if not self.m_energy_set :
+            self.error("Energy range of the observations not set")
+            
+        if not self.m_irfs_set :
+            self.error("IRFs to use not set")
+
+        if not self.m_roi_set :
+            self.error("ROI to use not set")
+
+        if not self.m_xml_set :
+            self.error("XML files for the sky model not set")
+
+    def copy(self,analyse,tag="CTA_analysis_copy"):
+        self.set_xml(analyse.m_xml)
+        self.set_irfs(analyse.m_caldb,analyse.m_irf)
+        self.set_roi(analyse.m_roi)
+        self.set_time_boundary(analyse.m_tmin,analyse.m_tmax)
+        self.set_energy_boundary(analyse.m_emin,analyse.m_emax)
+        self.set_source(analyse.m_name,analyse.m_ra,analyse.m_dec)
+        self.set_Fitsfiles(analyse.m_evtfile,tag)
 
 
     def set_obs(self,obs):
         self.m_obs = obs #set the GObservation container
 
+    def set_time_boundary(self,tmin,tmax):
+        """Set the start and stop time of the observation"""
+        self.m_tmin        = float(tmin)
+        self.m_tmax        = float(tmax)
+        self.m_time_set    = True
+
     def set_energy_boundary(self,emin,emax):
+        """Set the energy bounds of the observation"""
         self.m_emin = emin
         self.m_emax = emax
         ebounds = gl.GEbounds(gl.GEnergy(emin, self.m_eunit), \
@@ -152,10 +216,12 @@ class Analyser(base):
         if self.m_obs:
             for obs in self.m_obs:
                 obs.events().ebounds(ebounds)
+        self.m_energy_set = True
         
     def ctselect(self):
         # ctselect application and set parameters
         self.info("Running ctselect to cut on events")
+        self.validate()
         if self.m_obs:
             filter = ct.ctselect(self.m_obs)
         else:
@@ -186,6 +252,7 @@ class Analyser(base):
         
     def ctbin(self,log=False,debug=False):
         # ctbin application and set parameters
+        self.validate()
         self.info("Running ctbin to create count map")
         if self.m_obs:
             bin = ct.ctbin(self.m_obs)
@@ -215,7 +282,7 @@ class Analyser(base):
 
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps
-        bin.excute()
+        bin.execute()
         if self.m_obs:
             # Make a deep copy of the observation that will be returned
             # (the ctbin object will go out of scope one the function is
@@ -223,6 +290,7 @@ class Analyser(base):
             self.m_obs = bin.obs().copy()
             
     def create_fit(self,log=False,debug=False):
+        self.validate()
         # create ctlike instance with given parameters
         self.info("Fitting Data using ctlike")
         if self.m_obs:
@@ -237,7 +305,7 @@ class Analyser(base):
             self.like["stat"].string(self.m_stat)
             self.like["caldb"].string(self.m_caldb)
             self.like["irf"].string(self.m_irf)
-            self.like["srcmdl"] = self.m_xml 
+        self.like["srcmdl"] = self.m_xml 
         self.like["edisp"].boolean(self.m_edisp)
         self.like["outmdl"] = self.m_xml_out
 
@@ -249,6 +317,7 @@ class Analyser(base):
             self.like["debug"].boolean(True)
             
     def fit(self,log=False,debug=False):
+        self.validate()
         if not(self.like):
             self.warning("ctlike object not created, creating now")
             self.create_fit(log,debug)
@@ -266,15 +335,33 @@ class Analyser(base):
                 print "Model : "+m.name()
                 print m
                 
-    def GetSrcResuls(self,Res,srcname,E0=1,factor = 1e6):
-
+    def GetSrcResuls(self,Res,srcname,E0=None,factor = 1e6,tmin=None,tmax=None):
+        """function to get and store the results of a fit"""
         results = self.GetSrcParams(srcname)
 
-        Res["ener"]["value"].append(E0*factor)
-        Res["ener"]["ed_value"].append((E0-self.m_emin)*factor)
-        Res["ener"]["eu_value"].append((self.m_emax-E0)*factor)
-        Res["ener"]["unit"] = "MeV"
-        
+        if 1:
+        # #Time
+        # if (tmin is not None) or (tmax is not None) :
+            # Res["time"]["tmin_value"].append(tmin)
+            # Res["time"]["tmax_value"].append(tmax)
+            # Res["time"]["unit"] = "sec"
+        # else:
+            Res["time"]["tmin_value"].append(self.m_tmin)
+            Res["time"]["tmax_value"].append(self.m_tmax)
+            Res["time"]["unit"] = "sec"
+
+        #Energy
+        if (E0 is not None):
+            Res["ener"]["value"].append(E0*factor)
+            Res["ener"]["ed_value"].append((E0-self.m_emin)*factor)
+            Res["ener"]["eu_value"].append((self.m_emax-E0)*factor)
+            Res["ener"]["unit"] = "MeV"
+        else:
+            Res["ener"]["value"].append(sqrt(self.m_emin*self.m_emax))
+            Res["ener"]["ed_value"].append(-self.m_emin+sqrt(self.m_emin*self.m_emax))
+            Res["ener"]["eu_value"].append(self.m_emax-sqrt(self.m_emin*self.m_emax))
+            Res["ener"]["unit"] = self.m_eunit
+
         Res["Iflux"]["value"].append(results["flux"])
         Res["Iflux"]["eu_value"].append(results["eflux"])
         Res["Iflux"]["ed_value"].append(results["eflux"])
@@ -284,15 +371,8 @@ class Analyser(base):
         Res["dnde"]["value"].append(m.spectral()[0].value())
         Res["dnde"]["eu_value"].append(m.spectral()[0].error())
         Res["dnde"]["ed_value"].append(m.spectral()[0].error())
-        # Res["dnde"]["value"].append(m.spectral().eval(gl.GEnergy(E0,self.m_eunit),gl.GTime(0)))
-        # m.spectral().eval_gradients(gl.GEnergy(E0,self.m_eunit),gl.GTime(0))
-        # Assume that par 0 is the norm
-        # Res["dnde"]["eu_value"].append(m.spectral()[0].factor_gradient())
-        # Res["dnde"]["ed_value"].append(m.spectral()[0].factor_gradient())
-        # Res["dnde"]["unit"] = "unit"
 
         Res["TS"].append(100)
-        # Res["TS"].append(self.like.obs().models()[srcname].ts())
 
         UL = UpperLimitComputer(self,srcname) 
         UL.run()
@@ -339,22 +419,19 @@ def MakeEbin(analyse,nbins,srcname,binned = False):
         E0 = pow(10, (log10(emin) + log10(emax)) / 2)
         print "Making energy bin between %2.1e"%(emin)+analyse.m_eunit+" and %2.1e"%(emax)+analyse.m_eunit
 
-        # change the PivotEnergy to E0, froze all spectral parameters but the prefactor
+        # change the PivotEnergy to E0
         m = obs_copy.models()[srcname]
         for par in m.spectral():
             if par.name() == "PivotEnergy":
                 par.value(E0*factor)
-            # if not(par.name() == "Prefactor") and par.is_free(): # assume that all model have a prefactor
-                # par.fix()
-            # if par.name() == "Prefactor":
-                # Set the norm to a better guess
-                # new_val = m.spectral().eval(gl.GEnergy(E0,analyse.m_eunit),gl.GTime(0))
-                # m.spectral()["Prefactor"].value(new_val)
                             
         ana_bin = Analyser()
 
         #copy the obs object
         ana_bin.set_obs(obs_copy)
+
+        #copy the analyser parameters
+        ana_bin.copy(analyse)
 
         # Set energy boundaries
         ana_bin.set_energy_boundary(emin,emax)
@@ -371,6 +448,46 @@ def MakeEbin(analyse,nbins,srcname,binned = False):
 
         #Retrive the results in the good format
         Res = ana_bin.GetSrcResuls(Res,srcname,E0,factor)
+        
+        del ana_bin
+    return Res
+    
+def MakeLC(analyse,nbins,srcname,binned = False):
+    #Store the results
+    Res = ResultsSorage()
+
+    #check the source name, exit is the srcname is false
+    analyse.GetModel(srcname)
+    
+    for i in xrange(nbins):
+        obs_copy = analyse.like.obs().copy()
+        tmin = analyse.m_tmin + (analyse.m_tmax-analyse.m_tmin)/(nbins)*i
+        tmax = analyse.m_tmin + (analyse.m_tmax-analyse.m_tmin)/(nbins)*(i+1)
+        print "Making time bin between %2.1e"%(tmin)+" and %2.1e"%(tmax)
+                            
+        ana_bin = Analyser()
+
+        #copy the obs object
+        ana_bin.set_obs(obs_copy)
+        
+        #copy the analyser parameters
+        ana_bin.copy(analyse)
+
+        # Set energy boundaries
+        ana_bin.set_time_boundary(tmin,tmax)
+        ana_bin.ctselect()
+
+        # if binned:
+            # ana_bin.ctbin()
+
+        # Create the fit object
+        ana_bin.create_fit(log=False,debug=False)
+        
+        # Run ctlike application.
+        ana_bin.like.run()
+
+        #Retrive the results in the good format
+        Res = ana_bin.GetSrcResuls(Res,srcname,tmin=tmin,tmax=tmax)
         
         del ana_bin
     return Res
@@ -437,7 +554,6 @@ class UpperLimitComputer(base):
         value = self.spec[self.parname].value()
         error = self.spec[self.parname].error()
         scale = self.spec[self.parname].scale()
-        print value," ",error," ",scale
 
         #Fix all parameters
         for model in self.like.obs().models():
@@ -451,7 +567,6 @@ class UpperLimitComputer(base):
         # set start (a) and (b) depend on the CL asked
         a= value / scale +  (self.dloglike/4.)*error/scale
         b=value / scale + (self.dloglike*2)* error/scale
-        print a," ",b," ",self._func(a)," ",self._func(b)
         ul = self._bisec(a,b)
         
         self.ulimit = ul*self.spec[self.parname].scale()

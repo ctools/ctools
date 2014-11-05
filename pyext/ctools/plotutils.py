@@ -189,6 +189,45 @@ class ulimgraph(analysisutils.base,options,SpectralBase):
         plt.errorbar(ener, flux, yerr=[ed_flux, eu_flux],fmt=self.fmt,markersize=0.0,elinewidth=self.elinewidth,lolims=True,capsize=self.capsize,label='_nolegend_',mfc = self.color,ecolor=self.color,ms =self.markersize)      
             
 
+class LightCurvePlotter(analysisutils.base,options):
+    """ Class to plot the Light curve"""
+    def __init__(self,srcname,datapoint):
+        super(LightCurvePlotter,self).__init__()
+        options.__init__(self)
+        self.m_name = srcname
+        self.m_data = datapoint #data point in a Results Storage class
+
+    def draw(self):
+        if not(has_matplotlib):
+            self.warning("matplotlib module not found, can draw")
+            return
+
+        time     = []
+        dtime    = []
+        flux     = []
+        dflux_ed = []
+        dflux_eu = []
+        for i in range(len(self.m_data["time"]["tmin_value"])):
+            time.append((self.m_data["time"]["tmin_value"][i]+self.m_data["time"]["tmax_value"][i])/2)
+            dtime.append((self.m_data["time"]["tmax_value"][i]-self.m_data["time"]["tmin_value"][i])/2)
+            flux.append(self.m_data["Iflux"]["value"][i])
+            dflux_eu.append(self.m_data["Iflux"]["eu_value"][i])
+            dflux_ed.append(self.m_data["Iflux"]["ed_value"][i])
+
+        plt.figure("results",figsize=(12,7),edgecolor="w")
+        unit = self.m_data["time"]["unit"]
+        plt.xlabel("Time ["+ unit+"]",fontsize=15)
+        unit = self.m_data["Iflux"]["unit"]
+        plt.ylabel("E$^{2}$ dN/dE ["+unit+"]",fontsize=15)
+
+        print time
+        print dtime
+        print flux
+        print dflux_ed
+        print dflux_eu
+        plt.errorbar(time,flux,xerr=[dtime,dtime],yerr=[dflux_ed,dflux_eu],fmt=self.fmt,color=self.markercolor,elinewidth=self.elinewidth) 
+        plt.show()
+
 class SpectrumPlotter(analysisutils.base,SpectralBase):
     """ Class to compute and plot the spectra (i.e best fit model and butterfly).
         if data points are provided, only change applied  is energy unit convertion to match the butterfly one
@@ -221,7 +260,6 @@ class SpectrumPlotter(analysisutils.base,SpectralBase):
         #Assume MeV for the energy #TODO
         self.points = ulimgraph(datapoint,self.m_sed,gl.MeV2erg,energy)
         self.residuals = residuals(self.m_spectral,datapoint,self.m_sed,gl.MeV2erg,energy)
-
 
     def _validateUnits(self):
         Energy_list = {"MeV":1,"GeV":1e3,"TeV":1e6}
@@ -292,7 +330,6 @@ class SpectrumPlotter(analysisutils.base,SpectralBase):
             self._makebutterfly() # make the butterfly
         self.success("Spectrum computed")
 
-        
     def _makebutterfly(self):
         """make the butterfly by appending element in a table"""
         for i in xrange(self.m_npt):
