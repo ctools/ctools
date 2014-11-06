@@ -32,6 +32,7 @@ tmax,   r, a,   0.0,    0,   , "End time (CTA MET in seconds)"
 emin,   r, a,   0.1,    0,   , "Lower energy limit (TeV)"
 emax,   r, a, 100.0,    0,   , "Upper energy limit (TeV)"
 expr,   s, h,    "",     ,   , "Additional selection expression"
+usethres,s,h,"NONE",NONE|DEFAULT|USER, ,"Threshold applying algorithm"
 #
 # Standard parameters
 #====================
