@@ -664,7 +664,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         GEbounds ebounds = find_ebounds(obs,list->ebounds());
 
         // Check if energy bounds are valid
-        if (ebounds.size() > 0) {
+        if (ebounds.size() >= 1) {
 
             // Write ebounds to log
             if (logTerse()) {
@@ -1093,11 +1093,11 @@ GEbounds ctselect::find_ebounds(GCTAObservation* obs, const GEbounds& list_eboun
     if (list_ebounds.size() >= 1) {
 
             // Make sure the user parameters don't condradict previous selections
-            if (emin < ebounds.emin(0).TeV()) {
-                emin = ebounds.emin(0).TeV();
+            if (emin < list_ebounds.emin(0).TeV()) {
+                emin = list_ebounds.emin(0).TeV();
             }
-            if (emax > ebounds.emax(0).TeV()) {
-                emax = ebounds.emax(0).TeV();
+            if (emax > list_ebounds.emax(0).TeV()) {
+                emax = list_ebounds.emax(0).TeV();
             }
         } //endif: ebounds were valid
 
