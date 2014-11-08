@@ -45,9 +45,9 @@ class base(object):
     def info(self,message,newline=True):
         printstring = self.infocolor+"["+self.classname+"]: "+message+self.endcolor     
         if newline:
-            print printstring
+            print(printstring)
         else:
-            print self.infocolor+message+self.endcolor,
+            print(self.infocolor+message+self.endcolor)
             sys.stdout.flush()  
         
     def warning(self,message,functionname = ""):
@@ -56,15 +56,15 @@ class base(object):
             printstring = self.warningcolor+"["+self.classname+"] Warning: "+message+self.endcolor
         else:
             printstring = self.warningcolor+"["+self.classname+"::"+functionname+"] Warning: "+message+self.endcolor
-        print printstring
+        print(printstring)
         
     def success(self,message):
         printstring = self.successcolor+"["+self.classname+"]: "+message+self.endcolor
-        print printstring
+        print(printstring)
         
     def progress(self,message="."):
         string = self.infocolor+message+self.endcolor
-        print string
+        print(string)
         
         
 class ResultsSorage(dict,base):
@@ -104,10 +104,10 @@ class ResultsSorage(dict,base):
             self.info("Key name : "+k)
             try :
                 for ki in self[k].iterkeys():
-                    print "\t",ki,"\t",self[k][ki]
+                    print("\t",ki,"\t",self[k][ki])
             except:
-                print self[k]
-        print 
+                print(self[k])
+        print()
         
 class Analyser(base):
     def __init__(self):
@@ -332,8 +332,8 @@ class Analyser(base):
         self.info("Results of the Fit")
         for m in self.like.obs().models():
             if srcname == m.name() or srcname=="":
-                print "Model : "+m.name()
-                print m
+                print("Model : "+m.name())
+                print(m)
                 
     def GetSrcResuls(self,Res,srcname,E0=None,factor = 1e6,tmin=None,tmax=None):
         """function to get and store the results of a fit"""
@@ -417,7 +417,7 @@ def MakeEbin(analyse,nbins,srcname,binned = False):
         emin = pow(10,log10(analyse.m_emin) + (log10(analyse.m_emax)-log10(analyse.m_emin))/(nbins)*i)
         emax = pow(10,log10(analyse.m_emin) + (log10(analyse.m_emax)-log10(analyse.m_emin))/(nbins)*(i+1))
         E0 = pow(10, (log10(emin) + log10(emax)) / 2)
-        print "Making energy bin between %2.1e"%(emin)+analyse.m_eunit+" and %2.1e"%(emax)+analyse.m_eunit
+        print("Making energy bin between %2.1e"%(emin)+analyse.m_eunit+" and %2.1e"%(emax)+analyse.m_eunit)
 
         # change the PivotEnergy to E0
         m = obs_copy.models()[srcname]
@@ -463,7 +463,7 @@ def MakeLC(analyse,nbins,srcname,binned = False):
         obs_copy = analyse.like.obs().copy()
         tmin = analyse.m_tmin + (analyse.m_tmax-analyse.m_tmin)/(nbins)*i
         tmax = analyse.m_tmin + (analyse.m_tmax-analyse.m_tmin)/(nbins)*(i+1)
-        print "Making time bin between %2.1e"%(tmin)+" and %2.1e"%(tmax)
+        print("Making time bin between %2.1e"%(tmin)+" and %2.1e"%(tmax))
                             
         ana_bin = Analyser()
 

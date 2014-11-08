@@ -219,11 +219,11 @@ class LightCurvePlotter(analysisutils.base,options):
         unit = self.m_data["Iflux"]["unit"]
         plt.ylabel("E$^{2}$ dN/dE ["+unit+"]",fontsize=15)
 
-        print time
-        print dtime
-        print flux
-        print dflux_ed
-        print dflux_eu
+        print(time)
+        print(dtime)
+        print(flux)
+        print(dflux_ed)
+        print(dflux_eu)
         plt.errorbar(time,flux,xerr=[dtime,dtime],yerr=[dflux_ed,dflux_eu],fmt=self.fmt,color=self.markercolor,elinewidth=self.elinewidth) 
         plt.show()
 
