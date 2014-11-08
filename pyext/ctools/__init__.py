@@ -1,6 +1,8 @@
 # Import sub modules
 from .tools import *
 import obsutils
+import analysisutils
+import plotutils
 
 # Remove swig register stuff
 bad_entries = [entry for entry in list(locals())
