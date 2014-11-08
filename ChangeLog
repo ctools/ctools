@@ -1,4 +1,4 @@
-2014-10-30  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-11-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.8.0 released
         ========================
@@ -17,6 +17,7 @@
         ctmodel now always creates a single model cube
         Support energy dispersion in ctobssim, ctlike and ctmodel	
         Correct ctobssim for thread safety
+        Support save and user energy thresholds in ctselect
         Correctly apply time references in ctselect
         Reduce memory usage
         Move obsutils to ctools namespace

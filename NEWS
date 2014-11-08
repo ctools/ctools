@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 00-08-00
 
 Author(s) : Juergen Knoedlseder
 
-30 October 2014
+8 November 2014
 
 
 1. Introduction
@@ -64,6 +64,30 @@ Non-CTA time references are now correctly handled by ctselect. While the
 tmin and tmax parameters are given in CTA reference time, they are
 internally converted to the reference time of the GTI before event
 selection (#1329).
+
+ctselect now supports save and user energy thresholds (#1039). There
+are three different possibilities for specifying a threshold. They
+are toggled using the hidden usethres parameter:
+
+NONE: Use the emin and emax parameters to select an energy range.
+      This is the default mode which is identical to the previous
+      workings. The only difference is now that if the emin and/or
+      emax parameter is set to 0.0, the threshold will be ignored.
+      This allows to select all events above or below a given
+      threshold.
+
+DEFAULT: Use the save threshold that is found in the effective
+      area FITS header keywords LO_THRES and HI_THRES. If the
+      emin and emax parameters are non-zero, they will provide
+      an additional energy constraint.
+
+USER: Use the user specified threshold that are found in the
+      XML observation definition file. If the emin and emax
+      parameters are non-zero, they will provide an additional
+      energy constraint.
+
+Note that any existing energy boundaries will be used as envelope,
+i.e. a wider energy threshold specification will have no effect.
 
 
 7. ctbin - CTA event binning

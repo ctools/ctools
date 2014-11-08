@@ -71,6 +71,8 @@ protected:
     void        free_members(void);
     void        get_parameters(void);
     void        select_events(GCTAObservation* obs, const std::string& filename);
+    GEbounds    set_ebounds(GCTAObservation* obs,
+                            const GEbounds& ebounds) const;
     std::string check_infile(const std::string& filename) const;
     std::string set_outfile_name(const std::string& filename) const;
     void        save_fits(void);
@@ -78,7 +80,6 @@ protected:
     void        save_event_list(const GCTAObservation* obs,
                                 const std::string&     infile,
                                 const std::string&     outfile) const;
-    GEbounds find_ebounds(GCTAObservation* obs, const GEbounds& list_ebounds) const;
 
     // User parameters
     std::string m_infile;     //!< Input event list or XML file
@@ -93,7 +94,7 @@ protected:
     double      m_emin;       //!< Lower energy
     double      m_emax;       //!< Upper energy
     std::string m_expr;       //!< Selection expression
-    std::string m_usethres;//!<Choice of energy threshold usage
+    std::string m_usethres;   //!< Energy threshold type
 
     // Protected members
     GObservations            m_obs;        //!< Observations container
