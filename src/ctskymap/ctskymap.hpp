@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSKYMAP_NAME    "ctskymap"
-#define CTSKYMAP_VERSION "00-02-00"
+#define CTSKYMAP_VERSION "00-03-00"
 
 
 /***********************************************************************//**
