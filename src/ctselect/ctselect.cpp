@@ -36,6 +36,8 @@
 #define G_RUN                                               "ctselect::run()"
 #define G_SELECT_EVENTS          "ctselect::select_events(GCTAObservation*, "\
                                                               "std::string&)"
+#define G_SET_EBOUNDS    "ctselect::set_ebounds(GCTAObservation*, GEbounds&)"
+#define G_GET_PARAMETERS                         "ctselect::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -397,13 +399,14 @@ void ctselect::init_members(void)
     m_emin   = 0.0;
     m_emax   = 0.0;
     m_expr.clear();
+    m_usethres.clear();
 
     // Initialise protected members
     m_obs.clear();
     m_infiles.clear();
     m_timemin.clear();
     m_timemax.clear();
-    m_use_xml    = false;
+    m_use_xml = false;
     
     // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
     // which is defined in GCTALib.hpp. This is somehow a kluge. We need
@@ -423,18 +426,19 @@ void ctselect::init_members(void)
 void ctselect::copy_members(const ctselect& app)
 {
     // Copy parameters
-    m_infile  = app.m_infile;
-    m_outfile = app.m_outfile;
-    m_prefix  = app.m_prefix;
-    m_usepnt  = app.m_usepnt;
-    m_ra      = app.m_ra;
-    m_dec     = app.m_dec;
-    m_rad     = app.m_rad;
-    m_tmin    = app.m_tmin;
-    m_tmax    = app.m_tmax;
-    m_emin    = app.m_emin;
-    m_emax    = app.m_emax;
-    m_expr    = app.m_expr;
+    m_infile   = app.m_infile;
+    m_outfile  = app.m_outfile;
+    m_prefix   = app.m_prefix;
+    m_usepnt   = app.m_usepnt;
+    m_ra       = app.m_ra;
+    m_dec      = app.m_dec;
+    m_rad      = app.m_rad;
+    m_tmin     = app.m_tmin;
+    m_tmax     = app.m_tmax;
+    m_emin     = app.m_emin;
+    m_emax     = app.m_emax;
+    m_expr     = app.m_expr;
+    m_usethres = app.m_usethres;
 
     // Copy protected members
     m_obs        = app.m_obs;
@@ -514,12 +518,21 @@ void ctselect::get_parameters(void)
         m_ra  = (*this)["ra"].real();
         m_dec = (*this)["dec"].real();
     }
-    m_rad  = (*this)["rad"].real();
-    m_tmin = (*this)["tmin"].real();
-    m_tmax = (*this)["tmax"].real();
-    m_emin = (*this)["emin"].real();
-    m_emax = (*this)["emax"].real();
-    m_expr = (*this)["expr"].string();
+    m_rad      = (*this)["rad"].real();
+    m_tmin     = (*this)["tmin"].real();
+    m_tmax     = (*this)["tmax"].real();
+    m_emin     = (*this)["emin"].real();
+    m_emax     = (*this)["emax"].real();
+    m_expr     = (*this)["expr"].string();
+    m_usethres = (*this)["usethres"].string();
+
+    // Check parameters (Kluge as the parfile interface does not yet check
+    // parameters; this can be removed once this is done properly)
+    if (m_usethres != "NONE" && m_usethres != "DEFAULT" && m_usethres != "USER") {
+        std::string msg = "Parameter \"usethres\" must be one of \"NONE\", "
+                          "\"DEFAULT\" or \"USER\".";
+        throw GException::invalid_value(G_GET_PARAMETERS, msg);
+    }
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -569,16 +582,25 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Initialise selection flags
     bool remove_all = false;
 
-    // Analyse task parameters to see what selections are required
+    // Get CTA event list pointer
+    GCTAEventList* list =
+        static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+
+    // Get energy boundaries
+    double   emin    = 0.0;
+    double   emax    = 0.0;
+    GEbounds ebounds = set_ebounds(obs, list->ebounds());
+    if (ebounds.size() >= 1) {
+        emin = ebounds.emin(0).TeV();
+        emax = ebounds.emax(0).TeV();
+    }
+
+    // Analyse parameters to see what selections are required
     bool select_time   = (m_tmin != 0.0 || m_tmax != 0.0);
-    bool select_energy = true;
+    bool select_energy = (emin != 0.0 || emax != 0.0);
     bool select_roi    = ((m_dec != -1.0 && m_ra != -1.0 && m_rad != -1.0) || m_usepnt);
     bool select_expr   = (gammalib::strip_whitespace(m_expr).length() > 0);
 
-    // Set energy selection
-    double emin = m_emin;
-    double emax = m_emax;
-    
     // Set RA/DEC selection. If the "usepnt" parameter is set to true then
     // use the pointing direction as the ROI centre.
     double ra  = m_ra;
@@ -589,10 +611,6 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         ra  = pnt.dir().ra_deg();
         dec = pnt.dir().dec_deg();
     }
-
-    // Get CTA event list pointer
-    GCTAEventList* list =
-        static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
     
     // Set time selection interval. We make sure here that the time selection
     // interval cannot be wider than the GTIs covering the data. This is done
@@ -638,48 +656,58 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
             selection += " && ";
         }
 
-        // Log the requested energy range
-        if (logTerse()) {
-            log << gammalib::parformat("Requested energy range");
-            log << m_emin << " - " << m_emax << " TeV" << std::endl;
-        }
-
-        // Set the energy boundaries. Make sure that they overlap with any
-        // existing energy boundaries
-        const GEbounds& ebounds = list->ebounds();
-        if (ebounds.size() >= 1) {
-            if (logTerse()) {
-                log << gammalib::parformat("Energy range of data");
-                log << ebounds.emin(0).TeV() << " - ";
-                log << ebounds.emax(0).TeV() << " TeV" << std::endl;
-            }
-            if (emin < ebounds.emin(0).TeV()) {
-                emin = ebounds.emin(0).TeV();
-            }
-            if (emax > ebounds.emax(0).TeV()) {
-                emax = ebounds.emax(0).TeV();
-            }
-        }
-
-        // Log the selected energy range
+        // Log the requested energy selection
         if (logTerse()) {
             log << gammalib::parformat("Selected energy range");
-            if (emin >= emax) {
-                log << "None. There is no overlap between existing ";
-                log << "and requested energy range." << std::endl;
+            if (emin > 0.0 && emax > 0.0) {
+                if (emin >= emax) {
+                    log << "None. There is no overlap between existing ";
+                    log << "and requested energy range." << std::endl;
+                }
+                else {
+                    log << emin << " - " << emax << " TeV" << std::endl;
+                }
+            }
+            else if (emin > 0.0) {
+                log << "> " << emin << " TeV" << std::endl;
+            }
+            else if (emax > 0.0) {
+                log << "< " << emax << " TeV" << std::endl;
             }
             else {
-                log << emin << " - " << emax << " TeV" << std::endl;
+                log << "None" << std::endl;
             }
         }
 
-        // Format energy selection
-        char cmin[80];
-        char cmax[80];
-        sprintf(cmin, "%.8f", emin);
-        sprintf(cmax, "%.8f", emax);
-        selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+std::string(cmax);
-        
+        // Apply the requested energy selection
+        if (emin > 0.0 && emax > 0.0) {
+            if (emin >= emax) {
+                remove_all = true;
+            }
+            else {
+                char cmin[80];
+                char cmax[80];
+                sprintf(cmin, "%.8f", emin);
+                sprintf(cmax, "%.8f", emax);
+                selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+
+                             std::string(cmax);
+            }
+        }
+        else if (emin > 0.0) {
+            char cmin[80];
+            sprintf(cmin, "%.8f", emin);
+            selection += "ENERGY >= "+std::string(cmin);
+        }
+        else if (emax > 0.0) {
+            char cmax[80];
+            sprintf(cmax, "%.8f", emax);
+            selection += "ENERGY <= "+std::string(cmax);
+        }
+        else {
+            log << "None" << std::endl;
+            remove_all = true;
+        }
+
     } // endif: made energy selection
 
     // Make ROI selection
@@ -837,6 +865,137 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Return energy boundaries for a given observation
+ *
+ * @param[in] obs Pointer to CTA observation.
+ * @param[in] ebounds Current energy boundaries.
+ * @return Energy boundaries.
+ *
+ * Returns the energy boundaries for a given observation. Depending on the
+ * value of the usethres parameter, the following values will be
+ * returned:
+ *
+ *     NONE:    [max(emin,emin_exist),min(emax,emax_exist)]
+ *     DEFAULT: [max(emin,emin_exist,emin_save),min(emax,emax_exist,emax_save)]
+ *     USER:    [max(emin,emin_exist,emin_user),min(emax,emax_exist,emax_user)]
+ *
+ * where
+ *
+ *     emin is the value of the emin parameter
+ *     emax is the value of the emax parameter
+ *     emin_exist is the value of any existing minimum boundary
+ *     emax_exist is the value of any existing maximum boundary
+ *     emin_save is the lower save threshold
+ *     emax_save is the upper save threshold
+ *     emin_user is the lower user threshold
+ *     emax_user is the upper user threshold
+ *
+ * Any threshold value of 0 will be ignored.
+ ***************************************************************************/
+GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) const
+{
+    // Set emin and emax values from user parameters
+    double emin = m_emin;
+    double emax = m_emax;
+
+    // Check if we have already energy boundaries
+    if (ebounds.size() > 0) {
+
+        // Raise minimum energy to lower boundary
+        if ((emin == 0.0) ||
+            ((ebounds.emin(0).TeV() > 0.0) && (emin < ebounds.emin(0).TeV()))) {
+            emin = ebounds.emin(0).TeV();
+        }
+
+        // Lower maximum energy to upper boundary
+        if ((emax == 0.0) ||
+            ((ebounds.emax(0).TeV() > 0.0) && (emax > ebounds.emax(0).TeV()))) {
+            emax = ebounds.emax(0).TeV();
+        }
+
+    } // endif: there were already energy boundaries
+
+    // Check if default threshold (the one from the IRF, also known as save
+    // threshold) should be applied
+    if (m_usethres == "DEFAULT") {
+
+        // Get CTA IRF respsonse pointer and throw exception if we don't
+        //  find IRF
+        const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+        if (rsp == NULL) {
+            std::string msg = "No IRF response attached to given observation.";
+            throw GException::invalid_value(G_SET_EBOUNDS, msg);
+        }
+
+        // Retrieve energy range from response information
+        double lo_save_thres = rsp->lo_save_thres();
+        double hi_save_thres = rsp->hi_save_thres();
+
+        // Check threshold information for validity
+        if ((lo_save_thres > 0.0) &&
+            (hi_save_thres > 0.0) &&
+            (lo_save_thres >= hi_save_thres)) {
+            std::string msg = "IRF \""+obs->name()+"\" contains an invalid "
+                              "energy range ["+gammalib::str(lo_save_thres)+","+
+                              gammalib::str(hi_save_thres)+"] TeV.";
+            throw GException::invalid_value(G_SET_EBOUNDS, msg);
+        }
+
+        // Raise minimum energy to lower threshold (if lower threshold exists)
+        if ((emin == 0.0) ||
+            ((lo_save_thres > 0.0) && (emin < lo_save_thres))) {
+            emin = lo_save_thres;
+        }
+
+        // Lower maximum energy to upper threshold (if upper threshold exists)
+        if ((emax == 0.0) ||
+            ((hi_save_thres > 0.0) && (emax > hi_save_thres))) {
+            emax = hi_save_thres;
+        }
+
+    } //endif: usethres was "DEFAULT"
+
+    // ... otherwise check if a user specified threshold should be applied
+    else if (m_usethres == "USER") {
+
+        // Retrieve thresholds from observation
+        double lo_user_thres = obs->lo_user_thres();
+        double hi_user_thres = obs->hi_user_thres();
+
+        // Check threshold information for validity
+        if ((lo_user_thres > 0.0) &&
+            (hi_user_thres > 0.0) &&
+            (lo_user_thres >= hi_user_thres)) {
+            std::string msg = "User energy range ["+gammalib::str(lo_user_thres)+
+                              ","+gammalib::str(hi_user_thres)+"] TeV is invalid.";
+            throw GException::invalid_value(G_SET_EBOUNDS, msg);
+        }
+
+        // Raise minimum energy to lower threshold (if lower threshold exists)
+        if ((emin == 0.0) ||
+            ((lo_user_thres > 0.0) && (emin < lo_user_thres))) {
+            emin = lo_user_thres;
+        }
+
+        // Lower maximum energy to upper threshold (if upper threshold exists)
+        if ((emax == 0.0) ||
+            ((hi_user_thres > 0.0) && (emax > hi_user_thres))) {
+            emax = hi_user_thres;
+        }
+
+    } // endif: usethres was "USER
+
+    // Set selection energy boundaries
+    GEbounds result;
+    result.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+
+    // Return result
+    return result;
+
 }
 
 
@@ -1060,4 +1219,3 @@ void ctselect::save_event_list(const GCTAObservation* obs,
     // Return
     return;
 }
-
