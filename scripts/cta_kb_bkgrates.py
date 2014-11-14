@@ -20,7 +20,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from gammalib import *
+import os
+import glob
 import math
 import sys
 
@@ -69,7 +70,10 @@ def make_file_function(irfname, filename):
         omega = 2.0 * math.pi * (1.0 - math.cos(math.radians(r80)))
         
         # Compute background rate per steradian and MeV
-        bkg_rate = bgd/omega/ewidth
+        if omega > 0.0:
+            bkg_rate = bgd/omega/ewidth
+        else:
+            bkg_rate = 0.0
 
         # Write
         file.write(str(energy)+" "+str(bkg_rate)+"\n")
@@ -89,18 +93,24 @@ if __name__ == '__main__':
     """
     Main entry point
     """
+    # Set parameters
+    caldb = "/usr/local/gamma/share/caldb/data/cta/kb/"
+
     # Get IRF from command line argument
     if (len(sys.argv) > 1):
-        irf = sys.argv[1]
+        irfs = [caldb+"/"+sys.argv[1]]
     else:
-        irf = "kb_E_50h_v3"
+        irfs = glob.glob(caldb+"/*.dat")
+        irfs.sort()
 
-    # Set parameters
-    caldb    = "/usr/local/gamma/share/caldb/cta"
+    # Loop over all IRFs
+    for irfname in irfs:
+
+        # Build background filename
+        head, tail = os.path.split(irfname)
+        irf      = tail.strip(".dat")
+        filename = "bkg_"+irf+".txt"
+        print(filename)
     
-    # Set filenames
-    irfname  = caldb+"/"+irf+".dat"
-    filename = "bkg_"+irf+".txt"
-    
-    # Read 
-    make_file_function(irfname, filename)
+        # Make background file
+        make_file_function(irfname, filename)
