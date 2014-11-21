@@ -34,8 +34,6 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                        "ctbkgcube::get_parameters()"
-#define G_GET_OBS                                      "ctbkgcube::get_obs()"
-#define G_SET_FROM_CNTMAP          "ctbkgcube::set_from_cntmap(std::string&)"
 #define G_FILL_CUBE                  "ctbkgcube::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -407,7 +405,7 @@ void ctbkgcube::save(void)
     }
 
     // Get output filenames
-    std::string outfile  = (*this)["outfile"].filename();
+    std::string outfile  = (*this)["outcube"].filename();
     std::string outmodel = (*this)["outmodel"].filename();
 
     // Create empty FITS file
@@ -460,6 +458,8 @@ void ctbkgcube::save(void)
 void ctbkgcube::init_members(void)
 {
     // Initialise members
+    m_outcube.clear();
+    m_outmodel.clear();
     m_obs.clear();
     m_bkgcube.clear();
     m_bkgmdl.clear();
@@ -481,6 +481,8 @@ void ctbkgcube::init_members(void)
 void ctbkgcube::copy_members(const ctbkgcube& app)
 {
     // Copy members
+    m_outmodel = app.m_outmodel;
+    m_outcube = app.m_outcube;
     m_obs        = app.m_obs;
     m_bkgcube    = app.m_bkgcube;
     m_bkgmdl     = app.m_bkgmdl;
@@ -507,6 +509,8 @@ void ctbkgcube::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
+ *  @exception GException::invalid_value
+ *            Parameter "inobs" is required for ctbkgcube.
  * @exception GException::invalid_value
  *            No background model definition XML file specified.
  *
@@ -515,11 +519,23 @@ void ctbkgcube::free_members(void)
  ***************************************************************************/
 void ctbkgcube::get_parameters(void)
 {
-    // If we do not have any observations in the container then load them
-    // using the "infile" parameter
+    // If there are no observations in container then load them via user parameters
     if (m_obs.size() == 0) {
-        get_obs();
-    }
+
+        // Throw exception if no infile is given, since this tool needs an observation
+        // including events
+        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
+
+            std::string msg = "Parameter \"inobs\" is required to be given in ctbkgcube."
+                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        }
+
+        // Build observation container
+        m_obs = get_observations();
+
+    } // endif: there was no observation in the container
+
 
     // If there are no models associated with the observations then load now
     // the model definition from the XML file
@@ -536,175 +552,53 @@ void ctbkgcube::get_parameters(void)
         m_obs.models(models);
     }
 
-    // If no counts map is specified then setup the background cube from
-    // the user parameters
-    std::string cntmap = (*this)["cntmap"].filename();
-    if ((gammalib::toupper(cntmap) == "NONE") ||
-        (gammalib::strip_whitespace(cntmap) == "")) {
-    
-        // Get user parameters for counts map definition
-        std::string proj     = (*this)["proj"].string();
-        std::string coordsys = (*this)["coordsys"].string();
-        double      xref     = (*this)["xref"].real();
-        double      yref     = (*this)["yref"].real();
-        double      binsz    = (*this)["binsz"].real();
-        int         nxpix    = (*this)["nxpix"].integer();
-        int         nypix    = (*this)["nypix"].integer();
+    // Get the incube filename
+    std::string incube = (*this)["incube"].filename();
 
-        // Get energy definition
-        m_ebounds = get_ebounds();
+    // Check for filename validity
+    if ((gammalib::toupper(incube) == "NONE") ||
+        (gammalib::strip_whitespace(incube) == "")) {
 
-        // Define skymap for background cube
-        GSkymap map(proj, coordsys, xref, yref,
-                    -binsz, binsz, nxpix, nypix,
-                    m_ebounds.size());
+        // Check for usepnt flag
+        bool usepnt = (*this)["usepnt"].boolean();
 
-        // Allocate background cube using a dummy GTI
-        GGti gti;
-        gti.append(GTime(0.0), GTime(1.0)); // Dummy GTI
-        m_bkgcube = GCTAEventCube(map, m_ebounds, gti);
+        // Check if pointing should be used
+        if (usepnt) {
 
-    }
+            // build cube from user parameters and pointing information
+            m_bkgcube = get_cube(m_obs);
+
+        } // endif: pointing used as map center
+
+        else {
+
+            // Build cube from user parameters
+            m_bkgcube = get_cube();
+
+        } // endelse: m_usepnt was false
+
+    } // endif: filename was not valid
 
     // ... otherwise setup the background cube from the counts map
     else {
     
         // Set background cube from counts map
-        set_from_cntmap(cntmap);
+        m_bkgcube = set_from_cntmap(incube);
     
-    }
+    } // endelse: cube was loaded from file
+
+    // Get energy definition
+    m_ebounds = m_bkgcube.ebounds();
 
     // Read output filenames (if needed)
     if (read_ahead()) {
-        (*this)["outfile"].filename();
-        (*this)["outmodel"].filename();
+        m_outcube = (*this)["outcube"].filename();
+        m_outmodel = (*this)["outmodel"].filename();
     }
 
     // Return
     return;
 }
-
-
-/***********************************************************************//**
- * @brief Get observation definition
- *
- * @exception GException::invalid_value
- *            No event list, counts cube or observation definition file
- *            specified.
- *
- * Get observation definition from the user parameters.
- ***************************************************************************/
-void ctbkgcube::get_obs(void)
-{
-    // Get input filename
-    std::string filename = (*this)["infile"].filename();
-
-    // Check whether infile parameter is undefined
-    if (gammalib::toupper(filename) == "NONE") {
-        std::string msg = "No event list, counts cube or observation definition "
-                          "file specified. Please set the \"infile\" parameter "
-                          "to either an event list filename, a counts cube "
-                          "filename or an observation definition filename.";
-        throw GException::invalid_value(G_GET_OBS, msg);
-    }
-
-    // Try first to open as FITS file
-    try {
-
-        // Allocate CTA observation
-        GCTAObservation obs;
-        
-        // Load input file in CTA observation
-        obs.load(filename);
-
-        // Append CTA observation to container
-        m_obs.append(obs);
-            
-    }
-        
-    // ... otherwise try to open as XML file
-    catch (GException::fits_open_error &e) {
-
-        // Load observations from XML file
-        m_obs.load(filename);
-
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Set background cube definition from counts map
- *
- * @exception GException::invalid_value
- *            Invalid counts map projection or invalid events encountered.
- *
- * Set background cube definition from counts map.
- ***************************************************************************/
-void ctbkgcube::set_from_cntmap(const std::string& filename)
-{
-    // Allocate CTA observation
-    GCTAObservation obs;
-        
-    // Load counts map in CTA observation
-    obs.load(filename);
-
-    // Set background cube from counts map
-    const GCTAEventCube* cube = dynamic_cast<const GCTAEventCube*>(obs.events());
-
-    // Continue only if cube is valid
-    if (cube != NULL) {
-
-        // Get sky map projection
-        const GWcs* wcs = dynamic_cast<const GWcs*>(cube->map().projection());
-        
-        // Continue only if projection is valid
-        if (wcs != NULL) {
-            
-            // Get user parameters for counts map definition
-            std::string proj     = wcs->code();
-            std::string coordsys = wcs->coordsys();
-            double      xref     = wcs->crval(0);
-            double      yref     = wcs->crval(1);
-            double      dx       = wcs->cdelt(0);
-            double      dy       = wcs->cdelt(1);
-            int         nx       = cube->map().nx();
-            int         ny       = cube->map().ny();
-
-            // Get energy definition
-            m_ebounds = cube->ebounds();
-
-            // Define skymap for background cube
-            GSkymap map(proj, coordsys, xref, yref,
-                        dx, dy, nx, ny,
-                        m_ebounds.size());
-
-            // Allocate background cube
-            m_bkgcube = GCTAEventCube(map, m_ebounds, obs.events()->gti());
-
-        } // endif: WCS projection was valid
-
-        // ... projection is not of WCS type
-        else {
-            std::string msg = "Counts map project is not of WCS type.";
-            throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
-        }
-
-    } // endif: observation contained an events cube
-
-    // ... there is not events cube
-    else {
-        std::string msg = "No events cube found in file \""
-                          ""+filename+"\".";
-        throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
-    }
-
-    // Return
-    return;
-}
-
 
 /***********************************************************************//**
  * @brief Generate background cube

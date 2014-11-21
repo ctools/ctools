@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "00-05-00"
+#define CTBIN_VERSION "00-06-00"
 
 
 /***********************************************************************//**
@@ -87,21 +87,12 @@ protected:
     void copy_members(const ctbin& app);
     void free_members(void);
     void get_parameters(void);
-    void init_cube(void);
     void fill_cube(GCTAObservation* obs);
     void obs_cube(void);
 
     // User parameters
-    std::string   m_evfile;     //!< Input event list or XML file
-    std::string   m_outfile;    //!< Output counts map or XML file
+    std::string   m_outcube;    //!< Output counts map file
     bool          m_usepnt;     //!< Use pointing instead of xref/yref parameters
-    std::string   m_proj;       //!< WCS projection
-    std::string   m_coordsys;   //!< Coordinate system
-    double        m_xref;       //!< Longitude reference coordinate
-    double        m_yref;       //!< Latitude reference coordinate
-    double        m_binsz;      //!< Pixel size
-    int           m_nxpix;      //!< Number of pixels in longitude
-    int           m_nypix;      //!< Number of pixels in latitude
 
     // Protected members
     GObservations m_obs;        //!< Observation container

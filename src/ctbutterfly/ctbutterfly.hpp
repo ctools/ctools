@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBUTTERFLY_NAME    "ctbutterfly"
-#define CTBUTTERFLY_VERSION "00-01-00"
+#define CTBUTTERFLY_VERSION "00-02-00"
 
 
 /***********************************************************************//**
@@ -80,7 +80,6 @@ protected:
     void get_parameters(void);
 
     // User parameters
-    std::string m_infile;     //!< Input file
     std::string m_srcname;    //!< Name of source to compute butterfly
     std::string m_outfile;    //!< Output ascii file
     GEbounds    m_ebounds;    //!< Energy binning definition

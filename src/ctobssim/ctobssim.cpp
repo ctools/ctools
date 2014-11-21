@@ -377,7 +377,7 @@ void ctobssim::run(void)
                         outfile  = m_prefix + gammalib::str(i) + ".fits";
                     }
                     else {
-                        outfile  = (*this)["outfile"].filename();
+                        outfile  = (*this)["outevents"].filename();
                     }
 
                     // Store output file name in original observation
@@ -426,7 +426,6 @@ void ctobssim::run(void)
     // Return
     return;
 }
-
 
 /***********************************************************************//**
  * @brief Save the selected event list(s)
@@ -490,34 +489,19 @@ void ctobssim::save(void)
 void ctobssim::init_members(void)
 {
     // Initialise user parameters
-    m_infile.clear();
-    m_outfile.clear();
+    m_outevents.clear();
     m_prefix.clear();
     m_seed        =   1;
-    m_ra          = 0.0;
-    m_dec         = 0.0;
-    m_rad         = 0.0;
-    m_tmin        = 0.0;
-    m_tmax        = 0.0;
-    m_emin        = 0.0;
-    m_emax        = 0.0;
     m_apply_edisp = false;
-    m_deadc       = 1.0;
 
     // Initialise protected members
     m_rans.clear();
     m_obs.clear();
-    m_use_xml          = false;
     m_save_and_dispose = false;
 
     // Set fixed parameters
     m_area        = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
     m_max_photons = 1000000;            //!< Maximum number of photons / time slice
-
-    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
-    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
-    // a better mechanism to implement the CTA reference MJD.
-    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
     // Initialise first event identifier
     m_event_id = 1;
@@ -535,28 +519,17 @@ void ctobssim::init_members(void)
 void ctobssim::copy_members(const ctobssim& app)
 {
     // Copy user parameters
-    m_infile      = app.m_infile;
-    m_outfile     = app.m_outfile;
+    m_outevents     = app.m_outevents;
     m_prefix      = app.m_prefix;
     m_seed        = app.m_seed;
-    m_ra          = app.m_ra;
-    m_dec         = app.m_dec;
-    m_rad         = app.m_rad;
-    m_tmin        = app.m_tmin;
-    m_tmax        = app.m_tmax;
-    m_emin        = app.m_emin;
-    m_emax        = app.m_emax;
     m_apply_edisp = app.m_apply_edisp;
-    m_deadc       = app.m_deadc;
 
     // Copy protected members
     m_area             = app.m_area;
     m_max_photons      = app.m_max_photons;
     m_rans             = app.m_rans;
     m_obs              = app.m_obs;
-    m_use_xml          = app.m_use_xml;
     m_save_and_dispose = app.m_save_and_dispose;
-    m_cta_ref          = app.m_cta_ref;
     m_event_id         = app.m_event_id;
 
     // Return
@@ -585,48 +558,22 @@ void ctobssim::free_members(void)
  ***************************************************************************/
 void ctobssim::get_parameters(void)
 {
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
-    if (m_obs.size() == 0) {
+    // If there are no observations in container then load them via user parameters
+   if (m_obs.size() == 0) {
 
-        // Get CTA observation parameters
-        m_infile = (*this)["infile"].filename();
-        m_ra     = (*this)["ra"].real();
-        m_dec    = (*this)["dec"].real();
+       // Build observation container
+       m_obs = get_observations();
 
-        // Set pointing direction
-        GCTAPointing pnt;
-        GSkyDir      skydir;
-        skydir.radec_deg(m_ra, m_dec);
-        pnt.dir(skydir);
+   } // endif: there was no observation in the container
 
-        // Allocate CTA observation
-        GCTAObservation obs;
+   // Read model definition file if required
+   if (m_obs.models().size() == 0) {
+       std::string inmodel = (*this)["inmodel"].filename();
 
-        // Set response
-        set_obs_response(&obs);
+       // Load models from file
+       m_obs.models(inmodel);
 
-        // Set pointing
-        obs.pointing(pnt);
-
-        // Set event list (queries remaining parameters)
-        set_list(&obs);
-
-        // Append CTA observation to container
-        m_obs.append(obs);
-
-        // Load models into container
-        m_obs.models(m_infile);
-
-        // Signal that no XML file should be used for storage
-        m_use_xml = false;
-
-    } // endif: there was no observation in the container
-
-    // ... otherwise we signal that an XML file should be written
-    else {
-        m_use_xml = true;
-    }
+   } // endif: there were no models
 
     // Get other parameters
     m_seed        = (*this)["seed"].integer();
@@ -635,18 +582,8 @@ void ctobssim::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
+        m_outevents = (*this)["outevents"].filename();
         m_prefix  = (*this)["prefix"].string();
-    }
-
-    // Make sure that all observations hold a CTA event list
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
-                set_list(obs);
-            }
-        }
     }
 
     // Initialise random number generators. We initialise here one random
@@ -693,81 +630,6 @@ void ctobssim::get_parameters(void)
         m_rans.push_back(GRan(new_seed));
 
     } // endfor: looped over observations
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Set empty CTA event list
- *
- * @param[in] obs CTA observation.
- *
- * Attaches an empty event list to CTA observation. The method also sets the
- * pointing direction using the m_ra and m_dec members, the ROI based on
- * m_ra, m_dec and m_rad, a single GTI based on m_tmin and m_tmax, and a
- * single energy boundary based on m_emin and m_emax. The method furthermore
- * sets the ontime, livetime and deadtime correction factor.
- ***************************************************************************/
-void ctobssim::set_list(GCTAObservation* obs)
-{
-    // Continue only if observation is valid
-    if (obs != NULL) {
-
-        // Get CTA observation parameters
-        m_ra    = (*this)["ra"].real();
-        m_dec   = (*this)["dec"].real();
-        m_rad   = (*this)["rad"].real();
-        m_tmin  = (*this)["tmin"].real();
-        m_tmax  = (*this)["tmax"].real();
-        m_emin  = (*this)["emin"].real();
-        m_emax  = (*this)["emax"].real();
-        m_deadc = (*this)["deadc"].real();
-
-        // Allocate CTA event list
-        GCTAEventList events;
-
-        // Set pointing direction
-        GCTAPointing pnt;
-        GSkyDir      skydir;
-        skydir.radec_deg(m_ra, m_dec);
-        pnt.dir(skydir);
-
-        // Set ROI
-        GCTAInstDir instdir(skydir);
-        GCTARoi     roi(instdir, m_rad);
-
-        // Set GTI
-        GGti  gti(m_cta_ref);
-        GTime tstart;
-        GTime tstop;
-        tstart.set(m_tmin, m_cta_ref);
-        tstop.set(m_tmax, m_cta_ref);
-        gti.append(tstart, tstop);
-
-        // Set energy boundaries
-        GEbounds ebounds;
-        GEnergy  emin;
-        GEnergy  emax;
-        emin.TeV(m_emin);
-        emax.TeV(m_emax);
-        ebounds.append(emin, emax);
-
-        // Set CTA event list attributes
-        events.roi(roi);
-        events.gti(gti);
-        events.ebounds(ebounds);
-
-        // Attach event list to CTA observation
-        obs->events(events);
-
-        // Set observation ontime, livetime and deadtime correction factor
-        obs->ontime(gti.ontime());
-        obs->livetime(gti.ontime()*m_deadc);
-        obs->deadc(m_deadc);
-
-    } // endif: oberservation was valid
 
     // Return
     return;
@@ -1163,13 +1025,13 @@ void ctobssim::save_fits(void)
     if (!m_save_and_dispose) {
 
         // Get output filename
-        m_outfile = (*this)["outfile"].filename();
+        m_outevents = (*this)["outevents"].filename();
 
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
         // Save observation into FITS file
-        obs->save(m_outfile, clobber());
+        obs->save(m_outevents, clobber());
 
     } // endif: event list has not yet been saved and disposed
 
@@ -1191,14 +1053,14 @@ void ctobssim::save_fits(void)
 void ctobssim::save_xml(void)
 {
     // Get output filename and prefix
-    m_outfile = (*this)["outfile"].filename();
+    m_outevents = (*this)["outevents"].filename();
     m_prefix  = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outfile.substr(m_outfile.length()-4,4));
+    std::string suffix = gammalib::tolower(m_outevents.substr(m_outevents.length()-4,4));
     if (suffix != ".xml") {
         log << "*** WARNING: Name of observation definition output file \""+
-               m_outfile+"\"" << std::endl;
+               m_outevents+"\"" << std::endl;
         log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
         log << "*** WARNING: This is not an error, but might be misleading."
                " It is recommended" << std::endl;
@@ -1239,7 +1101,7 @@ void ctobssim::save_xml(void)
     } // endif: event list has not yet been saved and disposed
 
     // Save observations in XML file
-    m_obs.save(m_outfile);
+    m_obs.save(m_outevents);
 
     // Return
     return;

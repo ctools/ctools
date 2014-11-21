@@ -65,9 +65,9 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctcubemask
         mask = ctools.ctcubemask()
-        mask["infile"].filename(self.cntmap_name)
+        mask["inobs"].filename(self.cntmap_name)
         mask["regfile"].filename(self.regfile)
-        mask["outfile"].filename("filtered_cntmap.fits")
+        mask["outcube"].filename("filtered_cntmap.fits")
         mask["ra"].real(83.63)
         mask["dec"].real(22.01)
         mask["rad"].real(2.0)

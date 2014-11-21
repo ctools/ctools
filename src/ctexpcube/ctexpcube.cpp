@@ -284,10 +284,10 @@ void ctexpcube::save(void)
     }
 
     // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    m_outcube = (*this)["outcube"].filename();
 
     // Save exposure cube
-    m_expcube.save(m_outfile, clobber());
+    m_expcube.save(m_outcube, clobber());
 
     // Return
     return;
@@ -306,13 +306,13 @@ void ctexpcube::save(void)
 void ctexpcube::init_members(void)
 {
     // Initialise members
-    m_outfile.clear();
+    m_outcube.clear();
     m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
     m_expcube.clear();
-    m_ebounds.clear();
+    //m_ebounds.clear();
 
     // Return
     return;
@@ -327,13 +327,12 @@ void ctexpcube::init_members(void)
 void ctexpcube::copy_members(const ctexpcube& app)
 {
     // Copy attributes
-    m_outfile     = app.m_outfile;
+    m_outcube     = app.m_outcube;
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs        = app.m_obs;
     m_expcube    = app.m_expcube;
-    m_ebounds    = app.m_ebounds;
 
     // Return
     return;
@@ -352,6 +351,8 @@ void ctexpcube::free_members(void)
 
 /***********************************************************************//**
  * @brief Get application parameters
+ *  @exception GException::invalid_value
+ *            Parameter "inobs" is required for ctexpcube.
  *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
@@ -360,159 +361,72 @@ void ctexpcube::free_members(void)
  ***************************************************************************/
 void ctexpcube::get_parameters(void)
 {
-    // If we do not have any observations in the container then get an
-    // input file name or observation descriptor file
+    // If there are no observations in container then load them via user parameters
     if (m_obs.size() == 0) {
-        get_obs();
-    }
 
-    // For all observations that have no response, set the response
-    // from the task parameters
-    set_response(m_obs);
+        // Throw exception if no infile is given, since this tool needs an observation
+        // including events
+        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
+
+            std::string msg = "Parameter \"inobs\" is required to be given in ctexpcube."
+                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        }
+
+        // Build observation container
+        m_obs = get_observations();
+
+    } // endif: there was no observation in the container
 
     // Read energy dispersion flag
     m_apply_edisp = (*this)["edisp"].boolean();
 
-    // If no counts map is specified then setup the exposure cube from
-    // the user parameters
-    std::string cntmap = (*this)["cntmap"].filename();
-    if ((cntmap == "NONE") || (gammalib::strip_whitespace(cntmap) == "")) {
+    // Get the incube filename
+    std::string incube = (*this)["incube"].filename();
+
+    // Check for filename validity
+    if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
     
-        // Get user parameters for counts map definition
-        std::string wcs      = (*this)["proj"].string();
-        std::string coordsys = (*this)["coordsys"].string();
-        double      xref     = (*this)["xref"].real();
-        double      yref     = (*this)["yref"].real();
-        double      binsz    = (*this)["binsz"].real();
-        int         nxpix    = (*this)["nxpix"].integer();
-        int         nypix    = (*this)["nypix"].integer();
+       // Initialise event cube
+       GCTAEventCube cube;
 
-        // Get energy definition
-        m_ebounds = get_ebounds();
+        // Check for usepnt flag
+       bool usepnt = (*this)["usepnt"].boolean();
 
-        // Define exposure cube
-        m_expcube = GCTAExposure(wcs, coordsys, xref, yref,
-                                 -binsz, binsz, nxpix, nypix,
-                                 m_ebounds);
-    }
+       // Check if pointing should be used
+       if (usepnt) {
+
+           // build cube from user parameters and pointing information
+           cube = get_cube(m_obs);
+
+       } // endif: pointing used as map center
+
+       else {
+
+           // Build cube from user parameters
+           cube = get_cube();
+
+       } // endelse: m_usepnt was false
+
+       // Define exposure cube
+       m_expcube = GCTAExposure(cube);
+
+   } // endif: filename was not valid
 
     // ... otherwise setup the exposure cube from the counts map
     else {
-    
+
         // Set exposure cube from counts map
-        set_from_cntmap(cntmap);
-    
-    }
+        GCTAEventCube cube = set_from_cntmap(incube);
+
+        // Define exposure cube
+        m_expcube = GCTAExposure(cube);
+
+    } // endelse: cube loaded from file
 
     // Read output filename (if needed)
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get observation definition
- *
- * Get observation definition from the user parameters.
- ***************************************************************************/
-void ctexpcube::get_obs(void)
-{
-    // Get input filename
-    std::string filename = (*this)["infile"].filename();
-
-    // Try first to open as FITS file
-    try {
-
-        // Allocate CTA observation
-        GCTAObservation obs;
-        
-        // Load input file in CTA observation
-        obs.load(filename);
-
-        // Append CTA observation to container
-        m_obs.append(obs);
-
-            
-    }
-        
-    // ... otherwise try to open as XML file
-    catch (GException::fits_open_error &e) {
-
-        // Load observations from XML file
-        m_obs.load(filename);
-
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Set exposure cube definition from counts map
- *
- * @exception GException::invalid_value
- *            Invalid counts map projection or invalid events encountered.
- *
- * Set exposure cube definition from counts map.
- ***************************************************************************/
-void ctexpcube::set_from_cntmap(const std::string& filename)
-{
-    // Allocate CTA observation
-    GCTAObservation obs;
-        
-    // Load counts map in CTA observation
-    obs.load(filename);
-
-    // Set exposure cube from counts map
-    const GCTAEventCube* cube = dynamic_cast<const GCTAEventCube*>(obs.events());
-
-    // Continue only if cube is valid
-    if (cube != NULL) {
-
-        // Get sky map projection
-        const GWcs* wcs = dynamic_cast<const GWcs*>(cube->map().projection());
-        
-        // Continue only if projection is valid
-        if (wcs != NULL) {
-            
-            // Get user parameters for counts map definition
-            std::string proj     = wcs->code();
-            std::string coordsys = wcs->coordsys();
-            double      xref     = wcs->crval(0);
-            double      yref     = wcs->crval(1);
-            double      dx       = wcs->cdelt(0);
-            double      dy       = wcs->cdelt(1);
-            int         nx       = cube->map().nx();
-            int         ny       = cube->map().ny();
-
-            // Get energy definition
-            m_ebounds = cube->ebounds();
-
-            // Define exposure cube
-            m_expcube = GCTAExposure(proj, coordsys, xref, yref,
-                                     dx, dy, nx, ny,
-                                     m_ebounds);
-        
-        } // endif: WCS projection was valid
-
-        // ... projection is not of WCS type
-        else {
-            std::string msg = "Counts map project is not of WCS type.";
-            throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
-        }
-
-    } // endif: observation contained an events cube
-
-    // ... there is not events cube
-    else {
-        std::string msg = "No events cube found in file \""
-                          ""+filename+"\".";
-        throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
+        m_outcube = (*this)["outcube"].filename();
     }
 
     // Return

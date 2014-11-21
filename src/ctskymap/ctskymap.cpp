@@ -35,7 +35,7 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
 #define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
-
+#define G_GET_PARAMETERS          "ctskymap::get_parameters()"
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
@@ -262,12 +262,6 @@ void ctskymap::run(void)
                 }
             }
 
-            // If this is the first valid observation we're working on
-            // then initialise the sky maps
-            if (num_obs == 0) {
-                init_map(obs);
-            }
-
             // Map events into sky map
             map_events(obs);
             
@@ -311,10 +305,10 @@ void ctskymap::save(void)
     }
 
     // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    m_outmap = (*this)["outmap"].filename();
 
     // Save sky map
-    m_skymap.save(m_outfile, clobber());
+    m_skymap.save(m_outmap, clobber());
 
     // Return
     return;
@@ -324,6 +318,9 @@ void ctskymap::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
+ *  @exception GException::invalid_value
+ *            Parameter "inobs" is required for ctskymap.
+ *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Most parameters are only required if no observation exists so
  * far in the observation container. In this case, a single CTA observation
@@ -332,92 +329,53 @@ void ctskymap::save(void)
  ***************************************************************************/
 void ctskymap::get_parameters(void)
 {
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
-    if (m_obs.size() == 0) {
+    // If there are no observations in container then load them via user parameters
+       if (m_obs.size() == 0) {
 
-        // Get name of CTA events file
-        m_evfile = (*this)["evfile"].filename();
+           // Throw exception if no infile is given, since this tool needs an observation
+           // including events
+           if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
 
-        // Load unbinned CTA observation
-        GCTAObservation obs;
-        obs.load(m_evfile);
+               std::string msg = "Parameter \"inobs\" is required to be given in ctskymap."
+                               "Specify a vaild observation definition (XML or FITS) file to proceed";
+               throw GException::invalid_value(G_GET_PARAMETERS, msg);
+           }
 
-        // Append CTA observation to container
-        m_obs.append(obs);
-        
-        // Use the xref and yref parameters for binning (otherwise the
-        // pointing direction(s) is/are used)
-        m_xref = (*this)["xref"].real();
-        m_yref = (*this)["yref"].real();
+           // Build observation container without response (not needed)
+           m_obs = get_observations(false);
 
-    } // endif: there was no observation in the container
+       } // endif: there was no observation in the container
+
+    // Get parameters
+    bool usepnt = (*this)["usepnt"].boolean();
+
+    // Check if pointing should be used
+    if (usepnt) {
+
+        // buld map from user parameters and pointing information
+        m_skymap = get_map(m_obs);
+
+    } // endif: pointing used as map center
+
+    else {
+
+        // Build cube from user parameters
+        m_skymap = get_map();
+
+    } // endelse: m_usepnt was false
 
     // Get remaining parameters
     m_emin     = (*this)["emin"].real();
     m_emax     = (*this)["emax"].real();
-    m_proj     = (*this)["proj"].string();
-    m_coordsys = (*this)["coordsys"].string();
-    m_binsz    = (*this)["binsz"].real();
-    m_nxpix    = (*this)["nxpix"].integer();
-    m_nypix    = (*this)["nypix"].integer();
 
     // Read ahead parameters
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
+        m_outmap = (*this)["outmap"].filename();
     }
 
     // Return
     return;
 }
-
-
-/***********************************************************************//**
- * @brief Initialise sky map
- *
- * @param[in] obs CTA observation (no NULL pointer allowed).
- *
- * This method initialises the sky map.
- ***************************************************************************/
-void ctskymap::init_map(GCTAObservation* obs)
-{
-    // Clear any existing sky map
-    m_skymap.clear();
-    
-    // Get map centre. If no centre is specified then extract the map centre
-    // from the pointing direction. This obviously only works for 
-    double xref;
-    double yref;
-    if (m_xref != 9999.0 && m_yref != 9999.0) {
-        xref = m_xref;
-        yref = m_yref;
-    }
-    else {
-
-
-        // Get pointer on CTA pointing
-        const GCTAPointing& pnt = obs->pointing();
-            
-        // Set reference point to pointing
-        if (gammalib::toupper(m_coordsys) == "GAL") {
-            xref = pnt.dir().l_deg();
-            yref = pnt.dir().b_deg();
-        }
-        else {
-            xref = pnt.dir().ra_deg();
-            yref = pnt.dir().dec_deg();
-        }
-
-    } // endelse: map centre set to pointing
-
-    // Create skymap
-    m_skymap = GSkymap(m_proj, m_coordsys, xref, yref, -m_binsz, m_binsz,
-                       m_nxpix, m_nypix, 1);
-
-    // Return
-    return;
-}
-
 
 /***********************************************************************//**
  * @brief Map events into a sky map
@@ -473,8 +431,8 @@ void ctskymap::map_events(GCTAObservation* obs)
             GSkyPixel    pixel = m_skymap.dir2pix(dir);
 
             // Skip if pixel is out of range
-            if (pixel.x() < -0.5 || pixel.x() > (m_nxpix-0.5) ||
-                pixel.y() < -0.5 || pixel.y() > (m_nypix-0.5)) {
+            if (pixel.x() < -0.5 || pixel.x() > (m_skymap.nx() - 0.5) ||
+                pixel.y() < -0.5 || pixel.y() > (m_skymap.ny() - 0.5)) {
                 num_outside_map++;
                 continue;
             }
@@ -525,19 +483,10 @@ void ctskymap::map_events(GCTAObservation* obs)
 void ctskymap::init_members(void)
 {
     // Initialise members
-    m_evfile.clear();
-    m_outfile.clear();
-    m_proj.clear();
-    m_coordsys.clear();
     m_obs.clear();
     m_skymap.clear();
     m_emin     = 0.0;
     m_emax     = 0.0;
-    m_xref     = 9999.0; // Flags unset (use pointing direction)
-    m_yref     = 9999.0; // Flags unset (use pointing direction)
-    m_binsz    = 0.0;
-    m_nxpix    = 0;
-    m_nypix    = 0;
 
     // Return
     return;
@@ -552,19 +501,10 @@ void ctskymap::init_members(void)
 void ctskymap::copy_members(const ctskymap& app)
 {
     // Copy attributes
-    m_evfile   = app.m_evfile;
-    m_outfile  = app.m_outfile;
-    m_proj     = app.m_proj;
-    m_coordsys = app.m_coordsys;
     m_obs      = app.m_obs;
     m_skymap   = app.m_skymap;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
-    m_xref     = app.m_xref;
-    m_yref     = app.m_yref;
-    m_binsz    = app.m_binsz;
-    m_nxpix    = app.m_nxpix;
-    m_nypix    = app.m_nypix;
 
     // Return
     return;

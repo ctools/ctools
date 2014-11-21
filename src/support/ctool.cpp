@@ -48,6 +48,8 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_EBOUNDS                                  "ctool::get_ebounds()"
+#define G_SET_FROM_CNTMAP          "ctool::set_from_cntmap(std::string&)"
+#define G_GET_CUBE          "ctool::get_cube(GObservations&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -226,6 +228,12 @@ void ctool::init_members(void)
 {
     // Initialise members
     m_read_ahead = false;
+    m_use_xml = false;
+
+    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
+    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
+    // a better mechanism to implement the CTA reference MJD.
+    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
     // Set logger properties
     log.date(true);
@@ -244,6 +252,8 @@ void ctool::copy_members(const ctool& app)
 {
     // Copy members
     m_read_ahead = app.m_read_ahead;
+    m_use_xml = app.m_use_xml;
+    m_cta_ref = app.m_cta_ref;
 
     // Return
     return;
@@ -341,6 +351,412 @@ GEbounds ctool::get_ebounds(void)
     return ebounds;
 }
 
+
+
+
+/***********************************************************************//**
+ * @brief Get a GCTAEventCube from file
+ *
+ * @param[in] filename FITS file of count cube.
+ * @exception GException::invalid_value
+ *            Counts map not of WCS type
+ *
+ * Gets an cta event cube from file. This function is used in many ctools
+ *  to obtain a skymap definition from file
+ *
+ ***************************************************************************/
+GCTAEventCube ctool::set_from_cntmap(const std::string filename)
+{
+    // Allocate CTA observation
+    GCTAEventCube cube;
+
+    // Load counts map in CTA observation
+    cube.load(filename);
+
+    // Check for valid WCS coordinate system
+    const GWcs* wcs = dynamic_cast<const GWcs*>(cube.map().projection());
+    if (wcs == NULL) {
+
+        std::string msg = "Counts map project is not of WCS type.";
+        throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
+
+    } // endif: WCS projection was not valid
+
+    // Return cube
+    return cube;
+}
+
+
+
+/***********************************************************************//**
+ * @brief Get observation container
+ *
+ * @param[in] get_response flag whether response information should be loaded
+ *
+ * Get an observation container according to the user parameters. The method
+ * supports loading of a individual FITS file, an observation definition file in XML
+ * format. If the input filename is empty, parameters are read to build a CTA observation
+ * from scratch.
+ *
+ ***************************************************************************/
+GObservations ctool::get_observations(const bool& get_response)
+{
+    // Initialise empty observation container
+    GObservations obs;
+
+    // Get the filename from the input parameters
+    std::string filename = (*this)["inobs"].filename();
+
+    // If no observation definition file has been specified then read all
+    // parameters that are necessary to create an observation from scratch
+    // (see method setup_obs)
+    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
+
+        // Setup a new CTA observation
+        GCTAObservation cta_obs = setup_obs();
+
+        // Get response if required
+        if (get_response) {
+
+            // Set response
+           set_obs_response(&cta_obs);
+
+        } // endif: response was required
+
+       // Append observation to container
+       obs.append(cta_obs);
+
+    } // endif: filename was "NONE" or ""
+
+    else {
+
+        // Try first to open as FITS file
+        try {
+
+            // Allocate empyt CTA observation
+            GCTAObservation cta_obs;
+
+            // Load data
+            cta_obs.load(filename);
+
+            // Get response if required
+            if (get_response) {
+
+                // Set response
+                set_obs_response(&cta_obs);
+
+            } // endif: response was required
+
+            // Append observation to container
+            obs.append(cta_obs);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+
+        }
+        // ... otherwise try to open as XML file
+        catch (GException::fits_open_error &e) {
+
+            // Load observations from XML file
+            obs.load(filename);
+
+            // Get response if required
+            if (get_response) {
+
+                // For all observations that have no response, set the response
+                // from the task parameters
+                set_response(obs);
+
+            } // endif: response was required
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+            } // endcatch: file was an XML file
+    }
+
+    // Return observation container
+    return obs;
+
+}
+
+/***********************************************************************//**
+ * @brief Build a CTA observation with an empty event list
+ *
+ * Creates an empty CTA observation from user parameters. An empty event list
+ * including RoI, GTi and energy boundary information is attached to the observation.
+ * The method also sets the pointing direction using the ra and dec parameter, the ROI based on
+ * ra, dec and rad, a single GTI based on tmin and tmax, and a
+ * single energy boundary based on emin and emax. The method furthermore
+ * sets the ontime, livetime and deadtime correction factor.
+ *
+ ***************************************************************************/
+GCTAObservation ctool::setup_obs(void)
+{
+        //Get CTA observation parameters
+        double ra    = (*this)["ra"].real();
+        double dec   = (*this)["dec"].real();
+        double rad   = (*this)["rad"].real();
+        double deadc = (*this)["deadc"].real();
+        double t_min  = (*this)["tmin"].real();
+        double t_max  = (*this)["tmax"].real();
+        double e_min  = (*this)["emin"].real();
+        double e_max  = (*this)["emax"].real();
+
+        // Allocate CTA observation and empty event list
+        GCTAObservation obs;
+        GCTAEventList   list;
+
+        // Set pointing direction
+        GCTAPointing pnt;
+        GSkyDir      skydir;
+        skydir.radec_deg(ra, dec);
+        pnt.dir(skydir);
+
+        // Set ROI
+        GCTAInstDir instdir(skydir);
+        GCTARoi     roi(instdir, rad);
+
+        // Set GTI
+        GGti  gti(m_cta_ref);
+        GTime tstart;
+        GTime tstop;
+        tstart.set(t_min, m_cta_ref);
+        tstop.set(t_max, m_cta_ref);
+        gti.append(tstart, tstop);
+
+        // Set energy boundaries
+        GEbounds ebounds;
+        GEnergy  emin;
+        GEnergy  emax;
+        emin.TeV(e_min);
+        emax.TeV(e_max);
+        ebounds.append(emin, emax);
+
+        // Set CTA event list attributes
+        list.roi(roi);
+        list.gti(gti);
+        list.ebounds(ebounds);
+
+        // Attach event list to CTA observation
+        obs.events(list);
+
+        // Set observation ontime, livetime and deadtime correction factor
+        obs.pointing(pnt);
+        obs.ontime(gti.ontime());
+        obs.livetime(gti.ontime()*deadc);
+        obs.deadc(deadc);
+
+        // Return CTA observation
+        return obs;
+
+}
+
+GSkyDir ctool::get_pointing(const GObservations& obs)
+{
+    // Initialise values
+    double xref = 0.0;
+    double yref = 0.0;
+    int n_pnt = 0;
+    bool found = false;
+
+    // Loop over all observations to compute mean pointings
+    for (int i = 0; i < obs.size(); ++i) {
+       const GCTAObservation* cta_obs = dynamic_cast<const GCTAObservation*>(obs[i]);
+       if (cta_obs != NULL) {
+
+           // get pointing
+           const GCTAPointing& pnt = cta_obs->pointing();
+
+           // Add to coordinates
+           xref += pnt.dir().ra_deg();
+           yref += pnt.dir().dec_deg();
+           n_pnt += 1;
+
+           // Signal that pointing has been found
+           found = true;
+
+       } // endif: cta observation was valid
+
+    } // endfor: loop over alle observations
+
+    // Signal if no pointing is found
+    if (!found) {
+        std::string msg = "No valid CTA observation has been found in "
+                          "observation list, hence no pointing information "
+                          "could be extracted. Use the \"usepnt=no\" "
+                          "option and specify pointing explicitly";
+        throw GException::invalid_value(G_GET_CUBE, msg);
+    }
+
+    // Calculate mean coordinates
+    double ra = xref / double (n_pnt);
+    double dec = yref / double (n_pnt);
+
+    // Initialise sky dir
+    GSkyDir dir = GSkyDir();
+    dir.radec_deg(ra,dec);
+
+    // Return sky direction
+    return dir;
+}
+
+/***********************************************************************//**
+ * @brief Build a GCTAEventCube based on user parameters
+ *
+ * Creates an empty CTA event cube from input user parameters. It appends a dummy
+ * GTi to the event cube.
+ *
+ ***************************************************************************/
+GCTAEventCube ctool::get_cube(void)
+{
+    // Get cube parameters
+   double xref = (*this)["xref"].real();
+   double yref = (*this)["yref"].real();
+    std::string proj     = (*this)["proj"].string();
+    std::string coordsys = (*this)["coordsys"].string();
+    double binsz    = (*this)["binsz"].real();
+    int nxpix    = (*this)["nxpix"].integer();
+    int nypix    = (*this)["nypix"].integer();
+
+    // Set energy boundaries
+    GEbounds ebounds  = get_ebounds();
+
+    // Set dummy GTI that is needed for event cube creation
+    GGti gti;
+    gti.append(GTime(0.0), GTime(0.1234));
+
+    // Initialise sky map
+    GSkymap map = GSkymap(proj, coordsys, xref, yref, -binsz, binsz,  nxpix, nypix, ebounds.size());
+
+    // Build event cube from given information
+    GCTAEventCube cube = GCTAEventCube(map,ebounds,gti);
+
+    // Return cube
+    return cube;
+
+}
+
+/***********************************************************************//**
+ * @brief Build a GCTAEventCube based on user parameters
+ *
+ * @param[in] obs observation container
+ *
+ * Creates an empty CTA event cube from input user parameters. It appends a dummy
+ * GTi to the event cube. The input parameter is used to extract the pointing information
+ * from the given observations. This function is used if a ctool has the input parameter
+ * usepnt=true.
+ *
+ ***************************************************************************/
+GCTAEventCube ctool::get_cube(const GObservations& obs)
+{
+    // Read ahead map information
+    std::string proj     = (*this)["proj"].string();
+    std::string coordsys = (*this)["coordsys"].string();
+
+    // Initialise reference coordinates
+    double xref = 0.0;
+    double yref = 0.0;
+
+    // Get pointing from observations
+    GSkyDir pnt = get_pointing(obs);
+
+    // Use correct coordinate system
+    if (gammalib::toupper(coordsys) == "GAL") {
+        xref = pnt.l_deg();
+        yref = pnt.b_deg();
+    }
+    else {
+        xref = pnt.ra_deg();
+        yref = pnt.dec_deg();
+    }
+
+    // Read further binning parameters
+    double binsz    = (*this)["binsz"].real();
+    int nxpix    = (*this)["nxpix"].integer();
+    int nypix    = (*this)["nypix"].integer();
+
+    // Set energy boundaries
+    GEbounds ebounds  = get_ebounds();
+
+    // Set dummy GTI that is needed for event cube creation
+    GGti gti;
+    gti.append(GTime(0.0), GTime(0.1234));
+
+    // Build skymap from user parameters
+    GSkymap map = GSkymap(proj, coordsys, xref, yref, -binsz, binsz,  nxpix, nypix, ebounds.size());
+
+    // Initialise event cube from all parameters
+    GCTAEventCube cube = GCTAEventCube(map,ebounds,gti);
+
+    // Return event cube
+    return cube;
+
+}
+
+/***********************************************************************//**
+ * @brief Build a skymap based on user parameters
+ *
+ * Creates an empty skymap from input user parameters.
+ *
+ ***************************************************************************/
+GSkymap ctool::get_map()
+{
+    // Read map information
+    double xref = (*this)["xref"].real();
+    double yref = (*this)["yref"].real();
+    std::string proj     = (*this)["proj"].string();
+    std::string coordsys = (*this)["coordsys"].string();
+    double binsz    = (*this)["binsz"].real();
+    int nxpix    = (*this)["nxpix"].integer();
+    int nypix    = (*this)["nypix"].integer();
+
+    // Initialise sky map
+    GSkymap map = GSkymap(proj, coordsys, xref, yref, -binsz, binsz,  nxpix, nypix, 1);
+
+    // Return sky map
+    return map;
+}
+
+/***********************************************************************//**
+ * @brief Build a skymap based on user parameters
+ *
+ * Creates an empty skymap from input user parameters.
+ *
+ ***************************************************************************/
+GSkymap ctool::get_map(const GObservations& obs)
+{
+     // Read ahead map information
+     std::string proj     = (*this)["proj"].string();
+     std::string coordsys = (*this)["coordsys"].string();
+
+     // Initialise reference coordinates
+     double xref = 0.0;
+     double yref = 0.0;
+
+     // Get pointing from observations
+     GSkyDir pnt = get_pointing(obs);
+
+     // Use correct coordinate system
+     if (gammalib::toupper(coordsys) == "GAL") {
+         xref = pnt.l_deg();
+         yref = pnt.b_deg();
+     }
+     else {
+         xref = pnt.ra_deg();
+         yref = pnt.dec_deg();
+     }
+
+    double binsz    = (*this)["binsz"].real();
+    int nxpix    = (*this)["nxpix"].integer();
+    int nypix    = (*this)["nypix"].integer();
+
+    // Initialise sky map
+    GSkymap map = GSkymap(proj, coordsys, xref, yref, -binsz, binsz,  nxpix, nypix, 1);
+
+    // Return sky map
+    return map;
+}
 
 /***********************************************************************//**
  * @brief Set response for all CTA observations in container

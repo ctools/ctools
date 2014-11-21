@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctcubemask.par                                                #
-#  Version:   00-01-00                                                      #
+#  Version:   00-02-00                                                      #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -17,9 +17,9 @@
 #
 # File information
 #=================
-infile,  f, a, "cntmap.fits",,,"Input counts cube or observation definition file"
+inobs,  f, a, "cntmap.fits",,,"Input counts cube or observation definition file"
 regfile, f, a, "NONE",,,"Exclusion region file in ds9 format"
-outfile, f, a, "filtered_cube.fits",,,"Output event cube or observation definition file"
+outcube, f, a, "filtered_cube.fits",,,"Output event cube or observation definition file"
 prefix,  s, h, "filtered_",,,"Prefix for counts cube in observation definition file"
 #
 # Selection parameters

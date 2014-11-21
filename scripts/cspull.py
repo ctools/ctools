@@ -19,10 +19,12 @@
 #
 # ==========================================================================
 import gammalib
+import ctools
+#import obsutils
 from ctools import obsutils
 import sys
 import csv
-import math
+#import math
 
 
 # ============ #
@@ -41,12 +43,12 @@ class cspull(gammalib.GApplication):
         """
         # Set name
         self.name    = "cspull"
-        self.version = "0.3.0"
+        self.version = "0.4.0"
         
         # Initialise some members
         self.obs      = None
         self.model    = None
-        self.m_srcmdl = None
+        self.m_inmodel = None
         
         # Make sure that parfile exists
         file = self.parfile()
@@ -93,7 +95,7 @@ class cspull(gammalib.GApplication):
             
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("srcmdl","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
             pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
@@ -121,9 +123,18 @@ class cspull(gammalib.GApplication):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters
+       
+#         sim = ctools.ctobssim()
+#         sim.run()
+#         self.obs = sim.obs()
+#         sim = ctools.ctobssim()
+#         sim.run()
+#         self.obs = sim.obs().copy()
+#         print self.obs
+#         
+#         # Get parameters
         if self.model == None:
-            self.m_srcmdl = self["srcmdl"].filename()
+            self.m_inmodel = self["inmodel"].filename()
         self.m_outfile  = self["outfile"].filename()
         self.m_ntrials  = self["ntrials"].integer()
         self.m_caldb    = self["caldb"].string()
@@ -144,15 +155,15 @@ class cspull(gammalib.GApplication):
 
         # Set some fixed parameters
         self.m_log   = False # Logging in client tools
-        self.m_debug = False # Debugging in client tools
+        self.m_debug = True # Debugging in client tools
         
         # Setup observations
         self.obs = self.set_obs()
-        
+         
         # Load source model
-        if self.m_srcmdl != None:
-            self.model = gammalib.GModels(self.m_srcmdl)
-        
+        if self.m_inmodel != None:
+            self.model = gammalib.GModels(self.m_inmodel)
+         
         # Append source model to observation
         self.obs.models(self.model)
 
@@ -260,18 +271,23 @@ class cspull(gammalib.GApplication):
         if self.logExplicit():
             self.log.header2("Trial "+str(seed+1))
 
+#         sim = ctools.ctobssim(self.obs)
+#         sim["seed"].integer(seed)
+#         sim.run()
+        print self.obs
         # Simulate events
-        obs = obsutils.sim(self.obs, \
-                           nbins=self.m_enumbins, \
-                           seed=seed, \
-                           binsz=self.m_binsz, \
-                           npix=self.m_npix, \
-                           edisp=self.m_edisp, \
-                           log=self.m_log, debug=self.m_debug)
-
+        sim_obs = obsutils.sim(self.obs, \
+                            nbins=self.m_enumbins, \
+                            seed=seed, \
+                            binsz=self.m_binsz, \
+                            npix=self.m_npix, \
+                            edisp=self.m_edisp, \
+                            log=self.m_log, debug=self.m_debug)
+        print "SIM"
+        print sim_obs
         # Determine number of events in simulation
         nevents = 0.0
-        for run in obs:
+        for run in sim_obs:
             nevents += run.events().number()
 
         # Write simulation results
@@ -282,8 +298,10 @@ class cspull(gammalib.GApplication):
             self.log("\n")
 
         # Fit model
-        like = obsutils.fit(obs, edisp=self.m_edisp, \
-                            log=self.m_log, debug=self.m_debug)
+        like = ctools.ctlike(sim_obs)
+        like.run()
+#         like = obsutils.fit(obs, edisp=self.m_edisp, \
+#                             log=self.m_log, debug=self.m_debug)
 
         # Store results
         logL   = like.opt().value()
@@ -320,7 +338,7 @@ class cspull(gammalib.GApplication):
                 
                     # Compute pull
                     fitted_value = par.value()
-                    real_value   = self.model[i][k].value()
+                    real_value   = self.obs.models()[i][k].value()
                     error        = par.error()
                     if error != 0.0:
                         pull = (fitted_value - real_value) / error

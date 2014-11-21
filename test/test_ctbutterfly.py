@@ -67,8 +67,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
-        butterfly["infile"].filename(self.events_name)
-        butterfly["srcmdl"].filename(self.model_name)
+        butterfly["inobs"].filename(self.events_name)
+        butterfly["inmodel"].filename(self.model_name)
         butterfly["srcname"].string("Crab")
         butterfly["caldb"].string(self.caldb)
         butterfly["irf"].string(self.irf)

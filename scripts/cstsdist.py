@@ -346,6 +346,7 @@ class cstsdist(GApplication):
     
         # Set source name
         source.name("Test")
+        source.tscalc(True)
     
         # Return source
         return source
@@ -368,7 +369,7 @@ class cstsdist(GApplication):
                            binsz=self.m_binsz, \
                            npix=self.m_npix, \
                            log=self.m_log, debug=self.m_debug)
-
+        
         # Determine number of events in simulation
         nevents = 0.0
         for run in sim:
@@ -381,6 +382,11 @@ class cstsdist(GApplication):
             self.log(nevents)
             self.log("\n")
 
+#        sim.models(self.full_model)
+        
+#         like = obsutils.fit(sim, log = self.m_log, debug = self.m_debug)
+#         ts = like.obs().models()["Test"].ts()
+        
         # Fit background only
         sim.models(self.bkg_model)
         like_bgm   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
@@ -407,6 +413,7 @@ class cstsdist(GApplication):
         # Fit background and test source
         sim.models(self.full_model)
         like_all   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
+        print like_all.obs().models()
         result_all = like_all.obs().models()
         LogL_all   = like_all.opt().value()
         npred_all  = like_all.obs().npred()

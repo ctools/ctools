@@ -36,7 +36,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "00-06-00"
+#define CTSELECT_VERSION "00-07-00"
 
 
 /***********************************************************************//**
@@ -82,8 +82,7 @@ protected:
                                 const std::string&     outfile) const;
 
     // User parameters
-    std::string m_infile;     //!< Input event list or XML file
-    std::string m_outfile;    //!< Output event list or XML file
+    std::string m_outobs;    //!< Output event list or XML file
     std::string m_prefix;     //!< Prefix for multiple event lists
     bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
     double      m_ra;         //!< RA of ROI centre
@@ -101,8 +100,7 @@ protected:
     std::vector<std::string> m_infiles;    //!< Input event filenames
     GTime                    m_timemin;    //!< Earliest time
     GTime                    m_timemax;    //!< Latest time
-    bool                     m_use_xml;    //!< Use XML file instead of FITS file
-    GTimeReference           m_cta_ref;    //!< CTA time reference
+
 };
 
 

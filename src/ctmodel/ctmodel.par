@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctmodel.par                                                   #
-#  Version:   00-03-00                                                      #
+#  Version:   00-04-00                                                      #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -17,18 +17,19 @@
 #
 # General parameters
 #===================
-infile,   f, a, "NONE",,, "Input counts map or observation definition file"
-outfile,  f, a, "modmap.fits",,, "Output counts map or observation definition file"
-srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+incube,   f, a, "NONE",,, "Input counts map or observation definition file"
+outcube,  f, a, "modmap.fits",,, "Output counts map or observation definition file"
+inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 #
 # Observation parameters
 #=======================
-obsfile,  f, a, "NONE",,, "Observation definition file"
+inobs,  f, a, "NONE",,, "Input event list, cube or observation definition file"
 caldb,    s, a, "$CTOOLS/share/caldb/data/cta/dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 ra,       r, a, 83.63,0,360, "RA of pointing (degrees)"
 dec,      r, a, 22.01,-90,90, "Dec of pointing (degrees)"
+rad,      r, a,     5.0,    0,180, "Radius of FOV (degrees)"
 tmin,     r, a, 0.0,0,, "Start time (MET in s)"
 tmax,     r, a, 1800.0,0,, "End time (MET in s)"
 deadc,    r, h, 0.95,0,1, "Average deadtime correction factor"
@@ -43,6 +44,7 @@ ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
+usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"

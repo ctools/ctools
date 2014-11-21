@@ -52,7 +52,7 @@ export PFILES=pfiles
 $ECHO @ECHO_N@ "Test cspull: "
 chmod +x @abs_top_srcdir@/scripts/cspull.py
 @abs_top_srcdir@/scripts/cspull.py \
-  srcmdl="data/crab.xml" \
+  inmodel="data/crab.xml" \
   outfile="pull.dat" \
   ntrials="3" \
   caldb="irf" \
@@ -138,9 +138,9 @@ $ECHO " ok"
 $ECHO @ECHO_N@ "Test csresmap: "
 chmod +x @abs_top_srcdir@/scripts/csresmap.py
 @abs_top_srcdir@/scripts/csresmap.py \
-  infile="data/crab_events.fits" \
-  outfile="resmap.fits" \
-  srcmdl="data/crab.xml" \
+  inobs="data/crab_events.fits" \
+  outmap="resmap.fits" \
+  inmodel="data/crab.xml" \
   caldb="irf" \
   irf="cta_dummy_irf" \
   nxpix=50 \

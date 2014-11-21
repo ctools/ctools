@@ -326,11 +326,11 @@ void ctlike::save(void)
     }
 
     // Get output filename
-    m_outmdl = (*this)["outmdl"].filename();
+    m_outmodel = (*this)["outmodel"].filename();
 
     // Write results out as XML model
-    if (gammalib::toupper(m_outmdl) != "NONE") {
-        m_obs.models().save(m_outmdl);
+    if (gammalib::toupper(m_outmodel) != "NONE") {
+        m_obs.models().save(m_outmodel);
     }
 
     // Return
@@ -340,6 +340,9 @@ void ctlike::save(void)
 
 /***********************************************************************//**
  * @brief Get application parameters
+ *
+ * @exception GException::invalid_value
+ *            Parameter "inobs" is required for ctlike.
  *
  * Get all required task parameters from the parameter file or (if specified)
  * by querying the user. Observation dependent parameters will only be read
@@ -357,56 +360,38 @@ void ctlike::save(void)
  ***************************************************************************/
 void ctlike::get_parameters(void)
 {
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
+    // If there are no observations in container then load them via user parameters
     if (m_obs.size() == 0) {
 
-        // Allocate CTA observation
-        GCTAObservation obs;
-
-        // Get event file name
-        std::string filename = (*this)["infile"].filename();
-
-        // Try first to open as FITS file
-        try {
-
-            // Load data
-            obs.load(filename);
-
-            // Get other task parameters
-            std::string statistics = gammalib::toupper((*this)["stat"].string());
-
-            // Set statistics
-            obs.statistics(statistics);
-
-            // Set response
-            set_obs_response(&obs);
-
-            // Append observation to container
-            m_obs.append(obs);
-
+        // Throw exception if no infile is given, since this tool needs an observation
+        // including events
+        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
+            std::string msg = "Parameter \"inobs\" is required to be given in ctlike."
+                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
-        // ... otherwise try to open as XML file
-        catch (GException::fits_open_error &e) {
-
-            // Load observations from XML file
-            m_obs.load(filename);
-
-            // For all observations that have no response, set the response
-            // from the task parameters
-            set_response(m_obs);
-
-        } // endcatch: file was an XML file
+        // Build observation container
+        m_obs = get_observations();
 
     } // endif: there was no observation in the container
+
+    // If only single observation is used, read statistics parameter
+    if (!m_use_xml) {
+
+        // Get other task parameters
+        std::string statistics = gammalib::toupper((*this)["stat"].string());
+
+        // Set statistics
+        (*m_obs[0]).statistics(statistics);
+    }
 
     // If there is are no models associated with the observations then
     // load now the model definition
     if (m_obs.models().size() == 0) {
 
         // Get models XML filename
-        std::string filename = (*this)["srcmdl"].filename();
+        std::string filename = (*this)["inmodel"].filename();
 
         // Setup models for optimizing.
         m_obs.models(GModels(filename));
@@ -420,7 +405,7 @@ void ctlike::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outmdl = (*this)["outmdl"].filename();
+        m_outmodel = (*this)["outmodel"].filename();
     }
 
     // Return
@@ -547,7 +532,7 @@ double ctlike::reoptimize_lm(void)
 void ctlike::init_members(void)
 {
     // Initialise members
-    m_outmdl.clear();
+    m_outmodel.clear();
     m_obs.clear();
     m_refit       = false;
     m_max_iter    = 100;   // Set maximum number of iterations
@@ -573,7 +558,7 @@ void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
     m_refit       = app.m_refit;
-    m_outmdl      = app.m_outmdl;
+    m_outmodel      = app.m_outmodel;
     m_obs         = app.m_obs;
     m_max_iter    = app.m_max_iter;
     m_max_stall   = app.m_max_stall;

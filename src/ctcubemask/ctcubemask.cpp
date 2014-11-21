@@ -36,6 +36,7 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_RUN                                             "ctcubemask::run()"
 #define G_APPLY_MASK               "ctcubemask::apply_mask(GCTAObservation*)"
+#define G_GET_PARAMETERS     "ctcubemask::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -336,6 +337,9 @@ void ctcubemask::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
+ *  @exception GException::invalid_value
+ *          Parameter "inobs" is required for ctcubemask.
+ *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. 
  *
@@ -345,42 +349,23 @@ void ctcubemask::save(void)
  ***************************************************************************/
 void ctcubemask::get_parameters(void)
 {
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
-    if (m_obs.size() == 0) {
+    // If there are no observations in container then load them via user parameters
+        if (m_obs.size() == 0) {
 
-        // Get CTA event list file name
-        m_infile = (*this)["infile"].filename();
+            // Throw exception if no infile is given, since this tool needs an observation
+            // including events
+            if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
 
-        // Allocate CTA observation
-        GCTAObservation obs;
+                std::string msg = "Parameter \"inobs\" is required to be given in ctcubemask."
+                                "Specify a vaild observation definition (XML or FITS) file to proceed"
+                                "It is not possible to build a binned observation from scratch";
+                throw GException::invalid_value(G_GET_PARAMETERS, msg);
+            }
 
-        // Try first to open as FITS file
-        try {
+            // Build observation container without response (not needed)
+            m_obs = get_observations(false);
 
-            // Load event cube in CTA observation
-            obs.load(m_infile);
-
-            // Append CTA observation to container
-            m_obs.append(obs);
-
-            // Signal that no XML file should be used for storage
-            m_use_xml = false;
-            
-        }
-        
-        // ... otherwise try to open as XML file
-        catch (GException::fits_open_error &e) {
-
-            // Load observations from XML file
-            m_obs.load(m_infile);
-
-            // Signal that XML file should be used for storage
-            m_use_xml = true;
-
-        }
-
-    } // endif: there was no observation in the container
+        } // endif: there was no observation in the container
 
     // Get parameters
 	m_regfile = (*this)["regfile"].filename();
@@ -396,7 +381,7 @@ void ctcubemask::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
+        m_outcube = (*this)["outcube"].filename();
     }
 
     // Return
@@ -538,9 +523,9 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
 void ctcubemask::init_members(void)
 {
     // Initialise parameters
-    m_infile.clear();
+    //m_infile.clear();
 	m_regfile.clear();
-    m_outfile.clear();
+    m_outcube.clear();
 	m_prefix.clear();
     m_usepnt = false;
     m_ra     = 0.0;
@@ -552,7 +537,7 @@ void ctcubemask::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_infiles.clear();
-    m_use_xml    = false;
+//    m_use_xml    = false;
 
     // Return
     return;
@@ -567,9 +552,9 @@ void ctcubemask::init_members(void)
 void ctcubemask::copy_members(const ctcubemask& app)
 {
     // Copy parameters
-    m_infile  = app.m_infile;
+    //m_infile  = app.m_infile;
 	m_regfile = app.m_regfile;
-    m_outfile = app.m_outfile;
+    m_outcube = app.m_outcube;
 	m_prefix  = app.m_prefix;
     m_usepnt  = app.m_usepnt;
     m_ra      = app.m_ra;
@@ -581,7 +566,7 @@ void ctcubemask::copy_members(const ctcubemask& app)
     // Copy protected members
     m_obs        = app.m_obs;
     m_infiles    = app.m_infiles;
-    m_use_xml    = app.m_use_xml;
+//    m_use_xml    = app.m_use_xml;
     
     // Return
     return;
@@ -622,7 +607,7 @@ std::string ctcubemask::check_infile(const std::string& filename) const
     }
     catch (GException::fits_hdu_not_found& e) {
         message = "No \"IMAGE\" extension found in input file \""
-                + m_outfile + "\".";
+                + m_outcube + "\".";
     }
 
     // Return
@@ -661,13 +646,13 @@ std::string ctcubemask::set_outfile_name(const std::string& filename) const
 void ctcubemask::save_fits(void)
 {
     // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    m_outcube = (*this)["outcube"].filename();
 
     // Get CTA observation from observation container
     GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
     // Save event list
-    save_counts_map(obs, m_outfile);
+    save_counts_map(obs, m_outcube);
 
     // Return
     return;
@@ -688,14 +673,14 @@ void ctcubemask::save_fits(void)
 void ctcubemask::save_xml(void)
 {
     // Get output filename and prefix
-    m_outfile = (*this)["outfile"].filename();
+    m_outcube = (*this)["m_outcube"].filename();
     m_prefix  = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outfile.substr(m_outfile.length()-4,4));
+    std::string suffix = gammalib::tolower(m_outcube.substr(m_outcube.length()-4,4));
     if (suffix != ".xml") {
         log << "*** WARNING: Name of observation definition output file \""+
-               m_outfile+"\"" << std::endl;
+               m_outcube+"\"" << std::endl;
         log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
         log << "*** WARNING: This is not an error, but might be misleading."
                " It is recommended" << std::endl;
@@ -726,7 +711,7 @@ void ctcubemask::save_xml(void)
     } // endfor: looped over observations
 
     // Save observations in XML file
-    m_obs.save(m_outfile);
+    m_obs.save(m_outcube);
 
     // Return
     return;

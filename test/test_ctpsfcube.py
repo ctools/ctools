@@ -66,9 +66,9 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctpsfcube
         psfcube = ctools.ctpsfcube()
-        psfcube["infile"].filename(self.events_name)
-        psfcube["cntmap"].filename("NONE")
-        psfcube["outfile"].filename("psfcube.fits")
+        psfcube["inobs"].filename(self.events_name)
+        psfcube["incube"].filename("NONE")
+        psfcube["outcube"].filename("psfcube.fits")
         psfcube["caldb"].string(self.caldb)
         psfcube["irf"].string(self.irf)
         psfcube["ebinalg"].string("LOG")
