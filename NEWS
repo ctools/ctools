@@ -1,24 +1,14 @@
-New Features and Important Changes in ctools 00-08-00
+New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-8 November 2014
+24 November 2014
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most
 important changes made since the last release of ctools.
-
-For all ctools, the public method interface was cleaned up so that
-only methods that are really useful for an outside client are
-exposed. Low-level methods that are used by the application are now
-protected, as improper usage of these methods may lead to
-unpredictable results.
-
-The ctool base class has been introduced and all tools now derive
-from ctool instead of GApplication. This allows to avoid code
-duplications and makes the code generally slimmer and more readable.
 
 
 2. Configuration
@@ -33,108 +23,32 @@ None
 
 4. Support model
 ----------------
-A support module has been introduced that will contain common classes
-and functions. For the moment the only class in this module is the
-ctool base class.
+None
 
 
 5. ctobssim - CTA observation simulation
 ----------------------------------------
-ctobssim was not fully thread save as the models were shared among the
-threads which led to concurrent memory access when evaluating the Monte
-Carlo cache. The models are now copied within the parallel section,
-avoiding concurrent memory access (#1258).
-
-ctobssim now also supports the handling of energy dispersion. Energy
-dispersion can be switched on or off using the hidden edisp parameter.
-
-The memory needs for ctobssim have been reduced by first working on a
-local copy of the CTA observation (this de-allocates properly and memory
-cache associated to the response functions), and by saving and disposing
-the event lists immediately if called using the execute() method (this
-is the method called when the tool is run from the command line).
+None
 
 
 6. ctselect - CTA event selection
 ---------------------------------
-The temporary file is now properly close to avoid file opening errors
-when iterating over ctselect (#1149).
-
-Non-CTA time references are now correctly handled by ctselect. While the
-tmin and tmax parameters are given in CTA reference time, they are
-internally converted to the reference time of the GTI before event
-selection (#1329).
-
-ctselect now supports save and user energy thresholds (#1039). There
-are three different possibilities for specifying a threshold. They
-are toggled using the hidden usethres parameter:
-
-NONE: Use the emin and emax parameters to select an energy range.
-      This is the default mode which is identical to the previous
-      workings. The only difference is now that if the emin and/or
-      emax parameter is set to 0.0, the threshold will be ignored.
-      This allows to select all events above or below a given
-      threshold.
-
-DEFAULT: Use the save threshold that is found in the effective
-      area FITS header keywords LO_THRES and HI_THRES. If the
-      emin and emax parameters are non-zero, they will provide
-      an additional energy constraint.
-
-USER: Use the user specified threshold that are found in the
-      XML observation definition file. If the emin and emax
-      parameters are non-zero, they will provide an additional
-      energy constraint.
-
-Note that any existing energy boundaries will be used as envelope,
-i.e. a wider energy threshold specification will have no effect.
+None
 
 
 7. ctbin - CTA event binning
 ----------------------------
-WARNING: The philosophy behind the ctbin tool changed fundamentally!
-
-ctbin now always produces a single counts cube on output. If a single
-event list is specified on input, the functionnality is basically
-unchanged. If multiple event lists are specified, however, events are
-now merged into a single counts cube file. No observation definition
-XML file is written anymore!
-
-So far, ctbin still writes pointing information in the counts cube,
-although this is not necessarily meaningful if merging event lists
-with different pointings. In the long run, pointing information will
-be summarized in a pointings definition file, and will be removed
-from the counts cube header. The logic is that the pointing definition
-is set to the map centre. This is only identical to the pointing in
-case of binning a single event list and using the usepnt=yes option
-(or specifying the pointing manually as the xref and yref parameters).
-
-Memory usage has been reduced by disposing the event lists after their
-usage.
+None
 
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-ctlike now has full access to the calibration database, allowing
-the use for 2D response functions in FITS files.
-
-ctlike now also supports the handling of energy dispersion. Energy
-dispersion can be switched on or off using the hidden edisp parameter.
+None
 
 
 9. cttsmap - Generation of Test Statistics map
 ----------------------------------------------
-The cttsmap tool has been added that provides a test statistics map
-for a given set of observations. This tool is not restricted to CTA
-data and will work for all types of instruments.
-
-cttsmap will move a test sources over a specified grid of positions
-and compute the likelihood difference between having the source at
-a given position and having not the source. Twice the likelihood
-difference is called the Test Statistic. The computation is done for
-a grid of positions, and the results is saved into a FITS file as
-TS map. Also the value of the fitted parameters are stored as
-extension in the FITS file.
+None
 
 
 10. ctskymap - CTA sky mapping
@@ -144,105 +58,45 @@ None
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-WARNING: The philosophy behind the ctmodel tool changed fundamentally!
-
-ctmodel now always produces a single model cube on output. There are
-two important input parameters: "infile" and "obsfile". "infile"
-specifies a counts or model cube that is used to define the binning
-of the model cube. The functionnality for this parameter is as before.
-If "infile=NONE", the cube will be defined according to task parameters
-that specify the spatial and the energy binning. The "obsfile"
-parameter is new and allows specifying the observation definition
-for which the model cube should be computed. If an event list or a
-counts cube is presented, the pointing and Good Time Intervals will
-be extracted from the FITS file header. If an observation definition
-XML file is presented, ctmodel will now loop over all CTA observations
-in the file and add the model values to the model cube. If no
-response information is associated to the "obsfile" (which is typically
-the case for event lists or counts cubes), the "caldb" and "irf"
-parameters will be used to identify the response.
-
-ctmodel now has full access to the calibration database, allowing
-the use for 2D response functions in FITS files.
-
-ctmodel now also supports the handling of energy dispersion. Energy
-dispersion can be switched on or off using the hidden edisp parameter.
-
-Memory usage has been reduced by disposing the event lists after their
-usage.
+None
 
 
 12. ctexpcube - CTA exposure cube generation
 --------------------------------------------
-The first version of the ctexpcube tool is included in the release.
-ctexpcube computes the exposure cube for an observation definition
-file. The cube definition may be taken from a counts cube or may be
-specified by user parameters.
+None
 
 
 13. ctpsfcube - CTA point spread function cube generation
 ---------------------------------------------------------
-The first version of the ctpsfcube tool is included in the release.
-ctpsfcube computes the point spread function cube for an observation
-definition file. The cube definition may be taken from a counts cube
-or may be specified by user parameters.
+None
 
 
 14. ctbkgcube - CTA background cube generation
 ----------------------------------------------
-The first version of the ctbkgcube tool is included in the release.
-ctbkgcube computes the background cube for an observation definition 
-file. The cube definition may be taken from a counts cube or may be
-specified by user parameters. The tools also updates the input model
-by replacing all IACT background model components by a single
-background cube background model with a power law as spectral
-parameter. The model container is available to Python using the
-models() method or can be written into an XML file on disk.
+None
 
 
 15. ctcubemask - CTA cube filtering
 -----------------------------------
-The first version of the ctcubemask tool is included in the release.
-ctcubemask allows filtering of bins in a counts cube by setting the
-bin content to -1. Filtering can be done by energy, for a circular
-Region of Interest (ROI) or using ds9 exclusion regions.
+None
 
 
 16. ctbutterfly - Generate butterfly diagrams
 =============================================
-The first version of the ctbutterfly tool is included in the release.
-This tools derives a butterfly diagram from the fitted model parameters
-for one specified source. The result will be written into an ASCII
-file.
+None
 
 
 17. Examples
 ------------
-Added the following example scripts:
-* pipeline_stacked.py (simulation and stacked analysis)
+The following scripts have been adapted to fit the actual
+interface definition
+* make_binned_analysis.py
+* make_unbinned_analysis.py
 
 
 18. Scripts
 -----------
-Add logL and event statistics to cspull output file.
-
-Convert all tabs into spaces.
-
-The obsutils script has now been moved into the ctools module namespace.
-
-The following functions have been added to obsutils:
-* set_obs() replaces the now obsolete set() function
-* set_obs_list() returns an observation container filled with a list of
-  observations
-* set_obs_patterns() defines standard patterns of CTA observations.
-  Current options are:
-  - "single": single pointing
-  - "four": four pointings offset by specific angle around centre
-* spectrum() generates spectral points by fitting a source model in
-  specified energy bins.
-
-Add the csresmap script that uses ctbin and ctmodel to generate a
-residual counts cube for a given model.
+None
 
 
 19. caldb
