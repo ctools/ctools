@@ -56,7 +56,7 @@ class SpectralBase(object):
     def __init__(self,sed=True,sed_factor=1.):
         self.m_sed_factor = sed_factor
         self.m_sed        = sed
-        
+
     def _convertSED(self,tab,energy):
         """convert the a table storing dN/dE in sed with right units"""
 
@@ -67,6 +67,26 @@ class SpectralBase(object):
             for i in xrange(len(tab)):
                 tab[i] *= energy[i]**2*self.m_sed_factor
         return tab
+
+    def _convertE(self,energy,unit,newunit):
+        """convert the a energy which has units 'unit' to "newunit'"""
+        factor = 1
+        if unit == "MeV" and newunit == "GeV" :
+            factor = 1e-3
+        if unit == "MeV" and newunit == "TeV" :
+            factor = 1e-6
+        if unit == "GeV" and newunit == "TeV" :
+            factor = 1e-3
+        if unit == "GeV" and newunit == "MeV" :
+            factor = 1e3
+        if unit == "TeV" and newunit == "GeV" :
+            factor = 1e3
+        if unit == "TeV" and newunit == "MeV" :
+            factor = 1e6
+        for i in xrange(len(energy)):
+            energy[i] *= factor
+        return energy
+
 
 BLUE="#337EF5"
 GREY='grey'
@@ -103,6 +123,7 @@ class residuals(analysisutils.base,options,SpectralBase):
         Energy_list = {"MeV":1,"GeV":1e-3,"TeV":1e-6} #TODO
         for i in range(self.Npt):
             if self.m_point_info["TS"][i] >= self.tslim:
+                #TODO remove the like
                 th_val.append(self.spectrum.eval(gl.GEnergy(self.m_point_info["ener"]["value"][i],self.m_point_info["ener"]["unit"]),gl.GTime(0)))
                 index.append(i)
             else:
@@ -139,7 +160,7 @@ class ulimgraph(analysisutils.base,options,SpectralBase):
         self.Npt = len(self.m_point_info["dnde"]["value"])
        
     def _plt_points(self):
-        results = analysisutils.ResultsSorage()
+        results = analysisutils.ResultsStorage()
         
         Energy_list = {"MeV":1,"GeV":1e-3,"TeV":1e-6} #TODO
         for i in range(self.Npt):
@@ -232,22 +253,19 @@ class SpectrumPlotter(analysisutils.base,SpectralBase):
         if data points are provided, only change applied  is energy unit convertion to match the butterfly one
         (i.e. no dN/dE to SED conversion).
         It is currently assumed that the unit is MeV for the energy of the data point. this will be change 
-        once the I/O container format will be defined."""
-    def __init__(self,srcname,like,datapoint,emin=0.1,emax=100,energy = "TeV",SED = True ,npt = 50):
+        once the I/O container format will be defined.
+        like is used to compute the residual. if like = None, no residual will be computed TODO
+        butterfly is a results Storage object read from the file produced by ctbutterfly
+        datapoint is the results Storage object for the datapoints."""
+    def __init__(self,srcname,like, butterfly,datapoint,emin=0.1,emax=100,energy = "TeV",SED = True):
         super(SpectrumPlotter,self).__init__()
+        self.m_ebound    = [emin,emax]
+        self.m_name      = srcname
+        self.m_butterfly = butterfly
+        self.m_spectral  = like.obs().models()[srcname].spectral()
+        self.m_but       = []
+        self.m_enebut    = []
 
-        self.m_ebound   = [emin,emax]
-        self.m_name     = srcname
-        self.m_like     = like
-        self.m_spectral = like.obs().models()[srcname].spectral()
-        self.m_energy   = []
-        self.m_flux     = []
-        self.m_error    = []
-        self.m_but      = []
-        self.m_enebut   = []
-        self.m_npt      = npt
-        self.m_covar    = gl.GMatrix(1,1)
-        self.covar()
         #~ this part take care of the style : SED or differential flux
         #~ in the case of SED, the y-unit is erg/cm2/s
         self.m_sed = SED
@@ -260,6 +278,7 @@ class SpectrumPlotter(analysisutils.base,SpectralBase):
         self.points = ulimgraph(datapoint,self.m_sed,gl.MeV2erg,energy)
         self.residuals = residuals(self.m_spectral,datapoint,self.m_sed,gl.MeV2erg,energy)
 
+
     def _validateUnits(self):
         Energy_list = {"MeV":1,"GeV":1e3,"TeV":1e6}
         if not(Energy_list.has_key(self.eunit)):
@@ -269,74 +288,24 @@ class SpectrumPlotter(analysisutils.base,SpectralBase):
         if self.m_sed:
             self.m_sed_factor = gl.MeV2erg*Energy_list[self.eunit]**2
 
-    def covar(self):
-        # Get covariance matrix if fit has converged
-        try:
-            fullcovar = self.m_like.obs().function().curvature().invert()
-        except:
-            self.warning("Covariance matrix not determined successfully")
-            return
-        #~ get the matrix element of the source of interest
-        #~ 1) get the right element indices
-        idx = 0
-        par_index_map = []
-        for m in self.m_like.obs().models() :
-            if m.name()!= self.m_name:
-                idx += m.size()
-                continue
-            idx += m.spatial().size()
-            for par in m.spectral():
-                if par.is_free():
-                    par_index_map.append(idx)
-                    idx += 1
-
-        #~ 2) get the elemets and store them in a matrix
-        self.m_covar = gl.GMatrix(len(par_index_map),len(par_index_map))
-        i = 0
-        for xpar in par_index_map:
-            j = 0
-            for ypar in par_index_map:
-                self.m_covar[i,j] = fullcovar[xpar,ypar]
-                j += 1
-            i += 1
-        self.success("Covariance Matrix succesfuly computed")
-
     def _makespectrum(self):
-        for i in xrange(self.m_npt):
-            #Compute the energy
-            lene = log10(self.m_ebound[0])+log10(self.m_ebound[1])*i/(self.m_npt-1)
-            self.m_energy.append(pow(10,lene))
-            #Compute the flux
-            self.m_flux.append(self.m_spectral.eval(gl.GEnergy(pow(10,lene),self.eunit),gl.GTime(0)))
-
-            #Compute the gradients
-            if self.m_covar.size() != 1:
-                self.m_spectral.eval_gradients(gl.GEnergy(pow(10,lene), self.eunit),gl.GTime(0))
-                #store them into a GVector
-                Derivative = gl.GVector(self.m_covar.size()/2)
-                j = 0
-                for par in self.m_spectral:
-                    if par.is_free():
-                        Derivative[j] = par.factor_gradient()
-                    j += 1
-                #~ computed the error
-                self.m_error.append(sqrt(Derivative * (self.m_covar*Derivative)))
-
-        #~ convert the flux in sed if asked
-        self.m_flux = self._convertSED(self.m_flux,self.m_energy)
-        if self.m_covar.size() != 1:
-            self.m_error = self._convertSED(self.m_error,self.m_energy)
-            self._makebutterfly() # make the butterfly
-        self.success("Spectrum computed")
-
+        #convert the flux in sed if asked
+        self.m_energy    = self._convertE(self.m_butterfly['ener']["value"],"MeV","TeV") #gtbutterfly gives MeV
+        self.m_flux    = self._convertSED(self.m_butterfly['dnde']["value"],self.m_butterfly['ener']["value"])
+        self.m_error_d = self._convertSED(self.m_butterfly['dnde']["ed_value"],self.m_butterfly['ener']["value"])
+        self.m_error_u = self._convertSED(self.m_butterfly['dnde']["eu_value"],self.m_butterfly['ener']["value"])
+        self._makebutterfly() # make the butterfly
+        
+        self.success("Butterfly ready to be plotted")
+# 
     def _makebutterfly(self):
-        """make the butterfly by appending element in a table"""
-        for i in xrange(self.m_npt):
-            self.m_but.append(self.m_flux[i]+self.m_error[i])
+        """make the butterfly by reading the result and making a closed table"""
+        for i in xrange(len(self.m_energy)):
+            self.m_but.append(self.m_error_u[i])
             self.m_enebut.append(self.m_energy[i])
-        for i in xrange(self.m_npt):
-            idx = self.m_npt-i-1
-            self.m_but.append(self.m_flux[idx]-self.m_error[idx])
+        for i in xrange(len(self.m_energy)):
+            idx = len(self.m_energy)-i-1
+            self.m_but.append(self.m_error_d[idx])
             self.m_enebut.append(self.m_energy[idx])
         self.m_but.append(self.m_but[0])
         self.m_enebut.append(self.m_enebut[0])

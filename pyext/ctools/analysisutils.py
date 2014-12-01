@@ -21,9 +21,10 @@
 import ctools as ct
 import gammalib as gl
 from math import sqrt,log10,floor
-import sys
+import sys,string
 
 class base(object):
+    '''This class is used to defined the colors of the print''' 
     def __init__(self):
         self.classname = self.__class__.__name__
         self.errorcolor = "\033[31m"#red
@@ -35,6 +36,7 @@ class base(object):
         self.basemembers = ["classname","errorcolor","infocolor","warningcolor","successcolor","endcolor","prependfunction"]
         
     def error(self,message, functionname = ""):
+    '''Print the error message'''
         printstring = ""
         if functionname == "":
             printstring = "\n"+self.errorcolor+"*** Error ["+self.classname+"]: "+message+" ***\n"+self.endcolor
@@ -43,6 +45,7 @@ class base(object):
         sys.exit(printstring)
     
     def info(self,message,newline=True):
+    '''Print the information message'''
         printstring = self.infocolor+"["+self.classname+"]: "+message+self.endcolor     
         if newline:
             print(printstring)
@@ -50,7 +53,8 @@ class base(object):
             print(self.infocolor+message+self.endcolor)
             sys.stdout.flush()  
         
-    def warning(self,message,functionname = ""):
+    def warning(self,message,functionname = ""):*
+    '''Print the warning message'''
         printstring = ""
         if functionname == "":
             printstring = self.warningcolor+"["+self.classname+"] Warning: "+message+self.endcolor
@@ -59,19 +63,21 @@ class base(object):
         print(printstring)
         
     def success(self,message):
+    '''Print the success message'''
         printstring = self.successcolor+"["+self.classname+"]: "+message+self.endcolor
         print(printstring)
         
     def progress(self,message="."):
+    '''Print the progess message'''
         string = self.infocolor+message+self.endcolor
         print(string)
         
-        
-class ResultsSorage(dict,base):
+class ResultsStorage(dict,base):
     """class to store the results in the good format"""
     def __init__(self,*arg,**kw):
-        super(ResultsSorage, self).__init__(*arg, **kw)
+        super(ResultsStorage, self).__init__(*arg, **kw)
         base.__init__(self)
+        # Can store the differential flux, upper limit, time, energy and so one
         self["dnde"]      = {}
         self["ulim_dnde"] = []
         self["time"]      = {}
@@ -79,26 +85,31 @@ class ResultsSorage(dict,base):
         self["TS"]        = []
         self["Iflux"]     = {}
         
+        #store the time : Min, Max and units of the variable
         self["time"]["tmin_value"] = []
         self["time"]["tmax_value"] = []
         self["time"]["unit"]       = "sec"
         
+        #store the energy : Value min,max (ed_* and eu_*) and units of the variable
         self["ener"]["value"]      = []
         self["ener"]["ed_value"]   = []
         self["ener"]["eu_value"]   = []
         self["ener"]["unit"]       = "MeV"
         
+        #store the differential flux : Value min,max (ed_* and eu_*) and units of the variable
         self["dnde"]["value"]      = []
         self["dnde"]["ed_value"]   = []
         self["dnde"]["eu_value"]   = []
         self["dnde"]["unit"]       = "ph/cm2/s/MeV"
         
+        #store the integral flux : Value min,max (ed_* and eu_*) and units of the variable
         self["Iflux"]["value"]     = []
         self["Iflux"]["ed_value"]  = []
         self["Iflux"]["eu_value"]  = []
         self["Iflux"]["unit"]      = "ph/cm2/s"
         
     def Print(self):
+    """ Print the value stored in the class"""
         self.success("Results are :")
         for k in self.iterkeys():
             self.info("Key name : "+k)
@@ -110,12 +121,17 @@ class ResultsSorage(dict,base):
         print()
         
 class Analyser(base):
+    '''Class to run the analysis of the data. Currently the parameters are hard coded but this will change once
+        the method to feed the class will be defined
+        The classe can work with GObservation as input (simulation) or fits files (simulation+real data)'''
     def __init__(self):
         super(Analyser,self).__init__()
         self.info("Creating "+self.classname+" object")
+        #Observation and ctlike object
         self.m_obs = None
         self.like  = None
         
+        #parameters
         self.m_ebinalg  = "LOG"
         self.m_eunit    = "TeV"
         self.m_enumbins = 10#nbins
@@ -126,6 +142,8 @@ class Analyser(base):
         self.m_edisp    = False
         self.m_stat     = "POISSON"#stat
 
+        # booleans to ensure that input files and parameters have been defined
+        # set to false at the begining and turn to true while a file/parameter is defined.
         self.m_source_set = False
         self.m_files_set  = False
         self.m_time_set   = False
@@ -135,6 +153,7 @@ class Analyser(base):
         self.m_xml_set    = False
         
     def set_xml(self,xml):
+        '''Set the model XML file'''
         self.m_xml     = xml
         ind = xml.find(".xml")
         if not ind==-1:
@@ -142,6 +161,7 @@ class Analyser(base):
         self.m_xml_set = True
         
     def set_roi(self,roi):
+        '''Set the ROI parameter and compute the number of pixel, bin size of the map'''
         self.m_roi      = float(roi)
         self.m_nxpix    = int(self.m_roi*100) #nxpix
         self.m_nypix    = int(self.m_roi*100) #nypix
@@ -149,23 +169,45 @@ class Analyser(base):
         self.m_roi_set  = True
 
     def set_irfs(self,caldb,irf):
+        '''Set the IRFs definition'''
         self.m_caldb    = caldb
         self.m_irf      = irf
         self.m_irfs_set = True
 
     def set_Fitsfiles(self,evtfile,tag="CTA_analysis"):
+        '''Set the input and output fits files'''
         self.m_evtfile   = "event_selected_"+tag+".fits"    
         self.m_raw_evt   = evtfile
         self.m_cntfile   = "countmap_"+tag+".fits"
         self.m_files_set = True
 
     def set_source(self,name,ra,dec):
+        '''Set the source name and the RA/DEC position of the source'''
         self.m_ra         = ra
         self.m_dec        = dec
         self.m_name       = name
         self.m_source_set = True
 
+    def set_time_boundary(self,tmin,tmax):
+        """Set the start and stop time of the observation"""
+        self.m_tmin        = float(tmin)
+        self.m_tmax        = float(tmax)
+        self.m_time_set    = True
+
+    def set_energy_boundary(self,emin,emax):
+        """Set the energy bounds of the observation"""
+        self.m_emin = emin
+        self.m_emax = emax
+        ebounds = gl.GEbounds(gl.GEnergy(emin, self.m_eunit), \
+                                gl.GEnergy(emax, self.m_eunit))
+
+        if self.m_obs:
+            for obs in self.m_obs:
+                obs.events().ebounds(ebounds)
+        self.m_energy_set = True
+
     def validate(self):
+        '''Check is all the parameters has been set'''
         if not self.m_time_set :
             self.error("Time range of the observations not set")
 
@@ -188,6 +230,7 @@ class Analyser(base):
             self.error("XML files for the sky model not set")
 
     def copy(self,analyse,tag="CTA_analysis_copy"):
+        '''Make a copy of the class'''
         self.set_xml(analyse.m_xml)
         self.set_irfs(analyse.m_caldb,analyse.m_irf)
         self.set_roi(analyse.m_roi)
@@ -198,35 +241,20 @@ class Analyser(base):
 
 
     def set_obs(self,obs):
-        self.m_obs = obs #set the GObservation container
+        '''set the GObservation container'''
+        self.m_obs = obs 
 
-    def set_time_boundary(self,tmin,tmax):
-        """Set the start and stop time of the observation"""
-        self.m_tmin        = float(tmin)
-        self.m_tmax        = float(tmax)
-        self.m_time_set    = True
-
-    def set_energy_boundary(self,emin,emax):
-        """Set the energy bounds of the observation"""
-        self.m_emin = emin
-        self.m_emax = emax
-        ebounds = gl.GEbounds(gl.GEnergy(emin, self.m_eunit), \
-                                gl.GEnergy(emax, self.m_eunit))
-
-        if self.m_obs:
-            for obs in self.m_obs:
-                obs.events().ebounds(ebounds)
-        self.m_energy_set = True
-        
     def ctselect(self):
-        # ctselect application and set parameters
+        '''ctselect application and set parameters'''
         self.info("Running ctselect to cut on events")
-        self.validate()
+        self.validate()# check the parameters
+        
         if self.m_obs:
             filter = ct.ctselect(self.m_obs)
         else:
             filter = ct.ctselect()
         
+        #set the parameters for running the tool
         filter["infile"] = self.m_raw_evt               
         filter["outfile"] = self.m_evtfile  
         filter["usepnt"].boolean(self.m_usepnt) # Use pointing for map centre
@@ -241,6 +269,7 @@ class Analyser(base):
         filter.logFileOpen()
 
         filter.run()
+        # if no Gobservation have been defined, then save the fits file.
         if not(self.m_obs):
             filter.save()
 
@@ -251,14 +280,17 @@ class Analyser(base):
             self.m_obs = filter.obs().copy()
         
     def ctbin(self,log=False,debug=False):
-        # ctbin application and set parameters
-        self.validate()
+        '''ctbin application and set parameters'''
         self.info("Running ctbin to create count map")
+        self.validate()# check the parameters
+
         if self.m_obs:
             bin = ct.ctbin(self.m_obs)
         else:
             bin = ct.ctbin()
             bin["evfile"] = self.m_evtfile
+
+        #set the parameters for running the tool
         bin["outfile"] = self.m_cntfile
         bin["ebinalg"].string(self.m_ebinalg)
         bin["emin"].real(self.m_emin)
@@ -290,14 +322,17 @@ class Analyser(base):
             self.m_obs = bin.obs().copy()
             
     def create_fit(self,log=False,debug=False):
-        self.validate()
+        '''Create the like object from ctlike'''
         # create ctlike instance with given parameters
         self.info("Fitting Data using ctlike")
+        self.validate()
+        
+        #set the parameters of the tools
         if self.m_obs:
             self.like = ct.ctlike(self.m_obs)
         else:
             self.like = ct.ctlike()
-            if self.m_binned:
+            if self.m_binned#binned or unbinned analysis
                 self.like["infile"] = self.m_cntfile
             else:
                 self.like["infile"] = self.m_evtfile
@@ -312,10 +347,50 @@ class Analyser(base):
         # Optionally open the log file
         if log:
             self.like.logFileOpen()
+            
         # Optionally switch-on debugging model
         if debug:
             self.like["debug"].boolean(True)
             
+    def compute_butterfly(self,name,log=False,debug=False):
+        '''create ctlike instance with given parameters'''
+        self.info("Computing the data with ctbutterfly")
+        self.validate()
+        
+        if self.m_obs:
+            butterfly = ct.ctbutterfly(self.m_obs)
+        else:#parameters of the tools
+            butterfly = ct.ctbutterfly()
+            butterfly["infile"] = self.m_evtfile
+            butterfly['srcname'] = name
+            butterfly["emin"].real(self.m_emin)
+            butterfly["emax"].real(self.m_emax)
+            butterfly["caldb"].string(self.m_caldb)
+            butterfly["irf"].string(self.m_irf)
+            butterfly["srcmdl"] = self.m_xml
+            filename = name+"_butterfly.txt"
+            butterfly["outfile"] = filename
+
+        # Optionally open the log file
+        if log:
+            butterfly.logFileOpen()
+        # Optionally switch-on debugging model
+        if debug:
+            butterfly["debug"].boolean(True)
+        
+        butterfly.run() #Compute the butterfly
+        butterfly.save() # save the txt files
+
+        #Store the results in the Storage class
+        self.m_butterfly = ResultsStorage()
+        data = open(filename,'r').readlines()
+        for line in data:
+            words = string.split(line)
+            self.m_butterfly["ener"]["value"].append(float(words[0]))
+            self.m_butterfly["dnde"]["value"].append(float(words[1]))
+            self.m_butterfly["dnde"]["ed_value"].append(float(words[1]) - float(words[2]))
+            self.m_butterfly["dnde"]["eu_value"].append(float(words[1]) + float(words[2]))
+        
     def fit(self,log=False,debug=False):
         self.validate()
         if not(self.like):
@@ -329,81 +404,82 @@ class Analyser(base):
         self.success("Fit performed")
         
     def PrintResults(self,srcname = ""):
+        ''' Print results of the fit '''
         self.info("Results of the Fit")
         for m in self.like.obs().models():
             if srcname == m.name() or srcname=="":
                 print("Model : "+m.name())
                 print(m)
                 
-    def GetSrcResuls(self,Res,srcname,E0=None,factor = 1e6,tmin=None,tmax=None):
-        """function to get and store the results of a fit"""
+    def GetSrcResuls(self,Res,srcname,E0=None,factor = 1e6):
+        """function to get and store the results of a fit. Store the results in the Storage class element"""
         results = self.GetSrcParams(srcname)
 
-        if 1:
-        # #Time
-        # if (tmin is not None) or (tmax is not None) :
-            # Res["time"]["tmin_value"].append(tmin)
-            # Res["time"]["tmax_value"].append(tmax)
-            # Res["time"]["unit"] = "sec"
-        # else:
-            Res["time"]["tmin_value"].append(self.m_tmin)
-            Res["time"]["tmax_value"].append(self.m_tmax)
-            Res["time"]["unit"] = "sec"
+        #Store the time
+        Res["time"]["tmin_value"].append(self.m_tmin)
+        Res["time"]["tmax_value"].append(self.m_tmax)
+        Res["time"]["unit"] = "sec"
 
-        #Energy
-        if (E0 is not None):
+        #Store the energy
+        if (E0 is not None):#if a 'pivot' energy is given
             Res["ener"]["value"].append(E0*factor)
             Res["ener"]["ed_value"].append((E0-self.m_emin)*factor)
             Res["ener"]["eu_value"].append((self.m_emax-E0)*factor)
             Res["ener"]["unit"] = "MeV"
-        else:
+        else:#if not, the geometric mean energy is used
             Res["ener"]["value"].append(sqrt(self.m_emin*self.m_emax))
             Res["ener"]["ed_value"].append(-self.m_emin+sqrt(self.m_emin*self.m_emax))
             Res["ener"]["eu_value"].append(self.m_emax-sqrt(self.m_emin*self.m_emax))
             Res["ener"]["unit"] = self.m_eunit
 
+        #save the flux values
         Res["Iflux"]["value"].append(results["flux"])
         Res["Iflux"]["eu_value"].append(results["eflux"])
         Res["Iflux"]["ed_value"].append(results["eflux"])
-        # Res["Iflux"]["unit"] = "unit"
         
-        m = self.GetModel(srcname)
-        Res["dnde"]["value"].append(m.spectral()[0].value())
-        Res["dnde"]["eu_value"].append(m.spectral()[0].error())
-        Res["dnde"]["ed_value"].append(m.spectral()[0].error())
+        #save the differential flux in a src model independent maner
+        srcmodel = self.GetModel(srcname)
+        Res["dnde"]["value"].append(srcmodel.spectral()[0].value())
+        Res["dnde"]["eu_value"].append(srcmodel.spectral()[0].error())
+        Res["dnde"]["ed_value"].append(srcmodel.spectral()[0].error())
 
-        Res["TS"].append(100)
+        Res["TS"].append(100) ## TODO use the real TS value
 
-        UL = UpperLimitComputer(self,srcname) 
+        UL = UpperLimitComputer(self,srcname) #Compute the UL. To be updated
         UL.run()
         Res["ulim_dnde"].append(0)
-        # del UL
+
         return Res
 
     def GetSrcParams(self,srcname):
+        '''Retrive the source parameters from the like object and store it in a dictonnary'''
         results = {}
         found = False
         m = self.GetModel(srcname)
+        
+        #get the integral flux
         results["flux"] = m.spectral().flux(gl.GEnergy(self.m_emin,self.m_eunit),gl.GEnergy(self.m_emax,self.m_eunit))
         results["eflux"] = m.spectral().eflux(gl.GEnergy(self.m_emin,self.m_eunit),gl.GEnergy(self.m_emax,self.m_eunit))
+
+        # Get free parameters
         for par in m.spectral():
             if par.is_free():
                 results[par.name()] = par.value()
                 results["e"+par.name()] = par.error()
-            
+
         return results
-        
+
     def GetModel(self,srcname):
+        ''' Get the spectral parameters of the sources stored in the like object''' 
         found = False
         for m in self.like.obs().models():
             if m.name() == srcname:
                 return m
         self.error("source "+srcname+" not in the source list")
-            
     
 def MakeEbin(analyse,nbins,srcname,binned = False):
     #Store the results
-    Res = ResultsSorage()
+    Res = ResultsStorage()
     
     #check the source name, exit is the srcname is false
     analyse.GetModel(srcname)
@@ -454,7 +530,7 @@ def MakeEbin(analyse,nbins,srcname,binned = False):
     
 def MakeLC(analyse,nbins,srcname,binned = False):
     #Store the results
-    Res = ResultsSorage()
+    Res = ResultsStorage()
 
     #check the source name, exit is the srcname is false
     analyse.GetModel(srcname)
@@ -493,10 +569,11 @@ def MakeLC(analyse,nbins,srcname,binned = False):
     return Res
         
 class UpperLimitComputer(base):
+    '''This class compute the ul and will be removed'''
     def __init__(self,analyser,srcname,parname = "Prefactor"):
         super(UpperLimitComputer,self).__init__()
         self.info("Creating "+self.classname+" object")
-        # self.like = analyser.like.copy()
+
         obs = analyser.like.obs().copy()
         self.like = ct.ctlike(obs)
         self.succes = False
