@@ -1,8 +1,8 @@
-New Features and Important Changes in ctools 1.0.0
+New Features and Important Changes in ctools 0.8.1
 
 Author(s) : Juergen Knoedlseder
 
-24 November 2014
+8 January 2015
 
 
 1. Introduction
@@ -18,7 +18,8 @@ None
 
 3. Python interface
 -------------------
-None
+Include Python wrapper files in source code distribution (they were
+missing for version 0.8.0)
 
 
 4. Support model
@@ -82,16 +83,13 @@ None
 
 
 16. ctbutterfly - Generate butterfly diagrams
-=============================================
+---------------------------------------------
 None
 
 
 17. Examples
 ------------
-The following scripts have been adapted to fit the actual
-interface definition
-* make_binned_analysis.py
-* make_unbinned_analysis.py
+None
 
 
 18. Scripts

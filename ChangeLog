@@ -1,9 +1,9 @@
-2014-11-24  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
-        * Version 1.0.0 released
-        ========================
+        * Bug fix version 0.8.1 released
+        ================================
 
-        Review and adapt example scripts
+        Include Python wrappers in source code distribution
 
 
 2014-11-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
