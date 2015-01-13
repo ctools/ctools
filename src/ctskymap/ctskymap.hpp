@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -72,7 +72,7 @@ protected:
     void map_events(GCTAObservation* obs);
 
     // User parameters
-    std::string   m_outmap;    //!< Output counts map
+    std::string   m_outmap;     //!< Output counts map
     double        m_emin;       //!< Minimum energy (TeV)
     double        m_emax;       //!< Maximum energy (TeV)
 

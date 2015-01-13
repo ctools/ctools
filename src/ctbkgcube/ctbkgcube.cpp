@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -481,8 +481,8 @@ void ctbkgcube::init_members(void)
 void ctbkgcube::copy_members(const ctbkgcube& app)
 {
     // Copy members
-    m_outmodel = app.m_outmodel;
-    m_outcube = app.m_outcube;
+    m_outmodel   = app.m_outmodel;
+    m_outcube    = app.m_outcube;
     m_obs        = app.m_obs;
     m_bkgcube    = app.m_bkgcube;
     m_bkgmdl     = app.m_bkgmdl;
@@ -509,9 +509,8 @@ void ctbkgcube::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- *  @exception GException::invalid_value
- *            Parameter "inobs" is required for ctbkgcube.
  * @exception GException::invalid_value
+ *            Parameter "inobs" is required for ctbkgcube.
  *            No background model definition XML file specified.
  *
  * Get all task parameters from parameter file or (if required) by querying
@@ -524,10 +523,13 @@ void ctbkgcube::get_parameters(void)
 
         // Throw exception if no infile is given, since this tool needs an observation
         // including events
-        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
-
-            std::string msg = "Parameter \"inobs\" is required to be given in ctbkgcube."
-                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -592,7 +594,7 @@ void ctbkgcube::get_parameters(void)
 
     // Read output filenames (if needed)
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        m_outcube  = (*this)["outcube"].filename();
         m_outmodel = (*this)["outmodel"].filename();
     }
 

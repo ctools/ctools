@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -427,6 +427,7 @@ void ctobssim::run(void)
     return;
 }
 
+
 /***********************************************************************//**
  * @brief Save the selected event list(s)
  *
@@ -491,7 +492,7 @@ void ctobssim::init_members(void)
     // Initialise user parameters
     m_outevents.clear();
     m_prefix.clear();
-    m_seed        =   1;
+    m_seed        = 1;
     m_apply_edisp = false;
 
     // Initialise protected members
@@ -519,7 +520,7 @@ void ctobssim::init_members(void)
 void ctobssim::copy_members(const ctobssim& app)
 {
     // Copy user parameters
-    m_outevents     = app.m_outevents;
+    m_outevents   = app.m_outevents;
     m_prefix      = app.m_prefix;
     m_seed        = app.m_seed;
     m_apply_edisp = app.m_apply_edisp;
@@ -559,21 +560,18 @@ void ctobssim::free_members(void)
 void ctobssim::get_parameters(void)
 {
     // If there are no observations in container then load them via user parameters
-   if (m_obs.size() == 0) {
+    if (m_obs.size() == 0) {
 
        // Build observation container
        m_obs = get_observations();
 
-   } // endif: there was no observation in the container
+    } // endif: there was no observation in the container
 
-   // Read model definition file if required
-   if (m_obs.models().size() == 0) {
+    // Read model definition file if required
+    if (m_obs.models().size() == 0) {
        std::string inmodel = (*this)["inmodel"].filename();
-
-       // Load models from file
        m_obs.models(inmodel);
-
-   } // endif: there were no models
+    }
 
     // Get other parameters
     m_seed        = (*this)["seed"].integer();

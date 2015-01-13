@@ -17,8 +17,8 @@
 #
 # General parameters
 #===================
-inobs,   f, a, "events.fits",,,"Input event list, cube or observation definition file"
-inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+inobs,    f, a, "events.fits",,,"Input event list, cube or observation definition file"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
 srcname,  s, a, "Crab",,,"Source of interest"
 caldb,    s, a, "dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"

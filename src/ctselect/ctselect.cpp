@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -471,12 +471,14 @@ void ctselect::get_parameters(void)
     // If there are no observations in container then load them via user parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given, since this tool needs an observation
-        // including events
-        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
-
-            std::string msg = "Parameter \"inobs\" is required to be given in ctselect."
-                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+        // Throw exception if no infile is given
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -511,7 +513,7 @@ void ctselect::get_parameters(void)
     // dumped into the log file
     if (read_ahead()) {
         m_outobs = (*this)["outobs"].filename();
-        m_prefix  = (*this)["prefix"].string();
+        m_prefix = (*this)["prefix"].string();
     }
 
     // Set time interval with input times given in CTA reference

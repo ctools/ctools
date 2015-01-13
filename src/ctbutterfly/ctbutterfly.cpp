@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2014-2015 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -399,7 +399,6 @@ void ctbutterfly::save(void)
 void ctbutterfly::init_members(void)
 {
     // Initialise members
-    //m_inobs.clear();
     m_srcname.clear();
     m_outfile.clear();
     m_ebounds.clear();
@@ -424,7 +423,6 @@ void ctbutterfly::init_members(void)
 void ctbutterfly::copy_members(const ctbutterfly& app)
 {
     // Copy attributes
-   // m_inobs  = app.m_inobs;
     m_srcname = app.m_srcname;
     m_outfile = app.m_outfile;
     m_ebounds = app.m_ebounds;
@@ -456,8 +454,6 @@ void ctbutterfly::free_members(void)
  *
  * @exception GException::invalid_value
  *            Parameter "inobs" is required for ctbutterfly.
-
- * @exception GException::invalid_value
  *            Test source not found or no RA/DEC parameters found for test
  *            source.
  *
@@ -472,12 +468,14 @@ void ctbutterfly::get_parameters(void)
     // If there are no observations in container then load them via user parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given, since this tool needs an observation
-        // including events
-        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
-
-            std::string msg = "Parameter \"inobs\" is required to be given in ctbutterfly."
-                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+        // Throw exception if no infile is given
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -515,8 +513,8 @@ void ctbutterfly::get_parameters(void)
     std::string matrixfilename = (*this)["matrix"].filename();
     if (matrixfilename != "NONE") {
         std::string msg = "Loading of matrix from file not implemented yet. "
-                           "Use filename = \"NONE\" to induce a recomputation of "
-                           "the matrix internally.";
+                          "Use filename = \"NONE\" to induce a recomputation of "
+                          "the matrix internally.";
         throw GException::feature_not_implemented(G_GET_PARAMETERS, msg);
         // m_covariance.load(matrixfilename);
     }

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -74,7 +74,7 @@ protected:
 
     // User parameters
     bool          m_refit;       //!< Refitting
-    std::string   m_outmodel;      //!< Source model output XML file
+    std::string   m_outmodel;    //!< Source model output XML file
     bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Members

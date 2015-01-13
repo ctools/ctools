@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctbutterfly - butterfly calculation tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2014-2015 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -84,7 +84,7 @@ protected:
     std::string m_outfile;    //!< Output ascii file
     GEbounds    m_ebounds;    //!< Energy binning definition
 
-      // Protected members
+    // Protected members
     GObservations       m_obs;        //!< Observation container
     GMatrixSparse       m_covariance; //!< Covariance matrix
     std::vector<double> m_energies;   //!< Energy values for storage

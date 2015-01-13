@@ -17,13 +17,13 @@
 #
 # General parameters
 #===================
-inobs,  f, a, "events.fits",,, "Event list, counts cube or observation definition file"
-stat,   s, h, "POISSON",,, "Optimization statistics"
-edisp,  b, h, no,,, "Apply energy dispersion?"
-refit,  b, h, no,,, "Do refitting?"
-caldb,  s, a, "dummy",,, "Calibration database"
-irf,    s, a, "cta_dummy_irf",,, "Instrument response function"
-inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+inobs,    f, a, "events.fits",,, "Event list, counts cube or observation definition file"
+stat,     s, h, "POISSON",,, "Optimization statistics"
+edisp,    b, h, no,,, "Apply energy dispersion?"
+refit,    b, h, no,,, "Do refitting?"
+caldb,    s, a, "dummy",,, "Calibration database"
+irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
 outmodel, f, a, "crab_results.xml",,,  "Source model output file"
 #
 # Standard parameters

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -85,7 +85,7 @@ protected:
     void save_xml(void);
 
     // User parameters
-    std::string m_outevents;     //!< Output events file
+    std::string m_outevents;   //!< Output events file
     std::string m_prefix;      //!< Prefix for multiple event lists
     int         m_seed;        //!< Random number generator seed
     bool        m_apply_edisp; //!< Apply energy dispersion?

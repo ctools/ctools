@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -36,7 +36,7 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_RUN                                             "ctcubemask::run()"
 #define G_APPLY_MASK               "ctcubemask::apply_mask(GCTAObservation*)"
-#define G_GET_PARAMETERS     "ctcubemask::get_parameters()"
+#define G_GET_PARAMETERS                       "ctcubemask::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -349,27 +349,29 @@ void ctcubemask::save(void)
  ***************************************************************************/
 void ctcubemask::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
-        if (m_obs.size() == 0) {
+    // If there are no observations in container then load them via user
+    // parameters
+    if (m_obs.size() == 0) {
 
-            // Throw exception if no infile is given, since this tool needs an observation
-            // including events
-            if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
+        // Throw exception if no infile is given
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        }
 
-                std::string msg = "Parameter \"inobs\" is required to be given in ctcubemask."
-                                "Specify a vaild observation definition (XML or FITS) file to proceed"
-                                "It is not possible to build a binned observation from scratch";
-                throw GException::invalid_value(G_GET_PARAMETERS, msg);
-            }
+        // Build observation container without response (not needed)
+        m_obs = get_observations(false);
 
-            // Build observation container without response (not needed)
-            m_obs = get_observations(false);
-
-        } // endif: there was no observation in the container
+    } // endif: there was no observation in the container
 
     // Get parameters
 	m_regfile = (*this)["regfile"].filename();
-    m_usepnt = (*this)["usepnt"].boolean();
+    m_usepnt  = (*this)["usepnt"].boolean();
     if (!m_usepnt) {
         m_ra  = (*this)["ra"].real();
         m_dec = (*this)["dec"].real();
@@ -523,7 +525,6 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
 void ctcubemask::init_members(void)
 {
     // Initialise parameters
-    //m_infile.clear();
 	m_regfile.clear();
     m_outcube.clear();
 	m_prefix.clear();
@@ -537,7 +538,6 @@ void ctcubemask::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_infiles.clear();
-//    m_use_xml    = false;
 
     // Return
     return;
@@ -552,7 +552,6 @@ void ctcubemask::init_members(void)
 void ctcubemask::copy_members(const ctcubemask& app)
 {
     // Copy parameters
-    //m_infile  = app.m_infile;
 	m_regfile = app.m_regfile;
     m_outcube = app.m_outcube;
 	m_prefix  = app.m_prefix;
@@ -566,7 +565,6 @@ void ctcubemask::copy_members(const ctcubemask& app)
     // Copy protected members
     m_obs        = app.m_obs;
     m_infiles    = app.m_infiles;
-//    m_use_xml    = app.m_use_xml;
     
     // Return
     return;

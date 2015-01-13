@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -312,7 +312,6 @@ void ctexpcube::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_expcube.clear();
-    //m_ebounds.clear();
 
     // Return
     return;
@@ -331,8 +330,8 @@ void ctexpcube::copy_members(const ctexpcube& app)
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_expcube    = app.m_expcube;
+    m_obs     = app.m_obs;
+    m_expcube = app.m_expcube;
 
     // Return
     return;
@@ -361,15 +360,18 @@ void ctexpcube::free_members(void)
  ***************************************************************************/
 void ctexpcube::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given, since this tool needs an observation
-        // including events
-        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
-
-            std::string msg = "Parameter \"inobs\" is required to be given in ctexpcube."
-                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+        // Throw exception if no infile is given
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -411,7 +413,7 @@ void ctexpcube::get_parameters(void)
        // Define exposure cube
        m_expcube = GCTAExposure(cube);
 
-   } // endif: filename was not valid
+    } // endif: filename was not valid
 
     // ... otherwise setup the exposure cube from the counts map
     else {

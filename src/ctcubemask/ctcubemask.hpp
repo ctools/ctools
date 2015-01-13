@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -92,7 +92,6 @@ protected:
     // Protected members
     GObservations            m_obs;        //!< Observations container
     std::vector<std::string> m_infiles;    //!< Input event filenames
-    //bool                     m_use_xml;    //!< Use XML file instead of FITS file
 };
 
 

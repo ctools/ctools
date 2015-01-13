@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -62,28 +62,27 @@ public:
 
 protected:
     // Protected methods
-    void        init_members(void);
-    void        copy_members(const ctool& app);
-    void        free_members(void);
-    const bool& read_ahead(void) const;
-    GEbounds    get_ebounds(void);
-    GObservations get_observations(const bool& get_response=true);
+    void            init_members(void);
+    void            copy_members(const ctool& app);
+    void            free_members(void);
+    const bool&     read_ahead(void) const;
     GCTAObservation setup_obs(void);
-    GSkymap get_map(void);
-    GCTAEventCube get_cube(void);
-    GSkymap get_map(const GObservations& obs);
-    GCTAEventCube get_cube(const GObservations& obs);
-    GCTAEventCube set_from_cntmap(const std::string filename);
-    GSkyDir get_pointing(const GObservations& obs);
-
-    void        set_response(GObservations& obs);
-    void        set_obs_response(GCTAObservation* obs);
-    size_t      get_current_rss(void);
+    GSkymap         get_map(void);
+    GSkymap         get_map(const GObservations& obs);
+    GEbounds        get_ebounds(void);
+    GObservations   get_observations(const bool& get_response = true);
+    GCTAEventCube   get_cube(void);
+    GCTAEventCube   get_cube(const GObservations& obs);
+    GSkyDir         get_mean_pointing(const GObservations& obs);
+    size_t          get_current_rss(void);
+    GCTAEventCube   set_from_cntmap(const std::string filename);
+    void            set_response(GObservations& obs);
+    void            set_obs_response(GCTAObservation* obs);
 
     // Protected members
-    bool m_read_ahead;   //!< Read ahead parameters
-    bool m_use_xml; //!< Use XML file instead of FITS file for observations
-    GTimeReference        m_cta_ref;          //!< CTA time reference
+    bool           m_read_ahead; //!< Read ahead parameters
+    bool           m_use_xml;    //!< Use XML file instead of FITS file for observations
+    GTimeReference m_cta_ref;    //!< CTA time reference
 };
 
 

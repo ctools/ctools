@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2014-2015 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -85,12 +85,12 @@ protected:
 
     // User parameters
     std::string              m_srcname;    //!< Name of source which is moved around
-    std::string              m_outmap;    //!< Output counts map or XML file
+    std::string              m_outmap;     //!< Output counts map or XML file
 
     // Parameters to control speed and job splitting
-    int                      m_binmin;  //!< Map bin number from which computation should start
-    int                      m_binmax;  //!< Map bin number where map computation should end
-    double                   m_logL0;   //!< Likelihood value of null hypothesis
+    int                      m_binmin;     //!< Map bin number from which computation should start
+    int                      m_binmax;     //!< Map bin number where map computation should end
+    double                   m_logL0;      //!< Likelihood value of null hypothesis
 
     // Protected members
     GObservations            m_obs;        //!< Observation container

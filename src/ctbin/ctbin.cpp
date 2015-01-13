@@ -334,7 +334,7 @@ void ctbin::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-    m_usepnt   = false;
+    m_usepnt = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -357,16 +357,16 @@ void ctbin::init_members(void)
 void ctbin::copy_members(const ctbin& app)
 {
     // Copy attributes
-    m_outcube  = app.m_outcube;
-    m_usepnt   = app.m_usepnt;
+    m_outcube = app.m_outcube;
+    m_usepnt  = app.m_usepnt;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_cube       = app.m_cube;
-    m_ebounds    = app.m_ebounds;
-    m_gti        = app.m_gti;
-    m_ontime     = app.m_ontime;
-    m_livetime   = app.m_livetime;
+    m_obs      = app.m_obs;
+    m_cube     = app.m_cube;
+    m_ebounds  = app.m_ebounds;
+    m_gti      = app.m_gti;
+    m_ontime   = app.m_ontime;
+    m_livetime = app.m_livetime;
 
     // Return
     return;
@@ -400,8 +400,7 @@ void ctbin::get_parameters(void)
     // If there are no observations in container then load them via user parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given, since this tool needs an observation
-        // including events
+        // Throw exception if no infile is given
         if ((*this)["inobs"].filename() == "NONE" ||
             (*this)["inobs"].filename() == "") {
             std::string msg = "A valid file needs to be specified for the "

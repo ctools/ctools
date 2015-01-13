@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -35,7 +35,6 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                        "ctpsfcube::get_parameters()"
-#define G_SET_FROM_CNTMAP          "ctpsfcube::set_from_cntmap(std::string&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -355,12 +354,14 @@ void ctpsfcube::get_parameters(void)
     // If there are no observations in container then load them via user parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given, since this tool needs an observation
-        // including events
-        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
-
-            std::string msg = "Parameter \"inobs\" is required to be given in ctpsfcube."
-                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+        // Throw exception if no infile is given
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -373,8 +374,8 @@ void ctpsfcube::get_parameters(void)
     std::string incube = (*this)["incube"].filename();
 
     // Get additional binning parameters
-    double      dmax     = (*this)["amax"].real();
-    int         ndbins   = (*this)["anumbins"].integer();
+    double dmax   = (*this)["amax"].real();
+    int    ndbins = (*this)["anumbins"].integer();
 
     // Check for filename validity
     if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
@@ -388,7 +389,7 @@ void ctpsfcube::get_parameters(void)
         // Check if pointing should be used
         if (usepnt) {
 
-            // buld cube from user parameters and pointing information
+            // Build cube from user parameters and pointing information
             cube = get_cube(m_obs);
 
         } // endif: pointing used as map center
@@ -402,6 +403,7 @@ void ctpsfcube::get_parameters(void)
 
        // Define psf cube
        m_psfcube = GCTAMeanPsf(cube, dmax, ndbins);
+
     }
 
     // ... otherwise setup the exposure cube from the counts map

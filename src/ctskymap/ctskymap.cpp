@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -35,7 +35,8 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
 #define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
-#define G_GET_PARAMETERS          "ctskymap::get_parameters()"
+#define G_GET_PARAMETERS                         "ctskymap::get_parameters()"
+
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
@@ -329,22 +330,25 @@ void ctskymap::save(void)
  ***************************************************************************/
 void ctskymap::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
-       if (m_obs.size() == 0) {
+    // If there are no observations in container then load them via user
+    // parameters
+    if (m_obs.size() == 0) {
 
-           // Throw exception if no infile is given, since this tool needs an observation
-           // including events
-           if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
+        // Throw exception if no infile is given
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        }
 
-               std::string msg = "Parameter \"inobs\" is required to be given in ctskymap."
-                               "Specify a vaild observation definition (XML or FITS) file to proceed";
-               throw GException::invalid_value(G_GET_PARAMETERS, msg);
-           }
+        // Build observation container without response (not needed)
+        m_obs = get_observations(false);
 
-           // Build observation container without response (not needed)
-           m_obs = get_observations(false);
-
-       } // endif: there was no observation in the container
+    } // endif: there was no observation in the container
 
     // Get parameters
     bool usepnt = (*this)["usepnt"].boolean();
@@ -365,8 +369,8 @@ void ctskymap::get_parameters(void)
     } // endelse: m_usepnt was false
 
     // Get remaining parameters
-    m_emin     = (*this)["emin"].real();
-    m_emax     = (*this)["emax"].real();
+    m_emin = (*this)["emin"].real();
+    m_emax = (*this)["emax"].real();
 
     // Read ahead parameters
     if (read_ahead()) {
@@ -485,8 +489,8 @@ void ctskymap::init_members(void)
     // Initialise members
     m_obs.clear();
     m_skymap.clear();
-    m_emin     = 0.0;
-    m_emax     = 0.0;
+    m_emin = 0.0;
+    m_emax = 0.0;
 
     // Return
     return;
@@ -501,10 +505,10 @@ void ctskymap::init_members(void)
 void ctskymap::copy_members(const ctskymap& app)
 {
     // Copy attributes
-    m_obs      = app.m_obs;
-    m_skymap   = app.m_skymap;
-    m_emin     = app.m_emin;
-    m_emax     = app.m_emax;
+    m_obs    = app.m_obs;
+    m_skymap = app.m_skymap;
+    m_emin   = app.m_emin;
+    m_emax   = app.m_emax;
 
     // Return
     return;

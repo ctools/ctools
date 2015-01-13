@@ -17,7 +17,7 @@
 #
 # Observational parameters
 #===================
-inobs,   f, a, "NONE",,, "Input event list, cube or observation definition file"
+inobs,    f, a, "NONE",,, "Input event list, cube or observation definition file"
 inmodel,  f, a, "NONE",,, "Input (background) model XML file"
 incube,   f, a, "NONE",,, "Counts cube for background cube definition"
 outcube,  f, a, "bkgcube.fits",,, "Output background cube file"

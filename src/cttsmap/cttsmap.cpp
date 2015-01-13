@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2014-2015 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -436,18 +436,18 @@ void cttsmap::init_members(void)
 void cttsmap::copy_members(const cttsmap& app)
 {
     // Copy attributes
-    m_srcname   = app.m_srcname;
+    m_srcname = app.m_srcname;
     m_outmap  = app.m_outmap;
 
     // Copy protected members
-    m_binmin     = app.m_binmin;
-    m_binmax     = app.m_binmax;
-    m_logL0      = app.m_logL0;
-    m_obs        = app.m_obs;
-    m_tsmap      = app.m_tsmap;
-    m_mapnames   = app.m_mapnames;
-    m_maps       = app.m_maps;
-    m_statusmap  = app.m_statusmap;
+    m_binmin    = app.m_binmin;
+    m_binmax    = app.m_binmax;
+    m_logL0     = app.m_logL0;
+    m_obs       = app.m_obs;
+    m_tsmap     = app.m_tsmap;
+    m_mapnames  = app.m_mapnames;
+    m_maps      = app.m_maps;
+    m_statusmap = app.m_statusmap;
 
     // Clone protected members
     m_testsource = (app.m_testsource != NULL) ? app.m_testsource->clone() : NULL;
@@ -485,15 +485,18 @@ void cttsmap::free_members(void)
  ***************************************************************************/
 void cttsmap::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given, since this tool needs an observation
-        // including events
-        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
-
-            std::string msg = "Parameter \"inobs\" is required to be given in cttsmap."
-                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+        // Throw exception if no infile is given
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -544,14 +547,13 @@ void cttsmap::get_parameters(void)
         (*m_testsource)["DEC"].fix();
     }
 
-
-    // Get sky map binning from user parameters
-    // and check if pointing should be used
+    // Get sky map binning from user parameters and check if pointing
+    // should be used
     GSkymap map;
     bool usepnt = (*this)["usepnt"].boolean();
     if (usepnt) {
 
-       // build cube from user parameters and pointing information
+       // Build cube from user parameters and pointing information
        map = get_map(m_obs);
 
     } // endif: pointing used as map center
