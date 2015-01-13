@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -386,7 +386,7 @@ void ctbin::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- *  @exception GException::invalid_value
+ * @exception GException::invalid_value
  *            Parameter "inobs" is required for ctbin.
  *
  * Get all task parameters from parameter file or (if required) by querying
@@ -402,10 +402,13 @@ void ctbin::get_parameters(void)
 
         // Throw exception if no infile is given, since this tool needs an observation
         // including events
-        if ((*this)["inobs"].filename()=="NONE" || (*this)["inobs"].filename() == "") {
-
-            std::string msg = "Parameter \"inobs\" is required to be given in ctbin."
-                            "Specify a vaild observation definition (XML or FITS) file to proceed";
+        if ((*this)["inobs"].filename() == "NONE" ||
+            (*this)["inobs"].filename() == "") {
+            std::string msg = "A valid file needs to be specified for the "
+                              "\"inobs\" parameter, yet \""+
+                              (*this)["inobs"].filename()+"\" was given."
+                              " Specify a vaild observation definition or "
+                              "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -423,7 +426,7 @@ void ctbin::get_parameters(void)
     // Check if pointing should be used
     if (m_usepnt) {
 
-        // buld cube from user parameters and pointing information
+        // Build cube from user parameters and pointing information
         cube = get_cube(m_obs);
 
     } // endif: pointing used as map center
@@ -435,8 +438,9 @@ void ctbin::get_parameters(void)
 
     } // endelse: m_usepnt was false
 
-    // Get the skymap
+    // Get the skymap and initialise the pixels
     m_cube = cube.map();
+    m_cube = 0.0;
 
     // Get energy boundaries
     m_ebounds  = cube.ebounds();
