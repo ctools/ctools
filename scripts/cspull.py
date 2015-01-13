@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script generates the pull distribution for all model parameters.
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #
 # ==========================================================================
 import gammalib
-import ctools
+#import ctools
 #import obsutils
 from ctools import obsutils
 import sys
@@ -46,8 +46,8 @@ class cspull(gammalib.GApplication):
         self.version = "0.4.0"
         
         # Initialise some members
-        self.obs      = None
-        self.model    = None
+        self.obs       = None
+        self.model     = None
         self.m_inmodel = None
         
         # Make sure that parfile exists
@@ -123,16 +123,7 @@ class cspull(gammalib.GApplication):
         """
         Get parameters from parfile and setup the observation.
         """
-       
-#         sim = ctools.ctobssim()
-#         sim.run()
-#         self.obs = sim.obs()
-#         sim = ctools.ctobssim()
-#         sim.run()
-#         self.obs = sim.obs().copy()
-#         print self.obs
-#         
-#         # Get parameters
+        # Get parameters
         if self.model == None:
             self.m_inmodel = self["inmodel"].filename()
         self.m_outfile  = self["outfile"].filename()
@@ -155,7 +146,7 @@ class cspull(gammalib.GApplication):
 
         # Set some fixed parameters
         self.m_log   = False # Logging in client tools
-        self.m_debug = True # Debugging in client tools
+        self.m_debug = True  # Debugging in client tools
         
         # Setup observations
         self.obs = self.set_obs()
@@ -271,23 +262,18 @@ class cspull(gammalib.GApplication):
         if self.logExplicit():
             self.log.header2("Trial "+str(seed+1))
 
-#         sim = ctools.ctobssim(self.obs)
-#         sim["seed"].integer(seed)
-#         sim.run()
-        print self.obs
         # Simulate events
-        sim_obs = obsutils.sim(self.obs, \
-                            nbins=self.m_enumbins, \
-                            seed=seed, \
-                            binsz=self.m_binsz, \
-                            npix=self.m_npix, \
-                            edisp=self.m_edisp, \
-                            log=self.m_log, debug=self.m_debug)
-        print "SIM"
-        print sim_obs
+        obs = obsutils.sim(self.obs, \
+                           nbins=self.m_enumbins, \
+                           seed=seed, \
+                           binsz=self.m_binsz, \
+                           npix=self.m_npix, \
+                           edisp=self.m_edisp, \
+                           log=self.m_log, debug=self.m_debug)
+
         # Determine number of events in simulation
         nevents = 0.0
-        for run in sim_obs:
+        for run in obs:
             nevents += run.events().number()
 
         # Write simulation results
@@ -298,10 +284,8 @@ class cspull(gammalib.GApplication):
             self.log("\n")
 
         # Fit model
-        like = ctools.ctlike(sim_obs)
-        like.run()
-#         like = obsutils.fit(obs, edisp=self.m_edisp, \
-#                             log=self.m_log, debug=self.m_debug)
+        like = obsutils.fit(obs, edisp=self.m_edisp, \
+                            log=self.m_log, debug=self.m_debug)
 
         # Store results
         logL   = like.opt().value()
@@ -338,7 +322,7 @@ class cspull(gammalib.GApplication):
                 
                     # Compute pull
                     fitted_value = par.value()
-                    real_value   = self.obs.models()[i][k].value()
+                    real_value   = self.model[i][k].value()
                     error        = par.error()
                     if error != 0.0:
                         pull = (fitted_value - real_value) / error

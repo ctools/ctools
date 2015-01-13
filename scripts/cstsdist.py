@@ -3,7 +3,7 @@
 # This script generates the TS distribution for a particular model based
 # on Monte-Carlo simulations.
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class cstsdist(GApplication):
         """
         # Set name
         self.name    = "cstsdist"
-        self.version = "0.1.0"
+        self.version = "0.2.0"
         
         # Initialise some members
         self.obs        = None
@@ -381,11 +381,6 @@ class cstsdist(GApplication):
             self.log.parformat("Number of simulated events")
             self.log(nevents)
             self.log("\n")
-
-#        sim.models(self.full_model)
-        
-#         like = obsutils.fit(sim, log = self.m_log, debug = self.m_debug)
-#         ts = like.obs().models()["Test"].ts()
         
         # Fit background only
         sim.models(self.bkg_model)
@@ -413,7 +408,6 @@ class cstsdist(GApplication):
         # Fit background and test source
         sim.models(self.full_model)
         like_all   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
-        print like_all.obs().models()
         result_all = like_all.obs().models()
         LogL_all   = like_all.opt().value()
         npred_all  = like_all.obs().npred()
