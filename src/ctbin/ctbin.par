@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-inobs,  f, a, "events.fits",,,"Event list or observation definition file"
+inobs,   f, a, "events.fits",,,"Event list or observation definition file"
 outcube, f, a, "cntmap.fits",,, "Output counts cube"
 #
 # Energy binning parameters
