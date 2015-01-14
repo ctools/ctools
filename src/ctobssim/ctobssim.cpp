@@ -559,13 +559,11 @@ void ctobssim::free_members(void)
  ***************************************************************************/
 void ctobssim::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
-
-       // Build observation container
-       m_obs = get_observations();
-
-    } // endif: there was no observation in the container
+        m_obs = get_observations();
+    }
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
@@ -581,7 +579,7 @@ void ctobssim::get_parameters(void)
     // dumped into the log file
     if (read_ahead()) {
         m_outevents = (*this)["outevents"].filename();
-        m_prefix  = (*this)["prefix"].string();
+        m_prefix    = (*this)["prefix"].string();
     }
 
     // Initialise random number generators. We initialise here one random

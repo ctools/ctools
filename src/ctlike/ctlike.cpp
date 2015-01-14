@@ -341,9 +341,6 @@ void ctlike::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * @exception GException::invalid_value
- *            Parameter "inobs" is required for ctlike.
- *
  * Get all required task parameters from the parameter file or (if specified)
  * by querying the user. Observation dependent parameters will only be read
  * if the observation container is actually empty. Observation dependent
@@ -360,21 +357,14 @@ void ctlike::save(void)
  ***************************************************************************/
 void ctlike::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Build observation container
+        // Get observation container
         m_obs = get_observations();
 
     } // endif: there was no observation in the container

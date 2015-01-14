@@ -33,6 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
+#define G_GET_PARAMETERS                          "ctmodel::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -411,13 +412,11 @@ void ctmodel::free_members(void)
  ***************************************************************************/
 void ctmodel::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
-   if (m_obs.size() == 0) {
-
-       // Build observation container
-       m_obs = get_observations();
-
-   } // endif: there was no observation in the container
+    // If there are no observations in container then load them via user
+    // parameters
+    if (m_obs.size() == 0) {
+        m_obs = get_observations();
+    }
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
@@ -441,34 +440,18 @@ void ctmodel::get_parameters(void)
         // Read cube definition file
         std::string incube = (*this)["incube"].filename();
 
-        // If no cube file has been specified then read all parameters that
-        // are necessary to create the cube from scratch (see method ctool::get_cube())
-        if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
+        // If no cube file has been specified then create a cube from
+        // the task parameters ...
+        if ((incube == "NONE") ||
+            (gammalib::strip_whitespace(incube) == "")) {
+            
+            // Create cube from scratch
+            m_cube = create_cube(m_obs);
 
-            // Get parameters
-            bool usepnt = (*this)["usepnt"].boolean();
+        }
 
-            // Initialise event cube
-            GCTAEventCube cube;
-
-            // Check if pointing should be used
-            if (usepnt) {
-
-                // buld cube from user parameters and pointing information
-                m_cube = get_cube(m_obs);
-
-            } // endif: pointing used as map center
-
-            else {
-
-                // Build cube from user parameters
-                m_cube = get_cube();
-
-            } // endelse: m_usepnt was false
-
-        } // endif: incube file was not vaild
-
-        // ... else: build map information from file
+        // ... otherwise load the cube from file and reset all bins
+        // to zero
         else {
 
             // Load cube from given file

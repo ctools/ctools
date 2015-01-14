@@ -66,18 +66,22 @@ protected:
     void            copy_members(const ctool& app);
     void            free_members(void);
     const bool&     read_ahead(void) const;
-    GCTAObservation setup_obs(void);
-    GSkymap         get_map(void);
-    GSkymap         get_map(const GObservations& obs);
-    GEbounds        get_ebounds(void);
     GObservations   get_observations(const bool& get_response = true);
-    GCTAEventCube   get_cube(void);
-    GCTAEventCube   get_cube(const GObservations& obs);
-    GSkyDir         get_mean_pointing(const GObservations& obs);
-    size_t          get_current_rss(void);
-    GCTAEventCube   set_from_cntmap(const std::string filename);
+
+    // Protected methods that create objects from user parameters
+    GEbounds        create_ebounds(void);
+    GSkymap         create_map(const GObservations& obs);
+    GCTAEventCube   create_cube(const GObservations& obs);
+    GCTAObservation create_cta_obs(void);
+
+    // Protected methods that check user parameters
+    void            require_inobs(const std::string& method);
+
+    // Protected support methods
     void            set_response(GObservations& obs);
     void            set_obs_response(GCTAObservation* obs);
+    GSkyDir         get_mean_pointing(const GObservations& obs);
+    size_t          get_current_rss(void);
 
     // Protected members
     bool           m_read_ahead; //!< Read ahead parameters

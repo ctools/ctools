@@ -34,7 +34,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
-#define G_GET_PARAMETERS          "ctbin::get_parameters()"
+#define G_GET_PARAMETERS                            "ctbin::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -386,9 +386,6 @@ void ctbin::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * @exception GException::invalid_value
- *            Parameter "inobs" is required for ctbin.
- *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Most parameters are only required if no observation exists so
  * far in the observation container. In this case, a single CTA observation
@@ -397,47 +394,22 @@ void ctbin::free_members(void)
  ***************************************************************************/
 void ctbin::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Build observation container without response (not needed)
+        // Get observation container without response (not needed)
         m_obs = get_observations(false);
 
     } // endif: there was no observation in the container
 
-    // Get parameters
-    m_usepnt = (*this)["usepnt"].boolean();
+    // Create an event cube based on task parameters
+    GCTAEventCube cube = create_cube(m_obs);
 
-    // Initialise event cube
-    GCTAEventCube cube;
-
-    // Check if pointing should be used
-    if (m_usepnt) {
-
-        // Build cube from user parameters and pointing information
-        cube = get_cube(m_obs);
-
-    } // endif: pointing used as map center
-
-    else {
-
-        // Build cube from user parameters
-        cube = get_cube();
-
-    } // endelse: m_usepnt was false
-
-    // Get the skymap and initialise the pixels
+    // Get the skymap from the cube and initialise all pixels to zero
     m_cube = cube.map();
     m_cube = 0.0;
 
@@ -453,6 +425,7 @@ void ctbin::get_parameters(void)
     // Return
     return;
 }
+
 
 /***********************************************************************//**
  * @brief Fill events into counts cube

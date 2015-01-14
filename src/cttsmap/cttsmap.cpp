@@ -470,9 +470,6 @@ void cttsmap::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- *   @exception GException::invalid_value
- *            Parameter "inobs" is required for cttsmap.
- *
  * @exception GException::invalid_value
  *            Test source not found or no RA/DEC parameters found for test
  *            source.
@@ -489,18 +486,10 @@ void cttsmap::get_parameters(void)
     // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Build observation container
+        // Get observation container
         m_obs = get_observations();
 
     } // endif: there was no observation in the container
@@ -547,23 +536,8 @@ void cttsmap::get_parameters(void)
         (*m_testsource)["DEC"].fix();
     }
 
-    // Get sky map binning from user parameters and check if pointing
-    // should be used
-    GSkymap map;
-    bool usepnt = (*this)["usepnt"].boolean();
-    if (usepnt) {
-
-       // Build cube from user parameters and pointing information
-       map = get_map(m_obs);
-
-    } // endif: pointing used as map center
-
-    else {
-
-       // Build cube from user parameters
-       map = get_map();
-
-    } // endelse: m_usepnt was false
+    // Create sky map based on task parameters
+    GSkymap map = create_map(m_obs);
 
     // Initialise maps from user parameters
     init_maps(map);

@@ -350,13 +350,9 @@ void ctexpcube::free_members(void)
 
 /***********************************************************************//**
  * @brief Get application parameters
- *  @exception GException::invalid_value
- *            Parameter "inobs" is required for ctexpcube.
  *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
- *
- * @todo Setup exposure cube from counts map
  ***************************************************************************/
 void ctexpcube::get_parameters(void)
 {
@@ -364,16 +360,8 @@ void ctexpcube::get_parameters(void)
     // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
         // Build observation container
         m_obs = get_observations();
@@ -388,27 +376,9 @@ void ctexpcube::get_parameters(void)
 
     // Check for filename validity
     if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
-    
-       // Initialise event cube
-       GCTAEventCube cube;
 
-        // Check for usepnt flag
-       bool usepnt = (*this)["usepnt"].boolean();
-
-       // Check if pointing should be used
-       if (usepnt) {
-
-           // build cube from user parameters and pointing information
-           cube = get_cube(m_obs);
-
-       } // endif: pointing used as map center
-
-       else {
-
-           // Build cube from user parameters
-           cube = get_cube();
-
-       } // endelse: m_usepnt was false
+       // Create an event cube based on task parameters
+       GCTAEventCube cube = create_cube(m_obs);
 
        // Define exposure cube
        m_expcube = GCTAExposure(cube);
@@ -418,8 +388,8 @@ void ctexpcube::get_parameters(void)
     // ... otherwise setup the exposure cube from the counts map
     else {
 
-        // Set exposure cube from counts map
-        GCTAEventCube cube = set_from_cntmap(incube);
+        // Load event cube from filename
+        GCTAEventCube cube(incube);
 
         // Define exposure cube
         m_expcube = GCTAExposure(cube);

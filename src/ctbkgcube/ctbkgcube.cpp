@@ -510,7 +510,6 @@ void ctbkgcube::free_members(void)
  * @brief Get application parameters
  *
  * @exception GException::invalid_value
- *            Parameter "inobs" is required for ctbkgcube.
  *            No background model definition XML file specified.
  *
  * Get all task parameters from parameter file or (if required) by querying
@@ -518,20 +517,12 @@ void ctbkgcube::free_members(void)
  ***************************************************************************/
 void ctbkgcube::get_parameters(void)
 {
-    // If there are no observations in container then load them via user parameters
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given, since this tool needs an observation
-        // including events
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
         // Build observation container
         m_obs = get_observations();
@@ -561,31 +552,16 @@ void ctbkgcube::get_parameters(void)
     if ((gammalib::toupper(incube) == "NONE") ||
         (gammalib::strip_whitespace(incube) == "")) {
 
-        // Check for usepnt flag
-        bool usepnt = (*this)["usepnt"].boolean();
-
-        // Check if pointing should be used
-        if (usepnt) {
-
-            // build cube from user parameters and pointing information
-            m_bkgcube = get_cube(m_obs);
-
-        } // endif: pointing used as map center
-
-        else {
-
-            // Build cube from user parameters
-            m_bkgcube = get_cube();
-
-        } // endelse: m_usepnt was false
+        // Create an event cube based on task parameters
+        m_bkgcube = create_cube(m_obs);
 
     } // endif: filename was not valid
 
     // ... otherwise setup the background cube from the counts map
     else {
     
-        // Set background cube from counts map
-        m_bkgcube = set_from_cntmap(incube);
+        // Load event cube from filename
+        m_bkgcube.load(incube);
     
     } // endelse: cube was loaded from file
 

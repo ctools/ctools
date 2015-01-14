@@ -319,9 +319,6 @@ void ctskymap::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- *  @exception GException::invalid_value
- *            Parameter "inobs" is required for ctskymap.
- *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Most parameters are only required if no observation exists so
  * far in the observation container. In this case, a single CTA observation
@@ -334,39 +331,16 @@ void ctskymap::get_parameters(void)
     // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Build observation container without response (not needed)
+        // Get observation container without response (not needed)
         m_obs = get_observations(false);
 
     } // endif: there was no observation in the container
 
-    // Get parameters
-    bool usepnt = (*this)["usepnt"].boolean();
-
-    // Check if pointing should be used
-    if (usepnt) {
-
-        // buld map from user parameters and pointing information
-        m_skymap = get_map(m_obs);
-
-    } // endif: pointing used as map center
-
-    else {
-
-        // Build cube from user parameters
-        m_skymap = get_map();
-
-    } // endelse: m_usepnt was false
+    // Create sky map based on task parameters
+    m_skymap = create_map(m_obs);
 
     // Get remaining parameters
     m_emin = (*this)["emin"].real();
@@ -380,6 +354,7 @@ void ctskymap::get_parameters(void)
     // Return
     return;
 }
+
 
 /***********************************************************************//**
  * @brief Map events into a sky map
