@@ -60,7 +60,11 @@ public:
     // Public methods
     virtual void execute(void);
 
+#ifdef SWIG
+public:
+#else
 protected:
+#endif
     // Protected methods
     void            init_members(void);
     void            copy_members(const ctool& app);
