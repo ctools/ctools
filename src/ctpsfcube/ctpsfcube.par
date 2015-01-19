@@ -18,8 +18,8 @@
 # Observational parameters
 #===================
 inobs,    f, a, "NONE",,, "Event list or observation definition file"
-incube,   f, a, "NONE",,, "Counts map for exposure cube definition"
-outcube,  f, a, "psfcube.fits",,, "Output exposure cube file"
+incube,   f, a, "NONE",,, "Counts map for psf cube definition"
+outcube,  f, a, "psfcube.fits",,, "Output psf cube file"
 caldb,    s, a, "dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"

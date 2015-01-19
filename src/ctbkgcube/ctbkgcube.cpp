@@ -256,16 +256,17 @@ void ctbkgcube::run(void)
     // container and put all removed components in the output
     // container
     int num = m_bkgmdl.size();
+
     for (int i = num-1; i >= 0; --i) {
 
         // Flag removal
         bool remove = true;
 
         // Do we have a CTA, HESS, MAGIC or VERITAS specific model?
-        if (m_bkgmdl[i]->is_valid("CTA", "") ||
-            m_bkgmdl[i]->is_valid("HESS", "") ||
-            m_bkgmdl[i]->is_valid("MAGIC", "") ||
-            m_bkgmdl[i]->is_valid("VERITAS", "")) {
+        if (m_bkgmdl[i]->instruments() == "CTA" ||
+                m_bkgmdl[i]->instruments() == "HESS" ||
+                m_bkgmdl[i]->instruments() == "MAGIC" ||
+                m_bkgmdl[i]->instruments() == "VERITAS") {
 
             // Do we have a background model?
             if (dynamic_cast<GModelData*>(m_bkgmdl[i]) != NULL) {
@@ -562,6 +563,14 @@ void ctbkgcube::get_parameters(void)
     
         // Load event cube from filename
         m_bkgcube.load(incube);
+        // Loop over all bins in background cube
+        for (int i = 0; i < m_bkgcube.size(); ++i) {
+
+            // Get event bin
+            GCTAEventBin* bin = m_bkgcube[i];
+            bin->counts(0.0);
+
+        }
     
     } // endelse: cube was loaded from file
 
@@ -589,6 +598,7 @@ void ctbkgcube::get_parameters(void)
  ***************************************************************************/
 void ctbkgcube::fill_cube(GCTAObservation* obs)
 {
+
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
