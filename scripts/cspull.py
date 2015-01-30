@@ -19,12 +19,9 @@
 #
 # ==========================================================================
 import gammalib
-#import ctools
-#import obsutils
 from ctools import obsutils
 import sys
 import csv
-#import math
 
 
 # ============ #
