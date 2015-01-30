@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTEXPCUBE_NAME    "ctexpcube"
-#define CTEXPCUBE_VERSION "00-01-00"
+#define CTEXPCUBE_VERSION "00-02-00"
 
 
 /***********************************************************************//**
@@ -67,17 +67,14 @@ protected:
     void copy_members(const ctexpcube& app);
     void free_members(void);
     void get_parameters(void);
-    void get_obs(void);
-    void set_from_cntmap(const std::string& filename);
 
     // User parameters
-    std::string   m_outfile;     //!< Output exposure cube file
+    std::string   m_outcube;     //!< Output exposure cube file
     bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
     GObservations m_obs;         //!< Observation container
     GCTAExposure  m_expcube;     //!< Exposure cube
-    GEbounds      m_ebounds;     //!< Energy boundaries
 };
 
 

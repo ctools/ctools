@@ -67,10 +67,11 @@ export PFILES=pfiles
 # Test ctobssim
 # =============
 $ECHO -n "Test ctobssim: "
+
 #
 # Run 1
-$ctobssim infile="data/crab.xml" \
-          outfile="events.fits" \
+$ctobssim inmodel="data/crab.xml" \
+          outevents="events.fits" \
           caldb="irf" \
           irf="cta_dummy_irf" \
           ra=83.63 \
@@ -90,8 +91,8 @@ else
 fi
 #
 # Run 2
-$ctobssim infile="data/model_background_cube.xml" \
-          outfile="events2.fits" \
+$ctobssim inmodel="data/model_background_cube.xml" \
+          outevents="events2.fits" \
           caldb="irf" \
           irf="cta_dummy_irf" \
           ra=84.17263 \
@@ -116,8 +117,8 @@ $ECHO " ok"
 # Test ctskymap
 # =============
 $ECHO -n "Test ctskymap: "
-$ctskymap evfile="events.fits" \
-          outfile="skymap.fits" \
+$ctskymap inobs="events.fits" \
+          outmap="skymap.fits" \
           emin=0.1 \
           emax=100.0 \
           nxpix=200 \
@@ -144,8 +145,8 @@ $ECHO " ok"
 $ECHO -n "Test ctbin: "
 #
 # Run 1
-$ctbin evfile="events.fits" \
-       outfile="cntmap.fits" \
+$ctbin inobs="events.fits" \
+       outcube="cntmap.fits" \
        emin=0.1 \
        emax=100.0 \
        enumbins=20 \
@@ -167,8 +168,8 @@ else
 fi
 #
 # Run 2
-$ctbin evfile="events2.fits" \
-       outfile="cntmap2.fits" \
+$ctbin inobs="events2.fits" \
+       outcube="cntmap2.fits" \
        emin=0.3 \
        emax=8.0 \
        enumbins=10 \
@@ -191,18 +192,19 @@ fi
 $ECHO " ok"
 
 
+
 #
 # Test ctmodel
 # ============
 $ECHO -n "Test ctmodel: "
 #
 # Run 1
-$ctmodel infile="cntmap.fits" \
-         obsfile="cntmap.fits" \
-         outfile="modmap1.fits" \
+$ctmodel inobs="cntmap.fits" \
+         incube="cntmap.fits" \
+         outcube="modmap1.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \
-         srcmdl="data/crab.xml"
+         inmodel="data/crab.xml"
 $ECHO -n "."
 if [ -s "modmap1.fits" ]
 then
@@ -213,14 +215,15 @@ else
 fi
 #
 # Run 3
-$ctmodel infile="NONE" \
-         obsfile="NONE" \
-         outfile="modmap3.fits" \
+$ctmodel inobs="NONE" \
+         incube="NONE" \
+         outcube="modmap3.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \
-         srcmdl="data/crab.xml" \
+         inmodel="data/crab.xml" \
          ra=83.63 \
          dec=22.01 \
+         rad=10.0 \
          tmin=0.0 \
          tmax=1800.0 \
          emin=0.1 \
@@ -243,12 +246,12 @@ else
 fi
 #
 # Run 2
-$ctmodel infile="cntmap2.fits" \
-         obsfile="cntmap2.fits" \
-         outfile="modmap2.fits" \
+$ctmodel inobs="cntmap2.fits" \
+         incube="cntmap2.fits" \
+         outcube="modmap2.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \
-         srcmdl="data/model_background_cube.xml"
+         inmodel="data/model_background_cube.xml"
 $ECHO -n "."
 if [ -s "modmap2.fits" ]
 then
@@ -264,8 +267,8 @@ $ECHO " ok"
 # Test ctselect
 # =============
 $ECHO -n "Test ctselect: "
-$ctselect infile="events.fits" \
-          outfile="selected_events.fits" \
+$ctselect inobs="events.fits" \
+          outobs="selected_events.fits" \
           ra=83.63 \
           dec=22.01 \
           rad=10.0 \
@@ -290,9 +293,9 @@ $ECHO " ok"
 $ECHO -n "Test ctlike: "
 #
 # Run 1
-$ctlike infile="cntmap.fits" \
-        srcmdl="data/crab.xml" \
-        outmdl="results_binned.xml" \
+$ctlike inobs="cntmap.fits" \
+        inmodel="data/crab.xml" \
+        outmodel="results_binned.xml" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -305,9 +308,9 @@ else
 fi
 #
 # Run 2
-$ctlike infile="selected_events.fits" \
-        srcmdl="data/crab.xml" \
-        outmdl="results_unbinned.xml" \
+$ctlike inobs="selected_events.fits" \
+        inmodel="data/crab.xml" \
+        outmodel="results_unbinned.xml" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -320,9 +323,9 @@ else
 fi
 #
 # Run 3
-$ctlike infile="events2.fits" \
-        srcmdl="data/model_background_cube.xml" \
-        outmdl="results_unbinned_background_cube.xml" \
+$ctlike inobs="events2.fits" \
+        inmodel="data/model_background_cube.xml" \
+        outmodel="results_unbinned_background_cube.xml" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -335,9 +338,9 @@ else
 fi
 #
 # Run 4
-$ctlike infile="cntmap2.fits" \
-        srcmdl="data/model_background_cube.xml" \
-        outmdl="results_binned_background_cube.xml" \
+$ctlike inobs="cntmap2.fits" \
+        inmodel="data/model_background_cube.xml" \
+        outmodel="results_binned_background_cube.xml" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -355,12 +358,12 @@ $ECHO " ok"
 # Test cttsmap
 # ============
 $ECHO -n "Test cttsmap: "
-$cttsmap infile="selected_events.fits" \
-         srcmdl="data/crab.xml" \
+$cttsmap inobs="selected_events.fits" \
+         inmodel="data/crab.xml" \
          srcname="Crab" \
          caldb="irf" \
          irf="cta_dummy_irf" \
-         outfile="tsmap.fits" \
+         outmap="tsmap.fits" \
          nxpix=5 \
          nypix=5 \
          binsz=0.05 \
@@ -385,9 +388,9 @@ $ECHO " ok"
 $ECHO -n "Test ctexpcube: "
 #
 # Run 1
-$ctexpcube infile="data/crab_events.fits" \
-           cntmap="NONE" \
-           outfile="expcube1.fits" \
+$ctexpcube inobs="data/crab_events.fits" \
+           incube="NONE" \
+           outcube="expcube1.fits" \
            caldb="irf" \
            irf="cta_dummy_irf" \
            emin=0.1 \
@@ -410,9 +413,9 @@ else
 fi
 #
 # Run 2
-$ctexpcube infile="data/crab_events.fits" \
-           cntmap="data/crab_cntmap.fits" \
-           outfile="expcube2.fits" \
+$ctexpcube inobs="data/crab_events.fits" \
+           incube="data/crab_cntmap.fits" \
+           outcube="expcube2.fits" \
            caldb="irf" \
            irf="cta_dummy_irf"
 $ECHO -n "."
@@ -432,9 +435,9 @@ $ECHO " ok"
 $ECHO -n "Test ctpsfcube: "
 #
 # Run 1
-$ctpsfcube infile="data/crab_events.fits" \
-           cntmap="NONE" \
-           outfile="psfcube1.fits" \
+$ctpsfcube inobs="data/crab_events.fits" \
+           incube="NONE" \
+           outcube="psfcube1.fits" \
            caldb="irf" \
            irf="cta_dummy_irf" \
            emin=0.1 \
@@ -459,9 +462,9 @@ else
 fi
 #
 # Run 2
-$ctpsfcube infile="data/crab_events.fits" \
-           cntmap="data/crab_cntmap.fits" \
-           outfile="psfcube2.fits" \
+$ctpsfcube inobs="data/crab_events.fits" \
+           incube="data/crab_cntmap.fits" \
+           outcube="psfcube2.fits" \
            caldb="irf" \
            irf="cta_dummy_irf" \
            amax=0.3 \
@@ -483,11 +486,13 @@ $ECHO " ok"
 $ECHO -n "Test ctbkgcube: "
 #
 # Run 1
-$ctbkgcube infile="data/crab_events.fits" \
+$ctbkgcube inobs="data/crab_events.fits" \
            inmodel="data/crab.xml" \
-           cntmap="NONE" \
-           outfile="bkgcube1.fits" \
+           incube="NONE" \
+           outcube="bkgcube1.fits" \
            outmodel="bkgcube1.xml" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
            emin=0.1 \
            emax=100.0 \
            enumbins=20 \
@@ -515,10 +520,12 @@ else
 fi
 #
 # Run 2
-$ctbkgcube infile="data/crab_events.fits" \
+$ctbkgcube inobs="data/crab_events.fits" \
            inmodel="data/crab.xml" \
-           cntmap="data/crab_cntmap.fits" \
-           outfile="bkgcube2.fits" \
+           incube="data/crab_cntmap.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           outcube="bkgcube2.fits" \
            outmodel="bkgcube2.xml"
 $ECHO -n "."
 if [ -s "bkgcube2.fits" ]
@@ -542,9 +549,9 @@ $ECHO " ok"
 # Test ctcubemask
 # ===============
 $ECHO -n "Test ctcubemask: "
-$ctcubemask infile="data/crab_cntmap.fits" \
+$ctcubemask inobs="data/crab_cntmap.fits" \
             regfile="data/exclusion.reg" \
-            outfile="filtered_cube.fits" \
+            outcube="filtered_cube.fits" \
             ra=83.63 \
             dec=22.01 \
             rad=2.0 \
@@ -565,8 +572,8 @@ $ECHO " ok"
 # Test ctbutterfly
 # ===============
 $ECHO -n "Test ctbutterfly: "
-$ctbutterfly infile="data/crab_events.fits.gz" \
-             srcmdl="data/crab.xml" \
+$ctbutterfly inobs="data/crab_events.fits.gz" \
+             inmodel="data/crab.xml" \
              srcname="Crab" \
              outfile="butterfly.txt" \
              caldb="irf" \

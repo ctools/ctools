@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -36,7 +36,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME    "ctcubemask"
-#define CTCUBEMASK_VERSION "00-01-00"
+#define CTCUBEMASK_VERSION "00-02-00"
 
 
 /***********************************************************************//**
@@ -78,9 +78,9 @@ protected:
                                 const std::string&     outfile) const;
 
     // User parameters
-    std::string m_infile;     //!< Input event list or XML file
+    //std::string m_infile;     //!< Input event list or XML file
 	std::string m_regfile;    //!< ds9 region file
-    std::string m_outfile;    //!< Output event list or XML file
+    std::string m_outcube;    //!< Output event list or XML file
 	std::string m_prefix;     //!< Prefix for multiple counts maps
     bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
     double      m_ra;         //!< RA of ROI centre
@@ -92,7 +92,6 @@ protected:
     // Protected members
     GObservations            m_obs;        //!< Observations container
     std::vector<std::string> m_infiles;    //!< Input event filenames
-    bool                     m_use_xml;    //!< Use XML file instead of FITS file
 };
 
 

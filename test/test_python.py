@@ -102,6 +102,7 @@ if __name__ == '__main__':
 
     # Run test suite
     success = suites.run()
+    
 
     # Save test results
     suites.save("reports/ctools.xml")

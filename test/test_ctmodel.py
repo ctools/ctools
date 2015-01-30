@@ -66,12 +66,13 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctmodel from scratch
         model = ctools.ctmodel()
-        model["infile"].filename("NONE")
-        model["outfile"].filename("modmap.fits")
-        model["srcmdl"].filename(self.model_name)
-        model["obsfile"].filename("NONE")
+        model["incube"].filename("NONE")
+        model["outcube"].filename("modmap.fits")
+        model["inmodel"].filename(self.model_name)
+        model["inobs"].filename("NONE")
         model["caldb"].string(self.caldb)
         model["irf"].string(self.irf)
+        model["rad"].real(5.0)
         model["ra"].real(83.63)
         model["dec"].real(22.01)
         model["tmin"].real(0.0)

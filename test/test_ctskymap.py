@@ -64,8 +64,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctskymap
         skymap = ctools.ctskymap()
-        skymap["evfile"].filename(self.events_name)
-        skymap["outfile"].filename("skymap.fits")
+        skymap["inobs"].filename(self.events_name)
+        skymap["outmap"].filename("skymap.fits")
         skymap["emin"].real(0.1)
         skymap["emax"].real(100.0)
         skymap["nxpix"].integer(200)

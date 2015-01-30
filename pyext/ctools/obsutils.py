@@ -42,6 +42,7 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
      binsz - Pixel size for binned simulation (deg/pixel)
      npix  - Number of pixels in X and Y for binned simulation
     """
+    
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
     sim["seed"].integer(seed)

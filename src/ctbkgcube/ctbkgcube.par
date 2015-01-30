@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctbkgcube.par                                                 #
-#  Version:   00-01-00                                                      #
+#  Version:   00-02-00                                                      #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -15,13 +15,15 @@
 #                                                                           #
 #############################################################################
 #
-# General parameters
+# Observational parameters
 #===================
-infile,   f, a, "NONE",,, "Event list or observation definition file"
+inobs,    f, a, "NONE",,, "Input event list, cube or observation definition file"
 inmodel,  f, a, "NONE",,, "Input (background) model XML file"
-cntmap,   f, a, "NONE",,, "Counts cube for background cube definition"
-outfile,  f, a, "bkgcube.fits",,, "Output background cube file"
+incube,   f, a, "NONE",,, "Counts cube for background cube definition"
+outcube,  f, a, "bkgcube.fits",,, "Output background cube file"
 outmodel, f, a, "NONE",,,"Output (background) model XML file"
+caldb,    s, a, "dummy",,, "Calibration database"
+irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 #
 # Energy binning parameters
 #==========================
@@ -33,6 +35,7 @@ ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
+usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"

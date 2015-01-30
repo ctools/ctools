@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBKGCUBE_NAME    "ctbkgcube"
-#define CTBKGCUBE_VERSION "00-01-00"
+#define CTBKGCUBE_VERSION "00-02-00"
 
 
 /***********************************************************************//**
@@ -68,11 +68,11 @@ protected:
     void copy_members(const ctbkgcube& app);
     void free_members(void);
     void get_parameters(void);
-    void get_obs(void);
-    void set_from_cntmap(const std::string& filename);
     void fill_cube(GCTAObservation* obs);
 
     // Protected members
+    std::string   m_outcube;     //!< Filename of output cube
+    std::string   m_outmodel;    //!< Filename of output XML model
     GObservations m_obs;         //!< Observation container
     GCTAEventCube m_bkgcube;     //!< Background cube
     GModels       m_bkgmdl;      //!< CTA background models

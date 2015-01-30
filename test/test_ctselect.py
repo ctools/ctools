@@ -64,8 +64,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctselect
         select = ctools.ctselect()
-        select["infile"].filename(self.events_name)
-        select["outfile"].filename("selected_events.fits")
+        select["inobs"].filename(self.events_name)
+        select["outobs"].filename("selected_events.fits")
         select["ra"].real(83.63)
         select["dec"].real(22.01)
         select["rad"].real(3.0)

@@ -17,7 +17,7 @@
 #
 # The source is modelled as a point source
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctools import *
-from gammalib import *
+import gammalib
+from ctools import obsutils
 import sys
 import csv
 import math
@@ -43,7 +43,7 @@ import math
 # ============ #
 # cssens class #
 # ============ #
-class cssens(GApplication):
+class cssens(gammalib.GApplication):
     """
     This class implements the sensitivity computation script. It derives
     from the GammaLib::GApplication class which provides support for parameter
@@ -63,9 +63,9 @@ class cssens(GApplication):
 
         # Initialise application
         if len(argv) == 0:
-            GApplication.__init__(self, self.name, self.version)
+            gammalib.GApplication.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            GApplication.__init__(self, self.name, self.version, *argv)
+            gammalib.GApplication.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
@@ -97,31 +97,31 @@ class cssens(GApplication):
         parfile = self.name+".par"
         
         try:
-            pars = GApplicationPars(parfile)
+            pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
             
             # Create default parfile
-            pars = GApplicationPars()
-            pars.append(GApplicationPar("outfile","f","h","sensitivity.dat","","","Output file name"))
-            pars.append(GApplicationPar("caldb","s","a","$CTOOLS/share/caldb/data/cta/dummy","","","Calibration database"))
-            pars.append(GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-            pars.append(GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
-            pars.append(GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
-            pars.append(GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
-            pars.append(GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
-            pars.append(GApplicationPar("rad","r","a","5.0","","","Radius of ROI (deg)"))
-            pars.append(GApplicationPar("enumbins","i","h","0","","","Number of energy bins (0=unbinned)"))
-            pars.append(GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
-            pars.append(GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
-            pars.append(GApplicationPar("sigma","r","h","5.0","","","Significance threshold"))
-            pars.append(GApplicationPar("ts_use","b","h","yes","","","Use TS?"))
-            pars.append(GApplicationPar("index","r","h","-2.48","","","Assumed spectral index"))
-            pars.append(GApplicationPar("radius","r","h","0.1","","","Extended source model radius"))
-            pars.append(GApplicationPar("width","r","h","0.05","","","Extended source model width"))
-            pars.append(GApplicationPar("max_iter","i","h","50","","","Maximum number of iterations"))
-            pars.append(GApplicationPar("num_avg","i","h","3","","","Number of iterations for sliding average"))
+            pars = gammalib.GApplicationPars()
+            pars.append(gammalib.GApplicationPar("outfile","f","h","sensitivity.dat","","","Output file name"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","$CTOOLS/share/caldb/data/cta/dummy","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
+            pars.append(gammalib.GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
+            pars.append(gammalib.GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
+            pars.append(gammalib.GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
+            pars.append(gammalib.GApplicationPar("rad","r","a","5.0","","","Radius of ROI (deg)"))
+            pars.append(gammalib.GApplicationPar("enumbins","i","h","0","","","Number of energy bins (0=unbinned)"))
+            pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
+            pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+            pars.append(gammalib.GApplicationPar("sigma","r","h","5.0","","","Significance threshold"))
+            pars.append(gammalib.GApplicationPar("ts_use","b","h","yes","","","Use TS?"))
+            pars.append(gammalib.GApplicationPar("index","r","h","-2.48","","","Assumed spectral index"))
+            pars.append(gammalib.GApplicationPar("radius","r","h","0.1","","","Extended source model radius"))
+            pars.append(gammalib.GApplicationPar("width","r","h","0.05","","","Extended source model width"))
+            pars.append(gammalib.GApplicationPar("max_iter","i","h","50","","","Maximum number of iterations"))
+            pars.append(gammalib.GApplicationPar("num_avg","i","h","3","","","Number of iterations for sliding average"))
             pars.append_standard()
             pars.save(parfile)
         
@@ -192,8 +192,8 @@ class cssens(GApplication):
         # Initialise models. Note that we centre the point source at the Galactic
         # center as our observation is also centred at the Galactic centre, so
         # we're onaxis.
-        bkg_model  = GModels()
-        full_model = GModels()
+        bkg_model  = gammalib.GModels()
+        full_model = gammalib.GModels()
         bkg_model.append(self.set_bkg_model())
         full_model.append(self.set_bkg_model())
         full_model.append(self.set_src_model(0.0, \
@@ -263,10 +263,10 @@ class cssens(GApplication):
          emax - Maximum energy [TeV] (default: 100.0)
         """
         # Allocate observation container
-        obs = GObservations()
+        obs = gammalib.GObservations()
     
         # Set single pointing
-        pntdir = GSkyDir()
+        pntdir = gammalib.GSkyDir()
         pntdir.lb_deg(lpnt, bpnt)
         
         # Create CTA observation
@@ -289,21 +289,21 @@ class cssens(GApplication):
          fitidx - Fit spectral index (default: False)
         """
         # Define radial component
-        radial = GCTAModelRadialGauss(3.0)
+        radial = gammalib.GCTAModelRadialGauss(3.0)
         
         # Define spectral component. If a background model is given then
         # use a file function. Otherwise use a static power law.
         if len(self.m_bkg) > 0:
-            spectrum = GModelSpectralFunc(self.m_bkg, 1.0)
+            spectrum = gammalib.GModelSpectralFunc(self.m_bkg, 1.0)
         else:
-            spectrum = GModelSpectralPlaw(61.8e-6, -1.85, GEnergy(1.0, "TeV"))
+            spectrum = gammalib.GModelSpectralPlaw(61.8e-6, -1.85, gammalib.GEnergy(1.0, "TeV"))
             if fitidx:
                 spectrum["Index"].free()
             else:
                 spectrum["Index"].fix()
         
         # Create background model
-        model = GCTAModelRadialAcceptance(radial, spectrum)
+        model = gammalib.GCTAModelRadialAcceptance(radial, spectrum)
         model.name("Background")
         model.instruments("CTA")
     
@@ -328,11 +328,11 @@ class cssens(GApplication):
          fitidx - Fit index? (default: False)
         """
         # Set source location
-        location = GSkyDir()
+        location = gammalib.GSkyDir()
         location.lb_deg(l, b)
     
         # Set source spectrum
-        spectrum = GModelSpectralPlaw(flux*5.7e-16, index, GEnergy(0.3, "TeV"))
+        spectrum = gammalib.GModelSpectralPlaw(flux*5.7e-16, index, gammalib.GEnergy(0.3, "TeV"))
         if fitidx:
             spectrum["Index"].free()
         else:
@@ -340,7 +340,7 @@ class cssens(GApplication):
 
         # Set source
         if type == "point":
-            spatial = GModelSpatialPointSource(location)
+            spatial = gammalib.GModelSpatialPointSource(location)
             if fitpos:
                 spatial["RA"].free()
                 spatial["DEC"].free()
@@ -348,7 +348,7 @@ class cssens(GApplication):
                 spatial["RA"].fix()
                 spatial["DEC"].fix()
         elif type == "gauss":
-            spatial = GModelSpatialRadialGauss(location, self.m_radius)
+            spatial = gammalib.GModelSpatialRadialGauss(location, self.m_radius)
             if fitpos:
                 spatial["RA"].free()
                 spatial["DEC"].free()
@@ -358,7 +358,7 @@ class cssens(GApplication):
                 spatial["DEC"].fix()
                 spatial["Sigma"].fix()
         elif type == "disk":
-            spatial = GModelSpatialRadialDisk(location, self.m_radius)
+            spatial = gammalib.GModelSpatialRadialDisk(location, self.m_radius)
             if fitpos:
                 spatial["RA"].free()
                 spatial["DEC"].free()
@@ -368,7 +368,7 @@ class cssens(GApplication):
                 spatial["DEC"].fix()
                 spatial["Radius"].fix()
         elif type == "shell":
-            spatial = GModelSpatialRadialShell(location, self.m_radius, self.m_width)
+            spatial = gammalib.GModelSpatialRadialShell(location, self.m_radius, self.m_width)
             if fitpos:
                 spatial["RA"].free()
                 spatial["DEC"].free()
@@ -382,7 +382,7 @@ class cssens(GApplication):
         else:
             self.log("ERROR: Unknown source type '"+type+"'.\n")
             return None
-        source = GModelSky(spatial, spectrum)
+        source = gammalib.GModelSky(spatial, spectrum)
     
         # Set source name
         source.name("Test")

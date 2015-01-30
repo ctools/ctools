@@ -66,9 +66,9 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctexpcube
         expcube = ctools.ctexpcube()
-        expcube["infile"].filename(self.events_name)
-        expcube["cntmap"].filename("NONE")
-        expcube["outfile"].filename("expcube.fits")
+        expcube["inobs"].filename(self.events_name)
+        expcube["incube"].filename("NONE")
+        expcube["outcube"].filename("expcube.fits")
         expcube["caldb"].string(self.caldb)
         expcube["irf"].string(self.irf)
         expcube["ebinalg"].string("LOG")

@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTMODEL_NAME    "ctmodel"
-#define CTMODEL_VERSION "00-03-00"
+#define CTMODEL_VERSION "00-04-00"
 
 
 /***********************************************************************//**
@@ -78,41 +78,16 @@ protected:
     void copy_members(const ctmodel& app);
     void free_members(void);
     void get_parameters(void);
-    void setup_obs(void);
-    void init_cube(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
     
     // User parameters
-    std::string m_infile;      //!< Input counts cube
-    std::string m_obsfile;     //!< Event list, counts map or observation definition XML file
-    std::string m_outfile;     //!< Output model cube
-    std::string m_caldb;       //!< Calibration database
-    std::string m_irf;         //!< Instrument response functions
-    std::string m_srcmdl;      //!< Source model
-    double      m_ra;          //!< RA of pointing direction
-    double      m_dec;         //!< DEC of pointing direction
-    double      m_deadc;       //!< Deadtime correction factor
-    double      m_tmin;        //!< Start time
-    double      m_tmax;        //!< Stop time
-    std::string m_ebinalg;     //!< Algorithm for energy binning
-    std::string m_ebinfile;    //!< FITS-file containing energy binning
-    double      m_emin;        //!< Lower energy
-    double      m_emax;        //!< Upper energy
-    int         m_enumbins;    //!< Number of energy bins
-    std::string m_proj;        //!< WCS projection
-    std::string m_coordsys;    //!< Coordinate system
-    double      m_xref;        //!< Longitude reference coordinate
-    double      m_yref;        //!< Latitude reference coordinate
-    double      m_binsz;       //!< Pixel size
-    int         m_nxpix;       //!< Number of pixels in longitude
-    int         m_nypix;       //!< Number of pixels in latitude
+    std::string m_outcube;     //!< Output model cube
     bool        m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
     GObservations m_obs;        //!< Observation container
     GCTAEventCube m_cube;       //!< Model cube
-    GEbounds      m_ebounds;    //!< Energy boundaries
     GGti          m_gti;        //!< Model cube GTIs
     bool          m_has_cube;   //!< Signal if cube has been set or loaded
 };
