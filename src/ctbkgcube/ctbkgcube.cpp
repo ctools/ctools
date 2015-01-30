@@ -263,10 +263,10 @@ void ctbkgcube::run(void)
         bool remove = true;
 
         // Do we have a CTA, HESS, MAGIC or VERITAS specific model?
-        if (m_bkgmdl[i]->instruments() == "CTA" ||
-                m_bkgmdl[i]->instruments() == "HESS" ||
-                m_bkgmdl[i]->instruments() == "MAGIC" ||
-                m_bkgmdl[i]->instruments() == "VERITAS") {
+        if (m_bkgmdl[i]->is_valid("CTA", "") ||
+            m_bkgmdl[i]->is_valid("HESS", "") ||
+            m_bkgmdl[i]->is_valid("MAGIC", "") ||
+            m_bkgmdl[i]->is_valid("VERITAS", "")) {
 
             // Do we have a background model?
             if (dynamic_cast<GModelData*>(m_bkgmdl[i]) != NULL) {
