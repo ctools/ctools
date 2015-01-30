@@ -17,8 +17,8 @@
 #
 # General parameters
 #===================
-evfile,  f, a, "events.fits",,,"Event data file name"
-outfile, f, a, "skymap.fits",,, "Output file name"
+inobs,  f, a, "events.fits",,,"Event data file name"
+outmap, f, a, "skymap.fits",,, "Output file name"
 #
 # Event selection parameters
 #===========================
@@ -27,6 +27,7 @@ emax, r, a, 100.0,,,"Maximum energy in TeV"
 #
 # Spatial binning parameters
 #===========================
+usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"

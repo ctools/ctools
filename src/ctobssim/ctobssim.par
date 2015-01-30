@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctobssim.par                                                  #
-#  Version:   00-08-00                                                      #
+#  Version:   00-10-00                                                      #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -17,9 +17,10 @@
 #
 # File information
 #=================
-infile, f, a, "$CTOOLS/share/models/crab.xml",,, "Model"
-outfile,f, a, "events.fits",,,        "Output event data file or observation definition file"
-prefix, s, h, "sim_events_",,,        "Prefix for event lists in observation definition file"
+inobs,     f, h, "NONE",,,"Input event list or observation definition file"
+inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Model"
+outevents, f, a, "events.fits",,,"Output event data file or observation definition file"
+prefix,    s, h, "sim_events_",,,"Prefix for event lists in observation definition file"
 #
 # Observation parameters
 #=======================

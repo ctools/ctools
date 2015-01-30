@@ -21,10 +21,7 @@
 import ctools
 import gammalib
 import sys
-import tempfile
 import os
-import math
-
 
 # ============== #
 # cstsdist class #
@@ -42,7 +39,7 @@ class csresmap(gammalib.GApplication):
         """
         # Set name
         self.name    = "csresmap"
-        self.version = "0.1.0"
+        self.version = "0.2.0"
         
         # Initialise some members
         self.obs       = None 
@@ -103,9 +100,9 @@ class csresmap(gammalib.GApplication):
             
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("infile","f","a","obs.xml","","","Observation definition"))
-            pars.append(gammalib.GApplicationPar("srcmdl","f","a","crab.xml","","","model file name"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","resmap.fits","","","Output file name"))
+            pars.append(gammalib.GApplicationPar("inobs","f","a","obs.xml","","","Observation definition"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","crab.xml","","","model file name"))
+            pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output file name"))
             pars.append(gammalib.GApplicationPar("binfile","f","h","binned.fits","","","Output binned file name"))
             pars.append(gammalib.GApplicationPar("modfile","f","h","model.fits","","","Output model file name"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
@@ -137,7 +134,7 @@ class csresmap(gammalib.GApplication):
         # Set observation if not done before
         if self.obs.size() == 0:
             
-            obsfile = self["infile"].filename()
+            obsfile = self["inobs"].filename()
             try: 
                 
                 self.obs = gammalib.GObservations(obsfile)
@@ -163,8 +160,8 @@ class csresmap(gammalib.GApplication):
         # Note that the models should be optimised for 
         # meaningful residual map    
         if self.obs.models().size() == 0:
-            self.obs.models(self["srcmdl"].filename())
-        self.m_outfile   = self["outfile"].filename()
+            self.obs.models(self["inmodel"].filename())
+        self.m_outfile   = self["outmap"].filename()
         self.m_modfile   = self["modfile"].filename()
         self.m_binfile   = self["binfile"].filename()
         self.m_xref      = self["xref"].real()

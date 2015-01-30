@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -387,8 +387,7 @@ void ctselect::save(void)
 void ctselect::init_members(void)
 {
     // Initialise parameters
-    m_infile.clear();
-    m_outfile.clear();
+    m_outobs.clear();
     m_prefix.clear();
     m_usepnt = false;
     m_ra     = -1.0;
@@ -406,12 +405,6 @@ void ctselect::init_members(void)
     m_infiles.clear();
     m_timemin.clear();
     m_timemax.clear();
-    m_use_xml = false;
-    
-    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
-    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
-    // a better mechanism to implement the CTA reference MJD.
-    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
 
     // Return
     return;
@@ -426,8 +419,7 @@ void ctselect::init_members(void)
 void ctselect::copy_members(const ctselect& app)
 {
     // Copy parameters
-    m_infile   = app.m_infile;
-    m_outfile  = app.m_outfile;
+    m_outobs  = app.m_outobs;
     m_prefix   = app.m_prefix;
     m_usepnt   = app.m_usepnt;
     m_ra       = app.m_ra;
@@ -445,8 +437,6 @@ void ctselect::copy_members(const ctselect& app)
     m_infiles    = app.m_infiles;
     m_timemin    = app.m_timemin;
     m_timemax    = app.m_timemax;
-    m_use_xml    = app.m_use_xml;
-    m_cta_ref    = app.m_cta_ref;
     
     // Return
     return;
@@ -466,7 +456,7 @@ void ctselect::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all task parameters from parameter file or (if required) by querying
+ * Get all user parameters from parameter file or (if required) by querying
  * the user. Times are assumed to be in the native CTA MJD format.
  *
  * This method also loads observations if no observations are yet allocated.
@@ -475,40 +465,15 @@ void ctselect::free_members(void)
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Get CTA event list file name
-        m_infile = (*this)["infile"].filename();
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Allocate CTA observation
-        GCTAObservation obs;
-
-        // Try first to open as FITS file
-        try {
-
-            // Load event list in CTA observation
-            obs.load(m_infile);
-
-            // Append CTA observation to container
-            m_obs.append(obs);
-
-            // Signal that no XML file should be used for storage
-            m_use_xml = false;
-            
-        }
-        
-        // ... otherwise try to open as XML file
-        catch (GException::fits_open_error &e) {
-
-            // Load observations from XML file
-            m_obs.load(m_infile);
-
-            // Signal that XML file should be used for storage
-            m_use_xml = true;
-
-        }
+        // Get observation container without response (not needed)
+        m_obs = get_observations(false);
 
     } // endif: there was no observation in the container
 
@@ -537,8 +502,8 @@ void ctselect::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
-        m_prefix  = (*this)["prefix"].string();
+        m_outobs = (*this)["outobs"].filename();
+        m_prefix = (*this)["prefix"].string();
     }
 
     // Set time interval with input times given in CTA reference
@@ -1048,7 +1013,7 @@ std::string ctselect::check_infile(const std::string& filename) const
         if (missing.size() > 0) {
             message = "The following columns are missing in the"
                       " \"EVENTS\" extension of input file \""
-                    + m_outfile + "\": ";
+                    + m_outobs + "\": ";
             for (int i = 0; i < missing.size(); ++i) {
                 message += "\"" + missing[i] + "\"";
                 if (i < missing.size()-1) {
@@ -1060,7 +1025,7 @@ std::string ctselect::check_infile(const std::string& filename) const
     }
     catch (GException::fits_hdu_not_found& e) {
         message = "No \"EVENTS\" extension found in input file \""
-                + m_outfile + "\".";
+                + m_outobs + "\".";
     }
 
     // Return
@@ -1103,13 +1068,13 @@ std::string ctselect::set_outfile_name(const std::string& filename) const
 void ctselect::save_fits(void)
 {
     // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    m_outobs = (*this)["outobs"].filename();
 
     // Get CTA observation from observation container
     GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
     // Save event list
-    save_event_list(obs, m_infiles[0], m_outfile);
+    save_event_list(obs, m_infiles[0], m_outobs);
 
     // Return
     return;
@@ -1129,14 +1094,14 @@ void ctselect::save_fits(void)
 void ctselect::save_xml(void)
 {
     // Get output filename and prefix
-    m_outfile = (*this)["outfile"].filename();
+    m_outobs = (*this)["outobs"].filename();
     m_prefix  = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outfile.substr(m_outfile.length()-4,4));
+    std::string suffix = gammalib::tolower(m_outobs.substr(m_outobs.length()-4,4));
     if (suffix != ".xml") {
         log << "*** WARNING: Name of observation definition output file \""+
-               m_outfile+"\"" << std::endl;
+               m_outobs+"\"" << std::endl;
         log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
         log << "*** WARNING: This is not an error, but might be misleading."
                " It is recommended" << std::endl;
@@ -1167,7 +1132,7 @@ void ctselect::save_xml(void)
     } // endfor: looped over observations
 
     // Save observations in XML file
-    m_obs.save(m_outfile);
+    m_obs.save(m_outobs);
 
     // Return
     return;
