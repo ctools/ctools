@@ -20,8 +20,6 @@
 inobs,  f, a, "events.fits",,,"Input event list or observation definition file"
 outobs, f, a, "selected_events.fits",,,"Output event list or observation definition file"
 prefix, s, h, "selected_",,,"Prefix for event lists in observation definition file"
-caldb,  s, h, "dummy",,, "Calibration database"
-irf,    s, h, "cta_dummy_irf",,, "Instrument response function"
 #
 # Selection parameters
 #=====================
