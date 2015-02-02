@@ -73,8 +73,8 @@ def pipeline_v1():
     # Simulate events
     sim = ctools.ctobssim()
     sim.logFileOpen()  # We need this to explicitely open the log file in Python mode
-    sim["infile"].filename(model_name)
-    sim["outfile"].filename(events_name)
+    sim["inmodel"].filename(model_name)
+    sim["outevents"].filename(events_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -94,8 +94,8 @@ def pipeline_v1():
     # Bin events into counts map
     bin = ctools.ctbin()
     bin.logFileOpen()  # We need this to explicitely open the log file in Python mode
-    bin["evfile"].filename(events_name)
-    bin["outfile"].filename(cntmap_name)
+    bin["inobs"].filename(events_name)
+    bin["outcube"].filename(cntmap_name)
     bin["ebinalg"].string("LOG")
     bin["emin"].real(emin)
     bin["emax"].real(emax)
@@ -117,9 +117,9 @@ def pipeline_v1():
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
     like.logFileOpen()  # We need this to explicitely open the log file in Python mode
-    like["infile"].filename(cntmap_name)
-    like["srcmdl"].filename(model_name)
-    like["outmdl"].filename(result_name)
+    like["inobs"].filename(cntmap_name)
+    like["inmodel"].filename(model_name)
+    like["outmodel"].filename(result_name)
     like["caldb"].string(caldb)
     like["irf"].string(irf)
     like.execute()
@@ -174,7 +174,7 @@ def pipeline_v2():
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)

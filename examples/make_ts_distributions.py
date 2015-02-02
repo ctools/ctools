@@ -12,7 +12,7 @@
 # Required 3rd party modules:
 # - processing (optional)
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2015 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctools import *
-from gammalib import *
 from cstsdist import *
 import sys
 import time

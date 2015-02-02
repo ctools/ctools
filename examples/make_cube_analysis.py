@@ -20,6 +20,7 @@
 # ==========================================================================
 import ctools
 import gammalib
+from ctools import obsutils
 
 
 # ================= #
@@ -39,10 +40,10 @@ def pipeline(caldb = "dummy", \
      model - Source model
     """
     # Set pointing pattern (4 pointings)
-    pointings = ctools.obsutils.set_obs_patterns("four", offset=2.0)
+    pointings = obsutils.set_obs_patterns("four", offset=2.0)
 
     # Set CTA observations (default: 1800 sec per pointing)
-    obs = ctools.obsutils.set_obs_list(pointings, caldb=caldb, irf=irf)
+    obs = obsutils.set_obs_list(pointings, caldb=caldb, irf=irf)
 
     # Load models
     models = gammalib.GModels(model)
@@ -56,7 +57,7 @@ def pipeline(caldb = "dummy", \
     # Run ctbin (builds stacked event cube)
     bin = ctools.ctbin(sim.obs())
     bin.logFileOpen()
-    bin["outfile"].filename("cntmap.fits")
+    bin["outcube"].filename("cntmap.fits")
     bin["ebinalg"].string("LOG")
     bin["emin"].real(0.1)
     bin["emax"].real(100.0)
@@ -74,8 +75,8 @@ def pipeline(caldb = "dummy", \
     # Run ctexpcube (builds exposure cube)
     expcube = ctools.ctexpcube(sim.obs())
     expcube.logFileOpen()
-    expcube["cntmap"].filename("cntmap.fits")
-    expcube["outfile"].filename("expcube.fits")
+    expcube["incube"].filename("cntmap.fits")
+    expcube["outcube"].filename("expcube.fits")
     expcube["caldb"].string(caldb)
     expcube["irf"].string(irf)
     expcube.execute()
@@ -83,8 +84,8 @@ def pipeline(caldb = "dummy", \
     # Run ctpsfcube (builds PSF cube)
     psfcube = ctools.ctpsfcube(sim.obs())
     psfcube.logFileOpen()
-    psfcube["cntmap"].filename("NONE")
-    psfcube["outfile"].filename("psfcube.fits")
+    psfcube["incube"].filename("NONE")
+    psfcube["outcube"].filename("psfcube.fits")
     psfcube["caldb"].string(caldb)
     psfcube["irf"].string(irf)
     psfcube["ebinalg"].string("LOG")
@@ -105,33 +106,23 @@ def pipeline(caldb = "dummy", \
     # Run ctbkgcube (builds background cube)
     bkgcube = ctools.ctbkgcube(sim.obs())
     bkgcube.logFileOpen()
-    bkgcube["cntmap"].filename("cntmap.fits")
-    bkgcube["bkgmdl"].filename(model)
-    bkgcube["outfile"].filename("bkgcube.fits")
+    bkgcube["incube"].filename("cntmap.fits")
+    bkgcube["inmodel"].filename(model)
+    bkgcube["outcube"].filename("bkgcube.fits")
+    bkgcube["outmodel"].filename("bkgcube.xml")
     bkgcube.execute()
 
     # Create observation container for stacked cube analysis
     obs.clear()
     cta = gammalib.GCTAObservation("cntmap.fits", "expcube.fits", "psfcube.fits")
     obs.append(cta)
-
-    # Create model for stacked cube analysis
-    models = gammalib.GModels(model)
-    models.remove("Background")
-    spatial    = gammalib.GModelSpatialDiffuseCube("bkgcube.fits")
-    spectral   = gammalib.GModelSpectralConst()
-    background = gammalib.GCTAModelCubeBackground(spatial, spectral)
-    models.append(background)
-    models.save("cube_model.xml")
-
-    # Append model to observation container
-    obs.models(models)
+    obs.models(gammalib.GModels("bkgcube.xml"))
 
     # Run ctlike
     like = ctools.ctlike(obs)
     like.logFileOpen()
     like["debug"].boolean(True)
-    like["outmdl"].filename("cube_results.xml")
+    like["outmodel"].filename("cube_results.xml")
     like.execute()
 
     # Return

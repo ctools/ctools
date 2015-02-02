@@ -20,6 +20,7 @@
 # ==========================================================================
 import gammalib
 import ctools
+from ctools import obsutils
 try:
 	import matplotlib.pyplot as plt
 	has_matplotlib = True
@@ -47,7 +48,7 @@ def make_spectrum():
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -65,7 +66,7 @@ def make_spectrum():
     ebounds = gammalib.GEbounds(10, e_min, e_max)
 
     # Generate spectral points
-    spectrum = ctools.obsutils.spectrum(sim.obs(), "Crab", ebounds)
+    spectrum = obsutils.spectrum(sim.obs(), "Crab", ebounds)
 	
     # Return spectrum
     return spectrum

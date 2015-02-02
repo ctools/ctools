@@ -7,7 +7,7 @@
 # Required 3rd party modules:
 # None
 #
-# Copyright (C) 2011-2014 Jurgen Knodlseder
+# Copyright (C) 2011-2015 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,9 +23,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-#from ctools import *
-#from gammalib import *
-#from math import *
 import gammalib
 import ctools
 import math
@@ -74,8 +71,8 @@ def pipeline_v1():
     # Simulate events
     sim = ctools.ctobssim()
     sim.logFileOpen()
-    sim["infile"].filename(model_name)
-    sim["outfile"].filename(events_name)
+    sim["inmodel"].filename(model_name)
+    sim["outevents"].filename(events_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -95,8 +92,8 @@ def pipeline_v1():
     # Select events
     select = ctools.ctselect()
     select.logFileOpen()
-    select["infile"].filename(events_name)
-    select["outfile"].filename(selected_events_name)
+    select["inobs"].filename(events_name)
+    select["outobs"].filename(selected_events_name)
     select["ra"].real(ra)
     select["dec"].real(dec)
     select["rad"].real(rad_select)
@@ -114,9 +111,9 @@ def pipeline_v1():
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
     like.logFileOpen()
-    like["infile"].filename(selected_events_name)
-    like["srcmdl"].filename(model_name)
-    like["outmdl"].filename(result_name)
+    like["inobs"].filename(selected_events_name)
+    like["inmodel"].filename(model_name)
+    like["outmodel"].filename(result_name)
     like["caldb"].string(caldb)
     like["irf"].string(irf)
     like.execute()
@@ -164,7 +161,7 @@ def pipeline_v2(show_data):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -210,9 +207,6 @@ def pipeline_v2(show_data):
     print("Total wall time elapsed: "+str(wall_seconds)+" seconds")
     print("Total CPU time used ...: "+str(cpu_seconds)+" seconds")
 
-    # Show model fitting results
-    #print like.obs().models()
-    
     # Optionally plot counts
     if show_data:
         if has_matplotlib:
