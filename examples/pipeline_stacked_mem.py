@@ -24,6 +24,7 @@
 # ==========================================================================
 import gammalib
 import ctools
+from ctools import obsutils
 
 
 # ================== #
@@ -50,19 +51,19 @@ def setup_observations(pattern="four", ra=83.6331, dec=22.0145, offset=1.5, \
      irf       - Instrument response function (default: cta_dummy_irf)
     """
     # Set list of observations
-    obs_def_list = ctools.obsutils.set_obs_patterns(pattern, \
-                                                    ra=ra, \
-                                                    dec=dec, \
-                                                    offset=offset)
+    obs_def_list = obsutils.set_obs_patterns(pattern, \
+                                             ra=ra, \
+                                             dec=dec, \
+                                             offset=offset)
     
     # Get observation container
-    obs = ctools.obsutils.set_obs_list(obs_def_list, \
-                                       duration=duration, \
-                                       emin=emin, \
-                                       emax=emax, \
-                                       rad=rad, \
-                                       caldb=caldb, \
-                                       irf=irf)
+    obs = obsutils.set_obs_list(obs_def_list, \
+                                duration=duration, \
+                                emin=emin, \
+                                emax=emax, \
+                                rad=rad, \
+                                caldb=caldb, \
+                                irf=irf)
 
     # Return observation container
     return obs
@@ -129,7 +130,7 @@ def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
 
     # Create exposure cube
     expcube = ctools.ctexpcube(sim.obs())
-    expcube["cntmap"].filename("NONE")
+    expcube["incube"].filename("NONE")
     expcube["ebinalg"].string("LOG")
     expcube["emin"].real(emin)
     expcube["emax"].real(emax)
@@ -146,7 +147,7 @@ def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
 
     # Create PSF cube
     psfcube = ctools.ctpsfcube(sim.obs())
-    psfcube["cntmap"].filename("NONE")
+    psfcube["incube"].filename("NONE")
     psfcube["ebinalg"].string("LOG")
     psfcube["emin"].real(emin)
     psfcube["emax"].real(emax)
@@ -163,7 +164,7 @@ def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
 
     # Create background cube
     bkgcube = ctools.ctbkgcube(sim.obs())
-    bkgcube["cntmap"].filename("NONE")
+    bkgcube["incube"].filename("NONE")
     bkgcube["ebinalg"].string("LOG")
     bkgcube["emin"].real(emin)
     bkgcube["emax"].real(emax)

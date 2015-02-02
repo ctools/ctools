@@ -55,7 +55,7 @@ def unbinned_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -124,7 +124,7 @@ def binned_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -197,7 +197,7 @@ def cube_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -225,8 +225,8 @@ def cube_pipeline(duration):
     bin.run()
 
     # Create exposure cube
-    expcube = ctools.ctexpcube(bin.obs())
-    expcube["cntmap"].filename("NONE")
+    expcube = ctools.ctexpcube(sim.obs())
+    expcube["incube"].filename("NONE")
     expcube["caldb"].string(caldb)
     expcube["irf"].string(irf)
     expcube["ebinalg"].string("LOG")
@@ -243,8 +243,8 @@ def cube_pipeline(duration):
     expcube.run()
 
     # Create PSF cube
-    psfcube = ctools.ctpsfcube(bin.obs())
-    psfcube["cntmap"].filename("NONE")
+    psfcube = ctools.ctpsfcube(sim.obs())
+    psfcube["incube"].filename("NONE")
     psfcube["caldb"].string(caldb)
     psfcube["irf"].string(irf)
     psfcube["ebinalg"].string("LOG")
