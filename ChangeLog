@@ -1,8 +1,9 @@
 2015-02-02  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
-        * Bug fix version 0.8.2 released
-        ================================
+        * Version 1.0.0 released
+        ========================
 
+        Adapt to GammaLib 1.0.0 interface
         Do not import automatically Python scripts
 
 

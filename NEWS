@@ -1,4 +1,4 @@
-New Features and Important Changes in ctools 0.8.2
+New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
@@ -7,8 +7,9 @@ Author(s) : Juergen Knoedlseder
 
 1. Introduction
 ---------------
-This document briefly summarizes executable by executable the most
-important changes made since the last release of ctools.
+This document briefly summarizes executable by executable the most important
+changes made since the last release of ctools. The code complies to GammaLib
+version 1.0.0 or above.
 
 
 2. Configuration

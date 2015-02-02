@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -44,10 +44,10 @@ public:
     virtual ~ctexpcube(void);
 
     // Methods
-    void                clear(void);
-    void                run(void);
-    void                save(void);
-    const GCTAExposure& expcube(void) const;
+    void                    clear(void);
+    void                    run(void);
+    void                    save(void);
+    const GCTACubeExposure& expcube(void) const;
 };
 
 

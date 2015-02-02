@@ -372,7 +372,7 @@ void ctpsfcube::get_parameters(void)
         GCTAEventCube cube = create_cube(m_obs);
 
         // Define psf cube
-        m_psfcube = GCTAMeanPsf(cube, amax, anumbins);
+        m_psfcube = GCTACubePsf(cube, amax, anumbins);
 
     }
 
@@ -383,7 +383,7 @@ void ctpsfcube::get_parameters(void)
         GCTAEventCube cube(incube);
 
         // Define psf cube
-        m_psfcube = GCTAMeanPsf(cube, amax, anumbins);
+        m_psfcube = GCTACubePsf(cube, amax, anumbins);
 
     } // endelse: cube loaded from file
 

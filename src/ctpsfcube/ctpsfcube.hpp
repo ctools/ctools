@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTPSFCUBE_NAME    "ctpsfcube"
-#define CTPSFCUBE_VERSION "00-02-00"
+#define CTPSFCUBE_VERSION "1.0.0"
 
 
 /***********************************************************************//**
@@ -59,7 +59,7 @@ public:
     void               clear(void);
     void               run(void);
     void               save(void);
-    const GCTAMeanPsf& psfcube(void) const;
+    const GCTACubePsf& psfcube(void) const;
 
 protected:
     // Protected methods
@@ -74,7 +74,7 @@ protected:
 
     // Protected members
     GObservations m_obs;         //!< Observation container
-    GCTAMeanPsf   m_psfcube;     //!< PSF cube
+    GCTACubePsf   m_psfcube;     //!< PSF cube
 };
 
 
@@ -84,7 +84,7 @@ protected:
  * @return PSF cube
  ***************************************************************************/
 inline
-const GCTAMeanPsf& ctpsfcube::psfcube(void) const
+const GCTACubePsf& ctpsfcube::psfcube(void) const
 {
     return (m_psfcube);
 }

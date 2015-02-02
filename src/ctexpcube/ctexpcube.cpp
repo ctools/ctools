@@ -381,7 +381,7 @@ void ctexpcube::get_parameters(void)
        GCTAEventCube cube = create_cube(m_obs);
 
        // Define exposure cube
-       m_expcube = GCTAExposure(cube);
+       m_expcube = GCTACubeExposure(cube);
 
     } // endif: filename was not valid
 
@@ -392,7 +392,7 @@ void ctexpcube::get_parameters(void)
         GCTAEventCube cube(incube);
 
         // Define exposure cube
-        m_expcube = GCTAExposure(cube);
+        m_expcube = GCTACubeExposure(cube);
 
     } // endelse: cube loaded from file
 
