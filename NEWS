@@ -1,8 +1,8 @@
-New Features and Important Changes in ctools 0.8.1
+New Features and Important Changes in ctools 0.8.2
 
 Author(s) : Juergen Knoedlseder
 
-8 January 2015
+2 February 2015
 
 
 1. Introduction
@@ -18,8 +18,11 @@ None
 
 3. Python interface
 -------------------
-Include Python wrapper files in source code distribution (they were
-missing for version 0.8.0)
+The ctools module does no longer import automatically Python scripts. This
+prevents to break the ctools interface in case that some dependencies in
+the scripts are broken. Scripts (such as obsutils, analysisutils or plotutils)
+are support scripts that may not be fully supported throughout the
+development. They may be moved into a special contributions area in the future.
 
 
 4. Support model

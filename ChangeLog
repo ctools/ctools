@@ -1,3 +1,11 @@
+2015-02-02  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+        * Bug fix version 0.8.2 released
+        ================================
+
+        Do not import automatically Python scripts
+
+
 2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Bug fix version 0.8.1 released
