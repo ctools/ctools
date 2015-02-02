@@ -2,7 +2,7 @@
 # This script provides a number of functions that are useful for handling
 # CTA observations.
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -584,7 +584,7 @@ def spectrum(obs, source, ebounds):
         select.run()
         
         # Refit and write out to spectrum
-        binlike         = fit(select.obs(), log=False, debug=False, edisp=False, tscalc=True)
+        binlike         = fit(select.obs(), log=False, debug=False, edisp=False)
         binopt_spectral = binlike.obs().models()[source].spectral()
         binflux         = binopt_spectral.eval(ecenter, gammalib.GTime(0.0))
         if binopt_spectral[normpar].value() > 0.0:
@@ -604,10 +604,6 @@ def spectrum(obs, source, ebounds):
         spec["flux"]["unit"] = "ph/cm2/s/TeV"
         
         spec["TS"]["value"].append(binlike.obs().models()[source].ts())
-    
-    # Debugging???
-    #print(spec["energy"]["value"])
-    #print(spec["flux"]["value"])
     
     # Return spectrum
     return spec
