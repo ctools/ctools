@@ -17,8 +17,8 @@
 #
 # General parameters
 #===================
-incube,   f, a, "NONE",,, "Input counts map or observation definition file"
-outcube,  f, a, "modmap.fits",,, "Output counts map or observation definition file"
+incube,   f, a, "NONE",,, "Input counts cube"
+outcube,  f, a, "modmap.fits",,, "Output counts cube or observation definition file"
 inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 #
@@ -44,7 +44,7 @@ ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
-usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
+usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
