@@ -1,3 +1,5 @@
+.. _ctobssim:
+
 ctobssim
 ========
 

@@ -1,3 +1,5 @@
+.. _ctselect:
+
 ctselect
 ========
 

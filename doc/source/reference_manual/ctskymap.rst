@@ -1,3 +1,5 @@
+.. _ctskymap:
+
 ctskymap
 ========
 

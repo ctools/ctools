@@ -1,3 +1,5 @@
+.. _ctcubemask:
+
 ctcubemask
 ==========
 
