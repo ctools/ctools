@@ -319,7 +319,7 @@ GObservations ctool::get_observations(const bool& get_response)
         // Try first to open as FITS file
         try {
 
-            // Allocate empyt CTA observation
+            // Allocate empty CTA observation
             GCTAObservation cta_obs;
 
             // Load data
@@ -707,32 +707,79 @@ void ctool::set_response(GObservations& obs)
  *
  * @param[in,out] obs CTA observation
  *
- * Set the response for a CTA observation using the "caldb" and "irf"
- * task parameters.
+ * Set the response for a CTA observation. If the CTA observation contains
+ * a counts cube the method first attempts to set the response information
+ * using the @a expcube and @a psfcube user parameters. If this is not
+ * successful (for example because the parameters do not exist or their
+ * value is NONE or blank), the method will set the response information
+ * from the @a caldb and @a irf user parameters.
  *
  * The following parameters are read:
- *      caldb - Calibration database
- *      irf - Instrument response function
+ *      expcube - Exposure cube file (optional)
+ *      psfcube - PSF cube file (optional)
+ *      caldb - Calibration database (optional)
+ *      irf - Instrument response function (optional)
  ***************************************************************************/
 void ctool::set_obs_response(GCTAObservation* obs)
 {
-    // Load response information
-    std::string database = (*this)["caldb"].string();
-    std::string irf      = (*this)["irf"].string();
+    // Initialise response flag
+    bool has_response = false;
 
-    // Set calibration database. If "database" is a valid directory then use
-    // this as the pathname to the calibration database. Otherwise, interpret
-    // "database" as the instrument name, the mission being "cta"
-    GCaldb caldb;
-    if (gammalib::dir_exists(database)) {
-        caldb.rootdir(database);
-    }
-    else {
-        caldb.open("cta", database);
-    }
+    // If the observation contains a counts cube, then first check whether
+    // the expcube and psfcube parameters exist and are not NONE
+    if (dynamic_cast<const GCTAEventCube*>(obs->events()) != NULL) {
+        if (has_par("expcube") && has_par("psfcube")) {
 
-    // Set reponse
-    obs->response(irf, caldb);
+            // Get filenames
+            std::string expcube = (*this)["expcube"].filename();
+            std::string psfcube = (*this)["psfcube"].filename();
+
+            // Extract response information if available
+            if ((expcube != "NONE") && (psfcube != "NONE") &&
+                (gammalib::strip_whitespace(expcube) != "") &&
+                (gammalib::strip_whitespace(psfcube) != "")) {
+
+                // Get exposure and PSF cubes
+                GCTACubeExposure exposure(expcube);
+                GCTACubePsf      psf(psfcube);
+
+                // Set reponse
+                obs->response(exposure, psf);
+
+                // Signal response availability
+                has_response = true;
+
+            } // endif: filenames were available
+
+        } // endif: expcube and psfcube parameters exist
+    } // endif: observation contains a counts cube
+
+    // If we have not yet response information then get it now
+    // from the caldb and irf parameters
+    if (!has_response) {
+
+        // Load response information
+        std::string database = (*this)["caldb"].string();
+        std::string irf      = (*this)["irf"].string();
+
+        // Set calibration database. If "database" is a valid directory then use
+        // this as the pathname to the calibration database. Otherwise, interpret
+        // "database" as the instrument name, the mission being "cta"
+        GCaldb caldb;
+        if (gammalib::dir_exists(database)) {
+            caldb.rootdir(database);
+        }
+        else {
+            caldb.open("cta", database);
+        }
+
+        // Set reponse
+        obs->response(irf, caldb);
+
+        // Signal response availability
+        has_response = true;
+
+    } // endif: no response information was available
 
     // Return
     return;
