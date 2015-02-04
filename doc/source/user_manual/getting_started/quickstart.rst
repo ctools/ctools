@@ -1,3 +1,5 @@
+.. _quickstart:
+
 A quick ctools tutorial
 -----------------------
 
@@ -242,7 +244,7 @@ control).
   Start value for first energy bin in TeV [0.1] 
   Stop value for last energy bin in TeV [100.0] 
   Number of energy bins [20] 
-  Output counts cube [cntmap.fits]
+  Output counts cube [cntcube.fits]
 
 The counts cube will be centred on the location of the Crab (Right Ascension
 83.63 degrees, Declination 22.01 degrees) and will be aligned in celestial
@@ -252,7 +254,7 @@ total area of 4 x 4 degrees.
 
 The counts cube will contain 20 maps, which are logarithmically spaced
 in energy, and which cover the energy range from 0.1 TeV to 100 TeV. In this
-example, the counts cube will be saved as ``cntmap.fits`` in the working
+example, the counts cube will be saved as ``cntcube.fits`` in the working
 directory. In addition to the counts cube, that is stored as the primary
 image extension, the FITS file also contains an extension named ``EBOUNDS``
 that defines the energy boundaries that were used, and an extension ``GTI``
@@ -291,8 +293,8 @@ reproduced below:
   2015-02-04T15:33:34:  Name ......................: 
   2015-02-04T15:33:34:  Identifier ................: 
   2015-02-04T15:33:34:  Instrument ................: CTA
-  2015-02-04T15:33:34:  Event file ................: events.fits
-  2015-02-04T15:33:34:  Event type ................: CountsMap
+  2015-02-04T15:33:34:  Event file ................: 
+  2015-02-04T15:33:34:  Event type ................: CountsCube
   2015-02-04T15:33:34:  Statistics ................: Poisson
   2015-02-04T15:33:34:  Ontime ....................: 1800 s
   2015-02-04T15:33:34:  Livetime ..................: 1710 s
@@ -333,7 +335,9 @@ and we do the fit by typing:
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts cube or observation definition file [events.fits] cntmap.fits
+  Event list, counts cube or observation definition file [events.fits] cntcube.fits
+  Exposure cube file [NONE] 
+  PSF cube file [NONE] 
   Calibration database [dummy] 
   Instrument response function [cta_dummy_irf] 
   Source model [$CTOOLS/share/models/crab.xml] 
@@ -695,8 +699,8 @@ the same events for both analyses.
 
 .. _sec_butterfly_cta:
 
-Calculate and visualise butterfly
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Calculating and visualising a butterfly
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To visualise the analysis results retrieved above, one can calculate the
 confidence band of the spectral fit.
