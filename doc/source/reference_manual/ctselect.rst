@@ -11,10 +11,6 @@ Creates a new FITS file of selected events from an input event list based
 on spatial, temporal, and energy cuts.
 
 
-Links
------
-
-
 General parameters
 ------------------
 

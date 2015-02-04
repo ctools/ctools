@@ -11,10 +11,6 @@ Calculates the confidence band of a spectral model, taking into account the
 covariance matrix of a likelihood fit.
 
 
-Links
------
-
-
 General parameters
 ------------------
 

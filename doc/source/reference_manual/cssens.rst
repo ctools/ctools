@@ -12,10 +12,6 @@ Crab spectra are fitted in narrow energy bins to simulated data, and the
 flux level is determined that leads to a particular significance.
 
 
-Links
------
-
-
 General parameters
 ------------------
 

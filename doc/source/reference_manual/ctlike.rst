@@ -17,10 +17,6 @@ Based on the input file format, ctlike automatically selects between binned
 and unbinned maximum likelihood analysis.
 
 
-Links
------
-
-
 General parameters
 ------------------
 

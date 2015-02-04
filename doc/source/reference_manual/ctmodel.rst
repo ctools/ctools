@@ -12,10 +12,6 @@ The counts cube is a 3-dimensional data cube spanned by Right Ascension or
 Galactic longitude, Declination or Galactic latitude, and energy.
 
 
-Links
------
-
-
 General parameters
 ------------------
 

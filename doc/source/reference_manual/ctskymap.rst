@@ -10,10 +10,6 @@ Synopsis
 This tool generates a sky map from CTA data.
 
 
-Links
------
-
-
 General parameters
 ------------------
 

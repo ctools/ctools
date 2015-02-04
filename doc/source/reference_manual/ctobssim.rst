@@ -11,10 +11,6 @@ Generate photon events from astrophysical sources and process those photons
 according to the specified instrument response functions and generate
 instrumental background events.
 
-Links
------
-
-
 General parameters
 ------------------
 

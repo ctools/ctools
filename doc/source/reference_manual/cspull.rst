@@ -14,10 +14,6 @@ For unbiased parameter estimates, the pull distribution should follow a
 Gaussian centred on 0 and a sigma parameter of 1.
 
 
-Links
------
-
-
 General parameters
 ------------------
 
