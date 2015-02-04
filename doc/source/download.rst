@@ -2,7 +2,10 @@ Download
 ========
 
 ctools can be obtained in form of releases or directly from the git 
-development repository.
+development repository. Prefer a release if you intend using ctools
+for production (and publications). Clone the code from git if you need
+the most recent code that implements new features and corrects known
+bugs.
 
 
 Releases
@@ -74,13 +77,21 @@ To clone the ctools source code, type
   
 This will create a directory named ctools under the current working directory
 that will contain the ctools source code. Before you are able to compile the
-code you need to generate the configuration file
+code you need to generate the configuration file (make sure that you're
+actually on the devel branch of the git repository):
 
 .. code-block:: bash
 
   $ cd ctools
+  $ git checkout devel
   $ ./autogen.sh
 
-Note that you need `swig <http://www.swig.org/>`_ on your system to build the
-Python wrappers as these are not stored in the Git repository (yet they are
-bundled in the releases).
+.. note::
+
+  You need `swig <http://www.swig.org/>`_ on your system to build the
+  Python wrappers when you get the code from Git. Python wrappers are
+  not stored in the Git repository but are built using
+  `swig <http://www.swig.org/>`_ from interface files located in the
+  pyext folder. However, you do not need `swig <http://www.swig.org/>`_
+  when fetching a release as the Python wrappers are bundled with the
+  release tarballs.
