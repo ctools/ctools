@@ -544,13 +544,16 @@ void ctbin::fill_cube(GCTAObservation* obs)
 void ctbin::obs_cube(void)
 {
     // If we have only a single CTA observation in the container, then
-    // keep that observation and just attach the event cube to it
+    // keep that observation and just attach the event cube to it. Reset
+    // the filename, otherwise we still will have the old event filename
+    // in the log file.
     if (m_obs.size() == 1) {
 
         // Attach event cube to CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
         if (obs != NULL) {
             obs->events(this->cube());
+            obs->eventfile("");
         }
 
     }

@@ -24,7 +24,7 @@ General parameters
 ``inobs = events.fits [file]``
     Input event list or observation definition XML file.
 
-``outcube = cntmap.fits [file]``
+``outcube = cntcube.fits [file]``
     Output counts cube file.
  	 	 
 ``ebinalg = LOG <FILE|LIN|LOG> [string]``
