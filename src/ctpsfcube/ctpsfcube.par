@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctpsfcube.par                                                 #
-#  Version:   00-02-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -18,7 +18,7 @@
 # Observational parameters
 #===================
 inobs,    f, a, "NONE",,, "Event list or observation definition file"
-incube,   f, a, "NONE",,, "Counts map for psf cube definition"
+incube,   f, a, "NONE",,, "Counts cube for psf cube definition"
 outcube,  f, a, "psfcube.fits",,, "Output psf cube file"
 caldb,    s, a, "dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
@@ -34,15 +34,15 @@ ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
-usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
-nxpix,    i, a, 200,,, "Size of the X axis in pixels"
-nypix,    i, a, 200,,, "Size of the Y axis in pixels"
-binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
+usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
+nxpix,    i, a, 10,,, "Size of the X axis in pixels"
+nypix,    i, a, 10,,, "Size of the Y axis in pixels"
+binsz,    r, a, 1.0,,, "Image scale (in degrees/pixel)"
 coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
 xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
 axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
-proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
+proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|MOL|STG|TAN"
 #
 # Angular separation binning parameters
 #======================================
