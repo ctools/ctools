@@ -35,17 +35,6 @@ except:
           'WARNING: Please install it to get fully-functional Sphinx docs.\n'
           'WARNING: https://pypi.python.org/pypi/sphinxcontrib-doxylink\n')
 
-# http://sphinx-doc.org/extensions.html#where-to-put-your-own-extensions
-#sys.path.append(os.path.abspath('exts'))
-
-# We bundled the `rawfiles` sphinx extension to copy over files on sphinx build
-# https://pypi.python.org/pypi/sphinxcontrib-rawfiles
-#extensions += ['rawfiles']
-
-# You can list any files or folders here that should be copied 1:1 to the html
-# output directory by sphinx-build
-#rawfiles = ['fhelp']
-
 # This makes it possible to cross-link to the GammaLib Sphinx docs
 # see http://sphinx-doc.org/ext/intersphinx.html
 intersphinx_mapping = dict()
@@ -160,7 +149,7 @@ html_last_updated_fmt = '%b %d, %Y'
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
-html_additional_pages = {'index': 'index.html', 'download': 'download.html'}
+html_additional_pages = {'index': 'index.html'}
 
 # If false, no module index is generated.
 html_domain_indices = False
