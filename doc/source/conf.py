@@ -36,21 +36,20 @@ except:
           'WARNING: https://pypi.python.org/pypi/sphinxcontrib-doxylink\n')
 
 # http://sphinx-doc.org/extensions.html#where-to-put-your-own-extensions
-sys.path.append(os.path.abspath('exts'))
+#sys.path.append(os.path.abspath('exts'))
 
 # We bundled the `rawfiles` sphinx extension to copy over files on sphinx build
 # https://pypi.python.org/pypi/sphinxcontrib-rawfiles
-extensions += ['rawfiles']
+#extensions += ['rawfiles']
 
 # You can list any files or folders here that should be copied 1:1 to the html
 # output directory by sphinx-build
-rawfiles = ['fhelp']
+#rawfiles = ['fhelp']
 
 # This makes it possible to cross-link to the GammaLib Sphinx docs
 # see http://sphinx-doc.org/ext/intersphinx.html
 intersphinx_mapping = dict()
 intersphinx_mapping['gammalib'] = ('http://gammalib.sourceforge.net/', None)
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

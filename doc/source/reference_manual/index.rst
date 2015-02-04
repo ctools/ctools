@@ -1,6 +1,7 @@
-ctools reference manual
-=======================
+Reference Manual
+================
 
+This manual provides reference information for all ctools and csripts.
 General information on ctools usage can be found `here <usage.html>`__.
 
 Below you find links to the command line reference for the tools and scripts
