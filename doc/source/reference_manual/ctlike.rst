@@ -22,8 +22,27 @@ and unbinned maximum likelihood analysis.
 General parameters
 ------------------
 
-``inobs [file]``
+``inobs = events.fits [file]``
     Input event list, counts cube or observation definition XML file.
+
+``inmodel = $CTOOLS/share/models/crab.xml [string]``
+    Source model input XML file.
+ 	 	 
+``expcube = NONE [file]``
+    Exposure cube file (only needed for stacked analysis).
+
+``psfcube = NONE [file]``
+    PSF cube file (only needed for stacked analysis).
+
+``caldb [string]``
+    Calibration database.
+ 	 	 
+``irf [string]``
+    Instrument response function.
+ 	 	 
+``outmodel [string]``
+    Source model result XML file with values and uncertainties updated by
+    the maximum likelihood fit.
 
 ``(stat = POISSON) [string]``
     Fitting statistics (POISSON or GAUSSIAN; only affects binned analysis).
@@ -34,18 +53,6 @@ General parameters
 ``(refit = no) [boolean]``
     Performs refitting of solution after initial fit.
  	 	 
-``caldb [string]``
-    Calibration database.
- 	 	 
-``irf [string]``
-    Instrument response function.
- 	 	 
-``inmodel [string]``
-    Source model input XML file.
- 	 	 
-``outmodel [string]``
-    Source model result XML file with values and uncertainties updated by
-    the maximum likelihood fit.
  	 	 
 
 Standard parameters
