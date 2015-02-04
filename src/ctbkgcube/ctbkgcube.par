@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctbkgcube.par                                                 #
-#  Version:   00-02-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -17,7 +17,7 @@
 #
 # Observational parameters
 #===================
-inobs,    f, a, "NONE",,, "Input event list, cube or observation definition file"
+inobs,    f, a, "NONE",,, "Input event list or observation definition file"
 inmodel,  f, a, "NONE",,, "Input (background) model XML file"
 incube,   f, a, "NONE",,, "Counts cube for background cube definition"
 outcube,  f, a, "bkgcube.fits",,, "Output background cube file"
@@ -35,7 +35,7 @@ ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
-usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
+usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
@@ -43,7 +43,7 @@ coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galac
 xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
 axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
-proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
+proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|MOL|STG|TAN"
 #
 # Standard parameters
 #====================
