@@ -14,12 +14,17 @@ ctools
    :maxdepth: 1
 
    ctbin --- Generates counts cube <ctbin>
+   ctbkgcube --- Generates background cube <ctbkgcube>
    ctbutterfly --- Compute butterfly <ctbutterfly>
+   ctcubemask --- Filter counts cube <ctcubemask>
+   ctexpcube --- Generates exposure cube <ctexpcube>
    ctlike --- Performs maximum likelihood fitting <ctlike>
    ctmodel --- Computes model counts cube <ctmodel>
    ctobssim --- Simulate CTA observations <ctobssim>
+   ctpsfcube --- Generates point spread function cube <ctpsfcube>
    ctselect --- Selects event data <ctselect>
-   ctskymap --- Generate sky map <ctskymap>
+   ctskymap --- Generates sky map <ctskymap>
+   cttsmap --- Generates Test Statistics map <cttsmap>
 
 
 cscripts
@@ -28,6 +33,8 @@ cscripts
 .. toctree::
    :maxdepth: 1
 
-   cspull --- Generate pull distribution <cspull>
+   cscaldb --- Lists available instrument response functions <cscaldb>
+   cspull --- Generates pull distribution <cspull>
    cssens --- Computes CTA sensitivity <cssens>
-   cstsdist --- Generate TS distribution <cstsdist>
+   csresmap --- Generates residual map <csresmap>
+   cstsdist --- Generates TS distribution <cstsdist>

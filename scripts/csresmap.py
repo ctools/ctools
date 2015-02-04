@@ -101,11 +101,11 @@ class csresmap(gammalib.GApplication):
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","a","obs.xml","","","Observation definition"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","crab.xml","","","model file name"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","crab.xml","","","Model file name"))
             pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output file name"))
             pars.append(gammalib.GApplicationPar("binfile","f","h","binned.fits","","","Output binned file name"))
             pars.append(gammalib.GApplicationPar("modfile","f","h","model.fits","","","Output model file name"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("emin","r","h","0.1","0.0","","Lower energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","h","100.0","0.0","","Upper energy limit (TeV)"))

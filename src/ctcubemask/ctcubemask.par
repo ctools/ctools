@@ -19,7 +19,7 @@
 #=================
 inobs,   f, a, "cntmap.fits",,,"Input counts cube or observation definition file"
 regfile, f, a, "NONE",,,"Exclusion region file in ds9 format"
-outcube, f, a, "filtered_cube.fits",,,"Output event cube or observation definition file"
+outcube, f, a, "filtered_cube.fits",,,"Output counts cube or observation definition file"
 prefix,  s, h, "filtered_",,,"Prefix for counts cube in observation definition file"
 #
 # Selection parameters

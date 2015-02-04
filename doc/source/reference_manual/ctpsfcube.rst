@@ -1,30 +1,38 @@
-ctbin
-=====
+ctpsfcube
+=========
 
-Generate a counts cube for binned maximum likelihood analysis.
+Generate a point spread function cube for binned maximum likelihood 
+analysis.
 
 
 Synopsis
 --------
 
-This tool computes the counts cube for use in a binned maximum likelihood
-analysis.
-The counts cubes are 3-dimensional data cubes spanned by Right Ascension or
-Galactic longitude, Declination or Galactic latitude, and energy.
-The energy binning may be either linear, logarithmic, or custom defined.
-If an observation definition XML file containing several observations is 
-provided on input, the tool will stack all data into a single counts cube.
+This tool generates a point spread function cube for use in a binned
+maximum likelihood analysis.
 
 
 General parameters
 ------------------
 
-``inobs = events.fits [file]``
+``inobs = NONE [file]``
     Input event list or observation definition XML file.
 
-``outcube = cntmap.fits [file]``
-    Output counts cube file.
- 	 	 
+``incube = NONE [file]``
+    Counts cube for PSF cube definition.
+
+``outcube = psfcube.fits [file]``
+    Output PSF cube file.
+
+``caldb = dummy [string]``
+    Calibration database.
+
+``irf = cta_dummy_irf [string]``
+    Response function.
+
+``(edisp = no) [boolean]``
+    Apply energy dispersion for response computation.
+
 ``ebinalg = LOG <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
@@ -34,7 +42,7 @@ General parameters
 ``emax = 100.0 [double]``
     Upper energy value for last energy bin (in TeV).
  	 	 
-``enumbins = 20 [integer]``
+``enumbins =20 [integer]``
     Number of energy bins.
  	 	 
 ``ebinfile = NONE [file]``
@@ -51,7 +59,7 @@ General parameters
  	 	 
 ``binsz = 0.02 [double]``
     Cube bin size (in degrees/pixel).
- 	 	  	 	 
+ 	 	 
 ``coordsys = CEL <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
@@ -61,11 +69,18 @@ General parameters
 ``yref = 22.01 [double]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
  	 	 
-``(axisrot = h) [double]``
+``(axisrot = 0.0) [double]``
     Rotation angle of image axes (in degrees).
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
+
+``(amax = 0.3) [double]``
+    Upper bound of angular separation between true and measued photon
+    direction (in degrees).
+
+``(anumbins = 200) [integer]``
+    Number of angular separation bins.
  	 	 
 
 Standard parameters
@@ -92,7 +107,7 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctbin.log) [string]``
+``(logfile = ctpsfcube.log) [string]``
     Name of log file.
 
 
