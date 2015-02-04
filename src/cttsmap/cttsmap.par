@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      cttsmap.par                                                   #
-#  Version:   00-02-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Michael Mayer                                                 #
 #             michael.mayer@desy.de                                         #
@@ -17,9 +17,11 @@
 #
 # General parameters
 #===================
-inobs,   f, a, "events.fits",,, "Input event list, cube or observation definition file"
+inobs,   f, a, "events.fits",,, "Input event list, counts cube or observation definition file"
 inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
 srcname, s, a, "Crab",,, "Test source"
+expcube, f, a, NONE,,, "Exposure cube file (only needed for stacked analysis)"
+psfcube, f, a, NONE,,, "PSF cube file (only needed for stacked analysis)"
 caldb,   s, a, "dummy",,, "Calibration database"
 irf,     s, a, "cta_dummy_irf",,, "Instrument response function"
 outmap,  f, a, "tsmap.fits",,, "Output Test Statistics map"

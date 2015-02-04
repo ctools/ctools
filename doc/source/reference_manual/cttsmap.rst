@@ -16,7 +16,7 @@ General parameters
 ------------------
 
 ``inobs = events [file]``
-    Input event list, cube or observation definition XML file.
+    Input event list, counts cube or observation definition XML file.
 
 ``inmodel = $CTOOLS/share/models/crab.xml [file]``
     Input source model XML file.
@@ -25,8 +25,11 @@ General parameters
     Name of the source in the source model XML file for which the Test
     Statistic map should be computed.
 
-``incube = NONE [file]``
-    Counts cube for background cube definition.
+``expcube = NONE [file]``
+    Exposure cube file (only needed for stacked analysis).
+
+``psfcube = NONE [file]``
+    PSF cube file (only needed for stacked analysis).
 
 ``caldb = dummy [string]``
     Calibration database.
@@ -60,6 +63,15 @@ General parameters
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
+
+``(binmin = -1) [integer]``
+    First bin to compute.
+
+``(binmax = -1) [integer]``
+    Last bin to compute.
+
+``(logLO = -1) [double]``
+    LogLikelihood value of null hypothesis.
  	 	 
 
 Standard parameters
