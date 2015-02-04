@@ -56,9 +56,6 @@ ctexpcube::ctexpcube(void) : ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
     // Initialise members
     init_members();
 
-    // Write header into logger
-    log_header();
-
     // Return
     return;
 }
@@ -81,9 +78,6 @@ ctexpcube::ctexpcube(const GObservations& obs) :
     // Set observations
     m_obs = obs;
 
-    // Write header into logger
-    log_header();
-
     // Return
     return;
 }
@@ -101,9 +95,6 @@ ctexpcube::ctexpcube(int argc, char *argv[]) :
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
