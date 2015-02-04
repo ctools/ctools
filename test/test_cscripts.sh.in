@@ -49,7 +49,7 @@ export PFILES=pfiles
 #
 # Test cspull
 # ===========
-$ECHO @ECHO_N@ "Test cspull: "
+$ECHO -n "Test cspull: "
 chmod +x @abs_top_srcdir@/scripts/cspull.py
 @abs_top_srcdir@/scripts/cspull.py \
   inmodel="data/crab.xml" \
@@ -67,10 +67,10 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cspull.log
-$ECHO @ECHO_N@ "."
+$ECHO -n "."
 if [ -s "pull.dat" ]
 then
-  $ECHO @ECHO_N@ "."
+  $ECHO -n "."
 else
   $ECHO " pull.dat file is not valid"
   exit 1
@@ -81,7 +81,7 @@ $ECHO " ok"
 #
 # Test cssens
 # ===========
-#echo @ECHO_N@ "Test cssens: "
+#$ECHO -n "Test cssens: "
 #chmod +x @abs_top_srcdir@/scripts/cssens.py
 #@abs_top_srcdir@/scripts/cssens.py \
 #  duration=3600.0 \
@@ -94,7 +94,7 @@ $ECHO " ok"
 #echo @ECHO_N@ "."
 #if [ -s "sensitivity.dat" ]
 #then
-#  echo @ECHO_N@ "."
+#  $ECHO -n "."
 #else
 #  echo " sensitivity.dat file is not valid"
 #  exit 1
@@ -105,7 +105,7 @@ $ECHO " ok"
 #
 # Test cstsdist
 # =============
-$ECHO @ECHO_N@ "Test cstsdist: "
+$ECHO -n "Test cstsdist: "
 chmod +x @abs_top_srcdir@/scripts/cstsdist.py
 @abs_top_srcdir@/scripts/cstsdist.py \
   outfile="ts.dat" \
@@ -122,10 +122,10 @@ chmod +x @abs_top_srcdir@/scripts/cstsdist.py
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cstsdist.log
-$ECHO @ECHO_N@ "."
+$ECHO -n "."
 if [ -s "ts.dat" ]
 then
-  $ECHO @ECHO_N@ "."
+  $ECHO -n "."
 else
   $ECHO " ts.dat file is not valid"
   exit 1
@@ -135,7 +135,7 @@ $ECHO " ok"
 #
 # Test csresmap
 # =============
-$ECHO @ECHO_N@ "Test csresmap: "
+$ECHO -n "Test csresmap: "
 chmod +x @abs_top_srcdir@/scripts/csresmap.py
 @abs_top_srcdir@/scripts/csresmap.py \
   inobs="data/crab_events.fits" \
@@ -151,10 +151,10 @@ chmod +x @abs_top_srcdir@/scripts/csresmap.py
   yref=22.01 \
   proj="CAR" \
   binsz=0.05 > csresmap.log
-$ECHO @ECHO_N@ "."
+$ECHO -n "."
 if [ -s "resmap.fits" ]
 then
-  $ECHO @ECHO_N@ "."
+  $ECHO -n "."
 else
   $ECHO " resmap.fits file is not valid"
   exit 1
