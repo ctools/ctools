@@ -8,6 +8,7 @@ here now some chapters to read if you intend to do more complex
 analyses.
 Once you have gone through these chapters you should have a pretty complete
 picture about the capabilities of ctools.
+And you should be ready for doing your own cutting edge analyses.
 
 .. toctree::
    :maxdepth: 2
@@ -17,6 +18,7 @@ picture about the capabilities of ctools.
    beyond_tsmap
    beyond_residual
    beyond_irf
+   beyond_model
 
 
 
