@@ -14,6 +14,8 @@ here now some information on how to make more complex analyses:
 
 - :ref:`sec_residual`
 
+- :ref:`sec_connecting_irf`
+
 
 .. _sec_combining_obs:
 
@@ -648,3 +650,27 @@ Obviously, the map is free from any significant residuals.
    :width: 60%
 
    *Residual map of the Crab region*
+
+
+.. _sec_connecting_irf:
+
+Connecting observations to dedicated instrument response functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   Download the :download:`calibration database <caldb.tar.gz>`.
+
+
+So far a single instrument response function was used for all observations
+in our analysis examples.
+We always used the instrument response function ``cta_dummy_irf`` that
+is located in the calibration database ``dummy``.
+When combining multiple observations in a joint analysis we may have
+the need to specify dedicated instrument response functions for each
+observations.
+This can be done 
+
+
+
+

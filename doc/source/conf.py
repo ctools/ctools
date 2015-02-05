@@ -35,6 +35,11 @@ except:
           'WARNING: Please install it to get fully-functional Sphinx docs.\n'
           'WARNING: https://pypi.python.org/pypi/sphinxcontrib-doxylink\n')
 
+# Raw files to be copied over
+#sys.path.append(os.path.abspath('exts'))
+#extensions = ['rawfiles']
+#rawfiles   = ['user_manual/getting_started/caldb.tar.gz']
+
 # This makes it possible to cross-link to the GammaLib Sphinx docs
 # see http://sphinx-doc.org/ext/intersphinx.html
 intersphinx_mapping = dict()
