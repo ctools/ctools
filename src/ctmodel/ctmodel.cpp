@@ -427,14 +427,10 @@ void ctmodel::get_parameters(void)
 
     } // endif: there were no models
 
-    // Read optionally output cube filenames
-    if (read_ahead()) {
-           m_outcube = (*this)["outcube"].filename();
-    }
-
     // Get energy dispersion flag parameters
     m_apply_edisp = (*this)["edisp"].boolean();
 
+    // Optionally get input counts cube for model cube definition
     if (!m_has_cube) {
 
         // Read cube definition file
@@ -465,6 +461,11 @@ void ctmodel::get_parameters(void)
 
         // Signal that cube has been set
         m_has_cube = true;
+    }
+
+    // Read optionally output cube filenames
+    if (read_ahead()) {
+           m_outcube = (*this)["outcube"].filename();
     }
 
     // Return

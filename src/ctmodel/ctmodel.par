@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctmodel.par                                                   #
-#  Version:   00-04-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -18,14 +18,16 @@
 # General parameters
 #===================
 incube,   f, a, "NONE",,, "Input counts cube"
-outcube,  f, a, "modmap.fits",,, "Output counts cube or observation definition file"
 inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+outcube,  f, a, "modcube.fits",,, "Output model cube"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 #
 # Observation parameters
 #=======================
-inobs,    f, a, "NONE",,, "Input event list, cube or observation definition file"
-caldb,    s, a, "$CTOOLS/share/caldb/data/cta/dummy",,, "Calibration database"
+inobs,    f, a, "NONE",,, "Input event list, counts cube or observation definition file"
+expcube,  f, a, NONE,,, "Exposure cube file (only needed for stacked analysis)"
+psfcube,  f, a, NONE,,, "PSF cube file (only needed for stacked analysis)"
+caldb,    s, a, "dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 ra,       r, a, 83.63,0,360, "RA of pointing (degrees)"
 dec,      r, a, 22.01,-90,90, "Dec of pointing (degrees)"

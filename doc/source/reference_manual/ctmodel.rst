@@ -18,20 +18,30 @@ General parameters
 ------------------
 
 ``incube [file]``
-    Input counts cube. If the parameter is not NONE or blank, the specified
-    counts cube will be used to define the dimensions of the model cube.
- 	 	 
-``outcube [file]``
-    Output model counts cube.
- 	 	 
+    Input counts cube. If a filename is given the counts cube will be
+    used to define the dimensions of the model cube. The content of
+    the counts cube is not relevant.
+
 ``inmodel [string]``
     Source model XML file.
 
+``outcube [file]``
+    Output model counts cube.
+ 	 	 
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation.
 
 ``inobs [file]``
     Input event list, counts cube or observation definition XML file.
+    This information is needed to determine the observation information
+    (number of observations, duration, liftime, pointing, eventually
+    observation specific instrument response functions, etc.).
+
+``expcube = NONE [file]``
+    Exposure cube file (only needed for stacked analysis).
+
+``psfcube = NONE [file]``
+    PSF cube file (only needed for stacked analysis).
 
 ``caldb [string]``
     Calibration database.
