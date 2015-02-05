@@ -336,8 +336,8 @@ and we do the fit by typing:
 
   $ ctlike
   Event list, counts cube or observation definition file [events.fits] cntcube.fits
-  Exposure cube file [NONE] 
-  PSF cube file [NONE] 
+  Exposure cube file (only needed for stacked analysis) [NONE] 
+  PSF cube file (only needed for stacked analysis) [NONE] 
   Calibration database [dummy] 
   Instrument response function [cta_dummy_irf] 
   Source model [$CTOOLS/share/models/crab.xml] 
@@ -361,7 +361,7 @@ the XML result file that has been produced by the run:
 
   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
   <source_library title="source library">
-    <source name="Crab" type="PointSource" tscalc="0">
+    <source name="Crab" type="PointSource">
       <spectrum type="PowerLaw">
         <parameter name="Prefactor" value="6.07928" error="0.204582" scale="1e-16" min="1e-07" max="1000" free="1" />
         <parameter name="Index" value="2.5009" error="0.0252057" scale="-1" min="0" max="5" free="1" />
@@ -386,20 +386,6 @@ In this example, the ``Prefactor`` and ``Index`` of the spectral model for the
 Crab as well as the ``Normalization`` and ``Sigma`` parameter of the radial
 acceptance model have been fitted (all parameters having the attribute 
 ``free="1"`` are fitted).
-
-.. note::
-
-   You may have noticed that the Crab source contains an additional
-   ``tscalc`` attribute in the XML result file. This attribute can be
-   used to instruct :ref:`ctlike` to compute the Test Statistics
-   (which is a measure of the detection significance) of the source.
-   To do so, add ``tscalc="1"`` to the XML file on input
-   and then re-run :ref:`ctlike`. This will then give the following result:
-
-   .. code-block:: xml
-
-      <source name="Crab" type="PointSource" ts="6875.350" tscalc="1">
-
 
 To get more details about the model fitting you can inspect the log file.
 Below the last lines of the ctlike.log log file that has been produced by
@@ -489,6 +475,42 @@ are not too far of the best fitting values).
    small, in particular if the source model is too constrained. You may 
    then free some of the model parameters so that the fit can correctly
    describe the data.
+
+.. note::
+
+   The :ref:`ctlike` tool has the ability to estimate the detection 
+   significance for sources in the XML model. This is done by computing
+   the Test Statistic value which is defined as twice the log-likelihood
+   difference between fitting a source at a given position on top of a 
+   (background) model or fitting no source. Roughly speaken, the square
+   root of the Test Statistic value gives the source detection significance
+   in Gaussian sigmas, although the exact relation depends somewhat on
+   the formulation of the statistical problem.
+
+   To instruct :ref:`ctlike` to compute the Test Statistic value for a
+   given source you need to add the attribute ``tscalc="1"`` to the XML
+   file:
+
+   .. code-block:: xml
+
+      <source name="Crab" type="PointSource" tscalc="1">
+
+   :ref:`ctlike` will then compute the Test Statistic value for that
+   source and dump the result in the log file:
+
+   .. code-block:: xml
+
+      2015-02-05T08:29:07: === GModelSky ===
+      2015-02-05T08:29:07:  Name ......................: Crab
+      2015-02-05T08:29:07:  Instruments ...............: all
+      2015-02-05T08:29:07:  Test Statistic ............: 6875.35
+
+   The Test Statistic value will also be added as new attribute
+   ``ts`` to the XML result file:
+
+   .. code-block:: xml
+
+      <source name="Crab" type="PointSource" ts="6875.350" tscalc="1">
 
 
 .. _sec_unbinned_cta:
