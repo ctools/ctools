@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBUTTERFLY_NAME    "ctbutterfly"
-#define CTBUTTERFLY_VERSION "00-02-00"
+#define CTBUTTERFLY_VERSION "1.0.0"
 
 
 /***********************************************************************//**

@@ -25,6 +25,12 @@ General parameters
 ``srcname [string]``
     Name of model component for which butterfly should be computed.
  	 	 
+``expcube = NONE [file]``
+    Exposure cube file (only needed for stacked analysis).
+
+``psfcube = NONE [file]``
+    PSF cube file (only needed for stacked analysis).
+
 ``caldb [string]``
     Calibration database.
  	 	 
