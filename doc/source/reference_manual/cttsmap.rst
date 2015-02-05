@@ -38,7 +38,7 @@ General parameters
     Response function.
 
 ``outmap = tsmap.fits [file]``
-    Output Test Statistics map file.
+    Output Test Statistic map file.
  	 	 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for map centre instead of xref/yref parameters?
