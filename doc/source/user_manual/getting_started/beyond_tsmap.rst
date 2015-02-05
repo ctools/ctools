@@ -53,7 +53,8 @@ The figure below show the Test Statistic map which reaches a maximum
 value of 13782 near the centre of the map.
 
 .. figure:: tsmap-crab.png
-   :width: 60%
+   :height: 400px
+   :align: center
 
    *Test Statistic map of the Crab region*
 

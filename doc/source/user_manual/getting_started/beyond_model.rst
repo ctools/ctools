@@ -86,10 +86,10 @@ times larger background rate that was used in the simulation of the
 associated data.
 
 .. figure:: resmap-bkg.png
-     :height: 400px
-     :align: center
+   :height: 400px
+   :align: center
 
-     *Residual map of two jointly analysed observations offset by +/- 2 degrees*
+   *Residual map of two jointly analysed observations offset by +/- 2 degrees*
 
 The scheme is even more versatile in that it allows to connect a given 
 model component to several specific observations.

@@ -264,7 +264,8 @@ for each energy bin, while the ``GTI`` table has just a single row, indicating
 the start and stop time of the simulated data.
 
 .. figure:: cntmap-fits.jpg
-   :width: 100%
+   :width: 600px
+   :align: center
 
    *Counts cube FITS file*
 
@@ -273,7 +274,8 @@ An image of the first bin, covering the energy range 100 - 141 GeV, is
 shown below:
 
 .. figure:: cntmap-map.jpg
-   :width: 50%
+   :height: 400px
+   :align: center
 
    *Counts cube for first energy bin*
 
@@ -569,7 +571,8 @@ selection keywords that have been written to the ``EVENTS`` header in the
 file ``selected_events.fits``:
 
 .. figure:: dskeys.jpg
-   :width: 60%
+   :width: 400px
+   :align: center
 
    *Data selection keywords*
 
@@ -758,7 +761,8 @@ to make this work. To launch the script, type:
 This will result in a canvas which should look like the following:
 
 .. figure:: butterfly.jpg
-   :width: 60%
+   :height: 400px
+   :align: center
 
    *Confidence band of the fit*
  

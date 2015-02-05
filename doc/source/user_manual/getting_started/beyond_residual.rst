@@ -42,7 +42,8 @@ kernel of 3 pixels to enhance features, is shown in the following figure.
 Obviously, the map is free from any significant residuals.
 
 .. figure:: resmap-crab.png
-   :width: 60%
+   :height: 400px
+   :align: center
 
    *Residual map of the Crab region*
 
