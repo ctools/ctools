@@ -4,7 +4,10 @@ Beyond the first steps
 ----------------------
 
 Assuming that you have read the :ref:`quickstart <quickstart>` tutorial,
-here now some information on how to make more complex analyses:
+here now some chapters to read if you intend to do more complex
+analyses.
+Once you have gone through these chapters you should have a pretty complete
+picture about the capabilities of ctools.
 
 .. toctree::
    :maxdepth: 2
