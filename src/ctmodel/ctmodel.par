@@ -24,7 +24,7 @@ edisp,    b, h, no,,, "Apply energy dispersion?"
 #
 # Observation parameters
 #=======================
-inobs,    f, a, "NONE",,, "Input event list, counts cube or observation definition file"
+inobs,    f, a, "NONE",,, "Event list, counts cube or observation definition file"
 expcube,  f, a, NONE,,, "Exposure cube file (only needed for stacked analysis)"
 psfcube,  f, a, NONE,,, "PSF cube file (only needed for stacked analysis)"
 caldb,    s, a, "dummy",,, "Calibration database"
