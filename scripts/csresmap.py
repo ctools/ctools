@@ -118,7 +118,7 @@ class csresmap(gammalib.GApplication):
             pars.append(gammalib.GApplicationPar("nxpix","i","h","200","","","Size of the X axis in pixels"))
             pars.append(gammalib.GApplicationPar("nypix","i","h","200","","","Size of the Y axis in pixels"))
             pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("algorithm","s","h","SUBDIV","SUB|SUBDIV|SUBDIVSQRT","","Residual map computation algorithm"))
+            pars.append(gammalib.GApplicationPar("algorithm","s","h","SUB","SUB|SUBDIV|SUBDIVSQRT","","Residual map computation algorithm"))
             pars.append_standard()
             pars.save(parfile)
         
