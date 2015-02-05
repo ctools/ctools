@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script dumps all available calibrations into the console.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ class cscaldb(gammalib.GApplication):
             
                 # Write mission into logger
                 if self.logTerse():
-                    self.log.header3("Calibration: "+instrument)
+                    self.log.header3("Response functions in database \""+instrument+"\"")
 
                 # Open calibration index file
                 cifname = caldb.rootdir()+"/data/"+mission+"/"+instrument+"/caldb.indx"
