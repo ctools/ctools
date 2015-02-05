@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all ctools
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -202,6 +202,8 @@ $ECHO -n "Test ctmodel: "
 $ctmodel inobs="cntmap.fits" \
          incube="cntmap.fits" \
          outcube="modmap1.fits" \
+         expcube="NONE" \
+         psfcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          inmodel="data/crab.xml"
@@ -249,6 +251,8 @@ fi
 $ctmodel inobs="cntmap2.fits" \
          incube="cntmap2.fits" \
          outcube="modmap2.fits" \
+         expcube="NONE" \
+         psfcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          inmodel="data/model_background_cube.xml"
@@ -296,6 +300,8 @@ $ECHO -n "Test ctlike: "
 $ctlike inobs="cntmap.fits" \
         inmodel="data/crab.xml" \
         outmodel="results_binned.xml" \
+        expcube="NONE" \
+        psfcube="NONE" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -341,6 +347,8 @@ fi
 $ctlike inobs="cntmap2.fits" \
         inmodel="data/model_background_cube.xml" \
         outmodel="results_binned_background_cube.xml" \
+        expcube="NONE" \
+        psfcube="NONE" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."

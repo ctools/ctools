@@ -27,7 +27,7 @@ emax, r, a, 100.0,,,"Maximum energy in TeV"
 #
 # Spatial binning parameters
 #===========================
-usepnt,   b, h,    no,,, "Use pointing instead of xref/yref parameters?"
+usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
