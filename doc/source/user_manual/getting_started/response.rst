@@ -1,3 +1,5 @@
+.. _response:
+
 CTA Instrument Response Functions
 ---------------------------------
 
