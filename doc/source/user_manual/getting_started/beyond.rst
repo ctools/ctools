@@ -4,8 +4,7 @@ Beyond the first steps
 ----------------------
 
 Assuming that you have read the :ref:`quickstart <quickstart>` tutorial,
-here now some information on how to make the following more complex 
-analyses:
+here now some information on how to make more complex analyses:
 
 - :ref:`sec_combining_obs`
 
@@ -537,22 +536,22 @@ Real life situations may of course require larger correction factors.
 
 .. _sec_tsmap:
 
-Generating a Test Statistics map
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generating a Test Statistic map
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the above examples we were always considering that we knew exactly
 where the source is located, but in real life situations this may not
 necessarily be the case.
 We thus need a mean to search for significant excess emission in our data.
-One possibility to accomplish this task is to compute the Test Statistics
+One possibility to accomplish this task is to compute the Test Statistic
 for a specific source at a grid of trial positions.
 The :ref:`cttsmap` tool will exactly do that job.
-The Test Statistics is defined as twice the log-likelihood difference 
+The Test Statistic is defined as twice the log-likelihood difference 
 between fitting a source at a given position on top of a model or fitting
 no source.
-Roughly speaken, the square root of the Test Statistics value gives
+Roughly speaken, the square root of the Test Statistic value gives
 the source detection significance in Gaussian sigmas, although the
-exact releation depends somewhat on the formulation of the statistical
+exact relation depends somewhat on the formulation of the statistical
 problem.
 
 Here an example where we apply the :ref:`cttsmap` tool to our two
@@ -580,19 +579,19 @@ nominal position of the Crab nebula with a grid spacing of 0.02 degrees.
   Image scale (in degrees/pixel) [0.02] 
   Size of the X axis in pixels [200] 10
   Size of the Y axis in pixels [200] 10
-  Output Test Statistics map [tsmap.fits]
+  Output Test Statistic map [tsmap.fits]
 
-:ref:`cttsmap` writes the Test Statistics map in the ``tsmap.fits`` file
-that contains one extension for the Test Statistics value and further
+:ref:`cttsmap` writes the Test Statistic map in the ``tsmap.fits`` file
+that contains one extension for the Test Statistic value and further
 extensions for the spectral parameters that have been fitted for the
 source at each position of the grid.
-The figure below show the Test Statistics map which reaches a maximum
+The figure below show the Test Statistic map which reaches a maximum
 value of 13782 near the centre of the map.
 
 .. figure:: tsmap-crab.png
    :width: 60%
 
-   *Test Statistics map of the Crab region*
+   *Test Statistic map of the Crab region*
 
 .. note::
 
@@ -607,4 +606,21 @@ value of 13782 near the centre of the map.
 Generating a residual map
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBW
+.. code-block:: bash
+
+  $ csresmap
+  Parfile csresmap.par not found. Create default parfile.
+  Event list, counts cube, or observation definition file [events.fits] obs.xml
+  Calibration database [dummy] 
+  Instrument response function [cta_dummy_irf] 
+  Source model [$CTOOLS/share/models/crab.xml] crab_results.xml
+  Output residual map [resmap.fits] 
+  First coordinate of image center in degrees (RA or galactic l) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) [22.01] 
+  Coordinate System (CEL|GAL) [CEL] 
+  Projection method e.g. AIT|AZP|CAR|MER|MOL|STG|TAN (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
+
+.. figure:: resmap-crab.png
+   :width: 60%
+
+   *Residual map of the Crab region*
