@@ -3,7 +3,7 @@
 # This script performs an unbinned maximum likelihood analysis for a
 # variety of models. This allows checking the models.
 #
-# Copyright (C) 2011-2012 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctools import *
-from gammalib import *
-from math import *
-import os
-import glob
+import gammalib
+import ctools
 import sys
 
 
@@ -39,7 +36,7 @@ def pipeline(model_name):
 	FITS files on disk. All data is only hold in memory.
 	"""
 	# Set script parameters
-	caldb       = "irf"
+	caldb       = "dummy"
 	irf         = "cta_dummy_irf"
 	ra          =   83.63
 	dec         =   22.01
@@ -51,15 +48,15 @@ def pipeline(model_name):
 	rad_select  =    3.0
 
 	# Write model name
-	print("Model: "+model_name)
+	print("*** Model: "+model_name+" ************************************")
 
 	# Initialise timing
 	wall_seconds = 0.0
 	cpu_seconds  = 0.0
 
 	# Simulate events
-	sim = ctobssim()
-	sim["infile"].filename(model_name)
+	sim = ctools.ctobssim()
+	sim["inmodel"].filename(model_name)
 	sim["caldb"].string(caldb)
 	sim["irf"].string(irf)
 	sim["ra"].real(ra)
@@ -72,7 +69,7 @@ def pipeline(model_name):
 	sim.run()
 
 	# Select events
-	select = ctselect(sim.obs())
+	select = ctools.ctselect(sim.obs())
 	select["ra"].real(ra)
 	select["dec"].real(dec)
 	select["rad"].real(rad_select)
@@ -83,7 +80,7 @@ def pipeline(model_name):
 	select.run()
 
 	# Perform maximum likelihood fitting
-	like = ctlike(select.obs())
+	like = ctools.ctlike(select.obs())
 	like.run()
 
 	# Show model fitting results
