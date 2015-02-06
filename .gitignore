@@ -69,3 +69,4 @@ test/butterfly.txt
 examples/*.fits
 examples/*.xml
 examples/*.dat
+examples/ctools
