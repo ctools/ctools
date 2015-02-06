@@ -26,11 +26,11 @@ edisp,    b, h, no,,, "Apply energy dispersion?"
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, h, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
-emin,     r, a,  0.1,,,"Start value for first energy bin in TeV"
-emax,     r, a, 100.0,,,"Stop value for last energy bin in TeV"
-enumbins, i, a, 20,,,"Number of energy bins"
-ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
+ebinalg,  s, h, "LOG", FILE|LIN|LOG,, "Algorithm for defining energy bins"
+emin,     r, a, 0.1,,, "Start value for first energy bin in TeV"
+emax,     r, a, 100.0,,, "Stop value for last energy bin in TeV"
+enumbins, i, a, 20,,, "Number of energy bins"
+ebinfile, f, h, "NONE",,, "Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
@@ -39,15 +39,14 @@ nxpix,    i, a, 10,,, "Size of the X axis in pixels"
 nypix,    i, a, 10,,, "Size of the Y axis in pixels"
 binsz,    r, a, 1.0,,, "Image scale (in degrees/pixel)"
 coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
-xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
-yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
-axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
-proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|MOL|STG|TAN"
+xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
+yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
+proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 #
 # Angular separation binning parameters
 #======================================
-amax,     r, h,  0.3,,, "Upper bound of angular separation between true and measued photon direction (degrees)"
-anumbins, i, h, 200,,,  "Number of angular separation bins"
+amax,     r, h, 0.3,0,, "Upper bound of angular separation between true and measued photon direction (degrees)"
+anumbins, i, h, 200,,, "Number of angular separation bins"
 #
 # Standard parameters
 #====================

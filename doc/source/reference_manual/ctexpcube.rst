@@ -43,7 +43,7 @@ General parameters
 ``emax = 100.0 [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
-``enumbins =20 [integer]``
+``enumbins = 20 [integer]``
     Number of energy bins.
  	 	 
 ``ebinfile = NONE [file]``
@@ -69,9 +69,6 @@ General parameters
  	 	 
 ``yref = 22.01 [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
- 	 	 
-``(axisrot = 0.0) [real]``
-    Rotation angle of image axes (in degrees).
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.

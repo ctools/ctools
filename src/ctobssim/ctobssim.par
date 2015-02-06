@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctobssim.par                                                  #
-#  Version:   00-10-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -17,28 +17,28 @@
 #
 # File information
 #=================
-inobs,     f, h, "NONE",,,"Input event list or observation definition file"
+inobs,     f, h, "NONE",,, "Input event list or observation definition file"
 inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Model"
-outevents, f, a, "events.fits",,,"Output event data file or observation definition file"
-prefix,    s, h, "sim_events_",,,"Prefix for event lists in observation definition file"
+outevents, f, a, "events.fits",,, "Output event data file or observation definition file"
+prefix,    s, h, "sim_events_",,, "Prefix for event lists in observation definition file"
 #
 # Observation parameters
 #=======================
-caldb, s, a, "dummy",,,    "Calibration database"
+caldb, s, a, "dummy",,, "Calibration database"
 irf,   s, a, "cta_dummy_irf",,, "Instrument response function"
 #
 # Simulation parameters
 #======================
-seed,   i, h,        1,    ,   , "Random number generator seed"
-ra,     r, a,    83.63,   0,360, "RA of pointing (degrees)"
-dec,    r, a,    22.01, -90, 90, "Dec of pointing (degrees)"
-rad,    r, a,     5.0,    0,180, "Radius of FOV (degrees)"
-tmin,   r, a,     0.0,    0,   , "Start time (MET in s)"
-tmax,   r, a,  1800.0,    0,   , "End time (MET in s)"
-emin,   r, a,     0.1,    0,   , "Lower energy limit (TeV)"
-emax,   r, a,   100.0,    0,   , "Upper energy limit (TeV)"
-edisp,  b, h,      no,     ,   , "Apply energy dispersion?"
-deadc,  r, h,    0.95,    0,  1, "Average deadtime correction factor"
+seed,   i, h, 1,,, "Random number generator seed"
+ra,     r, a, 83.63,0,360, "RA of pointing (degrees)"
+dec,    r, a, 22.01,-90,90, "Dec of pointing (degrees)"
+rad,    r, a, 5.0,0,180, "Radius of FOV (degrees)"
+tmin,   r, a, 0.0,0,, "Start time (MET in s)"
+tmax,   r, a, 1800.0,0,, "End time (MET in s)"
+emin,   r, a, 0.1,0,, "Lower energy limit (TeV)"
+emax,   r, a, 100.0,0,, "Upper energy limit (TeV)"
+edisp,  b, h, no,,, "Apply energy dispersion?"
+deadc,  r, h, 0.95,0,1, "Average deadtime correction factor"
 #
 # Standard parameters
 #====================

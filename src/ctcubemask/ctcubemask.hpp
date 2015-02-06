@@ -36,7 +36,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME    "ctcubemask"
-#define CTCUBEMASK_VERSION "00-02-00"
+#define CTCUBEMASK_VERSION "1.0.0"
 
 
 /***********************************************************************//**

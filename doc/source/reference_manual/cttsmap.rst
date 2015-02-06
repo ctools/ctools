@@ -15,7 +15,7 @@ This tool generates a test statistics map.
 General parameters
 ------------------
 
-``inobs = events [file]``
+``inobs = events.fits [file]``
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel = $CTOOLS/share/models/crab.xml [file]``

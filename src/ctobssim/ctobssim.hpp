@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "00-10-00"
+#define CTOBSSIM_VERSION "1.0.0"
 
 
 /***********************************************************************//**

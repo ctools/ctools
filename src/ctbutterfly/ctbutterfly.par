@@ -31,7 +31,7 @@ matrix,   f, h, "NONE",,, "Input covariance Matrix FITS file"
 # Energy binning parameters
 #==========================
 ebinalg,  s, h, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
-emin,     r, a,  0.1,,,"Start value for first energy bin in TeV"
+emin,     r, a, 0.1,,,"Start value for first energy bin in TeV"
 emax,     r, a, 100.0,,,"Stop value for last energy bin in TeV"
 enumbins, i, h, 100,,,"Number of energy bins"
 ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"

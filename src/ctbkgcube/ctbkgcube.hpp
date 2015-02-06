@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBKGCUBE_NAME    "ctbkgcube"
-#define CTBKGCUBE_VERSION "00-02-00"
+#define CTBKGCUBE_VERSION "1.0.0"
 
 
 /***********************************************************************//**

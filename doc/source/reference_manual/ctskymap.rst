@@ -15,41 +15,38 @@ This tool generates a sky map from CTA data.
 General parameters
 ------------------
 
-``inobs [file]``
+``inobs = events.fits [file]``
     Input event list or observation definition XML file.
  	 	 
-``outmap [file]``
+``outmap = skymap.fits [file]``
     Output sky map.
  	 	 
-``emin [real]``
+``emin = 0.1 [real]``
     Minimum energy in map (in TeV).
  	 	 
-``emax [real]``
+``emax = 100.0 [real]``
     Maximum energy in map (in TeV).
 
 ``(usepnt = no) [boolean]``
     Use pointing instead of xref/yref parameters?
  	 	 
-``nxpix [integer]``
+``nxpix = 200 [integer]``
     Size of the Right Ascension / Galactic longitude axis (in pixels).
  	 	 
-``nypix [integer]``
+``nypix = 200 [integer]``
     Size of the Declination / Galactic latitude axis (in pixels).
  	 	 
-``binsz [real]``
+``binsz = 0.02 [real]``
     Pixel size (in degrees/pixel).
  	 	 
 ``coordsys = CEL <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref [real]``
+``xref = 83.63 [real]``
     Right Ascension / Galactic longitude of image centre (J2000, in degrees).
  	 	 
-``yref [real]``
+``yref = 22.01 [real]``
     Declination / Galactic latitude of image centre (J2000, in degrees).
- 	 	 
-``(axisrot = h) [real]``
-    Rotation angle of image axes (in degrees).
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|STG|TAN> [string]``
     Projection method.

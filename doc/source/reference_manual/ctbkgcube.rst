@@ -70,9 +70,6 @@ General parameters
 ``yref = 22.01 [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
  	 	 
-``(axisrot = h) [real]``
-    Rotation angle of image axes (in degrees).
- 	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
  	 	 
