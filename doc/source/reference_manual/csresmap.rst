@@ -39,10 +39,10 @@ General parameters
 ``ebinalg = LOG <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
-``emin = 0.1 [double]``
+``emin = 0.1 [real]``
     Lower energy value for first energy bin (in TeV).
  	 	 
-``emax = 100.0 [double]``
+``emax = 100.0 [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
 ``enumbins =20 [integer]``
@@ -57,16 +57,16 @@ General parameters
 ``nypix = 200 [integer]``
     Number of cube bins in Declination or Galactic latitude.
  	 	 
-``binsz = 0.02 [double]``
+``binsz = 0.02 [real]``
     Cube bin size (in degrees/pixel).
  	 	 
 ``coordsys = CEL <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref = 83.63 [double]``
+``xref = 83.63 [real]``
     Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
  	 	 
-``yref = 22.01 [double]``
+``yref = 22.01 [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
