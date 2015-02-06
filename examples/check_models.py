@@ -3,6 +3,11 @@
 # This script performs an unbinned maximum likelihood analysis for a
 # variety of models. This allows checking the models.
 #
+# Usage:
+#   ./check_models.py
+#
+# ==========================================================================
+#
 # Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
@@ -96,38 +101,28 @@ def pipeline(model_name):
 if __name__ == '__main__':
 	"""
 	Perform unbinned analyses for various models.
-	
-	This script implements the analysis steps to perform an unbinned analysis.
-	The steps include:
-	- Event simulation
-	- Event selection
-	- Binned maximum likelihood fitting
 	"""
 	# Initialise flags
 	need_help = False
-	show_data = True
 	
 	# Test for command line arguments
 	print(sys.argv[0])
 	if (len(sys.argv) > 1):
 		if sys.argv[1] == "-h":
 			need_help = True
-		elif sys.argv[1] == "-noshow":
-			show_data = False
 		else:
 			need_help = True			
 
 	# Print help if needed and exit
 	if need_help:
-		print("Usage: example_models.py [OPTIONS]")
+		print("Usage: check_models.py [OPTIONS]")
 		print("     -h       Display this usage message")
-		print("     -noshow  Do not show data using matplotlib")
 		sys.exit()
 
 	# Dump header
-	print("********************************")
-	print("* CTA unbinned analysis script *")
-	print("********************************")
+	print("*******************************************")
+	print("* Check models using an unbinned analysis *")
+	print("*******************************************")
 		
 	# Perform analysis for Crab model
 	pipeline("data/crab.xml")

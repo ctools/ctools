@@ -1,7 +1,11 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script simulates CTA surveys. It can be considered as the master
-# script for CTA science simulations. Please modify as needed.
+# This script simulates a galactic plane survey of CTA.
+#
+# Usage:
+#   ./make_survey.py
+#
+# ==========================================================================
 #
 # Copyright (C) 2011-2015 Juergen Knoedlseder
 #

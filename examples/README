@@ -6,6 +6,9 @@ benchmark_cta_analysis.py
   (unbinned, binned, stacked), and if matplotlib is installed, creates
   a plot of the benchmark results.
 
+check_models.py
+  Checks a variety of models using an unbinned analysis.
+
 make_pull_at_sensitivity_limit.py
   This script creates pull distributions as function of energy
   for a test source that is at the 5 sigma sensitivity limit for
@@ -16,6 +19,9 @@ make_pull_at_sensitivity_limit.py
 
 make_spectrum.py
   This script shows how to make a spectrum using obsutils.
+
+make_survey.py
+  This script simulates a CTA galactic plane survey.
 
 make_ts_distributions.py
   This script creates TS distributions as function of energy for
