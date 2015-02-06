@@ -2,6 +2,28 @@ This folder contains Python example scripts that illustrate the
 usage of the ctools.
 
 benchmark_cta_analysis.py
+  This script peforms a benchmark of the various CTA analysis types
+  (unbinned, binned, stacked), and if matplotlib is installed, creates
+  a plot of the benchmark results.
+
+make_pull_at_sensitivity_limit.py
+  This script creates pull distributions as function of energy
+  for a test source that is at the 5 sigma sensitivity limit for
+  50h of effective observing time. It takes as input file the
+  output file generated using cspull.
+  If the Python processing module is installed the script can make
+  use of multiple cores and runs in parallel.
+
+make_spectrum.py
+  This script shows how to make a spectrum using obsutils.
+
+make_ts_distributions.py
+  This script creates TS distributions as function of energy for
+  an off observation of 50h effective observing time.
+  If the Python processing module is installed the script can make
+  use of multiple cores and runs in parallel.
+
+benchmark_cta_analysis.py
   Performs performance benchmarks of the various CTA analysis types.
 
 pipeline_binned_disk.py
@@ -27,39 +49,6 @@ pipeline_unbinned_disk.py
 pipeline_unbinned_mem.py
   Example pipeline for simulating events and performing an unbinned
   analysis in memory. No files will be written to disk.
-
-
-
-
-make_binned_analysis.py
-  Example Python pipelines for binned analysis.
-  The first pipeline writes intermediate results to the disk while
-  the second pipeline keeps the results in memory.
-  If matplotlib is installed on the system the fitted spectrum
-  and the observed offset angle distribution is displayed in
-  counts space.
-
-make_pull_at_sensitivity_limit.py
-  This script creates pull distributions as function of energy
-  for a test source that is at the 5 sigma sensitivity limit for
-  50h of effective observing time. It takes as input file the
-  output file generated using cspull.
-  If the Python processing module is installed the script can make
-  use of multiple cores and runs in parallel.
-
-make_ts_distributions.py
-  This script creates TS distributions as function of energy for
-  an off observation of 50h effective observing time.
-  If the Python processing module is installed the script can make
-  use of multiple cores and runs in parallel.
-
-make_unbinned_analysis.py
-  Example Python pipelines for unbinned analysis.
-  The first pipeline writes intermediate results to the disk while
-  the second pipeline keeps the results in memory.
-  If matplotlib is installed on the system the fitted spectrum
-  and the observed offset angle distribution is displayed in
-  counts space.
 
 show_butterfly.py
   Displays a butterfly generated using the ctbutterfly tool.

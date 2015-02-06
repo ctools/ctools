@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ==========================================================================
 # This script peforms a benchmark of the various CTA analysis types
-# (unbinned, binned, cube-style), and if matplotlib is installed, creates
+# (unbinned, binned, stacked), and if matplotlib is installed, creates
 # a plot of the benchmark results.
 #
-# Copyright (C) 2014 Jurgen Knodlseder
+# Copyright (C) 2014-2015 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
