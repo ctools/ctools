@@ -125,13 +125,13 @@ if __name__ == '__main__':
 	print("*******************************************")
 		
 	# Perform analysis for Crab model
-	pipeline("data/crab.xml")
+	pipeline("$CTOOLS/share/models/crab.xml")
 
 	# Perform analysis for disk model
-	pipeline("data/disk.xml")
+	pipeline("$CTOOLS/share/models/disk.xml")
 
 	# Perform analysis for Gaussian model
-	pipeline("data/gauss.xml")
+	pipeline("$CTOOLS/share/models/gauss.xml")
 	
 	# Perform analysis for shell model
-	pipeline("data/shell.xml")
+	pipeline("$CTOOLS/share/models/shell.xml")
