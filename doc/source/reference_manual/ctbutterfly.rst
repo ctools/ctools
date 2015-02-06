@@ -46,10 +46,10 @@ General parameters
 ``(ebinalg = "LOG") <FILE|LIN|LOG> [string]``
     Butterfly energy binning algorithm.
  	 	 
-``emin [double]``
+``emin [real]``
     Minimum energy of butterfly (in TeV).
  	 	 
-``emax [double]``
+``emax [real]``
     Maximum energy of butterfly (in TeV).
  	 	 
 ``(enumbins = 100) [string]``

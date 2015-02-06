@@ -49,31 +49,31 @@ General parameters
 ``irf [string]``
     Instrument response function.
  	 	 
-``ra [double]``
+``ra [real]``
     Right Ascension of pointing (J2000, in degrees).
  	 	 
-``dec [double]``
+``dec [real]``
     Declination of pointing (J2000, in degrees).
 
-``rad [double]``
+``rad [real]``
     Radius of field of view (in degrees).
  	 	 
-``tmin [double]``
+``tmin [real]``
     CTA mission elapsed start time (in seconds).
  	 	 
-``tmax [double]``
+``tmax [real]``
     CTA mission elapsed stop time (in seconds).
  	 	 
-``(deadc = 0.95) [double]``
+``(deadc = 0.95) [real]``
     Average deadtime correction factor.
 
 ``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
-``emin [double]``
+``emin [real]``
     Lower energy value for first energy bin (in TeV).
  	 	 
-``emax [double]``
+``emax [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
 ``enumbins [integer]``
@@ -91,19 +91,19 @@ General parameters
 ``nypix [integer]``
     Size of the Declination / Galactic latitude axis (in pixels).
  	 	 
-``binsz [double]``
+``binsz [real]``
     Pixel size (in degrees/pixel).
  	 	 
 ``coordsys = CEL <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref [double]``
+``xref [real]``
     Right Ascension / Galactic longitude of image centre (J2000, in degrees).
  	 	 
-``yref [double]``
+``yref [real]``
     Declination / Galactic latitude of image centre (J2000, in degrees).
  	 	 
-``(axisrot = h) [double]``
+``(axisrot = h) [real]``
     Rotation angle of image axes (in degrees).
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|STG|TAN> [string]``

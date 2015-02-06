@@ -49,16 +49,16 @@ General parameters
 ``nypix = 200 [integer]``
     Number of map pixels in Declination or Galactic latitude.
  	 	 
-``binsz = 0.02 [double]``
+``binsz = 0.02 [real]``
     Map pixel size (in degrees/pixel).
  	 	 
 ``coordsys = CEL <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref = 83.63 [double]``
+``xref = 83.63 [real]``
     Right Ascension / Galactic longitude of map centre (J2000, in degrees).
  	 	 
-``yref = 22.01 [double]``
+``yref = 22.01 [real]``
     Declination / Galactic latitude of map centre (J2000, in degrees).
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
@@ -70,7 +70,7 @@ General parameters
 ``(binmax = -1) [integer]``
     Last bin to compute.
 
-``(logLO = -1) [double]``
+``(logLO = -1) [real]``
     LogLikelihood value of null hypothesis.
  	 	 
 

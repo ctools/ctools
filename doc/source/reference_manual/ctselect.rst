@@ -28,25 +28,25 @@ General parameters
 ``(usepnt = no) [boolean]``
     Use pointing instead of RA/DEC parameters?
  	 	 
-``ra [double]``
+``ra [real]``
     Right Ascension of acceptance cone (or ROI) centre (J2000, in degrees).
  	 	 
-``dec [double]``
+``dec [real]``
     Declination of acceptance cone (or ROI) centre (J2000, in degrees).
  	 	 
-``rad [double]``
+``rad [real]``
     Radius of acceptance cone (or ROI) centre (in degrees).
  	 	 
-``tmin [double]``
+``tmin [real]``
     CTA mission elapsed start time defining the earliest event (in seconds).
  	 	 
-``tmax [double]``
+``tmax [real]``
     CTA mission elapsed stop time defining the latest event (in seconds).
  	 	 
-``emin [double]``
+``emin [real]``
     Lower energy limit of events (in TeV).
  	 	 
-``emax [double]``
+``emax [real]``
     Upper energy limit of events (in TeV).
  	 	 
 ``(expr = "") [string]``

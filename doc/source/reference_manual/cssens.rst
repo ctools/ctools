@@ -29,16 +29,16 @@ General parameters
 ``type <point|gauss|shell|disk> [string]``
     Source model type.
  	 	 
-``offset [double]``
+``offset [real]``
     Source offset angle (in degrees).
  	 	 
 ``bkg [string]``
     Background model file function (none=power law for subarray E).
  	 	 
-``duration [double]``
+``duration [real]``
     Effective exposure time (in seconds).
  	 	 
-``rad [double]``
+``rad [real]``
     Radius of ROI (in degrees).
  	 	 
 ``(enumbins = 0) [integer]``
@@ -47,22 +47,22 @@ General parameters
 ``(npix = 200) [integer]``
     Number of pixels for binned analysis.
  	 	 
-``(binsz = 0.05) [double]``
+``(binsz = 0.05) [real]``
     Pixel size for binned analysis.
  	 	 
-``(sigma = 5.0) [double]``
+``(sigma = 5.0) [real]``
     Significance threshold.
  	 	 
 ``(ts_use = yes) [boolean]``
     Use TS for signifiance estimation?
  	 	 
-``(index = -2.48) [double]``
+``(index = -2.48) [real]``
     Spectral index for source model.
  	 	 
-``(radius = 0.1) [double]``
+``(radius = 0.1) [real]``
     Extended source model radius (in degrees).
  	 	 
-``(width = 0.05) [double]``
+``(width = 0.05) [real]``
     Extended source model width (in degrees).
  	 	 
 ``(max_iter = 50) [integer]``

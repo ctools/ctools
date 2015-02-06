@@ -38,40 +38,40 @@ General parameters
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation.
 
-``ra [double]``
+``ra [real]``
     Right Ascension of CTA pointing (J2000, in degrees).
  	 	 
-``dec [double]``
+``dec [real]``
     Declination of CTA pointing (J2000, in degrees).
  	 	 
-``emin [double]``
+``emin [real]``
     Lower energy limit of events (in TeV).
  	 	 
-``emax [double]``
+``emax [real]``
     Upper energy limit of events (in TeV).
  	 	 
 ``enumbins [integer]``
     Number of energy bins (0=unbinned).
  	 	 
-``duration [double]``
+``duration [real]``
     Duration of observation (in seconds).
  	 	 
-``(deadc = 0.95) [double]``
+``(deadc = 0.95) [real]``
     Average deadtime correction factor.
  	 	 
-``(rad = 5.0) [double]``
+``(rad = 5.0) [real]``
     ROI radius (in degrees).
 
 ``(pattern = single) [string]``
     Pattern for pointing simulation (single/four).
 
-``(offset = 1.5) [double]``
+``(offset = 1.5) [real]``
     Observation pattern offset (in degrees).
  	 	 
 ``(npix = 200) [integer]``
     Number of pixels for binned analysis.
  	 	 
-``(binsz = 0.05) [double]``
+``(binsz = 0.05) [real]``
     Pixel size for binned analysis.
 
 

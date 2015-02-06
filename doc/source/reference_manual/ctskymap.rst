@@ -21,10 +21,10 @@ General parameters
 ``outmap [file]``
     Output sky map.
  	 	 
-``emin [double]``
+``emin [real]``
     Minimum energy in map (in TeV).
  	 	 
-``emax [double]``
+``emax [real]``
     Maximum energy in map (in TeV).
 
 ``(usepnt = no) [boolean]``
@@ -36,19 +36,19 @@ General parameters
 ``nypix [integer]``
     Size of the Declination / Galactic latitude axis (in pixels).
  	 	 
-``binsz [double]``
+``binsz [real]``
     Pixel size (in degrees/pixel).
  	 	 
 ``coordsys = CEL <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref [double]``
+``xref [real]``
     Right Ascension / Galactic longitude of image centre (J2000, in degrees).
  	 	 
-``yref [double]``
+``yref [real]``
     Declination / Galactic latitude of image centre (J2000, in degrees).
  	 	 
-``(axisrot = h) [double]``
+``(axisrot = h) [real]``
     Rotation angle of image axes (in degrees).
  	 	 
 ``proj = CAR <AIT|AZP|CAR|MER|STG|TAN> [string]``

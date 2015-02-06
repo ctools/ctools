@@ -32,19 +32,19 @@ General parameters
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction instead of ra/dec parameters?
  	 	 
-``ra = 83.63 [double]``
+``ra = 83.63 [real]``
     Right Ascension of circular selection region centre (J2000, in degrees).
  	 	 
-``dec = 22.01 [double]``
+``dec = 22.01 [real]``
     Declination of circular selection region centre (J2000, in degrees).
 
-``rad = 3.0 [double]``
+``rad = 3.0 [real]``
     Radius of circular selection region (in degrees).
 
-``emin = 0.1 [double]``
+``emin = 0.1 [real]``
     Lower energy limit (in TeV).
  	 	 
-``emax = 100.0 [double]``
+``emax = 100.0 [real]``
     Upper energy limit (in TeV).
  	 	 
 

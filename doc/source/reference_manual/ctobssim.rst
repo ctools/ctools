@@ -41,31 +41,31 @@ General parameters
 ``(seed = 1) [integer]``
     Integer seed value to be used for Monte Carlo simulations.
  	 	 
-``ra [double]``
+``ra [real]``
     Right Ascension of CTA pointing (J2000, in degrees).
  	 	 
-``dec [double]``
+``dec [real]``
     Declination of CTA pointing (J2000, in degrees).
  	 	 
-``rad [double]``
+``rad [real]``
     Radius of CTA field of view (simulation cone radius) (in degrees).
  	 	 
-``tmin [double]``
+``tmin [real]``
     Mission elapsed start time of observation (in seconds).
  	 	 
-``tmax [double]``
+``tmax [real]``
     Mission elapsed stop time of observation (in seconds).
  	 	 
-``emin [double]``
+``emin [real]``
     Lower energy limit of events (in TeV).
  	 	 
-``emax [double]``
+``emax [real]``
     Upper energy limit of events (in TeV).
  	 	 
 ``(edisp = no) [boolean]``
     Apply energy dispersion?
  	 	 
-``(deadc = 0.95) [double]``
+``(deadc = 0.95) [real]``
     Average deadtime correction factor.
 
 

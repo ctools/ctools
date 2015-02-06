@@ -31,34 +31,34 @@ General parameters
 ``type <point|gauss|shell|disk> [string]``
     Source model type.
  	 	 
-``(index = -2.48) [double]``
+``(index = -2.48) [real]``
     Spectral index for source model.
  	 	 
-``offset [double]``
+``offset [real]``
     Source offset angle (in degrees).
  	 	 
 ``bkg [string]``
     Background model file function (none=power law for subarray E).
  	 	 
-``emin [double]``
+``emin [real]``
     Lower energy limit (in TeV).
  	 	 
-``emax [double]``
+``emax [real]``
     Upper energy limit (in TeV).
  	 	 
 ``enumbins [integer]``
     Number of energy bins (0=unbinned).
  	 	 
-``duration [double]``
+``duration [real]``
     Effective exposure time (in seconds).
  	 	 
-``(rad = 5.0) [double]``
+``(rad = 5.0) [real]``
     Radius of ROI (in degrees).
  	 	 
 ``(npix = 200) [integer]``
     Number of pixels for binned analysis.
  	 	 
-``(binsz = 0.05) [double]``
+``(binsz = 0.05) [real]``
     Pixel size for binned analysis.
 
 
