@@ -1,15 +1,15 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script illustrates how to perform a stacked CTA analysis based on
+# This script illustrates how to perform a binned CTA analysis based on
 # simulated CTA data. You may use and adapt this script to implement your
 # own pipeline.
 #
 # Usage:
-# ./pipeline_stacked_mem.py
+#   ./pipeline_binned_mem.py
 #
 # ==========================================================================
 #
-# Copyright (C) 2014-2015 Juergen Knoedlseder
+# Copyright (C) 2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -92,15 +92,13 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 # ================================ #
 # Simulation and analysis pipeline #
 # ================================ #
-def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
+def run_pipeline(obs, emin=0.1, emax=100.0, \
                  enumbins=20, nxpix=200, nypix=200, binsz=0.02, \
                  coordsys="CEL", proj="CAR", debug=False):
     """
-    Simulation and stacked analysis pipeline.
+    Simulation and binned analysis pipeline.
 
     Keywords:
-     ra       - RA of cube centre [deg] (default: 83.6331)
-     dec      - DEC of cube centre [deg] (default: 22.0145)
      emin     - Minimum energy of cube [TeV] (default: 0.1)
      emax     - Maximum energy of cube [TeV] (default: 100.0)
      enumbins - Number of energy bins in cube (default: 20)
@@ -116,82 +114,34 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
     sim["debug"].boolean(debug)
     sim.run()
 
-    # Bin events into counts map
-    bin = ctools.ctbin(sim.obs())
-    bin["ebinalg"].string("LOG")
-    bin["emin"].real(emin)
-    bin["emax"].real(emax)
-    bin["enumbins"].integer(enumbins)
-    bin["nxpix"].integer(nxpix)
-    bin["nypix"].integer(nypix)
-    bin["binsz"].real(binsz)
-    bin["coordsys"].string(coordsys)
-    bin["proj"].string(proj)
-    bin["xref"].real(ra)
-    bin["yref"].real(dec)
-    bin["debug"].boolean(debug)
-    bin.run()
+    # Bin events by looping over all observations in the container
+    obs = gammalib.GObservations()
+    obs.models(sim.obs().models())
+    for run in sim.obs():
 
-    # Create exposure cube
-    expcube = ctools.ctexpcube(sim.obs())
-    expcube["incube"].filename("NONE")
-    expcube["ebinalg"].string("LOG")
-    expcube["emin"].real(emin)
-    expcube["emax"].real(emax)
-    expcube["enumbins"].integer(enumbins)
-    expcube["nxpix"].integer(nxpix)
-    expcube["nypix"].integer(nypix)
-    expcube["binsz"].real(binsz)
-    expcube["coordsys"].string(coordsys)
-    expcube["proj"].string(proj)
-    expcube["xref"].real(ra)
-    expcube["yref"].real(dec)
-    expcube["debug"].boolean(debug)
-    expcube.run()
+        # Create container with a single observation
+        container = gammalib.GObservations()
+        container.append(run)
 
-    # Create PSF cube
-    psfcube = ctools.ctpsfcube(sim.obs())
-    psfcube["incube"].filename("NONE")
-    psfcube["ebinalg"].string("LOG")
-    psfcube["emin"].real(emin)
-    psfcube["emax"].real(emax)
-    psfcube["enumbins"].integer(enumbins)
-    psfcube["nxpix"].integer(10)
-    psfcube["nypix"].integer(10)
-    psfcube["binsz"].real(1.0)
-    psfcube["coordsys"].string(coordsys)
-    psfcube["proj"].string(proj)
-    psfcube["xref"].real(ra)
-    psfcube["yref"].real(dec)
-    psfcube["debug"].boolean(debug)
-    psfcube.run()
+        # Bin events for that observation
+        bin = ctools.ctbin(container)
+        bin["ebinalg"].string("LOG")
+        bin["emin"].real(emin)
+        bin["emax"].real(emax)
+        bin["enumbins"].integer(enumbins)
+        bin["nxpix"].integer(nxpix)
+        bin["nypix"].integer(nypix)
+        bin["binsz"].real(binsz)
+        bin["coordsys"].string(coordsys)
+        bin["usepnt"].boolean(True)
+        bin["proj"].string(proj)
+        bin.run()
 
-    # Create background cube
-    bkgcube = ctools.ctbkgcube(sim.obs())
-    bkgcube["incube"].filename("NONE")
-    bkgcube["ebinalg"].string("LOG")
-    bkgcube["emin"].real(emin)
-    bkgcube["emax"].real(emax)
-    bkgcube["enumbins"].integer(enumbins)
-    bkgcube["nxpix"].integer(10)
-    bkgcube["nypix"].integer(10)
-    bkgcube["binsz"].real(1.0)
-    bkgcube["coordsys"].string(coordsys)
-    bkgcube["proj"].string(proj)
-    bkgcube["xref"].real(ra)
-    bkgcube["yref"].real(dec)
-    bkgcube["debug"].boolean(debug)
-    bkgcube.run()
-
-    # Attach background model to observation container
-    bin.obs().models(bkgcube.models())
-
-    # Set Exposure and Psf cube for first CTA observation
-    # (ctbin will create an observation with a single container)
-    bin.obs()[0].response(expcube.expcube(), psfcube.psfcube())
+        # Append result to observations
+        obs.extend(bin.obs())
 
     # Perform maximum likelihood fitting
-    like = ctools.ctlike(bin.obs())
+    like = ctools.ctlike(obs)
     like["debug"].boolean(True) # Switch this always on for results in console
     like.run()
 	
@@ -207,7 +157,7 @@ if __name__ == '__main__':
     """
     # Dump header
     print("********************************************")
-    print("*      CTA stacked analysis pipeline       *")
+    print("*       CTA binned analysis pipeline       *")
     print("********************************************")
 
     # Setup observations
