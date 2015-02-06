@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script peforms a benchmark of the various CTA analysis styles
+# This script peforms a benchmark of the various CTA analysis types
 # (unbinned, binned, cube-style), and if matplotlib is installed, creates
 # a plot of the benchmark results.
 #
