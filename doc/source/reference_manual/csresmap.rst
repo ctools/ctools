@@ -24,12 +24,6 @@ General parameters
 ``outmap = resmap.fits [file]``
     Output residual counts map file.
 
-``expcube = NONE [file]``
-    Exposure cube file (only needed for stacked analysis).
-
-``psfcube = NONE [file]``
-    PSF cube file (only needed for stacked analysis).
-
 ``caldb = dummy [string]``
     Calibration database.
 
