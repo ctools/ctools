@@ -2,7 +2,7 @@
 # =====================================================================
 # Run all test and example scripts that come with the package.
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,17 +25,6 @@ base=$PWD
 
 
 #
-# test
-# ====
-echo
-echo "=====> test"
-cd test
-./example_models.py
-./example_survey.py
-cd $base
-
-
-#
 # examples
 # ========
 echo
@@ -43,23 +32,27 @@ echo "=====> examples"
 cd examples
 
 # Create local environment
-rm -rf gammalib
-mkdir -p gammalib/share
-mkdir -p gammalib/share/caldb
-ln -s $base/caldb gammalib/share/caldb/cta
-ln -s $base/models gammalib/share/models
-export GAMMALIB=./gammalib
+rm -rf ctools
+#mkdir -p ctools/share
+mkdir -p ctools/share/caldb
+ln -s $base/caldb ctools/share/caldb/cta
+ln -s $base/models ctools/share/models
+export CTOOLS=$PWD/ctools
 
-# Make binned analysis
-./make_binned_analysis.py
+# Run checkers
+./check_models.py
 
-# Make unbinned analysis
-./make_unbinned_analysis.py
+# Run pipelines
+./pipeline_binned_disk.py
+./pipeline_binned_mem.py    
+./pipeline_stacked_disk.py
+./pipeline_stacked_mem.py 
+./pipeline_unbinned_disk.py
+./pipeline_unbinned_mem.py 
 
-# Make TS distributions
+# Run makers
+./make_survey.py
 ./make_ts_distributions.py 2 2
-
-# Make pull distribution at sensitivity limit
 #./make_pull_at_sensitivity_limit.py
 
 # Remove local environment
