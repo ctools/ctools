@@ -559,6 +559,9 @@ void ctobssim::free_members(void)
  ***************************************************************************/
 void ctobssim::get_parameters(void)
 {
+    // Initialise seed vector
+    m_rans.clear();
+
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
