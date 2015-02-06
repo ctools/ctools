@@ -25,12 +25,12 @@ import sys
 # ============== #
 # cstsdist class #
 # ============== #
-class csresmap(ctools.ctool):
+class csresmap(ctools.cscript):
     """
-    This class implements the creation of a residual map. It derives
-    from the GammaLib::GApplication class which provides support for parameter
-    files, command line arguments, and logging. In that way the Python
-    script behaves just as a regular ctool. 
+    This class implements the creation of a residual map. It derives from
+    the ctools.cscript class which provides support for parameter files,
+    command line arguments, and logging. In that way the Python script
+    behaves just as a regular ctool. 
     """
     def __init__(self, *argv):
         """
@@ -60,9 +60,9 @@ class csresmap(ctools.ctool):
 
         # Initialise application
         if len(argv) == 0:
-            ctools.ctool.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            ctools.ctool.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
@@ -103,23 +103,24 @@ class csresmap(ctools.ctool):
             pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output residual map"))
-            #pars.append(gammalib.GApplicationPar("binfile","f","h","binned.fits","","","Output binned file name"))
-            #pars.append(gammalib.GApplicationPar("modfile","f","h","model.fits","","","Output model file name"))
+            pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("emin","r","h","0.1","0.0","","Lower energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","h","100.0","0.0","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emin","r","h","0.1","0","","Lower energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","h","100.0","0","","Upper energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","h","20","","","Number of energy bins"))
             pars.append(gammalib.GApplicationPar("ebinalg","s","h","LOG","LIN|LOG|FILE","","Binning algorithm"))
             pars.append(gammalib.GApplicationPar("coordsys","s","a","CEL","CEL|GAL","","Coordinate System"))
-            pars.append(gammalib.GApplicationPar("proj","s","a","CAR","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method e.g. AIT|AZP|CAR|MER|MOL|STG|TAN"))
-            pars.append(gammalib.GApplicationPar("xref","r","a","83.63","","","First coordinate of image center in degrees (RA or galactic l)"))
-            pars.append(gammalib.GApplicationPar("yref","r","a","22.01","","","Second coordinate of image center in degrees (DEC or galactic b)"))
+            pars.append(gammalib.GApplicationPar("proj","s","a","CAR","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method"))
+            pars.append(gammalib.GApplicationPar("xref","r","a","83.63","0","360","First coordinate of image center in degrees (RA or galactic l)"))
+            pars.append(gammalib.GApplicationPar("yref","r","a","22.01","-90","90","Second coordinate of image center in degrees (DEC or galactic b)"))
             pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
             pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
             pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
             pars.append(gammalib.GApplicationPar("algorithm","s","h","SUBDIV","SUB|SUBDIV|SUBDIVSQRT","","Residual map computation algorithm"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","csresmap.log","","","Log filename"))
             pars.save(parfile)
         
         # Return
@@ -135,9 +136,11 @@ class csresmap(ctools.ctool):
         if self.obs.size() == 0:
             self.obs = self.get_observations()
 
+        # Set models if we have none
         if self.obs.models().size() == 0:
             self.obs.models(self["inmodel"].filename())
-     
+
+        # Read other parameters
         self.m_outfile   = self["outmap"].filename()
         self.m_xref      = self["xref"].real()
         self.m_yref      = self["yref"].real()
