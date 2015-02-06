@@ -21,12 +21,11 @@
 import gammalib
 import ctools
 import sys
-import os
 
 # ============== #
 # cstsdist class #
 # ============== #
-class csresmap(gammalib.GApplication):
+class csresmap(ctools.ctool):
     """
     This class implements the creation of a residual map. It derives
     from the GammaLib::GApplication class which provides support for parameter
@@ -37,6 +36,7 @@ class csresmap(gammalib.GApplication):
         """
         Constructor.
         """
+        
         # Set name
         self.name    = "csresmap"
         self.version = "1.0.0"
@@ -60,9 +60,9 @@ class csresmap(gammalib.GApplication):
 
         # Initialise application
         if len(argv) == 0:
-            gammalib.GApplication.__init__(self, self.name, self.version)
+            ctools.ctool.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            gammalib.GApplication.__init__(self, self.name, self.version, *argv)
+            ctools.ctool.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
@@ -133,49 +133,12 @@ class csresmap(gammalib.GApplication):
         
         # Set observation if not done before
         if self.obs.size() == 0:
+            self.obs = self.get_observations()
 
-            # Get observation filename
-            obsfile = self["inobs"].filename()
-
-            # Setup observation
-            try: 
-                self.obs = gammalib.GObservations(obsfile)
-            except:
-                self.obs.clear()
-                obs = gammalib.GCTAObservation()
-                obs.load(obsfile)
-                self.m_caldb = self["caldb"].string()
-                self.m_irf   = self["irf"].string()
-                caldb        = gammalib.GCaldb()
-                if os.path.isdir(self.m_caldb):
-                    caldb.rootdir(self.m_caldb)    
-                else:
-                    caldb.open("cta",self. m_caldb)
-                obs.response(self.m_irf, caldb);
-                self.obs.append(obs)
-
-        # Make sure that all observations contain a valid response
-        # function
-        for obs in self.obs:
-            if not obs.has_response():
-                self.m_caldb = self["caldb"].string()
-                self.m_irf   = self["irf"].string()
-                caldb        = gammalib.GCaldb()
-                if os.path.isdir(self.m_caldb):
-                    caldb.rootdir(self.m_caldb)    
-                else:
-                    caldb.open("cta",self. m_caldb)
-                obs.response(self.m_irf, caldb);
-            
-        # Check for models in the container
-        # read models from file if there were none
-        # Note that the models should be optimised for 
-        # meaningful residual map    
         if self.obs.models().size() == 0:
             self.obs.models(self["inmodel"].filename())
+     
         self.m_outfile   = self["outmap"].filename()
-        #self.m_modfile   = self["modfile"].filename()
-        #self.m_binfile   = self["binfile"].filename()
         self.m_xref      = self["xref"].real()
         self.m_yref      = self["yref"].real()
         self.m_emin      = self["emin"].real()
@@ -194,7 +157,7 @@ class csresmap(gammalib.GApplication):
         self.m_chatter = self["chatter"].integer()
         self.m_clobber = self["clobber"].boolean()
         self.m_debug   = self["debug"].boolean()
-  
+         
         # Return
         return
     
