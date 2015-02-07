@@ -639,5 +639,5 @@ Constant
   .. code-block:: xml
 
    <temporalModel type="Constant">
-     <parameter name="Constant" scale="1.0" value="1.0" min="0.1" max="10.0" free="0"/>
+     <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="0"/>
    </temporalModel>
