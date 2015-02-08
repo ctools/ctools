@@ -116,6 +116,7 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","cspull.log","","","Log filename"))
             pars.save(parfile)
         
         # Return

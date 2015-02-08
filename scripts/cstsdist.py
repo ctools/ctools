@@ -117,6 +117,7 @@ class cstsdist(ctools.cscript):
             pars.append(gammalib.GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
             pars.append(gammalib.GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","cstsdist.log","","","Log filename"))
             pars.save(parfile)
         
         # Return
