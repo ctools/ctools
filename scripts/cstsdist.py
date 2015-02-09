@@ -20,19 +20,19 @@
 #
 # ==========================================================================
 import gammalib
+import ctools
 from ctools import obsutils
 import sys
 import csv
-import math
 
 
 # ============== #
 # cstsdist class #
 # ============== #
-class cstsdist(gammalib.GApplication):
+class cstsdist(ctools.cscript):
     """
     This class implements the TS distribution generation script. It derives
-    from the GammaLib::GApplication class which provides support for parameter
+    from the ctools.cscript class which provides support for parameter
     files, command line arguments, and logging. In that way the Python
     script behaves just as a regular ctool.
     """
@@ -42,7 +42,7 @@ class cstsdist(gammalib.GApplication):
         """
         # Set name
         self.name    = "cstsdist"
-        self.version = "0.2.0"
+        self.version = "1.0.0"
         
         # Initialise some members
         self.obs        = None
@@ -54,9 +54,9 @@ class cstsdist(gammalib.GApplication):
 
         # Initialise application
         if len(argv) == 0:
-            gammalib.GApplication.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            gammalib.GApplication.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
@@ -94,22 +94,30 @@ class cstsdist(gammalib.GApplication):
             
             # Create default parfile
             pars = gammalib.GApplicationPars()
+            pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
             pars.append(gammalib.GApplicationPar("outfile","f","h","ts.dat","","","Output file name"))
-            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","$GAMMALIB/share/caldb/cta","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
-            pars.append(gammalib.GApplicationPar("index","r","h","-2.48","","","Spectral index"))
-            pars.append(gammalib.GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
-            pars.append(gammalib.GApplicationPar("bkg","s","a","$GAMMALIB/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
-            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("ra","r","h","83.6331","0","360","RA of pointing (deg)"))
+            pars.append(gammalib.GApplicationPar("dec","r","h","22.0145","-90","90","Dec of pointing (deg)"))
+            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("tmin","r","h","0.0","","","Start time (MET in s)"))
+            pars.append(gammalib.GApplicationPar("tmax","r","a","1800.0","","","Observation duration (in s)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-            pars.append(gammalib.GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
-            pars.append(gammalib.GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
             pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
             pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))         
+            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
+            pars.append(gammalib.GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
+            pars.append(gammalib.GApplicationPar("index","r","h","-2.48","","","Spectral index"))       
+            pars.append(gammalib.GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
+            pars.append(gammalib.GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","cstsdist.log","","","Log filename"))
             pars.save(parfile)
         
         # Return
@@ -119,38 +127,45 @@ class cstsdist(gammalib.GApplication):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters
+        
+        # Set observation if not done before
+        if self.obs == None or self.obs.size() == 0:
+            self.obs = self.get_observations()
+            
+        # Get number of energy bins
+        self.m_enumbins = self["enumbins"].integer()
+        
+        # Read parameters for binned if requested
+        if not self.m_enumbins == 0:
+            self.m_npix     = self["npix"].integer()
+            self.m_binsz    = self["binsz"].real()
+        else:
+            # Set dummy values (required by obsutils)
+            self.m_npix = 0
+            self.m_binsz = 0.0
+          
+        # Get other parameters
         self.m_outfile  = self["outfile"].filename()
         self.m_ntrials  = self["ntrials"].integer()
-        self.m_caldb    = self["caldb"].string()
-        self.m_irf      = self["irf"].string()
         self.m_type     = self["type"].string()
         self.m_index    = self["index"].real()
         self.m_offset   = self["offset"].real()
         self.m_bkg      = self["bkg"].string()
-        self.m_emin     = self["emin"].real()
-        self.m_emax     = self["emax"].real()
-        self.m_enumbins = self["enumbins"].integer()
-        self.m_duration = self["duration"].real()
-        self.m_rad      = self["rad"].real()
-        self.m_npix     = self["npix"].integer()
-        self.m_binsz    = self["binsz"].real()
 
         # Set some fixed parameters
         self.m_log   = False # Logging in client tools
         self.m_debug = False # Debugging in client tools
-        
-        # Setup observation
-        self.obs = self.set_obs(emin=self.m_emin, emax=self.m_emax)
-        
-        # Initialise models. Note that we centre the point source at the Galactic
-        # center as our observation is also centred at the Galactic centre, so
-        # we're onaxis.
+          
+        pnt = gammalib.GSkyDir()
+        pnt.radec_deg(self["ra"].real(),self["dec"].real())  
+          
+        # Initialise models. Note that we centre the point source at the
+        # center of our observation, so we're onaxis.
         self.bkg_model  = gammalib.GModels()
         self.full_model = gammalib.GModels()
         self.bkg_model.append(self.set_bkg_model())
         self.full_model.append(self.set_bkg_model())
-        self.full_model.append(self.set_src_model(0.0, self.m_offset, \
+        self.full_model.append(self.set_src_model(pnt.l_deg(), pnt.b_deg()+self.m_offset, \
                                                   flux=0.010, \
                                                   type=self.m_type, \
                                                   index=self.m_index))
@@ -166,7 +181,7 @@ class cstsdist(gammalib.GApplication):
         Set model.
         """
         # Copy models
-        self.model = models.copy()
+        self.obs.models(models.copy())
     
         # Return
         return
@@ -235,35 +250,7 @@ class cstsdist(gammalib.GApplication):
         
         # Return
         return
-    
-    def set_obs(self, lpnt=0.0, bpnt=0.0, emin=0.1, emax=100.0):
-        """
-        Returns an observation container with a single CTA observation.
-        
-        Keywords:
-         lpnt - Galactic longitude of pointing [deg] (default: 0.0)
-         bpnt - Galactic latitude of pointing [deg] (default: 0.0)
-         emin - Minimum energy [TeV] (default: 0.1)
-         emax - Maximum energy [TeV] (default: 100.0)
-        """
-        # Allocate observation container
-        obs = gammalib.GObservations()
-    
-        # Set single pointing
-        pntdir = gammalib.GSkyDir()
-        pntdir.lb_deg(lpnt, bpnt)
-        
-        # Create CTA observation
-        run = obsutils.set_obs(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
-                               duration=self.m_duration, \
-                               emin=emin, emax=emax, rad=self.m_rad)
-        
-        # Append observation to container
-        obs.append(run)
-    
-        # Return observation container
-        return obs
-    
+  
     def set_bkg_model(self, fitsigma=False):
         """
         Setup CTA background model.
@@ -343,10 +330,13 @@ class cstsdist(gammalib.GApplication):
             self.log("ERROR: Unknown source type '"+type+"'.\n")
             return None
         source = gammalib.GModelSky(spatial, spectrum)
-    
+
         # Set source name
         source.name("Test")
-        source.tscalc(True)
+        
+        # Turn TS value computation off
+        # since we compute it by hand later on
+        source.tscalc(False)
     
         # Return source
         return source

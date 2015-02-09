@@ -132,6 +132,7 @@ class csresmap(ctools.cscript):
         
         # Set observation if not done before
         if self.obs.size() == 0:
+            self.require_inobs("csresmap.get_parameters()")
             self.obs = self.get_observations()
 
         # Set models if we have none

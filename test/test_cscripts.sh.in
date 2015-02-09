@@ -62,7 +62,7 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
   emin=0.1 \
   emax=100.0 \
   enumbins=0 \
-  duration=1800.0 \
+  tmax=1800.0 \
   deadc=0.95 \
   rad=5.0 \
   npix=200 \
@@ -118,7 +118,7 @@ chmod +x @abs_top_srcdir@/scripts/cstsdist.py
   emin=0.1 \
   emax=100.0 \
   enumbins=0 \
-  duration=1800.0 \
+  tmax=1800.0 \
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cstsdist.log
