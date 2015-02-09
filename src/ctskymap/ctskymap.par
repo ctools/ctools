@@ -22,8 +22,8 @@ outmap, f, a, "skymap.fits",,, "Output file name"
 #
 # Event selection parameters
 #===========================
-emin, r, a, 0.1,0,, "Minimum energy in TeV"
-emax, r, a, 100.0,0,, "Maximum energy in TeV"
+emin, r, a, 0.1,,, "Lower energy limit (TeV)"
+emax, r, a, 100.0,,, "Upper energy limit (TeV)"
 #
 # Spatial binning parameters
 #===========================

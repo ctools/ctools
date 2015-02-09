@@ -32,15 +32,15 @@ irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
 ra,       r, a, 83.63,0,360, "RA of pointing (degrees)"
 dec,      r, a, 22.01,-90,90, "Dec of pointing (degrees)"
 rad,      r, a, 5.0,0,180, "Radius of FOV (degrees)"
-tmin,     r, a, 0.0,0,, "Start time (MET in s)"
-tmax,     r, a, 1800.0,0,, "End time (MET in s)"
+tmin,     r, a, 0.0,,, "Start time (MET in s)"
+tmax,     r, a, 1800.0,,, "End time (MET in s)"
 deadc,    r, h, 0.95,0,1, "Average deadtime correction factor"
 #
 # Energy binning parameters
 #==========================
 ebinalg,  s, h, "LOG",FILE|LIN|LOG,, "Algorithm for defining energy bins"
-emin,     r, a, 0.1,0,, "Start value for first energy bin in TeV"
-emax,     r, a, 100.0,0,, "Stop value for last energy bin in TeV"
+emin,     r, a, 0.1,,, "Start value for first energy bin in TeV"
+emax,     r, a, 100.0,,, "Stop value for last energy bin in TeV"
 enumbins, i, a, 20,,, "Number of energy bins"
 ebinfile, f, h, "NONE",,, "Name of the file containing the energy bin definition"
 #

@@ -109,7 +109,7 @@ class cssens(ctools.cscript):
             pars.append(gammalib.GApplicationPar("caldb","s","a","$CTOOLS/share/caldb/data/cta/dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
-            pars.append(gammalib.GApplicationPar("offset","r","a","0.0","0.0","","Source offset angle (deg)"))
+            pars.append(gammalib.GApplicationPar("offset","r","a","0.0","","","Source offset angle (deg)"))
             pars.append(gammalib.GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
             pars.append(gammalib.GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
             pars.append(gammalib.GApplicationPar("rad","r","a","5.0","","","Radius of ROI (deg)"))

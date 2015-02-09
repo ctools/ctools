@@ -27,8 +27,8 @@ edisp,    b, h, no,,, "Apply energy dispersion?"
 # Energy binning parameters
 #==========================
 ebinalg,  s, h, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
-emin,     r, a, 0.1,0,,"Start value for first energy bin in TeV"
-emax,     r, a, 100.0,0,, "Stop value for last energy bin in TeV"
+emin,     r, a, 0.1,,,"Lower energy limit (TeV)"
+emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
 enumbins, i, a, 20,,, "Number of energy bins"
 ebinfile, f, h, "NONE",,, "Name of the file containing the energy bin definition"
 #
