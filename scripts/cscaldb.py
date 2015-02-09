@@ -19,6 +19,7 @@
 #
 # ==========================================================================
 import gammalib
+import ctools
 import sys
 import glob
 import os
@@ -27,7 +28,7 @@ import os
 # ============ #
 # cspull class #
 # ============ #
-class cscaldb(gammalib.GApplication):
+class cscaldb(ctools.cscript):
     """
     This class implements the pull distribution generation script. It derives
     from the GammaLib::GApplication class which provides support for parameter
@@ -47,9 +48,9 @@ class cscaldb(gammalib.GApplication):
 
         # Initialise application
         if len(argv) == 0:
-            gammalib.GApplication.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            gammalib.GApplication.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
