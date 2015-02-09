@@ -34,6 +34,7 @@
 #
 # ==========================================================================
 import gammalib
+import ctools
 from ctools import obsutils
 import sys
 import csv
@@ -43,10 +44,10 @@ import math
 # ============ #
 # cssens class #
 # ============ #
-class cssens(gammalib.GApplication):
+class cssens(ctools.cscript):
     """
     This class implements the sensitivity computation script. It derives
-    from the GammaLib::GApplication class which provides support for parameter
+    from the ctools.cscript class which provides support for parameter
     files, command line arguments, and logging. In that way the Python
     script behaves just as a regular ctool.
     """
@@ -56,16 +57,16 @@ class cssens(gammalib.GApplication):
         """
         # Set name
         self.name    = "cssens"
-        self.version = "0.4.0"
+        self.version = "1.0.0"
         
         # Make sure that parfile exists
         file = self.parfile()
 
         # Initialise application
         if len(argv) == 0:
-            gammalib.GApplication.__init__(self, self.name, self.version)
+            ctool.cscript.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            gammalib.GApplication.__init__(self, self.name, self.version, *argv)
+            ctool.cscript.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 

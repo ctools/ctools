@@ -19,6 +19,7 @@
 #
 # ==========================================================================
 import gammalib
+import ctools
 from ctools import obsutils
 import sys
 import csv
@@ -27,10 +28,10 @@ import csv
 # ============ #
 # cspull class #
 # ============ #
-class cspull(gammalib.GApplication):
+class cspull(ctools.cscript):
     """
     This class implements the pull distribution generation script. It derives
-    from the GammaLib::GApplication class which provides support for parameter
+    from the ctools.cscript class which provides support for parameter
     files, command line arguments, and logging. In that way the Python
     script behaves just as a regular ctool.
     """
@@ -40,7 +41,7 @@ class cspull(gammalib.GApplication):
         """
         # Set name
         self.name    = "cspull"
-        self.version = "0.4.0"
+        self.version = "1.0.0"
         
         # Initialise some members
         self.obs       = None
@@ -52,9 +53,9 @@ class cspull(gammalib.GApplication):
 
         # Initialise application
         if len(argv) == 0:
-            gammalib.GApplication.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            gammalib.GApplication.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
@@ -92,25 +93,30 @@ class cspull(gammalib.GApplication):
             
             # Create default parfile
             pars = gammalib.GApplicationPars()
+            pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
-            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
+            pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
             pars.append(gammalib.GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
-            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","0.0","","Lower energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","0.0","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("tmin","r","h","0.0","","","Start time (MET in s)"))
+            pars.append(gammalib.GApplicationPar("tmax","r","a","1800.0","","","Duration (in s)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-            pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Effective exposure time (s)"))
-            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
-            pars.append(gammalib.GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))
-            pars.append(gammalib.GApplicationPar("pattern","s","h","single","","","Observation pattern (single/four)"))
-            pars.append(gammalib.GApplicationPar("offset","r","h","1.5","","","Observation pattern offset (deg)"))
             pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
             pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))         
+            pars.append(gammalib.GApplicationPar("pattern","s","h","single","","","Observation pattern (single/four)"))
+            pars.append(gammalib.GApplicationPar("offset","r","h","1.5","","","Observation pattern offset (deg)"))
+            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","cspull.log","","","Log filename"))
             pars.save(parfile)
         
         # Return
@@ -121,39 +127,42 @@ class cspull(gammalib.GApplication):
         Get parameters from parfile and setup the observation.
         """
         # Get parameters
-        if self.model == None:
-            self.m_inmodel = self["inmodel"].filename()
-        self.m_outfile  = self["outfile"].filename()
-        self.m_ntrials  = self["ntrials"].integer()
-        self.m_caldb    = self["caldb"].string()
-        self.m_irf      = self["irf"].string()
-        self.m_edisp    = self["edisp"].boolean()
-        self.m_ra       = self["ra"].real()
-        self.m_dec      = self["dec"].real()
-        self.m_emin     = self["emin"].real()
-        self.m_emax     = self["emax"].real()
+        
+        # Set observation if not done before
+        if self.obs == None or self.obs.size() == 0:
+            self.obs = self.get_observations()
+            
+            # Check for requested pattern and use above
+            # observation parameters to set wobble pattern
+            self.m_pattern = self["pattern"].string()
+            if self.m_pattern == "four":
+                self.obs = self.set_obs()
+            
+        # Get number of energy bins
         self.m_enumbins = self["enumbins"].integer()
-        self.m_duration = self["duration"].real()
-        self.m_deadc    = self["deadc"].real()
-        self.m_rad      = self["rad"].real()
-        self.m_pattern  = self["pattern"].string()
-        self.m_offset   = self["offset"].real()
-        self.m_npix     = self["npix"].integer()
-        self.m_binsz    = self["binsz"].real()
+        
+        # Read parameters for binned if requested
+        if not self.m_enumbins == 0:
+            self.m_npix     = self["npix"].integer()
+            self.m_binsz    = self["binsz"].real()
+        else:
+            # Set dummy values (required by obsutils)
+            self.m_npix = 0
+            self.m_binsz = 0.0
+            
+        # Set models if we have none
+        if self.obs.models().size() == 0:
+            self.obs.models(self["inmodel"].filename())
+         
+        # Read other parameters    
+        self.m_outfile  = self["outfile"].filename()
+        self.m_ntrials  = self["ntrials"].integer()   
+        self.m_edisp = self["edisp"].boolean()
+        self.m_offset   = self["offset"].real()   
 
         # Set some fixed parameters
         self.m_log   = False # Logging in client tools
         self.m_debug = True  # Debugging in client tools
-        
-        # Setup observations
-        self.obs = self.set_obs()
-         
-        # Load source model
-        if self.m_inmodel != None:
-            self.model = gammalib.GModels(self.m_inmodel)
-         
-        # Append source model to observation
-        self.obs.models(self.model)
 
         # Return
         return
@@ -163,7 +172,7 @@ class cspull(gammalib.GApplication):
         Set model.
         """
         # Copy models
-        self.model = models.copy()
+        self.obs.models(models.copy())
     
         # Return
         return
@@ -232,18 +241,19 @@ class cspull(gammalib.GApplication):
         
         Keywords:
         """
+        
         # Setup observation definition list
         obsdeflist = obsutils.set_obs_patterns(self.m_pattern, \
-                                               ra=self.m_ra, dec=self.m_dec, \
-                                               offset=self.m_offset)
+                                               ra=self["ra"].real(), dec=self["dec"].real(), \
+                                               offset=self["offset"].real())
         
         # Create list of observations
         obs = obsutils.set_obs_list(obsdeflist, \
-                                    tstart=0.0, duration=self.m_duration, \
-                                    deadc=self.m_deadc, \
-                                    emin=self.m_emin, emax=self.m_emax, \
-                                    rad=self.m_rad, \
-                                    irf=self.m_irf, caldb=self.m_caldb)
+                                    tstart=self["tmin"].real(), duration=self["tmax"].real()-self["tmin"].real(), \
+                                    deadc=self["deadc"].real(), \
+                                    emin=self["emin"].real(), emax=self["emax"].real(), \
+                                    rad=self["rad"].real(), \
+                                    irf=self["irf"].string(), caldb=self["caldb"].string())
     
         # Return observation container
         return obs
@@ -319,7 +329,7 @@ class cspull(gammalib.GApplication):
                 
                     # Compute pull
                     fitted_value = par.value()
-                    real_value   = self.model[i][k].value()
+                    real_value   = self.obs.models()[i][k].value()
                     error        = par.error()
                     if error != 0.0:
                         pull = (fitted_value - real_value) / error
