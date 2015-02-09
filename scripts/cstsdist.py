@@ -32,7 +32,7 @@ import csv
 class cstsdist(ctools.cscript):
     """
     This class implements the TS distribution generation script. It derives
-    from the GammaLib::GApplication class which provides support for parameter
+    from the ctools.cscript class which provides support for parameter
     files, command line arguments, and logging. In that way the Python
     script behaves just as a regular ctool.
     """
@@ -42,7 +42,7 @@ class cstsdist(ctools.cscript):
         """
         # Set name
         self.name    = "cstsdist"
-        self.version = "0.2.0"
+        self.version = "1.0.0"
         
         # Initialise some members
         self.obs        = None

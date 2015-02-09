@@ -30,10 +30,10 @@ import os
 # ============ #
 class cscaldb(ctools.cscript):
     """
-    This class implements the pull distribution generation script. It derives
-    from the GammaLib::GApplication class which provides support for parameter
-    files, command line arguments, and logging. In that way the Python
-    script behaves just as a regular ctool.
+    This class dumps the content of the ctools calibration database.
+    It derives from the ctools.cscript class which provides support for
+    parameter files, command line arguments, and logging. In that way
+    the Python script behaves just as a regular ctool.
     """
     def __init__(self, *argv):
         """
@@ -41,7 +41,7 @@ class cscaldb(ctools.cscript):
         """
         # Set name
         self.name    = "cscaldb"
-        self.version = "0.1.0"
+        self.version = "1.0.0"
         
         # Make sure that parfile exists
         file = self.parfile()
