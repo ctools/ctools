@@ -605,8 +605,8 @@ $ECHO " ok"
 # Test ctulimit
 # ===============
 $ECHO -n "Test ctulimit: "
-$ctulimit inobs="selected_events.fits" \
-    inmodel="results_unbinned.xml" \
+$ctulimit inobs="data/crab_events.fits.gz" \
+    inmodel="data/crab.xml" \
     srcname="Crab" \
     outfile="ulimit.dat" \
     caldb="irf" \

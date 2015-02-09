@@ -19,7 +19,7 @@ General parameters
     Input event list, counts cube or observation definition XML file.
  	 	 
 ``inmodel [file]``
-    Model XML file containing the optimised source and background definitions.
+    Model XML file containing the source and background definitions.
  	 	 
 ``srcname [string]``
     Name of model component for which upper limit should be computed.
