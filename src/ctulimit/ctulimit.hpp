@@ -69,7 +69,9 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    const double&     ulimit(void) const;
+    const double&     diff_ulimit(void) const;
+    const double&     flux_ulimit(void) const;
+    const double&    eflux_ulimit(void) const;
 
 protected:
     // Protected methods
@@ -77,19 +79,32 @@ protected:
     void copy_members(const ctulimit& app);
     void free_members(void);
     void get_parameters(void);
+    void ulimit_bisection(const double& parmin, const double& parmax, const double& scale);
+    double evaluate(const double& value);
 
     // User parameters
-    std::string              m_infile;     //!< Input file
-    std::string              m_modelfile;//!< Name of model optimised model file
     std::string              m_srcname;    //!< Name of source which is moved around
-    std::string              m_parname; //!< Name of parameter upper limit should be computed
-    std::string              m_outfile;    //!< Output counts map or XML file
-    std::string              m_algorithm; //!< algorithm of upper limit computation
+    std::string              m_outfile;    //!< Output ascii file
+
+    GModelSky*            m_skymodel; //!< Pointer to variable spectral model
+
+    int                m_max_iter; //!< maximum number of iterations
+    double                m_dloglike; //!< Likelihood difference for upper limit computation
+    double                m_bestloglike ; //!< Best fit log likelihood of given model
+    double                m_tol; //!< tolerance for limit determination
+    double                m_sigma_min; //!< Starting value minimum (multiple fit errors above fit values)
+    double                m_sigma_max; //!< Starting value maximum (multiple fit errors above fit values)
+    double                m_eref; //!< reference energy for flux limits
+    double                m_emin; //!< minimum energy for flux limits
+    double                m_emax; //!< maximum energy for flux limits
+
+    double                m_diff_ulimit; //!<Differential upper limit value
+    double                m_flux_ulimit; //!< Flux upper limit value
+    double                m_eflux_ulimit; //!< Energy flux upper limits
 
     // Protected members
     GObservations            m_obs;        //!< Observation container
-
-    double                m_ulimit; //!<Upper limit value
+    GModels m_models;
 
 };
 
@@ -106,15 +121,36 @@ const GObservations& ctulimit::obs(void) const
 }
 
 /***********************************************************************//**
- * @brief Return observation container
+ * @brief Return differential upper limit
  *
- * @return Reference to observation container
+ * @return differential upper limit
  ***************************************************************************/
 inline
-const double& ctulimit::ulimit(void) const
+const double& ctulimit::diff_ulimit(void) const
 {
-    return m_ulimit;
+    return m_diff_ulimit;
 }
 
+/***********************************************************************//**
+ * @brief Return flux upper limit
+ *
+ * @return flux upper limit
+ ***************************************************************************/
+inline
+const double& ctulimit::flux_ulimit(void) const
+{
+    return m_flux_ulimit;
+}
+
+/***********************************************************************//**
+ * @brief return energy flux upper limit
+ *
+ * @return energy flux upper limits
+ ***************************************************************************/
+inline
+const double& ctulimit::eflux_ulimit(void) const
+{
+    return m_eflux_ulimit;
+}
 
 #endif /* CTULIMIT_HPP */

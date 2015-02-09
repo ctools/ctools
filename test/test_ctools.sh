@@ -46,12 +46,14 @@ ctpsfcube=../src/ctpsfcube/ctpsfcube
 ctbkgcube=../src/ctbkgcube/ctbkgcube
 ctcubemask=../src/ctcubemask/ctcubemask
 ctbutterfly=../src/ctbutterfly/ctbutterfly
+ctulimit=../src/ctulimit/ctulimit
 
 
 #
 # Remove any existing result files
 # ================================
 rm -rf *.fits *.xml
+rm -rf ulimit.dat butterfly.txt
 
 
 #
@@ -597,3 +599,25 @@ else
     exit 1
 fi
 $ECHO " ok"
+
+
+#
+# Test ctulimit
+# ===============
+$ECHO -n "Test ctulimit: "
+$ctulimit inobs="selected_events.fits" \
+    inmodel="results_unbinned.xml" \
+    srcname="Crab" \
+    outfile="ulimit.dat" \
+    caldb="irf" \
+    irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "ulimit.dat" ]
+then
+    $ECHO -n "."
+else
+    $ECHO " ulimit.dat file is not found"
+    exit 1
+fi
+$ECHO " ok"
+

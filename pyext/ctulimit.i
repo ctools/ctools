@@ -1,7 +1,7 @@
 /***************************************************************************
- *                      ctulimit - upper limit calculation tool                  *
+ *                  ctulimit - ctulimit calculation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2015 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,61 +19,46 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctulimit/main.cpp
- * @brief CTA upper limit generation
+ * @file ctulimit
+ * @brief upper limit calculation tool
  * @author Michael Mayer
  */
-
-/* __ Includes ___________________________________________________________ */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#include <cstdio>
+%{
+/* Put headers and other declarations here that are needed for compilation */
 #include "ctulimit.hpp"
+%}
 
 
 /***********************************************************************//**
- * @brief Main entry point of application
+ * @class ctulimit
  *
- * @param[in] argc Number of command line arguments.
- * @param[in] argv Command line arguments.
- *
- * This is the main entry point of the ctulimit application. It allocates a
- * ctupperlimit object and runs the application.
+ * @brief upper limit calculation tool
  ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Initialise return code
-    int rc = 1;
+class ctulimit : public ctool {
+public:
+    // Constructors and destructors
+    ctulimit(void);
+    explicit ctulimit(const GObservations& obs);
+    ctulimit(int argc, char *argv[]);
+    ctulimit(const ctulimit& app);
+    virtual ~ctulimit(void);
+    
+    // Methods
+    void                 clear(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    const double&     diff_ulimit(void) const;
+    const double&     flux_ulimit(void) const;
+    const double&    eflux_ulimit(void) const;
+};
 
-    // Create instance of application
-    ctulimit application(argc, argv);
 
-    // Run application
-    try {
-        // Execute application
-        application.execute();
-
-        // Signal success
-        rc = 0;
+/***********************************************************************//**
+ * @brief upper limit calculation tool Python extensions
+ ***************************************************************************/
+%extend ctulimit {
+    ctulimit copy() {
+        return (*self);
     }
-    catch (std::exception &e) {
-
-        // Extract error message
-        std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " ctulimit. Run aborted ...";
-
-        // Write error in logger
-        application.log << signal  << std::endl;
-        application.log << message << std::endl;
-
-        // Write error on standard output
-        std::cout << signal  << std::endl;
-        std::cout << message << std::endl;
-
-    } // endcatch: catched any application error
-
-    // Return
-    return rc;
 }
