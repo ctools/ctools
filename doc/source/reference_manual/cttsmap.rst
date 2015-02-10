@@ -15,53 +15,53 @@ This tool generates a test statistics map.
 General parameters
 ------------------
 
-``inobs = events.fits [file]``
+``inobs [file]``
     Input event list, counts cube or observation definition XML file.
 
-``inmodel = $CTOOLS/share/models/crab.xml [file]``
+``inmodel [file]``
     Input source model XML file.
 
-``srcname = Crab [string]``
+``srcname [string]``
     Name of the source in the source model XML file for which the Test
     Statistic map should be computed.
 
-``expcube = NONE [file]``
+``expcube [file]``
     Exposure cube file (only needed for stacked analysis).
 
-``psfcube = NONE [file]``
+``psfcube [file]``
     PSF cube file (only needed for stacked analysis).
 
-``caldb = dummy [string]``
+``caldb [string]``
     Calibration database.
 
-``irf = cta_dummy_irf [string]``
+``irf [string]``
     Response function.
 
-``outmap = tsmap.fits [file]``
+``outmap [file]``
     Output Test Statistic map file.
  	 	 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for map centre instead of xref/yref parameters?
  	 	 
-``nxpix = 200 [integer]``
+``nxpix [integer]``
     Number of map pixels in Right Ascension or Galactic longitude.
  	 	 
-``nypix = 200 [integer]``
+``nypix [integer]``
     Number of map pixels in Declination or Galactic latitude.
  	 	 
-``binsz = 0.02 [real]``
+``binsz [real]``
     Map pixel size (in degrees/pixel).
  	 	 
-``coordsys = CEL <CEL|GAL> [string]``
+``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref = 83.63 [real]``
+``xref [real]``
     Right Ascension / Galactic longitude of map centre (J2000, in degrees).
  	 	 
-``yref = 22.01 [real]``
+``yref [real]``
     Declination / Galactic latitude of map centre (J2000, in degrees).
  	 	 
-``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
 
 ``(binmin = -1) [integer]``

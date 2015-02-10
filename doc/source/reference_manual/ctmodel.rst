@@ -17,51 +17,51 @@ Galactic longitude, Declination or Galactic latitude, and energy.
 General parameters
 ------------------
 
-``incube = NONE [file]``
+``incube [file]``
     Input counts cube. If a filename is given the counts cube will be
     used to define the dimensions of the model cube. The content of
     the counts cube is not relevant.
 
-``inmodel = $CTOOLS/share/models/crab.xml [string]``
+``inmodel [string]``
     Source model XML file.
 
-``outcube = modcube.fits [file]``
+``outcube [file]``
     Output model counts cube.
  	 	 
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation.
 
-``inobs = NONE [file]``
+``inobs [file]``
     Input event list, counts cube or observation definition XML file.
     This information is needed to determine the observation information
     (number of observations, duration, liftime, pointing, eventually
     observation specific instrument response functions, etc.).
 
-``expcube = NONE [file]``
+``expcube [file]``
     Exposure cube file (only needed for stacked analysis).
 
-``psfcube = NONE [file]``
+``psfcube [file]``
     PSF cube file (only needed for stacked analysis).
 
-``caldb = dummy [string]``
+``caldb [string]``
     Calibration database.
  	 	 
-``irf = cta_dummy_irf [string]``
+``irf [string]``
     Instrument response function.
  	 	 
-``ra = 83.63 [real]``
+``ra [real]``
     Right Ascension of pointing (J2000, in degrees).
  	 	 
-``dec = 22.01 [real]``
+``dec [real]``
     Declination of pointing (J2000, in degrees).
 
-``rad = 5.0 [real]``
+``rad [real]``
     Radius of field of view (in degrees).
  	 	 
-``tmin = 0.0 [real]``
+``tmin [real]``
     CTA mission elapsed start time (in seconds).
  	 	 
-``tmax = 1800.0 [real]``
+``tmax [real]``
     CTA mission elapsed stop time (in seconds).
  	 	 
 ``(deadc = 0.95) [real]``
@@ -70,13 +70,13 @@ General parameters
 ``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
-``emin = 0.1 [real]``
+``emin [real]``
     Lower energy value for first energy bin (in TeV).
  	 	 
-``emax = 100 [real]``
+``emax [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
-``enumbins = 20 [integer]``
+``enumbins [integer]``
     Number of energy bins.
  	 	 
 ``(ebinfile = NONE) [file]``
@@ -85,25 +85,25 @@ General parameters
 ``(usepnt = no) [boolean]``
     Use pointing instead of xref/yref parameters?
  	 	 
-``nxpix = 200 [integer]``
+``nxpix [integer]``
     Size of the Right Ascension / Galactic longitude axis (in pixels).
  	 	 
-``nypix = 200 [integer]``
+``nypix [integer]``
     Size of the Declination / Galactic latitude axis (in pixels).
  	 	 
-``binsz = 0.02 [real]``
+``binsz [real]``
     Pixel size (in degrees/pixel).
  	 	 
-``coordsys = CEL <CEL|GAL> [string]``
+``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref = 83.63 [real]``
+``xref [real]``
     Right Ascension / Galactic longitude of image centre (J2000, in degrees).
  	 	 
-``yref = 22.01 [real]``
+``yref [real]``
     Declination / Galactic latitude of image centre (J2000, in degrees).
  	 	 
-``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
 
 

@@ -16,13 +16,13 @@ corresponding pixels to negative values.
 General parameters
 ------------------
 
-``inobs = cntmap.fits [file]``
+``inobs [file]``
     Input counts cube or observation definition XML file.
 
-``regfile = NONE [file]``
+``regfile [file]``
     Exclusion region file in ds9 format.
 
-``outcube = filtered_cube.fits [file]``
+``outcube [file]``
     Output counts cube or observation definition XML file.
 
 ``(prefix = filtered_) [string]``
@@ -32,19 +32,19 @@ General parameters
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction instead of ra/dec parameters?
  	 	 
-``ra = 83.63 [real]``
+``ra [real]``
     Right Ascension of circular selection region centre (J2000, in degrees).
  	 	 
-``dec = 22.01 [real]``
+``dec [real]``
     Declination of circular selection region centre (J2000, in degrees).
 
-``rad = 3.0 [real]``
+``rad [real]``
     Radius of circular selection region (in degrees).
 
-``emin = 0.1 [real]``
+``emin [real]``
     Lower energy limit (in TeV).
  	 	 
-``emax = 100.0 [real]``
+``emax [real]``
     Upper energy limit (in TeV).
  	 	 
 

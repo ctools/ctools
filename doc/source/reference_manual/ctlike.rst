@@ -22,16 +22,16 @@ and unbinned maximum likelihood analysis.
 General parameters
 ------------------
 
-``inobs = events.fits [file]``
+``inobs [file]``
     Input event list, counts cube or observation definition XML file.
 
-``inmodel = $CTOOLS/share/models/crab.xml [string]``
+``inmodel [string]``
     Source model input XML file.
  	 	 
-``expcube = NONE [file]``
+``expcube [file]``
     Exposure cube file (only needed for stacked analysis).
 
-``psfcube = NONE [file]``
+``psfcube [file]``
     PSF cube file (only needed for stacked analysis).
 
 ``caldb [string]``

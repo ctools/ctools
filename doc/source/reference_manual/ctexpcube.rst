@@ -16,61 +16,61 @@ analysis.
 General parameters
 ------------------
 
-``inobs = NONE [file]``
+``inobs [file]``
     Input event list or observation definition XML file.
 
-``incube = NONE [file]``
+``incube [file]``
     Counts cube for PSF cube definition.
 
-``outcube = expcube.fits [file]``
+``outcube [file]``
     Output exposure cube file.
 
-``caldb = dummy [string]``
+``caldb [string]``
     Calibration database.
 
-``irf = cta_dummy_irf [string]``
+``irf [string]``
     Response function.
 
 ``(edisp = no) [boolean]``
     Apply energy dispersion for response computation?
 
-``ebinalg = LOG <FILE|LIN|LOG> [string]``
+``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
-``emin = 0.1 [real]``
+``emin [real]``
     Lower energy value for first energy bin (in TeV).
  	 	 
-``emax = 100.0 [real]``
+``emax [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
-``enumbins = 20 [integer]``
+``enumbins [integer]``
     Number of energy bins.
  	 	 
-``ebinfile = NONE [file]``
+``ebinfile [file]``
     Name of the file containing the energy bin definition.
  	 	 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?
  	 	 
-``nxpix = 200 [integer]``
+``nxpix [integer]``
     Number of cube bins in Right Ascension or Galactic longitude.
  	 	 
-``nypix = 200 [integer]``
+``nypix [integer]``
     Number of cube bins in Declination or Galactic latitude.
  	 	 
-``binsz = 0.02 [real]``
+``binsz [real]``
     Cube bin size (in degrees/pixel).
  	 	 
-``coordsys = CEL <CEL|GAL> [string]``
+``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref = 83.63 [real]``
+``xref [real]``
     Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
  	 	 
-``yref = 22.01 [real]``
+``yref [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
  	 	 
-``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
  	 	 
 
