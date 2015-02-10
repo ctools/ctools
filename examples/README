@@ -59,6 +59,9 @@ pipeline_unbinned_mem.py
 show_butterfly.py
   Displays a butterfly generated using the ctbutterfly tool.
 
+show_model.py
+  Displays a spectral model.
+
 show_pha.py
   Displays a spectrum in PHA format.
 
