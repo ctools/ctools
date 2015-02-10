@@ -357,6 +357,7 @@ Constant
   where
 
   * :math:`N_0` = ``Normalization``
+    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
 
 
 
@@ -379,8 +380,10 @@ Power law
   where
 
   * :math:`k_0` = ``Prefactor``
+    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
   * :math:`\gamma` = ``Index``
   * :math:`E_0` = ``Scale``
+    :math:`[{\rm MeV}]`
 
   .. warning::
 
@@ -407,9 +410,12 @@ Power law
   where
 
   * :math:`N` = ``Integral``
+    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}]`
   * :math:`\gamma` = ``Index``
   * :math:`E_{\rm min}` = ``LowerLimit``
+    :math:`[{\rm MeV}]`
   * :math:`E_{\rm max}` = ``UpperLimit``
+    :math:`[{\rm MeV}]`
 
   .. warning::
 
@@ -441,9 +447,12 @@ Exponentially cut-off power law
   where
 
   * :math:`k_0` = ``Prefactor``
+    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
   * :math:`\gamma` = ``Index``
   * :math:`E_0` = ``Scale``
+    :math:`[{\rm MeV}]`
   * :math:`E_{\rm cut}` = ``Cutoff``
+    :math:`[{\rm MeV}]`
 
   .. warning::
 
@@ -477,9 +486,11 @@ Broken power law
   where
 
   * :math:`k_0` = ``Prefactor``
+    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
   * :math:`\gamma_1` = ``Index1``
   * :math:`\gamma_2` = ``Index2``
   * :math:`E_b` = ``BreakValue``
+    :math:`[{\rm MeV}]`
 
   .. warning::
 
@@ -508,10 +519,11 @@ Log parabola
   where
 
   * :math:`k_0` = ``Prefactor``
+    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
   * :math:`\gamma` = ``Index``
   * :math:`\eta` = ``Curvature``
   * :math:`E_0` = ``Scale``
-
+    :math:`[{\rm MeV}]`
 
   .. warning::
 
@@ -554,8 +566,11 @@ Gaussian
   where
 
   * :math:`N_0` = ``Normalization``
+    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}]`
   * :math:`\bar{E}` = ``Mean``
+    :math:`[{\rm MeV}]`
   * :math:`\sigma` = ``Sigma``
+    :math:`[{\rm MeV}]`
 
 
 File function
@@ -571,11 +586,12 @@ File function
   that is defined by intensity values at specific energies.
   The energy and intensity values are defined using an ASCII file with
   columns of energy and differential flux values.
-  The energy units are assumed to be MeV and the flux values are assumed to 
-  :math:`{\rm cm}^{-2} {\rm s}^{-1} {\rm MeV}^{-1}`
+  The energy units are assumed to be :math:`[{\rm MeV}]` and the flux values
+  are assumed to 
+  :math:`{\rm ph}\,\,{\rm cm}^{-2} {\rm s}^{-1} {\rm MeV}^{-1}`
   (the only exception being a model for which the spatial component is
   a constant diffuse model; in this case, the units are 
-  :math:`{\rm cm}^{-2} {\rm s}^{-1} {\rm MeV}^{-1} {\rm sr}^{-1}`).
+  :math:`{\rm ph}\,\,{\rm cm}^{-2} {\rm s}^{-1} {\rm MeV}^{-1} {\rm sr}^{-1}`).
   The only parameter is a multiplicative normalization:
 
   .. math::
@@ -612,6 +628,14 @@ Node function
   The ``NodeFunction`` model component implements a generalised broken 
   power law which is defined by a set of energy and intensity values
   (the so called nodes) that are piecewise connected by power laws.
+  Energies are given in units of
+  :math:`[{\rm MeV}]`,
+  intensities are given in units of
+  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
+  (except for a constant diffuse model where intensities are given in
+  units of 
+  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}\,{\rm 
+  sr}^{-1}]`).
 
   .. warning::
 
