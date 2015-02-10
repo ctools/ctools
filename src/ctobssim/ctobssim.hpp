@@ -66,6 +66,8 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
+    const double&        max_rate(void) const;
+    void                 max_rate(const double& max_rate);
 
 protected:
     // Protected methods
@@ -95,6 +97,7 @@ protected:
     mutable bool          m_save_and_dispose; //!< Save and dispose immediately
     double                m_area;             //!< Surface area for simulation (cm2)
     int                   m_max_photons;      //!< Maximum number of photons/slice
+    double                m_max_rate;         //!< Maximum photon rate
     std::vector<GRan>     m_rans;             //!< Random number generators
     int                   m_event_id;         //!< Event identifier
 };
@@ -108,7 +111,32 @@ protected:
 inline
 const GObservations& ctobssim::obs(void) const
 {
-    return m_obs;
+    return (m_obs);
+}
+
+
+/***********************************************************************//**
+ * @brief Return maximum photon rate
+ *
+ * @return Reference to maximum photon rate.
+ ***************************************************************************/
+inline
+const double& ctobssim::max_rate(void) const
+{
+    return (m_max_rate);
+}
+
+
+/***********************************************************************//**
+ * @brief Set maximum photon rate
+ *
+ * @param[in] max_rate Maximum photon rate.
+ ***************************************************************************/
+inline
+void ctobssim::max_rate(const double& max_rate)
+{
+    m_max_rate = max_rate;
+    return;
 }
 
 #endif /* CTOBSSIM_HPP */

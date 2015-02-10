@@ -9,9 +9,9 @@ Simulates CTA events.
 Synopsis
 --------
 
-Generate photon events from astrophysical sources and process those photons
-according to the specified instrument response functions and generate
-instrumental background events.
+Generate photon events from astrophysical sources and background events 
+from an instrumental background model.
+
 
 General parameters
 ------------------
@@ -24,7 +24,7 @@ General parameters
 
 ``inmodel [file]``
     XML file that describes the astrophysical sources and the instrumental
-    background.
+    background model.
  	 	 
 ``outevents [file]``
     Output event list or observation definition XML file.
@@ -39,7 +39,10 @@ General parameters
     Instrumental response function.
  	 	 
 ``(seed = 1) [integer]``
-    Integer seed value to be used for Monte Carlo simulations.
+    Integer seed value to be used for Monte Carlo simulations. Keep this 
+    parameter at the same value for repeatable simulations, or increment 
+    this value for subsequent runs if non-repeatable simulations are
+    required.
  	 	 
 ``ra [real]``
     Right Ascension of CTA pointing (J2000, in degrees).
@@ -57,16 +60,23 @@ General parameters
     Mission elapsed stop time of observation (in seconds).
  	 	 
 ``emin [real]``
-    Lower energy limit of events (in TeV).
+    Lower energy limit of simulated events (in TeV).
  	 	 
 ``emax [real]``
-    Upper energy limit of events (in TeV).
+    Upper energy limit of simulated events (in TeV).
  	 	 
 ``(edisp = no) [boolean]``
     Apply energy dispersion?
  	 	 
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.
+
+``(maxrate = 1.0e6) [real]``
+    Maximum photon rate for source models. Source models that exceed this
+    maximum photon rate will lead to an exception as very likely the
+    specified model normalisation is too large (probably due to the
+    a misinterpretation of units). Note that ctools specifies intensity
+    units per MeV.
 
 
 Standard parameters

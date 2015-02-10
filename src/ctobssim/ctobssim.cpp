@@ -494,6 +494,7 @@ void ctobssim::init_members(void)
     m_prefix.clear();
     m_seed        = 1;
     m_apply_edisp = false;
+    m_max_rate    = 1.0e6;
 
     // Initialise protected members
     m_rans.clear();
@@ -524,6 +525,7 @@ void ctobssim::copy_members(const ctobssim& app)
     m_prefix      = app.m_prefix;
     m_seed        = app.m_seed;
     m_apply_edisp = app.m_apply_edisp;
+    m_max_rate    = app.m_max_rate;
 
     // Copy protected members
     m_area             = app.m_area;
@@ -577,6 +579,7 @@ void ctobssim::get_parameters(void)
     // Get other parameters
     m_seed        = (*this)["seed"].integer();
     m_apply_edisp = (*this)["edisp"].boolean();
+    m_max_rate    = (*this)["maxrate"].real();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -768,6 +771,36 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         }
                         GTime tslice(duration, "sec");
 
+                        // If photon rate exceeds the maximum photon rate
+                        // then throw an exception
+                        if (rate > m_max_rate) {
+                            std::string modnam = (model->name().length() > 0) ?
+                                                 model->name() : "Unknown";
+                            std::string msg    = "Photon rate "+
+                                                 gammalib::str(rate)+
+                                                 " photons/sec for model \""+
+                                                 modnam+"\" exceeds maximum"
+                                                 " allowed photon rate of "+
+                                                 gammalib::str(m_max_rate)+
+                                                 " photons/sec. Please check"
+                                                 " the model parameters for"
+                                                 " model \""+modnam+"\" or"
+                                                 " increase the value of the"
+                                                 " hidden \"maxrate\""
+                                                 " parameter.";
+                            throw GException::invalid_value(G_SIMULATE_SOURCE, msg);
+                        }
+
+                        // Dump length of time slice and rate
+                        if (logExplicit()) {
+                            *wrklog << gammalib::parformat("Photon rate", indent);
+                            *wrklog << rate << " photons/sec";
+                            if (model->name().length() > 0) {
+                                *wrklog << " [" << model->name() << "]";
+                            }
+                            *wrklog << std::endl;
+                        }
+
                         // To reduce memory requirements we split long time
                         // intervals into several slices.
                         GTime tstart = tmin;
@@ -795,6 +828,10 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                 *wrklog << " - ";
                                 *wrklog << tstop.convert(m_cta_ref);
                                 *wrklog << " s" << std::endl;
+                                if (model->name().length() > 0) {
+                                    *wrklog << " [" << model->name() << "]";
+                                }
+                                *wrklog << std::endl;
                             }
 
                             // Get photons
