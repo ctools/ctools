@@ -827,7 +827,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                 *wrklog << tstart.convert(m_cta_ref);
                                 *wrklog << " - ";
                                 *wrklog << tstop.convert(m_cta_ref);
-                                *wrklog << " s" << std::endl;
+                                *wrklog << " s";
                                 if (model->name().length() > 0) {
                                     *wrklog << " [" << model->name() << "]";
                                 }
