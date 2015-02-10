@@ -342,7 +342,7 @@ CTA cube background
 
 
 
-.. _sec_spectal_models:
+.. _sec_spectral_models:
 
 Spectral model components
 ~~~~~~~~~~~~~~~~~~~~~~~~~
