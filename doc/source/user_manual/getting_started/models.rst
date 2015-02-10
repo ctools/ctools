@@ -223,6 +223,17 @@ Diffuse source
   .. code-block:: xml
 
     <source name="Crab" type="DiffuseSource">
+      <spatialModel type="ConstantValue">
+         <parameter name="Value" scale="1" value="1" min="1"  max="1" free="0"/>
+      </spatialModel>
+      <spectrum type="...">
+        ...
+      </spectrum>
+    </source>
+
+  .. code-block:: xml
+
+    <source name="Crab" type="DiffuseSource">
       <spatialModel type="SpatialMap" file="map.fits">
          <parameter name="Prefactor" scale="1" value="1" min="0.001" max="1000.0" free="0"/>
       </spatialModel>
@@ -338,6 +349,34 @@ Spectral model components
 
 The following sections present the spectral model components that are available 
 in ctools.
+
+.. warning::
+
+   The units of the spectral model depend on the spatial model component.
+   Units quoted below apply to spatial models for a source component.
+   Source intensities are generally given in units of
+   :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}`.
+
+   Exceptions to this rule exist for the following spatial models:
+
+   - ``ConstantValue``: intensity units are given per steradian, e.g.
+     :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}\,{\rm sr}^{-1}`
+
+   - ``MapCubeFunction``: intensities are unitless, the spectral model 
+     presents a relative scaling of the diffuse model
+
+   If spectral models are used for a background model component, intensity 
+   units are generally given in
+   :math:`{\rm counts}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}\,{\rm sr}^{-1}`
+   and correspond to the on-axis count rate.
+
+   Exceptions to this rule exist for the following spatial models:
+
+   - ``CTAIrfBackground``: intensities are unitless, the spectral model 
+     presents a relative scaling of the background model
+
+   - ``CTACubeBackground``: intensities are unitless, the spectral model 
+     presents a relative scaling of the background model
 
 
 Constant
@@ -586,12 +625,10 @@ File function
   that is defined by intensity values at specific energies.
   The energy and intensity values are defined using an ASCII file with
   columns of energy and differential flux values.
-  The energy units are assumed to be :math:`[{\rm MeV}]` and the flux values
-  are assumed to 
-  :math:`{\rm ph}\,\,{\rm cm}^{-2} {\rm s}^{-1} {\rm MeV}^{-1}`
-  (the only exception being a model for which the spatial component is
-  a constant diffuse model; in this case, the units are 
-  :math:`{\rm ph}\,\,{\rm cm}^{-2} {\rm s}^{-1} {\rm MeV}^{-1} {\rm sr}^{-1}`).
+  Energies are given in units of
+  :math:`[{\rm MeV}]`,
+  intensities are given in units of
+  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`.
   The only parameter is a multiplicative normalization:
 
   .. math::
@@ -631,11 +668,7 @@ Node function
   Energies are given in units of
   :math:`[{\rm MeV}]`,
   intensities are given in units of
-  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
-  (except for a constant diffuse model where intensities are given in
-  units of 
-  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}\,{\rm 
-  sr}^{-1}]`).
+  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`.
 
   .. warning::
 
