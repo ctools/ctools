@@ -15,58 +15,58 @@ This scripts generates a residual counts map.
 General parameters
 ------------------
 
-``inobs = obs.xml [file]``
+``inobs [file]``
     Input event list, counts cube or observation definition XML file.
 
-``inmodel = crab.xml [file]``
+``inmodel [file]``
     Model XML file.
 
-``outmap = resmap.fits [file]``
+``outmap [file]``
     Output residual counts map file.
 
-``caldb = dummy [string]``
+``caldb [string]``
     Calibration database.
 
-``irf = cta_dummy_irf [string]``
+``irf [string]``
     Instrument response function.
 
-``ebinalg = LOG <FILE|LIN|LOG> [string]``
+``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
-``emin = 0.1 [real]``
+``(emin = 0.1) [real]``
     Lower energy value for first energy bin (in TeV).
  	 	 
-``emax = 100.0 [real]``
+``(emax = 100.0) [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
-``enumbins =20 [integer]``
+``(enumbins = 20) [integer]``
     Number of energy bins.
  	 	 
-``ebinfile = NONE [file]``
+``(ebinfile = NONE) [file]``
     Name of the file containing the energy bin definition.
  	 	 
-``nxpix = 200 [integer]``
+``nxpix [integer]``
     Number of cube bins in Right Ascension or Galactic longitude.
  	 	 
-``nypix = 200 [integer]``
+``nypix [integer]``
     Number of cube bins in Declination or Galactic latitude.
  	 	 
-``binsz = 0.02 [real]``
+``binsz [real]``
     Cube bin size (in degrees/pixel).
  	 	 
-``coordsys = CEL <CEL|GAL> [string]``
+``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``xref = 83.63 [real]``
+``xref [real]``
     Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
  	 	 
-``yref = 22.01 [real]``
+``yref [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
  	 	 
-``proj = CAR <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
 
-``algorithm = SUBDIV <SUB|SUBDIV|SUBDIVSQRT> [string]``
+``(algorithm = SUBDIV) <SUB|SUBDIV|SUBDIVSQRT> [string]``
     Algorithm used to generate the residual map.
  	 	 
 
