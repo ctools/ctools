@@ -160,3 +160,30 @@ else
   exit 1
 fi
 $ECHO " ok"
+
+#
+# Test csspec
+# =============
+$ECHO -n "Test csspec: "
+chmod +x @abs_top_srcdir@/scripts/csspec.py
+@abs_top_srcdir@/scripts/csspec.py \
+  inobs="data/crab_events.fits" \
+  inmodel="data/crab.xml" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  enumbins=5 \
+  srcname="Crab" \
+  emin=0.1 \
+  emax=100.0 \
+  outfile="spectrum.fits" > csspec.log
+$ECHO -n "."
+if [ -s "spectrum.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " spectrum.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
