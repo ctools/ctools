@@ -405,6 +405,9 @@ void ctselect::init_members(void)
     m_infiles.clear();
     m_timemin.clear();
     m_timemax.clear();
+    m_select_energy = true;
+    m_select_roi    = true;
+    m_select_time   = true;
 
     // Return
     return;
@@ -433,10 +436,13 @@ void ctselect::copy_members(const ctselect& app)
     m_usethres = app.m_usethres;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_infiles    = app.m_infiles;
-    m_timemin    = app.m_timemin;
-    m_timemax    = app.m_timemax;
+    m_obs           = app.m_obs;
+    m_infiles       = app.m_infiles;
+    m_timemin       = app.m_timemin;
+    m_timemax       = app.m_timemax;
+    m_select_energy = app.m_select_energy;
+    m_select_roi    = app.m_select_roi;
+    m_select_time   = app.m_select_time;
     
     // Return
     return;
@@ -465,6 +471,11 @@ void ctselect::free_members(void)
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
+    // Initialise selection flags
+    m_select_energy = true;
+    m_select_roi    = true;
+    m_select_time   = true;
+
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
@@ -480,14 +491,56 @@ void ctselect::get_parameters(void)
     // Get parameters
     m_usepnt = (*this)["usepnt"].boolean();
     if (!m_usepnt) {
-        m_ra  = (*this)["ra"].real();
-        m_dec = (*this)["dec"].real();
+
+        // Check RA/DEC parameters for validity to read
+        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
+            m_ra         = (*this)["ra"].real();
+            m_dec        = (*this)["dec"].real();
+            m_select_roi = true;
+        }
+        else {
+            m_select_roi = false;
+        }
     }
-    m_rad      = (*this)["rad"].real();
-    m_tmin     = (*this)["tmin"].real();
-    m_tmax     = (*this)["tmax"].real();
-    m_emin     = (*this)["emin"].real();
-    m_emax     = (*this)["emax"].real();
+
+    // Check if radius is vaild for a RoI selection
+    if (m_select_roi && (*this)["rad"].is_valid()) {
+        m_rad = (*this)["rad"].real();
+    }
+    else {
+        m_select_roi = false;
+    }
+
+    // Check for sanity of time selection parameters
+    if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
+
+        // Get User parameters
+        m_tmin = (*this)["tmin"].real();
+        m_tmax = (*this)["tmax"].real();
+
+        // Additional check for time values
+        if (m_tmin >= m_tmax) {
+            m_select_time = false;
+        }
+        else {
+            m_select_time = true;
+        }
+    }
+    else {
+        m_select_time = false;
+    }
+
+    // Check for sanity of energy selection parameters
+    if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
+        m_emin          = (*this)["emin"].real();
+        m_emax          = (*this)["emax"].real();
+        m_select_energy = true;
+    }
+    else {
+        m_select_energy = false;
+    }
+
+    // Get other User parameters
     m_expr     = (*this)["expr"].string();
     m_usethres = (*this)["usethres"].string();
 
@@ -560,10 +613,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         emax = ebounds.emax(0).TeV();
     }
 
-    // Analyse parameters to see what selections are required
-    bool select_time   = (m_tmin != 0.0 || m_tmax != 0.0);
-    bool select_energy = (emin != 0.0 || emax != 0.0);
-    bool select_roi    = ((m_dec != -1.0 && m_ra != -1.0 && m_rad != -1.0) || m_usepnt);
+    // Analyse expression to see if a selection is required
     bool select_expr   = (gammalib::strip_whitespace(m_expr).length() > 0);
 
     // Set RA/DEC selection. If the "usepnt" parameter is set to true then
@@ -580,7 +630,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Set time selection interval. We make sure here that the time selection
     // interval cannot be wider than the GTIs covering the data. This is done
     // using GGti's reduce() method.
-    if (select_time) {
+    if (m_select_time) {
 
         // Reduce GTIs to specified time interval. The complicated cast is
         // necessary here because the gti() method is declared const, so
@@ -593,7 +643,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     GGti gti = list->gti();
 
     // Make time selection
-    if (select_time) {
+    if (m_select_time) {
     
         // Extract effective time interval in the reference time of the
         // event list. We get this reference time from gti.reference().
@@ -614,7 +664,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     } // endif: made time selection
 
     // Make energy selection
-    if (select_energy) {
+    if (m_select_energy) {
 
         // If we have aready a selection than add an "&&" operator
         if (selection.length() > 0) {
@@ -676,7 +726,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     } // endif: made energy selection
 
     // Make ROI selection
-    if (select_roi) {
+    if (m_select_roi) {
 
         // If we have aready a selection than add an "&&" operator
         if (selection.length() > 0) {
@@ -807,7 +857,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     list = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
     // If ROI selection has been applied then set the event list ROI
-    if (select_roi) {
+    if (m_select_roi) {
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
         list->roi(GCTARoi(instdir, rad));
@@ -817,7 +867,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     list->gti(gti);
 
     // If an energy selection has been applied then set the energy boundaries
-    if (select_energy) {
+    if (m_select_energy) {
         GEbounds ebounds;
         ebounds.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
         list->ebounds(ebounds);
