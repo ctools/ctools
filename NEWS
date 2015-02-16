@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-2 February 2015
+16 February 2015
 
 
 1. Introduction
@@ -38,7 +38,8 @@ None
 
 6. ctselect - CTA event selection
 ---------------------------------
-None
+If INDEF, UNDEF, NONE or UNDEFINED are passed for the selection parameters, no
+selection will be performed.
 
 
 7. ctbin - CTA event binning

@@ -96,13 +96,13 @@ protected:
     std::string m_usethres;   //!< Energy threshold type
 
     // Protected members
-    GObservations            m_obs;        //!< Observations container
-    std::vector<std::string> m_infiles;    //!< Input event filenames
-    GTime                    m_timemin;    //!< Earliest time
-    GTime                    m_timemax;    //!< Latest time
-    bool                 m_select_energy; //!< Flag that signals to perform energy selection
-    bool                 m_select_roi; //!< Flag that signals to perform energy selection
-    bool                 m_select_time; //!< Flag that signals to perform energy selection
+    GObservations            m_obs;           //!< Observations container
+    std::vector<std::string> m_infiles;       //!< Input event filenames
+    GTime                    m_timemin;       //!< Earliest time
+    GTime                    m_timemax;       //!< Latest time
+    bool                     m_select_energy; //!< Perform energy selection
+    bool                     m_select_roi;    //!< Perform ROI selection
+    bool                     m_select_time;   //!< Perform time selection
 
 };
 

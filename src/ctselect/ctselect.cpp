@@ -406,8 +406,8 @@ void ctselect::init_members(void)
     m_timemin.clear();
     m_timemax.clear();
     m_select_energy = true;
-    m_select_roi = true;
-    m_select_time = true;
+    m_select_roi    = true;
+    m_select_time   = true;
 
     // Return
     return;
@@ -436,13 +436,13 @@ void ctselect::copy_members(const ctselect& app)
     m_usethres = app.m_usethres;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_infiles    = app.m_infiles;
-    m_timemin    = app.m_timemin;
-    m_timemax    = app.m_timemax;
+    m_obs           = app.m_obs;
+    m_infiles       = app.m_infiles;
+    m_timemin       = app.m_timemin;
+    m_timemax       = app.m_timemax;
     m_select_energy = app.m_select_energy;
-    m_select_roi = app.m_select_roi;
-    m_select_time = app.m_select_time;
+    m_select_roi    = app.m_select_roi;
+    m_select_time   = app.m_select_time;
     
     // Return
     return;
@@ -471,6 +471,11 @@ void ctselect::free_members(void)
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
+    // Initialise selection flags
+    m_select_energy = true;
+    m_select_roi    = true;
+    m_select_time   = true;
+
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
@@ -489,8 +494,8 @@ void ctselect::get_parameters(void)
 
         // Check RA/DEC parameters for validity to read
         if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
-            m_ra  = (*this)["ra"].real();
-            m_dec = (*this)["dec"].real();
+            m_ra         = (*this)["ra"].real();
+            m_dec        = (*this)["dec"].real();
             m_select_roi = true;
         }
         else {
@@ -500,7 +505,7 @@ void ctselect::get_parameters(void)
 
     // Check if radius is vaild for a RoI selection
     if (m_select_roi && (*this)["rad"].is_valid()) {
-        m_rad      = (*this)["rad"].real();
+        m_rad = (*this)["rad"].real();
     }
     else {
         m_select_roi = false;
@@ -508,12 +513,17 @@ void ctselect::get_parameters(void)
 
     // Check for sanity of time selection parameters
     if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
-        m_tmin     = (*this)["tmin"].real();
-        m_tmax     = (*this)["tmax"].real();
+
+        // Get User parameters
+        m_tmin = (*this)["tmin"].real();
+        m_tmax = (*this)["tmax"].real();
 
         // Additional check for time values
         if (m_tmin >= m_tmax) {
             m_select_time = false;
+        }
+        else {
+            m_select_time = true;
         }
     }
     else {
@@ -522,13 +532,15 @@ void ctselect::get_parameters(void)
 
     // Check for sanity of energy selection parameters
     if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
-        m_emin     = (*this)["emin"].real();
-        m_emax     = (*this)["emax"].real();
+        m_emin          = (*this)["emin"].real();
+        m_emax          = (*this)["emax"].real();
+        m_select_energy = true;
     }
     else {
         m_select_energy = false;
     }
 
+    // Get other User parameters
     m_expr     = (*this)["expr"].string();
     m_usethres = (*this)["usethres"].string();
 
