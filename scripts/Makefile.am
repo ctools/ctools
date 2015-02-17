@@ -5,7 +5,7 @@ binscripts = cta_kb_bkgrates.py cta_root2irf.py cta_make_nodes.py \
              tsmerge.py
 
 # Scripts to be distributed in pythondir
-pythonscripts = cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py csspec.py\
+pythonscripts = cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py csspec.py csplotspec.py\
                 lsmodel.py \
 				obsutils.py
 

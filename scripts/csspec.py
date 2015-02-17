@@ -268,11 +268,11 @@ class csspec(ctools.cscript):
             select = ctools.ctselect(self.obs)
             select["emin"].real(emin.TeV())    
             select["emax"].real(emax.TeV()) 
-            select["tmin"].real(0.0)
-            select["tmax"].real(0.0)
-            select["rad"].real(0.0)
-            select["ra"].real(0.0)
-            select["dec"].real(-1.0)
+            select["tmin"].value("UNDEFINED")
+            select["tmax"].value("UNDEFINED")
+            select["rad"].value("UNDEFINED")
+            select["ra"].value("UNDEFINED")
+            select["dec"].value("UNDEFINED")
             select.run()        
             
             # likelihood
