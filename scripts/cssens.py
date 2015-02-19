@@ -1,21 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script computes the CTA sensitivity for a number of energy bins using
-# ctlike. Crab spectra are fitted in narrow energy bins to simulated data,
-# and the flux level is determined that leads to a particular significance.
-#
-# The significance can be either determined using the Test Statistic (which
-# is defined as twice the likelihood difference between fitting with and
-# without the test source) or using the source model scaling factor (or
-# Prefactor) divided by its statistical error. The latter has been turned
-# out to be more reliable, and is used as the default parameter.
-#
-# As background model, a GCTAModelRadialGauss model is used for the spatial
-# component. For the spectral component, either a file function is used
-# (specified by the "bkg" parameter), or if left blank, a power law adjusted
-# to Konrad's configuration "E" performance file is employed.
-#
-# The source is modelled as a point source
+# This script computes the CTA sensitivity.
 #
 # Copyright (C) 2011-2015 Juergen Knoedlseder
 #
@@ -46,10 +31,12 @@ import math
 # ============ #
 class cssens(ctools.cscript):
     """
-    This class implements the sensitivity computation script. It derives
-    from the ctools.cscript class which provides support for parameter
-    files, command line arguments, and logging. In that way the Python
-    script behaves just as a regular ctool.
+    This class computes the CTA sensitivity for a number of energy bins using
+    ctlike. Spectra are fitted in narrow energy bins to simulated data,
+    and the flux level is determined that leads to a particular significance.
+
+    The significance is determined using the Test Statistic, defined as twice
+    the likelihood difference between fitting with and  without the test source.
     """
     def __init__(self, *argv):
         """
@@ -58,6 +45,11 @@ class cssens(ctools.cscript):
         # Set name
         self.name    = "cssens"
         self.version = "1.0.0"
+
+        # Initialise some parameters
+        self.obs   = None
+        self.m_ra  = None
+        self.m_dec = None
         
         # Make sure that parfile exists
         file = self.parfile()
@@ -101,29 +93,31 @@ class cssens(ctools.cscript):
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
+            print("Parfile "+parfile+" not found. Create default parfile.")
             
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("outfile","f","h","sensitivity.dat","","","Output file name"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","$CTOOLS/share/caldb/data/cta/dummy","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
+            pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
+            pars.append(gammalib.GApplicationPar("offset","r","h","0.0","","","Source offset angle (deg)"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
-            pars.append(gammalib.GApplicationPar("offset","r","a","0.0","","","Source offset angle (deg)"))
-            pars.append(gammalib.GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function (none=power law for E)"))
+            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("outfile","f","h","sensitivity.dat","","","Output file name"))
             pars.append(gammalib.GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
             pars.append(gammalib.GApplicationPar("rad","r","a","5.0","","","Radius of ROI (deg)"))
+            pars.append(gammalib.GApplicationPar("emin","r","a","0.020","","","Lower energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","a","200.0","","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("bins","i","a","21","","","Number of energy bins for differential sensitivity computation"))
             pars.append(gammalib.GApplicationPar("enumbins","i","h","0","","","Number of energy bins (0=unbinned)"))
             pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
             pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
             pars.append(gammalib.GApplicationPar("sigma","r","h","5.0","","","Significance threshold"))
-            pars.append(gammalib.GApplicationPar("ts_use","b","h","yes","","","Use TS?"))
-            pars.append(gammalib.GApplicationPar("index","r","h","-2.48","","","Assumed spectral index"))
-            pars.append(gammalib.GApplicationPar("radius","r","h","0.1","","","Extended source model radius"))
-            pars.append(gammalib.GApplicationPar("width","r","h","0.05","","","Extended source model width"))
             pars.append(gammalib.GApplicationPar("max_iter","i","h","50","","","Maximum number of iterations"))
             pars.append(gammalib.GApplicationPar("num_avg","i","h","3","","","Number of iterations for sliding average"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","cssens.log","","","Log filename"))
             pars.save(parfile)
         
         # Return
@@ -131,31 +125,48 @@ class cssens(ctools.cscript):
         
     def get_parameters(self):
         """
-        Get parameters from parfile.
+        Get user parameters from parfile.
         """
-        # Get parameters
-        self.m_outfile  = self["outfile"].filename()
-        self.m_caldb    = self["caldb"].string()
-        self.m_irf      = self["irf"].string()
-        self.m_type     = self["type"].string()
-        self.m_offset   = self["offset"].real()
-        self.m_bkg      = self["bkg"].string()
-        self.m_duration = self["duration"].real()
-        self.m_roi      = self["rad"].real()
-        self.m_nbins    = self["enumbins"].integer()
-        self.m_npix     = self["npix"].integer()
-        self.m_binsz    = self["binsz"].real()
+        # Set observation if not done before
+        if self.obs == None or self.obs.size() == 0:
+            self.obs = self.set_obs()
+
+        # Set models if we have none
+        if self.obs.models().size() == 0:
+            self.obs.models(self["inmodel"].filename())
+
+        # Get source name
+        self.m_srcname = self["srcname"].string()
+
+        # Read further parameters
+        self.m_outfile = self["outfile"].filename()
+        self.m_emin    = self["emin"].real()
+        self.m_emax    = self["emax"].real()
+        self.m_bins    = self["bins"].integer()
+
+        # Read parameters for binned if requested
+        self.m_enumbins = self["enumbins"].integer()
+        if not self.m_enumbins == 0:
+            self.m_npix     = self["npix"].integer()
+            self.m_binsz    = self["binsz"].real()
+        else:
+            # Set dummy values (required by obsutils)
+            self.m_npix = 0
+            self.m_binsz = 0.0
+
+        # Read remaining parameters
         self.m_ts_thres = self["sigma"].real()*self["sigma"].real()
-        self.m_use_ts   = self["ts_use"].boolean()
-        self.m_index    = self["index"].real()
-        self.m_radius   = self["radius"].real()
-        self.m_width    = self["width"].real()
         self.m_max_iter = self["max_iter"].integer()
         self.m_num_avg  = self["num_avg"].integer()
-
+        
         # Set some fixed parameters
         self.m_log   = False                   # Logging in client tools
         self.m_debug = self["debug"].boolean() # Debugging in client tools
+
+        # Derive some parameters
+        self.m_ebounds = gammalib.GEbounds(self.m_bins, \
+                                           gammalib.GEnergy(self.m_emin, "TeV"), \
+                                           gammalib.GEnergy(self.m_emax, "TeV"))
         
         # Return
         return
@@ -190,17 +201,8 @@ class cssens(ctools.cscript):
         colnames = ['loge', 'emin', 'emax', 'crab', 'pflux', 'eflux', 'diffSens']
         results  = []
 
-        # Initialise models. Note that we centre the point source at the Galactic
-        # center as our observation is also centred at the Galactic centre, so
-        # we're onaxis.
-        bkg_model  = gammalib.GModels()
-        full_model = gammalib.GModels()
-        bkg_model.append(self.set_bkg_model())
-        full_model.append(self.set_bkg_model())
-        full_model.append(self.set_src_model(0.0, \
-                                             self.m_offset, \
-                                             type=self.m_type, \
-                                             index=self.m_index))
+        # Initialise models
+        full_model, bkg_model = self.set_models()
 
         # Write models into logger
         if self.logTerse():
@@ -218,21 +220,19 @@ class cssens(ctools.cscript):
             self.log("\n")
             self.log.header1("Sensitivity determination")
 
-        # Loop over energy bands. The number of energy band is still
-        # fixed ...
-        for ieng in range(21):
+        # Loop over energy bins
+        for ieng in range(self.m_ebounds.size()):
         
             # Set energies
-            loge  = -1.7 + ieng * 0.2
-            emean = pow(10.0, loge)
-            emin  = pow(10.0, loge-0.1)
-            emax  = pow(10.0, loge+0.1)
+            emean = self.m_ebounds.elogmean(ieng).TeV()
+            emin  = self.m_ebounds.emin(ieng).TeV()
+            emax  = self.m_ebounds.emax(ieng).TeV()
 
-            # Setup observation(s) 
-            obs = self.set_obs(emin=emin, emax=emax)
+            # Set energy boundaries
+            self.set_obs_ebounds(emin, emax)
             
             # Determine sensitivity
-            result = self.get_sensitivity(obs, bkg_model, full_model)
+            result = self.get_sensitivity(self.obs, bkg_model, full_model)
             
             # Write results
             if ieng == 0:
@@ -252,10 +252,10 @@ class cssens(ctools.cscript):
         
         # Return
         return
-    
+
     def set_obs(self, lpnt=0.0, bpnt=0.0, emin=0.1, emax=100.0):
         """
-        Returns an observation container with a single CTA observation.
+        Returns an observation container.
         
         Keywords:
          lpnt - Galactic longitude of pointing [deg] (default: 0.0)
@@ -263,134 +263,125 @@ class cssens(ctools.cscript):
          emin - Minimum energy [TeV] (default: 0.1)
          emax - Maximum energy [TeV] (default: 100.0)
         """
-        # Allocate observation container
-        obs = gammalib.GObservations()
+        # If an observation was provided on input then load it from XML file
+        filename = self["inobs"].filename()
+        if filename != "NONE" and filename != "":
+            obs = self.get_observations()
+
+        # ... otherwise allocate a single observation
+        else:
+
+            # Read relevant user parameters
+            caldb    = self["caldb"].string()
+            irf      = self["irf"].string()
+            deadc    = self["deadc"].real()
+            duration = self["duration"].real()
+            rad      = self["rad"].real()
+
+            # Allocate observation container
+            obs = gammalib.GObservations()
     
-        # Set single pointing
-        pntdir = gammalib.GSkyDir()
-        pntdir.lb_deg(lpnt, bpnt)
+            # Set single pointing
+            pntdir = gammalib.GSkyDir()
+            pntdir.lb_deg(lpnt, bpnt)
         
-        # Create CTA observation
-        run = obsutils.set_obs(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
-                               duration=self.m_duration, \
-                               emin=emin, emax=emax, rad=self.m_roi)
+            # Create CTA observation
+            run = obsutils.set_obs(pntdir, caldb=caldb, irf=irf, \
+                                   duration=duration, deadc=deadc, \
+                                   emin=emin, emax=emax, rad=rad)
         
-        # Append observation to container
-        obs.append(run)
+            # Append observation to container
+            obs.append(run)
+
+            # Set source position
+            offset     = self["offset"].real()
+            pntdir.lb_deg(lpnt, bpnt+offset)
+            self.m_ra  = pntdir.ra_deg()
+            self.m_dec = pntdir.dec_deg()
     
         # Return observation container
         return obs
-    
-    def set_bkg_model(self, fitidx=False):
+
+    def set_obs_ebounds(self, emin, emax):
         """
-        Setup standard CTA background model. We use a simple power law here,
-        scaled to Konrad's E configuration performance table. 
-        
-        Keywords:
-         fitidx - Fit spectral index (default: False)
+        Set energy boundaries for observation in container.
         """
-        # Define radial component
-        radial = gammalib.GCTAModelRadialGauss(3.0)
+        # Loop over all observations in container
+        for obs in self.obs:
         
-        # Define spectral component. If a background model is given then
-        # use a file function. Otherwise use a static power law.
-        if len(self.m_bkg) > 0:
-            spectrum = gammalib.GModelSpectralFunc(self.m_bkg, 1.0)
+            # Set energy boundaries
+            ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"), \
+                                        gammalib.GEnergy(emax, "TeV"))
+            obs.events().ebounds(ebounds)
+        
+        # Return
+        return
+
+    def set_models(self, fitpos=False, fitspec=False):
+        """
+        Set full and background model.
+        """
+        # Retrieve full model from observation container
+        full_model = self.obs.models().copy()
+
+        # Get source model
+        model = full_model[self.m_srcname]
+        
+        # Check that model has a Prefactor
+        if not model.has_par("Prefactor"):
+            msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
+                  " Only spectral models with a \"Prefactor\" parameter are supported."
+            raise gammalib.GException.invalid_value("cssens", msg)
+
+        # Set source position
+        if self.m_ra != None and self.m_dec != None:
+            if model.has_par("RA") and model.has_par("DEC"):
+                model["RA"].value(self.m_ra)
+                model["DEC"].value(self.m_dec)
+
+        # Fit or fix spatial parameters
+        if fitpos:
+            if model.has_par("RA"):
+                model["RA"].free()
+            if model.has_par("DEC"):
+                model["DEC"].free()
+            if model.has_par("Sigma"):
+                model["Sigma"].free()
+            if model.has_par("Radius"):
+                model["Radius"].free()
+            if model.has_par("Width"):
+                model["Width"].free()
         else:
-            spectrum = gammalib.GModelSpectralPlaw(61.8e-6, -1.85, gammalib.GEnergy(1.0, "TeV"))
-            if fitidx:
-                spectrum["Index"].free()
-            else:
-                spectrum["Index"].fix()
-        
+            if model.has_par("RA"):
+                model["RA"].fix()
+            if model.has_par("DEC"):
+                model["DEC"].fix()
+            if model.has_par("Sigma"):
+                model["Sigma"].fix()
+            if model.has_par("Radius"):
+                model["Radius"].fix()
+            if model.has_par("Width"):
+                model["Width"].fix()
+
+        # Fit or fix spectral parameters
+        if fitspec:
+            if model.has_par("Index"):
+                model["Index"].free()
+            if model.has_par("Cutoff"):
+                model["Cutoff"].free()
+        else:
+            if model.has_par("Index"):
+                model["Index"].fix()
+            if model.has_par("Cutoff"):
+                model["Cutoff"].fix()
+
         # Create background model
-        model = gammalib.GCTAModelRadialAcceptance(radial, spectrum)
-        model.name("Background")
-        model.instruments("CTA")
-    
-        # Return background model
-        return model
-    
-    def set_src_model(self, l, b, flux=1.0, index=-2.48, \
-                      type="point", fitpos=False, fitidx=False):
-        """
-        Returns a single source with Crab-like spectrum. The source flux
-        can be scaled in Crab units. The Crab spectrum is based on MAGIC
-        observations (Albert et al. 2008, ApJ, 674, 1037).
+        bkg_model = full_model.copy()
+        bkg_model.remove(self.m_srcname)
 
-        Parameters:
-         l      - Galactic longitude of source location [deg]
-         b      - Galactic latitude of source location [deg]
-        Keywords:
-         flux   - Source flux [Crabs]
-         index  - Spectral index
-         type   - Source type ("point", "gauss", "disk", "shell")
-         fitpos - Fit position and size? (default: False)
-         fitidx - Fit index? (default: False)
-        """
-        # Set source location
-        location = gammalib.GSkyDir()
-        location.lb_deg(l, b)
-    
-        # Set source spectrum
-        spectrum = gammalib.GModelSpectralPlaw(flux*5.7e-16, index, gammalib.GEnergy(0.3, "TeV"))
-        if fitidx:
-            spectrum["Index"].free()
-        else:
-            spectrum["Index"].fix() 
+        # Return models
+        return full_model, bkg_model
 
-        # Set source
-        if type == "point":
-            spatial = gammalib.GModelSpatialPointSource(location)
-            if fitpos:
-                spatial["RA"].free()
-                spatial["DEC"].free()
-            else:
-                spatial["RA"].fix()
-                spatial["DEC"].fix()
-        elif type == "gauss":
-            spatial = gammalib.GModelSpatialRadialGauss(location, self.m_radius)
-            if fitpos:
-                spatial["RA"].free()
-                spatial["DEC"].free()
-                spatial["Sigma"].free()
-            else:
-                spatial["RA"].fix()
-                spatial["DEC"].fix()
-                spatial["Sigma"].fix()
-        elif type == "disk":
-            spatial = gammalib.GModelSpatialRadialDisk(location, self.m_radius)
-            if fitpos:
-                spatial["RA"].free()
-                spatial["DEC"].free()
-                spatial["Radius"].free()
-            else:
-                spatial["RA"].fix()
-                spatial["DEC"].fix()
-                spatial["Radius"].fix()
-        elif type == "shell":
-            spatial = gammalib.GModelSpatialRadialShell(location, self.m_radius, self.m_width)
-            if fitpos:
-                spatial["RA"].free()
-                spatial["DEC"].free()
-                spatial["Radius"].free()
-                spatial["Width"].free()
-            else:
-                spatial["RA"].fix()
-                spatial["DEC"].fix()
-                spatial["Radius"].fix()
-                spatial["Width"].fix()
-        else:
-            self.log("ERROR: Unknown source type '"+type+"'.\n")
-            return None
-        source = gammalib.GModelSky(spatial, spectrum)
-    
-        # Set source name
-        source.name("Test")
-    
-        # Return source
-        return source
-    
     def get_sensitivity(self, obs, bkg_model, full_model):
         """
         Determine sensitivity for a given observations.
@@ -413,10 +404,25 @@ class cssens(ctools.cscript):
             erg_width = (emax.TeV()-emin.TeV()) * tev2erg
             break
 
+        # Compute Crab unit (this is the factor with which the Prefactor needs
+        # to be multiplied to get 1 Crab
+        crab_flux = self.get_crab_flux(emin, emax)
+        src_flux  = full_model[self.m_srcname].spectral().flux(emin, emax)
+        crab_unit = crab_flux/src_flux
+
         # Write header
         if self.logTerse():
             self.log("\n")
             self.log.header2("Energies: "+str(emin)+" - "+str(emax))
+            self.log.parformat("Crab flux")
+            self.log(crab_flux)
+            self.log(" ph/cm2/s\n")
+            self.log.parformat("Source model flux")
+            self.log(src_flux)
+            self.log(" ph/cm2/s\n")
+            self.log.parformat("Crab unit factor")
+            self.log(crab_unit)
+            self.log("\n")
 
         # Initialise loop
         flux_value     = []
@@ -424,7 +430,7 @@ class cssens(ctools.cscript):
         eflux_value    = []
         diffSens_value = []
         iter           = 0
-        test_flux      = 0.1  # This is the initial test flux in Crab units
+        test_cflux     = 0.1 # This is the initial test flux in Crab units (100 mCrab)
 
         # Loop until we break
         while True:
@@ -437,13 +443,14 @@ class cssens(ctools.cscript):
                 self.log.header2("Iteration "+str(iter))
 
             # Set test flux
-            src_model = full_model.copy()
-            crab_flux = src_model["Test"]['Prefactor'].value()
-            src_model["Test"]['Prefactor'].value(crab_flux*test_flux)
+            src_model      = full_model.copy()
+            crab_prefactor = src_model[self.m_srcname]['Prefactor'].value() * crab_unit
+            src_model[self.m_srcname]['Prefactor'].value(crab_prefactor * test_cflux)
             obs.models(src_model)
 
+
             # Simulate events
-            sim = obsutils.sim(obs, nbins=self.m_nbins, seed=iter, \
+            sim = obsutils.sim(obs, nbins=self.m_enumbins, seed=iter, \
                                binsz=self.m_binsz, npix=self.m_npix, \
                                log=self.m_log, debug=self.m_debug)
 
@@ -544,22 +551,24 @@ class cssens(ctools.cscript):
                 continue
 
             # Get fitted Crab, photon and energy fluxes
-            cflux     = result_all["Test"]['Prefactor'].value() / crab_flux
-            cflux_err = result_all["Test"]['Prefactor'].error() / crab_flux
-            pflux     = result_all["Test"].spectral().flux(emin, emax)
-            eflux     = result_all["Test"].spectral().eflux(emin, emax)
+            cflux     = result_all[self.m_srcname]['Prefactor'].value() / crab_prefactor
+            cflux_err = result_all[self.m_srcname]['Prefactor'].error() / crab_prefactor
+            pflux     = result_all[self.m_srcname].spectral().flux(emin, emax)
+            eflux     = result_all[self.m_srcname].spectral().eflux(emin, emax)
 
             # Compute differential sensitivity
             diffSens = pflux / erg_width * erg_mean*erg_mean
 
             # Compute flux correction factor based on average TS
             correct = 1.0
-            if self.m_use_ts:
-                if ts > 0:
-                    correct = math.sqrt(self.m_ts_thres/ts)
-            else:
-                if cflux > 0 and cflux_err > 0:
-                    correct = math.sqrt(self.m_ts_thres)/(cflux/cflux_err)
+            if ts > 0:
+                correct = math.sqrt(self.m_ts_thres/ts)
+            #if self.m_use_ts:
+            #    if ts > 0:
+            #        correct = math.sqrt(self.m_ts_thres/ts)
+            #else:
+            #    if cflux > 0 and cflux_err > 0:
+            #        correct = math.sqrt(self.m_ts_thres)/(cflux/cflux_err)
             
             # Compute extrapolated fluxes
             flux     = correct * cflux
@@ -631,8 +640,8 @@ class cssens(ctools.cscript):
             
             # Compare average flux to last average
             if iter > self.m_num_avg:
-                if test_flux > 0:
-                    ratio = flux/test_flux
+                if test_cflux > 0:
+                    ratio = flux/test_cflux
                     
                     # We have 2 convergence criteria:
                     # 1. The average flux does not change
@@ -648,7 +657,7 @@ class cssens(ctools.cscript):
                     break
             
             # Use average for next iteration
-            test_flux = flux
+            test_cflux = flux
             
             # Exit loop if number of trials exhausted
             if (iter >= self.m_max_iter):
@@ -711,6 +720,19 @@ class cssens(ctools.cscript):
         
         # Return result
         return result
+
+    def get_crab_flux(self, emin, emax):
+        """
+        Determine the Crab photon flux in a given energy interval.
+        """
+        # Set Crab spectral model
+        crab = gammalib.GModelSpectralPlaw(5.7e-16, -2.48, gammalib.GEnergy(0.3, "TeV"))
+
+        # Determine flux
+        flux = crab.flux(emin, emax)
+
+        # Return flux
+        return flux
 
 
 # ======================== #

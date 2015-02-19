@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all cscripts that are shipped with ctools
 #
-# Copyright (C) 2011-2013 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
   deadc=0.95 \
   rad=5.0 \
   npix=200 \
+  debug=yes \
   binsz=0.05 > cspull.log
 $ECHO -n "."
 if [ -s "pull.dat" ]
@@ -81,25 +82,27 @@ $ECHO " ok"
 #
 # Test cssens
 # ===========
-#$ECHO -n "Test cssens: "
-#chmod +x @abs_top_srcdir@/scripts/cssens.py
-#@abs_top_srcdir@/scripts/cssens.py \
-#  duration=3600.0 \
-#  caldb="irf" \
-#  irf="cta_dummy_irf" \
-#  type="point" \
-#  offset="0.0" \
-#  bkg="data/bkg_dummy.txt" \
-#  rad=5.0 > cssens.log
-#echo @ECHO_N@ "."
-#if [ -s "sensitivity.dat" ]
-#then
-#  $ECHO -n "."
-#else
-#  echo " sensitivity.dat file is not valid"
-#  exit 1
-#fi
-#echo " ok"
+$ECHO -n "Test cssens: "
+chmod +x @abs_top_srcdir@/scripts/cssens.py
+@abs_top_srcdir@/scripts/cssens.py \
+  inmodel="data/crab.xml" \
+  srcname="Crab" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  duration=1800.0 \
+  rad=3.0 \
+  emin=1.0 \
+  emax=10.0 \
+  bins=1 > cssens.log
+$ECHO -n "."
+if [ -s "sensitivity.dat" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " sensitivity.dat file is not valid"
+  exit 1
+fi
+$ECHO " ok"
 
 
 #

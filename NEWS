@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-16 February 2015
+20 February 2015
 
 
 1. Introduction
@@ -99,7 +99,10 @@ None
 
 18. Scripts
 -----------
-None
+The user parameter interface of cssens has been modified. The script
+now reads a source model that is used for sensitivity estimation.
+This provides more flexibility in the choice of the model for
+sensitivity estimation.
 
 
 19. caldb

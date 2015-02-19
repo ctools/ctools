@@ -3,13 +3,13 @@
 cttsmap
 =======
 
-Generate a Test Statistics map.
+Generate a Test Statistic map.
 
 
 Synopsis
 --------
 
-This tool generates a test statistics map.
+This tool generates a Test Statistic map.
 
 
 General parameters
