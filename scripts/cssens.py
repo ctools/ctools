@@ -64,9 +64,9 @@ class cssens(ctools.cscript):
 
         # Initialise application
         if len(argv) == 0:
-            ctool.cscript.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self.name, self.version)
         elif len(argv) ==1:
-            ctool.cscript.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self.name, self.version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
@@ -154,8 +154,8 @@ class cssens(ctools.cscript):
         self.m_num_avg  = self["num_avg"].integer()
 
         # Set some fixed parameters
-        self.m_log   = False # Logging in client tools
-        self.m_debug = False # self["debug"].boolean() # Debugging in client tools
+        self.m_log   = False                   # Logging in client tools
+        self.m_debug = self["debug"].boolean() # Debugging in client tools
         
         # Return
         return
@@ -271,9 +271,9 @@ class cssens(ctools.cscript):
         pntdir.lb_deg(lpnt, bpnt)
         
         # Create CTA observation
-        run = obsutils.set(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
-                           duration=self.m_duration, \
-                           emin=emin, emax=emax, rad=self.m_roi)
+        run = obsutils.set_obs(pntdir, caldb=self.m_caldb, irf=self.m_irf, \
+                               duration=self.m_duration, \
+                               emin=emin, emax=emax, rad=self.m_roi)
         
         # Append observation to container
         obs.append(run)
