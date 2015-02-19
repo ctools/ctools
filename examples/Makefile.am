@@ -16,8 +16,9 @@ scripts = README \
           pipeline_unbinned_mem.py \
           show_butterfly.py \
           show_pha.py \
-          show_response.py \
           show_pull_histogram.py \
+          show_response.py \
+          show_sensitivity.py \
           show_ts_distribution.py
 
 # Set directories
