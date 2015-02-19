@@ -155,7 +155,7 @@ class cssens(ctools.cscript):
 
         # Set some fixed parameters
         self.m_log   = False # Logging in client tools
-        self.m_debug = False # Debugging in client tools
+        self.m_debug = False # self["debug"].boolean() # Debugging in client tools
         
         # Return
         return
@@ -425,26 +425,28 @@ class cssens(ctools.cscript):
         diffSens_value = []
         iter           = 0
         test_flux      = 0.1  # This is the initial test flux in Crab units
-        
+
         # Loop until we break
         while True:
-        
+
             # Update iteration counter
             iter += 1
-            
+
             # Write header
             if self.logExplicit():
                 self.log.header2("Iteration "+str(iter))
 
             # Set test flux
-            full_model["Test"]['Prefactor'].value(test_flux)
-            obs.models(full_model)
-            
+            src_model = full_model.copy()
+            crab_flux = src_model["Test"]['Prefactor'].value()
+            src_model["Test"]['Prefactor'].value(crab_flux*test_flux)
+            obs.models(src_model)
+
             # Simulate events
             sim = obsutils.sim(obs, nbins=self.m_nbins, seed=iter, \
                                binsz=self.m_binsz, npix=self.m_npix, \
                                log=self.m_log, debug=self.m_debug)
-        
+
             # Determine number of events in simulation
             nevents = 0.0
             for run in sim:
@@ -463,7 +465,7 @@ class cssens(ctools.cscript):
             result_bgm = like.obs().models().copy()
             LogL_bgm   = like.opt().value()
             npred_bgm  = like.obs().npred()
-            
+
             # Assess quality based on a comparison between Npred and Nevents
             quality_bgm = npred_bgm-nevents
 
@@ -485,7 +487,7 @@ class cssens(ctools.cscript):
                 if self.logExplicit():
                     self.log("Fit quality outside required range. Start over.\n")
                 continue
-            
+
             # Write model fit results
             if self.logExplicit():
                 for model in result_bgm:
@@ -496,7 +498,7 @@ class cssens(ctools.cscript):
                         self.log(str(par)+"\n")
             
             # Fit background and test source
-            sim.models(full_model)
+            sim.models(src_model)
             like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
             result_all = like.obs().models().copy()
             LogL_all   = like.opt().value()
@@ -542,8 +544,8 @@ class cssens(ctools.cscript):
                 continue
 
             # Get fitted Crab, photon and energy fluxes
-            cflux     = result_all["Test"]['Prefactor'].value()
-            cflux_err = result_all["Test"]['Prefactor'].error()
+            cflux     = result_all["Test"]['Prefactor'].value() / crab_flux
+            cflux_err = result_all["Test"]['Prefactor'].error() / crab_flux
             pflux     = result_all["Test"].spectral().flux(emin, emax)
             eflux     = result_all["Test"].spectral().eflux(emin, emax)
 
