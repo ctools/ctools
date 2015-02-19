@@ -89,7 +89,7 @@ class cspull(ctools.cscript):
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
+            print("Parfile "+parfile+" not found. Create default parfile.")
             
             # Create default parfile
             pars = gammalib.GApplicationPars()
@@ -143,11 +143,11 @@ class cspull(ctools.cscript):
         
         # Read parameters for binned if requested
         if not self.m_enumbins == 0:
-            self.m_npix     = self["npix"].integer()
-            self.m_binsz    = self["binsz"].real()
+            self.m_npix  = self["npix"].integer()
+            self.m_binsz = self["binsz"].real()
         else:
             # Set dummy values (required by obsutils)
-            self.m_npix = 0
+            self.m_npix  = 0
             self.m_binsz = 0.0
             
         # Set models if we have none
@@ -155,18 +155,19 @@ class cspull(ctools.cscript):
             self.obs.models(self["inmodel"].filename())
          
         # Read other parameters    
-        self.m_outfile  = self["outfile"].filename()
-        self.m_ntrials  = self["ntrials"].integer()   
-        self.m_edisp = self["edisp"].boolean()
-        self.m_offset   = self["offset"].real()   
+        self.m_outfile = self["outfile"].filename()
+        self.m_ntrials = self["ntrials"].integer()   
+        self.m_edisp   = self["edisp"].boolean()
+        self.m_offset  = self["offset"].real()   
 
         # Set some fixed parameters
-        self.m_log   = False # Logging in client tools
-        self.m_debug = True  # Debugging in client tools
+        self.m_log   = False                    # Logging in client tools
+        self.m_debug = self["debug"].boolean()  # Debugging in client tools
 
         # Return
         return
     
+
     def models(self, models):
         """
         Set model.
@@ -177,6 +178,7 @@ class cspull(ctools.cscript):
         # Return
         return
         
+
     def execute(self):
         """
         Execute the script.
@@ -186,6 +188,7 @@ class cspull(ctools.cscript):
         
         # Return
         return
+
 
     def run(self):
         """
@@ -235,6 +238,7 @@ class cspull(ctools.cscript):
         # Return
         return
     
+
     def set_obs(self):
         """
         Returns an observation container with a set of CTA observations.
@@ -257,6 +261,7 @@ class cspull(ctools.cscript):
     
         # Return observation container
         return obs
+
 
     def trial(self, seed):
         """
