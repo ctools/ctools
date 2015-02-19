@@ -3,7 +3,7 @@
 # This script generates IRFs in the CALDB format of HEASARC using ROOT 2D
 # performance files.
 # -------------------------------------------------------------------------
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 # -------------------------------------------------------------------------
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 # - gammalib
 # - pyroot
 # ==========================================================================
-from ROOT import TFile, TH1F, TH2F
+from ROOT import TFile, TH1F, TH2F, TH3F
 from gammalib import *
 from datetime import datetime
 import math
@@ -818,6 +818,113 @@ class caldb():
 
         # Return boundary information
         return bounds
+
+    def make_3D_migra(self, array, hdu, name, unit, scale=1.0):
+        """
+        Make 3D cube as function of ETRUE, MIGRA and THETA form ROOT 3D
+        histogram. If the HDU has already the columns, this method will
+        simply add another data column.
+        If name==None, the method will not append any data column.
+        
+        Parameters:
+         array - ROOT 3D histogram.
+         hdu   - FITS HDU.
+         name  - Data column name.
+         unit  - Data unit.
+        Keywords:
+         scale - Scaling factor for histogram values.
+        """
+        # Extract Etrue, Eobs/Etrue and offset angle vectors
+        etrue    = array.GetXaxis()
+        netrue   = etrue.GetNbins()
+        migra    = array.GetYaxis()
+        nmigra   = migra.GetNbins()
+        offsets  = array.GetZaxis()
+        noffset  = offsets.GetNbins()
+        ewidth   = [] # in MeV
+        for ieng in range(netrue):
+            ewidth.append(pow(10.0, etrue.GetBinUpEdge(ieng+1) +6.0) - \
+                          pow(10.0, etrue.GetBinLowEdge(ieng+1)+6.0))
+
+        # Attach columns to HDU. We do this only if they do not yet
+        # exist. This allows adding columns to the same HDU in successive
+        # calls of this method
+        #
+        # ETRUE_LO
+        if not hdu.contains("ETRUE_LO"):
+            hdu.append(GFitsTableFloatCol("ETRUE_LO", 1, netrue))
+            hdu["ETRUE_LO"].unit("TeV")
+            for ieng in range(netrue):
+                e_lo = pow(10.0, etrue.GetBinLowEdge(ieng+1))
+                hdu["ETRUE_LO"][0,ieng] = e_lo
+        #
+        # ETRUE_HI
+        if not hdu.contains("ETRUE_HI"):
+            hdu.append(GFitsTableFloatCol("ETRUE_HI", 1, netrue))
+            hdu["ETRUE_HI"].unit("TeV")
+            for ieng in range(netrue):
+                e_hi = pow(10.0, etrue.GetBinUpEdge(ieng+1))
+                hdu["ETRUE_HI"][0,ieng] = e_hi
+        #
+        # MIGRA_LO
+        if not hdu.contains("MIGRA_LO"):
+            hdu.append(GFitsTableFloatCol("MIGRA_LO", 1, nmigra))
+            hdu["MIGRA_LO"].unit("")
+            for ieng in range(nmigra):
+                e_lo = pow(10.0, migra.GetBinLowEdge(ieng+1))
+                hdu["MIGRA_LO"][0,ieng] = e_lo
+        #
+        # MIGRA_HI
+        if not hdu.contains("MIGRA_HI"):
+            hdu.append(GFitsTableFloatCol("MIGRA_HI", 1, nmigra))
+            hdu["MIGRA_HI"].unit("")
+            for ieng in range(nmigra):
+                e_hi = pow(10.0, migra.GetBinUpEdge(ieng+1))
+                hdu["MIGRA_HI"][0,ieng] = e_hi
+        #
+        # THETA_LO
+        if not hdu.contains("THETA_LO"):
+            hdu.append(GFitsTableFloatCol("THETA_LO", 1, noffset))
+            hdu["THETA_LO"].unit("deg")
+            for ioff in range(noffset):
+                o_lo = offsets.GetBinLowEdge(ioff+1)
+                hdu["THETA_LO"][0,ioff] = o_lo
+        #
+        # THETA_LO
+        if not hdu.contains("THETA_HI"):
+            hdu.append(GFitsTableFloatCol("THETA_HI", 1, noffset))
+            hdu["THETA_HI"].unit("deg")
+            for ioff in range(noffset):
+                o_hi = offsets.GetBinUpEdge(ioff+1)
+                hdu["THETA_HI"][0,ioff] = o_hi
+        #
+        # "NAME"
+        if name != None and not hdu.contains(name):
+            hdu.append(GFitsTableFloatCol(name, 1, netrue*nmigra*noffset))
+            hdu[name].unit(unit)
+            hdu[name].dim([netrue, nmigra, noffset])
+            for ioff in range(noffset):
+                for imigra in range(nmigra):
+                    for ieng in range(netrue):
+                        index = ieng + (imigra + ioff * nmigra) * netrue
+                        value = array.GetBinContent(ieng+1,imigra+1,ioff+1)
+                        hdu[name][0,index] = value * scale
+
+        # Collect boundary information
+        bd_eng   = "ETRUE(%.4f-%.2f)TeV" % \
+                   (pow(10.0, etrue.GetBinLowEdge(1)), \
+                    pow(10.0, etrue.GetBinUpEdge(netrue)))
+        bd_migra = "MIGRA(%.4f-%.2f)TeV" % \
+                   (pow(10.0, migra.GetBinLowEdge(1)), \
+                    pow(10.0, migra.GetBinUpEdge(nmigra)))
+        bd_off   = "THETA(%.2f-%.2f)deg" % \
+                   (offsets.GetBinLowEdge(1), \
+                    offsets.GetBinUpEdge(noffset))
+        bd_phi   = "PHI(0-360)deg"
+        bounds   = [bd_eng, bd_migra, bd_off, bd_phi]
+
+        # Return boundary information
+        return bounds
     
     def root2caldb(self, filename, rebin=False, psftype="Gauss", scale=1.0):
         """
@@ -838,7 +945,7 @@ class caldb():
         self.root2psf(file, psftype)
 
         # Create energy dispersion
-        self.root2edisp(file)
+        self.root2edisp_migra(file)
 
         # Create background
         #self.root2bgd(file)
@@ -1126,7 +1233,7 @@ class caldb():
         # Return
         return
 
-    def root2edisp(self, file):
+    def root2edisp_2D(self, file):
         """
         Translate ROOT to CALDB energy dispersion extension. The following ROOT
         histograms are used:
@@ -1160,6 +1267,38 @@ class caldb():
 
             # EBIAS
             self.make_2D(ebias, self.hdu_edisp, "EBIAS", "Ereco/Etrue")
+
+        # Return
+        return
+
+    def root2edisp_migra(self, file):
+        """
+        Translate ROOT to CALDB energy dispersion extension. The following ROOT
+        histograms are used:
+
+        EestOverEtrue_offaxis  -> MATRIX
+
+        Parameters:
+         file - ROOT file.
+        Keywords:
+         None
+        """
+        # Continue only if energy dispersion HDU has been opened
+        if self.hdu_edisp != None:
+
+            # Allocate ROOT 3D array
+            matrix  = TH3F()
+            file.GetObject("EestOverEtrue_offaxis", matrix)
+
+            # Set boundaries
+            bounds = self.make_3D_migra(matrix, self.hdu_edisp, None, "")
+            for b in bounds:
+                self.edisp_bounds.append(b)
+            self.set_cif_keywords(self.hdu_edisp, self.edisp_name, \
+                                  self.edisp_bounds, self.edisp_desc)
+
+            # MATRIX
+            self.make_3D_migra(matrix, self.hdu_edisp, "MATRIX", "")
 
         # Return
         return
