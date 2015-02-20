@@ -268,13 +268,13 @@ Setting up the ctools environment
 You have to configure ctools by setting up some environment variables. This
 will be done automatically by an initialisation script that is found in the
 ``bin`` directory of the directory into which ctools has been installed. 
-Assuming that you have installed ctools into ``/usr/local/ctools`` you need
+Assuming that you have installed ctools into ``/usr/local/gamma`` you need
 to add the following to your ``$HOME/.bashrc`` or ``$HOME/.profile`` script
 on a Linux machine:
 
 .. code-block:: bash
 
-  export CTOOLS=/usr/local/ctools
+  export CTOOLS=/usr/local/gamma
   source $CTOOLS/bin/ctools-init.sh
 
 If you use C shell or a variant then add the following to your 
@@ -282,7 +282,7 @@ If you use C shell or a variant then add the following to your
 
 .. code-block:: csh
 
-  setenv CTOOLS /usr/local/ctools
+  setenv CTOOLS /usr/local/gamma
   source $CTOOLS/bin/ctools-init.csh
 
 
