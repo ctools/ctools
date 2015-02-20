@@ -6,7 +6,7 @@
 # - matplotlib
 # - numpy
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
             Non        = Non_lima(sigma, Noff)
             src_counts = Non - bgd_counts
             flux[i]    = src_counts / (0.68*aeff * duration) * E[i]*1.0e6 * gammalib.MeV2erg
-        print logE[i], flux[i]
+        #print logE[i], flux[i]
     
     # Plot data
     plt.loglog(E, flux, color+'-', label=name)
@@ -210,12 +210,14 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
 # ==================== #
 # Show one sensitivity #
 # ==================== #
-def show_one_response(rspname, dbname, name, color="r"):
+def show_one_response(rspname, dbname, name, rootdir=None, color="r"):
     """
     Show one response.
     """
     # Set-up calibration database
     caldb = gammalib.GCaldb()
+    if rootdir != None:
+        caldb.rootdir(rootdir)
     if gammalib.dir_exists(dbname):
         caldb.rootdir(dbname)
     else:
@@ -242,23 +244,15 @@ def show_one_response(rspname, dbname, name, color="r"):
 # ======================== #
 if __name__ == '__main__':
     """
-    Display spectrum in PHA format.
+    Display response information.
     """
-    # Print usage information
-    #usage = "Usage: show_pha filename" \
-    #        " [-n bins] [-c column] [-t title] [-p plot]"
-    #if len(sys.argv) < 2:
-    #    print(usage)
-    #    sys.exit()
-
-    # Extract parameters
-    #filename = sys.argv[1]
-
     # Create figures
     plt.figure(1)
     plt.title("Effective area")
     plt.figure(2)
     plt.title("Background rate")
+    plt.figure(3)
+    plt.title("Sensitivity")
 
     # Set response dictionary
     rsps = [
@@ -284,9 +278,13 @@ if __name__ == '__main__':
         rspname = rsp['rspname']
         color   = rsp['color']
         name    = rsp['name']
+        if rsp.has_key('rootdir'):
+            rootdir = rsp['rootdir']
+        else:
+            rootdir = None
         
         # Show response
-        show_one_response(rspname, dbname, name, color=color)
+        show_one_response(rspname, dbname, name, rootdir=rootdir, color=color)
 
     # Show plot
     plt.show()

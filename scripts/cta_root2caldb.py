@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script generates IRFs in the CALDB format of HEASARC using ROOT 2D
-# performance files.
+# This script generates IRFs in the CALDB format of HEASARC using ROOT
+# offaxis performance files.
 # -------------------------------------------------------------------------
 # Copyright (C) 2011-2015 Juergen Knoedlseder
 # -------------------------------------------------------------------------
@@ -25,7 +25,8 @@
 # - pyroot
 # ==========================================================================
 from ROOT import TFile, TH1F, TH2F, TH3F
-from gammalib import *
+#from gammalib import *
+import gammalib
 from datetime import datetime
 import math
 import sys
@@ -205,7 +206,7 @@ class caldb():
             self.bgd_file   = "irf_"+version+".fits"
         
         # Open calibration database index
-        self.cif = GFits(self.base_path+"/caldb.indx", True)
+        self.cif = gammalib.GFits(self.base_path+"/caldb.indx", True)
         
         # If file has no CIF extension than create it now
         try:
@@ -222,12 +223,12 @@ class caldb():
 
         # Open files
         if split:
-            self.ea    = GFits(ea_filename, True)
-            self.psf   = GFits(psf_filename, True)
-            self.edisp = GFits(edisp_filename, True)
-            self.bgd   = GFits(bgd_filename, True)
+            self.ea    = gammalib.GFits(ea_filename, True)
+            self.psf   = gammalib.GFits(psf_filename, True)
+            self.edisp = gammalib.GFits(edisp_filename, True)
+            self.bgd   = gammalib.GFits(bgd_filename, True)
         else:
-            self.irf   = GFits(ea_filename, True)
+            self.irf   = gammalib.GFits(ea_filename, True)
             self.ea    = self.irf
             self.psf   = self.irf
             self.edisp = self.irf
@@ -314,29 +315,29 @@ class caldb():
          None
         """
         # Create binary table
-        table = GFitsBinTable()
+        table = gammalib.GFitsBinTable()
         
         # Set boundary
         
         # Attach columns. Reference: CAL/GEN/92-008
-        table.append(GFitsTableStringCol("TELESCOP", 0, 10))
-        table.append(GFitsTableStringCol("INSTRUME", 0, 10))
-        table.append(GFitsTableStringCol("DETNAM", 0, 20))
-        table.append(GFitsTableStringCol("FILTER", 0, 10))
-        table.append(GFitsTableStringCol("CAL_DEV", 0, 20))
-        table.append(GFitsTableStringCol("CAL_DIR", 0, 70))
-        table.append(GFitsTableStringCol("CAL_FILE", 0, 40))
-        table.append(GFitsTableStringCol("CAL_CLAS", 0, 3))
-        table.append(GFitsTableStringCol("CAL_DTYP", 0, 4))
-        table.append(GFitsTableStringCol("CAL_CNAM", 0, 20))
-        table.append(GFitsTableStringCol("CAL_CBD", 0, 70, 9))
-        table.append(GFitsTableShortCol("CAL_XNO", 0))
-        table.append(GFitsTableStringCol("CAL_VSD", 0, 10))
-        table.append(GFitsTableStringCol("CAL_VST", 0, 8))
-        table.append(GFitsTableDoubleCol("REF_TIME", 0))
-        table.append(GFitsTableShortCol("CAL_QUAL", 0))
-        table.append(GFitsTableStringCol("CAL_DATE", 0, 8))
-        table.append(GFitsTableStringCol("CAL_DESC", 0, 70))
+        table.append(gammalib.GFitsTableStringCol("TELESCOP", 0, 10))
+        table.append(gammalib.GFitsTableStringCol("INSTRUME", 0, 10))
+        table.append(gammalib.GFitsTableStringCol("DETNAM", 0, 20))
+        table.append(gammalib.GFitsTableStringCol("FILTER", 0, 10))
+        table.append(gammalib.GFitsTableStringCol("CAL_DEV", 0, 20))
+        table.append(gammalib.GFitsTableStringCol("CAL_DIR", 0, 70))
+        table.append(gammalib.GFitsTableStringCol("CAL_FILE", 0, 40))
+        table.append(gammalib.GFitsTableStringCol("CAL_CLAS", 0, 3))
+        table.append(gammalib.GFitsTableStringCol("CAL_DTYP", 0, 4))
+        table.append(gammalib.GFitsTableStringCol("CAL_CNAM", 0, 20))
+        table.append(gammalib.GFitsTableStringCol("CAL_CBD", 0, 70, 9))
+        table.append(gammalib.GFitsTableShortCol("CAL_XNO", 0))
+        table.append(gammalib.GFitsTableStringCol("CAL_VSD", 0, 10))
+        table.append(gammalib.GFitsTableStringCol("CAL_VST", 0, 8))
+        table.append(gammalib.GFitsTableDoubleCol("REF_TIME", 0))
+        table.append(gammalib.GFitsTableShortCol("CAL_QUAL", 0))
+        table.append(gammalib.GFitsTableStringCol("CAL_DATE", 0, 8))
+        table.append(gammalib.GFitsTableStringCol("CAL_DESC", 0, 70))
         
         # Set keywords. Reference: CAL/GEN/92-008
         table.extname("CIF")
@@ -454,7 +455,7 @@ class caldb():
             self.hdu_ea = self.ea.table("EFFECTIVE AREA")
         except:
             # Create binary table
-            table = GFitsBinTable()
+            table = gammalib.GFitsBinTable()
             
             # Set extension name
             table.extname("EFFECTIVE AREA")
@@ -488,7 +489,7 @@ class caldb():
             self.hdu_psf = self.psf.table("POINT SPREAD FUNCTION")
         except:
             # Create binary table
-            table = GFitsBinTable()
+            table = gammalib.GFitsBinTable()
             
             # Set extension name
             table.extname("POINT SPREAD FUNCTION")
@@ -522,7 +523,7 @@ class caldb():
             self.hdu_edisp = self.edisp.table("ENERGY DISPERSION")
         except:
             # Create binary table
-            table = GFitsBinTable()
+            table = gammalib.GFitsBinTable()
             
             # Set extension name
             table.extname("ENERGY DISPERSION")
@@ -556,7 +557,7 @@ class caldb():
             self.hdu_bgd = self.bgd.table("BACKGROUND")
         except:
             # Create binary table
-            table = GFitsBinTable()
+            table = gammalib.GFitsBinTable()
             
             # Set extension name
             table.extname("BACKGROUND")
@@ -629,7 +630,7 @@ class caldb():
         #
         # ENERG_LO
         if not hdu.contains("ENERG_LO"):
-            hdu.append(GFitsTableFloatCol("ENERG_LO", 1, neng))
+            hdu.append(gammalib.GFitsTableFloatCol("ENERG_LO", 1, neng))
             hdu["ENERG_LO"].unit("TeV")
             for ieng in range(neng):
                 e_lo = pow(10.0, energies.GetBinLowEdge(ieng+1))
@@ -637,7 +638,7 @@ class caldb():
         #
         # ENERG_HI
         if not hdu.contains("ENERG_HI"):
-            hdu.append(GFitsTableFloatCol("ENERG_HI", 1, neng))
+            hdu.append(gammalib.GFitsTableFloatCol("ENERG_HI", 1, neng))
             hdu["ENERG_HI"].unit("TeV")
             for ieng in range(neng):
                 e_hi = pow(10.0, energies.GetBinUpEdge(ieng+1))
@@ -645,7 +646,7 @@ class caldb():
         #
         # THETA_LO
         if not hdu.contains("THETA_LO"):
-            hdu.append(GFitsTableFloatCol("THETA_LO", 1, noffset))
+            hdu.append(gammalib.GFitsTableFloatCol("THETA_LO", 1, noffset))
             hdu["THETA_LO"].unit("deg")
             for ioff in range(noffset):
                 o_lo = offsets.GetBinLowEdge(ioff+1)
@@ -653,7 +654,7 @@ class caldb():
         #
         # THETA_LO
         if not hdu.contains("THETA_HI"):
-            hdu.append(GFitsTableFloatCol("THETA_HI", 1, noffset))
+            hdu.append(gammalib.GFitsTableFloatCol("THETA_HI", 1, noffset))
             hdu["THETA_HI"].unit("deg")
             for ioff in range(noffset):
                 o_hi = offsets.GetBinUpEdge(ioff+1)
@@ -661,7 +662,7 @@ class caldb():
         #
         # "NAME"
         if name != None and not hdu.contains(name):
-            hdu.append(GFitsTableFloatCol(name, 1, neng*noffset))
+            hdu.append(gammalib.GFitsTableFloatCol(name, 1, neng*noffset))
             hdu[name].unit(unit)
             hdu[name].dim([neng, noffset])
             for ioff in range(noffset):
@@ -734,35 +735,35 @@ class caldb():
         #
         # DETX_LO
         if not hdu.contains("DETX_LO"):
-            hdu.append(GFitsTableFloatCol("DETX_LO", 1, ndets))
+            hdu.append(gammalib.GFitsTableFloatCol("DETX_LO", 1, ndets))
             hdu["DETX_LO"].unit("deg")
             for i in range(ndets):
                 hdu["DETX_LO"][0,i] = dets_lo[i]
         #
         # DETX_HI
         if not hdu.contains("DETX_HI"):
-            hdu.append(GFitsTableFloatCol("DETX_HI", 1, ndets))
+            hdu.append(gammalib.GFitsTableFloatCol("DETX_HI", 1, ndets))
             hdu["DETX_HI"].unit("deg")
             for i in range(ndets):
                 hdu["DETX_HI"][0,i] = dets_hi[i]
         #
         # DETY_LO
         if not hdu.contains("DETY_LO"):
-            hdu.append(GFitsTableFloatCol("DETY_LO", 1, ndets))
+            hdu.append(gammalib.GFitsTableFloatCol("DETY_LO", 1, ndets))
             hdu["DETY_LO"].unit("deg")
             for i in range(ndets):
                 hdu["DETY_LO"][0,i] = dets_lo[i]
         #
         # DETY_HI
         if not hdu.contains("DETY_HI"):
-            hdu.append(GFitsTableFloatCol("DETY_HI", 1, ndets))
+            hdu.append(gammalib.GFitsTableFloatCol("DETY_HI", 1, ndets))
             hdu["DETY_HI"].unit("deg")
             for i in range(ndets):
                 hdu["DETY_HI"][0,i] = dets_hi[i]
         #
         # ENERG_LO
         if not hdu.contains("ENERG_LO"):
-            hdu.append(GFitsTableFloatCol("ENERG_LO", 1, neng))
+            hdu.append(gammalib.GFitsTableFloatCol("ENERG_LO", 1, neng))
             hdu["ENERG_LO"].unit("TeV")
             for ieng in range(neng):
                 e_lo = pow(10.0, energies.GetBinLowEdge(ieng+1))
@@ -770,7 +771,7 @@ class caldb():
         #
         # ENERG_HI
         if not hdu.contains("ENERG_HI"):
-            hdu.append(GFitsTableFloatCol("ENERG_HI", 1, neng))
+            hdu.append(gammalib.GFitsTableFloatCol("ENERG_HI", 1, neng))
             hdu["ENERG_HI"].unit("TeV")
             for ieng in range(neng):
                 e_hi = pow(10.0, energies.GetBinUpEdge(ieng+1))
@@ -778,7 +779,7 @@ class caldb():
         #
         # "NAME"
         if name != None and not hdu.contains(name):
-            hdu.append(GFitsTableFloatCol(name, 1, ndets*ndets*neng))
+            hdu.append(gammalib.GFitsTableFloatCol(name, 1, ndets*ndets*neng))
             hdu[name].unit(unit)
             hdu[name].dim([ndets,ndets,neng])
             for ix in range(ndets):
@@ -852,7 +853,7 @@ class caldb():
         #
         # ETRUE_LO
         if not hdu.contains("ETRUE_LO"):
-            hdu.append(GFitsTableFloatCol("ETRUE_LO", 1, netrue))
+            hdu.append(gammalib.GFitsTableFloatCol("ETRUE_LO", 1, netrue))
             hdu["ETRUE_LO"].unit("TeV")
             for ieng in range(netrue):
                 e_lo = pow(10.0, etrue.GetBinLowEdge(ieng+1))
@@ -860,7 +861,7 @@ class caldb():
         #
         # ETRUE_HI
         if not hdu.contains("ETRUE_HI"):
-            hdu.append(GFitsTableFloatCol("ETRUE_HI", 1, netrue))
+            hdu.append(gammalib.GFitsTableFloatCol("ETRUE_HI", 1, netrue))
             hdu["ETRUE_HI"].unit("TeV")
             for ieng in range(netrue):
                 e_hi = pow(10.0, etrue.GetBinUpEdge(ieng+1))
@@ -868,7 +869,7 @@ class caldb():
         #
         # MIGRA_LO
         if not hdu.contains("MIGRA_LO"):
-            hdu.append(GFitsTableFloatCol("MIGRA_LO", 1, nmigra))
+            hdu.append(gammalib.GFitsTableFloatCol("MIGRA_LO", 1, nmigra))
             hdu["MIGRA_LO"].unit("")
             for ieng in range(nmigra):
                 e_lo = pow(10.0, migra.GetBinLowEdge(ieng+1))
@@ -876,7 +877,7 @@ class caldb():
         #
         # MIGRA_HI
         if not hdu.contains("MIGRA_HI"):
-            hdu.append(GFitsTableFloatCol("MIGRA_HI", 1, nmigra))
+            hdu.append(gammalib.GFitsTableFloatCol("MIGRA_HI", 1, nmigra))
             hdu["MIGRA_HI"].unit("")
             for ieng in range(nmigra):
                 e_hi = pow(10.0, migra.GetBinUpEdge(ieng+1))
@@ -884,7 +885,7 @@ class caldb():
         #
         # THETA_LO
         if not hdu.contains("THETA_LO"):
-            hdu.append(GFitsTableFloatCol("THETA_LO", 1, noffset))
+            hdu.append(gammalib.GFitsTableFloatCol("THETA_LO", 1, noffset))
             hdu["THETA_LO"].unit("deg")
             for ioff in range(noffset):
                 o_lo = offsets.GetBinLowEdge(ioff+1)
@@ -892,7 +893,7 @@ class caldb():
         #
         # THETA_LO
         if not hdu.contains("THETA_HI"):
-            hdu.append(GFitsTableFloatCol("THETA_HI", 1, noffset))
+            hdu.append(gammalib.GFitsTableFloatCol("THETA_HI", 1, noffset))
             hdu["THETA_HI"].unit("deg")
             for ioff in range(noffset):
                 o_hi = offsets.GetBinUpEdge(ioff+1)
@@ -900,7 +901,7 @@ class caldb():
         #
         # "NAME"
         if name != None and not hdu.contains(name):
-            hdu.append(GFitsTableFloatCol(name, 1, netrue*nmigra*noffset))
+            hdu.append(gammalib.GFitsTableFloatCol(name, 1, netrue*nmigra*noffset))
             hdu[name].unit(unit)
             hdu[name].dim([netrue, nmigra, noffset])
             for ioff in range(noffset):
@@ -926,20 +927,23 @@ class caldb():
         # Return boundary information
         return bounds
     
-    def root2caldb(self, filename, rebin=False, psftype="Gauss", scale=1.0):
+    def root2caldb(self, filename, rebin=False, psftype="Gauss", eascale=1.0, bgdscale=1.0):
         """
         Translate ROOT to CALDB information.
         
         Parameters:
          filename - ROOT 2D performance filename.
         Keywords:
-         rebin - Rebin Etrue histogram (useful for Prod1 IFAE runs)
+         rebin    - Rebin Etrue histogram (useful for Prod1 IFAE runs)
+         psftype  - PSF type
+         eascale  - Effective area scaling factor
+         bgdscale - Background scaling factor
         """
         # Open ROOT performance file
         file = TFile(filename)
 
         # Create effective area
-        self.root2ea(file, rebin=rebin)
+        self.root2ea(file, rebin=rebin, eascale=eascale)
         
         # Create point spread function
         self.root2psf(file, psftype)
@@ -949,12 +953,12 @@ class caldb():
 
         # Create background
         #self.root2bgd(file)
-        self.root2bgd3D(file, scale=scale)
+        self.root2bgd3D(file, bgdscale=bgdscale)
         
         # Return
         return
 
-    def root2ea(self, file, rebin=False):
+    def root2ea(self, file, rebin=False, eascale=1.0):
         """
         Translate ROOT to CALDB effective area extension. The following ROOT
         histograms are used:
@@ -965,7 +969,8 @@ class caldb():
         Parameters:
          file - ROOT file.
         Keywords:
-         rebin - Rebin Etrue histogram (useful for Prod1 IFAE runs)
+         rebin   - Rebin Etrue histogram (useful for Prod1 IFAE runs)
+         eascale - Effective area scaling factor
         """
         # Continue only if effective area HDU has been opened
         if self.hdu_ea != None:
@@ -975,8 +980,6 @@ class caldb():
             ereco = TH2F()
             file.GetObject("EffectiveAreaEtrue_offaxis", etrue)
             file.GetObject("EffectiveArea_offaxis",      ereco)
-            #print(etrue.GetXaxis().GetBinLowEdge(1), etrue.GetXaxis().GetBinUpEdge(etrue.GetXaxis().GetNbins()))
-            #print(ereco.GetXaxis().GetBinLowEdge(1), ereco.GetXaxis().GetBinUpEdge(ereco.GetXaxis().GetNbins()))
 
             # Rebin etrue histogram
             if rebin:
@@ -987,6 +990,21 @@ class caldb():
                     for ieng in range(neng):
                         value = etrue.GetBinContent(ieng+1,ioff+1) / 10.0
                         etrue.SetBinContent(ieng+1,ioff+1,value)
+
+            # Scale histograms (if needed)
+            if eascale != 1.0:
+                neng    = etrue.GetXaxis().GetNbins()
+                noffset = etrue.GetYaxis().GetNbins()
+                for ioff in range(noffset):
+                    for ieng in range(neng):
+                        value = etrue.GetBinContent(ieng+1,ioff+1) * eascale
+                        etrue.SetBinContent(ieng+1,ioff+1,value)
+                neng    = ereco.GetXaxis().GetNbins()
+                noffset = ereco.GetYaxis().GetNbins()
+                for ioff in range(noffset):
+                    for ieng in range(neng):
+                        value = ereco.GetBinContent(ieng+1,ioff+1) * eascale
+                        ereco.SetBinContent(ieng+1,ioff+1,value)
 
             # Write boundaries (use Ereco boundaries)
             bounds = self.make_2D(ereco, self.hdu_ea, None, "m2")
@@ -1339,7 +1357,7 @@ class caldb():
         # Return
         return
 
-    def root2bgd3D(self, file, scale=1.0):
+    def root2bgd3D(self, file, bgdscale=1.0):
         """
         Translate ROOT to CALDB background extension. The following ROOT
         histograms are used:
@@ -1367,10 +1385,10 @@ class caldb():
                                   self.bgd_bounds, self.bgd_desc)
 
             # BGD
-            self.make_3D(array, self.hdu_bgd, "BGD", "1/s/MeV/sr", scale=scale)
+            self.make_3D(array, self.hdu_bgd, "BGD", "1/s/MeV/sr", scale=bgdscale)
 
             # BGD_RECO
-            self.make_3D(array, self.hdu_bgd, "BGD_RECO", "1/s/MeV/sr", scale=scale)
+            self.make_3D(array, self.hdu_bgd, "BGD_RECO", "1/s/MeV/sr", scale=bgdscale)
             
         # Return
         return
@@ -1403,9 +1421,9 @@ class caldb():
         return
 
 
-#===================#
+# ================= #
 # Set test database #
-#===================#
+# ================= #
 def set_test():
     """
     Set Prod1 IFAE database.
@@ -1413,23 +1431,22 @@ def set_test():
     # Set database attributes
     path    = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
     rebin   = True
-    scale   = 1.0
 
     # Set database content
-    db = [{'inst': "e", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': "Gauss", 'scale': scale,
+    db = [{'inst': "e", 'id': "IFAE20120510_50h",
+           'path': path, 'rebin': rebin, 'psftype': "Gauss",
            'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"},
-          {'inst': "e", 'id':   "IFAE20120510_50h_King",
-           'path': path, 'rebin': rebin, 'psftype': "King", 'scale': scale,
+          {'inst': "e", 'id': "IFAE20120510_50h_King",
+           'path': path, 'rebin': rebin, 'psftype': "King",
            'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"}]
 
     # Return database
     return db
 
 
-#=========================#
+# ======================= #
 # Set Prod1 IFAE database #
-#=========================#
+# ======================= #
 def set_prod1_ifae():
     """
     Set Prod1 IFAE database.
@@ -1438,76 +1455,25 @@ def set_prod1_ifae():
     path    = "/project-data/cta/performance/prod1/IFAEOffaxisPerformanceBEI_May2012"
     rebin   = True
     psftype = "Gauss"
-    scale   = 1.0
 
     # Set database content
     db = [{'inst': "b", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "SubarrayB_IFAE_50hours_20120510_offaxis.root"},
           {'inst': "e", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "SubarrayE_IFAE_50hours_20120510_offaxis.root"},
           {'inst': "i", 'id':   "IFAE20120510_50h",
-           'path': path, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path, 'rebin': rebin, 'psftype': psftype,
            'file': "SubarrayI_IFAE_50hours_20120510_offaxis.root"}]
 
     # Return database
     return db
 
 
-#=========================#
+# ======================= #
 # Set Prod2 DESY database #
-#=========================#
-def set_prod2_desy_ignore():
-    """
-    Set Prod2 DESY database (ignore these files).
-    """
-    # Set database attributes
-    path_aar = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Aar"
-    path_ten = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Tenerife_50h"
-    rebin    = False
-    psftype  = "Gauss"
-    #scale   = 1.0/180000.0
-    scale    = 1.0
-
-    # Set database content
-    db = [{'inst': "aar", 'id':   "DESY20140105_50h",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
-          {'inst': "aar", 'id':   "DESY20140105_50h_0deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
-          {'inst': "aar", 'id':   "DESY20140105_50h_180deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
-
-          {'inst': "aar500", 'id':   "DESY20140105_50h",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
-          {'inst': "aar500", 'id':   "DESY20140105_50h_0deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
-          {'inst': "aar500", 'id':   "DESY20140105_50h_180deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
-
-          {'inst': "tenerife", 'id':   "DESY20140105_50h",
-           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
-          {'inst': "tenerife", 'id':   "DESY20140105_50h_0deg",
-           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
-          {'inst': "tenerife", 'id':   "DESY20140105_50h_180deg",
-           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
-           'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"}]
-
-    # Return database
-    return db
-
-
-#=========================#
-# Set Prod2 DESY database #
-#=========================#
+# ======================= #
 def set_prod2_desy():
     """
     Set Prod2 DESY database.
@@ -1517,37 +1483,37 @@ def set_prod2_desy():
     path_ten = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Tenerife_50h"
     rebin    = False
     psftype  = "Gauss"
-    scale    = 1.0
+    eascale  = 1.0 / 0.68  # Prod 2 DESY effective areas ar for 68% containment
 
     # Set database content
     db = [{'inst': "aar", 'id':   "DESY20140105_50h",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_0deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar", 'id':   "DESY20140105_50h_180deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
 
           {'inst': "aar500", 'id':   "DESY20140105_50h",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Aar-500m-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_0deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
           {'inst': "aar500", 'id':   "DESY20140105_50h_180deg",
-           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_aar, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Aar-NS.S.2a.180000s.root"},
 
           {'inst': "tenerife", 'id':   "DESY20140105_50h",
-           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_0deg",
-           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0_0degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"},
           {'inst': "tenerife", 'id':   "DESY20140105_50h_180deg",
-           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'scale': scale,
+           'path': path_ten, 'rebin': rebin, 'psftype': psftype, 'eascale': eascale,
            'file': "DESY.d20140105.Erec1.V3.ID0_180degNIM2.prod2-Tenerife-NS.N.2NN.180000s.root"}
          ]
 
@@ -1555,9 +1521,9 @@ def set_prod2_desy():
     return db
 
 
-#==========================#
+# ======================== #
 # Main routine entry point #
-#==========================#
+# ======================== #
 if __name__ == '__main__':
     """
     This script translates a CTA ROOT 2D performance files into a CALDB
@@ -1573,8 +1539,8 @@ if __name__ == '__main__':
     - BGRatePerSqDeg_offaxis (2D) - Background rate per square degree [counts/s/deg2]
     - BGRate_offaxis (2D) - Background rate
     - EffectiveAreaEtrue_offaxis (2D) - Effective area in true energy (finer bins)
-    - MigMatrix_offaxis (3D)
-    - EestOverEtrue_offaxis (3D)
+    - MigMatrix_offaxis (3D) - Migration matrix
+    - EestOverEtrue_offaxis (3D) - Migration matrix
     - ERes_offaxis (2D) - Energy Resolution
     - Ebias_offaxis (2D) - Energy bias
     """
@@ -1592,7 +1558,14 @@ if __name__ == '__main__':
         id       = entry['id']
         rebin    = entry['rebin']
         psftype  = entry['psftype']
-        scale    = entry['scale']
+        if entry.has_key('eascale'):
+            eascale = entry['eascale']
+        else:
+            eascale = 1.0
+        if entry.has_key('bgdscale'):
+            bgdscale = entry['bgdscale']
+        else:
+            bgdscale = 1.0
         filename = path+"/"+entry['file']
 
         # Allocate caldb entry
@@ -1602,4 +1575,4 @@ if __name__ == '__main__':
         irf.open("file")
     
         # Translate ROOT to CALDB information
-        irf.root2caldb(filename, rebin=rebin, psftype=psftype, scale=scale)
+        irf.root2caldb(filename, rebin=rebin, psftype=psftype, eascale=eascale, bgdscale=bgdscale)

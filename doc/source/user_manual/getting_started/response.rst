@@ -88,13 +88,13 @@ the database is installed using
 
 .. code-block:: bash
 
-  $ [sudo] tar -C $CALDB -zxvf cta-caldb-20140220.tar.gz
+  $ [sudo] tar -C $CALDB -zxvf cta-caldb-20150220.tar.gz
 
 or
 
 .. code-block:: bash
 
-  $ [sudo] tar -C $CALDB -xvf cta-caldb-20140220.tar
+  $ [sudo] tar -C $CALDB -xvf cta-caldb-20150220.tar
 
 depending on whether the database has been retrieved as a gzipped file or 
 not. Depending on your access rights to the ``$CALDB`` directory,
