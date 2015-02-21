@@ -47,6 +47,31 @@ export PFILES=pfiles
 
 
 #
+# Test csobsdef
+# =============
+$ECHO -n "Test csobsdef: "
+chmod +x @abs_top_srcdir@/scripts/csobsdef.py
+@abs_top_srcdir@/scripts/csobsdef.py \
+  inpnt="data/pntdef.dat" \
+  outobs="obs.xml" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  emin=0.1 \
+  emax=100.0 \
+  duration=1800.0 \
+  rad=5.0 > csobsdef.log
+$ECHO -n "."
+if [ -s "obs.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " obs.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
 # Test cspull
 # ===========
 $ECHO -n "Test cspull: "

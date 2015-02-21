@@ -229,7 +229,7 @@ class csobsdef(ctools.cscript):
                 irf = self["irf"].string()
             cal = gammalib.GCaldb()
             if gammalib.dir_exists(caldb):
-                cal.rootdir(database)
+                cal.rootdir(caldb)
             else:
                 cal.open("cta", caldb)
             obs.response(irf, cal);
