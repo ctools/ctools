@@ -97,7 +97,7 @@ class csobsdef(ctools.cscript):
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Pointing duration"))
+            pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Pointing duration (seconds)"))
             pars.append(gammalib.GApplicationPar("rad","r","a","5.0","","","Radius of ROI (degrees)"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
             pars.append_standard()
