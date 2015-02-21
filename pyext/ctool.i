@@ -84,11 +84,12 @@ public:
     virtual void execute(void);
 
     // Protected methods
-    void            init_members(void);
-    void            copy_members(const ctool& app);
-    void            free_members(void);
-    const bool&     read_ahead(void) const;
-    GObservations   get_observations(const bool& get_response = true);
+    void                  init_members(void);
+    void                  copy_members(const ctool& app);
+    void                  free_members(void);
+    const bool&           read_ahead(void) const;
+    const GTimeReference& time_reference(void) const;
+    GObservations         get_observations(const bool& get_response = true);
 
     // Protected methods that create objects from user parameters
     GEbounds        create_ebounds(void);
