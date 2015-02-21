@@ -227,12 +227,7 @@ class csobsdef(ctools.cscript):
                 irf = pntdef[row, header.index("irf")]
             else:
                 irf = self["irf"].string()
-            cal = gammalib.GCaldb()
-            if gammalib.dir_exists(caldb):
-                cal.rootdir(caldb)
-            else:
-                cal.open("cta", caldb)
-            obs.response(irf, cal);
+            obs = self.__set_response(obs, caldb, irf)
 
             # Set deadtime correction factor
             if "deadc" in header:
@@ -290,12 +285,26 @@ class csobsdef(ctools.cscript):
         # Return
         return
 
-    def __define_observation(self, header, pntdef, ipnt):
+    def __set_response(self, obs, caldb, irf):
         """
-        Define one oberservation.
+        Set response for an observation. We create an XML element for that
+        so that the response XML writer will write the database and response
+        name into the observation definition file.
         """
-        # Create CTA observation
-        obs = gammalib.GCTAObservation()
+        # Create XML element
+        xml = gammalib.GXmlElement()
+
+        # Append parameter
+        parameter = "parameter name=\"Calibration\" database=\""+\
+                    caldb+"\" response=\""+irf+"\""
+        xml.append(gammalib.GXmlElement(parameter))
+
+        # Create CTA response
+        response = gammalib.GCTAResponseIrf()
+        response.read(xml)
+        
+        # Attach response to observation
+        obs.response(response)
         
         # Return observation
         return obs
