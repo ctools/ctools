@@ -36,6 +36,7 @@ cscripts
    :maxdepth: 1
 
    cscaldb --- Lists available instrument response functions <cscaldb>
+   csobsdef --- Generates observation definition file <csobsdef>
    cspull --- Generates pull distribution <cspull>
    cssens --- Computes CTA sensitivity <cssens>
    csresmap --- Generates residual map <csresmap>
