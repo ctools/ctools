@@ -43,11 +43,30 @@ class csobsdef(ctools.cscript):
     duration - Duration of pointing (seconds)
     emin     - Lower energy limit (TeV)
     emax     - Upper energy limit (TeV)
-    rad      - Radius of region of interest (deg)        
-    
+    rad      - Radius of region of interest (deg)
+    deadc    - Deadtime correction factor [0-1]
+    caldb    - Calibration database
+    irf      - Response function name
+            
     Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
-    All other are optional and are queried as user parameters if they
-    are not specified in the pointing list.
+    All other keywords are optional and can be specified when calling
+    csobsdef as user parameters. The only exception is the "duration"
+    keyword that will automatically queried.
+    
+    Here some usage examples:
+    
+    csobsdef
+      Creates minimal observation definition file.
+
+    csobsdef emin=0.1 emax=100.0
+      Creates observation definition file with an energy range 100 GeV - 100 TeV.
+
+    csobsdef rad=5
+      Creates observation definition file with a ROI radius of 5 deg.
+
+    csobsdef caldb=dummy irf=cta_dummy_irf
+      Creates observation definition file using the "cta_dummy_irf" IRF in the
+      "dummy" calibration database.
     """
     def __init__(self, *argv):
         """
@@ -111,10 +130,12 @@ class csobsdef(ctools.cscript):
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Pointing definition file"))
             pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Output observation definition file"))
-            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Pointing duration (seconds)"))
-            pars.append(gammalib.GApplicationPar("rad","r","a","5.0","","","Radius of ROI (degrees)"))
+            pars.append(gammalib.GApplicationPar("caldb","s","h","","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("irf","s","h","","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("emin","r","h","UNDEF","","","Lower energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","h","UNDEF","","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("rad","r","h","UNDEF","","","Radius of ROI (degrees)"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csobsdef.log","","","Log filename"))
@@ -198,7 +219,7 @@ class csobsdef(ctools.cscript):
 
             # Set row index
             row = pnt + 1
-        
+
             # Create CTA observation
             obs = gammalib.GCTAObservation()
 
@@ -234,6 +255,18 @@ class csobsdef(ctools.cscript):
                       " definition file.")
             obs.pointing(gammalib.GCTAPointing(pntdir))
 
+            # Set response function
+            if "caldb" in header:
+                caldb = pntdef[row, header.index("caldb")]
+            else:
+                caldb = self["caldb"].string()
+            if "irf" in header:
+                irf = pntdef[row, header.index("irf")]
+            else:
+                irf = self["irf"].string()
+            if caldb != "" and irf != "":
+                obs = self.__set_response(obs, caldb, irf)
+
             # Set deadtime correction factor
             if "deadc" in header:
                 deadc = float(pntdef[row, header.index("deadc")])
@@ -257,29 +290,48 @@ class csobsdef(ctools.cscript):
             obs.livetime(gti.ontime()*deadc)
 
             # Set Energy Boundaries
+            has_emin = False
+            has_emax = False
             if "emin" in header:
-                emin = float(pntdef[row, header.index("emin")])
+                emin     = float(pntdef[row, header.index("emin")])
+                has_emin = True
             else:
-                emin = self["emin"].real()
+                if self["emin"].is_valid():
+                    emin     = self["emin"].real()
+                    has_emin = True
             if "emax" in header:
-                emax = float(pntdef[row, header.index("emax")])
+                emax     = float(pntdef[row, header.index("emax")])
+                has_emax = True
             else:
-                emax = self["emax"].real()
-            ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"),
-                                        gammalib.GEnergy(emax, "TeV"))
+                if self["emax"].is_valid():
+                    emax     = self["emax"].real()
+                    has_emax = True
+            has_ebounds = has_emin and has_emax
+            if has_ebounds:
+                ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"),
+                                            gammalib.GEnergy(emax, "TeV"))
 
             # Set ROI
+            has_roi = False
             if "rad" in header:
-                rad = float(pntdef[row, header.index("rad")])
+                rad     = float(pntdef[row, header.index("rad")])
+                has_roi = True
             else:
-                rad = self["rad"].real()
-            roi = gammalib.GCTARoi(gammalib.GCTAInstDir(pntdir), rad)
+                if self["rad"].is_valid():
+                    rad     = self["rad"].real()
+                    has_roi = True
+            if has_roi:
+                roi = gammalib.GCTARoi(gammalib.GCTAInstDir(pntdir), rad)
 
             # Create an empty event list
             list = gammalib.GCTAEventList()
-            list.roi(roi)
             list.gti(gti)
-            list.ebounds(ebounds)
+            
+            # Set optional information
+            if has_ebounds:
+                list.ebounds(ebounds)
+            if has_roi:
+                list.roi(roi)
             
             # Attach event list to CTA observation
             obs.events(list)
@@ -289,6 +341,30 @@ class csobsdef(ctools.cscript):
 
         # Return
         return
+
+    def __set_response(self, obs, caldb, irf):
+        """
+        Set response for an observation. We create an XML element for that
+        so that the response XML writer will write the database and response
+        name into the observation definition file.
+        """
+        # Create XML element
+        xml = gammalib.GXmlElement()
+
+        # Append parameter
+        parameter = "parameter name=\"Calibration\" database=\""+\
+                    caldb+"\" response=\""+irf+"\""
+        xml.append(gammalib.GXmlElement(parameter))
+
+        # Create CTA response
+        response = gammalib.GCTAResponseIrf()
+        response.read(xml)
+        
+        # Attach response to observation
+        obs.response(response)
+        
+        # Return observation
+        return obs
 
 
 # ======================== #
