@@ -762,9 +762,26 @@ void ctool::set_obs_response(GCTAObservation* obs)
         std::string database = (*this)["caldb"].string();
         std::string irf      = (*this)["irf"].string();
 
+        // Create an XML element containing the database and IRF name. This
+        // kluge will make sure that the information is later written
+        // to the observation definition XML file, in case an observation
+        // definition XML file is written.
+        std::string parameter = "parameter name=\"Calibration\""
+                                         " database=\""+database+"\""
+                                         " response=\""+irf+"\"";
+        GXmlElement xml;
+        xml.append(parameter);
+
+        // Create CTA response
+        GCTAResponseIrf response(xml);
+
+        // Attach response to observation
+        obs->response(response);
+        
         // Set calibration database. If "database" is a valid directory then use
         // this as the pathname to the calibration database. Otherwise, interpret
         // "database" as the instrument name, the mission being "cta"
+        /*
         GCaldb caldb;
         if (gammalib::dir_exists(database)) {
             caldb.rootdir(database);
@@ -772,9 +789,10 @@ void ctool::set_obs_response(GCTAObservation* obs)
         else {
             caldb.open("cta", database);
         }
+        */
 
         // Set reponse
-        obs->response(irf, caldb);
+        //obs->response(irf, caldb);
 
         // Signal response availability
         has_response = true;
