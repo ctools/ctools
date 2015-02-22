@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-20 February 2015
+22 February 2015
 
 
 1. Introduction
@@ -103,6 +103,12 @@ The user parameter interface of cssens has been modified. The script
 now reads a source model that is used for sensitivity estimation.
 This provides more flexibility in the choice of the model for
 sensitivity estimation.
+
+The csobsdef script has been added that allows creation of observation
+definition XML files from colon separated value ASCII files. The
+observation definition files from csobsdef can be fed to ctobssim for
+simulation of multiple pointings in one shot. This enables for example
+survey observations to be simulated in a single ctobssim run.
 
 
 19. caldb

@@ -1,4 +1,4 @@
-2015-02-20  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-02-22  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.0.0 released
         ========================
@@ -7,6 +7,7 @@
         Do not import automatically Python scripts
         Support INDEF/NONE/UNDEF/UNDEFINED parameters in ctselect
         Modify cssens parameter interface (#1426)
+        Add csobsdef script (#1429)
 
 
 2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
