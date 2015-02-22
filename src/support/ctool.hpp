@@ -85,6 +85,7 @@ protected:
     // Protected support methods
     void            set_response(GObservations& obs);
     void            set_obs_response(GCTAObservation* obs);
+    void            set_obs_bounds(GObservations& obs);
     GSkyDir         get_mean_pointing(const GObservations& obs);
     size_t          get_current_rss(void);
 

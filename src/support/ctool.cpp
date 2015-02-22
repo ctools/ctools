@@ -356,6 +356,9 @@ GObservations ctool::get_observations(const bool& get_response)
 
             } // endif: response was required
 
+            // Set observation boundary parameters (emin, emax, rad)
+            set_obs_bounds(obs);
+
             // Signal that XML file should be used for storage
             m_use_xml = true;
 
@@ -802,6 +805,70 @@ void ctool::set_obs_response(GCTAObservation* obs)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Set observation boundaries
+ *
+ * @param[in,out] obs Observation container
+ *
+ ***************************************************************************/
+void ctool::set_obs_bounds(GObservations& obs)
+{
+    // Setup response for all observations
+    for (int i = 0; i < obs.size(); ++i) {
+
+        // Is this observation a CTA observation?
+        GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
+
+        // Yes ...
+        if (cta != NULL) {
+
+            // Get pointer on event list
+            GCTAEventList* list = const_cast<GCTAEventList*>(dynamic_cast<const GCTAEventList*>(cta->events()));
+
+            // Continue only if it's valid
+            if (list != NULL) {
+
+                // If there are no energy boundaries then read the user
+                // parameters and add them
+                if (list->ebounds().is_empty()) {
+
+                    // If there are "emin" and "emax" parameters then use them
+                    if (has_par("emin") && has_par("emax")) {
+                        double emin = (*this)["emin"].real();
+                        double emax = (*this)["emax"].real();
+                        GEbounds ebounds(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+                        list->ebounds(ebounds);
+                    }
+                    
+                }
+
+                // If there is no ROI then read the user parameters and add
+                // them
+                if (list->roi().radius() == 0) {
+                    
+                    // If there is a "rad" parameter then use it
+                    if (has_par("rad")) {
+                        double rad   = (*this)["rad"].real();
+                        GCTARoi roi(GCTAInstDir(cta->pointing().dir()), rad);
+                        list->roi(roi);
+                    }
+
+                }
+
+            } // endif: list was valid
+
+        } // endif: observation was CTA
+        
+    } // endfor: looped over observations
+
+
+    // Return
+    return;
+}
+
+
 
 
 /***********************************************************************//**
