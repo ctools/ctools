@@ -9,7 +9,45 @@ Generates an observation definition file.
 Synopsis
 --------
 
-Generates an observation definition file.
+The csobsdef script generates an observation definition file from
+a pointing list. The pointing list is a colon separated value ASCII
+file with header keywords in the first row followed by a list of
+pointings (one pointing per row). The following header keywords
+are supported (case sensitive, column order irrelevant):
+    
+* name     - Observation name string
+* id       - Unique observation identifier string
+* ra       - Right Ascension of pointing (deg)
+* dec      - Declination of pointing (deg)
+* lon      - Galactic longitude of pointing (deg)
+* lat      - Galactic latitude of pointing (deg)
+* duration - Duration of pointing (seconds)
+* emin     - Lower energy limit (TeV)
+* emax     - Upper energy limit (TeV)
+* rad      - Radius of region of interest (deg)
+* deadc    - Deadtime correction factor [0-1]
+* caldb    - Calibration database
+* irf      - Response function name
+            
+Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
+All other keywords are optional and can be specified when calling
+csobsdef as user parameters. The only exception is the "duration"
+keyword that will automatically queried.
+    
+Here some usage examples:
+    
+``csobsdef``
+      Creates minimal observation definition file.
+
+``csobsdef emin=0.1 emax=100.0``
+      Creates observation definition file with an energy range 100 GeV - 100 TeV.
+
+``csobsdef rad=5``
+      Creates observation definition file with a ROI radius of 5 deg.
+
+``csobsdef caldb=dummy irf=cta_dummy_irf``
+      Creates observation definition file using the "cta_dummy_irf" IRF in the
+      "dummy" calibration database.
 
 
 General parameters
@@ -21,22 +59,22 @@ General parameters
 ``outobs [file]``
     Output Observation Definition XML file.
 
-``caldb [string]``
-    Calibration database.
- 	 	 
-``irf [string]``
-    Instrumental response function.
-
-``emin [real]``
-    Lower energy limit of events (in TeV).
- 	 	 
-``emax [real]``
-    Upper energy limit of events (in TeV).
- 	 	 
 ``duration [real]``
     Duration of observation (in seconds).
 
-``rad [real]``
+``(caldb = "") [string]``
+    Calibration database.
+ 	 	 
+``(irf = "") [string]``
+    Instrumental response function.
+
+``(emin = UNDEF) [real]``
+    Lower energy limit of events (in TeV).
+ 	 	 
+``(emax = UNDEF) [real]``
+    Upper energy limit of events (in TeV).
+ 	 	 
+``(rad = UNDEF) [real]``
     ROI radius (in degrees).
 
 ``(deadc = 0.95) [real]``
