@@ -29,7 +29,25 @@ import sys
 class csobsdef(ctools.cscript):
     """
     The csobsdef class generates an observation definition file from a
-    pointing list.
+    pointing list. The pointing list is a colon separated value ASCII
+    file with header keywords in the first row followed by a list of
+    pointings (one pointing per row). The following header keywords
+    are supported (case sensitive, column order irrelevant):
+    
+    name     - Observation name string
+    id       - Unique observation identifier string
+    ra       - Right Ascension of pointing (deg)
+    dec      - Declination of pointing (deg)
+    lon      - Galactic longitude of pointing (deg)
+    lat      - Galactic latitude of pointing (deg)
+    duration - Duration of pointing (seconds)
+    emin     - Lower energy limit (TeV)
+    emax     - Upper energy limit (TeV)
+    rad      - Radius of region of interest (deg)        
+    
+    Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
+    All other are optional and are queried as user parameters if they
+    are not specified in the pointing list.
     """
     def __init__(self, *argv):
         """
@@ -93,8 +111,6 @@ class csobsdef(ctools.cscript):
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Pointing definition file"))
             pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Output observation definition file"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Pointing duration (seconds)"))
@@ -218,17 +234,6 @@ class csobsdef(ctools.cscript):
                       " definition file.")
             obs.pointing(gammalib.GCTAPointing(pntdir))
 
-            # Set response function
-            if "caldb" in header:
-                caldb = pntdef[row, header.index("caldb")]
-            else:
-                caldb = self["caldb"].string()
-            if "irf" in header:
-                irf = pntdef[row, header.index("irf")]
-            else:
-                irf = self["irf"].string()
-            obs = self.__set_response(obs, caldb, irf)
-
             # Set deadtime correction factor
             if "deadc" in header:
                 deadc = float(pntdef[row, header.index("deadc")])
@@ -284,30 +289,6 @@ class csobsdef(ctools.cscript):
 
         # Return
         return
-
-    def __set_response(self, obs, caldb, irf):
-        """
-        Set response for an observation. We create an XML element for that
-        so that the response XML writer will write the database and response
-        name into the observation definition file.
-        """
-        # Create XML element
-        xml = gammalib.GXmlElement()
-
-        # Append parameter
-        parameter = "parameter name=\"Calibration\" database=\""+\
-                    caldb+"\" response=\""+irf+"\""
-        xml.append(gammalib.GXmlElement(parameter))
-
-        # Create CTA response
-        response = gammalib.GCTAResponseIrf()
-        response.read(xml)
-        
-        # Attach response to observation
-        obs.response(response)
-        
-        # Return observation
-        return obs
 
 
 # ======================== #
