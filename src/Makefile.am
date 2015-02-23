@@ -17,7 +17,8 @@ SUBDIRS = support \
           ctbkgcube \
           ctcubemask \
           cttsmap \
-          ctbutterfly
+          ctbutterfly \
+          ctulimit
 
 # Scripts to be distributed
 scripts = ctools-setup \
@@ -41,7 +42,8 @@ libctools_la_LIBADD = support/libsupport.la \
                       ctbkgcube/libctbkgcube.la \
                       ctcubemask/libctcubemask.la \
                       cttsmap/libcttsmap.la \
-                      ctbutterfly/libctbutterfly.la              
+                      ctbutterfly/libctbutterfly.la \
+                      ctulimit/libctulimit.la               
                       
 
 # Distribute scripts

@@ -1,0 +1,48 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      ctulimit.par                                                  #
+#  Version:   01-00-00                                                      #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
+#                                                                           #
+#  Purpose:   Parameter file for the ctulimit application                   #
+#                                                                           #
+#############################################################################
+#
+# General parameters
+#===================
+inobs,    f, a, "events.fits",,, "Input event list, counts cube or observation definition file"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+srcname,  s, a, "Crab",,, "Source of interest"
+expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
+psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
+caldb,    s, a, "dummy",,, "Calibration database"
+irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
+outfile,  f, a, "upperlimit.txt",,, "Output ASCII file"
+
+#
+# Upper limit calculation parameters
+#===================================
+confidence, r, h, 0.95,0.0,1.0, "Confidence level"
+sigma_min,  r, h, 0.0,,, "Start minimum value (multiple sigmas above fit value)"
+sigma_max,  r, h, 10.0,,, "Start maximum value (multiple sigmas above fit value)"
+eref,       r, h, 1.0,,, "Reference energy for differential limits (TeV)"
+emin,       r, h, 1.0,,, "Minimum energy for flux limits (TeV)"
+emax,       r, h, 100.0,,, "Maximum energy for flux limits (TeV)"
+tol,        r, h, 1e-5,,, "Computation tolerance"
+max_iter,   i, h, 50,,, "Maximum number of iterations"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, "ql",,, "Mode of automatic parameters"
+logfile, f, h, "ctulimit.log",,, "Log filename"
