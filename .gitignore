@@ -58,6 +58,7 @@ src/ctpsfcube/ctpsfcube
 src/ctbkgcube/ctbkgcube
 src/ctcubemask/ctcubemask
 src/ctbutterfly/ctbutterfly
+src/ctulimit/ctulimit
 test/pfiles/
 test/*.fits
 test/*.dat

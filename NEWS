@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-22 February 2015
+23 February 2015
 
 
 1. Introduction
@@ -92,12 +92,17 @@ None
 None
 
 
-17. Examples
+17. ctulimit - Compute upper limit
+----------------------------------
+Added an initial version of the upper limit computation tool.
+
+
+18. Examples
 ------------
 None
 
 
-18. Scripts
+19. Scripts
 -----------
 The user parameter interface of cssens has been modified. The script
 now reads a source model that is used for sensitivity estimation.
@@ -111,11 +116,11 @@ simulation of multiple pointings in one shot. This enables for example
 survey observations to be simulated in a single ctobssim run.
 
 
-19. caldb
+20. caldb
 ---------
 None
 
 
-20. models
+21. models
 ----------
 None
