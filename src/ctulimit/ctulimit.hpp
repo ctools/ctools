@@ -1,7 +1,7 @@
 /***************************************************************************
- *                    ctulimit - Upper limit calculation tool                    *
+ *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2015 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctulimit.hpp
- * @brief upper limit calculation tool interface definition
+ * @brief Upper limit calculation tool interface definition
  * @author Michael Mayer
  */
 
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTULIMIT_NAME    "ctulimit"
-#define CTULIMIT_VERSION "00-01-00"
+#define CTULIMIT_VERSION "01-00-00"
 
 
 /***********************************************************************//**
@@ -42,14 +42,13 @@
  *
  * @brief Upper limit calculation tool
  *
- * This class computes and upper limit for a given parameter.
+ * This class computes and upper limit for a given source.
  *
  * The class operates on predefined observation containers, an individual
  * event list or an observation definition XML file.
  *
- * During the computation the likelihood function is inspected to find the best
- * value for the upper limit.
- *
+ * During the computation the likelihood function is inspected to find the
+ * best value for the upper limit.
  ***************************************************************************/
 class ctulimit : public ctool {
 
@@ -69,43 +68,41 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    const double&     diff_ulimit(void) const;
-    const double&     flux_ulimit(void) const;
-    const double&    eflux_ulimit(void) const;
+    const double&        diff_ulimit(void) const;
+    const double&        flux_ulimit(void) const;
+    const double&        eflux_ulimit(void) const;
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctulimit& app);
-    void free_members(void);
-    void get_parameters(void);
-    void ulimit_bisection(const double& parmin, const double& parmax, const double& scale);
+    void   init_members(void);
+    void   copy_members(const ctulimit& app);
+    void   free_members(void);
+    void   get_parameters(void);
+    void   get_model_parameter(void);
+    void   ulimit_bisection(const double& parmin, const double& parmax);
     double evaluate(const double& value);
 
     // User parameters
-    std::string              m_srcname;    //!< Name of source which is moved around
-    std::string              m_outfile;    //!< Output ascii file
-
-    GModelSky*            m_skymodel; //!< Pointer to variable spectral model
-
-    int                m_max_iter; //!< maximum number of iterations
-    double                m_dloglike; //!< Likelihood difference for upper limit computation
-    double                m_bestloglike ; //!< Best fit log likelihood of given model
-    double                m_tol; //!< tolerance for limit determination
-    double                m_sigma_min; //!< Starting value minimum (multiple fit errors above fit values)
-    double                m_sigma_max; //!< Starting value maximum (multiple fit errors above fit values)
-    double                m_eref; //!< reference energy for flux limits
-    double                m_emin; //!< minimum energy for flux limits
-    double                m_emax; //!< maximum energy for flux limits
-
-    double                m_diff_ulimit; //!<Differential upper limit value
-    double                m_flux_ulimit; //!< Flux upper limit value
-    double                m_eflux_ulimit; //!< Energy flux upper limits
+    std::string   m_srcname;      //!< Name of source which is moved around
+    std::string   m_outfile;      //!< Output ascii file
+    double        m_sigma_min;    //!< Starting value minimum (multiple fit errors above fit values)
+    double        m_sigma_max;    //!< Starting value maximum (multiple fit errors above fit values)
+    double        m_eref;         //!< Reference energy for flux limits (TeV)
+    double        m_emin;         //!< Minimum energy for flux limits (TeV)
+    double        m_emax;         //!< Maximum energy for flux limits (TeV)
+    double        m_tol;          //!< Tolerance for limit determination
+    int           m_max_iter;     //!< Maximum number of iterations
 
     // Protected members
-    GObservations            m_obs;        //!< Observation container
-    GModels m_models;
-
+    GObservations m_obs;          //!< Observation container
+    GModels       m_models;
+    double        m_dlogL;        //!< Likelihood difference for upper limit computation
+    GModelSky*    m_skymodel;     //!< Pointer to sky model
+    GModelPar*    m_model_par;    //!< Pointer to model parameter
+    double        m_best_logL;    //!< Best fit log likelihood of given model
+    double        m_diff_ulimit;  //!< Differential upper limit value
+    double        m_flux_ulimit;  //!< Flux upper limit value
+    double        m_eflux_ulimit; //!< Energy flux upper limits
 };
 
 

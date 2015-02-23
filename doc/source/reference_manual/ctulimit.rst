@@ -3,14 +3,15 @@
 ctulimit
 ===========
 
-Computes upper limit.
+Computes upper limit for a specific sky model component.
 
 
 Synopsis
 --------
 
-Calculates the upper limit flux of a given source and stores the value in ascii file.
-The input model has to be optimised for ctulimit to converge.
+Computes the upper limit flux of a given source and stores the value
+in an ASCII file.
+
 
 General parameters
 ------------------
@@ -39,26 +40,29 @@ General parameters
 ``outfile [file]``
     Output ASCII file name.
 
-``(cl = 0.95) [real]``
-    Confidence Level of upper limit
+``(confidence = 0.95) [real]``
+    Confidence Level of upper limit.
     
 ``(sigma_min = 0.0) [real]``
-    Minimum boundary to start searching for upper limit value. Number of standard deviations above best fit value
+    Minimum boundary to start searching for upper limit value.
+    Number of standard deviations above best fit value
     
 ``(sigma_max = 10.0) [real]``
-    Maximum boundary to start searching for upper limit value. Number of standard deviations above best fit value  
+    Maximum boundary to start searching for upper limit value.
+    Number of standard deviations above best fit value  
  	 	 
 ``(emin = 1.0) [real])``
-    Minimum energy of flux upper limit (in TeV).
+    Minimum energy of flux limits (in TeV).
  	 	 
 ``(emax = 100) [real]``
-    Maximum energy of flux upper limit (in TeV).
+    Maximum energy of flux limits (in TeV).
  	 	 
 ``(tol = 1e-5) [real]``
-    Computation tolerance for minimum
+    Computation tolerance.
    
 ``(max_iter = 50) [integer]``
-    Maximum number of iterations before throwing an exception
+    Maximum number of iterations before stopping the upper
+    limit computations.
 
 
 Standard parameters
@@ -85,7 +89,7 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctskymap.log) [string]``
+``(logfile = ctulimit.log) [string]``
     Name of log file.
 
 

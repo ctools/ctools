@@ -1,7 +1,7 @@
 /***************************************************************************
- *                    ctulimit - upper limit calculation tool                    *
+ *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2015 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctulimit.hpp
- * @brief upper limit calculation tool interface implementation
+ * @brief Upper limit calculation tool interface implementation
  * @author Michael Mayer
  */
 
@@ -34,9 +34,11 @@
 #include "GOptimizer.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                          "ctulimit::get_parameters()"
-#define G_UL_BISECTION        "ctulimit::ul_bisection(const double&, const double&)"
-#define G_EVALUATE        "ctulimit::evaluate(const double&)"
+#define G_GET_PARAMETERS                         "ctulimit::get_parameters()"
+#define G_GET_MODEL_PARAMETER               "ctulimit::get_model_parameter()"
+#define G_UL_BISECTION             "ctulimit::ul_bisection(double&, double&)"
+#define G_EVALUATE                              "ctulimit::evaluate(double&)"
+
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
@@ -70,7 +72,7 @@ ctulimit::ctulimit(void) : ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
  * observations container.
  ***************************************************************************/
 ctulimit::ctulimit(const GObservations& obs) :
-         ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
+          ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
 {
     // Initialise members
     init_members();
@@ -91,7 +93,7 @@ ctulimit::ctulimit(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctulimit::ctulimit(int argc, char *argv[]) :
-         ctool(CTULIMIT_NAME, CTULIMIT_VERSION, argc, argv)
+          ctool(CTULIMIT_NAME, CTULIMIT_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -227,29 +229,63 @@ void ctulimit::run(void)
         log << m_obs << std::endl;
     }
 
+    // Save original models
     GModels models_orig = m_obs.models();
 
-
-    m_bestloglike = m_obs.logL();
-    if (m_bestloglike == 0.0) {
+    // Save original log-likelihood. If the value is zero it has never been
+    // computed hence we compute it now. 
+    m_best_logL = m_obs.logL();
+    if (m_best_logL == 0.0) {
 
         // Write header
         if (logTerse()) {
             log << std::endl;
-            log.header1("Recompute best-fit likelihood");
+            log.header1("Compute best-fit likelihood");
         }
 
         // Reoptimize if likelihood was not given before
         GOptimizerLM* opt = new GOptimizerLM();
         m_obs.optimize(*opt);
         m_obs.errors(*opt);
-        m_bestloglike = m_obs.logL();
+        m_best_logL = m_obs.logL();
 
-    } //endif: likelihood was 0.0
+        // Write optimised model into logger
+        if (logTerse()) {
+            log << m_obs.models() << std::endl;
+        }
 
-    // Store optimized models and pointer to skymodel of interest
-    m_models = m_obs.models();
-    m_skymodel = dynamic_cast<GModelSky*>(m_models[m_srcname])->clone();
+    } // endif: likelihood was zero
+
+    // Compute parameter bracketing
+    double value  = m_model_par->value();
+    double error  = m_model_par->error();
+    double parmin = value + m_sigma_min * error;
+    double parmax = value + m_sigma_max * error;
+
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Compute upper limit");
+        log << gammalib::parformat("Model name");
+        log << m_skymodel->name() << std::endl;
+        log << gammalib::parformat("Parameter name");
+        log << m_model_par->name() << std::endl;
+        log << gammalib::parformat("Initial parameter range");
+        log << "[";
+        log << parmin;
+        log << ", ";
+        log << parmax;
+        log << "]" << std::endl;
+    }
+
+    // Compute upper limit
+    ulimit_bisection(parmin, parmax);
+
+    // Write final parameter range
+    if (logTerse()) {
+        log << gammalib::parformat("Final parameter");
+        log << m_model_par->value() << std::endl;
+    }
 
     // Get reference energy for differential upper limit
     GEnergy eref = GEnergy(m_eref, "TeV");
@@ -258,49 +294,32 @@ void ctulimit::run(void)
     GEnergy emin = GEnergy(m_emin, "TeV");
     GEnergy emax = GEnergy(m_emax, "TeV");
 
-    // Get value, scale and error of parameter
-    double value = (*m_skymodel->spectral())[0].value();
-    double error = (*m_skymodel->spectral())[0].error();
-    double scale = (*m_skymodel->spectral())[0].scale();
-
-    // Compute starting boundaries
-    double parmin = value / scale +  m_sigma_min * error / scale;
-    double parmax = value / scale +  m_sigma_max * error / scale;
-
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Compute upper limit");
-        log << "Searching for upper limit between ";
-        log << parmin * scale;
-        log << " and ";
-        log << parmax * scale;
-        log << ": "<<std::endl;
-    }
-
-    // compute upper limit
-    ulimit_bisection(parmin, parmax, scale);
-
-    m_diff_ulimit = m_skymodel->spectral()->eval(eref, GTime());
-    m_flux_ulimit = m_skymodel->spectral()->flux(emin, emax);
+    // Compute upper limit intensity and fluxes
+    m_diff_ulimit  = m_skymodel->spectral()->eval(eref, GTime());
+    m_flux_ulimit  = m_skymodel->spectral()->flux(emin, emax);
     m_eflux_ulimit = m_skymodel->spectral()->eflux(emin, emax);
 
     // Write results to logfile
     if (logTerse()) {
         log << std::endl;
-        log.header1("Upper limit computation finished");
-        log << "Upper limits are:" << std::endl;
-        log << " Differential at ";
-        log << m_eref <<" TeV: ";
-        log << m_diff_ulimit << " ph/cm2/s/MeV" << std::endl;
-        log << " Integral [";
-        log << m_emin << " - " << m_emax;
-        log << "] TeV: ";
-        log << m_flux_ulimit << " ph/cm2/s" <<std::endl;
-        log << " Energy flux [";
-        log << m_emin << " - " << m_emax;
-        log << "] TeV: ";
-        log << m_eflux_ulimit << " erg/cm2/s" <<std::endl;
+        log.header1("Upper limit results");
+        log << gammalib::parformat("Differential flux limit");
+        log << m_diff_ulimit;
+        log << " ph/cm2/s/MeV at ";
+        log << m_eref << " TeV";
+        log << std::endl;
+        log << gammalib::parformat("Integral flux limit");
+        log << m_flux_ulimit;
+        log << " ph/cm2/s within [";
+        log << m_emin << "-" << m_emax;
+        log << "] TeV";
+        log << std::endl;
+        log << gammalib::parformat("Energy flux limit");
+        log << m_eflux_ulimit;
+        log << " erg/cm2/s within [";
+        log << m_emin << "-" << m_emax;
+        log << "] TeV";
+        log << std::endl;
     }
 
     // Recover original models
@@ -308,119 +327,6 @@ void ctulimit::run(void)
 
     // Return
     return;
-}
-
-/***********************************************************************//**
- * @brief Evaluates the likelihood
- *
- * @param[in] value Factorised parameter value of the parameter of interest
- * @return likelihood value
- *
- * This method evaluates the likelihood as a function of the parameter of interest
- ***************************************************************************/
-double ctulimit::evaluate(const double& value)
-{
-    // Initialise likelihood value
-    double LogL = 0.0;
-
-    // Check if given parameter is within boundaries
-    if (value > (*m_skymodel->spectral())[0].factor_min() && value < (*m_skymodel->spectral())[0].factor_max()) {
-
-        // Remove source model
-        m_models.remove(m_srcname);
-
-        // Change spectral model value
-        (*m_skymodel->spectral())[0].factor_value(value);
-
-        // Re-append model to container
-        m_models.append(*m_skymodel);
-
-        // Assign new models to observations
-        m_obs.models(m_models);
-
-        // Evaluate likelihood for new model container
-        m_obs.eval();
-
-        // Retrieve likelihood
-        LogL = m_obs.logL();
-
-    } // endif: value was inside allowed range
-
-    else {
-        // throw exception if value out of range
-        std::string msg = "Value out of range requested: "
-                "To omit this error, you could increase the allowed "
-                "parameter range in the model xml file.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Compute function value
-    double difflike = LogL - m_bestloglike - m_dloglike;
-
-    // Return
-    return difflike;
-}
-
-/***********************************************************************//**
- * @brief Induces upper limit computation by using a bisection method
- *
- * This method calculates the upper limit using a bisection method
- ***************************************************************************/
-void ctulimit::ulimit_bisection(const double& min, const double& max, const double& scale)
-{
-    // copy values to working values
-    double wrk_min = min;
-    double wrk_max = max;
-
-    // Initialise counter
-    int iter=0;
-
-    // Loop until breaking condition is reached
-    while (true) {
-
-        // Log information
-            if (logExplicit()) {
-                log << " Iteration ";
-                log << iter;
-                log << ": Parameter range reduced to [";
-                log << wrk_min * scale;
-                log <<"; ";
-                log << wrk_max * scale;
-                log << "]" << std::endl;
-            }
-
-        // Throw exception if maximum iterations are reached
-        if( iter > m_max_iter) {
-            throw GException::invalid_value(G_UL_BISECTION, "Maximum iterations reached");;
-        }
-
-        // compute center of boundary
-        double mid = (wrk_min + wrk_max) / 2.0;
-
-        // Calculate function value
-        double eval_mid = evaluate(mid);
-
-        // Check for convergence inside tolerance
-        if (std::abs(eval_mid) < m_tol) {
-            break;
-        }
-
-        // change boundaries for further iteration
-        if (eval_mid > 0.0) {
-            wrk_max = mid;
-        }
-        else if (eval_mid < 0.0) {
-            wrk_min = mid;
-        }
-
-        // increment counter
-        iter++;
-
-    } // endwhile
-
-    // Return
-    return;
-
 }
 
 
@@ -466,26 +372,27 @@ void ctulimit::save(void)
  ***************************************************************************/
 void ctulimit::init_members(void)
 {
-    // Initialise members
+    // Initialise user parameters
     m_outfile.clear();
     m_srcname.clear();
-    m_bestloglike = 0.0;
-    m_flux_ulimit = 0.0;
-    m_diff_ulimit = 0.0;
-    m_eflux_ulimit = 0.0;
-    m_dloglike = 0.0;
-    m_tol = 1e-6;
-    m_max_iter = 50;
-    m_eref = 0.0;
-    m_emin = 0.0;
-    m_emax = 0.0;
-    m_sigma_min = 0.0;
-    m_sigma_max  = 0.0;
-    m_skymodel = NULL;
+    m_sigma_min    = 0.0;
+    m_sigma_max    = 0.0;
+    m_eref         = 0.0;
+    m_emin         = 0.0;
+    m_emax         = 0.0;
+    m_tol          = 1.0e-6;
+    m_max_iter     = 50;
 
     // Initialise protected members
     m_obs.clear();
     m_models.clear();
+    m_dlogL        = 0.0;
+    m_skymodel     = NULL;
+    m_model_par    = NULL;
+    m_best_logL    = 0.0;
+    m_flux_ulimit  = 0.0;
+    m_diff_ulimit  = 0.0;
+    m_eflux_ulimit = 0.0;
 
     // Return
     return;
@@ -499,28 +406,29 @@ void ctulimit::init_members(void)
  ***************************************************************************/
 void ctulimit::copy_members(const ctulimit& app)
 {
-    // Copy attributes
-    m_outfile  = app.m_outfile;
-    m_srcname = app.m_srcname;
-    m_diff_ulimit = app.m_diff_ulimit;
-    m_flux_ulimit = app.m_flux_ulimit;
-    m_eflux_ulimit = app.m_eflux_ulimit;
-    m_bestloglike = app.m_bestloglike;
-    m_dloglike = app.m_dloglike;
-    m_tol = app.m_tol;
-    m_max_iter = app.m_max_iter;
-    m_eref = app.m_eref;
-    m_emin = app.m_emin;
-    m_emax = app.m_emax;
-    m_sigma_min = app.m_sigma_min;
-    m_sigma_max = app.m_sigma_max;
+    // Copy user parameters
+    m_outfile      = app.m_outfile;
+    m_srcname      = app.m_srcname;
+    m_sigma_min    = app.m_sigma_min;
+    m_sigma_max    = app.m_sigma_max;
+    m_eref         = app.m_eref;
+    m_emin         = app.m_emin;
+    m_emax         = app.m_emax;
+    m_tol          = app.m_tol;
+    m_max_iter     = app.m_max_iter;
+
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_models  = app.m_models;
+    m_obs          = app.m_obs;
+    m_models       = app.m_models;
+    m_dlogL        = app.m_dlogL;
+    m_best_logL    = app.m_best_logL;
+    m_diff_ulimit  = app.m_diff_ulimit;
+    m_flux_ulimit  = app.m_flux_ulimit;
+    m_eflux_ulimit = app.m_eflux_ulimit;
 
-    // Clone protected members
-    m_skymodel = (app.m_skymodel != NULL) ? app.m_skymodel->clone() : NULL;
+    // Extract model parameter
+    get_model_parameter();
 
     // Return
     return;
@@ -541,14 +449,10 @@ void ctulimit::free_members(void)
  * @brief Get application parameters
  *
  * @exception GException::invalid_value
- *            Test source not found or no RA/DEC parameters found for test
- *            source.
+ *            Test source not found.
  *
  * Get all task parameters from parameter file or (if required) by querying
- * the user. Most parameters are only required if no observation exists so
- * far in the observation container. In this case, a single CTA observation
- * will be added to the container, using the definition provided in the
- * parameter file.
+ * the user.
  ***************************************************************************/
 void ctulimit::get_parameters(void)
 {
@@ -586,16 +490,20 @@ void ctulimit::get_parameters(void)
         throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
-    double CL = (*this)["cl"].real();
-    if (CL != 0.95) {
-        std::string msg = "Confidence level different from 95% requested"
-                          "Currently only 95% CL is possible";
+    // Get relevant model and parameter for upper limit computation
+    get_model_parameter();
+
+    // Get confidence level
+    double confidence = (*this)["confidence"].real();
+    if (confidence != 0.95) {
+        std::string msg = "Confidence level different from 95% requested."
+                          " Currently only 95% is supported.";
         throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
     else {
         // Set Likelihood difference for 95% CL.
         // See Minuit Handbook
-        m_dloglike = 3.84 / 2.0;
+        m_dlogL = 3.84 / 2.0;
     }
 
     // Read starting boundaries for bisection
@@ -608,7 +516,7 @@ void ctulimit::get_parameters(void)
     m_emax = (*this)["emax"].real();
 
     // Read precision
-    m_tol = (*this)["tol"].real();
+    m_tol      = (*this)["tol"].real();
     m_max_iter = (*this)["max_iter"].integer();
 
     // Optionally read ahead parameters so that they get correctly
@@ -622,3 +530,156 @@ void ctulimit::get_parameters(void)
 }
 
 
+/***********************************************************************//**
+ * @brief Get application parameters
+ *
+ * @exception GException::invalid_value
+ *            Did not find a valid model parameter
+ *
+ * Extracts a pointer to the sky model (m_skymodel) and a pointer to the
+ * relevant model parameter (m_model_par) from the model container.
+ ***************************************************************************/
+void ctulimit::get_model_parameter(void)
+{
+    // Get relevant model and parameter for upper limit computation.
+    GModels& models = const_cast<GModels&>(m_obs.models());
+    m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
+    if (m_skymodel == NULL) {
+        std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
+                          "Please specify the name of a sky model for "
+                          "upper limit computation.";
+        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+    }
+    if (m_skymodel->spectral()->has_par("Normalization")) {
+        m_model_par = &(m_skymodel->spectral()->operator[]("Normalization"));
+    }
+    else if (m_skymodel->spectral()->has_par("Prefactor")) {
+        m_model_par = &(m_skymodel->spectral()->operator[]("Prefactor"));
+    }
+    else if (m_skymodel->spectral()->has_par("Integral")) {
+        m_model_par = &(m_skymodel->spectral()->operator[]("Integral"));
+    }
+    else {
+        std::string msg = "Require spectral parameter \"Normalization\", "
+                          "\"Prefactor\" or \"Integral\" for upper limit "
+                          "computation. The specified source \""+m_srcname+
+                          "\" does not have such a parameter.";
+        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Performs upper limit computation by using a bisection method
+ *
+ * @param[in] min Minimum parameter value
+ * @param[in] max Maximum parameter value
+ *
+ * This method calculates the upper limit using a bisection method.
+ ***************************************************************************/
+void ctulimit::ulimit_bisection(const double& min, const double& max)
+{
+    // Copy values to working values
+    double wrk_min = min;
+    double wrk_max = max;
+
+    // Initialise iteration counter
+    int iter = 0;
+
+    // Loop until breaking condition is reached
+    while (true) {
+
+        // Log information
+        if (logExplicit()) {
+            log << gammalib::parformat("Iteration "+gammalib::str(iter));
+            log << "[";
+            log << wrk_min;
+            log << ", ";
+            log << wrk_max;
+            log << "]" << std::endl;
+        }
+
+        // Throw exception if maximum iterations are reached
+        if (iter > m_max_iter) {
+            std::string msg = "The maximum number of "+gammalib::str(m_max_iter)+
+                              " has been reached. You may consider to increase"
+                              " the \"max_iter\" parameter and re-run ctulimit.";
+            throw GException::invalid_value(G_UL_BISECTION, msg);
+        }
+
+        // Compute center of boundary
+        double mid = (wrk_min + wrk_max) / 2.0;
+
+        // Calculate function value
+        double eval_mid = evaluate(mid);
+
+        // Check for convergence inside tolerance
+        if (std::abs(eval_mid) < m_tol) {
+            break;
+        }
+
+        // Change boundaries for further iteration
+        if (eval_mid > 0.0) {
+            wrk_max = mid;
+        }
+        else if (eval_mid < 0.0) {
+            wrk_min = mid;
+        }
+
+        // Increment counter
+        iter++;
+
+    } // endwhile
+
+    // Return
+    return;
+
+}
+
+
+/***********************************************************************//**
+ * @brief Evaluates the log-likelihood
+ *
+ * @param[in] value Parameter factor value
+ * @return Log-likelihood value
+ *
+ * This method evaluates the log-likelihood as a function of the parameter
+ * of interest.
+ ***************************************************************************/
+double ctulimit::evaluate(const double& value)
+{
+    // Initialise log-likelihood value
+    double logL = 0.0;
+
+    // Check if given parameter is within boundaries
+    if (value > m_model_par->min() && value < m_model_par->max()) {
+
+        // Change parameter factor
+        m_model_par->value(value);
+
+        // Evaluate likelihood for new model container
+        m_obs.eval();
+
+        // Retrieve likelihood
+        logL = m_obs.logL();
+
+    } // endif: value was inside allowed range
+
+    // ... otherwise signal that the parameter went outside the boundaries
+    else {
+        std::string msg = "Value of parameter \""+m_model_par->name()+"\" "
+                          "outside of validity range requested. To omit "
+                          "this error please enlarge the  parameter range "
+                          "in the model XML file.";
+        throw GException::invalid_value(G_EVALUATE, msg);
+    }
+
+    // Compute function value
+    double logL_difference = logL - m_best_logL - m_dlogL;
+
+    // Return
+    return logL_difference;
+}

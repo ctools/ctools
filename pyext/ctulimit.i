@@ -1,5 +1,5 @@
 /***************************************************************************
- *                  ctulimit - ctulimit calculation tool                   *
+ *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2015 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctulimit
- * @brief upper limit calculation tool
+ * @brief Upper limit calculation tool
  * @author Michael Mayer
  */
 %{
@@ -32,7 +32,7 @@
 /***********************************************************************//**
  * @class ctulimit
  *
- * @brief upper limit calculation tool
+ * @brief Upper limit calculation tool
  ***************************************************************************/
 class ctulimit : public ctool {
 public:
@@ -48,14 +48,14 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    const double&     diff_ulimit(void) const;
-    const double&     flux_ulimit(void) const;
-    const double&    eflux_ulimit(void) const;
+    const double&        diff_ulimit(void) const;
+    const double&        flux_ulimit(void) const;
+    const double&        eflux_ulimit(void) const;
 };
 
 
 /***********************************************************************//**
- * @brief upper limit calculation tool Python extensions
+ * @brief Upper limit calculation tool Python extensions
  ***************************************************************************/
 %extend ctulimit {
     ctulimit copy() {

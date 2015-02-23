@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cttsmap tool.
+# This scripts performs unit tests for the ctulimit tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2015 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

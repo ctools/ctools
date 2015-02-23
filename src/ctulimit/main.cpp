@@ -1,7 +1,7 @@
 /***************************************************************************
- *                      ctulimit - upper limit calculation tool                  *
+ *                  ctulimit - upper limit calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2015 by Michael Mayer                                    *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
