@@ -270,6 +270,10 @@ void ctulimit::run(void)
         log << m_skymodel->name() << std::endl;
         log << gammalib::parformat("Parameter name");
         log << m_model_par->name() << std::endl;
+        log << gammalib::parformat("Confidence level");
+        log << m_confidence*100.0 << "%" << std::endl;
+        log << gammalib::parformat("Log-likelihood difference");
+        log << m_dlogL << std::endl;
         log << gammalib::parformat("Initial parameter range");
         log << "[";
         log << parmin;
@@ -375,17 +379,17 @@ void ctulimit::init_members(void)
     // Initialise user parameters
     m_outfile.clear();
     m_srcname.clear();
-    m_sigma_min    = 0.0;
-    m_sigma_max    = 0.0;
-    m_eref         = 0.0;
-    m_emin         = 0.0;
-    m_emax         = 0.0;
-    m_tol          = 1.0e-6;
-    m_max_iter     = 50;
+    m_confidence = 0.95;
+    m_sigma_min  = 0.0;
+    m_sigma_max  = 0.0;
+    m_eref       = 0.0;
+    m_emin       = 0.0;
+    m_emax       = 0.0;
+    m_tol        = 1.0e-6;
+    m_max_iter   = 50;
 
     // Initialise protected members
     m_obs.clear();
-    m_models.clear();
     m_dlogL        = 0.0;
     m_skymodel     = NULL;
     m_model_par    = NULL;
@@ -407,20 +411,20 @@ void ctulimit::init_members(void)
 void ctulimit::copy_members(const ctulimit& app)
 {
     // Copy user parameters
-    m_outfile      = app.m_outfile;
-    m_srcname      = app.m_srcname;
-    m_sigma_min    = app.m_sigma_min;
-    m_sigma_max    = app.m_sigma_max;
-    m_eref         = app.m_eref;
-    m_emin         = app.m_emin;
-    m_emax         = app.m_emax;
-    m_tol          = app.m_tol;
-    m_max_iter     = app.m_max_iter;
+    m_outfile    = app.m_outfile;
+    m_srcname    = app.m_srcname;
+    m_confidence = app.m_confidence;
+    m_sigma_min  = app.m_sigma_min;
+    m_sigma_max  = app.m_sigma_max;
+    m_eref       = app.m_eref;
+    m_emin       = app.m_emin;
+    m_emax       = app.m_emax;
+    m_tol        = app.m_tol;
+    m_max_iter   = app.m_max_iter;
 
 
     // Copy protected members
     m_obs          = app.m_obs;
-    m_models       = app.m_models;
     m_dlogL        = app.m_dlogL;
     m_best_logL    = app.m_best_logL;
     m_diff_ulimit  = app.m_diff_ulimit;
@@ -493,18 +497,10 @@ void ctulimit::get_parameters(void)
     // Get relevant model and parameter for upper limit computation
     get_model_parameter();
 
-    // Get confidence level
-    double confidence = (*this)["confidence"].real();
-    if (confidence != 0.95) {
-        std::string msg = "Confidence level different from 95% requested."
-                          " Currently only 95% is supported.";
-        throw GException::invalid_value(G_GET_PARAMETERS, msg);
-    }
-    else {
-        // Set Likelihood difference for 95% CL.
-        // See Minuit Handbook
-        m_dlogL = 3.84 / 2.0;
-    }
+    // Get confidence level and transform into log-likelihood difference
+    m_confidence = (*this)["confidence"].real();
+    double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
+    m_dlogL      = (sigma*sigma) / 2.0;
 
     // Read starting boundaries for bisection
     m_sigma_min = (*this)["sigma_min"].real();

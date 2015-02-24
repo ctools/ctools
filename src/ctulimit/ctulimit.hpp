@@ -85,6 +85,7 @@ protected:
     // User parameters
     std::string   m_srcname;      //!< Name of source which is moved around
     std::string   m_outfile;      //!< Output ascii file
+    double        m_confidence;   //!< Confidence level
     double        m_sigma_min;    //!< Starting value minimum (multiple fit errors above fit values)
     double        m_sigma_max;    //!< Starting value maximum (multiple fit errors above fit values)
     double        m_eref;         //!< Reference energy for flux limits (TeV)
@@ -95,7 +96,6 @@ protected:
 
     // Protected members
     GObservations m_obs;          //!< Observation container
-    GModels       m_models;
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
     GModelSky*    m_skymodel;     //!< Pointer to sky model
     GModelPar*    m_model_par;    //!< Pointer to model parameter
