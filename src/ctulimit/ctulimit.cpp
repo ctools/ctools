@@ -537,31 +537,36 @@ void ctulimit::get_parameters(void)
  ***************************************************************************/
 void ctulimit::get_model_parameter(void)
 {
-    // Get relevant model and parameter for upper limit computation.
-    GModels& models = const_cast<GModels&>(m_obs.models());
-    m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
-    if (m_skymodel == NULL) {
-        std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
-                          "Please specify the name of a sky model for "
-                          "upper limit computation.";
-        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-    }
-    if (m_skymodel->spectral()->has_par("Normalization")) {
-        m_model_par = &(m_skymodel->spectral()->operator[]("Normalization"));
-    }
-    else if (m_skymodel->spectral()->has_par("Prefactor")) {
-        m_model_par = &(m_skymodel->spectral()->operator[]("Prefactor"));
-    }
-    else if (m_skymodel->spectral()->has_par("Integral")) {
-        m_model_par = &(m_skymodel->spectral()->operator[]("Integral"));
-    }
-    else {
-        std::string msg = "Require spectral parameter \"Normalization\", "
-                          "\"Prefactor\" or \"Integral\" for upper limit "
-                          "computation. The specified source \""+m_srcname+
-                          "\" does not have such a parameter.";
-        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-    }
+    // Continue only if source model exists
+    if (m_obs.models().contains(m_srcname)) {
+
+        // Get relevant model and parameter for upper limit computation.
+        GModels& models = const_cast<GModels&>(m_obs.models());
+        m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
+        if (m_skymodel == NULL) {
+            std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
+                              "Please specify the name of a sky model for "
+                              "upper limit computation.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+        }
+        if (m_skymodel->spectral()->has_par("Normalization")) {
+            m_model_par = &(m_skymodel->spectral()->operator[]("Normalization"));
+        }
+        else if (m_skymodel->spectral()->has_par("Prefactor")) {
+            m_model_par = &(m_skymodel->spectral()->operator[]("Prefactor"));
+        }
+        else if (m_skymodel->spectral()->has_par("Integral")) {
+            m_model_par = &(m_skymodel->spectral()->operator[]("Integral"));
+        }
+        else {
+            std::string msg = "Require spectral parameter \"Normalization\", "
+                              "\"Prefactor\" or \"Integral\" for upper limit "
+                              "computation. The specified source \""+m_srcname+
+                              "\" does not have such a parameter.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+        }
+
+    } // endif: source model existed
 
     // Return
     return;
