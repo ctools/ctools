@@ -546,6 +546,12 @@ void ctulimit::get_model_parameter(void)
                               "upper limit computation.";
             throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
         }
+        if (m_skymodel->spectral()->type() == "NodeFunction") {
+            std::string msg = "\"NodeFunction\" cannot be used as spectral "
+                              "model for an upper limit computation. "
+                              "Please specify another spectral model.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+        }
         if (m_skymodel->spectral()->has_par("Normalization")) {
             m_model_par = &(m_skymodel->spectral()->operator[]("Normalization"));
         }
