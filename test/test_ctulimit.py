@@ -72,7 +72,6 @@ class Test(gammalib.GPythonTestSuite):
         ulimit["srcname"].string("Crab")
         ulimit["caldb"].string(self.caldb)
         ulimit["irf"].string(self.irf)
-        ulimit["outfile"].filename("ulimit.dat")
         
         # Run tool
         self.test_try("Run ctulimit")

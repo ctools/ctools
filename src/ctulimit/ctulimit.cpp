@@ -337,7 +337,10 @@ void ctulimit::run(void)
 /***********************************************************************//**
  * @brief Save maps
  *
- * This method saves the upper limit to an ascii file
+ * This method saves the upper limit to an ascii file.
+ *
+ * @todo No yet implemented as we have no clear use case yet for saving
+ * the result.
  ***************************************************************************/
 void ctulimit::save(void)
 {
@@ -347,6 +350,7 @@ void ctulimit::save(void)
         log.header1("Save upper limit");
     }
 
+    /*
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
 
@@ -359,7 +363,8 @@ void ctulimit::save(void)
 
     // Save CSV table
     table.save(m_outfile, " ", clobber());
-
+    */
+    
     // Return
     return;
 }
@@ -377,7 +382,6 @@ void ctulimit::save(void)
 void ctulimit::init_members(void)
 {
     // Initialise user parameters
-    m_outfile.clear();
     m_srcname.clear();
     m_confidence = 0.95;
     m_sigma_min  = 0.0;
@@ -411,7 +415,6 @@ void ctulimit::init_members(void)
 void ctulimit::copy_members(const ctulimit& app)
 {
     // Copy user parameters
-    m_outfile    = app.m_outfile;
     m_srcname    = app.m_srcname;
     m_confidence = app.m_confidence;
     m_sigma_min  = app.m_sigma_min;
@@ -515,12 +518,6 @@ void ctulimit::get_parameters(void)
     m_tol      = (*this)["tol"].real();
     m_max_iter = (*this)["max_iter"].integer();
 
-    // Optionally read ahead parameters so that they get correctly
-    // dumped into the log file
-    if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
-    }
-
     // Return
     return;
 }
@@ -558,11 +555,14 @@ void ctulimit::get_model_parameter(void)
         else if (m_skymodel->spectral()->has_par("Integral")) {
             m_model_par = &(m_skymodel->spectral()->operator[]("Integral"));
         }
+        else if (m_skymodel->spectral()->has_par("Value")) {
+            m_model_par = &(m_skymodel->spectral()->operator[]("Value"));
+        }
         else {
             std::string msg = "Require spectral parameter \"Normalization\", "
-                              "\"Prefactor\" or \"Integral\" for upper limit "
-                              "computation. The specified source \""+m_srcname+
-                              "\" does not have such a parameter.";
+                              "\"Prefactor\", \"Integral\" or \"Value\" for "
+                              "upper limit computation. The specified source "
+                              "\""+m_srcname+"\" does not have such a parameter.";
             throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
         }
 

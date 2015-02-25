@@ -9,8 +9,7 @@ Computes upper limit for a specific sky model component.
 Synopsis
 --------
 
-Computes the upper limit flux of a given source and stores the value
-in an ASCII file.
+Computes the upper limit flux of a given source.
 
 
 General parameters
@@ -37,9 +36,6 @@ General parameters
 ``irf [string]``
     Instrumental response function.
  	 	 
-``outfile [file]``
-    Output ASCII file name.
-
 ``(confidence = 0.95) [real]``
     Confidence Level of upper limit.
     

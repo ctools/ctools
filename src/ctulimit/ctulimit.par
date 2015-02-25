@@ -24,7 +24,6 @@ expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)
 psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
 caldb,    s, a, "dummy",,, "Calibration database"
 irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
-outfile,  f, a, "upperlimit.txt",,, "Output ASCII file"
 
 #
 # Upper limit calculation parameters

@@ -608,15 +608,14 @@ $ECHO -n "Test ctulimit: "
 $ctulimit inobs="data/crab_events.fits.gz" \
     inmodel="data/crab.xml" \
     srcname="Crab" \
-    outfile="ulimit.dat" \
     caldb="irf" \
     irf="cta_dummy_irf"
 $ECHO -n "."
-if [ -s "ulimit.dat" ]
+if [ -s "ctulimit.log" ]
 then
     $ECHO -n "."
 else
-    $ECHO " ulimit.dat file is not found"
+    $ECHO " ctulimit.log file is not found"
     exit 1
 fi
 $ECHO " ok"

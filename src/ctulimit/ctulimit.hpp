@@ -84,7 +84,6 @@ protected:
 
     // User parameters
     std::string   m_srcname;      //!< Name of source which is moved around
-    std::string   m_outfile;      //!< Output ascii file
     double        m_confidence;   //!< Confidence level
     double        m_sigma_min;    //!< Starting value minimum (multiple fit errors above fit values)
     double        m_sigma_max;    //!< Starting value maximum (multiple fit errors above fit values)
