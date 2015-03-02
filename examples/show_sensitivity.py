@@ -46,13 +46,35 @@ def read_sensitivity(filename):
             values.append(float(csv[row+1,column]))
         sensitivity[name] = values
 
+    # Check where file contains differential or integral sensitivity
+    mode = "Integral"
+    if sensitivity.has_key("emax"):
+        emax_ref = -1.0
+        for value in sensitivity["emax"]:
+            if emax_ref < 0.0:
+                emax_ref = value
+            elif emax_ref != value:
+                mode = "Differential"
+                break
+
+    # Add mode
+    sensitivity["mode"] = mode
+
     # Add linear energy values
-    if sensitivity.has_key("loge"):
-        name   = 'energy'
-        values = []
-        for value in sensitivity["loge"]:
-            values.append(math.pow(10.0, value))
-        sensitivity[name] = values
+    if mode == "Differential":
+        if sensitivity.has_key("loge"):
+            name   = 'energy'
+            values = []
+            for value in sensitivity["loge"]:
+                values.append(math.pow(10.0, value))
+            sensitivity[name] = values
+    else:
+        if sensitivity.has_key("emin"):
+            name   = 'energy'
+            values = []
+            for value in sensitivity["emin"]:
+                values.append(value)
+            sensitivity[name] = values
 
     # Return
     return sensitivity
@@ -61,10 +83,13 @@ def read_sensitivity(filename):
 # ===================== #
 # Show sensitivity data #
 # ===================== #
-def show_sensitivity(sensitivity, title="Sensitivity"):
+def show_sensitivity(sensitivity, filename):
     """
     Plot sensitivity.
     """
+    # Build title
+    title = sensitivity['mode'] + ' sensitivity ('+filename+')'
+
     # Create figure
     plt.figure()
 
@@ -78,7 +103,10 @@ def show_sensitivity(sensitivity, title="Sensitivity"):
 
     # Set labels
     plt.xlabel("Energy (TeV)")
-    plt.ylabel(r"Sensitivity (erg cm$^{-2}$ s$^{-1}$)")
+    if sensitivity['mode'] == "Differential":
+        plt.ylabel(r"E$\times$ F(E) (erg cm$^{-2}$ s$^{-1}$)")
+    else:
+        plt.ylabel(r"E$\times$ F($>$E) (erg cm$^{-2}$ s$^{-1}$)")
 
     # Show plot
     plt.show()
@@ -105,11 +133,8 @@ if __name__ == '__main__':
     else:
         filename = sys.argv[1]
 
-    # Set title
-    title = 'Differential sensitivity ('+filename+')'
-
     # Read sensitivity data
     sensitivity = read_sensitivity(filename)
 
     # Show sensitivity data
-    show_sensitivity(sensitivity, title=title)
+    show_sensitivity(sensitivity, filename)

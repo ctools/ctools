@@ -45,12 +45,6 @@ General parameters
 ``outfile [file]``
     ASCII file containing the sensitivity values.
  	 	 
-``type <point|gauss|shell|disk> [string]``
-    Source model type.
- 	 	 
-``offset [real]``
-    Source offset angle (in degrees).
- 	 	 
 ``duration [real]``
     Effective exposure time (in seconds).
  	 	 
@@ -74,6 +68,9 @@ General parameters
  	 	 
 ``(binsz = 0.05) [real]``
     Pixel size for binned analysis.
+ 	 	 
+``(type = Differential) <Differential|Integral> [string]``
+    Sensitivity type.
  	 	 
 ``(sigma = 5.0) [real]``
     Significance threshold.

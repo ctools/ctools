@@ -47,9 +47,9 @@ class cssens(ctools.cscript):
         self.version = "1.0.0"
 
         # Initialise some parameters
-        self.obs   = None
-        self.m_ra  = None
-        self.m_dec = None
+        self.obs    = None
+        self.m_ra   = None
+        self.m_dec  = None
         
         # Make sure that parfile exists
         file = self.parfile()
@@ -113,6 +113,7 @@ class cssens(ctools.cscript):
             pars.append(gammalib.GApplicationPar("enumbins","i","h","0","","","Number of energy bins (0=unbinned)"))
             pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
             pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+            pars.append(gammalib.GApplicationPar("type","s","h","Differential","Differential|Integral","","Sensitivity type"))
             pars.append(gammalib.GApplicationPar("sigma","r","h","5.0","","","Significance threshold"))
             pars.append(gammalib.GApplicationPar("max_iter","i","h","50","","","Maximum number of iterations"))
             pars.append(gammalib.GApplicationPar("num_avg","i","h","3","","","Number of iterations for sliding average"))
@@ -147,17 +148,18 @@ class cssens(ctools.cscript):
         # Read parameters for binned if requested
         self.m_enumbins = self["enumbins"].integer()
         if not self.m_enumbins == 0:
-            self.m_npix     = self["npix"].integer()
-            self.m_binsz    = self["binsz"].real()
+            self.m_npix  = self["npix"].integer()
+            self.m_binsz = self["binsz"].real()
         else:
             # Set dummy values (required by obsutils)
-            self.m_npix = 0
+            self.m_npix  = 0
             self.m_binsz = 0.0
 
         # Read remaining parameters
         self.m_ts_thres = self["sigma"].real()*self["sigma"].real()
         self.m_max_iter = self["max_iter"].integer()
         self.m_num_avg  = self["num_avg"].integer()
+        self.m_type     = self["type"].string()
         
         # Set some fixed parameters
         self.m_log   = False                   # Logging in client tools
@@ -219,20 +221,28 @@ class cssens(ctools.cscript):
         if self.logTerse():
             self.log("\n")
             self.log.header1("Sensitivity determination")
+            self.log.parformat("Type")
+            self.log(self.m_type)
+            self.log("\n")
 
         # Loop over energy bins
         for ieng in range(self.m_ebounds.size()):
         
             # Set energies
-            emean = self.m_ebounds.elogmean(ieng).TeV()
-            emin  = self.m_ebounds.emin(ieng).TeV()
-            emax  = self.m_ebounds.emax(ieng).TeV()
-
-            # Set energy boundaries
-            self.set_obs_ebounds(emin, emax)
+            if self.m_type == "Differential":
+                emin  = self.m_ebounds.emin(ieng)
+                emax  = self.m_ebounds.emax(ieng)
+            elif self.m_type == "Integral":
+                emin  = self.m_ebounds.emin(ieng)
+                emax  = self.m_ebounds.emax()
+            else:
+                msg = "Invalid sensitivity type \""+self.m_type+"\" encountered."+ \
+                      " Either use \"Differential\" or \"Integral\"."
+                raise gammalib.GException.invalid_value("cssens", msg)
             
             # Determine sensitivity
-            result = self.get_sensitivity(self.obs, bkg_model, full_model)
+            result = self.get_sensitivity(self.obs, emin, emax, \
+                                          bkg_model, full_model)
             
             # Write results
             if ieng == 0:
@@ -305,13 +315,16 @@ class cssens(ctools.cscript):
     def set_obs_ebounds(self, emin, emax):
         """
         Set energy boundaries for observation in container.
+        
+        Parameters:
+         emin - Minimum energy
+         emax - Maximum energy
         """
         # Loop over all observations in container
         for obs in self.obs:
         
             # Set energy boundaries
-            ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"), \
-                                        gammalib.GEnergy(emax, "TeV"))
+            ebounds = gammalib.GEbounds(emin, emax)
             obs.events().ebounds(ebounds)
         
         # Return
@@ -382,27 +395,35 @@ class cssens(ctools.cscript):
         # Return models
         return full_model, bkg_model
 
-    def get_sensitivity(self, obs, bkg_model, full_model):
+    def get_sensitivity(self, obs, emin, emax, bkg_model, full_model):
         """
-        Determine sensitivity for a given observations.
+        Determine sensitivity for given observations.
         
         Parameters:
          obs        - Observation container
+         emin       - Minimum energy for fitting and flux computation
+         emax       - Maximum energy for fitting and flux computation
          bkg_model  - Background model
          full_model - Source model
         """
         # Set TeV->erg conversion factor
         tev2erg = 1.6021764
+
+        # Set energy boundaries
+        self.set_obs_ebounds(emin, emax)
         
         # Determine energy boundaries from first observation in
         # the container
-        for run in obs:
-            emin      = run.events().ebounds().emin()
-            emax      = run.events().ebounds().emax()
-            loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
-            erg_mean  = math.pow(10.0, loge) * tev2erg
-            erg_width = (emax.TeV()-emin.TeV()) * tev2erg
-            break
+        #for run in obs:
+        #    emin      = run.events().ebounds().emin()
+        #    emax      = run.events().ebounds().emax()
+        #    loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
+        #    erg_mean  = math.pow(10.0, loge) * tev2erg
+        #    erg_width = (emax.TeV()-emin.TeV()) * tev2erg
+        #    break
+        loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
+        erg_mean  = math.pow(10.0, loge) * tev2erg
+        erg_width = (emax.TeV()-emin.TeV()) * tev2erg
 
         # Compute Crab unit (this is the factor with which the Prefactor needs
         # to be multiplied to get 1 Crab
