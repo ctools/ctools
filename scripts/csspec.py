@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# spectral points generation script.
+# Spectral points generation script.
 #
 # Copyright (C) 2014-2015 Michael Mayer
 #
@@ -142,13 +142,13 @@ class csspec(ctools.cscript):
         self.m_ebounds = self.create_ebounds()
 
         # Read other parameters
-        self.m_outfile   = self["outfile"].filename()
+        self.m_outfile = self["outfile"].filename()
         
         # Get other parameeters
         self.m_calc_ulimit = self["calc_ulim"].boolean()
-        self.m_calc_ts = self["calc_ts"].boolean()
-        self.m_fix_bkg = self["fix_bkg"].boolean()
-        self.m_fix_srcs = self["fix_srcs"].boolean()
+        self.m_calc_ts     = self["calc_ts"].boolean()
+        self.m_fix_bkg     = self["fix_bkg"].boolean()
+        self.m_fix_srcs    = self["fix_srcs"].boolean()
              
         # Set some fixed parameters
         self.m_log     = False # Logging in client tools
@@ -237,31 +237,30 @@ class csspec(ctools.cscript):
         table.extname("SPECTRUM")
         
         # Add Header for compatibility with gammalib.GMWLSpectrum
-        table.card("Instrument","CTA","Name of Instrument")
-        table.card("Telescope","CTA","Name of Telescope")
+        table.card("Instrument", "CTA", "Name of Instrument")
+        table.card("Telescope",  "CTA", "Name of Telescope")
         
         # Create FITS table columns
-        energy = gammalib.GFitsTableDoubleCol("energy",self.m_ebounds.size())
+        energy      = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
         energy.unit("TeV")
-        energy_err = gammalib.GFitsTableDoubleCol("energy_err",self.m_ebounds.size())
+        energy_err  = gammalib.GFitsTableDoubleCol("e_Energy", self.m_ebounds.size())
         energy_err.unit("TeV")
-        flux = gammalib.GFitsTableDoubleCol("flux",self.m_ebounds.size())
+        flux        = gammalib.GFitsTableDoubleCol("Flux", self.m_ebounds.size())
         flux.unit("erg/cm2/s")
-        flux_err = gammalib.GFitsTableDoubleCol("flux_err",self.m_ebounds.size())
+        flux_err    = gammalib.GFitsTableDoubleCol("e_Flux", self.m_ebounds.size())
         flux_err.unit("erg/cm2/s")
-        TSvalues = gammalib.GFitsTableDoubleCol("TS",self.m_ebounds.size())
-        ulim_values  = gammalib.GFitsTableDoubleCol("ulimit",self.m_ebounds.size())
+        TSvalues    = gammalib.GFitsTableDoubleCol("TS", self.m_ebounds.size())
+        ulim_values = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
         ulim_values.unit("erg/cm2/s")
         
-        # MeV2erg
-        MeV2erg = 1.60217e-6
-            
+        # Loop over energy bins
         for i in range(self.m_ebounds.size()):
-            
-            emin = self.m_ebounds.emin(i)
-            emax = self.m_ebounds.emax(i)
-            emean = self.m_ebounds.emean(i)
-            elogmean = self.m_ebounds.elogmean(i)
+
+            # Get energy boundaries
+            emin      = self.m_ebounds.emin(i)
+            emax      = self.m_ebounds.emax(i)
+            emean     = self.m_ebounds.emean(i)
+            elogmean  = self.m_ebounds.elogmean(i)
             elogmean2 = elogmean.MeV() * elogmean.MeV()
             
             # Select events
@@ -281,7 +280,7 @@ class csspec(ctools.cscript):
             
             # Get results
             fitted_models = like.obs().models()
-            source = fitted_models[self.m_srcname]
+            source        = fitted_models[self.m_srcname]
             
             # Calculate Upper Limit            
             ulimit_value = -1.0
@@ -300,9 +299,9 @@ class csspec(ctools.cscript):
             fitted_flux = source.spectral().eval(elogmean,gammalib.GTime())
             
             # Compute flux error
-            parvalue = source.spectral()[0].value()
+            parvalue  = source.spectral()[0].value()
             rel_error = source.spectral()[0].error()/parvalue        
-            e_flux = fitted_flux*rel_error
+            e_flux    = fitted_flux*rel_error
             
             # Set values for storage
             TSvalues[i] = TS
@@ -314,10 +313,10 @@ class csspec(ctools.cscript):
             energy_err[i] = (emax - emean).TeV()
             
             # Convert fluxes to nuFnu
-            flux[i] = fitted_flux * elogmean2 * MeV2erg
-            flux_err[i] = e_flux * elogmean2 * MeV2erg
+            flux[i]     = fitted_flux * elogmean2 * gammalib.MeV2erg
+            flux_err[i] = e_flux      * elogmean2 * gammalib.MeV2erg
             if ulimit_value > 0.0:
-                ulim_values[i] = ulimit_value * elogmean2 * MeV2erg
+                ulim_values[i] = ulimit_value * elogmean2 * gammalib.MeV2erg
 
             
             # Log information
