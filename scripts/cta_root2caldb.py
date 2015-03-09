@@ -1363,7 +1363,6 @@ class caldb():
         histograms are used:
 
         BGRatePerSqDeg_offaxis -> BGD
-        BGRatePerSqDeg_offaxis -> BGD_RECO
 
         Parameters:
          file - ROOT file.
@@ -1384,11 +1383,8 @@ class caldb():
             self.set_cif_keywords(self.hdu_bgd, self.bgd_name, \
                                   self.bgd_bounds, self.bgd_desc)
 
-            # BGD
+            # BGD (reconstructed energy)
             self.make_3D(array, self.hdu_bgd, "BGD", "1/s/MeV/sr", scale=bgdscale)
-
-            # BGD_RECO
-            self.make_3D(array, self.hdu_bgd, "BGD_RECO", "1/s/MeV/sr", scale=bgdscale)
             
         # Return
         return
