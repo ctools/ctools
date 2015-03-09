@@ -811,7 +811,6 @@ void ctool::set_obs_response(GCTAObservation* obs)
  * @brief Set observation boundaries
  *
  * @param[in,out] obs Observation container
- *
  ***************************************************************************/
 void ctool::set_obs_bounds(GObservations& obs)
 {
@@ -821,8 +820,8 @@ void ctool::set_obs_bounds(GObservations& obs)
         // Is this observation a CTA observation?
         GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
 
-        // Yes ...
-        if (cta != NULL) {
+        // Continue only if observation is CTA and has events
+        if ((cta != NULL) && (cta->has_events())) {
 
             // Get pointer on event list
             GCTAEventList* list = const_cast<GCTAEventList*>(dynamic_cast<const GCTAEventList*>(cta->events()));
@@ -850,7 +849,7 @@ void ctool::set_obs_bounds(GObservations& obs)
                     
                     // If there is a "rad" parameter then use it
                     if (has_par("rad")) {
-                        double rad   = (*this)["rad"].real();
+                        double rad = (*this)["rad"].real();
                         GCTARoi roi(GCTAInstDir(cta->pointing().dir()), rad);
                         list->roi(roi);
                     }
