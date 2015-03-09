@@ -316,8 +316,9 @@ GObservations ctool::get_observations(const bool& get_response)
     // ... otherwise we have a file name
     else {
 
-        // Try first to open as FITS file
-        try {
+        // If file is a FITS file then create an empty CTA observation
+        // and load file into observation
+        if (gammalib::is_fits(filename)) {
 
             // Allocate empty CTA observation
             GCTAObservation cta_obs;
@@ -341,8 +342,8 @@ GObservations ctool::get_observations(const bool& get_response)
 
         }
 
-        // ... otherwise try to open as XML file
-        catch (GException::fits_open_error &e) {
+        // ... otherwise load file into observation container
+        else {
 
             // Load observations from XML file
             obs.load(filename);
@@ -362,7 +363,7 @@ GObservations ctool::get_observations(const bool& get_response)
             // Signal that XML file should be used for storage
             m_use_xml = true;
 
-        } // endcatch: file was an XML file
+        } // endelse: file was an XML file
 
     }
 
