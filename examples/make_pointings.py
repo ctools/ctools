@@ -31,7 +31,7 @@ import math
 # ======================= #
 # Setup double row scheme #
 # ======================= #
-def set_double_row(lmin=-30.0, lmax=30.0, separation=3.0, hours=100.0):
+def set_double_row(lmin=-30.0, lmax=30.0, separation=3.0, hours=100.0, site=None):
     """
     Setup double row scheme.
     """
@@ -62,6 +62,18 @@ def set_double_row(lmin=-30.0, lmax=30.0, separation=3.0, hours=100.0):
         obsdef.append(obs)
         lon += separation
 
+    # Optionally add-in site dependent IRF
+    if site != None:
+        if site == "North":
+            caldb = "tenerife"
+            irf   = "DESY20140105_50h"
+        else:
+            caldb = "aar"
+            irf   = "DESY20140105_50h"
+        for obs in obsdef:
+            obs['caldb'] = caldb
+            obs['irf']   = irf
+
     # Return observation definition
     return obsdef
 
@@ -77,19 +89,19 @@ def set_gps():
     obsdef = []
 
     # Add inner region South
-    obsdef.extend(set_double_row(lmin=-60.0, lmax=60.0, hours=780))
+    obsdef.extend(set_double_row(lmin=-60.0, lmax=60.0, hours=780, site="South"))
 
     # Add Vela & Carina region
-    obsdef.extend(set_double_row(lmin=240.0, lmax=300.0, hours=180))
+    obsdef.extend(set_double_row(lmin=240.0, lmax=300.0, hours=180, site="South"))
 
     # Add 210-240 region
-    obsdef.extend(set_double_row(lmin=210.0, lmax=240.0, hours=60))
+    obsdef.extend(set_double_row(lmin=210.0, lmax=240.0, hours=60, site="South"))
 
     # Add Cygnus, Perseus
-    obsdef.extend(set_double_row(lmin=60.0, lmax=150.0, hours=450))
+    obsdef.extend(set_double_row(lmin=60.0, lmax=150.0, hours=450, site="North"))
 
     # Add Anticentre
-    obsdef.extend(set_double_row(lmin=150.0, lmax=210.0, hours=150))
+    obsdef.extend(set_double_row(lmin=150.0, lmax=210.0, hours=150, site="North"))
 
     # Return observation definition
     return obsdef
@@ -106,7 +118,7 @@ def write_obsdef(filename, obsdef):
     file = open(filename, 'w')
 
     # Write header
-    file.write("ra,dec,duration\n")
+    file.write("ra,dec,duration,caldb,irf\n")
 
     # Loop over pointings
     for obs in obsdef:
@@ -124,7 +136,8 @@ def write_obsdef(filename, obsdef):
             dec = obs["dec"]
 
         # Write information
-        file.write("%8.4f,%8.4f,%.4f\n" % (ra, dec, obs["duration"]))
+        file.write("%8.4f,%8.4f,%.4f,%s,%s\n" % \
+                   (ra, dec, obs['duration'], obs['caldb'], obs['irf']))
 
     # Close file
     file.close()
@@ -161,4 +174,4 @@ if __name__ == '__main__':
     obsdef = set_gps()
 
     # Write observation definition file
-    write_obsdef("test.dat", obsdef)
+    write_obsdef("gps.dat", obsdef)
