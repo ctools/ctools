@@ -869,8 +869,6 @@ void ctool::set_obs_bounds(GObservations& obs)
 }
 
 
-
-
 /***********************************************************************//**
  * @brief Derives mean pointing from CTA observations
  *

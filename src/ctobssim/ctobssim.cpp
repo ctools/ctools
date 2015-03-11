@@ -570,6 +570,11 @@ void ctobssim::get_parameters(void)
         m_obs = get_observations();
     }
 
+    // ... otherwise make sure that observation boundaries are set
+    else {
+        set_obs_bounds(m_obs);
+    }
+
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
        std::string inmodel = (*this)["inmodel"].filename();
