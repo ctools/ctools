@@ -59,6 +59,7 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
+    const GCTACubeBackground& bgcube(void) const;
     const GCTAEventCube& cube(void) const;
     const GModels&       models(void) const;
 
@@ -74,7 +75,8 @@ protected:
     std::string   m_outcube;     //!< Filename of output cube
     std::string   m_outmodel;    //!< Filename of output XML model
     GObservations m_obs;         //!< Observation container
-    GCTAEventCube m_bkgcube;     //!< Background cube
+    GCTAEventCube m_bkgcube;     //!< Background event cube
+    GCTACubeBackground m_background;     //!< Background cube response
     GModels       m_bkgmdl;      //!< CTA background models
     GModels       m_outmdl;      //!< Output models
     GEbounds      m_ebounds;     //!< Energy boundaries
@@ -94,6 +96,19 @@ const GCTAEventCube& ctbkgcube::cube(void) const
     // Return background cube
     return (m_bkgcube);
 }
+
+/***********************************************************************//**
+ * @brief Return background response cube containing background rate
+ *
+ * @return Background response cube.
+ ***************************************************************************/
+inline
+const GCTACubeBackground& ctbkgcube::bgcube(void) const
+{
+    // Return background cube
+    return (m_background);
+}
+
 
 
 /***********************************************************************//**

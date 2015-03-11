@@ -360,18 +360,28 @@ void ctbkgcube::run(void)
         log << n_observations << std::endl;
     }
 
-    // Create a background model for output background cube and append
+    // Set cube background response
+    m_background.set(m_bkgcube.map(), m_bkgcube.ebounds());
+
+    // Create a background model for the output background cube and append
     // that model to the input model in place of the original
-    // background model
-    GEnergies energies;
-    for (int i = 0; i < m_bkgcube.ebins(); ++i) {
-        energies.append(m_bkgcube.energy(i));
-    }
-    GModelSpatialDiffuseCube spatial(m_bkgcube.map(), energies, 1.0);
-    GModelSpectralPlaw       spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
-    GCTAModelCubeBackground  model(spatial, spectral);
-    model.name("ctbkgcube default background model");
-    m_cube_model = m_outmdl.size(); // Store the slot number for save()
+    // background models
+    // Todo: We might think of creating the spectral model via user parameter
+    GCTAModelCubeBackground model(GModelSpectralConst(1.0));
+
+    // Set model name
+    model.name("BackgroundModel");
+
+    // Set model instrument
+    // Todo: Account for possibility to have observations from different
+    // IACTs in the same container
+    model.instruments("CTA,HESS,MAGIC,VERITAS");
+
+    // Set model identifier to "0". This is coupled to ctbin, where the binned output
+    // observation id is set to 0.
+    model.ids("0");
+
+    // Append model to output container
     m_outmdl.append(model);
 
     // Log output model
@@ -399,47 +409,19 @@ void ctbkgcube::save(void)
         log.header1("Save background cube");
     }
 
-    // Create energies container from energy boundaries
-    GEnergies energies;
-    for (int i = 0; i < m_ebounds.size(); ++i) {
-        energies.append(m_ebounds.elogmean(i));
-    }
 
     // Get output filenames
     std::string outfile  = (*this)["outcube"].filename();
     std::string outmodel = (*this)["outmodel"].filename();
 
-    // Create empty FITS file
-    GFits fits;
-
-    // Write background cube
-    m_bkgcube.map().write(fits);
-
-    // Write energies
-    energies.write(fits);
-    
-    // Save FITS file
-    fits.saveto(outfile, clobber());
+    // Save background cube
+    m_background.save(outfile, clobber());
 
     // Write output models if filename is valid
     if ((outmodel.length() > 0) && (gammalib::tolower(outmodel) != "none")) {
 
-        // Set filename of map cube.
-        if (m_cube_model >= 0) {
-            GCTAModelCubeBackground* model =
-                dynamic_cast<GCTAModelCubeBackground*>(m_outmdl[m_cube_model]);
-            if (model != NULL) {
-                GModelSpatialDiffuseCube* spatial =
-                    dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
-                if (spatial != NULL) {
-                    spatial->filename(outfile);
-                }
-            }
-        }
-
-        // Save output model container
+        // Save output model for binned analyses
         m_outmdl.save(outmodel);
-        
     }
 
     // Return
@@ -463,6 +445,7 @@ void ctbkgcube::init_members(void)
     m_outmodel.clear();
     m_obs.clear();
     m_bkgcube.clear();
+    m_background.clear();
     m_bkgmdl.clear();
     m_outmdl.clear();
     m_ebounds.clear();
@@ -486,6 +469,7 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
     m_outcube    = app.m_outcube;
     m_obs        = app.m_obs;
     m_bkgcube    = app.m_bkgcube;
+    m_background = app.m_background;
     m_bkgmdl     = app.m_bkgmdl;
     m_outmdl     = app.m_outmdl;
     m_ebounds    = app.m_ebounds;
@@ -530,22 +514,6 @@ void ctbkgcube::get_parameters(void)
 
     } // endif: there was no observation in the container
 
-
-    // If there are no models associated with the observations then load now
-    // the model definition from the XML file
-    if (m_obs.models().size() == 0) {
-        if ((*this)["inmodel"].is_undefined()) {
-            std::string msg = "No model definition XML file specified. "
-                              "Please set the \"inmodel\" parameter to the "
-                              "XML file that contains the background model "
-                              "definition.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
-        std::string inmodel = (*this)["inmodel"].filename();
-        GModels     models(inmodel);
-        m_obs.models(models);
-    }
-
     // Get the incube filename
     std::string incube = (*this)["incube"].filename();
 
@@ -573,6 +541,21 @@ void ctbkgcube::get_parameters(void)
         }
     
     } // endelse: cube was loaded from file
+
+    // If there are no models associated with the observations then load now
+    // the model definition from the XML file
+    if (m_obs.models().size() == 0) {
+        if ((*this)["inmodel"].is_undefined()) {
+            std::string msg = "No model definition XML file specified. "
+                              "Please set the \"inmodel\" parameter to the "
+                              "XML file that contains the background model "
+                              "definition.";
+            throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        }
+        std::string inmodel = (*this)["inmodel"].filename();
+        GModels     models(inmodel);
+        m_obs.models(models);
+    }
 
     // Get energy definition
     m_ebounds = m_bkgcube.ebounds();

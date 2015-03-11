@@ -107,8 +107,8 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("tmin","r","h","0.0","","","Start time (MET in s)"))
             pars.append(gammalib.GApplicationPar("tmax","r","a","1800.0","","","Duration (in s)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-            pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
-            pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+            pars.append(gammalib.GApplicationPar("npix","i","a","200","","","Number of pixels for binned"))
+            pars.append(gammalib.GApplicationPar("binsz","r","a","0.05","","","Pixel size for binned (deg/pixel)"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
             pars.append(gammalib.GApplicationPar("rad","r","h","5.0","0","180","Radius of ROI (deg)"))         
             pars.append(gammalib.GApplicationPar("pattern","s","h","single","","","Observation pattern (single/four)"))
@@ -140,7 +140,7 @@ class cspull(ctools.cscript):
             
         # Get number of energy bins
         self.m_enumbins = self["enumbins"].integer()
-        
+   
         # Read parameters for binned if requested
         if not self.m_enumbins == 0:
             self.m_npix  = self["npix"].integer()
