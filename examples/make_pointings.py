@@ -53,7 +53,7 @@ def get_positions(xmin, xmax, ymin, ymax, step):
     for row in range(ny):
 
         # Determine xstep and number of pointings in row
-        xstep = step * math.cos(gammalib.deg2rad * y)
+        xstep = step / math.cos(gammalib.deg2rad * y)
         nx    = int((xmax-xmin)/xstep+1.5)
         rescale = (xmax-xmin)/(xstep*(nx-1))
         xstep  *= rescale
@@ -63,7 +63,7 @@ def get_positions(xmin, xmax, ymin, ymax, step):
             x = xmin
         else:
             x = xmin + 0.5 * xstep
-        #print(row, x)
+        #print(row, y, nx)
 
         # Append pointings
         for pnt in range(nx):
@@ -209,9 +209,9 @@ def set_extgal(separation=3.0, lst=True):
     obsdef = []
 
     # Set patch
-    obsdef.extend(set_patch(lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+90.0, \
+    obsdef.extend(set_patch(lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0, \
                             separation=separation, hours=1000, \
-                            site="Automatic", lst=lst, autodec=25.0))
+                            site="Automatic", lst=lst, autodec=10.0))
 
     # Return observation definition
     return obsdef
