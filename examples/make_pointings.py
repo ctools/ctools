@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script simulates pointing patterns for CTA surveys.
+# This script generated pointing patterns for CTA observations.
 #
 # Usage:
 #   ./make_pointings.py
@@ -28,51 +28,132 @@ import sys
 import math
 
 
-# ======================= #
-# Setup double row scheme #
-# ======================= #
-def set_double_row(lmin=-30.0, lmax=30.0, separation=3.0, hours=100.0, site=None):
+# ============================================================ #
+# Get positions of pointings on sky for an interleaved pattern #
+# ============================================================ #
+def get_positions(xmin, xmax, ymin, ymax, step):
     """
-    Setup double row scheme.
+    Get positions for a patch of interleaved pointings on the sky.
+    The function does respect the latitude dependence of the
+    pointing distance. The step parameter is for a latitude of
+    zero.
+    """
+    # Initialise positions
+    positions = []
+
+    # Determine ystep and number of rows
+    ystep   = step * math.sqrt(0.75)
+    ny      = int((ymax-ymin)/ystep+1.5)
+    rescale = (ymax-ymin)/(ystep*(ny-1))
+    ystep  *= rescale
+    print("Number of rows ....: %d" % (ny))
+
+    # Loop over rows
+    y = ymin
+    for row in range(ny):
+
+        # Determine xstep and number of pointings in row
+        xstep = step * math.cos(gammalib.deg2rad * y)
+        nx    = int((xmax-xmin)/xstep+1.5)
+        rescale = (xmax-xmin)/(xstep*(nx-1))
+        xstep  *= rescale
+
+        # Set x offset
+        if row % 2 == 0:
+            x = xmin
+        else:
+            x = xmin + 0.5 * xstep
+        #print(row, x)
+
+        # Append pointings
+        for pnt in range(nx):
+            positions.append({'x': x, 'y': y})
+            x += xstep
+            if x >= 360.0:
+                x -= 360.0
+
+        # Increment y
+        y += ystep
+
+    # Return positions
+    return positions
+
+
+# ====================== #
+# Setup patch on the sky #
+# ====================== #
+def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5, \
+              separation=3.0, hours=100.0, \
+              site=None, lst=True, autodec=0.0):
+    """
+    Setup pointing patch on the sky.
     """
     # Initialise observation definition
     obsdef = []
 
-    # Compute number of pointings in row
-    n_pnt_per_row = int((lmax-lmin)/separation+0.5)
-    n_pnt         = 2*n_pnt_per_row
+    # Get pointing positions
+    pointings = get_positions(lmin, lmax, bmin, bmax, separation)
 
-    # Compute offset from Galactic plane (degrees)
-    offset = separation * 0.5 * math.sqrt(0.75)
-
-    # Compute duration per pointing (seconds)
+    # Determine number of pointings and pointing duration
+    n_pnt    = len(pointings)
     duration = hours*3600.0/float(n_pnt)
 
-    # Set upper row
-    lon = lmin
-    for i in range(n_pnt_per_row):
-        obs = {'lon': lon, 'lat': offset, 'duration': duration}
-        obsdef.append(obs)
-        lon += separation
+    # Observing time collectors
+    exposure_south = 0.0
+    exposure_north = 0.0
 
-    # Set lower row
-    lon = lmin + 0.5*separation
-    for i in range(n_pnt_per_row):
-        obs = {'lon': lon, 'lat': -offset, 'duration': duration}
-        obsdef.append(obs)
-        lon += separation
+    # Set observations
+    for pnt in pointings:
 
-    # Optionally add-in site dependent IRF
-    if site != None:
-        if site == "North":
-            caldb = "tenerife"
-            irf   = "DESY20140105_50h"
-        else:
-            caldb = "aar"
-            irf   = "DESY20140105_50h"
-        for obs in obsdef:
+        # Set positions and duration
+        obs = {'lon': pnt['x'], 'lat': pnt['y'], 'duration': duration}
+
+        # Optionally add-in site dependent IRF
+        if site != None:
+
+            # Handle automatic site switching
+            if site == "Automatic":
+                pos = gammalib.GSkyDir()
+                pos.lb_deg(pnt['x'], pnt['y'])
+                dec = pos.dec_deg()
+                if (dec >= autodec):
+                    obs_site = "North"
+                else:
+                    obs_site = "South"
+            else:
+                obs_site = site
+
+            # Set site IRF
+            if obs_site == "North":
+                caldb = "tenerife"
+                if lst:
+                    irf = "DESY20140105_50h"
+                else:
+                    irf = "DESY20140105_50h_noLST"
+                exposure_north += duration
+            else:
+                caldb = "aar"
+                if lst:
+                    irf = "DESY20140105_50h"
+                else:
+                    irf = "DESY20140105_50h_noLST"
+                exposure_south += duration
+
+            # Set IRF information
             obs['caldb'] = caldb
             obs['irf']   = irf
+
+        # Append observation
+        obsdef.append(obs)
+
+    # Dump statistics
+    print("Number of pointings: %d (%.2f sec)" % (n_pnt,duration))
+    print("South array .......: %.2f hours (%.2f%%)" % \
+          (exposure_south/3600.0, \
+           100.0*exposure_south/(exposure_south+exposure_north)))
+    print("North array .......: %.2f hours (%.2f%%)" % \
+          (exposure_north/3600.0, \
+           100.0*exposure_north/(exposure_south+exposure_north)))
 
     # Return observation definition
     return obsdef
@@ -81,7 +162,7 @@ def set_double_row(lmin=-30.0, lmax=30.0, separation=3.0, hours=100.0, site=None
 # =========================== #
 # Setup Galactic plane survey #
 # =========================== #
-def set_gps():
+def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, lst=True):
     """
     Setup Galactic plane survey.
     """
@@ -89,19 +170,72 @@ def set_gps():
     obsdef = []
 
     # Add inner region South
-    obsdef.extend(set_double_row(lmin=-60.0, lmax=60.0, hours=780, site="South"))
+    obsdef.extend(set_patch(lmin=-60.0, lmax=60.0, bmin=bmin, bmax=bmax, \
+                            separation=separation, hours=780, \
+                            site="South", lst=lst))
 
     # Add Vela & Carina region
-    obsdef.extend(set_double_row(lmin=240.0, lmax=300.0, hours=180, site="South"))
+    obsdef.extend(set_patch(lmin=240.0, lmax=300.0, bmin=bmin, bmax=bmax, \
+                            separation=separation, hours=180, \
+                            site="South", lst=lst))
 
     # Add 210-240 region
-    obsdef.extend(set_double_row(lmin=210.0, lmax=240.0, hours=60, site="South"))
+    obsdef.extend(set_patch(lmin=210.0, lmax=240.0, bmin=bmin, bmax=bmax, \
+                            separation=separation, hours=60, \
+                            site="South", lst=lst))
 
     # Add Cygnus, Perseus
-    obsdef.extend(set_double_row(lmin=60.0, lmax=150.0, hours=450, site="North"))
+    obsdef.extend(set_patch(lmin=60.0, lmax=150.0, bmin=bmin, bmax=bmax, \
+                            separation=separation, hours=450, \
+                            site="North", lst=lst))
 
     # Add Anticentre
-    obsdef.extend(set_double_row(lmin=150.0, lmax=210.0, hours=150, site="North"))
+    obsdef.extend(set_patch(lmin=150.0, lmax=210.0, bmin=bmin, bmax=bmax, \
+                            separation=separation, hours=150, \
+                            site="North", lst=lst))
+
+    # Return observation definition
+    return obsdef
+
+
+# ========================== #
+# Setup Extragalactic survey #
+# ========================== #
+def set_extgal(separation=3.0, lst=True):
+    """
+    Setup Extragalactic survey.
+    """
+    # Initialise observation definition
+    obsdef = []
+
+    # Set patch
+    obsdef.extend(set_patch(lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+90.0, \
+                            separation=separation, hours=1000, \
+                            site="Automatic", lst=lst, autodec=25.0))
+
+    # Return observation definition
+    return obsdef
+
+
+# ========================= #
+# Setup Galactic centre KSP #
+# ========================= #
+def set_gc(lst=True):
+    """
+    Setup Galactic centre KSP.
+    """
+    # Initialise observation definition
+    obsdef = []
+
+    # Central wobble
+    obsdef.extend(set_patch(lmin=-0.5, lmax=0.5, bmin=-0.5, bmax=0.5, \
+                            separation=0.1, hours=525, \
+                            site="South", lst=lst))
+
+    # Extended region
+    obsdef.extend(set_patch(lmin=-10.0, lmax=10.0, bmin=-10.0, bmax=10.0, \
+                            separation=1.5, hours=300, \
+                            site="South", lst=lst))
 
     # Return observation definition
     return obsdef
@@ -151,27 +285,50 @@ def write_obsdef(filename, obsdef):
 # ======================== #
 if __name__ == '__main__':
     """
-    CTA survey simulation.
+    CTA pointing pattern generation.
     """
     # Initialise flags
     need_help = False
     
     # Test for command line arguments
-    print(sys.argv[0])
+    #print(sys.argv[0])
     if (len(sys.argv) > 1):
         if sys.argv[1] == "-h":
             need_help = True
         else:
-            need_help = True
+            obsname = sys.argv[1]
+    else:
+        need_help = True
 
     # Print help if needed and exit
     if need_help:
         print("Usage: make_pointing.py [OPTIONS]")
         print("     -h       Display this usage message")
+        print("     gps      Galactic plane scan (2 row scheme)")
+        print("     gps3     Galactic plane scan (3 row scheme)")
+        print("     extgal   Extragalactic survey")
+        print("     gc       Galactic centre")
         sys.exit()
 
-    # Test
-    obsdef = set_gps()
+    # Galactic plane scan
+    if obsname == "gps":
+        obsdef = set_gps(lst=True)
+        write_obsdef("gps.dat", obsdef)
+    elif obsname == "gps3":
+        obsdef = set_gps(separation=1.5, lst=True)
+        write_obsdef("gps3.dat", obsdef)
 
-    # Write observation definition file
-    write_obsdef("gps.dat", obsdef)
+    # Extragalactic survey
+    elif obsname == "extgal":
+        obsdef = set_extgal(lst=True)
+        write_obsdef("extgal.dat", obsdef)
+
+    # Galactic centre
+    elif obsname == "gc":
+        obsdef = set_gc(lst=True)
+        write_obsdef("gc.dat", obsdef)
+
+    # Invalid pattern
+    else:
+        print("Unknown option \""+obsname+"\"")
+        
