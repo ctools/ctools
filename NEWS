@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-23 February 2015
+12 March 2015
 
 
 1. Introduction
@@ -64,7 +64,11 @@ None
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-None
+The ctmodel tool can now be used for stacked analysis from the command line.
+It directly makes use of the cube response to compute the model without using
+the original IRF information. This makes generation of model cubes substantially
+faster. The old method of accessing the IRF response for model computation is
+still possible.
 
 
 12. ctexpcube - CTA exposure cube generation

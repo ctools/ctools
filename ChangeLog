@@ -1,4 +1,4 @@
-2015-02-23  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-03-12  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.0.0 released
         ========================
@@ -9,6 +9,7 @@
         Modify cssens parameter interface (#1426)
         Add csobsdef script (#1429)
         Add ctulimit tool (#1363)
+        Allow ctmodel usage for stacked analysis from command line
 
 
 2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
