@@ -341,6 +341,12 @@ void ctbkgcube::run(void)
 
     } // endfor: looped over observations
 
+    // Log results
+    if (logTerse()) {
+        log << gammalib::parformat("Accumulated livetime");
+        log << m_livetime << " sec" << std::endl;
+    }
+
     // Re-normalize cube to get units of counts/MeV/s/sr
     if (m_livetime > 0.0) {
     
