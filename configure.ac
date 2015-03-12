@@ -34,6 +34,7 @@ AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
 AM_INIT_AUTOMAKE([gnu -Wno-portability])
+#AM_INIT_AUTOMAKE([gnu -Wno-portability serial-tests])
 AC_CONFIG_HEADER([config.h])
 
 
