@@ -365,7 +365,8 @@ void ctmodel::init_members(void)
     m_obs.clear();
     m_cube.clear();
     m_gti.clear();
-    m_has_cube = false;
+    m_has_cube    = false;
+    m_append_cube = false;
 
     // Return
     return;
@@ -384,10 +385,11 @@ void ctmodel::copy_members(const ctmodel& app)
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_cube       = app.m_cube;
-    m_gti        = app.m_gti;
-    m_has_cube   = app.m_has_cube;
+    m_obs         = app.m_obs;
+    m_cube        = app.m_cube;
+    m_gti         = app.m_gti;
+    m_has_cube    = app.m_has_cube;
+    m_append_cube = app.m_append_cube;
 
     // Return
     return;
@@ -412,10 +414,13 @@ void ctmodel::free_members(void)
  ***************************************************************************/
 void ctmodel::get_parameters(void)
 {
+    // Reset cube append flag
+    m_append_cube = false;
+
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
-        m_obs = get_observations();
+        get_obs();
     }
 
     // Read model definition file if required
@@ -468,9 +473,144 @@ void ctmodel::get_parameters(void)
            m_outcube = (*this)["outcube"].filename();
     }
 
+    // If cube should be appended to first observation then do that now.
+    // This is a kluge that makes sure that the cube is passed as part
+    // of the observation in case that a cube response is used. The kluge
+    // is needed because the GCTACubeSourceDiffuse::set method needs to
+    // get the full event cube from the observation.
+    if (m_append_cube) {
+
+        //TODO: Check that energy boundaries are compatible
+
+        // Attach GTI of observations to model cube
+        m_cube.gti(m_obs[0]->events()->gti());
+    
+        // Attach model cube to observations
+        m_obs[0]->events(m_cube);
+
+    } // endif: cube was scheduled for appending
+
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Get observation container
+ *
+ * Get an observation container according to the user parameters. The method
+ * supports loading of a individual FITS file or an observation definition
+ * file in XML format. If the input filename is empty, parameters are read
+ * to build a CTA observation from scratch.
+ ***************************************************************************/
+void ctmodel::get_obs(void)
+{
+    // Get the filename from the input parameters
+    std::string filename = (*this)["inobs"].filename();
+
+    // If no observation definition file has been specified then read all
+    // parameters that are necessary to create an observation from scratch
+    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
+
+        // Get response cube filenames
+        std::string expcube = (*this)["expcube"].filename();
+        std::string psfcube = (*this)["psfcube"].filename();
+
+        // If the filenames are valid then build an observation from cube
+        // response information
+        if ((expcube != "NONE") && (psfcube != "NONE") &&
+            (gammalib::strip_whitespace(expcube) != "") &&
+            (gammalib::strip_whitespace(psfcube) != "")) {
+
+            // Get exposure and PSF cubes
+            GCTACubeExposure exposure(expcube);
+            GCTACubePsf      psf(psfcube);
+
+            // Create energy boundaries
+            GEbounds ebounds = create_ebounds();
+
+            // Create dummy sky map cube
+            GSkymap map("CAR","GAL",0.0,0.0,1.0,1.0,1,1,ebounds.size());
+            m_append_cube = true;
+
+            // Create event cube
+            GCTAEventCube cube(map, ebounds, exposure.gti());
+
+            // Create CTA observation
+            GCTAObservation cta;
+            cta.events(cube);
+            cta.response(exposure, psf);
+
+            // Append observation to container
+            m_obs.append(cta);
+
+        } // endif: cube response information was available
+
+        // ... otherwise build an observation from IRF response information
+        else {
+
+            // Create CTA observation
+            GCTAObservation cta = create_cta_obs();
+
+            // Set response
+            set_obs_response(&cta);
+
+            // Append observation to container
+            m_obs.append(cta);
+            
+        }
+
+    } // endif: filename was "NONE" or ""
+
+    // ... otherwise we have a file name
+    else {
+
+        // If file is a FITS file then create an empty CTA observation
+        // and load file into observation
+        if (gammalib::is_fits(filename)) {
+
+            // Allocate empty CTA observation
+            GCTAObservation cta;
+
+            // Load data
+            cta.load(filename);
+
+            // Set response
+            set_obs_response(&cta);
+
+            // Append observation to container
+            m_obs.append(cta);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+
+        }
+
+        // ... otherwise load file into observation container
+        else {
+
+            // Load observations from XML file
+            m_obs.load(filename);
+
+            // For all observations that have no response, set the response
+            // from the task parameters
+            set_response(m_obs);
+
+            // Set observation boundary parameters (emin, emax, rad)
+            set_obs_bounds(m_obs);
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+        } // endelse: file was an XML file
+
+    }
+
+    // Return
+    return;
+
+}
+
 
 /***********************************************************************//**
  * @brief Fill model into model cube
@@ -515,6 +655,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             
             // Compute model value for cube bin
             double model = m_obs.models().eval(*bin, *obs) * bin->size();
+            //double model = m_obs.models().eval(*bin, *ptr) * bin->size();
 
             // Add model to actual value
             value += model;

@@ -218,10 +218,12 @@ else
   exit 1
 fi
 #
-# Run 3
+# Run 2
 $ctmodel inobs="NONE" \
          incube="NONE" \
          outcube="modmap3.fits" \
+         expcube="NONE" \
+         psfcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          inmodel="data/crab.xml" \
@@ -249,7 +251,7 @@ else
   exit 1
 fi
 #
-# Run 2
+# Run 3
 $ctmodel inobs="cntmap2.fits" \
          incube="cntmap2.fits" \
          outcube="modmap2.fits" \

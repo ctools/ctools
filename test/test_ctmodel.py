@@ -70,6 +70,8 @@ class Test(gammalib.GPythonTestSuite):
         model["outcube"].filename("modmap.fits")
         model["inmodel"].filename(self.model_name)
         model["inobs"].filename("NONE")
+        model["expcube"].filename("NONE")
+        model["psfcube"].filename("NONE")
         model["caldb"].string(self.caldb)
         model["irf"].string(self.irf)
         model["rad"].real(5.0)

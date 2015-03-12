@@ -304,7 +304,7 @@ GObservations ctool::get_observations(const bool& get_response)
         if (get_response) {
 
             // Set response
-           set_obs_response(&cta_obs);
+            set_obs_response(&cta_obs);
 
         } // endif: response was required
 

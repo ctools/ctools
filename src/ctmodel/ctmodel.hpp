@@ -78,6 +78,7 @@ protected:
     void copy_members(const ctmodel& app);
     void free_members(void);
     void get_parameters(void);
+    void get_obs(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
     
@@ -86,10 +87,11 @@ protected:
     bool        m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
-    GObservations m_obs;        //!< Observation container
-    GCTAEventCube m_cube;       //!< Model cube
-    GGti          m_gti;        //!< Model cube GTIs
-    bool          m_has_cube;   //!< Signal if cube has been set or loaded
+    GObservations m_obs;         //!< Observation container
+    GCTAEventCube m_cube;        //!< Model cube
+    GGti          m_gti;         //!< Model cube GTIs
+    bool          m_has_cube;    //!< Signal if cube has been set or loaded
+    bool          m_append_cube; //!< Signal that cube should be appended
 };
 
 
