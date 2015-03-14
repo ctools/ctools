@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -236,6 +236,13 @@ void ctmodel::run(void)
             log.header1("Observation");
         }
         log << m_obs << std::endl;
+    }
+
+    // Write models into logger
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Models");
+        log << m_obs.models() << std::endl;
     }
 
     // Write header
