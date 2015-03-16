@@ -46,6 +46,7 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
     sim["seed"].integer(seed)
+    sim["edisp"].boolean(edisp)
         
     # Optionally open the log file
     if log:
