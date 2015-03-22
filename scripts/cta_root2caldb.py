@@ -25,7 +25,6 @@
 # - pyroot
 # ==========================================================================
 from ROOT import TFile, TH1F, TH2F, TH3F
-#from gammalib import *
 import gammalib
 from datetime import datetime
 import math
@@ -871,17 +870,17 @@ class caldb():
         if not hdu.contains("MIGRA_LO"):
             hdu.append(gammalib.GFitsTableFloatCol("MIGRA_LO", 1, nmigra))
             hdu["MIGRA_LO"].unit("")
-            for ieng in range(nmigra):
-                e_lo = pow(10.0, migra.GetBinLowEdge(ieng+1))
-                hdu["MIGRA_LO"][0,ieng] = e_lo
+            for imigra in range(nmigra):
+                migra_lo = migra.GetBinLowEdge(imigra+1)
+                hdu["MIGRA_LO"][0,imigra] = migra_lo
         #
         # MIGRA_HI
         if not hdu.contains("MIGRA_HI"):
             hdu.append(gammalib.GFitsTableFloatCol("MIGRA_HI", 1, nmigra))
             hdu["MIGRA_HI"].unit("")
-            for ieng in range(nmigra):
-                e_hi = pow(10.0, migra.GetBinUpEdge(ieng+1))
-                hdu["MIGRA_HI"][0,ieng] = e_hi
+            for imigra in range(nmigra):
+                migra_hi = migra.GetBinUpEdge(imigra+1)
+                hdu["MIGRA_HI"][0,imigra] = migra_hi
         #
         # THETA_LO
         if not hdu.contains("THETA_LO"):
@@ -891,7 +890,7 @@ class caldb():
                 o_lo = offsets.GetBinLowEdge(ioff+1)
                 hdu["THETA_LO"][0,ioff] = o_lo
         #
-        # THETA_LO
+        # THETA_HI
         if not hdu.contains("THETA_HI"):
             hdu.append(gammalib.GFitsTableFloatCol("THETA_HI", 1, noffset))
             hdu["THETA_HI"].unit("deg")
@@ -1479,7 +1478,7 @@ def set_prod2_desy():
     path_ten = "/project-data/cta/performance/prod2/Performance_DESY_20140131_Tenerife_50h"
     rebin    = False
     psftype  = "Gauss"
-    eascale  = 1.0 / 0.68  # Prod 2 DESY effective areas ar for 68% containment
+    eascale  = 1.0 / 0.68  # Prod 2 DESY effective areas are for 68% containment
 
     # Set database content
     db = [{'inst': "aar", 'id':   "DESY20140105_50h",
