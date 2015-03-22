@@ -71,6 +71,7 @@ public:
     const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
     void                 cube(const GCTAEventCube& cube);
+    void                 models(const GModels& models);
 
 protected:
     // Protected methods
@@ -128,6 +129,21 @@ inline
 bool ctmodel::has_cube(void) const
 {
     return m_has_cube;
+}
+
+
+/***********************************************************************//**
+ * @brief Set models
+ *
+ * @param[in] models Model container.
+ *
+ * Set model container that should be used for model generation.
+ ***************************************************************************/
+inline
+void ctmodel::models(const GModels& models)
+{
+    m_obs.models(models);
+    return;
 }
 
 #endif /* CTMODEL_HPP */

@@ -432,6 +432,8 @@ void ctmodel::get_parameters(void)
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
+
+        // Get model filename
         std::string inmodel = (*this)["inmodel"].filename();
 
         // Load models from file
