@@ -202,8 +202,7 @@ class csobsdef(ctools.cscript):
 
         # Throw an exception is there is no header information
         if pntdef.nrows() < 1:
-            raise gammalib.GException.invalid_value(self.name,
-                  "No header found in pointing definition file.")
+            raise RuntimeError("No header found in pointing definition file.")
 
         # Clear observation container
         self.obs.clear()
