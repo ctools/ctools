@@ -1,21 +1,39 @@
 #!/usr/bin/env python
+# ==========================================================================
+# Generation of an H.E.S.S. observation definition file.
+#
+# Copyright (C) 2015 Michael Mayer
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ==========================================================================
 import gammalib
 import ctools
 import sys
 import os
 import glob
 
+
 # =============== #
 # cshessobs class #
 # =============== #
 class cshessobs(ctools.cscript):
     """
-    This class implements the creation of a observation xml file. It derives
-    from the GammaLib::GApplication class which provides support for parameter
-    files, command line arguments, and logging. In that way the Python
-    script behaves just as a regular ctool. This script is dedicated for use inside
-    the HESS Collaboration, i.e. it can only be used if you have access to HESS data
-    in FITS format. The HESSFITS environment has to be set correctly to use this script
+    This class implements the creation of a observation xml file for HESS
+    data analysis. This class is dedicated for use inside the HESS Collaboration,
+    i.e. it can only be used if you have access to HESS data in FITS format.
+    The HESSFITS environment has to be set correctly to use this script
     Please see the internal documentation for this purpose:
     https://hess-confluence.desy.de/confluence/display/HESS/HESS+Open+Source+Tools+-+HESS+data+and+IRFs+in+FITS+format
     """
@@ -26,18 +44,19 @@ class cshessobs(ctools.cscript):
         # Set name
         self.name    = "cshessobs"
         self.version = "0.1.0"
-        
-        # Initialise some members
-        self.datapath      = ""
-        self.inmodels = None
+
+        # Check on existence of HESSFITS environment variable
         try:
             self.datapath = os.environ["HESSFITS"] 
         except KeyError:
-            raise gammalib.GException.env_not_found(self.name, "HESSFITS",
-                  "Please set the environment variable HESSFITS to use this script")
-                
-        self.outobs = "obs.xml"
-        self.nodes = 1
+            raise RuntimeError("Environment variable \"HESSFITS\" not set. " \
+                               "Please set the environment variable \"HESSFITS\" to use this script")
+        
+        # Initialise some members
+        self.datapath = ""
+        self.inmodels = None
+        self.outobs   = "obs.xml"
+        self.nodes    = 1
         
         # Make sure that parfile exists
         file = self.parfile()
@@ -61,10 +80,6 @@ class cshessobs(ctools.cscript):
         """
         Destructor.
         """
-        #  Write separator into logger
-        if self.logTerse():
-            self.log("\n")
-        
         # Return
         return
 
@@ -144,7 +159,6 @@ class cshessobs(ctools.cscript):
                     pars.append(gammalib.GApplicationPar(chain+"_"+dstver+"_config","s","a",checked_folders[chain][dstver][0],avconfigs[:-1],"","Analysis configuration"))                
                 pars.append(gammalib.GApplicationPar(chain+"_dstver","s","a",checked_folders[chain].keys()[0],avdsts[:-1],"","DST version"))       
             pars.append(gammalib.GApplicationPar("chain","s","a",checked_folders.keys()[0],avchains[:-1],"","Analysis chain"))
-            
             pars.append(gammalib.GApplicationPar("runlistfile","f","a","runlist.lis","","","Runlist file"))   
             pars.append(gammalib.GApplicationPar("inmodel","f","h","NONE","","","Input model XML file (optional)"))
             pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Observation XML outfile"))
@@ -177,12 +191,12 @@ class cshessobs(ctools.cscript):
         self.outmodel = self["outmodel"].filename()
         
         # Read hidden parameters
-        self.nodes = self["nodes"].integer()
-        self.usetrig = self["usetrig"].boolean()      
+        self.nodes    = self["nodes"].integer()
+        self.usetrig  = self["usetrig"].boolean()      
         self.datapath = self["datapath"].string()
         
         # Read run configuration parameters
-        self.chain = self["chain"].string()
+        self.chain  = self["chain"].string()
         self.dstver = self[self.chain+"_dstver"].string()
         self.config = self[self.chain+"_"+self.dstver+"_config"].string()
         
@@ -195,8 +209,8 @@ class cshessobs(ctools.cscript):
         if not os.path.isdir(self.directory):
             raise gammalib.Exception.runtime_error("Folder structure not found. Please check your HESSFITS environment variable")
         
-        self.m_log   = False # Logging in client tools
-        self.m_debug = False # Debugging in client tools
+        self.m_log     = False # Logging in client tools
+        self.m_debug   = False # Debugging in client tools
         self.m_clobber = self["clobber"].boolean()
   
         # Return
@@ -259,7 +273,7 @@ class cshessobs(ctools.cscript):
         elif self.nodes == 2:
             
             # User a power law scaling function
-            e= gammalib.GEnergy(1.0,"TeV")
+            e    = gammalib.GEnergy(1.0,"TeV")
             spec = gammalib.GModelSpectralPlaw(1.0,0.0,e)  
             spec[0].free()
             spec[0].min(0.01)
@@ -395,10 +409,10 @@ class cshessobs(ctools.cscript):
             
             # construct filenames
             eventfile = runfolder + "hess_events_"+run+".fits.gz"
-            aefffile = runfolder + "hess_aeff_2d_"+run+".fits.gz"
-            psffile = runfolder + "hess_psf_king_"+run+".fits.gz"
+            aefffile  = runfolder + "hess_aeff_2d_"+run+".fits.gz"
+            psffile   = runfolder + "hess_psf_king_"+run+".fits.gz"
             edispfile = ""#runfolder + "hess_edisp_2d_"+run+".fits.gz"
-            bgfile = runfolder + "hess_bkg_offruns_"+run+".fits.gz"
+            bgfile    = runfolder + "hess_bkg_offruns_"+run+".fits.gz"
             
             # Check for existence of files
             msg = ""
@@ -497,7 +511,8 @@ class cshessobs(ctools.cscript):
         
         # Save model XML file
         self.models.save(self.outmodel)
-        
+
+
 # ======================== #
 # Main routine entry point #
 # ======================== #
