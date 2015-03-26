@@ -762,7 +762,9 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         // number of simulated photons to m_max_photons.
                         // The photon rate is estimated from the model flux
                         // and used to set the duration of the time slice.
-                        double flux     = model->spectral()->flux(emin, emax);
+                        //double flux     = model->spectral()->flux(emin, emax);
+                        double flux     = get_model_flux(model, emin, emax,
+                                                         dir, rad);
                         double rate     = flux * m_area;
                         double duration = 1800.0;  // default: 1800 sec
                         if (rate > 0.0) {
@@ -956,6 +958,67 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Determine sky model flux
+ *
+ * @param[in] model Sky model.
+ * @param[in] emin Minimum energy.
+ * @param[in] emin Maximum energy.
+ * @param[in] centre Centre of region for photon rate determination.
+ * @param[in] radius Radius of region for photon rate determination.
+ * @return Model flux (photons/cm2/sec).
+ ***************************************************************************/
+double ctobssim::get_model_flux(const GModelSky* model,
+                                const GEnergy&   emin,
+                                const GEnergy&   emax,
+                                const GSkyDir&   centre,
+                                const double&    radius)
+{
+    // Initialise de-allocation flag
+    bool free_spectral = false;
+
+    // Get pointer to spectral model
+    const GModelSpectral* spectral = model->spectral();
+
+    // If the spatial model is a diffuse cube then create a node function
+    // spectral model that is the product of the diffuse cube node function
+    // and the spectral model evaluated at the energies of the node function
+    GModelSpatialDiffuseCube* cube = dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
+    if (cube != NULL) {
+
+        // Set MC cone
+        cube->set_mc_cone(centre, radius);
+
+        // Allocate node function to replace the spectral component
+        GModelSpectralNodes* nodes = new GModelSpectralNodes(cube->spectrum());
+        for (int i = 0; i < nodes->nodes(); ++i) {
+            GEnergy energy    = nodes->energy(i);
+            GTime   time;                              // Dummy time
+            double  intensity = nodes->intensity(i);
+            double  norm      = spectral->eval(energy, time);
+            nodes->intensity(i, norm*intensity);
+        }
+
+        // Signal that node function needs to be de-allocated later
+        free_spectral = true;
+
+        // Set the spectral model pointer to the node function
+        spectral = nodes;
+
+    } // endif: spatial model was a diffuse cube
+    
+    // Compute flux within [emin, emax] in model from spectral
+    // component (units: ph/cm2/s)
+    double flux = spectral->flux(emin, emax);
+
+    // Free spectral model if required
+    if (free_spectral) delete spectral;
+
+    // Return model flux
+    return flux;
 }
 
 

@@ -71,20 +71,25 @@ public:
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctobssim& app);
-    void free_members(void);
-    void get_parameters(void);
-    void simulate_source(GCTAObservation* obs,
+    void   init_members(void);
+    void   copy_members(const ctobssim& app);
+    void   free_members(void);
+    void   get_parameters(void);
+    void   simulate_source(GCTAObservation* obs,
                          const GModels&   models,
                          GRan&            ran, 
                          GLog*            wrklog = NULL);
-    void simulate_background(GCTAObservation* obs,
-                             const GModels&   models,
-                             GRan&            ran,
-                             GLog*            wrklog = NULL);
-    void save_fits(void);
-    void save_xml(void);
+    double get_model_flux(const GModelSky* model,
+                          const GEnergy&   emin,
+                          const GEnergy&   emax,
+                          const GSkyDir&   centre,
+                          const double&    radius);
+    void   simulate_background(GCTAObservation* obs,
+                               const GModels&   models,
+                               GRan&            ran,
+                               GLog*            wrklog = NULL);
+    void   save_fits(void);
+    void   save_xml(void);
 
     // User parameters
     std::string m_outevents;   //!< Output events file
