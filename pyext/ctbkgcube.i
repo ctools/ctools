@@ -47,8 +47,7 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
-    const GCTACubeBackground& bgcube(void) const;
-    const GCTAEventCube& cube(void) const;
+    const GCTACubeBackground& cube(void) const;
     const GModels&       models(void) const;
 };
 
