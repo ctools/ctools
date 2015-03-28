@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-12 March 2015
+23 March 2015
 
 
 1. Introduction
@@ -33,7 +33,8 @@ None
 
 5. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+The rate check is now also correctly done for map cubes. Before, the rate check
+made simulations with a diffuse map cube fail (#1452).
 
 
 6. ctselect - CTA event selection
