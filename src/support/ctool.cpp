@@ -732,23 +732,26 @@ void ctool::set_obs_response(GCTAObservation* obs)
     // If the observation contains a counts cube, then first check whether
     // the expcube and psfcube parameters exist and are not NONE
     if (dynamic_cast<const GCTAEventCube*>(obs->events()) != NULL) {
-        if (has_par("expcube") && has_par("psfcube")) {
+        if (has_par("expcube") && has_par("psfcube") && has_par("bkgcube")) {
 
             // Get filenames
             std::string expcube = (*this)["expcube"].filename();
             std::string psfcube = (*this)["psfcube"].filename();
+            std::string bkgcube = (*this)["bkgcube"].filename();
 
             // Extract response information if available
-            if ((expcube != "NONE") && (psfcube != "NONE") &&
+            if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
                 (gammalib::strip_whitespace(expcube) != "") &&
-                (gammalib::strip_whitespace(psfcube) != "")) {
+                (gammalib::strip_whitespace(psfcube) != "") &&
+                (gammalib::strip_whitespace(bkgcube) != "")) {
 
                 // Get exposure and PSF cubes
-                GCTACubeExposure exposure(expcube);
-                GCTACubePsf      psf(psfcube);
+                GCTACubeExposure   exposure(expcube);
+                GCTACubePsf        psf(psfcube);
+                GCTACubeBackground background(bkgcube);
 
                 // Set reponse
-                obs->response(exposure, psf);
+                obs->response(exposure, psf, background);
 
                 // Signal response availability
                 has_response = true;

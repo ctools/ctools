@@ -11,6 +11,7 @@
         Add ctulimit tool (#1363)
         Allow ctmodel usage for stacked analysis from command line
         Correct rate check in ctobssim for map cubes (#1452)
+        Handle background cubes for stacked analysis (#1371)
 
 
 2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>

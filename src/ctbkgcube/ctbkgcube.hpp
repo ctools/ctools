@@ -56,11 +56,11 @@ public:
     ctbkgcube& operator=(const ctbkgcube& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GCTAEventCube& cube(void) const;
-    const GModels&       models(void) const;
+    void                      clear(void);
+    void                      run(void);
+    void                      save(void);
+    const GCTACubeBackground& cube(void) const;
+    const GModels&            models(void) const;
 
 protected:
     // Protected methods
@@ -71,29 +71,27 @@ protected:
     void fill_cube(GCTAObservation* obs);
 
     // Protected members
-    std::string   m_outcube;     //!< Filename of output cube
-    std::string   m_outmodel;    //!< Filename of output XML model
-    GObservations m_obs;         //!< Observation container
-    GCTAEventCube m_bkgcube;     //!< Background cube
-    GModels       m_bkgmdl;      //!< CTA background models
-    GModels       m_outmdl;      //!< Output models
-    GEbounds      m_ebounds;     //!< Energy boundaries
-    double        m_livetime;    //!< Total livetime for normalization
-    int           m_cube_model;  //!< Cube model index
+    std::string        m_outcube;     //!< Filename of output cube
+    std::string        m_outmodel;    //!< Filename of output XML model
+    GObservations      m_obs;         //!< Observation container
+    GCTACubeBackground m_background;  //!< Background cube response
+    GModels            m_bkgmdl;      //!< CTA background models
+    GModels            m_outmdl;      //!< Output models
 };
 
 
 /***********************************************************************//**
- * @brief Return event cube containing background rate
+ * @brief Return background response cube containing background rate
  *
- * @return Background event cube.
+ * @return Background response cube.
  ***************************************************************************/
 inline
-const GCTAEventCube& ctbkgcube::cube(void) const
+const GCTACubeBackground& ctbkgcube::cube(void) const
 {
     // Return background cube
-    return (m_bkgcube);
+    return (m_background);
 }
+
 
 
 /***********************************************************************//**

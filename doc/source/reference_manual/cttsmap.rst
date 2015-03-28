@@ -31,6 +31,9 @@ General parameters
 ``psfcube [file]``
     PSF cube file (only needed for stacked analysis).
 
+``bkgcube [file]``
+    Background cube file (only needed for stacked analysis).
+
 ``caldb [string]``
     Calibration database.
 

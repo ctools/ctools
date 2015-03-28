@@ -98,8 +98,11 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
             pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
+            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
             pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
             pars.append(gammalib.GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
@@ -107,14 +110,12 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("tmin","r","h","0.0","","","Start time (MET in s)"))
             pars.append(gammalib.GApplicationPar("tmax","r","a","1800.0","","","Duration (in s)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-            pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
-            pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
+            pars.append(gammalib.GApplicationPar("npix","i","a","200","","","Number of pixels for binned"))
+            pars.append(gammalib.GApplicationPar("binsz","r","a","0.05","","","Pixel size for binned (deg/pixel)"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
             pars.append(gammalib.GApplicationPar("rad","r","h","5.0","0","180","Radius of ROI (deg)"))         
             pars.append(gammalib.GApplicationPar("pattern","s","h","single","","","Observation pattern (single/four)"))
             pars.append(gammalib.GApplicationPar("offset","r","h","1.5","","","Observation pattern offset (deg)"))
-            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
-            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","cspull.log","","","Log filename"))
             pars.save(parfile)
@@ -140,7 +141,7 @@ class cspull(ctools.cscript):
             
         # Get number of energy bins
         self.m_enumbins = self["enumbins"].integer()
-        
+   
         # Read parameters for binned if requested
         if not self.m_enumbins == 0:
             self.m_npix  = self["npix"].integer()

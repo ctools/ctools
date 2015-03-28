@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-23 March 2015
+28 March 2015
 
 
 1. Introduction
@@ -50,12 +50,14 @@ None
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-None
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 9. cttsmap - Generation of Test Statistics map
 ----------------------------------------------
-None
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 10. ctskymap - CTA sky mapping
@@ -70,6 +72,9 @@ It directly makes use of the cube response to compute the model without using
 the original IRF information. This makes generation of model cubes substantially
 faster. The old method of accessing the IRF response for model computation is
 still possible.
+
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 12. ctexpcube - CTA exposure cube generation
@@ -94,12 +99,16 @@ None
 
 16. ctbutterfly - Generate butterfly diagrams
 ---------------------------------------------
-None
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 17. ctulimit - Compute upper limit
 ----------------------------------
 Added an initial version of the upper limit computation tool.
+
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 18. Examples

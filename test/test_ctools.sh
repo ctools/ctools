@@ -91,27 +91,6 @@ else
   echo " events.fits file is not found"
   exit 1
 fi
-#
-# Run 2
-$ctobssim inmodel="data/model_background_cube.xml" \
-          outevents="events2.fits" \
-          caldb="irf" \
-          irf="cta_dummy_irf" \
-          ra=84.17263 \
-          dec=22.01444 \
-          rad=1.0 \
-          tmin=0.0 \
-          tmax=1.0 \
-          emin=0.3 \
-          emax=8.0 chatter=4
-$ECHO -n "."
-if [ -s "events2.fits" ]
-then
-  $ECHO -n "."
-else
-  echo " events2.fits file is not found"
-  exit 1
-fi
 $ECHO " ok"
 
 
@@ -148,7 +127,7 @@ $ECHO -n "Test ctbin: "
 #
 # Run 1
 $ctbin inobs="events.fits" \
-       outcube="cntmap.fits" \
+       outcube="cntmap1.fits" \
        emin=0.1 \
        emax=100.0 \
        enumbins=20 \
@@ -161,27 +140,27 @@ $ctbin inobs="events.fits" \
        yref=22.01 \
        proj="CAR"
 $ECHO -n "."
-if [ -s "cntmap.fits" ]
+if [ -s "cntmap1.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " cntmap.fits file is not found"
+  $ECHO " cntmap1.fits file is not found"
   exit 1
 fi
 #
 # Run 2
-$ctbin inobs="events2.fits" \
+$ctbin inobs="events.fits" \
        outcube="cntmap2.fits" \
        emin=0.3 \
        emax=8.0 \
-       enumbins=10 \
+       enumbins=7 \
        ebinalg="LOG" \
-       nxpix=50 \
-       nypix=50 \
-       binsz=0.02 \
+       nxpix=30 \
+       nypix=30 \
+       binsz=0.05 \
        coordsys="CEL" \
-       xref=84.17263 \
-       yref=22.01444 \
+       xref=86.63 \
+       yref=22.01 \
        proj="CAR"
 $ECHO -n "."
 if [ -s "cntmap2.fits" ]
@@ -193,6 +172,168 @@ else
 fi
 $ECHO " ok"
 
+#
+# Test ctexpcube
+# ==============
+$ECHO -n "Test ctexpcube: "
+#
+# Run 1
+$ctexpcube inobs="data/crab_events.fits" \
+           incube="NONE" \
+           outcube="expcube1.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=200 \
+           nypix=200 \
+           binsz=0.02 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR"
+$ECHO -n "."
+if [ -s "expcube1.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " expcube1.fits file is not found"
+exit 1
+fi
+#
+# Run 2
+$ctexpcube inobs="events.fits" \
+           incube="cntmap2.fits" \
+           outcube="expcube2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "expcube2.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " expcube2.fits file is not found"
+exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test ctpsfcube
+# ==============
+$ECHO -n "Test ctpsfcube: "
+#
+# Run 1
+$ctpsfcube inobs="data/crab_events.fits" \
+           incube="NONE" \
+           outcube="psfcube1.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=10 \
+           nypix=10 \
+           binsz=0.4 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR" \
+           amax=0.3 \
+           anumbins=10
+$ECHO -n "."
+if [ -s "psfcube1.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " psfcube1.fits file is not found"
+exit 1
+fi
+#
+# Run 2
+$ctpsfcube inobs="events.fits" \
+           incube="cntmap2.fits" \
+           outcube="psfcube2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           amax=0.3 \
+           anumbins=2
+$ECHO -n "."
+if [ -s "psfcube2.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " psfcube2.fits file is not found"
+exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test ctbkgcube
+# ==============
+$ECHO -n "Test ctbkgcube: "
+#
+# Run 1
+$ctbkgcube inobs="data/crab_events.fits" \
+           inmodel="data/crab.xml" \
+           incube="NONE" \
+           outcube="bkgcube1.fits" \
+           outmodel="bkgcube1.xml" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=10 \
+           nypix=10 \
+           binsz=0.4 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR"
+$ECHO -n "."
+if [ -s "bkgcube1.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " bkgcube1.fits file is not found"
+exit 1
+fi
+if [ -s "bkgcube1.xml" ]
+then
+$ECHO -n "."
+else
+$ECHO " bkgcube1.xml file is not found"
+exit 1
+fi
+#
+# Run 2
+$ctbkgcube inobs="events.fits" \
+           inmodel="data/crab.xml" \
+           incube="cntmap2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           outcube="bkgcube2.fits" \
+           outmodel="bkgcube2.xml"
+$ECHO -n "."
+if [ -s "bkgcube2.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " bkgcube2.fits file is not found"
+exit 1
+fi
+if [ -s "bkgcube2.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " bkgcube2.xml file is not found"
+exit 1
+fi
+$ECHO " ok"
+
 
 
 #
@@ -201,11 +342,12 @@ $ECHO " ok"
 $ECHO -n "Test ctmodel: "
 #
 # Run 1
-$ctmodel inobs="cntmap.fits" \
-         incube="cntmap.fits" \
+$ctmodel inobs="cntmap1.fits" \
+         incube="cntmap1.fits" \
          outcube="modmap1.fits" \
          expcube="NONE" \
          psfcube="NONE" \
+         bkgcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          inmodel="data/crab.xml"
@@ -217,13 +359,35 @@ else
   $ECHO " modmap1.fits file is not found"
   exit 1
 fi
+
 #
 # Run 2
+$ctmodel inobs="cntmap2.fits" \
+         incube="cntmap2.fits" \
+         outcube="modmap2.fits" \
+         expcube="expcube2.fits" \
+         psfcube="psfcube2.fits" \
+         bkgcube="bkgcube2.fits" \
+         caldb="irf" \
+         irf="cta_dummy_irf" \
+         inmodel="bkgcube2.xml"
+$ECHO -n "."
+if [ -s "modmap2.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " modmap2.fits file is not found"
+exit 1
+fi
+
+#
+# Run 3
 $ctmodel inobs="NONE" \
          incube="NONE" \
          outcube="modmap3.fits" \
          expcube="NONE" \
          psfcube="NONE" \
+         bkgcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          inmodel="data/crab.xml" \
@@ -248,24 +412,6 @@ then
   $ECHO -n "."
 else
   $ECHO " modmap3.fits file is not found"
-  exit 1
-fi
-#
-# Run 3
-$ctmodel inobs="cntmap2.fits" \
-         incube="cntmap2.fits" \
-         outcube="modmap2.fits" \
-         expcube="NONE" \
-         psfcube="NONE" \
-         caldb="irf" \
-         irf="cta_dummy_irf" \
-         inmodel="data/model_background_cube.xml"
-$ECHO -n "."
-if [ -s "modmap2.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " modmap2.fits file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -301,11 +447,12 @@ $ECHO " ok"
 $ECHO -n "Test ctlike: "
 #
 # Run 1
-$ctlike inobs="cntmap.fits" \
+$ctlike inobs="cntmap1.fits" \
         inmodel="data/crab.xml" \
         outmodel="results_binned.xml" \
         expcube="NONE" \
         psfcube="NONE" \
+        bkgcube="NONE" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -331,36 +478,23 @@ else
   $ECHO " results_unbinned.xml file is not found"
   exit 1
 fi
+
 #
 # Run 3
-$ctlike inobs="events2.fits" \
-        inmodel="data/model_background_cube.xml" \
-        outmodel="results_unbinned_background_cube.xml" \
-        caldb="irf" \
-        irf="cta_dummy_irf"
-$ECHO -n "."
-if [ -s "results_unbinned_background_cube.xml" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " results_unbinned_background_cube.xml file is not found"
-  exit 1
-fi
-#
-# Run 4
 $ctlike inobs="cntmap2.fits" \
-        inmodel="data/model_background_cube.xml" \
-        outmodel="results_binned_background_cube.xml" \
-        expcube="NONE" \
-        psfcube="NONE" \
+        inmodel="bkgcube2.xml" \
+        outmodel="results_binned_cube_background.xml" \
+        expcube="expcube2.fits" \
+        psfcube="psfcube2.fits" \
+        bkgcube="bkgcube2.fits" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
-if [ -s "results_binned_background_cube.xml" ]
+if [ -s "results_binned_cube_background.xml" ]
 then
   $ECHO -n "."
 else
-  $ECHO " results_binned_background_cube.xml file is not found"
+  $ECHO " results_binned_cube_background.xml file is not found"
   exit 1
 fi
 $ECHO " ok"
@@ -394,167 +528,6 @@ fi
 $ECHO " ok"
 
 
-#
-# Test ctexpcube
-# ==============
-$ECHO -n "Test ctexpcube: "
-#
-# Run 1
-$ctexpcube inobs="data/crab_events.fits" \
-           incube="NONE" \
-           outcube="expcube1.fits" \
-           caldb="irf" \
-           irf="cta_dummy_irf" \
-           emin=0.1 \
-           emax=100.0 \
-           enumbins=20 \
-           nxpix=200 \
-           nypix=200 \
-           binsz=0.02 \
-           coordsys="CEL" \
-           xref=83.63 \
-           yref=22.01 \
-           proj="CAR"
-$ECHO -n "."
-if [ -s "expcube1.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " expcube1.fits file is not found"
-  exit 1
-fi
-#
-# Run 2
-$ctexpcube inobs="data/crab_events.fits" \
-           incube="data/crab_cntmap.fits" \
-           outcube="expcube2.fits" \
-           caldb="irf" \
-           irf="cta_dummy_irf"
-$ECHO -n "."
-if [ -s "expcube2.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " expcube2.fits file is not found"
-  exit 1
-fi
-$ECHO " ok"
-
-
-#
-# Test ctpsfcube
-# ==============
-$ECHO -n "Test ctpsfcube: "
-#
-# Run 1
-$ctpsfcube inobs="data/crab_events.fits" \
-           incube="NONE" \
-           outcube="psfcube1.fits" \
-           caldb="irf" \
-           irf="cta_dummy_irf" \
-           emin=0.1 \
-           emax=100.0 \
-           enumbins=20 \
-           nxpix=10 \
-           nypix=10 \
-           binsz=0.4 \
-           coordsys="CEL" \
-           xref=83.63 \
-           yref=22.01 \
-           proj="CAR" \
-           amax=0.3 \
-           anumbins=10
-$ECHO -n "."
-if [ -s "psfcube1.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " psfcube1.fits file is not found"
-  exit 1
-fi
-#
-# Run 2
-$ctpsfcube inobs="data/crab_events.fits" \
-           incube="data/crab_cntmap.fits" \
-           outcube="psfcube2.fits" \
-           caldb="irf" \
-           irf="cta_dummy_irf" \
-           amax=0.3 \
-           anumbins=2
-$ECHO -n "."
-if [ -s "psfcube2.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " psfcube2.fits file is not found"
-  exit 1
-fi
-$ECHO " ok"
-
-
-#
-# Test ctbkgcube
-# ==============
-$ECHO -n "Test ctbkgcube: "
-#
-# Run 1
-$ctbkgcube inobs="data/crab_events.fits" \
-           inmodel="data/crab.xml" \
-           incube="NONE" \
-           outcube="bkgcube1.fits" \
-           outmodel="bkgcube1.xml" \
-           caldb="irf" \
-           irf="cta_dummy_irf" \
-           emin=0.1 \
-           emax=100.0 \
-           enumbins=20 \
-           nxpix=10 \
-           nypix=10 \
-           binsz=0.4 \
-           coordsys="CEL" \
-           xref=83.63 \
-           yref=22.01 \
-           proj="CAR"
-$ECHO -n "."
-if [ -s "bkgcube1.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " bkgcube1.fits file is not found"
-  exit 1
-fi
-if [ -s "bkgcube1.xml" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " bkgcube1.xml file is not found"
-  exit 1
-fi
-#
-# Run 2
-$ctbkgcube inobs="data/crab_events.fits" \
-           inmodel="data/crab.xml" \
-           incube="data/crab_cntmap.fits" \
-           caldb="irf" \
-           irf="cta_dummy_irf" \
-           outcube="bkgcube2.fits" \
-           outmodel="bkgcube2.xml"
-$ECHO -n "."
-if [ -s "bkgcube2.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " bkgcube2.fits file is not found"
-  exit 1
-fi
-if [ -s "bkgcube2.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " bkgcube2.xml file is not found"
-  exit 1
-fi
-$ECHO " ok"
 
 
 #
@@ -608,10 +581,10 @@ $ECHO " ok"
 # ===============
 $ECHO -n "Test ctulimit: "
 $ctulimit inobs="data/crab_events.fits.gz" \
-    inmodel="data/crab.xml" \
-    srcname="Crab" \
-    caldb="irf" \
-    irf="cta_dummy_irf"
+          inmodel="data/crab.xml" \
+          srcname="Crab" \
+          caldb="irf" \
+          irf="cta_dummy_irf"
 $ECHO -n "."
 if [ -s "ctulimit.log" ]
 then

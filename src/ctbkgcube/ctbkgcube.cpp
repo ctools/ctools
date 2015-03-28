@@ -34,7 +34,6 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                        "ctbkgcube::get_parameters()"
-#define G_FILL_CUBE                  "ctbkgcube::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -209,9 +208,6 @@ void ctbkgcube::run(void)
         log.cout(true);
     }
 
-    // Initialise run parameters
-    m_livetime = 0.0;
-
     // Get task parameters
     get_parameters();
 
@@ -248,15 +244,14 @@ void ctbkgcube::run(void)
 
     // Copy models from observation container and reset output model
     // container
-    m_bkgmdl = m_obs.models();
+    GModels models_orig = m_obs.models();
+    m_bkgmdl            = m_obs.models();
     m_outmdl.clear();
-    m_cube_model = -1;
 
     // Remove all models that are not CTA background models from the
     // container and put all removed components in the output
     // container
     int num = m_bkgmdl.size();
-
     for (int i = num-1; i >= 0; --i) {
 
         // Flag removal
@@ -309,75 +304,28 @@ void ctbkgcube::run(void)
         log.header1("Generate background cube");
     }
 
-    // Initialise observation counter
-    int n_observations = 0;
+    // Assign background models to container
+    m_obs.models(m_bkgmdl);
 
-    // Loop over all observations in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
-      
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+    // Fill background cube from observations
+    m_background.fill(m_obs);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
-            if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation "+gammalib::str(i));
-                }
-            }
-
-            // Increment number of observations
-            n_observations++;
-
-            // Fill the cube
-            fill_cube(obs);
-
-        } // endif: CTA observation found
-
-    } // endfor: looped over observations
-
-    // Log results
-    if (logTerse()) {
-        log << gammalib::parformat("Accumulated livetime");
-        log << m_livetime << " sec" << std::endl;
-    }
-
-    // Re-normalize cube to get units of counts/MeV/s/sr
-    if (m_livetime > 0.0) {
-    
-        // Loop over all bins in background cube and divide the content
-        // by the total livetime.
-        for (int i = 0; i < m_bkgcube.size(); ++i) {
-            GCTAEventBin* bin  = m_bkgcube[i];
-            double        rate = bin->counts() / m_livetime;
-            bin->counts(rate);
-        }
-
-    } // endif: livetime was positive
-
-    // Log results
-    if (logTerse()) {
-        log << gammalib::parformat("Number of observations");
-        log << n_observations << std::endl;
-    }
-
-    // Create a background model for output background cube and append
+    // Create a background model for the output background cube and append
     // that model to the input model in place of the original
-    // background model
-    GEnergies energies;
-    for (int i = 0; i < m_bkgcube.ebins(); ++i) {
-        energies.append(m_bkgcube.energy(i));
-    }
-    GModelSpatialDiffuseCube spatial(m_bkgcube.map(), energies, 1.0);
-    GModelSpectralPlaw       spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
-    GCTAModelCubeBackground  model(spatial, spectral);
-    model.name("ctbkgcube default background model");
-    m_cube_model = m_outmdl.size(); // Store the slot number for save()
+    // background models
+    // TODO: We might think of creating the spectral model via user parameter
+    GModelSpectralPlaw      spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
+    GCTAModelCubeBackground model(spectral);
+
+    // Set model name
+    model.name("BackgroundModel");
+
+    // Set model instrument
+    // TODO: Account for possibility to have observations from different
+    // IACTs in the same container
+    model.instruments("CTA,HESS,MAGIC,VERITAS");
+
+    // Append model to output container
     m_outmdl.append(model);
 
     // Log output model
@@ -386,6 +334,9 @@ void ctbkgcube::run(void)
         log.header1("Output model");
         log << m_outmdl << std::endl;
     }
+
+    // Recover original models
+    m_obs.models(models_orig);
 
     // Return
     return;
@@ -405,47 +356,19 @@ void ctbkgcube::save(void)
         log.header1("Save background cube");
     }
 
-    // Create energies container from energy boundaries
-    GEnergies energies;
-    for (int i = 0; i < m_ebounds.size(); ++i) {
-        energies.append(m_ebounds.elogmean(i));
-    }
-
     // Get output filenames
     std::string outfile  = (*this)["outcube"].filename();
     std::string outmodel = (*this)["outmodel"].filename();
 
-    // Create empty FITS file
-    GFits fits;
-
-    // Write background cube
-    m_bkgcube.map().write(fits);
-
-    // Write energies
-    energies.write(fits);
-    
-    // Save FITS file
-    fits.saveto(outfile, clobber());
+    // Save background cube
+    m_background.save(outfile, clobber());
 
     // Write output models if filename is valid
     if ((outmodel.length() > 0) && (gammalib::tolower(outmodel) != "none")) {
 
-        // Set filename of map cube.
-        if (m_cube_model >= 0) {
-            GCTAModelCubeBackground* model =
-                dynamic_cast<GCTAModelCubeBackground*>(m_outmdl[m_cube_model]);
-            if (model != NULL) {
-                GModelSpatialDiffuseCube* spatial =
-                    dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
-                if (spatial != NULL) {
-                    spatial->filename(outfile);
-                }
-            }
-        }
-
-        // Save output model container
+        // Save output model for binned analyses
         m_outmdl.save(outmodel);
-        
+
     }
 
     // Return
@@ -468,12 +391,9 @@ void ctbkgcube::init_members(void)
     m_outcube.clear();
     m_outmodel.clear();
     m_obs.clear();
-    m_bkgcube.clear();
+    m_background.clear();
     m_bkgmdl.clear();
     m_outmdl.clear();
-    m_ebounds.clear();
-    m_livetime   = 0.0;
-    m_cube_model = -1;
 
     // Return
     return;
@@ -491,12 +411,9 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
     m_outmodel   = app.m_outmodel;
     m_outcube    = app.m_outcube;
     m_obs        = app.m_obs;
-    m_bkgcube    = app.m_bkgcube;
+    m_background = app.m_background;
     m_bkgmdl     = app.m_bkgmdl;
     m_outmdl     = app.m_outmdl;
-    m_ebounds    = app.m_ebounds;
-    m_livetime   = app.m_livetime;
-    m_cube_model = app.m_cube_model;
 
     // Return
     return;
@@ -536,6 +453,28 @@ void ctbkgcube::get_parameters(void)
 
     } // endif: there was no observation in the container
 
+    // Get the incube filename
+    std::string incube = (*this)["incube"].filename();
+
+    // Check for filename validity
+    if ((gammalib::toupper(incube) == "NONE") ||
+        (gammalib::strip_whitespace(incube) == "")) {
+
+        // Create an event cube based on task parameters
+        GCTAEventCube cube = create_cube(m_obs);
+
+        // Define background cube
+        m_background = GCTACubeBackground(cube);
+
+    } // endif: filename was not valid
+
+    // ... otherwise setup the background cube from the counts map
+    else {
+
+        // Define background cube from file
+        m_background = GCTACubeBackground(incube);
+    
+    } // endelse: cube was loaded from file
 
     // If there are no models associated with the observations then load now
     // the model definition from the XML file
@@ -552,131 +491,11 @@ void ctbkgcube::get_parameters(void)
         m_obs.models(models);
     }
 
-    // Get the incube filename
-    std::string incube = (*this)["incube"].filename();
-
-    // Check for filename validity
-    if ((gammalib::toupper(incube) == "NONE") ||
-        (gammalib::strip_whitespace(incube) == "")) {
-
-        // Create an event cube based on task parameters
-        m_bkgcube = create_cube(m_obs);
-
-    } // endif: filename was not valid
-
-    // ... otherwise setup the background cube from the counts map
-    else {
-    
-        // Load event cube from filename
-        m_bkgcube.load(incube);
-        // Loop over all bins in background cube
-        for (int i = 0; i < m_bkgcube.size(); ++i) {
-
-            // Get event bin
-            GCTAEventBin* bin = m_bkgcube[i];
-            bin->counts(0.0);
-
-        }
-    
-    } // endelse: cube was loaded from file
-
-    // Get energy definition
-    m_ebounds = m_bkgcube.ebounds();
-
     // Read output filenames (if needed)
     if (read_ahead()) {
         m_outcube  = (*this)["outcube"].filename();
         m_outmodel = (*this)["outmodel"].filename();
     }
-
-    // Return
-    return;
-}
-
-/***********************************************************************//**
- * @brief Generate background cube
- *
- * @param[in] obs Pointer to CTA observation.
- *
- * Fills the background cube with the model value for a CTA observation.
- * This method will not need to load the event file as it gets the event
- * ROI and GTI directly from the observation.
- ***************************************************************************/
-void ctbkgcube::fill_cube(GCTAObservation* obs)
-{
-
-    // Continue only if observation pointer is valid
-    if (obs != NULL) {
-
-        // Initialise statistics
-        double sum            = 0.0;
-        int    n_bins_inside  = 0;
-        int    n_bins_outside = 0;
-
-        // Extract region of interest from CTA observation
-        GCTARoi roi = obs->roi();
-
-        // Set GTI of actual observations as the GTI of the event cube
-        m_bkgcube.gti(obs->gti());
-
-        // Get observation livetime
-        double livetime = obs->livetime();
-
-        // Loop over all bins in background cube
-        for (int i = 0; i < m_bkgcube.size(); ++i) {
-
-            // Get event bin
-            GCTAEventBin* bin = m_bkgcube[i];
-
-            // Continue only if binned in contained in ROI
-            if (roi.contains(*bin)) {
-            
-                // Compute model value for event bin. The model value is
-                // given in counts/MeV/s/sr.
-                double model = m_bkgmdl.eval(*bin, *obs);
-
-                // Compute number events
-                sum += model * bin->size();
-
-                // Multiply by livetime to get the correct weighting for
-                // each observation. We divide by the total livetime later
-                // to get the background model in units of counts/MeV/s/sr.
-                model *= livetime;
-
-                // Add existing number of counts
-                model += bin->counts();
-
-                // Store cumulated value (units: counts/MeV/sr)
-                bin->counts(model);
-
-                // Increment contained bin counter
-                n_bins_inside++;
-                
-            } // endif: bin was contained in RoI
-            
-            // ... otherwise count bin as an outsider
-            else {
-                n_bins_outside++;
-            }
-
-        } // endfor: looped over all bins
-
-        // Accumulate livetime
-        m_livetime += livetime;
-
-        // Log results
-        if (logTerse()) {
-            log << gammalib::parformat("Bins within RoI");
-            log << n_bins_inside << std::endl;
-            log << gammalib::parformat("Bins outside RoI");
-            log << n_bins_outside << std::endl;
-            log << gammalib::parformat("Background events in cube");
-            log << sum << std::endl;
-            log << gammalib::parformat("Cube livetime");
-            log << livetime << " sec" << std::endl;
-        }
-
-    } // endif: observation pointer was not valid
 
     // Return
     return;
