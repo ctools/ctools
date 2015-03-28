@@ -24,11 +24,14 @@ General parameters
 ``srcname [string]``
     Name of model component for which upper limit should be computed.
  	 	 
-``expcube = NONE [file]``
+``expcube [file]``
     Exposure cube file (only needed for stacked analysis).
 
-``psfcube = NONE [file]``
+``psfcube [file]``
     PSF cube file (only needed for stacked analysis).
+
+``bkgcube [file]``
+    Background cube file (only needed for stacked analysis).
 
 ``caldb [string]``
     Calibration database.
