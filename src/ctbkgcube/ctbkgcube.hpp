@@ -56,11 +56,11 @@ public:
     ctbkgcube& operator=(const ctbkgcube& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
+    void                      clear(void);
+    void                      run(void);
+    void                      save(void);
     const GCTACubeBackground& cube(void) const;
-    const GModels&       models(void) const;
+    const GModels&            models(void) const;
 
 protected:
     // Protected methods
@@ -71,14 +71,12 @@ protected:
     void fill_cube(GCTAObservation* obs);
 
     // Protected members
-    std::string   m_outcube;     //!< Filename of output cube
-    std::string   m_outmodel;    //!< Filename of output XML model
-    GObservations m_obs;         //!< Observation container
-    GCTACubeBackground m_background;     //!< Background cube response
-    GModels       m_bkgmdl;      //!< CTA background models
-    GModels       m_outmdl;      //!< Output models
-    GEbounds      m_ebounds;     //!< Energy boundaries
-
+    std::string        m_outcube;     //!< Filename of output cube
+    std::string        m_outmodel;    //!< Filename of output XML model
+    GObservations      m_obs;         //!< Observation container
+    GCTACubeBackground m_background;  //!< Background cube response
+    GModels            m_bkgmdl;      //!< CTA background models
+    GModels            m_outmdl;      //!< Output models
 };
 
 

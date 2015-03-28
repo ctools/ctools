@@ -34,7 +34,6 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                        "ctbkgcube::get_parameters()"
-#define G_FILL_CUBE                  "ctbkgcube::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -246,14 +245,13 @@ void ctbkgcube::run(void)
     // Copy models from observation container and reset output model
     // container
     GModels models_orig = m_obs.models();
-    m_bkgmdl = m_obs.models();
+    m_bkgmdl            = m_obs.models();
     m_outmdl.clear();
 
     // Remove all models that are not CTA background models from the
     // container and put all removed components in the output
     // container
     int num = m_bkgmdl.size();
-
     for (int i = num-1; i >= 0; --i) {
 
         // Flag removal
@@ -315,20 +313,17 @@ void ctbkgcube::run(void)
     // Create a background model for the output background cube and append
     // that model to the input model in place of the original
     // background models
-    // Todo: We might think of creating the spectral model via user parameter
-    GCTAModelCubeBackground model(GModelSpectralConst(1.0));
+    // TODO: We might think of creating the spectral model via user parameter
+    GModelSpectralPlaw      spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
+    GCTAModelCubeBackground model(spectral);
 
     // Set model name
     model.name("BackgroundModel");
 
     // Set model instrument
-    // Todo: Account for possibility to have observations from different
+    // TODO: Account for possibility to have observations from different
     // IACTs in the same container
     model.instruments("CTA,HESS,MAGIC,VERITAS");
-
-    // Set model identifier to "0". This is coupled to ctbin, where the binned output
-    // observation id is set to 0.
-    model.ids("0");
 
     // Append model to output container
     m_outmdl.append(model);
@@ -361,7 +356,6 @@ void ctbkgcube::save(void)
         log.header1("Save background cube");
     }
 
-
     // Get output filenames
     std::string outfile  = (*this)["outcube"].filename();
     std::string outmodel = (*this)["outmodel"].filename();
@@ -374,6 +368,7 @@ void ctbkgcube::save(void)
 
         // Save output model for binned analyses
         m_outmdl.save(outmodel);
+
     }
 
     // Return
@@ -399,7 +394,6 @@ void ctbkgcube::init_members(void)
     m_background.clear();
     m_bkgmdl.clear();
     m_outmdl.clear();
-    m_ebounds.clear();
 
     // Return
     return;
@@ -420,7 +414,6 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
     m_background = app.m_background;
     m_bkgmdl     = app.m_bkgmdl;
     m_outmdl     = app.m_outmdl;
-    m_ebounds    = app.m_ebounds;
 
     // Return
     return;
@@ -497,9 +490,6 @@ void ctbkgcube::get_parameters(void)
         GModels     models(inmodel);
         m_obs.models(models);
     }
-
-//    // Get energy definition
-//    m_ebounds = m_background.ebounds();
 
     // Read output filenames (if needed)
     if (read_ahead()) {

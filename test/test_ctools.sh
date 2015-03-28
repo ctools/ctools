@@ -179,20 +179,20 @@ $ECHO -n "Test ctexpcube: "
 #
 # Run 1
 $ctexpcube inobs="data/crab_events.fits" \
-incube="NONE" \
-outcube="expcube1.fits" \
-caldb="irf" \
-irf="cta_dummy_irf" \
-emin=0.1 \
-emax=100.0 \
-enumbins=20 \
-nxpix=200 \
-nypix=200 \
-binsz=0.02 \
-coordsys="CEL" \
-xref=83.63 \
-yref=22.01 \
-proj="CAR"
+           incube="NONE" \
+           outcube="expcube1.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=200 \
+           nypix=200 \
+           binsz=0.02 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR"
 $ECHO -n "."
 if [ -s "expcube1.fits" ]
 then
@@ -204,10 +204,10 @@ fi
 #
 # Run 2
 $ctexpcube inobs="events.fits" \
-incube="cntmap2.fits" \
-outcube="expcube2.fits" \
-caldb="irf" \
-irf="cta_dummy_irf"
+           incube="cntmap2.fits" \
+           outcube="expcube2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf"
 $ECHO -n "."
 if [ -s "expcube2.fits" ]
 then
@@ -226,22 +226,22 @@ $ECHO -n "Test ctpsfcube: "
 #
 # Run 1
 $ctpsfcube inobs="data/crab_events.fits" \
-incube="NONE" \
-outcube="psfcube1.fits" \
-caldb="irf" \
-irf="cta_dummy_irf" \
-emin=0.1 \
-emax=100.0 \
-enumbins=20 \
-nxpix=10 \
-nypix=10 \
-binsz=0.4 \
-coordsys="CEL" \
-xref=83.63 \
-yref=22.01 \
-proj="CAR" \
-amax=0.3 \
-anumbins=10
+           incube="NONE" \
+           outcube="psfcube1.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=10 \
+           nypix=10 \
+           binsz=0.4 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR" \
+           amax=0.3 \
+           anumbins=10
 $ECHO -n "."
 if [ -s "psfcube1.fits" ]
 then
@@ -253,12 +253,12 @@ fi
 #
 # Run 2
 $ctpsfcube inobs="events.fits" \
-incube="cntmap2.fits" \
-outcube="psfcube2.fits" \
-caldb="irf" \
-irf="cta_dummy_irf" \
-amax=0.3 \
-anumbins=2
+           incube="cntmap2.fits" \
+           outcube="psfcube2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           amax=0.3 \
+           anumbins=2
 $ECHO -n "."
 if [ -s "psfcube2.fits" ]
 then
@@ -277,22 +277,22 @@ $ECHO -n "Test ctbkgcube: "
 #
 # Run 1
 $ctbkgcube inobs="data/crab_events.fits" \
-inmodel="data/crab.xml" \
-incube="NONE" \
-outcube="bkgcube1.fits" \
-outmodel="bkgcube1.xml" \
-caldb="irf" \
-irf="cta_dummy_irf" \
-emin=0.1 \
-emax=100.0 \
-enumbins=20 \
-nxpix=10 \
-nypix=10 \
-binsz=0.4 \
-coordsys="CEL" \
-xref=83.63 \
-yref=22.01 \
-proj="CAR"
+           inmodel="data/crab.xml" \
+           incube="NONE" \
+           outcube="bkgcube1.fits" \
+           outmodel="bkgcube1.xml" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           emin=0.1 \
+           emax=100.0 \
+           enumbins=20 \
+           nxpix=10 \
+           nypix=10 \
+           binsz=0.4 \
+           coordsys="CEL" \
+           xref=83.63 \
+           yref=22.01 \
+           proj="CAR"
 $ECHO -n "."
 if [ -s "bkgcube1.fits" ]
 then
@@ -311,12 +311,12 @@ fi
 #
 # Run 2
 $ctbkgcube inobs="events.fits" \
-inmodel="data/crab.xml" \
-incube="cntmap2.fits" \
-caldb="irf" \
-irf="cta_dummy_irf" \
-outcube="bkgcube2.fits" \
-outmodel="bkgcube2.xml"
+           inmodel="data/crab.xml" \
+           incube="cntmap2.fits" \
+           caldb="irf" \
+           irf="cta_dummy_irf" \
+           outcube="bkgcube2.fits" \
+           outmodel="bkgcube2.xml"
 $ECHO -n "."
 if [ -s "bkgcube2.fits" ]
 then
@@ -347,7 +347,7 @@ $ctmodel inobs="cntmap1.fits" \
          outcube="modmap1.fits" \
          expcube="NONE" \
          psfcube="NONE" \
-         bgcube="NONE" \
+         bkgcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          inmodel="data/crab.xml"
@@ -362,14 +362,14 @@ fi
 #
 # Run 2
 $ctmodel inobs="cntmap2.fits" \
-incube="cntmap2.fits" \
-outcube="modmap2.fits" \
-expcube="expcube2.fits" \
-psfcube="psfcube2.fits" \
-bgcube="bkgcube2.fits" \
-caldb="irf" \
-irf="cta_dummy_irf" \
-inmodel="bkgcube2.xml"
+         incube="cntmap2.fits" \
+         outcube="modmap2.fits" \
+         expcube="expcube2.fits" \
+         psfcube="psfcube2.fits" \
+         bkgcube="bkgcube2.fits" \
+         caldb="irf" \
+         irf="cta_dummy_irf" \
+         inmodel="bkgcube2.xml"
 $ECHO -n "."
 if [ -s "modmap2.fits" ]
 then
@@ -448,7 +448,7 @@ $ctlike inobs="cntmap1.fits" \
         outmodel="results_binned.xml" \
         expcube="NONE" \
         psfcube="NONE" \
-        bgcube="NONE" \
+        bkgcube="NONE" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -482,7 +482,7 @@ $ctlike inobs="cntmap2.fits" \
         outmodel="results_binned_cube_background.xml" \
         expcube="expcube2.fits" \
         psfcube="psfcube2.fits" \
-        bgcube="bkgcube2.fits" \
+        bkgcube="bkgcube2.fits" \
         caldb="irf" \
         irf="cta_dummy_irf"
 $ECHO -n "."
@@ -577,10 +577,10 @@ $ECHO " ok"
 # ===============
 $ECHO -n "Test ctulimit: "
 $ctulimit inobs="data/crab_events.fits.gz" \
-    inmodel="data/crab.xml" \
-    srcname="Crab" \
-    caldb="irf" \
-    irf="cta_dummy_irf"
+          inmodel="data/crab.xml" \
+          srcname="Crab" \
+          caldb="irf" \
+          irf="cta_dummy_irf"
 $ECHO -n "."
 if [ -s "ctulimit.log" ]
 then
