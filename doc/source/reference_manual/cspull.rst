@@ -26,9 +26,15 @@ General parameters
 ``outfile [file]``
     ASCII file containing the individual pull values.
  	 	 
-``ntrials [integer]``
-    Number of samples for generating the pull distribution.
- 	 	 
+``expcube [file]``
+    Exposure cube file (only needed for stacked analysis).
+
+``psfcube [file]``
+    PSF cube file (only needed for stacked analysis).
+
+``bkgcube [file]``
+    Background cube file (only needed for stacked analysis).
+
 ``caldb [string]``
     Calibration database.
  	 	 
@@ -38,6 +44,9 @@ General parameters
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation.
 
+``ntrials [integer]``
+    Number of samples for generating the pull distribution.
+ 	 	 
 ``ra [real]``
     Right Ascension of CTA pointing (J2000, in degrees).
  	 	 
