@@ -72,6 +72,7 @@ class Test(gammalib.GPythonTestSuite):
         model["inobs"].filename("NONE")
         model["expcube"].filename("NONE")
         model["psfcube"].filename("NONE")
+        model["bkgcube"].filename("NONE")
         model["caldb"].string(self.caldb)
         model["irf"].string(self.irf)
         model["rad"].real(5.0)

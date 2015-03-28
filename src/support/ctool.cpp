@@ -745,7 +745,7 @@ void ctool::set_obs_response(GCTAObservation* obs)
                 (gammalib::strip_whitespace(psfcube) != "") &&
                 (gammalib::strip_whitespace(bkgcube) != "")) {
 
-                // Get exposure and PSF cubes
+                // Get exposure, PSF and background cubes
                 GCTACubeExposure   exposure(expcube);
                 GCTACubePsf        psf(psfcube);
                 GCTACubeBackground background(bkgcube);

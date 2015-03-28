@@ -524,16 +524,19 @@ void ctmodel::get_obs(void)
         // Get response cube filenames
         std::string expcube = (*this)["expcube"].filename();
         std::string psfcube = (*this)["psfcube"].filename();
+        std::string bkgcube = (*this)["bkgcube"].filename();
 
         // If the filenames are valid then build an observation from cube
         // response information
-        if ((expcube != "NONE") && (psfcube != "NONE") &&
+        if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
             (gammalib::strip_whitespace(expcube) != "") &&
-            (gammalib::strip_whitespace(psfcube) != "")) {
+            (gammalib::strip_whitespace(psfcube) != "") &&
+            (gammalib::strip_whitespace(bkgcube) != "")) {
 
-            // Get exposure and PSF cubes
-            GCTACubeExposure exposure(expcube);
-            GCTACubePsf      psf(psfcube);
+            // Get exposure, PSF and background cubes
+            GCTACubeExposure   exposure(expcube);
+            GCTACubePsf        psf(psfcube);
+            GCTACubeBackground background(bkgcube);
 
             // Create energy boundaries
             GEbounds ebounds = create_ebounds();
@@ -548,7 +551,7 @@ void ctmodel::get_obs(void)
             // Create CTA observation
             GCTAObservation cta;
             cta.events(cube);
-            cta.response(exposure, psf);
+            cta.response(exposure, psf, background);
 
             // Append observation to container
             m_obs.append(cta);
