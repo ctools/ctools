@@ -471,8 +471,11 @@ void ctbkgcube::get_parameters(void)
     // ... otherwise setup the background cube from the counts map
     else {
 
+        // Load event cube from filename
+        GCTAEventCube cube(incube);
+
         // Define background cube from file
-        m_background = GCTACubeBackground(incube);
+        m_background = GCTACubeBackground(cube);
     
     } // endelse: cube was loaded from file
 
