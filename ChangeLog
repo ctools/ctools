@@ -1,4 +1,4 @@
-2015-03-28  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-04-10  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.0.0 released
         ========================
@@ -12,6 +12,7 @@
         Allow ctmodel usage for stacked analysis from command line
         Correct rate check in ctobssim for map cubes (#1452)
         Handle background cubes for stacked analysis (#1371)
+        Add csspec script (#1364)
 
 
 2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>

@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-28 March 2015
+10 April 2015
 
 
 1. Introduction
@@ -128,6 +128,9 @@ definition XML files from colon separated value ASCII files. The
 observation definition files from csobsdef can be fed to ctobssim for
 simulation of multiple pointings in one shot. This enables for example
 survey observations to be simulated in a single ctobssim run.
+
+The csspec script has been added that creates a spectrum for a given
+dataset.
 
 
 20. caldb
