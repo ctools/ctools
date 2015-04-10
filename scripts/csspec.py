@@ -23,9 +23,9 @@ import ctools
 import sys
 import tempfile
 
-# ============== #
-# cstsdist class #
-# ============== #
+# ============ #
+# csspec class #
+# ============ #
 class csspec(ctools.cscript):
     """
     This class implements the creation of spectral points. It derives from
@@ -43,14 +43,14 @@ class csspec(ctools.cscript):
         self.version = "1.0.0"
         
         # Initialise some members
-        self.obs       = None 
+        self.obs = None 
               
         # Initialise some members
         if isinstance(argv[0],gammalib.GObservations):
             self.obs = argv[0]
-            argv = argv[1:]
+            argv     = argv[1:]
         else:      
-            self.obs      = gammalib.GObservations()
+            self.obs = gammalib.GObservations()
             self.obs.clear()   
         self.m_outfile = ""
         
@@ -105,6 +105,7 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("outfile","f","a","spectrum.fits","","","Output file name"))
             pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit for spectral points(TeV)"))
@@ -135,7 +136,6 @@ class csspec(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
             self.require_inobs("csspec::get_parameters()")
@@ -154,14 +154,14 @@ class csspec(ctools.cscript):
         # Get binning flag
         self.m_binned = self["binned"].boolean()
         if self.m_binned:
-            self.m_xref = self["xref"].real()
-            self.m_yref = self["yref"].real()
-            self.m_nxpix = self["nxpix"].integer()
-            self.m_nypix = self["nypix"].integer()
-            self.m_binsz = self["binsz"].real()
+            self.m_xref     = self["xref"].real()
+            self.m_yref     = self["yref"].real()
+            self.m_nxpix    = self["nxpix"].integer()
+            self.m_nypix    = self["nypix"].integer()
+            self.m_binsz    = self["binsz"].real()
             self.m_coordsys = self["coordsys"].string()
-            self.m_proj = self["proj"].string()
-            self.m_ebins = self["nebins"].integer()
+            self.m_proj     = self["proj"].string()
+            self.m_ebins    = self["nebins"].integer()
 
         # Read other parameters
         self.m_outfile = self["outfile"].filename()
@@ -277,8 +277,8 @@ class csspec(ctools.cscript):
         table.extname("SPECTRUM")
         
         # Add Header for compatibility with gammalib.GMWLSpectrum
-        table.card("Instrument", "CTA", "Name of Instrument")
-        table.card("Telescope",  "CTA", "Name of Telescope")
+        table.card("INSTRUME", "CTA", "Name of Instrument")
+        table.card("TELESCOP", "CTA", "Name of Telescope")
         
         # Create FITS table columns
         energy      = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
@@ -313,7 +313,7 @@ class csspec(ctools.cscript):
             energy[i] = elogmean.TeV()
             
             # Store energy errors
-            energy_low[i] = (elogmean - emin).TeV()
+            energy_low[i]  = (elogmean - emin).TeV()
             energy_high[i] = (emax - elogmean).TeV()
             
             # Log information
@@ -330,15 +330,18 @@ class csspec(ctools.cscript):
             select["ra"].value("UNDEFINED")
             select["dec"].value("UNDEFINED")
             select.run()  
-            
+
+            # Retrieve observation
             obs = select.obs()
-            
+
+            # Binned analysis
             if self.m_binned:
-                
+
+                # Header
                 if self.logTerse():
                     self.log.header3("Binning events")
                 
-                # bin events
+                # Bin events
                 bin = ctools.ctbin(select.obs())
                 bin["usepnt"].boolean(False)
                 bin["ebinalg"].string("LOG")
@@ -354,10 +357,11 @@ class csspec(ctools.cscript):
                 bin["proj"].string(self.m_proj)            
                 bin.run()
                 
+                # Header
                 if self.logTerse():
                     self.log.header3("Creating exposure cube")
                 
-                # create exposure cube
+                # Create exposure cube
                 expcube = ctools.ctexpcube(select.obs())
                 expcube["incube"].filename("NONE")
                 expcube["usepnt"].boolean(False)
@@ -374,10 +378,11 @@ class csspec(ctools.cscript):
                 expcube["proj"].string(self.m_proj)               
                 expcube.run()
                 
+                # Header
                 if self.logTerse():
                     self.log.header3("Creating PSF cube")
                 
-                # create psf cube
+                # Create psf cube
                 psfcube = ctools.ctpsfcube(select.obs())
                 psfcube["incube"].filename("NONE")
                 psfcube["usepnt"].boolean(False)
@@ -394,10 +399,11 @@ class csspec(ctools.cscript):
                 psfcube["proj"].string(self.m_proj)               
                 psfcube.run()
                 
+                # Header
                 if self.logTerse():
                     self.log.header3("Creating background cube")
                 
-                # create background cube
+                # Create background cube
                 bkgcube = ctools.ctbkgcube(select.obs())
                 bkgcube["incube"].filename("NONE")
                 bkgcube["usepnt"].boolean(False)
@@ -433,10 +439,11 @@ class csspec(ctools.cscript):
                 # Set new models to binned observation           
                 obs.models(models)
                 
+            # Header
             if self.logTerse():
                 self.log.header3("Performing fit")
                              
-            # likelihood
+            # Likelihood
             like = ctools.ctlike(obs)
             like.run()
             
@@ -446,10 +453,11 @@ class csspec(ctools.cscript):
                 # Log information
                 if self.logTerse():
                     self.log("No event in this bin. Bin is skipped\n")
-                
-                flux[i] = 0.0
-                flux_err[i] = 0.0
-                TSvalues[i] = 0.0
+
+                # Set all values to 0
+                flux[i]        = 0.0
+                flux_err[i]    = 0.0
+                TSvalues[i]    = 0.0
                 ulim_values[i] = 0.0
                 continue
                          
@@ -475,7 +483,6 @@ class csspec(ctools.cscript):
                     ulimit.run()
                     ulimit_value = ulimit.diff_ulimit()
                 except:
-                    
                     if self.logTerse():
                         self.log("Upper limit calculation failed\n")
                     ulimit_value = -1.0

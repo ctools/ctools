@@ -191,7 +191,7 @@ $ECHO " ok"
 
 #
 # Test csspec
-# =============
+# ===========
 $ECHO -n "Test csspec: "
 chmod +x @abs_top_srcdir@/scripts/csspec.py
 @abs_top_srcdir@/scripts/csspec.py \
@@ -217,7 +217,7 @@ $ECHO " ok"
 
 #
 # Test csspec Run2
-# =============
+# ================
 $ECHO -n "Test csspec: "
 chmod +x @abs_top_srcdir@/scripts/csspec.py
 @abs_top_srcdir@/scripts/csspec.py \
