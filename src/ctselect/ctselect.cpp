@@ -1006,7 +1006,9 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
 
     // Set selection energy boundaries
     GEbounds result;
-    result.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+    if (emax > emin) {
+        result.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+    }
 
     // Return result
     return result;
