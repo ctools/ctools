@@ -749,8 +749,8 @@ darwin_kluge=no
 # Detect if GammaLib has been compiled with OpenMP
 AC_MSG_CHECKING(whether GammaLib has been compiled with OpenMP)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <GObservations.hpp>]],,)],			     
-		   [gammalib_with_openmp=no;AC_MSG_RESULT(no)],
- 		   [gammalib_with_openmp=yes;AC_MSG_RESULT(yes)])
+               [gammalib_with_openmp=no;AC_MSG_RESULT(no)],
+               [gammalib_with_openmp=yes;AC_MSG_RESULT(yes)])
 
 # Check if openMP is available
 m4_ifdef([AC_OPENMP],[AC_OPENMP], [AX_OPENMP([openmp_ok=yes],[openmp_ok=no])])
