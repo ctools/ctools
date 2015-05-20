@@ -1,4 +1,4 @@
-2015-04-10  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-05-20  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.0.0 released
         ========================
@@ -13,6 +13,8 @@
         Correct rate check in ctobssim for map cubes (#1452)
         Handle background cubes for stacked analysis (#1371)
         Add csspec script (#1364)
+        Add cslightcrv script (#1365)
+        Correct sensitivity computation in cssens
 
 
 2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>

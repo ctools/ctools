@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-10 April 2015
+20 May 2015
 
 
 1. Introduction
@@ -130,7 +130,13 @@ simulation of multiple pointings in one shot. This enables for example
 survey observations to be simulated in a single ctobssim run.
 
 The csspec script has been added that creates a spectrum for a given
-dataset.
+dataset and source.
+
+The cslightcrv script has been added that creates a lightcurv for a given
+dataset and source.
+
+The sensitivity computation in cssens has been corrected so that the script
+actually returns the differential flux for a given set of energies.
 
 
 20. caldb
