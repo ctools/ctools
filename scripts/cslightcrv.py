@@ -133,8 +133,7 @@ class cslightcrv(ctools.cscript):
         
         # Return
         return
-    
-    
+
     def create_tbounds(self):
         
         # Create time bin container
@@ -156,8 +155,8 @@ class cslightcrv(ctools.cscript):
             # Use linear time binning
             time_min = self["tmin"].real()
             time_max = self["tmax"].real()
-            nbins = self["tbins"].integer()            
-            step = (time_max - time_min) / float(nbins)
+            nbins    = self["tbins"].integer()            
+            step     = (time_max - time_min) / float(nbins)
             for i in range(nbins):
                 tmin = gammalib.GTime()
                 tmin.mjd(time_min + i*step)# ref)
@@ -171,8 +170,10 @@ class cslightcrv(ctools.cscript):
                     self.m_tbins.append(obs.events().gti().tstart(i),obs.events().gti().tstop(i))
         else:
             raise AttributeError("tbinalg=\""+self["tbinalg"].string()+"\" unkown. Must be one of \"FILE\", \"LIN\" or \"GTI\"")
+
+        # Return
+        return
   
-        
     def get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -205,7 +206,6 @@ class cslightcrv(ctools.cscript):
             self.m_ebins    = self["nebins"].integer()
             self.m_emin     = self["emin"].real()
             self.m_emax     = self["emax"].real()
-            
 
         # Read other parameters
         self.m_outfile = self["outfile"].filename()
@@ -309,7 +309,7 @@ class cslightcrv(ctools.cscript):
             self.log("\n")
             self.log.header1("Generate lightcurve")      
         
-        # Initialise FITS Table with extension "SPECTRUM"
+        # Initialise FITS Table with extension "LIGHTCURVE"
         table = gammalib.GFitsBinTable(self.m_tbins.size())
         table.extname("LIGHTCURVE")
         
@@ -348,14 +348,14 @@ class cslightcrv(ctools.cscript):
                 self.log.header2("Time bin "+str(i))
 
             # Get time boundaries
-            tmin      = self.m_tbins.tstart(i)
-            tmax      = self.m_tbins.tstop(i)
+            tmin = self.m_tbins.tstart(i)
+            tmax = self.m_tbins.tstop(i)
             
-            # compute time bin center and time width
-            tmean = (tmin + tmax)
-            tmean*=0.5
-            twidth = (tmax - tmin)
-            twidth*=0.5 
+            # Compute time bin center and time width
+            tmean   = (tmin + tmax)
+            tmean  *= 0.5
+            twidth  = (tmax - tmin)
+            twidth *= 0.5 
 
             # Store time as MJD
             MJD[i] = tmean.mjd()
@@ -501,7 +501,7 @@ class cslightcrv(ctools.cscript):
 
                 # Set all values to 0
                 for col in columns:
-                    col[i]     = 0.0
+                    col[i] = 0.0
                 TSvalues[i]    = 0.0
                 ulim_values[i] = 0.0
                 continue
@@ -598,4 +598,3 @@ if __name__ == '__main__':
     
     # Execute application
     app.execute()
-    
