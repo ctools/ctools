@@ -190,9 +190,9 @@ fi
 $ECHO " ok"
 
 #
-# Test csspec
-# ===========
-$ECHO -n "Test csspec: "
+# Test csspec (unbinned)
+# =====================
+$ECHO -n "Test csspec (unbinned): "
 chmod +x @abs_top_srcdir@/scripts/csspec.py
 @abs_top_srcdir@/scripts/csspec.py \
   inobs="data/crab_events.fits" \
@@ -216,9 +216,9 @@ fi
 $ECHO " ok"
 
 #
-# Test csspec Run2
-# ================
-$ECHO -n "Test csspec: "
+# Test csspec (binned)
+# ====================
+$ECHO -n "Test csspec (binned): "
 chmod +x @abs_top_srcdir@/scripts/csspec.py
 @abs_top_srcdir@/scripts/csspec.py \
   inobs="data/crab_events.fits" \
@@ -250,9 +250,9 @@ fi
 $ECHO " ok"
 
 #
-# Test cslightcrv
-# ===========
-$ECHO -n "Test cslightcrv: "
+# Test cslightcrv (unbinned)
+# ==========================
+$ECHO -n "Test cslightcrv (unbinned): "
 chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
 @abs_top_srcdir@/scripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
@@ -277,9 +277,9 @@ fi
 $ECHO " ok"
 
 #
-# Test cslightcrv Run2
-# ================
-$ECHO -n "Test cslightcrv: "
+# Test cslightcrv (binned)
+# ========================
+$ECHO -n "Test cslightcrv (binned): "
 chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
 @abs_top_srcdir@/scripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
@@ -309,4 +309,3 @@ else
   exit 1
 fi
 $ECHO " ok"
-
