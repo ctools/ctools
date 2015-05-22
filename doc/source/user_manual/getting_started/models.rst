@@ -319,22 +319,6 @@ CTA cube background
   .. code-block:: xml
 
     <source name="Background" type="CTACubeBackground" instrument="CTA">
-      <spatialModel type="GaussFunction">
-        <parameter name="RA"    scale="1.0" value="83.6221" min="0.0"   max="360.0" free="0"/>
-        <parameter name="DEC"   scale="1.0" value="22.01"   min="-90.0" max="90.0"  free="0"/>
-        <parameter name="Sigma" scale="1.0" value="1.0"     min="0.0"   max="10.0"  free="0"/>
-      </spatialModel>
-      <spectrum type="...">
-        ...
-      </spectrum>
-    </source>
-
-  .. code-block:: xml
-
-    <source name="Background" type="CTACubeBackground" instrument="CTA">
-      <spatialModel type="MapCubeFunction" file="map_cube.fits">
-        <parameter name="Normalization" scale="1" value="1" min="0.001" max="1000.0" free="0"/>
-      </spatialModel>
       <spectrum type="...">
         ...
       </spectrum>
