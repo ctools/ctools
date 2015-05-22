@@ -1,8 +1,8 @@
-New Features and Important Changes in ctools 1.0.0
+New Features and Important Changes in ctools 0.9.0
 
 Author(s) : Juergen Knoedlseder
 
-20 May 2015
+22 May 2015
 
 
 1. Introduction
@@ -141,7 +141,8 @@ actually returns the differential flux for a given set of energies.
 
 20. caldb
 ---------
-None
+Official Prod2 instrument response functions for the Southern and Northern
+array have been added.
 
 
 21. models
