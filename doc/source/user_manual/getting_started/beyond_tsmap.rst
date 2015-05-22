@@ -6,7 +6,7 @@ Generating a Test Statistic map
 In the above examples we were always considering that we knew exactly
 where the source is located, but in real life situations this may not
 necessarily be the case.
-We thus need a mean to search for significant excess emission in our data.
+We thus need a means to search for significant excess emission in our data.
 One possibility to accomplish this task is to compute the Test Statistic
 for a specific source at a grid of trial positions.
 The :ref:`cttsmap` tool will exactly do that job.
@@ -32,25 +32,25 @@ nominal position of the Crab nebula with a grid spacing of 0.02 degrees.
 
   $ cttsmap
   Input event list, counts cube or observation definition file [events.fits] obs.xml
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
   Source model [$CTOOLS/share/models/crab.xml] 
   Test source [Crab] 
-  First coordinate of image center in degrees (RA or galactic l) [83.63] 
-  Second coordinate of image center in degrees (DEC or galactic b) [22.01] 
-  Projection method e.g. AIT|AZP|CAR|MER|STG|TAN (AIT|AZP|CAR|MER|STG|TAN) [CAR] 
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
   Image scale (in degrees/pixel) [0.02] 
   Size of the X axis in pixels [200] 10
   Size of the Y axis in pixels [200] 10
-  Output Test Statistic map [tsmap.fits]
+  Output Test Statistic map [tsmap.fits] 
 
 :ref:`cttsmap` writes the Test Statistic map in the ``tsmap.fits`` file
 that contains one extension for the Test Statistic value and further
 extensions for the spectral parameters that have been fitted for the
 source at each position of the grid.
 The figure below show the Test Statistic map which reaches a maximum
-value of 13782 near the centre of the map.
+value of 37484 near the centre of the map.
 
 .. figure:: tsmap-crab.png
    :height: 400px

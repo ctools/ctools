@@ -31,7 +31,7 @@ Installing gammalib
 ctools is built on top of gammalib, hence gammalib needs to be built,
 installed and configured before ctools can be installed. In case that
 ctools is already installed on your system you may skip reading this
-section and continue with Section TBD that explains how to install ctools.
+section and continue with the :ref:`sec_building_ctools` section.
 
 You will need the following to build the gammalib:
 
@@ -59,7 +59,7 @@ in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz gammalib-1.0.0.tar.gz
+  $ tar xvfz gammalib-0.10.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -69,7 +69,7 @@ typing
 
 .. code-block:: bash
 
-  $ cd gammalib-1.0.0
+  $ cd gammalib-0.10.0
   $ ./configure
   $ make
   $ make check
@@ -117,6 +117,8 @@ If you use C shell or a variant then add the following to your
   source $GAMMALIB/bin/gammalib-init.csh
 
 
+.. _sec_building_ctools:
+
 Building ctools
 ---------------
 
@@ -125,7 +127,7 @@ an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz ctools-1.0.0.tar.gz
+  $ tar xvfz ctools-0.9.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -134,7 +136,7 @@ Step in the directory and build the ctools by typing
 
 .. code-block:: bash
 
-  $ cd ctools-1.0.0
+  $ cd ctools-0.9.0
   $ ./configure
   $ make
 
@@ -171,7 +173,7 @@ following output at the end of the unit testing:
   PASS: test_python.py
   make[4]: Nothing to be done for `all'.
   ============================================================================
-  Testsuite summary for ctools 1.0.0
+  Testsuite summary for ctools 0.9.0
   ============================================================================
   # TOTAL: 3
   # PASS:  3
@@ -189,26 +191,33 @@ For older automake version, you should see
   ***************
   * Test ctools *
   ***************
-  Test ctobssim: .... ok
+  Test ctobssim: .. ok
   Test ctskymap: .. ok
   Test ctbin: .... ok
-  Test ctmodel: ...... ok
-  Test ctselect: .. ok
-  Test ctlike: ........ ok
-  Test cttsmap: .. ok
   Test ctexpcube: .... ok
   Test ctpsfcube: .... ok
   Test ctbkgcube: ...... ok
+  Test ctmodel: ...... ok
+  Test ctselect: .. ok
+  Test ctlike: ...... ok
+  Test cttsmap: .. ok
   Test ctcubemask: .. ok
   Test ctbutterfly: .. ok
+  Test ctulimit: .. ok
   PASS: test_ctools.sh
 
   *****************
   * Test cscripts *
   *****************
+  Test csobsdef: .. ok
   Test cspull: .. ok
+  Test cssens: .. ok
   Test cstsdist: .. ok
   Test csresmap: .. ok
+  Test csspec (unbinned): .. ok
+  Test csspec (binned): .. ok
+  Test cslightcrv (unbinned): .. ok
+  Test cslightcrv (binned): .. ok
   PASS: test_cscripts.sh
 
   ***********************
@@ -227,6 +236,7 @@ For older automake version, you should see
   Test ctbkgcube functionality: ... ok
   Test ctcubemask functionality: ... ok
   Test ctbutterfly functionality: ... ok
+  Test ctulimit functionality: ... ok
   Test unbinned pipeline with FITS file saving: .... ok
   Test unbinned in-memory pipeline: .... ok
   PASS: test_python.py
@@ -307,9 +317,8 @@ GammaLib unit tests fail
 
 Some users have reported failure of a large fraction of the GammaLib unit
 tests after after typing ``make check``. In all cases, this was related to
-the absence of the directory where the shared ``libcfitsio`` library 
-resides in the library load path. To solve the issue, locate the directory
-where the shared ``libcfitsio`` library resides and then type
+not finding the ``libcfitsio`` library. To solve the issue, locate the 
+directory where the shared ``libcfitsio`` library resides and then type
 
 .. code-block:: bash
 
