@@ -83,16 +83,16 @@ General parameters
     Pixel size (in degrees/pixel).
  	 	 
 ``(calc_ts = yes) [boolean]``
-    Compute TS for each spectral point.
+    Compute TS for each spectral point?
 
 ``(calc_ulim = yes) [boolean]``
-    Compute upper limit for each spectral point.
+    Compute upper limit for each spectral point?
 
 ``(fix_srcs = yes) [boolean]``
-    Fix other sky model parameters.
+    Fix other sky model parameters?
 
 ``(fix_bkg = no) [boolean]``
-    Fix background parameters.
+    Fix background model parameters?
 
 
 Standard parameters
