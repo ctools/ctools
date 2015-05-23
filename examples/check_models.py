@@ -41,8 +41,8 @@ def pipeline(model_name):
 	FITS files on disk. All data is only hold in memory.
 	"""
 	# Set script parameters
-	caldb       = "dummy"
-	irf         = "cta_dummy_irf"
+	caldb       = "prod2"
+	irf         = "South_50h"
 	ra          =   83.63
 	dec         =   22.01
 	rad_sim     =   10.0
