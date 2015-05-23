@@ -136,13 +136,14 @@ $ECHO " ok"
 $ECHO -n "Test cstsdist: "
 chmod +x @abs_top_srcdir@/scripts/cstsdist.py
 @abs_top_srcdir@/scripts/cstsdist.py \
+  inmodel="data/crab.xml" \
+  srcname="Crab" \
   outfile="ts.dat" \
   ntrials="1" \
   caldb="irf" \
   irf="cta_dummy_irf" \
-  type="point" \
-  offset="0.0" \
-  bkg="data/bkg_dummy.txt" \
+  ra=83.63 \
+  dec=22.01 \
   emin=0.1 \
   emax=100.0 \
   enumbins=0 \
@@ -159,6 +160,7 @@ else
   exit 1
 fi
 $ECHO " ok"
+
 
 #
 # Test csresmap
@@ -189,6 +191,7 @@ else
 fi
 $ECHO " ok"
 
+
 #
 # Test csspec (unbinned)
 # =====================
@@ -214,6 +217,7 @@ else
   exit 1
 fi
 $ECHO " ok"
+
 
 #
 # Test csspec (binned)
@@ -249,6 +253,7 @@ else
 fi
 $ECHO " ok"
 
+
 #
 # Test cslightcrv (unbinned)
 # ==========================
@@ -277,6 +282,7 @@ else
   exit 1
 fi
 $ECHO " ok"
+
 
 #
 # Test cslightcrv (binned)
