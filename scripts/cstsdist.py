@@ -95,27 +95,29 @@ class cstsdist(ctools.cscript):
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
-            pars.append(gammalib.GApplicationPar("outfile","f","h","ts.dat","","","Output file name"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
+            pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
+            pars.append(gammalib.GApplicationPar("outfile","f","a","ts.dat","","","Output file name"))
             pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("ra","r","h","83.63","0","360","RA of pointing (deg)"))
-            pars.append(gammalib.GApplicationPar("dec","r","h","22.01","-90","90","Dec of pointing (deg)"))
+            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
+            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
+            pars.append(gammalib.GApplicationPar("ra","r","a","83.63","0","360","RA of pointing (deg)"))
+            pars.append(gammalib.GApplicationPar("dec","r","a","22.01","-90","90","Dec of pointing (deg)"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit (TeV)"))
+            pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
             pars.append(gammalib.GApplicationPar("tmin","r","h","0.0","","","Start time (MET in s)"))
             pars.append(gammalib.GApplicationPar("tmax","r","a","1800.0","","","Observation duration (in s)"))
-            pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
-            pars.append(gammalib.GApplicationPar("npix","i","h","200","","","Number of pixels for binned"))
-            pars.append(gammalib.GApplicationPar("binsz","r","h","0.05","","","Pixel size for binned (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("npix","i","a","200","","","Number of pixels for binned"))
+            pars.append(gammalib.GApplicationPar("binsz","r","a","0.05","","","Pixel size for binned (deg/pixel)"))
             pars.append(gammalib.GApplicationPar("rad","r","h","5.0","","","Radius of ROI (deg)"))         
-            pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
-            pars.append(gammalib.GApplicationPar("type","s","a","point","","","Source model type (point/gauss/shell/disk)"))
-            pars.append(gammalib.GApplicationPar("index","r","h","-2.48","","","Spectral index"))       
-            pars.append(gammalib.GApplicationPar("offset","r","a","0.0","","","Source offset angle (deg)"))
-            pars.append(gammalib.GApplicationPar("bkg","s","a","$CTOOLS/share/models/bkg_dummy.txt","","","Background model file function"))
+            pars.append(gammalib.GApplicationPar("pattern","s","h","single","","","Observation pattern (single/four)"))
+            pars.append(gammalib.GApplicationPar("offset","r","h","1.5","","","Observation pattern offset (deg)"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","cstsdist.log","","","Log filename"))
             pars.save(parfile)
@@ -131,6 +133,15 @@ class cstsdist(ctools.cscript):
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
             self.obs = self.get_observations()
+
+            # Check for requested pattern and use above
+            # observation parameters to set wobble pattern
+            self.m_pattern = self["pattern"].string()
+            if self.m_pattern == "four":
+                self.obs = self.set_obs()
+
+        # Get source name
+        self.m_srcname = self["srcname"].string()
             
         # Get number of energy bins
         self.m_enumbins = self["enumbins"].integer()
@@ -143,36 +154,21 @@ class cstsdist(ctools.cscript):
             # Set dummy values (required by obsutils)
             self.m_npix = 0
             self.m_binsz = 0.0
+
+        # Set models if we have none
+        if self.obs.models().size() == 0:
+            self.obs.models(self["inmodel"].filename())
           
         # Get other parameters
-        self.m_outfile  = self["outfile"].filename()
-        self.m_ntrials  = self["ntrials"].integer()
-        self.m_type     = self["type"].string()
-        self.m_index    = self["index"].real()
-        self.m_offset   = self["offset"].real()
-        self.m_bkg      = self["bkg"].string()
+        self.m_outfile = self["outfile"].filename()
+        self.m_ntrials = self["ntrials"].integer()
+        self.m_edisp   = self["edisp"].boolean()
+        self.m_offset  = self["offset"].real()
 
         # Set some fixed parameters
-        self.m_log   = False # Logging in client tools
-        self.m_debug = False # Debugging in client tools
-          
-        pnt = gammalib.GSkyDir()
-        pnt.radec_deg(self["ra"].real(),self["dec"].real())  
-          
-        # Initialise models. Note that we centre the point source at the
-        # center of our observation, so we're onaxis.
-        self.bkg_model  = gammalib.GModels()
-        self.full_model = gammalib.GModels()
-        self.bkg_model.append(self.set_bkg_model())
-        self.full_model.append(self.set_bkg_model())
-        self.full_model.append(self.set_src_model(pnt.l_deg(), pnt.b_deg()+self.m_offset, \
-                                                  flux=0.010, \
-                                                  type=self.m_type, \
-                                                  index=self.m_index))
+        self.m_log   = False                    # Logging in client tools
+        self.m_debug = self["debug"].boolean()  # Debugging in client tools
 
-        # Attach background model to observation container
-        self.obs.models(self.bkg_model)
-        
         # Return
         return
     
@@ -211,6 +207,20 @@ class cstsdist(ctools.cscript):
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
+
+        # Initialise models
+        full_model, bkg_model = self.set_models()
+
+        # Write models into logger
+        if self.logTerse():
+            self.log("\n")
+            self.log.header1("Models")
+            self.log.header2("Background model")
+            self.log(str(bkg_model))
+            self.log("\n\n")
+            self.log.header2("Full model")
+            self.log(str(full_model))
+            self.log("\n")
         
         # Write observation into logger
         if self.logTerse():
@@ -235,7 +245,7 @@ class cstsdist(ctools.cscript):
         for seed in range(self.m_ntrials):
         
             # Make a trial
-            result = self.trial(seed)
+            result = self.trial(seed, full_model, bkg_model)
             
             # Write out result immediately
             if seed == 0:
@@ -251,97 +261,89 @@ class cstsdist(ctools.cscript):
         # Return
         return
   
-    def set_bkg_model(self, fitsigma=False):
+    def set_models(self, fitpos=False, fitspec=False):
         """
-        Setup CTA background model.
+        Set full and background model.
         """
-        # Define radial component
-        radial = gammalib.GCTAModelRadialGauss(3.0)
-        if fitsigma:
-            radial["Sigma"].free()
+        # Retrieve full model from observation container
+        full_model = self.obs.models().copy()
+
+        # Get source model
+        model = full_model[self.m_srcname]
+        
+        # Check that model has a Prefactor
+        if not model.has_par("Prefactor"):
+            msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
+                  " Only spectral models with a \"Prefactor\" parameter are supported."
+            raise gammalib.GException.invalid_value("cssens", msg)
+
+        # Fit or fix spatial parameters
+        if fitpos:
+            if model.has_par("RA"):
+                model["RA"].free()
+            if model.has_par("DEC"):
+                model["DEC"].free()
+            if model.has_par("Sigma"):
+                model["Sigma"].free()
+            if model.has_par("Radius"):
+                model["Radius"].free()
+            if model.has_par("Width"):
+                model["Width"].free()
         else:
-            radial["Sigma"].fix()
-        
-        # Define spectral component
-        spectrum = gammalib.GModelSpectralFunc(self.m_bkg, 1.0)
-        
+            if model.has_par("RA"):
+                model["RA"].fix()
+            if model.has_par("DEC"):
+                model["DEC"].fix()
+            if model.has_par("Sigma"):
+                model["Sigma"].fix()
+            if model.has_par("Radius"):
+                model["Radius"].fix()
+            if model.has_par("Width"):
+                model["Width"].fix()
+
+        # Fit or fix spectral parameters
+        if fitspec:
+            if model.has_par("Index"):
+                model["Index"].free()
+            if model.has_par("Cutoff"):
+                model["Cutoff"].free()
+        else:
+            if model.has_par("Index"):
+                model["Index"].fix()
+            if model.has_par("Cutoff"):
+                model["Cutoff"].fix()
+
         # Create background model
-        model = gammalib.GCTAModelRadialAcceptance(radial, spectrum)
-        model.name("Background")
-        model.instruments("CTA")
-    
-        # Return background model
-        return model
-    
-    def set_src_model(self, l, b, flux=1.0, index=-2.48, \
-                      type="point", sigma=1.0, radius=1.0, width=0.1, \
-                      fitpos=False, fitidx=False):
+        bkg_model = full_model.copy()
+        bkg_model.remove(self.m_srcname)
+
+        # Return models
+        return full_model, bkg_model
+
+    def set_obs(self):
         """
-        Returns a single source with Crab-like spectrum. The source flux
-        can be scaled in Crab units. The Crab spectrum is based on MAGIC
-        observations (Albert et al. 2008, ApJ, 674, 1037).
-
-        Parameters:
-         l      - Galactic longitude of source location [deg]
-         b      - Galactic latitude of source location [deg]
-        Keywords:
-         flux   - Source flux [Crabs]
-         index  - Spectral index
-         type   - Source type ("point", "gauss", "disk", "shell")
-         sigma  - Gaussian sigma (for type="gauss")
-         radius - Disk or shell inner radius [deg] (for type="disk" and type="shell")
-         width  - Shell width [deg] (for type="shell")
-         fitpos - Fit position? (default: True)
-         fitidx - Fit index? (default: True)
-        """
-        # Set source location
-        location = gammalib.GSkyDir()
-        location.lb_deg(l, b)
-    
-        # Set source spectrum
-        spectrum = gammalib.GModelSpectralPlaw(flux*5.7e-16, index, gammalib.GEnergy(0.3, "TeV"))
-        if fitidx:
-            spectrum["Index"].free()
-        else:
-            spectrum["Index"].fix() 
-
-        # Set source
-        if type == "point":
-            spatial = gammalib.GModelSpatialPointSource(location)
-            if fitpos:
-                spatial[0].free()
-                spatial[1].free()
-        elif type == "gauss":
-            spatial = gammalib.GModelSpatialRadialGauss(location, sigma)
-            if fitpos:
-                spatial[0].free()
-                spatial[1].free()
-        elif type == "disk":
-            spatial = gammalib.GModelSpatialRadialDisk(location, radius)
-            if fitpos:
-                spatial[0].free()
-                spatial[1].free()
-        elif type == "shell":
-            spatial = gammalib.GModelSpatialRadialShell(location, radius, width)
-            if fitpos:
-                spatial[0].free()
-                spatial[1].free()
-        else:
-            self.log("ERROR: Unknown source type '"+type+"'.\n")
-            return None
-        source = gammalib.GModelSky(spatial, spectrum)
-
-        # Set source name
-        source.name("Test")
+        Returns an observation container with a set of CTA observations.
         
-        # Turn TS value computation off
-        # since we compute it by hand later on
-        source.tscalc(False)
+        Keywords:
+        """
+        
+        # Setup observation definition list
+        obsdeflist = obsutils.set_obs_patterns(self.m_pattern, \
+                                               ra=self["ra"].real(), dec=self["dec"].real(), \
+                                               offset=self["offset"].real())
+        
+        # Create list of observations
+        obs = obsutils.set_obs_list(obsdeflist, \
+                                    tstart=self["tmin"].real(), duration=self["tmax"].real()-self["tmin"].real(), \
+                                    deadc=self["deadc"].real(), \
+                                    emin=self["emin"].real(), emax=self["emax"].real(), \
+                                    rad=self["rad"].real(), \
+                                    irf=self["irf"].string(), caldb=self["caldb"].string())
     
-        # Return source
-        return source
-    
-    def trial(self, seed):
+        # Return observation container
+        return obs
+
+    def trial(self, seed, full_model, bkg_model):
         """
         Create the TS for a single trial.
         
@@ -373,9 +375,9 @@ class cstsdist(ctools.cscript):
             self.log("\n")
         
         # Fit background only
-        sim.models(self.bkg_model)
+        sim.models(bkg_model)
         like_bgm   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
-        result_bgm = like_bgm.obs().models()
+        result_bgm = like_bgm.obs().models().copy()
         LogL_bgm   = like_bgm.opt().value()
         npred_bgm  = like_bgm.obs().npred()
 
@@ -396,9 +398,9 @@ class cstsdist(ctools.cscript):
                     self.log(str(par)+"\n")
 
         # Fit background and test source
-        sim.models(self.full_model)
+        sim.models(full_model)
         like_all   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
-        result_all = like_all.obs().models()
+        result_all = like_all.obs().models().copy()
         LogL_all   = like_all.opt().value()
         npred_all  = like_all.obs().npred()
         ts         = 2.0*(LogL_bgm-LogL_all)
@@ -428,9 +430,9 @@ class cstsdist(ctools.cscript):
             self.log("TS=")
             self.log(ts)
             self.log("  Prefactor=")
-            self.log(result_all["Test"]["Prefactor"].value())
+            self.log(result_all[self.m_srcname]["Prefactor"].value())
             self.log("+/-")
-            self.log(result_all["Test"]["Prefactor"].error())
+            self.log(result_all[self.m_srcname]["Prefactor"].error())
             self.log("\n")
         
         # Initialise results

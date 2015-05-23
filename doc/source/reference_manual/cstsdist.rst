@@ -16,30 +16,49 @@ Monte-Carlo simulations.
 General parameters
 ------------------
 
-``(outfile = ts.dat) [file]``
+``(inobs = NONE) [file]``
+    Input event list, counts cube or observation definition XML file.
+
+``inmodel [file]``
+    Input source model XML file.
+
+``srcname [string]``
+    Name of the source in the source model XML file which should be used
+    for sensitivity computation.
+
+``outfile [file]``
     ASCII file containing the TS distribution values.
- 	 	 
-``ntrials [integer]``
-    Number of Monte Carlo samples.
- 	 	 
+
+``expcube [file]``
+    Exposure cube file (only needed for stacked analysis).
+
+``psfcube [file]``
+    PSF cube file (only needed for stacked analysis).
+
+``bkgcube [file]``
+    Background cube file (only needed for stacked analysis).
+
 ``caldb [string]``
     Calibration database.
  	 	 
 ``irf [string]``
     Instrumental response function.
  	 	 
-``type <point|gauss|shell|disk> [string]``
-    Source model type.
+``(deadc = 0.95) [real]``
+    Average deadtime correction factor.
+
+``(edisp = no) [boolean]``
+    Apply energy dispersion to response computation.
+
+``ntrials [integer]``
+    Number of Monte Carlo samples.
+
+``ra [real]``
+    Right Ascension of CTA pointing (J2000, in degrees).
  	 	 
-``(index = -2.48) [real]``
-    Spectral index for source model.
- 	 	 
-``offset [real]``
-    Source offset angle (in degrees).
- 	 	 
-``bkg [string]``
-    Background model file function (none=power law for subarray E).
- 	 	 
+``dec [real]``
+    Declination of CTA pointing (J2000, in degrees).
+
 ``emin [real]``
     Lower energy limit (in TeV).
  	 	 
@@ -49,17 +68,26 @@ General parameters
 ``enumbins [integer]``
     Number of energy bins (0=unbinned).
  	 	 
-``duration [real]``
-    Effective exposure time (in seconds).
+``(tmin = 0.0) [real]``
+    Start time (in seconds).
  	 	 
-``(rad = 5.0) [real]``
-    Radius of ROI (in degrees).
+``tmax [real]``
+    Stop time (in seconds).
  	 	 
-``(npix = 200) [integer]``
+``npix [integer]``
     Number of pixels for binned analysis.
  	 	 
-``(binsz = 0.05) [real]``
+``binsz [real]``
     Pixel size for binned analysis.
+
+``(rad = 5.0) [real]``
+    Radius of ROI (in degrees).
+
+``(pattern = single) [string]``
+    Pattern for pointing simulation (single/four).
+
+``(offset = 1.5) [real]``
+    Observation pattern offset (in degrees).
 
 
 Standard parameters
@@ -85,6 +113,9 @@ Standard parameters
  	 	 
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
+
+``(logfile = cstsdist.log) [string]``
+    Log filename.
 
 
 Related tools
