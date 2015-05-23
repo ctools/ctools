@@ -480,7 +480,7 @@ class cslightcrv(ctools.cscript):
                 obs = bin.obs()
                 
                 # Set precomputed binned response
-                obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.cube())
+                obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
                 # Get new models
                 models = bkgcube.models()
