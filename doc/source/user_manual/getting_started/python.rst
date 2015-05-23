@@ -20,7 +20,7 @@ generally not very useful.
 
 .. warning::
 
-   The GammaLib module needs to be imported before the ctools 
+   The GammaLib module needs to be imported **before** the ctools 
    module so that GammaLib class types are handled correctly.
    So make sure that you **always import the GammaLib module before the ctools
    module.**
@@ -114,11 +114,12 @@ To see what kind of object you actually got, use:
    >>> type(sim.obs()[0].events())
    <class 'gammalib.cta.GCTAEventList'>
 
-The CTA event list is implement as the ``GCTAEventList`` class in the 
+The CTA event list is implement by the ``GCTAEventList`` class in the 
 ``cta`` module of GammaLib.
 To visualise the individual events you can iterate over the events using a 
 for loop.
-This will show the simulated celestial coordinates (RA, DEC), energies and 
+This will show the simulated celestial coordinates (RA, DEC), the 
+coordinate in the camera system [DETX, DETY], energies and 
 terrestrial times (TT) of all events. 
 
 .. code-block:: python
@@ -178,11 +179,11 @@ Where are the user parameters?
 :ref:`ctlike` doesn't in fact need any as all the relevant information is 
 already contained in the observation container produced by the 
 :ref:`ctobssim` class.
-And you make have recognised that we constructed the :ref:`ctlike` 
+And you may have recognised that we constructed the :ref:`ctlike` 
 instance by using the :ref:`ctobssim` observation container as
 constructor argument.
 
-To check how the fit went you may inspect the optimiser class used by
+To check how the fit went you can inspect the optimiser used by
 :ref:`ctlike`:
 
 .. code-block:: python
@@ -198,8 +199,10 @@ To check how the fit went you may inspect the optimiser class used by
     Number of iterations ......: 2
     Lambda ....................: 1e-05
 
-Apparently, the fit converged after fitting 4 parameters in 3 iterations.
-To inspect the fit results you may print the model container that is a 
+Apparently, the fit converged after 2 iterations.
+Out of 10 parameters in the model 4 have been fitted (the others were kept
+fixed).
+To inspect the fit results you can print the model container that is a 
 member of the observation container:
 
 .. code-block:: python
@@ -298,7 +301,7 @@ the ``fix()`` method.
    is okay as the ``ctools.ctlike(sim.obs())`` constructor will create
    a copy of the observation container that lives within the :ref:`ctlike`
    instance.
-   To preserve an observation container after a ctools object went out 
+   To preserve an observation container after a ctools object goes out 
    of scope you have to create a local copy of the container using the
    ``copy()`` method:
 
@@ -327,8 +330,8 @@ Here an example of how to use ``obsutils``:
    >>> import ctools
    >>> from ctools import obsutils
    >>> pattern = obsutils.set_obs_patterns("four", ra=83.63, dec=22.01, offset=1.0)
-   >>> obs = obsutils.set_obs_list(pattern, duration=1800, emin=0.1, emax=100.0, rad=5.0, caldb="dummy", irf="cta_dummy_irf")
-   >>> print(like.obs())   
+   >>> obs = obsutils.set_obs_list(pattern, duration=1800, emin=0.1, emax=100.0, rad=5.0, caldb="prod2", irf="South_50h")
+   >>> print(obs)   
    === GObservations ===
     Number of observations ....: 4
     Number of predicted events : 0
@@ -339,7 +342,7 @@ Here an example of how to use ``obsutils``:
    >>> print(like.obs().models())   
    === GModels ===
     Number of models ..........: 2
-    Number of parameters ......: 9
+    Number of parameters ......: 10
    ...
 
 The module is imported using the ``from ctools import obsutils`` directive.
