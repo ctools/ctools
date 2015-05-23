@@ -61,8 +61,8 @@ def create_pull(loge, emin, emax, models, ntrials=100, duration=180000.0, \
 	pull.models(models)
 	pull["outfile"]  = outfile
 	pull["ntrials"]  = ntrials
-	pull["caldb"]    = "${CALDB}/data/cta/dummy/bcf"
-	pull["irf"]      = "cta_dummy_irf"
+	pull["caldb"]    = "prod2"
+	pull["irf"]      = "South_50h"
 	pull["ra"]       = 83.6331
 	pull["dec"]      = 22.0145
 	pull["emin"]     = emin

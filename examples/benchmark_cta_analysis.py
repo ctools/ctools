@@ -39,8 +39,8 @@ def unbinned_pipeline(duration):
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =   10.0
@@ -103,8 +103,8 @@ def binned_pipeline(duration):
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =   10.0
@@ -176,8 +176,8 @@ def cube_pipeline(duration):
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =   10.0

@@ -36,8 +36,8 @@ def make_spectrum():
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =    3.0

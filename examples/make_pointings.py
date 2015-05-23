@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script generated pointing patterns for CTA observations.
+# This script generates pointing patterns for CTA observations.
 #
 # Usage:
 #   ./make_pointings.py
@@ -124,19 +124,18 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5, \
                 obs_site = site
 
             # Set site IRF
+            caldb = "prod2"
             if obs_site == "North":
-                caldb = "tenerife"
                 if lst:
-                    irf = "DESY20140105_50h"
+                    irf = "North_50h"
                 else:
-                    irf = "DESY20140105_50h_noLST"
+                    irf = "North_50h"
                 exposure_north += duration
             else:
-                caldb = "aar"
                 if lst:
-                    irf = "DESY20140105_50h"
+                    irf = "South_50h"
                 else:
-                    irf = "DESY20140105_50h_noLST"
+                    irf = "South_50h"
                 exposure_south += duration
 
             # Set IRF information
@@ -291,7 +290,6 @@ if __name__ == '__main__':
     need_help = False
     
     # Test for command line arguments
-    #print(sys.argv[0])
     if (len(sys.argv) > 1):
         if sys.argv[1] == "-h":
             need_help = True
