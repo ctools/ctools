@@ -11,9 +11,10 @@ check_models.py
 
 make_pointings.py
   This script creates pointings for CTA surveys. For the moment the
-  Galactic Plane Survey (gps), the Extragalactic Survey (extgal)
-  and the Galactic Centre Survey (gc) are implemented. The script
-  outputs and ASCII file that can be used by csobsdef.
+  Galactic Plane Survey (gps), the Extragalactic Survey (extgal),
+  the Galactic Centre Survey (gc) and the LMC survey (lmc) are
+  implemented. The script outputs and ASCII file that can be used by
+  csobsdef.
 
 make_pull_at_sensitivity_limit.py
   This script creates pull distributions as function of energy
