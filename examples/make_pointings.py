@@ -275,11 +275,11 @@ def set_lmc(hours=250.0, lst=True):
         obs = {'lon': lon, 'lat': lat, 'duration': duration}
 
         # Add IRF
-        caldb = "aar"
+        caldb = "prod2"
         if lst:
-            irf = "DESY20140105_50h"
+            irf = "South_50h"
         else:
-            irf = "DESY20140105_50h_noLST"
+            irf = "South_50h"
         obs['caldb'] = caldb
         obs['irf']   = irf
 
