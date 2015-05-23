@@ -584,9 +584,9 @@ def spectrum(obs, source, ebounds):
 
         # Clone observations and reset energy thresholds
         select = ctools.ctselect(obs)
-        select["ra"].real(-1.0)
-        select["dec"].real(-1.0)
-        select["rad"].real(-1.0)
+        select["ra"].value("UNDEF")
+        select["dec"].value("UNDEF")
+        select["rad"].value("UNDEF")
         select["tmin"].real(0.0)
         select["tmax"].real(0.0)
         select["emin"].real(ebounds.emin(i).TeV())
