@@ -257,14 +257,16 @@ chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
 @abs_top_srcdir@/scripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
+  srcname="Crab" \
   caldb="irf" \
   irf="cta_dummy_irf" \
-  tbins=3 \
+  tbinalg="LIN" \
   tmin=51544.5 \
   tmax=51544.53 \
-  srcname="Crab" \
-  tbinalg="LIN" \
-  binned=no \
+  tbins=3 \
+  enumbins=0 \
+  emin=0.1 \
+  emax=100.0 \
   outfile="lightcurve.fits" > cslightcrv.log
 $ECHO -n "."
 if [ -s "lightcurve.fits" ]
@@ -284,21 +286,20 @@ chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
 @abs_top_srcdir@/scripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
+  srcname="Crab" \
   caldb="irf" \
   irf="cta_dummy_irf" \
   tbinalg="GTI" \
-  srcname="Crab" \
+  enumbins=2 \
   emin=0.1 \
   emax=100.0 \
-  binned=yes \
+  coordsys="CEL" \
+  proj="CAR" \
+  xref=83.63 \
+  yref=22.01 \
   nxpix=10 \
   nypix=10 \
   binsz=0.1 \
-  nebins=2 \
-  coordsys="CEL" \
-  xref=83.63 \
-  yref=22.01 \
-  proj="CAR" \
   outfile="lightcurve.fits" > cslightcrv.log
 $ECHO -n "."
 if [ -s "lightcurve.fits" ]
