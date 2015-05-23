@@ -88,7 +88,7 @@ def plot_spectrum(spectrum):
                spectrum['flux']['value'], 'ro', label='Crab')
     plt.errorbar(spectrum['energy']['value'], \
                  spectrum['flux']['value'], \
-                 spectrum['flux']['ed_value'], fmt=None, ecolor='r')
+                 spectrum['flux']['ed_value'], ecolor='r')
 
     # Put labels
     plt.xlabel("Energy ("+spectrum['energy']['unit']+")")
