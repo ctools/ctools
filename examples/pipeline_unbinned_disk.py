@@ -36,7 +36,7 @@ from ctools import obsutils
 def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
                        emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
                        deadc=0.95, \
-                       caldb="dummy", irf="cta_dummy_irf"):
+                       caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
     
@@ -96,7 +96,7 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0, \
                  emin=0.1, emax=100.0, \
                  tmin=0.0, tmax=0.0, \
                  model="${CTOOLS}/share/models/crab.xml", \
-                 caldb="dummy", irf="cta_dummy_irf", \
+                 caldb="prod2", irf="South_50h", \
                  debug=False):
     """
     Simulation and unbinned analysis pipeline.

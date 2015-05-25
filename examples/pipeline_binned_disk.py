@@ -36,7 +36,7 @@ from ctools import obsutils
 def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
                        emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
                        deadc=0.95, \
-                       caldb="dummy", irf="cta_dummy_irf"):
+                       caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
     
@@ -96,7 +96,7 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
                  enumbins=20, nxpix=200, nypix=200, binsz=0.02, \
                  coordsys="CEL", proj="CAR", \
                  model="${CTOOLS}/share/models/crab.xml", \
-                 caldb="dummy", irf="cta_dummy_irf", \
+                 caldb="prod2", irf="South_50h", \
                  debug=False):
     """
     Simulation and binned analysis pipeline.
@@ -165,6 +165,7 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
     like["outmodel"].filename("fit_results.xml")
     like["expcube"].filename("NONE")
     like["psfcube"].filename("NONE")
+    like["bkgcube"].filename("NONE")
     like["caldb"].string(caldb)
     like["irf"].string(irf)
     like["debug"].boolean(True) # Switch this always on for results in console

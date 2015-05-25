@@ -41,6 +41,9 @@ General parameters
 ``irf [string]``
     Instrumental response function.
 
+``(deadc = 0.95) [real]``
+    Average deadtime correction factor.
+
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation.
 
@@ -62,12 +65,18 @@ General parameters
 ``enumbins [integer]``
     Number of energy bins (0=unbinned).
  	 	 
-``duration [real]``
-    Duration of observation (in seconds).
+``(tmin = 0.0) [real]``
+    Start time (in seconds).
  	 	 
-``(deadc = 0.95) [real]``
-    Average deadtime correction factor.
+``tmax [real]``
+    Stop time (in seconds).
  	 	 
+``npix [integer]``
+    Number of pixels for binned analysis.
+ 	 	 
+``binsz [real]``
+    Pixel size for binned analysis.
+
 ``(rad = 5.0) [real]``
     ROI radius (in degrees).
 
@@ -77,12 +86,6 @@ General parameters
 ``(offset = 1.5) [real]``
     Observation pattern offset (in degrees).
  	 	 
-``(npix = 200) [integer]``
-    Number of pixels for binned analysis.
- 	 	 
-``(binsz = 0.05) [real]``
-    Pixel size for binned analysis.
-
 
 Standard parameters
 -------------------
@@ -107,6 +110,9 @@ Standard parameters
  	 	 
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
+
+``(logfile = cspull.log) [string]``
+    Log filename.
 
 
 Related tools

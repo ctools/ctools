@@ -56,23 +56,21 @@ event list.
         <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
       </spatialModel>
     </source>
-    <source name="Background_00001" type="RadialAcceptance" instrument="CTA" id="00001">
-      <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
-        <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="1.0" free="1"/>
+    <source name="Background_00001" type="CTAIrfBackground" instrument="CTA" id="00001">
+      <spectrum type="PowerLaw">
+        <parameter name="Prefactor" scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="1"/>
+        <parameter name="Index"     scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>
+        <parameter name="Scale"     scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
       </spectrum>
-      <radialModel type="Gaussian">
-         <parameter name="Sigma" scale="1.0" value="3.0" min="0.01" max="10.0" free="1"/>
-      </radialModel>
     </source>
-    <source name="Background_00002" type="RadialAcceptance" instrument="CTA" id="00002">
-      <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
-        <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="10.0" free="1"/>
+    <source name="Background_00002" type="CTAIrfBackground" instrument="CTA" id="00002">
+      <spectrum type="PowerLaw">
+        <parameter name="Prefactor" scale="1.0"  value="10.0"  min="1e-3" max="1e+3"   free="1"/>
+        <parameter name="Index"     scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>
+        <parameter name="Scale"     scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
       </spectrum>
-      <radialModel type="Gaussian">
-         <parameter name="Sigma" scale="1.0" value="3.0" min="0.01" max="10.0" free="1"/>
-      </radialModel>
     </source>
-    </source_library>
+  </source_library>
 
 Note that both background model components distinguish in their event rate;
 component ``Background_00002`` has a ten times larger background rate than
@@ -112,21 +110,19 @@ This is illustrated in the model definition file below where component
         <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
       </spatialModel>
     </source>
-    <source name="Background_00001" type="RadialAcceptance" instrument="CTA" id="00001,00003,00004">
-      <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
-        <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="1.0" free="1"/>
+    <source name="Background_00001" type="CTAIrfBackground" instrument="CTA" id="00001,00003,00004">
+      <spectrum type="PowerLaw">
+        <parameter name="Prefactor" scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="1"/>
+        <parameter name="Index"     scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>
+        <parameter name="Scale"     scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
       </spectrum>
-      <radialModel type="Gaussian">
-         <parameter name="Sigma" scale="1.0" value="3.0" min="0.01" max="10.0" free="1"/>
-      </radialModel>
     </source>
-    <source name="Background_00002" type="RadialAcceptance" instrument="CTA" id="00002">
-      <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
-        <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="10.0" free="1"/>
+    <source name="Background_00002" type="CTAIrfBackground" instrument="CTA" id="00002">
+      <spectrum type="PowerLaw">
+        <parameter name="Prefactor" scale="1.0"  value="10.0"  min="1e-3" max="1e+3"   free="1"/>
+        <parameter name="Index"     scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>
+        <parameter name="Scale"     scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
       </spectrum>
-      <radialModel type="Gaussian">
-         <parameter name="Sigma" scale="1.0" value="3.0" min="0.01" max="10.0" free="1"/>
-      </radialModel>
     </source>
   </source_library>
 

@@ -106,8 +106,8 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit for spectral points(TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","h","100.0","","","Upper energy limit for spectral points(TeV)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","20","","","Number of spectral points"))
@@ -424,7 +424,7 @@ class csspec(ctools.cscript):
                 obs = bin.obs()
                 
                 # Set precomputed binned response
-                obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.cube())
+                obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
                 # Get new models
                 models = bkgcube.models()

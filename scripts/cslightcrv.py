@@ -105,15 +105,17 @@ class cslightcrv(ctools.cscript):
             pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("tmin","r","a","51544.5","","days","Lightcurve Time start [MJD]"))
-            pars.append(gammalib.GApplicationPar("tmax","r","a","51544.6","","days","Lightcurve Time stop [MJD]"))
-            pars.append(gammalib.GApplicationPar("tbins","i","a","5","","","Number of time bins points"))
-            pars.append(gammalib.GApplicationPar("tbinalg","s", "a","GTI","FILE|LIN|GTI","", "Algorithm for defining energy bins"))
-            pars.append(gammalib.GApplicationPar("tbinfile","s", "a","tbins.fits","","", "File defining the time binning"))
-            pars.append(gammalib.GApplicationPar("binned","b","a","no","yes|no","","Use binned analysis in each energy bin"))
-            pars.append(gammalib.GApplicationPar("nebins","i","h","20","","","Number of energy bins per light curve point"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("tbinalg","s","h","GTI","FILE|LIN|GTI","", "Algorithm for defining time bins"))
+            pars.append(gammalib.GApplicationPar("tmin","r","a","51544.5","","days","Lightcurve start time [MJD]"))
+            pars.append(gammalib.GApplicationPar("tmax","r","a","51544.6","","days","Lightcurve stop time [MJD]"))
+            pars.append(gammalib.GApplicationPar("tbins","i","a","5","","","Number of time bins"))
+            pars.append(gammalib.GApplicationPar("tbinfile","f","a","tbins.fits","","", "File defining the time binning"))
+            #pars.append(gammalib.GApplicationPar("binned","b","a","no","yes|no","","Use binned analysis in each time bin"))
+            pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins per light curve bin (0=unbinned)"))
+            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit of events (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit of events (TeV)"))
             pars.append(gammalib.GApplicationPar("coordsys","s","a","CEL","CEL|GAL","","Coordinate System"))
             pars.append(gammalib.GApplicationPar("proj","s","a","CAR","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method"))
             pars.append(gammalib.GApplicationPar("xref","r","a","83.63","0","360","First coordinate of image center in degrees (RA or galactic l)"))
@@ -121,12 +123,10 @@ class cslightcrv(ctools.cscript):
             pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
             pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
             pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit for binned analysis (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit for binned analysis (TeV)"))
-            pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value in each bin"))
-            pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit in each bin"))
-            pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other skymodel parameters"))
-            pars.append(gammalib.GApplicationPar("fix_bkg","b","h","no","yes|no","","Fix background parameters"))
+            pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value for each bin?"))
+            pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit for each bin?"))
+            pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other sky model parameters?"))
+            pars.append(gammalib.GApplicationPar("fix_bkg","b","h","no","yes|no","","Fix background model parameters?"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","cslightcrv.log","","","Log filename"))
             pars.save(parfile)
@@ -190,22 +190,33 @@ class cslightcrv(ctools.cscript):
         # Get source name   
         self.m_srcname = self["srcname"].string()
         
-        # Get ebounds             
+        # Get time boundaries             
         self.create_tbounds()
 
+        # Unbinned or binned analysis?
+        self.m_ebins    = self["enumbins"].integer()
+        if self.m_ebins == 0:
+            self.m_binned = False
+        else:
+            self.m_binned = True
+
+        # Get energy range
+        self.m_emin = self["emin"].real()
+        self.m_emax = self["emax"].real()
+
         # Get binning flag
-        self.m_binned = self["binned"].boolean()
+        #self.m_binned = self["binned"].boolean()
         if self.m_binned:
+            self.m_coordsys = self["coordsys"].string()
+            self.m_proj     = self["proj"].string()
             self.m_xref     = self["xref"].real()
             self.m_yref     = self["yref"].real()
             self.m_nxpix    = self["nxpix"].integer()
             self.m_nypix    = self["nypix"].integer()
             self.m_binsz    = self["binsz"].real()
-            self.m_coordsys = self["coordsys"].string()
-            self.m_proj     = self["proj"].string()
-            self.m_ebins    = self["nebins"].integer()
-            self.m_emin     = self["emin"].real()
-            self.m_emax     = self["emax"].real()
+            #self.m_ebins    = self["enumbins"].integer()
+            #self.m_emin     = self["emin"].real()
+            #self.m_emax     = self["emax"].real()
 
         # Read other parameters
         self.m_outfile = self["outfile"].filename()
@@ -367,8 +378,8 @@ class cslightcrv(ctools.cscript):
                      
             # Select events
             select = ctools.ctselect(self.obs)
-            select["emin"].value("UNDEFINED")    
-            select["emax"].value("UNDEFINED") 
+            select["emin"].real(self.m_emin)    
+            select["emax"].real(self.m_emax) 
             select["tmin"].real(tmin.convert(select.time_reference()))
             select["tmax"].real(tmax.convert(select.time_reference()))
             select["rad"].value("UNDEFINED")
@@ -469,7 +480,7 @@ class cslightcrv(ctools.cscript):
                 obs = bin.obs()
                 
                 # Set precomputed binned response
-                obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.cube())
+                obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
                 # Get new models
                 models = bkgcube.models()

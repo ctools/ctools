@@ -288,7 +288,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 # ===================================== #
 def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
-        irf="cta_dummy_irf", caldb="dummy"):
+        irf="South_50h", caldb="prod2"):
     """
     Obsolete function, use set_obs instead.
     """
@@ -309,7 +309,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf="cta_dummy_irf", caldb="dummy", id="000000", instrument="CTA"):
+            irf="South_50h", caldb="prod2", id="000000", instrument="CTA"):
     """
     Returns a single CTA observation containing an empty CTA event list.
     By looping over this function you can add CTA observations to the
@@ -384,7 +384,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ============================ #
 def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
-        irf="cta_dummy_irf", caldb="dummy"):
+        irf="South_50h", caldb="prod2"):
     """
     Returns an observation container filled with a list of CTA observations.
     The list is defined by the obsdeflist parameter which is a dictionnary
@@ -584,9 +584,9 @@ def spectrum(obs, source, ebounds):
 
         # Clone observations and reset energy thresholds
         select = ctools.ctselect(obs)
-        select["ra"].real(-1.0)
-        select["dec"].real(-1.0)
-        select["rad"].real(-1.0)
+        select["ra"].value("UNDEF")
+        select["dec"].value("UNDEF")
+        select["rad"].value("UNDEF")
         select["tmin"].real(0.0)
         select["tmax"].real(0.0)
         select["emin"].real(ebounds.emin(i).TeV())

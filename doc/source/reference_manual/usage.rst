@@ -26,7 +26,7 @@ Examples
 ``infile [file]``
     Describes an automatic (queried) file-type parameter with no default value.
  	 	 
-``irf = kb_E_50h_v3 <kb_E_50h_v3|kb_H_50h_v3> [string]``
+``irf = South_50h <North_50h|South_50h> [string]``
     Describes an automatic (queried) string-type parameter with two value
     options.
  	 	 
@@ -39,4 +39,4 @@ Examples
   To set hidden parameters at runtime, specify them explicitly at 
   the command line; for example:
 
-  ``gtobssim start_time=900``
+  ``ctobssim start_time=900``

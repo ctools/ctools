@@ -965,7 +965,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  *
  * @param[in] model Sky model.
  * @param[in] emin Minimum energy.
- * @param[in] emin Maximum energy.
+ * @param[in] emax Maximum energy.
  * @param[in] centre Centre of region for photon rate determination.
  * @param[in] radius Radius of region for photon rate determination.
  * @return Model flux (photons/cm2/sec).
