@@ -78,8 +78,8 @@ class Test(gammalib.GPythonTestSuite):
     
         # Simulate events
         sim = ctools.ctobssim()
-        sim["infile"].filename(model_name)
-        sim["outfile"].filename(events_name)
+        sim["inmodel"].filename(model_name)
+        sim["outevents"].filename(events_name)
         sim["caldb"].string(caldb)
         sim["irf"].string(irf)
         sim["ra"].real(ra)
@@ -98,8 +98,8 @@ class Test(gammalib.GPythonTestSuite):
     
         # Select events
         select = ctools.ctselect()
-        select["infile"].filename(events_name)
-        select["outfile"].filename(selected_events_name)
+        select["inobs"].filename(events_name)
+        select["outobs"].filename(selected_events_name)
         select["ra"].real(ra)
         select["dec"].real(dec)
         select["rad"].real(rad_select)
@@ -116,9 +116,9 @@ class Test(gammalib.GPythonTestSuite):
     
         # Perform maximum likelihood fitting
         like = ctools.ctlike()
-        like["infile"].filename(selected_events_name)
-        like["srcmdl"].filename(model_name)
-        like["outmdl"].filename(result_name)
+        like["inobs"].filename(selected_events_name)
+        like["inmodel"].filename(model_name)
+        like["outmodel"].filename(result_name)
         like["caldb"].string(caldb)
         like["irf"].string(irf)
         self.test_try("Execute ctlike")
@@ -149,7 +149,7 @@ class Test(gammalib.GPythonTestSuite):
     
         # Simulate events
         sim = ctools.ctobssim()
-        sim["infile"].filename(model_name)
+        sim["inmodel"].filename(model_name)
         sim["caldb"].string(caldb)
         sim["irf"].string(irf)
         sim["ra"].real(ra)

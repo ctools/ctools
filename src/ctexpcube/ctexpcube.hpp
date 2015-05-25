@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Juergen Knoedlseder                              *
+ *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTEXPCUBE_NAME    "ctexpcube"
-#define CTEXPCUBE_VERSION "00-01-00"
+#define CTEXPCUBE_VERSION "1.0.0"
 
 
 /***********************************************************************//**
@@ -56,10 +56,10 @@ public:
     ctexpcube& operator=(const ctexpcube& app);
 
     // Methods
-    void                clear(void);
-    void                run(void);
-    void                save(void);
-    const GCTAExposure& expcube(void) const;
+    void                    clear(void);
+    void                    run(void);
+    void                    save(void);
+    const GCTACubeExposure& expcube(void) const;
 
 protected:
     // Protected methods
@@ -67,17 +67,14 @@ protected:
     void copy_members(const ctexpcube& app);
     void free_members(void);
     void get_parameters(void);
-    void get_obs(void);
-    void set_from_cntmap(const std::string& filename);
 
     // User parameters
-    std::string   m_outfile;     //!< Output exposure cube file
+    std::string   m_outcube;     //!< Output exposure cube file
     bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
-    GObservations m_obs;         //!< Observation container
-    GCTAExposure  m_expcube;     //!< Exposure cube
-    GEbounds      m_ebounds;     //!< Energy boundaries
+    GObservations    m_obs;         //!< Observation container
+    GCTACubeExposure m_expcube;     //!< Exposure cube
 };
 
 
@@ -87,7 +84,7 @@ protected:
  * @return Exposure cube
  ***************************************************************************/
 inline
-const GCTAExposure& ctexpcube::expcube(void) const
+const GCTACubeExposure& ctexpcube::expcube(void) const
 {
     return (m_expcube);
 }

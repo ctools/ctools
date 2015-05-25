@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -48,7 +48,7 @@ public:
     void               clear(void);
     void               run(void);
     void               save(void);
-    const GCTAMeanPsf& psfcube(void) const;
+    const GCTACubePsf& psfcube(void) const;
 };
 
 /***********************************************************************//**

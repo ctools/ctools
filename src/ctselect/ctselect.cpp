@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -268,6 +268,16 @@ void ctselect::run(void)
             // Save event file name (for possible saving)
             m_infiles[i] = obs->eventfile();
 
+            // Fall through in case that the event file is empty
+            if (obs->events()->size() == 0) {
+                if (logTerse()) {
+                    log << " Warning: No events in event file \"";
+                    log << m_infiles[i] << "\". Event selection skipped.";
+                    log << std::endl;
+                }
+                continue;
+            }
+
             // Get temporary file name
             #if G_USE_MKSTEMP
             char tpl[]  = "ctselectXXXXXX";
@@ -387,8 +397,7 @@ void ctselect::save(void)
 void ctselect::init_members(void)
 {
     // Initialise parameters
-    m_infile.clear();
-    m_outfile.clear();
+    m_outobs.clear();
     m_prefix.clear();
     m_usepnt = false;
     m_ra     = -1.0;
@@ -406,12 +415,9 @@ void ctselect::init_members(void)
     m_infiles.clear();
     m_timemin.clear();
     m_timemax.clear();
-    m_use_xml = false;
-    
-    // Set CTA time reference. G_CTA_MJDREF is the CTA reference MJD,
-    // which is defined in GCTALib.hpp. This is somehow a kluge. We need
-    // a better mechanism to implement the CTA reference MJD.
-    m_cta_ref.set(G_CTA_MJDREF, "s", "TT", "LOCAL");
+    m_select_energy = true;
+    m_select_roi    = true;
+    m_select_time   = true;
 
     // Return
     return;
@@ -426,8 +432,7 @@ void ctselect::init_members(void)
 void ctselect::copy_members(const ctselect& app)
 {
     // Copy parameters
-    m_infile   = app.m_infile;
-    m_outfile  = app.m_outfile;
+    m_outobs  = app.m_outobs;
     m_prefix   = app.m_prefix;
     m_usepnt   = app.m_usepnt;
     m_ra       = app.m_ra;
@@ -441,12 +446,13 @@ void ctselect::copy_members(const ctselect& app)
     m_usethres = app.m_usethres;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_infiles    = app.m_infiles;
-    m_timemin    = app.m_timemin;
-    m_timemax    = app.m_timemax;
-    m_use_xml    = app.m_use_xml;
-    m_cta_ref    = app.m_cta_ref;
+    m_obs           = app.m_obs;
+    m_infiles       = app.m_infiles;
+    m_timemin       = app.m_timemin;
+    m_timemax       = app.m_timemax;
+    m_select_energy = app.m_select_energy;
+    m_select_roi    = app.m_select_roi;
+    m_select_time   = app.m_select_time;
     
     // Return
     return;
@@ -466,7 +472,7 @@ void ctselect::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all task parameters from parameter file or (if required) by querying
+ * Get all user parameters from parameter file or (if required) by querying
  * the user. Times are assumed to be in the native CTA MJD format.
  *
  * This method also loads observations if no observations are yet allocated.
@@ -475,54 +481,76 @@ void ctselect::free_members(void)
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
+    // Initialise selection flags
+    m_select_energy = true;
+    m_select_roi    = true;
+    m_select_time   = true;
+
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Get CTA event list file name
-        m_infile = (*this)["infile"].filename();
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Allocate CTA observation
-        GCTAObservation obs;
-
-        // Try first to open as FITS file
-        try {
-
-            // Load event list in CTA observation
-            obs.load(m_infile);
-
-            // Append CTA observation to container
-            m_obs.append(obs);
-
-            // Signal that no XML file should be used for storage
-            m_use_xml = false;
-            
-        }
-        
-        // ... otherwise try to open as XML file
-        catch (GException::fits_open_error &e) {
-
-            // Load observations from XML file
-            m_obs.load(m_infile);
-
-            // Signal that XML file should be used for storage
-            m_use_xml = true;
-
-        }
+        // Get observation container without response (not needed)
+        m_obs = get_observations(false);
 
     } // endif: there was no observation in the container
 
     // Get parameters
     m_usepnt = (*this)["usepnt"].boolean();
     if (!m_usepnt) {
-        m_ra  = (*this)["ra"].real();
-        m_dec = (*this)["dec"].real();
+
+        // Check RA/DEC parameters for validity to read
+        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
+            m_ra         = (*this)["ra"].real();
+            m_dec        = (*this)["dec"].real();
+            m_select_roi = true;
+        }
+        else {
+            m_select_roi = false;
+        }
     }
-    m_rad      = (*this)["rad"].real();
-    m_tmin     = (*this)["tmin"].real();
-    m_tmax     = (*this)["tmax"].real();
-    m_emin     = (*this)["emin"].real();
-    m_emax     = (*this)["emax"].real();
+
+    // Check if radius is vaild for a RoI selection
+    if (m_select_roi && (*this)["rad"].is_valid()) {
+        m_rad = (*this)["rad"].real();
+    }
+    else {
+        m_select_roi = false;
+    }
+
+    // Check for sanity of time selection parameters
+    if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
+
+        // Get User parameters
+        m_tmin = (*this)["tmin"].real();
+        m_tmax = (*this)["tmax"].real();
+
+        // Additional check for time values
+        if (m_tmin >= m_tmax) {
+            m_select_time = false;
+        }
+        else {
+            m_select_time = true;
+        }
+    }
+    else {
+        m_select_time = false;
+    }
+
+    // Check for sanity of energy selection parameters
+    if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
+        m_emin          = (*this)["emin"].real();
+        m_emax          = (*this)["emax"].real();
+        m_select_energy = true;
+    }
+    else {
+        m_select_energy = false;
+    }
+
+    // Get other User parameters
     m_expr     = (*this)["expr"].string();
     m_usethres = (*this)["usethres"].string();
 
@@ -537,8 +565,8 @@ void ctselect::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
-        m_prefix  = (*this)["prefix"].string();
+        m_outobs = (*this)["outobs"].filename();
+        m_prefix = (*this)["prefix"].string();
     }
 
     // Set time interval with input times given in CTA reference
@@ -595,10 +623,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         emax = ebounds.emax(0).TeV();
     }
 
-    // Analyse parameters to see what selections are required
-    bool select_time   = (m_tmin != 0.0 || m_tmax != 0.0);
-    bool select_energy = (emin != 0.0 || emax != 0.0);
-    bool select_roi    = ((m_dec != -1.0 && m_ra != -1.0 && m_rad != -1.0) || m_usepnt);
+    // Analyse expression to see if a selection is required
     bool select_expr   = (gammalib::strip_whitespace(m_expr).length() > 0);
 
     // Set RA/DEC selection. If the "usepnt" parameter is set to true then
@@ -615,7 +640,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     // Set time selection interval. We make sure here that the time selection
     // interval cannot be wider than the GTIs covering the data. This is done
     // using GGti's reduce() method.
-    if (select_time) {
+    if (m_select_time) {
 
         // Reduce GTIs to specified time interval. The complicated cast is
         // necessary here because the gti() method is declared const, so
@@ -628,7 +653,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     GGti gti = list->gti();
 
     // Make time selection
-    if (select_time) {
+    if (m_select_time) {
     
         // Extract effective time interval in the reference time of the
         // event list. We get this reference time from gti.reference().
@@ -649,7 +674,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     } // endif: made time selection
 
     // Make energy selection
-    if (select_energy) {
+    if (m_select_energy) {
 
         // If we have aready a selection than add an "&&" operator
         if (selection.length() > 0) {
@@ -711,7 +736,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     } // endif: made energy selection
 
     // Make ROI selection
-    if (select_roi) {
+    if (m_select_roi) {
 
         // If we have aready a selection than add an "&&" operator
         if (selection.length() > 0) {
@@ -822,7 +847,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     int nevents = file.table("EVENTS")->nrows();
 
     // If the selected event list is empty or if removal of all events
-    // has been requesten then append an empty event list to the observation.
+    // has been requested then append an empty event list to the observation.
     if ((nevents < 1) || (remove_all)) {
 
         // Create empty event list
@@ -842,7 +867,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     list = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
     // If ROI selection has been applied then set the event list ROI
-    if (select_roi) {
+    if (m_select_roi) {
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
         list->roi(GCTARoi(instdir, rad));
@@ -852,7 +877,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     list->gti(gti);
 
     // If an energy selection has been applied then set the energy boundaries
-    if (select_energy) {
+    if (m_select_energy) {
         GEbounds ebounds;
         ebounds.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
         list->ebounds(ebounds);
@@ -991,7 +1016,9 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
 
     // Set selection energy boundaries
     GEbounds result;
-    result.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+    if (emax > emin) {
+        result.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+    }
 
     // Return result
     return result;
@@ -1048,7 +1075,7 @@ std::string ctselect::check_infile(const std::string& filename) const
         if (missing.size() > 0) {
             message = "The following columns are missing in the"
                       " \"EVENTS\" extension of input file \""
-                    + m_outfile + "\": ";
+                    + m_outobs + "\": ";
             for (int i = 0; i < missing.size(); ++i) {
                 message += "\"" + missing[i] + "\"";
                 if (i < missing.size()-1) {
@@ -1060,7 +1087,7 @@ std::string ctselect::check_infile(const std::string& filename) const
     }
     catch (GException::fits_hdu_not_found& e) {
         message = "No \"EVENTS\" extension found in input file \""
-                + m_outfile + "\".";
+                + m_outobs + "\".";
     }
 
     // Return
@@ -1103,13 +1130,13 @@ std::string ctselect::set_outfile_name(const std::string& filename) const
 void ctselect::save_fits(void)
 {
     // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    m_outobs = (*this)["outobs"].filename();
 
     // Get CTA observation from observation container
     GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
     // Save event list
-    save_event_list(obs, m_infiles[0], m_outfile);
+    save_event_list(obs, m_infiles[0], m_outobs);
 
     // Return
     return;
@@ -1129,14 +1156,14 @@ void ctselect::save_fits(void)
 void ctselect::save_xml(void)
 {
     // Get output filename and prefix
-    m_outfile = (*this)["outfile"].filename();
+    m_outobs = (*this)["outobs"].filename();
     m_prefix  = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outfile.substr(m_outfile.length()-4,4));
+    std::string suffix = gammalib::tolower(m_outobs.substr(m_outobs.length()-4,4));
     if (suffix != ".xml") {
         log << "*** WARNING: Name of observation definition output file \""+
-               m_outfile+"\"" << std::endl;
+               m_outobs+"\"" << std::endl;
         log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
         log << "*** WARNING: This is not an error, but might be misleading."
                " It is recommended" << std::endl;
@@ -1167,7 +1194,7 @@ void ctselect::save_xml(void)
     } // endfor: looped over observations
 
     // Save observations in XML file
-    m_obs.save(m_outfile);
+    m_obs.save(m_outobs);
 
     // Return
     return;

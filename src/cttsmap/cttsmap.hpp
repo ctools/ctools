@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2014-2015 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTTSMAP_NAME    "cttsmap"
-#define CTTSMAP_VERSION "00-01-00"
+#define CTTSMAP_VERSION "1.0.0"
 
 
 /***********************************************************************//**
@@ -81,24 +81,16 @@ protected:
     void copy_members(const cttsmap& app);
     void free_members(void);
     void get_parameters(void);
-    void init_maps(void);
+    void init_maps(const GSkymap& map);
 
     // User parameters
-    std::string              m_infile;     //!< Input file
     std::string              m_srcname;    //!< Name of source which is moved around
-    std::string              m_outfile;    //!< Output counts map or XML file
-    std::string              m_proj;       //!< WCS projection
-    std::string              m_coordsys;   //!< Coordinate system
-    double                   m_xref;       //!< Longitude reference coordinate
-    double                   m_yref;       //!< Latitude reference coordinate
-    double                   m_binsz;      //!< Pixel size
-    int                      m_nxpix;      //!< Number of pixels in longitude
-    int                      m_nypix;      //!< Number of pixels in latitude
+    std::string              m_outmap;     //!< Output counts map or XML file
 
     // Parameters to control speed and job splitting
-    int                      m_binmin;  //!< Map bin number from which computation should start
-    int                      m_binmax;  //!< Map bin number where map computation should end
-    double                   m_logL0;   //!< Likelihood value of null hypothesis
+    int                      m_binmin;     //!< Map bin number from which computation should start
+    int                      m_binmax;     //!< Map bin number where map computation should end
+    double                   m_logL0;      //!< Likelihood value of null hypothesis
 
     // Protected members
     GObservations            m_obs;        //!< Observation container

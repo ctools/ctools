@@ -12,7 +12,7 @@
 # Required 3rd party modules:
 # - processing (optional)
 #
-# Copyright (C) 2011 Jurgen Knodlseder
+# Copyright (C) 2011-2015 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctools import *
-from gammalib import *
 from cstsdist import *
 import sys
 import time
@@ -63,21 +61,23 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0, \
 	
 	# Setup cstsdist tool
 	tsdist = cstsdist()
-	tsdist["outfile"]  = outfile
-	tsdist["ntrials"]  = ntrials
-	tsdist["caldb"]    = "${CALDB}/data/cta/dummy/bcf"
-	tsdist["irf"]      = "cta_dummy_irf"
-	tsdist["type"]     = "point"
-	tsdist["index"]    = -2.48
-	tsdist["offset"]   = 0.0
-	tsdist["bkg"]      = "${CTOOLS}/share/models/bkg_dummy.txt"
-	tsdist["emin"]     = float(emin)
-	tsdist["emax"]     = float(emax)
-	tsdist["enumbins"] = int(enumbins)
-	tsdist["duration"] = float(duration)
-	tsdist["rad"]      = 5.0
-	tsdist["npix"]     = 200
-	tsdist["binsz"]    = 0.05
+	tsdist["inmodel"].filename("$CTOOLS/share/models/crab.xml")
+	tsdist["srcname"].string("Crab")
+	tsdist["outfile"].filename(outfile)
+	tsdist["ntrials"].integer(ntrials)
+	tsdist["caldb"].string("prod2")
+	tsdist["irf"].string("South_50h")
+	tsdist["ra"].real(83.63)
+	tsdist["dec"].real(22.01)
+	tsdist["emin"].real(float(emin))
+	tsdist["emax"].real(float(emax))
+	tsdist["enumbins"].integer(int(enumbins))
+	tsdist["tmin"].real(0.0)
+	tsdist["tmax"].real(float(duration))
+	tsdist["rad"].real(5.0)
+	tsdist["npix"].integer(200)
+	tsdist["binsz"].real(0.05)
+	#tsdist["debug"].boolean(True)
 		
 	# Optionally open the log file
 	if log:
@@ -141,14 +141,10 @@ if __name__ == '__main__':
 	enumbins    = pars[1]['value']
 	duration    = pars[2]['value']
 	max_threads = pars[3]['value']
-	#print ntrials
-	#print enumbins
-	#print duration
-	#print max_threads
 	
 	# Loop over energy bands. The energy bands are those that are also
 	# used for sensitivity computation.
-	for ieng in range(21):
+	for ieng in range(20):
 		
 		# Set energies
 		loge  = -1.7 + ieng * 0.2

@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBKGCUBE_NAME    "ctbkgcube"
-#define CTBKGCUBE_VERSION "00-01-00"
+#define CTBKGCUBE_VERSION "1.0.0"
 
 
 /***********************************************************************//**
@@ -56,11 +56,11 @@ public:
     ctbkgcube& operator=(const ctbkgcube& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GCTAEventCube& cube(void) const;
-    const GModels&       models(void) const;
+    void                      clear(void);
+    void                      run(void);
+    void                      save(void);
+    const GCTACubeBackground& bkgcube(void) const;
+    const GModels&            models(void) const;
 
 protected:
     // Protected methods
@@ -68,32 +68,30 @@ protected:
     void copy_members(const ctbkgcube& app);
     void free_members(void);
     void get_parameters(void);
-    void get_obs(void);
-    void set_from_cntmap(const std::string& filename);
     void fill_cube(GCTAObservation* obs);
 
     // Protected members
-    GObservations m_obs;         //!< Observation container
-    GCTAEventCube m_bkgcube;     //!< Background cube
-    GModels       m_bkgmdl;      //!< CTA background models
-    GModels       m_outmdl;      //!< Output models
-    GEbounds      m_ebounds;     //!< Energy boundaries
-    double        m_livetime;    //!< Total livetime for normalization
-    int           m_cube_model;  //!< Cube model index
+    std::string        m_outcube;     //!< Filename of output cube
+    std::string        m_outmodel;    //!< Filename of output XML model
+    GObservations      m_obs;         //!< Observation container
+    GCTACubeBackground m_background;  //!< Background cube response
+    GModels            m_bkgmdl;      //!< CTA background models
+    GModels            m_outmdl;      //!< Output models
 };
 
 
 /***********************************************************************//**
- * @brief Return event cube containing background rate
+ * @brief Return background response cube containing background rate
  *
- * @return Background event cube.
+ * @return Background response cube.
  ***************************************************************************/
 inline
-const GCTAEventCube& ctbkgcube::cube(void) const
+const GCTACubeBackground& ctbkgcube::bkgcube(void) const
 {
     // Return background cube
-    return (m_bkgcube);
+    return (m_background);
 }
+
 
 
 /***********************************************************************//**

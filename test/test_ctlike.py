@@ -67,11 +67,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctlike
         like = ctools.ctlike()
-        like["infile"].filename(self.events_name)
-        like["srcmdl"].filename(self.model_name)
+        like["inobs"].filename(self.events_name)
+        like["inmodel"].filename(self.model_name)
         like["caldb"].string(self.caldb)
         like["irf"].string(self.irf)
-        like["outmdl"].filename("result.xml")
+        like["outmodel"].filename("result.xml")
 
         # Run tool
         self.test_try("Run ctlike")

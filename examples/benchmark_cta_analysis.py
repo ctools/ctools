@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script peforms a benchmark of the various CTA analysis styles
-# (unbinned, binned, cube-style), and if matplotlib is installed, creates
+# This script peforms a benchmark of the various CTA analysis types
+# (unbinned, binned, stacked), and if matplotlib is installed, creates
 # a plot of the benchmark results.
 #
-# Copyright (C) 2014 Jurgen Knodlseder
+# Copyright (C) 2014-2015 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ def unbinned_pipeline(duration):
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =   10.0
@@ -55,7 +55,7 @@ def unbinned_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -103,8 +103,8 @@ def binned_pipeline(duration):
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =   10.0
@@ -124,7 +124,7 @@ def binned_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -167,17 +167,17 @@ def binned_pipeline(duration):
     return telapsed, tctlike
 
 
-# ============================ #
-# Cube-style analysis pipeline #
-# ============================ #
-def cube_pipeline(duration):
+# ========================= #
+# Stacked analysis pipeline #
+# ========================= #
+def stacked_pipeline(duration):
     """
     Cube-style analysis pipeline.
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =   10.0
@@ -197,7 +197,7 @@ def cube_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -225,8 +225,8 @@ def cube_pipeline(duration):
     bin.run()
 
     # Create exposure cube
-    expcube = ctools.ctexpcube(bin.obs())
-    expcube["cntmap"].filename("NONE")
+    expcube = ctools.ctexpcube(sim.obs())
+    expcube["incube"].filename("NONE")
     expcube["caldb"].string(caldb)
     expcube["irf"].string(irf)
     expcube["ebinalg"].string("LOG")
@@ -243,8 +243,8 @@ def cube_pipeline(duration):
     expcube.run()
 
     # Create PSF cube
-    psfcube = ctools.ctpsfcube(bin.obs())
-    psfcube["cntmap"].filename("NONE")
+    psfcube = ctools.ctpsfcube(sim.obs())
+    psfcube["incube"].filename("NONE")
     psfcube["caldb"].string(caldb)
     psfcube["irf"].string(irf)
     psfcube["ebinalg"].string("LOG")
@@ -260,17 +260,34 @@ def cube_pipeline(duration):
     psfcube["yref"].real(dec)
     psfcube.run()
 
-    # Set exposure and PSF cube for first CTA observation
-    obs = bin.obs()
-    cta = gammalib.GCTAObservation(obs[0])
-    cta.response(expcube.expcube(), psfcube.psfcube())
-    obs[0] = cta
+    # Create background cube
+    bkgcube = ctools.ctbkgcube(sim.obs())
+    bkgcube["incube"].filename("NONE")
+    bkgcube["ebinalg"].string("LOG")
+    bkgcube["emin"].real(emin)
+    bkgcube["emax"].real(emax)
+    bkgcube["enumbins"].integer(enumbins)
+    bkgcube["nxpix"].integer(10)
+    bkgcube["nypix"].integer(10)
+    bkgcube["binsz"].real(1.0)
+    bkgcube["coordsys"].string(coordsys)
+    bkgcube["proj"].string(proj)
+    bkgcube["xref"].real(ra)
+    bkgcube["yref"].real(dec)
+    bkgcube.run()
+
+    # Attach background model to observation container
+    bin.obs().models(bkgcube.models())
+
+    # Set Exposure and Psf cube for first CTA observation
+    # (ctbin will create an observation with a single container)
+    bin.obs()[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
     # Get ctlike start CPU time
     tctlike = time.clock()
 
     # Perform maximum likelihood fitting
-    like = ctools.ctlike(obs)
+    like = ctools.ctlike(bin.obs())
     like.run()
 
     # Get stop CPU time
@@ -292,16 +309,16 @@ if __name__ == '__main__':
     print("*************************************")
     print("*      CTA analysis benchmark       *")
     print("*************************************")
-    print("  Duration   Unbinned     Binned Cube-style  ctlike-UB   ctlike-B  ctlike-CS")
+    print("  Duration   Unbinned     Binned    Stacked  ctlike-UB   ctlike-B   ctlike-S")
 
     # Initialize arrays
     a_duration = []
     a_unbinned = []
     a_binned   = []
-    a_cube     = []
+    a_stacked  = []
     c_unbinned = []
     c_binned   = []
-    c_cube     = []
+    c_stacked  = []
 
     # Perform benchmarks
     duration = 1800.0
@@ -309,22 +326,22 @@ if __name__ == '__main__':
 
         # Perform analyses
         t_unbinned, ct_unbinned = unbinned_pipeline(duration)
-        t_binned, ct_binned     = binned_pipeline(duration)
-        t_cube, ct_cube         = cube_pipeline(duration)
+        t_binned,   ct_binned   = binned_pipeline(duration)
+        t_stacked,  ct_stacked  = stacked_pipeline(duration)
 
         # Collect results
         a_duration.append(duration/3600.0)
         a_unbinned.append(t_unbinned)
         a_binned.append(t_binned)
-        a_cube.append(t_cube)
+        a_stacked.append(t_stacked)
         c_unbinned.append(ct_unbinned)
         c_binned.append(ct_binned)
-        c_cube.append(ct_cube)
+        c_stacked.append(ct_stacked)
 
         # Print results
         print("%10.0f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f" % \
-              (duration, t_unbinned, t_binned, t_cube, \
-                         ct_unbinned, ct_binned, ct_cube))
+              (duration, t_unbinned, t_binned, t_stacked, \
+                         ct_unbinned, ct_binned, ct_stacked))
 
         # Increment duration
         duration *= 2.0
@@ -335,10 +352,10 @@ if __name__ == '__main__':
         plt.title("CTA analysis benchmark")
         plt.loglog(a_duration, a_unbinned, 'ro-', label='unbinned')
         plt.loglog(a_duration, a_binned, 'bo-', label='binned')
-        plt.loglog(a_duration, a_cube, 'go-', label='cube-style')
+        plt.loglog(a_duration, a_stacked, 'go-', label='cube-style')
         plt.loglog(a_duration, c_unbinned, 'ro--')
         plt.loglog(a_duration, c_binned, 'bo--')
-        plt.loglog(a_duration, c_cube, 'go--')
+        plt.loglog(a_duration, c_stacked, 'go--')
         plt.xlabel("Duration (hours)")
         plt.ylabel("CPU time (seconds)")
         plt.legend(loc="lower right")

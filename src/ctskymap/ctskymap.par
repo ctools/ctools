@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctskymap.par                                                  #
-#  Version:   00-02-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             knodlseder@cesr.fr                                            #
@@ -17,24 +17,24 @@
 #
 # General parameters
 #===================
-evfile,  f, a, "events.fits",,,"Event data file name"
-outfile, f, a, "skymap.fits",,, "Output file name"
+inobs,  f, a, "events.fits",,, "Event list or observation definition file"
+outmap, f, a, "skymap.fits",,, "Output file name"
 #
 # Event selection parameters
 #===========================
-emin, r, a,   0.1,,,"Minimum energy in TeV"
-emax, r, a, 100.0,,,"Maximum energy in TeV"
+emin, r, a, 0.1,,, "Lower energy limit (TeV)"
+emax, r, a, 100.0,,, "Upper energy limit (TeV)"
 #
 # Spatial binning parameters
 #===========================
+usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
 coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
-xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
-yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
-axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
-proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
+xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
+yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
+proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 
 #
 # Standard parameters

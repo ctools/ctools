@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -36,7 +36,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "00-06-00"
+#define CTSELECT_VERSION "1.0.0"
 
 
 /***********************************************************************//**
@@ -82,8 +82,7 @@ protected:
                                 const std::string&     outfile) const;
 
     // User parameters
-    std::string m_infile;     //!< Input event list or XML file
-    std::string m_outfile;    //!< Output event list or XML file
+    std::string m_outobs;     //!< Output event list or XML file
     std::string m_prefix;     //!< Prefix for multiple event lists
     bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
     double      m_ra;         //!< RA of ROI centre
@@ -97,12 +96,14 @@ protected:
     std::string m_usethres;   //!< Energy threshold type
 
     // Protected members
-    GObservations            m_obs;        //!< Observations container
-    std::vector<std::string> m_infiles;    //!< Input event filenames
-    GTime                    m_timemin;    //!< Earliest time
-    GTime                    m_timemax;    //!< Latest time
-    bool                     m_use_xml;    //!< Use XML file instead of FITS file
-    GTimeReference           m_cta_ref;    //!< CTA time reference
+    GObservations            m_obs;           //!< Observations container
+    std::vector<std::string> m_infiles;       //!< Input event filenames
+    GTime                    m_timemin;       //!< Earliest time
+    GTime                    m_timemax;       //!< Latest time
+    bool                     m_select_energy; //!< Perform energy selection
+    bool                     m_select_roi;    //!< Perform ROI selection
+    bool                     m_select_time;   //!< Perform time selection
+
 };
 
 

@@ -29,11 +29,12 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [0.8.1], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [0.9.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
 AM_INIT_AUTOMAKE([gnu -Wno-portability])
+#AM_INIT_AUTOMAKE([gnu -Wno-portability serial-tests])
 AC_CONFIG_HEADER([config.h])
 
 
@@ -748,8 +749,8 @@ darwin_kluge=no
 # Detect if GammaLib has been compiled with OpenMP
 AC_MSG_CHECKING(whether GammaLib has been compiled with OpenMP)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <GObservations.hpp>]],,)],			     
-		   [gammalib_with_openmp=no;AC_MSG_RESULT(no)],
- 		   [gammalib_with_openmp=yes;AC_MSG_RESULT(yes)])
+               [gammalib_with_openmp=no;AC_MSG_RESULT(no)],
+               [gammalib_with_openmp=yes;AC_MSG_RESULT(yes)])
 
 # Check if openMP is available
 m4_ifdef([AC_OPENMP],[AC_OPENMP], [AX_OPENMP([openmp_ok=yes],[openmp_ok=no])])
@@ -888,6 +889,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctcubemask/Makefile
                  src/cttsmap/Makefile
                  src/ctbutterfly/Makefile
+                 src/ctulimit/Makefile
                  src/support/Makefile
                  src/ctools-setup
                  test/Makefile

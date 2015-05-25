@@ -10,4 +10,5 @@ Documentation
    :maxdepth: 2
 
    user_manual/index
+   reference_manual/index
    develop

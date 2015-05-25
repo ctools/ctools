@@ -20,6 +20,7 @@
 # ==========================================================================
 import gammalib
 import ctools
+from ctools import obsutils
 try:
 	import matplotlib.pyplot as plt
 	has_matplotlib = True
@@ -35,8 +36,8 @@ def make_spectrum():
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
-    caldb       = "dummy"
-    irf         = "cta_dummy_irf"
+    caldb       = "prod2"
+    irf         = "South_50h"
     ra          =   83.63
     dec         =   22.01
     rad_sim     =    3.0
@@ -47,7 +48,7 @@ def make_spectrum():
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["infile"].filename(model_name)
+    sim["inmodel"].filename(model_name)
     sim["caldb"].string(caldb)
     sim["irf"].string(irf)
     sim["ra"].real(ra)
@@ -65,7 +66,7 @@ def make_spectrum():
     ebounds = gammalib.GEbounds(10, e_min, e_max)
 
     # Generate spectral points
-    spectrum = ctools.obsutils.spectrum(sim.obs(), "Crab", ebounds)
+    spectrum = obsutils.spectrum(sim.obs(), "Crab", ebounds)
 	
     # Return spectrum
     return spectrum
@@ -87,7 +88,7 @@ def plot_spectrum(spectrum):
                spectrum['flux']['value'], 'ro', label='Crab')
     plt.errorbar(spectrum['energy']['value'], \
                  spectrum['flux']['value'], \
-                 spectrum['flux']['ed_value'], fmt=None, ecolor='r')
+                 spectrum['flux']['ed_value'], ecolor='r')
 
     # Put labels
     plt.xlabel("Energy ("+spectrum['energy']['unit']+")")

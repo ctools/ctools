@@ -40,6 +40,8 @@ class Test(gammalib.GPythonTestSuite):
         # Set members
         self.events_name = "data/crab_events.fits"
         self.bkg_model   = "data/crab.xml"
+        self.caldb      = "irf"
+        self.irf        = "cta_dummy_irf"
 
         # Return
         return
@@ -65,11 +67,13 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbkgcube
         bkgcube = ctools.ctbkgcube()
-        bkgcube["infile"].filename(self.events_name)
+        bkgcube["inobs"].filename(self.events_name)
         bkgcube["inmodel"].filename(self.bkg_model)
-        bkgcube["cntmap"].filename("NONE")
-        bkgcube["outfile"].filename("bkgcube.fits")
+        bkgcube["incube"].filename("NONE")
+        bkgcube["outcube"].filename("bkgcube.fits")
         bkgcube["outmodel"].filename("bkgcube.xml")
+        bkgcube["caldb"].string(self.caldb)
+        bkgcube["irf"].string(self.irf)
         bkgcube["ebinalg"].string("LOG")
         bkgcube["emin"].real(0.1)
         bkgcube["emax"].real(100.0)

@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      cttsmap.par                                                   #
-#  Version:   00-01-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Michael Mayer                                                 #
 #             michael.mayer@desy.de                                         #
@@ -17,30 +17,34 @@
 #
 # General parameters
 #===================
-infile,   f, a, "events.fits",,,"Input event list, cube or observation definition file"
-srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
-srcname,  s, a, "TestSource",,,"Test source"
-caldb,    s, a, "dummy",,, "Calibration database"
-irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
-outfile,  f, a, "tsmap.fits",,, "Output counts cube"
+inobs,   f, a, "events.fits",,, "Input event list, counts cube or observation definition file"
+inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+srcname, s, a, "Crab",,, "Test source"
+expcube, f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
+psfcube, f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
+bkgcube, f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
+caldb,   s, a, "prod2",,, "Calibration database"
+irf,     s, a, "South_50h",,, "Instrument response function"
+outmap,  f, a, "tsmap.fits",,, "Output Test Statistic map"
 
 #
 # Spatial binning parameters
 #===========================
-nxpix,    i, a,   200,,, "Size of the X axis in pixels"
-nypix,    i, a,   200,,, "Size of the Y axis in pixels"
-binsz,    r, a,  0.02,,, "Image scale (in degrees/pixel)"
+usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
+nxpix,    i, a, 200,,, "Size of the X axis in pixels"
+nypix,    i, a, 200,,, "Size of the Y axis in pixels"
+binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
 coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
-xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
-yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
-proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
+xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
+yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
+proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 
 #
 # Parameters for splitting and speed purpose
 #===========================
-binmin,   i, h,   -1,,, "First bin to compute"
-binmax,   i, h,   -1,,, "Last bin to compute"
-logL0,    r, h,  0.0,,, "LogLikelihood value of null hypothesis"
+binmin,   i, h, -1,,, "First bin to compute"
+binmax,   i, h, -1,,, "Last bin to compute"
+logL0,    r, h, 0.0,,, "LogLikelihood value of null hypothesis"
 
 
 #

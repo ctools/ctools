@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -44,11 +44,11 @@ public:
     virtual ~ctbkgcube(void);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GCTAEventCube& cube(void) const;
-    const GModels&       models(void) const;
+    void                      clear(void);
+    void                      run(void);
+    void                      save(void);
+    const GCTACubeBackground& bkgcube(void) const;
+    const GModels&            models(void) const;
 };
 
 /***********************************************************************//**

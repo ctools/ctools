@@ -67,12 +67,12 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up cttsmap
         tsmap = ctools.cttsmap()
-        tsmap["infile"].filename(self.events_name)
-        tsmap["srcmdl"].filename(self.model_name)
+        tsmap["inobs"].filename(self.events_name)
+        tsmap["inmodel"].filename(self.model_name)
         tsmap["srcname"].string("Crab")
         tsmap["caldb"].string(self.caldb)
         tsmap["irf"].string(self.irf)
-        tsmap["outfile"].filename("tsmap.fits")
+        tsmap["outmap"].filename("tsmap.fits")
         tsmap["nxpix"].integer(5)
         tsmap["nypix"].integer(5)
         tsmap["binsz"].real(0.02)

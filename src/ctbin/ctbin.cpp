@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,8 +33,8 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_INIT_CUBE                                      "ctbin::init_cube()"
 #define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
+#define G_GET_PARAMETERS                            "ctbin::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -238,9 +238,6 @@ void ctbin::run(void)
         }
     }
 
-    // Initialise counts cube
-    init_cube();
-
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
@@ -309,14 +306,14 @@ void ctbin::save(void)
     }
 
     // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    m_outcube = (*this)["outcube"].filename();
 
     // Get CTA observation from observation container
     GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
     // Save only if observation is valid
     if (obs != NULL) {
-        obs->save(m_outfile, clobber());
+        obs->save(m_outcube, clobber());
     }
 
     // Return
@@ -336,16 +333,8 @@ void ctbin::save(void)
 void ctbin::init_members(void)
 {
     // Initialise members
-    m_evfile.clear();
-    m_outfile.clear();
-    m_proj.clear();
-    m_coordsys.clear();
-    m_usepnt   = false;
-    m_xref     = 0.0;
-    m_yref     = 0.0;
-    m_binsz    = 0.0;
-    m_nxpix    = 0;
-    m_nypix    = 0;
+    m_outcube.clear();
+    m_usepnt = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -368,24 +357,16 @@ void ctbin::init_members(void)
 void ctbin::copy_members(const ctbin& app)
 {
     // Copy attributes
-    m_evfile   = app.m_evfile;
-    m_outfile  = app.m_outfile;
-    m_proj     = app.m_proj;
-    m_coordsys = app.m_coordsys;
-    m_usepnt   = app.m_usepnt;
-    m_xref     = app.m_xref;
-    m_yref     = app.m_yref;
-    m_binsz    = app.m_binsz;
-    m_nxpix    = app.m_nxpix;
-    m_nypix    = app.m_nypix;
+    m_outcube = app.m_outcube;
+    m_usepnt  = app.m_usepnt;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_cube       = app.m_cube;
-    m_ebounds    = app.m_ebounds;
-    m_gti        = app.m_gti;
-    m_ontime     = app.m_ontime;
-    m_livetime   = app.m_livetime;
+    m_obs      = app.m_obs;
+    m_cube     = app.m_cube;
+    m_ebounds  = app.m_ebounds;
+    m_gti      = app.m_gti;
+    m_ontime   = app.m_ontime;
+    m_livetime = app.m_livetime;
 
     // Return
     return;
@@ -413,125 +394,33 @@ void ctbin::free_members(void)
  ***************************************************************************/
 void ctbin::get_parameters(void)
 {
-    // Initialize energy boundaries
-    m_ebounds.clear();
-
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Get name of CTA events file
-        m_evfile = (*this)["evfile"].filename();
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Allocate CTA observation
-        GCTAObservation obs;
-
-        // Try first to open as FITS file
-        try {
-
-            // Load event list in CTA observation
-            obs.load(m_evfile);
-
-            // Append CTA observation to container
-            m_obs.append(obs);
-
-        }
-
-        // ... otherwise try to open as XML file
-        catch (GException::fits_open_error &e) {
-
-            // Load observations from XML file
-            m_obs.load(m_evfile);
-
-        }
+        // Get observation container without response (not needed)
+        m_obs = get_observations(false);
 
     } // endif: there was no observation in the container
 
-    // Get parameters
-    m_usepnt = (*this)["usepnt"].boolean();
-    if (!m_usepnt) {
-        m_xref = (*this)["xref"].real();
-        m_yref = (*this)["yref"].real();
-    }
-    m_proj     = (*this)["proj"].string();
-    m_coordsys = (*this)["coordsys"].string();
-    m_binsz    = (*this)["binsz"].real();
-    m_nxpix    = (*this)["nxpix"].integer();
-    m_nypix    = (*this)["nypix"].integer();
-    
-    // Set energy boundaries
-    m_ebounds  = get_ebounds();
+    // Create an event cube based on task parameters
+    GCTAEventCube cube = create_cube(m_obs);
+
+    // Get the skymap from the cube and initialise all pixels to zero
+    m_cube = cube.map();
+    m_cube = 0.0;
+
+    // Get energy boundaries
+    m_ebounds  = cube.ebounds();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
+        m_outcube = (*this)["outcube"].filename();
     }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Initialise counts cube information
- *
- * @exception GException::invalid_value
- *            No valid CTA observation found to derive the counts cube
- *            map centre.
- *
- * Initialises the skymap, energy boundaries and GTI for a counts cube.
- ***************************************************************************/
-void ctbin::init_cube(void)
-{
-    // Initialse cube information
-    m_ontime   = 0.0;
-    m_livetime = 0.0;
-    m_cube.clear();
-    m_gti.clear();
-
-    // Set event cube centre, either from the user parameters or from the
-    // pointing
-    double xref = m_xref;
-    double yref = m_yref;
-    if (m_usepnt) {
-
-        // Dummy: get pointing from first observation. Ultimately, we want
-        // to get the pointing from a kind of average
-        bool found = false;
-        for (int i = 0; i < m_obs.size(); ++i) {
-            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-            if (obs != NULL) {
-                const GCTAPointing& pnt = obs->pointing();
-                if (gammalib::toupper(m_coordsys) == "GAL") {
-                    xref = pnt.dir().l_deg();
-                    yref = pnt.dir().b_deg();
-                }
-                else {
-                    xref = pnt.dir().ra_deg();
-                    yref = pnt.dir().dec_deg();
-                }
-                found = true;
-                break;
-            }
-        }
-
-        // Signal if no pointing is found
-        if (!found) {
-            std::string msg = "No valid CTA observation has been found in "
-                              "observation list, hence no pointing information "
-                              "could be extracted. Use the \"usepnt=no\" "
-                              "option and specify pointing explicitly when "
-                              "running ctbin.";
-            throw GException::invalid_value(G_INIT_CUBE, msg);
-        }
-
-    } // endif: used pointing
-
-    // Create skymap
-    m_cube = GSkymap(m_proj, m_coordsys,
-                     xref, yref, -m_binsz, m_binsz,
-                     m_nxpix, m_nypix, m_ebounds.size());
 
     // Return
     return;
@@ -590,8 +479,8 @@ void ctbin::fill_cube(GCTAObservation* obs)
             }
 
             // Skip if pixel is out of range
-            if (pixel.x() < -0.5 || pixel.x() > (m_nxpix-0.5) ||
-                pixel.y() < -0.5 || pixel.y() > (m_nypix-0.5)) {
+            if (pixel.x() < -0.5 || pixel.x() > (m_cube.nx()-0.5) ||
+                pixel.y() < -0.5 || pixel.y() > (m_cube.ny()-0.5)) {
                 num_outside_map++;
                 continue;
             }
@@ -655,13 +544,16 @@ void ctbin::fill_cube(GCTAObservation* obs)
 void ctbin::obs_cube(void)
 {
     // If we have only a single CTA observation in the container, then
-    // keep that observation and just attach the event cube to it
+    // keep that observation and just attach the event cube to it. Reset
+    // the filename, otherwise we still will have the old event filename
+    // in the log file.
     if (m_obs.size() == 1) {
 
         // Attach event cube to CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
         if (obs != NULL) {
             obs->events(this->cube());
+            obs->eventfile("");
         }
 
     }

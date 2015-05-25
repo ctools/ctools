@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctselect.par                                                  #
-#  Version:   00-05-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -17,22 +17,22 @@
 #
 # File information
 #=================
-infile, f, a, "events.fits",,,"Input event list or observation definition file"
-outfile,f, a, "selected_events.fits",,,"Output event list or observation definition file"
-prefix, s, h, "selected_",,,"Prefix for event lists in observation definition file"
+inobs,  f, a, "events.fits",,, "Input event list or observation definition file"
+outobs, f, a, "selected_events.fits",,, "Output event list or observation definition file"
+prefix, s, h, "selected_",,, "Prefix for event lists in observation definition file"
 #
 # Selection parameters
 #=====================
-usepnt,  b, h,            no,,, "Use pointing instead of RA/DEC parameters?"
-ra,      r, a,  83.63,   0,360, "RA for ROI centre (degrees)"
-dec,     r, a,  22.01, -90, 90, "Dec for ROI centre (degrees)"
-rad,     r, a,   3.0,    0,180, "Radius of ROI (degrees)"
-tmin,    r, a,   0.0,    0,   , "Start time (CTA MET in seconds)"
-tmax,    r, a,   0.0,    0,   , "End time (CTA MET in seconds)"
-emin,    r, a,   0.1,    0,   , "Lower energy limit (TeV)"
-emax,    r, a, 100.0,    0,   , "Upper energy limit (TeV)"
-expr,    s, h,    "",     ,   , "Additional selection expression"
-usethres,s, h,"NONE",NONE|DEFAULT|USER,,"Energy threshold type (NONE|DEFAULT|USER)"
+usepnt,  b, h, no,,, "Use pointing instead of RA/DEC parameters?"
+ra,      r, a, 83.63,0,360, "RA for ROI centre (degrees)"
+dec,     r, a, 22.01,-90,90, "Dec for ROI centre (degrees)"
+rad,     r, a, 3.0,0,180, "Radius of ROI (degrees)"
+tmin,    r, a, 0.0,,, "Start time (CTA MET in seconds)"
+tmax,    r, a, 0.0,,, "End time (CTA MET in seconds)"
+emin,    r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,    r, a, 100.0,,, "Upper energy limit (TeV)"
+expr,    s, h, "",,, "Additional selection expression"
+usethres,s, h, "NONE",NONE|DEFAULT|USER,, "Energy threshold type"
 #
 # Standard parameters
 #====================

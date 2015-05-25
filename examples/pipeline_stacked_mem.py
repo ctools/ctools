@@ -1,12 +1,15 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script illustrates how to perform a stacked CTA analysis from the
-# simulation to the analysis. You may use and adapt this script to
-# implement your own pipeline. You can run the example by typing
+# This script illustrates how to perform a stacked CTA analysis based on
+# simulated CTA data. You may use and adapt this script to implement your
+# own pipeline.
 #
+# Usage:
 # ./pipeline_stacked_mem.py
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# ==========================================================================
+#
+# Copyright (C) 2014-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,15 +27,16 @@
 # ==========================================================================
 import gammalib
 import ctools
+from ctools import obsutils
 
 
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.6331, dec=22.0145, offset=1.5, \
+def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
                        emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
                        deadc=0.95, \
-                       caldb="dummy", irf="cta_dummy_irf"):
+                       caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
     
@@ -50,19 +54,19 @@ def setup_observations(pattern="four", ra=83.6331, dec=22.0145, offset=1.5, \
      irf       - Instrument response function (default: cta_dummy_irf)
     """
     # Set list of observations
-    obs_def_list = ctools.obsutils.set_obs_patterns(pattern, \
-                                                    ra=ra, \
-                                                    dec=dec, \
-                                                    offset=offset)
+    obs_def_list = obsutils.set_obs_patterns(pattern, \
+                                             ra=ra, \
+                                             dec=dec, \
+                                             offset=offset)
     
     # Get observation container
-    obs = ctools.obsutils.set_obs_list(obs_def_list, \
-                                       duration=duration, \
-                                       emin=emin, \
-                                       emax=emax, \
-                                       rad=rad, \
-                                       caldb=caldb, \
-                                       irf=irf)
+    obs = obsutils.set_obs_list(obs_def_list, \
+                                duration=duration, \
+                                emin=emin, \
+                                emax=emax, \
+                                rad=rad, \
+                                caldb=caldb, \
+                                irf=irf)
 
     # Return observation container
     return obs
@@ -76,7 +80,7 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
     Setup model for analysis.
     
     Keywords:
-     model     - Model Xml file
+     model - Model Xml file
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
@@ -88,23 +92,24 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 # ================================ #
 # Simulation and analysis pipeline #
 # ================================ #
-def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
+def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
                  enumbins=20, nxpix=200, nypix=200, binsz=0.02, \
                  coordsys="CEL", proj="CAR", debug=False):
     """
     Simulation and stacked analysis pipeline.
 
     Keywords:
-     ra        - RA of cube centre [deg] (default: 83.6331)
-     dec       - DEC of cube centre [deg] (default: 22.0145)
-     emin      - Minimum energy of cube [TeV] (default: 0.1)
-     emax      - Maximum energy of cube [TeV] (default: 100.0)
-     enumbins  - Number of energy bins in cube (default: 20)
-     nxpix     - Number of RA pixels in cube (default: 200)
-     nypix     - Number of DEC pixels in cube (default: 200)
-     binsz     - Spatial cube bin size [deg] (default: 0.02)
-     coordsys  - Cube coordinate system (CEL or GAL)
-     proj      - Cube World Coordinate System (WCS) projection
+     ra       - RA of cube centre [deg] (default: 83.6331)
+     dec      - DEC of cube centre [deg] (default: 22.0145)
+     emin     - Minimum energy of cube [TeV] (default: 0.1)
+     emax     - Maximum energy of cube [TeV] (default: 100.0)
+     enumbins - Number of energy bins in cube (default: 20)
+     nxpix    - Number of RA pixels in cube (default: 200)
+     nypix    - Number of DEC pixels in cube (default: 200)
+     binsz    - Spatial cube bin size [deg] (default: 0.02)
+     coordsys - Cube coordinate system (CEL or GAL)
+     proj     - Cube World Coordinate System (WCS) projection
+     debug    - Enable debugging (default: False)
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
@@ -129,7 +134,7 @@ def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
 
     # Create exposure cube
     expcube = ctools.ctexpcube(sim.obs())
-    expcube["cntmap"].filename("NONE")
+    expcube["incube"].filename("NONE")
     expcube["ebinalg"].string("LOG")
     expcube["emin"].real(emin)
     expcube["emax"].real(emax)
@@ -146,7 +151,7 @@ def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
 
     # Create PSF cube
     psfcube = ctools.ctpsfcube(sim.obs())
-    psfcube["cntmap"].filename("NONE")
+    psfcube["incube"].filename("NONE")
     psfcube["ebinalg"].string("LOG")
     psfcube["emin"].real(emin)
     psfcube["emax"].real(emax)
@@ -163,7 +168,7 @@ def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
 
     # Create background cube
     bkgcube = ctools.ctbkgcube(sim.obs())
-    bkgcube["cntmap"].filename("NONE")
+    bkgcube["incube"].filename("NONE")
     bkgcube["ebinalg"].string("LOG")
     bkgcube["emin"].real(emin)
     bkgcube["emax"].real(emax)
@@ -183,7 +188,7 @@ def run_pipeline(obs, ra=83.6331, dec=22.0145, emin=0.1, emax=100.0, \
 
     # Set Exposure and Psf cube for first CTA observation
     # (ctbin will create an observation with a single container)
-    bin.obs()[0].response(expcube.expcube(), psfcube.psfcube())
+    bin.obs()[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(bin.obs())

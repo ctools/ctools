@@ -6,7 +6,7 @@
 # - matplotlib
 # - numpy
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -167,6 +167,7 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
     """
     # Set constants
     r68_to_sigma = 0.6624305
+    TeV2erg      = 1.0e6 * gammalib.MeV2erg
 
     # Set to figure 3
     plt.figure(3)
@@ -189,8 +190,16 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
         if Noff > 0:
             Non        = Non_lima(sigma, Noff)
             src_counts = Non - bgd_counts
-            flux[i]    = src_counts / (0.68*aeff * duration) * E[i]*1.0e6 * gammalib.MeV2erg
-        print logE[i], flux[i]
+            if src_counts < 0.05*bgd_counts:
+                src_counts = 0.05*bgd_counts
+            if src_counts < 10:
+                src_counts = 10.0
+            emin    = gammalib.GEnergy(math.pow(10.0, logE[i]-0.1), "TeV")
+            emax    = gammalib.GEnergy(math.pow(10.0, logE[i]+0.1), "TeV")
+            epivot  = gammalib.GEnergy(math.pow(10.0, logE[i]), "TeV")
+            plaw    = gammalib.GModelSpectralPlaw(1.0e-6, -2.6, epivot)
+            conv    = TeV2erg*E[i]*E[i]/plaw.flux(emin, emax)
+            flux[i] = conv * src_counts / (duration * aeff*0.68)
     
     # Plot data
     plt.loglog(E, flux, color+'-', label=name)
@@ -210,12 +219,14 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
 # ==================== #
 # Show one sensitivity #
 # ==================== #
-def show_one_response(rspname, dbname, name, color="r"):
+def show_one_response(rspname, dbname, name, rootdir=None, color="r"):
     """
     Show one response.
     """
     # Set-up calibration database
     caldb = gammalib.GCaldb()
+    if rootdir != None:
+        caldb.rootdir(rootdir)
     if gammalib.dir_exists(dbname):
         caldb.rootdir(dbname)
     else:
@@ -242,23 +253,15 @@ def show_one_response(rspname, dbname, name, color="r"):
 # ======================== #
 if __name__ == '__main__':
     """
-    Display spectrum in PHA format.
+    Display response information.
     """
-    # Print usage information
-    #usage = "Usage: show_pha filename" \
-    #        " [-n bins] [-c column] [-t title] [-p plot]"
-    #if len(sys.argv) < 2:
-    #    print(usage)
-    #    sys.exit()
-
-    # Extract parameters
-    #filename = sys.argv[1]
-
     # Create figures
     plt.figure(1)
     plt.title("Effective area")
     plt.figure(2)
     plt.title("Background rate")
+    plt.figure(3)
+    plt.title("Sensitivity")
 
     # Set response dictionary
     rsps = [
@@ -284,9 +287,13 @@ if __name__ == '__main__':
         rspname = rsp['rspname']
         color   = rsp['color']
         name    = rsp['name']
+        if rsp.has_key('rootdir'):
+            rootdir = rsp['rootdir']
+        else:
+            rootdir = None
         
         # Show response
-        show_one_response(rspname, dbname, name, color=color)
+        show_one_response(rspname, dbname, name, rootdir=rootdir, color=color)
 
     # Show plot
     plt.show()

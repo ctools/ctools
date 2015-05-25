@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -35,7 +35,6 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                        "ctpsfcube::get_parameters()"
-#define G_SET_FROM_CNTMAP          "ctpsfcube::set_from_cntmap(std::string&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -275,10 +274,10 @@ void ctpsfcube::save(void)
     }
 
     // Get output filename
-    m_outfile = (*this)["outfile"].filename();
+    m_outcube = (*this)["outcube"].filename();
 
     // Save PSF cube
-    m_psfcube.save(m_outfile, clobber());
+    m_psfcube.save(m_outcube, clobber());
 
     // Return
     return;
@@ -297,13 +296,12 @@ void ctpsfcube::save(void)
 void ctpsfcube::init_members(void)
 {
     // Initialise members
-    m_outfile.clear();
+    m_outcube.clear();
     m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
     m_psfcube.clear();
-    m_ebounds.clear();
 
     // Return
     return;
@@ -318,13 +316,12 @@ void ctpsfcube::init_members(void)
 void ctpsfcube::copy_members(const ctpsfcube& app)
 {
     // Copy attributes
-    m_outfile     = app.m_outfile;
+    m_outcube     = app.m_outcube;
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs        = app.m_obs;
     m_psfcube    = app.m_psfcube;
-    m_ebounds    = app.m_ebounds;
 
     // Return
     return;
@@ -346,167 +343,56 @@ void ctpsfcube::free_members(void)
  *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
- *
- * @todo Setup PSF cube from counts map
  ***************************************************************************/
 void ctpsfcube::get_parameters(void)
 {
-    // If we do not have any observations in the container then get an
-    // input file name or observation descriptor file
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
-        get_obs();
+
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
+
+        // Build observation container
+        m_obs = get_observations();
+
+    } // endif: there was no observation in the container
+
+    // Get the incube filename
+    std::string incube = (*this)["incube"].filename();
+
+    // Get additional binning parameters
+    double amax     = (*this)["amax"].real();
+    int    anumbins = (*this)["anumbins"].integer();
+
+    // Check for filename validity
+    if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
+
+        // Create an event cube based on task parameters
+        GCTAEventCube cube = create_cube(m_obs);
+
+        // Define psf cube
+        m_psfcube = GCTACubePsf(cube, amax, anumbins);
+
     }
 
-    // Make sure that response is set
-    set_response(m_obs);
+    // ... otherwise setup the exposure cube from the counts map
+    else {
+
+        // Load event cube from filename
+        GCTAEventCube cube(incube);
+
+        // Define psf cube
+        m_psfcube = GCTACubePsf(cube, amax, anumbins);
+
+    } // endelse: cube loaded from file
 
     // Read energy dispersion flag
     m_apply_edisp = (*this)["edisp"].boolean();
 
-    // If no counts map is specified then setup the PSF cube from
-    // the user parameters
-    std::string cntmap = (*this)["cntmap"].filename();
-    if ((cntmap == "NONE") || (gammalib::strip_whitespace(cntmap) == "")) {
-    
-        // Get user parameters for counts map definition
-        std::string wcs      = (*this)["proj"].string();
-        std::string coordsys = (*this)["coordsys"].string();
-        double      xref     = (*this)["xref"].real();
-        double      yref     = (*this)["yref"].real();
-        double      binsz    = (*this)["binsz"].real();
-        int         nxpix    = (*this)["nxpix"].integer();
-        int         nypix    = (*this)["nypix"].integer();
-        double      dmax     = (*this)["amax"].real();
-        int         ndbins   = (*this)["anumbins"].integer();
-
-        // Get energy definition
-        m_ebounds = get_ebounds();
-
-        // Define PSF cube
-        m_psfcube = GCTAMeanPsf(wcs, coordsys, xref, yref,
-                                -binsz, binsz, nxpix, nypix,
-                                m_ebounds, dmax, ndbins);
-
-    } // endif: PSF cube set from user parameters
-
-    // ... otherwise setup the PSF cube from the counts map
-    else {
-    
-        // Set PSF cube from counts map
-        set_from_cntmap(cntmap);
-    
-    }
-
     // Read output filename (if needed)
     if (read_ahead()) {
-        m_outfile = (*this)["outfile"].filename();
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get observation definition
- *
- * Get observation definition from the user parameters.
- ***************************************************************************/
-void ctpsfcube::get_obs(void)
-{
-    // Get input filename
-    std::string filename = (*this)["infile"].filename();
-
-    // Try first to open as FITS file
-    try {
-
-        // Allocate CTA observation
-        GCTAObservation obs;
-        
-        // Load input file in CTA observation
-        obs.load(filename);
-
-        // Append CTA observation to container
-        m_obs.append(obs);
-
-    }
-        
-    // ... otherwise try to open as XML file
-    catch (GException::fits_open_error &e) {
-
-        // Load observations from XML file
-        m_obs.load(filename);
-
-    }
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Set PSF cube definition from counts map
- *
- * @exception GException::invalid_value
- *            Invalid counts map projection or invalid events encountered.
- *
- * Set PSF cube definition from counts map.
- ***************************************************************************/
-void ctpsfcube::set_from_cntmap(const std::string& filename)
-{
-    // Allocate CTA observation
-    GCTAObservation obs;
-        
-    // Load counts map in CTA observation
-    obs.load(filename);
-
-    // Set PSF cube from counts map
-    const GCTAEventCube* cube = dynamic_cast<const GCTAEventCube*>(obs.events());
-
-    // Continue only if cube is valid
-    if (cube != NULL) {
-
-        // Get sky map projection
-        const GWcs* wcs = dynamic_cast<const GWcs*>(cube->map().projection());
-        
-        // Continue only if projection is valid
-        if (wcs != NULL) {
-            
-            // Get user parameters for counts map definition
-            std::string proj     = wcs->code();
-            std::string coordsys = wcs->coordsys();
-            double      xref     = wcs->crval(0);
-            double      yref     = wcs->crval(1);
-            double      dx       = wcs->cdelt(0);
-            double      dy       = wcs->cdelt(1);
-            int         nx       = cube->map().nx();
-            int         ny       = cube->map().ny();
-            double      amax     = (*this)["amax"].real();
-            int         anumbins = (*this)["anumbins"].integer();
-
-            // Get energy definition
-            m_ebounds = cube->ebounds();
-
-            // Define PSF cube
-            m_psfcube = GCTAMeanPsf(proj, coordsys, xref, yref,
-                                    dx, dy, nx, ny,
-                                    m_ebounds, amax, anumbins);
-        
-        } // endif: WCS projection was valid
-
-        // ... projection is not of WCS type
-        else {
-            std::string msg = "Counts map project is not of WCS type.";
-            throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
-        }
-
-    } // endif: observation contained an events cube
-
-    // ... there is not events cube
-    else {
-        std::string msg = "No events cube found in file \""
-                          ""+filename+"\".";
-        throw GException::invalid_value(G_SET_FROM_CNTMAP, msg);
+        m_outcube = (*this)["outcube"].filename();
     }
 
     // Return

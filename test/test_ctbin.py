@@ -64,8 +64,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbin
         bin = ctools.ctbin()
-        bin["evfile"].filename(self.events_name)
-        bin["outfile"].filename("cntmap.fits")
+        bin["inobs"].filename(self.events_name)
+        bin["outcube"].filename("cntmap.fits")
         bin["ebinalg"].string("LOG")
         bin["emin"].real(0.1)
         bin["emax"].real(100.0)

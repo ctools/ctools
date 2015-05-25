@@ -1,14 +1,15 @@
-New Features and Important Changes in ctools 0.8.1
+New Features and Important Changes in ctools 0.9.0
 
 Author(s) : Juergen Knoedlseder
 
-8 January 2015
+22 May 2015
 
 
 1. Introduction
 ---------------
-This document briefly summarizes executable by executable the most
-important changes made since the last release of ctools.
+This document briefly summarizes executable by executable the most important
+changes made since the last release of ctools. The code complies to GammaLib
+version 1.0.0 or above.
 
 
 2. Configuration
@@ -18,8 +19,11 @@ None
 
 3. Python interface
 -------------------
-Include Python wrapper files in source code distribution (they were
-missing for version 0.8.0)
+The ctools module does no longer import automatically Python scripts. This
+prevents to break the ctools interface in case that some dependencies in
+the scripts are broken. Scripts (such as obsutils, analysisutils or plotutils)
+are support scripts that may not be fully supported throughout the
+development. They may be moved into a special contributions area in the future.
 
 
 4. Support model
@@ -29,12 +33,14 @@ None
 
 5. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+The rate check is now also correctly done for map cubes. Before, the rate check
+made simulations with a diffuse map cube fail (#1452).
 
 
 6. ctselect - CTA event selection
 ---------------------------------
-None
+If INDEF, UNDEF, NONE or UNDEFINED are passed for the selection parameters, no
+selection will be performed.
 
 
 7. ctbin - CTA event binning
@@ -44,12 +50,14 @@ None
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-None
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 9. cttsmap - Generation of Test Statistics map
 ----------------------------------------------
-None
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 10. ctskymap - CTA sky mapping
@@ -59,7 +67,14 @@ None
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-None
+The ctmodel tool can now be used for stacked analysis from the command line.
+It directly makes use of the cube response to compute the model without using
+the original IRF information. This makes generation of model cubes substantially
+faster. The old method of accessing the IRF response for model computation is
+still possible.
+
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
 12. ctexpcube - CTA exposure cube generation
@@ -84,24 +99,52 @@ None
 
 16. ctbutterfly - Generate butterfly diagrams
 ---------------------------------------------
-None
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
 
 
-17. Examples
+17. ctulimit - Compute upper limit
+----------------------------------
+Added an initial version of the upper limit computation tool.
+
+The bkgcube parameter has been added to allow specification of a background
+cube for stacked analysis.
+
+
+18. Examples
 ------------
 None
 
 
-18. Scripts
+19. Scripts
 -----------
-None
+The user parameter interface of cssens has been modified. The script
+now reads a source model that is used for sensitivity estimation.
+This provides more flexibility in the choice of the model for
+sensitivity estimation.
+
+The csobsdef script has been added that allows creation of observation
+definition XML files from colon separated value ASCII files. The
+observation definition files from csobsdef can be fed to ctobssim for
+simulation of multiple pointings in one shot. This enables for example
+survey observations to be simulated in a single ctobssim run.
+
+The csspec script has been added that creates a spectrum for a given
+dataset and source.
+
+The cslightcrv script has been added that creates a lightcurv for a given
+dataset and source.
+
+The sensitivity computation in cssens has been corrected so that the script
+actually returns the differential flux for a given set of energies.
 
 
-19. caldb
+20. caldb
 ---------
-None
+Official Prod2 instrument response functions for the Southern and Northern
+array have been added.
 
 
-20. models
+21. models
 ----------
 None

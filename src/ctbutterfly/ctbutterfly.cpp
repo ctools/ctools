@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Michael Mayer                                    *
+ *  copyright (C) 2014-2015 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -399,7 +399,6 @@ void ctbutterfly::save(void)
 void ctbutterfly::init_members(void)
 {
     // Initialise members
-    m_infile.clear();
     m_srcname.clear();
     m_outfile.clear();
     m_ebounds.clear();
@@ -424,7 +423,6 @@ void ctbutterfly::init_members(void)
 void ctbutterfly::copy_members(const ctbutterfly& app)
 {
     // Copy attributes
-    m_infile  = app.m_infile;
     m_srcname = app.m_srcname;
     m_outfile = app.m_outfile;
     m_ebounds = app.m_ebounds;
@@ -466,51 +464,25 @@ void ctbutterfly::free_members(void)
  ***************************************************************************/
 void ctbutterfly::get_parameters(void)
 {
-    // If there are no observations in container then add a single CTA
-    // observation using the parameters from the parameter file
+    // If there are no observations in container then load them via user
+    // parameters
     if (m_obs.size() == 0) {
 
-        // Allocate CTA observation
-        GCTAObservation obs;
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
 
-        // Get event file name
-        std::string filename = (*this)["infile"].filename();
-
-        // Try first to open as FITS file
-        try {
-
-            // Load data
-            obs.load(filename);
-
-            // Set response
-            set_obs_response(&obs);
-
-            // Append observation to container
-            m_obs.append(obs);
-
-        }
-
-        // ... otherwise try to open as XML file
-        catch (GException::fits_open_error &e) {
-
-            // Load observations from XML file
-            m_obs.load(filename);
-
-            // Check if all observations have response information. If
-            // not, get the calibration database parameters and set
-            // the response properly
-            set_response(m_obs);
-
-        } // endcatch: file was an XML file
+        // Build observation container
+        m_obs = get_observations();
 
     } // endif: there was no observation in the container
+
 
     // If there is are no models associated with the observations then
     // load now the model definition
     if (m_obs.models().size() == 0) {
 
         // Get models XML filename
-        std::string filename = (*this)["srcmdl"].filename();
+        std::string filename = (*this)["inmodel"].filename();
 
         // Setup models for optimizing.
         m_obs.models(GModels(filename));
@@ -526,15 +498,15 @@ void ctbutterfly::get_parameters(void)
     	throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
-    // Get energy binning information
-    m_ebounds  = get_ebounds();
+    // Create energy boundaries from user parameters
+    m_ebounds = create_ebounds();
 
     // Get matrix file name and load if possible
     std::string matrixfilename = (*this)["matrix"].filename();
     if (matrixfilename != "NONE") {
         std::string msg = "Loading of matrix from file not implemented yet. "
-                           "Use filename = \"NONE\" to induce a recomputation of "
-                           "the matrix internally.";
+                          "Use filename = \"NONE\" to induce a recomputation of "
+                          "the matrix internally.";
         throw GException::feature_not_implemented(G_GET_PARAMETERS, msg);
         // m_covariance.load(matrixfilename);
     }

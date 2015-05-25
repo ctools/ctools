@@ -34,6 +34,7 @@ import test_ctpsfcube
 import test_ctbkgcube
 import test_ctcubemask
 import test_ctbutterfly
+import test_ctulimit
 import test_pipelines
 
 
@@ -60,6 +61,7 @@ if __name__ == '__main__':
     suite_ctbkgcube   = test_ctbkgcube.Test()
     suite_ctcubemask  = test_ctcubemask.Test()
     suite_ctbutterfly = test_ctbutterfly.Test()
+    suite_ctulimit    = test_ctulimit.Test()
     suite_pipelines   = test_pipelines.Test()
 
     # Setup unit tests
@@ -75,6 +77,7 @@ if __name__ == '__main__':
     suite_ctbkgcube.set()
     suite_ctcubemask.set()
     suite_ctbutterfly.set()
+    suite_ctulimit.set()
     suite_pipelines.set()
 
     # Append tests to container
@@ -90,6 +93,7 @@ if __name__ == '__main__':
     suites.append(suite_ctbkgcube)
     suites.append(suite_ctcubemask)
     suites.append(suite_ctbutterfly)
+    suites.append(suite_ctulimit)
     suites.append(suite_pipelines)
 
     # Set PFILES environment variable
@@ -102,6 +106,7 @@ if __name__ == '__main__':
 
     # Run test suite
     success = suites.run()
+    
 
     # Save test results
     suites.save("reports/ctools.xml")

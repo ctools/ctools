@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all cscripts that are shipped with ctools
 #
-# Copyright (C) 2011-2013 Juergen Knoedlseder
+# Copyright (C) 2011-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,12 +47,37 @@ export PFILES=pfiles
 
 
 #
+# Test csobsdef
+# =============
+$ECHO -n "Test csobsdef: "
+chmod +x @abs_top_srcdir@/scripts/csobsdef.py
+@abs_top_srcdir@/scripts/csobsdef.py \
+  inpnt="data/pntdef.dat" \
+  outobs="obs.xml" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  emin=0.1 \
+  emax=100.0 \
+  duration=1800.0 \
+  rad=5.0 > csobsdef.log
+$ECHO -n "."
+if [ -s "obs.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " obs.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
 # Test cspull
 # ===========
-$ECHO @ECHO_N@ "Test cspull: "
+$ECHO -n "Test cspull: "
 chmod +x @abs_top_srcdir@/scripts/cspull.py
 @abs_top_srcdir@/scripts/cspull.py \
-  srcmdl="data/crab.xml" \
+  inmodel="data/crab.xml" \
   outfile="pull.dat" \
   ntrials="3" \
   caldb="irf" \
@@ -62,15 +87,16 @@ chmod +x @abs_top_srcdir@/scripts/cspull.py
   emin=0.1 \
   emax=100.0 \
   enumbins=0 \
-  duration=1800.0 \
+  tmax=1800.0 \
   deadc=0.95 \
   rad=5.0 \
   npix=200 \
+  debug=yes \
   binsz=0.05 > cspull.log
-$ECHO @ECHO_N@ "."
+$ECHO -n "."
 if [ -s "pull.dat" ]
 then
-  $ECHO @ECHO_N@ "."
+  $ECHO -n "."
 else
   $ECHO " pull.dat file is not valid"
   exit 1
@@ -81,66 +107,70 @@ $ECHO " ok"
 #
 # Test cssens
 # ===========
-#echo @ECHO_N@ "Test cssens: "
-#chmod +x @abs_top_srcdir@/scripts/cssens.py
-#@abs_top_srcdir@/scripts/cssens.py \
-#  duration=3600.0 \
-#  caldb="irf" \
-#  irf="cta_dummy_irf" \
-#  type="point" \
-#  offset="0.0" \
-#  bkg="data/bkg_dummy.txt" \
-#  rad=5.0 > cssens.log
-#echo @ECHO_N@ "."
-#if [ -s "sensitivity.dat" ]
-#then
-#  echo @ECHO_N@ "."
-#else
-#  echo " sensitivity.dat file is not valid"
-#  exit 1
-#fi
-#echo " ok"
+$ECHO -n "Test cssens: "
+chmod +x @abs_top_srcdir@/scripts/cssens.py
+@abs_top_srcdir@/scripts/cssens.py \
+  inmodel="data/crab.xml" \
+  srcname="Crab" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  duration=1800.0 \
+  rad=3.0 \
+  emin=1.0 \
+  emax=10.0 \
+  bins=1 > cssens.log
+$ECHO -n "."
+if [ -s "sensitivity.dat" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " sensitivity.dat file is not valid"
+  exit 1
+fi
+$ECHO " ok"
 
 
 #
 # Test cstsdist
 # =============
-$ECHO @ECHO_N@ "Test cstsdist: "
+$ECHO -n "Test cstsdist: "
 chmod +x @abs_top_srcdir@/scripts/cstsdist.py
 @abs_top_srcdir@/scripts/cstsdist.py \
+  inmodel="data/crab.xml" \
+  srcname="Crab" \
   outfile="ts.dat" \
   ntrials="1" \
   caldb="irf" \
   irf="cta_dummy_irf" \
-  type="point" \
-  offset="0.0" \
-  bkg="data/bkg_dummy.txt" \
+  ra=83.63 \
+  dec=22.01 \
   emin=0.1 \
   emax=100.0 \
   enumbins=0 \
-  duration=1800.0 \
+  tmax=1800.0 \
   rad=5.0 \
   npix=200 \
   binsz=0.05 > cstsdist.log
-$ECHO @ECHO_N@ "."
+$ECHO -n "."
 if [ -s "ts.dat" ]
 then
-  $ECHO @ECHO_N@ "."
+  $ECHO -n "."
 else
   $ECHO " ts.dat file is not valid"
   exit 1
 fi
 $ECHO " ok"
 
+
 #
 # Test csresmap
 # =============
-$ECHO @ECHO_N@ "Test csresmap: "
+$ECHO -n "Test csresmap: "
 chmod +x @abs_top_srcdir@/scripts/csresmap.py
 @abs_top_srcdir@/scripts/csresmap.py \
-  infile="data/crab_events.fits" \
-  outfile="resmap.fits" \
-  srcmdl="data/crab.xml" \
+  inobs="data/crab_events.fits" \
+  outmap="resmap.fits" \
+  inmodel="data/crab.xml" \
   caldb="irf" \
   irf="cta_dummy_irf" \
   nxpix=50 \
@@ -151,12 +181,138 @@ chmod +x @abs_top_srcdir@/scripts/csresmap.py
   yref=22.01 \
   proj="CAR" \
   binsz=0.05 > csresmap.log
-$ECHO @ECHO_N@ "."
+$ECHO -n "."
 if [ -s "resmap.fits" ]
 then
-  $ECHO @ECHO_N@ "."
+  $ECHO -n "."
 else
   $ECHO " resmap.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csspec (unbinned)
+# =====================
+$ECHO -n "Test csspec (unbinned): "
+chmod +x @abs_top_srcdir@/scripts/csspec.py
+@abs_top_srcdir@/scripts/csspec.py \
+  inobs="data/crab_events.fits" \
+  inmodel="data/crab.xml" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  enumbins=5 \
+  srcname="Crab" \
+  emin=0.1 \
+  emax=100.0 \
+  binned=no \
+  outfile="spectrum.fits" > csspec.log
+$ECHO -n "."
+if [ -s "spectrum.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " spectrum.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csspec (binned)
+# ====================
+$ECHO -n "Test csspec (binned): "
+chmod +x @abs_top_srcdir@/scripts/csspec.py
+@abs_top_srcdir@/scripts/csspec.py \
+  inobs="data/crab_events.fits" \
+  inmodel="data/crab.xml" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  enumbins=3 \
+  srcname="Crab" \
+  emin=0.1 \
+  emax=100.0 \
+  binned=yes \
+  nxpix=10 \
+  nypix=10 \
+  binsz=0.1 \
+  nebins=2 \
+  coordsys="CEL" \
+  xref=83.63 \
+  yref=22.01 \
+  proj="CAR" \
+  outfile="spectrum.fits" > csspec.log
+$ECHO -n "."
+if [ -s "spectrum.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " spectrum.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cslightcrv (unbinned)
+# ==========================
+$ECHO -n "Test cslightcrv (unbinned): "
+chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
+@abs_top_srcdir@/scripts/cslightcrv.py \
+  inobs="data/crab_events.fits" \
+  inmodel="data/crab.xml" \
+  srcname="Crab" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  tbinalg="LIN" \
+  tmin=51544.5 \
+  tmax=51544.53 \
+  tbins=3 \
+  enumbins=0 \
+  emin=0.1 \
+  emax=100.0 \
+  outfile="lightcurve.fits" > cslightcrv.log
+$ECHO -n "."
+if [ -s "lightcurve.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " lightcurve.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cslightcrv (binned)
+# ========================
+$ECHO -n "Test cslightcrv (binned): "
+chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
+@abs_top_srcdir@/scripts/cslightcrv.py \
+  inobs="data/crab_events.fits" \
+  inmodel="data/crab.xml" \
+  srcname="Crab" \
+  caldb="irf" \
+  irf="cta_dummy_irf" \
+  tbinalg="GTI" \
+  enumbins=2 \
+  emin=0.1 \
+  emax=100.0 \
+  coordsys="CEL" \
+  proj="CAR" \
+  xref=83.63 \
+  yref=22.01 \
+  nxpix=10 \
+  nypix=10 \
+  binsz=0.1 \
+  outfile="lightcurve.fits" > cslightcrv.log
+$ECHO -n "."
+if [ -s "lightcurve.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " lightcurve.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"

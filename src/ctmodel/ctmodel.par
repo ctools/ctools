@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctmodel.par                                                   #
-#  Version:   00-03-00                                                      #
+#  Version:   1.0.0                                                         #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -17,40 +17,44 @@
 #
 # General parameters
 #===================
-infile,   f, a, "NONE",,, "Input counts map or observation definition file"
-outfile,  f, a, "modmap.fits",,, "Output counts map or observation definition file"
-srcmdl,   f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+incube,   f, a, "NONE",,, "Input counts cube"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+outcube,  f, a, "modcube.fits",,, "Output model cube"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 #
 # Observation parameters
 #=======================
-obsfile,  f, a, "NONE",,, "Observation definition file"
-caldb,    s, a, "$CTOOLS/share/caldb/data/cta/dummy",,, "Calibration database"
-irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
+inobs,    f, a, "NONE",,, "Event list, counts cube or observation definition file"
+expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
+psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
+bkgcube,  f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
+caldb,    s, a, "prod2",,, "Calibration database"
+irf,      s, a, "South_50h",,, "Instrument response function"
 ra,       r, a, 83.63,0,360, "RA of pointing (degrees)"
 dec,      r, a, 22.01,-90,90, "Dec of pointing (degrees)"
-tmin,     r, a, 0.0,0,, "Start time (MET in s)"
-tmax,     r, a, 1800.0,0,, "End time (MET in s)"
+rad,      r, a, 5.0,0,180, "Radius of FOV (degrees)"
+tmin,     r, a, 0.0,,, "Start time (MET in s)"
+tmax,     r, a, 1800.0,,, "End time (MET in s)"
 deadc,    r, h, 0.95,0,1, "Average deadtime correction factor"
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, h, "LOG", FILE|LIN|LOG,,"Algorithm for defining energy bins"
-emin,     r, a,  0.1,,,"Start value for first energy bin in TeV"
-emax,     r, a, 100.0,,,"Stop value for last energy bin in TeV"
-enumbins, i, a, 20,,,"Number of energy bins"
-ebinfile, f, h, "NONE",,,"Name of the file containing the energy bin definition"
+ebinalg,  s, h, "LOG",FILE|LIN|LOG,, "Algorithm for defining energy bins"
+emin,     r, a, 0.1,,, "Start value for first energy bin in TeV"
+emax,     r, a, 100.0,,, "Stop value for last energy bin in TeV"
+enumbins, i, a, 20,,, "Number of energy bins"
+ebinfile, f, h, "NONE",,, "Name of the file containing the energy bin definition"
 #
 # Spatial binning parameters
 #===========================
+usepnt,   b, h, no,,, "Use pointing instead of xref/yref parameters?"
 nxpix,    i, a, 200,,, "Size of the X axis in pixels"
 nypix,    i, a, 200,,, "Size of the Y axis in pixels"
 binsz,    r, a, 0.02,,, "Image scale (in degrees/pixel)"
 coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galactic)"
-xref,     r, a, 83.63,,, "First coordinate of image center in degrees (RA or galactic l)"
-yref,     r, a, 22.01,,, "Second coordinate of image center in degrees (DEC or galactic b)"
-axisrot,  r, h, 0.0,,, "Rotation angle of image axis, in degrees"
-proj,     s, a, "CAR", AIT|AZP|CAR|MER|STG|TAN,, "Projection method e.g. AIT|AZP|CAR|MER|STG|TAN"
+xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
+yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
+proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 #
 # Standard parameters
 #====================
