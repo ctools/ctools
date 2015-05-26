@@ -52,7 +52,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-cterror::cterror(void) : ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
+cterror::cterror(void) : ctool(CTERROR_NAME, CTERROR_VERSION)
 {
     // Initialise members
     init_members();
@@ -71,7 +71,7 @@ cterror::cterror(void) : ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
  * observations container.
  ***************************************************************************/
 cterror::cterror(const GObservations& obs) :
-          ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
+          ctool(CTERROR_NAME, CTERROR_VERSION)
 {
     // Initialise members
     init_members();
@@ -92,7 +92,7 @@ cterror::cterror(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 cterror::cterror(int argc, char *argv[]) :
-          ctool(CTULIMIT_NAME, CTULIMIT_VERSION, argc, argv)
+          ctool(CTERROR_NAME, CTERROR_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
