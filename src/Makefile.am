@@ -18,7 +18,8 @@ SUBDIRS = support \
           ctcubemask \
           cttsmap \
           ctbutterfly \
-          ctulimit
+          ctulimit \
+          cterror
 
 # Scripts to be distributed
 scripts = ctools-setup \
