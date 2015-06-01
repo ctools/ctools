@@ -46,7 +46,7 @@ class csspec(ctools.cscript):
         self.obs = None 
               
         # Initialise some members
-        if isinstance(argv[0],gammalib.GObservations):
+        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
             self.obs = argv[0]
             argv     = argv[1:]
         else:      
