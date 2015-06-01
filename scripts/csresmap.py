@@ -48,10 +48,10 @@ class csresmap(ctools.cscript):
               
         # Initialise some members
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-                self.obs = argv[0]
-                argv = argv[1:]
+            self.obs = argv[0]
+            argv     = argv[1:]
         else:      
-            self.obs      = gammalib.GObservations()
+            self.obs = gammalib.GObservations()
             self.obs.clear()   
         self.outfile = ""
         
