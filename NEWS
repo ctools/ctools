@@ -1,15 +1,15 @@
-New Features and Important Changes in ctools 0.9.0
+New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-22 May 2015
+2 June 2015
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
 changes made since the last release of ctools. The code complies to GammaLib
-version 1.0.0 or above.
+version 0.11.0 or above.
 
 
 2. Configuration
@@ -19,11 +19,8 @@ None
 
 3. Python interface
 -------------------
-The ctools module does no longer import automatically Python scripts. This
-prevents to break the ctools interface in case that some dependencies in
-the scripts are broken. Scripts (such as obsutils, analysisutils or plotutils)
-are support scripts that may not be fully supported throughout the
-development. They may be moved into a special contributions area in the future.
+The cscripts have been moved to the ctools module. Now everything is comprised
+in that module.
 
 
 4. Support model
@@ -33,14 +30,12 @@ None
 
 5. ctobssim - CTA observation simulation
 ----------------------------------------
-The rate check is now also correctly done for map cubes. Before, the rate check
-made simulations with a diffuse map cube fail (#1452).
+None
 
 
 6. ctselect - CTA event selection
 ---------------------------------
-If INDEF, UNDEF, NONE or UNDEFINED are passed for the selection parameters, no
-selection will be performed.
+None
 
 
 7. ctbin - CTA event binning
@@ -50,14 +45,12 @@ None
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-The bkgcube parameter has been added to allow specification of a background
-cube for stacked analysis.
+None
 
 
 9. cttsmap - Generation of Test Statistics map
 ----------------------------------------------
-The bkgcube parameter has been added to allow specification of a background
-cube for stacked analysis.
+None
 
 
 10. ctskymap - CTA sky mapping
@@ -67,14 +60,7 @@ None
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-The ctmodel tool can now be used for stacked analysis from the command line.
-It directly makes use of the cube response to compute the model without using
-the original IRF information. This makes generation of model cubes substantially
-faster. The old method of accessing the IRF response for model computation is
-still possible.
-
-The bkgcube parameter has been added to allow specification of a background
-cube for stacked analysis.
+None
 
 
 12. ctexpcube - CTA exposure cube generation
@@ -99,16 +85,12 @@ None
 
 16. ctbutterfly - Generate butterfly diagrams
 ---------------------------------------------
-The bkgcube parameter has been added to allow specification of a background
-cube for stacked analysis.
+None
 
 
 17. ctulimit - Compute upper limit
 ----------------------------------
-Added an initial version of the upper limit computation tool.
-
-The bkgcube parameter has been added to allow specification of a background
-cube for stacked analysis.
+None
 
 
 18. Examples
@@ -118,31 +100,12 @@ None
 
 19. Scripts
 -----------
-The user parameter interface of cssens has been modified. The script
-now reads a source model that is used for sensitivity estimation.
-This provides more flexibility in the choice of the model for
-sensitivity estimation.
-
-The csobsdef script has been added that allows creation of observation
-definition XML files from colon separated value ASCII files. The
-observation definition files from csobsdef can be fed to ctobssim for
-simulation of multiple pointings in one shot. This enables for example
-survey observations to be simulated in a single ctobssim run.
-
-The csspec script has been added that creates a spectrum for a given
-dataset and source.
-
-The cslightcrv script has been added that creates a lightcurv for a given
-dataset and source.
-
-The sensitivity computation in cssens has been corrected so that the script
-actually returns the differential flux for a given set of energies.
+None
 
 
 20. caldb
 ---------
-Official Prod2 instrument response functions for the Southern and Northern
-array have been added.
+None
 
 
 21. models
