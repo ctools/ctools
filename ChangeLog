@@ -1,8 +1,9 @@
-2015-06-02  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-06-05  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.10.0 released
         =========================
 
+        Allocate optimizer in ctlike upon construction (#1471)
         Move cscripts into the ctools Python module (#1470)
 
 

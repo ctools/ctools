@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-2 June 2015
+5 June 2015
 
 
 1. Introduction
@@ -45,7 +45,8 @@ None
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-None
+The optimizer is now allocated upon construction so that ctlike always returns a
+meaningful object using the opt() method.
 
 
 9. cttsmap - Generation of Test Statistics map
