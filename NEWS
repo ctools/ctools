@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-5 June 2015
+9 June 2015
 
 
 1. Introduction
@@ -40,7 +40,8 @@ None
 
 7. ctbin - CTA event binning
 ----------------------------
-None
+ctbin now verifies if an ROI has been set properly, and throws an exception in
+case that no ROI information could be found.
 
 
 8. ctlike - Maximum likelihood fitting

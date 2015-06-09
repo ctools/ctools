@@ -458,9 +458,9 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Check for RoI sanity
         if (!roi.is_valid()) {
             std::string msg = "No RoI information found in input observation "
-                                          "\""+obs->name()+"\". Consider running ctselect "
-                                          "to set the RoI information properly. This is required "
-                                          "to proceed with ctbin.";
+                              "\""+obs->name()+"\". Run ctselect to specify "
+                              "an RoI for this observation before running "
+                              "ctbin.";
             throw GException::invalid_value(G_FILL_CUBE, msg);
         }
 
