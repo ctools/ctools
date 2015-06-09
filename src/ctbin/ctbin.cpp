@@ -455,6 +455,15 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Get the RoI
         const GCTARoi& roi = events->roi();
 
+        // Check for RoI sanity
+        if (!roi.is_valid()) {
+            std::string msg = "No RoI information found in input observation "
+                                          "\""+obs->name()+"\". Consider running ctselect "
+                                          "to set the RoI information properly. This is required "
+                                          "to proceed with ctbin.";
+            throw GException::invalid_value(G_FILL_CUBE, msg);
+        }
+
         // Initialise binning statistics
         int num_outside_roi  = 0;
         int num_outside_map  = 0;
