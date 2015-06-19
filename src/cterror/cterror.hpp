@@ -73,19 +73,18 @@ protected:
     double error_bisection(const double& min, const double& max);
 
     // User parameters
-    std::string   m_srcname;      //!< Name of source which is moved around
+    std::string   m_srcname;      //!< Name of source
     double        m_confidence;   //!< Confidence level
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
     double        m_value;        //!< Parameter value 
-    double        m_error;        //!< Parameter error
 
     // Protected members
     GObservations m_obs;          //!< Observation container
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
     GModelPar*    m_model_par;    //!< Pointer to model parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
-    GOptimizerLM* m_opt;
+    GOptimizerLM* m_opt;          //!< Optimizer
 
 };
 

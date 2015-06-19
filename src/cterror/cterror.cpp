@@ -227,6 +227,12 @@ void cterror::run(void)
         log << m_obs << std::endl;
     }
 
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Compute best-fit likelihood");
+    }
+
     // Allocate optimizer
     m_opt = new GOptimizerLM();
 
@@ -235,14 +241,11 @@ void cterror::run(void)
     m_obs.errors(*m_opt);
     m_best_logL = m_obs.logL();
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Compute best-fit likelihood");
-    }
-
     // Write optimised model into logger
     if (logTerse()) {
+        log << *m_opt << std::endl;
+        log << gammalib::parformat("Maximum log likelihood");
+        log << gammalib::str(m_best_logL,3) << std::endl;
         log << m_obs.models() << std::endl;
     }
 
@@ -285,23 +288,20 @@ void cterror::run(void)
 
             // Compute parameter bracketing
             double parmin = std::max(m_model_par->factor_min(),
-                                     m_value - 10*m_model_par->factor_error());
+                                     m_value - 10.0*m_model_par->factor_error());
             double parmax = std::min(m_model_par->factor_max(),
-                                     m_value + 10*m_model_par->factor_error());
+                                     m_value + 10.0*m_model_par->factor_error());
 
             // Write header
             if (logTerse()) {
                 log << std::endl;
-                log.header1("Compute parameter error");
-                log << gammalib::parformat("Model name");
-                log << model->name() << std::endl;
-                log << gammalib::parformat("Parameter name");
-                log << m_model_par->name() << std::endl;
+                log.header1("Compute error for source \""+m_srcname+"\""
+                            " parameter \""+m_model_par->name()+"\"");
                 log << gammalib::parformat("Confidence level");
                 log << m_confidence*100.0 << "%" << std::endl;
                 log << gammalib::parformat("Log-likelihood difference");
                 log << m_dlogL << std::endl;
-                log << gammalib::parformat("Initial parameter range");
+                log << gammalib::parformat("Initial factor range");
                 log << "[";
                 log << parmin;
                 log << ", ";
@@ -312,47 +312,46 @@ void cterror::run(void)
             // Compute lower boundary
             double value_lo = error_bisection(parmin, m_value);
 
-            // Dump lower parameter value
+            // Write lower parameter value
             if (logTerse()) {
-                log << gammalib::parformat("Final lower parameter value");
+                log << gammalib::parformat("Lower parameter factor");
                 log << value_lo << std::endl;
             }
 
             // Compute upper boundary
             double value_hi = error_bisection(m_value, parmax);
 
-            // Dump upper parameter value
+            // Write upper parameter value
             if (logTerse()) {
-                log << gammalib::parformat("Final upper parameter");
+                log << gammalib::parformat("Upper parameter factor");
                 log << value_hi << std::endl;
             }
 
             // Compute errors
-            m_error          = 0.5 * (value_hi - value_lo);
-            double error_neg = value_lo - m_value;
+            double error     = 0.5 * (value_hi - value_lo);
+            double error_neg = m_value  - value_lo;
             double error_pos = value_hi - m_value;
             //double error_max = std::max(value_hi-m_value, m_value-value_lo);
             //double error_min = std::min(value_hi-m_value, m_value-value_lo);
 
-            // Write results to logfile
+            // Write errors
             if (logTerse()) {
-                log << std::endl;
-                log.header1("Error results");
-                log << gammalib::parformat("Negative error");
-                log << error_neg;
-                log << gammalib::parformat("Positive error");
-                log << error_pos;
-                log << gammalib::parformat("Mean parameter error");
-                log << m_error;
-                log << " " << m_model_par->unit();
-                log << std::endl;
-                log << gammalib::parformat("Parameter scale");
-                log << m_model_par->scale();
-                log << std::endl;
+                log << gammalib::parformat("Error from curvature");
+                log << m_model_par->error();
+                log << " " << m_model_par->unit() << std::endl;
+                log << gammalib::parformat("Error from profile");
+                log << std::abs(error*m_model_par->scale());
+                log << " " << m_model_par->unit() << std::endl;
+                log << gammalib::parformat("Negative profile error");
+                log << std::abs(error_neg*m_model_par->scale());
+                log << " " << m_model_par->unit() << std::endl;
+                log << gammalib::parformat("Positive profile error");
+                log << std::abs(error_pos*m_model_par->scale());
+                log << " " << m_model_par->unit() << std::endl;
             }
 
             // Save error result
-            model->at(i).factor_error(m_error);
+            model->at(i).factor_error(error);
 
         } // endfor: looped over spectral parameters
 
@@ -409,7 +408,6 @@ void cterror::init_members(void)
     m_tol        = 1.0e-3;
     m_max_iter   = 50;
     m_value      = 0.0;
-    m_error      = 0.0;
 
     // Initialise protected members
     m_obs.clear();
@@ -530,7 +528,7 @@ double cterror::error_bisection(const double& min, const double& max)
     double wrk_max = max;
 
     // Initialise iteration counter
-    int iter = 0;
+    int iter = 1;
 
     // Initialize mid value
     double mid = (wrk_min + wrk_max) / 2.0;
@@ -538,42 +536,38 @@ double cterror::error_bisection(const double& min, const double& max)
     // Loop until breaking condition is reached
     while (true) {
 
-        // Log information
-        if (logExplicit()) {
-            log << gammalib::parformat("Iteration "+gammalib::str(iter));
-            log << "[";
-            log << wrk_min;
-            log << ", ";
-            log << wrk_max;
-            log << "]" << std::endl;
-        }
-
         // Throw exception if maximum iterations are reached
         if (iter > m_max_iter) {
-            if(wrk_min - m_model_par->factor_min() < m_tol) {
-                std::string msg = "The "+m_model_par->name()+" parameter minimum has been"
-                                  " reached during error calculation. To obtain accurate "
-                                  " errors, consider to set the minimum to a lower value,"
-                                  " and re-run cterror.";
+            if (wrk_min - m_model_par->factor_min() < m_tol) {
+                std::string msg = "The \""+m_model_par->name()+"\" parameter "
+                                  "minimum has been reached during error "
+                                  "calculation. To obtain accurate errors, "
+                                  "consider setting the minimum parameter "
+                                  "value to a lower value, and re-run "
+                                  "cterror.";
                 if (logTerse()) {
                     log << msg;
                 }
                 break;
             }
-            else if(m_model_par->factor_max() - wrk_max < m_tol) {
-                std::string msg = "The "+m_model_par->name()+" parameter maximum has been"
-                                  " reached during error calculation. To obtain accurate "
-                                  " errors, consider to set the maxmimum to a higher value"
-                                  ", and re-run cterror.";
+            else if (m_model_par->factor_max() - wrk_max < m_tol) {
+                std::string msg = "The \""+m_model_par->name()+"\" parameter "
+                                  "maximum has been reached during error "
+                                  "calculation. To obtain accurate errors, "
+                                  "consider setting the maximum parameter "
+                                  "value to a higher value, and re-run "
+                                  "cterror.";
                 if (logTerse()) {
                     log << msg;
                 }
                 break;
             }
             else {
-                std::string msg = "The maximum number of "+gammalib::str(m_max_iter)+
-                                  " has been reached. You may consider to increase"
-                                  " the \"max_iter\" parameter, and re-run cterror.";
+                std::string msg = "The maximum number of "+
+                                  gammalib::str(m_max_iter)+" iterations has "
+                                  "been reached. Please increase the "
+                                  "\"max_iter\" parameter, and re-run "
+                                  "cterror.";
                 throw GException::invalid_value(G_ERR_BISECTION, msg);
             }
         }
@@ -583,6 +577,18 @@ double cterror::error_bisection(const double& min, const double& max)
 
         // Calculate function value
         double eval_mid = evaluate(mid);
+
+        // Log interval
+        if (logExplicit()) {
+            log << gammalib::parformat("  Iteration "+gammalib::str(iter));
+            log << "[";
+            log << wrk_min;
+            log << ", ";
+            log << wrk_max;
+            log << "] ";
+            log << eval_mid;
+            log << std::endl;
+        }
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
