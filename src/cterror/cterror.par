@@ -19,20 +19,18 @@
 #===================
 inobs,    f, a, "events.fits",,, "Input event list, counts cube or observation definition file"
 inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
-outfile,  f, a, "results.xml",,, "Save results"
+outmodel, f, a, "results.xml",,, "Source model output file"
 srcname,  s, a, "Crab",,, "Source of interest"
 expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
 psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
 bkgcube,  f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
-caldb,    s, a, "dummy",,, "Calibration database"
-irf,      s, a, "cta_dummy_irf",,, "Instrument response function"
+caldb,    s, a, "prod2",,, "Calibration database"
+irf,      s, a, "South_50h",,, "Instrument response function"
 
 #
 # Upper limit calculation parameters
 #===================================
 confidence, r, h, 0.68,0.0,1.0, "Confidence level"
-sigma_min,  r, h, 0.0,,, "Start minimum value (multiple sigmas above fit value)"
-sigma_max,  r, h, 10.0,,, "Start maximum value (multiple sigmas above fit value)"
 tol,        r, h, 1e-3,,, "Computation tolerance"
 max_iter,   i, h, 50,,, "Maximum number of iterations"
 

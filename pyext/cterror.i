@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   cterror - Parameter error calculation tool            *
+ *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2015 by Florent Forest                                   *
  * ----------------------------------------------------------------------- *
@@ -38,7 +38,7 @@
  ***************************************************************************/
 class cterror : public ctool {
 
-    public:
+public:
     // Constructors and destructors
     cterror(void);
     explicit cterror(const GObservations& obs);
@@ -52,8 +52,8 @@ class cterror : public ctool {
     void                 save(void);
     const GObservations& obs(void) const;
     const GOptimizer*    opt(void) const;
-
 };
+
 
 /***********************************************************************//**
  * @brief Parameter error calculation tool Python extensions

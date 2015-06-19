@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   cterror - Parameter error calculation tool            *
+ *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2015 by Florent Forest                                   *
  * ----------------------------------------------------------------------- *
@@ -70,13 +70,11 @@ protected:
     void   free_members(void);
     void   get_parameters(void);
     double evaluate(const double& value);
-    void   error_bisection(const double& min, const double& max);
+    double error_bisection(const double& min, const double& max);
 
     // User parameters
     std::string   m_srcname;      //!< Name of source which is moved around
     double        m_confidence;   //!< Confidence level
-    double        m_sigma_min;    //!< Starting value minimum (multiple fit errors above fit values)
-    double        m_sigma_max;    //!< Starting value maximum (multiple fit errors above fit values)
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
     double        m_value;        //!< Parameter value 
@@ -85,7 +83,6 @@ protected:
     // Protected members
     GObservations m_obs;          //!< Observation container
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
-    GModelSky*    m_skymodel;     //!< Pointer to sky model
     GModelPar*    m_model_par;    //!< Pointer to model parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
     GOptimizerLM* m_opt;

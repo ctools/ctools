@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctools package.
 #
-# Copyright (C) 2012-2014 Juergen Knoedlseder
+# Copyright (C) 2012-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ import test_ctbkgcube
 import test_ctcubemask
 import test_ctbutterfly
 import test_ctulimit
+import test_cterror
 import test_pipelines
 
 
@@ -62,6 +63,7 @@ if __name__ == '__main__':
     suite_ctcubemask  = test_ctcubemask.Test()
     suite_ctbutterfly = test_ctbutterfly.Test()
     suite_ctulimit    = test_ctulimit.Test()
+    suite_cterror     = test_cterror.Test()
     suite_pipelines   = test_pipelines.Test()
 
     # Setup unit tests
@@ -78,6 +80,7 @@ if __name__ == '__main__':
     suite_ctcubemask.set()
     suite_ctbutterfly.set()
     suite_ctulimit.set()
+    suite_cterror.set()
     suite_pipelines.set()
 
     # Append tests to container
@@ -94,6 +97,7 @@ if __name__ == '__main__':
     suites.append(suite_ctcubemask)
     suites.append(suite_ctbutterfly)
     suites.append(suite_ctulimit)
+    suites.append(suite_cterror)
     suites.append(suite_pipelines)
 
     # Set PFILES environment variable

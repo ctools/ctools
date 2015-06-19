@@ -140,9 +140,10 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
     Parameters:
      obs   - Observation container
     Keywords:
-     log   - Create log file(s)
-     debug - Create screen dump
-     edisp - Apply energy dispersion?
+     log     - Create log file(s)
+     debug   - Create screen dump
+     chatter - Chatter level
+     edisp   - Apply energy dispersion?
     """
     # Allocate ctlike application
     like = ctools.ctlike(obs)
@@ -167,19 +168,21 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
     # Return observations
     return like
 
-# ================ #
-# Run cterror      #
-# ================ #
-def cterror(obs, log=False, debug=False):
+
+# ============================================================== #
+# Fit observations and determine errors using likelihood profile #
+# ============================================================== #
+def cterror(obs, log=False, debug=False, chatter=2):
     """
     Perform maximum likelihood fitting of observations in the container.
     
     Parameters:
      obs   - Observation container
     Keywords:
-     log   - Create log file(s)
-     debug - Create screen dump
-     edisp - Apply energy dispersion?
+     log     - Create log file(s)
+     debug   - Create screen dump
+     chatter - Chatter level
+     edisp   - Apply energy dispersion?
     """
     # Allocate cterror application
     error = ctools.cterror(obs)
@@ -191,6 +194,9 @@ def cterror(obs, log=False, debug=False):
     # Optionally switch-on debugging model
     if debug:
         error["debug"].boolean(True)
+
+    # Set chatter level
+    error["chatter"].chatter = chatter
 
     # Run cterror application.
     error.run()

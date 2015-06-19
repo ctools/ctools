@@ -47,6 +47,8 @@ class cspull(ctools.cscript):
         self.obs       = None
         self.model     = None
         self.m_inmodel = None
+        self.m_edisp   = False
+        self.m_profile = False
         
         # Make sure that parfile exists
         file = self.parfile()
@@ -103,6 +105,7 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
+            pars.append(gammalib.GApplicationPar("profile","b","h","no","","","Use likelihood profile method for errors?"))
             pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
             pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
             pars.append(gammalib.GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
@@ -160,6 +163,7 @@ class cspull(ctools.cscript):
         self.m_ntrials = self["ntrials"].integer()   
         self.m_edisp   = self["edisp"].boolean()
         self.m_offset  = self["offset"].real()   
+        self.m_profile = self["profile"].boolean()
 
         # Set some fixed parameters
         self.m_log   = False                    # Logging in client tools
@@ -297,9 +301,12 @@ class cspull(ctools.cscript):
             self.log("\n")
 
         # Fit model
-        #like = obsutils.fit(obs, edisp=self.m_edisp, \
-        #                    log=self.m_log, debug=self.m_debug)
-        like  = obsutils.cterror(obs, log=self.m_log, debug=self.m_debug)
+        if self.m_profile:
+            like  = obsutils.cterror(obs, \
+                                     log=self.m_log, debug=self.m_debug)
+        else:
+            like = obsutils.fit(obs, edisp=self.m_edisp, \
+                                log=self.m_log, debug=self.m_debug)
 
         # Store results
         logL   = like.opt().value()

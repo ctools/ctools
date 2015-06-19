@@ -42,6 +42,7 @@ rm -rf *.fits *.xml *.dat
 #
 # Creates pfiles directory
 # ========================
+rm -rf pfiles
 mkdir -p pfiles
 export PFILES=pfiles
 
@@ -316,3 +317,5 @@ else
   exit 1
 fi
 $ECHO " ok"
+
+ls -la pfiles
