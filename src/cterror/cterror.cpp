@@ -261,14 +261,14 @@ void cterror::run(void)
             throw GException::invalid_value(G_RUN, msg);
         }
 
-        // Get number of spectral parameters
-        int npars = model->spectral()->size();
+        // Get number of parameters
+        int npars = model->size();
 
-        // Loop over spectral parameters of sky model
+        // Loop over parameters of sky model
         for (int i = 0; i < npars; ++i) {
 
             // Skip parameter if it is fixed
-            if (model->spectral()->at(i).is_fixed()) {
+            if (model->at(i).is_fixed()) {
                 continue;
             }
 
@@ -278,7 +278,7 @@ void cterror::run(void)
             // Get pointer on sky model parameter
             GModels&   current_models = const_cast<GModels&>(m_obs.models());
             GModelSky* current_model  = dynamic_cast<GModelSky*>(current_models[m_srcname]);
-            m_model_par               = &(current_model->spectral()->at(i));
+            m_model_par               = &(current_model->at(i));
 
             // Extract current value
             m_value = m_model_par->factor_value();
@@ -352,7 +352,7 @@ void cterror::run(void)
             }
 
             // Save error result
-            model->spectral()->at(i).factor_error(m_error);
+            model->at(i).factor_error(m_error);
 
         } // endfor: looped over spectral parameters
 
