@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the ctulimit tool.
+# This scripts performs unit tests for the cterror tool.
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015 Florent Forest
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@ import gammalib
 import ctools
 
 
-# ============================ #
-# Test class for ctulimit tool #
-# ============================ #
+# =========================== #
+# Test class for cterror tool #
+# =========================== #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for ctulimit tool.
+    Test class for cterror tool.
     """
     # Constructor
     def __init__(self):
@@ -40,6 +40,7 @@ class Test(gammalib.GPythonTestSuite):
         # Set members
         self.events_name = "data/crab_events.fits"
         self.model_name  = "data/crab.xml"
+        self.result_name = "cterror_result.xml"
         self.caldb       = "irf"
         self.irf         = "cta_dummy_irf"
 
@@ -52,10 +53,10 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("ctulimit")
+        self.name("cterror")
 
         # Append tests
-        self.append(self.test_functional, "Test ctulimit functionality")
+        self.append(self.test_functional, "Test cterror functionality")
 
         # Return
         return
@@ -63,28 +64,29 @@ class Test(gammalib.GPythonTestSuite):
     # Test cttsmap functionnality
     def test_functional(self):
         """
-        Test ctulimit functionnality.
+        Test cterror functionnality.
         """
-        # Set-up cttsmap
-        ulimit = ctools.ctulimit()
-        ulimit["inobs"].filename(self.events_name)
-        ulimit["inmodel"].filename(self.model_name)
-        ulimit["srcname"].string("Crab")
-        ulimit["caldb"].string(self.caldb)
-        ulimit["irf"].string(self.irf)
+        # Set-up cterror
+        error = ctools.cterror()
+        error["inobs"].filename(self.events_name)
+        error["inmodel"].filename(self.model_name)
+        error["outmodel"].filename(self.result_name)
+        error["srcname"].string("Crab")
+        error["caldb"].string(self.caldb)
+        error["irf"].string(self.irf)
         
         # Run tool
-        self.test_try("Run ctulimit")
+        self.test_try("Run cterror")
         try:
-            ulimit.run()
+            error.run()
             self.test_try_success()
         except:
-            self.test_try_failure("Exception occured in ctulimit.")
+            self.test_try_failure("Exception occured in cterror.")
 
         # Save results
         self.test_try("Save results")
         try:
-            ulimit.save()
+            error.save()
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in saving results.")
