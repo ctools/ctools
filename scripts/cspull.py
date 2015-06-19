@@ -297,8 +297,9 @@ class cspull(ctools.cscript):
             self.log("\n")
 
         # Fit model
-        like = obsutils.fit(obs, edisp=self.m_edisp, \
-                            log=self.m_log, debug=self.m_debug)
+        #like = obsutils.fit(obs, edisp=self.m_edisp, \
+        #                    log=self.m_log, debug=self.m_debug)
+        like  = obsutils.cterror(obs, log=self.m_log, debug=self.m_debug)
 
         # Store results
         logL   = like.opt().value()

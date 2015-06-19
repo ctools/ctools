@@ -1,5 +1,5 @@
 /***************************************************************************
- *                  cterror - Parameter error calculation tool             *
+ *                   cterror - Parameter error calculation tool            *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2015 by Florent Forest                                   *
  * ----------------------------------------------------------------------- *
@@ -19,61 +19,47 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file main.cpp
- * @brief CTA parameter error calculation
+ * @file cterror.i
+ * @brief Parameter error calculation tool interface definition
  * @author Florent Forest
  */
 
-/* __ Includes ___________________________________________________________ */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#include <iostream>
+%{
+/* Put headers and other declarations here that are needed for compilation */
 #include "cterror.hpp"
+%}
 
 
 /***********************************************************************//**
- * @brief Main entry point of application
+ * @class cterror
  *
- * @param[in] argc Number of command line arguments.
- * @param[in] argv Command line arguments.
+ * @brief Parameter error calculation tool
  *
- * This is the main entry point of the cterror application. It allocates a
- * cterror object and runs the application.
  ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Initialise return code
-    int rc = 1;
+class cterror : public ctool {
 
-    // Create instance of application
-    cterror application(argc, argv);
+    public:
+    // Constructors and destructors
+    cterror(void);
+    explicit cterror(const GObservations& obs);
+    cterror(int argc, char *argv[]);
+    cterror(const cterror& app);
+    virtual ~cterror(void);
 
-    // Run application
-    try {
-        // Execute application
-        application.execute();
+    // Methods
+    void                 clear(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
+    const GOptimizer*    opt(void) const;
 
-        // Signal success
-        rc = 0;
+};
+
+/***********************************************************************//**
+ * @brief Parameter error calculation tool Python extensions
+ ***************************************************************************/
+%extend cterror {
+    cterror copy() {
+        return (*self);
     }
-    catch (std::exception &e) {
-
-        // Extract error message
-        std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " cterror. Run aborted ...";
-
-        // Write error in logger
-        application.log << signal  << std::endl;
-        application.log << message << std::endl;
-
-        // Write error on standard output
-        std::cout << signal  << std::endl;
-        std::cout << message << std::endl;
-
-    } // endcatch: catched any application error
-
-    // Return
-    return rc;
 }

@@ -44,8 +44,8 @@ libctools_la_LIBADD = support/libsupport.la \
                       ctcubemask/libctcubemask.la \
                       cttsmap/libcttsmap.la \
                       ctbutterfly/libctbutterfly.la \
-                      ctulimit/libctulimit.la               
-                      
+                      ctulimit/libctulimit.la \
+                      cterror/libcterror.la
 
 # Distribute scripts
 EXTRA_DIST   = $(scripts)

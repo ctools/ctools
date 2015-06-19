@@ -28,15 +28,16 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio>
+#include <iostream>
 #include "cterror.hpp"
 #include "GTools.hpp"
 #include "GOptimizer.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                         "cterror::get_parameters()"
-#define G_GET_MODEL_PARAMETER               "cterror::get_model_parameter()"
+#define G_ERR_BISECTION         "cterror::error_bisection(double&, double&)"
 #define G_EVALUATE                              "cterror::evaluate(double&)"
+#define G_RUN                                               "cterror::run()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -230,92 +231,161 @@ void cterror::run(void)
     // Save original models
     GModels models_orig = m_obs.models();
 
-    // Save original log-likelihood. If the value is zero it has never been
-    // computed hence we compute it now. 
+    // Allocate optimizer
+    m_opt = new GOptimizerLM();
+    // Optimize and save best log-likelihood
+    m_obs.optimize(*m_opt);
+    m_obs.errors(*m_opt);
     m_best_logL = m_obs.logL();
-    if (m_best_logL == 0.0) {
-
-        // Write header
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Compute best-fit likelihood");
-        }
-
-        // Reoptimize if likelihood was not given before
-        GOptimizerLM* opt = new GOptimizerLM();
-        m_obs.optimize(*opt);
-        m_obs.errors(*opt);
-        m_best_logL = m_obs.logL();
-
-        // Write optimised model into logger
-        if (logTerse()) {
-            log << m_obs.models() << std::endl;
-        }
-
-    } // endif: likelihood was zero
-
-    // Compute parameter bracketing
-    double value  = m_model_par->value();
-    double error  = m_model_par->error();
-    double parmin = value + m_sigma_min * error;
-    double parmax = value + m_sigma_max * error;
 
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Compute upper limit");
-        log << gammalib::parformat("Model name");
-        log << m_skymodel->name() << std::endl;
-        log << gammalib::parformat("Parameter name");
-        log << m_model_par->name() << std::endl;
-        log << gammalib::parformat("Confidence level");
-        log << m_confidence*100.0 << "%" << std::endl;
-        log << gammalib::parformat("Log-likelihood difference");
-        log << m_dlogL << std::endl;
-        log << gammalib::parformat("Initial parameter range");
-        log << "[";
-        log << parmin;
-        log << ", ";
-        log << parmax;
-        log << "]" << std::endl;
+        log.header1("Compute best-fit likelihood");
     }
 
-    // Compute lower boundary
-    error_bisection(parmin, value);
-    double value_lo = m_model_par->value();
-
+    // Write optimised model into logger
     if (logTerse()) {
-        log << gammalib::parformat("Final lower parameter value");
-        log << value_lo << std::endl;
+        log << m_obs.models() << std::endl;
     }
 
-    // Reset parameter to previous value
-    m_model_par->value(value);
 
-    // Compute upper boundary
-    error_bisection(value, parmax);
-    double value_hi = m_model_par->value();
+    // Continue only if source model exists
+    if (m_obs.models().contains(m_srcname)) {
 
-    if (logTerse()) {
-        log << gammalib::parformat("Final upper parameter");
-        log << value_hi << std::endl;
+        GModels& models = const_cast<GModels&>(m_obs.models());
+        m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
+        if (m_skymodel == NULL) {
+            std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
+                    "Please specify the name of a sky model for "
+                    "parameter error computation.";
+            throw GException::invalid_value(G_RUN, msg);
+        }
+
+        int npars = m_skymodel->spectral()->size();
+
+
+        for (int i = 0; i < npars; ++i)
+        {
+
+            // Re-optimize
+            m_obs.optimize(*m_opt);
+
+            if(m_skymodel->spectral()->at(i).is_fixed())
+                continue;
+
+            m_model_par = &(m_skymodel->spectral()->at(i));
+
+            // Compute parameter bracketing
+            m_value  = m_model_par->factor_value();
+            double parmin = std::max(m_model_par->factor_min(),
+                                     m_value - 10*m_model_par->factor_error());
+            double parmax = std::min(m_model_par->factor_max(),
+                                     m_value + 10*m_model_par->factor_error());
+
+            // Write header
+            if (logTerse()) {
+                log << std::endl;
+                log.header1("Compute parameter error");
+                log << gammalib::parformat("Model name");
+                log << m_skymodel->name() << std::endl;
+                log << gammalib::parformat("Parameter name");
+                log << m_model_par->name() << std::endl;
+                log << gammalib::parformat("Confidence level");
+                log << m_confidence*100.0 << "%" << std::endl;
+                log << gammalib::parformat("Log-likelihood difference");
+                log << m_dlogL << std::endl;
+                log << gammalib::parformat("Initial parameter range");
+                log << "[";
+                log << parmin;
+                log << ", ";
+                log << parmax;
+                log << "]" << std::endl;
+            }
+
+            // Compute lower boundary
+            error_bisection(parmin, m_value);
+            double value_lo = m_model_par->factor_value();
+
+            if (logTerse()) {
+                log << gammalib::parformat("Final lower parameter value");
+                log << value_lo << std::endl;
+            }
+
+            // Reset parameter to original value
+            m_model_par->factor_value(m_value);
+
+            // Compute upper boundary
+            error_bisection(m_value, parmax);
+            double value_hi = m_model_par->factor_value();
+
+            if (logTerse()) {
+                log << gammalib::parformat("Final upper parameter");
+                log << value_hi << std::endl;
+            }
+
+            // Reset parameter to original value
+            m_model_par->factor_value(m_value);
+
+            // Compute errors
+            m_error = 0.5*(value_hi - value_lo);
+            double error_max = std::max(value_hi-m_value, m_value-value_lo);
+            double error_min = std::min(value_hi-m_value, m_value-value_lo);
+
+
+            // Write results to logfile
+            if (logTerse()) {
+                log << std::endl;
+                log.header1("Error results");
+                log << gammalib::parformat("Max error");
+                log << error_max;
+                log << gammalib::parformat("Min error");
+                log << error_min;
+                log << gammalib::parformat("Mean parameter error");
+                log << m_error;
+                log << " " << m_model_par->unit();
+                log << std::endl;
+                log << gammalib::parformat("Parameter scale");
+                log << m_model_par->scale();
+                log << std::endl;
+            }
+
+            // Save error result
+            m_model_par->factor_error(m_error);
+
+        }
+
     }
 
-    // Compute error
-    double error = value_hi - value_lo;
 
-    // Write results to logfile
+    // Return
+    return;
+}
+
+/***********************************************************************//**
+ * @brief Save maps
+ *
+ * This method saves the error to an ascii file.
+ *
+ * @todo No yet implemented as we have no clear use case yet for saving
+ * the result.
+ ***************************************************************************/
+void cterror::save(void)
+{
+    // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Error results");
-        log << gammalib::parformat("Parameter error");
-        log << error;
-        log << " " << m_model_par->unit();
-        log << std::endl;
+        log.header1("Save results");
     }
 
-    // Recover original models
-    m_obs.models(models_orig);
+
+    // Get output filename
+    std::string outmodel = (*this)["outfile"].filename();
+
+     // Write results out as XML model
+    if (gammalib::toupper(outmodel) != "NONE") {
+        m_obs.models().save(outmodel);
+    }
 
     // Return
     return;
@@ -334,11 +404,13 @@ void cterror::init_members(void)
 {
     // Initialise user parameters
     m_srcname.clear();
-    m_confidence = 0.95;
+    m_confidence = 0.68;
     m_sigma_min  = 0.0;
     m_sigma_max  = 0.0;
-    m_tol        = 1.0e-6;
+    m_tol        = 1.0e-3;
     m_max_iter   = 50;
+    m_value      = 0.0;
+    m_error      = 0.0;
 
     // Initialise protected members
     m_obs.clear();
@@ -367,15 +439,10 @@ void cterror::copy_members(const cterror& app)
     m_tol        = app.m_tol;
     m_max_iter   = app.m_max_iter;
 
-
     // Copy protected members
     m_obs          = app.m_obs;
     m_dlogL        = app.m_dlogL;
     m_best_logL    = app.m_best_logL;
-
-
-    // Extract model parameter
-    get_model_parameter();
 
     // Return
     return;
@@ -416,7 +483,7 @@ void cterror::get_parameters(void)
     } // endif: there was no observation in the container
 
 
-    // If there is are no models associated with the observations then
+    // If there are no models associated with the observations then
     // load now the model definition
     if (m_obs.models().size() == 0) {
 
@@ -437,11 +504,9 @@ void cterror::get_parameters(void)
         throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
-    // Get relevant model and parameter for upper limit computation
-    get_model_parameter();
-
     // Get confidence level and transform into log-likelihood difference
     m_confidence = (*this)["confidence"].real();
+
     double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
     m_dlogL      = (sigma*sigma) / 2.0;
 
@@ -449,70 +514,10 @@ void cterror::get_parameters(void)
     m_sigma_min = (*this)["sigma_min"].real();
     m_sigma_max = (*this)["sigma_max"].real();
 
-    // Read energy values
-    m_eref = (*this)["eref"].real();
-    m_emin = (*this)["emin"].real();
-    m_emax = (*this)["emax"].real();
-
     // Read precision
     m_tol      = (*this)["tol"].real();
     m_max_iter = (*this)["max_iter"].integer();
 
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Get application parameters
- *
- * @exception GException::invalid_value
- *            Did not find a valid model parameter
- *
- * Extracts a pointer to the sky model (m_skymodel) and a pointer to the
- * relevant model parameter (m_model_par) from the model container.
- ***************************************************************************/
-void cterror::get_model_parameter(void)
-{
-    // Continue only if source model exists
-    if (m_obs.models().contains(m_srcname)) {
-
-        // Get relevant model and parameter for upper limit computation.
-        GModels& models = const_cast<GModels&>(m_obs.models());
-        m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
-        if (m_skymodel == NULL) {
-            std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
-                              "Please specify the name of a sky model for "
-                              "upper limit computation.";
-            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-        }
-        if (m_skymodel->spectral()->type() == "NodeFunction") {
-            std::string msg = "\"NodeFunction\" cannot be used as spectral "
-                              "model for an upper limit computation. "
-                              "Please specify another spectral model.";
-            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-        }
-        if (m_skymodel->spectral()->has_par("Normalization")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Normalization"));
-        }
-        else if (m_skymodel->spectral()->has_par("Prefactor")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Prefactor"));
-        }
-        else if (m_skymodel->spectral()->has_par("Integral")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Integral"));
-        }
-        else if (m_skymodel->spectral()->has_par("Value")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Value"));
-        }
-        else {
-            std::string msg = "Require spectral parameter \"Normalization\", "
-                              "\"Prefactor\", \"Integral\" or \"Value\" for "
-                              "upper limit computation. The specified source "
-                              "\""+m_srcname+"\" does not have such a parameter.";
-            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-        }
-
-    } // endif: source model existed
 
     // Return
     return;
@@ -551,10 +556,35 @@ void cterror::error_bisection(const double& min, const double& max)
 
         // Throw exception if maximum iterations are reached
         if (iter > m_max_iter) {
-            std::string msg = "The maximum number of "+gammalib::str(m_max_iter)+
-                              " has been reached. You may consider to increase"
-                              " the \"max_iter\" parameter and re-run cterror.";
-            throw GException::invalid_value(G_UL_BISECTION, msg);
+            if(wrk_min - m_model_par->factor_min() < m_tol)
+            {
+                std::string msg = "The "+m_model_par->name()+" parameter minimum has been"
+                                  " reached during error calculation. To obtain accurate "
+                                  " errors, consider to set the minimum to a lower value,"
+                                  " and re-run cterror.";
+                if (logTerse()) {
+                    log << msg;
+                }
+                break;
+            }
+            else if(m_model_par->factor_max() - wrk_max < m_tol)
+            {
+                std::string msg = "The "+m_model_par->name()+" parameter maximum has been"
+                                  " reached during error calculation. To obtain accurate "
+                                  " errors, consider to set the maxmimum to a higher value"
+                                  ", and re-run cterror.";
+                if (logTerse()) {
+                    log << msg;
+                }
+                break;
+            }
+            else
+            {
+                std::string msg = "The maximum number of "+gammalib::str(m_max_iter)+
+                                  " has been reached. You may consider to increase"
+                                  " the \"max_iter\" parameter, and re-run cterror.";
+                throw GException::invalid_value(G_ERR_BISECTION, msg);
+            }
         }
 
         // Compute center of boundary
@@ -568,12 +598,27 @@ void cterror::error_bisection(const double& min, const double& max)
             break;
         }
 
-        // Change boundaries for further iteration
-        if (eval_mid > 0.0) {
-            wrk_max = mid;
+        // If we are on the crescent side of the parabola
+        if (mid > m_value)
+        {
+            // Change boundaries for further iteration
+            if (eval_mid > 0.0) {
+                wrk_max = mid;
+            }
+            else if (eval_mid < 0.0) {
+                wrk_min = mid;
+            }
         }
-        else if (eval_mid < 0.0) {
-            wrk_min = mid;
+        // If we are on the decrescent side of the parabola
+        else
+        {
+            // Change boundaries for further iteration
+            if (eval_mid > 0.0) {
+                wrk_min = mid;
+            }
+            else if (eval_mid < 0.0) {
+                wrk_max = mid;
+            }
         }
 
         // Increment counter
@@ -602,16 +647,25 @@ double cterror::evaluate(const double& value)
     double logL = 0.0;
 
     // Check if given parameter is within boundaries
-    if (value > m_model_par->min() && value < m_model_par->max()) {
+    if (value > m_model_par->factor_min() && value < m_model_par->factor_max()) {
 
         // Change parameter factor
-        m_model_par->value(value);
+        m_model_par->factor_value(value);
+
+        //Fix parameter
+        m_model_par->fix();
+
+        // Re-optimize
+        m_obs.optimize(*m_opt);
 
         // Evaluate likelihood for new model container
         m_obs.eval();
 
         // Retrieve likelihood
         logL = m_obs.logL();
+
+        // Free parameter
+        m_model_par->free();
 
     } // endif: value was inside allowed range
 
@@ -626,6 +680,7 @@ double cterror::evaluate(const double& value)
 
     // Compute function value
     double logL_difference = logL - m_best_logL - m_dlogL;
+
 
     // Return
     return logL_difference;

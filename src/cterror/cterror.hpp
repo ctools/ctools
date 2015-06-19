@@ -61,7 +61,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-
+    const GOptimizer*    opt(void) const;
 
 protected:
     // Protected methods
@@ -69,7 +69,6 @@ protected:
     void   copy_members(const cterror& app);
     void   free_members(void);
     void   get_parameters(void);
-    void   get_model_parameter(void);
     double evaluate(const double& value);
     void   error_bisection(const double& min, const double& max);
 
@@ -80,6 +79,8 @@ protected:
     double        m_sigma_max;    //!< Starting value maximum (multiple fit errors above fit values)
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
+    double        m_value;        //!< Parameter value 
+    double        m_error;        //!< Parameter error
 
     // Protected members
     GObservations m_obs;          //!< Observation container
@@ -87,6 +88,7 @@ protected:
     GModelSky*    m_skymodel;     //!< Pointer to sky model
     GModelPar*    m_model_par;    //!< Pointer to model parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
+    GOptimizerLM* m_opt;
 
 };
 
@@ -102,5 +104,15 @@ const GObservations& cterror::obs(void) const
     return m_obs;
 }
 
+/***********************************************************************//**
+ * @brief Return optimizer
+ *
+ * @return Pointer to optimizer
+ ***************************************************************************/
+inline
+const GOptimizer* cterror::opt(void) const
+{
+    return m_opt;
+}
 
 #endif /* CTERROR_HPP */

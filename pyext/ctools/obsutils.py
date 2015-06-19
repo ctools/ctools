@@ -158,6 +158,37 @@ def fit(obs, log=False, debug=False, edisp=False):
     # Return observations
     return like
 
+# ================ #
+# Run cterror      #
+# ================ #
+def cterror(obs, log=False, debug=False):
+    """
+    Perform maximum likelihood fitting of observations in the container.
+    
+    Parameters:
+     obs   - Observation container
+    Keywords:
+     log   - Create log file(s)
+     debug - Create screen dump
+     edisp - Apply energy dispersion?
+    """
+    # Allocate cterror application
+    error = ctools.cterror(obs)
+    
+    # Optionally open the log file
+    if log:
+        error.logFileOpen()
+    
+    # Optionally switch-on debugging model
+    if debug:
+        error["debug"].boolean(True)
+
+    # Run cterror application.
+    error.run()
+    
+    # Return observations
+    return error
+
 
 # ================= #
 # Create counts map #
