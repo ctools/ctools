@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-9 June 2015
+19 June 2015
 
 
 1. Introduction
@@ -95,21 +95,28 @@ None
 None
 
 
-18. Examples
+18. cterror - Likelihood profile error computation
+--------------------------------------------------
+Added initial version of the likelihood profile error computation tool. This
+tool will scan the likelihood function to find the confidence interval for
+all source parameters.
+
+
+19. Examples
 ------------
 None
 
 
-19. Scripts
+20. Scripts
 -----------
 None
 
 
-20. caldb
+21. caldb
 ---------
 None
 
 
-21. models
+22. models
 ----------
 None

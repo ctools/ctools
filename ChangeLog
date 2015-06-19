@@ -1,8 +1,9 @@
-2015-06-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-06-19  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.10.0 released
         =========================
 
+        Add cterror tool
         Check existence of ROI in ctbin (#1476)
         Allocate optimizer in ctlike upon construction (#1471)
         Move cscripts into the ctools Python module (#1470)
