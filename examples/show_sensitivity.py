@@ -99,7 +99,7 @@ def show_sensitivity(sensitivity, filename):
     plt.grid()
 
     # Show differential sensitivity
-    plt.plot(sensitivity['energy'], sensitivity['eflux'], 'ro-')
+    plt.plot(sensitivity['energy'], sensitivity['sensitivity'], 'ro-')
 
     # Set labels
     plt.xlabel("Energy (TeV)")

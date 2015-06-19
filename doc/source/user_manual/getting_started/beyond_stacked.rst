@@ -15,10 +15,10 @@ into a single counts cube:
 .. code-block:: bash
 
   $ ctbin
-  Event list or observation definition file [events2.fits] obs.xml
-  First coordinate of image center in degrees (RA or galactic l) [83.63] 
-  Second coordinate of image center in degrees (DEC or galactic b) [22.01] 
-  Projection method e.g. AIT|AZP|CAR|MER|STG|TAN (AIT|AZP|CAR|MER|STG|TAN) [CAR] 
+  Event list or observation definition file [events.fits] obs.xml
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
   Image scale (in degrees/pixel) [0.02] 
   Size of the X axis in pixels [200] 
@@ -27,15 +27,16 @@ into a single counts cube:
   Start value for first energy bin in TeV [0.1] 
   Stop value for last energy bin in TeV [100.0] 
   Number of energy bins [20] 
-  Output counts cube [cntcube2.fits] cntcube.fits
+  Output counts cube [cntcube.fits] 
 
 We now have a stacked counts cube ``cntcube.fits`` on disk.
 Before we can use that counts cube in a maximum likelihood
 analysis, we have to compute the instrument response and the
 background model that are needed to describe the stacked data.
+
 For the former, we have to compute the total exposure for the stacked
 cube (i.e. the sum of the effective areas for each observation multiplied
-by the corresponding lifetimes) and an effective point spread function
+by the corresponding livetimes) and an effective point spread function
 (i.e. the point spread function of the different observations weighted by
 the corresponding exposures).
 To get both informations we use the :ref:`ctexpcube` and 
@@ -45,29 +46,29 @@ To get both informations we use the :ref:`ctexpcube` and
 
   $ ctexpcube
   Event list or observation definition file [NONE] obs.xml
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
   Counts cube for exposure cube definition [NONE] cntcube.fits
-  Output exposure cube file [expcube.fits]
+  Output exposure cube file [expcube.fits] 
 
 .. code-block:: bash
 
   $ ctpsfcube
   Event list or observation definition file [NONE] obs.xml
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
   Counts cube for psf cube definition [NONE] 
-  First coordinate of image center in degrees (RA or galactic l) [83.63] 
-  Second coordinate of image center in degrees (DEC or galactic b) [22.01] 
-  Projection method e.g. AIT|AZP|CAR|MER|MOL|STG|TAN (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
   Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
   Image scale (in degrees/pixel) [1.0] 
   Size of the X axis in pixels [10] 
   Size of the Y axis in pixels [10] 
-  Start value for first energy bin in TeV [0.1] 
-  Stop value for last energy bin in TeV [100.0] 
+  Lower energy limit (TeV) [0.1] 
+  Upper energy limit (TeV) [100.0] 
   Number of energy bins [20] 
-  Output psf cube file [psfcube.fits]
+  Output psf cube file [psfcube.fits] 
 
 We provide the ``obs.xml`` file on input to inform both tools which
 observations have been combined.
@@ -93,17 +94,17 @@ background cube using the :ref:`ctbkgcube` tool:
 
   $ ctbkgcube
   Input event list or observation definition file [NONE] obs.xml
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
-  Input (background) model XML file [NONE] $CTOOLS/share/models/crab.xml
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
   Counts cube for background cube definition [NONE] cntcube.fits
+  Input model XML file [NONE] $CTOOLS/share/models/crab.xml
   Output background cube file [bkgcube.fits] 
-  Output (background) model XML file [NONE] model.xml
+  Output model XML file [NONE] model.xml
 
 The usage of :ref:`ctbkgcube` is very similar to that of :ref:`ctexpcube`,
 yet it takes the model XML file as an additional input parameter.
-We here use the usual ``$CTOOLS/share/models/crab.xml`` Crab plus
-background model file that is shipped with the ctools.
+We here use the usual ``$CTOOLS/share/models/crab.xml`` model
+file that is shipped with the ctools.
 :ref:`ctbkgcube` provides on output the background cube file
 ``bkgcube.fits`` and the model XML file ``model.xml`` that can
 be used for further analysis.
@@ -125,25 +126,21 @@ modelling works:
         <parameter name="DEC" value="22.0145" scale="1" min="-90" max="90" free="0" />
       </spatialModel>
     </source>
-    <source name="ctbkgcube default background model" type="CTACubeBackground">
+    <source name="BackgroundModel" type="CTACubeBackground" instrument="CTA,HESS,MAGIC,VERITAS">
       <spectrum type="PowerLaw">
         <parameter name="Prefactor" value="1" error="0" scale="1" min="0" free="1" />
         <parameter name="Index" value="0" error="0" scale="1" min="-10" max="10" free="1" />
         <parameter name="Scale" value="1" scale="1e+06" free="0" />
       </spectrum>
-      <spatialModel type="MapCubeFunction" file="bkgcube.fits">
-        <parameter name="Normalization" value="1" scale="1" min="0.001" max="1000" free="0" />
-      </spatialModel>
     </source>
   </source_library>
 
 The Crab source component is the same that is also present in
 ``$CTOOLS/share/models/crab.xml`` and is not modified.
-The background component, however, has been replaced and now is
-the ``ctbkgcube default background model``.
-This model is of type ``CTACubeBackground`` which is a 3-dimensional
-data cube that describes the expected background rate as function
-of spatial position and energy.
+The background component, however, has been replaced by a model of
+type ``CTACubeBackground``.
+This model is a 3-dimensional data cube that describes the expected 
+background rate as function of spatial position and energy.
 The data cube is multiplied by a power law spectrum that allows to adjust
 the normalization and slope of the background spectrum in the fit.
 This power law could be replaced by any spectral model that is found
@@ -166,87 +163,82 @@ analysis using the :ref:`ctlike` tool:
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts cube or observation definition file [events.fits] cntcube.fits
-  Exposure cube file [NONE] expcube.fits
-  PSF cube file [NONE] psfcube.fits
+  Event list, counts cube or observation definition file [obs.xml] cntcube.fits
+  Exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
+  PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
+  Background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
   Source model [$CTOOLS/share/models/crab.xml] model.xml
-  Source model output file [crab_results.xml]
+  Source model output file [crab_results.xml] 
 
 :ref:`ctlike` recognises that a counts cube should be analysed and queries
-for the exposure cube and PSF cube file names.
-We specified the names of the files produced by the :ref:`ctexpcube` and
-:ref:`ctpsfcube` tools and furthermore provided the ``model.xml`` file
-that is generated by the :ref:`ctbkgcube` tool as source model.
+for the exposure cube, the PSF cube, and the background cube file names.
+We specified the names of the files produced by the :ref:`ctexpcube`,
+the :ref:`ctpsfcube` and the :ref:`ctbkgcube` tools.
+Furthermore we provided as model the ``model.xml`` file that has been
+generated by the :ref:`ctbkgcube` tool.
+
 The log file of the :ref:`ctlike` run is shown below.
 Note that the spectral model that is multiplied with the background
-cube has a Prefactor of 1.06 +/- 0.02 and an Index of 0.004 +/- 0.009,
+cube has a Prefactor of 1.09 +/- 0.02 and an Index of 0.03 +/- 0.01,
 indicating a very small correction to the actual spectrum of the background
 cube.
 Real life situations may of course require larger correction factors.
 
 .. code-block:: xml
 
-  2015-02-04T23:00:25: +=================================+
-  2015-02-04T23:00:25: | Maximum likelihood optimisation |
-  2015-02-04T23:00:25: +=================================+
-  2015-02-04T23:00:29:  >Iteration   0: -logL=36748.112, Lambda=1.0e-03
-  2015-02-04T23:00:33:  >Iteration   1: -logL=36734.170, Lambda=1.0e-03, delta=13.942, max(|grad|)=34.291911 [Index:8]
-  2015-02-04T23:00:38:  >Iteration   2: -logL=36734.127, Lambda=1.0e-04, delta=0.044, max(|grad|)=0.178088 [Index:8]
-  2015-02-04T23:00:42:  >Iteration   3: -logL=36734.127, Lambda=1.0e-05, delta=0.000, max(|grad|)=-0.001993 [Index:8]
-  2015-02-04T23:00:46: 
-  2015-02-04T23:00:46: +=========================================+
-  2015-02-04T23:00:46: | Maximum likelihood optimization results |
-  2015-02-04T23:00:46: +=========================================+
-  2015-02-04T23:00:46: === GOptimizerLM ===
-  2015-02-04T23:00:46:  Optimized function value ..: 36734.127
-  2015-02-04T23:00:46:  Absolute precision ........: 0.005
-  2015-02-04T23:00:46:  Acceptable value decrease .: 2
-  2015-02-04T23:00:46:  Optimization status .......: converged
-  2015-02-04T23:00:46:  Number of parameters ......: 11
-  2015-02-04T23:00:46:  Number of free parameters .: 4
-  2015-02-04T23:00:46:  Number of iterations ......: 3
-  2015-02-04T23:00:46:  Lambda ....................: 1e-06
-  2015-02-04T23:00:46:  Maximum log likelihood ....: -36734.127
-  2015-02-04T23:00:46:  Observed events  (Nobs) ...: 10685.000
-  2015-02-04T23:00:46:  Predicted events (Npred) ..: 10685.000 (Nobs - Npred = 2.06522e-06)
-  2015-02-04T23:00:46: === GModels ===
-  2015-02-04T23:00:46:  Number of models ..........: 2
-  2015-02-04T23:00:46:  Number of parameters ......: 11
-  2015-02-04T23:00:46: === GModelSky ===
-  2015-02-04T23:00:46:  Name ......................: Crab
-  2015-02-04T23:00:46:  Instruments ...............: all
-  2015-02-04T23:00:46:  Instrument scale factors ..: unity
-  2015-02-04T23:00:46:  Observation identifiers ...: all
-  2015-02-04T23:00:46:  Model type ................: PointSource
-  2015-02-04T23:00:46:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
-  2015-02-04T23:00:46:  Number of parameters ......: 6
-  2015-02-04T23:00:46:  Number of spatial par's ...: 2
-  2015-02-04T23:00:46:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-  2015-02-04T23:00:46:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-  2015-02-04T23:00:46:  Number of spectral par's ..: 3
-  2015-02-04T23:00:46:   Prefactor ................: 6.01471e-16 +/- 1.44183e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-  2015-02-04T23:00:46:   Index ....................: -2.49533 +/- 0.0179769 [-0,-5]  (free,scale=-1,gradient)
-  2015-02-04T23:00:46:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
-  2015-02-04T23:00:46:  Number of temporal par's ..: 1
-  2015-02-04T23:00:46:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2015-02-04T23:00:46: === GCTAModelCubeBackground ===
-  2015-02-04T23:00:46:  Name ......................: ctbkgcube default background model
-  2015-02-04T23:00:46:  Instruments ...............: all
-  2015-02-04T23:00:46:  Instrument scale factors ..: unity
-  2015-02-04T23:00:46:  Observation identifiers ...: all
-  2015-02-04T23:00:46:  Model type ................: "MapCubeFunction" * "PowerLaw" * "Constant"
-  2015-02-04T23:00:46:  Number of parameters ......: 5
-  2015-02-04T23:00:46:  Number of spatial par's ...: 1
-  2015-02-04T23:00:46:   Normalization ............: 1 [0.001,1000]  (fixed,scale=1,gradient)
-  2015-02-04T23:00:46:  Number of spectral par's ..: 3
-  2015-02-04T23:00:46:   Prefactor ................: 1.05876 +/- 0.0178132 [0,infty[ ph/cm2/s/MeV (free,scale=1,gradient)
-  2015-02-04T23:00:46:   Index ....................: 0.00396962 +/- 0.00881842 [-10,10]  (free,scale=1,gradient)
-  2015-02-04T23:00:46:   PivotEnergy ..............: 1e+06 MeV (fixed,scale=1e+06,gradient)
-  2015-02-04T23:00:46:  Number of temporal par's ..: 1
-  2015-02-04T23:00:46:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2015-02-04T23:00:46: 
-  2015-02-04T23:00:46: +==============+
-  2015-02-04T23:00:46: | Save results |
-  2015-02-04T23:00:46: +==============+
-  2015-02-04T23:00:46: 
-  2015-02-04T23:00:46: Application "ctlike" terminated after 43 wall clock seconds, consuming 21.5624 seconds of CPU time.
+  2015-05-22T21:10:09: +=================================+
+  2015-05-22T21:10:09: | Maximum likelihood optimisation |
+  2015-05-22T21:10:09: +=================================+
+  2015-05-22T21:10:10:  >Iteration   0: -logL=60663.798, Lambda=1.0e-03
+  2015-05-22T21:10:11:  >Iteration   1: -logL=60642.413, Lambda=1.0e-03, delta=21.385, max(|grad|)=120.031102 [Index:7]
+  2015-05-22T21:10:13:  >Iteration   2: -logL=60642.233, Lambda=1.0e-04, delta=0.180, max(|grad|)=1.139187 [Index:7]
+  2015-05-22T21:10:14:  >Iteration   3: -logL=60642.233, Lambda=1.0e-05, delta=0.000, max(|grad|)=-0.001247 [Index:7]
+  2015-05-22T21:10:16: 
+  2015-05-22T21:10:16: +=========================================+
+  2015-05-22T21:10:16: | Maximum likelihood optimization results |
+  2015-05-22T21:10:16: +=========================================+
+  2015-05-22T21:10:16: === GOptimizerLM ===
+  2015-05-22T21:10:16:  Optimized function value ..: 60642.233 
+  2015-05-22T21:10:16:  Absolute precision ........: 0.005
+  2015-05-22T21:10:16:  Acceptable value decrease .: 2
+  2015-05-22T21:10:16:  Optimization status .......: converged
+  2015-05-22T21:10:16:  Number of parameters ......: 10
+  2015-05-22T21:10:16:  Number of free parameters .: 4
+  2015-05-22T21:10:16:  Number of iterations ......: 3
+  2015-05-22T21:10:16:  Lambda ....................: 1e-06
+  2015-05-22T21:10:16:  Maximum log likelihood ....: -60642.233
+  2015-05-22T21:10:16:  Observed events  (Nobs) ...: 25963.000
+  2015-05-22T21:10:16:  Predicted events (Npred) ..: 25963.000 (Nobs - Npred = 1.5749e-05)
+  2015-05-22T21:10:16: === GModels ===
+  2015-05-22T21:10:16:  Number of models ..........: 2
+  2015-05-22T21:10:16:  Number of parameters ......: 10
+  2015-05-22T21:10:16: === GModelSky ===
+  2015-05-22T21:10:16:  Name ......................: Crab
+  2015-05-22T21:10:16:  Instruments ...............: all
+  2015-05-22T21:10:16:  Instrument scale factors ..: unity
+  2015-05-22T21:10:16:  Observation identifiers ...: all
+  2015-05-22T21:10:16:  Model type ................: PointSource
+  2015-05-22T21:10:16:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2015-05-22T21:10:16:  Number of parameters ......: 6
+  2015-05-22T21:10:16:  Number of spatial par's ...: 2
+  2015-05-22T21:10:16:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+  2015-05-22T21:10:16:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+  2015-05-22T21:10:16:  Number of spectral par's ..: 3
+  2015-05-22T21:10:16:   Prefactor ................: 5.8499e-16 +/- 8.02289e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+  2015-05-22T21:10:16:   Index ....................: -2.49909 +/- 0.0118976 [-0,-5]  (free,scale=-1,gradient)
+  2015-05-22T21:10:16:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
+  2015-05-22T21:10:16:  Number of temporal par's ..: 1
+  2015-05-22T21:10:16:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+  2015-05-22T21:10:16: === GCTAModelCubeBackground ===
+  2015-05-22T21:10:16:  Name ......................: BackgroundModel
+  2015-05-22T21:10:16:  Instruments ...............: CTA, HESS, MAGIC, VERITAS
+  2015-05-22T21:10:16:  Instrument scale factors ..: unity
+  2015-05-22T21:10:16:  Observation identifiers ...: all
+  2015-05-22T21:10:16:  Model type ................: "PowerLaw" * "Constant"
+  2015-05-22T21:10:16:  Number of parameters ......: 4
+  2015-05-22T21:10:16:  Number of spectral par's ..: 3
+  2015-05-22T21:10:16:   Prefactor ................: 1.08781 +/- 0.0212678 [0,infty[ ph/cm2/s/MeV (free,scale=1,gradient)
+  2015-05-22T21:10:16:   Index ....................: 0.0269681 +/- 0.0111532 [-10,10]  (free,scale=1,gradient)
+  2015-05-22T21:10:16:   PivotEnergy ..............: 1e+06 MeV (fixed,scale=1e+06,gradient)
+  2015-05-22T21:10:16:  Number of temporal par's ..: 1
+  2015-05-22T21:10:16:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)

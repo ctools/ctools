@@ -401,6 +401,14 @@ void ctlike::get_parameters(void)
         m_outmodel = (*this)["outmodel"].filename();
     }
 
+    // Set optimizer logger
+    if (logTerse()) {
+        static_cast<GOptimizerLM*>(m_opt)->logger(&log);
+    }
+    else {
+        static_cast<GOptimizerLM*>(m_opt)->logger(NULL);
+    }
+
     // Return
     return;
 }
@@ -411,22 +419,6 @@ void ctlike::get_parameters(void)
  ***************************************************************************/
 void ctlike::optimize_lm(void)
 {
-    // Free any existing optimizer
-    if (m_opt != NULL) delete m_opt;
-    m_opt = NULL;
-
-    // Allocate optimizer. The logger is only passed to the optimizer
-    // constructor if optimizer logging is requested.
-    GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log)
-                                     : new GOptimizerLM();
-
-    // Assign optimizer
-    m_opt = opt;
-
-    // Set optimizer parameters
-    opt->max_iter(m_max_iter);
-    opt->max_stalls(m_max_stall);
-
     // Write Header for optimization and indent for optimizer logging
     if (logTerse()) {
         log << std::endl;
@@ -435,7 +427,7 @@ void ctlike::optimize_lm(void)
     }
 
     // Perform LM optimization
-    m_obs.optimize(*opt);
+    m_obs.optimize(*m_opt);
 
     // Optionally refit
     if (m_refit) {
@@ -449,15 +441,15 @@ void ctlike::optimize_lm(void)
         }
 
         // Optimise again
-        m_obs.optimize(*opt);
+        m_obs.optimize(*m_opt);
 
     }
 
     // Compute errors
-    m_obs.errors(*opt);
+    m_obs.errors(*m_opt);
 
     // Store maximum log likelihood value
-    m_logL = -(opt->value());
+    m_logL = -(m_opt->value());
 
     // Remove indent
     log.indent(0);
@@ -473,15 +465,6 @@ void ctlike::optimize_lm(void)
  ***************************************************************************/
 double ctlike::reoptimize_lm(void)
 {
-    // Allocate optimizer. The logger is only passed to the optimizer
-    // constructor if optimizer logging is requested.
-    GOptimizerLM* opt = (logTerse()) ? new GOptimizerLM(log)
-                                     : new GOptimizerLM();
-
-    // Set optimizer parameters
-    opt->max_iter(m_max_iter);
-    opt->max_stalls(m_max_stall);
-
     // Write Header for optimization and indent for optimizer logging
     if (logTerse()) {
         log << std::endl;
@@ -490,22 +473,22 @@ double ctlike::reoptimize_lm(void)
     }
 
     // Perform LM optimization
-    m_obs.optimize(*opt);
+    m_obs.optimize(*m_opt);
 
     // Optionally refit
     if (m_refit) {
-        m_obs.optimize(*opt);
+        m_obs.optimize(*m_opt);
     }
 
     // Store maximum log likelihood value
-    double logL = -(opt->value());
+    double logL = -(m_opt->value());
 
     // Write optimization results
     log.indent(0);
     if (logTerse()) {
         log << std::endl;
         log.header1("Maximum likelihood re-optimization results");
-        log << *opt << std::endl;
+        log << *m_opt << std::endl;
     }
 
     // Return
@@ -537,6 +520,16 @@ void ctlike::init_members(void)
     // Set logger properties
     log.date(true);
 
+    // Allocate LM optimizer
+    GOptimizerLM* opt = new GOptimizerLM();
+
+    // Set optimizer parameters
+    opt->max_iter(m_max_iter);
+    opt->max_stalls(m_max_stall);
+
+    // Set optimizer pointer
+    m_opt = opt;
+
     // Return
     return;
 }
@@ -551,7 +544,7 @@ void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
     m_refit       = app.m_refit;
-    m_outmodel      = app.m_outmodel;
+    m_outmodel    = app.m_outmodel;
     m_obs         = app.m_obs;
     m_max_iter    = app.m_max_iter;
     m_max_stall   = app.m_max_stall;

@@ -13,7 +13,7 @@ bugs.
 Releases
 --------
 
-The latest ctools release is ``ctools-00-08-01`` (8 January 2015).
+The latest ctools release is ``ctools-0.9.0`` (22 May 2015).
 
 Below a table of ctools releases. Please note that at this stage of the
 project there is a strict link between the ctools and gammalib versions.
@@ -28,6 +28,9 @@ gammalib.
    * - `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ChangeLog>`_
      - `gammalib <http://cta.irap.omp.eu/ctools/releases/gammalib/ChangeLog>`_
      - Mac OS X package
+   * - `0.9.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-0.9.0.tar.gz>`_
+     - `0.10.0 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-0.10.0.tar.gz>`_
+     - `ctools-0.9.0-macosx10.3.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-0.9.0-macosx10.3.dmg>`_
    * - `0.8.1 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-00-08-01.tar.gz>`_
      - `0.9.1 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-00-09-01.tar.gz>`_
      - `ctools-00-08-01-macosx10.3.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-00-08-01-macosx10.3.dmg>`_

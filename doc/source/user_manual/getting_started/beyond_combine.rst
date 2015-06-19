@@ -20,12 +20,12 @@ nebula, each offset by 0.5 deg from the nebula in opposite directions:
   RA of pointing (degrees) (0-360) [83.63] 
   Dec of pointing (degrees) (-90-90) [22.01] 21.51
   Radius of FOV (degrees) (0-180) [5.0] 
-  Start time (MET in s) (0) [0.0] 
-  End time (MET in s) (0) [1800.0] 
-  Lower energy limit (TeV) (0) [0.1] 
-  Upper energy limit (TeV) (0) [100.0] 
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
+  Start time (MET in s) [0.0] 
+  End time (MET in s) [1800.0] 
+  Lower energy limit (TeV) [0.1] 
+  Upper energy limit (TeV) [100.0] 
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
   Model [$CTOOLS/share/models/crab.xml] 
   Output event data file or observation definition file [events.fits] events1.fits
 
@@ -35,12 +35,12 @@ nebula, each offset by 0.5 deg from the nebula in opposite directions:
   RA of pointing (degrees) (0-360) [83.63] 
   Dec of pointing (degrees) (-90-90) [21.51] 22.51
   Radius of FOV (degrees) (0-180) [5.0] 
-  Start time (MET in s) (0) [0.0] 
-  End time (MET in s) (0) [1800.0] 
-  Lower energy limit (TeV) (0) [0.1] 
-  Upper energy limit (TeV) (0) [100.0] 
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
+  Start time (MET in s) [0.0] 
+  End time (MET in s) [1800.0] 
+  Lower energy limit (TeV) [0.1] 
+  Upper energy limit (TeV) [100.0] 
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
   Model [$CTOOLS/share/models/crab.xml] 
   Output event data file or observation definition file [events1.fits] events2.fits
 
@@ -92,11 +92,11 @@ Now we are ready to do a joint maximum likelihood analysis using
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts cube or observation definition file [events.fits] obs.xml
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
+  Event list, counts cube or observation definition file [selected_events.fits] obs.xml
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
   Source model [$CTOOLS/share/models/crab.xml] 
-  Source model output file [crab_results.xml]
+  Source model output file [crab_results.xml] 
 
 Instead of providing an event list or a counts cube, we now provided the
 filename of the observation definition XML file (here ``obs.xml``) as input
@@ -106,102 +106,96 @@ joint analysis, as indicated in the log file:
 
 .. code-block:: xml
 
-  2015-02-04T20:33:26: +==============+
-  2015-02-04T20:33:26: | Observations |
-  2015-02-04T20:33:26: +==============+
-  2015-02-04T20:33:26: === GObservations ===
-  2015-02-04T20:33:26:  Number of observations ....: 2
-  2015-02-04T20:33:26:  Number of predicted events : 0
-  2015-02-04T20:33:26: === GCTAObservation ===
-  2015-02-04T20:33:26:  Name ......................: Crab
-  2015-02-04T20:33:26:  Identifier ................: 00001
-  2015-02-04T20:33:26:  Instrument ................: CTA
-  2015-02-04T20:33:26:  Event file ................: events1.fits
-  2015-02-04T20:33:26:  Event type ................: EventList
-  2015-02-04T20:33:26:  Statistics ................: Poisson
-  2015-02-04T20:33:26:  Ontime ....................: 1800 s
-  2015-02-04T20:33:26:  Livetime ..................: 1710 s
-  2015-02-04T20:33:26:  Deadtime correction .......: 0.95
-  2015-02-04T20:33:26:  User energy range .........: undefined
-  2015-02-04T20:33:26: === GCTAPointing ===
-  2015-02-04T20:33:26:  Pointing direction ........: (RA,Dec)=(83.63,21.51)
+  2015-05-22T20:17:07: +==============+
+  2015-05-22T20:17:07: | Observations |
+  2015-05-22T20:17:07: +==============+
+  2015-05-22T20:17:07: === GObservations ===
+  2015-05-22T20:17:07:  Number of observations ....: 2
+  2015-05-22T20:17:07:  Number of predicted events : 0
+  2015-05-22T20:17:07: === GCTAObservation ===
+  2015-05-22T20:17:07:  Name ......................: 
+  2015-05-22T20:17:07:  Identifier ................: 00001
+  2015-05-22T20:17:07:  Instrument ................: CTA
+  2015-05-22T20:17:07:  Event file ................: events1.fits
+  2015-05-22T20:17:07:  Event type ................: EventList
+  2015-05-22T20:17:07:  Statistics ................: Poisson
+  2015-05-22T20:17:07:  Ontime ....................: 1800 s
+  2015-05-22T20:17:07:  Livetime ..................: 1710 s
+  2015-05-22T20:17:07:  Deadtime correction .......: 0.95
+  2015-05-22T20:17:07:  User energy range .........: undefined
+  2015-05-22T20:17:07: === GCTAPointing ===
+  2015-05-22T20:17:07:  Pointing direction ........: (RA,Dec)=(83.63,21.51)
   ...
-  2015-02-04T20:33:26: === GCTAObservation ===
-  2015-02-04T20:33:26:  Name ......................: Crab
-  2015-02-04T20:33:26:  Identifier ................: 00002
-  2015-02-04T20:33:26:  Instrument ................: CTA
-  2015-02-04T20:33:26:  Event file ................: events2.fits
-  2015-02-04T20:33:26:  Event type ................: EventList
-  2015-02-04T20:33:26:  Statistics ................: Poisson
-  2015-02-04T20:33:26:  Ontime ....................: 1800 s
-  2015-02-04T20:33:26:  Livetime ..................: 1710 s
-  2015-02-04T20:33:26:  Deadtime correction .......: 0.95
-  2015-02-04T20:33:26:  User energy range .........: undefined
-  2015-02-04T20:33:26: === GCTAPointing ===
-  2015-02-04T20:33:26:  Pointing direction ........: (RA,Dec)=(83.63,22.51)
+  2015-05-22T20:17:07: === GCTAObservation ===
+  2015-05-22T20:17:07:  Name ......................: 
+  2015-05-22T20:17:07:  Identifier ................: 00002
+  2015-05-22T20:17:07:  Instrument ................: CTA
+  2015-05-22T20:17:07:  Event file ................: events2.fits
+  2015-05-22T20:17:07:  Event type ................: EventList
+  2015-05-22T20:17:07:  Statistics ................: Poisson
+  2015-05-22T20:17:07:  Ontime ....................: 1800 s
+  2015-05-22T20:17:07:  Livetime ..................: 1710 s
+  2015-05-22T20:17:07:  Deadtime correction .......: 0.95
+  2015-05-22T20:17:07:  User energy range .........: undefined
+  2015-05-22T20:17:07: === GCTAPointing ===
+  2015-05-22T20:17:07:  Pointing direction ........: (RA,Dec)=(83.63,22.51)
   ...
-  2015-02-04T20:33:26: +=================================+
-  2015-02-04T20:33:26: | Maximum likelihood optimisation |
-  2015-02-04T20:33:26: +=================================+
-  2015-02-04T20:33:26:  >Iteration   0: -logL=89099.788, Lambda=1.0e-03
-  2015-02-04T20:33:26:  >Iteration   1: -logL=89094.435, Lambda=1.0e-03, delta=5.353, max(|grad|)=-4.388872 [Normalization:7]
-  2015-02-04T20:33:26:  >Iteration   2: -logL=89094.420, Lambda=1.0e-04, delta=0.015, max(|grad|)=-0.116432 [Index:3]
-  2015-02-04T20:33:26:  >Iteration   3: -logL=89094.420, Lambda=1.0e-05, delta=0.000, max(|grad|)=-0.003989 [Index:3]
-  2015-02-04T20:33:26: 
-  2015-02-04T20:33:26: +=========================================+
-  2015-02-04T20:33:26: | Maximum likelihood optimization results |
-  2015-02-04T20:33:26: +=========================================+
-  2015-02-04T20:33:26: === GOptimizerLM ===
-  2015-02-04T20:33:26:  Optimized function value ..: 89094.420
-  2015-02-04T20:33:26:  Absolute precision ........: 0.005
-  2015-02-04T20:33:26:  Acceptable value decrease .: 2
-  2015-02-04T20:33:26:  Optimization status .......: converged
-  2015-02-04T20:33:26:  Number of parameters ......: 9
-  2015-02-04T20:33:26:  Number of free parameters .: 4
-  2015-02-04T20:33:26:  Number of iterations ......: 3
-  2015-02-04T20:33:26:  Lambda ....................: 1e-06
-  2015-02-04T20:33:26:  Maximum log likelihood ....: -89094.420
-  2015-02-04T20:33:26:  Observed events  (Nobs) ...: 12260.000
-  2015-02-04T20:33:26:  Predicted events (Npred) ..: 12260.000 (Nobs - Npred = 6.95764e-06)
-  2015-02-04T20:33:26: === GModels ===
-  2015-02-04T20:33:26:  Number of models ..........: 2
-  2015-02-04T20:33:26:  Number of parameters ......: 9
-  2015-02-04T20:33:26: === GModelSky ===
-  2015-02-04T20:33:26:  Name ......................: Crab
-  2015-02-04T20:33:26:  Instruments ...............: all
-  2015-02-04T20:33:26:  Instrument scale factors ..: unity
-  2015-02-04T20:33:26:  Observation identifiers ...: all
-  2015-02-04T20:33:26:  Model type ................: PointSource
-  2015-02-04T20:33:26:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
-  2015-02-04T20:33:26:  Number of parameters ......: 6
-  2015-02-04T20:33:26:  Number of spatial par's ...: 2
-  2015-02-04T20:33:26:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-  2015-02-04T20:33:26:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-  2015-02-04T20:33:26:  Number of spectral par's ..: 3
-  2015-02-04T20:33:26:   Prefactor ................: 6.06322e-16 +/- 1.44948e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-  2015-02-04T20:33:26:   Index ....................: -2.49814 +/- 0.0178524 [-0,-5]  (free,scale=-1,gradient)
-  2015-02-04T20:33:26:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
-  2015-02-04T20:33:26:  Number of temporal par's ..: 1
-  2015-02-04T20:33:26:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2015-02-04T20:33:26: === GCTAModelRadialAcceptance ===
-  2015-02-04T20:33:26:  Name ......................: Background
-  2015-02-04T20:33:26:  Instruments ...............: CTA
-  2015-02-04T20:33:26:  Instrument scale factors ..: unity
-  2015-02-04T20:33:26:  Observation identifiers ...: all
-  2015-02-04T20:33:26:  Model type ................: "Gaussian" * "FileFunction" * "Constant"
-  2015-02-04T20:33:26:  Number of parameters ......: 3
-  2015-02-04T20:33:26:  Number of radial par's ....: 1
-  2015-02-04T20:33:26:   Sigma ....................: 3.0356 +/- 0.0215259 [0.01,10] deg2 (free,scale=1,gradient)
-  2015-02-04T20:33:26:  Number of spectral par's ..: 1
-  2015-02-04T20:33:26:   Normalization ............: 0.99936 +/- 0.0122024 [0,1000]  (free,scale=1,gradient)
-  2015-02-04T20:33:26:  Number of temporal par's ..: 1
-  2015-02-04T20:33:26:   Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-  2015-02-04T20:33:26: 
-  2015-02-04T20:33:26: +==============+
-  2015-02-04T20:33:26: | Save results |
-  2015-02-04T20:33:26: +==============+
-  2015-02-04T20:33:26: 
-  2015-02-04T20:33:26: Application "ctlike" terminated after 10 wall clock seconds, consuming 0.385432 seconds of CPU time.
+  2015-05-22T20:17:07: +=================================+
+  2015-05-22T20:17:07: | Maximum likelihood optimisation |
+  2015-05-22T20:17:07: +=================================+
+  2015-05-22T20:17:07:  >Iteration   0: -logL=201836.657, Lambda=1.0e-03
+  2015-05-22T20:17:07:  >Iteration   1: -logL=201829.438, Lambda=1.0e-03, delta=7.220, max(|grad|)=22.756507 [Index:7]
+  2015-05-22T20:17:07:  >Iteration   2: -logL=201829.432, Lambda=1.0e-04, delta=0.005, max(|grad|)=0.086395 [Index:3]
+  2015-05-22T20:17:07:  >Iteration   3: -logL=201829.432, Lambda=1.0e-05, delta=0.000, max(|grad|)=0.001287 [Index:3]
+  2015-05-22T20:17:07: 
+  2015-05-22T20:17:07: +=========================================+
+  2015-05-22T20:17:07: | Maximum likelihood optimization results |
+  2015-05-22T20:17:07: +=========================================+
+  2015-05-22T20:17:07: === GOptimizerLM ===
+  2015-05-22T20:17:07:  Optimized function value ..: 201829.432
+  2015-05-22T20:17:07:  Absolute precision ........: 0.005
+  2015-05-22T20:17:07:  Acceptable value decrease .: 2
+  2015-05-22T20:17:07:  Optimization status .......: converged
+  2015-05-22T20:17:07:  Number of parameters ......: 10
+  2015-05-22T20:17:07:  Number of free parameters .: 4
+  2015-05-22T20:17:07:  Number of iterations ......: 3
+  2015-05-22T20:17:07:  Lambda ....................: 1e-06
+  2015-05-22T20:17:07:  Maximum log likelihood ....: -201829.432
+  2015-05-22T20:17:07:  Observed events  (Nobs) ...: 31799.000
+  2015-05-22T20:17:07:  Predicted events (Npred) ..: 31799.000 (Nobs - Npred = 2.67544e-06)
+  2015-05-22T20:17:07: === GModels ===
+  2015-05-22T20:17:07:  Number of models ..........: 2
+  2015-05-22T20:17:07:  Number of parameters ......: 10
+  2015-05-22T20:17:07: === GModelSky ===
+  2015-05-22T20:17:07:  Name ......................: Crab
+  2015-05-22T20:17:07:  Instruments ...............: all
+  2015-05-22T20:17:07:  Instrument scale factors ..: unity
+  2015-05-22T20:17:07:  Observation identifiers ...: all
+  2015-05-22T20:17:07:  Model type ................: PointSource
+  2015-05-22T20:17:07:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2015-05-22T20:17:07:  Number of parameters ......: 6
+  2015-05-22T20:17:07:  Number of spatial par's ...: 2
+  2015-05-22T20:17:07:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+  2015-05-22T20:17:07:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+  2015-05-22T20:17:07:  Number of spectral par's ..: 3
+  2015-05-22T20:17:07:   Prefactor ................: 5.8727e-16 +/- 8.04314e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+  2015-05-22T20:17:07:   Index ....................: -2.49825 +/- 0.0118418 [-0,-5]  (free,scale=-1,gradient)
+  2015-05-22T20:17:07:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
+  2015-05-22T20:17:07:  Number of temporal par's ..: 1
+  2015-05-22T20:17:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+  2015-05-22T20:17:07: === GCTAModelIrfBackground ===
+  2015-05-22T20:17:07:  Name ......................: CTABackgroundModel
+  2015-05-22T20:17:07:  Instruments ...............: CTA
+  2015-05-22T20:17:07:  Instrument scale factors ..: unity
+  2015-05-22T20:17:07:  Observation identifiers ...: all
+  2015-05-22T20:17:07:  Model type ................: "PowerLaw" * "Constant"
+  2015-05-22T20:17:07:  Number of parameters ......: 4
+  2015-05-22T20:17:07:  Number of spectral par's ..: 3
+  2015-05-22T20:17:07:   Prefactor ................: 1.01608 +/- 0.0152751 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+  2015-05-22T20:17:07:   Index ....................: 0.0226023 +/- 0.0086794 [-5,5]  (free,scale=1,gradient)
+  2015-05-22T20:17:07:   PivotEnergy ..............: 1e+06 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
+  2015-05-22T20:17:07:  Number of temporal par's ..: 1
+  2015-05-22T20:17:07:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 The log file indicates that the fit converged quickly, the spectral
 parameters of the Crab nebula have now been constrained using the events

@@ -101,8 +101,8 @@ class cssens(ctools.cscript):
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
             pars.append(gammalib.GApplicationPar("offset","r","h","0.0","","","Source offset angle (deg)"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
             pars.append(gammalib.GApplicationPar("outfile","f","h","sensitivity.dat","","","Output file name"))
             pars.append(gammalib.GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
@@ -200,7 +200,8 @@ class cssens(ctools.cscript):
             self.log("\n")
         
         # Initialise script
-        colnames = ['loge', 'emin', 'emax', 'crab', 'pflux', 'eflux', 'diffSens']
+        colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux', \
+                    'energy_flux', 'sensitivity']
         results  = []
 
         # Initialise models
@@ -412,18 +413,10 @@ class cssens(ctools.cscript):
         # Set energy boundaries
         self.set_obs_ebounds(emin, emax)
         
-        # Determine energy boundaries from first observation in
-        # the container
-        #for run in obs:
-        #    emin      = run.events().ebounds().emin()
-        #    emax      = run.events().ebounds().emax()
-        #    loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
-        #    erg_mean  = math.pow(10.0, loge) * tev2erg
-        #    erg_width = (emax.TeV()-emin.TeV()) * tev2erg
-        #    break
+        # Determine energy boundaries from first observation in the container
         loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
-        erg_mean  = math.pow(10.0, loge) * tev2erg
-        erg_width = (emax.TeV()-emin.TeV()) * tev2erg
+        e_mean    = math.pow(10.0, loge)
+        erg_mean  = e_mean * tev2erg
 
         # Compute Crab unit (this is the factor with which the Prefactor needs
         # to be multiplied to get 1 Crab
@@ -446,12 +439,12 @@ class cssens(ctools.cscript):
             self.log("\n")
 
         # Initialise loop
-        flux_value     = []
-        pflux_value    = []
-        eflux_value    = []
-        diffSens_value = []
-        iter           = 0
-        test_cflux     = 0.1 # This is the initial test flux in Crab units (100 mCrab)
+        crab_flux_value   = []
+        photon_flux_value = []
+        energy_flux_value = []
+        sensitivity_value = []
+        iter              = 0
+        test_crab_flux    = 0.1 # Initial test flux in Crab units (100 mCrab)
 
         # Loop until we break
         while True:
@@ -463,12 +456,12 @@ class cssens(ctools.cscript):
             if self.logExplicit():
                 self.log.header2("Iteration "+str(iter))
 
-            # Set test flux
+            # Set source model. crab_prefactor is the Prefactor that
+            # corresponds to 1 Crab
             src_model      = full_model.copy()
             crab_prefactor = src_model[self.m_srcname]['Prefactor'].value() * crab_unit
-            src_model[self.m_srcname]['Prefactor'].value(crab_prefactor * test_cflux)
+            src_model[self.m_srcname]['Prefactor'].value(crab_prefactor * test_crab_flux)
             obs.models(src_model)
-
 
             # Simulate events
             sim = obsutils.sim(obs, nbins=self.m_enumbins, seed=iter, \
@@ -572,48 +565,45 @@ class cssens(ctools.cscript):
                 continue
 
             # Get fitted Crab, photon and energy fluxes
-            cflux     = result_all[self.m_srcname]['Prefactor'].value() / crab_prefactor
-            cflux_err = result_all[self.m_srcname]['Prefactor'].error() / crab_prefactor
-            pflux     = result_all[self.m_srcname].spectral().flux(emin, emax)
-            eflux     = result_all[self.m_srcname].spectral().eflux(emin, emax)
+            crab_flux     = result_all[self.m_srcname]['Prefactor'].value() / crab_prefactor
+            crab_flux_err = result_all[self.m_srcname]['Prefactor'].error() / crab_prefactor
+            photon_flux   = result_all[self.m_srcname].spectral().flux(emin, emax)
+            energy_flux   = result_all[self.m_srcname].spectral().eflux(emin, emax)
 
-            # Compute differential sensitivity
-            diffSens = pflux / erg_width * erg_mean*erg_mean
+            # Compute differential sensitivity in unit erg/cm2/s
+            energy      = gammalib.GEnergy(e_mean, "TeV")
+            time        = gammalib.GTime()
+            sensitivity = result_all[self.m_srcname].spectral().eval(energy, time) * \
+                          erg_mean*erg_mean * 1.0e6
 
             # Compute flux correction factor based on average TS
             correct = 1.0
             if ts > 0:
                 correct = math.sqrt(self.m_ts_thres/ts)
-            #if self.m_use_ts:
-            #    if ts > 0:
-            #        correct = math.sqrt(self.m_ts_thres/ts)
-            #else:
-            #    if cflux > 0 and cflux_err > 0:
-            #        correct = math.sqrt(self.m_ts_thres)/(cflux/cflux_err)
             
             # Compute extrapolated fluxes
-            flux     = correct * cflux
-            pflux    = correct * pflux
-            eflux    = correct * eflux
-            diffSens = correct * diffSens
-            flux_value.append(flux)
-            pflux_value.append(pflux)
-            eflux_value.append(eflux)
-            diffSens_value.append(diffSens)
+            crab_flux   = correct * crab_flux
+            photon_flux = correct * photon_flux
+            energy_flux = correct * energy_flux
+            sensitivity = correct * sensitivity
+            crab_flux_value.append(crab_flux)
+            photon_flux_value.append(photon_flux)
+            energy_flux_value.append(energy_flux)
+            sensitivity_value.append(sensitivity)
             
             # Write background and test source fit results
             if self.logExplicit():
                 self.log.parformat("Photon flux")
-                self.log(pflux)
+                self.log(photon_flux)
                 self.log(" ph/cm2/s\n")
                 self.log.parformat("Energy flux")
-                self.log(eflux)
+                self.log(energy_flux)
                 self.log(" erg/cm2/s\n")
                 self.log.parformat("Crab flux")
-                self.log(cflux*1000.0)
+                self.log(crab_flux*1000.0)
                 self.log(" mCrab\n")
                 self.log.parformat("Differential sensitivity")
-                self.log(diffSens)
+                self.log(sensitivity)
                 self.log(" erg/cm2/s\n")
                 for model in result_all:
                     self.log.parformat("Model")
@@ -629,40 +619,40 @@ class cssens(ctools.cscript):
                 self.log("corr=")
                 self.log(correct)
                 self.log("  ")
-                self.log(pflux)
+                self.log(photon_flux)
                 self.log(" ph/cm2/s = ")
-                self.log(eflux)
+                self.log(energy_flux)
                 self.log(" erg/cm2/s = ")
-                self.log(cflux*1000.0)
+                self.log(crab_flux*1000.0)
                 self.log(" mCrab = ")
-                self.log(diffSens)
+                self.log(sensitivity)
                 self.log(" erg/cm2/s\n")
             
             # Compute sliding average of extrapolated fitted prefactor,
             # photon and energy flux. This damps out fluctuations and
             # improves convergence
-            flux     = 0.0
-            pflux    = 0.0
-            eflux    = 0.0
-            diffSens = 0.0
-            num      = 0.0
+            crab_flux   = 0.0
+            photon_flux = 0.0
+            energy_flux = 0.0
+            sensitivity = 0.0
+            num         = 0.0
             for k in range(self.m_num_avg):
-                inx = len(flux_value) - k - 1
+                inx = len(crab_flux_value) - k - 1
                 if inx >= 0:
-                    flux     += flux_value[inx]
-                    pflux    += pflux_value[inx]
-                    eflux    += eflux_value[inx]
-                    diffSens += diffSens_value[inx]
+                    crab_flux   += crab_flux_value[inx]
+                    photon_flux += photon_flux_value[inx]
+                    energy_flux += energy_flux_value[inx]
+                    sensitivity += sensitivity_value[inx]
                     num      += 1.0
-            flux     /= num
-            pflux    /= num
-            eflux    /= num
-            diffSens /= num
+            crab_flux   /= num
+            photon_flux /= num
+            energy_flux /= num
+            sensitivity /= num
             
             # Compare average flux to last average
             if iter > self.m_num_avg:
-                if test_cflux > 0:
-                    ratio = flux/test_cflux
+                if test_crab_flux > 0:
+                    ratio = crab_flux/test_crab_flux
                     
                     # We have 2 convergence criteria:
                     # 1. The average flux does not change
@@ -678,7 +668,7 @@ class cssens(ctools.cscript):
                     break
             
             # Use average for next iteration
-            test_cflux = flux
+            test_crab_flux = crab_flux
             
             # Exit loop if number of trials exhausted
             if (iter >= self.m_max_iter):
@@ -693,16 +683,16 @@ class cssens(ctools.cscript):
             self.log(ts)
             self.log("\n")
             self.log.parformat("Photon flux")
-            self.log(pflux)
+            self.log(photon_flux)
             self.log(" ph/cm2/s\n")
             self.log.parformat("Energy flux")
-            self.log(eflux)
+            self.log(energy_flux)
             self.log(" erg/cm2/s\n")
             self.log.parformat("Crab flux")
-            self.log(cflux*1000.0)
+            self.log(crab_flux*1000.0)
             self.log(" mCrab\n")
             self.log.parformat("Differential sensitivity")
-            self.log(diffSens)
+            self.log(sensitivity)
             self.log(" erg/cm2/s\n")
             self.log.parformat("Number of simulated events")
             self.log(nevents)
@@ -736,8 +726,9 @@ class cssens(ctools.cscript):
             
         # Store result
         result = {'loge': loge, 'emin': emin.TeV(), 'emax': emax.TeV(), \
-                  'crab': flux, 'pflux': pflux, 'eflux': eflux, \
-                  'diffSens': diffSens}
+                  'crab_flux': crab_flux, 'photon_flux': photon_flux, \
+                  'energy_flux': energy_flux, \
+                  'sensitivity': sensitivity}
         
         # Return result
         return result

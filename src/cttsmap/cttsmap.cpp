@@ -242,7 +242,7 @@ void cttsmap::run(void)
     int binmax = (m_binmax == -1) ? m_tsmap.npix() : m_binmax;
 
     // Initialise optimizer
-    GOptimizerLM* opt = (logExplicit()) ? new GOptimizerLM(log)
+    GOptimizerLM* opt = (logExplicit()) ? new GOptimizerLM(&log)
         	                            : new GOptimizerLM();
 
     // Store initial models

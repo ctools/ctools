@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script generated pointing patterns for CTA observations.
+# This script generates pointing patterns for CTA observations.
 #
 # Usage:
 #   ./make_pointings.py
@@ -124,19 +124,18 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5, \
                 obs_site = site
 
             # Set site IRF
+            caldb = "prod2"
             if obs_site == "North":
-                caldb = "tenerife"
                 if lst:
-                    irf = "DESY20140105_50h"
+                    irf = "North_50h"
                 else:
-                    irf = "DESY20140105_50h_noLST"
+                    irf = "North_50h"
                 exposure_north += duration
             else:
-                caldb = "aar"
                 if lst:
-                    irf = "DESY20140105_50h"
+                    irf = "South_50h"
                 else:
-                    irf = "DESY20140105_50h_noLST"
+                    irf = "South_50h"
                 exposure_south += duration
 
             # Set IRF information
@@ -241,6 +240,59 @@ def set_gc(lst=True):
     return obsdef
 
 
+# ============= #
+# Setup LMC KSP #
+# ============= #
+def set_lmc(hours=250.0, lst=True):
+    """
+    Setup LMC KSP.
+    """
+    # Initialise observation definition
+    obsdef = []
+
+    # Set LMC centre
+    centre = gammalib.GSkyDir()
+    centre.radec_deg(80.0, -69.0)
+
+    # Set offset angle and number of pointings
+    offset = 1.0 # degrees
+    n_pnt  = 12
+
+    # Prepare computations
+    dphi     = 360.0/n_pnt
+    duration = hours*3600.0/float(n_pnt)
+
+    # Loop over pointings
+    for ipnt in range(n_pnt):
+
+        # Compute pointing direction
+        pnt = centre.copy()
+        pnt.rotate_deg(ipnt*dphi, offset)
+        lon = pnt.l_deg()
+        lat = pnt.b_deg()
+
+        # Set positions and duration
+        obs = {'lon': lon, 'lat': lat, 'duration': duration}
+
+        # Add IRF
+        caldb = "prod2"
+        if lst:
+            irf = "South_50h"
+        else:
+            irf = "South_50h"
+        obs['caldb'] = caldb
+        obs['irf']   = irf
+
+        # Append observation
+        obsdef.append(obs)
+
+    # Dump statistics
+    print("Number of pointings: %d (%.2f sec)" % (n_pnt,duration))
+
+    # Return observation definition
+    return obsdef
+
+
 # ======================================= #
 # Write observation definition dictionary #
 # ======================================= #
@@ -291,7 +343,6 @@ if __name__ == '__main__':
     need_help = False
     
     # Test for command line arguments
-    #print(sys.argv[0])
     if (len(sys.argv) > 1):
         if sys.argv[1] == "-h":
             need_help = True
@@ -304,13 +355,14 @@ if __name__ == '__main__':
     if need_help:
         print("Usage: make_pointing.py [OPTIONS]")
         print("     -h       Display this usage message")
-        print("     gps      Galactic plane scan (2 row scheme)")
-        print("     gps3     Galactic plane scan (3 row scheme)")
+        print("     gps      Galactic plane survey (2 row scheme)")
+        print("     gps3     Galactic plane survey (3 row scheme)")
         print("     extgal   Extragalactic survey")
-        print("     gc       Galactic centre")
+        print("     gc       Galactic centre survey")
+        print("     lmc      LMC survey")
         sys.exit()
 
-    # Galactic plane scan
+    # Galactic plane survey
     if obsname == "gps":
         obsdef = set_gps(lst=True)
         write_obsdef("gps.dat", obsdef)
@@ -327,6 +379,11 @@ if __name__ == '__main__':
     elif obsname == "gc":
         obsdef = set_gc(lst=True)
         write_obsdef("gc.dat", obsdef)
+
+    # LMC
+    elif obsname == "lmc":
+        obsdef = set_lmc(lst=True)
+        write_obsdef("lmc.dat", obsdef)
 
     # Invalid pattern
     else:

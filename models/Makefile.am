@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
 # Background rate files to distribute
-bkgs = bkg_dummy.txt
-bkgsdir   = $(datadir)/models
-bkgs_DATA = $(bkgs)
+#bkgs = bkg_dummy.txt
+#bkgsdir   = $(datadir)/models
+#bkgs_DATA = $(bkgs)
 
 # Models to distribute
 models      = crab.xml \
@@ -16,4 +16,4 @@ modelsdir   = $(datadir)/models
 models_DATA = $(models)
 
 # Extra files to be distributed in the tar file
-EXTRA_DIST = $(bkgs) $(models)
+EXTRA_DIST = $(models)

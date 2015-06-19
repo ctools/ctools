@@ -167,6 +167,7 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
     """
     # Set constants
     r68_to_sigma = 0.6624305
+    TeV2erg      = 1.0e6 * gammalib.MeV2erg
 
     # Set to figure 3
     plt.figure(3)
@@ -189,8 +190,16 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
         if Noff > 0:
             Non        = Non_lima(sigma, Noff)
             src_counts = Non - bgd_counts
-            flux[i]    = src_counts / (0.68*aeff * duration) * E[i]*1.0e6 * gammalib.MeV2erg
-        #print logE[i], flux[i]
+            if src_counts < 0.05*bgd_counts:
+                src_counts = 0.05*bgd_counts
+            if src_counts < 10:
+                src_counts = 10.0
+            emin    = gammalib.GEnergy(math.pow(10.0, logE[i]-0.1), "TeV")
+            emax    = gammalib.GEnergy(math.pow(10.0, logE[i]+0.1), "TeV")
+            epivot  = gammalib.GEnergy(math.pow(10.0, logE[i]), "TeV")
+            plaw    = gammalib.GModelSpectralPlaw(1.0e-6, -2.6, epivot)
+            conv    = TeV2erg*E[i]*E[i]/plaw.flux(emin, emax)
+            flux[i] = conv * src_counts / (duration * aeff*0.68)
     
     # Plot data
     plt.loglog(E, flux, color+'-', label=name)

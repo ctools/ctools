@@ -38,7 +38,9 @@ cscripts
 
    cscaldb --- Lists available instrument response functions <cscaldb>
    csobsdef --- Generates observation definition file <csobsdef>
+   cslightcrv --- Computes lightcurve <cslightcrv>
    cspull --- Generates pull distribution <cspull>
    cssens --- Computes CTA sensitivity <cssens>
+   csspec --- Computes spectral points <csspec>
    csresmap --- Generates residual map <csresmap>
    cstsdist --- Generates TS distribution <cstsdist>

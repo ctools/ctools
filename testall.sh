@@ -33,7 +33,6 @@ cd examples
 
 # Create local environment
 rm -rf ctools
-#mkdir -p ctools/share
 mkdir -p ctools/share/caldb
 ln -s $base/caldb ctools/share/caldb/cta
 ln -s $base/models ctools/share/models
@@ -52,11 +51,11 @@ export CTOOLS=$PWD/ctools
 
 # Run makers
 ./make_survey.py
-./make_ts_distributions.py 2 2
+./make_ts_distributions.py -n 2 -e 0 -d 1800
 #./make_pull_at_sensitivity_limit.py
 
 # Remove local environment
-rm -rf gammalib
+rm -rf ctools
 
 # Step back to base directory
 cd $base

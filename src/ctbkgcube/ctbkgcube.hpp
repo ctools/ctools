@@ -59,7 +59,7 @@ public:
     void                      clear(void);
     void                      run(void);
     void                      save(void);
-    const GCTACubeBackground& cube(void) const;
+    const GCTACubeBackground& bkgcube(void) const;
     const GModels&            models(void) const;
 
 protected:
@@ -86,7 +86,7 @@ protected:
  * @return Background response cube.
  ***************************************************************************/
 inline
-const GCTACubeBackground& ctbkgcube::cube(void) const
+const GCTACubeBackground& ctbkgcube::bkgcube(void) const
 {
     // Return background cube
     return (m_background);

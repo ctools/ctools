@@ -1,9 +1,19 @@
-2015-03-28  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-06-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
-        * Version 1.0.0 released
+        * Version 0.10.0 released
+        =========================
+
+        Check existence of ROI in ctbin (#1476)
+        Allocate optimizer in ctlike upon construction (#1471)
+        Move cscripts into the ctools Python module (#1470)
+
+
+2015-05-22  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+        * Version 0.9.0 released
         ========================
 
-        Adapt to GammaLib 1.0.0 interface
+        Adapt to GammaLib 0.10.0 interface
         Do not import automatically Python scripts
         Support INDEF/NONE/UNDEF/UNDEFINED parameters in ctselect
         Modify cssens parameter interface (#1426)
@@ -12,6 +22,9 @@
         Allow ctmodel usage for stacked analysis from command line
         Correct rate check in ctobssim for map cubes (#1452)
         Handle background cubes for stacked analysis (#1371)
+        Add csspec script (#1364)
+        Add cslightcrv script (#1365)
+        Correct sensitivity computation in cssens
 
 
 2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>

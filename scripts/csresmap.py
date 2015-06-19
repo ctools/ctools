@@ -47,11 +47,11 @@ class csresmap(ctools.cscript):
         self.resmap    = None
               
         # Initialise some members
-        if isinstance(argv[0],gammalib.GObservations):
+        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
             self.obs = argv[0]
-            argv = argv[1:]
+            argv     = argv[1:]
         else:      
-            self.obs      = gammalib.GObservations()
+            self.obs = gammalib.GObservations()
             self.obs.clear()   
         self.outfile = ""
         
@@ -103,8 +103,8 @@ class csresmap(ctools.cscript):
             pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output residual map"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","dummy","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","cta_dummy_irf","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("ebinalg","s","h","LOG","LIN|LOG|FILE","","Binning algorithm"))
             pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","h","100.0","","","Upper energy limit (TeV)"))

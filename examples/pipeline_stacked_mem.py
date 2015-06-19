@@ -36,7 +36,7 @@ from ctools import obsutils
 def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
                        emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
                        deadc=0.95, \
-                       caldb="dummy", irf="cta_dummy_irf"):
+                       caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
     
@@ -188,7 +188,7 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
 
     # Set Exposure and Psf cube for first CTA observation
     # (ctbin will create an observation with a single container)
-    bin.obs()[0].response(expcube.expcube(), psfcube.psfcube())
+    bin.obs()[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(bin.obs())

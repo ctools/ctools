@@ -44,6 +44,7 @@ class cshessobs(ctools.cscript):
         # Set name
         self.name    = "cshessobs"
         self.version = "0.1.0"
+        self.datapath = ""
 
         # Check on existence of HESSFITS environment variable
         try:
@@ -53,7 +54,6 @@ class cshessobs(ctools.cscript):
                                "Please set the environment variable \"HESSFITS\" to use this script")
         
         # Initialise some members
-        self.datapath = ""
         self.inmodels = None
         self.outobs   = "obs.xml"
         self.nodes    = 1
@@ -450,7 +450,13 @@ class cshessobs(ctools.cscript):
             # Open fits file to determine the observation name
             fits = gammalib.GFits(eventfile)  
             object_name = fits["EVENTS"].string("OBJECT")
-            trgrate = fits["EVENTS"].real("ZTRGRATE")
+            
+            # Retrieve trigger rate if available
+            trgrate = 0.0
+            if fits["EVENTS"].has_card("ZTRGRATE"):
+                trgrate = fits["EVENTS"].real("ZTRGRATE")
+
+            # Close FITS file
             fits.close()
             
             # Append observation to XML and set attributes

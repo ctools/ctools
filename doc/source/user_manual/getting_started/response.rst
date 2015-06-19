@@ -3,20 +3,6 @@
 CTA Instrument Response Functions
 ---------------------------------
 
-.. note ::
-
-   Instrument response functions are formally not part of ctools as they
-   should be provided by the instrument teams. The GammaLib framework on
-   which ctools are built comes with a set of basic response functions, but
-   for getting the latest instrument response functions you should contact
-   the relevant instrument teams. CTA consortium members should 
-   `download 
-   <https://portal.cta-observatory.org/WG/DM/DM_wiki/DATA_Access/Pages/Science%20Tools.aspx>`_
-   the latest calibration database containing Prod1 and Prod2 instrument
-   response functions from the consortium Sharepoint site (requires 
-   password).
-
-
 What are instrument response functions?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -47,98 +33,64 @@ atmospheric conditions, etc.). All these quantities and hence the
 instrument response function may depend on time.
 
 
-Data formats
-~~~~~~~~~~~~
+CTA response functions
+~~~~~~~~~~~~~~~~~~~~~~
 
-So far the data format of the CTA instrument response functions has not
-yet been settled, and information about instrument response functions is
-provided in various ways. Three types of data formats are supported:
+The instrument response functions for CTA are factorised into 
+the effective area :math:`A_{\rm eff}(d, p, E, t)` (units :math:`cm^2`),
+the point spread function :math:`PSF(p' | d, p, E, t)`,
+and the energy dispersion :math:`E_{\rm disp}(E' | d, p, E, t)`
+following:
 
--  :ref:`sec_cta_rsp_perftable`
+.. math::
+    R(p', E', t' | d, p, E, t) =
+    A_{\rm eff}(d, p, E, t) \times
+    PSF(p' | d, p, E, t) \times
+    E_{\rm disp}(E' | d, p, E, t)
 
--  :ref:`sec_cta_rsp_xspec`
+ctools are shipped with response functions for the northern and southern
+arrays, and variants are available that have been optimised for exposure
+times of 0.5 hours, 5 hours and 50 hours.
+In total, the following six instrument response functions are available:
+``North_0.5h``, ``North_5h``, ``North_50h``, ``South_0.5h``,
+``South_5h``, and ``South_50h``.
 
--  :ref:`sec_cta_rsp_rsptable`
+Each response is stored in a single FITS file, and each component of
+the response factorisation is stored in a binary table of that FITS
+file.
+In addition, the response files contain an additional table that
+describes the background rate as function of energy and position in
+the field of view.
+An example of a CTA response file is shown below:
 
-All formats provide the instrument response as function of true (and 
-sometimes also measured) photon energy, typically from about 20 GeV to
-about 125 TeV.
-Performance tables provide the instrument response for on-axis sources.
-ARF, RMF and PSF files provide the instrument response for a specific
-source position (and region) within the field of view.
-Response tables provide the instrument response as function of position in 
-the field of view. Response tables are thus the most universal form of 
-instrument response functions available, and we recommend using this form 
-for any analysis.
+.. figure:: irf-file.png
+   :width: 100%
 
-.. note ::
+Each table in the response file is in a standardised format that is
+the one that is also used for the Fermi/LAT telescope.
+As an example, the effective area component of the response file
+is shown below.
+Response information is stored in a n-dimensional cube, and each axis
+of this cube is described by the lower and upper edges of the axis bins.
+In this example the effective area is stored as a 2D matrix with the
+first axis being energy and the second axis being offaxis angle.
+Effective area information is stored for true (``EFFAREA``) and
+reconstructed (``EFFAREA_RECO``) energy.
+Vector columns are used to store all information.
 
-   Instrument response functions are so far only provided for a fixed
-   zenith angle of 20 deg. Therefore, no zenith or azimuth angle dependence has 
-   been implemented so far.
-
-
-Installing the CTA calibration database
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-After `downloading 
-<https://portal.cta-observatory.org/WG/DM/DM_wiki/DATA_Access/Pages/Science%20Tools.aspx>`_
-the latest calibration database (only possible for CTA consortium members),
-the database is installed using
-
-.. code-block:: bash
-
-  $ [sudo] tar -C $CALDB -zxvf cta-caldb-20150220.tar.gz
-
-or
-
-.. code-block:: bash
-
-  $ [sudo] tar -C $CALDB -xvf cta-caldb-20150220.tar
-
-depending on whether the database has been retrieved as a gzipped file or 
-not. Depending on your access rights to the ``$CALDB`` directory,
-installation of the calibration database may require root privileges
-(type ``sudo`` in this case, otherwise omit this part of the command).
-
-The calibration database must be installed into the directory to which you 
-``CALDB`` environment variable points. By default, ctools sets this 
-enviroment variable to
-
-.. code-block:: bash
-
-  $CTOOLS/share/caldb
-
-but it may be that due to some other analysis software on your system the
-``CALDB`` environment variable points to another directory. If in doubt, type
-
-.. code-block:: bash
-
-  echo $CALDB
-
-to find out to which directory your ``CALDB`` environment variable points. 
-You may always overwrite this setting using
-
-.. code-block:: bash
-
-  export CALDB=/my/preferred/caldb/directory
-
-which you can add to your ``.bashrc`` file to set the directory 
-permanently.
-ctools will use the ``CALDB`` environment variable to find out where the 
-calibration database is located. If needed, this mechanism can be 
-circumvented (see :ref:`sec_cta_rsp_abspath`).
+.. figure:: irf-aeff.png
+   :width: 100%
 
 
-Specifying the CTA Instrument Response Functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Specifying CTA response functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The specification of the CTA Instrument Response Functions depends on the 
 way how ctools are used. Common to all methods is that the IRFs are 
 defined by a response name and a calibration database name.
-
-There are different means to specify the CTA Instrument Response Functions 
-when using ctools, and the following section describe the
+ctools makes use of HEASARC's CALDB format to index and store
+IRFs, and specification of the database and response names is
+sufficient to access the response.
 
 
 Specifying the response function as input parameters
@@ -146,23 +98,22 @@ Specifying the response function as input parameters
 
 ctools that require instrument response functions have two parameters
 to specify the calibration database name and the response function name.
-The following example shows a ``ctobssim`` run using the ``dummy``
-calibration database and the ``cta_dummy_irf`` response function:
+The following example shows a ``ctobssim`` run using the ``prod2``
+calibration database and the ``South_50h`` response function:
 
 .. code-block:: bash
 
   $ ctobssim
-  Model [$CTOOLS/share/models/crab.xml] 
-  Calibration database [dummy] 
-  Instrument response function [cta_dummy_irf] 
   RA of pointing (degrees) (0-360) [83.63] 
-  Dec of pointing (degrees) (-90-90) [22.01] 
+  Dec of pointing (degrees) (-90-90) [22.51] 
   Radius of FOV (degrees) (0-180) [5.0] 
-  Start time (MET in s) (0) [0.0] 
-  End time (MET in s) (0) [1800.0] 
-  Lower energy limit (TeV) (0) [0.1] 
-  Upper energy limit (TeV) (0) [100.0] 
-  Output event data file or observation definition file [events.fits]
+  Start time (MET in s) [0.0] 
+  End time (MET in s) [1800.0] 
+  Lower energy limit (TeV) [0.1] 
+  Upper energy limit (TeV) [100.0] 
+  Calibration database [prod2] 
+  Instrument response function [South_50h] 
+  Model [$CTOOLS/share/models/crab.xml] 
 
 Running the other tools is equivalent.
 
@@ -180,7 +131,7 @@ definition file:
   <observation_list title="observation library">
     <observation name="Crab" id="00001" instrument="CTA">
       <parameter name="EventList"   file="events.fits"/>
-      <parameter name="Calibration" database="dummy" response="cta_dummy_irf"/>
+      <parameter name="Calibration" database="prod2" response="South_50h"/>
     </observation>
   </observation_list>
 
@@ -190,9 +141,9 @@ response name. You can then pass this file directly to, e.g., ``ctlike``:
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts map or observation definition file [events.fits] obs_rsp.xml
+  Event list, counts cube or observation definition file [events.fits] obs_irf.xml
   Source model [$CTOOLS/share/models/crab.xml] 
-  Source model output file [crab_results.xml]
+  Source model output file [crab_results.xml] 
 
 Note that ``ctlike`` does not ask for the calibration database and
 response name as it found the relevant information in the XML file.
@@ -211,10 +162,10 @@ specify them individually in the XML observation file as follows:
   <observation_list title="observation library">
     <observation name="Crab" id="00001" instrument="CTA">
       <parameter name="EventList"           file="events.fits"/>
-      <parameter name="EffectiveArea"       file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
-      <parameter name="PointSpreadFunction" file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
-      <parameter name="EnergyDispersion"    file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
-      <parameter name="Background"          file="$CALDB/data/cta/dummy/bcf/cta_dummy_irf.dat"/>
+      <parameter name="EffectiveArea"       file="$CALDB/data/cta/prod2/bcf/North_0.5h/irf_file.fits.gz"/>
+      <parameter name="PointSpreadFunction" file="$CALDB/data/cta/prod2/bcf/North_0.5h/irf_file.fits.gz"/>
+      <parameter name="EnergyDispersion"    file="$CALDB/data/cta/prod2/bcf/North_0.5h/irf_file.fits.gz"/>
+      <parameter name="Background"          file="$CALDB/data/cta/prod2/bcf/North_0.5h/irf_file.fits.gz"/>
     </observation>
   </observation_list>
 
@@ -229,169 +180,12 @@ and response name from within Python:
 
   import gammalib
   obs   = gammalib.GCTAObservation()
-  caldb = gammalib.GCaldb("cta", "dummy")
-  irf   = "cta_dummy_irf"
+  caldb = gammalib.GCaldb("cta", "prod2")
+  irf   = "South_50h"
   obs.response(irf, caldb)
 
 The calibration database is set by creating a ``GCaldb`` object. The
 constructor takes as argument the mission (always ``cta``) and the 
-database name, in our case ``dummy``. The response function is then set
-by passing the response name (here ``cta_dummy_irf``) and the calibration
+database name, in our case ``prod2``. The response function is then set
+by passing the response name (here ``South_50h``) and the calibration
 database object to the ``response`` method.
-
-Alternatively, you can specify a specific response file by using
-
-.. code-block:: python
-
-  import gammalib
-  obs   = gammalib.GCTAObservation()
-  caldb = gammalib.GCaldb("$CALDB/data/cta/dummy/bcf")
-  irf   = "cta_dummy_irf.dat"
-  obs.response(irf, caldb)
-
-Here, the directory in which the calibration file resides is specified
-as argument to the ``GCaldb`` constructor, and the filename is passed
-as response function name to the ``response`` method.
-
-
-What response functions are available?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To see what response functions are available on your system, type
-
-.. code-block:: bash
-
-  $ cscaldb
-
-This creates the file ``cscaldb.log`` in your current working directory
-that contains information about the available response functions. The 
-format of the file is:
-
-.. code-block:: bash
-
-  2014-02-20T17:15:21: +==============+
-  2014-02-20T17:15:21: | Mission: cta |
-  2014-02-20T17:15:21: +==============+
-  2014-02-20T17:15:21: === Calibration: aar ===
-  2014-02-20T17:15:21: DESY20140105_50h
-  2014-02-20T17:15:21: DESY20140105_50h_0deg
-  2014-02-20T17:15:21: DESY20140105_50h_180deg
-  2014-02-20T17:15:21: 
-  2014-02-20T17:15:21: === Calibration: aar500 ===
-  2014-02-20T17:15:21: DESY20140105_50h
-  2014-02-20T17:15:21: DESY20140105_50h_0deg
-  2014-02-20T17:15:21: DESY20140105_50h_180deg
-
-The name after ``Calibration`` is what we called earlier the calibration
-database, and the names that are following each 
-``=== Calibration: xxx ===`` header are the response file names.
-
-To get the same information also onto the console, type
-
-.. code-block:: bash
-
-  $ cscaldb debug=yes
-
-
-Data format details
-~~~~~~~~~~~~~~~~~~~
-
-.. _sec_cta_rsp_perftable:
-
-Performance tables
-^^^^^^^^^^^^^^^^^^
-
-In the early days, the instrument performances derived from Monte-Carlo
-simulations have been summarised in what we call here Performance 
-Tables, which are ASCII files that contain as function of energy the
-on-axis performance parameters of CTA, such as effective area, point spread
-function containment radius, energy resolution, background count rate and
-differential sensitivity.
-
-Below an example of a CTA performance table::
-
-  log(E)     Area     r68     r80  ERes. BG Rate    Diff Sens
-  -1.7      261.6  0.3621  0.4908 0.5134 0.0189924  6.88237e-11
-  -1.5     5458.2  0.2712  0.3685 0.4129 0.1009715  1.72717e-11
-  -1.3    15590.0  0.1662  0.2103 0.2721 0.0575623  6.16963e-12
-  -1.1    26554.1  0.1253  0.1567 0.2611 0.0213008  2.89932e-12
-  -0.9    52100.5  0.1048  0.1305 0.1987 0.0088729  1.39764e-12
-  -0.7    66132.1  0.0827  0.1024 0.1698 0.0010976  6.03531e-13
-  -0.5   108656.8  0.0703  0.0867 0.1506 0.0004843  3.98147e-13
-  -0.3   129833.0  0.0585  0.0722 0.1338 0.0001575  3.23090e-13
-  -0.1   284604.3  0.0531  0.0656 0.1008 0.0001367  2.20178e-13
-   0.1   263175.3  0.0410  0.0506 0.0831 0.0000210  1.87452e-13
-   0.3   778048.6  0.0470  0.0591 0.0842 0.0000692  1.53976e-13
-   0.5   929818.8  0.0391  0.0492 0.0650 0.0000146  1.18947e-13
-   0.7  1078450.0  0.0335  0.0415 0.0541 0.0000116  1.51927e-13
-   0.9  1448579.1  0.0317  0.0397 0.0516 0.0000047  1.42439e-13
-   1.1  1899905.0  0.0290  0.0372 0.0501 0.0000081  1.96670e-13
-   1.3  2476403.8  0.0285  0.0367 0.0538 0.0000059  2.20695e-13
-   1.5  2832570.6  0.0284  0.0372 0.0636 0.0000073  3.22523e-13
-   1.7  3534065.3  0.0290  0.0386 0.0731 0.0000135  4.84153e-13
-   1.9  3250103.4  0.0238  0.0308 0.0729 0.0000044  6.26265e-13
-   2.1  3916071.6  0.0260  0.0354 0.0908 0.0000023  7.69921e-13
-   ---------------------------------------------
-   1) log(E) = log10(E/TeV) - bin centre
-   2) Eff Area - in square metres after background cut (no theta cut)
-   3) Ang. Res - 68% containment radius of gamma-ray PSF post cuts - in degrees
-   4) Ang. Res - 80% containment radius of gamma-ray PSF post cuts - in degrees
-   5) Fractional Energy Resolution (rms)
-   6) BG Rate  - inside point-source selection region - post call cuts - in Hz
-   7) Diff Sens - differential sensitivity for this bin expressed as E^2 dN/dE
-      - in erg cm^-2 s^-1 - for a 50 hours exposure - 5 sigma significance including
-      systematics and statistics and at least 10 photons.
-
-
-.. _sec_cta_rsp_xspec:
-
-ARF, RMF and PSF files
-^^^^^^^^^^^^^^^^^^^^^^
-
-Instrument response information for the first CTA Data Challenge (1DC) has been
-provided in a format that was heavily inspired by the 
-`RMF and ARF file formats 
-<http://heasarc.gsfc.nasa.gov/docs/heasarc/caldb/docs/memos/cal_gen_92_002/cal_gen_92_002.html>`_
-that have been introduced by
-`HEASARC <http://heasarc.gsfc.nasa.gov/>`_
-for spectral analysis of X-ray data.
-
-The Redistribution Matrix File (RMF) describes how an incoming photon with 
-a given true energy is redistributed in measured energy. In other words, it
-describes the energy dispersion of the instrument. The RMF is organised as
-a two-dimensional matrix, with the first axis being in true energies while
-the second axis represents the measured energies.
-
-The Ancillary Response File (ARF) describes the sensitivity of the 
-instrument to photons of a given true energy. The ARF gives the effective
-area of the detector system after applying an event selection cut
-(theta cut). For computing the ARF, some knowledge of the Point Spread
-Function (PSF) is needed, so that the fraction of photons that falls into
-the event selection region for a given source can be properly estimated.
-Once this is done, no further PSF information is needed for the analysis.
-
-ctools however relies on the full modelling of the instrument, including 
-the Point Spread Function, and hence, PSF information has also been 
-provided for 1DC. Two data formats have been used for this: a first that 
-is based on a simple one-dimensional vector, providing the width of a
-2-dimensional Gaussian as function of energy; and a second that is based
-on a three-component 2D Gaussian as function of energy and offset angle
-in the camera system. While the former was implement by a simply FITS 
-table with two columns, the latter was implemented by
-:ref:`sec_cta_rsp_rsptable`.
-
-
-.. _sec_cta_rsp_rsptable:
-
-Response tables
-^^^^^^^^^^^^^^^
-
-The CTA response table class ``GCTAResponseTable`` provides a generic 
-handle for multi-dimensional response information. It is based on the 
-response format used for storing response information for the
-*Fermi*/LAT telescope. In this format, all information is stored in
-a single row of a FITS binary table. Each element of the row contains
-a vector column, that describes the axes of the  multi-dimensional response
-cube and the response information. Note that this class may in the future
-be promoted to the GammaLib core, as a similar class has been implemented
-in the *Fermi*/LAT interface. 

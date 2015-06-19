@@ -268,6 +268,16 @@ void ctselect::run(void)
             // Save event file name (for possible saving)
             m_infiles[i] = obs->eventfile();
 
+            // Fall through in case that the event file is empty
+            if (obs->events()->size() == 0) {
+                if (logTerse()) {
+                    log << " Warning: No events in event file \"";
+                    log << m_infiles[i] << "\". Event selection skipped.";
+                    log << std::endl;
+                }
+                continue;
+            }
+
             // Get temporary file name
             #if G_USE_MKSTEMP
             char tpl[]  = "ctselectXXXXXX";
@@ -837,7 +847,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     int nevents = file.table("EVENTS")->nrows();
 
     // If the selected event list is empty or if removal of all events
-    // has been requesten then append an empty event list to the observation.
+    // has been requested then append an empty event list to the observation.
     if ((nevents < 1) || (remove_all)) {
 
         // Create empty event list
@@ -1006,7 +1016,9 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
 
     // Set selection energy boundaries
     GEbounds result;
-    result.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+    if (emax > emin) {
+        result.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+    }
 
     // Return result
     return result;

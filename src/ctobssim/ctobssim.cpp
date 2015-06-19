@@ -730,8 +730,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                 GEnergy e_true_min = emin;
                 GEnergy e_true_max = emax;
                 if (rsp->use_edisp()) {
-                    e_true_min = rsp->ebounds_src(e_true_min).emin();
-                    e_true_max = rsp->ebounds_src(e_true_max).emax();
+                    e_true_min = rsp->ebounds(e_true_min).emin();
+                    e_true_max = rsp->ebounds(e_true_max).emax();
                 }
 
                 // Dump energy range
@@ -762,7 +762,6 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         // number of simulated photons to m_max_photons.
                         // The photon rate is estimated from the model flux
                         // and used to set the duration of the time slice.
-                        //double flux     = model->spectral()->flux(emin, emax);
                         double flux     = get_model_flux(model, emin, emax,
                                                          dir, rad);
                         double rate     = flux * m_area;
@@ -966,7 +965,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  *
  * @param[in] model Sky model.
  * @param[in] emin Minimum energy.
- * @param[in] emin Maximum energy.
+ * @param[in] emax Maximum energy.
  * @param[in] centre Centre of region for photon rate determination.
  * @param[in] radius Radius of region for photon rate determination.
  * @return Model flux (photons/cm2/sec).

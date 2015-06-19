@@ -26,7 +26,7 @@ import math
 # ===================== #
 # Simulate observations #
 # ===================== #
-def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
+def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
         binsz=0.05, npix=200, proj="TAN", coord="GAL"):
     """
     Simulate events for all observations in the container.
@@ -55,6 +55,9 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
     # Optionally switch-on debugging model
     if debug:
         sim["debug"].boolean(True)
+
+    # Set chatter level
+    sim["chatter"].chatter = chatter
     
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
@@ -101,6 +104,9 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
         if debug:
             bin["debug"].boolean(True)
 
+        # Set chatter level
+        bin["chatter"].chatter = chatter
+
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps
         bin.run()
@@ -127,7 +133,7 @@ def sim(obs, log=False, debug=False, edisp=False, seed=0, nbins=0,
 # ================ #
 # Fit observations #
 # ================ #
-def fit(obs, log=False, debug=False, edisp=False):
+def fit(obs, log=False, debug=False, chatter=2, edisp=False):
     """
     Perform maximum likelihood fitting of observations in the container.
     
@@ -148,6 +154,9 @@ def fit(obs, log=False, debug=False, edisp=False):
     # Optionally switch-on debugging model
     if debug:
         like["debug"].boolean(True)
+
+    # Set chatter level
+    like["chatter"].chatter = chatter
     
     # Optionally apply energy dispersion
     like["edisp"].boolean(edisp)
@@ -310,7 +319,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 # ===================================== #
 def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
-        irf="cta_dummy_irf", caldb="dummy"):
+        irf="South_50h", caldb="prod2"):
     """
     Obsolete function, use set_obs instead.
     """
@@ -331,7 +340,7 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf="cta_dummy_irf", caldb="dummy", id="000000", instrument="CTA"):
+            irf="South_50h", caldb="prod2", id="000000", instrument="CTA"):
     """
     Returns a single CTA observation containing an empty CTA event list.
     By looping over this function you can add CTA observations to the
@@ -406,7 +415,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ============================ #
 def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
         emin=0.1, emax=100.0, rad=5.0, \
-        irf="cta_dummy_irf", caldb="dummy"):
+        irf="South_50h", caldb="prod2"):
     """
     Returns an observation container filled with a list of CTA observations.
     The list is defined by the obsdeflist parameter which is a dictionnary
@@ -606,9 +615,9 @@ def spectrum(obs, source, ebounds):
 
         # Clone observations and reset energy thresholds
         select = ctools.ctselect(obs)
-        select["ra"].real(-1.0)
-        select["dec"].real(-1.0)
-        select["rad"].real(-1.0)
+        select["ra"].value("UNDEF")
+        select["dec"].value("UNDEF")
+        select["rad"].value("UNDEF")
         select["tmin"].real(0.0)
         select["tmax"].real(0.0)
         select["emin"].real(ebounds.emin(i).TeV())

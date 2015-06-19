@@ -20,7 +20,7 @@ generally not very useful.
 
 .. warning::
 
-   The GammaLib module needs to be imported before the ctools 
+   The GammaLib module needs to be imported **before** the ctools 
    module so that GammaLib class types are handled correctly.
    So make sure that you **always import the GammaLib module before the ctools
    module.**
@@ -42,8 +42,8 @@ way as if it were executed from the command line.
    >>> sim = ctools.ctobssim()
    >>> sim["inmodel"].filename("${CTOOLS}/share/models/crab.xml")
    >>> sim["outevents"].filename("events.fits")
-   >>> sim["caldb"].string("dummy")
-   >>> sim["irf"].string("cta_dummy_irf")
+   >>> sim["caldb"].string("prod2")
+   >>> sim["irf"].string("South_50h")
    >>> sim["ra"].real(83.63)
    >>> sim["dec"].real(22.01)
    >>> sim["rad"].real(5.0)
@@ -95,13 +95,13 @@ in that observation you may type:
 
    >>> print(sim.obs()[0].events())
    === GCTAEventList ===
-    Number of events ..........: 12152
+    Number of events ..........: 31928
     Time interval .............: 51544.5 - 51544.5 days
    === GEbounds ===
     Number of intervals .......: 1
     Energy range ..............: 100 GeV - 100 TeV
    === GCTARoi ===
-    ROI centre ................: RA=83.63, DEC=22.01 [0, 0]
+    ROI centre ................: RA=83.63, DEC=22.01 [0,0]
     ROI radius ................: 5 deg
 
 The ``obs()[0]`` operator returns the first observation in the observation 
@@ -114,11 +114,12 @@ To see what kind of object you actually got, use:
    >>> type(sim.obs()[0].events())
    <class 'gammalib.cta.GCTAEventList'>
 
-The CTA event list is implement as the ``GCTAEventList`` class in the 
+The CTA event list is implement by the ``GCTAEventList`` class in the 
 ``cta`` module of GammaLib.
 To visualise the individual events you can iterate over the events using a 
 for loop.
-This will show the simulated celestial coordinates (RA, DEC), energies and 
+This will show the simulated celestial coordinates (RA, DEC), the 
+coordinate in the camera system [DETX, DETY], energies and 
 terrestrial times (TT) of all events. 
 
 .. code-block:: python
@@ -127,9 +128,9 @@ terrestrial times (TT) of all events.
    >>> for event in events:
    ...     print(event)
    ...
-   Dir=RA=83.6477, DEC=22.0202 [0.000178879, 0.000286637] Energy=3.235 TeV Time=-3.15576e+08 s (TT)
-   Dir=RA=83.482, DEC=22.0189 [0.000155643, -0.00239471] Energy=141.949 GeV Time=-3.15576e+08 s (TT)
-   Dir=RA=83.6058, DEC=22.1586 [0.00259306, -0.000391919] Energy=316.376 GeV Time=-3.15576e+08 s (TT)
+   Dir=RA=83.5759, DEC=21.9757 [-0.000597839,-0.000875483] Energy=328.153 GeV Time=-3.15576e+08 s (TT)
+   Dir=RA=83.5775, DEC=22.0128 [4.88943e-05,-0.000849504] Energy=353.264 GeV Time=-3.15576e+08 s (TT)
+   Dir=RA=83.4302, DEC=21.931 [-0.00137616,-0.0032343] Energy=117.999 GeV Time=-3.15576e+08 s (TT)
    ...
 
 .. note::
@@ -150,13 +151,13 @@ terrestrial times (TT) of all events.
      >>> sim.run()                   
      >>> print(sim.obs()[0].events())
      === GCTAEventList ===
-      Number of events ..........: 6141
+      Number of events ..........: 15964
       Time interval .............: 51544.5 - 51544.5 days
      === GEbounds ===
       Number of intervals .......: 1
       Energy range ..............: 100 GeV - 100 TeV
      === GCTARoi ===
-      ROI centre ................: RA=83.63, DEC=22.01 [0, 0]
+      ROI centre ................: RA=83.63, DEC=22.01 [0,0]
       ROI radius ................: 5 deg
 
 
@@ -178,28 +179,30 @@ Where are the user parameters?
 :ref:`ctlike` doesn't in fact need any as all the relevant information is 
 already contained in the observation container produced by the 
 :ref:`ctobssim` class.
-And you make have recognised that we constructed the :ref:`ctlike` 
+And you may have recognised that we constructed the :ref:`ctlike` 
 instance by using the :ref:`ctobssim` observation container as
 constructor argument.
 
-To check how the fit went you may inspect the optimiser class used by
+To check how the fit went you can inspect the optimiser used by
 :ref:`ctlike`:
 
 .. code-block:: python
 
    >>> print(like.opt())         
    === GOptimizerLM ===
-    Optimized function value ..: 44578.761
+    Optimized function value ..: 101048.382
     Absolute precision ........: 0.005
     Acceptable value decrease .: 2
     Optimization status .......: converged
-    Number of parameters ......: 9
+    Number of parameters ......: 10
     Number of free parameters .: 4
-    Number of iterations ......: 3
-    Lambda ....................: 1e-06
+    Number of iterations ......: 2
+    Lambda ....................: 1e-05
 
-Apparently, the fit converged after fitting 4 parameters in 3 iterations.
-To inspect the fit results you may print the model container that is a 
+Apparently, the fit converged after 2 iterations.
+Out of 10 parameters in the model 4 have been fitted (the others were kept
+fixed).
+To inspect the fit results you can print the model container that is a 
 member of the observation container:
 
 .. code-block:: python
@@ -207,7 +210,7 @@ member of the observation container:
    >>> print(like.obs().models())
    === GModels ===
     Number of models ..........: 2
-    Number of parameters ......: 9
+    Number of parameters ......: 10
    === GModelSky ===
     Name ......................: Crab
     Instruments ...............: all
@@ -220,24 +223,24 @@ member of the observation container:
      RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
      DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
     Number of spectral par's ..: 3
-     Prefactor ................: 6.13265e-16 +/- 2.05734e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-     Index ....................: -2.50565 +/- 0.0250831 [-0,-5]  (free,scale=-1,gradient)
+     Prefactor ................: 5.80565e-16 +/- 1.11147e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+     Index ....................: -2.49266 +/- 0.0163476 [-0,-5]  (free,scale=-1,gradient)
      PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
     Number of temporal par's ..: 1
-     Constant .................: 1 (relative value) (fixed,scale=1,gradient)
-   === GCTAModelRadialAcceptance ===
-    Name ......................: Background
+     Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   === GCTAModelIrfBackground ===
+    Name ......................: CTABackgroundModel
     Instruments ...............: CTA
     Instrument scale factors ..: unity
     Observation identifiers ...: all
-    Model type ................: "Gaussian" * "FileFunction" * "Constant"
-    Number of parameters ......: 3
-    Number of radial par's ....: 1
-     Sigma ....................: 3.03693 +/- 0.0304896 [0.01,10] deg2 (free,scale=1,gradient)
-    Number of spectral par's ..: 1
-     Normalization ............: 0.998667 +/- 0.0172585 [0,1000]  (free,scale=1,gradient)
+    Model type ................: "PowerLaw" * "Constant"
+    Number of parameters ......: 4
+    Number of spectral par's ..: 3
+     Prefactor ................: 1.01701 +/- 0.0216563 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+     Index ....................: 0.0230864 +/- 0.0123006 [-5,5]  (free,scale=1,gradient)
+     PivotEnergy ..............: 1e+06 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
     Number of temporal par's ..: 1
-     Constant .................: 1 (relative value) (fixed,scale=1,gradient)
+     Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 Suppose you want to repeat the fit by optimising also the position of the 
 point source.
@@ -250,8 +253,8 @@ This is easy from Python:
    >>> like.run()
    >>> print(like.obs().models())
    ...
-     RA .......................: 83.633 +/- 0.00137216 [-360,360] deg (free,scale=1)
-     DEC ......................: 22.0144 +/- 0.00127247 [-90,90] deg (free,scale=1)
+     RA .......................: 83.6341 +/- 0.000958947 [-360,360] deg (free,scale=1)
+     DEC ......................: 22.0139 +/- 0.000870912 [-90,90] deg (free,scale=1)
 
 The ``like.obs().models()`` method provides the model container, using the 
 ``["Crab"]`` operator we access the Crab model in that container and using 
@@ -293,12 +296,12 @@ the ``fix()`` method.
       >>> print(like.obs())
       === GObservations ===
        Number of observations ....: 1
-       Number of predicted events : 6141
+       Number of predicted events : 15964
 
    is okay as the ``ctools.ctlike(sim.obs())`` constructor will create
    a copy of the observation container that lives within the :ref:`ctlike`
    instance.
-   To preserve an observation container after a ctools object went out 
+   To preserve an observation container after a ctools object goes out 
    of scope you have to create a local copy of the container using the
    ``copy()`` method:
 
@@ -327,8 +330,8 @@ Here an example of how to use ``obsutils``:
    >>> import ctools
    >>> from ctools import obsutils
    >>> pattern = obsutils.set_obs_patterns("four", ra=83.63, dec=22.01, offset=1.0)
-   >>> obs = obsutils.set_obs_list(pattern, duration=1800, emin=0.1, emax=100.0, rad=5.0, caldb="dummy", irf="cta_dummy_irf")
-   >>> print(like.obs())   
+   >>> obs = obsutils.set_obs_list(pattern, duration=1800, emin=0.1, emax=100.0, rad=5.0, caldb="prod2", irf="South_50h")
+   >>> print(obs)   
    === GObservations ===
     Number of observations ....: 4
     Number of predicted events : 0
@@ -339,7 +342,7 @@ Here an example of how to use ``obsutils``:
    >>> print(like.obs().models())   
    === GModels ===
     Number of models ..........: 2
-    Number of parameters ......: 9
+    Number of parameters ......: 10
    ...
 
 The module is imported using the ``from ctools import obsutils`` directive.
