@@ -95,4 +95,4 @@ Standard parameters
 Related tools
 -------------
 
-<cterror>
+:ref:`cterror`
