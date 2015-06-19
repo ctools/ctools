@@ -1,15 +1,17 @@
-.. _ctulimit:
+.. _cterror:
 
-ctulimit
-===========
+cterror
+=======
 
-Computes upper limit for a specific sky model component.
+Computes parameter errors for a specific sky model component using
+a likelihood profile method.
 
 
 Synopsis
 --------
 
-Computes the upper limit flux of a given source.
+This tool computes the parameter errors for a specific sky model using
+a likelihood profile method.
 
 
 General parameters
@@ -20,6 +22,9 @@ General parameters
  	 	 
 ``inmodel [file]``
     Model XML file containing the source and background definitions.
+ 	 	 
+``outmodel [file]``
+    Model XML file with updated error information.
  	 	 
 ``srcname [string]``
     Name of model component for which upper limit should be computed.
@@ -39,29 +44,15 @@ General parameters
 ``irf [string]``
     Instrumental response function.
  	 	 
-``(confidence = 0.95) [real]``
-    Confidence level of upper limit.
+``(confidence = 0.68) [real]``
+    Confidence level for error computation.
     
-``(sigma_min = 0.0) [real]``
-    Minimum boundary to start searching for upper limit value.
-    Number of standard deviations above best fit value
-    
-``(sigma_max = 10.0) [real]``
-    Maximum boundary to start searching for upper limit value.
-    Number of standard deviations above best fit value  
- 	 	 
-``(emin = 1.0) [real])``
-    Minimum energy of flux limits (in TeV).
- 	 	 
-``(emax = 100) [real]``
-    Maximum energy of flux limits (in TeV).
- 	 	 
-``(tol = 1e-5) [real]``
+``(tol = 1e-3) [real]``
     Computation tolerance.
    
 ``(max_iter = 50) [integer]``
-    Maximum number of iterations before stopping the upper
-    limit computations.
+    Maximum number of iterations before stopping the likelihood
+    profil computations.
 
 
 Standard parameters
@@ -88,11 +79,11 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctulimit.log) [string]``
+``(logfile = cterror.log) [string]``
     Name of log file.
 
 
 Related tools
 -------------
 
-<cterror>
+<ctulimit>
