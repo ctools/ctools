@@ -317,5 +317,3 @@ else
   exit 1
 fi
 $ECHO " ok"
-
-ls -la pfiles

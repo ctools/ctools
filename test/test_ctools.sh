@@ -62,7 +62,7 @@ rm -rf ulimit.dat butterfly.txt
 # ========================
 rm -rf pfiles
 mkdir -p pfiles
-#cp -r ../src/*/*.par pfiles/
+cp -r ../src/*/*.par pfiles/
 export PFILES=pfiles
 
 
