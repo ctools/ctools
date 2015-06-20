@@ -172,12 +172,13 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
 # ============================================================== #
 # Fit observations and determine errors using likelihood profile #
 # ============================================================== #
-def cterror(obs, log=False, debug=False, chatter=2):
+def cterror(obs, srcname, log=False, debug=False, chatter=2):
     """
     Perform maximum likelihood fitting of observations in the container.
     
     Parameters:
-     obs   - Observation container
+     obs     - Observation container
+     srcname - Source name
     Keywords:
      log     - Create log file(s)
      debug   - Create screen dump
@@ -186,6 +187,9 @@ def cterror(obs, log=False, debug=False, chatter=2):
     """
     # Allocate cterror application
     error = ctools.cterror(obs)
+
+    # Set cterror parameters
+    error["srcname"].string(srcname)
     
     # Optionally open the log file
     if log:
