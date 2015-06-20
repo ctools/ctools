@@ -57,7 +57,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
         sim["debug"].boolean(True)
 
     # Set chatter level
-    sim["chatter"].chatter = chatter
+    sim["chatter"].integer(chatter)
     
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
@@ -105,7 +105,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
             bin["debug"].boolean(True)
 
         # Set chatter level
-        bin["chatter"].chatter = chatter
+        bin["chatter"].integer(chatter)
 
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps
@@ -157,7 +157,7 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
         like["debug"].boolean(True)
 
     # Set chatter level
-    like["chatter"].chatter = chatter
+    like["chatter"].integer(chatter)
     
     # Optionally apply energy dispersion
     like["edisp"].boolean(edisp)
@@ -200,7 +200,7 @@ def cterror(obs, srcname, log=False, debug=False, chatter=2):
         error["debug"].boolean(True)
 
     # Set chatter level
-    error["chatter"].chatter = chatter
+    error["chatter"].integer(chatter)
 
     # Run cterror application.
     error.run()
