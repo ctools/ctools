@@ -593,6 +593,11 @@ double cterror::error_bisection(const double& min, const double& max)
             break;
         }
 
+        // Check if interval is smaller than 1.0e-6
+        if (std::abs(wrk_max-wrk_min) < 1.0e-6) {
+            break;
+        }
+
         // If we are on the crescent side of the parabola ...
         if (mid > m_value) {
 
