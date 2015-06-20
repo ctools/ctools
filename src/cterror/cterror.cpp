@@ -37,7 +37,6 @@
 #define G_GET_PARAMETERS                         "cterror::get_parameters()"
 #define G_ERR_BISECTION         "cterror::error_bisection(double&, double&)"
 #define G_EVALUATE                              "cterror::evaluate(double&)"
-#define G_RUN                                               "cterror::run()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -241,6 +240,9 @@ void cterror::run(void)
     m_obs.errors(*m_opt);
     m_best_logL = m_obs.logL();
 
+    // Store optimizer for later recovery
+    GOptimizerLM best_opt = *m_opt;
+
     // Write optimised model into logger
     if (logTerse()) {
         log << *m_opt << std::endl;
@@ -255,14 +257,8 @@ void cterror::run(void)
         // Save best fitting models
         GModels models_best = m_obs.models();
 
-        // Get pointer on sky model
-        GModelSky* model  = dynamic_cast<GModelSky*>(models_best[m_srcname]);
-        if (model == NULL) {
-            std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
-                              "Please specify the name of a sky model for "
-                              "parameter error computation.";
-            throw GException::invalid_value(G_RUN, msg);
-        }
+        // Get pointer on model
+        GModel* model = models_best[m_srcname];
 
         // Get number of parameters
         int npars = model->size();
@@ -278,10 +274,9 @@ void cterror::run(void)
             // Initialise with best fitting models
             m_obs.models(models_best);
 
-            // Get pointer on sky model parameter
-            GModels&   current_models = const_cast<GModels&>(m_obs.models());
-            GModelSky* current_model  = dynamic_cast<GModelSky*>(current_models[m_srcname]);
-            m_model_par               = &(current_model->at(i));
+            // Get pointer on model parameter
+            GModels& current_models = const_cast<GModels&>(m_obs.models());
+            m_model_par             = &(current_models[m_srcname]->at(i));
 
             // Extract current value
             m_value = m_model_par->factor_value();
@@ -359,6 +354,9 @@ void cterror::run(void)
         m_obs.models(models_best);
 
     } // endif: source model exists
+
+    // Recover optimizer
+    *m_opt = best_opt;
 
     // Return
     return;
@@ -592,6 +590,11 @@ double cterror::error_bisection(const double& min, const double& max)
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
+            break;
+        }
+
+        // Check if interval is smaller than 1.0e-6
+        if (std::abs(wrk_max-wrk_min) < 1.0e-6) {
             break;
         }
 

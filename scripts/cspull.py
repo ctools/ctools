@@ -166,8 +166,9 @@ class cspull(ctools.cscript):
         self.m_profile = self["profile"].boolean()
 
         # Set some fixed parameters
-        self.m_log   = False                    # Logging in client tools
-        self.m_debug = self["debug"].boolean()  # Debugging in client tools
+        self.m_log     = False                     # Logging in client tools
+        self.m_chatter = self["chatter"].integer() # Chatter level 
+        self.m_debug   = self["debug"].boolean()   # Debugging in client tools
 
         # Return
         return
@@ -276,7 +277,7 @@ class cspull(ctools.cscript):
          seed - Random number generator seed
         """
         # Write header
-        if self.logExplicit():
+        if self.logNormal():
             self.log.header2("Trial "+str(seed+1))
 
         # Simulate events
@@ -286,7 +287,9 @@ class cspull(ctools.cscript):
                            binsz=self.m_binsz, \
                            npix=self.m_npix, \
                            edisp=self.m_edisp, \
-                           log=self.m_log, debug=self.m_debug)
+                           log=self.m_log, \
+                           debug=self.m_debug, \
+                           chatter=self.m_chatter)
 
         # Determine number of events in simulation
         nevents = 0.0
@@ -294,7 +297,7 @@ class cspull(ctools.cscript):
             nevents += run.events().number()
 
         # Write simulation results
-        if self.logExplicit():
+        if self.logNormal():
             self.log.header3("Simulation")
             self.log.parformat("Number of simulated events")
             self.log(nevents)
@@ -302,11 +305,18 @@ class cspull(ctools.cscript):
 
         # Fit model
         if self.m_profile:
-            like  = obsutils.cterror(obs, \
-                                     log=self.m_log, debug=self.m_debug)
+            models = obs.models()
+            for i in range(models.size()):
+                model_name = models[i].name()
+                like       = obsutils.cterror(obs, model_name, \
+                                              log=self.m_log, \
+                                              debug=self.m_debug,
+                                              chatter=self.m_chatter)
         else:
             like = obsutils.fit(obs, edisp=self.m_edisp, \
-                                log=self.m_log, debug=self.m_debug)
+                                log=self.m_log, \
+                                debug=self.m_debug, \
+                                chatter=self.m_chatter)
 
         # Store results
         logL   = like.opt().value()
@@ -314,7 +324,7 @@ class cspull(ctools.cscript):
         models = like.obs().models()
 
         # Write result header
-        if self.logExplicit():
+        if self.logNormal():
             self.log.header3("Pulls")
         
         # Gather results
@@ -356,7 +366,7 @@ class cspull(ctools.cscript):
                     values["Unc_"+name] = error
 
                     # Write result
-                    if self.logExplicit():
+                    if self.logNormal():
                         self.log.parformat(name)
                         self.log(pull)
                         self.log(" (")
