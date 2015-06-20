@@ -166,8 +166,9 @@ class cspull(ctools.cscript):
         self.m_profile = self["profile"].boolean()
 
         # Set some fixed parameters
-        self.m_log   = False                    # Logging in client tools
-        self.m_debug = self["debug"].boolean()  # Debugging in client tools
+        self.m_log     = False                     # Logging in client tools
+        self.m_chatter = self["chatter"].integer() # Chatter level 
+        self.m_debug   = self["debug"].boolean()   # Debugging in client tools
 
         # Return
         return
@@ -286,7 +287,9 @@ class cspull(ctools.cscript):
                            binsz=self.m_binsz, \
                            npix=self.m_npix, \
                            edisp=self.m_edisp, \
-                           log=self.m_log, debug=self.m_debug)
+                           log=self.m_log, \
+                           debug=self.m_debug, \
+                           chatter=self.m_chatter)
 
         # Determine number of events in simulation
         nevents = 0.0
@@ -307,10 +310,13 @@ class cspull(ctools.cscript):
                 model_name = models[i].name()
                 like       = obsutils.cterror(obs, model_name, \
                                               log=self.m_log, \
-                                              debug=self.m_debug)
+                                              debug=self.m_debug,
+                                              chatter=self.m_chatter)
         else:
             like = obsutils.fit(obs, edisp=self.m_edisp, \
-                                log=self.m_log, debug=self.m_debug)
+                                log=self.m_log, \
+                                debug=self.m_debug, \
+                                chatter=self.m_chatter)
 
         # Store results
         logL   = like.opt().value()
