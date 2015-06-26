@@ -28,8 +28,8 @@ caldb,    s, a, "prod2",,, "Calibration database"
 irf,      s, a, "South_50h",,, "Instrument response function"
 
 #
-# Upper limit calculation parameters
-#===================================
+# Error calculation parameters
+#=============================
 confidence, r, h, 0.68,0.0,1.0, "Confidence level"
 tol,        r, h, 1e-3,,, "Computation tolerance"
 max_iter,   i, h, 50,,, "Maximum number of iterations"
