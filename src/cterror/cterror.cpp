@@ -232,9 +232,6 @@ void cterror::run(void)
         log.header1("Compute best-fit likelihood");
     }
 
-    // Allocate optimizer
-    m_opt = new GOptimizerLM();
-
     // Optimize and save best log-likelihood
     m_obs.optimize(*m_opt);
     m_obs.errors(*m_opt);
@@ -414,6 +411,16 @@ void cterror::init_members(void)
     m_model_par    = NULL;
     m_opt          = NULL;
 
+    // Allocate LM optimizer
+    GOptimizerLM* opt = new GOptimizerLM();
+
+    // Set optimizer parameters
+    opt->max_iter(m_max_iter);
+    opt->max_stalls(10);
+
+    // Set optimizer pointer
+    m_opt = opt;
+
     // Return
     return;
 }
@@ -436,8 +443,8 @@ void cterror::copy_members(const cterror& app)
     m_obs       = app.m_obs;
     m_dlogL     = app.m_dlogL;
     m_best_logL = app.m_best_logL;
+    m_opt       = app.m_opt->clone();
     m_model_par = NULL;
-    m_opt = NULL;
 
     // Return
     return;
