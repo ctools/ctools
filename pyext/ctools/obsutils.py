@@ -45,8 +45,8 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
     
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
-    sim["seed"].integer(seed)
-    sim["edisp"].boolean(edisp)
+    sim["seed"] = seed
+    sim["edisp"] = edisp
         
     # Optionally open the log file
     if log:
@@ -54,10 +54,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
 
     # Optionally switch-on debugging model
     if debug:
-        sim["debug"].boolean(True)
+        sim["debug"] = True
 
     # Set chatter level
-    sim["chatter"].integer(chatter)
+    sim["chatter"] = chatter
     
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
@@ -85,16 +85,16 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
     
         # Allocate ctbin application and set parameters
         bin = ctools.ctbin(sim.obs())
-        bin["ebinalg"].string("LOG")
-        bin["emin"].real(emin)
-        bin["emax"].real(emax)
-        bin["enumbins"].integer(nbins)
-        bin["usepnt"].boolean(True) # Use pointing for map centre
-        bin["nxpix"].integer(npix)
-        bin["nypix"].integer(npix)
-        bin["binsz"].real(binsz)
-        bin["coordsys"].string(coord)
-        bin["proj"].string(proj)
+        bin["ebinalg"] = "LOG"
+        bin["emin"] = emin
+        bin["emax"] = emax
+        bin["enumbins"] = nbins
+        bin["usepnt"] = True # Use pointing for map centre
+        bin["nxpix"] = npix
+        bin["nypix"] = npix
+        bin["binsz"] = binsz
+        bin["coordsys"] = coord
+        bin["proj"] = proj
         
         # Optionally open the log file
         if log:
@@ -102,10 +102,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
 
         # Optionally switch-on debugging model
         if debug:
-            bin["debug"].boolean(True)
+            bin["debug"] = True
 
         # Set chatter level
-        bin["chatter"].integer(chatter)
+        bin["chatter"] = chatter
 
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps
@@ -154,13 +154,13 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
     
     # Optionally switch-on debugging model
     if debug:
-        like["debug"].boolean(True)
+        like["debug"] = True
 
     # Set chatter level
-    like["chatter"].integer(chatter)
+    like["chatter"] = chatter
     
     # Optionally apply energy dispersion
-    like["edisp"].boolean(edisp)
+    like["edisp"] = edisp
 
     # Run ctlike application.
     like.run()
@@ -189,7 +189,7 @@ def cterror(obs, srcname, log=False, debug=False, chatter=2):
     error = ctools.cterror(obs)
 
     # Set cterror parameters
-    error["srcname"].string(srcname)
+    error["srcname"] = srcname
     
     # Optionally open the log file
     if log:
@@ -197,10 +197,10 @@ def cterror(obs, srcname, log=False, debug=False, chatter=2):
     
     # Optionally switch-on debugging model
     if debug:
-        error["debug"].boolean(True)
+        error["debug"] = True
 
     # Set chatter level
-    error["chatter"].integer(chatter)
+    error["chatter"] = chatter
 
     # Run cterror application.
     error.run()
@@ -625,13 +625,13 @@ def spectrum(obs, source, ebounds):
 
         # Clone observations and reset energy thresholds
         select = ctools.ctselect(obs)
-        select["ra"].value("UNDEF")
-        select["dec"].value("UNDEF")
-        select["rad"].value("UNDEF")
-        select["tmin"].real(0.0)
-        select["tmax"].real(0.0)
-        select["emin"].real(ebounds.emin(i).TeV())
-        select["emax"].real(ebounds.emax(i).TeV())
+        select["ra"] = "UNDEF"
+        select["dec"] = "UNDEF"
+        select["rad"] = "UNDEF"
+        select["tmin"] = 0
+        select["tmax"] = 0
+        select["emin"] = ebounds.emin(i).TeV()
+        select["emax"] = ebounds.emax(i).TeV()
         select.run()
         
         # Refit and write out to spectrum

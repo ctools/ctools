@@ -117,8 +117,8 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"].boolean(debug)
-    sim["outevents"].filename("obs.xml")
+    sim["debug"] = debug
+    sim["outevents"] = "obs.xml"
     sim.execute()
 
     # Bin events by looping over all observations in the container
@@ -132,18 +132,18 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
 
         # Bin events for that observation
         bin = ctools.ctbin()
-        bin["inobs"].filename(eventfile)
-        bin["outcube"].filename(cubefile)
-        bin["ebinalg"].string("LOG")
-        bin["emin"].real(emin)
-        bin["emax"].real(emax)
-        bin["enumbins"].integer(enumbins)
-        bin["nxpix"].integer(nxpix)
-        bin["nypix"].integer(nypix)
-        bin["binsz"].real(binsz)
-        bin["coordsys"].string(coordsys)
-        bin["usepnt"].boolean(True)
-        bin["proj"].string(proj)
+        bin["inobs"]    = eventfile
+        bin["outcube"]  = cubefile
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = emin
+        bin["emax"]     = emax
+        bin["enumbins"] = enumbins
+        bin["nxpix"]    = nxpix
+        bin["nypix"]    = nypix
+        bin["binsz"]    = binsz
+        bin["coordsys"] = coordsys
+        bin["usepnt"]   = True
+        bin["proj"]     = proj
         bin.execute()
 
         # Set observation ID
@@ -160,15 +160,15 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"].filename("obs_cube.xml")
-    like["inmodel"].filename(model)
-    like["outmodel"].filename("fit_results.xml")
-    like["expcube"].filename("NONE")
-    like["psfcube"].filename("NONE")
-    like["bkgcube"].filename("NONE")
-    like["caldb"].string(caldb)
-    like["irf"].string(irf)
-    like["debug"].boolean(True) # Switch this always on for results in console
+    like["inobs"]    = "obs_cube.xml"
+    like["inmodel"]  = model
+    like["outmodel"] = "fit_results.xml"
+    like["expcube"]  = "NONE"
+    like["psfcube"]  = "NONE"
+    like["bkgcube"]  = "NONE"
+    like["caldb"]    = caldb
+    like["irf"]      = irf
+    like["debug"]    = True # Switch this always on for results in console
     like.execute()
 	
     # Return

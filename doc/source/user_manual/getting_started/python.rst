@@ -22,29 +22,26 @@ To illustrate how to use ctools from Python, below is a working example
 of an event list simulation using the :ref:`ctobssim` class.
 An instance ``sim`` of the :ref:`ctobssim` class is generated and user 
 parameters are set for this instance using the ``[ ]`` operator.
-Note that specific methods exist for [file], [string], [real], [integer], 
-and [boolean] parameter types (see the :ref:`reference` for a list of 
-parameters and their types).
+See the :ref:`reference` for a list of parameters and their types).
 The ``execute()`` method executes the :ref:`ctobssim` class in the same 
 way as if it were executed from the command line.
 
 .. code-block:: python
 
-   >>> import gammalib
-   >>> import ctools
-   >>> sim = ctools.ctobssim()
-   >>> sim["inmodel"].filename("${CTOOLS}/share/models/crab.xml")
-   >>> sim["outevents"].filename("events.fits")
-   >>> sim["caldb"].string("prod2")
-   >>> sim["irf"].string("South_50h")
-   >>> sim["ra"].real(83.63)
-   >>> sim["dec"].real(22.01)
-   >>> sim["rad"].real(5.0)
-   >>> sim["tmin"].real(0.0)
-   >>> sim["tmax"].real(1800.0)
-   >>> sim["emin"].real(0.1)
-   >>> sim["emax"].real(100.0)
-   >>> sim.execute()
+   import ctools
+   sim = ctools.ctobssim()
+   sim["inmodel"] = "${CTOOLS}/share/models/crab.xml"
+   sim["outevents"] = "events.fits"
+   sim["caldb"] = "prod2"
+   sim["irf"] = "South_50h"
+   sim["ra"] = 83.63
+   sim["dec"] = 22.01
+   sim["rad"] = 5.0
+   sim["tmin"] = 0
+   sim["tmax"] = 1800
+   sim["emin"] = 0.1
+   sim["emax"] = 100
+   sim.execute()
 
 Alternatively, you may "run" the :ref:`ctobssim` tool using
 
@@ -364,5 +361,3 @@ You now have learned the basics of using ctools and GammaLib within Python.
 To go beyond these initial steps you may check the Python scripts in the
 ``examples`` folder that provide useful analysis examples.
 Check the ``README`` file in that folder for an explanation of the scripts.
-
-

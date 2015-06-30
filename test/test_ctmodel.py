@@ -66,30 +66,30 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctmodel from scratch
         model = ctools.ctmodel()
-        model["incube"].filename("NONE")
-        model["outcube"].filename("modmap.fits")
-        model["inmodel"].filename(self.model_name)
-        model["inobs"].filename("NONE")
-        model["expcube"].filename("NONE")
-        model["psfcube"].filename("NONE")
-        model["bkgcube"].filename("NONE")
-        model["caldb"].string(self.caldb)
-        model["irf"].string(self.irf)
-        model["rad"].real(5.0)
-        model["ra"].real(83.63)
-        model["dec"].real(22.01)
-        model["tmin"].real(0.0)
-        model["tmax"].real(1800.0)
-        model["emin"].real(0.1)
-        model["emax"].real(100.0)
-        model["enumbins"].integer(20)
-        model["nxpix"].integer(200)
-        model["nypix"].integer(200)
-        model["binsz"].real(0.02)
-        model["coordsys"].string("CEL")
-        model["proj"].string("CAR")
-        model["xref"].real(83.63)
-        model["yref"].real(22.01)
+        model["incube"]   = "NONE"
+        model["outcube"]  = "modmap.fits"
+        model["inmodel"]  = self.model_name
+        model["inobs"]    = "NONE"
+        model["expcube"]  = "NONE"
+        model["psfcube"]  = "NONE"
+        model["bkgcube"]  = "NONE"
+        model["caldb"]    = self.caldb
+        model["irf"]      = self.irf
+        model["rad"]      = 5
+        model["ra"]       = 83.63
+        model["dec"]      = 22.01
+        model["tmin"]     = 0
+        model["tmax"]     = 1800
+        model["emin"]     = 0.1
+        model["emax"]     = 100
+        model["enumbins"] = 20
+        model["nxpix"]    = 200
+        model["nypix"]    = 200
+        model["binsz"]    = 0.02
+        model["coordsys"] = "CEL"
+        model["proj"]     = "CAR"
+        model["xref"]     = 83.63
+        model["yref"]     = 22.01
         
         # Run tool
         self.test_try("Run ctmodel")
