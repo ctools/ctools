@@ -260,17 +260,17 @@ class Analyser(base):
             bin = ct.ctbin()
             bin["evfile"] = self.m_evtfile
         bin["outfile"] = self.m_cntfile
-        bin["ebinalg"].string(self.m_ebinalg)
-        bin["emin"].real(self.m_emin)
-        bin["emax"].real(self.m_emax)
+        bin["ebinalg"] = self.m_ebinalg
+        bin["emin"] = self.m_emin
+        bin["emax"] = self.m_emax
         Nbdecade = log10(self.m_emax)-log10(self.m_emin)#Compute the number of decade
-        bin["enumbins"].integer(int(self.m_enumbins*Nbdecade))
-        bin["usepnt"].boolean(self.m_usepnt) # Use pointing for map centre
-        bin["nxpix"].integer(self.m_nxpix)
-        bin["nypix"].integer(self.m_nypix)
-        bin["binsz"].real(self.m_binsz)
-        bin["coordsys"].string(self.m_coordsys)
-        bin["proj"].string(self.m_proj)
+        bin["enumbins"] = int(self.m_enumbins*Nbdecade)
+        bin["usepnt"] = self.m_usepnt # Use pointing for map centre
+        bin["nxpix"] = self.m_nxpix
+        bin["nypix"] = self.m_nypix
+        bin["binsz"] = self.m_binsz
+        bin["coordsys"] = self.m_coordsys
+        bin["proj"] = self.m_proj
         
         # Optionally open the log file
         if log:
@@ -278,7 +278,7 @@ class Analyser(base):
 
         # Optionally switch-on debugging model
         if debug:
-            bin["debug"].boolean(True)
+            bin["debug"] = True
 
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps
@@ -302,11 +302,11 @@ class Analyser(base):
             else:
                 self.like["infile"] = self.m_evtfile
                 
-            self.like["stat"].string(self.m_stat)
-            self.like["caldb"].string(self.m_caldb)
-            self.like["irf"].string(self.m_irf)
+            self.like["stat"] = self.m_stat
+            self.like["caldb"] = self.m_caldb
+            self.like["irf"] = self.m_irf
         self.like["srcmdl"] = self.m_xml 
-        self.like["edisp"].boolean(self.m_edisp)
+        self.like["edisp"] = self.m_edisp
         self.like["outmdl"] = self.m_xml_out
 
         # Optionally open the log file
@@ -314,7 +314,7 @@ class Analyser(base):
             self.like.logFileOpen()
         # Optionally switch-on debugging model
         if debug:
-            self.like["debug"].boolean(True)
+            self.like["debug"] = True
             
     def fit(self,log=False,debug=False):
         self.validate()
