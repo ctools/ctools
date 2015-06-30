@@ -232,9 +232,6 @@ void ctulimit::run(void)
     // Save original models
     GModels models_orig = m_obs.models();
 
-    // Allocate a new optimizer
-    m_opt = new GOptimizerLM();
-
     // Initialise best fit optimizer
     GOptimizerLM best_opt;
 
@@ -418,7 +415,17 @@ void ctulimit::init_members(void)
     m_flux_ulimit  = 0.0;
     m_diff_ulimit  = 0.0;
     m_eflux_ulimit = 0.0;
-    m_opt = NULL;
+    m_opt          = NULL;
+
+    // Allocate LM optimizer
+    GOptimizerLM* opt = new GOptimizerLM();
+
+    // Set optimizer parameters
+    opt->max_iter(m_max_iter);
+    opt->max_stalls(10);
+
+    // Set optimizer pointer
+    m_opt = opt;
 
     // Return
     return;
@@ -451,7 +458,7 @@ void ctulimit::copy_members(const ctulimit& app)
     m_diff_ulimit  = app.m_diff_ulimit;
     m_flux_ulimit  = app.m_flux_ulimit;
     m_eflux_ulimit = app.m_eflux_ulimit;
-    m_opt = NULL;
+    m_opt          = app.m_opt->clone();
 
     // Extract model parameter
     get_model_parameter();

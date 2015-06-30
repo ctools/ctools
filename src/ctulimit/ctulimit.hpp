@@ -68,6 +68,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
+    const GOptimizer*    opt(void) const;
     const double&        diff_ulimit(void) const;
     const double&        flux_ulimit(void) const;
     const double&        eflux_ulimit(void) const;
