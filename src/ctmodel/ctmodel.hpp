@@ -79,7 +79,6 @@ protected:
     void copy_members(const ctmodel& app);
     void free_members(void);
     void get_parameters(void);
-    void get_obs(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
     

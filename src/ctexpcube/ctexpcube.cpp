@@ -248,7 +248,7 @@ void ctexpcube::run(void)
     }
 
     // Fill exposure
-    m_expcube.fill(m_obs);
+    m_expcube.fill(m_obs, &log);
 
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {

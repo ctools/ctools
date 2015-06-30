@@ -263,6 +263,17 @@ void ctskymap::run(void)
                 }
             }
 
+            // Skip observation if we don't have an unbinned observation
+            if (obs->eventtype() != "EventList") {
+
+                // Log that we skip the this observation
+                if (logTerse()) {
+                    log << "Warning: Skipping binned observation \""+obs->name()+"\"";
+                    log << std::endl;
+                }
+                continue;
+            }
+
             // Map events into sky map
             map_events(obs);
             

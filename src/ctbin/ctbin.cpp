@@ -257,6 +257,17 @@ void ctbin::run(void)
                 }
             }
 
+            // Skip observation if we don't have an unbinned observation
+            if (obs->eventtype() != "EventList") {
+
+                // Log that we skip the this observation
+                if (logTerse()) {
+                    log << "Warning: Skipping binned observation \""+obs->name()+"\"";
+                    log << std::endl;
+                }
+                continue;
+            }
+
             // Fill the cube
             fill_cube(obs);
 
@@ -561,11 +572,25 @@ void ctbin::obs_cube(void)
         // Attach event cube to CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
         if (obs != NULL) {
-            obs->events(this->cube());
-            obs->eventfile("");
-        }
 
-    }
+            // Only change the event type if we had an unbinned observation
+            if (obs->eventtype() == "EventList") {
+
+                obs->events(this->cube());
+                obs->eventfile("");
+             } // endif: observation was unbinned
+            else { // input observation was binned and skipped
+
+                // Create new and empty cube
+                GCTAEventCube cube = GCTAEventCube(m_cube, m_ebounds, obs->gti());
+
+                // Assign empty cube to have a new binned observation
+                obs->events(cube);
+            }
+
+        } // endif: obervation was valid
+
+    } // endif: we only had one observation in the container
 
     // ... otherwise put a single CTA observation in container
     else {

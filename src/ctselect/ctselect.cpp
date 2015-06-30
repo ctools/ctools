@@ -268,6 +268,17 @@ void ctselect::run(void)
             // Save event file name (for possible saving)
             m_infiles[i] = obs->eventfile();
 
+            // Skip observation if we don't have an unbinned observation
+            if (obs->eventtype() != "EventList") {
+
+                // Log that we skip the this observation
+                if (logTerse()) {
+                    log << "Warning: Skipping binned observation \""+obs->name()+"\"";
+                    log << std::endl;
+                }
+                continue;
+            }
+
             // Fall through in case that the event file is empty
             if (obs->events()->size() == 0) {
                 if (logTerse()) {
@@ -1218,28 +1229,33 @@ void ctselect::save_event_list(const GCTAObservation* obs,
     // Save only if observation is valid
     if (obs != NULL) {
 
-        // Save observation into FITS file
-        obs->save(outfile, clobber());
+        // Save only if we have an event list
+        if (obs->eventtype() == "EventList") {
 
-        // Copy all extensions other than EVENTS and GTI from the input to
-        // the output event list. The EVENTS and GTI extensions are written
-        // by the save method, all others that may eventually be present
-        // have to be copied by hand.
-        GFits infits(infile);
-        GFits outfits(outfile);
-        for (int extno = 1; extno < infits.size(); ++extno) {
-            GFitsHDU* hdu = infits.at(extno);
-            if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
-                outfits.append(*hdu);
+            // Save observation into FITS file
+            obs->save(outfile, clobber());
+
+            // Copy all extensions other than EVENTS and GTI from the input to
+            // the output event list. The EVENTS and GTI extensions are written
+            // by the save method, all others that may eventually be present
+            // have to be copied by hand.
+            GFits infits(infile);
+            GFits outfits(outfile);
+            for (int extno = 1; extno < infits.size(); ++extno) {
+                GFitsHDU* hdu = infits.at(extno);
+                if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
+                    outfits.append(*hdu);
+                }
             }
-        }
 
-        // Close input file
-        infits.close();
+            // Close input file
+            infits.close();
 
-        // Save file to disk and close it (we need both operations)
-        outfits.save(true);
-        outfits.close();
+            // Save file to disk and close it (we need both operations)
+            outfits.save(true);
+            outfits.close();
+
+        } // endif: observation was unbinned
 
     } // endif: observation was valid
 

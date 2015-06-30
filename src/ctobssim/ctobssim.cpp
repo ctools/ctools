@@ -340,6 +340,17 @@ void ctobssim::run(void)
                     }
                 }
 
+                // Skip observation if we don't have an unbinned observation
+                if (obs->eventtype() != "EventList") {
+
+                    // Log that we skip the this observation
+                    if (logTerse()) {
+                        log << "Warning: Skipping binned observation \""+obs->name()+"\"";
+                        log << std::endl;
+                    }
+                    continue;
+                }
+
                 // Work on a clone of the CTA observation. This makes sure that
                 // any memory allocated for computing (for example a response
                 // cache) is properly de-allocated on exit of this run
