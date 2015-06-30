@@ -61,27 +61,27 @@ def pipeline(model_name):
 
 	# Simulate events
 	sim = ctools.ctobssim()
-	sim["inmodel"].filename(model_name)
-	sim["caldb"].string(caldb)
-	sim["irf"].string(irf)
-	sim["ra"].real(ra)
-	sim["dec"].real(dec)
-	sim["rad"].real(rad_sim)
-	sim["tmin"].real(tstart)
-	sim["tmax"].real(tstop)
-	sim["emin"].real(emin)
-	sim["emax"].real(emax)
+	sim["inmodel"] = model_name
+	sim["caldb"] = caldb
+	sim["irf"] = irf
+	sim["ra"] = ra
+	sim["dec"] = dec
+	sim["rad"] = rad_sim
+	sim["tmin"] = tstart
+	sim["tmax"] = tstop
+	sim["emin"] = emin
+	sim["emax"] = emax
 	sim.run()
 
 	# Select events
 	select = ctools.ctselect(sim.obs())
-	select["ra"].real(ra)
-	select["dec"].real(dec)
-	select["rad"].real(rad_select)
-	select["tmin"].real(tstart)
-	select["tmax"].real(tstop)
-	select["emin"].real(emin)
-	select["emax"].real(emax)
+	select["ra"] = ra
+	select["dec"] = dec
+	select["rad"] = rad_select
+	select["tmin"] = tstart
+	select["tmax"] = tstop
+	select["emin"] = emin
+	select["emax"] = emax
 	select.run()
 
 	# Perform maximum likelihood fitting

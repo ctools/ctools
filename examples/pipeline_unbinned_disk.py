@@ -118,32 +118,32 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0, \
 
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"].boolean(debug)
-    sim["outevents"].filename("obs.xml")
+    sim["debug"] = debug
+    sim["outevents"] = "obs.xml"
     sim.execute()
 
     # Select events
     select = ctools.ctselect()
-    select["inobs"].filename("obs.xml")
-    select["outobs"].filename("obs_selected.xml")
-    select["ra"].real(ra)
-    select["dec"].real(dec)
-    select["rad"].real(rad)
-    select["emin"].real(emin)
-    select["emax"].real(emax)
-    select["tmin"].real(tmin)
-    select["tmax"].real(tmax)
-    select["debug"].boolean(debug)
+    select["inobs"] = "obs.xml"
+    select["outobs"] = "obs_selected.xml"
+    select["ra"] = ra
+    select["dec"] = dec
+    select["rad"] = rad
+    select["emin"] = emin
+    select["emax"] = emax
+    select["tmin"] = tmin
+    select["tmax"] = tmax
+    select["debug"] = debug
     select.execute()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"].filename("obs_selected.xml")
-    like["inmodel"].filename(model)
-    like["outmodel"].filename("fit_results.xml")
-    like["caldb"].string(caldb)
-    like["irf"].string(irf)
-    like["debug"].boolean(True) # Switch this always on for results in console
+    like["inobs"] = "obs_selected.xml"
+    like["inmodel"] = model
+    like["outmodel"] = "fit_results.xml"
+    like["caldb"] = caldb
+    like["irf"] = irf
+    like["debug"] = True # Switch this always on for results in console
     like.execute()
 	
     # Return

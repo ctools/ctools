@@ -55,27 +55,27 @@ def unbinned_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["inmodel"].filename(model_name)
-    sim["caldb"].string(caldb)
-    sim["irf"].string(irf)
-    sim["ra"].real(ra)
-    sim["dec"].real(dec)
-    sim["rad"].real(rad_sim)
-    sim["tmin"].real(tstart)
-    sim["tmax"].real(tstop)
-    sim["emin"].real(emin)
-    sim["emax"].real(emax)
+    sim["inmodel"] = model_name
+    sim["caldb"] = caldb
+    sim["irf"] = irf
+    sim["ra"] = ra
+    sim["dec"] = dec
+    sim["rad"] = rad_sim
+    sim["tmin"] = tstart
+    sim["tmax"] = tstop
+    sim["emin"] = emin
+    sim["emax"] = emax
     sim.run()
 
     # Select events
     select = ctools.ctselect(sim.obs())
-    select["ra"].real(ra)
-    select["dec"].real(dec)
-    select["rad"].real(rad_select)
-    select["tmin"].real(tstart)
-    select["tmax"].real(tstop)
-    select["emin"].real(emin)
-    select["emax"].real(emax)
+    select["ra"] = ra
+    select["dec"] = dec
+    select["rad"] = rad_select
+    select["tmin"] = tstart
+    select["tmax"] = tstop
+    select["emin"] = emin
+    select["emax"] = emax
     select.run()
 
     # Get ctlike start CPU time
@@ -124,31 +124,31 @@ def binned_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["inmodel"].filename(model_name)
-    sim["caldb"].string(caldb)
-    sim["irf"].string(irf)
-    sim["ra"].real(ra)
-    sim["dec"].real(dec)
-    sim["rad"].real(rad_sim)
-    sim["tmin"].real(tstart)
-    sim["tmax"].real(tstop)
-    sim["emin"].real(emin)
-    sim["emax"].real(emax)
+    sim["inmodel"] = model_name
+    sim["caldb"] = caldb
+    sim["irf"] = irf
+    sim["ra"] = ra
+    sim["dec"] = dec
+    sim["rad"] = rad_sim
+    sim["tmin"] = tstart
+    sim["tmax"] = tstop
+    sim["emin"] = emin
+    sim["emax"] = emax
     sim.run()
 
     # Bin events into counts map
     bin = ctools.ctbin(sim.obs())
-    bin["ebinalg"].string("LOG")
-    bin["emin"].real(emin)
-    bin["emax"].real(emax)
-    bin["enumbins"].integer(enumbins)
-    bin["nxpix"].integer(nxpix)
-    bin["nypix"].integer(nypix)
-    bin["binsz"].real(binsz)
-    bin["coordsys"].string(coordsys)
-    bin["xref"].real(ra)
-    bin["yref"].real(dec)
-    bin["proj"].string(proj)
+    bin["ebinalg"] = "LOG"
+    bin["emin"] = emin
+    bin["emax"] = emax
+    bin["enumbins"] = enumbins
+    bin["nxpix"] = nxpix
+    bin["nypix"] = nypix
+    bin["binsz"] = binsz
+    bin["coordsys"] = coordsys
+    bin["xref"] = ra
+    bin["yref"] = dec
+    bin["proj"] = proj
     bin.run()
 
     # Get ctlike start CPU time
@@ -197,83 +197,83 @@ def stacked_pipeline(duration):
 
     # Simulate events
     sim = ctools.ctobssim()
-    sim["inmodel"].filename(model_name)
-    sim["caldb"].string(caldb)
-    sim["irf"].string(irf)
-    sim["ra"].real(ra)
-    sim["dec"].real(dec)
-    sim["rad"].real(rad_sim)
-    sim["tmin"].real(tstart)
-    sim["tmax"].real(tstop)
-    sim["emin"].real(emin)
-    sim["emax"].real(emax)
+    sim["inmodel"] = model_name
+    sim["caldb"] = caldb
+    sim["irf"] = irf
+    sim["ra"] = ra
+    sim["dec"] = dec
+    sim["rad"] = rad_sim
+    sim["tmin"] = tstart
+    sim["tmax"] = tstop
+    sim["emin"] = emin
+    sim["emax"] = emax
     sim.run()
 
     # Bin events into counts map
     bin = ctools.ctbin(sim.obs())
-    bin["ebinalg"].string("LOG")
-    bin["emin"].real(emin)
-    bin["emax"].real(emax)
-    bin["enumbins"].integer(enumbins)
-    bin["nxpix"].integer(nxpix)
-    bin["nypix"].integer(nypix)
-    bin["binsz"].real(binsz)
-    bin["coordsys"].string(coordsys)
-    bin["proj"].string(proj)
-    bin["xref"].real(ra)
-    bin["yref"].real(dec)
+    bin["ebinalg"] = "LOG"
+    bin["emin"] = emin
+    bin["emax"] = emax
+    bin["enumbins"] = enumbins
+    bin["nxpix"] = nxpix
+    bin["nypix"] = nypix
+    bin["binsz"] = binsz
+    bin["coordsys"] = coordsys
+    bin["proj"] = proj
+    bin["xref"] = ra
+    bin["yref"] = dec
     bin.run()
 
     # Create exposure cube
     expcube = ctools.ctexpcube(sim.obs())
-    expcube["incube"].filename("NONE")
-    expcube["caldb"].string(caldb)
-    expcube["irf"].string(irf)
-    expcube["ebinalg"].string("LOG")
-    expcube["emin"].real(emin)
-    expcube["emax"].real(emax)
-    expcube["enumbins"].integer(enumbins)
-    expcube["nxpix"].integer(nxpix)
-    expcube["nypix"].integer(nypix)
-    expcube["binsz"].real(binsz)
-    expcube["coordsys"].string(coordsys)
-    expcube["proj"].string(proj)
-    expcube["xref"].real(ra)
-    expcube["yref"].real(dec)
+    expcube["incube"] = "NONE"
+    expcube["caldb"] = caldb
+    expcube["irf"] = irf
+    expcube["ebinalg"] = "LOG"
+    expcube["emin"] = emin
+    expcube["emax"] = emax
+    expcube["enumbins"] = enumbins
+    expcube["nxpix"] = nxpix
+    expcube["nypix"] = nypix
+    expcube["binsz"] = binsz
+    expcube["coordsys"] = coordsys
+    expcube["proj"] = proj
+    expcube["xref"] = ra
+    expcube["yref"] = dec
     expcube.run()
 
     # Create PSF cube
     psfcube = ctools.ctpsfcube(sim.obs())
-    psfcube["incube"].filename("NONE")
-    psfcube["caldb"].string(caldb)
-    psfcube["irf"].string(irf)
-    psfcube["ebinalg"].string("LOG")
-    psfcube["emin"].real(emin)
-    psfcube["emax"].real(emax)
-    psfcube["enumbins"].integer(enumbins)
-    psfcube["nxpix"].integer(10)
-    psfcube["nypix"].integer(10)
-    psfcube["binsz"].real(1.0)
-    psfcube["coordsys"].string(coordsys)
-    psfcube["proj"].string(proj)
-    psfcube["xref"].real(ra)
-    psfcube["yref"].real(dec)
+    psfcube["incube"] = "NONE"
+    psfcube["caldb"] = caldb
+    psfcube["irf"] = irf
+    psfcube["ebinalg"] = "LOG"
+    psfcube["emin"] = emin
+    psfcube["emax"] = emax
+    psfcube["enumbins"] = enumbins
+    psfcube["nxpix"] = 10
+    psfcube["nypix"] = 10
+    psfcube["binsz"] = 1.0
+    psfcube["coordsys"] = coordsys
+    psfcube["proj"] = proj
+    psfcube["xref"] = ra
+    psfcube["yref"] = dec
     psfcube.run()
 
     # Create background cube
     bkgcube = ctools.ctbkgcube(sim.obs())
-    bkgcube["incube"].filename("NONE")
-    bkgcube["ebinalg"].string("LOG")
-    bkgcube["emin"].real(emin)
-    bkgcube["emax"].real(emax)
-    bkgcube["enumbins"].integer(enumbins)
-    bkgcube["nxpix"].integer(10)
-    bkgcube["nypix"].integer(10)
-    bkgcube["binsz"].real(1.0)
-    bkgcube["coordsys"].string(coordsys)
-    bkgcube["proj"].string(proj)
-    bkgcube["xref"].real(ra)
-    bkgcube["yref"].real(dec)
+    bkgcube["incube"] = "NONE"
+    bkgcube["ebinalg"] = "LOG"
+    bkgcube["emin"] = emin
+    bkgcube["emax"] = emax
+    bkgcube["enumbins"] = enumbins
+    bkgcube["nxpix"] = 10
+    bkgcube["nypix"] = 10
+    bkgcube["binsz"] = 1.0
+    bkgcube["coordsys"] = coordsys
+    bkgcube["proj"] = proj
+    bkgcube["xref"] = ra
+    bkgcube["yref"] = dec
     bkgcube.run()
 
     # Attach background model to observation container

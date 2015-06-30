@@ -111,24 +111,24 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0, \
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"].boolean(debug)
+    sim["debug"] = debug
     sim.run()
 
     # Select events
     select = ctools.ctselect(sim.obs())
-    select["ra"].real(ra)
-    select["dec"].real(dec)
-    select["rad"].real(rad)
-    select["emin"].real(emin)
-    select["emax"].real(emax)
-    select["tmin"].real(tmin)
-    select["tmax"].real(tmax)
-    select["debug"].boolean(debug)
+    select["ra"] = ra
+    select["dec"] = dec
+    select["rad"] = rad
+    select["emin"] = emin
+    select["emax"] = emax
+    select["tmin"] = tmin
+    select["tmax"] = tmax
+    select["debug"] = debug
     select.run()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(select.obs())
-    like["debug"].boolean(True) # Switch this always on for results in console
+    like["debug"] = True # Switch this always on for results in console
     like.run()
 	
     # Return
