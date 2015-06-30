@@ -102,6 +102,7 @@ protected:
     double        m_diff_ulimit;  //!< Differential upper limit value
     double        m_flux_ulimit;  //!< Flux upper limit value
     double        m_eflux_ulimit; //!< Energy flux upper limits
+    GOptimizerLM* m_opt;          //!< Optimizer
 };
 
 

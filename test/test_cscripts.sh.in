@@ -44,6 +44,7 @@ rm -rf *.fits *.xml *.dat
 # ========================
 rm -rf pfiles
 mkdir -p pfiles
+cp -r ../src/*/*.par pfiles/
 export PFILES=pfiles
 
 

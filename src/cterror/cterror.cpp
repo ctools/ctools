@@ -412,6 +412,7 @@ void cterror::init_members(void)
     m_dlogL        = 0.0;
     m_best_logL    = 0.0;
     m_model_par    = NULL;
+    m_opt          = NULL;
 
     // Return
     return;
@@ -436,6 +437,7 @@ void cterror::copy_members(const cterror& app)
     m_dlogL     = app.m_dlogL;
     m_best_logL = app.m_best_logL;
     m_model_par = NULL;
+    m_opt = NULL;
 
     // Return
     return;
