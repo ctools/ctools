@@ -15,6 +15,7 @@ asked.
 - :ref:`What is the difference between ctools and GammaLib? <faq_ctools_gammalib>`
 - :ref:`Are ctools and GammaLib specific to CTA? <faq_instruments>`
 - :ref:`I want to upgrade ctools, do I have to upgrade GammaLib? <faq_upgrade>`
+- :ref:`Why does my ctool complain about missing parameters? <faq_pars>`
 
 
 .. _faq_ctools_gammalib:
@@ -77,3 +78,21 @@ asked.
   (see the :ref:`download` section for a correspondance of versions).
   We plan however to put the GammaLib interface under change control.
   ctools should then become more independent from GammaLib.
+
+
+.. _faq_pars:
+
+.. topic:: Why does my ctool complain about missing parameters?
+
+  After upgrading to a new ctools version, a ctool may issue the following
+  error
+
+  ``*** ERROR in GApplicationPars::operator[](std::string&): Invalid 
+  argument. Parameter "XXX" has not been found in parameter file.
+  Please specify a valid parameter name.``
+
+  This error may occur if some parameters have been added to a ctool and
+  you still have the old parameter file without that parameter sitting in
+  your pfiles folder. Simply erasing all files in the pfiles folder should
+  fix this problem.
+

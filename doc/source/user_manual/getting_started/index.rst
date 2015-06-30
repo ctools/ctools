@@ -9,5 +9,4 @@ Getting started
    models
    response
    python
-   faq
 
