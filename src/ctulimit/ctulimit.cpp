@@ -232,6 +232,9 @@ void ctulimit::run(void)
     // Save original models
     GModels models_orig = m_obs.models();
 
+    // Initialise best fit optimizer
+    GOptimizerLM best_opt;
+
     // Save original log-likelihood. If the value is zero it has never been
     // computed hence we compute it now. 
     m_best_logL = m_obs.logL();
@@ -243,24 +246,32 @@ void ctulimit::run(void)
             log.header1("Compute best-fit likelihood");
         }
 
-        // Reoptimize if likelihood was not given before
-        GOptimizerLM* opt = new GOptimizerLM();
-        m_obs.optimize(*opt);
-        m_obs.errors(*opt);
-        m_best_logL = m_obs.logL();
+         // Optimize and save best log-likelihood
+         m_obs.optimize(m_opt);
+         m_obs.errors(m_opt);
+         m_best_logL = m_obs.logL();
 
-        // Write optimised model into logger
-        if (logTerse()) {
-            log << m_obs.models() << std::endl;
-        }
+         // Store optimizer for later recovery
+         best_opt = m_opt;
+
+         // Write optimised model into logger
+         if (logTerse()) {
+             log << m_opt << std::endl;
+             log << gammalib::parformat("Maximum log likelihood");
+             log << gammalib::str(m_best_logL,3) << std::endl;
+             log << m_obs.models() << std::endl;
+         }
 
     } // endif: likelihood was zero
 
+    // Extract current value
+    double value = m_model_par->factor_value();
+
     // Compute parameter bracketing
-    double value  = m_model_par->value();
-    double error  = m_model_par->error();
-    double parmin = value + m_sigma_min * error;
-    double parmax = value + m_sigma_max * error;
+    double parmin = std::max(m_model_par->factor_min(),
+                             value - m_sigma_min * m_model_par->factor_error());
+    double parmax = std::min(m_model_par->factor_max(),
+                             value + m_sigma_max * m_model_par->factor_error());
 
     // Write header
     if (logTerse()) {
@@ -329,6 +340,9 @@ void ctulimit::run(void)
     // Recover original models
     m_obs.models(models_orig);
 
+    // Recover optimizer
+    m_opt = best_opt;
+
     // Return
     return;
 }
@@ -394,6 +408,7 @@ void ctulimit::init_members(void)
 
     // Initialise protected members
     m_obs.clear();
+    m_opt.clear();
     m_dlogL        = 0.0;
     m_skymodel     = NULL;
     m_model_par    = NULL;
@@ -401,6 +416,10 @@ void ctulimit::init_members(void)
     m_flux_ulimit  = 0.0;
     m_diff_ulimit  = 0.0;
     m_eflux_ulimit = 0.0;
+
+    // Set optimizer parameters
+    m_opt.max_iter(m_max_iter);
+    m_opt.max_stalls(10);
 
     // Return
     return;
@@ -433,6 +452,7 @@ void ctulimit::copy_members(const ctulimit& app)
     m_diff_ulimit  = app.m_diff_ulimit;
     m_flux_ulimit  = app.m_flux_ulimit;
     m_eflux_ulimit = app.m_eflux_ulimit;
+    m_opt          = app.m_opt;
 
     // Extract model parameter
     get_model_parameter();
@@ -662,16 +682,22 @@ double ctulimit::evaluate(const double& value)
     double logL = 0.0;
 
     // Check if given parameter is within boundaries
-    if (value > m_model_par->min() && value < m_model_par->max()) {
+    if (value > m_model_par->factor_min() && value < m_model_par->factor_max()) {
 
         // Change parameter factor
-        m_model_par->value(value);
+        m_model_par->factor_value(value);
 
-        // Evaluate likelihood for new model container
-        m_obs.eval();
+        // Fix parameter
+        m_model_par->fix();
+
+        // Re-optimize
+        m_obs.optimize(m_opt);
 
         // Retrieve likelihood
         logL = m_obs.logL();
+
+        // Free parameter
+        m_model_par->free();
 
     } // endif: value was inside allowed range
 

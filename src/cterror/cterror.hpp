@@ -84,7 +84,7 @@ protected:
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
     GModelPar*    m_model_par;    //!< Pointer to model parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
-    GOptimizerLM* m_opt;          //!< Optimizer
+    GOptimizerLM  m_opt;          //!< Optimizer
 
 };
 
@@ -92,7 +92,7 @@ protected:
 /***********************************************************************//**
  * @brief Return observation container
  *
- * @return Reference to observation container
+ * @return Reference to observation container.
  ***************************************************************************/
 inline
 const GObservations& cterror::obs(void) const
@@ -100,15 +100,16 @@ const GObservations& cterror::obs(void) const
     return m_obs;
 }
 
+
 /***********************************************************************//**
  * @brief Return optimizer
  *
- * @return Pointer to optimizer
+ * @return Pointer to optimizer.
  ***************************************************************************/
 inline
 const GOptimizer* cterror::opt(void) const
 {
-    return m_opt;
+    return &m_opt;
 }
 
 #endif /* CTERROR_HPP */

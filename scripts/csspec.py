@@ -21,7 +21,7 @@
 import gammalib
 import ctools
 import sys
-import tempfile
+
 
 # ============ #
 # csspec class #
