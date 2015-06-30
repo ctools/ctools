@@ -1,3 +1,6 @@
+# import gammalib first
+import gammalib
+
 # Import sub modules
 from .tools import *
 #import obsutils (require explicit from ctools import obsutils)
