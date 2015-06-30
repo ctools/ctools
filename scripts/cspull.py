@@ -305,13 +305,16 @@ class cspull(ctools.cscript):
 
         # Fit model
         if self.m_profile:
-            models = obs.models()
+            models     = obs.models()
+            new_models = gammalib.GModels()
             for i in range(models.size()):
                 model_name = models[i].name()
                 like       = obsutils.cterror(obs, model_name, \
                                               log=self.m_log, \
                                               debug=self.m_debug,
                                               chatter=self.m_chatter)
+                new_models.append(like.obs().models()[i])
+            like.obs().models(new_models)
         else:
             like = obsutils.fit(obs, edisp=self.m_edisp, \
                                 log=self.m_log, \
