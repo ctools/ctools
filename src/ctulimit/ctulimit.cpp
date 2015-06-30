@@ -247,16 +247,16 @@ void ctulimit::run(void)
         }
 
          // Optimize and save best log-likelihood
-         m_obs.optimize(*m_opt);
-         m_obs.errors(*m_opt);
+         m_obs.optimize(m_opt);
+         m_obs.errors(m_opt);
          m_best_logL = m_obs.logL();
 
          // Store optimizer for later recovery
-         best_opt = *m_opt;
+         best_opt = m_opt;
 
          // Write optimised model into logger
          if (logTerse()) {
-             log << *m_opt << std::endl;
+             log << m_opt << std::endl;
              log << gammalib::parformat("Maximum log likelihood");
              log << gammalib::str(m_best_logL,3) << std::endl;
              log << m_obs.models() << std::endl;
@@ -341,7 +341,7 @@ void ctulimit::run(void)
     m_obs.models(models_orig);
 
     // Recover optimizer
-    *m_opt = best_opt;
+    m_opt = best_opt;
 
     // Return
     return;
@@ -408,6 +408,7 @@ void ctulimit::init_members(void)
 
     // Initialise protected members
     m_obs.clear();
+    m_opt.clear();
     m_dlogL        = 0.0;
     m_skymodel     = NULL;
     m_model_par    = NULL;
@@ -415,17 +416,10 @@ void ctulimit::init_members(void)
     m_flux_ulimit  = 0.0;
     m_diff_ulimit  = 0.0;
     m_eflux_ulimit = 0.0;
-    m_opt          = NULL;
-
-    // Allocate LM optimizer
-    GOptimizerLM* opt = new GOptimizerLM();
 
     // Set optimizer parameters
-    opt->max_iter(m_max_iter);
-    opt->max_stalls(10);
-
-    // Set optimizer pointer
-    m_opt = opt;
+    m_opt.max_iter(m_max_iter);
+    m_opt.max_stalls(10);
 
     // Return
     return;
@@ -458,7 +452,7 @@ void ctulimit::copy_members(const ctulimit& app)
     m_diff_ulimit  = app.m_diff_ulimit;
     m_flux_ulimit  = app.m_flux_ulimit;
     m_eflux_ulimit = app.m_eflux_ulimit;
-    m_opt          = app.m_opt->clone();
+    m_opt          = app.m_opt;
 
     // Extract model parameter
     get_model_parameter();
@@ -697,7 +691,7 @@ double ctulimit::evaluate(const double& value)
         m_model_par->fix();
 
         // Re-optimize
-        m_obs.optimize(*m_opt);
+        m_obs.optimize(m_opt);
 
         // Retrieve likelihood
         logL = m_obs.logL();

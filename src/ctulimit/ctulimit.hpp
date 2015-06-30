@@ -103,14 +103,14 @@ protected:
     double        m_diff_ulimit;  //!< Differential upper limit value
     double        m_flux_ulimit;  //!< Flux upper limit value
     double        m_eflux_ulimit; //!< Energy flux upper limits
-    GOptimizerLM* m_opt;          //!< Optimizer
+    GOptimizerLM  m_opt;          //!< Optimizer
 };
 
 
 /***********************************************************************//**
  * @brief Return observation container
  *
- * @return Reference to observation container
+ * @return Reference to observation container.
  ***************************************************************************/
 inline
 const GObservations& ctulimit::obs(void) const
@@ -118,10 +118,23 @@ const GObservations& ctulimit::obs(void) const
     return m_obs;
 }
 
+
+/***********************************************************************//**
+ * @brief Return optimizer
+ *
+ * @return Pointer to optimizer.
+ ***************************************************************************/
+inline
+const GOptimizer* ctulimit::opt(void) const
+{
+    return &m_opt;
+}
+
+
 /***********************************************************************//**
  * @brief Return differential upper limit
  *
- * @return differential upper limit
+ * @return Differential upper flux limit.
  ***************************************************************************/
 inline
 const double& ctulimit::diff_ulimit(void) const
@@ -129,10 +142,11 @@ const double& ctulimit::diff_ulimit(void) const
     return m_diff_ulimit;
 }
 
+
 /***********************************************************************//**
  * @brief Return flux upper limit
  *
- * @return flux upper limit
+ * @return Upper flux limit.
  ***************************************************************************/
 inline
 const double& ctulimit::flux_ulimit(void) const
@@ -140,10 +154,11 @@ const double& ctulimit::flux_ulimit(void) const
     return m_flux_ulimit;
 }
 
+
 /***********************************************************************//**
  * @brief return energy flux upper limit
  *
- * @return energy flux upper limits
+ * @return Upper energy flux limit.
  ***************************************************************************/
 inline
 const double& ctulimit::eflux_ulimit(void) const

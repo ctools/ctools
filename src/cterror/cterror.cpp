@@ -233,16 +233,16 @@ void cterror::run(void)
     }
 
     // Optimize and save best log-likelihood
-    m_obs.optimize(*m_opt);
-    m_obs.errors(*m_opt);
+    m_obs.optimize(m_opt);
+    m_obs.errors(m_opt);
     m_best_logL = m_obs.logL();
 
     // Store optimizer for later recovery
-    GOptimizerLM best_opt = *m_opt;
+    GOptimizerLM best_opt = m_opt;
 
     // Write optimised model into logger
     if (logTerse()) {
-        log << *m_opt << std::endl;
+        log << m_opt << std::endl;
         log << gammalib::parformat("Maximum log likelihood");
         log << gammalib::str(m_best_logL,3) << std::endl;
         log << m_obs.models() << std::endl;
@@ -353,7 +353,7 @@ void cterror::run(void)
     } // endif: source model exists
 
     // Recover optimizer
-    *m_opt = best_opt;
+    m_opt = best_opt;
 
     // Return
     return;
@@ -406,20 +406,14 @@ void cterror::init_members(void)
 
     // Initialise protected members
     m_obs.clear();
+    m_opt.clear();
     m_dlogL        = 0.0;
     m_best_logL    = 0.0;
     m_model_par    = NULL;
-    m_opt          = NULL;
-
-    // Allocate LM optimizer
-    GOptimizerLM* opt = new GOptimizerLM();
 
     // Set optimizer parameters
-    opt->max_iter(m_max_iter);
-    opt->max_stalls(10);
-
-    // Set optimizer pointer
-    m_opt = opt;
+    m_opt.max_iter(m_max_iter);
+    m_opt.max_stalls(10);
 
     // Return
     return;
@@ -443,7 +437,7 @@ void cterror::copy_members(const cterror& app)
     m_obs       = app.m_obs;
     m_dlogL     = app.m_dlogL;
     m_best_logL = app.m_best_logL;
-    m_opt       = app.m_opt->clone();
+    m_opt       = app.m_opt;
     m_model_par = NULL;
 
     // Return
@@ -666,7 +660,7 @@ double cterror::evaluate(const double& value)
         m_model_par->fix();
 
         // Re-optimize
-        m_obs.optimize(*m_opt);
+        m_obs.optimize(m_opt);
 
         // Retrieve likelihood
         logL = m_obs.logL();
