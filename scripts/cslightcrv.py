@@ -112,7 +112,6 @@ class cslightcrv(ctools.cscript):
             pars.append(gammalib.GApplicationPar("tmax","r","a","51544.6","","days","Lightcurve stop time [MJD]"))
             pars.append(gammalib.GApplicationPar("tbins","i","a","5","","","Number of time bins"))
             pars.append(gammalib.GApplicationPar("tbinfile","f","a","tbins.fits","","", "File defining the time binning"))
-            #pars.append(gammalib.GApplicationPar("binned","b","a","no","yes|no","","Use binned analysis in each time bin"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins per light curve bin (0=unbinned)"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit of events (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit of events (TeV)"))
@@ -205,7 +204,6 @@ class cslightcrv(ctools.cscript):
         self.m_emax = self["emax"].real()
 
         # Get binning flag
-        #self.m_binned = self["binned"].boolean()
         if self.m_binned:
             self.m_coordsys = self["coordsys"].string()
             self.m_proj     = self["proj"].string()
@@ -214,9 +212,6 @@ class cslightcrv(ctools.cscript):
             self.m_nxpix    = self["nxpix"].integer()
             self.m_nypix    = self["nypix"].integer()
             self.m_binsz    = self["binsz"].real()
-            #self.m_ebins    = self["enumbins"].integer()
-            #self.m_emin     = self["emin"].real()
-            #self.m_emax     = self["emax"].real()
 
         # Read other parameters
         self.m_outfile = self["outfile"].filename()
@@ -382,9 +377,9 @@ class cslightcrv(ctools.cscript):
             select["emax"] = self.m_emax 
             select["tmin"] = tmin.convert(select.time_reference())
             select["tmax"] = tmax.convert(select.time_reference())
-            select["rad"] = "UNDEFINED"
-            select["ra"] = "UNDEFINED"
-            select["dec"] = "UNDEFINED"
+            select["rad"]  = "UNDEFINED"
+            select["ra"]   = "UNDEFINED"
+            select["dec"]  = "UNDEFINED"
             select.run()  
 
             # Retrieve observation
@@ -399,18 +394,18 @@ class cslightcrv(ctools.cscript):
                 
                 # Bin events
                 bin = ctools.ctbin(select.obs())
-                bin["usepnt"] = False
-                bin["ebinalg"] = "LOG"
-                bin["xref"] = self.m_xref
-                bin["yref"] = self.m_yref
-                bin["binsz"] = self.m_binsz
-                bin["nxpix"] = self.m_nxpix
-                bin["nypix"] = self.m_nypix
+                bin["usepnt"]   = False
+                bin["ebinalg"]  = "LOG"
+                bin["xref"]     = self.m_xref
+                bin["yref"]     = self.m_yref
+                bin["binsz"]    = self.m_binsz
+                bin["nxpix"]    = self.m_nxpix
+                bin["nypix"]    = self.m_nypix
                 bin["enumbins"] = self.m_ebins
-                bin["emin"] = self.m_emin
-                bin["emax"] = self.m_emax        
+                bin["emin"]     = self.m_emin
+                bin["emax"]     = self.m_emax        
                 bin["coordsys"] = self.m_coordsys
-                bin["proj"] = self.m_proj            
+                bin["proj"]     = self.m_proj            
                 bin.run()
                 
                 # Header
@@ -419,19 +414,19 @@ class cslightcrv(ctools.cscript):
                 
                 # Create exposure cube
                 expcube = ctools.ctexpcube(select.obs())
-                expcube["incube"] = "NONE"
-                expcube["usepnt"] = False
-                expcube["ebinalg"] = "LOG"
-                expcube["xref"] = self.m_xref
-                expcube["yref"] = self.m_yref
-                expcube["binsz"] = self.m_binsz
-                expcube["nxpix"] = self.m_nxpix
-                expcube["nypix"] = self.m_nypix
+                expcube["incube"]   = "NONE"
+                expcube["usepnt"]   = False
+                expcube["ebinalg"]  = "LOG"
+                expcube["xref"]     = self.m_xref
+                expcube["yref"]     = self.m_yref
+                expcube["binsz"]    = self.m_binsz
+                expcube["nxpix"]    = self.m_nxpix
+                expcube["nypix"]    = self.m_nypix
                 expcube["enumbins"] = self.m_ebins
-                expcube["emin"] = self.m_emin
-                expcube["emax"] = self.m_emax   
+                expcube["emin"]     = self.m_emin
+                expcube["emax"]     = self.m_emax   
                 expcube["coordsys"] = self.m_coordsys
-                expcube["proj"] = self.m_proj               
+                expcube["proj"]     = self.m_proj               
                 expcube.run()
                 
                 # Header
@@ -440,19 +435,19 @@ class cslightcrv(ctools.cscript):
                 
                 # Create psf cube
                 psfcube = ctools.ctpsfcube(select.obs())
-                psfcube["incube"] = "NONE"
-                psfcube["usepnt"] = False
-                psfcube["ebinalg"] = "LOG"
-                psfcube["xref"] = self.m_xref
-                psfcube["yref"] = self.m_yref
-                psfcube["binsz"] = self.m_binsz
-                psfcube["nxpix"] = self.m_nxpix
-                psfcube["nypix"] = self.m_nypix
+                psfcube["incube"]   = "NONE"
+                psfcube["usepnt"]   = False
+                psfcube["ebinalg"]  = "LOG"
+                psfcube["xref"]     = self.m_xref
+                psfcube["yref"]     = self.m_yref
+                psfcube["binsz"]    = self.m_binsz
+                psfcube["nxpix"]    = self.m_nxpix
+                psfcube["nypix"]    = self.m_nypix
                 psfcube["enumbins"] = self.m_ebins
-                psfcube["emin"] = self.m_emin
-                psfcube["emax"] = self.m_emax    
+                psfcube["emin"]     = self.m_emin
+                psfcube["emax"]     = self.m_emax    
                 psfcube["coordsys"] = self.m_coordsys
-                psfcube["proj"] = self.m_proj               
+                psfcube["proj"]     = self.m_proj               
                 psfcube.run()
                 
                 # Header
@@ -461,19 +456,19 @@ class cslightcrv(ctools.cscript):
                 
                 # Create background cube
                 bkgcube = ctools.ctbkgcube(select.obs())
-                bkgcube["incube"] = "NONE"
-                bkgcube["usepnt"] = False
-                bkgcube["ebinalg"] = "LOG"
-                bkgcube["xref"] = self.m_xref
-                bkgcube["yref"] = self.m_yref
-                bkgcube["binsz"] = self.m_binsz
-                bkgcube["nxpix"] = self.m_nxpix
-                bkgcube["nypix"] = self.m_nypix
+                bkgcube["incube"]   = "NONE"
+                bkgcube["usepnt"]   = False
+                bkgcube["ebinalg"]  = "LOG"
+                bkgcube["xref"]     = self.m_xref
+                bkgcube["yref"]     = self.m_yref
+                bkgcube["binsz"]    = self.m_binsz
+                bkgcube["nxpix"]    = self.m_nxpix
+                bkgcube["nypix"]    = self.m_nypix
                 bkgcube["enumbins"] = self.m_ebins
-                bkgcube["emin"] = self.m_emin
-                bkgcube["emax"] = self.m_emax   
+                bkgcube["emin"]     = self.m_emin
+                bkgcube["emax"]     = self.m_emax   
                 bkgcube["coordsys"] = self.m_coordsys
-                bkgcube["proj"] = self.m_proj                
+                bkgcube["proj"]     = self.m_proj                
                 bkgcube.run()
                 
                 # Set new binned observation

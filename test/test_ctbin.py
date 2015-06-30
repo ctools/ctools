@@ -64,19 +64,19 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbin
         bin = ctools.ctbin()
-        bin["inobs"] = self.events_name
-        bin["outcube"] = "cntmap.fits"
-        bin["ebinalg"] = "LOG"
-        bin["emin"] = 0.1
-        bin["emax"] = 100.0
+        bin["inobs"]    = self.events_name
+        bin["outcube"]  = "cntmap.fits"
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = 0.1
+        bin["emax"]     = 100.0
         bin["enumbins"] = 20
-        bin["nxpix"] = 200
-        bin["nypix"] = 200
-        bin["binsz"] = 0.02
+        bin["nxpix"]    = 200
+        bin["nypix"]    = 200
+        bin["binsz"]    = 0.02
         bin["coordsys"] = "CEL"
-        bin["proj"] = "CAR"
-        bin["xref"] = 83.63
-        bin["yref"] = 22.01
+        bin["proj"]     = "CAR"
+        bin["xref"]     = 83.63
+        bin["yref"]     = 22.01
         
         # Run tool
         self.test_try("Run ctbin")

@@ -64,17 +64,17 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctskymap
         skymap = ctools.ctskymap()
-        skymap["inobs"] = self.events_name
-        skymap["outmap"] = "skymap.fits"
-        skymap["emin"] = 0.1
-        skymap["emax"] = 100
-        skymap["nxpix"] = 200
-        skymap["nypix"] = 200
-        skymap["binsz"] = 0.02
+        skymap["inobs"]    = self.events_name
+        skymap["outmap"]   = "skymap.fits"
+        skymap["emin"]     = 0.1
+        skymap["emax"]     = 100
+        skymap["nxpix"]    = 200
+        skymap["nypix"]    = 200
+        skymap["binsz"]    = 0.02
         skymap["coordsys"] = "CEL"
-        skymap["proj"] = "CAR"
-        skymap["xref"] = 83.63
-        skymap["yref"] = 22.01
+        skymap["proj"]     = "CAR"
+        skymap["xref"]     = 83.63
+        skymap["yref"]     = 22.01
         
         # Run tool
         self.test_try("Run ctskymap")

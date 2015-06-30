@@ -217,20 +217,20 @@ class csresmap(ctools.cscript):
 
         # Create countsmap
         bin = ctools.ctbin(self.obs)
-        bin["nxpix"] = self.m_nxpix
-        bin["nypix"] = self.m_nypix
-        bin["proj"] = self.m_proj
+        bin["nxpix"]    = self.m_nxpix
+        bin["nypix"]    = self.m_nypix
+        bin["proj"]     = self.m_proj
         bin["coordsys"] = self.m_coordsys
-        bin["xref"] = self.m_xref
-        bin["yref"] = self.m_yref
+        bin["xref"]     = self.m_xref
+        bin["yref"]     = self.m_yref
         bin["enumbins"] = self.m_enumbins
-        bin["ebinalg"] = self.m_ebinalg
-        bin["emin"] = self.m_emin
-        bin["emax"] = self.m_emax
-        bin["binsz"] = self.m_binsz
-        bin["chatter"] = self.m_chatter
-        bin["clobber"] = self.m_clobber
-        bin["debug"] = self.m_debug
+        bin["ebinalg"]  = self.m_ebinalg
+        bin["emin"]     = self.m_emin
+        bin["emax"]     = self.m_emax
+        bin["binsz"]    = self.m_binsz
+        bin["chatter"]  = self.m_chatter
+        bin["clobber"]  = self.m_clobber
+        bin["debug"]    = self.m_debug
         bin.run()
 
         # Store counts map as residual map. Note that we need a
@@ -252,7 +252,7 @@ class csresmap(ctools.cscript):
         model.cube(bin.cube())
         model["chatter"] = self.m_chatter
         model["clobber"] = self.m_clobber
-        model["debug"] = self.m_debug
+        model["debug"]   = self.m_debug
         model.run()
 
         # Get model map into GSkymap object

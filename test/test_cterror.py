@@ -68,12 +68,12 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up cterror
         error = ctools.cterror()
-        error["inobs"].filename(self.events_name)
-        error["inmodel"].filename(self.model_name)
-        error["outmodel"].filename(self.result_name)
-        error["srcname"].string("Crab")
-        error["caldb"].string(self.caldb)
-        error["irf"].string(self.irf)
+        error["inobs"]    = self.events_name
+        error["inmodel"]  = self.model_name
+        error["outmodel"] = self.result_name
+        error["srcname"]  = "Crab"
+        error["caldb"]    = self.caldb
+        error["irf"]      = self.irf
         
         # Run tool
         self.test_try("Run cterror")

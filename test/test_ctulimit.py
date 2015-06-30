@@ -67,11 +67,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up cttsmap
         ulimit = ctools.ctulimit()
-        ulimit["inobs"].filename(self.events_name)
-        ulimit["inmodel"].filename(self.model_name)
-        ulimit["srcname"].string("Crab")
-        ulimit["caldb"].string(self.caldb)
-        ulimit["irf"].string(self.irf)
+        ulimit["inobs"]   = self.events_name
+        ulimit["inmodel"] = self.model_name
+        ulimit["srcname"] = "Crab"
+        ulimit["caldb"]   = self.caldb
+        ulimit["irf"]     = self.irf
         
         # Run tool
         self.test_try("Run ctulimit")

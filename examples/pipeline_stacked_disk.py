@@ -116,104 +116,104 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"] = debug
+    sim["debug"]     = debug
     sim["outevents"] = "obs.xml"
     sim.execute()
 
     # Bin events into counts map
     bin = ctools.ctbin()
-    bin["inobs"] = "obs.xml"
-    bin["outcube"] = "cntcube.fits"
-    bin["ebinalg"] = "LOG"
-    bin["emin"] = emin
-    bin["emax"] = emax
+    bin["inobs"]    = "obs.xml"
+    bin["outcube"]  = "cntcube.fits"
+    bin["ebinalg"]  = "LOG"
+    bin["emin"]     = emin
+    bin["emax"]     = emax
     bin["enumbins"] = enumbins
-    bin["nxpix"] = nxpix
-    bin["nypix"] = nypix
-    bin["binsz"] = binsz
+    bin["nxpix"]    = nxpix
+    bin["nypix"]    = nypix
+    bin["binsz"]    = binsz
     bin["coordsys"] = coordsys
-    bin["proj"] = proj
-    bin["xref"] = ra
-    bin["yref"] = dec
-    bin["debug"] = debug
+    bin["proj"]     = proj
+    bin["xref"]     = ra
+    bin["yref"]     = dec
+    bin["debug"]    = debug
     bin.execute()
 
     # Create exposure cube
     expcube = ctools.ctexpcube()
-    expcube["inobs"] = "obs.xml"
-    expcube["incube"] = "cntcube.fits"
-    expcube["outcube"] = "expcube.fits"
-    expcube["caldb"] = caldb
-    expcube["irf"] = irf
-    expcube["ebinalg"] = "LOG"
-    expcube["emin"] = emin
-    expcube["emax"] = emax
+    expcube["inobs"]    = "obs.xml"
+    expcube["incube"]   = "cntcube.fits"
+    expcube["outcube"]  = "expcube.fits"
+    expcube["caldb"]    = caldb
+    expcube["irf"]      = irf
+    expcube["ebinalg"]  = "LOG"
+    expcube["emin"]     = emin
+    expcube["emax"]     = emax
     expcube["enumbins"] = enumbins
-    expcube["nxpix"] = nxpix
-    expcube["nypix"] = nypix
-    expcube["binsz"] = binsz
+    expcube["nxpix"]    = nxpix
+    expcube["nypix"]    = nypix
+    expcube["binsz"]    = binsz
     expcube["coordsys"] = coordsys
-    expcube["proj"] = proj
-    expcube["xref"] = ra
-    expcube["yref"] = dec
-    expcube["debug"] = debug
+    expcube["proj"]     = proj
+    expcube["xref"]     = ra
+    expcube["yref"]     = dec
+    expcube["debug"]    = debug
     expcube.execute()
 
     # Create PSF cube
     psfcube = ctools.ctpsfcube()
-    psfcube["inobs"] = "obs.xml"
-    psfcube["incube"] = "NONE"
-    psfcube["outcube"] = "psfcube.fits"
-    psfcube["caldb"] = caldb
-    psfcube["irf"] = irf
-    psfcube["ebinalg"] = "LOG"
-    psfcube["emin"] = emin
-    psfcube["emax"] = emax
+    psfcube["inobs"]    = "obs.xml"
+    psfcube["incube"]   = "NONE"
+    psfcube["outcube"]  = "psfcube.fits"
+    psfcube["caldb"]    = caldb
+    psfcube["irf"]      = irf
+    psfcube["ebinalg"]  = "LOG"
+    psfcube["emin"]     = emin
+    psfcube["emax"]     = emax
     psfcube["enumbins"] = enumbins
-    psfcube["nxpix"] = 10
-    psfcube["nypix"] = 10
-    psfcube["binsz"] = 1.0
+    psfcube["nxpix"]    = 10
+    psfcube["nypix"]    = 10
+    psfcube["binsz"]    = 1.0
     psfcube["coordsys"] = coordsys
-    psfcube["proj"] = proj
-    psfcube["xref"] = ra
-    psfcube["yref"] = dec
-    psfcube["debug"] = debug
+    psfcube["proj"]     = proj
+    psfcube["xref"]     = ra
+    psfcube["yref"]     = dec
+    psfcube["debug"]    = debug
     psfcube.execute()
 
     # Create background cube
     bkgcube = ctools.ctbkgcube()
-    bkgcube["inobs"] = "obs.xml"
-    bkgcube["inmodel"] = model
-    bkgcube["incube"] = "cntcube.fits"
-    bkgcube["outcube"] = "bkgcube.fits"
+    bkgcube["inobs"]    = "obs.xml"
+    bkgcube["inmodel"]  = model
+    bkgcube["incube"]   = "cntcube.fits"
+    bkgcube["outcube"]  = "bkgcube.fits"
     bkgcube["outmodel"] = "model_bkg.xml"
-    bkgcube["caldb"] = caldb
-    bkgcube["irf"] = irf
-    bkgcube["ebinalg"] = "LOG"
-    bkgcube["emin"] = emin
-    bkgcube["emax"] = emax
+    bkgcube["caldb"]    = caldb
+    bkgcube["irf"]      = irf
+    bkgcube["ebinalg"]  = "LOG"
+    bkgcube["emin"]     = emin
+    bkgcube["emax"]     = emax
     bkgcube["enumbins"] = enumbins
-    bkgcube["nxpix"] = 10
-    bkgcube["nypix"] = 10
-    bkgcube["binsz"] = 1.0
+    bkgcube["nxpix"]    = 10
+    bkgcube["nypix"]    = 10
+    bkgcube["binsz"]    = 1.0
     bkgcube["coordsys"] = coordsys
-    bkgcube["proj"] = proj
-    bkgcube["xref"] = ra
-    bkgcube["yref"] = dec
-    bkgcube["debug"] = debug
+    bkgcube["proj"]     = proj
+    bkgcube["xref"]     = ra
+    bkgcube["yref"]     = dec
+    bkgcube["debug"]    = debug
     bkgcube.execute()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"] = "cntcube.fits"
-    like["inmodel"] = "model_bkg.xml"
+    like["inobs"]    = "cntcube.fits"
+    like["inmodel"]  = "model_bkg.xml"
     like["outmodel"] = "fit_results.xml"
-    like["expcube"] = "expcube.fits"
-    like["psfcube"] = "psfcube.fits"
-    like["bkgcube"] = "bkgcube.fits"
-    like["caldb"] = caldb
-    like["irf"] = irf
-    like["debug"] = True # Switch this always on for results in console
+    like["expcube"]  = "expcube.fits"
+    like["psfcube"]  = "psfcube.fits"
+    like["bkgcube"]  = "bkgcube.fits"
+    like["caldb"]    = caldb
+    like["irf"]      = irf
+    like["debug"]    = True # Switch this always on for results in console
     like.execute()
 	
     # Return

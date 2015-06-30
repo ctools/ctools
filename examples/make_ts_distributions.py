@@ -61,22 +61,22 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0, \
 	
 	# Setup cstsdist tool
 	tsdist = cstsdist()
-	tsdist["inmodel"] = "$CTOOLS/share/models/crab.xml"
-	tsdist["srcname"] = "Crab"
-	tsdist["outfile"] = outfile
-	tsdist["ntrials"] = ntrials
-	tsdist["caldb"] = "prod2"
-	tsdist["irf"] = "South_50h"
-	tsdist["ra"] = 83.63
-	tsdist["dec"] = 22.01
-	tsdist["emin"] = emin
-	tsdist["emax"] = emax
+	tsdist["inmodel"]  = "$CTOOLS/share/models/crab.xml"
+	tsdist["srcname"]  = "Crab"
+	tsdist["outfile"]  = outfile
+	tsdist["ntrials"]  = ntrials
+	tsdist["caldb"]    = "prod2"
+	tsdist["irf"]      = "South_50h"
+	tsdist["ra"]       = 83.63
+	tsdist["dec"]      = 22.01
+	tsdist["emin"]     = emin
+	tsdist["emax"]     = emax
 	tsdist["enumbins"] = enumbins
-	tsdist["tmin"] = 0
-	tsdist["tmax"] = duration
-	tsdist["rad"] = 5.0
-	tsdist["npix"] = 200
-	tsdist["binsz"] = 0.05
+	tsdist["tmin"]     = 0
+	tsdist["tmax"]     = duration
+	tsdist["rad"]      = 5.0
+	tsdist["npix"]     = 200
+	tsdist["binsz"]    = 0.05
 	#tsdist["debug"].boolean(True)
 		
 	# Optionally open the log file

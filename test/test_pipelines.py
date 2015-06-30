@@ -78,17 +78,17 @@ class Test(gammalib.GPythonTestSuite):
     
         # Simulate events
         sim = ctools.ctobssim()
-        sim["inmodel"] = model_name
+        sim["inmodel"]   = model_name
         sim["outevents"] = events_name
-        sim["caldb"] = caldb
-        sim["irf"] = irf
-        sim["ra"] = ra
-        sim["dec"] = dec
-        sim["rad"] = rad_sim
-        sim["tmin"] = tstart
-        sim["tmax"] = tstop
-        sim["emin"] = emin
-        sim["emax"] = emax
+        sim["caldb"]     = caldb
+        sim["irf"]       = irf
+        sim["ra"]        = ra
+        sim["dec"]       = dec
+        sim["rad"]       = rad_sim
+        sim["tmin"]      = tstart
+        sim["tmax"]      = tstop
+        sim["emin"]      = emin
+        sim["emax"]      = emax
         self.test_try("Execute ctobssim")
         try:
             sim.execute()
@@ -98,15 +98,15 @@ class Test(gammalib.GPythonTestSuite):
     
         # Select events
         select = ctools.ctselect()
-        select["inobs"] = events_name
+        select["inobs"]  = events_name
         select["outobs"] = selected_events_name
-        select["ra"] = ra
-        select["dec"] = dec
-        select["rad"] = rad_select
-        select["tmin"] = tstart
-        select["tmax"] = tstop
-        select["emin"] = emin
-        select["emax"] = emax
+        select["ra"]     = ra
+        select["dec"]    = dec
+        select["rad"]    = rad_select
+        select["tmin"]   = tstart
+        select["tmax"]   = tstop
+        select["emin"]   = emin
+        select["emax"]   = emax
         self.test_try("Execute ctselect")
         try:
             select.execute()
@@ -116,11 +116,11 @@ class Test(gammalib.GPythonTestSuite):
     
         # Perform maximum likelihood fitting
         like = ctools.ctlike()
-        like["inobs"] = selected_events_name
-        like["inmodel"] = model_name
+        like["inobs"]    = selected_events_name
+        like["inmodel"]  = model_name
         like["outmodel"] = result_name
-        like["caldb"] = caldb
-        like["irf"] = irf
+        like["caldb"]    = caldb
+        like["irf"]      = irf
         self.test_try("Execute ctlike")
         try:
             like.execute()
@@ -150,15 +150,15 @@ class Test(gammalib.GPythonTestSuite):
         # Simulate events
         sim = ctools.ctobssim()
         sim["inmodel"] = model_name
-        sim["caldb"] = caldb
-        sim["irf"] = irf
-        sim["ra"] = ra
-        sim["dec"] = dec
-        sim["rad"] = rad_sim
-        sim["tmin"] = tstart
-        sim["tmax"] = tstop
-        sim["emin"] = emin
-        sim["emax"] = emax
+        sim["caldb"]   = caldb
+        sim["irf"]     = irf
+        sim["ra"]      = ra
+        sim["dec"]     = dec
+        sim["rad"]     = rad_sim
+        sim["tmin"]    = tstart
+        sim["tmax"]    = tstop
+        sim["emin"]    = emin
+        sim["emax"]    = emax
         self.test_try("Run ctobssim")
         try:
             sim.run()
@@ -168,9 +168,9 @@ class Test(gammalib.GPythonTestSuite):
     
         # Select events
         select = ctools.ctselect(sim.obs())
-        select["ra"] = ra
-        select["dec"] = dec
-        select["rad"] = rad_select
+        select["ra"]   = ra
+        select["dec"]  = dec
+        select["rad"]  = rad_select
         select["tmin"] = tstart
         select["tmax"] = tstop
         select["emin"] = emin

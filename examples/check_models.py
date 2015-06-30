@@ -62,22 +62,22 @@ def pipeline(model_name):
 	# Simulate events
 	sim = ctools.ctobssim()
 	sim["inmodel"] = model_name
-	sim["caldb"] = caldb
-	sim["irf"] = irf
-	sim["ra"] = ra
-	sim["dec"] = dec
-	sim["rad"] = rad_sim
-	sim["tmin"] = tstart
-	sim["tmax"] = tstop
-	sim["emin"] = emin
-	sim["emax"] = emax
+	sim["caldb"]   = caldb
+	sim["irf"]     = irf
+	sim["ra"]      = ra
+	sim["dec"]     = dec
+	sim["rad"]     = rad_sim
+	sim["tmin"]    = tstart
+	sim["tmax"]    = tstop
+	sim["emin"]    = emin
+	sim["emax"]    = emax
 	sim.run()
 
 	# Select events
 	select = ctools.ctselect(sim.obs())
-	select["ra"] = ra
-	select["dec"] = dec
-	select["rad"] = rad_select
+	select["ra"]   = ra
+	select["dec"]  = dec
+	select["rad"]  = rad_select
 	select["tmin"] = tstart
 	select["tmax"] = tstop
 	select["emin"] = emin

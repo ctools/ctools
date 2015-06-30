@@ -132,18 +132,18 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
 
         # Bin events for that observation
         bin = ctools.ctbin()
-        bin["inobs"] = eventfile
-        bin["outcube"] = cubefile
-        bin["ebinalg"] = "LOG"
-        bin["emin"] = emin
-        bin["emax"] = emax
+        bin["inobs"]    = eventfile
+        bin["outcube"]  = cubefile
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = emin
+        bin["emax"]     = emax
         bin["enumbins"] = enumbins
-        bin["nxpix"] = nxpix
-        bin["nypix"] = nypix
-        bin["binsz"] = binsz
+        bin["nxpix"]    = nxpix
+        bin["nypix"]    = nypix
+        bin["binsz"]    = binsz
         bin["coordsys"] = coordsys
-        bin["usepnt"] = True
-        bin["proj"] = proj
+        bin["usepnt"]   = True
+        bin["proj"]     = proj
         bin.execute()
 
         # Set observation ID
@@ -160,15 +160,15 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"] = "obs_cube.xml"
-    like["inmodel"] = model
+    like["inobs"]    = "obs_cube.xml"
+    like["inmodel"]  = model
     like["outmodel"] = "fit_results.xml"
-    like["expcube"] = "NONE"
-    like["psfcube"] = "NONE"
-    like["bkgcube"] = "NONE"
-    like["caldb"] = caldb
-    like["irf"] = irf
-    like["debug"] = True # Switch this always on for results in console
+    like["expcube"]  = "NONE"
+    like["psfcube"]  = "NONE"
+    like["bkgcube"]  = "NONE"
+    like["caldb"]    = caldb
+    like["irf"]      = irf
+    like["debug"]    = True # Switch this always on for results in console
     like.execute()
 	
     # Return

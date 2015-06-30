@@ -67,24 +67,24 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbkgcube
         bkgcube = ctools.ctbkgcube()
-        bkgcube["inobs"] = self.events_name
-        bkgcube["inmodel"] = self.bkg_model
-        bkgcube["incube"] = "NONE"
-        bkgcube["outcube"] = "bkgcube.fits"
+        bkgcube["inobs"]    = self.events_name
+        bkgcube["inmodel"]  = self.bkg_model
+        bkgcube["incube"]   = "NONE"
+        bkgcube["outcube"]  = "bkgcube.fits"
         bkgcube["outmodel"] = "bkgcube.xml"
-        bkgcube["caldb"] = self.caldb
-        bkgcube["irf"] = self.irf
-        bkgcube["ebinalg"] = "LOG"
-        bkgcube["emin"] = 0.1
-        bkgcube["emax"] = 100
+        bkgcube["caldb"]    = self.caldb
+        bkgcube["irf"]      = self.irf
+        bkgcube["ebinalg"]  = "LOG"
+        bkgcube["emin"]     = 0.1
+        bkgcube["emax"]     = 100
         bkgcube["enumbins"] = 20
-        bkgcube["nxpix"] = 10
-        bkgcube["nypix"] = 10
-        bkgcube["binsz"] = 0.4
+        bkgcube["nxpix"]    = 10
+        bkgcube["nypix"]    = 10
+        bkgcube["binsz"]    = 0.4
         bkgcube["coordsys"] = "CEL"
-        bkgcube["proj"] = "CAR"
-        bkgcube["xref"] = 83.63
-        bkgcube["yref"] = 22.01
+        bkgcube["proj"]     = "CAR"
+        bkgcube["xref"]     = 83.63
+        bkgcube["yref"]     = 22.01
         
         # Run tool
         self.test_try("Run ctbkgcube")

@@ -125,16 +125,16 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
 
         # Bin events for that observation
         bin = ctools.ctbin(container)
-        bin["ebinalg"] = "LOG"
-        bin["emin"] = emin
-        bin["emax"] = emax
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = emin
+        bin["emax"]     = emax
         bin["enumbins"] = enumbins
-        bin["nxpix"] = nxpix
-        bin["nypix"] = nypix
-        bin["binsz"] = binsz
+        bin["nxpix"]    = nxpix
+        bin["nypix"]    = nypix
+        bin["binsz"]    = binsz
         bin["coordsys"] = coordsys
-        bin["usepnt"] = True
-        bin["proj"] = proj
+        bin["usepnt"]   = True
+        bin["proj"]     = proj
         bin.run()
 
         # Append result to observations

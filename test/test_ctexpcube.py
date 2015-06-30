@@ -66,22 +66,22 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctexpcube
         expcube = ctools.ctexpcube()
-        expcube["inobs"] = self.events_name
-        expcube["incube"] = "NONE"
-        expcube["outcube"] = "expcube.fits"
-        expcube["caldb"] = self.caldb
-        expcube["irf"] = self.irf
-        expcube["ebinalg"] = "LOG"
-        expcube["emin"] = 0.1
-        expcube["emax"] = 100
+        expcube["inobs"]    = self.events_name
+        expcube["incube"]   = "NONE"
+        expcube["outcube"]  = "expcube.fits"
+        expcube["caldb"]    = self.caldb
+        expcube["irf"]      = self.irf
+        expcube["ebinalg"]  = "LOG"
+        expcube["emin"]     = 0.1
+        expcube["emax"]     = 100
         expcube["enumbins"] = 20
-        expcube["nxpix"] = 200
-        expcube["nypix"] = 200
-        expcube["binsz"] = 0.02
+        expcube["nxpix"]    = 200
+        expcube["nypix"]    = 200
+        expcube["binsz"]    = 0.02
         expcube["coordsys"] = "CEL"
-        expcube["proj"] = "CAR"
-        expcube["xref"] = 83.63
-        expcube["yref"] = 22.01
+        expcube["proj"]     = "CAR"
+        expcube["xref"]     = 83.63
+        expcube["yref"]     = 22.01
         
         # Run tool
         self.test_try("Run ctexpcube")

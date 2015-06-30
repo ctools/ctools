@@ -65,14 +65,14 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctcubemask
         mask = ctools.ctcubemask()
-        mask["inobs"] = self.cntmap_name
+        mask["inobs"]   = self.cntmap_name
         mask["regfile"] = self.regfile
         mask["outcube"] = "filtered_cntmap.fits"
-        mask["ra"] = 83.63
-        mask["dec"] = 22.01
-        mask["rad"] = 2.0
-        mask["emin"] = 0.1
-        mask["emax"] = 100
+        mask["ra"]      = 83.63
+        mask["dec"]     = 22.01
+        mask["rad"]     = 2.0
+        mask["emin"]    = 0.1
+        mask["emax"]    = 100
         
         # Run tool
         self.test_try("Run ctcubemask")

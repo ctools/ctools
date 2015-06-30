@@ -326,9 +326,9 @@ class csspec(ctools.cscript):
             select["emax"] = emax.TeV() 
             select["tmin"] = "UNDEFINED"
             select["tmax"] = "UNDEFINED"
-            select["rad"] = "UNDEFINED"
-            select["ra"] = "UNDEFINED"
-            select["dec"] = "UNDEFINED"
+            select["rad"]  = "UNDEFINED"
+            select["ra"]   = "UNDEFINED"
+            select["dec"]  = "UNDEFINED"
             select.run()  
 
             # Retrieve observation
@@ -343,18 +343,18 @@ class csspec(ctools.cscript):
                 
                 # Bin events
                 bin = ctools.ctbin(select.obs())
-                bin["usepnt"] = False
-                bin["ebinalg"] = "LOG"
-                bin["xref"] = self.m_xref
-                bin["yref"] = self.m_yref
-                bin["binsz"] = self.m_binsz
-                bin["nxpix"] = self.m_nxpix
-                bin["nypix"] = self.m_nypix
+                bin["usepnt"]   = False
+                bin["ebinalg"]  = "LOG"
+                bin["xref"]     = self.m_xref
+                bin["yref"]     = self.m_yref
+                bin["binsz"]    = self.m_binsz
+                bin["nxpix"]    = self.m_nxpix
+                bin["nypix"]    = self.m_nypix
                 bin["enumbins"] = self.m_ebins
-                bin["emin"] = emin.TeV()
-                bin["emax"] = emax.TeV()        
+                bin["emin"]     = emin.TeV()
+                bin["emax"]     = emax.TeV()        
                 bin["coordsys"] = self.m_coordsys
-                bin["proj"] = self.m_proj
+                bin["proj"]     = self.m_proj
                 bin.run()
                 
                 # Header
@@ -363,19 +363,19 @@ class csspec(ctools.cscript):
                 
                 # Create exposure cube
                 expcube = ctools.ctexpcube(select.obs())
-                expcube["incube"] = "NONE"
-                expcube["usepnt"] = False
-                expcube["ebinalg"] = "LOG"
-                expcube["xref"] = self.m_xref
-                expcube["yref"] = self.m_yref
-                expcube["binsz"] = self.m_binsz
-                expcube["nxpix"] = self.m_nxpix
-                expcube["nypix"] = self.m_nypix
+                expcube["incube"]   = "NONE"
+                expcube["usepnt"]   = False
+                expcube["ebinalg"]  = "LOG"
+                expcube["xref"]     = self.m_xref
+                expcube["yref"]     = self.m_yref
+                expcube["binsz"]    = self.m_binsz
+                expcube["nxpix"]    = self.m_nxpix
+                expcube["nypix"]    = self.m_nypix
                 expcube["enumbins"] = self.m_ebins
-                expcube["emin"] = emin.TeV()
-                expcube["emax"] = emax.TeV() 
+                expcube["emin"]     = emin.TeV()
+                expcube["emax"]     = emax.TeV() 
                 expcube["coordsys"] = self.m_coordsys
-                expcube["proj"] = self.m_proj               
+                expcube["proj"]     = self.m_proj               
                 expcube.run()
                 
                 # Header
@@ -384,19 +384,19 @@ class csspec(ctools.cscript):
                 
                 # Create psf cube
                 psfcube = ctools.ctpsfcube(select.obs())
-                psfcube["incube"] = "NONE"
-                psfcube["usepnt"] = False
-                psfcube["ebinalg"] = "LOG"
-                psfcube["xref"] = self.m_xref
-                psfcube["yref"] = self.m_yref
-                psfcube["binsz"] = self.m_binsz
-                psfcube["nxpix"] = self.m_nxpix
-                psfcube["nypix"] = self.m_nypix
+                psfcube["incube"]   = "NONE"
+                psfcube["usepnt"]   = False
+                psfcube["ebinalg"]  = "LOG"
+                psfcube["xref"]     = self.m_xref
+                psfcube["yref"]     = self.m_yref
+                psfcube["binsz"]    = self.m_binsz
+                psfcube["nxpix"]    = self.m_nxpix
+                psfcube["nypix"]    = self.m_nypix
                 psfcube["enumbins"] = self.m_ebins
-                psfcube["emin"] = emin.TeV()
-                psfcube["emax"] = emax.TeV()  
+                psfcube["emin"]     = emin.TeV()
+                psfcube["emax"]     = emax.TeV()  
                 psfcube["coordsys"] = self.m_coordsys
-                psfcube["proj"] = self.m_proj               
+                psfcube["proj"]     = self.m_proj               
                 psfcube.run()
                 
                 # Header
@@ -405,19 +405,19 @@ class csspec(ctools.cscript):
                 
                 # Create background cube
                 bkgcube = ctools.ctbkgcube(select.obs())
-                bkgcube["incube"] = "NONE"
-                bkgcube["usepnt"] = False
-                bkgcube["ebinalg"] = "LOG"
-                bkgcube["xref"] = self.m_xref
-                bkgcube["yref"] = self.m_yref
-                bkgcube["binsz"] = self.m_binsz
-                bkgcube["nxpix"] = self.m_nxpix
-                bkgcube["nypix"] = self.m_nypix
+                bkgcube["incube"]   = "NONE"
+                bkgcube["usepnt"]   = False
+                bkgcube["ebinalg"]  = "LOG"
+                bkgcube["xref"]     = self.m_xref
+                bkgcube["yref"]     = self.m_yref
+                bkgcube["binsz"]    = self.m_binsz
+                bkgcube["nxpix"]    = self.m_nxpix
+                bkgcube["nypix"]    = self.m_nypix
                 bkgcube["enumbins"] = self.m_ebins
-                bkgcube["emin"] = emin.TeV()
-                bkgcube["emax"] = emax.TeV() 
+                bkgcube["emin"]     = emin.TeV()
+                bkgcube["emax"]     = emax.TeV() 
                 bkgcube["coordsys"] = self.m_coordsys
-                bkgcube["proj"] = self.m_proj                
+                bkgcube["proj"]     = self.m_proj                
                 bkgcube.run()
                 
                 # Set new binned observation

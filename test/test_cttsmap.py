@@ -63,23 +63,23 @@ class Test(gammalib.GPythonTestSuite):
     # Test cttsmap functionnality
     def test_functional(self):
         """
-        Test cttsmap functionnality.
+        Test cttsmap functionality.
         """
         # Set-up cttsmap
         tsmap = ctools.cttsmap()
-        tsmap["inobs"] = self.events_name
-        tsmap["inmodel"] = self.model_name
-        tsmap["srcname"] = "Crab"
-        tsmap["caldb"] = self.caldb
-        tsmap["irf"] = self.irf
-        tsmap["outmap"] = "tsmap.fits"
-        tsmap["nxpix"] = 5
-        tsmap["nypix"] = 5
-        tsmap["binsz"] = 0.02
+        tsmap["inobs"]    = self.events_name
+        tsmap["inmodel"]  = self.model_name
+        tsmap["srcname"]  = "Crab"
+        tsmap["caldb"]    = self.caldb
+        tsmap["irf"]      = self.irf
+        tsmap["outmap"]   = "tsmap.fits"
+        tsmap["nxpix"]    = 5
+        tsmap["nypix"]    = 5
+        tsmap["binsz"]    = 0.02
         tsmap["coordsys"] = "CEL"
-        tsmap["proj"] = "CAR"
-        tsmap["xref"] = 83.63
-        tsmap["yref"] = 22.01
+        tsmap["proj"]     = "CAR"
+        tsmap["xref"]     = 83.63
+        tsmap["yref"]     = 22.01
 
         # Run tool
         self.test_try("Run cttsmap")

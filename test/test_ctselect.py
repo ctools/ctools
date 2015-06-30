@@ -64,15 +64,15 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctselect
         select = ctools.ctselect()
-        select["inobs"] = self.events_name
+        select["inobs"]  = self.events_name
         select["outobs"] = "selected_events.fits"
-        select["ra"] = 83.63
-        select["dec"] = 22.01
-        select["rad"] = 3
-        select["tmin"] = 0
-        select["tmax"] = 1800
-        select["emin"] = 0.1
-        select["emax"] = 100
+        select["ra"]     = 83.63
+        select["dec"]    = 22.01
+        select["rad"]    = 3
+        select["tmin"]   = 0
+        select["tmax"]   = 1800
+        select["emin"]   = 0.1
+        select["emax"]   = 100
 
         # Run tool
         self.test_try("Run ctselect")

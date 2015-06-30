@@ -116,13 +116,13 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0, \
 
     # Select events
     select = ctools.ctselect(sim.obs())
-    select["ra"] = ra
-    select["dec"] = dec
-    select["rad"] = rad
-    select["emin"] = emin
-    select["emax"] = emax
-    select["tmin"] = tmin
-    select["tmax"] = tmax
+    select["ra"]    = ra
+    select["dec"]   = dec
+    select["rad"]   = rad
+    select["emin"]  = emin
+    select["emax"]  = emax
+    select["tmin"]  = tmin
+    select["tmax"]  = tmax
     select["debug"] = debug
     select.run()
 

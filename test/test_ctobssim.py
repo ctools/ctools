@@ -67,17 +67,17 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctobssim
         sim = ctools.ctobssim()
-        sim["inmodel"] = self.model_name
+        sim["inmodel"]   = self.model_name
         sim["outevents"] = "events.fits"
-        sim["caldb"] = self.caldb
-        sim["irf"] = self.irf
-        sim["ra"] = 83.63
-        sim["dec"] = 22.01
-        sim["rad"] = 10.0
-        sim["tmin"] = 0.0
-        sim["tmax"] = 1800.0
-        sim["emin"] = 0.1
-        sim["emax"] = 100.0
+        sim["caldb"]     = self.caldb
+        sim["irf"]       = self.irf
+        sim["ra"]        = 83.63
+        sim["dec"]       = 22.01
+        sim["rad"]       = 10.0
+        sim["tmin"]      = 0.0
+        sim["tmax"]      = 1800.0
+        sim["emin"]      = 0.1
+        sim["emax"]      = 100.0
         
         # Run tool
         self.test_try("Run ctobssim")
@@ -118,7 +118,7 @@ class Test(gammalib.GPythonTestSuite):
         # Set-up ctobssim
         sim = ctools.ctobssim(obs)
         sim["outevents"] = "sim_events.xml"
-        sim["inmodel"] = self.model_name
+        sim["inmodel"]   = self.model_name
         # Run tool
         self.test_try("Run ctobssim")
         try:

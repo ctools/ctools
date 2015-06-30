@@ -66,23 +66,23 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctpsfcube
         psfcube = ctools.ctpsfcube()
-        psfcube["inobs"] = self.events_name
-        psfcube["incube"] = "NONE"
-        psfcube["outcube"] = "psfcube.fits"
-        psfcube["caldb"] = self.caldb
-        psfcube["irf"] = self.irf
-        psfcube["ebinalg"] = "LOG"
-        psfcube["emin"] = 0.1
-        psfcube["emax"] = 100
+        psfcube["inobs"]    = self.events_name
+        psfcube["incube"]   = "NONE"
+        psfcube["outcube"]  = "psfcube.fits"
+        psfcube["caldb"]    = self.caldb
+        psfcube["irf"]      = self.irf
+        psfcube["ebinalg"]  = "LOG"
+        psfcube["emin"]     = 0.1
+        psfcube["emax"]     = 100
         psfcube["enumbins"] = 20
-        psfcube["nxpix"] = 10
-        psfcube["nypix"] = 10
-        psfcube["binsz"] = 0.4
+        psfcube["nxpix"]    = 10
+        psfcube["nypix"]    = 10
+        psfcube["binsz"]    = 0.4
         psfcube["coordsys"] = "CEL"
-        psfcube["proj"] = "CAR"
-        psfcube["xref"] = 83.63
-        psfcube["yref"] = 22.01
-        psfcube["amax"] = 0.3
+        psfcube["proj"]     = "CAR"
+        psfcube["xref"]     = 83.63
+        psfcube["yref"]     = 22.01
+        psfcube["amax"]     = 0.3
         psfcube["anumbins"] = 10
         
         # Run tool

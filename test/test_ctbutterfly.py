@@ -67,13 +67,13 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
-        butterfly["inobs"] = self.events_name
+        butterfly["inobs"]   = self.events_name
         butterfly["inmodel"] = self.model_name
         butterfly["srcname"] = "Crab"
-        butterfly["caldb"] = self.caldb
-        butterfly["irf"] = self.irf
-        butterfly["emin"] = 0.1
-        butterfly["emax"] = 100
+        butterfly["caldb"]   = self.caldb
+        butterfly["irf"]     = self.irf
+        butterfly["emin"]    = 0.1
+        butterfly["emax"]    = 100
         butterfly["outfile"] = "butterfly.txt"
         
         # Run tool

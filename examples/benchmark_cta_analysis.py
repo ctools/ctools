@@ -56,22 +56,22 @@ def unbinned_pipeline(duration):
     # Simulate events
     sim = ctools.ctobssim()
     sim["inmodel"] = model_name
-    sim["caldb"] = caldb
-    sim["irf"] = irf
-    sim["ra"] = ra
-    sim["dec"] = dec
-    sim["rad"] = rad_sim
-    sim["tmin"] = tstart
-    sim["tmax"] = tstop
-    sim["emin"] = emin
-    sim["emax"] = emax
+    sim["caldb"]   = caldb
+    sim["irf"]     = irf
+    sim["ra"]      = ra
+    sim["dec"]     = dec
+    sim["rad"]     = rad_sim
+    sim["tmin"]    = tstart
+    sim["tmax"]    = tstop
+    sim["emin"]    = emin
+    sim["emax"]    = emax
     sim.run()
 
     # Select events
     select = ctools.ctselect(sim.obs())
-    select["ra"] = ra
-    select["dec"] = dec
-    select["rad"] = rad_select
+    select["ra"]   = ra
+    select["dec"]  = dec
+    select["rad"]  = rad_select
     select["tmin"] = tstart
     select["tmax"] = tstop
     select["emin"] = emin
@@ -125,30 +125,30 @@ def binned_pipeline(duration):
     # Simulate events
     sim = ctools.ctobssim()
     sim["inmodel"] = model_name
-    sim["caldb"] = caldb
-    sim["irf"] = irf
-    sim["ra"] = ra
-    sim["dec"] = dec
-    sim["rad"] = rad_sim
-    sim["tmin"] = tstart
-    sim["tmax"] = tstop
-    sim["emin"] = emin
-    sim["emax"] = emax
+    sim["caldb"]   = caldb
+    sim["irf"]     = irf
+    sim["ra"]      = ra
+    sim["dec"]     = dec
+    sim["rad"]     = rad_sim
+    sim["tmin"]    = tstart
+    sim["tmax"]    = tstop
+    sim["emin"]    = emin
+    sim["emax"]    = emax
     sim.run()
 
     # Bin events into counts map
     bin = ctools.ctbin(sim.obs())
-    bin["ebinalg"] = "LOG"
-    bin["emin"] = emin
-    bin["emax"] = emax
+    bin["ebinalg"]  = "LOG"
+    bin["emin"]     = emin
+    bin["emax"]     = emax
     bin["enumbins"] = enumbins
-    bin["nxpix"] = nxpix
-    bin["nypix"] = nypix
-    bin["binsz"] = binsz
+    bin["nxpix"]    = nxpix
+    bin["nypix"]    = nypix
+    bin["binsz"]    = binsz
     bin["coordsys"] = coordsys
-    bin["xref"] = ra
-    bin["yref"] = dec
-    bin["proj"] = proj
+    bin["xref"]     = ra
+    bin["yref"]     = dec
+    bin["proj"]     = proj
     bin.run()
 
     # Get ctlike start CPU time
@@ -198,82 +198,82 @@ def stacked_pipeline(duration):
     # Simulate events
     sim = ctools.ctobssim()
     sim["inmodel"] = model_name
-    sim["caldb"] = caldb
-    sim["irf"] = irf
-    sim["ra"] = ra
-    sim["dec"] = dec
-    sim["rad"] = rad_sim
-    sim["tmin"] = tstart
-    sim["tmax"] = tstop
-    sim["emin"] = emin
-    sim["emax"] = emax
+    sim["caldb"]   = caldb
+    sim["irf"]     = irf
+    sim["ra"]      = ra
+    sim["dec"]     = dec
+    sim["rad"]     = rad_sim
+    sim["tmin"]    = tstart
+    sim["tmax"]    = tstop
+    sim["emin"]    = emin
+    sim["emax"]    = emax
     sim.run()
 
     # Bin events into counts map
     bin = ctools.ctbin(sim.obs())
-    bin["ebinalg"] = "LOG"
-    bin["emin"] = emin
-    bin["emax"] = emax
+    bin["ebinalg"]  = "LOG"
+    bin["emin"]     = emin
+    bin["emax"]     = emax
     bin["enumbins"] = enumbins
-    bin["nxpix"] = nxpix
-    bin["nypix"] = nypix
-    bin["binsz"] = binsz
+    bin["nxpix"]    = nxpix
+    bin["nypix"]    = nypix
+    bin["binsz"]    = binsz
     bin["coordsys"] = coordsys
-    bin["proj"] = proj
-    bin["xref"] = ra
-    bin["yref"] = dec
+    bin["proj"]     = proj
+    bin["xref"]     = ra
+    bin["yref"]     = dec
     bin.run()
 
     # Create exposure cube
     expcube = ctools.ctexpcube(sim.obs())
-    expcube["incube"] = "NONE"
-    expcube["caldb"] = caldb
-    expcube["irf"] = irf
-    expcube["ebinalg"] = "LOG"
-    expcube["emin"] = emin
-    expcube["emax"] = emax
+    expcube["incube"]   = "NONE"
+    expcube["caldb"]    = caldb
+    expcube["irf"]      = irf
+    expcube["ebinalg"]  = "LOG"
+    expcube["emin"]     = emin
+    expcube["emax"]     = emax
     expcube["enumbins"] = enumbins
-    expcube["nxpix"] = nxpix
-    expcube["nypix"] = nypix
-    expcube["binsz"] = binsz
+    expcube["nxpix"]    = nxpix
+    expcube["nypix"]    = nypix
+    expcube["binsz"]    = binsz
     expcube["coordsys"] = coordsys
-    expcube["proj"] = proj
-    expcube["xref"] = ra
-    expcube["yref"] = dec
+    expcube["proj"]     = proj
+    expcube["xref"]     = ra
+    expcube["yref"]     = dec
     expcube.run()
 
     # Create PSF cube
     psfcube = ctools.ctpsfcube(sim.obs())
-    psfcube["incube"] = "NONE"
-    psfcube["caldb"] = caldb
-    psfcube["irf"] = irf
-    psfcube["ebinalg"] = "LOG"
-    psfcube["emin"] = emin
-    psfcube["emax"] = emax
+    psfcube["incube"]   = "NONE"
+    psfcube["caldb"]    = caldb
+    psfcube["irf"]      = irf
+    psfcube["ebinalg"]  = "LOG"
+    psfcube["emin"]     = emin
+    psfcube["emax"]     = emax
     psfcube["enumbins"] = enumbins
-    psfcube["nxpix"] = 10
-    psfcube["nypix"] = 10
-    psfcube["binsz"] = 1.0
+    psfcube["nxpix"]    = 10
+    psfcube["nypix"]    = 10
+    psfcube["binsz"]    = 1.0
     psfcube["coordsys"] = coordsys
-    psfcube["proj"] = proj
-    psfcube["xref"] = ra
-    psfcube["yref"] = dec
+    psfcube["proj"]     = proj
+    psfcube["xref"]     = ra
+    psfcube["yref"]     = dec
     psfcube.run()
 
     # Create background cube
     bkgcube = ctools.ctbkgcube(sim.obs())
-    bkgcube["incube"] = "NONE"
-    bkgcube["ebinalg"] = "LOG"
-    bkgcube["emin"] = emin
-    bkgcube["emax"] = emax
+    bkgcube["incube"]   = "NONE"
+    bkgcube["ebinalg"]  = "LOG"
+    bkgcube["emin"]     = emin
+    bkgcube["emax"]     = emax
     bkgcube["enumbins"] = enumbins
-    bkgcube["nxpix"] = 10
-    bkgcube["nypix"] = 10
-    bkgcube["binsz"] = 1.0
+    bkgcube["nxpix"]    = 10
+    bkgcube["nypix"]    = 10
+    bkgcube["binsz"]    = 1.0
     bkgcube["coordsys"] = coordsys
-    bkgcube["proj"] = proj
-    bkgcube["xref"] = ra
-    bkgcube["yref"] = dec
+    bkgcube["proj"]     = proj
+    bkgcube["xref"]     = ra
+    bkgcube["yref"]     = dec
     bkgcube.run()
 
     # Attach background model to observation container

@@ -66,30 +66,30 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctmodel from scratch
         model = ctools.ctmodel()
-        model["incube"] = "NONE"
-        model["outcube"] = "modmap.fits"
-        model["inmodel"] = self.model_name
-        model["inobs"] = "NONE"
-        model["expcube"] = "NONE"
-        model["psfcube"] = "NONE"
-        model["bkgcube"] = "NONE"
-        model["caldb"] = self.caldb
-        model["irf"] = self.irf
-        model["rad"] = 5
-        model["ra"] = 83.63
-        model["dec"] = 22.01
-        model["tmin"] = 0
-        model["tmax"] = 1800
-        model["emin"] = 0.1
-        model["emax"] = 100
+        model["incube"]   = "NONE"
+        model["outcube"]  = "modmap.fits"
+        model["inmodel"]  = self.model_name
+        model["inobs"]    = "NONE"
+        model["expcube"]  = "NONE"
+        model["psfcube"]  = "NONE"
+        model["bkgcube"]  = "NONE"
+        model["caldb"]    = self.caldb
+        model["irf"]      = self.irf
+        model["rad"]      = 5
+        model["ra"]       = 83.63
+        model["dec"]      = 22.01
+        model["tmin"]     = 0
+        model["tmax"]     = 1800
+        model["emin"]     = 0.1
+        model["emax"]     = 100
         model["enumbins"] = 20
-        model["nxpix"] = 200
-        model["nypix"] = 200
-        model["binsz"] = 0.02
+        model["nxpix"]    = 200
+        model["nypix"]    = 200
+        model["binsz"]    = 0.02
         model["coordsys"] = "CEL"
-        model["proj"] = "CAR"
-        model["xref"] = 83.63
-        model["yref"] = 22.01
+        model["proj"]     = "CAR"
+        model["xref"]     = 83.63
+        model["yref"]     = 22.01
         
         # Run tool
         self.test_try("Run ctmodel")
