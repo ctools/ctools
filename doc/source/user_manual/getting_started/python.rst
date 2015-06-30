@@ -18,13 +18,6 @@ generally not very useful.
    >>> import gammalib
    >>> import ctools
 
-.. warning::
-
-   The GammaLib module needs to be imported **before** the ctools 
-   module so that GammaLib class types are handled correctly.
-   So make sure that you **always import the GammaLib module before the ctools
-   module.**
-
 To illustrate how to use ctools from Python, below is a working example 
 of an event list simulation using the :ref:`ctobssim` class.
 An instance ``sim`` of the :ref:`ctobssim` class is generated and user 
