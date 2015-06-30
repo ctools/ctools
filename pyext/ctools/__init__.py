@@ -3,9 +3,6 @@ import gammalib
 
 # Import sub modules
 from .tools import *
-#import obsutils (require explicit from ctools import obsutils)
-#import analysisutils (require explicit from ctools import obsutils)
-#import plotutils (require explicit from ctools import obsutils)
 
 # Remove swig register stuff
 bad_entries = [entry for entry in list(locals())
