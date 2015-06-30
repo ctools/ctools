@@ -259,8 +259,8 @@ void ctlike::run(void)
     if (ts_srcs.size() > 0) {
 
         // Store original maximum likelihood and models
-        double  logL_src    = m_logL;
-        GModels models = m_obs.models();
+        double  logL_src = m_logL;
+        GModels models   = m_obs.models();
 
         // Loop over stored models, remove source and refit
         for (int i = 0; i < ts_srcs.size(); ++i) {
@@ -424,6 +424,29 @@ void ctlike::optimize_lm(void)
         log << std::endl;
         log.header1("Maximum likelihood optimisation");
         log.indent(1);
+    }
+
+    // Compute number of fitted parameters
+    int nfit = 0;
+    for (int i = 0; i < m_obs.models().size(); ++i) {
+        const GModel* model = m_obs.models()[i];
+        for (int k = 0; k < model->size(); ++k) {
+            if ((*model)[k].is_free()) {
+                nfit++;
+            }
+        }
+    }
+
+    // Notify if all parameters are fixed
+    if (nfit == 0) {
+        if (logTerse()) {
+            log << "WARNING: All model parameters are fixed!";
+            log << std::endl;
+            log << "         ctlike will proceed without fitting parameters.";
+            log << std::endl;
+            log << "         All curvature matrix elements will be zero.";
+            log << std::endl;
+        }
     }
 
     // Perform LM optimization
