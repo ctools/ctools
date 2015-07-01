@@ -244,37 +244,40 @@ void ctbin::run(void)
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << "Warning: Skipping "+m_obs[i]->instrument();
+                log << " observation \"";
+                log << m_obs[i]->name() << "\"" << std::endl;
             }
+            continue;
+        }
 
-            // Skip observation if we don't have an unbinned observation
-            if (obs->eventtype() != "EventList") {
-
-                // Log that we skip the this observation
-                if (logTerse()) {
-                    log << "Warning: Skipping binned observation \""+obs->name()+"\"";
-                    log << std::endl;
-                }
-                continue;
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << "Warning: Skipping binned observation \"";
+                log << obs->name()+"\"" << std::endl;
             }
+            continue;
+        }
 
-            // Fill the cube
-            fill_cube(obs);
+        // Write header for observation
+        if (logTerse()) {
+            if (obs->name().length() > 1) {
+                log.header3("Observation "+obs->name());
+            }
+            else {
+                log.header3("Observation");
+            }
+        }
 
-            // Dispose events to free memory
-            obs->dispose_events();
+        // Fill the cube
+        fill_cube(obs);
 
-        } // endif: CTA observation found
+        // Dispose events to free memory
+        obs->dispose_events();
 
     } // endfor: looped over observations
 

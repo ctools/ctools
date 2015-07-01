@@ -249,85 +249,88 @@ void ctselect::run(void)
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << "Warning: Skipping "+m_obs[i]->instrument();
+                log << " observation \"";
+                log << m_obs[i]->name() << "\"" << std::endl;
             }
+            continue;
+        }
 
-            // Increment counter
-            n_observations++;
-
-            // Save event file name (for possible saving)
-            m_infiles[i] = obs->eventfile();
-
-            // Skip observation if we don't have an unbinned observation
-            if (obs->eventtype() != "EventList") {
-
-                // Log that we skip the this observation
-                if (logTerse()) {
-                    log << "Warning: Skipping binned observation \""+obs->name()+"\"";
-                    log << std::endl;
-                }
-                continue;
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << "Warning: Skipping binned observation \"";
+                log << obs->name()+"\"" << std::endl;
             }
+            continue;
+        }
 
-            // Fall through in case that the event file is empty
-            if (obs->events()->size() == 0) {
-                if (logTerse()) {
-                    log << " Warning: No events in event file \"";
-                    log << m_infiles[i] << "\". Event selection skipped.";
-                    log << std::endl;
-                }
-                continue;
+        // Write header for observation
+        if (logTerse()) {
+            if (obs->name().length() > 1) {
+                log.header3("Observation "+obs->name());
             }
+            else {
+                log.header3("Observation");
+            }
+        }
 
-            // Get temporary file name
-            #if G_USE_MKSTEMP
-            char tpl[]  = "ctselectXXXXXX";
-            int  fileid = mkstemp(tpl);
-            std::string filename(tpl);
-            #else
-            std::string filename = std::tmpnam(NULL);
-            #endif
+        // Increment counter
+        n_observations++;
 
-            // Save observation in temporary file
-            obs->save(filename, true);
+        // Save event file name (for possible saving)
+        m_infiles[i] = obs->eventfile();
 
-            // Log saved FITS file
-            if (logExplicit()) {
-                GFits tmpfile(filename);
+        // Fall through in case that the event file is empty
+        if (obs->events()->size() == 0) {
+            if (logTerse()) {
+                log << " Warning: No events in event file \"";
+                log << m_infiles[i] << "\". Event selection skipped.";
                 log << std::endl;
-                log.header1("FITS file content of temporary file");
-                log << tmpfile << std::endl;
-                tmpfile.close();
             }
+            continue;
+        }
 
-            // Check temporary file
-            std::string message = check_infile(filename);
-            if (message.length() > 0) {
-                throw GException::app_error(G_RUN, message);
-            }
+        // Get temporary file name
+        #if G_USE_MKSTEMP
+        char tpl[]  = "ctselectXXXXXX";
+        int  fileid = mkstemp(tpl);
+        std::string filename(tpl);
+        #else
+        std::string filename = std::tmpnam(NULL);
+        #endif
 
-            // Load observation from temporary file, including event selection
-            select_events(obs, filename);
+        // Save observation in temporary file
+        obs->save(filename, true);
 
-            // Close temporary file
-            #if G_USE_MKSTEMP
-            close(fileid);
-            #endif
+        // Log saved FITS file
+        if (logExplicit()) {
+            GFits tmpfile(filename);
+            log << std::endl;
+            log.header1("FITS file content of temporary file");
+            log << tmpfile << std::endl;
+            tmpfile.close();
+        }
 
-            // Remove temporary file
-            std::remove(filename.c_str());
-            
-        } // endif: had a CTA observation
+        // Check temporary file
+        std::string message = check_infile(filename);
+        if (message.length() > 0) {
+            throw GException::app_error(G_RUN, message);
+        }
+
+        // Load observation from temporary file, including event selection
+        select_events(obs, filename);
+
+        // Close temporary file
+        #if G_USE_MKSTEMP
+        close(fileid);
+        #endif
+
+        // Remove temporary file
+        std::remove(filename.c_str());
 
     } // endfor: looped over all observations
 

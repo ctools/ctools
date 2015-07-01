@@ -112,7 +112,6 @@ class cslightcrv(ctools.cscript):
             pars.append(gammalib.GApplicationPar("tmax","r","a","51544.6","","days","Lightcurve stop time [MJD]"))
             pars.append(gammalib.GApplicationPar("tbins","i","a","5","","","Number of time bins"))
             pars.append(gammalib.GApplicationPar("tbinfile","f","a","tbins.fits","","", "File defining the time binning"))
-            #pars.append(gammalib.GApplicationPar("binned","b","a","no","yes|no","","Use binned analysis in each time bin"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins per light curve bin (0=unbinned)"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit of events (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit of events (TeV)"))

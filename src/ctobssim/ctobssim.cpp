@@ -327,93 +327,89 @@ void ctobssim::run(void)
             // Get pointer on CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-            // Continue only if observation is a CTA observation
-            if (obs != NULL) {
-
-                // Write header for observation
+            // Skip observation if it's not CTA
+            if (obs == NULL) {
                 if (logTerse()) {
-                    if (obs->name().length() > 1) {
-                        wrklog.header3("Observation "+obs->name());
-                    }
-                    else {
-                        wrklog.header3("Observation");
-                    }
+                    log << "Warning: Skipping "+m_obs[i]->instrument();
+                    log << " observation \"";
+                    log << m_obs[i]->name() << "\"" << std::endl;
                 }
+                continue;
+            }
 
-                // Skip observation if we don't have an unbinned observation
-                if (obs->eventtype() != "EventList") {
-
-                    // Log that we skip the this observation
-                    if (logTerse()) {
-                        log << "Warning: Skipping binned observation \""+obs->name()+"\"";
-                        log << std::endl;
-                    }
-                    continue;
+            // Skip observation if we have a binned observation
+            if (obs->eventtype() == "CountsCube") {
+                if (logTerse()) {
+                    log << "Warning: Skipping binned observation \"";
+                    log << obs->name()+"\"" << std::endl;
                 }
+                continue;
+            }
 
-                // Work on a clone of the CTA observation. This makes sure that
-                // any memory allocated for computing (for example a response
-                // cache) is properly de-allocated on exit of this run
-                GCTAObservation obs_clone = *obs;
-
-                // Save number of events before entering simulation
-                int events_before = obs_clone.events()->size();
-
-                // Simulate source events
-                simulate_source(&obs_clone, models, m_rans[i], &wrklog);
-
-                // Simulate source events
-                simulate_background(&obs_clone, models, m_rans[i], &wrklog);
-
-                // Dump simulation results
-                if (logNormal()) {
-                    wrklog << gammalib::parformat("MC events");
-                    wrklog << obs_clone.events()->size() - events_before;
-                    wrklog << " (all models)";
-                    wrklog << std::endl;
+            // Write header for observation
+            if (logTerse()) {
+                if (obs->name().length() > 1) {
+                    wrklog.header3("Observation "+obs->name());
                 }
-
-                // Append the event list to the original observation
-                obs->events(*(obs_clone.events()));
-
-                // If requested, event lists are saved immediately
-                if (m_save_and_dispose) {
-
-                    // Set event output file name. If multiple observations are
-                    // handled, build the filename from prefix and observation
-                    // index. Otherwise use the outfile parameter.
-                    std::string outfile;
-                    if (m_use_xml) {
-                        m_prefix = (*this)["prefix"].string();
-                        outfile  = m_prefix + gammalib::str(i) + ".fits";
-                    }
-                    else {
-                        outfile  = (*this)["outevents"].filename();
-                    }
-
-                    // Store output file name in original observation
-                    obs->eventfile(outfile);
-
-                    // Save observation into FITS file. This is a critical zone
-                    // to avoid multiple threads writing simultaneously
-                    #pragma omp critical
-                    {
-                        obs_clone.save(outfile, clobber());
-                    }
-
-                    // Dispose events
-                    obs->dispose_events();
-
-                }
-
-                // ... otherwise append the event list to the original observation
-                /*
                 else {
-                    obs->events(*(obs_clone.events()));
+                    wrklog.header3("Observation");
                 }
-                */
+            }
 
-            } // endif: CTA observation found
+            // Work on a clone of the CTA observation. This makes sure that
+            // any memory allocated for computing (for example a response
+            // cache) is properly de-allocated on exit of this run
+            GCTAObservation obs_clone = *obs;
+
+            // Save number of events before entering simulation
+            int events_before = obs_clone.events()->size();
+
+            // Simulate source events
+            simulate_source(&obs_clone, models, m_rans[i], &wrklog);
+
+            // Simulate source events
+            simulate_background(&obs_clone, models, m_rans[i], &wrklog);
+
+            // Dump simulation results
+            if (logNormal()) {
+                wrklog << gammalib::parformat("MC events");
+                wrklog << obs_clone.events()->size() - events_before;
+                wrklog << " (all models)";
+                wrklog << std::endl;
+            }
+
+            // Append the event list to the original observation
+            obs->events(*(obs_clone.events()));
+
+            // If requested, event lists are saved immediately
+            if (m_save_and_dispose) {
+
+                // Set event output file name. If multiple observations are
+                // handled, build the filename from prefix and observation
+                // index. Otherwise use the outfile parameter.
+                std::string outfile;
+                if (m_use_xml) {
+                    m_prefix = (*this)["prefix"].string();
+                    outfile  = m_prefix + gammalib::str(i) + ".fits";
+                }
+                else {
+                    outfile  = (*this)["outevents"].filename();
+                }
+
+                // Store output file name in original observation
+                obs->eventfile(outfile);
+
+                // Save observation into FITS file. This is a critical zone
+                // to avoid multiple threads writing simultaneously
+                #pragma omp critical
+                {
+                    obs_clone.save(outfile, clobber());
+                }
+
+                // Dispose events
+                obs->dispose_events();
+
+            }
 
         } // endfor: looped over observations
 
