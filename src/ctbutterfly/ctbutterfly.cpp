@@ -36,6 +36,7 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                      "ctbutterfly::get_parameters()"
 #define G_SAVE                                          "ctbutterfly::save()"
+#define G_GET_MODEL_PARAMETER               "ctbutterfly::get_model_parameter()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -279,47 +280,37 @@ void ctbutterfly::run(void)
             log.header2(msg);
         }
 
-        // Initialise model flux value
+        // Initialise flux value
         double model_flux = 0.0;
 
         // Loop over models
         for (int j = 0; j < models.size(); ++j) {
 
-            // Check wether model is a skymodel
-            GModelSky* skymodel = dynamic_cast<GModelSky*>(models[j]);
+            if (models[j]->name() == m_srcname) {
 
-            // Yes ...
-            if (skymodel != NULL) {
-
-                // Skip spatial models
-                num_gradient += skymodel->spatial()->size();
-
-                // Get pointer to spectral model
+                // If source name is found retrieve the nominal flux
+                // Note that we have to compute the gradients here repetively to update the
+                // gradients in the vector
+                // No check for valid pointers necessary here as this was covered by get_model_parameter()
+                GModelSky* skymodel = dynamic_cast<GModelSky*>(models[j]);
                 GModelSpectral* spectral = skymodel->spectral();
+                model_flux = spectral->eval_gradients(energy, time);
 
-                // Set flux value of source of interest
-                if (skymodel->name() == m_srcname) {
-                    model_flux = spectral->eval_gradients(energy, time);
-                } // endif: model was source of interest
-                
-                // Loop over model parameters, get gradients
-                // and assign them to the vector
-                for (int k = 0; k < spectral->size(); ++k) {
-                    grad[num_gradient] = (*spectral)[k].gradient();
-                    num_gradient++;
-                } // endfor: looped over spectral parameters
+          }
 
-                // Skip temporal models
-                num_gradient += skymodel->temporal()->size();
+            // Loop over model parameters
+            for(int i = 0; i < models[j]->size(); ++i) {
 
-            } // endif: model was sky model
+                // Get model parameter
+                GModelPar parameter = models[j]->at(i);
 
-            else {
+                // Set gradient value to the vector
+                grad[num_gradient] = parameter.gradient();
 
-                // Skip other models (e.g. GModelData instances)
-                num_gradient += models[j]->size();
+                // increment vector index
+                num_gradient++;
 
-            } // endelse: Model was not GModelSky
+            } // endfor: Looped over model parameters
 
         } // endfor: Looped over models
 
@@ -328,6 +319,9 @@ void ctbutterfly::run(void)
 
         // Get the error from the scalar product
         double error = std::sqrt(grad * vector);
+
+        // Multiply in scale of spectral parameter
+        error *= m_par_scale;
 
         // Store flux, value and energy for saving
         m_fluxes.push_back(model_flux);
@@ -404,6 +398,8 @@ void ctbutterfly::init_members(void)
     m_ebounds.clear();
 
     // Initialise protected members
+    m_skymodel     = NULL;
+    m_par_scale    = 0.0;
     m_obs.clear();
     m_covariance.clear();
     m_energies.clear();
@@ -433,6 +429,9 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_energies   = app.m_energies;
     m_fluxes     = app.m_fluxes;
     m_errors     = app.m_errors;
+
+    // Extract model parameter
+    get_model_parameter();
 
     // Return
     return;
@@ -495,8 +494,11 @@ void ctbutterfly::get_parameters(void)
         std::string msg = "Source \""+m_srcname+"\" not found in model "
                           "container. Please add a source with that name "
                           "or check for possible typos.";
-    	throw GException::invalid_value(G_GET_PARAMETERS, msg);
+    throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
+
+    // Get relevant model and parameter for model computation
+    get_model_parameter();
 
     // Create energy boundaries from user parameters
     m_ebounds = create_ebounds();
@@ -516,6 +518,68 @@ void ctbutterfly::get_parameters(void)
     if (read_ahead()) {
         m_outfile = (*this)["outfile"].filename();
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get application parameters
+ *
+ * @exception GException::invalid_value
+ *            Did not find a valid model parameter
+ *
+ * Extracts a pointer to the sky model (m_skymodel) and a pointer to the
+ * relevant model parameter (m_model_par) from the model container.
+ ***************************************************************************/
+void ctbutterfly::get_model_parameter(void)
+{
+    // Continue only if source model exists
+    if (m_obs.models().contains(m_srcname)) {
+
+        // Get relevant model and parameter for upper limit computation.
+        GModels& models = const_cast<GModels&>(m_obs.models());
+        m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
+        if (m_skymodel == NULL) {
+            std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
+                              "Please specify the name of a sky model for "
+                              "butterfly computation.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+        }
+
+        GModelPar* modelpar;
+
+        if (m_skymodel->spectral()->type() == "NodeFunction") {
+            std::string msg = "\"NodeFunction\" cannot be used as spectral "
+                              "model for an butterfly computation. "
+                              "Please specify another spectral model.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+        }
+        if (m_skymodel->spectral()->has_par("Normalization")) {
+            modelpar = &(m_skymodel->spectral()->operator[]("Normalization"));
+        }
+        else if (m_skymodel->spectral()->has_par("Prefactor")) {
+            modelpar = &(m_skymodel->spectral()->operator[]("Prefactor"));
+        }
+        else if (m_skymodel->spectral()->has_par("Integral")) {
+            modelpar = &(m_skymodel->spectral()->operator[]("Integral"));
+        }
+        else if (m_skymodel->spectral()->has_par("Value")) {
+            modelpar = &(m_skymodel->spectral()->operator[]("Value"));
+        }
+        else {
+            std::string msg = "Require spectral parameter \"Normalization\", "
+                              "\"Prefactor\", \"Integral\" or \"Value\" for "
+                              "butterfly computation. The specified source "
+                              "\""+m_srcname+"\" does not have such a parameter.";
+            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+        }
+
+        // Set scale value from parameter
+        m_par_scale = modelpar->scale();
+
+    } // endif: source model existed
 
     // Return
     return;

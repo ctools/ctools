@@ -63,14 +63,20 @@ if __name__ == "__main__":
         index = nrows - 1 - row
         
         butterfly_x.append(csv.real(index,0))
-        butterfly_y.append(csv.real(index,1)-csv.real(index,2))    
+        low_error = csv.real(index,1)-csv.real(index,2)
+        if low_error < 1e-26:
+            low_error=1e-26
+        butterfly_y.append(low_error)   
+         
     
     # plot the butterfly and spectral line       
     plt.figure()
+    plt.ylim([1e-26,1e-14])
     plt.loglog()
     plt.grid()
     plt.plot(line_x,line_y,color='black',ls='-')
     plt.fill(butterfly_x,butterfly_y,color='green',alpha=0.5)
+
     plt.xlabel("Energy [MeV]")
     plt.ylabel(r"dN/dE [MeV$^{-1}$ s$^{-1}$ cm$^{-2}$]")    
     plt.show()
