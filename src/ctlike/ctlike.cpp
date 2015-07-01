@@ -468,6 +468,15 @@ void ctlike::optimize_lm(void)
 
     }
 
+    // Optionally show curvature matrix
+    if (logNormal()) {
+        log << std::endl;
+        log.header1("Curvature matrix");
+        log.indent(1);
+        log << *(const_cast<GObservations::likelihood&>(m_obs.function()).curvature());
+        log << std::endl;
+    }
+
     // Compute errors
     m_obs.errors(*m_opt);
 
