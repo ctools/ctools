@@ -777,6 +777,16 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         }
                         GTime tslice(duration, "sec");
 
+                        // Dump photon rate
+                        if (logNormal()) {
+                            *wrklog << gammalib::parformat("Photon rate", indent);
+                            *wrklog << rate << " photons/sec";
+                            if (model->name().length() > 0) {
+                                *wrklog << " [" << model->name() << "]";
+                            }
+                            *wrklog << std::endl;
+                        }
+
                         // If photon rate exceeds the maximum photon rate
                         // then throw an exception
                         if (rate > m_max_rate) {
@@ -795,16 +805,6 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                                  " hidden \"maxrate\""
                                                  " parameter.";
                             throw GException::invalid_value(G_SIMULATE_SOURCE, msg);
-                        }
-
-                        // Dump length of time slice and rate
-                        if (logExplicit()) {
-                            *wrklog << gammalib::parformat("Photon rate", indent);
-                            *wrklog << rate << " photons/sec";
-                            if (model->name().length() > 0) {
-                                *wrklog << " [" << model->name() << "]";
-                            }
-                            *wrklog << std::endl;
                         }
 
                         // To reduce memory requirements we split long time
@@ -916,7 +916,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                             *wrklog << std::endl;
 
                         }
-
+                        
                     } // endif: model was a sky model
 
                 } // endfor: looped over models
