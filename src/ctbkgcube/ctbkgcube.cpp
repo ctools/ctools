@@ -308,7 +308,7 @@ void ctbkgcube::run(void)
     m_obs.models(m_bkgmdl);
 
     // Fill background cube from observations
-    m_background.fill(m_obs);
+    m_background.fill(m_obs, &log);
 
     // Create a background model for the output background cube and append
     // that model to the input model in place of the original

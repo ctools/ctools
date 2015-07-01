@@ -250,42 +250,42 @@ void ctskymap::run(void)
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for current observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << "Warning: Skipping "+m_obs[i]->instrument();
+                log << " observation \"";
+                log << m_obs[i]->name() << "\"" << std::endl;
             }
+            continue;
+        }
 
-            // Map events into sky map
-            map_events(obs);
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << "Warning: Skipping binned observation \"";
+                log << obs->name()+"\"" << std::endl;
+            }
+            continue;
+        }
+
+        // Write header for current observation
+        if (logTerse()) {
+            if (obs->name().length() > 1) {
+                log.header3("Observation "+obs->name());
+            }
+            else {
+                log.header3("Observation");
+            }
+        }
+
+        // Map events into sky map
+        map_events(obs);
             
-            // Increment observation counter
-            num_obs++;
-
-        } // endif: CTA observation found
+        // Increment observation counter
+        num_obs++;
 
     } // endfor: looped over observations
-
-    // Write observation(s) into logger
-/*
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Map observations");
-        }
-        else {
-            log.header1("Map observation");
-        }
-        log << m_obs << std::endl;
-    }
-*/
 
     // Return
     return;

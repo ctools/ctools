@@ -107,7 +107,7 @@ class cslightcrv(ctools.cscript):
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("tbinalg","s","h","GTI","FILE|LIN|GTI","", "Algorithm for defining time bins"))
+            pars.append(gammalib.GApplicationPar("tbinalg","s","a","GTI","FILE|LIN|GTI","", "Algorithm for defining time bins"))
             pars.append(gammalib.GApplicationPar("tmin","r","a","51544.5","","days","Lightcurve start time [MJD]"))
             pars.append(gammalib.GApplicationPar("tmax","r","a","51544.6","","days","Lightcurve stop time [MJD]"))
             pars.append(gammalib.GApplicationPar("tbins","i","a","5","","","Number of time bins"))
