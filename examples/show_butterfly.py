@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script shows how to plot a butterfly created with ctbutterfly 
 #
-# Copyright (C) 2014 Michael Mayer
+# Copyright (C) 2014-2015 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,9 +65,8 @@ if __name__ == "__main__":
         butterfly_x.append(csv.real(index,0))
         low_error = csv.real(index,1)-csv.real(index,2)
         if low_error < 1e-26:
-            low_error=1e-26
+            low_error = 1e-26
         butterfly_y.append(low_error)   
-         
     
     # plot the butterfly and spectral line       
     plt.figure()

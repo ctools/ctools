@@ -36,7 +36,7 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                      "ctbutterfly::get_parameters()"
 #define G_SAVE                                          "ctbutterfly::save()"
-#define G_GET_MODEL_PARAMETER               "ctbutterfly::get_model_parameter()"
+#define G_GET_MODEL_PARAMETER            "ctbutterfly::get_model_parameter()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -286,20 +286,21 @@ void ctbutterfly::run(void)
         // Loop over models
         for (int j = 0; j < models.size(); ++j) {
 
+            // If source name is found, retrieve the nominal flux
             if (models[j]->name() == m_srcname) {
 
-                // If source name is found retrieve the nominal flux
-                // Note that we have to compute the gradients here repetively to update the
-                // gradients in the vector
-                // No check for valid pointers necessary here as this was covered by get_model_parameter()
-                GModelSky* skymodel = dynamic_cast<GModelSky*>(models[j]);
+                // Note that we have to compute the gradients here
+                // repetively to update the gradients in the vector
+                // No check for valid pointers necessary here as this 
+                // was covered by get_model_parameter()
+                GModelSky*      skymodel = dynamic_cast<GModelSky*>(models[j]);
                 GModelSpectral* spectral = skymodel->spectral();
                 model_flux = spectral->eval_gradients(energy, time);
 
-          }
+            }
 
             // Loop over model parameters
-            for(int i = 0; i < models[j]->size(); ++i) {
+            for (int i = 0; i < models[j]->size(); ++i) {
 
                 // Get model parameter
                 GModelPar parameter = models[j]->at(i);
@@ -398,8 +399,8 @@ void ctbutterfly::init_members(void)
     m_ebounds.clear();
 
     // Initialise protected members
-    m_skymodel     = NULL;
-    m_par_scale    = 0.0;
+    m_skymodel  = NULL;
+    m_par_scale = 0.0;
     m_obs.clear();
     m_covariance.clear();
     m_energies.clear();
@@ -494,7 +495,7 @@ void ctbutterfly::get_parameters(void)
         std::string msg = "Source \""+m_srcname+"\" not found in model "
                           "container. Please add a source with that name "
                           "or check for possible typos.";
-    throw GException::invalid_value(G_GET_PARAMETERS, msg);
+        throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
     // Get relevant model and parameter for model computation
