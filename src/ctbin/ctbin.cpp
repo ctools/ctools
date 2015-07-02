@@ -325,13 +325,26 @@ void ctbin::save(void)
     // Get output filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+    // Save only if filename is non-empty
+    if (m_outcube.length() > 0) {
 
-    // Save only if observation is valid
-    if (obs != NULL) {
-        obs->save(m_outcube, clobber());
-    }
+        // Get CTA observation from observation container
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+
+        // Save only if observation is valid
+        if (obs != NULL) {
+        
+            // Dump filename
+            if (logTerse()) {
+                log << "Save \""+m_outcube+"\"" << std::endl;
+            }
+            
+            // Save cube
+            obs->save(m_outcube, clobber());
+
+        } // endif: observation was valid
+
+    } // endif: outcube file was valid
 
     // Return
     return;
