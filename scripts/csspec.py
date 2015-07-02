@@ -281,18 +281,18 @@ class csspec(ctools.cscript):
         table.card("TELESCOP", "CTA", "Name of Telescope")
         
         # Create FITS table columns
-        energy      = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
+        energy       = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
         energy.unit("TeV")
-        energy_low  = gammalib.GFitsTableDoubleCol("ed_Energy", self.m_ebounds.size())
+        energy_low   = gammalib.GFitsTableDoubleCol("ed_Energy", self.m_ebounds.size())
         energy_low.unit("TeV")
         energy_high  = gammalib.GFitsTableDoubleCol("eu_Energy", self.m_ebounds.size())
         energy_high.unit("TeV")
-        flux        = gammalib.GFitsTableDoubleCol("Flux", self.m_ebounds.size())
+        flux         = gammalib.GFitsTableDoubleCol("Flux", self.m_ebounds.size())
         flux.unit("erg/cm2/s")
-        flux_err    = gammalib.GFitsTableDoubleCol("e_Flux", self.m_ebounds.size())
+        flux_err     = gammalib.GFitsTableDoubleCol("e_Flux", self.m_ebounds.size())
         flux_err.unit("erg/cm2/s")
-        TSvalues    = gammalib.GFitsTableDoubleCol("TS", self.m_ebounds.size())
-        ulim_values = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
+        TSvalues     = gammalib.GFitsTableDoubleCol("TS", self.m_ebounds.size())
+        ulim_values  = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
         ulim_values.unit("erg/cm2/s")
         Npred_values = gammalib.GFitsTableDoubleCol("Npred", self.m_ebounds.size())
         
@@ -457,10 +457,10 @@ class csspec(ctools.cscript):
                     self.log("No event in this bin. Bin is skipped\n")
 
                 # Set all values to 0
-                flux[i]        = 0.0
-                flux_err[i]    = 0.0
-                TSvalues[i]    = 0.0
-                ulim_values[i] = 0.0
+                flux[i]         = 0.0
+                flux_err[i]     = 0.0
+                TSvalues[i]     = 0.0
+                ulim_values[i]  = 0.0
                 Npred_values[i] = 0.0
                 continue
                          
@@ -531,7 +531,7 @@ class csspec(ctools.cscript):
                     self.log(", UL = "+str(ulim_values[i])+" [erg/cm2/s]")
                 self.log("\n")
 
-        # Append filles columns to fits table    
+        # Append filled columns to fits table    
         table.append(energy)
         table.append(energy_low)
         table.append(energy_high)
