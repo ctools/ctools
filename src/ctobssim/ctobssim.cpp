@@ -225,8 +225,8 @@ void ctobssim::run(void)
         m_save_and_dispose = true;
     }
 
-    // Determine the number of valid CTA observations, set energy dispersion flag
-    // for all CTA observations and save old values in save_edisp vector
+    // Determine the number of valid CTA observations, set energy dispersion
+    // flag for all CTA observations and save old values in save_edisp vector
     int               n_observations = 0;
     std::vector<bool> save_edisp;
     save_edisp.assign(m_obs.size(), false);
@@ -324,15 +324,26 @@ void ctobssim::run(void)
         #pragma omp for
         for (int i = 0; i < m_obs.size(); ++i) {
 
+            // Write header for observation
+            if (logTerse()) {
+                if (m_obs[i]->name().length() > 1) {
+                    wrklog.header3("Observation "+m_obs[i]->name());
+                }
+                else {
+                    wrklog.header3("Observation");
+                }
+            }
+
             // Get pointer on CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
             // Skip observation if it's not CTA
             if (obs == NULL) {
                 if (logTerse()) {
-                    log << "Warning: Skipping "+m_obs[i]->instrument();
-                    log << " observation \"";
-                    log << m_obs[i]->name() << "\"" << std::endl;
+                    wrklog << " Skipping "+m_obs[i]->instrument();
+                    wrklog << " observation \"";
+                    wrklog << m_obs[i]->name() << "\"";
+                    wrklog << " (id=" << m_obs[i]->id() << ")" << std::endl;
                 }
                 continue;
             }
@@ -340,20 +351,13 @@ void ctobssim::run(void)
             // Skip observation if we have a binned observation
             if (obs->eventtype() == "CountsCube") {
                 if (logTerse()) {
-                    log << "Warning: Skipping binned observation \"";
-                    log << obs->name()+"\"" << std::endl;
+                    wrklog << " Skipping binned ";
+                    wrklog << obs->instrument();
+                    wrklog << " observation \"";
+                    wrklog << obs->name()+"\"";
+                    wrklog << " (id=" << obs->id() << ")" << std::endl;
                 }
                 continue;
-            }
-
-            // Write header for observation
-            if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    wrklog.header3("Observation "+obs->name());
-                }
-                else {
-                    wrklog.header3("Observation");
-                }
             }
 
             // Work on a clone of the CTA observation. This makes sure that
@@ -409,7 +413,7 @@ void ctobssim::run(void)
                 // Dispose events
                 obs->dispose_events();
 
-            }
+            } // endif: save and dispose requested
 
         } // endfor: looped over observations
 
