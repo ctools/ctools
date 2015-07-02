@@ -243,6 +243,18 @@ void ctselect::run(void)
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Write header for observation
+        if (logTerse()) {
+            std::string header = m_obs[i]->instrument() + " observation";
+            if (m_obs[i]->name().length() > 1) {
+                header += " \"" + m_obs[i]->name() + "\"";
+            }
+            if (m_obs[i]->id().length() > 1) {
+                header += " (id=" + m_obs[i]->id() +")";
+            }
+            log.header3(header);
+        }
+
         // Initialise event input and output filenames
         m_infiles.push_back("");
 
@@ -252,9 +264,9 @@ void ctselect::run(void)
         // Skip observation if it's not CTA
         if (obs == NULL) {
             if (logTerse()) {
-                log << "Warning: Skipping "+m_obs[i]->instrument();
-                log << " observation \"";
-                log << m_obs[i]->name() << "\"" << std::endl;
+                log << " Skipping ";
+                log << m_obs[i]->instrument();
+                log << " observation" << std::endl;
             }
             continue;
         }
@@ -262,20 +274,11 @@ void ctselect::run(void)
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
             if (logTerse()) {
-                log << "Warning: Skipping binned observation \"";
-                log << obs->name()+"\"" << std::endl;
+                log << " Skipping binned ";
+                log << obs->instrument();
+                log << " observation" << std::endl;
             }
             continue;
-        }
-
-        // Write header for observation
-        if (logTerse()) {
-            if (obs->name().length() > 1) {
-                log.header3("Observation "+obs->name());
-            }
-            else {
-                log.header3("Observation");
-            }
         }
 
         // Increment counter
@@ -1149,8 +1152,23 @@ void ctselect::save_fits(void)
     // Get CTA observation from observation container
     GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
-    // Save event list
-    save_event_list(obs, m_infiles[0], m_outobs);
+    // Save only if it's a CTA observation
+    if (obs != NULL) {
+    
+        // Save only if filename is non-empty
+        if (m_infiles[0].length() > 0) {
+
+            // Dump filename
+            if (logTerse()) {
+                log << "Save \""+m_infiles[0]+"\"" << std::endl;
+            }
+
+            // Save event list
+            save_event_list(obs, m_infiles[0], m_outobs);
+
+        } // endif: filename was non empty
+
+    } // endif: observation was CTA observation
 
     // Return
     return;
@@ -1191,21 +1209,36 @@ void ctselect::save_xml(void)
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Handle only CTA observations
-        if (obs != NULL) {
+        // Skip observations that are no CTA observations
+        if (obs == NULL) {
+            continue;
+        }
 
-            // Set event output file name
-            std::string outfile = set_outfile_name(m_infiles[i]);
+        // Skip observations that have empty names
+        if (m_infiles[i].length() == 0) {
+            continue;
+        }
 
-            // Store output file name in observation
-            obs->eventfile(outfile);
+        // Set event output file name
+        std::string outfile = set_outfile_name(m_infiles[i]);
 
-            // Save event list
-            save_event_list(obs, m_infiles[i], outfile);
+        // Dump filename
+        if (logTerse()) {
+            log << "Save \""+outfile+"\"" << std::endl;
+        }
 
-        } // endif: observation was a CTA observations
+        // Store output file name in observation
+        obs->eventfile(outfile);
+
+        // Save event list
+        save_event_list(obs, m_infiles[i], outfile);
 
     } // endfor: looped over observations
+
+    // Dump filename
+    if (logTerse()) {
+        log << "Save \""+m_outobs+"\"" << std::endl;
+    }
 
     // Save observations in XML file
     m_obs.save(m_outobs);
