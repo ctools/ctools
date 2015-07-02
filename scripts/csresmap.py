@@ -326,7 +326,7 @@ class csresmap(ctools.cscript):
             
             # Subtract and divide by model map
             self.resmap -= modelmap
-            self.resmap /= modelmap   # Python 3.x does not like this !!!
+            self.resmap /= modelmap
             #for pixel in modelmap:
             #    if pixel != 0.0:
             #        pixel = 1.0/pixel
@@ -336,7 +336,7 @@ class csresmap(ctools.cscript):
 
             # subtract and divide by sqrt of model map
             self.resmap -= modelmap
-            self.resmap /= modelmap.sqrt()   # Python 3.x does not like this !!!
+            self.resmap /= modelmap.sqrt()
             #for pixel in modelmap:
             #    if pixel != 0.0:
             #        pixel = 1.0/math.sqrt(pixel)
