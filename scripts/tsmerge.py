@@ -155,7 +155,7 @@ if __name__ == "__main__":
     files = kwargs["files"]
     allfiles = []
     if os.path.isfile(files):
-        allfiles = open(files).readlines()   
+        allfiles = open(files).read().splitlines()   
     else:
         allfiles = glob.glob(files)
         
