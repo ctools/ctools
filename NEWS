@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-19 June 2015
+2 July 2015
 
 
 1. Introduction
@@ -21,6 +21,9 @@ None
 -------------------
 The cscripts have been moved to the ctools module. Now everything is comprised
 in that module.
+
+The obsutils.spectrum() function has been removed as it is now replaced by the
+csspec script.
 
 
 4. Support model
