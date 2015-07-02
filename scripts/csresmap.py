@@ -42,9 +42,12 @@ class csresmap(ctools.cscript):
         self.version = "1.0.0"
         
         # Initialise some members
-        self.obs       = None 
-        self.algorithm = "SUB"
-        self.resmap    = None
+        self.obs            = None 
+        self.algorithm      = "SUB"
+        self.resmap         = None
+        self.m_modcube      = "None"
+        self.m_use_maps     = False
+        self.m_skip_binning = False
               
         # Initialise some members
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
@@ -101,8 +104,10 @@ class csresmap(ctools.cscript):
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
-            pars.append(gammalib.GApplicationPar("cntcube","f","h","NONE","","","Input model cube (generated with ctmodel)"))
-            pars.append(gammalib.GApplicationPar("modcube","f","h","NONE","","","Input counts cube (generated with ctbin)"))            
+            pars.append(gammalib.GApplicationPar("modcube","f","a","NONE","","","Model cube file (generated with ctmodel)"))            
+            pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output residual map"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
@@ -131,19 +136,23 @@ class csresmap(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters
-        
         # Initialise some flags
-        self.m_use_maps = False
+        self.m_use_maps     = False
         self.m_skip_binning = False
-        
-        # First check for cntcube and modcube parameters
-        self.m_cntcube = self["cntcube"].filename()
-        self.m_modcube = self["modcube"].filename()
-        if not (self.m_cntcube == "NONE" or self.m_modcube == "NONE"):
-            
-            # Signal that we can use the maps directly without ctbin and ctmodel
-            self.m_use_maps = True
+
+        # First check if the inobs parameter is a counts cube
+        if self["inobs"].filename() != "NONE":
+            if gammalib.is_fits(self["inobs"].filename()):
+                cta = gammalib.GCTAObservation()
+                cta.load(self["inobs"].filename())
+                if self.obs[0].eventtype() == "CountsCube":
+                    self.m_skip_binning = True
+
+        # If we have a counts cube, then ask whether we also have a model
+        if self.m_skip_binning:
+            self.m_modcube = self["modcube"].filename()
+            if self.m_modcube != "NONE":
+                self.m_use_maps = True
         
         # If not two maps are given, proceed to set up observation
         if not self.m_use_maps:
@@ -245,8 +254,8 @@ class csresmap(ctools.cscript):
         
         # Use input file directly if given
         if self.m_use_maps:
-            countmap = gammalib.GSkymap(self["cntcube"].filename())
-            modelmap = gammalib.GSkymap(self["modcube"].filename())
+            countmap = gammalib.GSkymap(self.m_cntcube)
+            modelmap = gammalib.GSkymap(self.m_modcube)
             
         else:
             
