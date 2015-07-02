@@ -241,15 +241,27 @@ void ctbin::run(void)
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Write header for observation
+        if (logTerse()) {
+            std::string header = m_obs[i]->instrument() + " observation";
+            if (m_obs[i]->name().length() > 1) {
+                header += " \"" + m_obs[i]->name() + "\"";
+            }
+            if (m_obs[i]->id().length() > 1) {
+                header += " (id=" + m_obs[i]->id() +")";
+            }
+            log.header3(header);
+        }
+
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Skip observation if it's not CTA
         if (obs == NULL) {
             if (logTerse()) {
-                log << "Warning: Skipping "+m_obs[i]->instrument();
-                log << " observation \"";
-                log << m_obs[i]->name() << "\"" << std::endl;
+                log << " Skipping ";
+                log << m_obs[i]->instrument();
+                log << " observation" << std::endl;
             }
             continue;
         }
@@ -257,20 +269,11 @@ void ctbin::run(void)
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
             if (logTerse()) {
-                log << "Warning: Skipping binned observation \"";
-                log << obs->name()+"\"" << std::endl;
+                log << " Skipping binned ";
+                log << obs->instrument();
+                log << " observation" << std::endl;
             }
             continue;
-        }
-
-        // Write header for observation
-        if (logTerse()) {
-            if (obs->name().length() > 1) {
-                log.header3("Observation "+obs->name());
-            }
-            else {
-                log.header3("Observation");
-            }
         }
 
         // Fill the cube

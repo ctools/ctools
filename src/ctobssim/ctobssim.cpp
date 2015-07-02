@@ -326,12 +326,14 @@ void ctobssim::run(void)
 
             // Write header for observation
             if (logTerse()) {
+                std::string header = m_obs[i]->instrument() + " observation";
                 if (m_obs[i]->name().length() > 1) {
-                    wrklog.header3("Observation "+m_obs[i]->name());
+                    header += " \"" + m_obs[i]->name() + "\"";
                 }
-                else {
-                    wrklog.header3("Observation");
+                if (m_obs[i]->id().length() > 1) {
+                    header += " (id=" + m_obs[i]->id() +")";
                 }
+                wrklog.header3(header);
             }
 
             // Get pointer on CTA observation
@@ -340,10 +342,9 @@ void ctobssim::run(void)
             // Skip observation if it's not CTA
             if (obs == NULL) {
                 if (logTerse()) {
-                    wrklog << " Skipping "+m_obs[i]->instrument();
-                    wrklog << " observation \"";
-                    wrklog << m_obs[i]->name() << "\"";
-                    wrklog << " (id=" << m_obs[i]->id() << ")" << std::endl;
+                    wrklog << " Skipping ";
+                    wrklog << m_obs[i]->instrument();
+                    wrklog << " observation" << std::endl;
                 }
                 continue;
             }
@@ -353,9 +354,7 @@ void ctobssim::run(void)
                 if (logTerse()) {
                     wrklog << " Skipping binned ";
                     wrklog << obs->instrument();
-                    wrklog << " observation \"";
-                    wrklog << obs->name()+"\"";
-                    wrklog << " (id=" << obs->id() << ")" << std::endl;
+                    wrklog << " observation" << std::endl;
                 }
                 continue;
             }
