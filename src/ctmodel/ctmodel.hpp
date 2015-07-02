@@ -92,7 +92,7 @@ protected:
     GGti          m_gti;         //!< Model cube GTIs
     bool          m_has_cube;    //!< Signal if cube has been set or loaded
     bool          m_append_cube; //!< Signal that cube should be appended
-    bool          m_binned; //!< Signals that we are in binned mode
+    bool          m_binned;      //!< Signals that we are in binned mode
 };
 
 

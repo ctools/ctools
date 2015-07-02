@@ -254,57 +254,56 @@ void ctmodel::run(void)
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Write header for observation
+        if (logTerse()) {
+            std::string header = m_obs[i]->instrument() + " observation";
+            if (m_obs[i]->name().length() > 1) {
+                header += " \"" + m_obs[i]->name() + "\"";
+            }
+            if (m_obs[i]->id().length() > 1) {
+                header += " (id=" + m_obs[i]->id() +")";
+            }
+            log.header3(header);
+        }
+
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << " Skipping ";
+                log << m_obs[i]->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-            // Fill cube and leave loop if we are binned mode (meaning we only have
-            // one binned observation)
-            if (m_binned && m_obs.size() == 1) {
-                fill_cube(obs);
-                break;
-            }
-
-            // Skip observation if we don't have an unbinned observation
-            if (obs->eventtype() != "EventList") {
-
-                // Log that we skip the this observation
-                if (logTerse()) {
-                    log << "Warning: Skipping binned observation \""+obs->name()+"\"";
-                    log << std::endl;
-                }
-                continue;
-            }
-
-
-            // Fill the cube
+        // Fill cube and leave loop if we are binned mode (meaning we 
+        // only have one binned observation)
+        if (m_binned && m_obs.size() == 1) {
             fill_cube(obs);
+            break;
+        }
 
-            // Leave loop if we are binned mode (meaning we only have
-            // one binned observation
-            if (m_binned && m_obs.size() == 1) {
-                break;
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << " Skipping binned ";
+                log << obs->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-            // Dispose events to free memory if event file exists on disk
-            if (obs->eventfile().length() > 0 &&
-                gammalib::file_exists(obs->eventfile())) {
-                obs->dispose_events();
-            }
+        // Fill the cube
+        fill_cube(obs);
 
-        } // endif: CTA observation found
+        // Dispose events to free memory if event file exists on disk
+        if (obs->eventfile().length() > 0 &&
+            gammalib::file_exists(obs->eventfile())) {
+            obs->dispose_events();
+        }
 
     } // endfor: looped over observations
 
@@ -345,8 +344,18 @@ void ctmodel::save(void)
     // Make sure we have the FITS filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save model cube into FITS file
-    m_cube.save(m_outcube, clobber());
+    // Save only if filename is non-empty
+    if (m_outcube.length() > 0) {
+
+        // Dump filename
+        if (logTerse()) {
+            log << "Save \""+m_outcube+"\"" << std::endl;
+        }
+
+        // Save model cube into FITS file
+        m_cube.save(m_outcube, clobber());
+
+    }
 
     // Return
     return;
