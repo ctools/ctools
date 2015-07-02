@@ -145,7 +145,7 @@ class csresmap(ctools.cscript):
             if gammalib.is_fits(self["inobs"].filename()):
                 cta = gammalib.GCTAObservation()
                 cta.load(self["inobs"].filename())
-                if self.obs[0].eventtype() == "CountsCube":
+                if cta.eventtype() == "CountsCube":
                     self.m_skip_binning = True
 
         # If we have a counts cube, then ask whether we also have a model
@@ -249,17 +249,12 @@ class csresmap(ctools.cscript):
             self.log(str(self.obs))
             self.log("\n")
 
-        countmap = gammalib.GSkymap()
-        modelmap = gammalib.GSkymap()
-        
         # Use input file directly if given
         if self.m_use_maps:
-            countmap = gammalib.GSkymap(self.m_cntcube)
+            countmap = gammalib.GSkymap(self["inobs"].filename())
             modelmap = gammalib.GSkymap(self.m_modcube)
             
         else:
-            
-            cta_counts_cube = gammalib.GCTAEventCube()
             
             if self.m_skip_binning:
                 cta_counts_cube = gammalib.GCTAEventCube(self.obs[0].events().clone())   
