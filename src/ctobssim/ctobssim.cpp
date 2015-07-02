@@ -1084,6 +1084,10 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                     // Reserves space for events
                     events->reserve(list->size()+events->size());
 
+                    // Initialise statistics
+                    int n_appended    = 0;
+                    int n_outside_roi = 0;
+                    
                     // Append events
                     for (int k = 0; k < list->size(); k++) {
 
@@ -1100,14 +1104,24 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                             // Append event
                             events->append(*event);
 
+                            // Increment number of appended events
+                            n_appended++;
+
                         } // endif: event was within ROI
+
+                        // ... otherwise increment outside ROI counter
+                        else {
+                            n_outside_roi++;
+                        }
 
                     } // endfor: looped over all events
 
                     // Dump simulation results
                     if (logNormal()) {
+                        *wrklog << gammalib::parformat("MC events outside ROI");
+                        *wrklog << n_outside_roi << std::endl;
                         *wrklog << gammalib::parformat("MC background events");
-                        *wrklog << list->size() << std::endl;
+                        *wrklog << n_appended << std::endl;
                     }
 
                     // Free event list
