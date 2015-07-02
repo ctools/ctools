@@ -12,7 +12,7 @@ pythonscripts = cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py cshessobs
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
               csobsdef csspec cshessobs cslightcrv \
-              lsmodel
+              lsmodel csinfo
 
 # Distribute scripts
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
