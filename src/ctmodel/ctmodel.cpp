@@ -270,8 +270,33 @@ void ctmodel::run(void)
                 }
             }
 
+            // Fill cube and leave loop if we are binned mode (meaning we only have
+            // one binned observation)
+            if (m_binned && m_obs.size() == 1) {
+                fill_cube(obs);
+                break;
+            }
+
+            // Skip observation if we don't have an unbinned observation
+            if (obs->eventtype() != "EventList") {
+
+                // Log that we skip the this observation
+                if (logTerse()) {
+                    log << "Warning: Skipping binned observation \""+obs->name()+"\"";
+                    log << std::endl;
+                }
+                continue;
+            }
+
+
             // Fill the cube
             fill_cube(obs);
+
+            // Leave loop if we are binned mode (meaning we only have
+            // one binned observation
+            if (m_binned && m_obs.size() == 1) {
+                break;
+            }
 
             // Dispose events to free memory if event file exists on disk
             if (obs->eventfile().length() > 0 &&
@@ -374,6 +399,7 @@ void ctmodel::init_members(void)
     m_gti.clear();
     m_has_cube    = false;
     m_append_cube = false;
+    m_binned = false;
 
     // Return
     return;
@@ -397,6 +423,7 @@ void ctmodel::copy_members(const ctmodel& app)
     m_gti         = app.m_gti;
     m_has_cube    = app.m_has_cube;
     m_append_cube = app.m_append_cube;
+    m_binned    = app.m_binned;
 
     // Return
     return;
@@ -429,6 +456,36 @@ void ctmodel::get_parameters(void)
     if (m_obs.size() == 0) {
         m_obs = get_observations();
     }
+
+    // Check if we got excactly one binned CTA observation
+    if (m_obs.size() == 1) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+
+        // Continue only if observation is a CTA observation
+        if (obs != NULL) {
+
+            // Check for binned observation
+            if (obs->eventtype() == "CountsCube") {
+
+                // Set cube from binned observation
+                GCTAEventCube* evtcube = dynamic_cast<GCTAEventCube*>(const_cast<GEvents*>(obs->events()));
+
+                cube(*evtcube);
+
+                // Signal that cube has been set
+                m_has_cube = true;
+
+                // Signal that we are in binned mode
+                m_binned = true;
+
+            } // endif: observation was binned
+
+        } // endif: observation was CTA
+
+    } // endif: had exactly one observation
+
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
@@ -583,3 +640,4 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     // Return
     return;
 }
+

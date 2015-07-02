@@ -42,9 +42,12 @@ class csresmap(ctools.cscript):
         self.version = "1.0.0"
         
         # Initialise some members
-        self.obs       = None 
-        self.algorithm = "SUB"
-        self.resmap    = None
+        self.obs            = None 
+        self.algorithm      = "SUB"
+        self.resmap         = None
+        self.m_modcube      = "None"
+        self.m_use_maps     = False
+        self.m_skip_binning = False
               
         # Initialise some members
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
@@ -101,6 +104,10 @@ class csresmap(ctools.cscript):
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
+            pars.append(gammalib.GApplicationPar("modcube","f","a","NONE","","","Model cube file (generated with ctmodel)"))            
+            pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output residual map"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
@@ -117,7 +124,7 @@ class csresmap(ctools.cscript):
             pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
             pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
             pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("algorithm","s","h","SUBDIV","SUB|SUBDIV|SUBDIVSQRT","","Residual map computation algorithm"))
+            pars.append(gammalib.GApplicationPar("algorithm","s","a","SUBDIV","SUB|SUBDIV|SUBDIVSQRT","","Residual map computation algorithm"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csresmap.log","","","Log filename"))
             pars.save(parfile)
@@ -129,32 +136,64 @@ class csresmap(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters
+        # Initialise some flags
+        self.m_use_maps     = False
+        self.m_skip_binning = False
+
+        # First check if the inobs parameter is a counts cube
+        if self["inobs"].filename() != "NONE":
+            if gammalib.is_fits(self["inobs"].filename()):
+                cta = gammalib.GCTAObservation()
+                cta.load(self["inobs"].filename())
+                if self.obs[0].eventtype() == "CountsCube":
+                    self.m_skip_binning = True
+
+        # If we have a counts cube, then ask whether we also have a model
+        if self.m_skip_binning:
+            self.m_modcube = self["modcube"].filename()
+            if self.m_modcube != "NONE":
+                self.m_use_maps = True
         
-        # Set observation if not done before
-        if self.obs.size() == 0:
-            self.require_inobs("csresmap.get_parameters()")
-            self.obs = self.get_observations()
-
-        # Set models if we have none
-        if self.obs.models().size() == 0:
-            self.obs.models(self["inmodel"].filename())
-
-        # Read other parameters
-        self.m_outfile   = self["outmap"].filename()
-        self.m_xref      = self["xref"].real()
-        self.m_yref      = self["yref"].real()
-        self.m_emin      = self["emin"].real()
-        self.m_emax      = self["emax"].real()
-        self.m_enumbins  = self["enumbins"].integer()
-        self.m_ebinalg   = self["ebinalg"].string()
-        self.m_coordsys  = self["coordsys"].string()
-        self.m_proj      = self["proj"].string()
-        self.m_nxpix     = self["nxpix"].integer()
-        self.m_nypix     = self["nypix"].integer()
-        self.m_binsz     = self["binsz"].real()
+        # If not two maps are given, proceed to set up observation
+        if not self.m_use_maps:
+        
+            # Set observation if not done before
+            if self.obs.size() == 0:
+                self.require_inobs("csresmap.get_parameters()")
+                self.obs = self.get_observations()
+                
+            # Check if we have exactly one binned CTA observation
+            if self.obs.size() == 1:
+                
+                if self.obs[0].classname() == "GCTAObservation":
+                    if self.obs[0].eventtype() == "CountsCube":                
+                        # Skip ctbin step later on
+                        self.m_skip_binning = True
+                    
+    
+            # Set models if we have none
+            if self.obs.models().size() == 0:
+                self.obs.models(self["inmodel"].filename())
+    
+            # Skip query for spatial parameters if a binning is provided in the observation
+            if not self.m_skip_binning:
+                # Read other parameters        
+                self.m_xref      = self["xref"].real()
+                self.m_yref      = self["yref"].real()
+                self.m_emin      = self["emin"].real()
+                self.m_emax      = self["emax"].real()
+                self.m_enumbins  = self["enumbins"].integer()
+                self.m_ebinalg   = self["ebinalg"].string()
+                self.m_coordsys  = self["coordsys"].string()
+                self.m_proj      = self["proj"].string()
+                self.m_nxpix     = self["nxpix"].integer()
+                self.m_nypix     = self["nypix"].integer()
+                self.m_binsz     = self["binsz"].real()
+        
+        # Read necessary parameters
+        self.m_outfile   = self["outmap"].filename()    
         self.m_algorithm = self["algorithm"].string()
-             
+                 
         # Set some fixed parameters
         self.m_log     = False # Logging in client tools
         self.m_chatter = self["chatter"].integer()
@@ -210,53 +249,76 @@ class csresmap(ctools.cscript):
             self.log(str(self.obs))
             self.log("\n")
 
-        # Write header
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Generate binned map (ctbin)")
+        countmap = gammalib.GSkymap()
+        modelmap = gammalib.GSkymap()
+        
+        # Use input file directly if given
+        if self.m_use_maps:
+            countmap = gammalib.GSkymap(self.m_cntcube)
+            modelmap = gammalib.GSkymap(self.m_modcube)
+            
+        else:
+            
+            cta_counts_cube = gammalib.GCTAEventCube()
+            
+            if self.m_skip_binning:
+                cta_counts_cube = gammalib.GCTAEventCube(self.obs[0].events().clone())   
 
-        # Create countsmap
-        bin = ctools.ctbin(self.obs)
-        bin["nxpix"]    = self.m_nxpix
-        bin["nypix"]    = self.m_nypix
-        bin["proj"]     = self.m_proj
-        bin["coordsys"] = self.m_coordsys
-        bin["xref"]     = self.m_xref
-        bin["yref"]     = self.m_yref
-        bin["enumbins"] = self.m_enumbins
-        bin["ebinalg"]  = self.m_ebinalg
-        bin["emin"]     = self.m_emin
-        bin["emax"]     = self.m_emax
-        bin["binsz"]    = self.m_binsz
-        bin["chatter"]  = self.m_chatter
-        bin["clobber"]  = self.m_clobber
-        bin["debug"]    = self.m_debug
-        bin.run()
-
+            else:
+            
+                # Write header
+                if self.logTerse():
+                    self.log("\n")
+                    self.log.header1("Generate binned map (ctbin)")
+        
+                # Create countsmap
+                bin = ctools.ctbin(self.obs)
+                bin["nxpix"].integer(self.m_nxpix)
+                bin["nypix"].integer(self.m_nypix)
+                bin["proj"].string(self.m_proj)
+                bin["coordsys"].string(self.m_coordsys)
+                bin["xref"].real(self.m_xref)
+                bin["yref"].real(self.m_yref)
+                bin["enumbins"].integer(self.m_enumbins)
+                bin["ebinalg"].string(self.m_ebinalg)
+                bin["emin"].real(self.m_emin)
+                bin["emax"].real(self.m_emax)
+                bin["binsz"].real(self.m_binsz)
+                bin["chatter"].integer(self.m_chatter)
+                bin["clobber"].boolean(self.m_clobber)
+                bin["debug"].boolean(self.m_debug)
+                bin.run()
+    
+                # Retrieve counts cube
+                cta_counts_cube = bin.cube()
+     
+            # Assign GCTAEventCube to skymap
+            countmap = cta_counts_cube.map()
+     
+            # Write header
+            if self.logTerse():
+                self.log("\n")
+                self.log.header1("Generate model map (ctmodel)")
+    
+            # Create model map
+            model = ctools.ctmodel(self.obs)
+            model.cube(cta_counts_cube)
+            model["chatter"].integer(self.m_chatter)
+            model["clobber"].boolean(self.m_clobber)
+            model["debug"].boolean(self.m_debug)
+            model.run()
+    
+            # Get model map into GSkymap object
+            modelmap = model.cube().map().copy()
+            
+        
         # Store counts map as residual map. Note that we need a
         # special construct here to avoid memory leaks. This seems
         # to be a SWIG feature as SWIG creates a new object when
         # calling bin.cube()
-        #residualmap = bin.cube().map()
-        counts_cube = bin.cube()
-        self.resmap = counts_cube.map().copy()
+        #residualmap = bin.cube().map() 
+        self.resmap = countmap.copy()
         self.resmap.stack_maps()
- 
-        # Write header
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Generate model map (ctmodel)")
-
-        # Create model map
-        model = ctools.ctmodel(self.obs)
-        model.cube(bin.cube())
-        model["chatter"] = self.m_chatter
-        model["clobber"] = self.m_clobber
-        model["debug"]   = self.m_debug
-        model.run()
-
-        # Get model map into GSkymap object
-        modelmap = model.cube().map()
         modelmap.stack_maps()
         
         # Continue calculations depending on given algorithm

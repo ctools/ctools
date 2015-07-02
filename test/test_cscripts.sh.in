@@ -182,7 +182,8 @@ chmod +x @abs_top_srcdir@/scripts/csresmap.py
   xref=83.63 \
   yref=22.01 \
   proj="CAR" \
-  binsz=0.05 > csresmap.log
+  binsz=0.05 \
+  algorithm="SUBDIV" > csresmap.log
 $ECHO -n "."
 if [ -s "resmap.fits" ]
 then
