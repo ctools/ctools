@@ -294,6 +294,8 @@ class csspec(ctools.cscript):
         TSvalues    = gammalib.GFitsTableDoubleCol("TS", self.m_ebounds.size())
         ulim_values = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
         ulim_values.unit("erg/cm2/s")
+        Npred_values = gammalib.GFitsTableDoubleCol("Npred", self.m_ebounds.size())
+        
 
         # Loop over energy bins
         for i in range(self.m_ebounds.size()):
@@ -459,6 +461,7 @@ class csspec(ctools.cscript):
                 flux_err[i]    = 0.0
                 TSvalues[i]    = 0.0
                 ulim_values[i] = 0.0
+                Npred_values[i] = 0.0
                 continue
                          
             # Get results
@@ -491,6 +494,11 @@ class csspec(ctools.cscript):
             TS = -1.0
             if self.m_calc_ts:
                 TS = source.ts() 
+            
+            # Compute Npred value
+            Npred = 0.0
+            for observation in like.obs():
+                Npred += observation.npred(source)  
               
             # Get differential flux    
             fitted_flux = source.spectral().eval(elogmean,gammalib.GTime())
@@ -502,6 +510,9 @@ class csspec(ctools.cscript):
             
             # Set values for storage
             TSvalues[i] = TS
+            
+            # Set npred values 
+            Npred_values[i] = Npred
             
             # Convert fluxes to nuFnu
             flux[i]     = fitted_flux * elogmean2 * gammalib.MeV2erg
@@ -528,6 +539,7 @@ class csspec(ctools.cscript):
         table.append(flux_err)
         table.append(TSvalues)
         table.append(ulim_values)
+        table.append(Npred_values)
         
         # Create the FITS file now
         self.fits = gammalib.GFits()
