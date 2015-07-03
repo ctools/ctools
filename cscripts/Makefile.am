@@ -17,12 +17,19 @@ linkscripts = cspull cssens cstsdist cscaldb csresmap \
               cshessobs csobsdef csspec cslightcrv \
               csinfo
 
+testscripts = tests/__init__.py \
+              tests/test_unbinned.py \
+              tests/test_binned.py
+
+
 # Distribute scripts
-EXTRA_DIST         = $(binscripts) $(pythonscripts)
+EXTRA_DIST         = $(binscripts) $(pythonscripts) $(testscripts)
 binscriptsdir      = $(bindir)
 binscripts_DATA    = $(binscripts)
 pythonscriptsdir   = $(pythondir)/cscripts
 pythonscripts_DATA = $(pythonscripts)
+testscriptsdir   = $(pythondir)/cscripts/tests
+testscripts_DATA = $(testscripts)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:
