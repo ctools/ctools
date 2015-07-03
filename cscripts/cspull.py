@@ -102,9 +102,9 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
-            pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
+            #pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
+            #pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
+            #pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
@@ -359,10 +359,10 @@ class cspull(ctools.cscript):
                            debug=self.m_debug, \
                            chatter=self.m_chatter)
         
-        #If stacked, add stacked responses and model
-        if self.obs.size()>0 and self.m_enumbins>0:
-            obs[0].response(self.m_exposure,self.m_psfcube,self.m_bckcube)
-            obs.models(self.m_stackmodels) 
+        # If stacked, add stacked responses and model
+        if self.obs.size() > 0 and self.m_enumbins > 0:
+            obs[0].response(self.m_exposure, self.m_psfcube, self.m_bckcube)
+            obs.models(self.m_stackmodels)
         
         # Determine number of events in simulation
         nevents = 0.0
