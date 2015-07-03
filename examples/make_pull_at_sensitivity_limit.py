@@ -138,14 +138,14 @@ if __name__ == '__main__':
     """
     Create pull distributions for the energy bands and fluxes given in the
     file specified in the argument. The file needs to be created using the
-cssens script.
+    cssens script.
     """
     # Get input arguments
     usage = """
-	make_pull_at_sensitivity_limit filename [max_threads]
+    make_pull_at_sensitivity_limit filename [max_threads]
+    Run cssens to create the input file.
+    """
 
-	Run cssens to create the input file.
-	"""
     if len(sys.argv) < 2 or len(sys.argv) > 3:
         print(usage)
         sys.exit()

@@ -33,6 +33,7 @@ except:
 # =============== #
 def make_spectrum():
     """
+    Make a spectrum.
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
