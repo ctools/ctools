@@ -19,8 +19,12 @@ None
 
 3. Python interface
 -------------------
-The cscripts have been moved to the ctools module. Now everything is comprised
-in that module.
+A specific cscripts Python module has been created for cscripts. This module
+can be imported using
+
+    import cscripts
+
+The obsutils utility functions have also been moved into the scripts folder.
 
 The obsutils.spectrum() function has been removed as it is now replaced by the
 csspec script.
