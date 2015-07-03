@@ -19,6 +19,9 @@ Gaussian centred on 0 and a sigma parameter of 1.
 General parameters
 ------------------
 
+``inobs [file]``
+    Event list, counts cube, or observation definition XML file.
+
 ``inmodel [file]``
     XML file that describes the astrophysical sources and the instrumental
     background.
@@ -26,15 +29,6 @@ General parameters
 ``outfile [file]``
     ASCII file containing the individual pull values.
  	 	 
-``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
-
-``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
-
-``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
-
 ``caldb [string]``
     Calibration database.
  	 	 
@@ -45,7 +39,10 @@ General parameters
     Average deadtime correction factor.
 
 ``(edisp = no) [boolean]``
-    Apply energy dispersion to response computation.
+    Apply energy dispersion to response computation?
+
+``(profile = no) [boolean]``
+    Use likelihood profile method for errors?
 
 ``ntrials [integer]``
     Number of samples for generating the pull distribution.
@@ -55,6 +52,12 @@ General parameters
  	 	 
 ``dec [real]``
     Declination of CTA pointing (J2000, in degrees).
+
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (CEL - celestial, GAL - galactic).
+ 	 	 
+``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+    Projection method.
  	 	 
 ``emin [real]``
     Lower energy limit of events (in TeV).

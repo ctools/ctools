@@ -53,6 +53,8 @@ class cspull(ctools.cscript):
         self.m_psfcube     = None
         self.m_bckcube     = None
         self.m_stackmodels = None
+        self.m_coordsys    = "CEL"
+        self.m_proj        = "TAN"
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -102,9 +104,6 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
-            #pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
-            #pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
-            #pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
@@ -113,6 +112,8 @@ class cspull(ctools.cscript):
             pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
             pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))
             pars.append(gammalib.GApplicationPar("dec","r","a","22.0145","-90","90","Dec of pointing (deg)"))
+            pars.append(gammalib.GApplicationPar("coordsys","s","a","CEL","CEL|GAL","","Coordinate system (CEL - celestial, GAL - galactic)"))
+            pars.append(gammalib.GApplicationPar("proj","s","a","TAN","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins (0=unbinned)"))
@@ -151,8 +152,10 @@ class cspull(ctools.cscript):
 
         # Read parameters for binned if requested
         if not self.m_enumbins == 0:
-            self.m_npix  = self["npix"].integer()
-            self.m_binsz = self["binsz"].real()
+            self.m_npix     = self["npix"].integer()
+            self.m_binsz    = self["binsz"].real()
+            self.m_coordsys = self["coordsys"].string()
+            self.m_proj     = self["proj"].string()
         else:
             # Set dummy values (required by obsutils)
             self.m_npix  = 0
@@ -220,8 +223,8 @@ class cspull(ctools.cscript):
         expcube["enumbins"] = self.m_enumbins
         expcube["emin"]     = self["emin"].real()
         expcube["emax"]     = self["emax"].real()
-        expcube["coordsys"] = "CEL"
-        expcube["proj"]     = "TAN" 
+        expcube["coordsys"] = self.m_coordsys
+        expcube["proj"]     = self.m_proj
         expcube.run()
 
         # Notify exposure computation
@@ -239,8 +242,8 @@ class cspull(ctools.cscript):
         psfcube["enumbins"] = self.m_enumbins
         psfcube["emin"]     = self["emin"].real()
         psfcube["emax"]     = self["emax"].real()
-        psfcube["coordsys"] = "CEL"
-        psfcube["proj"]     = "TAN"      
+        psfcube["coordsys"] = self.m_coordsys
+        psfcube["proj"]     = self.m_proj
         psfcube.run()
 
         # Notify Psf computation
@@ -258,8 +261,8 @@ class cspull(ctools.cscript):
         bkgcube["enumbins"] = self.m_enumbins
         bkgcube["emin"]     = self["emin"].real()
         bkgcube["emax"]     = self["emax"].real()
-        bkgcube["coordsys"] = "CEL"
-        bkgcube["proj"]     = "TAN"
+        bkgcube["coordsys"] = self.m_coordsys
+        bkgcube["proj"]     = self.m_proj
         bkgcube.run()
 
         # Notify background cube computation
@@ -338,16 +341,20 @@ class cspull(ctools.cscript):
 
         # Setup observation definition list
         obsdeflist = obsutils.set_obs_patterns(self.m_pattern,
-                                               ra=self["ra"].real(), dec=self["dec"].real(),
+                                               ra=self["ra"].real(),
+                                               dec=self["dec"].real(),
                                                offset=self["offset"].real())
 
         # Create list of observations
         obs = obsutils.set_obs_list(obsdeflist,
-                                    tstart=self["tmin"].real(), duration=self["tmax"].real()-self["tmin"].real(),
+                                    tstart=self["tmin"].real(),
+                                    duration=self["tmax"].real()-self["tmin"].real(),
                                     deadc=self["deadc"].real(),
-                                    emin=self["emin"].real(), emax=self["emax"].real(),
+                                    emin=self["emin"].real(),
+                                    emax=self["emax"].real(),
                                     rad=self["rad"].real(),
-                                    irf=self["irf"].string(), caldb=self["caldb"].string())
+                                    irf=self["irf"].string(),
+                                    caldb=self["caldb"].string())
 
         # Return observation container
         return obs
@@ -371,6 +378,8 @@ class cspull(ctools.cscript):
                            seed=seed,
                            binsz=self.m_binsz,
                            npix=self.m_npix,
+                           proj=self.m_proj,
+                           coord=self.m_coordsys,
                            edisp=self.m_edisp,
                            log=self.m_log,
                            debug=self.m_debug,
