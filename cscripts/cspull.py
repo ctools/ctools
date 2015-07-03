@@ -44,11 +44,15 @@ class cspull(ctools.cscript):
         self.version = "1.0.0"
         
         # Initialise some members
-        self.obs       = None
-        self.model     = None
-        self.m_inmodel = None
-        self.m_edisp   = False
-        self.m_profile = False
+        self.obs           = None
+        self.model         = None
+        self.m_inmodel     = None
+        self.m_edisp       = False
+        self.m_profile     = False
+        self.m_exposure    = None
+        self.m_psfcube     = None
+        self.m_bckcube     = None
+        self.m_stackmodels = None
         
         # Make sure that parfile exists
         file = self.parfile()
@@ -195,7 +199,66 @@ class cspull(ctools.cscript):
         # Return
         return
 
-
+        
+    def set_stacked_irf(self):
+        """
+        For stacked analysis prepare stacked irfs
+        """
+        # Get stacked exposure
+        expcube = ctools.ctexpcube(self.obs)
+        expcube["incube"]   = "NONE"
+        expcube["usepnt"]   = True
+        expcube["ebinalg"]  = "LOG"
+        expcube["binsz"]    = self.m_binsz
+        expcube["nxpix"]    = self.m_npix
+        expcube["nypix"]    = self.m_npix
+        expcube["enumbins"] = self.m_enumbins
+        expcube["emin"]     = self["emin"].real()
+        expcube["emax"]     = self["emax"].real()
+        expcube["coordsys"] = "GAL"
+        expcube["proj"]     = "TAN" 
+        expcube.run()
+        
+        # Get stacked Psf
+        psfcube = ctools.ctpsfcube(self.obs)
+        psfcube["incube"]   = "NONE"
+        psfcube["usepnt"]   = True
+        psfcube["ebinalg"]  = "LOG"
+        psfcube["binsz"]    = self.m_binsz
+        psfcube["nxpix"]    = self.m_npix
+        psfcube["nypix"]    = self.m_npix
+        psfcube["enumbins"] = self.m_enumbins
+        psfcube["emin"]     = self["emin"].real()
+        psfcube["emax"]     = self["emax"].real()
+        psfcube["coordsys"] = "GAL"
+        psfcube["proj"]     = "TAN"      
+        psfcube.run()
+        
+        # Get stacked background
+        bkgcube = ctools.ctbkgcube(self.obs)
+        bkgcube["incube"]   = "NONE"
+        bkgcube["usepnt"]   = True
+        bkgcube["ebinalg"]  = "LOG"
+        bkgcube["binsz"]    = self.m_binsz
+        bkgcube["nxpix"]    = self.m_npix
+        bkgcube["nypix"]    = self.m_npix
+        bkgcube["enumbins"] = self.m_enumbins
+        bkgcube["emin"]     = self["emin"].real()
+        bkgcube["emax"]     = self["emax"].real()
+        bkgcube["coordsys"] = "GAL"
+        bkgcube["proj"]     = "TAN"
+        bkgcube.run()
+        
+        # Store results
+        self.m_exposure    = expcube.expcube().copy()
+        self.m_psfcube     = psfcube.psfcube().copy()
+        self.m_bckcube     = bkgcube.bkgcube().copy()
+        self.m_stackmodels = bkgcube.models().copy()
+        
+        # Return
+        return
+        
+        
     def run(self):
         """
         Run the script.
@@ -207,6 +270,10 @@ class cspull(ctools.cscript):
         # Get parameters
         self.get_parameters()
         
+        # If several observations and binned: prepare stacked irfs
+        if self.obs.size() > 1 and self.m_enumbins > 0:
+            self.set_stacked_irf()
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
@@ -276,6 +343,7 @@ class cspull(ctools.cscript):
         Parameters:
          seed - Random number generator seed
         """
+        
         # Write header
         if self.logNormal():
             self.log.header2("Trial "+str(seed+1))
@@ -290,7 +358,12 @@ class cspull(ctools.cscript):
                            log=self.m_log, \
                            debug=self.m_debug, \
                            chatter=self.m_chatter)
-
+        
+        #If stacked, add stacked responses and model
+        if self.obs.size()>0 and self.m_enumbins>0:
+            obs[0].response(self.m_exposure,self.m_psfcube,self.m_bckcube)
+            obs.models(self.m_stackmodels) 
+        
         # Determine number of events in simulation
         nevents = 0.0
         for run in obs:
@@ -305,16 +378,13 @@ class cspull(ctools.cscript):
 
         # Fit model
         if self.m_profile:
-            models     = obs.models()
-            new_models = gammalib.GModels()
+            models = obs.models()
             for i in range(models.size()):
                 model_name = models[i].name()
                 like       = obsutils.cterror(obs, model_name, \
                                               log=self.m_log, \
                                               debug=self.m_debug,
                                               chatter=self.m_chatter)
-                new_models.append(like.obs().models()[i])
-            like.obs().models(new_models)
         else:
             like = obsutils.fit(obs, edisp=self.m_edisp, \
                                 log=self.m_log, \

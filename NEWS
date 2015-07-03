@@ -119,6 +119,10 @@ None
 Added csinfo script to provide some information about the GammaLib and ctools
 installation. To be run in case of problems to help diagnostics.
 
+The cspull script was extended to now also handle stacked analysis in case
+that an observation definition XML file is specified with multiple observations
+by the inobs parameter.
+
 
 21. caldb
 ---------
