@@ -17,6 +17,8 @@
 .project
 .pydevproject
 .settings
+.autotools
+.idea
 Makefile
 Makefile.in
 aclocal.m4
