@@ -537,7 +537,7 @@ void cttsmap::get_parameters(void)
     }
 
     // Create sky map based on task parameters
-    GSkymap map = create_map(m_obs);
+    GSkyMap map = create_map(m_obs);
 
     // Initialise maps from user parameters
     init_maps(map);
@@ -563,19 +563,19 @@ void cttsmap::get_parameters(void)
  *
  * Initialises skymaps that will contain map information.
  ***************************************************************************/
-void cttsmap::init_maps(const GSkymap& map)
+void cttsmap::init_maps(const GSkyMap& map)
 {
     // Initialise map information
     m_tsmap.clear();
 
     // Create skymap
-    m_tsmap = GSkymap(map);
+    m_tsmap = GSkyMap(map);
 
     // Initialise map information
 	m_statusmap.clear();
 
 	// Create status map
-	m_statusmap = GSkymap(map);
+	m_statusmap = GSkyMap(map);
 
 	// Initialise maps of free parameters
     if (m_testsource != NULL) {

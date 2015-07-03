@@ -37,13 +37,13 @@ class maps:
         fits = gammalib.GFits(fitsfile)
 
         # get TS map
-        self.tsmap = gammalib.GSkymap()
+        self.tsmap = gammalib.GSkyMap()
         self.tsmap.read(fits[0])
 
         # Get status map
         if not fits.contains("STATUS MAP"):
             self.error("No extension \"STATUS MAP\" found in \""+self.filename+"\"")
-        self.statusmap = gammalib.GSkymap()
+        self.statusmap = gammalib.GSkyMap()
         self.statusmap.read(fits["STATUS MAP"])
 
         # Get other maps 
@@ -51,7 +51,7 @@ class maps:
         self.mapnames = []
         for hdu in fits:
             if hdu.extname() != "IMAGE" and hdu.extname() != "STATUS MAP":
-                skymap = gammalib.GSkymap()
+                skymap = gammalib.GSkyMap()
                 skymap.read(hdu)
                 self.maps.append(skymap)
                 self.mapnames.append(hdu.extname())

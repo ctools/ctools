@@ -73,7 +73,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    const GSkymap&       tsmap(void) const;
+    const GSkyMap&       tsmap(void) const;
 
 protected:
     // Protected methods
@@ -81,7 +81,7 @@ protected:
     void copy_members(const cttsmap& app);
     void free_members(void);
     void get_parameters(void);
-    void init_maps(const GSkymap& map);
+    void init_maps(const GSkyMap& map);
 
     // User parameters
     std::string              m_srcname;    //!< Name of source which is moved around
@@ -94,10 +94,10 @@ protected:
 
     // Protected members
     GObservations            m_obs;        //!< Observation container
-    GSkymap                  m_tsmap;      //!< TS map
-    GSkymap                  m_statusmap;  //!< Map of computed bins
+    GSkyMap                  m_tsmap;      //!< TS map
+    GSkyMap                  m_statusmap;  //!< Map of computed bins
     std::vector<std::string> m_mapnames;   //!< Names of free parameters
-    std::vector<GSkymap>     m_maps;       //!< Sky maps for each free parameter
+    std::vector<GSkyMap>     m_maps;       //!< Sky maps for each free parameter
     GModel*                  m_testsource; //!< Pointer to test source for TS computation
 };
 
@@ -120,7 +120,7 @@ const GObservations& cttsmap::obs(void) const
  * @return Reference to TS skymap
  ***************************************************************************/
 inline
-const GSkymap& cttsmap::tsmap(void) const
+const GSkyMap& cttsmap::tsmap(void) const
 {
     return m_tsmap;
 }

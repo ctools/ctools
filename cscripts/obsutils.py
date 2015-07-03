@@ -232,7 +232,7 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
      outname - Counts map FITS filename (default: cntmap.fits)
     """
     # Allocate counts map
-    map = gammalib.GSkymap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
+    map = gammalib.GSkyMap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
 
     # Set maximum pixel number
     maxpixel = nxpix * nypix
@@ -284,7 +284,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
      outname - Model map FITS filename (default: modmap.fits)
     """
     # Allocate model map
-    map = gammalib.GSkymap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
+    map = gammalib.GSkyMap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
 
     # Set reference energy, time and direction. The time is not initialised and is
     # in fact not used (as the IRF is assumed to be time independent for now).

@@ -475,7 +475,7 @@ GEbounds ctool::create_ebounds(void)
  *      nxpix - Number of pixels in Right Ascension or longitude
  *      nypix - Number of pixels in Declination or latitude
  ***************************************************************************/
-GSkymap ctool::create_map(const GObservations& obs)
+GSkyMap ctool::create_map(const GObservations& obs)
 {
     // Read task parameters
     double xref   = 0.0;
@@ -510,7 +510,7 @@ GSkymap ctool::create_map(const GObservations& obs)
     } // endif: got mean pointing as reference
 
     // Initialise sky map
-    GSkymap map = GSkymap(proj, coordsys, xref, yref, -binsz, binsz, 
+    GSkyMap map = GSkyMap(proj, coordsys, xref, yref, -binsz, binsz, 
                           nxpix, nypix, 1);
 
     // Return sky map
@@ -543,7 +543,7 @@ GSkymap ctool::create_map(const GObservations& obs)
 GCTAEventCube ctool::create_cube(const GObservations& obs)
 {
     // Get skymap
-    GSkymap map = create_map(obs);
+    GSkyMap map = create_map(obs);
 
     // Set energy boundaries
     GEbounds ebounds = create_ebounds();

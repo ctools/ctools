@@ -251,8 +251,8 @@ class csresmap(ctools.cscript):
 
         # Use input file directly if given
         if self.m_use_maps:
-            countmap = gammalib.GSkymap(self["inobs"].filename())
-            modelmap = gammalib.GSkymap(self.m_modcube)
+            countmap = gammalib.GSkyMap(self["inobs"].filename())
+            modelmap = gammalib.GSkyMap(self.m_modcube)
 
         else:
 
@@ -303,7 +303,7 @@ class csresmap(ctools.cscript):
             model["debug"].boolean(self.m_debug)
             model.run()
 
-            # Get model map into GSkymap object
+            # Get model map into GSkyMap object
             modelmap = model.cube().map().copy()
 
 
