@@ -20,7 +20,18 @@
 # ==========================================================================
 import sys
 import os
-import commands
+
+
+def get_command_output(cmd):
+    """Utility function to get command output on old and new Python versions.
+    """
+    try:
+        from subprocess import getoutput
+    except ImportError:
+        from commands import getoutput
+
+    return getoutput(cmd)
+
 
 # Copied and edited a bit from the `doc/source/reference_manual/index.rst` file
 # The list there and here needs to be manually updated and kept in sync.
@@ -116,52 +127,68 @@ def csinfo_setup_check():
         ctools_python = True
 
     if all_ok:
-        print('\n   Your Gammalib / ctools setup is OK.')
+        print('\n   ===> Your Gammalib / ctools setup is OK.')
     else:
-        print('\n   WARNING: Your Gammalib / ctools setup is NOT OK!\n')
+        print('\n   ===> WARNING: Your Gammalib / ctools setup is NOT OK!\n')
         if gammalib_environ:
             print('      - Have you set the GAMMALIB environment variable?')
-            print('      - Did you source gammalib-init.sh?')
         if ctools_environ:
             print('      - Have you set the CTOOLS environment variable?')
-            print('      - Did you source ctools-init.sh ?')
         if gammalib_python or ctools_python:
+            print('      - Did you source gammalib-init.sh?')
+            print('      - Did you source ctools-init.sh ?')
             print('      - Are you using the correct Python ?')
 
+        print('')
+        print('   Gammalib:  http://cta.irap.omp.eu/gammalib-devel/')
+        print('   ctools:    http://cta.irap.omp.eu/ctools-devel/')
+
     print('')
+
 
 def csinfo_setup_info():
     print('\nGammalib / ctools setup info:\n')
 
-    log('   CTOOLS  environment variable ... ', end='')
-    try:
-        ctools_env = os.environ['CTOOLS']
-        print('   $CTOOLS = {0}'.format(ctools_env))
-    except KeyError:
-        print('WARNING: $CTOOLS environment variable not set. Did you source ctools-init.sh?')
-        all_ok = False
+    gammalib_version = 'TODO'  # a function needs to be added to the library to get the version
+    print('   Gammalib version ................. {0}'.format(gammalib_version))
 
+    ctools_version = 'TODO'  # a function needs to be added to the library to get the version
+    print('   ctools   version ................. {0}'.format(ctools_version))
+
+    gammalib_env = os.environ.get('GAMMALIB', 'Not found')
+    print('   $GAMMALIB environment variable ... {0}'.format(gammalib_env))
+
+    ctools_env = os.environ.get('CTOOLS', 'Not found')
+    print('   $CTOOLS   environment variable ... {0}'.format(ctools_env))
+
+    print('   Python executable ................ {0}'.format(sys.executable))
+
+    log('   gammalib  Python package ......... ', end='')
     try:
         import gammalib
-        print('   Python `gammalib` path: {0}'.format(gammalib.__path__[0]))
-    except:
-        print('WARNING: Python `gammalib` import failed. Are you using the right Python?')
+        print(gammalib.__path__[0])
+    except ImportError:
+        print('Not found')
 
+    log('   ctools    Python package  ........ ', end='')
     try:
         import ctools
-        print('   Python `ctools` path: {0}'.format(ctools.__path__[0]))
-    except:
-        print('WARNING: Python `ctools` import failed. Are you using the right Python?')
+        print(ctools.__path__[0])
+    except ImportError:
+        print('Not found')
 
-    print('   GAMMALIB CFLAGS: {0}'.format(get_pkg_config_info('cflags', 'gammalib')))
-    print('   CTOOLS   CFLAGS: {0}'.format(get_pkg_config_info('cflags', 'ctools')))
+    print('   GAMMALIB  CFLAGS ................. {0}'.format(get_pkg_config_info('cflags', 'gammalib')))
+    print('   CTOOLS    CFLAGS ................. {0}'.format(get_pkg_config_info('cflags', 'ctools')))
+
+    print('   GAMMALIB  LIBS   ................. {0}'.format(get_pkg_config_info('libs', 'gammalib')))
+    print('   CTOOLS    LIBS   ................. {0}'.format(get_pkg_config_info('libs', 'ctools')))
 
     print('')
 
 
 def get_pkg_config_info(info, library):
     cmd = 'pkg-config --{0} {1}'.format(info, library)
-    out = commands.getoutput(cmd)
+    out = get_command_output(cmd)
     if 'was not found' in out:
         return 'Not available'
     else:
