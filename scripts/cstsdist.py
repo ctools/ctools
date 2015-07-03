@@ -21,7 +21,8 @@
 # ==========================================================================
 import gammalib
 import ctools
-from ctools import obsutils
+#from ctools import obsutils
+from cscripts import obsutils
 import sys
 import csv
 
