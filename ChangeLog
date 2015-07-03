@@ -3,6 +3,7 @@
         * Version 0.10.0 released
         =========================
 
+        Add tests for installed ctools version (#1486)
         Create cscripts Python module, move obsutils in that module (#1470)
         Add csinfo script (#1489)
         Removed obsutils.spectrum() function (replaced by csspec)

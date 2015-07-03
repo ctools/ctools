@@ -15,9 +15,9 @@ class TestUnbinnedAnalysis(unittest.TestCase):
     """
 
     def setUp(self):
-        gammalib_dir = os.environ['GAMMALIB']
+        gammalib_dir    = os.environ['GAMMALIB']
         self.model_name = os.path.join(gammalib_dir, "share/models/crab.xml")
-        self.workdir = mkdtemp()
+        self.workdir    = mkdtemp()
 
     def test_unbinned_fits(self):
         """

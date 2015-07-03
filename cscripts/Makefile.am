@@ -5,22 +5,21 @@
 #             tsmerge.py
 binscripts = tsmerge.py
 
-# Scripts to be distributed in pythondir
+# Scripts to be distributed in $(pythondir)/cscripts
 pythonscripts = __init__.py \
                 cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py \
                 cshessobs.py csobsdef.py csspec.py cslightcrv.py \
                 csinfo.py \
                 obsutils.py
 
+# Test scripts to be distributed in $(pythondir)/cscripts/tests
+testscripts = tests/__init__.py \
+              tests/test_unbinned.py
+
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
               cshessobs csobsdef csspec cslightcrv \
               csinfo
-
-testscripts = tests/__init__.py \
-              tests/test_unbinned.py \
-              tests/test_binned.py
-
 
 # Distribute scripts
 EXTRA_DIST         = $(binscripts) $(pythonscripts) $(testscripts)
@@ -28,8 +27,8 @@ binscriptsdir      = $(bindir)
 binscripts_DATA    = $(binscripts)
 pythonscriptsdir   = $(pythondir)/cscripts
 pythonscripts_DATA = $(pythonscripts)
-testscriptsdir   = $(pythondir)/cscripts/tests
-testscripts_DATA = $(testscripts)
+testscriptsdir     = $(pythondir)/cscripts/tests
+testscripts_DATA   = $(testscripts)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:
