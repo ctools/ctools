@@ -365,8 +365,7 @@ assumed that you have a ctlike object called 'like' which is setup and runs:
    import ctools
    like = ctools.ctlike(sim.obs())
    like.run()
-   ...
-   
+
 * Best-fit parameters:
 
   The following command shows how to access the fit parameters and errors:
@@ -376,31 +375,27 @@ assumed that you have a ctlike object called 'like' which is setup and runs:
    obs = like.obs() # Get observations object
    obs.models()["Crab"]["Prefactor"].value() # This returns the actual fit value
    obs.models()["Crab"]["Prefactor"].error() # This returns the actual fit error
-   ...
 
 * Open XML model file from python and print models on screen:
 
   .. code-block:: python
   
     models = gammalib.GModels("$CTOOLS/share/models/crab.xml")
-    print models
-    ...
-  
+    print(models)
+
 * Likelihood value
  
  .. code-block:: python
   
     like.opt().value() # Returns likelihood value
-    ...    
-    
+
 * Covariance Matrix
 
  .. code-block:: python
    
    covariance = like.opt().curvature().invert() # Return GMatrix object 
-   print covariance
-   ...
-   
+   print(covariance)
+
 Modify and work on XML models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -409,52 +404,45 @@ Modify and work on XML models
  .. code-block:: python
 
    models["Crab"]["Prefactor"].fix()
-   ...
-     
+
 * Release a certain parameter
 
  .. code-block:: python
 
    models["Crab"]["Prefactor"].free()
-   ...
-     
+
 * Check if parameter is free
 
  .. code-block:: python
 
    models["Crab"]["Prefactor"].is_free()
-   ...
-     
+
 * Set parameter value
 
  .. code-block:: python
 
    models["Crab"]["Index"].value(-2.5)
-   ...
-     
+
 * Set parameter boundaries
 
  .. code-block:: python 
    
    models["Crab"]["Index"].min(-5.0)
    models["Crab"]["Index"].max(-1.0)
-   ...
-     
+
 * Loop over models and parameters (e.g. fix all parameters)
 
- .. code-block:: python 
- 
-   for model in models: # Loop over models
-   	for par in model: # Loop over parameters
-   		par.fix() # fix parameter
-   ...
-     
+ .. code-block:: python
+
+    for model in models: # Loop over models
+        for par in model: # Loop over parameters
+            par.fix() # fix parameter
+
 * Save modified XML model
  
  .. code-block:: python
    
-   models.save("myXMLmodel.xml")
-   ...
+   models.save("my_model.xml")
 
 
 Beyond the first steps
