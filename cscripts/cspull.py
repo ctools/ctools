@@ -204,6 +204,11 @@ class cspull(ctools.cscript):
         """
         For stacked analysis prepare stacked irfs
         """
+        # Write header into logger
+        if self.logTerse():
+            self.log("\n")
+            self.log.header1("Compute stacked response")
+
         # Get stacked exposure
         expcube = ctools.ctexpcube(self.obs)
         expcube["incube"]   = "NONE"
@@ -215,24 +220,32 @@ class cspull(ctools.cscript):
         expcube["enumbins"] = self.m_enumbins
         expcube["emin"]     = self["emin"].real()
         expcube["emax"]     = self["emax"].real()
-        expcube["coordsys"] = "GAL"
+        expcube["coordsys"] = "CEL"
         expcube["proj"]     = "TAN" 
         expcube.run()
+
+        # Notify exposure computation
+        if self.logTerse():
+            self.log("Computed exposure cube\n")
         
         # Get stacked Psf
         psfcube = ctools.ctpsfcube(self.obs)
         psfcube["incube"]   = "NONE"
         psfcube["usepnt"]   = True
         psfcube["ebinalg"]  = "LOG"
-        psfcube["binsz"]    = self.m_binsz
-        psfcube["nxpix"]    = self.m_npix
-        psfcube["nypix"]    = self.m_npix
+        psfcube["binsz"]    = self.m_binsz*10.0
+        psfcube["nxpix"]    = self.m_npix/10
+        psfcube["nypix"]    = self.m_npix/10
         psfcube["enumbins"] = self.m_enumbins
         psfcube["emin"]     = self["emin"].real()
         psfcube["emax"]     = self["emax"].real()
-        psfcube["coordsys"] = "GAL"
+        psfcube["coordsys"] = "CEL"
         psfcube["proj"]     = "TAN"      
         psfcube.run()
+
+        # Notify Psf computation
+        if self.logTerse():
+            self.log("Computed Psf cube\n")
         
         # Get stacked background
         bkgcube = ctools.ctbkgcube(self.obs)
@@ -245,9 +258,13 @@ class cspull(ctools.cscript):
         bkgcube["enumbins"] = self.m_enumbins
         bkgcube["emin"]     = self["emin"].real()
         bkgcube["emax"]     = self["emax"].real()
-        bkgcube["coordsys"] = "GAL"
+        bkgcube["coordsys"] = "CEL"
         bkgcube["proj"]     = "TAN"
         bkgcube.run()
+
+        # Notify background cube computation
+        if self.logTerse():
+            self.log("Computed background cube\n")
         
         # Store results
         self.m_exposure    = expcube.expcube().copy()
@@ -270,10 +287,6 @@ class cspull(ctools.cscript):
         # Get parameters
         self.get_parameters()
         
-        # If several observations and binned: prepare stacked irfs
-        if self.obs.size() > 1 and self.m_enumbins > 0:
-            self.set_stacked_irf()
-
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
@@ -282,9 +295,13 @@ class cspull(ctools.cscript):
         # Write observation into logger
         if self.logTerse():
             self.log("\n")
-            self.log.header1("Observation")
+            self.log.header1("Observation(s)")
             self.log(str(self.obs))
             self.log("\n")
+
+        # If several observations and binned: prepare stacked irfs
+        if self.obs.size() > 1 and self.m_enumbins > 0:
+            self.set_stacked_irf()
 
         # Write header
         if self.logTerse():
