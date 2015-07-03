@@ -3,7 +3,7 @@
         * Version 0.10.0 released
         =========================
 
-        Create cscripts Python module, move obsutils in that module
+        Create cscripts Python module, move obsutils in that module (#1470)
         Add csinfo script (#1489)
         Removed obsutils.spectrum() function (replaced by csspec)
         Add cterror tool
