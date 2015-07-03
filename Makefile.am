@@ -4,7 +4,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 # Subdirectories
-SUBDIRS = src pyext test caldb models examples scripts
+SUBDIRS = src pyext test caldb models examples cscripts
 
 # Pkgconfig directory
 pkgconfigdir = $(libdir)/pkgconfig

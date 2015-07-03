@@ -900,7 +900,7 @@ AC_CONFIG_FILES([Makefile
                  caldb/Makefile
                  models/Makefile
                  examples/Makefile
-                 scripts/Makefile
+                 cscripts/Makefile
                  ctools.pc
                  testconf.sh],
                 [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;
