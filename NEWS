@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-2 July 2015
+3 July 2015
 
 
 1. Introduction
@@ -112,7 +112,8 @@ None
 
 20. Scripts
 -----------
-None
+Added csinfo script to provide some information about the GammaLib and ctools
+installation. To be run in case of problems to help diagnostics.
 
 
 21. caldb
