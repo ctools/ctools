@@ -84,7 +84,7 @@ class Test(gammalib.GPythonTestSuite):
         psfcube["yref"]     = 22.01
         psfcube["amax"]     = 0.3
         psfcube["anumbins"] = 10
-        
+
         # Run tool
         self.test_try("Run ctpsfcube")
         try:

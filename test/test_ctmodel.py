@@ -90,7 +90,7 @@ class Test(gammalib.GPythonTestSuite):
         model["proj"]     = "CAR"
         model["xref"]     = 83.63
         model["yref"]     = 22.01
-        
+
         # Run tool
         self.test_try("Run ctmodel")
         try:

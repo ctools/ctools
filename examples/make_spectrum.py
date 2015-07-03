@@ -22,10 +22,10 @@ import gammalib
 import ctools
 from cscripts import obsutils
 try:
-	import matplotlib.pyplot as plt
-	has_matplotlib = True
+    import matplotlib.pyplot as plt
+    has_matplotlib = True
 except:
-	has_matplotlib = False
+    has_matplotlib = False
 
 
 # =============== #
@@ -67,7 +67,7 @@ def make_spectrum():
 
     # Generate spectral points
     spectrum = obsutils.spectrum(sim.obs(), "Crab", ebounds)
-	
+
     # Return spectrum
     return spectrum
 
@@ -100,7 +100,7 @@ def plot_spectrum(spectrum):
 
     # Return
     return
-    
+
 
 #==========================#
 # Main routine entry point #

@@ -75,7 +75,7 @@ class Test(gammalib.GPythonTestSuite):
         skymap["proj"]     = "CAR"
         skymap["xref"]     = 83.63
         skymap["yref"]     = 22.01
-        
+
         # Run tool
         self.test_try("Run ctskymap")
         try:

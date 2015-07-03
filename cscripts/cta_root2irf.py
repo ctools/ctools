@@ -40,7 +40,7 @@ import os
 def sigma_lima(Non, Noff, alpha=0.2):
     """
     Compute Eq. (17) of Li & Ma (1983).
-    
+
     Parameters:
      Non   - Number of on counts
      Noff  - Number of off counts
@@ -55,7 +55,7 @@ def sigma_lima(Non, Noff, alpha=0.2):
     term1  = Non  * math.log((alpha1/alpha)*arg1)
     term2  = Noff * math.log(alpha1*arg2)
     sigma  = math.sqrt(2.0 * (term1 + term2))
-    
+
     # Return sensitivity
     return sigma
 
@@ -66,7 +66,7 @@ def sigma_lima(Non, Noff, alpha=0.2):
 def Non_lima(sigma, Noff, alpha=0.2):
     """
     Solve Eq. (17) of Li & Ma (1983) for Non
-    
+
     Parameters:
      sigma - Required significance
      Noff  - Number of off counts
@@ -76,18 +76,18 @@ def Non_lima(sigma, Noff, alpha=0.2):
     # Set initial guess for Non
     S   = 25.0
     Non = S + alpha*Noff
-    
+
     # Compute initial sigma estimate
     s     = sigma_lima(Non, Noff, alpha=alpha)
     delta = s - sigma
-    
+
     # Iterate
     while abs(delta) > 1.0e-6:
         S    *= sigma/s
         Non   = S + alpha*Noff
         s     = sigma_lima(Non, Noff, alpha=alpha)
         delta = s - sigma
-    
+
     # Return
     return Non
 
@@ -101,7 +101,7 @@ def get_aeff(bgrate, emin, emax, \
     Computes effective area assuming a Crab spectrum. This does not
     include any hadron cut efficiencies, and thus is not very useful in a first
     place ...
-    
+
     Parameters:
      bgrate   - Background rate (TeV)
      emin     - Minimum energy (TeV)
@@ -118,14 +118,14 @@ def get_aeff(bgrate, emin, emax, \
     Noff = B/alpha
     Non  = Non_lima(sigma, Noff)
     S    = (Non - B)
-    
+
     # Compute Crab flux in specified energy band
     inx = index+1.0
     cu  = norm/inx * (math.pow(emax, inx) - math.pow(emin, inx))
-    
+
     # Compute effective area
     area = S / duration / cu
-    
+
     # Return effective area
     return area
 
@@ -136,7 +136,7 @@ def get_aeff(bgrate, emin, emax, \
 def make_files(filename, prfname, bkgname):
     """
     Generate files.
-    
+
     Parameters:
      filename - Performance file name
      prfname  - Performance file name
@@ -146,7 +146,7 @@ def make_files(filename, prfname, bkgname):
     file = TFile(filename)
     fprf = open(prfname, "w")
     fbkg = open(bkgname, "w")
-    
+
     # Write header
     fprf.write("log(E) Area  r68  r80  ERes. BG Rate  Diff Sens\n")
     #sys.stdout.write("log(E) Area  Area80  r68  r80  ERes. BG Rate  Diff Sens  BGRateSqDeg  BGInt  (BGIntControl)\n")
@@ -173,12 +173,12 @@ def make_files(filename, prfname, bkgname):
     file.GetObject("AngRes", angres)
     file.GetObject("AngRes80", angres80)
     file.GetObject("ERes", eres)
-    
+
     # Setup vectors
     energies  = bgrate.GetXaxis()
     nbins_eng = energies.GetNbins()
     for i in range(nbins_eng):
-        
+
         # Get logE and background rate per squared degree
         logE   = energies.GetBinCenter(i+1)
         bgd    = bgrate.GetBinContent(i+1,1)
@@ -189,7 +189,7 @@ def make_files(filename, prfname, bkgname):
         r80    = angres80.GetBinContent(i+1,1)
         dE     = eres.GetBinContent(i+1,1)
         diffs  = sens.GetBinContent(i+1,1)
-        
+
         # Skip any NaNs
         if math.isnan(area80):
             continue
@@ -199,10 +199,10 @@ def make_files(filename, prfname, bkgname):
         emin   = math.pow(10.0, logE-0.1)*1.0e6
         emax   = math.pow(10.0, logE+0.1)*1.0e6
         ewidth = emax-emin
-        
+
         # Convert into background rate per steradian and MeV
         bkg_rate  = bgdsq / (0.01745329*0.01745329) / ewidth
-        
+
         # Compute control background rate (this only works for KB files
         # as they are for 80% containment radius). But we don't use this
         # anyways, it's just for control on display ...
@@ -211,7 +211,7 @@ def make_files(filename, prfname, bkgname):
             bkg_rate2 = bgd / omega / ewidth
         else:
             bkg_rate2 = 0.0
-        
+
         # Compute full effective area by dividing area80/0.80
         area = area80/0.80
 
@@ -241,7 +241,7 @@ def make_files(filename, prfname, bkgname):
     # Close files
     fprf.close()
     fbkg.close()
-    
+
     # Return
     return
 
@@ -263,13 +263,13 @@ if __name__ == '__main__':
     # Get list of all performance files
     files = glob.glob(caldb+"/*.root")
     files.sort()
-    
+
     # Loop over all files
     for file in files:
-        
+
         # Get filename
         head, tail = os.path.split(file)
-        
+
         # Build name
         name    = tail.strip(".root")
         if name.find("kb_") != -1:
@@ -281,7 +281,7 @@ if __name__ == '__main__':
             i    = name.find("hours")
             if i != -1:
                 name = name[0:i+1]
-        
+
         # Build output filenames
         prfname = name + ".dat"
         bkgname = "bkg_"+name+".txt"

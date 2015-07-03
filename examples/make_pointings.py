@@ -330,7 +330,7 @@ def write_obsdef(filename, obsdef):
 
     # Return
     return
-    
+
 
 # ======================== #
 # Main routine entry point #
@@ -341,7 +341,7 @@ if __name__ == '__main__':
     """
     # Initialise flags
     need_help = False
-    
+
     # Test for command line arguments
     if (len(sys.argv) > 1):
         if sys.argv[1] == "-h":

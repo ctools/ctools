@@ -50,7 +50,7 @@ class cssens(ctools.cscript):
         self.obs    = None
         self.m_ra   = None
         self.m_dec  = None
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -69,7 +69,7 @@ class cssens(ctools.cscript):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -77,7 +77,7 @@ class cssens(ctools.cscript):
         #  Write separator into logger
         if self.logTerse():
             self.log("\n")
-        
+
         # Return
         return
 
@@ -88,13 +88,13 @@ class cssens(ctools.cscript):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
+
         try:
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             print("Parfile "+parfile+" not found. Create default parfile.")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
@@ -120,10 +120,10 @@ class cssens(ctools.cscript):
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","cssens.log","","","Log filename"))
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get user parameters from parfile.
@@ -160,7 +160,7 @@ class cssens(ctools.cscript):
         self.m_max_iter = self["max_iter"].integer()
         self.m_num_avg  = self["num_avg"].integer()
         self.m_type     = self["type"].string()
-        
+
         # Set some fixed parameters
         self.m_log   = False                   # Logging in client tools
         self.m_debug = self["debug"].boolean() # Debugging in client tools
@@ -169,17 +169,17 @@ class cssens(ctools.cscript):
         self.m_ebounds = gammalib.GEbounds(self.m_bins,
                                            gammalib.GEnergy(self.m_emin, "TeV"),
                                            gammalib.GEnergy(self.m_emax, "TeV"))
-        
+
         # Return
         return
-    
+
     def execute(self):
         """
         Execute the script.
         """
         # Run the script
         self.run()
-        
+
         # Return
         return
 
@@ -193,12 +193,12 @@ class cssens(ctools.cscript):
 
         # Get parameters
         self.get_parameters()
-        
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
-        
+
         # Initialise script
         colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux',
                     'energy_flux', 'sensitivity']
@@ -228,7 +228,7 @@ class cssens(ctools.cscript):
 
         # Loop over energy bins
         for ieng in range(self.m_ebounds.size()):
-        
+
             # Set energies
             if self.m_type == "Differential":
                 emin  = self.m_ebounds.emin(ieng)
@@ -240,11 +240,11 @@ class cssens(ctools.cscript):
                 msg = "Invalid sensitivity type \""+self.m_type+"\" encountered."+ \
                       " Either use \"Differential\" or \"Integral\"."
                 raise gammalib.GException.invalid_value("cssens", msg)
-            
+
             # Determine sensitivity
             result = self.get_sensitivity(self.obs, emin, emax,
                                           bkg_model, full_model)
-            
+
             # Write results
             if ieng == 0:
                 f      = open(self.m_outfile, 'w')
@@ -257,17 +257,17 @@ class cssens(ctools.cscript):
                 writer = csv.DictWriter(f, colnames)
                 writer.writerow(result)
                 f.close()
-            
+
             # Append results
             results.append(result)
-        
+
         # Return
         return
 
     def set_obs(self, lpnt=0.0, bpnt=0.0, emin=0.1, emax=100.0):
         """
         Returns an observation container.
-        
+
         Keywords:
          lpnt - Galactic longitude of pointing [deg] (default: 0.0)
          bpnt - Galactic latitude of pointing [deg] (default: 0.0)
@@ -291,16 +291,16 @@ class cssens(ctools.cscript):
 
             # Allocate observation container
             obs = gammalib.GObservations()
-    
+
             # Set single pointing
             pntdir = gammalib.GSkyDir()
             pntdir.lb_deg(lpnt, bpnt)
-        
+
             # Create CTA observation
             run = obsutils.set_obs(pntdir, caldb=caldb, irf=irf,
                                    duration=duration, deadc=deadc,
                                    emin=emin, emax=emax, rad=rad)
-        
+
             # Append observation to container
             obs.append(run)
 
@@ -309,25 +309,25 @@ class cssens(ctools.cscript):
             pntdir.lb_deg(lpnt, bpnt+offset)
             self.m_ra  = pntdir.ra_deg()
             self.m_dec = pntdir.dec_deg()
-    
+
         # Return observation container
         return obs
 
     def set_obs_ebounds(self, emin, emax):
         """
         Set energy boundaries for observation in container.
-        
+
         Parameters:
          emin - Minimum energy
          emax - Maximum energy
         """
         # Loop over all observations in container
         for obs in self.obs:
-        
+
             # Set energy boundaries
             ebounds = gammalib.GEbounds(emin, emax)
             obs.events().ebounds(ebounds)
-        
+
         # Return
         return
 
@@ -340,7 +340,7 @@ class cssens(ctools.cscript):
 
         # Get source model
         model = full_model[self.m_srcname]
-        
+
         # Check that model has a Prefactor
         if not model.has_par("Prefactor"):
             msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
@@ -399,7 +399,7 @@ class cssens(ctools.cscript):
     def get_sensitivity(self, obs, emin, emax, bkg_model, full_model):
         """
         Determine sensitivity for given observations.
-        
+
         Parameters:
          obs        - Observation container
          emin       - Minimum energy for fitting and flux computation
@@ -412,7 +412,7 @@ class cssens(ctools.cscript):
 
         # Set energy boundaries
         self.set_obs_ebounds(emin, emax)
-        
+
         # Determine energy boundaries from first observation in the container
         loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
         e_mean    = math.pow(10.0, loge)
@@ -517,7 +517,7 @@ class cssens(ctools.cscript):
                     self.log("\n")
                     for par in model:
                         self.log(str(par)+"\n")
-            
+
             # Fit background and test source
             sim.models(src_model)
             like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
@@ -580,7 +580,7 @@ class cssens(ctools.cscript):
             correct = 1.0
             if ts > 0:
                 correct = math.sqrt(self.m_ts_thres/ts)
-            
+
             # Compute extrapolated fluxes
             crab_flux   = correct * crab_flux
             photon_flux = correct * photon_flux
@@ -590,7 +590,7 @@ class cssens(ctools.cscript):
             photon_flux_value.append(photon_flux)
             energy_flux_value.append(energy_flux)
             sensitivity_value.append(sensitivity)
-            
+
             # Write background and test source fit results
             if self.logExplicit():
                 self.log.parformat("Photon flux")
@@ -627,7 +627,7 @@ class cssens(ctools.cscript):
                 self.log(" mCrab = ")
                 self.log(sensitivity)
                 self.log(" erg/cm2/s\n")
-            
+
             # Compute sliding average of extrapolated fitted prefactor,
             # photon and energy flux. This damps out fluctuations and
             # improves convergence
@@ -648,12 +648,12 @@ class cssens(ctools.cscript):
             photon_flux /= num
             energy_flux /= num
             sensitivity /= num
-            
+
             # Compare average flux to last average
             if iter > self.m_num_avg:
                 if test_crab_flux > 0:
                     ratio = crab_flux/test_crab_flux
-                    
+
                     # We have 2 convergence criteria:
                     # 1. The average flux does not change
                     # 2. The flux correction factor is small
@@ -666,10 +666,10 @@ class cssens(ctools.cscript):
                     if self.logTerse():
                         self.log(" Flux is zero.\n")
                     break
-            
+
             # Use average for next iteration
             test_crab_flux = crab_flux
-            
+
             # Exit loop if number of trials exhausted
             if (iter >= self.m_max_iter):
                 if self.logTerse():
@@ -723,13 +723,13 @@ class cssens(ctools.cscript):
                 self.log("\n")
                 for par in model:
                     self.log(str(par)+"\n")
-            
+
         # Store result
         result = {'loge': loge, 'emin': emin.TeV(), 'emax': emax.TeV(), \
                   'crab_flux': crab_flux, 'photon_flux': photon_flux, \
                   'energy_flux': energy_flux, \
                   'sensitivity': sensitivity}
-        
+
         # Return result
         return result
 
@@ -756,7 +756,6 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = cssens(sys.argv)
-    
+
     # Run application
     app.execute()
-    

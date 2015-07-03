@@ -30,7 +30,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
         binsz=0.05, npix=200, proj="TAN", coord="GAL"):
     """
     Simulate events for all observations in the container.
-    
+
     Parameters:
      obs   - Observation container
     Keywords:
@@ -42,12 +42,12 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
      binsz - Pixel size for binned simulation (deg/pixel)
      npix  - Number of pixels in X and Y for binned simulation
     """
-    
+
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
     sim["seed"] = seed
     sim["edisp"] = edisp
-        
+
     # Optionally open the log file
     if log:
         sim.logFileOpen()
@@ -58,16 +58,16 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
 
     # Set chatter level
     sim["chatter"] = chatter
-    
+
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
     # events are not added together, they still apply to each observation
     # separately.
     sim.run()
-    
+
     # Binned option?
     if nbins > 0:
-    
+
         # Determine common energy boundaries for observations
         emin = None
         emax = None
@@ -82,7 +82,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
                 emax = run_emax
             elif run_emax > emax:
                 emax = run_emax
-    
+
         # Allocate ctbin application and set parameters
         bin = ctools.ctbin(sim.obs())
         bin["ebinalg"] = "LOG"
@@ -95,7 +95,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
         bin["binsz"] = binsz
         bin["coordsys"] = coord
         bin["proj"] = proj
-        
+
         # Optionally open the log file
         if log:
             bin.logFileOpen()
@@ -110,22 +110,22 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps
         bin.run()
-        
+
         # Make a deep copy of the observation that will be returned
         # (the ctbin object will go out of scope one the function is
         # left)
         obs = bin.obs().copy()
 
     else:
-    
+
         # Make a deep copy of the observation that will be returned
         # (the ctobssim object will go out of scope one the function is
         # left)
         obs = sim.obs().copy()
-        
+
     # Delete the simulation
     del sim
-    
+
     # Return observation container
     return obs
 
@@ -136,7 +136,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
 def fit(obs, log=False, debug=False, chatter=2, edisp=False):
     """
     Perform maximum likelihood fitting of observations in the container.
-    
+
     Parameters:
      obs   - Observation container
     Keywords:
@@ -147,24 +147,24 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
     """
     # Allocate ctlike application
     like = ctools.ctlike(obs)
-    
+
     # Optionally open the log file
     if log:
         like.logFileOpen()
-    
+
     # Optionally switch-on debugging model
     if debug:
         like["debug"] = True
 
     # Set chatter level
     like["chatter"] = chatter
-    
+
     # Optionally apply energy dispersion
     like["edisp"] = edisp
 
     # Run ctlike application.
     like.run()
-    
+
     # Return observations
     return like
 
@@ -175,7 +175,7 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
 def cterror(obs, srcname, log=False, debug=False, chatter=2):
     """
     Perform maximum likelihood fitting of observations in the container.
-    
+
     Parameters:
      obs     - Observation container
      srcname - Source name
@@ -190,11 +190,11 @@ def cterror(obs, srcname, log=False, debug=False, chatter=2):
 
     # Set cterror parameters
     error["srcname"] = srcname
-    
+
     # Optionally open the log file
     if log:
         error.logFileOpen()
-    
+
     # Optionally switch-on debugging model
     if debug:
         error["debug"] = True
@@ -204,7 +204,7 @@ def cterror(obs, srcname, log=False, debug=False, chatter=2):
 
     # Run cterror application.
     error.run()
-    
+
     # Return observations
     return error
 
@@ -218,7 +218,7 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
     """
     Creates a counts map by combining the events of all observations.
     The counts map will be a summed map over all energies.
-    
+
     Parameters:
      obs     - Observation container
     Keywords:
@@ -236,25 +236,25 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 
     # Set maximum pixel number
     maxpixel = nxpix * nypix
-    
+
     # Fill all observations
     for run in obs:
-        
+
         # Loop over all events
         for event in run.events():
-            
+
             # Determine sky pixel
             skydir = event.dir().dir()
             pixel  = map.dir2inx(skydir)
-            
+
             # Set pixel
             if pixel < maxpixel:
                 map[pixel] += event.counts()
-    
+
     # Save sky map. The clobber flag is set to True, so any existing FITS
     # file will be overwritten.
     map.save(outname, True)
-    
+
     # Return counts map
     return map
 
@@ -269,7 +269,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
     Make model map for a given reference energy by combining all observations.
     The model map will be evaluated for a given reference energy 'eref' and will
     be given in units of [counts/(sr MeV s)].
-    
+
     Parameters:
      obs     - Observation container
     Keywords:
@@ -285,7 +285,7 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
     """
     # Allocate model map
     map = gammalib.GSkymap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
-    
+
     # Set reference energy, time and direction. The time is not initialised and is
     # in fact not used (as the IRF is assumed to be time independent for now).
     # The sky direction is set later using the pixel values.
@@ -293,33 +293,33 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
     time    = gammalib.GTime()
     instdir = gammalib.GCTAInstDir()
     energy.TeV(eref)
-    
+
     # Loop over all map pixels
     for pixel in range(map.npix()):
-        
+
         # Get sky direction
         skydir = map.inx2dir(pixel)
         instdir.dir(skydir)
-        
+
         # Create event atom for map pixel
         atom = gammalib.GCTAEventAtom()
         atom.dir(instdir)
         atom.energy(energy)
         atom.time(time)
-        
+
         # Initialise model value
         value = 0.0
-        
+
         # Loop over all observations
         for run in obs:
             value += obs.models().eval(atom, run)
-        
+
         # Set map value
         map[pixel] = value
-    
+
     # Save sky map
     map.save(outname, True)
-    
+
     # Return model map
     return map
 
@@ -335,15 +335,15 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     """
     # Print warning
     print("Warning: obsutils.set is obsolete, use obsutils.set_obs instead.")
-    
+
     # Call new function
     obs_cta = set_obs(pntdir, tstart=tstart, duration=duration, deadc=deadc, \
                       emin=emin, emax=emax, rad=rad, \
                       irf=irf, caldb=caldb)
-    
+
     # Return CTA observation
     return obs_cta
-    
+
 
 # ======================= #
 # Set one CTA observation #
@@ -355,7 +355,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     Returns a single CTA observation containing an empty CTA event list.
     By looping over this function you can add CTA observations to the
     observation container.
-    
+
     Parameters:
      pntdir   - Pointing direction [GSkyDir]
     Keywords:
@@ -379,23 +379,23 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         db.rootdir(caldb)
     else:
         db.open("cta", caldb)
-    
+
     # Set pointing direction
     pnt = gammalib.GCTAPointing()
     pnt.dir(pntdir)
     obs_cta.pointing(pnt)
-    
+
     # Set ROI
     roi     = gammalib.GCTARoi()
     instdir = gammalib.GCTAInstDir()
     instdir.dir(pntdir)
     roi.centre(instdir)
     roi.radius(rad)
-    
+
     # Set GTI
     gti = gammalib.GGti()
     gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
-    
+
     # Set energy boundaries
     ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"), \
                                 gammalib.GEnergy(emax, "TeV"))
@@ -406,16 +406,16 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     events.gti(gti)
     events.ebounds(ebounds)
     obs_cta.events(events)
-    
+
     # Set instrument response
     obs_cta.response(irf, db)
-    
+
     # Set ontime, livetime, and deadtime correction factor
     obs_cta.ontime(duration)
     obs_cta.livetime(duration*deadc)
     obs_cta.deadc(deadc)
     obs_cta.id(id)
-    
+
     # Return CTA observation
     return obs_cta
 
@@ -434,7 +434,7 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
     over other observation proposerties, such as duration, deadtime correction,
     energy range, etc. If an optional keyword is not specified, the function
     keyword is used instead.
-    
+
     Parameters:
      obsdeflist - Observation definition list [{'ra': x.xx, 'dec': x.xx}]
                   The directory can take the following optional keywords:
@@ -470,7 +470,7 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
         # Set pointing direction
         pntdir = gammalib.GSkyDir()
         pntdir.radec_deg(obsdef['ra'], obsdef['dec'])
-        
+
         # Set duration (use default if not found in definition list)
         if 'duration' in obsdef:
             obs_duration = obsdef['duration']
@@ -512,7 +512,7 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
             obs_irf = obsdef['irf']
         else:
             obs_irf = irf
-        
+
         # Generate identifier string
         id = "%6.6d" % obs_id
 
@@ -520,14 +520,14 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
         obs_cta = set_obs(pntdir, tstart=obs_start, duration=obs_duration, \
                           deadc=obs_deadc, emin=obs_emin, emax=obs_emax, \
                           rad=obs_rad, irf=obs_irf, caldb=obs_caldb, id=id)
-        
+
         # Append to container
         obs.append(obs_cta)
 
         # Update start time and identifier
         obs_start += obs_duration
         obs_id    += 1
-    
+
     # Return observation container
     return obs
 
@@ -543,7 +543,7 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
      pattern - Observation pattern. Possible options are:
                - "single": single pointing
                - "four": four pointings 'offset' around pattern centre
-             
+
     Keywords:
      ra      - Right Ascension of pattern centre [deg] (default: 83.6331)
      dec     - Declination of pattern centre [deg] (default: 22.0145)
@@ -551,7 +551,7 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
     """
     # Initialise observation definition list
     obsdeflist = []
-    
+
     # Add patterns
     if pattern == "single":
         obsdef = {'ra': ra, 'dec': dec}
@@ -560,7 +560,7 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
         # Set pattern centre
         centre = gammalib.GSkyDir()
         centre.radec_deg(ra, dec)
-        
+
         # Append pointings
         for phi in [0.0, 90.0, 180.0, 270.0]:
             pntdir = centre.copy()
@@ -568,6 +568,6 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
             obsdeflist.append({'ra': pntdir.ra_deg(), 'dec': pntdir.dec_deg()})
     else:
         print("Warning: Observation pattern '"+str(pattern)+"' not recognized.")
-    
+
     # Return observation definition list
     return obsdeflist

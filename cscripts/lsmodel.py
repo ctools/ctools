@@ -39,7 +39,7 @@ class lsmodel(gammalib.GApplication):
         # Set name
         self.name    = "lsmodel"
         self.version = "0.1.0"
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -57,7 +57,7 @@ class lsmodel(gammalib.GApplication):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -65,7 +65,7 @@ class lsmodel(gammalib.GApplication):
         #  Write separator into logger
         if self.logTerse():
             self.log("\n")
-        
+
         # Return
         return
 
@@ -76,13 +76,13 @@ class lsmodel(gammalib.GApplication):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
+
         try:
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("cntmap","f","a","cntmap.fits","","","Counts map"))
@@ -94,10 +94,10 @@ class lsmodel(gammalib.GApplication):
             pars.append(gammalib.GApplicationPar("outfile","f","a","model_cube.fits","","","Output file name"))
             pars.append_standard()
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -114,17 +114,17 @@ class lsmodel(gammalib.GApplication):
         # Set some fixed parameters
         self.m_log   = False # Logging in client tools
         self.m_debug = False # Debugging in client tools
-        
+
         # Return
         return
-    
+
     def execute(self):
         """
         Execute the script.
         """
         # Run the script
         self.run()
-        
+
         # Return
         return
 
@@ -138,12 +138,12 @@ class lsmodel(gammalib.GApplication):
 
         # Get parameters
         self.get_parameters()
-        
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
-        
+
         # Write header
         if self.logTerse():
             self.log("\n")
@@ -194,10 +194,9 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = lsmodel(sys.argv)
-    
+
     # Open logfile
     app.logFileOpen()
-    
+
     # Execute application
     app.execute()
-    

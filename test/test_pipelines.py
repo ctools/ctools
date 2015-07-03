@@ -75,7 +75,7 @@ class Test(gammalib.GPythonTestSuite):
         emin                 =    0.1
         emax                 =  100.0
         rad_select           =    3.0
-    
+
         # Simulate events
         sim = ctools.ctobssim()
         sim["inmodel"]   = model_name
@@ -95,7 +95,7 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in ctobssim.")
-    
+
         # Select events
         select = ctools.ctselect()
         select["inobs"]  = events_name
@@ -113,7 +113,7 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in ctselect.")
-    
+
         # Perform maximum likelihood fitting
         like = ctools.ctlike()
         like["inobs"]    = selected_events_name
@@ -146,7 +146,7 @@ class Test(gammalib.GPythonTestSuite):
         emin                 =    0.1
         emax                 =  100.0
         rad_select           =    3.0
-    
+
         # Simulate events
         sim = ctools.ctobssim()
         sim["inmodel"] = model_name
@@ -165,7 +165,7 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in ctobssim.")
-    
+
         # Select events
         select = ctools.ctselect(sim.obs())
         select["ra"]   = ra
@@ -181,7 +181,7 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in ctselect.")
-    
+
         # Perform maximum likelihood fitting
         like = ctools.ctlike(select.obs())
         self.test_try("Run ctlike")

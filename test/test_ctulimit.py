@@ -72,7 +72,7 @@ class Test(gammalib.GPythonTestSuite):
         ulimit["srcname"] = "Crab"
         ulimit["caldb"]   = self.caldb
         ulimit["irf"]     = self.irf
-        
+
         # Run tool
         self.test_try("Run ctulimit")
         try:
@@ -88,6 +88,6 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in saving results.")
-        
+
         # Return
         return

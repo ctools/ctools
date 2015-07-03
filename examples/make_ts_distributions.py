@@ -35,155 +35,155 @@ from cscripts import cstsdist
 # Try importing processing module
 has_processing = False
 try:
-	import processing
-	has_processing = True
+    import processing
+    has_processing = True
 except:
-	pass
+    pass
 
 
 # ====================== #
 # Create TS distribution #
 # ====================== #
 def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
-			  enumbins=0, log=False):
-	"""
-	Create TS distribution.
-	
-	Parameters:
-	 loge - Logarithm of mean energy in TeV
-	 emin - Minimum energy (TeV)
-	 emax - Maximum energy (TeV)
-	Keywords:
-	 log  - Create log file(s)
-	"""
-	# Generate output filename
-	outfile = "ts_"+str(loge)+".dat"
-	
-	# Setup cstsdist tool
-	tsdist = cstsdist()
-	tsdist["inmodel"]  = "$CTOOLS/share/models/crab.xml"
-	tsdist["srcname"]  = "Crab"
-	tsdist["outfile"]  = outfile
-	tsdist["ntrials"]  = ntrials
-	tsdist["caldb"]    = "prod2"
-	tsdist["irf"]      = "South_50h"
-	tsdist["ra"]       = 83.63
-	tsdist["dec"]      = 22.01
-	tsdist["emin"]     = emin
-	tsdist["emax"]     = emax
-	tsdist["enumbins"] = enumbins
-	tsdist["tmin"]     = 0
-	tsdist["tmax"]     = duration
-	tsdist["rad"]      = 5.0
-	tsdist["npix"]     = 200
-	tsdist["binsz"]    = 0.05
-	#tsdist["debug"].boolean(True)
-		
-	# Optionally open the log file
-	if log:
-		tsdist.logFileOpen()
-	
-	# Run tool
-	tsdist.run()
-	
-	# Return
-	return
+                          enumbins=0, log=False):
+    """
+    Create TS distribution.
+
+    Parameters:
+     loge - Logarithm of mean energy in TeV
+     emin - Minimum energy (TeV)
+     emax - Maximum energy (TeV)
+    Keywords:
+     log  - Create log file(s)
+    """
+    # Generate output filename
+    outfile = "ts_"+str(loge)+".dat"
+
+    # Setup cstsdist tool
+    tsdist = cstsdist()
+    tsdist["inmodel"]  = "$CTOOLS/share/models/crab.xml"
+    tsdist["srcname"]  = "Crab"
+    tsdist["outfile"]  = outfile
+    tsdist["ntrials"]  = ntrials
+    tsdist["caldb"]    = "prod2"
+    tsdist["irf"]      = "South_50h"
+    tsdist["ra"]       = 83.63
+    tsdist["dec"]      = 22.01
+    tsdist["emin"]     = emin
+    tsdist["emax"]     = emax
+    tsdist["enumbins"] = enumbins
+    tsdist["tmin"]     = 0
+    tsdist["tmax"]     = duration
+    tsdist["rad"]      = 5.0
+    tsdist["npix"]     = 200
+    tsdist["binsz"]    = 0.05
+    #tsdist["debug"].boolean(True)
+
+    # Optionally open the log file
+    if log:
+        tsdist.logFileOpen()
+
+    # Run tool
+    tsdist.run()
+
+    # Return
+    return
 
 
 # ======================== #
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-	"""
-	Create TS distribution in a number of energy bands.
-	"""
-	# Get input arguments
-	usage = "make_ts_distributions [-n ntrials] [-e enumbins] [-m max_threads]"
-	if len(sys.argv) < 1:
-		print(usage)
-		sys.exit()
-	
-	# Set default parameters
-	ntrials     = 100
-	enumbins    = 0
-	duration    = 180000.0
-	max_threads = 1
-	
-	# Parameter dictionnary
-	pars = [{'option': '-n', 'value': ntrials},
-	        {'option': '-e', 'value': enumbins},
-	        {'option': '-d', 'value': duration},
-			{'option': '-m', 'value': max_threads}]
-	
-	# Gather parameters from command line
-	i = 1
-	while i < len(sys.argv):
-		
-		# Search for options
-		for par in pars:
-			if sys.argv[i] == par['option']:
-				if len(sys.argv) > i+1:
-					i      += 1
-					try:
-						par['value'] = int(sys.argv[i])
-					except:
-						print(usage)
-						sys.exit()
-				else:
-					print(usage)
-					sys.exit()
-		
-		# Next item
-		i += 1
-	
-	# Recover parameters
-	ntrials     = pars[0]['value']
-	enumbins    = pars[1]['value']
-	duration    = pars[2]['value']
-	max_threads = pars[3]['value']
-	
-	# Loop over energy bands. The energy bands are those that are also
-	# used for sensitivity computation.
-	for ieng in range(20):
-		
-		# Set energies
-		loge  = -1.7 + ieng * 0.2
-		emean = pow(10.0, loge)
-		emin  = pow(10.0, loge-0.1)
-		emax  = pow(10.0, loge+0.1)
-		if loge < 0:
-			loge = "m"+str(abs(loge))
-		else:
-			loge = "p"+str(abs(loge))
+    """
+    Create TS distribution in a number of energy bands.
+    """
+    # Get input arguments
+    usage = "make_ts_distributions [-n ntrials] [-e enumbins] [-m max_threads]"
+    if len(sys.argv) < 1:
+        print(usage)
+        sys.exit()
 
-		# Processing support?
-		if has_processing:
+    # Set default parameters
+    ntrials     = 100
+    enumbins    = 0
+    duration    = 180000.0
+    max_threads = 1
 
-			# Wait until one thread has finished
-			while len(processing.activeChildren()) >= max_threads:
-				time.sleep(10)
+    # Parameter dictionnary
+    pars = [{'option': '-n', 'value': ntrials},
+            {'option': '-e', 'value': enumbins},
+            {'option': '-d', 'value': duration},
+                    {'option': '-m', 'value': max_threads}]
 
-			# Set arguments
-			args   = (loge, emin, emax)
-			kwargs = {'ntrials': ntrials, 'enumbins': enumbins,
-			          'duration': duration}
+    # Gather parameters from command line
+    i = 1
+    while i < len(sys.argv):
 
-			# Generate pull distribution
-			p = processing.Process(target=create_ts, args=args, kwargs=kwargs)
-			p.start()
-			print("Process emin=%.4f emax=%.4f started." % (emin, emax))
+        # Search for options
+        for par in pars:
+            if sys.argv[i] == par['option']:
+                if len(sys.argv) > i+1:
+                    i      += 1
+                    try:
+                        par['value'] = int(sys.argv[i])
+                    except:
+                        print(usage)
+                        sys.exit()
+                else:
+                    print(usage)
+                    sys.exit()
 
-			# Wait a short time to allow process to start
-			time.sleep(1)
-		
-		# ... no
-		else:
-			create_ts(loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
-                      duration=duration)
-	
-	# Processing support
-	if has_processing:
-	
-		# Wait until all threads finished
-		while len(processing.activeChildren()) > 0:
-			time.sleep(10)
+        # Next item
+        i += 1
+
+    # Recover parameters
+    ntrials     = pars[0]['value']
+    enumbins    = pars[1]['value']
+    duration    = pars[2]['value']
+    max_threads = pars[3]['value']
+
+    # Loop over energy bands. The energy bands are those that are also
+    # used for sensitivity computation.
+    for ieng in range(20):
+
+        # Set energies
+        loge  = -1.7 + ieng * 0.2
+        emean = pow(10.0, loge)
+        emin  = pow(10.0, loge-0.1)
+        emax  = pow(10.0, loge+0.1)
+        if loge < 0:
+            loge = "m"+str(abs(loge))
+        else:
+            loge = "p"+str(abs(loge))
+
+        # Processing support?
+        if has_processing:
+
+            # Wait until one thread has finished
+            while len(processing.activeChildren()) >= max_threads:
+                time.sleep(10)
+
+            # Set arguments
+            args   = (loge, emin, emax)
+            kwargs = {'ntrials': ntrials, 'enumbins': enumbins,
+                      'duration': duration}
+
+            # Generate pull distribution
+            p = processing.Process(target=create_ts, args=args, kwargs=kwargs)
+            p.start()
+            print("Process emin=%.4f emax=%.4f started." % (emin, emax))
+
+            # Wait a short time to allow process to start
+            time.sleep(1)
+
+        # ... no
+        else:
+            create_ts(loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
+          duration=duration)
+
+    # Processing support
+    if has_processing:
+
+        # Wait until all threads finished
+        while len(processing.activeChildren()) > 0:
+            time.sleep(10)

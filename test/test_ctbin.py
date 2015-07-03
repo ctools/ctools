@@ -77,7 +77,7 @@ class Test(gammalib.GPythonTestSuite):
         bin["proj"]     = "CAR"
         bin["xref"]     = 83.63
         bin["yref"]     = 22.01
-        
+
         # Run tool
         self.test_try("Run ctbin")
         try:

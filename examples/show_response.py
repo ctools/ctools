@@ -32,58 +32,58 @@ import matplotlib.pyplot as plt
 # Compute Eq. (17) of Li & Ma (1983) #
 # ================================== #
 def sigma_lima(Non, Noff, alpha=0.2):
-	"""
-	Compute Eq. (17) of Li & Ma (1983).
-	
-	Parameters:
-	 Non   - Number of on counts
-	 Noff  - Number of off counts
-	Keywords:
-	 alpha - Ratio of on-to-off exposure
-	"""
-	# Compute sensitivity
-	alpha1 = alpha + 1.0
-	sum    = Non + Noff
-	arg1   = Non / sum
-	arg2   = Noff / sum
-	term1  = Non  * math.log((alpha1/alpha)*arg1)
-	term2  = Noff * math.log(alpha1*arg2)
-	sigma  = math.sqrt(2.0 * (term1 + term2))
-	
-	# Return sensitivity
-	return sigma
+    """
+    Compute Eq. (17) of Li & Ma (1983).
+
+    Parameters:
+     Non   - Number of on counts
+     Noff  - Number of off counts
+    Keywords:
+     alpha - Ratio of on-to-off exposure
+    """
+    # Compute sensitivity
+    alpha1 = alpha + 1.0
+    sum    = Non + Noff
+    arg1   = Non / sum
+    arg2   = Noff / sum
+    term1  = Non  * math.log((alpha1/alpha)*arg1)
+    term2  = Noff * math.log(alpha1*arg2)
+    sigma  = math.sqrt(2.0 * (term1 + term2))
+
+    # Return sensitivity
+    return sigma
 
 
 # ======================================== #
 # Solve Eq. (17) of Li & Ma (1983) for Non #
 # ======================================== #
 def Non_lima(sigma, Noff, alpha=0.2):
-	"""
-	Solve Eq. (17) of Li & Ma (1983) for Non
-	
-	Parameters:
-	 sigma - Required significance
-	 Noff  - Number of off counts
-	Keywords:
-	 alpha - Ratio of on-to-off exposure
-	"""
-	# Set initial guess for Non
-	S   = 25.0
-	Non = S + alpha*Noff
-	
-	# Compute initial sigma estimate
-	s     = sigma_lima(Non, Noff, alpha=alpha)
-	delta = s - sigma
-	
-	# Iterate
-	while abs(delta) > 1.0e-6:
-		S    *= sigma/s
-		Non   = S + alpha*Noff
-		s     = sigma_lima(Non, Noff, alpha=alpha)
-		delta = s - sigma
-	
-	# Return
-	return Non
+    """
+    Solve Eq. (17) of Li & Ma (1983) for Non
+
+    Parameters:
+     sigma - Required significance
+     Noff  - Number of off counts
+    Keywords:
+     alpha - Ratio of on-to-off exposure
+    """
+    # Set initial guess for Non
+    S   = 25.0
+    Non = S + alpha*Noff
+
+    # Compute initial sigma estimate
+    s     = sigma_lima(Non, Noff, alpha=alpha)
+    delta = s - sigma
+
+    # Iterate
+    while abs(delta) > 1.0e-6:
+        S    *= sigma/s
+        Non   = S + alpha*Noff
+        s     = sigma_lima(Non, Noff, alpha=alpha)
+        delta = s - sigma
+
+    # Return
+    return Non
 
 
 # ======================= #
@@ -95,7 +95,7 @@ def show_one_effective_area(rsp, name, color="r"):
     """
     # Set to figure 1
     plt.figure(1)
-    
+
     # Generate logE(TeV) vector
     nbins = 20
     logE  = [-1.7+0.2*i for i in range(nbins)]
@@ -130,7 +130,7 @@ def show_one_background_rate(rsp, name, color="r"):
     """
     # Set to figure 2
     plt.figure(2)
-    
+
     # Generate logE(TeV) vector
     nbins = 20
     logE  = [-1.7+0.2*i for i in range(nbins)]
@@ -142,7 +142,7 @@ def show_one_background_rate(rsp, name, color="r"):
         bgrate[i] = rsp.background()(logE[i], 0.0, 0.0)
         if bgrate[i] < 1.0e-10:
             bgrate[i] = 0.0
-    
+
     # Plot data
     plt.loglog(E, bgrate, color+'-', label=name)
     plt.loglog(E, bgrate, color+'o')
@@ -171,7 +171,7 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
 
     # Set to figure 3
     plt.figure(3)
-    
+
     # Generate logE(TeV) vector
     nbins = 20
     logE  = [-1.7+0.2*i for i in range(nbins)]
@@ -200,7 +200,7 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
             plaw    = gammalib.GModelSpectralPlaw(1.0e-6, -2.6, epivot)
             conv    = TeV2erg*E[i]*E[i]/plaw.flux(emin, emax)
             flux[i] = conv * src_counts / (duration * aeff*0.68)
-    
+
     # Plot data
     plt.loglog(E, flux, color+'-', label=name)
     plt.loglog(E, flux, color+'o')
@@ -243,11 +243,11 @@ def show_one_response(rspname, dbname, name, rootdir=None, color="r"):
 
     # Show sensitivity
     show_one_sensitivity(rsp, name, color=color)
-    
+
     # Return
     return
-    
-    
+
+
 # ======================== #
 # Main routine entry point #
 # ======================== #
@@ -291,7 +291,7 @@ if __name__ == '__main__':
             rootdir = rsp['rootdir']
         else:
             rootdir = None
-        
+
         # Show response
         show_one_response(rspname, dbname, name, rootdir=rootdir, color=color)
 

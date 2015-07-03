@@ -43,12 +43,12 @@ class cstsdist(ctools.cscript):
         # Set name
         self.name    = "cstsdist"
         self.version = "1.0.0"
-        
+
         # Initialise some members
         self.obs        = None
         self.bkg_model  = None
         self.full_model = None
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -66,7 +66,7 @@ class cstsdist(ctools.cscript):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -74,7 +74,7 @@ class cstsdist(ctools.cscript):
         #  Write separator into logger
         if self.logTerse():
             self.log("\n")
-        
+
         # Return
         return
 
@@ -85,13 +85,13 @@ class cstsdist(ctools.cscript):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
+
         try:
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
@@ -121,15 +121,15 @@ class cstsdist(ctools.cscript):
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","cstsdist.log","","","Log filename"))
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
-        
+
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
             self.obs = self.get_observations()
@@ -142,10 +142,10 @@ class cstsdist(ctools.cscript):
 
         # Get source name
         self.m_srcname = self["srcname"].string()
-            
+
         # Get number of energy bins
         self.m_enumbins = self["enumbins"].integer()
-        
+
         # Read parameters for binned if requested
         if not self.m_enumbins == 0:
             self.m_npix     = self["npix"].integer()
@@ -158,7 +158,7 @@ class cstsdist(ctools.cscript):
         # Set models if we have none
         if self.obs.models().size() == 0:
             self.obs.models(self["inmodel"].filename())
-          
+
         # Get other parameters
         self.m_outfile = self["outfile"].filename()
         self.m_ntrials = self["ntrials"].integer()
@@ -171,24 +171,24 @@ class cstsdist(ctools.cscript):
 
         # Return
         return
-    
+
     def models(self, models):
         """
         Set model.
         """
         # Copy models
         self.obs.models(models.copy())
-    
+
         # Return
         return
-        
+
     def execute(self):
         """
         Execute the script.
         """
         # Run the script
         self.run()
-        
+
         # Return
         return
 
@@ -202,7 +202,7 @@ class cstsdist(ctools.cscript):
 
         # Get parameters
         self.get_parameters()
-        
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
@@ -221,7 +221,7 @@ class cstsdist(ctools.cscript):
             self.log.header2("Full model")
             self.log(str(full_model))
             self.log("\n")
-        
+
         # Write observation into logger
         if self.logTerse():
             self.log("\n")
@@ -243,10 +243,10 @@ class cstsdist(ctools.cscript):
 
         # Loop over trials
         for seed in range(self.m_ntrials):
-        
+
             # Make a trial
             result = self.trial(seed, full_model, bkg_model)
-            
+
             # Write out result immediately
             if seed == 0:
                 file = open(self.m_outfile, 'w')
@@ -257,10 +257,10 @@ class cstsdist(ctools.cscript):
             writer = csv.DictWriter(file, result['colnames'])
             writer.writerow(result['values'])
             file.close()
-        
+
         # Return
         return
-  
+
     def set_models(self, fitpos=False, fitspec=False):
         """
         Set full and background model.
@@ -270,7 +270,7 @@ class cstsdist(ctools.cscript):
 
         # Get source model
         model = full_model[self.m_srcname]
-        
+
         # Check that model has a Prefactor
         if not model.has_par("Prefactor"):
             msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
@@ -323,16 +323,16 @@ class cstsdist(ctools.cscript):
     def set_obs(self):
         """
         Returns an observation container with a set of CTA observations.
-        
+
         Keywords:
         """
-        
+
         # Setup observation definition list
         obsdeflist = obsutils.set_obs_patterns(self.m_pattern,
                                                ra=self["ra"].real(),
                                                dec=self["dec"].real(),
                                                offset=self["offset"].real())
-        
+
         # Create list of observations
         obs = obsutils.set_obs_list(obsdeflist,
                                     tstart=self["tmin"].real(),
@@ -342,14 +342,14 @@ class cstsdist(ctools.cscript):
                                     emax=self["emax"].real(),
                                     rad=self["rad"].real(),
                                     irf=self["irf"].string(), caldb=self["caldb"].string())
-    
+
         # Return observation container
         return obs
 
     def trial(self, seed, full_model, bkg_model):
         """
         Create the TS for a single trial.
-        
+
         Parameters:
          seed - Random number generator seed
         """
@@ -364,7 +364,7 @@ class cstsdist(ctools.cscript):
                            binsz=self.m_binsz,
                            npix=self.m_npix,
                            log=self.m_log, debug=self.m_debug)
-        
+
         # Determine number of events in simulation
         nevents = 0.0
         for run in sim:
@@ -376,7 +376,7 @@ class cstsdist(ctools.cscript):
             self.log.parformat("Number of simulated events")
             self.log(nevents)
             self.log("\n")
-        
+
         # Fit background only
         sim.models(bkg_model)
         like_bgm   = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
@@ -407,7 +407,7 @@ class cstsdist(ctools.cscript):
         LogL_all   = like_all.opt().value()
         npred_all  = like_all.obs().npred()
         ts         = 2.0*(LogL_bgm-LogL_all)
-        
+
         # Write background and test source fit results
         if self.logExplicit():
             self.log.header3("Background and test source model fit")
@@ -426,7 +426,7 @@ class cstsdist(ctools.cscript):
                 self.log("\n")
                 for par in model:
                     self.log(str(par)+"\n")
-                    
+
         # Write result
         elif self.logTerse():
             self.log.parformat("Trial "+str(seed))
@@ -437,11 +437,11 @@ class cstsdist(ctools.cscript):
             self.log("+/-")
             self.log(result_all[self.m_srcname]["Prefactor"].error())
             self.log("\n")
-        
+
         # Initialise results
         colnames = []
         values   = {}
-        
+
         # Set TS value
         colnames.append("TS")
         values["TS"] = ts
@@ -465,7 +465,7 @@ class cstsdist(ctools.cscript):
         # Set Npred for full fit
         colnames.append("Npred_all")
         values["Npred_all"] = npred_all
-        
+
         # Gather free full fit parameters
         for i in range(result_all.size()):
             model      = result_all[i]
@@ -473,22 +473,22 @@ class cstsdist(ctools.cscript):
             for k in range(model.size()):
                 par = model[k]
                 if par.is_free():
-                
+
                     # Set parameter name
                     name = model_name+"_"+par.name()
-                    
+
                     # Append value
                     colnames.append(name)
                     values[name] = par.value()
-                    
+
                     # Append error
                     name = "Unc_"+name
                     colnames.append(name)
                     values[name] = par.error()
-        
+
         # Bundle together results
         result = {'colnames': colnames, 'values': values}
-        
+
         # Return
         return result
 
@@ -502,10 +502,9 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = cstsdist(sys.argv)
-    
+
     # Open logfile
     app.logFileOpen()
-    
+
     # Execute application
     app.execute()
-    

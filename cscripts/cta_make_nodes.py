@@ -56,7 +56,7 @@ def write_node(file, energy, scale):
 
     # Return
     return
-    
+
 
 # ============ #
 # Create nodes #
@@ -72,29 +72,29 @@ def create_nodes(emin, emax, enumbins):
     elogmin = math.log10(float(emin))
     elogmax = math.log10(float(emax))
     elogbin = (elogmax - elogmin)/(float(enumbins)-1.0)
-    
+
     # Fill arrays
     for i in range(int(enumbins)):
-        
+
         # Compute energy
         energy = math.pow(10.0, i*elogbin+elogmin)
-        
+
         # Compute scale (HESS Crab spectrum)
         scale = 3.45e-17 * math.pow(energy, -2.63)
-        
+
         # Write node
         write_node(file, energy, scale)
-        
+
         # Debug
         #sys.stdout.write(energy)
         #sys.stdout.write(math.pow(10.0, int(math.log10(scale))-1.0)±"\n")
-    
+
     # Close file
     file.close()
-    
+
     # Return
     return
-    
+
 
 # ======================= #
 # Main script entry point #
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 3:
         sys.stdout.write(usage+"\n")
         sys.exit()
-    
+
     # Extract parameters
     emin     = sys.argv[1]
     emax     = sys.argv[2]
@@ -116,4 +116,3 @@ if __name__ == '__main__':
 
     # Create nodes
     create_nodes(emin, emax, enumbins)
-    

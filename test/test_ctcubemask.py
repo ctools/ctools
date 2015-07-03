@@ -73,7 +73,7 @@ class Test(gammalib.GPythonTestSuite):
         mask["rad"]     = 2.0
         mask["emin"]    = 0.1
         mask["emax"]    = 100
-        
+
         # Run tool
         self.test_try("Run ctcubemask")
         try:

@@ -33,7 +33,7 @@ class csobsdef(ctools.cscript):
     file with header keywords in the first row followed by a list of
     pointings (one pointing per row). The following header keywords
     are supported (case sensitive, column order irrelevant):
-    
+
     name     - Observation name string
     id       - Unique observation identifier string
     ra       - Right Ascension of pointing (deg)
@@ -47,14 +47,14 @@ class csobsdef(ctools.cscript):
     deadc    - Deadtime correction factor [0-1]
     caldb    - Calibration database
     irf      - Response function name
-            
+
     Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
     All other keywords are optional and can be specified when calling
     csobsdef as user parameters. The only exception is the "duration"
     keyword that will automatically queried.
-    
+
     Here some usage examples:
-    
+
     csobsdef
       Creates minimal observation definition file.
 
@@ -85,7 +85,7 @@ class csobsdef(ctools.cscript):
         self.clobber    = True
         self.debug      = False
         self.read_ahead = False
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -103,7 +103,7 @@ class csobsdef(ctools.cscript):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -125,7 +125,7 @@ class csobsdef(ctools.cscript):
         except:
             # Signal that parfile was not found
             print("Parfile \""+parfile+"\" not found. Create default parfile.")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Pointing definition file"))
@@ -140,10 +140,10 @@ class csobsdef(ctools.cscript):
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csobsdef.log","","","Log filename"))
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get parameters from parfile.
@@ -162,20 +162,20 @@ class csobsdef(ctools.cscript):
 
         # Return
         return
-    
+
     def execute(self):
         """
         Execute the script.
         """
         # Set read ahead flag
         self.read_ahead = True
-        
+
         # Run the script
         self.run()
 
         # Save observation definition file
         self.obs.save(self.outfile)
-        
+
         # Return
         return
 
@@ -189,7 +189,7 @@ class csobsdef(ctools.cscript):
 
         # Get parameters
         self.get_parameters()
-        
+
         # Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
@@ -325,13 +325,13 @@ class csobsdef(ctools.cscript):
             # Create an empty event list
             list = gammalib.GCTAEventList()
             list.gti(gti)
-            
+
             # Set optional information
             if has_ebounds:
                 list.ebounds(ebounds)
             if has_roi:
                 list.roi(roi)
-            
+
             # Attach event list to CTA observation
             obs.events(list)
 
@@ -358,10 +358,10 @@ class csobsdef(ctools.cscript):
         # Create CTA response
         response = gammalib.GCTAResponseIrf()
         response.read(xml)
-        
+
         # Attach response to observation
         obs.response(response)
-        
+
         # Return observation
         return obs
 
@@ -375,10 +375,9 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = csobsdef(sys.argv)
-    
+
     # Open logfile
     app.logFileOpen()
-    
+
     # Execute application
     app.execute()
-    

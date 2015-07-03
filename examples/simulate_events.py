@@ -86,10 +86,10 @@ def createobs(ra=86.171648, dec=-1.4774586, rad=5.0,
     events.gti(gti)
     events.ebounds(ebounds)
     obs.events(events)
-    
+
     # Set instrument response
     obs.response(irf, db)
-    
+
     # Set ontime, livetime, and deadtime correction factor
     obs.ontime(duration)
     obs.livetime(duration*deadc)
@@ -155,7 +155,7 @@ def simulate_ctobssim(obs, xmlname, seed=0):
 
     # Run simulator
     sim.run()
-    
+
     # Retrieve events
     events = sim.obs()[0].events().copy()
 
@@ -169,7 +169,7 @@ def simulate_ctobssim(obs, xmlname, seed=0):
 
     # Return events
     return events
-    
+
 
 # =========== #
 # Show events #

@@ -35,7 +35,7 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100):
     """
     # Get spectral component
     spectrum = model.spectral()
-  
+
     # Setup energy axis
     e_min   = gammalib.GEnergy(emin, "TeV")
     e_max   = gammalib.GEnergy(emax, "TeV")
@@ -61,7 +61,7 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100):
     if min < 0.0001*max:
         min = 0.0001*max
     min = math.pow(10.0, math.log10(min)-1)
-    
+
 
     # Show spectrum
     plt.figure()
@@ -73,11 +73,11 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100):
     plt.ylabel(r"dN/dE [ph s$^{-1}$ cm$^{-2}$ MeV$^{-1}$]")
     plt.ylim([min,max]) 
     plt.show()
-    
+
     # Return
     return
-    
-    
+
+
 # ============= #
 # Script entry  #
 # ============= #    
@@ -100,6 +100,6 @@ if __name__ == "__main__":
 
     # Extract relevant model
     model = models[index]
-    
+
     # Plot spectrum
     plot_spectrum(model)

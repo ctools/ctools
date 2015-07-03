@@ -85,7 +85,7 @@ class Test(gammalib.GPythonTestSuite):
         bkgcube["proj"]     = "CAR"
         bkgcube["xref"]     = 83.63
         bkgcube["yref"]     = 22.01
-        
+
         # Run tool
         self.test_try("Run ctbkgcube")
         try:

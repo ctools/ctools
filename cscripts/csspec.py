@@ -37,14 +37,14 @@ class csspec(ctools.cscript):
         """
         Constructor.
         """
-        
+
         # Set name
         self.name    = "csspec"
         self.version = "1.0.0"
-        
+
         # Initialise some members
         self.obs = None 
-              
+
         # Initialise some members
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
             self.obs = argv[0]
@@ -53,7 +53,7 @@ class csspec(ctools.cscript):
             self.obs = gammalib.GObservations()
             self.obs.clear()   
         self.m_outfile = ""
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -71,7 +71,7 @@ class csspec(ctools.cscript):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -79,7 +79,7 @@ class csspec(ctools.cscript):
         #  Write separator into logger
         if self.logTerse():
             self.log("\n")
-        
+
         # Return
         return
 
@@ -90,13 +90,13 @@ class csspec(ctools.cscript):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
+
         try:
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
@@ -128,10 +128,10 @@ class csspec(ctools.cscript):
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csspec.log","","","Log filename"))
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -144,10 +144,10 @@ class csspec(ctools.cscript):
         # Set models if we have none
         if self.obs.models().size() == 0:
             self.obs.models(self["inmodel"].filename())
-           
+
         # Get source name   
         self.m_srcname = self["srcname"].string()
-        
+
         # Get ebounds             
         self.m_ebounds = self.create_ebounds()
 
@@ -165,32 +165,32 @@ class csspec(ctools.cscript):
 
         # Read other parameters
         self.m_outfile = self["outfile"].filename()
-        
+
         # Get other parameeters
         self.m_calc_ulimit = self["calc_ulim"].boolean()
         self.m_calc_ts     = self["calc_ts"].boolean()
         self.m_fix_bkg     = self["fix_bkg"].boolean()
         self.m_fix_srcs    = self["fix_srcs"].boolean()
-             
+
         # Set some fixed parameters
         self.m_log     = False # Logging in client tools
         self.m_chatter = self["chatter"].integer()
         self.m_clobber = self["clobber"].boolean()
         self.m_debug   = self["debug"].boolean()
-         
+
         # Return
         return
-    
+
     def models(self, models):
         """
         Set model.
         """
         # Copy models
         self.obs.models(models.clone())
-    
+
         # Return
         return
-        
+
     def execute(self):
         """
         Execute the script.
@@ -200,7 +200,7 @@ class csspec(ctools.cscript):
 
         # Save residual map
         self.fits.saveto(self.m_outfile, self.m_clobber)
-        
+
         # Return
         return
 
@@ -214,12 +214,12 @@ class csspec(ctools.cscript):
 
         # Get parameters
         self.get_parameters()
-        
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
-        
+
         # Write observation into logger
         if self.logTerse():
             self.log("\n")
@@ -234,15 +234,15 @@ class csspec(ctools.cscript):
 
         # Adjust model parameters dependent on input user parameters
         for model in self.obs.models():
-            
+
             # Set TS flag for all models to false.
             # Source of interest will be set to true later
             model.tscalc(False)
-            
+
             # Log model name
             if self.logExplicit():
                 self.log.header3(model.name())
-            
+
             # Deal with the source of interest    
             if model.name() == self.m_srcname:
                 for par in model:
@@ -254,32 +254,32 @@ class csspec(ctools.cscript):
                 model.spectral()[0].free()
                 if self.m_calc_ts:
                     model.tscalc(True)
-                
+
             elif self.m_fix_bkg and not model.classname() == "GModelSky":
                 for par in model:
                     if par.is_free() and self.logExplicit():
                         self.log(" Fixing \""+par.name()+"\"\n")
                     par.fix()
-        
+
             elif self.m_fix_srcs and model.classname() == "GModelSky":
                 for par in model:
                     if par.is_free() and self.logExplicit():
                         self.log(" Fixing \""+par.name()+"\"\n")
                     par.fix()
-        
+
         # Write header
         if self.logTerse():
             self.log("\n")
             self.log.header1("Generate spectrum")      
-        
+
         # Initialise FITS Table with extension "SPECTRUM"
         table = gammalib.GFitsBinTable(self.m_ebounds.size())
         table.extname("SPECTRUM")
-        
+
         # Add Header for compatibility with gammalib.GMWLSpectrum
         table.card("INSTRUME", "CTA", "Name of Instrument")
         table.card("TELESCOP", "CTA", "Name of Telescope")
-        
+
         # Create FITS table columns
         energy       = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
         energy.unit("TeV")
@@ -295,7 +295,7 @@ class csspec(ctools.cscript):
         ulim_values  = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
         ulim_values.unit("erg/cm2/s")
         Npred_values = gammalib.GFitsTableDoubleCol("Npred", self.m_ebounds.size())
-        
+
 
         # Loop over energy bins
         for i in range(self.m_ebounds.size()):
@@ -310,18 +310,18 @@ class csspec(ctools.cscript):
             emax      = self.m_ebounds.emax(i)
             elogmean  = self.m_ebounds.elogmean(i)
             elogmean2 = elogmean.MeV() * elogmean.MeV()    
-                        
+
             # Store energy as TeV
             energy[i] = elogmean.TeV()
-            
+
             # Store energy errors
             energy_low[i]  = (elogmean - emin).TeV()
             energy_high[i] = (emax - elogmean).TeV()
-            
+
             # Log information
             if self.logExplicit():
-                    self.log.header3("Selecting events")
-            
+                self.log.header3("Selecting events")
+
             # Select events
             select = ctools.ctselect(self.obs)
             select["emin"] = emin.TeV()    
@@ -342,7 +342,7 @@ class csspec(ctools.cscript):
                 # Header
                 if self.logTerse():
                     self.log.header3("Binning events")
-                
+
                 # Bin events
                 bin = ctools.ctbin(select.obs())
                 bin["usepnt"]   = False
@@ -358,11 +358,11 @@ class csspec(ctools.cscript):
                 bin["coordsys"] = self.m_coordsys
                 bin["proj"]     = self.m_proj
                 bin.run()
-                
+
                 # Header
                 if self.logTerse():
                     self.log.header3("Creating exposure cube")
-                
+
                 # Create exposure cube
                 expcube = ctools.ctexpcube(select.obs())
                 expcube["incube"]   = "NONE"
@@ -379,11 +379,11 @@ class csspec(ctools.cscript):
                 expcube["coordsys"] = self.m_coordsys
                 expcube["proj"]     = self.m_proj               
                 expcube.run()
-                
+
                 # Header
                 if self.logTerse():
                     self.log.header3("Creating PSF cube")
-                
+
                 # Create psf cube
                 psfcube = ctools.ctpsfcube(select.obs())
                 psfcube["incube"]   = "NONE"
@@ -400,11 +400,11 @@ class csspec(ctools.cscript):
                 psfcube["coordsys"] = self.m_coordsys
                 psfcube["proj"]     = self.m_proj               
                 psfcube.run()
-                
+
                 # Header
                 if self.logTerse():
                     self.log.header3("Creating background cube")
-                
+
                 # Create background cube
                 bkgcube = ctools.ctbkgcube(select.obs())
                 bkgcube["incube"]   = "NONE"
@@ -421,37 +421,37 @@ class csspec(ctools.cscript):
                 bkgcube["coordsys"] = self.m_coordsys
                 bkgcube["proj"]     = self.m_proj                
                 bkgcube.run()
-                
+
                 # Set new binned observation
                 obs = bin.obs()
-                
+
                 # Set precomputed binned response
                 obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
                 # Get new models
                 models = bkgcube.models()
-                
+
                 # Fix background models if required
                 if self.m_fix_bkg:
                     for model in models:
                         if not model.classname() == "GModelSky":
                             for par in model:
                                 par.fix()
-                                
+
                 # Set new models to binned observation           
                 obs.models(models)
-                
+
             # Header
             if self.logTerse():
                 self.log.header3("Performing fit")
-                             
+
             # Likelihood
             like = ctools.ctlike(obs)
             like.run()
-            
+
             # Skip bin if no event was present
             if like.obs().logL() == 0.0:
-                
+
                 # Log information
                 if self.logTerse():
                     self.log("No event in this bin. Bin is skipped\n")
@@ -463,7 +463,7 @@ class csspec(ctools.cscript):
                 ulim_values[i]  = 0.0
                 Npred_values[i] = 0.0
                 continue
-                         
+
             # Get results
             fitted_models = like.obs().models()
             source        = fitted_models[self.m_srcname]
@@ -471,16 +471,16 @@ class csspec(ctools.cscript):
             # Calculate Upper Limit            
             ulimit_value = -1.0
             if self.m_calc_ulimit:
-                
+
                 # Logging information
                 if self.logTerse():
                     self.log.header3("Computing upper limit")
-                  
+
                 # Create upper limit object  
                 ulimit = ctools.ctulimit(like.obs())
                 ulimit["srcname"] = self.m_srcname
                 ulimit["eref"] = elogmean.TeV()
-                
+
                 # Try to run upper limit and catch exceptions
                 try:
                     ulimit.run()
@@ -489,37 +489,37 @@ class csspec(ctools.cscript):
                     if self.logTerse():
                         self.log("Upper limit calculation failed\n")
                     ulimit_value = -1.0
-            
+
             # Get TS value
             TS = -1.0
             if self.m_calc_ts:
                 TS = source.ts() 
-            
+
             # Compute Npred value
             Npred = 0.0
             for observation in like.obs():
                 Npred += observation.npred(source)  
-              
+
             # Get differential flux    
             fitted_flux = source.spectral().eval(elogmean,gammalib.GTime())
-            
+
             # Compute flux error
             parvalue  = source.spectral()[0].value()
             rel_error = source.spectral()[0].error()/parvalue        
             e_flux    = fitted_flux*rel_error
-            
+
             # Set values for storage
             TSvalues[i] = TS
-            
+
             # Set npred values 
             Npred_values[i] = Npred
-            
+
             # Convert fluxes to nuFnu
             flux[i]     = fitted_flux * elogmean2 * gammalib.MeV2erg
             flux_err[i] = e_flux      * elogmean2 * gammalib.MeV2erg
             if ulimit_value > 0.0:
                 ulim_values[i] = ulimit_value * elogmean2 * gammalib.MeV2erg
-         
+
             # Log information
             if self.logExplicit(): 
                 self.log("Bin "+str(i)+" ["+str(emin.TeV())+"-"+str(emax.TeV())+"] TeV: ")
@@ -540,14 +540,14 @@ class csspec(ctools.cscript):
         table.append(TSvalues)
         table.append(ulim_values)
         table.append(Npred_values)
-        
+
         # Create the FITS file now
         self.fits = gammalib.GFits()
         self.fits.append(table)
-            
+
         # Return
         return
-    
+
 
 # ======================== #
 # Main routine entry point #
@@ -558,10 +558,9 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = csspec(sys.argv)
-    
+
     # Open logfile
     app.logFileOpen()
-    
+
     # Execute application
     app.execute()
-    

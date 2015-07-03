@@ -50,7 +50,7 @@ class caldb():
         """
         # Store root path
         self.path = path
-        
+
         # Initialise some members
         self.cif     = None
         self.irf     = None
@@ -62,7 +62,7 @@ class caldb():
 
         # Store UTC date of job execution
         self.utc = datetime.utcnow().isoformat()[:19]
-        
+
         # Set CALDB information
         self.cal_tel      = "CTA"
         self.cal_inst     = inst.upper()
@@ -99,13 +99,13 @@ class caldb():
         self.bgd_doc      = "???"
         self.bgd_bounds   = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.bgd_desc     = "CTA background"
-            
+
         # Create directory structure
         self.make_dirs()
-        
+
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor. Close all FITS files.
@@ -115,18 +115,18 @@ class caldb():
 
         # Return
         return
-    
+
     def make_dirs(self):
         """
         Generate CALDB directory structure for one observation identifier.
         The structure is given by
-        
+
             data/<tel>/<inst>/bcf/
-        
+
         where <tel> is "cta" and <inst> is the instrument specified in the
         CALDB constructor (the instrument may be used for different array
         configurations).
-        
+
         Parameters:
          None
         Keywords:
@@ -139,7 +139,7 @@ class caldb():
 
         # Set directory names
         self.bcf_dir   = self.base_dir+"/bcf"
-        
+
         # Optionally prefix path
         if len(self.path) > 0:
             self.base_path  = self.path+"/"+self.base_dir
@@ -151,17 +151,17 @@ class caldb():
         # Create directory structure
         if not os.path.isdir(self.bcf_path):
             os.makedirs(self.bcf_path)
-    
+
         # Return
         return
-    
+
     def add(self, rspname, split=False, clobber=True):
         """
         Add new calibration. The actual version will put
         all calibrations in the same file, although each part of the response
         function will have its own logical name. We can thus easily modify
         the script to put each calibration information in a separate file.
-        
+
         Parameters:
          rspname - Response name
         Keywords:
@@ -179,21 +179,21 @@ class caldb():
             self.psf_file   = "irf_"+rspname+".dat"
             self.edisp_file = "irf_"+rspname+".dat"
             self.bgd_file   = "irf_"+rspname+".dat"
-        
+
         # Open calibration database index
         if self.cif == None:
             self.cif = gammalib.GFits(self.base_path+"/caldb.indx", True)
-        
+
         # If file has no CIF extension than create it now
         try:
             self.hdu_cif = self.cif.table("CIF")
         except:
             self.create_cif()
             self.hdu_cif = self.cif.table("CIF")
-        
+
         # Set response name
         self.cal_name = "NAME("+rspname+")"
-        
+
         # Return
         return
 
@@ -210,7 +210,7 @@ class caldb():
         # necessarily have all the information at hand (in particular
         # about the boundaries)
         #self.add_cif_info()
-        
+
         # Close CIF
         if self.cif != None:
             self.cif.save(True)
@@ -222,7 +222,7 @@ class caldb():
 
         # Return
         return
-    
+
     def create_cif(self):
         """
         Create Calibration Index File (CIF) extension in CIF FITS file.
@@ -234,9 +234,9 @@ class caldb():
         """
         # Create binary table
         table = gammalib.GFitsBinTable()
-        
+
         # Set boundary
-        
+
         # Attach columns. Reference: CAL/GEN/92-008
         table.append(gammalib.GFitsTableStringCol("TELESCOP", 0, 10))
         table.append(gammalib.GFitsTableStringCol("INSTRUME", 0, 10))
@@ -256,20 +256,20 @@ class caldb():
         table.append(gammalib.GFitsTableShortCol("CAL_QUAL", 0))
         table.append(gammalib.GFitsTableStringCol("CAL_DATE", 0, 8))
         table.append(gammalib.GFitsTableStringCol("CAL_DESC", 0, 70))
-        
+
         # Set keywords. Reference: CAL/GEN/92-008
         table.extname("CIF")
         table.card("CIFVERSN", "1992a", "Version of CIF format")
-        
+
         # Attach table to FITS file. Note that at this moment the
         # FITS table gets connected to the FITS file. Yet since
         # nothing was yet written to the FITS file, we cannot read
         # anything from it.
         self.cif.append(table)
-        
+
         # Return
         return
-    
+
     def add_cif_info(self):
         """
         Add information to CIF extension.
@@ -287,13 +287,13 @@ class caldb():
 
         # Append 4 rows to CIF extension
         self.hdu_cif.append_rows(4)
-        
+
         # Add generic information for these 4 rows
         for i in range(4):
-        
+
             # Set row number
             row = i+self.hdu_cif.nrows()-4
-            
+
             # Set element
             self.hdu_cif["TELESCOP"][row] = self.cal_tel
             self.hdu_cif["INSTRUME"][row] = self.cal_inst
@@ -307,7 +307,7 @@ class caldb():
             self.hdu_cif["REF_TIME"][row] = self.ref_time
             self.hdu_cif["CAL_QUAL"][row] = self.cal_qual
             self.hdu_cif["CAL_DATE"][row] = self.cal_date
-        
+
         # Add effective area information
         row = self.hdu_cif.nrows()-4
         self.hdu_cif["CAL_DIR"][row]   = self.bcf_dir
@@ -359,14 +359,14 @@ class caldb():
                 self.hdu_cif["CAL_CBD"][row, n] = "NONE"
             else:
                 self.hdu_cif["CAL_CBD"][row, n] = self.bgd_bounds[n]
-        
+
         # Return
         return
-    
+
     def root2caldb(self, filename):
         """
         Generate files.
-    
+
         Parameters:
          filename - Performance file name
         """
@@ -383,16 +383,16 @@ class caldb():
         if self.ea_file == self.psf_file and \
            self.ea_file == self.edisp_file and \
            self.ea_file == self.bgd_file :
-           split = False
-           fprf  = open(ea_filename, "w")
-           files = [fprf]
+            split = False
+            fprf  = open(ea_filename, "w")
+            files = [fprf]
         else:
-           split = True
-           fea    = open(ea_filename, "w")
-           fpsf   = open(psf_filename, "w")
-           fedisp = open(edisp_filename, "w")
-           fbgd   = open(bgd_filename, "w")
-           files  = [fea, fpsf, fedisp, fbgd]
+            split = True
+            fea    = open(ea_filename, "w")
+            fpsf   = open(psf_filename, "w")
+            fedisp = open(edisp_filename, "w")
+            fbgd   = open(bgd_filename, "w")
+            files  = [fea, fpsf, fedisp, fbgd]
 
         # Write header
         for file in files:
@@ -420,12 +420,12 @@ class caldb():
         rootfile.GetObject("AngRes", angres)
         rootfile.GetObject("AngRes80", angres80)
         rootfile.GetObject("ERes", eres)
-    
+
         # Setup vectors
         energies  = bgrate.GetXaxis()
         nbins_eng = energies.GetNbins()
         for i in range(nbins_eng):
-        
+
             # Get logE and background rate per squared degree
             logE   = energies.GetBinCenter(i+1)
             bgd    = bgrate.GetBinContent(i+1,1)
@@ -436,7 +436,7 @@ class caldb():
             r80    = angres80.GetBinContent(i+1,1)
             dE     = eres.GetBinContent(i+1,1)
             diffs  = sens.GetBinContent(i+1,1)
-        
+
             # Skip any NaNs
             if math.isnan(area80):
                 continue
@@ -446,10 +446,10 @@ class caldb():
             emin   = math.pow(10.0, logE-0.1)*1.0e6
             emax   = math.pow(10.0, logE+0.1)*1.0e6
             ewidth = emax-emin
-        
+
             # Convert into background rate per steradian and MeV
             bkg_rate  = bgdsq / (0.01745329*0.01745329) / ewidth
-        
+
             # Compute control background rate (this only works for KB files
             # as they are for 80% containment radius). But we don't use this
             # anyways, it's just for control on display ...
@@ -458,7 +458,7 @@ class caldb():
                 bkg_rate2 = bgd / omega / ewidth
             else:
                 bkg_rate2 = 0.0
-        
+
             # Compute full effective area by dividing area80/0.80
             area = area80/0.80
 
@@ -494,7 +494,7 @@ class caldb():
         # necessarily have all the information at hand (in particular
         # about the boundaries)
         self.add_cif_info()
-    
+
         # Return
         return
 
@@ -521,7 +521,7 @@ if __name__ == '__main__':
 
     # Loop over all files
     for file in files:
-        
+
         # Get filename
         head, tail = os.path.split(file)
 
@@ -540,6 +540,6 @@ if __name__ == '__main__':
 
         # Open calibration file
         irf.add(name)
-    
+
         # Translate ROOT to CALDB information
         irf.root2caldb(file)

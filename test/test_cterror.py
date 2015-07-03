@@ -74,7 +74,7 @@ class Test(gammalib.GPythonTestSuite):
         error["srcname"]  = "Crab"
         error["caldb"]    = self.caldb
         error["irf"]      = self.irf
-        
+
         # Run tool
         self.test_try("Run cterror")
         try:
@@ -90,6 +90,6 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in saving results.")
-        
+
         # Return
         return

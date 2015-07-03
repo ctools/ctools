@@ -82,7 +82,7 @@ class Test(gammalib.GPythonTestSuite):
         expcube["proj"]     = "CAR"
         expcube["xref"]     = 83.63
         expcube["yref"]     = 22.01
-        
+
         # Run tool
         self.test_try("Run ctexpcube")
         try:

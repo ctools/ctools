@@ -32,7 +32,7 @@ import sys
 def make_file_function(irfname, filename):
     """
     Generate file function from model.
-    
+
     Parameters:
      irfname  - IRF filename
      filename - File function filename
@@ -40,16 +40,16 @@ def make_file_function(irfname, filename):
     # Open performance file and file function
     irf  = open(irfname, "r")
     file = open(filename, "w")
-    
+
     # Read data
     for row in irf:
-    
+
         # Skip header and trailer
         if row.find("log(E)") != -1:
             continue
         if row.find("--------") != -1:
             break
-            
+
         # Extract data
         fields = row.replace(" ",",").replace(",,",",").rstrip("\n").split(",")
         logE   = float(fields[0])
@@ -59,16 +59,16 @@ def make_file_function(irfname, filename):
         eres   = float(fields[4])
         bgd    = float(fields[5])
         sens   = float(fields[6])
-        
+
         # Compute energy (in MeV)
         energy = math.pow(10.0, logE)*1.0e6
         emin   = math.pow(10.0, logE-0.1)*1.0e6
         emax   = math.pow(10.0, logE+0.1)*1.0e6
         ewidth = emax-emin
-        
+
         # Compute solid angle of r80 region in sr
         omega = 2.0 * math.pi * (1.0 - math.cos(math.radians(r80)))
-        
+
         # Compute background rate per steradian and MeV
         if omega > 0.0:
             bkg_rate = bgd/omega/ewidth
@@ -77,11 +77,11 @@ def make_file_function(irfname, filename):
 
         # Write
         file.write(str(energy)+" "+str(bkg_rate)+"\n")
-    
+
     # Close files
     irf.close()
     file.close()
-    
+
     # Return
     return
 
@@ -111,6 +111,6 @@ if __name__ == '__main__':
         irf      = tail.strip(".dat")
         filename = "bkg_"+irf+".txt"
         print(filename)
-    
+
         # Make background file
         make_file_function(irfname, filename)

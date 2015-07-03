@@ -25,27 +25,27 @@ def print_help():
 # Maps class holding the different sky maps 
 # created by cttsmap
 class maps:
-    
+
     # Constructor
     def __init__(self,fitsfile):
-        
+
         self.filename = fitsfile
         if not os.path.isfile(fitsfile):
             self.error("Maps instance cannot be constructed: File \""+self.filename+"\" does not exist")
-        
+
         # open FITS file
         fits = gammalib.GFits(fitsfile)
-        
+
         # get TS map
         self.tsmap = gammalib.GSkymap()
         self.tsmap.read(fits[0])
-        
+
         # Get status map
         if not fits.contains("STATUS MAP"):
             self.error("No extension \"STATUS MAP\" found in \""+self.filename+"\"")
         self.statusmap = gammalib.GSkymap()
         self.statusmap.read(fits["STATUS MAP"])
-              
+
         # Get other maps 
         self.maps = []
         self.mapnames = []
@@ -72,30 +72,30 @@ class maps:
                 check = False
                 break
         return check
-    
+
     # Save maps to outfile
     def save(self,outfile):
-        
+
         fits = gammalib.GFits()
         self.tsmap.write(fits)
-        
+
         for i in range(len(self.maps)):
             self.maps[i].write(fits)
-        
+
         for i in range(len(self.mapnames)):   
             fits[i+1].extname(self.mapnames[i])
-        
+
         if not self.check_status():
             self.statusmap.write(fits)
             fits[fits.size()-1].extname("STATUS MAP")
         fits.saveto(outfile,True)
-           
+
     # Add map instances to each other
     # in this way the TS maps get merged  
     def add(self,addmaps):
         if not len(addmaps) == len(self.maps):
             self.error("Maps cannot be added: Maps from \""+self.filename+"\" do not match from \""+addmaps.filename+"\"")
-            
+
         # Loop over bins    
         for i in range(self.tsmap.npix()):
             if addmaps.statusmap[i] > 0.5:
@@ -107,8 +107,8 @@ class maps:
     def error(self,message):  
         print("*** ERROR ***: "+message)
         sys.exit(-1)
-        
-        
+
+
 def pars_from_argv(argv):
 
     if argv is None:
@@ -139,10 +139,10 @@ def get_kwargs(argv):
         if s.count('=') == 1:
             key, value = s.split('=', 1) 
             kwargs[key] = value
-            
+
         else:
             print_help()         
-            
+
     return kwargs   
 
 if __name__ == "__main__":
@@ -158,10 +158,10 @@ if __name__ == "__main__":
         allfiles = open(files).read().splitlines()   
     else:
         allfiles = glob.glob(files)
-        
+
     # Initialise files to be merged
     mergefiles = []
-    
+
     # Test files for the entry status map
     # and add them to the file list
     for fitsfile in allfiles:    
@@ -169,14 +169,13 @@ if __name__ == "__main__":
         if fits.contains("STATUS MAP"):
             mergefiles.append(fitsfile)
         fits.close()
-        
+
     # create a maps instance from the first file
     finalmaps = maps(mergefiles[0])
-    
+
     # add other files to the maps instance
     for fitsfile in mergefiles[1:]:
         finalmaps.add(maps(fitsfile))
-    
+
     # save the filled maps to file
     finalmaps.save(outfile=outfile)
-    

@@ -26,18 +26,18 @@ try:
 except:
     sys.exit("This script needs matplotlib")
 
-  
+
 # ============ #
 # Script entry #
 # ============ #    
 if __name__ == "__main__":
     """
     """
-    
+
     # Check for given spectrum file
     if not len(sys.argv) == 2:
         sys.exit("Usage: show_spectrum.py spectrum.fits")
-    
+
     # Read spectrum file    
     filename = sys.argv[1]
     fits     = gammalib.GFits(filename)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     c_eflux  = table["e_Flux"]
     c_ts     = table["TS"]
     c_upper  = table["UpperLimit"]
-    
+
     # Initialise arrays to be filled
     energies    = []
     flux        = []
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     ul_ed_engs  = []
     ul_eu_engs  = []
     ul_flux     = []
-    
+
     # Loop over rows of the file
     nrows = table.nrows()
     for row in range(nrows):
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         ts    = c_ts.real(row)
         flx   = c_flux.real(row)
         e_flx = c_eflux.real(row)
-        
+
         # Switch
         if ts > 9.0 and e_flx < flx:
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
             ul_flux.append(c_upper.real(row))
             ul_ed_engs.append(c_ed.real(row))
             ul_eu_engs.append(c_eu.real(row))
-    
+
     # Plot the spectrum 
     plt.figure()
     plt.loglog()
@@ -98,4 +98,3 @@ if __name__ == "__main__":
     plt.xlabel("Energy [TeV]")
     plt.ylabel(r"dN/dE [erg cm$^{-2}$ s$^{-1}$]")    
     plt.show()
-    

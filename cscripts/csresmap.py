@@ -36,11 +36,11 @@ class csresmap(ctools.cscript):
         """
         Constructor.
         """
-        
+
         # Set name
         self.name    = "csresmap"
         self.version = "1.0.0"
-        
+
         # Initialise some members
         self.obs            = None 
         self.algorithm      = "SUB"
@@ -48,7 +48,7 @@ class csresmap(ctools.cscript):
         self.m_modcube      = "None"
         self.m_use_maps     = False
         self.m_skip_binning = False
-              
+
         # Initialise some members
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
             self.obs = argv[0]
@@ -57,7 +57,7 @@ class csresmap(ctools.cscript):
             self.obs = gammalib.GObservations()
             self.obs.clear()   
         self.outfile = ""
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -75,7 +75,7 @@ class csresmap(ctools.cscript):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -83,7 +83,7 @@ class csresmap(ctools.cscript):
         #  Write separator into logger
         if self.logTerse():
             self.log("\n")
-        
+
         # Return
         return
 
@@ -94,13 +94,13 @@ class csresmap(ctools.cscript):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
+
         try:
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
@@ -128,10 +128,10 @@ class csresmap(ctools.cscript):
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csresmap.log","","","Log filename"))
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -153,28 +153,28 @@ class csresmap(ctools.cscript):
             self.m_modcube = self["modcube"].filename()
             if self.m_modcube != "NONE":
                 self.m_use_maps = True
-        
+
         # If not two maps are given, proceed to set up observation
         if not self.m_use_maps:
-        
+
             # Set observation if not done before
             if self.obs.size() == 0:
                 self.require_inobs("csresmap.get_parameters()")
                 self.obs = self.get_observations()
-                
+
             # Check if we have exactly one binned CTA observation
             if self.obs.size() == 1:
-                
+
                 if self.obs[0].classname() == "GCTAObservation":
                     if self.obs[0].eventtype() == "CountsCube":                
                         # Skip ctbin step later on
                         self.m_skip_binning = True
-                    
-    
+
+
             # Set models if we have none
             if self.obs.models().size() == 0:
                 self.obs.models(self["inmodel"].filename())
-    
+
             # Skip query for spatial parameters if a binning is provided in the observation
             if not self.m_skip_binning:
                 # Read other parameters        
@@ -189,30 +189,30 @@ class csresmap(ctools.cscript):
                 self.m_nxpix     = self["nxpix"].integer()
                 self.m_nypix     = self["nypix"].integer()
                 self.m_binsz     = self["binsz"].real()
-        
+
         # Read necessary parameters
         self.m_outfile   = self["outmap"].filename()    
         self.m_algorithm = self["algorithm"].string()
-                 
+
         # Set some fixed parameters
         self.m_log     = False # Logging in client tools
         self.m_chatter = self["chatter"].integer()
         self.m_clobber = self["clobber"].boolean()
         self.m_debug   = self["debug"].boolean()
-         
+
         # Return
         return
-    
+
     def models(self, models):
         """
         Set model.
         """
         # Copy models
         self.obs.models(models.clone())
-    
+
         # Return
         return
-        
+
     def execute(self):
         """
         Execute the script.
@@ -222,7 +222,7 @@ class csresmap(ctools.cscript):
 
         # Save residual map
         self.resmap.save(self.m_outfile, self.m_clobber)
-        
+
         # Return
         return
 
@@ -236,12 +236,12 @@ class csresmap(ctools.cscript):
 
         # Get parameters
         self.get_parameters()
-        
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
-        
+
         # Write observation into logger
         if self.logTerse():
             self.log("\n")
@@ -253,19 +253,19 @@ class csresmap(ctools.cscript):
         if self.m_use_maps:
             countmap = gammalib.GSkymap(self["inobs"].filename())
             modelmap = gammalib.GSkymap(self.m_modcube)
-            
+
         else:
-            
+
             if self.m_skip_binning:
                 cta_counts_cube = gammalib.GCTAEventCube(self.obs[0].events().clone())   
 
             else:
-            
+
                 # Write header
                 if self.logTerse():
                     self.log("\n")
                     self.log.header1("Generate binned map (ctbin)")
-        
+
                 # Create countsmap
                 bin = ctools.ctbin(self.obs)
                 bin["nxpix"].integer(self.m_nxpix)
@@ -283,18 +283,18 @@ class csresmap(ctools.cscript):
                 bin["clobber"].boolean(self.m_clobber)
                 bin["debug"].boolean(self.m_debug)
                 bin.run()
-    
+
                 # Retrieve counts cube
                 cta_counts_cube = bin.cube()
-     
+
             # Assign GCTAEventCube to skymap
             countmap = cta_counts_cube.map()
-     
+
             # Write header
             if self.logTerse():
                 self.log("\n")
                 self.log.header1("Generate model map (ctmodel)")
-    
+
             # Create model map
             model = ctools.ctmodel(self.obs)
             model.cube(cta_counts_cube)
@@ -302,11 +302,11 @@ class csresmap(ctools.cscript):
             model["clobber"].boolean(self.m_clobber)
             model["debug"].boolean(self.m_debug)
             model.run()
-    
+
             # Get model map into GSkymap object
             modelmap = model.cube().map().copy()
-            
-        
+
+
         # Store counts map as residual map. Note that we need a
         # special construct here to avoid memory leaks. This seems
         # to be a SWIG feature as SWIG creates a new object when
@@ -315,15 +315,15 @@ class csresmap(ctools.cscript):
         self.resmap = countmap.copy()
         self.resmap.stack_maps()
         modelmap.stack_maps()
-        
+
         # Continue calculations depending on given algorithm
         if self.m_algorithm == "SUB":
-            
+
             # Subtract maps 
             self.resmap -= modelmap
-        
+
         elif self.m_algorithm == "SUBDIV":
-            
+
             # Subtract and divide by model map
             self.resmap -= modelmap
             self.resmap /= modelmap
@@ -331,7 +331,7 @@ class csresmap(ctools.cscript):
             #    if pixel != 0.0:
             #        pixel = 1.0/pixel
             #self.resmap *= modelmap
-            
+
         elif self.m_algorithm == "SUBDIVSQRT":
 
             # subtract and divide by sqrt of model map
@@ -341,15 +341,15 @@ class csresmap(ctools.cscript):
             #    if pixel != 0.0:
             #        pixel = 1.0/math.sqrt(pixel)
             #self.resmap *= modelmap
-            
+
         else:
-            
+
             # Raise error if algorithm is unkown
             raise TypeError("Algorithm \""+self.m_algorithm+"\" not known")
-        
+
         # Return
         return
-    
+
 
 # ======================== #
 # Main routine entry point #
@@ -360,10 +360,9 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = csresmap(sys.argv)
-    
+
     # Open logfile
     app.logFileOpen()
-    
+
     # Execute application
     app.execute()
-    

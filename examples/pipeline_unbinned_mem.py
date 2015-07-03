@@ -39,7 +39,7 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
                        caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
-    
+
     Keywords:
      pattern   - Pointing pattern, either "single" or "four"
      ra        - RA of pattern centre [deg] (default: 83.6331)
@@ -58,7 +58,7 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
                                              ra=ra,
                                              dec=dec,
                                              offset=offset)
-    
+
     # Get observation container
     obs = obsutils.set_obs_list(obs_def_list,
                                 duration=duration,
@@ -78,13 +78,13 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
 def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
     """
     Setup model for analysis.
-    
+
     Keywords:
      model - Model Xml file
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
-    
+
     # Return observation container
     return obs
 
@@ -130,7 +130,7 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0,
     like = ctools.ctlike(select.obs())
     like["debug"] = True # Switch this always on for results in console
     like.run()
-	
+
     # Return
     return
 

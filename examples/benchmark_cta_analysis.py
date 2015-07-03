@@ -88,7 +88,7 @@ def unbinned_pipeline(duration):
     tstop    = time.clock()
     telapsed = tstop - tstart
     tctlike  = tstop - tctlike
-	
+
     # Return
     return telapsed, tctlike
 
@@ -161,7 +161,7 @@ def binned_pipeline(duration):
     tstop    = time.clock()
     telapsed = tstop - tstart
     tctlike  = tstop - tctlike
-	
+
     # Return
     return telapsed, tctlike
 
@@ -293,7 +293,7 @@ def stacked_pipeline(duration):
     tstop    = time.clock()
     telapsed = tstop - tstart
     tctlike  = tstop - tctlike
-	
+
     # Return
     return telapsed, tctlike
 
@@ -344,7 +344,7 @@ if __name__ == '__main__':
 
         # Increment duration
         duration *= 2.0
- 
+
     # Optionally plot results
     if has_matplotlib:
         plt.figure(1)
@@ -359,4 +359,3 @@ if __name__ == '__main__':
         plt.ylabel("CPU time (seconds)")
         plt.legend(loc="lower right")
         plt.show()
-        

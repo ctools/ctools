@@ -52,7 +52,7 @@ class caldb():
         """
         # Store root path
         self.path = path
-        
+
         # Initialise some members
         self.cif     = None
         self.irf     = None
@@ -64,7 +64,7 @@ class caldb():
 
         # Store UTC date of job execution
         self.utc = datetime.utcnow().isoformat()[:19]
-        
+
         # Set CALDB information
         self.cal_tel      = "CTA"
         self.cal_inst     = inst.upper()
@@ -102,13 +102,13 @@ class caldb():
         self.bgd_doc      = "???"
         self.bgd_bounds   = [self.cal_name, self.cal_version, self.cal_cut, self.cal_analysis]
         self.bgd_desc     = "CTA background"
-            
+
         # Create directory structure
         self.make_dirs()
-        
+
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor. Close all FITS files.
@@ -118,18 +118,18 @@ class caldb():
 
         # Return
         return
-    
+
     def make_dirs(self):
         """
         Generate CALDB directory structure for one observation identifier.
         The structure is given by
-        
+
             data/<tel>/<inst>/bcf/<obsid>
-        
+
         where <tel> is "cta" and <inst> is the instrument specified in the
         CALDB constructor (the instrument may be used for different array
         configurations).
-        
+
         Parameters:
          None
         Keywords:
@@ -147,7 +147,7 @@ class caldb():
         self.psf_dir   = self.obs_dir
         self.edisp_dir = self.obs_dir
         self.bgd_dir   = self.obs_dir
-        
+
         # Optionally prefix path
         if len(self.path) > 0:
             self.base_path  = self.path+"/"+self.base_dir
@@ -175,17 +175,17 @@ class caldb():
             os.makedirs(self.edisp_path)
         if not os.path.isdir(self.bgd_path):
             os.makedirs(self.bgd_path)
-    
+
         # Return
         return
-    
+
     def open(self, version, split=False, clobber=True):
         """
         Open existing or create new calibration. The actual version will put
         all calibrations in the same file, although each part of the response
         function will have its own logical name. We can thus easily modify
         the script to put each calibration information in a separate file.
-        
+
         Parameters:
          version - Filename version
         Keywords:
@@ -203,17 +203,17 @@ class caldb():
             self.psf_file   = "irf_"+version+".fits"
             self.edisp_file = "irf_"+version+".fits"
             self.bgd_file   = "irf_"+version+".fits"
-        
+
         # Open calibration database index
         self.cif = gammalib.GFits(self.base_path+"/caldb.indx", True)
-        
+
         # If file has no CIF extension than create it now
         try:
             self.hdu_cif = self.cif.table("CIF")
         except:
             self.create_cif()
             self.hdu_cif = self.cif.table("CIF")
-        
+
         # Set filenames
         ea_filename    = self.ea_path+"/"+self.ea_file
         psf_filename   = self.psf_path+"/"+self.psf_file
@@ -232,13 +232,13 @@ class caldb():
             self.psf   = self.irf
             self.edisp = self.irf
             self.bgd   = self.irf
-        
+
         # Open HDUs
         self.open_ea()
         self.open_psf()
         self.open_edisp()
         self.open_bgd()
-        
+
         # Return
         return
 
@@ -255,7 +255,7 @@ class caldb():
         # necessarily have all the information at hand (in particular
         # about the boundaries)
         self.add_cif_info()
-        
+
         # Close CIF
         if self.cif != None:
             self.cif.save(True)
@@ -272,11 +272,11 @@ class caldb():
             self.psf   = None
             self.edisp = None
             self.bgd   = None
-        
+
         # ... otherwise we have split files, so we have to close them
         # all
         else:
-        
+
             # Close effective area file
             if self.ea != None:
                 self.ea.save(True)
@@ -300,10 +300,10 @@ class caldb():
                 self.bgd.save(True)
                 self.bgd.close()
                 self.bgd = None
-        
+
         # Return
         return
-    
+
     def create_cif(self):
         """
         Create Calibration Index File (CIF) extension in CIF FITS file.
@@ -315,9 +315,9 @@ class caldb():
         """
         # Create binary table
         table = gammalib.GFitsBinTable()
-        
+
         # Set boundary
-        
+
         # Attach columns. Reference: CAL/GEN/92-008
         table.append(gammalib.GFitsTableStringCol("TELESCOP", 0, 10))
         table.append(gammalib.GFitsTableStringCol("INSTRUME", 0, 10))
@@ -337,20 +337,20 @@ class caldb():
         table.append(gammalib.GFitsTableShortCol("CAL_QUAL", 0))
         table.append(gammalib.GFitsTableStringCol("CAL_DATE", 0, 8))
         table.append(gammalib.GFitsTableStringCol("CAL_DESC", 0, 70))
-        
+
         # Set keywords. Reference: CAL/GEN/92-008
         table.extname("CIF")
         table.card("CIFVERSN", "1992a", "Version of CIF format")
-        
+
         # Attach table to FITS file. Note that at this moment the
         # FITS table gets connected to the FITS file. Yet since
         # nothing was yet written to the FITS file, we cannot read
         # anything from it.
         self.cif.append(table)
-        
+
         # Return
         return
-    
+
     def add_cif_info(self):
         """
         Add information to CIF extension.
@@ -362,13 +362,13 @@ class caldb():
         """
         # Append 4 rows to CIF extension
         self.hdu_cif.append_rows(4)
-        
+
         # Add generic information for these 4 rows
         for i in range(4):
-        
+
             # Set row number
             row = i+self.hdu_cif.nrows()-4
-            
+
             # Set element
             self.hdu_cif["TELESCOP"][row] = self.cal_tel
             self.hdu_cif["INSTRUME"][row] = self.cal_inst
@@ -382,7 +382,7 @@ class caldb():
             self.hdu_cif["REF_TIME"][row] = self.ref_time
             self.hdu_cif["CAL_QUAL"][row] = self.cal_qual
             self.hdu_cif["CAL_DATE"][row] = self.cal_date
-        
+
         # Add effective area information
         row = self.hdu_cif.nrows()-4
         self.hdu_cif["CAL_DIR"][row]   = self.ea_dir
@@ -434,7 +434,7 @@ class caldb():
                 self.hdu_cif["CAL_CBD"][row, n] = "NONE"
             else:
                 self.hdu_cif["CAL_CBD"][row, n] = self.bgd_bounds[n]
-        
+
         # Return
         return
 
@@ -455,20 +455,20 @@ class caldb():
         except:
             # Create binary table
             table = gammalib.GFitsBinTable()
-            
+
             # Set extension name
             table.extname("EFFECTIVE AREA")
-            
+
             # Set OGIP keywords
             self.set_ogip_keywords(table, self.ea_doc, \
                                    ["RESPONSE", self.ea_name])
-            
+
             # Append table
             self.ea.append(table)
-            
+
             # Get extension
             self.hdu_ea = self.ea.table("EFFECTIVE AREA")
-        
+
         # Return
         return
 
@@ -489,20 +489,20 @@ class caldb():
         except:
             # Create binary table
             table = gammalib.GFitsBinTable()
-            
+
             # Set extension name
             table.extname("POINT SPREAD FUNCTION")
-            
+
             # Set OGIP keywords
             self.set_ogip_keywords(table, self.psf_doc, \
                                    ["RESPONSE", self.psf_name])
-            
+
             # Append table
             self.psf.append(table)
 
             # Get extension
             self.hdu_psf = self.psf.table("POINT SPREAD FUNCTION")
-        
+
         # Return
         return
 
@@ -523,10 +523,10 @@ class caldb():
         except:
             # Create binary table
             table = gammalib.GFitsBinTable()
-            
+
             # Set extension name
             table.extname("ENERGY DISPERSION")
-            
+
             # Set OGIP keywords
             self.set_ogip_keywords(table, self.edisp_doc, \
                                    ["RESPONSE", self.edisp_name])
@@ -536,7 +536,7 @@ class caldb():
 
             # Get extension
             self.hdu_edisp = self.edisp.table("ENERGY DISPERSION")
-        
+
         # Return
         return
 
@@ -557,10 +557,10 @@ class caldb():
         except:
             # Create binary table
             table = gammalib.GFitsBinTable()
-            
+
             # Set extension name
             table.extname("BACKGROUND")
-            
+
             # Set OGIP keywords
             self.set_ogip_keywords(table, self.bgd_doc, \
                                    ["RESPONSE", self.bgd_name])
@@ -570,7 +570,7 @@ class caldb():
 
             # Get extension
             self.hdu_bgd = self.bgd.table("BACKGROUND")
-        
+
         # Return
         return
 
@@ -597,7 +597,7 @@ class caldb():
             key = "HDUCLAS%d" % (i+1)
             hdu.card(key, item, "")
         hdu.card("HDUVERS", "1.0.0", "")
-        
+
         # Return
         return
 
@@ -608,7 +608,7 @@ class caldb():
         offset angle columns, this method will simply add another data
         column.
         If name==None, the method will not append any data column.
-        
+
         Parameters:
          array - ROOT 2D histogram.
          hdu   - FITS HDU.
@@ -690,7 +690,7 @@ class caldb():
         offset angle columns, this method will simply add another data
         column.
         If name==None, the method will not append any data column.
-        
+
         Parameters:
          array - ROOT 2D histogram.
          hdu   - FITS HDU.
@@ -701,7 +701,7 @@ class caldb():
         """
         # Set constants
         deg2sr = 0.01745329*0.01745329
-        
+
         # Extract energy and offset angle vectors
         energies = array.GetXaxis()
         neng     = energies.GetNbins()
@@ -825,7 +825,7 @@ class caldb():
         histogram. If the HDU has already the columns, this method will
         simply add another data column.
         If name==None, the method will not append any data column.
-        
+
         Parameters:
          array - ROOT 3D histogram.
          hdu   - FITS HDU.
@@ -925,11 +925,11 @@ class caldb():
 
         # Return boundary information
         return bounds
-    
+
     def root2caldb(self, filename, rebin=False, psftype="Gauss", eascale=1.0, bgdscale=1.0):
         """
         Translate ROOT to CALDB information.
-        
+
         Parameters:
          filename - ROOT 2D performance filename.
         Keywords:
@@ -943,7 +943,7 @@ class caldb():
 
         # Create effective area
         self.root2ea(file, rebin=rebin, eascale=eascale)
-        
+
         # Create point spread function
         self.root2psf(file, psftype)
 
@@ -953,7 +953,7 @@ class caldb():
         # Create background
         #self.root2bgd(file)
         self.root2bgd3D(file, bgdscale=bgdscale)
-        
+
         # Return
         return
 
@@ -1076,7 +1076,7 @@ class caldb():
                 for ieng in range(neng):
                     sigma = r68.GetBinContent(ieng+1,ioff+1) * r68_to_sigma
                     r68.SetBinContent(ieng+1,ioff+1,sigma)
-            
+
             # Compute scale histogram
             scale = r68.Clone()
             for ioff in range(noffset):
@@ -1087,7 +1087,7 @@ class caldb():
                     else:
                         value = 0.0
                     scale.SetBinContent(ieng+1,ioff+1,value)
-            
+
             # Set zero histogram
             zero = r68.Clone()
             for ioff in range(noffset):
@@ -1172,12 +1172,12 @@ class caldb():
 
                     # Continue only if both radii are positive
                     if r_68 > 0 and r_80 > 0:
-                    
+
                         # Derive constants for equation to solve
                         a = 1.0 - 0.68
                         b = 1.0 - 0.80
                         c = r_68*r_68/(r_80*r_80)
-                    
+
                         # Solve equation (a^x-1)/(b^x-1)=c for x using secant
                         # method. Stop when we are better than 1e-6.
                         x1   = -0.5
@@ -1202,7 +1202,7 @@ class caldb():
                             gamma = 1.0 - 1.0/x
                         else:
                             gamma = 1.0
-                        
+
                         # Compute sigma
                         denominator = 2.0 * gamma * (math.pow(a, x) - 1.0)
                         if denominator > 0.0:
@@ -1228,7 +1228,7 @@ class caldb():
 
                         # Show results on console
                         #print(ioff,ieng,gamma,sigma,x,f,iter)
-                        
+
                     # Set bin contents
                     gamma2D.SetBinContent(ieng+1,ioff+1,gamma)
                     sigma2D.SetBinContent(ieng+1,ioff+1,sigma)
@@ -1352,7 +1352,7 @@ class caldb():
 
             # BGD_RECO
             self.make_2D(array, self.hdu_bgd, "BGD_RECO", "")
-            
+
         # Return
         return
 
@@ -1384,7 +1384,7 @@ class caldb():
 
             # BGD (reconstructed energy)
             self.make_3D(array, self.hdu_bgd, "BGD", "1/s/MeV/sr", scale=bgdscale)
-            
+
         # Return
         return
 
@@ -1397,7 +1397,7 @@ class caldb():
         hdu.card("CCLS0001", self.cal_class, "Calibration class")
         hdu.card("CDTP0001", self.cal_type, "Calibration type")
         hdu.card("CCNM0001", name, "Calibration name")
-        
+
         # Set boundary keywords
         for n in range(9):
             keyname = "CBD%d0001" % (n+1)
@@ -1406,12 +1406,12 @@ class caldb():
             else:
                 value = bounds[n]
             hdu.card(keyname, value, "Calibration boundary")
-        
+
         # Set validity keywords
         hdu.card("CVSD0001", self.val_date, "Calibration validity start date (UTC)")
         hdu.card("CVST0001", self.val_time, "Calibration validity start time (UTC)")
         hdu.card("CDEC0001", desc, "Calibration description")
-        
+
         # Return
         return
 
@@ -1551,7 +1551,7 @@ if __name__ == '__main__':
     This script translates a CTA ROOT 2D performance files into a CALDB
     compliant CTA response. The script will create the response for 3 
     observations to illustrate the run-wise file structure.
-    
+
     The CTA ROOT 2D performance files contain the following histograms:
     - DiffSens_offaxis (2D) - Differential sensitivity
     - EffectiveArea_offaxis (2D) - Effective area (full containment?, reco energy?)
@@ -1592,9 +1592,9 @@ if __name__ == '__main__':
 
         # Allocate caldb entry
         irf = caldb(inst, id)
-    
+
         # Open calibration file
         irf.open("file")
-    
+
         # Translate ROOT to CALDB information
         irf.root2caldb(filename, rebin=rebin, psftype=psftype, eascale=eascale, bgdscale=bgdscale)

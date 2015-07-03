@@ -42,7 +42,7 @@ class cscaldb(ctools.cscript):
         # Set name
         self.name    = "cscaldb"
         self.version = "1.0.0"
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -60,7 +60,7 @@ class cscaldb(ctools.cscript):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -75,35 +75,35 @@ class cscaldb(ctools.cscript):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
+
         try:
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append_standard()
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get parameters from parfile.
         """
         # Return
         return
-    
+
     def execute(self):
         """
         Execute the script.
         """
         # Run the script
         self.run()
-        
+
         # Return
         return
 
@@ -117,7 +117,7 @@ class cscaldb(ctools.cscript):
 
         # Get parameters
         self.get_parameters()
-        
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
@@ -156,7 +156,7 @@ class cscaldb(ctools.cscript):
 
             # Loop over instruments
             for instrument in instruments:
-            
+
                 # Write mission into logger
                 if self.logTerse():
                     self.log.header3("Response functions in database \""+instrument+"\"")
@@ -166,7 +166,7 @@ class cscaldb(ctools.cscript):
                 fits = gammalib.GFits(cifname)
                 cif  = fits["CIF"]
                 cals = cif["CAL_CBD"]
-                
+
                 # Extract response names
                 names = []
                 nrows = cals.length()
@@ -181,13 +181,13 @@ class cscaldb(ctools.cscript):
                             if names.count(name) == 0:
                                 names.append(name)
                 names.sort()
-                
+
                 # Print response name
                 if self.logTerse():
                     for name in names:
                         self.log(name+"\n")
                     self.log("\n")
-        
+
         # Return
         return
 
@@ -201,10 +201,9 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = cscaldb(sys.argv)
-    
+
     # Open logfile
     app.logFileOpen()
-    
+
     # Execute application
     app.execute()
-    

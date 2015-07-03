@@ -96,6 +96,6 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in saving results.")
-        
+
         # Return
         return

@@ -42,7 +42,7 @@ class cspull(ctools.cscript):
         # Set name
         self.name    = "cspull"
         self.version = "1.0.0"
-        
+
         # Initialise some members
         self.obs           = None
         self.model         = None
@@ -53,7 +53,7 @@ class cspull(ctools.cscript):
         self.m_psfcube     = None
         self.m_bckcube     = None
         self.m_stackmodels = None
-        
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -71,7 +71,7 @@ class cspull(ctools.cscript):
 
         # Return
         return
-    
+
     def __del__(self):
         """
         Destructor.
@@ -79,7 +79,7 @@ class cspull(ctools.cscript):
         #  Write separator into logger
         if self.logTerse():
             self.log("\n")
-        
+
         # Return
         return
 
@@ -90,13 +90,13 @@ class cspull(ctools.cscript):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
+
         try:
             pars = gammalib.GApplicationPars(parfile)
         except:
             # Signal if parfile was not found
             print("Parfile "+parfile+" not found. Create default parfile.")
-            
+
             # Create default parfile
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
@@ -126,29 +126,29 @@ class cspull(ctools.cscript):
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","cspull.log","","","Log filename"))
             pars.save(parfile)
-        
+
         # Return
         return
-        
+
     def get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
         # Get parameters
-        
+
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
             self.obs = self.get_observations()
-            
+
             # Check for requested pattern and use above
             # observation parameters to set wobble pattern
             self.m_pattern = self["pattern"].string()
             if self.m_pattern == "four":
                 self.obs = self.set_obs()
-            
+
         # Get number of energy bins
         self.m_enumbins = self["enumbins"].integer()
-   
+
         # Read parameters for binned if requested
         if not self.m_enumbins == 0:
             self.m_npix  = self["npix"].integer()
@@ -157,11 +157,11 @@ class cspull(ctools.cscript):
             # Set dummy values (required by obsutils)
             self.m_npix  = 0
             self.m_binsz = 0.0
-            
+
         # Set models if we have none
         if self.obs.models().size() == 0:
             self.obs.models(self["inmodel"].filename())
-         
+
         # Read other parameters    
         self.m_outfile = self["outfile"].filename()
         self.m_ntrials = self["ntrials"].integer()   
@@ -176,7 +176,7 @@ class cspull(ctools.cscript):
 
         # Return
         return
-    
+
 
     def models(self, models):
         """
@@ -184,10 +184,10 @@ class cspull(ctools.cscript):
         """
         # Copy models
         self.obs.models(models.copy())
-    
+
         # Return
         return
-        
+
 
     def execute(self):
         """
@@ -195,11 +195,11 @@ class cspull(ctools.cscript):
         """
         # Run the script
         self.run()
-        
+
         # Return
         return
 
-        
+
     def set_stacked_irf(self):
         """
         For stacked analysis prepare stacked irfs
@@ -227,7 +227,7 @@ class cspull(ctools.cscript):
         # Notify exposure computation
         if self.logTerse():
             self.log("Computed exposure cube\n")
-        
+
         # Get stacked Psf
         psfcube = ctools.ctpsfcube(self.obs)
         psfcube["incube"]   = "NONE"
@@ -246,7 +246,7 @@ class cspull(ctools.cscript):
         # Notify Psf computation
         if self.logTerse():
             self.log("Computed Psf cube\n")
-        
+
         # Get stacked background
         bkgcube = ctools.ctbkgcube(self.obs)
         bkgcube["incube"]   = "NONE"
@@ -265,17 +265,17 @@ class cspull(ctools.cscript):
         # Notify background cube computation
         if self.logTerse():
             self.log("Computed background cube\n")
-        
+
         # Store results
         self.m_exposure    = expcube.expcube().copy()
         self.m_psfcube     = psfcube.psfcube().copy()
         self.m_bckcube     = bkgcube.bkgcube().copy()
         self.m_stackmodels = bkgcube.models().copy()
-        
+
         # Return
         return
-        
-        
+
+
     def run(self):
         """
         Run the script.
@@ -286,12 +286,12 @@ class cspull(ctools.cscript):
 
         # Get parameters
         self.get_parameters()
-        
+
         #  Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
-        
+
         # Write observation into logger
         if self.logTerse():
             self.log("\n")
@@ -310,10 +310,10 @@ class cspull(ctools.cscript):
 
         # Loop over trials
         for seed in range(self.m_ntrials):
-        
+
             # Make a trial
             result = self.trial(seed)
-            
+
             # Write out result immediately
             if seed == 0:
                 file = open(self.m_outfile, 'w')
@@ -324,23 +324,23 @@ class cspull(ctools.cscript):
             writer = csv.DictWriter(file, result['colnames'])
             writer.writerow(result['values'])
             file.close()
-        
+
         # Return
         return
-    
+
 
     def set_obs(self):
         """
         Returns an observation container with a set of CTA observations.
-        
+
         Keywords:
         """
-        
+
         # Setup observation definition list
         obsdeflist = obsutils.set_obs_patterns(self.m_pattern,
                                                ra=self["ra"].real(), dec=self["dec"].real(),
                                                offset=self["offset"].real())
-        
+
         # Create list of observations
         obs = obsutils.set_obs_list(obsdeflist,
                                     tstart=self["tmin"].real(), duration=self["tmax"].real()-self["tmin"].real(),
@@ -348,7 +348,7 @@ class cspull(ctools.cscript):
                                     emin=self["emin"].real(), emax=self["emax"].real(),
                                     rad=self["rad"].real(),
                                     irf=self["irf"].string(), caldb=self["caldb"].string())
-    
+
         # Return observation container
         return obs
 
@@ -356,11 +356,11 @@ class cspull(ctools.cscript):
     def trial(self, seed):
         """
         Create the pull for a single trial.
-        
+
         Parameters:
          seed - Random number generator seed
         """
-        
+
         # Write header
         if self.logNormal():
             self.log.header2("Trial "+str(seed+1))
@@ -375,12 +375,12 @@ class cspull(ctools.cscript):
                            log=self.m_log,
                            debug=self.m_debug,
                            chatter=self.m_chatter)
-        
+
         # If stacked, add stacked responses and model
         if self.obs.size() > 0 and self.m_enumbins > 0:
             obs[0].response(self.m_exposure, self.m_psfcube, self.m_bckcube)
             obs.models(self.m_stackmodels)
-        
+
         # Determine number of events in simulation
         nevents = 0.0
         for run in obs:
@@ -416,7 +416,7 @@ class cspull(ctools.cscript):
         # Write result header
         if self.logNormal():
             self.log.header3("Pulls")
-        
+
         # Gather results
         colnames = []
         values   = {}
@@ -432,15 +432,15 @@ class cspull(ctools.cscript):
             for k in range(model.size()):
                 par = model[k]
                 if par.is_free():
-                
+
                     # Set parameter name
                     name = model_name+"_"+par.name()
-                    
+
                     # Append parameter, Pull_parameter and Unc_parameter
                     colnames.append(name)
                     colnames.append("Pull_"+name)
                     colnames.append("Unc_"+name)
-                
+
                     # Compute pull
                     fitted_value = par.value()
                     real_value   = self.obs.models()[i][k].value()
@@ -449,7 +449,7 @@ class cspull(ctools.cscript):
                         pull = (fitted_value - real_value) / error
                     else:
                         pull = 99.0
-                        
+
                     # Store results
                     values[name] = fitted_value
                     values["Pull_"+name] = pull
@@ -464,10 +464,10 @@ class cspull(ctools.cscript):
                         self.log(" +/- ")
                         self.log(error)
                         self.log(")\n")
-        
+
         # Bundle together results
         result = {'colnames': colnames, 'values': values}
-        
+
         # Return
         return result
 
@@ -481,10 +481,9 @@ if __name__ == '__main__':
     """
     # Create instance of application
     app = cspull(sys.argv)
-    
+
     # Open logfile
     app.logFileOpen()
-    
+
     # Execute application
     app.execute()
-    
