@@ -22,12 +22,17 @@ None
 A specific cscripts Python module has been created for cscripts. This module
 can be imported using
 
-    import cscripts
+    >>> import cscripts
 
 The obsutils utility functions have also been moved into the scripts folder.
 
 The obsutils.spectrum() function has been removed as it is now replaced by the
 csspec script.
+
+Some tests for the installed ctools package have been added. They can be
+executed by typing the following under Python:
+
+    >>> cscripts.test()
 
 
 4. Support model
