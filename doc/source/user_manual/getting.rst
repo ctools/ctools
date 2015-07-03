@@ -309,6 +309,42 @@ If you use C shell or a variant then add the following to your
   source $CTOOLS/bin/ctools-init.csh
 
 
+Checking your setup
+-------------------
+
+Now you should be ready to get started using Gammalib and ctools.
+
+As a quick check that your setup is OK, you can run ``csinfo check``:
+
+.. code-block:: bash
+
+  $ csinfo check
+
+  Gammalib / ctools setup check:
+
+     GAMMALIB environment variable ... ok
+     CTOOLS   environment variable ... ok
+     gammalib Python import .......... ok
+     ctools   Python import .......... ok
+
+     ===> Your Gammalib / ctools setup is OK.
+
+If the setup is not OK, run the ``csinfo info`` command to print
+detailed information about your setup.
+There's also a ``csinfo list`` command to quickly list the available tools:
+
+.. code-block:: bash
+
+  $ csinfo
+
+  Print info about Gammalib and ctools to the console.
+
+  Available commands:
+     csinfo list    List available ctools and cscripts
+     csinfo check   Check Gammalib / ctools setup
+     csinfo info    Print Gammalib / ctools setup info
+
+
 Known problems
 --------------
 
