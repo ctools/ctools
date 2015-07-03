@@ -377,7 +377,7 @@ class cspull(ctools.cscript):
                            chatter=self.m_chatter)
 
         # If stacked, add stacked responses and model
-        if self.obs.size() > 0 and self.m_enumbins > 0:
+        if self.obs.size() > 1 and self.m_enumbins > 0:
             obs[0].response(self.m_exposure, self.m_psfcube, self.m_bckcube)
             obs.models(self.m_stackmodels)
 
