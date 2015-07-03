@@ -23,11 +23,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-from ctools import obsutils
 import os
 import glob
 import sys
+import math
+import gammalib
+from cscripts import obsutils
 
 
 # =========== #
@@ -86,7 +87,7 @@ def plot_counts(obs):
                 counts[index] = counts[index] + 1.0
             
             # Create error bars
-            error = [sqrt(c) for c in counts]
+            error = [math.sqrt(c) for c in counts]
             
             # Plot spectrum
             plt.loglog(energy, counts, 'ro', label='data')
@@ -140,7 +141,7 @@ def plot_counts(obs):
                     counts[index] = counts[index] + 1.0
             
             # Create error bars
-            error = [sqrt(c) for c in counts]
+            error = [math.sqrt(c) for c in counts]
             
             # Plot distribution
             #plt.semilogy(offset2, counts, 'ro', label='data')

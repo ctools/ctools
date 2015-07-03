@@ -166,8 +166,8 @@ class cssens(ctools.cscript):
         self.m_debug = self["debug"].boolean() # Debugging in client tools
 
         # Derive some parameters
-        self.m_ebounds = gammalib.GEbounds(self.m_bins, \
-                                           gammalib.GEnergy(self.m_emin, "TeV"), \
+        self.m_ebounds = gammalib.GEbounds(self.m_bins,
+                                           gammalib.GEnergy(self.m_emin, "TeV"),
                                            gammalib.GEnergy(self.m_emax, "TeV"))
         
         # Return
@@ -200,7 +200,7 @@ class cssens(ctools.cscript):
             self.log("\n")
         
         # Initialise script
-        colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux', \
+        colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux',
                     'energy_flux', 'sensitivity']
         results  = []
 
@@ -242,7 +242,7 @@ class cssens(ctools.cscript):
                 raise gammalib.GException.invalid_value("cssens", msg)
             
             # Determine sensitivity
-            result = self.get_sensitivity(self.obs, emin, emax, \
+            result = self.get_sensitivity(self.obs, emin, emax,
                                           bkg_model, full_model)
             
             # Write results
@@ -297,8 +297,8 @@ class cssens(ctools.cscript):
             pntdir.lb_deg(lpnt, bpnt)
         
             # Create CTA observation
-            run = obsutils.set_obs(pntdir, caldb=caldb, irf=irf, \
-                                   duration=duration, deadc=deadc, \
+            run = obsutils.set_obs(pntdir, caldb=caldb, irf=irf,
+                                   duration=duration, deadc=deadc,
                                    emin=emin, emax=emax, rad=rad)
         
             # Append observation to container
@@ -464,8 +464,8 @@ class cssens(ctools.cscript):
             obs.models(src_model)
 
             # Simulate events
-            sim = obsutils.sim(obs, nbins=self.m_enumbins, seed=iter, \
-                               binsz=self.m_binsz, npix=self.m_npix, \
+            sim = obsutils.sim(obs, nbins=self.m_enumbins, seed=iter,
+                               binsz=self.m_binsz, npix=self.m_npix,
                                log=self.m_log, debug=self.m_debug)
 
             # Determine number of events in simulation

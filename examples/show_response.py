@@ -265,18 +265,18 @@ if __name__ == '__main__':
 
     # Set response dictionary
     rsps = [
-            {'dbname':  "dummy", \
-             'rspname': "cta_dummy_irf", \
-             'name':    "Prod1 (Array E, MPIK)", \
-             'color':   "b"}, \
-            {'dbname':  "e", \
-             'rspname': "IFAE20120510_50h", \
-             'name':    "Prod1 (Array E, IFAE)", \
-             'color':   "g"}, \
-            {'dbname':  "aar", \
-             'rspname': "DESY20140105_50h", \
-             'name':    "Prod2 (Aar, DESY)", \
-             'color':   "r"} \
+            {'dbname':  "dummy",
+             'rspname': "cta_dummy_irf",
+             'name':    "Prod1 (Array E, MPIK)",
+             'color':   "b"},
+            {'dbname':  "e",
+             'rspname': "IFAE20120510_50h",
+             'name':    "Prod1 (Array E, IFAE)",
+             'color':   "g"},
+            {'dbname':  "aar",
+             'rspname': "DESY20140105_50h",
+             'name':    "Prod2 (Aar, DESY)",
+             'color':   "r"}
             ]
 
     # Loop over all responses
@@ -297,4 +297,3 @@ if __name__ == '__main__':
 
     # Show plot
     plt.show()
-    

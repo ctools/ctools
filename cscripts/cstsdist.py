@@ -328,16 +328,19 @@ class cstsdist(ctools.cscript):
         """
         
         # Setup observation definition list
-        obsdeflist = obsutils.set_obs_patterns(self.m_pattern, \
-                                               ra=self["ra"].real(), dec=self["dec"].real(), \
+        obsdeflist = obsutils.set_obs_patterns(self.m_pattern,
+                                               ra=self["ra"].real(),
+                                               dec=self["dec"].real(),
                                                offset=self["offset"].real())
         
         # Create list of observations
-        obs = obsutils.set_obs_list(obsdeflist, \
-                                    tstart=self["tmin"].real(), duration=self["tmax"].real()-self["tmin"].real(), \
-                                    deadc=self["deadc"].real(), \
-                                    emin=self["emin"].real(), emax=self["emax"].real(), \
-                                    rad=self["rad"].real(), \
+        obs = obsutils.set_obs_list(obsdeflist,
+                                    tstart=self["tmin"].real(),
+                                    duration=self["tmax"].real()-self["tmin"].real(),
+                                    deadc=self["deadc"].real(),
+                                    emin=self["emin"].real(),
+                                    emax=self["emax"].real(),
+                                    rad=self["rad"].real(),
                                     irf=self["irf"].string(), caldb=self["caldb"].string())
     
         # Return observation container
@@ -355,11 +358,11 @@ class cstsdist(ctools.cscript):
             self.log.header2("Trial "+str(seed+1))
 
         # Simulate events
-        sim = obsutils.sim(self.obs, \
-                           nbins=self.m_enumbins, \
-                           seed=seed, \
-                           binsz=self.m_binsz, \
-                           npix=self.m_npix, \
+        sim = obsutils.sim(self.obs,
+                           nbins=self.m_enumbins,
+                           seed=seed,
+                           binsz=self.m_binsz,
+                           npix=self.m_npix,
                            log=self.m_log, debug=self.m_debug)
         
         # Determine number of events in simulation

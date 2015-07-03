@@ -337,16 +337,16 @@ class cspull(ctools.cscript):
         """
         
         # Setup observation definition list
-        obsdeflist = obsutils.set_obs_patterns(self.m_pattern, \
-                                               ra=self["ra"].real(), dec=self["dec"].real(), \
+        obsdeflist = obsutils.set_obs_patterns(self.m_pattern,
+                                               ra=self["ra"].real(), dec=self["dec"].real(),
                                                offset=self["offset"].real())
         
         # Create list of observations
-        obs = obsutils.set_obs_list(obsdeflist, \
-                                    tstart=self["tmin"].real(), duration=self["tmax"].real()-self["tmin"].real(), \
-                                    deadc=self["deadc"].real(), \
-                                    emin=self["emin"].real(), emax=self["emax"].real(), \
-                                    rad=self["rad"].real(), \
+        obs = obsutils.set_obs_list(obsdeflist,
+                                    tstart=self["tmin"].real(), duration=self["tmax"].real()-self["tmin"].real(),
+                                    deadc=self["deadc"].real(),
+                                    emin=self["emin"].real(), emax=self["emax"].real(),
+                                    rad=self["rad"].real(),
                                     irf=self["irf"].string(), caldb=self["caldb"].string())
     
         # Return observation container
@@ -366,14 +366,14 @@ class cspull(ctools.cscript):
             self.log.header2("Trial "+str(seed+1))
 
         # Simulate events
-        obs = obsutils.sim(self.obs, \
-                           nbins=self.m_enumbins, \
-                           seed=seed, \
-                           binsz=self.m_binsz, \
-                           npix=self.m_npix, \
-                           edisp=self.m_edisp, \
-                           log=self.m_log, \
-                           debug=self.m_debug, \
+        obs = obsutils.sim(self.obs,
+                           nbins=self.m_enumbins,
+                           seed=seed,
+                           binsz=self.m_binsz,
+                           npix=self.m_npix,
+                           edisp=self.m_edisp,
+                           log=self.m_log,
+                           debug=self.m_debug,
                            chatter=self.m_chatter)
         
         # If stacked, add stacked responses and model
@@ -398,14 +398,14 @@ class cspull(ctools.cscript):
             models = obs.models()
             for i in range(models.size()):
                 model_name = models[i].name()
-                like       = obsutils.cterror(obs, model_name, \
-                                              log=self.m_log, \
+                like       = obsutils.cterror(obs, model_name,
+                                              log=self.m_log,
                                               debug=self.m_debug,
                                               chatter=self.m_chatter)
         else:
-            like = obsutils.fit(obs, edisp=self.m_edisp, \
-                                log=self.m_log, \
-                                debug=self.m_debug, \
+            like = obsutils.fit(obs, edisp=self.m_edisp,
+                                log=self.m_log,
+                                debug=self.m_debug,
                                 chatter=self.m_chatter)
 
         # Store results

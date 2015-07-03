@@ -28,9 +28,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctools.cstsdist import *
 import sys
 import time
+from cscripts import cstsdist
 
 # Try importing processing module
 has_processing = False
@@ -44,7 +44,7 @@ except:
 # ====================== #
 # Create TS distribution #
 # ====================== #
-def create_ts(loge, emin, emax, ntrials=100, duration=180000.0, \
+def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
 			  enumbins=0, log=False):
 	"""
 	Create TS distribution.
@@ -110,9 +110,9 @@ if __name__ == '__main__':
 	max_threads = 1
 	
 	# Parameter dictionnary
-	pars = [{'option': '-n', 'value': ntrials}, \
-	        {'option': '-e', 'value': enumbins}, \
-	        {'option': '-d', 'value': duration}, \
+	pars = [{'option': '-n', 'value': ntrials},
+	        {'option': '-e', 'value': enumbins},
+	        {'option': '-d', 'value': duration},
 			{'option': '-m', 'value': max_threads}]
 	
 	# Gather parameters from command line
@@ -165,7 +165,7 @@ if __name__ == '__main__':
 
 			# Set arguments
 			args   = (loge, emin, emax)
-			kwargs = {'ntrials': ntrials, 'enumbins': enumbins, \
+			kwargs = {'ntrials': ntrials, 'enumbins': enumbins,
 			          'duration': duration}
 
 			# Generate pull distribution
@@ -178,7 +178,7 @@ if __name__ == '__main__':
 		
 		# ... no
 		else:
-			create_ts(loge, emin, emax, ntrials=ntrials, enumbins=enumbins, \
+			create_ts(loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
                       duration=duration)
 	
 	# Processing support

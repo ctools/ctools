@@ -24,11 +24,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ctools import *
-from gammalib import *
-from cspull import *
 import sys
 import time
+import csv
+import gammalib
+from cscripts import cspull
 
 # Try importing processing module
 has_processing = False
@@ -42,7 +42,7 @@ except:
 # ======================== #
 # Create pull distribution #
 # ======================== #
-def create_pull(loge, emin, emax, models, ntrials=100, duration=180000.0, \
+def create_pull(loge, emin, emax, models, ntrials=100, duration=180000.0,
                 enumbins=0, log=False):
 	"""
 	Create pull distribution
@@ -94,8 +94,8 @@ def create_model(flux, index=-2.48, fitidx=False):
 	 flux - Flux in Crab units
 	"""
 	# Define background model
-	bgd_radial   = GCTAModelRadialGauss(3.0)
-	bgd_spectrum = GModelSpectralPlaw(61.8, -1.85)
+	bgd_radial   = gammalib.GCTAModelRadialGauss(3.0)
+	bgd_spectrum = gammalib.GModelSpectralPlaw(61.8, -1.85)
 	bgd_spectrum["Prefactor"].scale(1.0e-6)
 	bgd_spectrum["PivotEnergy"].value(1.0)
 	bgd_spectrum["PivotEnergy"].scale(1.0e6)
@@ -103,15 +103,15 @@ def create_model(flux, index=-2.48, fitidx=False):
 		bgd_spectrum["Index"].free()
 	else:
 		bgd_spectrum["Index"].fix()
-	bgd_model = GCTAModelRadialAcceptance(bgd_radial, bgd_spectrum)
+	bgd_model = gammalib.GCTAModelRadialAcceptance(bgd_radial, bgd_spectrum)
 	bgd_model.name("Background")
 	bgd_model.instruments("CTA")
 	
 	# Define source spectrum
-	location = GSkyDir()
+	location = gammalib.GSkyDir()
 	location.radec_deg(83.6331, 22.0145)
-	src_spatial  = GModelSpatialPtsrc(location)
-	src_spectrum = GModelSpectralPlaw(flux, index)
+	src_spatial  = gammalib.GModelSpatialPtsrc(location)
+	src_spectrum = gammalib.GModelSpectralPlaw(flux, index)
 	src_spectrum["Prefactor"].scale(5.7e-16)
 	src_spectrum["PivotEnergy"].value(0.3)
 	src_spectrum["PivotEnergy"].scale(1.0e6)
@@ -119,11 +119,11 @@ def create_model(flux, index=-2.48, fitidx=False):
 		src_spectrum["Index"].free()
 	else:
 		src_spectrum["Index"].fix()	
-	src_model = GModelPointSource(src_spatial, src_spectrum)
+	src_model = gammalib.GModelPointSource(src_spatial, src_spectrum)
 	src_model.name("Test")
 
 	# Add models to container
-	models = GModels()
+	models = gammalib.GModels()
 	models.append(bgd_model)
 	models.append(src_model)
 	
@@ -141,7 +141,11 @@ if __name__ == '__main__':
     cssens script.
 	"""
 	# Get input arguments
-	usage = "make_pull_at_sensitivity_limit filename [max_threads]"
+	usage = """
+	make_pull_at_sensitivity_limit filename [max_threads]
+
+	Run cssens to create the input file.
+	"""
 	if len(sys.argv) < 2 or len(sys.argv) > 3:
 		print(usage)
 		sys.exit()

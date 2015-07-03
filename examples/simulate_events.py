@@ -36,8 +36,8 @@ except:
 # ======================== #
 # Create CTA observation #
 # ======================== #
-def createobs(ra=86.171648, dec=-1.4774586, rad=5.0, \
-              emin=0.1, emax=100.0, duration=360000.0, deadc=0.95, \
+def createobs(ra=86.171648, dec=-1.4774586, rad=5.0,
+              emin=0.1, emax=100.0, duration=360000.0, deadc=0.95,
               irf="South_50h", caldb="prod2"):
     """
     Create CTA observation.

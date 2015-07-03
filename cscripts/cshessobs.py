@@ -374,8 +374,8 @@ class cshessobs(ctools.cscript):
 
         # Initialise empty xml file and append an observation list
         self.xml = gammalib.GXml()
-        self.xml.append(gammalib.GXmlElement("observation_list title=\"observation list\""));
-        lib = self.xml.element("observation_list", 0);
+        self.xml.append(gammalib.GXmlElement("observation_list title=\"observation list\""))
+        lib = self.xml.element("observation_list", 0)
         
         # Read runlist from file
         runlist = []

@@ -24,114 +24,113 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
+import ctools
 
 
 # ================= #
 # Analysis pipeline #
 # ================= #
 def pipeline(model_name):
-	"""
-	Unbinned analysis pipeline - keep intermediate results in memory.
-    
+    """
+    Unbinned analysis pipeline - keep intermediate results in memory.
+
     This function implements an analysis pipeline that successively calls
     ctobssim, ctselect and ctlike without saving the intermediate results as
-	FITS files on disk. All data is only hold in memory.
-	"""
-	# Set script parameters
-	caldb       = "prod2"
-	irf         = "South_50h"
-	ra          =   83.63
-	dec         =   22.01
-	rad_sim     =   10.0
-	tstart      =    0.0
-	tstop       = 1800.0
-	emin        =    0.1
-	emax        =  100.0
-	rad_select  =    3.0
+    FITS files on disk. All data is only hold in memory.
+    """
+    # Set script parameters
+    caldb       = "prod2"
+    irf         = "South_50h"
+    ra          =   83.63
+    dec         =   22.01
+    rad_sim     =   10.0
+    tstart      =    0.0
+    tstop       = 1800.0
+    emin        =    0.1
+    emax        =  100.0
+    rad_select  =    3.0
 
-	# Write model name
-	print("*** Model: "+model_name+" ************************************")
+    # Write model name
+    print("*** Model: "+model_name+" ************************************")
 
-	# Initialise timing
-	wall_seconds = 0.0
-	cpu_seconds  = 0.0
+    # Initialise timing
+    wall_seconds = 0.0
+    cpu_seconds  = 0.0
 
-	# Simulate events
-	sim = ctools.ctobssim()
-	sim["inmodel"] = model_name
-	sim["caldb"]   = caldb
-	sim["irf"]     = irf
-	sim["ra"]      = ra
-	sim["dec"]     = dec
-	sim["rad"]     = rad_sim
-	sim["tmin"]    = tstart
-	sim["tmax"]    = tstop
-	sim["emin"]    = emin
-	sim["emax"]    = emax
-	sim.run()
+    # Simulate events
+    sim = ctools.ctobssim()
+    sim["inmodel"] = model_name
+    sim["caldb"]   = caldb
+    sim["irf"]     = irf
+    sim["ra"]      = ra
+    sim["dec"]     = dec
+    sim["rad"]     = rad_sim
+    sim["tmin"]    = tstart
+    sim["tmax"]    = tstop
+    sim["emin"]    = emin
+    sim["emax"]    = emax
+    sim.run()
 
-	# Select events
-	select = ctools.ctselect(sim.obs())
-	select["ra"]   = ra
-	select["dec"]  = dec
-	select["rad"]  = rad_select
-	select["tmin"] = tstart
-	select["tmax"] = tstop
-	select["emin"] = emin
-	select["emax"] = emax
-	select.run()
+    # Select events
+    select = ctools.ctselect(sim.obs())
+    select["ra"]   = ra
+    select["dec"]  = dec
+    select["rad"]  = rad_select
+    select["tmin"] = tstart
+    select["tmax"] = tstop
+    select["emin"] = emin
+    select["emax"] = emax
+    select.run()
 
-	# Perform maximum likelihood fitting
-	like = ctools.ctlike(select.obs())
-	like.run()
+    # Perform maximum likelihood fitting
+    like = ctools.ctlike(select.obs())
+    like.run()
 
-	# Show model fitting results
-	print(like.obs().models()[0])
-	
-	# Return
-	return
+    # Show model fitting results
+    print(like.obs().models()[0])
+
+    # Return
+    return
 
 
 #==========================#
 # Main routine entry point #
 #==========================#
 if __name__ == '__main__':
-	"""
-	Perform unbinned analyses for various models.
-	"""
-	# Initialise flags
-	need_help = False
-	
-	# Test for command line arguments
-	print(sys.argv[0])
-	if (len(sys.argv) > 1):
-		if sys.argv[1] == "-h":
-			need_help = True
-		else:
-			need_help = True			
+    """
+    Perform unbinned analyses for various models.
+    """
+    # Initialise flags
+    need_help = False
 
-	# Print help if needed and exit
-	if need_help:
-		print("Usage: check_models.py [OPTIONS]")
-		print("     -h       Display this usage message")
-		sys.exit()
+    # Test for command line arguments
+    print(sys.argv[0])
+    if (len(sys.argv) > 1):
+        if sys.argv[1] == "-h":
+            need_help = True
+        else:
+            need_help = True
 
-	# Dump header
-	print("*******************************************")
-	print("* Check models using an unbinned analysis *")
-	print("*******************************************")
-		
-	# Perform analysis for Crab model
-	pipeline("$CTOOLS/share/models/crab.xml")
+    # Print help if needed and exit
+    if need_help:
+        print("Usage: check_models.py [OPTIONS]")
+        print("     -h       Display this usage message")
+        sys.exit()
 
-	# Perform analysis for disk model
-	pipeline("$CTOOLS/share/models/disk.xml")
+    # Dump header
+    print("*******************************************")
+    print("* Check models using an unbinned analysis *")
+    print("*******************************************")
 
-	# Perform analysis for Gaussian model
-	pipeline("$CTOOLS/share/models/gauss.xml")
-	
-	# Perform analysis for shell model
-	pipeline("$CTOOLS/share/models/shell.xml")
+    # Perform analysis for Crab model
+    pipeline("$CTOOLS/share/models/crab.xml")
+
+    # Perform analysis for disk model
+    pipeline("$CTOOLS/share/models/disk.xml")
+
+    # Perform analysis for Gaussian model
+    pipeline("$CTOOLS/share/models/gauss.xml")
+
+    # Perform analysis for shell model
+    pipeline("$CTOOLS/share/models/shell.xml")

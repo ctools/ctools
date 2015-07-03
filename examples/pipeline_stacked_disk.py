@@ -27,15 +27,15 @@
 # ==========================================================================
 import gammalib
 import ctools
-from ctools import obsutils
+from cscripts import obsutils
 
 
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
-                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
-                       deadc=0.95, \
+def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
+                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0,
+                       deadc=0.95,
                        caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
@@ -54,18 +54,18 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
      irf       - Instrument response function (default: cta_dummy_irf)
     """
     # Set list of observations
-    obs_def_list = obsutils.set_obs_patterns(pattern, \
-                                             ra=ra, \
-                                             dec=dec, \
+    obs_def_list = obsutils.set_obs_patterns(pattern,
+                                             ra=ra,
+                                             dec=dec,
                                              offset=offset)
     
     # Get observation container
-    obs = obsutils.set_obs_list(obs_def_list, \
-                                duration=duration, \
-                                emin=emin, \
-                                emax=emax, \
-                                rad=rad, \
-                                caldb=caldb, \
+    obs = obsutils.set_obs_list(obs_def_list,
+                                duration=duration,
+                                emin=emin,
+                                emax=emax,
+                                rad=rad,
+                                caldb=caldb,
                                 irf=irf)
 
     # Return observation container
@@ -92,11 +92,11 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 # ================================ #
 # Simulation and analysis pipeline #
 # ================================ #
-def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
-                 enumbins=20, nxpix=200, nypix=200, binsz=0.02, \
-                 coordsys="CEL", proj="CAR", \
-                 model="${CTOOLS}/share/models/crab.xml", \
-                 caldb="prod2", irf="South_50h", \
+def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
+                 enumbins=20, nxpix=200, nypix=200, binsz=0.02,
+                 coordsys="CEL", proj="CAR",
+                 model="${CTOOLS}/share/models/crab.xml",
+                 caldb="prod2", irf="South_50h",
                  debug=False):
     """
     Simulation and stacked analysis pipeline.

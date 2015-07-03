@@ -24,7 +24,7 @@
 # ==========================================================================
 import sys
 import math
-from gammalib import *
+import gammalib
 
 
 # ================= #
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     filename = sys.argv[1]
 
     # Load PHA spectrum
-    pha = GPha(filename)
+    pha = gammalib.GPha(filename)
     #print(pha)
 
     # Try importing matplotlib

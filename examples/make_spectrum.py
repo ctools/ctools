@@ -20,7 +20,7 @@
 # ==========================================================================
 import gammalib
 import ctools
-from ctools import obsutils
+from cscripts import obsutils
 try:
 	import matplotlib.pyplot as plt
 	has_matplotlib = True
@@ -84,10 +84,10 @@ def plot_spectrum(spectrum):
     plt.title("Crab spectrum")
 
     # Plot spectrum
-    plt.loglog(spectrum['energy']['value'], \
+    plt.loglog(spectrum['energy']['value'],
                spectrum['flux']['value'], 'ro', label='Crab')
-    plt.errorbar(spectrum['energy']['value'], \
-                 spectrum['flux']['value'], \
+    plt.errorbar(spectrum['energy']['value'],
+                 spectrum['flux']['value'],
                  spectrum['flux']['ed_value'], ecolor='r')
 
     # Put labels
@@ -115,4 +115,3 @@ if __name__ == '__main__':
     # Plot spectrum
     if has_matplotlib:
         plot_spectrum(spectrum)
-    

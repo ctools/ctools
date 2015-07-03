@@ -178,8 +178,8 @@ def dist_pdf(values, nbins, title):
 		nbins     += 1
 	
 	# Create histogram
-	n, bins, patches = plt.hist(values, nbins, range=[min_value, max_value], \
-	                            align='mid', facecolor='green', \
+	n, bins, patches = plt.hist(values, nbins, range=[min_value, max_value],
+	                            align='mid', facecolor='green',
 								log=True, label="simulations")
 
 	# Create expected distribution (onyl for positive TS). We compute the
@@ -239,9 +239,9 @@ if __name__ == '__main__':
 	plot   = "pdf"
 
 	# Parameter dictionnary
-	pars = [{'option': '-n', 'value': nbins}, \
-	        {'option': '-c', 'value': tsname}, \
-	        {'option': '-t', 'value': title}, \
+	pars = [{'option': '-n', 'value': nbins},
+	        {'option': '-c', 'value': tsname},
+	        {'option': '-t', 'value': title},
 			{'option': '-p', 'value': plot}]
 	
 	# Gather parameters from command line
@@ -280,5 +280,3 @@ if __name__ == '__main__':
 		dist_pdf(values, nbins, title)
 	else:
 		dist_cdf(values, nbins, title)
-
-	
