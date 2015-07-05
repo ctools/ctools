@@ -16,6 +16,7 @@ asked.
 - :ref:`Are ctools and GammaLib specific to CTA? <faq_instruments>`
 - :ref:`I want to upgrade ctools, do I have to upgrade GammaLib? <faq_upgrade>`
 - :ref:`Why does my ctool complain about missing parameters? <faq_pars>`
+- :ref:`Should I used binned or unbinned analysis? <faq_analysis>`
 
 
 .. _faq_ctools_gammalib:
@@ -95,4 +96,26 @@ asked.
   you still have the old parameter file without that parameter sitting in
   your pfiles folder. Simply erasing all files in the pfiles folder should
   fix this problem.
+
+
+.. _faq_analysis:
+
+.. topic:: Should I used binned or unbinned analysis?
+
+  This depends on the amount of data you want to analyse and to some extent
+  on the question you want to answer with your analysis.
+  For an unbinned analysis, the computation time increases about linearly
+  with the number of events and hence with the duration of the observation,
+  while for binned analysis the computation time depends only on the number
+  of bins that is used.
+  Consequently, for short observation times (below 30 hours), unbinned
+  analysis is faster, while for longer times it is advantageous to use
+  a binned analysis.
+  If you want to take the energy dispersion into account (which is required
+  if your analysis covers the lowest energies), you need to use unbinned
+  analysis, since binned analysis does not yet implement energy dispersion.
+  If you'd like to fit a Gaussian line to your data you may also prefer
+  unbinned over binned analysis, as the fine sampling required to resolve
+  the line may require a prohibitive large number of energy bins for a binned
+  analysis.
 

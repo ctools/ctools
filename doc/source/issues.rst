@@ -41,8 +41,7 @@ Below you will find a list of known issues.
    When performing a binned or stacked analysis you should make sure
    that the spatial and spectral binning is sufficiently fine grained.
    The spatial binning should be better than the best angular resolution
-   over the energy range of interest. Use a typical value of 0.02 degrees.
-   For the spectral binning, use at least 5 bins per decade.
-   If the binning is too coarse, the spectral parameters will be biased.
-   For example, a spectral hardening is observed when using a coarser
-   spatial binning.
+   over the energy range of interest. Use a typical value of 0.02 degrees
+   per pixel for the spatial binning and 10 bins per decade for the
+   spectral binning. If the binning is too coarse, the spectral parameters 
+   that are fitted will be biased.
