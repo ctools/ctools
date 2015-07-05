@@ -111,7 +111,7 @@ def binned_pipeline(duration):
     tstop       = duration
     emin        =    0.1
     emax        =  100.0
-    enumbins    =   20
+    enumbins    =   40
     nxpix       =  200
     nypix       =  200
     binsz       =    0.02
@@ -184,7 +184,7 @@ def stacked_pipeline(duration):
     tstop       = duration
     emin        =    0.1
     emax        =  100.0
-    enumbins    =   20
+    enumbins    =   40
     nxpix       =  200
     nypix       =  200
     binsz       =    0.02
