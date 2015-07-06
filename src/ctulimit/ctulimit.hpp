@@ -93,6 +93,7 @@ protected:
     double        m_emax;         //!< Maximum energy for flux limits (TeV)
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
+    bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
     GObservations m_obs;          //!< Observation container

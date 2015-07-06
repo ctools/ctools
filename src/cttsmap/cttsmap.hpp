@@ -86,6 +86,7 @@ protected:
     // User parameters
     std::string              m_srcname;    //!< Name of source which is moved around
     std::string              m_outmap;     //!< Output counts map or XML file
+    bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Parameters to control speed and job splitting
     int                      m_binmin;     //!< Map bin number from which computation should start

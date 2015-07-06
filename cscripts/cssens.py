@@ -107,6 +107,7 @@ class cssens(ctools.cscript):
             pars.append(gammalib.GApplicationPar("outfile","f","h","sensitivity.dat","","","Output file name"))
             pars.append(gammalib.GApplicationPar("duration","r","a","180000.0","","","Effective exposure time (s)"))
             pars.append(gammalib.GApplicationPar("rad","r","a","5.0","","","Radius of ROI (deg)"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.020","","","Lower energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","a","200.0","","","Upper energy limit (TeV)"))
             pars.append(gammalib.GApplicationPar("bins","i","a","21","","","Number of energy bins for differential sensitivity computation"))
@@ -156,6 +157,7 @@ class cssens(ctools.cscript):
             self.m_binsz = 0.0
 
         # Read remaining parameters
+        self.m_edisp    = self["edisp"].boolean()
         self.m_ts_thres = self["sigma"].real()*self["sigma"].real()
         self.m_max_iter = self["max_iter"].integer()
         self.m_num_avg  = self["num_avg"].integer()
@@ -466,7 +468,7 @@ class cssens(ctools.cscript):
             # Simulate events
             sim = obsutils.sim(obs, nbins=self.m_enumbins, seed=iter,
                                binsz=self.m_binsz, npix=self.m_npix,
-                               log=self.m_log, debug=self.m_debug)
+                               log=self.m_log, debug=self.m_debug, edisp=self.m_edisp)
 
             # Determine number of events in simulation
             nevents = 0.0
@@ -482,7 +484,7 @@ class cssens(ctools.cscript):
 
             # Fit background only
             sim.models(bkg_model)
-            like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
+            like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug, edisp=self.m_edisp)
             result_bgm = like.obs().models().copy()
             LogL_bgm   = like.opt().value()
             npred_bgm  = like.obs().npred()
@@ -520,7 +522,7 @@ class cssens(ctools.cscript):
 
             # Fit background and test source
             sim.models(src_model)
-            like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug)
+            like       = obsutils.fit(sim, log=self.m_log, debug=self.m_debug, edisp=self.m_edisp)
             result_all = like.obs().models().copy()
             LogL_all   = like.opt().value()
             npred_all  = like.obs().npred()

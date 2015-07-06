@@ -214,6 +214,18 @@ void cterror::run(void)
         log << std::endl;
     }
 
+    // Set energy dispersion flag for all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp;
+    save_edisp.assign(m_obs.size(), false);
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -355,6 +367,14 @@ void cterror::run(void)
     // Recover optimizer
     m_opt = best_opt;
 
+    // Restore energy dispersion flag for all CTA observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            obs->response()->apply_edisp(save_edisp[i]);
+        }
+    }
+
     // Return
     return;
 }
@@ -410,6 +430,7 @@ void cterror::init_members(void)
     m_dlogL        = 0.0;
     m_best_logL    = 0.0;
     m_model_par    = NULL;
+    m_apply_edisp = false;
 
     // Set optimizer parameters
     m_opt.max_iter(m_max_iter);
@@ -432,6 +453,7 @@ void cterror::copy_members(const cterror& app)
     m_confidence = app.m_confidence;
     m_tol        = app.m_tol;
     m_max_iter   = app.m_max_iter;
+    m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs       = app.m_obs;
@@ -499,6 +521,9 @@ void cterror::get_parameters(void)
                           "or check for possible typos.";
         throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
+
+    // Read energy dispersion flag
+    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Get confidence level and transform into log-likelihood difference
     m_confidence = (*this)["confidence"].real();

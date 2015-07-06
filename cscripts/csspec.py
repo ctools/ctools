@@ -107,6 +107,7 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit for spectral points(TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","h","100.0","","","Upper energy limit for spectral points(TeV)"))
@@ -153,6 +154,10 @@ class csspec(ctools.cscript):
 
         # Get binning flag
         self.m_binned = self["binned"].boolean()
+        
+        # Get edisp flag
+        self.m_edisp = self["edisp"].boolean()
+        
         if self.m_binned:
             self.m_xref     = self["xref"].real()
             self.m_yref     = self["yref"].real()
@@ -368,6 +373,7 @@ class csspec(ctools.cscript):
                 expcube["incube"]   = "NONE"
                 expcube["usepnt"]   = False
                 expcube["ebinalg"]  = "LOG"
+                expcube["edisp"]    = self.m_edisp
                 expcube["xref"]     = self.m_xref
                 expcube["yref"]     = self.m_yref
                 expcube["binsz"]    = self.m_binsz
@@ -389,6 +395,7 @@ class csspec(ctools.cscript):
                 psfcube["incube"]   = "NONE"
                 psfcube["usepnt"]   = False
                 psfcube["ebinalg"]  = "LOG"
+                psfcube["edisp"]    = self.m_edisp
                 psfcube["xref"]     = self.m_xref
                 psfcube["yref"]     = self.m_yref
                 psfcube["binsz"]    = self.m_binsz
@@ -447,6 +454,7 @@ class csspec(ctools.cscript):
 
             # Likelihood
             like = ctools.ctlike(obs)
+            like["edisp"].boolean(self.m_edisp)
             like.run()
 
             # Skip bin if no event was present
