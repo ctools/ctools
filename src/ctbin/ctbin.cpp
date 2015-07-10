@@ -482,6 +482,9 @@ void ctbin::fill_cube(GCTAObservation* obs)
             throw GException::invalid_value(G_FILL_CUBE, msg);
         }
 
+        if (events->size() == 0) {
+            return;
+        }
         // Get the RoI
         const GCTARoi& roi = events->roi();
 

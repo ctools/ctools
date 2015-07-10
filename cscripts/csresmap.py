@@ -190,7 +190,9 @@ class csresmap(ctools.cscript):
                 self.m_nxpix     = self["nxpix"].integer()
                 self.m_nypix     = self["nypix"].integer()
                 self.m_binsz     = self["binsz"].real()
-                self.m_edisp     = self["edisp"].boolean()
+                
+        # Read energy dispersion flag
+        self.m_edisp     = self["edisp"].boolean()
 
         # Read necessary parameters
         self.m_outfile   = self["outmap"].filename()    
