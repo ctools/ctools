@@ -402,6 +402,7 @@ class csspec(ctools.cscript):
                 psfcube["nxpix"]    = self.m_nxpix
                 psfcube["nypix"]    = self.m_nypix
                 psfcube["enumbins"] = self.m_ebins
+                psfcube["anumbins"] = 20
                 psfcube["emin"]     = emin.TeV()
                 psfcube["emax"]     = emax.TeV()  
                 psfcube["coordsys"] = self.m_coordsys
@@ -505,8 +506,9 @@ class csspec(ctools.cscript):
 
             # Compute Npred value
             Npred = 0.0
-            for observation in like.obs():
-                Npred += observation.npred(source)  
+            if not self.m_binned:
+                for observation in like.obs():
+                    Npred += observation.npred(source)  
 
             # Get differential flux    
             fitted_flux = source.spectral().eval(elogmean,gammalib.GTime())
