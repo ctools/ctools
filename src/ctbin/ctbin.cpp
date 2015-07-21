@@ -482,11 +482,11 @@ void ctbin::fill_cube(GCTAObservation* obs)
             throw GException::invalid_value(G_FILL_CUBE, msg);
         }
 
-        if (events->size() == 0) {
-            return;
-        }
         // Get the RoI
         const GCTARoi& roi = events->roi();
+
+        // Get the ebounds
+        const GEbounds& obs_ebounds = events->ebounds();
 
         // Check for RoI sanity
         if (!roi.is_valid()) {
@@ -529,7 +529,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
             // Determine energy bin. Skip if we are outside the energy range
             int index = m_ebounds.index(event->energy());
-            if (index == -1) {
+            if (index == -1 || !obs_ebounds.is_in_range(m_ebounds.emin(index), m_ebounds.emax(index))) {
                 num_outside_ebds++;
                 continue;
             }
