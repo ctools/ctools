@@ -1383,7 +1383,7 @@ class caldb():
                                   self.bgd_bounds, self.bgd_desc)
 
             # BGD (reconstructed energy)
-            self.make_3D(array, self.hdu_bgd, "BGD", "1/s/MeV/sr", scale=bgdscale)
+            self.make_3D(array, self.hdu_bgd, "BGD", "MeV^-1 s^-1 sr^-1", scale=bgdscale)
 
         # Return
         return
