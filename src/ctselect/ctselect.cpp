@@ -631,7 +631,13 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     GCTAEventList* list =
         static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
-    // Get energy boundaries
+    // Get existing Roi and energy bounds for possible later use
+    // (will be empty if unavailable)
+    GCTARoi  old_roi     = list->roi();
+    GEbounds old_ebounds = list->ebounds();
+
+    // Determine new energy boundaries for selection
+    // taking into account previous existing ones
     double   emin    = 0.0;
     double   emax    = 0.0;
     GEbounds ebounds = set_ebounds(obs, list->ebounds());
@@ -888,6 +894,12 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
         list->roi(GCTARoi(instdir, rad));
+    } // endif: Roi selection was performed
+
+    else if (old_roi.is_valid()) {
+        // Restore old Roi information in case no selection was performed
+        // and RoI was existing before
+        list->roi(old_roi);
     }
 
     // Set event list GTI (in any case as any event list has a GTI)
@@ -898,6 +910,12 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         GEbounds ebounds;
         ebounds.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
         list->ebounds(ebounds);
+    } //endif: energy selection was performed
+
+    else if (old_ebounds.size() > 0) {
+        // Restore old Ebounds in case no energy selection was performed
+        // and observation already had valid Ebounds
+        list->ebounds(old_ebounds);
     }
 
     // Recompute ontime and livetime.
