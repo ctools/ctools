@@ -633,7 +633,7 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
 
     // Get existing Roi and energy bounds for possible later use
     // (will be empty if unavailable)
-    GCTARoi old_roi = list->roi();
+    GCTARoi  old_roi     = list->roi();
     GEbounds old_ebounds = list->ebounds();
 
     // Determine new energy boundaries for selection
