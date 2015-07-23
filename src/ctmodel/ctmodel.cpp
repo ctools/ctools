@@ -590,7 +590,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         const GGti&     gti     = obs->events()->gti();
 
         // Get the ebounds
-        const GEbounds& obs_ebounds = obs->ebounds();
+        const GEbounds& obs_ebounds  = obs->ebounds();
         const GEbounds& cube_ebounds = m_cube.ebounds();
 
         // Initialise statistics
@@ -608,7 +608,9 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
 
             // Skip bin if it is outside the energy range of the observation
             int index = cube_ebounds.index(bin->energy());
-            if (index == -1 || !obs_ebounds.is_in_range(cube_ebounds.emin(index), cube_ebounds.emax(index))) {
+            if (index == -1 ||
+                !obs_ebounds.is_in_range(cube_ebounds.emin(index),
+                                         cube_ebounds.emax(index))) {
                 num_outside_ebds++;
                 continue;
             }
@@ -618,7 +620,6 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             
             // Compute model value for cube bin
             double model = m_obs.models().eval(*bin, *obs) * bin->size();
-            //double model = m_obs.models().eval(*bin, *ptr) * bin->size();
 
             // Add model to actual value
             value += model;

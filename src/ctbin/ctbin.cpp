@@ -529,7 +529,9 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
             // Determine energy bin. Skip if we are outside the energy range
             int index = m_ebounds.index(event->energy());
-            if (index == -1 || !obs_ebounds.is_in_range(m_ebounds.emin(index), m_ebounds.emax(index))) {
+            if (index == -1 ||
+                !obs_ebounds.contains(m_ebounds.emin(index),
+                                      m_ebounds.emax(index))) {
                 num_outside_ebds++;
                 continue;
             }
