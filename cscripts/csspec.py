@@ -122,7 +122,7 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
             pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
             pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("anumbins","i","h","20","","","Angular separation bins for PSF cube in binned mode"))
+            pars.append(gammalib.GApplicationPar("anumbins","i","h","200","","","Angular separation bins for PSF cube in binned mode"))
             pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value in each bin"))
             pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit in each bin"))
             pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other skymodel parameters"))
@@ -404,9 +404,9 @@ class csspec(ctools.cscript):
                 psfcube["edisp"]    = self.m_edisp
                 psfcube["xref"]     = self.m_xref
                 psfcube["yref"]     = self.m_yref
-                psfcube["binsz"]    = self.m_binsz
-                psfcube["nxpix"]    = self.m_nxpix
-                psfcube["nypix"]    = self.m_nypix
+                psfcube["binsz"]    = self.m_binsz*20.0 # Slow Psf variation
+                psfcube["nxpix"]    = self.m_nxpix/20
+                psfcube["nypix"]    = self.m_nypix/20
                 psfcube["enumbins"] = self.m_ebins
                 psfcube["anumbins"] = self.m_anumbins
                 psfcube["emin"]     = emin.TeV()
