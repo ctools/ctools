@@ -78,6 +78,7 @@ protected:
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
     double        m_value;        //!< Parameter value 
+    bool          m_apply_edisp;  //!< Apply energy dispersion?
 
     // Protected members
     GObservations m_obs;          //!< Observation container

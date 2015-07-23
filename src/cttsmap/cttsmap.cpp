@@ -215,6 +215,18 @@ void cttsmap::run(void)
         log << std::endl;
     }
 
+    // Set energy dispersion flag for all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp;
+    save_edisp.assign(m_obs.size(), false);
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -348,6 +360,14 @@ void cttsmap::run(void)
     // Bring models to initial state
     m_obs.models(models_orig);
 
+    // Restore energy dispersion flag for all CTA observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            obs->response()->apply_edisp(save_edisp[i]);
+        }
+    }
+
     // Return
     return;
 }
@@ -411,6 +431,7 @@ void cttsmap::init_members(void)
     // Initialise members
     m_srcname.clear();
     m_outmap.clear();
+    m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -438,6 +459,7 @@ void cttsmap::copy_members(const cttsmap& app)
     // Copy attributes
     m_srcname = app.m_srcname;
     m_outmap  = app.m_outmap;
+    m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_binmin    = app.m_binmin;
@@ -541,6 +563,9 @@ void cttsmap::get_parameters(void)
 
     // Initialise maps from user parameters
     init_maps(map);
+
+    // Read energy dispersion flag
+    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Get optional splitting parameters
     m_binmin = (*this)["binmin"].integer();

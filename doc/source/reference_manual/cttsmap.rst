@@ -40,6 +40,9 @@ General parameters
 ``irf [string]``
     Response function.
 
+``(edisp = no) [boolean]``
+    Applies energy dispersion to response computation.
+
 ``outmap [file]``
     Output Test Statistic map file.
  	 	 

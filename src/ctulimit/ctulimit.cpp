@@ -217,6 +217,18 @@ void ctulimit::run(void)
         log << std::endl;
     }
 
+    // Set energy dispersion flag for all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp;
+    save_edisp.assign(m_obs.size(), false);
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -343,6 +355,14 @@ void ctulimit::run(void)
     // Recover optimizer
     m_opt = best_opt;
 
+    // Restore energy dispersion flag for all CTA observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            obs->response()->apply_edisp(save_edisp[i]);
+        }
+    }
+
     // Return
     return;
 }
@@ -405,6 +425,7 @@ void ctulimit::init_members(void)
     m_emax       = 0.0;
     m_tol        = 1.0e-6;
     m_max_iter   = 50;
+    m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -443,7 +464,7 @@ void ctulimit::copy_members(const ctulimit& app)
     m_emax       = app.m_emax;
     m_tol        = app.m_tol;
     m_max_iter   = app.m_max_iter;
-
+    m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs          = app.m_obs;
@@ -519,6 +540,9 @@ void ctulimit::get_parameters(void)
 
     // Get relevant model and parameter for upper limit computation
     get_model_parameter();
+
+    // Read energy dispersion flag
+    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Get confidence level and transform into log-likelihood difference
     m_confidence = (*this)["confidence"].real();

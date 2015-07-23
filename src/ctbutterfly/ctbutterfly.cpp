@@ -216,6 +216,18 @@ void ctbutterfly::run(void)
         log << std::endl;
     }
 
+    // Set energy dispersion flag for all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp;
+    save_edisp.assign(m_obs.size(), false);
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            save_edisp[i] = obs->response()->apply_edisp();
+            obs->response()->apply_edisp(m_apply_edisp);
+        }
+    }
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -347,6 +359,14 @@ void ctbutterfly::run(void)
 
     } //endfor: loop over energy bin
 
+    // Restore energy dispersion flag for all CTA observations
+    for (int i = 0; i < m_obs.size(); ++i) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        if (obs != NULL) {
+            obs->response()->apply_edisp(save_edisp[i]);
+        }
+    }
+
     // Return
     return;
 }
@@ -402,6 +422,7 @@ void ctbutterfly::init_members(void)
     m_srcname.clear();
     m_outfile.clear();
     m_ebounds.clear();
+    m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -426,6 +447,7 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_srcname = app.m_srcname;
     m_outfile = app.m_outfile;
     m_ebounds = app.m_ebounds;
+    m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs        = app.m_obs;
@@ -510,6 +532,9 @@ void ctbutterfly::get_parameters(void)
         throw GException::feature_not_implemented(G_GET_PARAMETERS, msg);
         // m_covariance.load(matrixfilename);
     }
+
+    // Read energy dispersion flag
+    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file

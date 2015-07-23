@@ -25,6 +25,7 @@ psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
 bkgcube,  f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
 caldb,    s, a, "prod2",,, "Calibration database"
 irf,      s, a, "South_50h",,, "Instrument response function"
+edisp,    b, h, no,,, "Apply energy dispersion?"
 outfile,  f, a, "butterfly.txt",,, "Output ascii file"
 matrix,   f, h, "NONE",,, "Input covariance Matrix FITS file"
 

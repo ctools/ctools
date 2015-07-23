@@ -45,6 +45,7 @@ class cshessobs(ctools.cscript):
         self.name    = "cshessobs"
         self.version = "0.1.0"
         self.datapath = ""
+        self.m_erange = gammalib.GEbounds()
 
         # Check on existence of HESSFITS environment variable
         try:
@@ -320,6 +321,12 @@ class cshessobs(ctools.cscript):
         # Return model
         return bck
 
+    
+    def erange(self):
+        """
+        Returns runlist energy range
+        """
+        return self.m_erange
 
     def execute(self):
         """
@@ -397,6 +404,10 @@ class cshessobs(ctools.cscript):
             self.log("\n")
             self.log.header1("Looping over runs")
 
+        # Initialise energy range values for logging
+        runlist_emin = 100.0
+        runlist_emax = 0.0
+
         for runnr in runlist:
 
             # Unify run number string length
@@ -411,7 +422,7 @@ class cshessobs(ctools.cscript):
             eventfile = runfolder + "hess_events_"+run+".fits.gz"
             aefffile  = runfolder + "hess_aeff_2d_"+run+".fits.gz"
             psffile   = runfolder + "hess_psf_king_"+run+".fits.gz"
-            edispfile = ""#runfolder + "hess_edisp_2d_"+run+".fits.gz"
+            edispfile = runfolder + "hess_edisp_2d_"+run+".fits.gz"
             bgfile    = runfolder + "hess_bkg_offruns_"+run+".fits.gz"
 
             # Check for existence of files
@@ -428,6 +439,9 @@ class cshessobs(ctools.cscript):
                 skip = True
             elif not os.path.isfile(psffile):
                 msg = "Run "+str(int(run))+" has no PSF - Run is skipped"
+                skip = True
+            elif not os.path.isfile(edispfile):
+                msg = "Run "+str(int(run))+" has no energy dispersion - Run is skipped"
                 skip = True
             elif not os.path.isfile(bgfile):
                 msg = "Run "+str(int(run))+" has no background - Run is skipped"
@@ -458,6 +472,16 @@ class cshessobs(ctools.cscript):
 
             # Close FITS file
             fits.close()
+            
+            # Open effective area file to look for threshold
+            aeff_fits = gammalib.GFits(aefffile)
+            run_emin = aeff_fits["EFFECTIVE AREA"].real("LO_THRES")
+            run_emax = aeff_fits["EFFECTIVE AREA"].real("HI_THRES")
+            if run_emin < runlist_emin:
+                runlist_emin = run_emin
+            if run_emax > runlist_emax:
+                runlist_emax = run_emax
+            aeff_fits.close()          
 
             # Append observation to XML and set attributes
             obs = lib.append("observation");
@@ -494,6 +518,15 @@ class cshessobs(ctools.cscript):
 
             # Append instrumental background model
             self.models.append(self.hess_inst_background(run,aefffile,trgrate))
+        
+        # Store energy range as member
+        self.m_erange = gammalib.GEbounds(gammalib.GEnergy(runlist_emin,"TeV"),gammalib.GEnergy(runlist_emax,"TeV"))
+           
+        # Write energy range into log file    
+        if self.logTerse():
+            self.log("\n")
+            self.log("Eenrgy range of obervation list: ")
+            self.log(("% 3.2f" % runlist_emin)+" - "+("% 3.2f" % runlist_emax)+" TeV")
 
         # Append models provided by 'inmodels' of necessary
         if not self.inmodels == None:

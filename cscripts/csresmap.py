@@ -110,6 +110,7 @@ class csresmap(ctools.cscript):
             pars.append(gammalib.GApplicationPar("bkgcube","f","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
             pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output residual map"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("ebinalg","s","h","LOG","LIN|LOG|FILE","","Binning algorithm"))
@@ -141,7 +142,7 @@ class csresmap(ctools.cscript):
         self.m_skip_binning = False
 
         # First check if the inobs parameter is a counts cube
-        if self["inobs"].filename() != "NONE":
+        if self.obs.size() == 0 and self["inobs"].filename() != "NONE":
             if gammalib.is_fits(self["inobs"].filename()):
                 cta = gammalib.GCTAObservation()
                 cta.load(self["inobs"].filename())
@@ -189,6 +190,9 @@ class csresmap(ctools.cscript):
                 self.m_nxpix     = self["nxpix"].integer()
                 self.m_nypix     = self["nypix"].integer()
                 self.m_binsz     = self["binsz"].real()
+                
+        # Read energy dispersion flag
+        self.m_edisp     = self["edisp"].boolean()
 
         # Read necessary parameters
         self.m_outfile   = self["outmap"].filename()    
@@ -301,6 +305,7 @@ class csresmap(ctools.cscript):
             model["chatter"].integer(self.m_chatter)
             model["clobber"].boolean(self.m_clobber)
             model["debug"].boolean(self.m_debug)
+            model["edisp"].boolean(self.m_edisp)
             model.run()
 
             # Get model map into GSkyMap object

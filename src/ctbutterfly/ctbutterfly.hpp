@@ -80,9 +80,10 @@ protected:
     void get_parameters(void);
 
     // User parameters
-    std::string m_srcname;    //!< Name of source to compute butterfly
-    std::string m_outfile;    //!< Output ascii file
-    GEbounds    m_ebounds;    //!< Energy binning definition
+    std::string m_srcname;     //!< Name of source to compute butterfly
+    std::string m_outfile;     //!< Output ascii file
+    GEbounds    m_ebounds;     //!< Energy binning definition
+    bool        m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
     GObservations       m_obs;        //!< Observation container

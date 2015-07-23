@@ -39,6 +39,9 @@ General parameters
  	 	 
 ``irf [string]``
     Instrumental response function.
+
+``(edisp = no) [boolean]``
+    Applies energy dispersion to response computation.
  	 	 
 ``outfile [file]``
     Output butterfly ASCII file name.
