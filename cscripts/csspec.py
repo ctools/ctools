@@ -122,6 +122,7 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
             pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
             pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
+            pars.append(gammalib.GApplicationPar("anumbins","i","h","20","","","Angular separation bins for PSF cube in binned mode"))
             pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value in each bin"))
             pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit in each bin"))
             pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other skymodel parameters"))
@@ -167,6 +168,7 @@ class csspec(ctools.cscript):
             self.m_coordsys = self["coordsys"].string()
             self.m_proj     = self["proj"].string()
             self.m_ebins    = self["nebins"].integer()
+            self.m_anumbins = self["anumbins"].integer()
 
         # Read other parameters
         self.m_outfile = self["outfile"].filename()
@@ -254,9 +256,10 @@ class csspec(ctools.cscript):
                     if par.is_free() and self.logExplicit():
                         self.log(" Fixing \""+par.name()+"\"\n")
                     par.fix()
-                if par.is_fixed() and self.logExplicit():
-                    self.log(" Freeing \""+par.name()+"\"\n")
-                model.spectral()[0].free()
+                normpar = model.spectral()[0]
+                if normpar.is_fixed() and self.logExplicit():
+                    self.log(" Freeing \""+normpar.name()+"\"\n")
+                normpar.free()
                 if self.m_calc_ts:
                     model.tscalc(True)
 
@@ -308,7 +311,7 @@ class csspec(ctools.cscript):
             # Log information
             if self.logTerse():
                 self.log("\n")
-                self.log.header2("Energy bin "+str(i))
+                self.log.header2("Energy bin "+str(i+1))
 
             # Get energy boundaries
             emin      = self.m_ebounds.emin(i)
@@ -323,33 +326,36 @@ class csspec(ctools.cscript):
             energy_low[i]  = (elogmean - emin).TeV()
             energy_high[i] = (emax - elogmean).TeV()
 
-            # Log information
-            if self.logExplicit():
-                self.log.header3("Selecting events")
-
-            # Select events
-            select = ctools.ctselect(self.obs)
-            select["emin"] = emin.TeV()    
-            select["emax"] = emax.TeV() 
-            select["tmin"] = "UNDEFINED"
-            select["tmax"] = "UNDEFINED"
-            select["rad"]  = "UNDEFINED"
-            select["ra"]   = "UNDEFINED"
-            select["dec"]  = "UNDEFINED"
-            select.run()  
-
-            # Retrieve observation
-            obs = select.obs()
+            # unbinned analysis
+            if not self.m_binned:
+                
+                # Log information
+                if self.logExplicit():
+                    self.log.header3("Selecting events")
+    
+                # Select events
+                select = ctools.ctselect(self.obs)
+                select["emin"] = emin.TeV()    
+                select["emax"] = emax.TeV() 
+                select["tmin"] = "UNDEFINED"
+                select["tmax"] = "UNDEFINED"
+                select["rad"]  = "UNDEFINED"
+                select["ra"]   = "UNDEFINED"
+                select["dec"]  = "UNDEFINED"
+                select.run()  
+    
+                # Retrieve observation
+                obs = select.obs()
 
             # Binned analysis
-            if self.m_binned:
+            else:
 
                 # Header
                 if self.logTerse():
                     self.log.header3("Binning events")
 
                 # Bin events
-                bin = ctools.ctbin(select.obs())
+                bin = ctools.ctbin(self.obs)
                 bin["usepnt"]   = False
                 bin["ebinalg"]  = "LOG"
                 bin["xref"]     = self.m_xref
@@ -369,7 +375,7 @@ class csspec(ctools.cscript):
                     self.log.header3("Creating exposure cube")
 
                 # Create exposure cube
-                expcube = ctools.ctexpcube(select.obs())
+                expcube = ctools.ctexpcube(self.obs)
                 expcube["incube"]   = "NONE"
                 expcube["usepnt"]   = False
                 expcube["ebinalg"]  = "LOG"
@@ -383,7 +389,7 @@ class csspec(ctools.cscript):
                 expcube["emin"]     = emin.TeV()
                 expcube["emax"]     = emax.TeV() 
                 expcube["coordsys"] = self.m_coordsys
-                expcube["proj"]     = self.m_proj               
+                expcube["proj"]     = self.m_proj             
                 expcube.run()
 
                 # Header
@@ -391,7 +397,7 @@ class csspec(ctools.cscript):
                     self.log.header3("Creating PSF cube")
 
                 # Create psf cube
-                psfcube = ctools.ctpsfcube(select.obs())
+                psfcube = ctools.ctpsfcube(self.obs)
                 psfcube["incube"]   = "NONE"
                 psfcube["usepnt"]   = False
                 psfcube["ebinalg"]  = "LOG"
@@ -402,10 +408,11 @@ class csspec(ctools.cscript):
                 psfcube["nxpix"]    = self.m_nxpix
                 psfcube["nypix"]    = self.m_nypix
                 psfcube["enumbins"] = self.m_ebins
+                psfcube["anumbins"] = self.m_anumbins
                 psfcube["emin"]     = emin.TeV()
                 psfcube["emax"]     = emax.TeV()  
                 psfcube["coordsys"] = self.m_coordsys
-                psfcube["proj"]     = self.m_proj               
+                psfcube["proj"]     = self.m_proj            
                 psfcube.run()
 
                 # Header
@@ -413,7 +420,7 @@ class csspec(ctools.cscript):
                     self.log.header3("Creating background cube")
 
                 # Create background cube
-                bkgcube = ctools.ctbkgcube(select.obs())
+                bkgcube = ctools.ctbkgcube(self.obs)
                 bkgcube["incube"]   = "NONE"
                 bkgcube["usepnt"]   = False
                 bkgcube["ebinalg"]  = "LOG"
@@ -426,7 +433,7 @@ class csspec(ctools.cscript):
                 bkgcube["emin"]     = emin.TeV()
                 bkgcube["emax"]     = emax.TeV() 
                 bkgcube["coordsys"] = self.m_coordsys
-                bkgcube["proj"]     = self.m_proj                
+                bkgcube["proj"]     = self.m_proj          
                 bkgcube.run()
 
                 # Set new binned observation
@@ -462,7 +469,7 @@ class csspec(ctools.cscript):
 
                 # Log information
                 if self.logTerse():
-                    self.log("No event in this bin. Bin is skipped\n")
+                    self.log("No event in this bin. Likelihood is zero. Bin is skipped\n")
 
                 # Set all values to 0
                 flux[i]         = 0.0
@@ -505,8 +512,9 @@ class csspec(ctools.cscript):
 
             # Compute Npred value
             Npred = 0.0
-            for observation in like.obs():
-                Npred += observation.npred(source)  
+            if not self.m_binned:
+                for observation in like.obs():
+                    Npred += observation.npred(source)  
 
             # Get differential flux    
             fitted_flux = source.spectral().eval(elogmean,gammalib.GTime())
