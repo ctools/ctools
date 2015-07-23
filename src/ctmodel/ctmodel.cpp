@@ -609,8 +609,8 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             // Skip bin if it is outside the energy range of the observation
             int index = cube_ebounds.index(bin->energy());
             if (index == -1 ||
-                !obs_ebounds.is_in_range(cube_ebounds.emin(index),
-                                         cube_ebounds.emax(index))) {
+                !obs_ebounds.contains(cube_ebounds.emin(index),
+                                      cube_ebounds.emax(index))) {
                 num_outside_ebds++;
                 continue;
             }
