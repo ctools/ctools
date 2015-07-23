@@ -44,6 +44,9 @@ General parameters
 ``irf [string]``
     Instrumental response function.
  	 	 
+``(edisp = no) [boolean]``
+    Applies energy dispersion to response computation.
+ 	 	 
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
     
