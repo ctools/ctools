@@ -34,6 +34,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                          "ctmodel::get_parameters()"
+#define G_FILL_CUBE             "ctmodel::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -585,17 +586,28 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
-        // Get energy boundaries and GTI references for observation
-        const GEbounds& ebounds = obs->events()->ebounds();
+        // Get GTI references for observation
         const GGti&     gti     = obs->events()->gti();
 
         // Get the ebounds
         const GEbounds& obs_ebounds  = obs->ebounds();
         const GEbounds& cube_ebounds = m_cube.ebounds();
 
+        // Extract region of interest from CTA observation
+        GCTARoi roi = obs->roi();
+
+        // Check for RoI sanity
+        if (!roi.is_valid()) {
+            std::string msg = "No RoI information found in input observation "
+                              "\""+obs->name()+"\". Run ctselect to specify "
+                              "an RoI for this observation";
+            throw GException::invalid_value(G_FILL_CUBE, msg);
+        }
+
         // Initialise statistics
         double sum              = 0.0;
         int    num_outside_ebds = 0;
+        int    num_outside_roi = 0;
 
         // Setup cube GTIs for this observation
         m_cube.gti(obs->events()->gti());
@@ -612,6 +624,12 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
                 !obs_ebounds.contains(cube_ebounds.emin(index),
                                       cube_ebounds.emax(index))) {
                 num_outside_ebds++;
+                continue;
+            }
+
+            // Skip bin if outside RoI
+            if (!roi.contains(*bin)) {
+                num_outside_roi++;
                 continue;
             }
 
@@ -642,6 +660,8 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             log << sum << std::endl;
             log << gammalib::parformat("Bins outside energy range");
             log << num_outside_ebds << std::endl;
+            log << gammalib::parformat("Bins outside RoI");
+            log << num_outside_roi << std::endl;
         }
 
         // Log cube
