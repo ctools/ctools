@@ -34,7 +34,6 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                          "ctmodel::get_parameters()"
-#define G_FILL_CUBE             "ctmodel::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -586,22 +585,19 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
-        // Get GTI references for observation
+        // Get energy boundaries and GTI references for observation
         const GGti&     gti     = obs->events()->gti();
-
-        // Get the ebounds
         const GEbounds& obs_ebounds  = obs->ebounds();
+
+        // Get cube ebounds
         const GEbounds& cube_ebounds = m_cube.ebounds();
 
-        // Extract region of interest from CTA observation
-        GCTARoi roi = obs->roi();
+        // Initialise empty, invalid RoI
+        GCTARoi roi;
 
-        // Check for RoI sanity
-        if (!roi.is_valid()) {
-            std::string msg = "No RoI information found in input observation "
-                              "\""+obs->name()+"\". Run ctselect to specify "
-                              "an RoI for this observation";
-            throw GException::invalid_value(G_FILL_CUBE, msg);
+        // Retrieve RoI in case we have an unbinned observation
+        if (obs->eventtype() == "EventList") {
+            roi = obs->roi();
         }
 
         // Initialise statistics
@@ -627,11 +623,16 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
                 continue;
             }
 
-            // Skip bin if outside RoI
-            if (!roi.contains(*bin)) {
-                num_outside_roi++;
-                continue;
-            }
+            // Check if RoI is valid , i.e. check if we have an unbinned observation
+            if (roi.is_valid()) {
+
+                // Skip bin if it is outside the RoI of the observation
+                if (!roi.contains(*bin)) {
+                    num_outside_roi++;
+                    continue;
+                } // endif: bin was inside RoI
+
+            } // endif: RoI was not valid
 
             // Get actual bin value
             double value = bin->counts();
