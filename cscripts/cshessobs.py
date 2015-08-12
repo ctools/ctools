@@ -257,7 +257,7 @@ class cshessobs(ctools.cscript):
 
         if self.usetrig and trgrate > 0.0:
             # Use value from lookup
-            value = 0.00451521513379 * trgrate + 0.162316854264
+            value = 0.00427233352611 * trgrate + 0.181244590076
 
         if self.nodes <= 1:
 
@@ -519,16 +519,22 @@ class cshessobs(ctools.cscript):
             # Append instrumental background model
             self.models.append(self.hess_inst_background(run,aefffile,trgrate))
         
-        # Store energy range as member
-        self.m_erange = gammalib.GEbounds(gammalib.GEnergy(runlist_emin,"TeV"),gammalib.GEnergy(runlist_emax,"TeV"))
-           
-        # Write energy range into log file    
-        if self.logTerse():
-            self.log("\n")
-            self.log("Eenrgy range of obervation list: ")
-            self.log(("% 3.2f" % runlist_emin)+" - "+("% 3.2f" % runlist_emax)+" TeV")
+        # Continue only if there are observations available
+        if lib.size():
+            
+            # Store energy range as member
+            self.m_erange = gammalib.GEbounds(gammalib.GEnergy(runlist_emin,"TeV"),gammalib.GEnergy(runlist_emax,"TeV"))
+               
+            # Write energy range into log file    
+            if self.logTerse():
+                self.log("\n")
+                self.log("Eenrgy range of obervation list: ")
+                self.log(("% 3.2f" % runlist_emin)+" - "+("% 3.2f" % runlist_emax)+" TeV")
+        
+        else:
+            self.log.header2("WARNING: No observation from given runlist available")
 
-        # Append models provided by 'inmodels' of necessary
+        # Append models provided by 'inmodels' if necessary
         if not self.inmodels == None:
             if self.logTerse():
                 self.log("\n")
