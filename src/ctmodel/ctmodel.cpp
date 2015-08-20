@@ -585,11 +585,11 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
-        // Get energy boundaries and GTI references for observation
-        const GGti&     gti     = obs->events()->gti();
-        const GEbounds& obs_ebounds  = obs->ebounds();
+        // Get GTI and energy boundaries references for observation
+        const GGti&     gti         = obs->events()->gti();
+        const GEbounds& obs_ebounds = obs->ebounds();
 
-        // Get cube ebounds
+        // Get cube energy boundaries
         const GEbounds& cube_ebounds = m_cube.ebounds();
 
         // Initialise empty, invalid RoI
@@ -603,7 +603,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
         // Initialise statistics
         double sum              = 0.0;
         int    num_outside_ebds = 0;
-        int    num_outside_roi = 0;
+        int    num_outside_roi  = 0;
 
         // Setup cube GTIs for this observation
         m_cube.gti(obs->events()->gti());
@@ -623,14 +623,15 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
                 continue;
             }
 
-            // Check if RoI is valid , i.e. check if we have an unbinned observation
+            // Check if RoI is valid, i.e. check if we have an unbinned
+            // observation
             if (roi.is_valid()) {
 
                 // Skip bin if it is outside the RoI of the observation
                 if (!roi.contains(*bin)) {
                     num_outside_roi++;
                     continue;
-                } // endif: bin was inside RoI
+                }
 
             } // endif: RoI was not valid
 
