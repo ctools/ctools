@@ -491,11 +491,13 @@ class cshessobs(ctools.cscript):
                 msg = "Run "+str(int(run))+" has no PSF - Run is skipped"
                 skip = True
             elif not os.path.isfile(edispfile):
-                msg = "Run "+str(int(run))+" has no energy dispersion - Run is skipped"
-                skip = True
+                msg = "Warning: Run "+str(int(run))+" has no energy dispersion - usage of energy dispersion not possible"
+                skip = False
+                edispfile = ""
             elif not os.path.isfile(bgfile):
-                msg = "Run "+str(int(run))+" has no background - Run is skipped"
-                skip = True            
+                msg = "Warning: Run "+str(int(run))+" has no background file - use of IRF background not possible"
+                skip = False       
+                bgfile = ""     
             else:
                 msg = "Adding run "+str(int(run))
 
