@@ -290,6 +290,7 @@ class cshessobs(ctools.cscript):
                     spec[1].free()           
             
             else:
+                
                 # Use several energy-dependent scaling factors  
                 fits = gammalib.GFits(aefffile)
                 emin = fits["EFFECTIVE AREA"].real("LO_THRES")
@@ -306,14 +307,16 @@ class cshessobs(ctools.cscript):
                     energy = bounds.elogmean(i)
                     spec.append(energy, plaw.eval(energy, gammalib.GTime())) 
                 for par in spec:
+                    
                     if "Energy" in par.name():
                         par.fix()
                     elif "Intensity" in par.name():  
-                        par.scale(scale)                   
-                        par.min(0.01*par.scale())
-                        par.max(100.0*par.scale())
-#         print prefactor, index
-#         print spec
+                        parscale =  pow(10,math.floor(math.log10(abs(par.value())))) 
+                        par.scale(parscale)         
+                        par.min(0.01*parscale)
+                        par.max(100.0*parscale)
+                        
+        
         return spec
 
     def hess_background(self, run, aefffile, trgrate, zenith):
