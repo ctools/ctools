@@ -52,7 +52,6 @@ class cssens(ctools.cscript):
         self.m_dec  = None
 
         # Make sure that parfile exists
-        print "making sure the parfile exists"
         file = self.parfile()
 
         # Initialise application
@@ -89,8 +88,6 @@ class cssens(ctools.cscript):
         """
         # Set parfile name
         parfile = self.name+".par"
-        
-        print "parfile ",parfile
 
         try:
             pars = gammalib.GApplicationPars(parfile)
@@ -236,11 +233,9 @@ class cssens(ctools.cscript):
 
             # Set energies
             if self.m_type == "Differential":
-                print "Differential "
                 emin  = self.m_ebounds.emin(ieng)
                 emax  = self.m_ebounds.emax(ieng)
             elif self.m_type == "Integral":
-                print "Integral "
                 emin  = self.m_ebounds.emin(ieng)
                 emax  = self.m_ebounds.emax()
             else:
@@ -471,9 +466,6 @@ class cssens(ctools.cscript):
             obs.models(src_model)
 
             # Simulate events
-            sim = obsutils.sim(obs, nbins=self.m_enumbins, seed=iter,
-                               binsz=self.m_binsz, npix=self.m_npix,
-                               log=self.m_log, debug=self.m_debug, edisp=self.m_edisp)
             sim = obsutils.sim(obs, nbins=self.m_enumbins, seed=iter,
                                binsz=self.m_binsz, npix=self.m_npix,
                                log=self.m_log, debug=self.m_debug, edisp=self.m_edisp)
@@ -735,7 +727,7 @@ class cssens(ctools.cscript):
                     self.log(str(par)+"\n")
 
         # Store result
-        result = {'loge': loge, 'emin': math.log10(emin.TeV()), 'emax': math.log10(emax.TeV()), \
+        result = {'loge': loge, 'emin': emin.TeV(), 'emax': emax.TeV(), \
                   'crab_flux': crab_flux, 'photon_flux': photon_flux, \
                   'energy_flux': energy_flux, \
                   'sensitivity': sensitivity}
