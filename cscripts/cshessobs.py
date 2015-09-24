@@ -237,9 +237,9 @@ class cshessobs(ctools.cscript):
                         # check if config is valid
                         path = self.datapath+"/"+chain+"/"+dst+"/"+config
                         if os.path.isdir(path) and len(glob.glob(path+"/run*")):  
-                            if not newfolders.has_key(chain):
+                            if not chain in newfolders:
                                 newfolders[chain] = {}
-                            if not newfolders[chain].has_key(dst):
+                            if not dst in newfolders[chain]:
                                 newfolders[chain][dst] = []
                             newfolders[chain][dst].append(config)
 
