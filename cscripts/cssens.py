@@ -506,10 +506,10 @@ class cssens(ctools.cscript):
                 self.log("\n")
 
             # Start over if the fit quality was bad
-            if abs(quality_bgm) > 3.0:
-                if self.logExplicit():
-                    self.log("Fit quality outside required range. Start over.\n")
-                continue
+            #if abs(quality_bgm) > 3.0:
+            #    if self.logExplicit():
+            #        self.log("Fit quality outside required range. Start over.\n")
+            #    continue
 
             # Write model fit results
             if self.logExplicit():
@@ -555,10 +555,10 @@ class cssens(ctools.cscript):
                         self.log(str(par)+"\n")
 
             # Start over if the fit quality was bad
-            if abs(quality_all) > 3.0:
-                if self.logExplicit():
-                    self.log("Fit quality outside required range. Start over.\n")
-                continue
+            #if abs(quality_all) > 3.0:
+            #    if self.logExplicit():
+            #        self.log("Fit quality outside required range. Start over.\n")
+            #    continue
 
             # Start over if TS was non-positive
             if ts <= 0.0:
