@@ -23,6 +23,7 @@ import ctools
 import sys
 import os
 import glob
+import math
 
 
 # =============== #
@@ -43,7 +44,7 @@ class cshessobs(ctools.cscript):
         """
         # Set name
         self.name    = "cshessobs"
-        self.version = "0.1.0"
+        self.version = "0.2.0"
         self.datapath = ""
         self.m_erange = gammalib.GEbounds()
 
@@ -57,7 +58,6 @@ class cshessobs(ctools.cscript):
         # Initialise some members
         self.inmodels = None
         self.outobs   = "obs.xml"
-        self.nodes    = 1
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -165,8 +165,9 @@ class cshessobs(ctools.cscript):
             pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Observation XML outfile"))
             pars.append(gammalib.GApplicationPar("outmodel","f","a","bgmodels.xml","","","Output model XML file"))
             pars.append(gammalib.GApplicationPar("datapath","s","h",self.datapath,"","","Data directoy"))     
-            pars.append(gammalib.GApplicationPar("nodes","i","h","1","","","Number of free parameters per background model"))
+            pars.append(gammalib.GApplicationPar("bkgpars","i","a","1","","","Number of free parameters per background model"))
             pars.append(gammalib.GApplicationPar("usetrig","b","h","yes","yes|no","","Pre-estimate background normalisation? Recommended for binned analysis"))
+            pars.append(gammalib.GApplicationPar("bkgtype","s","a","irf","gauss|irf|aeff","","What background model should be used"))
             pars.append_standard()
             pars.save(parfile)
 
@@ -192,7 +193,8 @@ class cshessobs(ctools.cscript):
         self.outmodel = self["outmodel"].filename()
 
         # Read hidden parameters
-        self.nodes    = self["nodes"].integer()
+        self.bkgpars  = self["bkgpars"].integer()
+        self.bkgtype  = self["bkgtype"].string()
         self.usetrig  = self["usetrig"].boolean()      
         self.datapath = self["datapath"].string()
 
@@ -245,82 +247,133 @@ class cshessobs(ctools.cscript):
 
         # Return valid configs
         return newfolders
-
-    # Create instrument background model
-    def hess_inst_background(self,run,aefffile,trgrate=0.0):
-
-        # Initialise return spectrum
-        spec = 0  
-
-        # Initialise default value
-        value = 1.0
-
-        if self.usetrig and trgrate > 0.0:
-            # Use value from lookup
-            value = 0.00427233352611 * trgrate + 0.181244590076
-
-        if self.nodes <= 1:
-
-            # Use a constant scaling function
+    
+    def background_spectrum(self, run, prefactor, index, aefffile = ""):
+        
+        scale = pow(10,math.floor(math.log10(abs(prefactor))))        
+        
+        if index == 0.0 and self.bkgpars <= 1:
             spec = gammalib.GModelSpectralConst()
-            spec["Value"].min(0.1)
-            spec["Value"].max(10)
-            spec["Value"].value(value)
-            if self.nodes < 1:
+            spec["Value"].min(0.1*scale)
+            spec["Value"].max(10*scale)
+            spec["Value"].value(prefactor)
+            spec["Value"].scale(scale)
+            if self.bkgpars == 0:
                 spec["Value"].fix()
             else:
                 spec["Value"].free()
+                
+        else:
+                
+            # Create power law if number of free parameters are less 2 or less
+            if self.bkgpars <= 2:
+                e    = gammalib.GEnergy(1.0,"TeV")
+                spec = gammalib.GModelSpectralPlaw(prefactor, index, e)  
+                 
+                # Set parameter ranges
+                spec[0].scale(scale)
+                spec[0].min(0.01 * scale)
+                spec[0].max(100.0 * scale)
+                spec[1].scale(1)
+                spec[1].min(-5.0)
+                spec[1].max(5.0)
+                
+                # Set number of free parameters
+                if self.bkgpars == 0:
+                    spec[0].fix()
+                    spec[1].fix()
+                elif self.bkgpars == 1:
+                    spec[0].free()
+                    spec[1].fix()
+                else:
+                    spec[0].free()
+                    spec[1].free()           
+            
+            else:
+                
+                # Use several energy-dependent scaling factors  
+                fits = gammalib.GFits(aefffile)
+                emin = fits["EFFECTIVE AREA"].real("LO_THRES")
+                emax = fits["EFFECTIVE AREA"].real("HI_THRES")
+                fits.close()
+                
+                # Create reference powerlaw
+                plaw = gammalib.GModelSpectralPlaw(prefactor, index, gammalib.GEnergy(1.0,"TeV")) 
+                
+                # Create spectral model and energy values
+                spec = gammalib.GModelSpectralNodes()
+                bounds = gammalib.GEbounds(self.bkgpars,gammalib.GEnergy(emin,"TeV"),gammalib.GEnergy(emax,"TeV"),True)
+                for i in range(bounds.size()):     
+                    energy = bounds.elogmean(i)
+                    spec.append(energy, plaw.eval(energy, gammalib.GTime())) 
+                for par in spec:
+                    
+                    if "Energy" in par.name():
+                        par.fix()
+                    elif "Intensity" in par.name():  
+                        parscale =  pow(10,math.floor(math.log10(abs(par.value())))) 
+                        par.scale(parscale)         
+                        par.min(0.01*parscale)
+                        par.max(100.0*parscale)
+                        
+        
+        return spec
 
-        elif self.nodes == 2:
-
-            # User a power law scaling function
-            e    = gammalib.GEnergy(1.0,"TeV")
-            spec = gammalib.GModelSpectralPlaw(1.0,0.0,e)  
-            spec[0].free()
-            spec[0].min(0.01)
-            spec[0].max(10.0)
-            spec[0].scale(1.0)
-            spec[0].value(value)
-            spec[1].free()
-            spec[1].min(-2.0)
-            spec[1].max(2.0)
-            spec[1].scale(1.0)
-        else:        
-
-            # Use several energy-dependent scaling factors  
-            fits = gammalib.GFits(aefffile)
-            emin = fits["EFFECTIVE AREA"].real("LO_THRES")
-            emax = fits["EFFECTIVE AREA"].real("HI_THRES")
-            fits.close()
-            spec = gammalib.GModelSpectralNodes()
-            bounds = gammalib.GEbounds(self.nodes,gammalib.GEnergy(emin,"TeV"),gammalib.GEnergy(emax,"TeV"),True)
-            for i in range(bounds.size()):      
-                spec.append(bounds.elogmean(i),value) 
-            for par in spec:
-                if "Energy" in par.name():
-                    par.fix()
-                elif "Intensity" in par.name():                     
-                    par.min(0.01)
-                    par.max(10.0)
-
-        # Create background model instance
-        bck = gammalib.GCTAModelIrfBackground(spec)
-
+    def hess_background(self, run, aefffile, trgrate, zenith):
+        
+        # Set IrfBackground
+        if self.bkgtype == "irf":
+            prefactor = 1.0
+            index = 0.0
+            if self.usetrig and trgrate > 0.0:
+                # Use value from lookup
+                prefactor = 0.00427233352611 * trgrate + 0.181244590076
+            spec = self.background_spectrum(run, prefactor, index, aefffile)
+            # Create background model instance
+            bck = gammalib.GCTAModelIrfBackground(spec)
+        
+        # Set AeffBackground   
+        elif self.bkgtype == "aeff":
+            prefactor = 5e-14
+            index = -2.5
+            # Use values from lookup if possible
+            if self.usetrig and trgrate > 0.0:
+                prefactor = 1.52976410372e-16 * trgrate + 2.71805547108e-14               
+            if zenith > 0.0: 
+                index = 0.000271928721732 * zenith * zenith -0.0029602286453 * zenith -2.76404600416
+        
+            spec = self.background_spectrum(run, prefactor, index, aefffile)
+                
+            # Create background model instance
+            bck = gammalib.GCTAModelAeffBackground(spec)
+            
+        # Set Gaussian Background
+        elif self.bkgtype == "gauss":
+            spec = self.background_spectrum(run, 1e-4, -1.8, aefffile)
+            radial = gammalib.GCTAModelRadialGauss(2.5)
+            bck = gammalib.GCTAModelRadialAcceptance(radial, spec)
+        
+        else:
+            sys.exit("Background type \""+self.bkgtype+"\" unsupported")
+        
+        # Copy model
+        model = bck.clone()
+            
         # Assign specific run id
-        bck.ids(str(int(run)))
-
+        model.ids(str(int(run)))
+        
         # Assign instrument
-        bck.instruments("HESS")
-
+        model.instruments("HESS")
+        
         # Set name (arbitrary)
-        bck.name("bkg_"+run)  
-
+        model.name("bkg_"+run)  
+        
         # Turn off TS calculation for background model
-        bck.tscalc(False)
-
+        model.tscalc(False)
+        
         # Return model
-        return bck
-
+        return model
+        
     
     def erange(self):
         """
@@ -441,11 +494,13 @@ class cshessobs(ctools.cscript):
                 msg = "Run "+str(int(run))+" has no PSF - Run is skipped"
                 skip = True
             elif not os.path.isfile(edispfile):
-                msg = "Run "+str(int(run))+" has no energy dispersion - Run is skipped"
-                skip = True
+                msg = "Warning: Run "+str(int(run))+" has no energy dispersion - usage of energy dispersion not possible"
+                skip = False
+                edispfile = ""
             elif not os.path.isfile(bgfile):
-                msg = "Run "+str(int(run))+" has no background - Run is skipped"
-                skip = True            
+                msg = "Warning: Run "+str(int(run))+" has no background file - use of IRF background not possible"
+                skip = False       
+                bgfile = ""     
             else:
                 msg = "Adding run "+str(int(run))
 
@@ -465,10 +520,13 @@ class cshessobs(ctools.cscript):
             fits = gammalib.GFits(eventfile)  
             object_name = fits["EVENTS"].string("OBJECT")
 
-            # Retrieve trigger rate if available
+            # Retrieve trigger rate and zenith if available
             trgrate = 0.0
+            zenith = 0.0
             if fits["EVENTS"].has_card("ZTRGRATE"):
                 trgrate = fits["EVENTS"].real("ZTRGRATE")
+            if fits["EVENTS"].has_card("ALT_PNT"):
+                zenith = 90.-fits["EVENTS"].real("ALT_PNT")
 
             # Close FITS file
             fits.close()
@@ -515,10 +573,10 @@ class cshessobs(ctools.cscript):
             obs.append(psf)
             obs.append(edisp)
             obs.append(bck)
-
+            
             # Append instrumental background model
-            self.models.append(self.hess_inst_background(run,aefffile,trgrate))
-        
+            self.models.append(self.hess_background(run, aefffile, trgrate, zenith))
+
         # Continue only if there are observations available
         if lib.size():
             
