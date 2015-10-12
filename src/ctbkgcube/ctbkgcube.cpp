@@ -314,7 +314,9 @@ void ctbkgcube::run(void)
     // that model to the input model in place of the original
     // background models
     // TODO: We might think of creating the spectral model via user parameter
-    GModelSpectralPlaw      spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
+    GModelSpectralPlaw spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
+    spectral["Prefactor"].range(0.01, 100.0);
+    spectral["Index"].range(-5.0, 5.0);
     GCTAModelCubeBackground model(spectral);
 
     // Set model name

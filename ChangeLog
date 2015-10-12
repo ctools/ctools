@@ -1,8 +1,9 @@
-2015-07-03  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-10-12  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.10.0 released
         =========================
 
+        Limit power law parameters in ctbkgcube (#1547)
         Extend cspull to stacked analysis (#1503)
         Add tests for installed ctools version (#1486)
         Create cscripts Python module, move obsutils in that module (#1470)

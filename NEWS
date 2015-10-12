@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-3 July 2015
+12 October 2015
 
 
 1. Introduction
@@ -89,7 +89,8 @@ None
 
 14. ctbkgcube - CTA background cube generation
 ----------------------------------------------
-None
+Limit the power law prefactor to a range of [0.01,100] and the index to [-5,5]. This
+solves some stability problems in csspec (#1547).
 
 
 15. ctcubemask - CTA cube filtering
