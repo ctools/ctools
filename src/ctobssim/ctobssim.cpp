@@ -977,7 +977,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  * @param[in] emin Minimum energy.
  * @param[in] emax Maximum energy.
  * @param[in] centre Centre of region for photon rate determination.
- * @param[in] radius Radius of region for photon rate determination.
+ * @param[in] radius Radius of region for photon rate determination (degrees).
  * @return Model flux (photons/cm2/sec).
  ***************************************************************************/
 double ctobssim::get_model_flux(const GModelSky* model,
@@ -986,45 +986,60 @@ double ctobssim::get_model_flux(const GModelSky* model,
                                 const GSkyDir&   centre,
                                 const double&    radius)
 {
-    // Initialise de-allocation flag
-    bool free_spectral = false;
+    // Initialise flux
+    double flux = 0.0;
 
-    // Get pointer to spectral model
-    const GModelSpectral* spectral = model->spectral();
+    // Determine the spatial model normalization within the simulation
+    // cone and check whether the model will produce any photons in that
+    // cone.
+    double norm      = model->spatial()->mc_norm(centre, radius);
+    bool   use_model = (norm > 0.0) ? true : false;
 
-    // If the spatial model is a diffuse cube then create a node function
-    // spectral model that is the product of the diffuse cube node function
-    // and the spectral model evaluated at the energies of the node function
-    GModelSpatialDiffuseCube* cube = dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
-    if (cube != NULL) {
+    // Continue only if model overlaps with simulation region
+    if (use_model) {
 
-        // Set MC cone
-        cube->set_mc_cone(centre, radius);
+        // Initialise de-allocation flag
+        bool free_spectral = false;
 
-        // Allocate node function to replace the spectral component
-        GModelSpectralNodes* nodes = new GModelSpectralNodes(cube->spectrum());
-        for (int i = 0; i < nodes->nodes(); ++i) {
-            GEnergy energy    = nodes->energy(i);
-            GTime   time;                              // Dummy time
-            double  intensity = nodes->intensity(i);
-            double  norm      = spectral->eval(energy, time);
-            nodes->intensity(i, norm*intensity);
-        }
+        // Get pointer to spectral model
+        const GModelSpectral* spectral = model->spectral();
 
-        // Signal that node function needs to be de-allocated later
-        free_spectral = true;
+        // If the spatial model is a diffuse cube then create a node
+        // function spectral model that is the product of the diffuse
+        // cube node function and the spectral model evaluated at the
+        // energies of the node function
+        GModelSpatialDiffuseCube* cube = dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
+        if (cube != NULL) {
 
-        // Set the spectral model pointer to the node function
-        spectral = nodes;
+            // Set MC cone
+            cube->set_mc_cone(centre, radius);
 
-    } // endif: spatial model was a diffuse cube
+            // Allocate node function to replace the spectral component
+            GModelSpectralNodes* nodes = new GModelSpectralNodes(cube->spectrum());
+            for (int i = 0; i < nodes->nodes(); ++i) {
+                GEnergy energy    = nodes->energy(i);
+                GTime   time;                              // Dummy time
+                double  intensity = nodes->intensity(i);
+                double  value     = spectral->eval(energy, time);
+                nodes->intensity(i, value * intensity);
+            }
+
+            // Signal that node function needs to be de-allocated later
+            free_spectral = true;
+
+            // Set the spectral model pointer to the node function
+            spectral = nodes;
+
+        } // endif: spatial model was a diffuse cube
     
-    // Compute flux within [emin, emax] in model from spectral
-    // component (units: ph/cm2/s)
-    double flux = spectral->flux(emin, emax);
+        // Compute flux within [emin, emax] in model from spectral
+        // component (units: ph/cm2/s)
+        flux = spectral->flux(emin, emax) * norm;
 
-    // Free spectral model if required
-    if (free_spectral) delete spectral;
+        // Free spectral model if required
+        if (free_spectral) delete spectral;
+
+    } // endif: model overlaps with simulation region
 
     // Return model flux
     return flux;
