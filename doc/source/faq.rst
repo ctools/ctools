@@ -17,6 +17,7 @@ asked.
 - :ref:`I want to upgrade ctools, do I have to upgrade GammaLib? <faq_upgrade>`
 - :ref:`Why does my ctool complain about missing parameters? <faq_pars>`
 - :ref:`Should I used binned or unbinned analysis? <faq_analysis>`
+- :ref:`How precise are ctools? <faq_precision>`
 
 
 .. _faq_ctools_gammalib:
@@ -119,3 +120,20 @@ asked.
   the line may require a prohibitive large number of energy bins for a binned
   analysis.
 
+
+.. _faq_precision:
+
+.. topic:: How precise are ctools?
+
+  The ctools and gammalib codes have a numerical accuracy of better than 1%.
+  This means that if you use ctools to determine for example the flux 
+  received from a source or the spectral points of an SED, the relative 
+  precision of the flux or the spectral points is better than 1%.
+  The same is true for spatial parameters, such as source position or
+  source extension.
+  For many cases the actual numerical precision is in fact much better
+  than 1%, but in any case, it should never be worse.
+  Note, however, that this does not imply that source parameters can be
+  determined with CTA with an accuracy of 1%. The accuracy depends in the
+  end on the precision to which the instrument response function is known,
+  which should be more in the 10% range.
