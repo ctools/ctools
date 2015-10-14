@@ -15,6 +15,13 @@ Releases
 
 The latest ctools release is ``ctools-0.9.0`` (22 May 2015).
 
+.. note::
+
+   The cscripts in the Mac OS X binary package ctools-0.9.0-macosx10.3.dmg 
+   were not working. If you encounter a problem please download the updated
+   binary package
+   `ctools-0.9.1-macosx10.3.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-0.9.1-macosx10.3.dmg>`_.
+
 Below a table of ctools releases. Please note that at this stage of the
 project there is a strict link between the ctools and gammalib versions.
 Please make sure that you have the corresponding gammalib version installed
@@ -30,7 +37,7 @@ gammalib.
      - Mac OS X package
    * - `0.9.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-0.9.0.tar.gz>`_
      - `0.10.0 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-0.10.0.tar.gz>`_
-     - `ctools-0.9.0-macosx10.3.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-0.9.0-macosx10.3.dmg>`_
+     - `ctools-0.9.1-macosx10.3.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-0.9.1-macosx10.3.dmg>`_
    * - `0.8.1 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-00-08-01.tar.gz>`_
      - `0.9.1 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-00-09-01.tar.gz>`_
      - `ctools-00-08-01-macosx10.3.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-00-08-01-macosx10.3.dmg>`_
@@ -71,25 +78,46 @@ gammalib.
      - `0.4.7 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-00-04-07.tar.gz>`_
      -
 
+
 Git repository
 --------------
 
-To clone the ctools source code, type
+To clone the gammalib and ctools source codes, type
 
 .. code-block:: bash
 
-  $ git clone https://cta-git.irap.omp.eu/ctools
+   $ git clone https://cta-git.irap.omp.eu/gammalib
+   $ git clone https://cta-git.irap.omp.eu/ctools
   
-This will create a directory named ctools under the current working directory
-that will contain the ctools source code. Before you are able to compile the
-code you need to generate the configuration file (make sure that you're
-actually on the devel branch of the git repository):
+This will create directories named gammalib and ctools under the current working
+directory that will contain the gammalib and ctools source code. Before you are able
+to compile the code you need to generate the configuration file using the 
+``autogen.sh`` script. Also make sure that you're actually on the devel branch of the git
+repository. GammaLib and ctools can be compiled using the following 
+command sequence (the code will be installed into the ``/usr/local/gamma`` 
+directory):
 
 .. code-block:: bash
 
-  $ cd ctools
-  $ git checkout devel
-  $ ./autogen.sh
+   $ cd gammalib
+   $ git checkout devel
+   $ ./autogen.sh
+   $ ./configure
+   $ make
+   $ make check
+   $ sudo make install
+   $ export GAMMALIB=/usr/local/gamma
+   $ source $GAMMALIB/bin/gammalib-init.sh
+   $ cd ..
+   $ cd ctools
+   $ git checkout devel
+   $ ./autogen.sh
+   $ ./configure
+   $ make
+   $ make check
+   $ sudo make install
+   $ export CTOOLS=/usr/local/gamma
+   $ source $CTOOLS/bin/ctools-init.sh
 
 .. note::
 

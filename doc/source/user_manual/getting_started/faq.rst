@@ -15,6 +15,9 @@ asked.
 - :ref:`What is the difference between ctools and GammaLib? <faq_ctools_gammalib>`
 - :ref:`Are ctools and GammaLib specific to CTA? <faq_instruments>`
 - :ref:`I want to upgrade ctools, do I have to upgrade GammaLib? <faq_upgrade>`
+- :ref:`Why does my ctool complain about missing parameters? <faq_pars>`
+- :ref:`Should I used binned or unbinned analysis? <faq_analysis>`
+- :ref:`How precise are ctools? <faq_precision>`
 
 
 .. _faq_ctools_gammalib:
@@ -77,3 +80,60 @@ asked.
   (see the :ref:`download` section for a correspondance of versions).
   We plan however to put the GammaLib interface under change control.
   ctools should then become more independent from GammaLib.
+
+
+.. _faq_pars:
+
+.. topic:: Why does my ctool complain about missing parameters?
+
+  After upgrading to a new ctools version, a ctool may issue the following
+  error
+
+  ``*** ERROR in GApplicationPars::operator[](std::string&): Invalid 
+  argument. Parameter "XXX" has not been found in parameter file.
+  Please specify a valid parameter name.``
+
+  This error may occur if some parameters have been added to a ctool and
+  you still have the old parameter file without that parameter sitting in
+  your pfiles folder. Simply erasing all files in the pfiles folder should
+  fix this problem.
+
+
+.. _faq_analysis:
+
+.. topic:: Should I used binned or unbinned analysis?
+
+  This depends on the amount of data you want to analyse and to some extent
+  on the question you want to answer with your analysis.
+  For an unbinned analysis, the computation time increases about linearly
+  with the number of events and hence with the duration of the observation,
+  while for binned analysis the computation time depends only on the number
+  of bins that is used.
+  Consequently, for short observation times (below 30 hours), unbinned
+  analysis is faster, while for longer times it is advantageous to use
+  a binned analysis.
+  If you want to take the energy dispersion into account (which is required
+  if your analysis covers the lowest energies), you need to use unbinned
+  analysis, since binned analysis does not yet implement energy dispersion.
+  If you'd like to fit a Gaussian line to your data you may also prefer
+  unbinned over binned analysis, as the fine sampling required to resolve
+  the line may require a prohibitive large number of energy bins for a binned
+  analysis.
+
+
+.. _faq_precision:
+
+.. topic:: How precise are ctools?
+
+  The ctools and gammalib codes have a numerical accuracy of better than 1%.
+  This means that if you use ctools to determine for example the flux 
+  received from a source or the spectral points of an SED, the relative 
+  precision of the flux or the spectral points is better than 1%.
+  The same is true for spatial parameters, such as source position or
+  source extension.
+  For many cases the actual numerical precision is in fact much better
+  than 1%, but in any case, it should never be worse.
+  Note, however, that this does not imply that source parameters can be
+  determined with CTA with an accuracy of 1%. The accuracy depends in the
+  end on the precision to which the instrument response function is known,
+  which should be more in the 10% range.
