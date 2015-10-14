@@ -39,6 +39,9 @@
 
 /* __ Coding definitions _________________________________________________ */
 
+/* __ Constants __________________________________________________________ */
+const GEnergy g_energy_margin(1.0e-12, "TeV");
+
 
 /*==========================================================================
  =                                                                         =
@@ -617,8 +620,8 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             // Skip bin if it is outside the energy range of the observation
             int index = cube_ebounds.index(bin->energy());
             if (index == -1 ||
-                !obs_ebounds.contains(cube_ebounds.emin(index),
-                                      cube_ebounds.emax(index))) {
+                !obs_ebounds.contains(cube_ebounds.emin(index)+g_energy_margin,
+                                      cube_ebounds.emax(index)-g_energy_margin)) {
                 num_outside_ebds++;
                 continue;
             }

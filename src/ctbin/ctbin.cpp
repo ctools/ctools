@@ -40,6 +40,9 @@
 
 /* __ Coding definitions _________________________________________________ */
 
+/* __ Constants __________________________________________________________ */
+const GEnergy g_energy_margin(1.0e-12, "TeV");
+
 
 /*==========================================================================
  =                                                                         =
@@ -530,8 +533,8 @@ void ctbin::fill_cube(GCTAObservation* obs)
             // Determine energy bin. Skip if we are outside the energy range
             int index = m_ebounds.index(event->energy());
             if (index == -1 ||
-                !obs_ebounds.contains(m_ebounds.emin(index),
-                                      m_ebounds.emax(index))) {
+                !obs_ebounds.contains(m_ebounds.emin(index)+g_energy_margin,
+                                      m_ebounds.emax(index)-g_energy_margin)) {
                 num_outside_ebds++;
                 continue;
             }
