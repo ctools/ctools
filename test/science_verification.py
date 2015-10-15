@@ -208,13 +208,13 @@ class sciver(gammalib.GPythonTestSuite):
         # Test mean
         mean  = self.results[name]["mean"]
         valid = (mean >= -0.30) and (mean <= +0.30)
-        text  = "Mean "+str(mean)+" of "+name+" is outside [-0.3,0.3] range"
+        text  = "Mean "+str(mean)+" of "+name+" should be within [-0.3,0.3] range"
         self.test_assert(valid, text)
 
         # Test standard deviation
         std   = self.results[name]["std"]
         valid = (std >= 0.90) and (std <= 1.10)
-        text  = "Standard deviation "+str(std)+" of "+name+" is outside [0.9,1.1] range"
+        text  = "Standard deviation "+str(std)+" of "+name+" should be within [0.9,1.1] range"
         self.test_assert(valid, text)
 
         # Return
