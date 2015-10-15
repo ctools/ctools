@@ -2,10 +2,10 @@
 <source_library title="source library">
   <source name="Crab" type="PointSource">
     <spectrum type="PowerLaw2">
-      <parameter name="Integral"   scale="1e-07" value="1.0"      min="1e-07" max="1000.0"    free="1"/>
-      <parameter name="Index"      scale="-1.0"  value="2.48"     min="-5.0"  max="+5.0"      free="1"/>
-      <parameter name="LowerLimit" scale="1.0"   value="100.0"    min="10.0"  max="1000000.0" free="0"/>
-      <parameter name="UpperLimit" scale="1.0"   value="500000.0" min="10.0"  max="1000000.0" free="0"/>
+      <parameter name="Integral"   scale="1e-5" value="1.617"      min="1e-07" max="1000.0"    free="1"/>
+      <parameter name="Index"      scale="-1.0" value="2.48"     min="-5.0"  max="+5.0"      free="1"/>
+      <parameter name="LowerLimit" scale="1.0"  value="100.0"    min="10.0"  max="1000000.0" free="0"/>
+      <parameter name="UpperLimit" scale="1.0"  value="500000.0" min="10.0"  max="1000000.0" free="0"/>
     </spectrum>
     <spatialModel type="SkyDirFunction">
       <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
