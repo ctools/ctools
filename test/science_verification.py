@@ -179,8 +179,15 @@ class sciver(gammalib.GPythonTestSuite):
         # Set test name
         self.name("Science Verification")
 
-        # Append tests
+        # Append spectral tests
         self.append(self.spec_plaw, "Test power law model")
+        self.append(self.spec_plaw2, "Test power law 2 model")
+        self.append(self.spec_eplaw, "Test exponentially cut off power law model")
+        self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
+        self.append(self.spec_logparabola, "Test log parabola model")
+        self.append(self.spec_gauss, "Test Gaussian model")
+        self.append(self.spec_filefct, "Test file function model")
+        self.append(self.spec_nodes, "Test nodes model")
 
         # Return
         return
@@ -228,6 +235,98 @@ class sciver(gammalib.GPythonTestSuite):
         self.pull("data/sciver/crab_plaw")
         self.test("Pull_Crab_Prefactor")
         self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test power law 2 model
+    def spec_plaw2(self):
+        """
+        Test power law 2 model.
+        """
+        self.pull("data/sciver/crab_plaw2")
+        self.test("Pull_Crab_Integral")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test exponentially cut off power law model
+    def spec_eplaw(self):
+        """
+        Test exponentially cut off power law model.
+        """
+        self.pull("data/sciver/crab_eplaw")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_Cutoff")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test super exponentially cut off power law model
+    def spec_supeplaw(self):
+        """
+        Test super exponentially cut off power law model.
+        """
+        self.pull("data/sciver/crab_supeplaw")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index1")
+        self.test("Pull_Crab_Index2")
+        self.test("Pull_Crab_Cutoff")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test log parabola model
+    def spec_logparabola(self):
+        """
+        Test log parabola model.
+        """
+        self.pull("data/sciver/crab_logparabola")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_Curvature")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test Gaussian model
+    def spec_gauss(self):
+        """
+        Test Gaussian model.
+        """
+        self.pull("data/sciver/crab_gauss")
+        self.test("Pull_Crab_Normalization")
+        self.test("Pull_Crab_Mean")
+        self.test("Pull_Crab_Sigma")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test file function model
+    def spec_filefct(self):
+        """
+        Test file function model.
+        """
+        self.pull("data/sciver/crab_filefct")
+        self.test("Pull_Crab_Normalization")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test nodes model
+    def spec_nodes(self):
+        """
+        Test nodes model.
+        """
+        self.pull("data/sciver/crab_nodes")
+        self.test("Pull_Crab_Intensity0")
+        self.test("Pull_Crab_Intensity1")
+        self.test("Pull_Crab_Intensity2")
+        self.test("Pull_Crab_Intensity3")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
         return
 
 
