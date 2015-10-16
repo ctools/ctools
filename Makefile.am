@@ -106,6 +106,16 @@ valgrind:
 		echo "valgrind not found in PATH."; \
 	fi
 
+# Add science verification rule
+science-verification:
+	@if type test/science_verification.py >/dev/null 2>&1; then \
+	    cd test; \
+	    ./science_verification.py; \
+	    cd ..; \
+	else \
+		echo "science_verification.py not found in test."; \
+	fi
+
 # Add Sphinx rule
 sphinx:
 	@if type sphinx-build >/dev/null 2>&1; then \
