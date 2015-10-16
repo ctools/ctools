@@ -109,8 +109,6 @@ valgrind:
 # Add science verification rule
 science-verification:
 	@if type test/science_verification.py >/dev/null 2>&1; then \
-	    PYTHONPATH=$(top_builddir):$(top_builddir)/pyext:$(top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH); \
-	    @RUNSHARED@=$(top_builddir)/src/.libs:$(LIBDIR_GAMMALIB):$(@RUNSHARED@); \
 	    cd test; \
 	    ./science_verification.py; \
 	    cd ..; \
