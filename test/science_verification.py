@@ -181,13 +181,22 @@ class sciver(gammalib.GPythonTestSuite):
 
         # Append spectral tests
         #self.append(self.spec_plaw, "Test power law model")
-        self.append(self.spec_plaw2, "Test power law 2 model")
-        self.append(self.spec_eplaw, "Test exponentially cut off power law model")
+        #self.append(self.spec_plaw2, "Test power law 2 model")
+        #self.append(self.spec_eplaw, "Test exponentially cut off power law model")
         #self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
-        self.append(self.spec_logparabola, "Test log parabola model")
+        #self.append(self.spec_logparabola, "Test log parabola model")
         #self.append(self.spec_gauss, "Test Gaussian model")
         #self.append(self.spec_filefct, "Test file function model")
-        self.append(self.spec_nodes, "Test nodes model")
+        #self.append(self.spec_nodes, "Test nodes model")
+
+        # Append spatial tests
+        self.append(self.spec_ptsrc, "Test point source model")
+        self.append(self.spec_rdisk, "Test radial disk model")
+        self.append(self.spec_rgauss, "Test radial Gaussian model")
+        self.append(self.spec_rshell, "Test radial shell model")
+        self.append(self.spec_edisk, "Test elliptical disk model")
+        self.append(self.spec_egauss, "Test elliptical Gaussian model")
+        self.append(self.spec_map, "Test elliptical Gaussian model")
 
         # Return
         return
@@ -325,6 +334,112 @@ class sciver(gammalib.GPythonTestSuite):
         self.test("Pull_Crab_Intensity1")
         self.test("Pull_Crab_Intensity2")
         self.test("Pull_Crab_Intensity3")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test point source model
+    def spec_ptsrc(self):
+        """
+        Test point source model.
+        """
+        self.pull("data/sciver/crab_ptsrc")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_RA")
+        self.test("Pull_Crab_DEC")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test radial disk model
+    def spec_rdisk(self):
+        """
+        Test radial disk model.
+        """
+        self.pull("data/sciver/crab_rdisk")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_RA")
+        self.test("Pull_Crab_DEC")
+        self.test("Pull_Crab_Radius")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test radial Gaussian model
+    def spec_rgauss(self):
+        """
+        Test radial Gaussian model.
+        """
+        self.pull("data/sciver/crab_rgauss")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_RA")
+        self.test("Pull_Crab_DEC")
+        self.test("Pull_Crab_Sigma")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test radial shell model
+    def spec_rshell(self):
+        """
+        Test radial shell model.
+        """
+        self.pull("data/sciver/crab_rshell")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_RA")
+        self.test("Pull_Crab_DEC")
+        self.test("Pull_Crab_Radius")
+        self.test("Pull_Crab_Width")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test elliptical disk model
+    def spec_edisk(self):
+        """
+        Test elliptical disk model.
+        """
+        self.pull("data/sciver/crab_edisk")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_RA")
+        self.test("Pull_Crab_DEC")
+        self.test("Pull_Crab_PA")
+        self.test("Pull_Crab_MinorRadius")
+        self.test("Pull_Crab_MajorRadius")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test elliptical Gaussian model
+    def spec_egauss(self):
+        """
+        Test elliptical Gaussian model.
+        """
+        self.pull("data/sciver/crab_egauss")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Crab_RA")
+        self.test("Pull_Crab_DEC")
+        self.test("Pull_Crab_PA")
+        self.test("Pull_Crab_MinorRadius")
+        self.test("Pull_Crab_MajorRadius")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test diffuse map model
+    def spec_map(self):
+        """
+        Test diffuse map model.
+        """
+        self.pull("data/sciver/crab_map")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
         self.test("Pull_Background_Prefactor")
         self.test("Pull_Background_Index")
         return
