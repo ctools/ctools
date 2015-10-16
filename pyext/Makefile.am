@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2014 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2015 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -28,6 +28,15 @@
 
 # Works only if Python is available
 if WITH_PYTHON
+
+# Test scripts to be distributed in $(pythondir)/ctools/tests
+testscripts = ctools/tests/__init__.py \
+              ctools/tests/unbinned.py
+
+# Distribute scripts
+EXTRA_DIST       = $(testscripts)
+testscriptsdir   = $(pythondir)/ctools/tests
+testscripts_DATA = $(testscripts)
 
 # Set SWIG interface filename
 SWIG_INTERFACE = ctools/tools.i
