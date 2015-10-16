@@ -137,7 +137,8 @@ def analyse_pull_distribution(filename):
 
     # Compute mean and standard deviations
     for i in range(len(stds)):
-        std       = math.sqrt(stds[i]/samples - means[i]*means[i]/(samples*samples))
+        std       = math.sqrt(stds[i]/samples -
+                              means[i]*means[i]/(samples*samples))
         stds[i]   = std
         means[i] /= samples
 
@@ -180,14 +181,14 @@ class sciver(gammalib.GPythonTestSuite):
         self.name("Science Verification")
 
         # Append spectral tests
-        #self.append(self.spec_plaw, "Test power law model")
-        #self.append(self.spec_plaw2, "Test power law 2 model")
-        #self.append(self.spec_eplaw, "Test exponentially cut off power law model")
-        #self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
-        #self.append(self.spec_logparabola, "Test log parabola model")
-        #self.append(self.spec_gauss, "Test Gaussian model")
-        #self.append(self.spec_filefct, "Test file function model")
-        #self.append(self.spec_nodes, "Test nodes model")
+        self.append(self.spec_plaw, "Test power law model")
+        self.append(self.spec_plaw2, "Test power law 2 model")
+        self.append(self.spec_eplaw, "Test exponentially cut off power law model")
+        self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
+        self.append(self.spec_logparabola, "Test log parabola model")
+        self.append(self.spec_gauss, "Test Gaussian model")
+        self.append(self.spec_filefct, "Test file function model")
+        self.append(self.spec_nodes, "Test nodes model")
 
         # Append spatial tests
         self.append(self.spec_ptsrc, "Test point source model")
@@ -223,14 +224,14 @@ class sciver(gammalib.GPythonTestSuite):
         """
         # Test mean
         mean  = self.results[name]["mean"]
-        valid = (mean >= -0.30) and (mean <= +0.30)
-        text  = "Mean "+str(mean)+" of "+name+" should be within [-0.3,0.3] range"
+        valid = (mean >= -0.40) and (mean <= +0.40)
+        text  = "Mean %.5f of %s should be within [-0.4,0.4] range" % (mean, name)
         self.test_assert(valid, text)
 
         # Test standard deviation
         std   = self.results[name]["std"]
         valid = (std >= 0.80) and (std <= 1.20)
-        text  = "Standard deviation "+str(std)+" of "+name+" should be within [0.8,1.2] range"
+        text  = "Standard deviation %.5f of %s should be within [0.8,1.2] range" % (std, name)
         self.test_assert(valid, text)
 
         # Return
