@@ -14,7 +14,7 @@ pythonscripts = __init__.py \
 
 # Test scripts to be distributed in $(pythondir)/cscripts/tests
 testscripts = tests/__init__.py \
-              tests/test_unbinned.py
+              tests/scripts.py
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \

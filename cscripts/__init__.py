@@ -1,4 +1,5 @@
-"""cscripts --- Python scripts from the ctools package.
+"""
+cscripts --- Python scripts from the ctools package.
 
 http://cta.irap.omp.eu/ctools/
 """
@@ -33,18 +34,22 @@ from .csspec     import csspec
 from .cstsdist   import cstsdist
 from . import obsutils
 
-
+# Add test function
 def test(verbosity=2):
-    """Run ctools tests.
     """
+    Run cscripts tests.
+    """
+    # Imports
     import unittest
-    from .tests.test_unbinned import TestUnbinnedAnalysis
+    from .tests.scripts import scripts
 
+    # Create a test suite
     test_suite = unittest.TestSuite()
 
     # Test cases must be listed manually here ...
-    # we currently don't use unittest for test collection
-    test_suite.addTest(unittest.makeSuite(TestUnbinnedAnalysis))
+    # We currently don't use unittest for test collection
+    test_suite.addTest(unittest.makeSuite(scripts))
 
+    # Create a test runner and run the test
     test_runner = unittest.TextTestRunner(verbosity=verbosity)
     test_runner.run(test_suite)
