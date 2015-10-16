@@ -405,8 +405,8 @@ class csspec(ctools.cscript):
                 psfcube["xref"]     = self.m_xref
                 psfcube["yref"]     = self.m_yref
                 psfcube["binsz"]    = self.m_binsz*20.0 # Slow Psf variation
-                psfcube["nxpix"]    = self.m_nxpix/20
-                psfcube["nypix"]    = self.m_nypix/20
+                psfcube["nxpix"]    = self.m_nxpix/20+1
+                psfcube["nypix"]    = self.m_nypix/20+1
                 psfcube["enumbins"] = self.m_ebins
                 psfcube["anumbins"] = self.m_anumbins
                 psfcube["emin"]     = emin.TeV()
