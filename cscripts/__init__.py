@@ -1,9 +1,22 @@
-"""
-cscripts --- Python scripts from the ctools package.
-
-http://cta.irap.omp.eu/ctools/
-"""
-
+# ==========================================================================
+# cscripts Python module
+#
+# Copyright (C) 2015 Juergen Knoedlseder
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ==========================================================================
 
 # List all scripts in this module
 __all__ = [
@@ -35,21 +48,8 @@ from .cstsdist   import cstsdist
 from . import obsutils
 
 # Add test function
-def test(verbosity=2):
+def test():
     """
     Run cscripts tests.
     """
-    # Imports
-    import unittest
-    from .tests.scripts import scripts
-
-    # Create a test suite
-    test_suite = unittest.TestSuite()
-
-    # Test cases must be listed manually here ...
-    # We currently don't use unittest for test collection
-    test_suite.addTest(unittest.makeSuite(scripts))
-
-    # Create a test runner and run the test
-    test_runner = unittest.TextTestRunner(verbosity=verbosity)
-    test_runner.run(test_suite)
+    print("No cscripts unit tests have been implemented so far.")

@@ -13,8 +13,8 @@ pythonscripts = __init__.py \
                 obsutils.py
 
 # Test scripts to be distributed in $(pythondir)/cscripts/tests
-testscripts = tests/__init__.py \
-              tests/scripts.py
+#testscripts = tests/__init__.py \
+#              tests/scripts.py
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
@@ -27,8 +27,8 @@ binscriptsdir      = $(bindir)
 binscripts_DATA    = $(binscripts)
 pythonscriptsdir   = $(pythondir)/cscripts
 pythonscripts_DATA = $(pythonscripts)
-testscriptsdir     = $(pythondir)/cscripts/tests
-testscripts_DATA   = $(testscripts)
+#testscriptsdir     = $(pythondir)/cscripts/tests
+#testscripts_DATA   = $(testscripts)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:
