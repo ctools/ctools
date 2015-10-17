@@ -60,3 +60,10 @@
 %include "ctbutterfly.i"
 %include "ctulimit.i"
 %include "cterror.i"
+
+/* __ Test function ______________________________________________________ */
+%pythoncode %{
+def test():
+    from ctools.tests import test_python
+    test_python.test(installed=True)
+%}
