@@ -3,7 +3,7 @@
 # Scripts to be distributed in bindir
 binscripts = tsmerge.py
 
-# Scripts to be distributed in $(pythondir)/cscripts
+# Scripts to be distributed in $(pyexecdir)/cscripts
 pythonscripts = __init__.py \
                 cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py \
                 cshessobs.py csobsdef.py csspec.py cslightcrv.py \
@@ -31,7 +31,7 @@ install-data-hook:
 	@linklist='$(linkscripts)';\
 	for p in $$linklist; do \
       rm -rf "$(DESTDIR)$(bindir)/$$p"; \
-      ln -s "$(DESTDIR)$(pythondir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
-	  chmod +x "$(DESTDIR)$(pythondir)/cscripts/$$p.py"; \
+      ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
+	  chmod +x "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py"; \
 	done
     
