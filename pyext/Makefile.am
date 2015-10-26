@@ -30,7 +30,8 @@
 if WITH_PYTHON
 
 # Test scripts to be distributed in $(pythondir)/ctools/tests
-testscripts = $(abs_top_srcdir)/test/test_python.py \
+testscripts = ctools/tests/__init__.py \
+              $(abs_top_srcdir)/test/test_python.py \
               $(abs_top_srcdir)/test/test_ctobssim.py \
               $(abs_top_srcdir)/test/test_ctselect.py \
               $(abs_top_srcdir)/test/test_ctbin.py \
