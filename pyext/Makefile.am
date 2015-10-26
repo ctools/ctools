@@ -54,11 +54,11 @@ testirf     = $(abs_top_srcdir)/test/irf/cta_dummy_irf.dat
 
 # Distribute scripts
 EXTRA_DIST       = $(testscripts) $(testdata) $(testirf)
-testscriptsdir   = $(pythondir)/ctools/tests
+testscriptsdir   = $(pyexecdir)/ctools/tests
 testscripts_DATA = $(testscripts)
-testdatadir      = $(pythondir)/ctools/tests/data
+testdatadir      = $(pyexecdir)/ctools/tests/data
 testdata_DATA    = $(testdata)
-testirfdir       = $(pythondir)/ctools/tests/irf
+testirfdir       = $(pyexecdir)/ctools/tests/irf
 testirf_DATA     = $(testirf)
 
 # Set SWIG interface filename

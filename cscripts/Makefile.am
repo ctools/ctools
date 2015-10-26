@@ -1,8 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
 # Scripts to be distributed in bindir
-#binscripts = cta_kb_bkgrates.py cta_root2irf.py cta_make_nodes.py \
-#             tsmerge.py
 binscripts = tsmerge.py
 
 # Scripts to be distributed in $(pythondir)/cscripts
@@ -12,23 +10,17 @@ pythonscripts = __init__.py \
                 csinfo.py \
                 obsutils.py
 
-# Test scripts to be distributed in $(pythondir)/cscripts/tests
-#testscripts = tests/__init__.py \
-#              tests/scripts.py
-
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
               cshessobs csobsdef csspec cslightcrv \
               csinfo
 
 # Distribute scripts
-EXTRA_DIST         = $(binscripts) $(pythonscripts) $(testscripts)
+EXTRA_DIST         = $(binscripts) $(pythonscripts)
 binscriptsdir      = $(bindir)
 binscripts_DATA    = $(binscripts)
-pythonscriptsdir   = $(pythondir)/cscripts
+pythonscriptsdir   = $(pyexecdir)/cscripts
 pythonscripts_DATA = $(pythonscripts)
-#testscriptsdir     = $(pythondir)/cscripts/tests
-#testscripts_DATA   = $(testscripts)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:
