@@ -29,7 +29,7 @@
 # Works only if Python is available
 if WITH_PYTHON
 
-# Test scripts to be distributed in $(pythondir)/ctools/tests
+# Test scripts to be distributed in $(pyexecdir)/ctools/tests
 testscripts = ctools/tests/__init__.py \
               $(abs_top_srcdir)/test/test_python.py \
               $(abs_top_srcdir)/test/test_ctobssim.py \
