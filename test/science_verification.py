@@ -181,34 +181,35 @@ class sciver(gammalib.GPythonTestSuite):
         self.name("Science Verification")
 
         # Append spectral tests
-        self.append(self.spec_plaw, "Test power law model")
-        self.append(self.spec_plaw2, "Test power law 2 model")
-        self.append(self.spec_eplaw, "Test exponentially cut off power law model")
-        self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
-        self.append(self.spec_logparabola, "Test log parabola model")
-        self.append(self.spec_gauss, "Test Gaussian model")
-        self.append(self.spec_filefct, "Test file function model")
-        self.append(self.spec_nodes, "Test nodes model")
+        #self.append(self.spec_plaw, "Test power law model")
+        #self.append(self.spec_plaw2, "Test power law 2 model")
+        #self.append(self.spec_eplaw, "Test exponentially cut off power law model")
+        #self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
+        #self.append(self.spec_logparabola, "Test log parabola model")
+        #self.append(self.spec_gauss, "Test Gaussian model")
+        #self.append(self.spec_filefct, "Test file function model")
+        #self.append(self.spec_nodes, "Test nodes model")
 
         # Append spatial tests
-        self.append(self.spec_ptsrc, "Test point source model")
-        self.append(self.spec_rdisk, "Test radial disk model")
-        self.append(self.spec_rgauss, "Test radial Gaussian model")
-        self.append(self.spec_rshell, "Test radial shell model")
-        self.append(self.spec_edisk, "Test elliptical disk model")
-        self.append(self.spec_egauss, "Test elliptical Gaussian model")
-        self.append(self.spec_map, "Test elliptical Gaussian model")
+        #self.append(self.spec_ptsrc, "Test point source model")
+        #self.append(self.spec_rdisk, "Test radial disk model")
+        #self.append(self.spec_rgauss, "Test radial Gaussian model")
+        #self.append(self.spec_rshell, "Test radial shell model")
+        #self.append(self.spec_edisk, "Test elliptical disk model")
+        #self.append(self.spec_egauss, "Test elliptical Gaussian model")
+        self.append(self.spec_map, "Test diffuse map model")
 
         # Return
         return
 
     # Generate and analyse pull distributions
-    def pull(self, model, trials=100):
+    def pull(self, model, trials=100, ra=83.63, dec=22.01):
         """
         Generate and analyse pull distributions.
         """
         # Generate pull distribution
-        outfile = generate_pull_distribution(model, trials=trials)
+        outfile = generate_pull_distribution(model, trials=trials,
+                                             ra=ra, dec=dec)
 
         # Analyse pull distribution
         self.results = analyse_pull_distribution(outfile)
@@ -438,7 +439,7 @@ class sciver(gammalib.GPythonTestSuite):
         """
         Test diffuse map model.
         """
-        self.pull("data/sciver/crab_map")
+        self.pull("data/sciver/crab_map", ra=201.3651, dec=-43.0191)
         self.test("Pull_Crab_Prefactor")
         self.test("Pull_Crab_Index")
         self.test("Pull_Background_Prefactor")
