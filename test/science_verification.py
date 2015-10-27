@@ -197,8 +197,9 @@ class sciver(gammalib.GPythonTestSuite):
         #self.append(self.spat_rshell, "Test radial shell model")
         #self.append(self.spat_edisk, "Test elliptical disk model")
         #self.append(self.spat_egauss, "Test elliptical Gaussian model")
-        #self.append(self.spat_map, "Test diffuse map model")
-        self.append(self.spat_const, "Test diffuse const model")
+        self.append(self.spat_const, "Test diffuse isotropic model")
+        self.append(self.spat_map, "Test diffuse map model")
+        self.append(self.spat_cube, "Test diffuse cube model")
 
         # Return
         return
@@ -435,6 +436,18 @@ class sciver(gammalib.GPythonTestSuite):
         self.test("Pull_Background_Index")
         return
 
+    # Test diffuse isotropic model
+    def spat_const(self):
+        """
+        Test diffuse isotropic model.
+        """
+        self.pull("data/sciver/crab_const")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
     # Test diffuse map model
     def spat_map(self):
         """
@@ -447,12 +460,12 @@ class sciver(gammalib.GPythonTestSuite):
         self.test("Pull_Background_Index")
         return
 
-    # Test diffuse isotropic model
-    def spat_const(self):
+    # Test diffuse cube model
+    def spat_cube(self):
         """
-        Test diffuse isotropic model.
+        Test diffuse cube model.
         """
-        self.pull("data/sciver/crab_const")
+        self.pull("data/sciver/crab_cube")
         self.test("Pull_Crab_Prefactor")
         self.test("Pull_Crab_Index")
         self.test("Pull_Background_Prefactor")
