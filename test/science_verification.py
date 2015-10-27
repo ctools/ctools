@@ -199,19 +199,21 @@ class sciver(gammalib.GPythonTestSuite):
         #self.append(self.spat_egauss, "Test elliptical Gaussian model")
         self.append(self.spat_const, "Test diffuse isotropic model")
         self.append(self.spat_map, "Test diffuse map model")
+        self.append(self.spat_map_roi, "Test diffuse map model (small ROI)")
+        self.append(self.spat_map_nn, "Test diffuse map model (not normalized and scaled)")
         self.append(self.spat_cube, "Test diffuse cube model")
 
         # Return
         return
 
     # Generate and analyse pull distributions
-    def pull(self, model, trials=100, ra=83.63, dec=22.01):
+    def pull(self, model, trials=100, ra=83.63, dec=22.01, rad=5.0):
         """
         Generate and analyse pull distributions.
         """
         # Generate pull distribution
         outfile = generate_pull_distribution(model, trials=trials,
-                                             ra=ra, dec=dec)
+                                             ra=ra, dec=dec, rad=rad)
 
         # Analyse pull distribution
         self.results = analyse_pull_distribution(outfile)
@@ -454,6 +456,30 @@ class sciver(gammalib.GPythonTestSuite):
         Test diffuse map model.
         """
         self.pull("data/sciver/crab_map", ra=201.3651, dec=-43.0191)
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test diffuse map model (small ROI)
+    def spat_map_roi(self):
+        """
+        Test diffuse map model (small ROI).
+        """
+        self.pull("data/sciver/crab_map_roi", ra=201.3651, dec=-43.0191, rad=1.5)
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test diffuse map model (not normalized and scaled)
+    def spat_map_nn(self):
+        """
+        Test diffuse map model (not normalized and scaled).
+        """
+        self.pull("data/sciver/crab_map_nn", ra=201.3651, dec=-43.0191, rad=1.5)
         self.test("Pull_Crab_Prefactor")
         self.test("Pull_Crab_Index")
         self.test("Pull_Background_Prefactor")
