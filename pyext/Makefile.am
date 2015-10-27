@@ -29,29 +29,29 @@
 # Works only if Python is available
 if WITH_PYTHON
 
-# Test scripts to be distributed in $(pythondir)/ctools/tests
+# Test scripts to be distributed in $(pyexecdir)/ctools/tests
 testscripts = ctools/tests/__init__.py \
-              $(abs_top_srcdir)/test/test_python.py \
-              $(abs_top_srcdir)/test/test_ctobssim.py \
-              $(abs_top_srcdir)/test/test_ctselect.py \
-              $(abs_top_srcdir)/test/test_ctbin.py \
-              $(abs_top_srcdir)/test/test_ctlike.py \
-              $(abs_top_srcdir)/test/test_cttsmap.py \
-              $(abs_top_srcdir)/test/test_ctmodel.py \
-              $(abs_top_srcdir)/test/test_ctskymap.py \
-              $(abs_top_srcdir)/test/test_ctexpcube.py \
-              $(abs_top_srcdir)/test/test_ctpsfcube.py \
-              $(abs_top_srcdir)/test/test_ctbkgcube.py \
-              $(abs_top_srcdir)/test/test_ctcubemask.py \
-              $(abs_top_srcdir)/test/test_ctbutterfly.py \
-              $(abs_top_srcdir)/test/test_ctulimit.py \
-              $(abs_top_srcdir)/test/test_cterror.py \
-              $(abs_top_srcdir)/test/test_pipelines.py
-testdata    = $(abs_top_srcdir)/test/data/crab.xml \
-              $(abs_top_srcdir)/test/data/crab_events.fits.gz \
-              $(abs_top_srcdir)/test/data/crab_cntmap.fits.gz \
-              $(abs_top_srcdir)/test/data/exclusion.reg
-testirf     = $(abs_top_srcdir)/test/irf/cta_dummy_irf.dat
+              ../test/test_python.py \
+              ../test/test_ctobssim.py \
+              ../test/test_ctselect.py \
+              ../test/test_ctbin.py \
+              ../test/test_ctlike.py \
+              ../test/test_cttsmap.py \
+              ../test/test_ctmodel.py \
+              ../test/test_ctskymap.py \
+              ../test/test_ctexpcube.py \
+              ../test/test_ctpsfcube.py \
+              ../test/test_ctbkgcube.py \
+              ../test/test_ctcubemask.py \
+              ../test/test_ctbutterfly.py \
+              ../test/test_ctulimit.py \
+              ../test/test_cterror.py \
+              ../test/test_pipelines.py
+testdata    = ../test/data/crab.xml \
+              ../test/data/crab_events.fits.gz \
+              ../test/data/crab_cntmap.fits.gz \
+              ../test/data/exclusion.reg
+testirf     = ../test/irf/cta_dummy_irf.dat
 
 # Distribute scripts
 EXTRA_DIST       = $(testscripts) $(testdata) $(testirf)
