@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 0.10.0
 
 Author(s) : Juergen Knoedlseder
 
-12 October 2015
+28 October 2015
 
 
 1. Introduction
@@ -37,7 +37,9 @@ executed by typing the following under Python:
 
 4. Support model
 ----------------
-None
+The ctool base class now handles the specification of the --help option on
+the command line. For each tools or script, a help text that is generated from
+the .rst documentation files is displayed on the console when --help is given.
 
 
 5. ctobssim - CTA observation simulation
