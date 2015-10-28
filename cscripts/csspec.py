@@ -43,7 +43,8 @@ class csspec(ctools.cscript):
         self.version = "1.0.0"
 
         # Initialise some members
-        self.obs = None 
+        self.obs  = None
+        self.fits = None
 
         # Initialise some members
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
@@ -107,8 +108,8 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit for spectral points(TeV)"))
             pars.append(gammalib.GApplicationPar("emax","r","h","100.0","","","Upper energy limit for spectral points(TeV)"))
             pars.append(gammalib.GApplicationPar("enumbins","i","a","20","","","Number of spectral points"))
@@ -197,6 +198,13 @@ class csspec(ctools.cscript):
 
         # Return
         return
+
+    def spectrum(self):
+        """
+        Return spectrum as FITS object.
+        """
+        # Return
+        return self.fits
 
     def execute(self):
         """

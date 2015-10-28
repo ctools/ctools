@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script shows how to make a spectrum using obsutils.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
+#import gammalib
 import ctools
-from cscripts import obsutils
+import cscripts
 try:
     import matplotlib.pyplot as plt
     has_matplotlib = True
@@ -46,6 +46,7 @@ def make_spectrum():
     tstop       = 1800.0
     emin        =    0.1
     emax        =  100.0
+    enumbins    =     10
 
     # Simulate events
     sim = ctools.ctobssim()
@@ -62,14 +63,28 @@ def make_spectrum():
     sim.run()
 
     # Generate an energy binning
-    e_min   = gammalib.GEnergy(emin, "TeV")
-    e_max   = gammalib.GEnergy(emax, "TeV")
-    ebounds = gammalib.GEbounds(10, e_min, e_max)
+    #e_min   = gammalib.GEnergy(emin, "TeV")
+    #e_max   = gammalib.GEnergy(emax, "TeV")
+    #ebounds = gammalib.GEbounds(10, e_min, e_max)
 
-    # Generate spectral points
-    spectrum = obsutils.spectrum(sim.obs(), "Crab", ebounds)
+    # Setup csspec run
+    spec = cscripts.csspec(sim.obs())
+    spec["srcname"]  = "Crab"
+    spec["outfile"]  = "spectrum.fits"
+    spec["expcube"]  = "NONE"
+    spec["psfcube"]  = "NONE"
+    spec["bkgcube"]  = "NONE"
+    spec["edisp"]    = False
+    spec["emin"]     = emin
+    spec["emax"]     = emax
+    spec["enumbins"] = enumbins
+    spec["binned"]   = False
+    spec.run()
 
-    # Return spectrum
+    # Get copy of spectrum
+    spectrum = spec.spectrum().copy()
+
+    # Return
     return spectrum
 
 
@@ -80,21 +95,66 @@ def plot_spectrum(spectrum):
     """
     Plot spectrum.
     """
+    # Read spectrum file    
+    table    = spectrum.table(1)
+    c_energy = table["Energy"]
+    c_ed     = table["ed_Energy"]
+    c_eu     = table["eu_Energy"]
+    c_flux   = table["Flux"]
+    c_eflux  = table["e_Flux"]
+    c_ts     = table["TS"]
+    c_upper  = table["UpperLimit"]
+
+    # Initialise arrays to be filled
+    energies    = []
+    flux        = []
+    ed_engs     = []
+    eu_engs     = []
+    e_flux      = []
+    ul_energies = []
+    ul_ed_engs  = []
+    ul_eu_engs  = []
+    ul_flux     = []
+
+    # Loop over rows of the file
+    nrows = table.nrows()
+    for row in range(nrows):
+
+        # Get TS
+        ts    = c_ts.real(row)
+        flx   = c_flux.real(row)
+        e_flx = c_eflux.real(row)
+
+        # Switch
+        if ts > 9.0 and e_flx < flx:
+
+            # Add information
+            energies.append(c_energy.real(row))
+            flux.append(c_flux.real(row))
+            ed_engs.append(c_ed.real(row))
+            eu_engs.append(c_eu.real(row))
+            e_flux.append(c_eflux.real(row))
+
+        #
+        else:
+
+            # Add information
+            ul_energies.append(c_energy.real(row))
+            ul_flux.append(c_upper.real(row))
+            ul_ed_engs.append(c_ed.real(row))
+            ul_eu_engs.append(c_eu.real(row))
+
     # Create figure
-    plt.figure(1)
+    plt.figure()
     plt.title("Crab spectrum")
 
-    # Plot spectrum
-    plt.loglog(spectrum['energy']['value'],
-               spectrum['flux']['value'], 'ro', label='Crab')
-    plt.errorbar(spectrum['energy']['value'],
-                 spectrum['flux']['value'],
-                 spectrum['flux']['ed_value'], ecolor='r')
-
-    # Put labels
-    plt.xlabel("Energy ("+spectrum['energy']['unit']+")")
-    plt.ylabel("Flux ("+spectrum['flux']['unit']+")")
-    plt.legend(loc="lower left")
+    # Plot the spectrum 
+    plt.loglog()
+    plt.grid()
+    plt.errorbar(energies, flux, yerr=e_flux, xerr=[ed_engs, eu_engs], fmt='ro')
+    plt.errorbar(ul_energies, ul_flux, xerr=[ul_ed_engs, ul_eu_engs], yerr=1.0e-11, uplims=True, fmt='ro')
+    plt.xlabel("Energy (TeV)")
+    plt.ylabel(r"dN/dE (erg cm$^{-2}$ s$^{-1}$)")    
 
     # Show spectrum
     plt.show()
