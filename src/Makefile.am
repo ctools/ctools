@@ -52,6 +52,24 @@ EXTRA_DIST   = $(scripts)
 scriptsdir   = $(bindir)
 scripts_DATA = $(scripts)
 
+# Things to install
+install-data-local: help-install
+
+# Install help files
+help-install:
+	@$(mkinstalldirs) $(DESTDIR)$(datadir)/help && \
+    for file in $(top_srcdir)/doc/source/reference_manual/c*.rst ; do \
+        filename="$${file##*/}" ; \
+        basename="$${filename%%.*}" ; \
+        helpname="$$basename.txt" ; \
+        echo "$(INSTALL_DATA) $$file $(DESTDIR)$(datadir)/help/$$helpname" ; \
+        $(INSTALL_DATA) "$$file" $(DESTDIR)$(datadir)/help/"$$helpname" ; \
+        sed -i.bak -e 's/``//g' -e 's/`//g' -e 's/:ref://g' -e 's/:doc://g' \
+            -e 's/.. note::/Note/g' -e '1d' \
+            $(DESTDIR)$(datadir)/help/"$$helpname" ; \
+        rm -rf $(DESTDIR)$(datadir)/help/"$$helpname".bak ; \
+    done
+
 # Add hook rule to make scripts executable
 install-data-hook:
 	@list='$(scripts_DATA)';\
