@@ -78,6 +78,7 @@ protected:
     void copy_members(const ctbutterfly& app);
     void free_members(void);
     void get_parameters(void);
+    void get_model_parameter(void);
 
     // User parameters
     std::string m_srcname;     //!< Name of source to compute butterfly
@@ -88,6 +89,8 @@ protected:
     // Protected members
     GObservations       m_obs;        //!< Observation container
     GMatrixSparse       m_covariance; //!< Covariance matrix
+    GModelSky*          m_skymodel;   //!< Pointer to sky model
+    double              m_par_scale;  //!< Scale of normalising parameter
     std::vector<double> m_energies;   //!< Energy values for storage
     std::vector<double> m_fluxes;     //!< Flux values per energy bin
     std::vector<double> m_errors;     //!< Flux errors per energy bin
