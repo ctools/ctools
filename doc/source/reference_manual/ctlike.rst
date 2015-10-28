@@ -12,11 +12,10 @@ Synopsis
 Determines source model parameters, such as flux, spectral index, source 
 position, and source extent from a maximum likelihood analysis of CTA data.
 The analysis can be done in a binned or an unbinned formulation of the
-log-likelihood function.
-For binned analysis, a counts cube produced by :doc:`ctbin` is required.
-For unbinned analysis, an event list processed by :doc:`ctselect` is required.
-Based on the input file format, ctlike automatically selects between binned
-and unbinned maximum likelihood analysis.
+log-likelihood function. For binned analysis, a counts cube produced by
+:doc:`ctbin` is required. For unbinned analysis, an event list processed by
+:doc:`ctselect` is required. Based on the input file format, ctlike
+automatically selects between binned and unbinned maximum likelihood analysis.
 
 
 General parameters
