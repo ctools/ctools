@@ -89,6 +89,10 @@ protected:
     GSkyDir         get_mean_pointing(const GObservations& obs);
     size_t          get_current_rss(void);
 
+protected:
+    // Protected methods
+    void           provide_help(void) const;
+    
     // Protected members
     bool           m_read_ahead; //!< Read ahead parameters
     bool           m_use_xml;    //!< Use XML file instead of FITS file for observations
