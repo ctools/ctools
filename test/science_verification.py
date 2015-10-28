@@ -198,10 +198,10 @@ class sciver(gammalib.GPythonTestSuite):
         #self.append(self.spat_edisk, "Test elliptical disk model")
         #self.append(self.spat_egauss, "Test elliptical Gaussian model")
         self.append(self.spat_const, "Test diffuse isotropic model")
-        self.append(self.spat_map, "Test diffuse map model")
-        self.append(self.spat_map_roi, "Test diffuse map model (small ROI)")
-        self.append(self.spat_map_nn, "Test diffuse map model (not normalized and scaled)")
-        self.append(self.spat_cube, "Test diffuse cube model")
+        #self.append(self.spat_map, "Test diffuse map model")
+        #self.append(self.spat_map_roi, "Test diffuse map model (small ROI)")
+        #self.append(self.spat_map_nn, "Test diffuse map model (not normalized and scaled)")
+        #self.append(self.spat_cube, "Test diffuse cube model")
 
         # Return
         return
