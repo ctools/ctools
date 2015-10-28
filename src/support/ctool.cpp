@@ -28,6 +28,8 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <cstdlib>         // std::getenv() function
+#include <cstdio>          // std::fopen(), etc. functions
 #include "ctool.hpp"
 #include "GTools.hpp"
 
