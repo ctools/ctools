@@ -3,18 +3,19 @@
 ctbutterfly
 ===========
 
-Computes butterfly.
+Computes butterfly diagram for a power law model.
 
 
 Synopsis
 --------
 
 Calculates the confidence band of a power law model, taking into account the
-covariance matrix of a likelihood fit. The tool derives the envelope of 
-power law models with parameters that lie within the error ellipse. It 
-outputs an ASCII file in column separated value (CSV) format containing 
-the results. Each row in the result file corresponds to an energy. The 
-columns give the energy in MeV, the fitted intensity in ph/cm2/s/MeV,
+covariance matrix resulting from a maximum likelihood fit. The tool derives
+the envelope of all power law models whose prefactor and spectral index fall
+within the error ellipse that is associated with the covariance of the 
+parameters. It outputs an ASCII file in column separated value (CSV) format
+containing the results. Each row in the result file corresponds to an energy.
+The columns give the energy in MeV, the fitted intensity in ph/cm2/s/MeV,
 and the minimum and maximum intensity that envelope the power law model 
 with a given confidence (by default a confidence level of 68% is used, but 
 the level can be adjusted using the ``confidence`` parameter).

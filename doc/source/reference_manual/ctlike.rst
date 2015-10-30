@@ -9,13 +9,20 @@ Performs binned and unbinned maximum likelihood analysis of CTA data.
 Synopsis
 --------
 
-Determines source model parameters, such as flux, spectral index, source 
-position, and source extent from a maximum likelihood analysis of CTA data.
-The analysis can be done in a binned or an unbinned formulation of the
-log-likelihood function. For binned analysis, a counts cube produced by
-:doc:`ctbin` is required. For unbinned analysis, an event list processed by
-:doc:`ctselect` is required. Based on the input file format, ctlike
-automatically selects between binned and unbinned maximum likelihood analysis.
+Determines the flux, spectral index, position or extent of gamma-ray
+sources using maximum likelihood model fitting of CTA data. The analysis
+can be done in a binned or an unbinned formulation of the log-likelihood
+function. For binned analysis, a counts cube produced by :doc:`ctbin` is
+required. If several observations have been stacked into a single counts
+cube, an exposure cube, a PSF cube and a background cube have to be
+provided. For a single observation it is sufficient to specify the
+instrument response function. For unbinned analysis, an event list
+processed by :doc:`ctselect` is required. Based on files specified on
+input, ctlike automatically selects between binned or unbinned analysis.
+The tool can also be applied to lists of observations, specified in form
+of an observation definition file in XML format. Events of each observation
+are kept separate, and are associated to their appropriate instrument 
+response function.
 
 
 General parameters
