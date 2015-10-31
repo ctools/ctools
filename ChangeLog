@@ -1,8 +1,9 @@
-2015-10-28  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-10-31  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.10.0 released
         =========================
 
+        Add science verification tests (#1555)
         Specifying --help on command line displays help text (#572)
         Limit power law parameters in ctbkgcube (#1547)
         Extend cspull to stacked analysis (#1503)
