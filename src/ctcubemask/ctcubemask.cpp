@@ -407,7 +407,7 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
     if (cube != NULL) {
 
         // Extract event cube and energy boundaries
-        GSkymap         map     = cube->map();
+        GSkyMap         map     = cube->map();
         const GEbounds& ebounds = cube->ebounds();
 
         // Initialise energy selection

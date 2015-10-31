@@ -243,80 +243,97 @@ void ctselect::run(void)
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Write header for observation
+        if (logTerse()) {
+            std::string header = m_obs[i]->instrument() + " observation";
+            if (m_obs[i]->name().length() > 1) {
+                header += " \"" + m_obs[i]->name() + "\"";
+            }
+            if (m_obs[i]->id().length() > 1) {
+                header += " (id=" + m_obs[i]->id() +")";
+            }
+            log.header3(header);
+        }
+
         // Initialise event input and output filenames
         m_infiles.push_back("");
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << " Skipping ";
+                log << m_obs[i]->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-            // Increment counter
-            n_observations++;
-
-            // Save event file name (for possible saving)
-            m_infiles[i] = obs->eventfile();
-
-            // Fall through in case that the event file is empty
-            if (obs->events()->size() == 0) {
-                if (logTerse()) {
-                    log << " Warning: No events in event file \"";
-                    log << m_infiles[i] << "\". Event selection skipped.";
-                    log << std::endl;
-                }
-                continue;
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << " Skipping binned ";
+                log << obs->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-            // Get temporary file name
-            #if G_USE_MKSTEMP
-            char tpl[]  = "ctselectXXXXXX";
-            int  fileid = mkstemp(tpl);
-            std::string filename(tpl);
-            #else
-            std::string filename = std::tmpnam(NULL);
-            #endif
+        // Increment counter
+        n_observations++;
 
-            // Save observation in temporary file
-            obs->save(filename, true);
+        // Save event file name (for possible saving)
+        m_infiles[i] = obs->eventfile();
 
-            // Log saved FITS file
-            if (logExplicit()) {
-                GFits tmpfile(filename);
+        // Fall through in case that the event file is empty
+        if (obs->events()->size() == 0) {
+            if (logTerse()) {
+                log << " Warning: No events in event file \"";
+                log << m_infiles[i] << "\". Event selection skipped.";
                 log << std::endl;
-                log.header1("FITS file content of temporary file");
-                log << tmpfile << std::endl;
-                tmpfile.close();
             }
+            continue;
+        }
 
-            // Check temporary file
-            std::string message = check_infile(filename);
-            if (message.length() > 0) {
-                throw GException::app_error(G_RUN, message);
-            }
+        // Get temporary file name
+        #if G_USE_MKSTEMP
+        char tpl[]  = "ctselectXXXXXX";
+        int  fileid = mkstemp(tpl);
+        std::string filename(tpl);
+        #else
+        std::string filename = std::tmpnam(NULL);
+        #endif
 
-            // Load observation from temporary file, including event selection
-            select_events(obs, filename);
+        // Save observation in temporary file
+        obs->save(filename, true);
 
-            // Close temporary file
-            #if G_USE_MKSTEMP
-            close(fileid);
-            #endif
+        // Log saved FITS file
+        if (logExplicit()) {
+            GFits tmpfile(filename);
+            log << std::endl;
+            log.header1("FITS file content of temporary file");
+            log << tmpfile << std::endl;
+            tmpfile.close();
+        }
 
-            // Remove temporary file
-            std::remove(filename.c_str());
-            
-        } // endif: had a CTA observation
+        // Check temporary file
+        std::string message = check_infile(filename);
+        if (message.length() > 0) {
+            throw GException::app_error(G_RUN, message);
+        }
+
+        // Load observation from temporary file, including event selection
+        select_events(obs, filename);
+
+        // Close temporary file
+        #if G_USE_MKSTEMP
+        close(fileid);
+        #endif
+
+        // Remove temporary file
+        std::remove(filename.c_str());
 
     } // endfor: looped over all observations
 
@@ -614,7 +631,13 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
     GCTAEventList* list =
         static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
-    // Get energy boundaries
+    // Get existing Roi and energy bounds for possible later use
+    // (will be empty if unavailable)
+    GCTARoi  old_roi     = list->roi();
+    GEbounds old_ebounds = list->ebounds();
+
+    // Determine new energy boundaries for selection
+    // taking into account previous existing ones
     double   emin    = 0.0;
     double   emax    = 0.0;
     GEbounds ebounds = set_ebounds(obs, list->ebounds());
@@ -871,6 +894,12 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
         list->roi(GCTARoi(instdir, rad));
+    } // endif: Roi selection was performed
+
+    else if (old_roi.is_valid()) {
+        // Restore old Roi information in case no selection was performed
+        // and RoI was existing before
+        list->roi(old_roi);
     }
 
     // Set event list GTI (in any case as any event list has a GTI)
@@ -881,6 +910,12 @@ void ctselect::select_events(GCTAObservation* obs, const std::string& filename)
         GEbounds ebounds;
         ebounds.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
         list->ebounds(ebounds);
+    } //endif: energy selection was performed
+
+    else if (old_ebounds.size() > 0) {
+        // Restore old Ebounds in case no energy selection was performed
+        // and observation already had valid Ebounds
+        list->ebounds(old_ebounds);
     }
 
     // Recompute ontime and livetime.
@@ -1135,8 +1170,23 @@ void ctselect::save_fits(void)
     // Get CTA observation from observation container
     GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
-    // Save event list
-    save_event_list(obs, m_infiles[0], m_outobs);
+    // Save only if it's a CTA observation
+    if (obs != NULL) {
+    
+        // Save only if filename is non-empty
+        if (m_infiles[0].length() > 0) {
+
+            // Dump filename
+            if (logTerse()) {
+                log << "Save \""+m_infiles[0]+"\"" << std::endl;
+            }
+
+            // Save event list
+            save_event_list(obs, m_infiles[0], m_outobs);
+
+        } // endif: filename was non empty
+
+    } // endif: observation was CTA observation
 
     // Return
     return;
@@ -1177,21 +1227,36 @@ void ctselect::save_xml(void)
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Handle only CTA observations
-        if (obs != NULL) {
+        // Skip observations that are no CTA observations
+        if (obs == NULL) {
+            continue;
+        }
 
-            // Set event output file name
-            std::string outfile = set_outfile_name(m_infiles[i]);
+        // Skip observations that have empty names
+        if (m_infiles[i].length() == 0) {
+            continue;
+        }
 
-            // Store output file name in observation
-            obs->eventfile(outfile);
+        // Set event output file name
+        std::string outfile = set_outfile_name(m_infiles[i]);
 
-            // Save event list
-            save_event_list(obs, m_infiles[i], outfile);
+        // Dump filename
+        if (logTerse()) {
+            log << "Save \""+outfile+"\"" << std::endl;
+        }
 
-        } // endif: observation was a CTA observations
+        // Store output file name in observation
+        obs->eventfile(outfile);
+
+        // Save event list
+        save_event_list(obs, m_infiles[i], outfile);
 
     } // endfor: looped over observations
+
+    // Dump filename
+    if (logTerse()) {
+        log << "Save \""+m_outobs+"\"" << std::endl;
+    }
 
     // Save observations in XML file
     m_obs.save(m_outobs);
@@ -1218,28 +1283,33 @@ void ctselect::save_event_list(const GCTAObservation* obs,
     // Save only if observation is valid
     if (obs != NULL) {
 
-        // Save observation into FITS file
-        obs->save(outfile, clobber());
+        // Save only if we have an event list
+        if (obs->eventtype() == "EventList") {
 
-        // Copy all extensions other than EVENTS and GTI from the input to
-        // the output event list. The EVENTS and GTI extensions are written
-        // by the save method, all others that may eventually be present
-        // have to be copied by hand.
-        GFits infits(infile);
-        GFits outfits(outfile);
-        for (int extno = 1; extno < infits.size(); ++extno) {
-            GFitsHDU* hdu = infits.at(extno);
-            if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
-                outfits.append(*hdu);
+            // Save observation into FITS file
+            obs->save(outfile, clobber());
+
+            // Copy all extensions other than EVENTS and GTI from the input to
+            // the output event list. The EVENTS and GTI extensions are written
+            // by the save method, all others that may eventually be present
+            // have to be copied by hand.
+            GFits infits(infile);
+            GFits outfits(outfile);
+            for (int extno = 1; extno < infits.size(); ++extno) {
+                GFitsHDU* hdu = infits.at(extno);
+                if (hdu->extname() != "EVENTS" && hdu->extname() != "GTI") {
+                    outfits.append(*hdu);
+                }
             }
-        }
 
-        // Close input file
-        infits.close();
+            // Close input file
+            infits.close();
 
-        // Save file to disk and close it (we need both operations)
-        outfits.save(true);
-        outfits.close();
+            // Save file to disk and close it (we need both operations)
+            outfits.save(true);
+            outfits.close();
+
+        } // endif: observation was unbinned
 
     } // endif: observation was valid
 

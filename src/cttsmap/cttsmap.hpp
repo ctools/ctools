@@ -73,7 +73,7 @@ public:
     void                 run(void);
     void                 save(void);
     const GObservations& obs(void) const;
-    const GSkymap&       tsmap(void) const;
+    const GSkyMap&       tsmap(void) const;
 
 protected:
     // Protected methods
@@ -81,24 +81,25 @@ protected:
     void copy_members(const cttsmap& app);
     void free_members(void);
     void get_parameters(void);
-    void init_maps(const GSkymap& map);
+    void init_maps(const GSkyMap& map);
 
     // User parameters
-    std::string              m_srcname;    //!< Name of source which is moved around
-    std::string              m_outmap;     //!< Output counts map or XML file
+    std::string              m_srcname;     //!< Name of source which is moved around
+    std::string              m_outmap;      //!< Output counts map or XML file
+    bool                     m_apply_edisp; //!< Apply energy dispersion?
 
     // Parameters to control speed and job splitting
-    int                      m_binmin;     //!< Map bin number from which computation should start
-    int                      m_binmax;     //!< Map bin number where map computation should end
-    double                   m_logL0;      //!< Likelihood value of null hypothesis
+    int                      m_binmin;      //!< Map bin number from which computation should start
+    int                      m_binmax;      //!< Map bin number where map computation should end
+    double                   m_logL0;       //!< Likelihood value of null hypothesis
 
     // Protected members
-    GObservations            m_obs;        //!< Observation container
-    GSkymap                  m_tsmap;      //!< TS map
-    GSkymap                  m_statusmap;  //!< Map of computed bins
-    std::vector<std::string> m_mapnames;   //!< Names of free parameters
-    std::vector<GSkymap>     m_maps;       //!< Sky maps for each free parameter
-    GModel*                  m_testsource; //!< Pointer to test source for TS computation
+    GObservations            m_obs;         //!< Observation container
+    GSkyMap                  m_tsmap;       //!< TS map
+    GSkyMap                  m_statusmap;   //!< Map of computed bins
+    std::vector<std::string> m_mapnames;    //!< Names of free parameters
+    std::vector<GSkyMap>     m_maps;        //!< Sky maps for each free parameter
+    GModel*                  m_testsource;  //!< Pointer to test source for TS computation
 };
 
 
@@ -120,7 +121,7 @@ const GObservations& cttsmap::obs(void) const
  * @return Reference to TS skymap
  ***************************************************************************/
 inline
-const GSkymap& cttsmap::tsmap(void) const
+const GSkyMap& cttsmap::tsmap(void) const
 {
     return m_tsmap;
 }

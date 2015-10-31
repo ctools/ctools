@@ -67,6 +67,7 @@
 {% block header %}
 <div class="pageheader">
   <ul>
+    <li><a href="{{ pathto('about') }}">About</a></li>
     <li><a href="{{ pathto('index') }}">Home</a></li>
     <li><a href="{{ pathto('download') }}">Download</a></li>
     <li><a href="{{ pathto('contents') }}">Documentation</a></li>
@@ -77,6 +78,8 @@
       <div class=banner_part>
       <img src="{{ pathto('_static/logo.png', 1) }}" height="64" alt="SPHINX" />
       </div>
+	  <div class=banner_part></div>
+	  <div class=banner_part></div>
       <div class=banner_part>
       	<span id="banner_text1">CTA</span><br/>
       	<span id="banner_text2">Cherenkov Telescope Array Science Analysis Software</span>

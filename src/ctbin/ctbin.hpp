@@ -96,7 +96,7 @@ protected:
 
     // Protected members
     GObservations m_obs;        //!< Observation container
-    GSkymap       m_cube;       //!< Event cube
+    GSkyMap       m_cube;       //!< Event cube
     GEbounds      m_ebounds;    //!< Energy boundaries
     GGti          m_gti;        //!< Good time intervals
     double        m_ontime;     //!< Total ontime

@@ -67,25 +67,25 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbkgcube
         bkgcube = ctools.ctbkgcube()
-        bkgcube["inobs"].filename(self.events_name)
-        bkgcube["inmodel"].filename(self.bkg_model)
-        bkgcube["incube"].filename("NONE")
-        bkgcube["outcube"].filename("bkgcube.fits")
-        bkgcube["outmodel"].filename("bkgcube.xml")
-        bkgcube["caldb"].string(self.caldb)
-        bkgcube["irf"].string(self.irf)
-        bkgcube["ebinalg"].string("LOG")
-        bkgcube["emin"].real(0.1)
-        bkgcube["emax"].real(100.0)
-        bkgcube["enumbins"].integer(20)
-        bkgcube["nxpix"].integer(10)
-        bkgcube["nypix"].integer(10)
-        bkgcube["binsz"].real(0.4)
-        bkgcube["coordsys"].string("CEL")
-        bkgcube["proj"].string("CAR")
-        bkgcube["xref"].real(83.63)
-        bkgcube["yref"].real(22.01)
-        
+        bkgcube["inobs"]    = self.events_name
+        bkgcube["inmodel"]  = self.bkg_model
+        bkgcube["incube"]   = "NONE"
+        bkgcube["outcube"]  = "bkgcube.fits"
+        bkgcube["outmodel"] = "bkgcube.xml"
+        bkgcube["caldb"]    = self.caldb
+        bkgcube["irf"]      = self.irf
+        bkgcube["ebinalg"]  = "LOG"
+        bkgcube["emin"]     = 0.1
+        bkgcube["emax"]     = 100
+        bkgcube["enumbins"] = 20
+        bkgcube["nxpix"]    = 10
+        bkgcube["nypix"]    = 10
+        bkgcube["binsz"]    = 0.4
+        bkgcube["coordsys"] = "CEL"
+        bkgcube["proj"]     = "CAR"
+        bkgcube["xref"]     = 83.63
+        bkgcube["yref"]     = 22.01
+
         # Run tool
         self.test_try("Run ctbkgcube")
         try:

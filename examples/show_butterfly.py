@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script shows how to plot a butterfly created with ctbutterfly 
 #
-# Copyright (C) 2014 Michael Mayer
+# Copyright (C) 2014-2015 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,59 +18,63 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-
 import gammalib
 import sys
 try:
     import matplotlib.pyplot as plt
 except:
     sys.exit("This script needs matplotlib")
-  
-# =============== #
-# Script entry    #
-# =============== #    
+
+
+# ============ #
+# Script entry #
+# ============ #    
 if __name__ == "__main__":
-    
-    # check for given butterfly file
+    """
+    """
+    # Check for given butterfly file
     if not len(sys.argv) == 2:
         sys.exit("Usage: show_butterfly.py butterfly.txt")
-    
+
     # Read given butterfly file    
     filename = sys.argv[1]
-    csv = gammalib.GCsv(filename)
-    
-    # initialise arrays to be filled
+    csv      = gammalib.GCsv(filename)
+
+    # Initialise arrays to be filled
     butterfly_x = []
     butterfly_y = []
-    
-    line_x = []
-    line_y = []
-    
-    # loop over rows of the file
+    line_x      = []
+    line_y      = []
+
+    # Loop over rows of the file
     nrows = csv.nrows()
     for row in range(nrows):
+
         # Compute upper edge of confidence band
         butterfly_x.append(csv.real(row,0))
-        butterfly_y.append(csv.real(row,1)+csv.real(row,2))
-        
+        butterfly_y.append(csv.real(row,2))
+
         # Set line values
         line_x.append(csv.real(row,0))
         line_y.append(csv.real(row,1))
-    
+
     # Loop over the rows backwards to compute the lower edge
     # of the confidence band    
     for row in range(nrows):
         index = nrows - 1 - row
-        
         butterfly_x.append(csv.real(index,0))
-        butterfly_y.append(csv.real(index,1)-csv.real(index,2))    
+        low_error = csv.real(index,3)
+        if low_error < 1e-26:
+            low_error = 1e-26
+        butterfly_y.append(low_error)   
     
-    # plot the butterfly and spectral line       
+    # Plot the butterfly and spectral line       
     plt.figure()
+    plt.ylim([1e-26,1e-14])
     plt.loglog()
     plt.grid()
     plt.plot(line_x,line_y,color='black',ls='-')
     plt.fill(butterfly_x,butterfly_y,color='green',alpha=0.5)
-    plt.xlabel("Energy [MeV]")
-    plt.ylabel(r"dN/dE [MeV$^{-1}$ s$^{-1}$ cm$^{-2}$]")    
+    plt.xlabel("Energy (MeV)")
+    plt.ylabel(r"dN/dE (MeV$^{-1}$ s$^{-1}$ cm$^{-2}$)")    
     plt.show()

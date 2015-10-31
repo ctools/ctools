@@ -61,7 +61,7 @@ public:
     void           clear(void);
     void           run(void);
     void           save(void);
-    const GSkymap& map(void) const;
+    const GSkyMap& map(void) const;
 
 protected:
     // Protected methods
@@ -79,7 +79,7 @@ protected:
 
     // Protected members
     GObservations m_obs;        //!< Observation container
-    GSkymap       m_skymap;     //!< Sky map
+    GSkyMap       m_skymap;     //!< Sky map
 };
 
 
@@ -89,7 +89,7 @@ protected:
  * @return Reference to observation container
  ***************************************************************************/
 inline
-const GSkymap& ctskymap::map(void) const
+const GSkyMap& ctskymap::map(void) const
 {
     return m_skymap;
 }

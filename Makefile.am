@@ -4,7 +4,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 # Subdirectories
-SUBDIRS = src pyext test caldb models examples scripts
+SUBDIRS = src pyext test caldb models examples cscripts
 
 # Pkgconfig directory
 pkgconfigdir = $(libdir)/pkgconfig
@@ -104,6 +104,16 @@ valgrind:
 		$(MAKE) -C test valgrind; \
 	else \
 		echo "valgrind not found in PATH."; \
+	fi
+
+# Add science verification rule
+science-verification:
+	@if type test/science_verification.py >/dev/null 2>&1; then \
+	    cd test; \
+	    ./science_verification.py; \
+	    cd ..; \
+	else \
+		echo "science_verification.py not found in test."; \
 	fi
 
 # Add Sphinx rule

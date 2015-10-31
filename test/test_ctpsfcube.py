@@ -66,25 +66,25 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctpsfcube
         psfcube = ctools.ctpsfcube()
-        psfcube["inobs"].filename(self.events_name)
-        psfcube["incube"].filename("NONE")
-        psfcube["outcube"].filename("psfcube.fits")
-        psfcube["caldb"].string(self.caldb)
-        psfcube["irf"].string(self.irf)
-        psfcube["ebinalg"].string("LOG")
-        psfcube["emin"].real(0.1)
-        psfcube["emax"].real(100.0)
-        psfcube["enumbins"].integer(20)
-        psfcube["nxpix"].integer(10)
-        psfcube["nypix"].integer(10)
-        psfcube["binsz"].real(0.4)
-        psfcube["coordsys"].string("CEL")
-        psfcube["proj"].string("CAR")
-        psfcube["xref"].real(83.63)
-        psfcube["yref"].real(22.01)
-        psfcube["amax"].real(0.3)
-        psfcube["anumbins"].integer(10)
-        
+        psfcube["inobs"]    = self.events_name
+        psfcube["incube"]   = "NONE"
+        psfcube["outcube"]  = "psfcube.fits"
+        psfcube["caldb"]    = self.caldb
+        psfcube["irf"]      = self.irf
+        psfcube["ebinalg"]  = "LOG"
+        psfcube["emin"]     = 0.1
+        psfcube["emax"]     = 100
+        psfcube["enumbins"] = 20
+        psfcube["nxpix"]    = 10
+        psfcube["nypix"]    = 10
+        psfcube["binsz"]    = 0.4
+        psfcube["coordsys"] = "CEL"
+        psfcube["proj"]     = "CAR"
+        psfcube["xref"]     = 83.63
+        psfcube["yref"]     = 22.01
+        psfcube["amax"]     = 0.3
+        psfcube["anumbins"] = 10
+
         # Run tool
         self.test_try("Run ctpsfcube")
         try:

@@ -27,19 +27,19 @@
 # ==========================================================================
 import gammalib
 import ctools
-from ctools import obsutils
+from cscripts import obsutils
 
 
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
-                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
-                       deadc=0.95, \
+def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
+                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0,
+                       deadc=0.95,
                        caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
-    
+
     Keywords:
      pattern   - Pointing pattern, either "single" or "four"
      ra        - RA of pattern centre [deg] (default: 83.6331)
@@ -54,18 +54,18 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
      irf       - Instrument response function (default: cta_dummy_irf)
     """
     # Set list of observations
-    obs_def_list = obsutils.set_obs_patterns(pattern, \
-                                             ra=ra, \
-                                             dec=dec, \
+    obs_def_list = obsutils.set_obs_patterns(pattern,
+                                             ra=ra,
+                                             dec=dec,
                                              offset=offset)
-    
+
     # Get observation container
-    obs = obsutils.set_obs_list(obs_def_list, \
-                                duration=duration, \
-                                emin=emin, \
-                                emax=emax, \
-                                rad=rad, \
-                                caldb=caldb, \
+    obs = obsutils.set_obs_list(obs_def_list,
+                                duration=duration,
+                                emin=emin,
+                                emax=emax,
+                                rad=rad,
+                                caldb=caldb,
                                 irf=irf)
 
     # Return observation container
@@ -78,13 +78,13 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
 def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
     """
     Setup model for analysis.
-    
+
     Keywords:
      model - Model Xml file
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
-    
+
     # Return observation container
     return obs
 
@@ -92,11 +92,11 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 # ================================ #
 # Simulation and analysis pipeline #
 # ================================ #
-def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
-                 enumbins=20, nxpix=200, nypix=200, binsz=0.02, \
-                 coordsys="CEL", proj="CAR", \
-                 model="${CTOOLS}/share/models/crab.xml", \
-                 caldb="prod2", irf="South_50h", \
+def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
+                 enumbins=20, nxpix=200, nypix=200, binsz=0.02,
+                 coordsys="CEL", proj="CAR",
+                 model="${CTOOLS}/share/models/crab.xml",
+                 caldb="prod2", irf="South_50h",
                  debug=False):
     """
     Simulation and stacked analysis pipeline.
@@ -116,106 +116,106 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0, \
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"].boolean(debug)
-    sim["outevents"].filename("obs.xml")
+    sim["debug"]     = debug
+    sim["outevents"] = "obs.xml"
     sim.execute()
 
     # Bin events into counts map
     bin = ctools.ctbin()
-    bin["inobs"].filename("obs.xml")
-    bin["outcube"].filename("cntcube.fits")
-    bin["ebinalg"].string("LOG")
-    bin["emin"].real(emin)
-    bin["emax"].real(emax)
-    bin["enumbins"].integer(enumbins)
-    bin["nxpix"].integer(nxpix)
-    bin["nypix"].integer(nypix)
-    bin["binsz"].real(binsz)
-    bin["coordsys"].string(coordsys)
-    bin["proj"].string(proj)
-    bin["xref"].real(ra)
-    bin["yref"].real(dec)
-    bin["debug"].boolean(debug)
+    bin["inobs"]    = "obs.xml"
+    bin["outcube"]  = "cntcube.fits"
+    bin["ebinalg"]  = "LOG"
+    bin["emin"]     = emin
+    bin["emax"]     = emax
+    bin["enumbins"] = enumbins
+    bin["nxpix"]    = nxpix
+    bin["nypix"]    = nypix
+    bin["binsz"]    = binsz
+    bin["coordsys"] = coordsys
+    bin["proj"]     = proj
+    bin["xref"]     = ra
+    bin["yref"]     = dec
+    bin["debug"]    = debug
     bin.execute()
 
     # Create exposure cube
     expcube = ctools.ctexpcube()
-    expcube["inobs"].filename("obs.xml")
-    expcube["incube"].filename("cntcube.fits")
-    expcube["outcube"].filename("expcube.fits")
-    expcube["caldb"].string(caldb)
-    expcube["irf"].string(irf)
-    expcube["ebinalg"].string("LOG")
-    expcube["emin"].real(emin)
-    expcube["emax"].real(emax)
-    expcube["enumbins"].integer(enumbins)
-    expcube["nxpix"].integer(nxpix)
-    expcube["nypix"].integer(nypix)
-    expcube["binsz"].real(binsz)
-    expcube["coordsys"].string(coordsys)
-    expcube["proj"].string(proj)
-    expcube["xref"].real(ra)
-    expcube["yref"].real(dec)
-    expcube["debug"].boolean(debug)
+    expcube["inobs"]    = "obs.xml"
+    expcube["incube"]   = "cntcube.fits"
+    expcube["outcube"]  = "expcube.fits"
+    expcube["caldb"]    = caldb
+    expcube["irf"]      = irf
+    expcube["ebinalg"]  = "LOG"
+    expcube["emin"]     = emin
+    expcube["emax"]     = emax
+    expcube["enumbins"] = enumbins
+    expcube["nxpix"]    = nxpix
+    expcube["nypix"]    = nypix
+    expcube["binsz"]    = binsz
+    expcube["coordsys"] = coordsys
+    expcube["proj"]     = proj
+    expcube["xref"]     = ra
+    expcube["yref"]     = dec
+    expcube["debug"]    = debug
     expcube.execute()
 
     # Create PSF cube
     psfcube = ctools.ctpsfcube()
-    psfcube["inobs"].filename("obs.xml")
-    psfcube["incube"].filename("NONE")
-    psfcube["outcube"].filename("psfcube.fits")
-    psfcube["caldb"].string(caldb)
-    psfcube["irf"].string(irf)
-    psfcube["ebinalg"].string("LOG")
-    psfcube["emin"].real(emin)
-    psfcube["emax"].real(emax)
-    psfcube["enumbins"].integer(enumbins)
-    psfcube["nxpix"].integer(10)
-    psfcube["nypix"].integer(10)
-    psfcube["binsz"].real(1.0)
-    psfcube["coordsys"].string(coordsys)
-    psfcube["proj"].string(proj)
-    psfcube["xref"].real(ra)
-    psfcube["yref"].real(dec)
-    psfcube["debug"].boolean(debug)
+    psfcube["inobs"]    = "obs.xml"
+    psfcube["incube"]   = "NONE"
+    psfcube["outcube"]  = "psfcube.fits"
+    psfcube["caldb"]    = caldb
+    psfcube["irf"]      = irf
+    psfcube["ebinalg"]  = "LOG"
+    psfcube["emin"]     = emin
+    psfcube["emax"]     = emax
+    psfcube["enumbins"] = enumbins
+    psfcube["nxpix"]    = 10
+    psfcube["nypix"]    = 10
+    psfcube["binsz"]    = 1.0
+    psfcube["coordsys"] = coordsys
+    psfcube["proj"]     = proj
+    psfcube["xref"]     = ra
+    psfcube["yref"]     = dec
+    psfcube["debug"]    = debug
     psfcube.execute()
 
     # Create background cube
     bkgcube = ctools.ctbkgcube()
-    bkgcube["inobs"].filename("obs.xml")
-    bkgcube["inmodel"].filename(model)
-    bkgcube["incube"].filename("cntcube.fits")
-    bkgcube["outcube"].filename("bkgcube.fits")
-    bkgcube["outmodel"].filename("model_bkg.xml")
-    bkgcube["caldb"].string(caldb)
-    bkgcube["irf"].string(irf)
-    bkgcube["ebinalg"].string("LOG")
-    bkgcube["emin"].real(emin)
-    bkgcube["emax"].real(emax)
-    bkgcube["enumbins"].integer(enumbins)
-    bkgcube["nxpix"].integer(10)
-    bkgcube["nypix"].integer(10)
-    bkgcube["binsz"].real(1.0)
-    bkgcube["coordsys"].string(coordsys)
-    bkgcube["proj"].string(proj)
-    bkgcube["xref"].real(ra)
-    bkgcube["yref"].real(dec)
-    bkgcube["debug"].boolean(debug)
+    bkgcube["inobs"]    = "obs.xml"
+    bkgcube["inmodel"]  = model
+    bkgcube["incube"]   = "cntcube.fits"
+    bkgcube["outcube"]  = "bkgcube.fits"
+    bkgcube["outmodel"] = "model_bkg.xml"
+    bkgcube["caldb"]    = caldb
+    bkgcube["irf"]      = irf
+    bkgcube["ebinalg"]  = "LOG"
+    bkgcube["emin"]     = emin
+    bkgcube["emax"]     = emax
+    bkgcube["enumbins"] = enumbins
+    bkgcube["nxpix"]    = 10
+    bkgcube["nypix"]    = 10
+    bkgcube["binsz"]    = 1.0
+    bkgcube["coordsys"] = coordsys
+    bkgcube["proj"]     = proj
+    bkgcube["xref"]     = ra
+    bkgcube["yref"]     = dec
+    bkgcube["debug"]    = debug
     bkgcube.execute()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"].filename("cntcube.fits")
-    like["inmodel"].filename("model_bkg.xml")
-    like["outmodel"].filename("fit_results.xml")
-    like["expcube"].filename("expcube.fits")
-    like["psfcube"].filename("psfcube.fits")
-    like["bkgcube"].filename("bkgcube.fits")
-    like["caldb"].string(caldb)
-    like["irf"].string(irf)
-    like["debug"].boolean(True) # Switch this always on for results in console
+    like["inobs"]    = "cntcube.fits"
+    like["inmodel"]  = "model_bkg.xml"
+    like["outmodel"] = "fit_results.xml"
+    like["expcube"]  = "expcube.fits"
+    like["psfcube"]  = "psfcube.fits"
+    like["bkgcube"]  = "bkgcube.fits"
+    like["caldb"]    = caldb
+    like["irf"]      = irf
+    like["debug"]    = True # Switch this always on for results in console
     like.execute()
-	
+
     # Return
     return
 

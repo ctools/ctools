@@ -67,15 +67,15 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
-        butterfly["inobs"].filename(self.events_name)
-        butterfly["inmodel"].filename(self.model_name)
-        butterfly["srcname"].string("Crab")
-        butterfly["caldb"].string(self.caldb)
-        butterfly["irf"].string(self.irf)
-        butterfly["emin"].real(0.1)
-        butterfly["emax"].real(100)
-        butterfly["outfile"].filename("butterfly.txt")
-        
+        butterfly["inobs"]   = self.events_name
+        butterfly["inmodel"] = self.model_name
+        butterfly["srcname"] = "Crab"
+        butterfly["caldb"]   = self.caldb
+        butterfly["irf"]     = self.irf
+        butterfly["emin"]    = 0.1
+        butterfly["emax"]    = 100
+        butterfly["outfile"] = "butterfly.txt"
+
         # Run tool
         self.test_try("Run ctbutterfly")
         try:
@@ -91,6 +91,6 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in saving results.")
-        
+
         # Return
         return

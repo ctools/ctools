@@ -29,7 +29,7 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [0.9.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [0.10.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
@@ -890,6 +890,7 @@ AC_CONFIG_FILES([Makefile
                  src/cttsmap/Makefile
                  src/ctbutterfly/Makefile
                  src/ctulimit/Makefile
+                 src/cterror/Makefile
                  src/support/Makefile
                  src/ctools-setup
                  test/Makefile
@@ -899,7 +900,7 @@ AC_CONFIG_FILES([Makefile
                  caldb/Makefile
                  models/Makefile
                  examples/Makefile
-                 scripts/Makefile
+                 cscripts/Makefile
                  ctools.pc
                  testconf.sh],
                 [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;

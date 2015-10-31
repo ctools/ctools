@@ -28,6 +28,8 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <cstdlib>         // std::getenv() function
+#include <cstdio>          // std::fopen(), etc. functions
 #include "ctool.hpp"
 #include "GTools.hpp"
 
@@ -49,6 +51,7 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_MEAN_POINTING        "ctool::get_mean_pointing(GObservations&)"
 #define G_CREATE_EBOUNDS                            "ctool::create_ebounds()"
+#define G_PROVIDE_HELP                                "ctool::provide_help()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -109,6 +112,12 @@ ctool::ctool(const std::string& name, const std::string& version,
              int argc, char *argv[]) : 
        GApplication(name, version, argc, argv)
 {
+    // Catch --help option before doing anything else
+    if (need_help()) {
+        provide_help();
+        exit(0);
+    }
+    
     // Initialise members
     init_members();
 
@@ -475,7 +484,7 @@ GEbounds ctool::create_ebounds(void)
  *      nxpix - Number of pixels in Right Ascension or longitude
  *      nypix - Number of pixels in Declination or latitude
  ***************************************************************************/
-GSkymap ctool::create_map(const GObservations& obs)
+GSkyMap ctool::create_map(const GObservations& obs)
 {
     // Read task parameters
     double xref   = 0.0;
@@ -510,7 +519,7 @@ GSkymap ctool::create_map(const GObservations& obs)
     } // endif: got mean pointing as reference
 
     // Initialise sky map
-    GSkymap map = GSkymap(proj, coordsys, xref, yref, -binsz, binsz, 
+    GSkyMap map = GSkyMap(proj, coordsys, xref, yref, -binsz, binsz, 
                           nxpix, nypix, 1);
 
     // Return sky map
@@ -543,7 +552,7 @@ GSkymap ctool::create_map(const GObservations& obs)
 GCTAEventCube ctool::create_cube(const GObservations& obs)
 {
     // Get skymap
-    GSkymap map = create_map(obs);
+    GSkyMap map = create_map(obs);
 
     // Set energy boundaries
     GEbounds ebounds = create_ebounds();
@@ -977,4 +986,44 @@ size_t ctool::get_current_rss(void)
 
     // Return resident set size
     return rss;
+}
+
+
+/***********************************************************************//**
+ * @brief Dumps help text in the console
+ ***************************************************************************/
+void ctool::provide_help(void) const
+{
+    // Allocate line buffer
+    const int n = 1000; 
+    char  line[n];
+
+    // Build help file name
+    std::string helpfile = name()+".txt";
+
+    // Get ctools environment variable
+    char* ptr = std::getenv("CTOOLS");
+    if (ptr == NULL) {
+        std::string msg = "CTOOLS environment variable not set, cannot "
+                          "display help file. Please define CTOOLS "
+                          "environment variable.";
+        throw GException::invalid_value(G_PROVIDE_HELP, msg);
+    }
+
+    // If help file exists then display it, otherwise notify that no
+    // help is available
+    std::string fname = std::string(ptr) + "/share/help/" + helpfile;
+    FILE* fptr = fopen(fname.c_str(), "r");
+    if (fptr != NULL) {
+        while (fgets(line, n, fptr) != NULL) {
+            std::cout << std::string(line);
+        }
+        fclose(fptr);
+    }
+    else {
+        std::cout << "No help available for "+name()+"." << std::endl;
+    }
+
+    // Return
+    return;
 }

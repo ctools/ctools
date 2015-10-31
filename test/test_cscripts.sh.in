@@ -42,7 +42,9 @@ rm -rf *.fits *.xml *.dat
 #
 # Creates pfiles directory
 # ========================
+rm -rf pfiles
 mkdir -p pfiles
+cp -r ../src/*/*.par pfiles/
 export PFILES=pfiles
 
 
@@ -50,8 +52,8 @@ export PFILES=pfiles
 # Test csobsdef
 # =============
 $ECHO -n "Test csobsdef: "
-chmod +x @abs_top_srcdir@/scripts/csobsdef.py
-@abs_top_srcdir@/scripts/csobsdef.py \
+chmod +x @abs_top_srcdir@/cscripts/csobsdef.py
+@abs_top_srcdir@/cscripts/csobsdef.py \
   inpnt="data/pntdef.dat" \
   outobs="obs.xml" \
   caldb="irf" \
@@ -75,8 +77,8 @@ $ECHO " ok"
 # Test cspull
 # ===========
 $ECHO -n "Test cspull: "
-chmod +x @abs_top_srcdir@/scripts/cspull.py
-@abs_top_srcdir@/scripts/cspull.py \
+chmod +x @abs_top_srcdir@/cscripts/cspull.py
+@abs_top_srcdir@/cscripts/cspull.py \
   inmodel="data/crab.xml" \
   outfile="pull.dat" \
   ntrials="3" \
@@ -108,8 +110,8 @@ $ECHO " ok"
 # Test cssens
 # ===========
 $ECHO -n "Test cssens: "
-chmod +x @abs_top_srcdir@/scripts/cssens.py
-@abs_top_srcdir@/scripts/cssens.py \
+chmod +x @abs_top_srcdir@/cscripts/cssens.py
+@abs_top_srcdir@/cscripts/cssens.py \
   inmodel="data/crab.xml" \
   srcname="Crab" \
   caldb="irf" \
@@ -134,8 +136,8 @@ $ECHO " ok"
 # Test cstsdist
 # =============
 $ECHO -n "Test cstsdist: "
-chmod +x @abs_top_srcdir@/scripts/cstsdist.py
-@abs_top_srcdir@/scripts/cstsdist.py \
+chmod +x @abs_top_srcdir@/cscripts/cstsdist.py
+@abs_top_srcdir@/cscripts/cstsdist.py \
   inmodel="data/crab.xml" \
   srcname="Crab" \
   outfile="ts.dat" \
@@ -166,8 +168,8 @@ $ECHO " ok"
 # Test csresmap
 # =============
 $ECHO -n "Test csresmap: "
-chmod +x @abs_top_srcdir@/scripts/csresmap.py
-@abs_top_srcdir@/scripts/csresmap.py \
+chmod +x @abs_top_srcdir@/cscripts/csresmap.py
+@abs_top_srcdir@/cscripts/csresmap.py \
   inobs="data/crab_events.fits" \
   outmap="resmap.fits" \
   inmodel="data/crab.xml" \
@@ -180,7 +182,8 @@ chmod +x @abs_top_srcdir@/scripts/csresmap.py
   xref=83.63 \
   yref=22.01 \
   proj="CAR" \
-  binsz=0.05 > csresmap.log
+  binsz=0.05 \
+  algorithm="SUBDIV" > csresmap.log
 $ECHO -n "."
 if [ -s "resmap.fits" ]
 then
@@ -196,8 +199,8 @@ $ECHO " ok"
 # Test csspec (unbinned)
 # =====================
 $ECHO -n "Test csspec (unbinned): "
-chmod +x @abs_top_srcdir@/scripts/csspec.py
-@abs_top_srcdir@/scripts/csspec.py \
+chmod +x @abs_top_srcdir@/cscripts/csspec.py
+@abs_top_srcdir@/cscripts/csspec.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
   caldb="irf" \
@@ -223,8 +226,8 @@ $ECHO " ok"
 # Test csspec (binned)
 # ====================
 $ECHO -n "Test csspec (binned): "
-chmod +x @abs_top_srcdir@/scripts/csspec.py
-@abs_top_srcdir@/scripts/csspec.py \
+chmod +x @abs_top_srcdir@/cscripts/csspec.py
+@abs_top_srcdir@/cscripts/csspec.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
   caldb="irf" \
@@ -258,8 +261,8 @@ $ECHO " ok"
 # Test cslightcrv (unbinned)
 # ==========================
 $ECHO -n "Test cslightcrv (unbinned): "
-chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
-@abs_top_srcdir@/scripts/cslightcrv.py \
+chmod +x @abs_top_srcdir@/cscripts/cslightcrv.py
+@abs_top_srcdir@/cscripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
   srcname="Crab" \
@@ -288,8 +291,8 @@ $ECHO " ok"
 # Test cslightcrv (binned)
 # ========================
 $ECHO -n "Test cslightcrv (binned): "
-chmod +x @abs_top_srcdir@/scripts/cslightcrv.py
-@abs_top_srcdir@/scripts/cslightcrv.py \
+chmod +x @abs_top_srcdir@/cscripts/cslightcrv.py
+@abs_top_srcdir@/cscripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
   srcname="Crab" \

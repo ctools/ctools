@@ -247,7 +247,7 @@ void ctpsfcube::run(void)
     }
 
     // Fill PSF 
-    m_psfcube.fill(m_obs);
+    m_psfcube.fill(m_obs, &log);
 
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {

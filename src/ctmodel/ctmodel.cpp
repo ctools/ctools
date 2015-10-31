@@ -39,6 +39,9 @@
 
 /* __ Coding definitions _________________________________________________ */
 
+/* __ Constants __________________________________________________________ */
+const GEnergy g_energy_margin(1.0e-12, "TeV");
+
 
 /*==========================================================================
  =                                                                         =
@@ -254,32 +257,56 @@ void ctmodel::run(void)
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Write header for observation
+        if (logTerse()) {
+            std::string header = m_obs[i]->instrument() + " observation";
+            if (m_obs[i]->name().length() > 1) {
+                header += " \"" + m_obs[i]->name() + "\"";
+            }
+            if (m_obs[i]->id().length() > 1) {
+                header += " (id=" + m_obs[i]->id() +")";
+            }
+            log.header3(header);
+        }
+
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << " Skipping ";
+                log << m_obs[i]->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-            // Fill the cube
+        // Fill cube and leave loop if we are binned mode (meaning we 
+        // only have one binned observation)
+        if (m_binned && m_obs.size() == 1) {
             fill_cube(obs);
+            break;
+        }
 
-            // Dispose events to free memory if event file exists on disk
-            if (obs->eventfile().length() > 0 &&
-                gammalib::file_exists(obs->eventfile())) {
-                obs->dispose_events();
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << " Skipping binned ";
+                log << obs->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-        } // endif: CTA observation found
+        // Fill the cube
+        fill_cube(obs);
+
+        // Dispose events to free memory if event file exists on disk
+        if (obs->eventfile().length() > 0 &&
+            gammalib::file_exists(obs->eventfile())) {
+            obs->dispose_events();
+        }
 
     } // endfor: looped over observations
 
@@ -320,8 +347,18 @@ void ctmodel::save(void)
     // Make sure we have the FITS filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save model cube into FITS file
-    m_cube.save(m_outcube, clobber());
+    // Save only if filename is non-empty
+    if (m_outcube.length() > 0) {
+
+        // Dump filename
+        if (logTerse()) {
+            log << "Save \""+m_outcube+"\"" << std::endl;
+        }
+
+        // Save model cube into FITS file
+        m_cube.save(m_outcube, clobber());
+
+    }
 
     // Return
     return;
@@ -374,6 +411,7 @@ void ctmodel::init_members(void)
     m_gti.clear();
     m_has_cube    = false;
     m_append_cube = false;
+    m_binned = false;
 
     // Return
     return;
@@ -397,6 +435,7 @@ void ctmodel::copy_members(const ctmodel& app)
     m_gti         = app.m_gti;
     m_has_cube    = app.m_has_cube;
     m_append_cube = app.m_append_cube;
+    m_binned    = app.m_binned;
 
     // Return
     return;
@@ -427,8 +466,38 @@ void ctmodel::get_parameters(void)
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
-        get_obs();
+        m_obs = get_observations();
     }
+
+    // Check if we got excactly one binned CTA observation
+    if (m_obs.size() == 1) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+
+        // Continue only if observation is a CTA observation
+        if (obs != NULL) {
+
+            // Check for binned observation
+            if (obs->eventtype() == "CountsCube") {
+
+                // Set cube from binned observation
+                GCTAEventCube* evtcube = dynamic_cast<GCTAEventCube*>(const_cast<GEvents*>(obs->events()));
+
+                cube(*evtcube);
+
+                // Signal that cube has been set
+                m_has_cube = true;
+
+                // Signal that we are in binned mode
+                m_binned = true;
+
+            } // endif: observation was binned
+
+        } // endif: observation was CTA
+
+    } // endif: had exactly one observation
+
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
@@ -505,126 +574,6 @@ void ctmodel::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Get observation container
- *
- * Get an observation container according to the user parameters. The method
- * supports loading of a individual FITS file or an observation definition
- * file in XML format. If the input filename is empty, parameters are read
- * to build a CTA observation from scratch.
- ***************************************************************************/
-void ctmodel::get_obs(void)
-{
-    // Get the filename from the input parameters
-    std::string filename = (*this)["inobs"].filename();
-
-    // If no observation definition file has been specified then read all
-    // parameters that are necessary to create an observation from scratch
-    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
-
-        // Get response cube filenames
-        std::string expcube = (*this)["expcube"].filename();
-        std::string psfcube = (*this)["psfcube"].filename();
-        std::string bkgcube = (*this)["bkgcube"].filename();
-
-        // If the filenames are valid then build an observation from cube
-        // response information
-        if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
-            (gammalib::strip_whitespace(expcube) != "") &&
-            (gammalib::strip_whitespace(psfcube) != "") &&
-            (gammalib::strip_whitespace(bkgcube) != "")) {
-
-            // Get exposure, PSF and background cubes
-            GCTACubeExposure   exposure(expcube);
-            GCTACubePsf        psf(psfcube);
-            GCTACubeBackground background(bkgcube);
-
-            // Create energy boundaries
-            GEbounds ebounds = create_ebounds();
-
-            // Create dummy sky map cube
-            GSkymap map("CAR","GAL",0.0,0.0,1.0,1.0,1,1,ebounds.size());
-            m_append_cube = true;
-
-            // Create event cube
-            GCTAEventCube cube(map, ebounds, exposure.gti());
-
-            // Create CTA observation
-            GCTAObservation cta;
-            cta.events(cube);
-            cta.response(exposure, psf, background);
-
-            // Append observation to container
-            m_obs.append(cta);
-
-        } // endif: cube response information was available
-
-        // ... otherwise build an observation from IRF response information
-        else {
-
-            // Create CTA observation
-            GCTAObservation cta = create_cta_obs();
-
-            // Set response
-            set_obs_response(&cta);
-
-            // Append observation to container
-            m_obs.append(cta);
-            
-        }
-
-    } // endif: filename was "NONE" or ""
-
-    // ... otherwise we have a file name
-    else {
-
-        // If file is a FITS file then create an empty CTA observation
-        // and load file into observation
-        if (gammalib::is_fits(filename)) {
-
-            // Allocate empty CTA observation
-            GCTAObservation cta;
-
-            // Load data
-            cta.load(filename);
-
-            // Set response
-            set_obs_response(&cta);
-
-            // Append observation to container
-            m_obs.append(cta);
-
-            // Signal that no XML file should be used for storage
-            m_use_xml = false;
-
-        }
-
-        // ... otherwise load file into observation container
-        else {
-
-            // Load observations from XML file
-            m_obs.load(filename);
-
-            // For all observations that have no response, set the response
-            // from the task parameters
-            set_response(m_obs);
-
-            // Set observation boundary parameters (emin, emax, rad)
-            set_obs_bounds(m_obs);
-
-            // Signal that XML file should be used for storage
-            m_use_xml = true;
-
-        } // endelse: file was an XML file
-
-    }
-
-    // Return
-    return;
-
-}
-
-
-/***********************************************************************//**
  * @brief Fill model into model cube
  *
  * @param[in] obs CTA observation.
@@ -639,13 +588,25 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
-        // Get energy boundaries and GTI references for observation
-        const GEbounds& ebounds = obs->events()->ebounds();
-        const GGti&     gti     = obs->events()->gti();
+        // Get GTI and energy boundaries references for observation
+        const GGti&     gti         = obs->events()->gti();
+        const GEbounds& obs_ebounds = obs->ebounds();
+
+        // Get cube energy boundaries
+        const GEbounds& cube_ebounds = m_cube.ebounds();
+
+        // Initialise empty, invalid RoI
+        GCTARoi roi;
+
+        // Retrieve RoI in case we have an unbinned observation
+        if (obs->eventtype() == "EventList") {
+            roi = obs->roi();
+        }
 
         // Initialise statistics
         double sum              = 0.0;
         int    num_outside_ebds = 0;
+        int    num_outside_roi  = 0;
 
         // Setup cube GTIs for this observation
         m_cube.gti(obs->events()->gti());
@@ -657,17 +618,31 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             GCTAEventBin* bin = m_cube[i];
 
             // Skip bin if it is outside the energy range of the observation
-            if (!ebounds.contains(bin->energy())) {
+            int index = cube_ebounds.index(bin->energy());
+            if (index == -1 ||
+                !obs_ebounds.contains(cube_ebounds.emin(index)+g_energy_margin,
+                                      cube_ebounds.emax(index)-g_energy_margin)) {
                 num_outside_ebds++;
                 continue;
             }
+
+            // Check if RoI is valid, i.e. check if we have an unbinned
+            // observation
+            if (roi.is_valid()) {
+
+                // Skip bin if it is outside the RoI of the observation
+                if (!roi.contains(*bin)) {
+                    num_outside_roi++;
+                    continue;
+                }
+
+            } // endif: RoI was not valid
 
             // Get actual bin value
             double value = bin->counts();
             
             // Compute model value for cube bin
             double model = m_obs.models().eval(*bin, *obs) * bin->size();
-            //double model = m_obs.models().eval(*bin, *ptr) * bin->size();
 
             // Add model to actual value
             value += model;
@@ -690,6 +665,8 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             log << sum << std::endl;
             log << gammalib::parformat("Bins outside energy range");
             log << num_outside_ebds << std::endl;
+            log << gammalib::parformat("Bins outside RoI");
+            log << num_outside_roi << std::endl;
         }
 
         // Log cube
@@ -703,3 +680,4 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     // Return
     return;
 }
+

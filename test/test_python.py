@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctools package.
 #
-# Copyright (C) 2012-2014 Juergen Knoedlseder
+# Copyright (C) 2012-2015 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,13 +35,14 @@ import test_ctbkgcube
 import test_ctcubemask
 import test_ctbutterfly
 import test_ctulimit
+import test_cterror
 import test_pipelines
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
+# ================== #
+# Perform unit tests #
+# ================== #
+def test(installed=False):
     """
     Perform unit testing for Python interface.
     """
@@ -62,6 +63,7 @@ if __name__ == '__main__':
     suite_ctcubemask  = test_ctcubemask.Test()
     suite_ctbutterfly = test_ctbutterfly.Test()
     suite_ctulimit    = test_ctulimit.Test()
+    suite_cterror     = test_cterror.Test()
     suite_pipelines   = test_pipelines.Test()
 
     # Setup unit tests
@@ -78,6 +80,7 @@ if __name__ == '__main__':
     suite_ctcubemask.set()
     suite_ctbutterfly.set()
     suite_ctulimit.set()
+    suite_cterror.set()
     suite_pipelines.set()
 
     # Append tests to container
@@ -94,28 +97,64 @@ if __name__ == '__main__':
     suites.append(suite_ctcubemask)
     suites.append(suite_ctbutterfly)
     suites.append(suite_ctulimit)
+    suites.append(suite_cterror)
     suites.append(suite_pipelines)
+
+    # If we have an installed version then create a temporary
+    # directory and copy over all information that is needed
+    if installed:
+
+        # Create temporary working directory
+        import tempfile
+        path = tempfile.mkdtemp()
+        os.chdir(path)
+
+        # Get test directory
+        import inspect
+        testdir = inspect.getfile(ctools.tests)
+        head, tail = os.path.split(testdir)
+
+        # Copy over test data and irf
+        os.system("cp -r %s %s" % (head+"/data", "data"))
+        os.system("cp -r %s %s" % (head+"/irf",  "irf"))
 
     # Set PFILES environment variable
     try:
         os.mkdir("pfiles")
     except:
         pass
-    os.system("cp -r ../src/*/*.par pfiles/")
     os.environ['PFILES'] = "pfiles"
+
+    # If we have a non-installed version then copy over pfiles
+    if not installed:
+        os.system("cp -r ../src/*/*.par pfiles/")
 
     # Run test suite
     success = suites.run()
-    
 
-    # Save test results
-    suites.save("reports/ctools.xml")
+    # If we have a non-installed version then save test results
+    if not installed:
+        suites.save("reports/ctools.xml")
 
     # Set return code
     if success:
         rc = 0
     else:
         rc = 1
+
+    # Return
+    return rc
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+    """
+    Perform unit testing for Python interface.
+    """
+    # Run tests
+    rc = test()
 
     # Exit with return code
     sys.exit(rc)

@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2014 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2015 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -28,6 +28,39 @@
 
 # Works only if Python is available
 if WITH_PYTHON
+
+# Test scripts to be distributed in $(pyexecdir)/ctools/tests
+testscripts = ctools/tests/__init__.py \
+              ../test/test_python.py \
+              ../test/test_ctobssim.py \
+              ../test/test_ctselect.py \
+              ../test/test_ctbin.py \
+              ../test/test_ctlike.py \
+              ../test/test_cttsmap.py \
+              ../test/test_ctmodel.py \
+              ../test/test_ctskymap.py \
+              ../test/test_ctexpcube.py \
+              ../test/test_ctpsfcube.py \
+              ../test/test_ctbkgcube.py \
+              ../test/test_ctcubemask.py \
+              ../test/test_ctbutterfly.py \
+              ../test/test_ctulimit.py \
+              ../test/test_cterror.py \
+              ../test/test_pipelines.py
+testdata    = ../test/data/crab.xml \
+              ../test/data/crab_events.fits.gz \
+              ../test/data/crab_cntmap.fits.gz \
+              ../test/data/exclusion.reg
+testirf     = ../test/irf/cta_dummy_irf.dat
+
+# Distribute scripts
+EXTRA_DIST       = $(testscripts) $(testdata) $(testirf)
+testscriptsdir   = $(pyexecdir)/ctools/tests
+testscripts_DATA = $(testscripts)
+testdatadir      = $(pyexecdir)/ctools/tests/data
+testdata_DATA    = $(testdata)
+testirfdir       = $(pyexecdir)/ctools/tests/irf
+testirf_DATA     = $(testirf)
 
 # Set SWIG interface filename
 SWIG_INTERFACE = ctools/tools.i

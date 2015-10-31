@@ -47,6 +47,7 @@ ctbkgcube=../src/ctbkgcube/ctbkgcube
 ctcubemask=../src/ctcubemask/ctcubemask
 ctbutterfly=../src/ctbutterfly/ctbutterfly
 ctulimit=../src/ctulimit/ctulimit
+cterror=../src/cterror/cterror
 
 
 #
@@ -591,6 +592,27 @@ then
     $ECHO -n "."
 else
     $ECHO " ctulimit.log file is not found"
+    exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cterror
+# ============
+$ECHO -n "Test cterror: "
+$cterror inobs="data/crab_events.fits.gz" \
+         inmodel="data/crab.xml" \
+         outmodel="results_error.xml" \
+         srcname="Crab" \
+         caldb="irf" \
+         irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "cterror.log" ]
+then
+    $ECHO -n "."
+else
+    $ECHO " cterror.log file is not found"
     exit 1
 fi
 $ECHO " ok"

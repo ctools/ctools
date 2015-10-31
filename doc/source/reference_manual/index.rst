@@ -28,6 +28,7 @@ ctools
    ctskymap --- Generates sky map <ctskymap>
    cttsmap --- Generates Test Statistics map <cttsmap>
    ctulimit --- Calculates upper limit <ctulimit>
+   cterror --- Calculates likelihood profile errors <cterror>
 
 
 cscripts

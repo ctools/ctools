@@ -3,14 +3,22 @@
 ctbutterfly
 ===========
 
-Computes butterfly.
+Computes butterfly diagram for a power law model.
 
 
 Synopsis
 --------
 
-Calculates the confidence band of a spectral model, taking into account the
-covariance matrix of a likelihood fit.
+Calculates the confidence band of a power law model, taking into account the
+covariance matrix resulting from a maximum likelihood fit. The tool derives
+the envelope of all power law models whose prefactor and spectral index fall
+within the error ellipse that is associated with the covariance of the 
+parameters. It outputs an ASCII file in column separated value (CSV) format
+containing the results. Each row in the result file corresponds to an energy.
+The columns give the energy in MeV, the fitted intensity in ph/cm2/s/MeV,
+and the minimum and maximum intensity that envelope the power law model 
+with a given confidence (by default a confidence level of 68% is used, but 
+the level can be adjusted using the ``confidence`` parameter).
 
 
 General parameters
@@ -39,10 +47,19 @@ General parameters
  	 	 
 ``irf [string]``
     Instrumental response function.
+
+``(edisp = no) [boolean]``
+    Applies energy dispersion to response computation.
  	 	 
 ``outfile [file]``
     Output butterfly ASCII file name.
+
+``(refit = no) [boolean]``
+    Performs refitting of solution ignoring any provided covariance matrix.
  	 	 
+``(confidence = 0.68) [real]``
+    Confidence level for error computation.
+    
 ``(matrix = "NONE") [file]``
     Input covariance matrix file (not used)
 
@@ -86,11 +103,12 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctskymap.log) [string]``
+``(logfile = ctbutterfly.log) [string]``
     Name of log file.
 
 
 Related tools
 -------------
 
-None
+:ref:`ctulimit`
+:ref:`cterror`

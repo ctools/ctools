@@ -23,9 +23,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
 import sys
 import math
+import gammalib
 
 
 # ============================================================ #
@@ -82,8 +82,8 @@ def get_positions(xmin, xmax, ymin, ymax, step):
 # ====================== #
 # Setup patch on the sky #
 # ====================== #
-def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5, \
-              separation=3.0, hours=100.0, \
+def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
+              separation=3.0, hours=100.0,
               site=None, lst=True, autodec=0.0):
     """
     Setup pointing patch on the sky.
@@ -147,11 +147,11 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5, \
 
     # Dump statistics
     print("Number of pointings: %d (%.2f sec)" % (n_pnt,duration))
-    print("South array .......: %.2f hours (%.2f%%)" % \
-          (exposure_south/3600.0, \
+    print("South array .......: %.2f hours (%.2f%%)" %
+          (exposure_south/3600.0,
            100.0*exposure_south/(exposure_south+exposure_north)))
-    print("North array .......: %.2f hours (%.2f%%)" % \
-          (exposure_north/3600.0, \
+    print("North array .......: %.2f hours (%.2f%%)" %
+          (exposure_north/3600.0,
            100.0*exposure_north/(exposure_south+exposure_north)))
 
     # Return observation definition
@@ -169,28 +169,28 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, lst=True):
     obsdef = []
 
     # Add inner region South
-    obsdef.extend(set_patch(lmin=-60.0, lmax=60.0, bmin=bmin, bmax=bmax, \
-                            separation=separation, hours=780, \
+    obsdef.extend(set_patch(lmin=-60.0, lmax=60.0, bmin=bmin, bmax=bmax,
+                            separation=separation, hours=780,
                             site="South", lst=lst))
 
     # Add Vela & Carina region
-    obsdef.extend(set_patch(lmin=240.0, lmax=300.0, bmin=bmin, bmax=bmax, \
-                            separation=separation, hours=180, \
+    obsdef.extend(set_patch(lmin=240.0, lmax=300.0, bmin=bmin, bmax=bmax,
+                            separation=separation, hours=180,
                             site="South", lst=lst))
 
     # Add 210-240 region
-    obsdef.extend(set_patch(lmin=210.0, lmax=240.0, bmin=bmin, bmax=bmax, \
-                            separation=separation, hours=60, \
+    obsdef.extend(set_patch(lmin=210.0, lmax=240.0, bmin=bmin, bmax=bmax,
+                            separation=separation, hours=60,
                             site="South", lst=lst))
 
     # Add Cygnus, Perseus
-    obsdef.extend(set_patch(lmin=60.0, lmax=150.0, bmin=bmin, bmax=bmax, \
-                            separation=separation, hours=450, \
+    obsdef.extend(set_patch(lmin=60.0, lmax=150.0, bmin=bmin, bmax=bmax,
+                            separation=separation, hours=450,
                             site="North", lst=lst))
 
     # Add Anticentre
-    obsdef.extend(set_patch(lmin=150.0, lmax=210.0, bmin=bmin, bmax=bmax, \
-                            separation=separation, hours=150, \
+    obsdef.extend(set_patch(lmin=150.0, lmax=210.0, bmin=bmin, bmax=bmax,
+                            separation=separation, hours=150,
                             site="North", lst=lst))
 
     # Return observation definition
@@ -208,8 +208,8 @@ def set_extgal(separation=3.0, lst=True):
     obsdef = []
 
     # Set patch
-    obsdef.extend(set_patch(lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0, \
-                            separation=separation, hours=1000, \
+    obsdef.extend(set_patch(lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0,
+                            separation=separation, hours=1000,
                             site="Automatic", lst=lst, autodec=10.0))
 
     # Return observation definition
@@ -227,13 +227,13 @@ def set_gc(lst=True):
     obsdef = []
 
     # Central wobble
-    obsdef.extend(set_patch(lmin=-0.5, lmax=0.5, bmin=-0.5, bmax=0.5, \
-                            separation=0.1, hours=525, \
+    obsdef.extend(set_patch(lmin=-0.5, lmax=0.5, bmin=-0.5, bmax=0.5,
+                            separation=0.1, hours=525,
                             site="South", lst=lst))
 
     # Extended region
-    obsdef.extend(set_patch(lmin=-10.0, lmax=10.0, bmin=-10.0, bmax=10.0, \
-                            separation=1.5, hours=300, \
+    obsdef.extend(set_patch(lmin=-10.0, lmax=10.0, bmin=-10.0, bmax=10.0,
+                            separation=1.5, hours=300,
                             site="South", lst=lst))
 
     # Return observation definition
@@ -322,7 +322,7 @@ def write_obsdef(filename, obsdef):
             dec = obs["dec"]
 
         # Write information
-        file.write("%8.4f,%8.4f,%.4f,%s,%s\n" % \
+        file.write("%8.4f,%8.4f,%.4f,%s,%s\n" %
                    (ra, dec, obs['duration'], obs['caldb'], obs['irf']))
 
     # Close file
@@ -330,7 +330,7 @@ def write_obsdef(filename, obsdef):
 
     # Return
     return
-    
+
 
 # ======================== #
 # Main routine entry point #
@@ -341,7 +341,7 @@ if __name__ == '__main__':
     """
     # Initialise flags
     need_help = False
-    
+
     # Test for command line arguments
     if (len(sys.argv) > 1):
         if sys.argv[1] == "-h":
@@ -387,5 +387,4 @@ if __name__ == '__main__':
 
     # Invalid pattern
     else:
-        print("Unknown option \""+obsname+"\"")
-        
+        print('Unknown option "' + obsname + '"')

@@ -27,19 +27,19 @@
 # ==========================================================================
 import gammalib
 import ctools
-from ctools import obsutils
+from cscripts import obsutils
 
 
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
-                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
-                       deadc=0.95, \
+def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
+                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0,
+                       deadc=0.95,
                        caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
-    
+
     Keywords:
      pattern   - Pointing pattern, either "single" or "four"
      ra        - RA of pattern centre [deg] (default: 83.6331)
@@ -54,18 +54,18 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
      irf       - Instrument response function (default: cta_dummy_irf)
     """
     # Set list of observations
-    obs_def_list = obsutils.set_obs_patterns(pattern, \
-                                             ra=ra, \
-                                             dec=dec, \
+    obs_def_list = obsutils.set_obs_patterns(pattern,
+                                             ra=ra,
+                                             dec=dec,
                                              offset=offset)
-    
+
     # Get observation container
-    obs = obsutils.set_obs_list(obs_def_list, \
-                                duration=duration, \
-                                emin=emin, \
-                                emax=emax, \
-                                rad=rad, \
-                                caldb=caldb, \
+    obs = obsutils.set_obs_list(obs_def_list,
+                                duration=duration,
+                                emin=emin,
+                                emax=emax,
+                                rad=rad,
+                                caldb=caldb,
                                 irf=irf)
 
     # Return observation container
@@ -78,13 +78,13 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
 def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
     """
     Setup model for analysis.
-    
+
     Keywords:
      model - Model Xml file
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
-    
+
     # Return observation container
     return obs
 
@@ -92,11 +92,11 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 # ================================ #
 # Simulation and analysis pipeline #
 # ================================ #
-def run_pipeline(obs, emin=0.1, emax=100.0, \
-                 enumbins=20, nxpix=200, nypix=200, binsz=0.02, \
-                 coordsys="CEL", proj="CAR", \
-                 model="${CTOOLS}/share/models/crab.xml", \
-                 caldb="prod2", irf="South_50h", \
+def run_pipeline(obs, emin=0.1, emax=100.0,
+                 enumbins=20, nxpix=200, nypix=200, binsz=0.02,
+                 coordsys="CEL", proj="CAR",
+                 model="${CTOOLS}/share/models/crab.xml",
+                 caldb="prod2", irf="South_50h",
                  debug=False):
     """
     Simulation and binned analysis pipeline.
@@ -117,8 +117,8 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"].boolean(debug)
-    sim["outevents"].filename("obs.xml")
+    sim["debug"] = debug
+    sim["outevents"] = "obs.xml"
     sim.execute()
 
     # Bin events by looping over all observations in the container
@@ -132,18 +132,18 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
 
         # Bin events for that observation
         bin = ctools.ctbin()
-        bin["inobs"].filename(eventfile)
-        bin["outcube"].filename(cubefile)
-        bin["ebinalg"].string("LOG")
-        bin["emin"].real(emin)
-        bin["emax"].real(emax)
-        bin["enumbins"].integer(enumbins)
-        bin["nxpix"].integer(nxpix)
-        bin["nypix"].integer(nypix)
-        bin["binsz"].real(binsz)
-        bin["coordsys"].string(coordsys)
-        bin["usepnt"].boolean(True)
-        bin["proj"].string(proj)
+        bin["inobs"]    = eventfile
+        bin["outcube"]  = cubefile
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = emin
+        bin["emax"]     = emax
+        bin["enumbins"] = enumbins
+        bin["nxpix"]    = nxpix
+        bin["nypix"]    = nypix
+        bin["binsz"]    = binsz
+        bin["coordsys"] = coordsys
+        bin["usepnt"]   = True
+        bin["proj"]     = proj
         bin.execute()
 
         # Set observation ID
@@ -160,17 +160,17 @@ def run_pipeline(obs, emin=0.1, emax=100.0, \
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"].filename("obs_cube.xml")
-    like["inmodel"].filename(model)
-    like["outmodel"].filename("fit_results.xml")
-    like["expcube"].filename("NONE")
-    like["psfcube"].filename("NONE")
-    like["bkgcube"].filename("NONE")
-    like["caldb"].string(caldb)
-    like["irf"].string(irf)
-    like["debug"].boolean(True) # Switch this always on for results in console
+    like["inobs"]    = "obs_cube.xml"
+    like["inmodel"]  = model
+    like["outmodel"] = "fit_results.xml"
+    like["expcube"]  = "NONE"
+    like["psfcube"]  = "NONE"
+    like["bkgcube"]  = "NONE"
+    like["caldb"]    = caldb
+    like["irf"]      = irf
+    like["debug"]    = True # Switch this always on for results in console
     like.execute()
-	
+
     # Return
     return
 

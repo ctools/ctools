@@ -247,45 +247,48 @@ void ctskymap::run(void)
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Write header for observation
+        if (logTerse()) {
+            std::string header = m_obs[i]->instrument() + " observation";
+            if (m_obs[i]->name().length() > 1) {
+                header += " \"" + m_obs[i]->name() + "\"";
+            }
+            if (m_obs[i]->id().length() > 1) {
+                header += " (id=" + m_obs[i]->id() +")";
+            }
+            log.header3(header);
+        }
+
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for current observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << " Skipping ";
+                log << m_obs[i]->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-            // Map events into sky map
-            map_events(obs);
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << " Skipping binned ";
+                log << obs->instrument();
+                log << " observation" << std::endl;
+            }
+            continue;
+        }
+
+        // Map events into sky map
+        map_events(obs);
             
-            // Increment observation counter
-            num_obs++;
-
-        } // endif: CTA observation found
+        // Increment observation counter
+        num_obs++;
 
     } // endfor: looped over observations
-
-    // Write observation(s) into logger
-/*
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Map observations");
-        }
-        else {
-            log.header1("Map observation");
-        }
-        log << m_obs << std::endl;
-    }
-*/
 
     // Return
     return;
@@ -308,8 +311,18 @@ void ctskymap::save(void)
     // Get output filename
     m_outmap = (*this)["outmap"].filename();
 
-    // Save sky map
-    m_skymap.save(m_outmap, clobber());
+    // Save only if filename is non-empty
+    if (m_outmap.length() > 0) {
+
+        // Dump filename
+        if (logTerse()) {
+            log << "Save \""+m_outmap+"\"" << std::endl;
+        }
+
+        // Save sky map
+        m_skymap.save(m_outmap, clobber());
+
+    }
 
     // Return
     return;
@@ -424,23 +437,21 @@ void ctskymap::map_events(GCTAObservation* obs)
 
         // Log binning results
         if (logTerse()) {
-            log << std::endl;
-            log.header1("Mapping");
             log << gammalib::parformat("Events in list");
             log << obs->events()->size() << std::endl;
             log << gammalib::parformat("Events in map");
             log << num_in_map << std::endl;
             log << gammalib::parformat("Events outside map area");
             log << num_outside_map << std::endl;
-            log << gammalib::parformat("Events outside energy range");
+            log << gammalib::parformat("Events outside energies");
             log << num_outside_erange << std::endl;
         }
 
         // Log map
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Sky map");
+        if (logVerbose()) {
+            log.indent(1);
             log << m_skymap << std::endl;
+            log.indent(0);
         }
 
     } // endif: observation was valid

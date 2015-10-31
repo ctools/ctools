@@ -40,6 +40,9 @@
 
 /* __ Coding definitions _________________________________________________ */
 
+/* __ Constants __________________________________________________________ */
+const GEnergy g_energy_margin(1.0e-12, "TeV");
+
 
 /*==========================================================================
  =                                                                         =
@@ -241,29 +244,46 @@ void ctbin::run(void)
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
+        // Write header for observation
+        if (logTerse()) {
+            std::string header = m_obs[i]->instrument() + " observation";
+            if (m_obs[i]->name().length() > 1) {
+                header += " \"" + m_obs[i]->name() + "\"";
+            }
+            if (m_obs[i]->id().length() > 1) {
+                header += " (id=" + m_obs[i]->id() +")";
+            }
+            log.header3(header);
+        }
+
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Write header for observation
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
             if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
+                log << " Skipping ";
+                log << m_obs[i]->instrument();
+                log << " observation" << std::endl;
             }
+            continue;
+        }
 
-            // Fill the cube
-            fill_cube(obs);
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            if (logTerse()) {
+                log << " Skipping binned ";
+                log << obs->instrument();
+                log << " observation" << std::endl;
+            }
+            continue;
+        }
 
-            // Dispose events to free memory
-            obs->dispose_events();
+        // Fill the cube
+        fill_cube(obs);
 
-        } // endif: CTA observation found
+        // Dispose events to free memory
+        obs->dispose_events();
 
     } // endfor: looped over observations
 
@@ -308,13 +328,26 @@ void ctbin::save(void)
     // Get output filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+    // Save only if filename is non-empty
+    if (m_outcube.length() > 0) {
 
-    // Save only if observation is valid
-    if (obs != NULL) {
-        obs->save(m_outcube, clobber());
-    }
+        // Get CTA observation from observation container
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+
+        // Save only if observation is valid
+        if (obs != NULL) {
+        
+            // Dump filename
+            if (logTerse()) {
+                log << "Save \""+m_outcube+"\"" << std::endl;
+            }
+            
+            // Save cube
+            obs->save(m_outcube, clobber());
+
+        } // endif: observation was valid
+
+    } // endif: outcube file was valid
 
     // Return
     return;
@@ -455,6 +488,18 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Get the RoI
         const GCTARoi& roi = events->roi();
 
+        // Get the ebounds
+        const GEbounds& obs_ebounds = events->ebounds();
+
+        // Check for RoI sanity
+        if (!roi.is_valid()) {
+            std::string msg = "No RoI information found in input observation "
+                              "\""+obs->name()+"\". Run ctselect to specify "
+                              "an RoI for this observation before running "
+                              "ctbin.";
+            throw GException::invalid_value(G_FILL_CUBE, msg);
+        }
+
         // Initialise binning statistics
         int num_outside_roi  = 0;
         int num_outside_map  = 0;
@@ -487,7 +532,9 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
             // Determine energy bin. Skip if we are outside the energy range
             int index = m_ebounds.index(event->energy());
-            if (index == -1) {
+            if (index == -1 ||
+                !obs_ebounds.contains(m_ebounds.emin(index)+g_energy_margin,
+                                      m_ebounds.emax(index)-g_energy_margin)) {
                 num_outside_ebds++;
                 continue;
             }
@@ -552,11 +599,25 @@ void ctbin::obs_cube(void)
         // Attach event cube to CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
         if (obs != NULL) {
-            obs->events(this->cube());
-            obs->eventfile("");
-        }
 
-    }
+            // Only change the event type if we had an unbinned observation
+            if (obs->eventtype() == "EventList") {
+
+                obs->events(this->cube());
+                obs->eventfile("");
+             } // endif: observation was unbinned
+            else { // input observation was binned and skipped
+
+                // Create new and empty cube
+                GCTAEventCube cube = GCTAEventCube(m_cube, m_ebounds, obs->gti());
+
+                // Assign empty cube to have a new binned observation
+                obs->events(cube);
+            }
+
+        } // endif: obervation was valid
+
+    } // endif: we only had one observation in the container
 
     // ... otherwise put a single CTA observation in container
     else {

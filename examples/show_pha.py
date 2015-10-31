@@ -24,7 +24,7 @@
 # ==========================================================================
 import sys
 import math
-from gammalib import *
+import gammalib
 
 
 # ================= #
@@ -53,7 +53,7 @@ def show_pha(pha):
     for i in range(pha.size()):
         counts[i] = pha[i]
     error = [math.sqrt(c) for c in counts]
-    
+
     # Plot data
     if channels:
         plt.semilogy(energy, counts, 'ro')
@@ -70,11 +70,11 @@ def show_pha(pha):
 
     # Show plot
     plt.show()
-    
+
     # Return
     #return
-    
-    
+
+
 # ======================== #
 # Main routine entry point #
 # ======================== #
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     filename = sys.argv[1]
 
     # Load PHA spectrum
-    pha = GPha(filename)
+    pha = gammalib.GPha(filename)
     #print(pha)
 
     # Try importing matplotlib
@@ -107,4 +107,3 @@ if __name__ == '__main__':
     # Show PHA spectrum
     if has_matplotlib:
         show_pha(pha)
-    

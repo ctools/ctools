@@ -27,19 +27,19 @@
 # ==========================================================================
 import gammalib
 import ctools
-from ctools import obsutils
+from cscripts import obsutils
 
 
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
-                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0, \
-                       deadc=0.95, \
+def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
+                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0,
+                       deadc=0.95,
                        caldb="prod2", irf="South_50h"):
     """
     Returns an observation container.
-    
+
     Keywords:
      pattern   - Pointing pattern, either "single" or "four"
      ra        - RA of pattern centre [deg] (default: 83.6331)
@@ -54,18 +54,18 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
      irf       - Instrument response function (default: cta_dummy_irf)
     """
     # Set list of observations
-    obs_def_list = obsutils.set_obs_patterns(pattern, \
-                                             ra=ra, \
-                                             dec=dec, \
+    obs_def_list = obsutils.set_obs_patterns(pattern,
+                                             ra=ra,
+                                             dec=dec,
                                              offset=offset)
-    
+
     # Get observation container
-    obs = obsutils.set_obs_list(obs_def_list, \
-                                duration=duration, \
-                                emin=emin, \
-                                emax=emax, \
-                                rad=rad, \
-                                caldb=caldb, \
+    obs = obsutils.set_obs_list(obs_def_list,
+                                duration=duration,
+                                emin=emin,
+                                emax=emax,
+                                rad=rad,
+                                caldb=caldb,
                                 irf=irf)
 
     # Return observation container
@@ -78,13 +78,13 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5, \
 def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
     """
     Setup model for analysis.
-    
+
     Keywords:
      model - Model Xml file
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
-    
+
     # Return observation container
     return obs
 
@@ -92,9 +92,9 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 # ================================ #
 # Simulation and analysis pipeline #
 # ================================ #
-def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0, \
-                 emin=0.1, emax=100.0, \
-                 tmin=0.0, tmax=0.0, \
+def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0,
+                 emin=0.1, emax=100.0,
+                 tmin=0.0, tmax=0.0,
                  debug=False):
     """
     Simulation and unbinned analysis pipeline.
@@ -111,26 +111,26 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0, \
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"].boolean(debug)
+    sim["debug"] = debug
     sim.run()
 
     # Select events
     select = ctools.ctselect(sim.obs())
-    select["ra"].real(ra)
-    select["dec"].real(dec)
-    select["rad"].real(rad)
-    select["emin"].real(emin)
-    select["emax"].real(emax)
-    select["tmin"].real(tmin)
-    select["tmax"].real(tmax)
-    select["debug"].boolean(debug)
+    select["ra"]    = ra
+    select["dec"]   = dec
+    select["rad"]   = rad
+    select["emin"]  = emin
+    select["emax"]  = emax
+    select["tmin"]  = tmin
+    select["tmax"]  = tmax
+    select["debug"] = debug
     select.run()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(select.obs())
-    like["debug"].boolean(True) # Switch this always on for results in console
+    like["debug"] = True # Switch this always on for results in console
     like.run()
-	
+
     # Return
     return
 

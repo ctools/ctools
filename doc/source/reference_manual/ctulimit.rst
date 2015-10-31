@@ -39,8 +39,11 @@ General parameters
 ``irf [string]``
     Instrumental response function.
  	 	 
+``(edisp = no) [boolean]``
+    Applies energy dispersion to response computation.
+ 	 	 
 ``(confidence = 0.95) [real]``
-    Confidence Level of upper limit.
+    Confidence level of upper limit.
     
 ``(sigma_min = 0.0) [real]``
     Minimum boundary to start searching for upper limit value.
@@ -95,4 +98,4 @@ Standard parameters
 Related tools
 -------------
 
-None
+:ref:`cterror`

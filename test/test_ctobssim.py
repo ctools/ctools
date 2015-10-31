@@ -67,18 +67,18 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctobssim
         sim = ctools.ctobssim()
-        sim["inmodel"].filename(self.model_name)
-        sim["outevents"].filename("events.fits")
-        sim["caldb"].string(self.caldb)
-        sim["irf"].string(self.irf)
-        sim["ra"].real(83.63)
-        sim["dec"].real(22.01)
-        sim["rad"].real(10.0)
-        sim["tmin"].real(0.0)
-        sim["tmax"].real(1800.0)
-        sim["emin"].real(0.1)
-        sim["emax"].real(100.0)
-        
+        sim["inmodel"]   = self.model_name
+        sim["outevents"] = "events.fits"
+        sim["caldb"]     = self.caldb
+        sim["irf"]       = self.irf
+        sim["ra"]        = 83.63
+        sim["dec"]       = 22.01
+        sim["rad"]       = 10.0
+        sim["tmin"]      = 0.0
+        sim["tmax"]      = 1800.0
+        sim["emin"]      = 0.1
+        sim["emax"]      = 100.0
+
         # Run tool
         self.test_try("Run ctobssim")
         try:
@@ -98,7 +98,7 @@ class Test(gammalib.GPythonTestSuite):
         self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6, "ROI Right Ascension is not 83.63 deg")
         self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6, "ROI Declination is not 22.01 deg")
         self.test_value(evt.size(), 4134, "Number of events is not 4134")
-        
+
         # Save events
         self.test_try("Save events")
         try:
@@ -114,11 +114,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up observation container
         obs = self.set_obs(4)
-        
+
         # Set-up ctobssim
         sim = ctools.ctobssim(obs)
-        sim["outevents"].filename("sim_events.xml")
-        sim["inmodel"].filename(self.model_name)
+        sim["outevents"] = "sim_events.xml"
+        sim["inmodel"]   = self.model_name
         # Run tool
         self.test_try("Run ctobssim")
         try:
@@ -185,18 +185,18 @@ class Test(gammalib.GPythonTestSuite):
         pnt = gammalib.GCTAPointing()
         pnt.dir(pntdir)
         obs_cta.pointing(pnt)
-    
+
         # Set ROI
         roi     = gammalib.GCTARoi()
         instdir = gammalib.GCTAInstDir()
         instdir.dir(pntdir)
         roi.centre(instdir)
         roi.radius(rad)
-    
+
         # Set GTI
         gti = gammalib.GGti()
         gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
-    
+
         # Set energy boundaries
         ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"), \
                                     gammalib.GEnergy(emax, "TeV"))
@@ -207,16 +207,15 @@ class Test(gammalib.GPythonTestSuite):
         events.gti(gti)
         events.ebounds(ebounds)
         obs_cta.events(events)
-    
+
         # Set instrument response
         obs_cta.response(self.irf, db)
-    
+
         # Set ontime, livetime, and deadtime correction factor
         obs_cta.ontime(duration)
         obs_cta.livetime(duration*deadc)
         obs_cta.deadc(deadc)
         obs_cta.id(id)
-    
+
         # Return CTA observation
         return obs_cta
-        

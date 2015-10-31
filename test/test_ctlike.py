@@ -67,11 +67,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctlike
         like = ctools.ctlike()
-        like["inobs"].filename(self.events_name)
-        like["inmodel"].filename(self.model_name)
-        like["caldb"].string(self.caldb)
-        like["irf"].string(self.irf)
-        like["outmodel"].filename("result.xml")
+        like["inobs"]    = self.events_name
+        like["inmodel"]  = self.model_name
+        like["caldb"]    = self.caldb
+        like["irf"]      = self.irf
+        like["outmodel"] = "result.xml"
 
         # Run tool
         self.test_try("Run ctlike")
@@ -88,6 +88,6 @@ class Test(gammalib.GPythonTestSuite):
             self.test_try_success()
         except:
             self.test_try_failure("Exception occured in saving results.")
-        
+
         # Return
         return

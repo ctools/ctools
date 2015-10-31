@@ -81,6 +81,9 @@ General parameters
  	 	 
 ``binsz [real]``
     Pixel size (in degrees/pixel).
+
+``(anumbins = 200) [integer]``
+    Number of angular separation bins.
  	 	 
 ``(calc_ts = yes) [boolean]``
     Compute TS for each spectral point?

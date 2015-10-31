@@ -308,13 +308,15 @@ void ctbkgcube::run(void)
     m_obs.models(m_bkgmdl);
 
     // Fill background cube from observations
-    m_background.fill(m_obs);
+    m_background.fill(m_obs, &log);
 
     // Create a background model for the output background cube and append
     // that model to the input model in place of the original
     // background models
     // TODO: We might think of creating the spectral model via user parameter
-    GModelSpectralPlaw      spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
+    GModelSpectralPlaw spectral(1.0, 0.0, GEnergy(1.0, "TeV"));
+    spectral["Prefactor"].range(0.01, 100.0);
+    spectral["Index"].range(-5.0, 5.0);
     GCTAModelCubeBackground model(spectral);
 
     // Set model name

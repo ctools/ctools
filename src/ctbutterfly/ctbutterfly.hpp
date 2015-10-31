@@ -78,18 +78,33 @@ protected:
     void copy_members(const ctbutterfly& app);
     void free_members(void);
     void get_parameters(void);
+    void check_model(void);
+    void eigenvectors(const double& a,
+                      const double& b,
+                      const double& c,
+                      const double& d,
+                      double*       lambda1,
+                      double*       lambda2,
+                      GVector*      vector1,
+                      GVector*      vector2);
 
     // User parameters
-    std::string m_srcname;    //!< Name of source to compute butterfly
-    std::string m_outfile;    //!< Output ascii file
-    GEbounds    m_ebounds;    //!< Energy binning definition
+    std::string m_srcname;      //!< Name of source to compute butterfly
+    double      m_confidence;   //!< Confidence level
+    int         m_max_iter;     //!< Maximum number of iterations
+    bool        m_apply_edisp;  //!< Apply energy dispersion?
+    bool        m_refit;        //!< Do refit?
+    GEbounds    m_ebounds;      //!< Energy binning definition
+    std::string m_outfile;      //!< Output ascii file
 
     // Protected members
-    GObservations       m_obs;        //!< Observation container
-    GMatrixSparse       m_covariance; //!< Covariance matrix
-    std::vector<double> m_energies;   //!< Energy values for storage
-    std::vector<double> m_fluxes;     //!< Flux values per energy bin
-    std::vector<double> m_errors;     //!< Flux errors per energy bin
+    GOptimizerLM        m_opt;             //!< Optimizer
+    GObservations       m_obs;             //!< Observation container
+    GMatrixSparse       m_covariance;      //!< Covariance matrix
+    std::vector<double> m_energies;        //!< Energy values
+    std::vector<double> m_intensities;     //!< Power law intensity
+    std::vector<double> m_min_intensities; //!< Minimum intensities
+    std::vector<double> m_max_intensities; //!< Maximum intensities
 };
 
 /***********************************************************************//**

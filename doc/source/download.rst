@@ -89,13 +89,27 @@ To clone the gammalib and ctools source codes, type
    $ git clone https://cta-git.irap.omp.eu/gammalib
    $ git clone https://cta-git.irap.omp.eu/ctools
   
-This will create directories named gammalib and ctools under the current working
-directory that will contain the gammalib and ctools source code. Before you are able
-to compile the code you need to generate the configuration file using the 
-``autogen.sh`` script. Also make sure that you're actually on the devel branch of the git
-repository. GammaLib and ctools can be compiled using the following 
-command sequence (the code will be installed into the ``/usr/local/gamma`` 
-directory):
+This will create directories named gammalib and ctools under the current
+working directory that will contain the gammalib and ctools source code.
+In case that the cloning does not work you may try adding
+
+.. code-block:: bash
+
+   $ export GIT_SSL_NO_VERIFY=true
+
+or
+
+.. code-block:: bash
+
+   $ git config --global http.sslverify "false"
+
+before retrieving the code.
+Before you will be able to compile the code you need to generate the
+configuration file using the ``autogen.sh`` script.
+Also make sure that you're actually on the devel branch of the git
+repository. GammaLib and ctools can be compiled and configured using
+the following command sequence (the code will be installed into the 
+``/usr/local/gamma`` directory):
 
 .. code-block:: bash
 
@@ -108,8 +122,7 @@ directory):
    $ sudo make install
    $ export GAMMALIB=/usr/local/gamma
    $ source $GAMMALIB/bin/gammalib-init.sh
-   $ cd ..
-   $ cd ctools
+   $ cd ../ctools
    $ git checkout devel
    $ ./autogen.sh
    $ ./configure

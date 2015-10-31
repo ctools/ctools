@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2015 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -47,7 +47,7 @@ public:
     void           clear(void);
     void           run(void);
     void           save(void);
-    const GSkymap& map(void) const;
+    const GSkyMap& map(void) const;
 };
 
 

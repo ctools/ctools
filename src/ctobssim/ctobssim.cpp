@@ -225,8 +225,8 @@ void ctobssim::run(void)
         m_save_and_dispose = true;
     }
 
-    // Determine the number of valid CTA observations, set energy dispersion flag
-    // for all CTA observations and save old values in save_edisp vector
+    // Determine the number of valid CTA observations, set energy dispersion
+    // flag for all CTA observations and save old values in save_edisp vector
     int               n_observations = 0;
     std::vector<bool> save_edisp;
     save_edisp.assign(m_obs.size(), false);
@@ -324,85 +324,95 @@ void ctobssim::run(void)
         #pragma omp for
         for (int i = 0; i < m_obs.size(); ++i) {
 
+            // Write header for observation
+            if (logTerse()) {
+                std::string header = m_obs[i]->instrument() + " observation";
+                if (m_obs[i]->name().length() > 1) {
+                    header += " \"" + m_obs[i]->name() + "\"";
+                }
+                if (m_obs[i]->id().length() > 1) {
+                    header += " (id=" + m_obs[i]->id() +")";
+                }
+                wrklog.header3(header);
+            }
+
             // Get pointer on CTA observation
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-            // Continue only if observation is a CTA observation
-            if (obs != NULL) {
-
-                // Write header for observation
+            // Skip observation if it's not CTA
+            if (obs == NULL) {
                 if (logTerse()) {
-                    if (obs->name().length() > 1) {
-                        wrklog.header3("Observation "+obs->name());
-                    }
-                    else {
-                        wrklog.header3("Observation");
-                    }
+                    wrklog << " Skipping ";
+                    wrklog << m_obs[i]->instrument();
+                    wrklog << " observation" << std::endl;
                 }
+                continue;
+            }
 
-                // Work on a clone of the CTA observation. This makes sure that
-                // any memory allocated for computing (for example a response
-                // cache) is properly de-allocated on exit of this run
-                GCTAObservation obs_clone = *obs;
-
-                // Save number of events before entering simulation
-                int events_before = obs_clone.events()->size();
-
-                // Simulate source events
-                simulate_source(&obs_clone, models, m_rans[i], &wrklog);
-
-                // Simulate source events
-                simulate_background(&obs_clone, models, m_rans[i], &wrklog);
-
-                // Dump simulation results
-                if (logNormal()) {
-                    wrklog << gammalib::parformat("MC events");
-                    wrklog << obs_clone.events()->size() - events_before;
-                    wrklog << " (all models)";
-                    wrklog << std::endl;
+            // Skip observation if we have a binned observation
+            if (obs->eventtype() == "CountsCube") {
+                if (logTerse()) {
+                    wrklog << " Skipping binned ";
+                    wrklog << obs->instrument();
+                    wrklog << " observation" << std::endl;
                 }
+                continue;
+            }
 
-                // Append the event list to the original observation
-                obs->events(*(obs_clone.events()));
+            // Work on a clone of the CTA observation. This makes sure that
+            // any memory allocated for computing (for example a response
+            // cache) is properly de-allocated on exit of this run
+            GCTAObservation obs_clone = *obs;
 
-                // If requested, event lists are saved immediately
-                if (m_save_and_dispose) {
+            // Save number of events before entering simulation
+            int events_before = obs_clone.events()->size();
 
-                    // Set event output file name. If multiple observations are
-                    // handled, build the filename from prefix and observation
-                    // index. Otherwise use the outfile parameter.
-                    std::string outfile;
-                    if (m_use_xml) {
-                        m_prefix = (*this)["prefix"].string();
-                        outfile  = m_prefix + gammalib::str(i) + ".fits";
-                    }
-                    else {
-                        outfile  = (*this)["outevents"].filename();
-                    }
+            // Simulate source events
+            simulate_source(&obs_clone, models, m_rans[i], &wrklog);
 
-                    // Store output file name in original observation
-                    obs->eventfile(outfile);
+            // Simulate source events
+            simulate_background(&obs_clone, models, m_rans[i], &wrklog);
 
-                    // Save observation into FITS file. This is a critical zone
-                    // to avoid multiple threads writing simultaneously
-                    #pragma omp critical
-                    {
-                        obs_clone.save(outfile, clobber());
-                    }
+            // Dump simulation results
+            if (logNormal()) {
+                wrklog << gammalib::parformat("MC events");
+                wrklog << obs_clone.events()->size() - events_before;
+                wrklog << " (all models)";
+                wrklog << std::endl;
+            }
 
-                    // Dispose events
-                    obs->dispose_events();
+            // Append the event list to the original observation
+            obs->events(*(obs_clone.events()));
 
+            // If requested, event lists are saved immediately
+            if (m_save_and_dispose) {
+
+                // Set event output file name. If multiple observations are
+                // handled, build the filename from prefix and observation
+                // index. Otherwise use the outfile parameter.
+                std::string outfile;
+                if (m_use_xml) {
+                    m_prefix = (*this)["prefix"].string();
+                    outfile  = m_prefix + gammalib::str(i) + ".fits";
                 }
-
-                // ... otherwise append the event list to the original observation
-                /*
                 else {
-                    obs->events(*(obs_clone.events()));
+                    outfile  = (*this)["outevents"].filename();
                 }
-                */
 
-            } // endif: CTA observation found
+                // Store output file name in original observation
+                obs->eventfile(outfile);
+
+                // Save observation into FITS file. This is a critical zone
+                // to avoid multiple threads writing simultaneously
+                #pragma omp critical
+                {
+                    obs_clone.save(outfile, clobber());
+                }
+
+                // Dispose events
+                obs->dispose_events();
+
+            } // endif: save and dispose requested
 
         } // endfor: looped over observations
 
@@ -777,6 +787,16 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         }
                         GTime tslice(duration, "sec");
 
+                        // Dump photon rate
+                        if (logNormal()) {
+                            *wrklog << gammalib::parformat("Photon rate", indent);
+                            *wrklog << rate << " photons/sec";
+                            if (model->name().length() > 0) {
+                                *wrklog << " [" << model->name() << "]";
+                            }
+                            *wrklog << std::endl;
+                        }
+
                         // If photon rate exceeds the maximum photon rate
                         // then throw an exception
                         if (rate > m_max_rate) {
@@ -795,16 +815,6 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                                  " hidden \"maxrate\""
                                                  " parameter.";
                             throw GException::invalid_value(G_SIMULATE_SOURCE, msg);
-                        }
-
-                        // Dump length of time slice and rate
-                        if (logExplicit()) {
-                            *wrklog << gammalib::parformat("Photon rate", indent);
-                            *wrklog << rate << " photons/sec";
-                            if (model->name().length() > 0) {
-                                *wrklog << " [" << model->name() << "]";
-                            }
-                            *wrklog << std::endl;
                         }
 
                         // To reduce memory requirements we split long time
@@ -916,7 +926,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                             *wrklog << std::endl;
 
                         }
-
+                        
                     } // endif: model was a sky model
 
                 } // endfor: looped over models
@@ -967,7 +977,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  * @param[in] emin Minimum energy.
  * @param[in] emax Maximum energy.
  * @param[in] centre Centre of region for photon rate determination.
- * @param[in] radius Radius of region for photon rate determination.
+ * @param[in] radius Radius of region for photon rate determination (degrees).
  * @return Model flux (photons/cm2/sec).
  ***************************************************************************/
 double ctobssim::get_model_flux(const GModelSky* model,
@@ -976,45 +986,60 @@ double ctobssim::get_model_flux(const GModelSky* model,
                                 const GSkyDir&   centre,
                                 const double&    radius)
 {
-    // Initialise de-allocation flag
-    bool free_spectral = false;
+    // Initialise flux
+    double flux = 0.0;
 
-    // Get pointer to spectral model
-    const GModelSpectral* spectral = model->spectral();
+    // Determine the spatial model normalization within the simulation
+    // cone and check whether the model will produce any photons in that
+    // cone.
+    double norm      = model->spatial()->mc_norm(centre, radius);
+    bool   use_model = (norm > 0.0) ? true : false;
 
-    // If the spatial model is a diffuse cube then create a node function
-    // spectral model that is the product of the diffuse cube node function
-    // and the spectral model evaluated at the energies of the node function
-    GModelSpatialDiffuseCube* cube = dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
-    if (cube != NULL) {
+    // Continue only if model overlaps with simulation region
+    if (use_model) {
 
-        // Set MC cone
-        cube->set_mc_cone(centre, radius);
+        // Initialise de-allocation flag
+        bool free_spectral = false;
 
-        // Allocate node function to replace the spectral component
-        GModelSpectralNodes* nodes = new GModelSpectralNodes(cube->spectrum());
-        for (int i = 0; i < nodes->nodes(); ++i) {
-            GEnergy energy    = nodes->energy(i);
-            GTime   time;                              // Dummy time
-            double  intensity = nodes->intensity(i);
-            double  norm      = spectral->eval(energy, time);
-            nodes->intensity(i, norm*intensity);
-        }
+        // Get pointer to spectral model
+        const GModelSpectral* spectral = model->spectral();
 
-        // Signal that node function needs to be de-allocated later
-        free_spectral = true;
+        // If the spatial model is a diffuse cube then create a node
+        // function spectral model that is the product of the diffuse
+        // cube node function and the spectral model evaluated at the
+        // energies of the node function
+        GModelSpatialDiffuseCube* cube = dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
+        if (cube != NULL) {
 
-        // Set the spectral model pointer to the node function
-        spectral = nodes;
+            // Set MC cone
+            cube->set_mc_cone(centre, radius);
 
-    } // endif: spatial model was a diffuse cube
+            // Allocate node function to replace the spectral component
+            GModelSpectralNodes* nodes = new GModelSpectralNodes(cube->spectrum());
+            for (int i = 0; i < nodes->nodes(); ++i) {
+                GEnergy energy    = nodes->energy(i);
+                GTime   time;                              // Dummy time
+                double  intensity = nodes->intensity(i);
+                double  value     = spectral->eval(energy, time);
+                nodes->intensity(i, value * intensity);
+            }
+
+            // Signal that node function needs to be de-allocated later
+            free_spectral = true;
+
+            // Set the spectral model pointer to the node function
+            spectral = nodes;
+
+        } // endif: spatial model was a diffuse cube
     
-    // Compute flux within [emin, emax] in model from spectral
-    // component (units: ph/cm2/s)
-    double flux = spectral->flux(emin, emax);
+        // Compute flux within [emin, emax] in model from spectral
+        // component (units: ph/cm2/s)
+        flux = spectral->flux(emin, emax) * norm;
 
-    // Free spectral model if required
-    if (free_spectral) delete spectral;
+        // Free spectral model if required
+        if (free_spectral) delete spectral;
+
+    } // endif: model overlaps with simulation region
 
     // Return model flux
     return flux;
@@ -1074,6 +1099,10 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                     // Reserves space for events
                     events->reserve(list->size()+events->size());
 
+                    // Initialise statistics
+                    int n_appended    = 0;
+                    int n_outside_roi = 0;
+                    
                     // Append events
                     for (int k = 0; k < list->size(); k++) {
 
@@ -1090,14 +1119,24 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                             // Append event
                             events->append(*event);
 
+                            // Increment number of appended events
+                            n_appended++;
+
                         } // endif: event was within ROI
+
+                        // ... otherwise increment outside ROI counter
+                        else {
+                            n_outside_roi++;
+                        }
 
                     } // endfor: looped over all events
 
                     // Dump simulation results
                     if (logNormal()) {
+                        *wrklog << gammalib::parformat("MC events outside ROI");
+                        *wrklog << n_outside_roi << std::endl;
                         *wrklog << gammalib::parformat("MC background events");
-                        *wrklog << list->size() << std::endl;
+                        *wrklog << n_appended << std::endl;
                     }
 
                     // Free event list

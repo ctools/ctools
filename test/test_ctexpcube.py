@@ -66,23 +66,23 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctexpcube
         expcube = ctools.ctexpcube()
-        expcube["inobs"].filename(self.events_name)
-        expcube["incube"].filename("NONE")
-        expcube["outcube"].filename("expcube.fits")
-        expcube["caldb"].string(self.caldb)
-        expcube["irf"].string(self.irf)
-        expcube["ebinalg"].string("LOG")
-        expcube["emin"].real(0.1)
-        expcube["emax"].real(100.0)
-        expcube["enumbins"].integer(20)
-        expcube["nxpix"].integer(200)
-        expcube["nypix"].integer(200)
-        expcube["binsz"].real(0.02)
-        expcube["coordsys"].string("CEL")
-        expcube["proj"].string("CAR")
-        expcube["xref"].real(83.63)
-        expcube["yref"].real(22.01)
-        
+        expcube["inobs"]    = self.events_name
+        expcube["incube"]   = "NONE"
+        expcube["outcube"]  = "expcube.fits"
+        expcube["caldb"]    = self.caldb
+        expcube["irf"]      = self.irf
+        expcube["ebinalg"]  = "LOG"
+        expcube["emin"]     = 0.1
+        expcube["emax"]     = 100
+        expcube["enumbins"] = 20
+        expcube["nxpix"]    = 200
+        expcube["nypix"]    = 200
+        expcube["binsz"]    = 0.02
+        expcube["coordsys"] = "CEL"
+        expcube["proj"]     = "CAR"
+        expcube["xref"]     = 83.63
+        expcube["yref"]     = 22.01
+
         # Run tool
         self.test_try("Run ctexpcube")
         try:
