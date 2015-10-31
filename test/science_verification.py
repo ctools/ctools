@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ==========================================================================
 # This script performs the ctools science verification. It creates and
-# analyses the pull distributions for a variety of model in unbinned
+# analyses the pull distributions for a variety of models in unbinned
 # analysis mode. At the end the script produces a JUnit compliant
 # science verification report.
 #
@@ -191,31 +191,35 @@ class sciver(gammalib.GPythonTestSuite):
         self.append(self.spec_nodes, "Test nodes model")
 
         # Append spatial tests
-        self.append(self.spec_ptsrc, "Test point source model")
-        self.append(self.spec_rdisk, "Test radial disk model")
-        self.append(self.spec_rgauss, "Test radial Gaussian model")
-        self.append(self.spec_rshell, "Test radial shell model")
-        self.append(self.spec_edisk, "Test elliptical disk model")
-        self.append(self.spec_egauss, "Test elliptical Gaussian model")
-        self.append(self.spec_map, "Test elliptical Gaussian model")
+        self.append(self.spat_ptsrc, "Test point source model")
+        self.append(self.spat_rdisk, "Test radial disk model")
+        self.append(self.spat_rgauss, "Test radial Gaussian model")
+        self.append(self.spat_rshell, "Test radial shell model")
+        self.append(self.spat_edisk, "Test elliptical disk model")
+        self.append(self.spat_egauss, "Test elliptical Gaussian model")
+        self.append(self.spat_const, "Test diffuse isotropic model")
+        self.append(self.spat_map, "Test diffuse map model")
+        self.append(self.spat_map_roi, "Test diffuse map model (small ROI)")
+        self.append(self.spat_map_nn, "Test diffuse map model (not normalized and scaled)")
+        self.append(self.spat_cube, "Test diffuse cube model")
 
         # Return
         return
 
     # Generate and analyse pull distributions
-    def pull(self, model, trials=100):
+    def pull(self, model, trials=100, ra=83.63, dec=22.01, rad=5.0):
         """
         Generate and analyse pull distributions.
         """
         # Generate pull distribution
-        outfile = generate_pull_distribution(model, trials=trials)
+        outfile = generate_pull_distribution(model, trials=trials,
+                                             ra=ra, dec=dec, rad=rad)
 
         # Analyse pull distribution
         self.results = analyse_pull_distribution(outfile)
 
         # Return
         return
-        
 
     # Test parameter result
     def test(self, name):
@@ -340,7 +344,7 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Test point source model
-    def spec_ptsrc(self):
+    def spat_ptsrc(self):
         """
         Test point source model.
         """
@@ -354,7 +358,7 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Test radial disk model
-    def spec_rdisk(self):
+    def spat_rdisk(self):
         """
         Test radial disk model.
         """
@@ -369,7 +373,7 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Test radial Gaussian model
-    def spec_rgauss(self):
+    def spat_rgauss(self):
         """
         Test radial Gaussian model.
         """
@@ -384,7 +388,7 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Test radial shell model
-    def spec_rshell(self):
+    def spat_rshell(self):
         """
         Test radial shell model.
         """
@@ -400,7 +404,7 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Test elliptical disk model
-    def spec_edisk(self):
+    def spat_edisk(self):
         """
         Test elliptical disk model.
         """
@@ -417,7 +421,7 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Test elliptical Gaussian model
-    def spec_egauss(self):
+    def spat_egauss(self):
         """
         Test elliptical Gaussian model.
         """
@@ -433,12 +437,60 @@ class sciver(gammalib.GPythonTestSuite):
         self.test("Pull_Background_Index")
         return
 
+    # Test diffuse isotropic model
+    def spat_const(self):
+        """
+        Test diffuse isotropic model.
+        """
+        self.pull("data/sciver/crab_const")
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
     # Test diffuse map model
-    def spec_map(self):
+    def spat_map(self):
         """
         Test diffuse map model.
         """
-        self.pull("data/sciver/crab_map")
+        self.pull("data/sciver/crab_map", ra=201.3651, dec=-43.0191)
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test diffuse map model (small ROI)
+    def spat_map_roi(self):
+        """
+        Test diffuse map model (small ROI).
+        """
+        self.pull("data/sciver/crab_map_roi", ra=201.3651, dec=-43.0191, rad=1.5)
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test diffuse map model (not normalized and scaled)
+    def spat_map_nn(self):
+        """
+        Test diffuse map model (not normalized and scaled).
+        """
+        self.pull("data/sciver/crab_map_nn", ra=201.3651, dec=-43.0191, rad=1.5)
+        self.test("Pull_Crab_Prefactor")
+        self.test("Pull_Crab_Index")
+        self.test("Pull_Background_Prefactor")
+        self.test("Pull_Background_Index")
+        return
+
+    # Test diffuse cube model
+    def spat_cube(self):
+        """
+        Test diffuse cube model.
+        """
+        self.pull("data/sciver/crab_cube")
         self.test("Pull_Crab_Prefactor")
         self.test("Pull_Crab_Index")
         self.test("Pull_Background_Prefactor")

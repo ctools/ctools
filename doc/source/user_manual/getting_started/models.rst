@@ -216,6 +216,21 @@ Elliptical source
       </spectrum>
     </source>
 
+  .. code-block:: xml
+
+    <source name="Crab" type="ExtendedSource">
+      <spatialModel type="EllipticalGauss">
+        <parameter name="RA"          scale="1.0" value="83.6331" min="-360"  max="360" free="1"/>
+        <parameter name="DEC"         scale="1.0" value="22.0145" min="-90"   max="90"  free="1"/>
+        <parameter name="PA"          scale="1.0" value="45.0"    min="-360"  max="360" free="1"/>
+        <parameter name="MinorRadius" scale="1.0" value="0.5"     min="0.001" max="10"  free="1"/>
+        <parameter name="MajorRadius" scale="1.0" value="2.0"     min="0.001" max="10"  free="1"/>
+      </spatialModel>
+      <spectrum type="...">
+        ...
+      </spectrum>
+    </source>
+
 
 Diffuse source
 ^^^^^^^^^^^^^^
