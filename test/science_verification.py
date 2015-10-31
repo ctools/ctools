@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ==========================================================================
 # This script performs the ctools science verification. It creates and
-# analyses the pull distributions for a variety of model in unbinned
+# analyses the pull distributions for a variety of models in unbinned
 # analysis mode. At the end the script produces a JUnit compliant
 # science verification report.
 #
@@ -181,27 +181,27 @@ class sciver(gammalib.GPythonTestSuite):
         self.name("Science Verification")
 
         # Append spectral tests
-        #self.append(self.spec_plaw, "Test power law model")
-        #self.append(self.spec_plaw2, "Test power law 2 model")
-        #self.append(self.spec_eplaw, "Test exponentially cut off power law model")
-        #self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
-        #self.append(self.spec_logparabola, "Test log parabola model")
-        #self.append(self.spec_gauss, "Test Gaussian model")
-        #self.append(self.spec_filefct, "Test file function model")
-        #self.append(self.spec_nodes, "Test nodes model")
+        self.append(self.spec_plaw, "Test power law model")
+        self.append(self.spec_plaw2, "Test power law 2 model")
+        self.append(self.spec_eplaw, "Test exponentially cut off power law model")
+        self.append(self.spec_supeplaw, "Test super exponentially cut off power law model")
+        self.append(self.spec_logparabola, "Test log parabola model")
+        self.append(self.spec_gauss, "Test Gaussian model")
+        self.append(self.spec_filefct, "Test file function model")
+        self.append(self.spec_nodes, "Test nodes model")
 
         # Append spatial tests
-        #self.append(self.spat_ptsrc, "Test point source model")
-        #self.append(self.spat_rdisk, "Test radial disk model")
-        #self.append(self.spat_rgauss, "Test radial Gaussian model")
-        #self.append(self.spat_rshell, "Test radial shell model")
-        #self.append(self.spat_edisk, "Test elliptical disk model")
+        self.append(self.spat_ptsrc, "Test point source model")
+        self.append(self.spat_rdisk, "Test radial disk model")
+        self.append(self.spat_rgauss, "Test radial Gaussian model")
+        self.append(self.spat_rshell, "Test radial shell model")
+        self.append(self.spat_edisk, "Test elliptical disk model")
         self.append(self.spat_egauss, "Test elliptical Gaussian model")
-        #self.append(self.spat_const, "Test diffuse isotropic model")
-        #self.append(self.spat_map, "Test diffuse map model")
-        #self.append(self.spat_map_roi, "Test diffuse map model (small ROI)")
-        #self.append(self.spat_map_nn, "Test diffuse map model (not normalized and scaled)")
-        #self.append(self.spat_cube, "Test diffuse cube model")
+        self.append(self.spat_const, "Test diffuse isotropic model")
+        self.append(self.spat_map, "Test diffuse map model")
+        self.append(self.spat_map_roi, "Test diffuse map model (small ROI)")
+        self.append(self.spat_map_nn, "Test diffuse map model (not normalized and scaled)")
+        self.append(self.spat_cube, "Test diffuse cube model")
 
         # Return
         return
