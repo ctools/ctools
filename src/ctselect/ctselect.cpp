@@ -1107,7 +1107,7 @@ std::string ctselect::check_infile(const std::string& filename) const
         }
 
         // Set error message for missing columns
-        if (missing.size() > 0) {
+        if (!missing.empty()) {
             message = "The following columns are missing in the"
                       " \"EVENTS\" extension of input file \""
                     + m_outobs + "\": ";

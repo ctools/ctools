@@ -763,10 +763,6 @@ void ctbutterfly::eigenvectors(const double& a,
     *lambda2    = arg1 - arg2;
 
     // Compute eigenvectors
-    double vector1_1;
-    double vector1_2;
-    double vector2_1;
-    double vector2_2;
     if (c != 0.0) {
         (*vector1)[0] = *lambda1 - det;
         (*vector1)[1] = c;

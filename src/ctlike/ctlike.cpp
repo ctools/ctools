@@ -256,7 +256,7 @@ void ctlike::run(void)
     }
 
     // Compute TS values if requested
-    if (ts_srcs.size() > 0) {
+    if (!ts_srcs.empty()) {
 
         // Store original maximum likelihood and models
         double  logL_src = m_logL;
