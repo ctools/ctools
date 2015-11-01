@@ -9,7 +9,16 @@ Computes a lightcurve for a given source.
 Synopsis
 --------
 
-Computes a lightcurve for a given source.
+Computes a lightcurve by performing a maximum likekihood fit in a series of 
+time bins. The time bins can be either specified in an ASCII file, as an
+interval divided into equally sized time bins, or can be taken from the Good 
+Time Intervals of the observation(s). The format of the ASCII file is one
+row per time bin, each specifying the start of stop value of the bin, separated
+by a whitespace. The times are given in Modified Julian Days (MJD). 
+cslightcrv writes the fitted model parameters and their statistical errors 
+in a FITS file. In addition, it computes for each time bin the statistical 
+significance of the detection, expressed by the Test Statistics, and the 
+upper flux limit.
 
 
 General parameters

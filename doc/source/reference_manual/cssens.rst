@@ -11,10 +11,10 @@ Synopsis
 
 Computes the CTA sensitivity for a number of energy bins using :doc:`ctlike`.
 Crab spectra are fitted in narrow energy bins to simulated data, and the
-flux level is determined that leads to a particular significance.
-The significance is estimated using the Test Statistic value.
-The simplified assumption is made that the significance (in Gaussian
-sigma) is the square root of the Test Statistic.
+flux level is determined that leads to a particular significance. The
+significance is estimated using the Test Statistic value. The simplified
+assumption is made that the significance (in Gaussian sigma) is the square
+root of the Test Statistic.
 
 
 General parameters

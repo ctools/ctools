@@ -9,11 +9,11 @@ Generates pull distribution for all model parameters.
 Synopsis
 --------
 
-Generates pull distributions for all parameters in a model.
-The pull is defined by the fitted value minus the simulated true value,
-devided by the statistical uncertainty.
-For unbiased parameter estimates, the pull distribution should follow a
-Gaussian centred on 0 and a sigma parameter of 1.
+Generates pull distributions for all parameters in a model. The pull is
+defined by the fitted value minus the simulated true value, devided by
+the statistical uncertainty. For unbiased parameter estimates, the pull
+distribution should follow a Gaussian centred on 0 and a sigma parameter
+of 1.
 
 
 General parameters

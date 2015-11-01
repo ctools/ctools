@@ -9,8 +9,8 @@ Generates the TS distribution for a particular model.
 Synopsis
 --------
 
-Generates the Test Statistics (TS) distribution for a particular model based on
-Monte-Carlo simulations.
+Generates the Test Statistics (TS) distribution for a particular model
+based on Monte-Carlo simulations.
 
 
 General parameters

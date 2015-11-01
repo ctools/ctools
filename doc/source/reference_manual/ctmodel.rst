@@ -9,9 +9,9 @@ Computes model counts cube.
 Synopsis
 --------
 
-This tool computes a model counts cube based on an XML model.
-The counts cube is a 3-dimensional data cube spanned by Right Ascension or
-Galactic longitude, Declination or Galactic latitude, and energy.
+This tool computes a model counts cube based on an XML model. The counts
+cube is a 3-dimensional data cube spanned by Right Ascension or Galactic
+longitude, Declination or Galactic latitude, and energy.
 
 
 General parameters
