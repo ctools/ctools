@@ -27,6 +27,12 @@ By making use of the GammaLib multi-instrument capabilities, ctools
 supports the joint analysis of CTA (or any IACT providing data in the 
 CTA format), Fermi/LAT and COMPTEL data.
 
+ctools are developed by a team of enthousiastic gamma-ray astronomers with
+support from engineers. We regularily organise
+`coding sprints <https://cta-redmine.irap.omp.eu/projects/ctools/wiki/Coding_sprints>`_
+where key developers but also newcomers meet to discuss the developments 
+and next steps, and advance with the coding of the software.
+
 
 Acknowledging or citing ctools
 ------------------------------

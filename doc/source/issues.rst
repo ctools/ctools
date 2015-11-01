@@ -8,7 +8,7 @@ Below you will find a list of known issues.
 **Installation issues**
 
 - :ref:`Certificate problem when cloning from Git <issue_ssl>`
-- :ref:`Python unit test fail on El Capitan <issue_elcapitan>`
+- :ref:`Python unit test fails on El Capitan <issue_elcapitan>`
 
 **Analysis issues**
 
@@ -40,7 +40,7 @@ Installation issues
  
 .. _issue_elcapitan:
 
-.. topic:: Python unit test fail on El Capitan
+.. topic:: Python unit test fails on El Capitan
 
     On Mac OS X 10.11 (El Capitan) the Python unit tests fail when ctools 
     are not installed due to the way the ``DYLD_LIBRARY_PATH`` environment

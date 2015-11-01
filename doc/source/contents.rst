@@ -16,3 +16,4 @@ Documentation
    faq
    issues
    develop
+   help
