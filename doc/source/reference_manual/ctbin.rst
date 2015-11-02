@@ -10,9 +10,8 @@ Synopsis
 --------
 
 This tool computes the counts cube for use in a binned maximum likelihood
-analysis.
-The counts cubes are 3-dimensional data cubes spanned by Right Ascension or
-Galactic longitude, Declination or Galactic latitude, and energy.
+analysis. The counts cubes are 3-dimensional data cubes spanned by Right
+Ascension or Galactic longitude, Declination or Galactic latitude, and energy.
 The energy binning may be either linear, logarithmic, or custom defined.
 If an observation definition XML file containing several observations is 
 provided on input, the tool will stack all data into a single counts cube.

@@ -1,3 +1,5 @@
+.. _sec_getting:
+
 Getting the ctools
 ==================
 
@@ -24,6 +26,8 @@ software:
 
 No system administrator privileges are needed to install ctools.
 
+
+.. _sec_installing_gammalib:
 
 Installing gammalib
 -------------------
@@ -59,7 +63,7 @@ in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz gammalib-0.10.0.tar.gz
+  $ tar xvfz gammalib-0.11.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -69,7 +73,7 @@ typing
 
 .. code-block:: bash
 
-  $ cd gammalib-0.10.0
+  $ cd gammalib-0.11.0
   $ ./configure
   $ make
   $ make check
@@ -90,6 +94,8 @@ directory by typing for example
 which then installs GammaLib in the ``gamma`` folder of your home
 directory.
 
+
+.. _sec_setup_gammalib:
 
 Setting up the GammaLib environment
 -----------------------------------
@@ -127,7 +133,7 @@ an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz ctools-0.9.0.tar.gz
+  $ tar xvfz ctools-0.10.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -136,7 +142,7 @@ Step in the directory and build the ctools by typing
 
 .. code-block:: bash
 
-  $ cd ctools-0.9.0
+  $ cd ctools-0.10.0
   $ ./configure
   $ make
 
@@ -152,6 +158,8 @@ You can get the full list of configuration options by typing
 
   $ ./configure --help
 
+
+.. _sec_testing_ctools:
 
 Testing ctools
 --------------
@@ -173,7 +181,7 @@ following output at the end of the unit testing:
   PASS: test_python.py
   make[4]: Nothing to be done for `all'.
   ============================================================================
-  Testsuite summary for ctools 0.9.0
+  Testsuite summary for ctools 0.10.0
   ============================================================================
   # TOTAL: 3
   # PASS:  3
@@ -204,6 +212,7 @@ For older automake version, you should see
   Test ctcubemask: .. ok
   Test ctbutterfly: .. ok
   Test ctulimit: .. ok
+  Test cterror: .. ok
   PASS: test_ctools.sh
 
   *****************
@@ -237,6 +246,7 @@ For older automake version, you should see
   Test ctcubemask functionality: ... ok
   Test ctbutterfly functionality: ... ok
   Test ctulimit functionality: ... ok
+  Test cterror functionality: ... ok
   Test unbinned pipeline with FITS file saving: .... ok
   Test unbinned in-memory pipeline: .... ok
   PASS: test_python.py
@@ -254,14 +264,17 @@ versions, but there it is written in log files that you can find in the
   test_cscripts.sh.log
   test_python.py.log
 
-If you do not see the same output, but a failure message, please report 
-this to the ctools developer team.
+If you do not see the same output, but a failure message, please check
+first the :ref:`issues` section. If you cannot fix the problem, please
+create an issue on the ctools tracker
+`here <https://cta-redmine.irap.omp.eu/projects/ctools>`_.
 
+.. _sec_installing_ctools:
 
 Installing ctools
 -----------------
 
-The ctools are installed by typing
+Now you are ready to install the ctools by typing
 
 .. code-block:: bash
 
@@ -284,13 +297,14 @@ can be given, for example:
 
   $ ./configure --prefix=$HOME/gamma
 
+.. _sec_setup_ctools:
 
 Setting up the ctools environment
 ---------------------------------
 
 You have to configure ctools by setting up some environment variables. This
 will be done automatically by an initialisation script that is found in the
-``bin`` directory of the directory into which ctools has been installed. 
+``bin`` directory of the ctools installation. 
 Assuming that you have installed ctools into ``/usr/local/gamma`` you need
 to add the following to your ``$HOME/.bashrc`` or ``$HOME/.profile`` script
 on a Linux machine:
@@ -308,13 +322,14 @@ If you use C shell or a variant then add the following to your
   setenv CTOOLS /usr/local/gamma
   source $CTOOLS/bin/ctools-init.csh
 
+.. _sec_check_ctools_setup:
 
 Checking your setup
 -------------------
 
 Now you should be ready to get started using Gammalib and ctools.
 
-As a quick check that your setup is OK, you can run ``csinfo check``:
+As a quick check that your setup is okay you can run ``csinfo check``:
 
 .. code-block:: bash
 
@@ -329,7 +344,7 @@ As a quick check that your setup is OK, you can run ``csinfo check``:
 
      ===> Your Gammalib / ctools setup is OK.
 
-If the setup is not OK, run the ``csinfo info`` command to print
+If the setup is not okay, run the ``csinfo info`` command to print
 detailed information about your setup.
 There's also a ``csinfo list`` command to quickly list the available tools:
 
@@ -345,89 +360,16 @@ There's also a ``csinfo list`` command to quickly list the available tools:
      csinfo info    Print Gammalib / ctools setup info
 
 
+.. _sec_known_problems:
+
 Known problems
 --------------
 
-GammaLib unit tests fail
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Some users have reported failure of a large fraction of the GammaLib unit
-tests after after typing ``make check``. In all cases, this was related to
-not finding the ``libcfitsio`` library. To solve the issue, locate the 
-directory where the shared ``libcfitsio`` library resides and then type
-
-.. code-block:: bash
-
-  export LD_LIBRARY_PATH=/directory/to/lib:$LD_LIBRARY_PATH
-
-on Unix based systems or
-
-.. code-block:: bash
-
-  export DYLD_LIBRARY_PATH=/directory/to/lib:$DYLD_LIBRARY_PATH
-
-on Mac OS X (``/directory/to/lib`` should be replaced by the correct
-library path on your system).
-
-
-Python support
-~~~~~~~~~~~~~~
-
-ctools comes with Python wrappers so that all classes can be directly 
-used from Python. To compile-in Python support, ctools needs the 
-``Python.h`` header file, which on many distributions is not installed
-by default. To make ``Python.h`` available, install the Python developer
-package in your distribution. Otherwise you will not be able to use ctools
-from Python.
-
-GammaLib and ctools release bundles come with Python wrapper files, but 
-these wrapper files will be deleted once you type ``make clean``. Wrapper
-files will be built automatically when needed, but this required
-`swig <http://www.swig.org/>`_ installed on your system. In that case,
-please make sure that you swig version 2.0.4 or newer.
-
-
-Mac OS X
-~~~~~~~~
-
-The Python development package is not installed by default on Mac OS X,
-and consequently, the ``Python.h`` header file is missing that is needed
-to compile in the Python bindings. The configure script recognises this
-fact and adjust the build procedure accordingly, but you will not be able
-to use ctools as a Python module. So better install the Python development
-package before installing ctools.
-
-It was also reported that adding of 
-``export MACOSX_DEPLOYMENT_TARGET=10.6`` to the ``.bashrc`` file was
-necessary one some Mac OS X 10.6 installations to make ctools compile.
-
-
-Solaris
-~~~~~~~
-
-Although ctools builds on Solaris using the Sun compiler, there are problems
-with global symbols in shared libraries and exception catching, which prevents
-the FITS interface to work correctly. ctools has however been built and tested
-successfully using the GNU compiler, and this is the only build method that
-is currently supported. Problems have also been encountered when compiling
-cfitsio versions more recent than 3.250. The problems have been reported to
-the cfitsio developer team, and are likely to be solved in the future. For 
-the time being, it is recommended to use cfitsio version 3.250 on Solaris.
-
-
-OpenSolaris
-~~~~~~~~~~~
-
-On OpenSolaris, the same problems concerning the SunStudio compiler occur
-as for Solaris, and also here, the GNU compiler is the recommended tool to
-build ctools. Also here, cfitsio version 3.250 is the recommended library as
-more recent version feature relocation problems. ctools has been tested 
-using gcc 4.3.2 on OpenSolaris 2009.06. Make sure to create the symbolic 
-links
-
-.. code-block:: csh
-
-  $ ln -s /usr/bin/gcc4.3.2 /usr/bin/gcc
-  $ ln -s /usr/bin/g++4.3.2 /usr/bin/g++
-
-which are not there by default to avoid excess warnings during compilation.
+In case you encounter problem, please check the list of known
+:ref:`installation_issues`.
+If you encounter problems during the GammaLib installation, please
+check the list of
+`known GammaLib issues <http://cta.irap.omp.eu/gammalib/doc/html/issues.html>`_.
+If you cannot solve your problems, please create an issue on the
+ctools tracker
+`here <https://cta-redmine.irap.omp.eu/projects/ctools>`_.
