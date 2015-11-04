@@ -29,7 +29,7 @@ import sys
 class csobsdef(ctools.cscript):
     """
     The csobsdef class generates an observation definition file from a
-    pointing list. The pointing list is a colon separated value ASCII
+    pointing list. The pointing list is a comma-separated value ASCII
     file with header keywords in the first row followed by a list of
     pointings (one pointing per row). The following header keywords
     are supported (case sensitive, column order irrelevant):
@@ -51,7 +51,7 @@ class csobsdef(ctools.cscript):
     Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
     All other keywords are optional and can be specified when calling
     csobsdef as user parameters. The only exception is the "duration"
-    keyword that will automatically queried.
+    keyword that will automatically be queried.
 
     Here some usage examples:
 
