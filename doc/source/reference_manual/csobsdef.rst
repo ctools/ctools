@@ -10,9 +10,9 @@ Synopsis
 --------
 
 The csobsdef script generates an observation definition file from
-a pointing list. The pointing list is a colon separated value ASCII
-file with header keywords in the first row followed by a list of
-pointings (one pointing per row). The following header keywords
+a pointing list. The pointing list is a comma-separated value (CSV)
+ASCII file with header keywords in the first row followed by a list
+of pointings (one pointing per row). The following header keywords
 are supported (case sensitive, column order irrelevant):
     
 * name     - Observation name string
@@ -32,7 +32,7 @@ are supported (case sensitive, column order irrelevant):
 Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
 All other keywords are optional and can be specified when calling
 csobsdef as user parameters. The only exception is the "duration"
-keyword that will automatically queried.
+keyword that will automatically be queried.
     
 Here some usage examples:
     
@@ -54,7 +54,7 @@ General parameters
 ------------------
 
 ``inpnt [file]``
-    Pointing definition ASCII file in colon separated values format.
+    Pointing definition ASCII file in comma-separated value (CSV) format.
 
 ``outobs [file]``
     Output Observation Definition XML file.
@@ -109,7 +109,7 @@ Standard parameters
     Log filename.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
 None

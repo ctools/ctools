@@ -3,18 +3,40 @@
 cssens
 ======
 
-Computes the CTA sensitivity for a number of energy bins.
+Computes differential or integrated CTA sensitivity.
 
 
 Synopsis
 --------
 
-Computes the CTA sensitivity for a number of energy bins using :doc:`ctlike`.
-Crab spectra are fitted in narrow energy bins to simulated data, and the
-flux level is determined that leads to a particular significance. The
-significance is estimated using the Test Statistic value. The simplified
-assumption is made that the significance (in Gaussian sigma) is the square
-root of the Test Statistic.
+This script computes the differential or integrated CTA sensitivity using
+maximum likelihood fitting of a test source. The differential sensitivity
+is determined for a number of energy bins, the integral sensitivity is 
+determined for a number of energy thresholds. The test source is fitted to
+simulated data using :doc:`ctlike` to determine it's detection significance
+as a function of source flux. The source flux is then varied until the
+source significance achieves a given level, specified by the (hidden)
+significance parameter ``sigma``. To damp variations between individual
+Monte Carlo simulations, a sliding average is applied in the significance
+computation (controlled by hidden ``num_avg`` parameter).
+
+The significance is estimated using the Test Statistic value, defined as 
+twice the log-likelihood difference that is obtained when fitting the 
+simulated data with and without the test source. The simplified assumption
+is made that the significance (in Gaussian sigma) is the square root of
+the Test Statistic.
+
+cssens will generate an ASCII file in comma-separated value (CSV) format 
+containing the sensitivity as function of energy. The first row is a header
+row providing the column names. The following rows provide the mean
+logarithmic energy and the boundaries of the energy bin for which the
+sensitivity was computed. They also provide the flux within the energy bin
+in Crab units, in photons (ph/cm2/s) and in energy (ers/cm2/s). Finally, 
+the sensitivity is given as the test source spectrum evaluated at the mean 
+logarithmic energy multiplied by the energy squared (erg/cm2/s).
+
+The sensitivity can be displayed using the ``show_sensitivity.py`` script 
+in the example folder. Matplotlib is required to execute the script.
 
 
 General parameters
@@ -24,7 +46,7 @@ General parameters
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel [file]``
-    Input source model XML file.
+    Input model XML file.
 
 ``srcname [string]``
     Name of the source in the source model XML file which should be used
@@ -110,7 +132,7 @@ Standard parameters
     Log filename.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`ctlike`

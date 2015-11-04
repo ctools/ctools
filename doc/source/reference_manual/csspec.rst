@@ -9,7 +9,20 @@ Computes spectrum for a given source.
 Synopsis
 --------
 
-Computes spectral points for a given source.
+This script computes the source spectrum by fitting a model in a given set
+of energy bins. The model fit per energy bin is performed using :doc:`ctlike`
+and the script provides the possibility to fix sources other than the
+source of interest (hidden parameter ``fix_srcs``) or to fix the background
+model component(s) (hidden parameter ``fix_bkg``). The script computes the
+source flux and its uncertainty in each energy bin, as well as the significance
+of the source detection. Optionally, it also computes an upper flux limit
+that is particularily useful in case that the source is not significantly
+detected within an energy bin (hidden parameter ``calc_ulim``).
+
+The script works on event lists only.
+
+On output, the script will provide a FITS file with the fitted source 
+spectrum.
 
 
 General parameters
@@ -19,7 +32,7 @@ General parameters
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel [file]``
-    Input source model XML file.
+    Input model XML file.
 
 ``srcname [string]``
     Name of the source in the source model XML file which should be used
@@ -126,7 +139,7 @@ Standard parameters
     Log filename.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`ctlike`

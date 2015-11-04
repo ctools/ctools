@@ -3,13 +3,26 @@
 csresmap
 ========
 
-Generates residual counts map.
+Generates residual map.
 
 
 Synopsis
 --------
 
-This scripts generates a residual counts map.
+This scripts generates a residual map for a given model. It works for
+event lists, counts cubes or observation definition files. For event
+lists, parameters that define the spatial and spectral binning need to
+be provided so that the script can bin the data internally. The model
+is then convolved with the instrumental response function for that
+binning and used for residual computation. Before residual computation,
+the counts and model cubes are collapsed into maps by summing over all
+energies. Three options exist then for residual computation:
+
+* the subtraction of the model from the counts (SUB)
+* the subtraction and division by the model (SUBDIV)
+* the subtraction and division by the square root of the model (SUBDIVSQRT)
+
+The residual map is written into a FITS file.  
 
 
 General parameters
@@ -19,7 +32,7 @@ General parameters
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel [file]``
-    Model XML file.
+    Input model XML file.
 
 ``outmap [file]``
     Output residual counts map file.
@@ -94,8 +107,11 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
+``(logfile = csresmap.log) [string]``
+    Log filename.
 
-Related tools
--------------
+
+Related tools or scripts
+------------------------
 
 None

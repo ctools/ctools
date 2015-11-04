@@ -3,14 +3,30 @@
 cstsdist
 ========
 
-Generates the TS distribution for a particular model.
+Generates the TS distribution for a given source.
 
 
 Synopsis
 --------
 
-Generates the Test Statistics (TS) distribution for a particular model
-based on Monte-Carlo simulations.
+This script generates the Test Statistics (TS) distribution for a given 
+source by repeatedly computing the TS value for ``ntrials`` simulated data 
+sets. The Test Statistics is defined as twice the log-likelihood difference
+that is obtained when fitting simulated data with and without a given
+source model component.
+
+This script either performs an unbinned or a binned simulation, stacked 
+analysis is not yet supported.
+
+cstsdist will create an ASCII file in comma-separated value (CSV) format,
+containing one row per TS computation. The first row is a header row providing
+the column names. The following rows give the TS value, the log-likelihood 
+values of the fit with or without the source, the number of observed and 
+fitted events, as well as the values and errors for all fitted parameters.
+
+From the output file, TS distribution plots can be generated using for
+example the ``show_ts_distribution.py`` script in the examples folder. The
+script require matplotlib for plotting.
 
 
 General parameters
@@ -20,11 +36,11 @@ General parameters
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel [file]``
-    Input source model XML file.
+    Input model XML file.
 
 ``srcname [string]``
     Name of the source in the source model XML file which should be used
-    for sensitivity computation.
+    for Test Statistics computation.
 
 ``outfile [file]``
     ASCII file containing the TS distribution values.
@@ -118,7 +134,9 @@ Standard parameters
     Log filename.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`ctlike`
+:doc:`cspull`
+
