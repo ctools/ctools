@@ -17,17 +17,19 @@
 #
 # General parameters
 #===================
-inobs,    f, a, "events.fits",,, "Event list, counts cube or observation definition file"
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
-expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
-psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
-bkgcube,  f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
-caldb,    s, a, "prod2",,, "Calibration database"
-irf,      s, a, "South_50h",,, "Instrument response function"
-outmodel, f, a, "crab_results.xml",,, "Source model output file"
-stat,     s, h, "POISSON",,, "Optimization statistics"
-edisp,    b, h, no,,, "Apply energy dispersion?"
-refit,    b, h, no,,, "Do refitting?"
+inobs,           f, a, "events.fits",,, "Event list, counts cube or observation definition file"
+inmodel,         f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+expcube,         f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
+psfcube,         f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
+bkgcube,         f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
+caldb,           s, a, "prod2",,, "Calibration database"
+irf,             s, a, "South_50h",,, "Instrument response function"
+outmodel,        f, a, "crab_results.xml",,, "Source model output file"
+stat,            s, h, "POISSON",,, "Optimization statistics"
+edisp,           b, h, no,,, "Apply energy dispersion?"
+refit,           b, h, no,,, "Do refitting?"
+fix_spat_for_ts, b, h, no,,,"Fix spatial parameters for TS computation?"
+
 #
 # Standard parameters
 #====================

@@ -73,9 +73,10 @@ protected:
     double reoptimize_lm(void);
 
     // User parameters
-    bool          m_refit;       //!< Refitting
-    std::string   m_outmodel;    //!< Source model output XML file
-    bool          m_apply_edisp; //!< Apply energy dispersion?
+    bool          m_refit;           //!< Refitting
+    std::string   m_outmodel;        //!< Source model output XML file
+    bool          m_apply_edisp;     //!< Apply energy dispersion?
+    bool          m_fix_spat_for_ts; //!< Fix spatial parameters for TS computation?
 
     // Members
     GObservations m_obs;        //!< Observations

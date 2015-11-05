@@ -60,7 +60,10 @@ General parameters
     Applies energy dispersion to response computation.
 
 ``(refit = no) [boolean]``
-    Performs refitting of solution after initial fit.
+    Perform refitting of solution after initial fit.
+
+``(fix_spat_for_ts = no) [boolean]``
+    Fix spatial parameters for TS computation.
  	 	 
  	 	 
 
