@@ -264,21 +264,23 @@ void ctlike::run(void)
 
         // Fix spatial parameters if requested
         if (m_fix_spat_for_ts) {
-            for(int i = 0; i < models.size(); ++i) {
+
+            // Loop over all models
+            for (int i = 0; i < models.size(); ++i) {
 
                 // Continue only if model is skymodel
                 GModelSky* sky= dynamic_cast<GModelSky*>(models[i]);
                 if (sky != NULL) {
 
                     // Fix spatial parameters
-                    GModelSpatial* spat = sky->spatial();
-                    for (int j = 0; j < spat->size(); j++) {
-                        (*spat)[j].fix();
-                    } // endfor: loop over spatial parameters
+                    GModelSpatial* spatial = sky->spatial();
+                    for (int j = 0; j < spatial->size(); j++) {
+                        (*spatial)[j].fix();
+                    } // endfor: looped over spatial parameters
 
                 } // endif: there was a sky model
 
-            } // endfor: Loop over models
+            } // endfor: looped over models
 
         } // endif: spatial parameter should be fixed
 
@@ -412,8 +414,8 @@ void ctlike::get_parameters(void)
     } // endif: no models were associated with observations
 
     // Get other parameters
-    m_refit       = (*this)["refit"].boolean();
-    m_apply_edisp = (*this)["edisp"].boolean();
+    m_refit           = (*this)["refit"].boolean();
+    m_apply_edisp     = (*this)["edisp"].boolean();
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
@@ -563,12 +565,13 @@ void ctlike::init_members(void)
     // Initialise members
     m_outmodel.clear();
     m_obs.clear();
-    m_refit       = false;
-    m_max_iter    = 100;   // Set maximum number of iterations
-    m_max_stall   = 10;    // Set maximum number of stalls
-    m_logL        = 0.0;
-    m_opt         = NULL;
-    m_apply_edisp = false;
+    m_refit           = false;
+    m_max_iter        = 100;   // Set maximum number of iterations
+    m_max_stall       = 10;    // Set maximum number of stalls
+    m_logL            = 0.0;
+    m_opt             = NULL;
+    m_apply_edisp     = false;
+    m_fix_spat_for_ts = false;
 
     // Set logger properties
     log.date(true);
@@ -596,14 +599,15 @@ void ctlike::init_members(void)
 void ctlike::copy_members(const ctlike& app)
 {
     // Copy attributes
-    m_refit       = app.m_refit;
-    m_outmodel    = app.m_outmodel;
-    m_obs         = app.m_obs;
-    m_max_iter    = app.m_max_iter;
-    m_max_stall   = app.m_max_stall;
-    m_logL        = app.m_logL;
-    m_opt         = app.m_opt->clone();
-    m_apply_edisp = app.m_apply_edisp;
+    m_refit           = app.m_refit;
+    m_outmodel        = app.m_outmodel;
+    m_obs             = app.m_obs;
+    m_max_iter        = app.m_max_iter;
+    m_max_stall       = app.m_max_stall;
+    m_logL            = app.m_logL;
+    m_opt             = app.m_opt->clone();
+    m_apply_edisp     = app.m_apply_edisp;
+    m_fix_spat_for_ts = app.m_fix_spat_for_ts;
 
     // Return
     return;
