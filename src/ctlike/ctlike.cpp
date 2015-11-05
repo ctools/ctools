@@ -262,6 +262,26 @@ void ctlike::run(void)
         double  logL_src = m_logL;
         GModels models   = m_obs.models();
 
+        // Fix spatial parameters if requested
+        if (m_fix_spat_for_ts) {
+            for(int i = 0; i < models.size(); ++i) {
+
+                // Continue only if model is skymodel
+                GModelSky* sky= dynamic_cast<GModelSky*>(models[i]);
+                if (sky != NULL) {
+
+                    // Fix spatial parameters
+                    GModelSpatial* spat = sky->spatial();
+                    for (int j = 0; j < spat->size(); j++) {
+                        (*spat)[j].fix();
+                    } // endfor: loop over spatial parameters
+
+                } // endif: there was a sky model
+
+            } // endfor: Loop over models
+
+        } // endif: spatial parameter should be fixed
+
         // Loop over stored models, remove source and refit
         for (int i = 0; i < ts_srcs.size(); ++i) {
             models.remove(ts_srcs[i]);
@@ -394,6 +414,7 @@ void ctlike::get_parameters(void)
     // Get other parameters
     m_refit       = (*this)["refit"].boolean();
     m_apply_edisp = (*this)["edisp"].boolean();
+    m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file

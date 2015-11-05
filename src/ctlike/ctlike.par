@@ -28,6 +28,8 @@ outmodel, f, a, "crab_results.xml",,, "Source model output file"
 stat,     s, h, "POISSON",,, "Optimization statistics"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 refit,    b, h, no,,, "Do refitting?"
+fix_spat_for_ts,b,h,no,,,"Fix spatial parameters for TS computation?"
+
 #
 # Standard parameters
 #====================
