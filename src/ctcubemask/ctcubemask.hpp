@@ -92,6 +92,8 @@ protected:
     // Protected members
     GObservations            m_obs;        //!< Observations container
     std::vector<std::string> m_infiles;    //!< Input event filenames
+    bool                     m_select_energy; //!< Perform energy selection
+    bool                     m_select_roi;    //!< Perform ROI selection
 };
 
 

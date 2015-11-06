@@ -349,6 +349,10 @@ void ctcubemask::save(void)
  ***************************************************************************/
 void ctcubemask::get_parameters(void)
 {
+    // Initialise selection flags
+    m_select_energy = true;
+    m_select_roi    = true;
+
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
@@ -373,13 +377,36 @@ void ctcubemask::get_parameters(void)
 	m_regfile = (*this)["regfile"].filename();
     m_usepnt  = (*this)["usepnt"].boolean();
     if (!m_usepnt) {
-        m_ra  = (*this)["ra"].real();
-        m_dec = (*this)["dec"].real();
+
+        // Check RA/DEC parameters for validity to read
+        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
+           m_ra         = (*this)["ra"].real();
+           m_dec        = (*this)["dec"].real();
+           m_select_roi = true;
+        }
+        else {
+           m_select_roi = false;
+        }
     }
-    m_rad  = (*this)["rad"].real();
-    m_emin = (*this)["emin"].real();
-    m_emax = (*this)["emax"].real();
-	
+
+    // Check if radius is vaild for a RoI selection
+    if (m_select_roi && (*this)["rad"].is_valid()) {
+       m_rad = (*this)["rad"].real();
+    }
+    else {
+       m_select_roi = false;
+    }
+
+    // Check for sanity of energy selection parameters
+    if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
+        m_emin          = (*this)["emin"].real();
+        m_emax          = (*this)["emax"].real();
+        m_select_energy = true;
+    }
+    else {
+        m_select_energy = false;
+    }
+
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
@@ -409,6 +436,12 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         // Extract event cube and energy boundaries
         GSkyMap         map     = cube->map();
         const GEbounds& ebounds = cube->ebounds();
+
+        // If no energy selection is required set energy boundaries to cube boundaries
+        if (!m_select_energy) {
+            m_emin = ebounds.emin().TeV();
+            m_emax = ebounds.emax().TeV();
+        }
 
         // Initialise energy selection
         int n_ebin = ebounds.size();
@@ -455,24 +488,26 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Set all pixels inside selected energy bands but outside ROI
-        // to -1.0
-        GSkyRegionCircle roi(m_ra, m_dec, m_rad);
-        for (int i = e_idx1; i <= e_idx2; ++i) {
-            for (int pixel = 0; pixel < npix; ++pixel) {
-                GSkyDir dir = map.inx2dir(pixel);
-                if (!roi.contains(dir)) {
-                    map(pixel,i) = -1.0;
+        // to -1.0 if requested
+        if (m_select_roi) {
+            GSkyRegionCircle roi(m_ra, m_dec, m_rad);
+            for (int i = e_idx1; i <= e_idx2; ++i) {
+                for (int pixel = 0; pixel < npix; ++pixel) {
+                    GSkyDir dir = map.inx2dir(pixel);
+                    if (!roi.contains(dir)) {
+                        map(pixel,i) = -1.0;
+                    }
                 }
             }
-        }
 
-        // Log selected energy band
-        if (logTerse()) {
-            log << gammalib::parformat("Selected ROI");
-            log << "RA=" << m_ra << " deg, ";
-            log << "DEC=" << m_dec << " deg, ";
-            log << "Radius=" << m_rad << " deg";
-            log << std::endl;
+            // Log selected energy band
+            if (logTerse()) {
+                log << gammalib::parformat("Selected ROI");
+                log << "RA=" << m_ra << " deg, ";
+                log << "DEC=" << m_dec << " deg, ";
+                log << "Radius=" << m_rad << " deg";
+                log << std::endl;
+            }
         }
 
         // Set all pixels inside selected energy bands and inside exclusion
@@ -538,6 +573,8 @@ void ctcubemask::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_infiles.clear();
+    m_select_energy = true;
+    m_select_roi    = true;
 
     // Return
     return;
@@ -565,6 +602,8 @@ void ctcubemask::copy_members(const ctcubemask& app)
     // Copy protected members
     m_obs        = app.m_obs;
     m_infiles    = app.m_infiles;
+    m_select_energy = app.m_select_energy;
+    m_select_roi    = app.m_select_roi;
     
     // Return
     return;
