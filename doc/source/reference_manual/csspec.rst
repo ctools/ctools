@@ -10,23 +10,39 @@ Synopsis
 --------
 
 This script computes the source spectrum by fitting a model in a given set
-of energy bins. The model fit per energy bin is performed using :doc:`ctlike`
+of spectral bins. The model fit per spectral bin is performed using :doc:`ctlike`
 and the script provides the possibility to fix sources other than the
 source of interest (hidden parameter ``fix_srcs``) or to fix the background
 model component(s) (hidden parameter ``fix_bkg``). The script computes the
-source flux and its uncertainty in each energy bin, as well as the significance
-of the source detection. Optionally, it also computes an upper flux limit
-that is particularily useful in case that the source is not significantly
-detected within an energy bin (hidden parameter ``calc_ulim``). The script 
-works on both, binned and unbinned observation containers. In case of binned input,
-the script will determine from the ``enumbins`` parameter, which energy layers 
-of the input cube will be merged for one spectral bin. Of course, the script
-cannot create more spectral bins as available energy bins in the cube. 
-Also note that for the moment, the Npred column in the output file is not 
-filled for binned analyses.
+source flux and its uncertainty in each spectral bin, as well as the
+significance of the source detection. Optionally, it also computes an upper
+flux limit that is particularily useful in case that the source is not
+significantly detected within a spectral bin (hidden parameter ``calc_ulim``).
+
+The script works on binned and unbinned data.
+
+For unbinned data, the spectral binning is either defined by a FITS file
+containing the energy boundaries of each bin (option ``ebinalg=FILE``) or
+as ``enumbins`` bins spread linearly  (option ``ebinalg=LIN``) or
+logarithmically (option ``ebinalg=LOG``) from a minimum energy given by
+``emin`` to a maximum energy given by ``emax``.
+
+For binned data, all energy bins within the counts cube that overlap with
+the energy range spanned by ``emin`` and ``emax`` are considered. The number
+of spectral bins is only approximately determined by the ``enumbins`` parameter.
+Naturally, the script cannot create more spectral bins than the number of
+energy bins that are available in the cube. Also, in case that ``enumbins``
+is smaller than the number of energy bins in the cube, the script will fit
+several layers of the counts cube for each spectral bin. The number of 
+layers fit is determined by the total number of energy bins divided by the
+``enumbins`` parameter.
 
 On output, the script will provide a FITS file with the fitted source 
-spectrum.
+spectrum in form of a binary table. Each row corresponds to a spectral bin.
+The columns are the mean as well as the boundaries of the spectral bin, 
+the fitted flux and flux error, the Test Statistics value (option
+``calc_ts=yes``), the upper flux limit (option ``calc_ulim=yes``) and the
+predicted number of events (only for unbinned data).
 
 
 General parameters
@@ -70,11 +86,14 @@ General parameters
     Upper energy limit of events (in TeV).
  	 	 
 ``enumbins [integer]``
-    Number of energy bins (0=unbinned).
+    Number of energy bins.
  	 	 
-``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
+``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
+``ebinfile [file]``
+    Name of the file containing the energy bin definition.
+
 ``(calc_ts = yes) [boolean]``
     Compute TS for each spectral point?
 
