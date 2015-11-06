@@ -110,10 +110,11 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
-            pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit for spectral points(TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","h","100.0","","","Upper energy limit for spectral points(TeV)"))
-            pars.append(gammalib.GApplicationPar("enumbins","i","a","20","","","Number of spectral points"))
-            pars.append(gammalib.GApplicationPar("ebinalg","s", "h","LOG","FILE|LIN|LOG","", "Algorithm for defining energy bins"))
+            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit for spectral points (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit for spectral points (TeV)"))
+            pars.append(gammalib.GApplicationPar("enumbins","i","a","20","1","10000","Number of spectral points"))
+            pars.append(gammalib.GApplicationPar("ebinalg","s","a","LOG","FILE|LIN|LOG","", "Algorithm for defining energy bins"))
+            pars.append(gammalib.GApplicationPar("ebinfile","f","a","NONE","","", "Name of the file containing the energy bin definition"))
             pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value in each bin"))
             pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit in each bin"))
             pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other skymodel parameters"))
@@ -129,7 +130,6 @@ class csspec(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
             self.require_inobs("csspec::get_parameters()")
@@ -149,41 +149,8 @@ class csspec(ctools.cscript):
         # Get source name   
         self.m_srcname = self["srcname"].string()
 
-        # Get ebounds
-        if self.m_binned_mode:
-            
-            #  Extract cube ebounds
-            cube_ebounds = self.obs[0].events().ebounds()
-            
-            # Read user parameters
-            self.m_enumbins = self["enumbins"].integer()
-            self.m_emin = self["emin"].real() - 1e-6 #rounding tolerance
-            self.m_emax = self["emax"].real() + 1e-6 #rounding tolerance
-            
-            # Compute number of energy layers used for one spectral bin
-            n_layers = cube_ebounds.size() / self.m_enumbins 
-            
-            # Don't allow zero layers
-            if n_layers == 0:
-                n_layers = 1
-            
-            # Create new ebounds object and fill it
-            self.m_ebounds = gammalib.GEbounds()
-            for i in range(cube_ebounds.size())[::n_layers]:
-                if i + n_layers > cube_ebounds.size():
-                    break
-
-                # Get new emin and emax of bin
-                emin = cube_ebounds.emin(i)
-                emax = cube_ebounds.emax(i + n_layers - 1)
-                
-                # Append energy bin if within user range
-                if self.m_emin <= emin.TeV() and self.m_emax >= emax.TeV():                        
-                    self.m_ebounds.append(emin, emax)
-                    
-        # Unbinned mode       
-        else:
-            self.m_ebounds = self.create_ebounds()
+        # Set ebounds
+        self.set_ebounds()
                  
         # Get edisp flag
         self.m_edisp = self["edisp"].boolean()
@@ -202,6 +169,66 @@ class csspec(ctools.cscript):
         self.m_chatter = self["chatter"].integer()
         self.m_clobber = self["clobber"].boolean()
         self.m_debug   = self["debug"].boolean()
+
+        # Return
+        return
+
+    def set_ebounds(self):
+        """
+        Set energy boundaries.
+        """
+        # Get ebounds
+        if self.m_binned_mode:
+            
+            #  Extract cube ebounds
+            cube_ebounds = self.obs[0].events().ebounds()
+            
+            # Read user parameters
+            self.m_enumbins = self["enumbins"].integer()
+            self.m_emin     = self["emin"].real() - 1e-6 # Rounding tolerance
+            self.m_emax     = self["emax"].real() + 1e-6 # Rounding tolerance
+
+            # Set energy range
+            emin = gammalib.GEnergy(self.m_emin, "TeV")
+            emax = gammalib.GEnergy(self.m_emax, "TeV")
+
+            # Determine all cube layers that overlap with the [emin,emax]
+            # energy range.
+            use_layers = []
+            for i in range(cube_ebounds.size()):
+                if cube_ebounds.emin(i) < emax and cube_ebounds.emax(i) > emin:
+                    use_layers.append(i)
+
+            # If no layers overlap then throw an exception
+            if (len(use_layers) == 0):
+                msg = "Energy range ["+str(cube_ebounds.emin(i))+ \
+                      ", "+str(cube_ebounds.emax(i))+"] of counts "+ \
+                      "cube does not overlap with specified energy range ["+ \
+                      str(emin)+", "+str(emax)+"]. Specify "+ \
+                      "overlapping energy range."
+                raise gammalib.GException.invalid_argument("csspec", msg)
+
+            # Determine number of layers to use for each spectral bin
+            n_layers = int(len(use_layers) / self.m_enumbins)
+
+            # Don't allow zero layers
+            if n_layers == 0:
+                n_layers = 1
+
+            # Create energy boundaries
+            self.m_ebounds = gammalib.GEbounds()
+            for i in range(len(use_layers))[::n_layers]:
+                i_start = i
+                i_stop  = i + n_layers - 1
+                if i_stop >= len(use_layers):
+                    i_stop = len(use_layers) - 1
+                ebinmin = cube_ebounds.emin(use_layers[i_start])
+                ebinmax = cube_ebounds.emax(use_layers[i_stop])
+                self.m_ebounds.append(ebinmin, ebinmax)
+                    
+        # Unbinned mode       
+        else:
+            self.m_ebounds = self.create_ebounds()
 
         # Return
         return
@@ -251,6 +278,24 @@ class csspec(ctools.cscript):
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
+
+        # Write spectral binning into header
+        if self.logTerse():
+            self.log("\n")
+            self.log.header1("Spectral binning")
+            if self.m_binned_mode:
+                cube_ebounds = self.obs[0].events().ebounds()
+                self.log.parformat("Counts cube energy range")
+                self.log(str(cube_ebounds.emin()))
+                self.log(" - ")
+                self.log(str(cube_ebounds.emax()))
+                self.log("\n")
+            for i in range(self.m_ebounds.size()):
+                self.log.parformat("Bin "+str(i+1))
+                self.log(str(self.m_ebounds.emin(i)))
+                self.log(" - ")
+                self.log(str(self.m_ebounds.emax(i)))
+                self.log("\n")
 
         # Write observation into logger
         if self.logTerse():
@@ -316,26 +361,25 @@ class csspec(ctools.cscript):
 
         # Create FITS table columns
         energy       = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
-        energy.unit("TeV")
         energy_low   = gammalib.GFitsTableDoubleCol("ed_Energy", self.m_ebounds.size())
-        energy_low.unit("TeV")
         energy_high  = gammalib.GFitsTableDoubleCol("eu_Energy", self.m_ebounds.size())
-        energy_high.unit("TeV")
         flux         = gammalib.GFitsTableDoubleCol("Flux", self.m_ebounds.size())
-        flux.unit("erg/cm2/s")
         flux_err     = gammalib.GFitsTableDoubleCol("e_Flux", self.m_ebounds.size())
-        flux_err.unit("erg/cm2/s")
         TSvalues     = gammalib.GFitsTableDoubleCol("TS", self.m_ebounds.size())
         ulim_values  = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
-        ulim_values.unit("erg/cm2/s")
         Npred_values = gammalib.GFitsTableDoubleCol("Npred", self.m_ebounds.size())
-
+        energy.unit("TeV")
+        energy_low.unit("TeV")
+        energy_high.unit("TeV")
+        flux.unit("erg/cm2/s")
+        flux_err.unit("erg/cm2/s")
+        ulim_values.unit("erg/cm2/s")
 
         # Loop over energy bins
         for i in range(self.m_ebounds.size()):
 
             # Log information
-            if self.logTerse():
+            if self.logExplicit():
                 self.log("\n")
                 self.log.header2("Energy bin "+str(i+1))
 
@@ -377,9 +421,10 @@ class csspec(ctools.cscript):
             else:
 
                 # Header
-                if self.logTerse():
-                    self.log.header3("Selecting events")
+                if self.logExplicit():
+                    self.log.header3("Filtering cube")
 
+                # Select layers
                 cubemask            = ctools.ctcubemask(self.obs)
                 cubemask["regfile"] = "NONE"
                 cubemask["ra"]      = "UNDEFINED"
@@ -393,7 +438,7 @@ class csspec(ctools.cscript):
                 obs = cubemask.obs()
 
             # Header
-            if self.logTerse():
+            if self.logExplicit():
                 self.log.header3("Performing fit")
 
             # Likelihood
@@ -405,8 +450,10 @@ class csspec(ctools.cscript):
             if like.obs().logL() == 0.0:
 
                 # Log information
-                if self.logTerse():
-                    self.log("No event in this bin. Likelihood is zero. Bin is skipped\n")
+                if self.logExplicit():
+                    self.log("No event in this bin. ")
+                    self.log("Likelihood is zero. ")
+                    self.log("Bin is skipped.")
 
                 # Set all values to 0
                 flux[i]         = 0.0
@@ -425,21 +472,21 @@ class csspec(ctools.cscript):
             if self.m_calc_ulimit:
 
                 # Logging information
-                if self.logTerse():
+                if self.logExplicit():
                     self.log.header3("Computing upper limit")
 
                 # Create upper limit object  
                 ulimit = ctools.ctulimit(like.obs())
                 ulimit["srcname"] = self.m_srcname
-                ulimit["eref"] = elogmean.TeV()
+                ulimit["eref"]    = elogmean.TeV()
 
                 # Try to run upper limit and catch exceptions
                 try:
                     ulimit.run()
                     ulimit_value = ulimit.diff_ulimit()
                 except:
-                    if self.logTerse():
-                        self.log("Upper limit calculation failed\n")
+                    if self.logExplicit():
+                        self.log("Upper limit calculation failed.")
                     ulimit_value = -1.0
 
             # Get TS value
@@ -474,15 +521,17 @@ class csspec(ctools.cscript):
                 ulim_values[i] = ulimit_value * elogmean2 * gammalib.MeV2erg
 
             # Log information
-            if self.logExplicit(): 
-                self.log("Bin "+str(i)+" ["+str(emin.TeV())+"-"+str(emax.TeV())+"] TeV: ")
-                self.log("Flux = "+str(flux[i]))
-                self.log(" +- "+str(flux_err[i])+" [erg/cm2/s]")
-                if self.m_calc_ts and TSvalues[i] > 0.0:
-                    self.log(", TS = "+str(TS))
-                if self.m_calc_ulimit and ulim_values[i] > 0.0:
-                    self.log(", UL = "+str(ulim_values[i])+" [erg/cm2/s]")
+            if self.logTerse(): 
                 self.log("\n")
+                self.log.parformat("Bin "+str(i+1))
+                self.log(str(flux[i]))
+                self.log(" +/- ")
+                self.log(str(flux_err[i]))
+                if self.m_calc_ulimit and ulim_values[i] > 0.0:
+                    self.log(" [< "+str(ulim_values[i])+"]")
+                self.log(" erg/cm2/s")
+                if self.m_calc_ts and TSvalues[i] > 0.0:
+                    self.log(" (TS = "+str(TS)+")")
 
         # Append filled columns to fits table    
         table.append(energy)
