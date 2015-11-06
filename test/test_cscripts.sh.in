@@ -205,6 +205,7 @@ chmod +x @abs_top_srcdir@/cscripts/csspec.py
   inmodel="data/crab.xml" \
   caldb="irf" \
   irf="cta_dummy_irf" \
+  ebinalg="LOG" \
   enumbins=5 \
   srcname="Crab" \
   emin=0.1 \
@@ -232,6 +233,7 @@ chmod +x @abs_top_srcdir@/cscripts/csspec.py
   psfcube="data/crab_psfcube.fits.gz" \
   bkgcube="data/crab_bkgcube.fits.gz" \
   inmodel="data/crab_bkgcube.xml" \
+  ebinalg="LOG" \
   enumbins=2 \
   emin=0.1 \
   emax=100.0 \
