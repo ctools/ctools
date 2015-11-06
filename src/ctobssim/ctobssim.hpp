@@ -83,7 +83,9 @@ protected:
                           const GEnergy&   emin,
                           const GEnergy&   emax,
                           const GSkyDir&   centre,
-                          const double&    radius);
+                          const double&    radius,
+                          const int&       indent,
+                          GLog*            wrklog = NULL);
     void   simulate_background(GCTAObservation* obs,
                                const GModels&   models,
                                GRan&            ran,
