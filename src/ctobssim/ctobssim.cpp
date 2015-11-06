@@ -773,7 +773,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         // The photon rate is estimated from the model flux
                         // and used to set the duration of the time slice.
                         double flux     = get_model_flux(model, emin, emax,
-                                                         dir, rad);
+                                                         dir, rad,
+                                                         indent, wrklog);
                         double rate     = flux * m_area;
                         double duration = 1800.0;  // default: 1800 sec
                         if (rate > 0.0) {
@@ -787,10 +788,15 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                         }
                         GTime tslice(duration, "sec");
 
+                        // Skip model if photon rate is 0
+                        if (rate <= 0.0) {
+                            continue;
+                        }
+
                         // Dump photon rate
                         if (logNormal()) {
                             *wrklog << gammalib::parformat("Photon rate", indent);
-                            *wrklog << rate << " photons/sec";
+                            *wrklog << rate << " photons/s";
                             if (model->name().length() > 0) {
                                 *wrklog << " [" << model->name() << "]";
                             }
@@ -804,11 +810,11 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
                                                  model->name() : "Unknown";
                             std::string msg    = "Photon rate "+
                                                  gammalib::str(rate)+
-                                                 " photons/sec for model \""+
+                                                 " photons/s for model \""+
                                                  modnam+"\" exceeds maximum"
                                                  " allowed photon rate of "+
                                                  gammalib::str(m_max_rate)+
-                                                 " photons/sec. Please check"
+                                                 " photons/s. Please check"
                                                  " the model parameters for"
                                                  " model \""+modnam+"\" or"
                                                  " increase the value of the"
@@ -984,7 +990,9 @@ double ctobssim::get_model_flux(const GModelSky* model,
                                 const GEnergy&   emin,
                                 const GEnergy&   emax,
                                 const GSkyDir&   centre,
-                                const double&    radius)
+                                const double&    radius,
+                                const int&       indent,
+                                GLog*            wrklog)
 {
     // Initialise flux
     double flux = 0.0;
@@ -994,6 +1002,24 @@ double ctobssim::get_model_flux(const GModelSky* model,
     // cone.
     double norm      = model->spatial()->mc_norm(centre, radius);
     bool   use_model = (norm > 0.0) ? true : false;
+    if (logNormal()) {
+        if (use_model) {
+            *wrklog << gammalib::parformat("Use model", indent);
+        }
+        else {
+            *wrklog << gammalib::parformat("Skip model", indent);
+        }
+        if (model->name().length() > 0) {
+            *wrklog << model->name();
+        }
+        *wrklog << std::endl;
+        *wrklog << gammalib::parformat("Normalization", indent);
+        *wrklog << norm;
+        if (model->name().length() > 0) {
+            *wrklog << " [" << model->name() << "]";
+        }
+        *wrklog << std::endl;
+    }
 
     // Continue only if model overlaps with simulation region
     if (use_model) {
@@ -1034,7 +1060,24 @@ double ctobssim::get_model_flux(const GModelSky* model,
     
         // Compute flux within [emin, emax] in model from spectral
         // component (units: ph/cm2/s)
-        flux = spectral->flux(emin, emax) * norm;
+        double flux0 = spectral->flux(emin, emax);
+        flux         = flux0 * norm;
+
+        // Dump flux
+        if (logNormal()) {
+            *wrklog << gammalib::parformat("Flux", indent);
+            *wrklog << flux0;
+            if (model->name().length() > 0) {
+                *wrklog << " [" << model->name() << "]";
+            }
+            *wrklog << " photons/cm2/s" << std::endl;
+            *wrklog << gammalib::parformat("Normalized flux", indent);
+            *wrklog << flux;
+            if (model->name().length() > 0) {
+                *wrklog << " [" << model->name() << "]";
+            }
+            *wrklog << " photons/cm2/s" << std::endl;
+        }
 
         // Free spectral model if required
         if (free_spectral) delete spectral;
