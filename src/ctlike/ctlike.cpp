@@ -301,7 +301,10 @@ void ctlike::run(void)
     // Compute number of observed events in all observations
     double num_events = 0.0;
     for (int i = 0; i < m_obs.size(); ++i) {
-        num_events += m_obs[i]->events()->number();
+        double data = m_obs[i]->events()->number();
+        if (data >= 0.0) {
+            num_events += data;
+        }
     }
 
     // Write results into logger
