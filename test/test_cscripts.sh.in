@@ -209,7 +209,6 @@ chmod +x @abs_top_srcdir@/cscripts/csspec.py
   srcname="Crab" \
   emin=0.1 \
   emax=100.0 \
-  binned=no \
   outfile="spectrum.fits" > csspec.log
 $ECHO -n "."
 if [ -s "spectrum.fits" ]
@@ -228,30 +227,22 @@ $ECHO " ok"
 $ECHO -n "Test csspec (binned): "
 chmod +x @abs_top_srcdir@/cscripts/csspec.py
 @abs_top_srcdir@/cscripts/csspec.py \
-  inobs="data/crab_events.fits" \
-  inmodel="data/crab.xml" \
-  caldb="irf" \
-  irf="cta_dummy_irf" \
-  enumbins=3 \
-  srcname="Crab" \
+  inobs="data/crab_cntmap_small.fits.gz" \
+  expcube="data/crab_expcube.fits.gz" \
+  psfcube="data/crab_psfcube.fits.gz" \
+  bkgcube="data/crab_bkgcube.fits.gz" \
+  inmodel="data/crab_bkgcube.xml" \
+  enumbins=2 \
   emin=0.1 \
   emax=100.0 \
-  binned=yes \
-  nxpix=10 \
-  nypix=10 \
-  binsz=0.1 \
-  nebins=2 \
-  coordsys="CEL" \
-  xref=83.63 \
-  yref=22.01 \
-  proj="CAR" \
-  outfile="spectrum.fits" > csspec.log
+  srcname="Crab" \
+  outfile="spectrum_binned.fits" > csspec.log
 $ECHO -n "."
-if [ -s "spectrum.fits" ]
+if [ -s "spectrum_binned.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " spectrum.fits file is not valid"
+  $ECHO " spectrum_binned.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
@@ -309,13 +300,13 @@ chmod +x @abs_top_srcdir@/cscripts/cslightcrv.py
   nxpix=10 \
   nypix=10 \
   binsz=0.1 \
-  outfile="lightcurve.fits" > cslightcrv.log
+  outfile="lightcurve_binned.fits" > cslightcrv.log
 $ECHO -n "."
-if [ -s "lightcurve.fits" ]
+if [ -s "lightcurve_binned.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " lightcurve.fits file is not valid"
+  $ECHO " lightcurve_binned.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
