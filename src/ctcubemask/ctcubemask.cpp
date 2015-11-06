@@ -363,7 +363,7 @@ void ctcubemask::get_parameters(void)
             std::string msg = "A valid file needs to be specified for the "
                               "\"inobs\" parameter, yet \""+
                               (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
+                              " Specify a valid observation definition or "
                               "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
@@ -600,8 +600,8 @@ void ctcubemask::copy_members(const ctcubemask& app)
     m_emax    = app.m_emax;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_infiles    = app.m_infiles;
+    m_obs           = app.m_obs;
+    m_infiles       = app.m_infiles;
     m_select_energy = app.m_select_energy;
     m_select_roi    = app.m_select_roi;
     

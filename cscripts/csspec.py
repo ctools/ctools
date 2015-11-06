@@ -157,8 +157,8 @@ class csspec(ctools.cscript):
             
             # Read user parameters
             self.m_enumbins = self["enumbins"].integer()
-            self.m_emin = self["emin"].real() - 1e-6 #rounding tolerance
-            self.m_emax = self["emax"].real() + 1e-6 #rounding tolerance
+            self.m_emin     = self["emin"].real() - 1e-6 #rounding tolerance
+            self.m_emax     = self["emax"].real() + 1e-6 #rounding tolerance
             
             # Compute number of energy layers used for one spectral bin
             n_layers = cube_ebounds.size() / self.m_enumbins 
@@ -316,19 +316,19 @@ class csspec(ctools.cscript):
 
         # Create FITS table columns
         energy       = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
-        energy.unit("TeV")
         energy_low   = gammalib.GFitsTableDoubleCol("ed_Energy", self.m_ebounds.size())
-        energy_low.unit("TeV")
         energy_high  = gammalib.GFitsTableDoubleCol("eu_Energy", self.m_ebounds.size())
-        energy_high.unit("TeV")
         flux         = gammalib.GFitsTableDoubleCol("Flux", self.m_ebounds.size())
-        flux.unit("erg/cm2/s")
         flux_err     = gammalib.GFitsTableDoubleCol("e_Flux", self.m_ebounds.size())
-        flux_err.unit("erg/cm2/s")
         TSvalues     = gammalib.GFitsTableDoubleCol("TS", self.m_ebounds.size())
         ulim_values  = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
-        ulim_values.unit("erg/cm2/s")
         Npred_values = gammalib.GFitsTableDoubleCol("Npred", self.m_ebounds.size())
+        energy.unit("TeV")
+        energy_low.unit("TeV")
+        energy_high.unit("TeV")
+        flux.unit("erg/cm2/s")
+        flux_err.unit("erg/cm2/s")
+        ulim_values.unit("erg/cm2/s")
 
 
         # Loop over energy bins
@@ -380,6 +380,7 @@ class csspec(ctools.cscript):
                 if self.logTerse():
                     self.log.header3("Selecting events")
 
+                # Select layers
                 cubemask            = ctools.ctcubemask(self.obs)
                 cubemask["regfile"] = "NONE"
                 cubemask["ra"]      = "UNDEFINED"
