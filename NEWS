@@ -1,15 +1,15 @@
-New Features and Important Changes in ctools 0.10.0
+New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-31 October 2015
+6 November 2015
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
 changes made since the last release of ctools. The code complies to GammaLib
-version 0.11.0 or above.
+version 1.0.0 or above.
 
 
 2. Configuration
@@ -19,27 +19,12 @@ None
 
 3. Python interface
 -------------------
-A specific cscripts Python module has been created for cscripts. This module
-can be imported using
-
-    >>> import cscripts
-
-The obsutils utility functions have also been moved into the scripts folder.
-
-The obsutils.spectrum() function has been removed as it is now replaced by the
-csspec script.
-
-Some tests for the installed ctools package have been added. They can be
-executed by typing the following under Python:
-
-    >>> cscripts.test()
+None
 
 
 4. Support model
 ----------------
-The ctool base class now handles the specification of the --help option on
-the command line. For each tools or script, a help text that is generated from
-the .rst documentation files is displayed on the console when --help is given.
+None
 
 
 5. ctobssim - CTA observation simulation
@@ -54,14 +39,12 @@ None
 
 7. ctbin - CTA event binning
 ----------------------------
-ctbin now verifies if an ROI has been set properly, and throws an exception in
-case that no ROI information could be found.
+None
 
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-The optimizer is now allocated upon construction so that ctlike always returns a
-meaningful object using the opt() method.
+None
 
 
 9. cttsmap - Generation of Test Statistics map
@@ -91,13 +74,13 @@ None
 
 14. ctbkgcube - CTA background cube generation
 ----------------------------------------------
-Limit the power law prefactor to a range of [0.01,100] and the index to [-5,5]. This
-solves some stability problems in csspec (#1547).
+None
 
 
 15. ctcubemask - CTA cube filtering
 -----------------------------------
-None
+Allow to ignore the spatial filtering by specifying NONE parameters for "ra",
+"dec" or "rad".
 
 
 16. ctbutterfly - Generate butterfly diagrams
@@ -112,24 +95,20 @@ None
 
 18. cterror - Likelihood profile error computation
 --------------------------------------------------
-Added initial version of the likelihood profile error computation tool. This
-tool will scan the likelihood function to find the confidence interval for
-all source parameters.
-
-
-19. Examples
-------------
 None
 
 
-20. Scripts
------------
-Added csinfo script to provide some information about the GammaLib and ctools
-installation. To be run in case of problems to help diagnostics.
+19. cscripts
+------------
+The csspec script now handled correctly stacked data. Dependent on the
+requested energy binning, it selects for each spectral energy bin the
+relevant energy bins from the counts cube and performs a maximum likelihood
+analysis.
 
-The cspull script was extended to now also handle stacked analysis in case
-that an observation definition XML file is specified with multiple observations
-by the inobs parameter.
+
+20. Examples
+------------
+None
 
 
 21. caldb

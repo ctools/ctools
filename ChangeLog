@@ -1,3 +1,11 @@
+2015-11-06  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+        * Version 1.0.0 released
+        ========================
+
+        Implement handling of stacked data in csspec (#1566).
+
+
 2015-10-31  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.10.0 released
