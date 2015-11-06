@@ -36,7 +36,7 @@ $ECHO "*****************"
 #
 # Remove any existing result files
 # ================================
-rm -rf spectrum*.fits lightcurve*.fits resmap*.fits obs.xml *.dat
+rm -rf *.fits *.xml *.dat
 
 
 #
@@ -227,11 +227,11 @@ $ECHO " ok"
 $ECHO -n "Test csspec (binned): "
 chmod +x @abs_top_srcdir@/cscripts/csspec.py
 @abs_top_srcdir@/cscripts/csspec.py \
-  inobs="cntmap2.fits" \
-  expcube="expcube2.fits" \
-  psfcube="psfcube2.fits" \
-  bkgcube="bkgcube2.fits" \
-  inmodel="bkgcube2.xml" \
+  inobs="data/crab_cntmap_small.fits.gz" \
+  expcube="data/crab_expcube.fits.gz" \
+  psfcube="data/crab_psfcube.fits.gz" \
+  bkgcube="data/crab_bkgcube.fits.gz" \
+  inmodel="data/crab_bkgcube.xml" \
   enumbins=2 \
   emin=0.1 \
   emax=100.0 \
