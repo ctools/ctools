@@ -17,9 +17,13 @@ model component(s) (hidden parameter ``fix_bkg``). The script computes the
 source flux and its uncertainty in each energy bin, as well as the significance
 of the source detection. Optionally, it also computes an upper flux limit
 that is particularily useful in case that the source is not significantly
-detected within an energy bin (hidden parameter ``calc_ulim``).
-
-The script works on event lists only.
+detected within an energy bin (hidden parameter ``calc_ulim``). The script 
+works on both, binned and unbinned observation containers. In case of binned input,
+the script will determine from the ``enumbins`` parameter, which energy layers 
+of the input cube will be merged for one spectral bin. Of course, the script
+cannot create more spectral bins as available energy bins in the cube. 
+Also note that for the moment, the Npred column in the output file is not 
+filled for binned analyses.
 
 On output, the script will provide a FITS file with the fitted source 
 spectrum.
@@ -56,6 +60,9 @@ General parameters
 ``irf [string]``
     Instrumental response function.
 
+``(edisp = no) [boolean]``
+    Apply energy dispersion to response computation?
+
 ``emin [real]``
     Lower energy limit of events (in TeV).
  	 	 
@@ -67,36 +74,6 @@ General parameters
  	 	 
 ``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
- 	 	 
-``binned [boolean]``
-    Specifies whether a binned computation should be used.
-
-``(nebins = 5) [integer]``
-    Number of bins per spectral point for binned analysis.
-
-``coordsys <CEL|GAL> [string]``
-    Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
-``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
-    Projection method.
-
-``xref [real]``
-    Right Ascension / Galactic longitude of image centre (J2000, in degrees).
- 	 	 
-``yref [real]``
-    Declination / Galactic latitude of image centre (J2000, in degrees).
-
-``nxpix [integer]``
-    Size of the Right Ascension / Galactic longitude axis (in pixels).
- 	 	 
-``nypix [integer]``
-    Size of the Declination / Galactic latitude axis (in pixels).
- 	 	 
-``binsz [real]``
-    Pixel size (in degrees/pixel).
-
-``(anumbins = 200) [integer]``
-    Number of angular separation bins.
  	 	 
 ``(calc_ts = yes) [boolean]``
     Compute TS for each spectral point?
