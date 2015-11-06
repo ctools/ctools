@@ -221,7 +221,7 @@ void ctcubemask::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        log.header1("Observations for applying mask");
+        log.header1("Observations");
         log << m_obs << std::endl;
     }
 
@@ -363,7 +363,7 @@ void ctcubemask::get_parameters(void)
             std::string msg = "A valid file needs to be specified for the "
                               "\"inobs\" parameter, yet \""+
                               (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
+                              " Specify a valid observation definition or "
                               "event list FITS file to proceed.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
@@ -444,9 +444,20 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Initialise energy selection
+        int npix   = map.npix();
         int n_ebin = ebounds.size();
         int e_idx1 = 0;
         int e_idx2 = n_ebin;
+
+        // Determine number of events before masking
+        double sum_before = 0.0;
+        for (int i = 0; i < n_ebin; ++i) {
+            for (int pixel = 0; pixel < npix; ++pixel) {
+                if (map(pixel, i) >= 0.0) {
+                    sum_before += map(pixel, i);
+                }
+            }
+        }
 
         // Loop over ebounds to find the first valid energy band
         for (int i = 0; i < n_ebin; ++i) {
@@ -467,7 +478,6 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Set all pixels outside the desired energy bands to -1.0
-        int npix = map.npix();
         for (int i = 0; i < e_idx1; ++i) {
             for (int pixel = 0; pixel < npix; ++pixel) {
                 map(pixel,i) = -1.0;
@@ -538,6 +548,24 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
             }
         }
 
+        // Determine number of events after masking
+        double sum_after = 0.0;
+        for (int i = 0; i < n_ebin; ++i) {
+            for (int pixel = 0; pixel < npix; ++pixel) {
+                if (map(pixel, i) >= 0.0) {
+                    sum_after += map(pixel, i);
+                }
+            }
+        }
+
+        // Dump number of events before and after masking
+        if (logTerse()) {
+            log << gammalib::parformat("Events before masking");
+            log << sum_before << std::endl;
+            log << gammalib::parformat("Events after masking");
+            log << sum_after << std::endl;
+        }
+
         // Put back map into the event cube
         cube->map(map);
 
@@ -600,8 +628,8 @@ void ctcubemask::copy_members(const ctcubemask& app)
     m_emax    = app.m_emax;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_infiles    = app.m_infiles;
+    m_obs           = app.m_obs;
+    m_infiles       = app.m_infiles;
     m_select_energy = app.m_select_energy;
     m_select_roi    = app.m_select_roi;
     
