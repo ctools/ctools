@@ -7,12 +7,12 @@ binscripts = tsmerge.py
 pythonscripts = __init__.py \
                 cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py \
                 cshessobs.py csobsdef.py csspec.py cslightcrv.py \
-                csinfo.py \
+                csinfo.py csobs2caldb.py \
                 obsutils.py
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
-              cshessobs csobsdef csspec cslightcrv \
+              cshessobs csobsdef csspec cslightcrv csobs2caldb \
               csinfo
 
 # Distribute scripts
