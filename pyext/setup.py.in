@@ -114,6 +114,10 @@ else:
 	extra_compile_args = []
 	extra_link_args    = []
 
+# Optionally add link flag for El Capitan post-processing of modules
+if '@IS_ELCAPITAN_TRUE@' != '#':
+    extra_link_args.append('-headerpad_max_install_names')
+
 # Setup
 setup(name='@PACKAGE_NAME@',
       version='@PACKAGE_VERSION@',
