@@ -160,17 +160,24 @@ class csobsinfo(ctools.cscript):
         # Loop over observations
         for obs in self.obs:
             
-            # Logging
-            if self.logTerse():
-                self.log.header2(obs.name())
-            
+
             # Skip non-CTA observations
             if not obs.classname() == "GCTAObservation":
                 self.log("Skipping "+obs.instrument()+" observation\n")
                 continue 
             
+            # Use observed object as observation name
+            # if name is not given
+            obs_name = obs.name()
+            if obs_name == "":
+                obs_name = obs.object()
+            
+            # Logging
+            if self.logTerse():
+                self.log.header2(obs_name)
+                
             # Retrieve observation name
-            obs_names.append(obs.name())
+            obs_names.append(obs_name)
             
             # Retrieve energy boundaries
             obs_bounds = obs.events().ebounds()
@@ -309,7 +316,7 @@ class csobsinfo(ctools.cscript):
         
         # Log mean offset if possible
         if self.m_offset:
-            self.log.parformat("Mean offset")
+            self.log.parformat("Mean offset angle")
             self.log("%.2f"%(sum(self.offsets)/len(self.offsets)))
             self.log("\n")
         
