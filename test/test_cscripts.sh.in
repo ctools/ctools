@@ -36,7 +36,7 @@ $ECHO "*****************"
 #
 # Remove any existing result files
 # ================================
-rm -rf *.fits *.xml *.dat
+rm -rf *.fits *.xml *.dat *.reg
 
 
 #
@@ -68,6 +68,28 @@ then
   $ECHO -n "."
 else
   $ECHO " obs.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csobsinfo
+# ==============
+$ECHO -n "Test csobsinfo: "
+chmod +x @abs_top_srcdir@/cscripts/csobsinfo.py
+@abs_top_srcdir@/cscripts/csobsinfo.py \
+  inobs="obs.xml" \
+  ds9file="ds9.reg" \
+  offset=yes \
+  ra="83.6331" \
+  dec="22.01" > csobsinfo.log
+$ECHO -n "."
+if [ -s "ds9.reg" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " ds9.reg file is not valid"
   exit 1
 fi
 $ECHO " ok"

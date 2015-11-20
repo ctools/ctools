@@ -21,8 +21,6 @@
 import gammalib
 import ctools
 import sys
-import os
-import datetime
 
 
 # =============== #
@@ -103,7 +101,7 @@ class csobsinfo(ctools.cscript):
         # Get parameters     
         #self.inobs = self["inobs"].filename()
         self.require_inobs("csobsinfo::get_parameters")
-        self.obs = self.get_observations(False)#gammalib.GObservations(self.inobs)
+        self.obs = self.get_observations(False)
         
         self.obj_dir = gammalib.GSkyDir()
         
@@ -145,8 +143,8 @@ class csobsinfo(ctools.cscript):
         obs_names = []
         
         # Initialise output to be filled
-        ebounds = gammalib.GEbounds()
-        gti = gammalib.GGti()
+        self.ebounds = gammalib.GEbounds()
+        self.gti = gammalib.GGti()
         ontime = 0.0
         livetime = 0.0
         n_events = 0
@@ -197,10 +195,10 @@ class csobsinfo(ctools.cscript):
             
             # If avaliable append energy boundaries
             if obs_bounds.size() > 0 : 
-                ebounds.merge(obs_bounds.emin(),obs_bounds.emax())
+                self.ebounds.merge(obs_bounds.emin(),obs_bounds.emax())
             
             # Append time interval
-            gti.merge(obs_gti.tstart(), obs_gti.tstop())
+            self.gti.merge(obs_gti.tstart(), obs_gti.tstop())
             
             # increment global livetime and ontime
             ontime += obs.ontime()
@@ -340,25 +338,25 @@ class csobsinfo(ctools.cscript):
         # Log energy range
         self.log.header3("Energy range")
         self.log.parformat("Emin")
-        if ebounds.size() == 0:
+        if self.ebounds.size() == 0:
             self.log("undefined")
         else:
-            self.log(str(ebounds.emin()))
+            self.log(str(self.ebounds.emin()))
         self.log("\n")
         self.log.parformat("Emax")
-        if ebounds.size() == 0:
+        if self.ebounds.size() == 0:
             self.log("undefined")
         else:
-            self.log(str(ebounds.emax()))
+            self.log(str(self.ebounds.emax()))
         self.log("\n\n")
         
         # Log time range
         self.log.header3("Time range")
         self.log.parformat("Start [MJD]")
-        self.log(str(gti.tstart().mjd()))
+        self.log(str(self.gti.tstart().mjd()))
         self.log("\n")
         self.log.parformat("Stop [MJD]")
-        self.log(str(gti.tstop().mjd()))
+        self.log(str(self.gti.tstop().mjd()))
         self.log("\n")  
         
         # Log ontime and livetime in different units      
@@ -422,7 +420,18 @@ class csobsinfo(ctools.cscript):
         Return offset angles
         """
         return self.offsets
-            
+
+    def ebounds(self):
+        """
+        Return energy boundaries
+        """
+        return self.ebounds
+    
+    def gti(self):
+        """
+        Return good time intervals
+        """
+        return self.gti
             
     def execute(self):
         """
