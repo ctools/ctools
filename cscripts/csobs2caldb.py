@@ -87,7 +87,7 @@ class csobs2caldb(ctools.cscript):
             pars = gammalib.GApplicationPars()
             pars.append(gammalib.GApplicationPar("inobs","f","a","obs.xml","","","Input observation definition file"))
             pars.append(gammalib.GApplicationPar("rspname","s","a","NONE","","","Response output name (e.g. Zenith50)"))            
-            pars.append(gammalib.GApplicationPar("outfile","f","h","irf_file.fits","","","Output IRF file name"))            
+            pars.append(gammalib.GApplicationPar("outirfs","f","h","irf_file.fits","","","Output IRF file name"))            
             pars.append(gammalib.GApplicationPar("index","i","h","0","","","Index of observation to be used from XML file"))            
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csobs2caldb.log","","","Log filename"))
@@ -119,7 +119,7 @@ class csobs2caldb(ctools.cscript):
         
         # Get config and file name
         self.m_rspname = self["rspname"].string()
-        self.m_outfile = self["outfile"].filename()
+        self.m_outfile = self["outirfs"].filename()
         
         # Make sure we have a cta observation
         if not self.observation.classname() == "GCTAObservation":
@@ -141,6 +141,9 @@ class csobs2caldb(ctools.cscript):
         # retrieve response component
         rsp = self.observation.response()
     
+        # Initialise FITS file
+        fits = gammalib.GFits()
+    
         # Open FITS files of response components
         fits_aeff = gammalib.GFits(rsp.aeff().filename())
         fits_psf = gammalib.GFits(rsp.psf().filename())
@@ -148,7 +151,6 @@ class csobs2caldb(ctools.cscript):
         fits_bkg = gammalib.GFits(rsp.background().filename())
         
         # Bundle IRFs into one file
-        fits = gammalib.GFits()
         fits.append(fits_aeff["EFFECTIVE AREA"])
         fits.append(fits_psf["POINT SPREAD FUNCTION"])
         fits.append(fits_edisp["ENERGY DISPERSION"])
