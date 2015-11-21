@@ -1,8 +1,8 @@
 ctools information
 ==================
-Version:             0.10.0 (31 October 2015)
+Version:             1.0.0 (21 November 2015)
 Author:              Juergen Knodlseder (jurgen.knodlseder@irap.omp.eu)
-GammaLib dependency: 0.11.0
+GammaLib dependency: 1.0.0
 
 
 License information
@@ -38,6 +38,7 @@ The following tools are available:
     ctbkgcube   - generate a background cube
     ctbutterfly - create a butterfly
     ctcubemask  - mask bins in binned analysis
+    cterror     - likelihood profile error estimation
     ctexpcube   - generate an exposure cube
     ctlike      - maximum likelihood model fitting
     ctmodel     - generation of model counts map
@@ -51,10 +52,8 @@ The following tools are available:
 
 Web sites
 =========
-http://cta.irap.omp.eu/ctools                     - ctools documentation
+http://cta.irap.omp.eu/ctools                     - for ctools users
 https://cta-redmine.irap.omp.eu/projects/ctools   - for ctools development
-https://cta-redmine.irap.omp.eu/projects/gammalib - for GammaLib documentation
-https://sourceforge.net/projects/gammalib/        - for GammaLib downloads
 
 
 Prerequisites
