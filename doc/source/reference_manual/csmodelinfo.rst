@@ -1,27 +1,27 @@
 .. _csmodelinfo:
 
 csmodelinfo
-======
+===========
 
-Dumps information about a model container into log file or on screen
+Dumps information about a model container into log file or on screen.
 
 
 Synopsis
 --------
 
 This script provides detailled information about a given model container.
-It presents the number of parameters, the number of free parameters (sub-divided by
-spectral, spatial and temporal type). The tool further creates information about any
-parameter that is stuck at the parameter boundaries. This might be quite useful for
-debugging a fit.
-Finally the tool also list the TS values of each source that was fitted, in order
-have a quick overview on these quantities on the screen.
+It presents the number of parameters, the number of free parameters (sub-
+divided by spectral, spatial and temporal type). The tool further creates
+information about any parameter that is stuck at the parameter boundaries.
+This might be quite useful for debugging a fit. Finally the tool also list
+the TS values of each source that was fitted, in order have a quick overview
+on these quantities on the screen.
 
-In addition the tool is also capable of exporting the input model XML container to
-a region file which is compatible to be read with ds9 or other displying tools.
-To create a region file, the hidden parameter "ds9file" needs to be specified. There 
-are quite a few further hidden parameters to steer e.g. color, font, etc of the region
-file output.
+In addition the tool is also capable of exporting the input model XML container
+to a region file which is compatible to be read with ds9 or other displying
+tools. To create a region file, the hidden parameter "ds9file" needs to be
+specified. There are quite a few further hidden parameters to steer e.g.
+color, font, etc of the region file output.
 
 
 General parameters
@@ -91,10 +91,11 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = cssens.log) [filename]``
+``(logfile = csmodelinfo.log) [filename]``
     Log filename.
 
 
 Related tools or scripts
 ------------------------
 
+None

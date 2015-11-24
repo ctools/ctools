@@ -24,13 +24,13 @@ import sys
 
 
 # =============== #
-# cshessobs class #
+# csobsinfo class #
 # =============== #
 class csobsinfo(ctools.cscript):
     """
-    This class dumps information about an observation container into a logfile or on screen.
-    This might be helpful for quick access to an observation container, e.g. total lifetime, 
-    energy range etc.
+    This class dumps information about an observation container into a
+    logfile or on screen. This might be helpful for quick access to an
+    observation container showing, e.g., total lifetime, energy range etc.
     """
     def __init__(self, *argv):
         """
@@ -38,7 +38,7 @@ class csobsinfo(ctools.cscript):
         """
         # Set name
         self.name    = "csobsinfo"
-        self.version = "0.1.0"
+        self.version = "1.1.0"
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -68,7 +68,8 @@ class csobsinfo(ctools.cscript):
     def parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
+        default parfile. This kluge avoids shipping the cscript with a
+        parfile.
         """
 
         # Set parfile name
@@ -104,18 +105,19 @@ class csobsinfo(ctools.cscript):
         
         # Initialise object position
         self.obj_dir = gammalib.GSkyDir()
-        
+
+        # Get (optional) offset parameters
         self.m_offset = self["offset"].boolean()
         if self.m_offset:
-            ra = self["ra"].real()
+            ra  = self["ra"].real()
             dec = self["dec"].real() 
             self.obj_dir.radec_deg(ra,dec)
-            
+
+        # Get (optional) DS9 filename
         self.ds9file = self["ds9file"].filename()
 
         # Return
         return
- 
         
     def run(self):
         """
@@ -135,21 +137,21 @@ class csobsinfo(ctools.cscript):
         
         # Initialise arrays to store certain values for reuse
         # Todo, think about using a python dictionary
-        self.offsets = []
-        self.zeniths = []
+        self.offsets  = []
+        self.zeniths  = []
         self.azimuths = []
-        self.pnt_ra = []
-        self.pnt_dec = []
-        obs_names = []
+        self.pnt_ra   = []
+        self.pnt_dec  = []
+        obs_names     = []
         
         # Initialise output to be filled
-        self.ebounds = gammalib.GEbounds()
-        self.gti = gammalib.GGti()
-        ontime = 0.0
-        livetime = 0.0
-        n_events = 0
-        n_eventbins = 0
-        n_obs_binned = 0
+        self.ebounds   = gammalib.GEbounds()
+        self.gti       = gammalib.GGti()
+        ontime         = 0.0
+        livetime       = 0.0
+        n_events       = 0
+        n_eventbins    = 0
+        n_obs_binned   = 0
         n_obs_unbinned = 0
         
         # Logging
@@ -183,9 +185,9 @@ class csobsinfo(ctools.cscript):
             # Retrieve time interval
             obs_gti = obs.events().gti()
             
-            # Compute mean time and dead tim fraction in percent
-            tmean = (obs_gti.tstart() + obs_gti.tstop())
-            tmean*=0.5
+            # Compute mean time and dead time fraction in percent
+            tmean    = (obs_gti.tstart() + obs_gti.tstop())
+            tmean   *= 0.5
             deadfrac = (1.0-obs.deadc(tmean))*100.0
             
             # Retrieve pointing and store Ra,Dec
@@ -209,7 +211,7 @@ class csobsinfo(ctools.cscript):
                 self.log.parformat("binned")
             
             if obs.eventtype() == "CountsCube":
-                n_eventbins += obs.events().size()
+                n_eventbins  += obs.events().size()
                 n_obs_binned += 1
                 if self.logTerse():
                     self.log("yes")
@@ -218,7 +220,7 @@ class csobsinfo(ctools.cscript):
                     self.log(str(obs.events().size()))
                     self.log("\n")
             else:
-                n_events +=  obs.events().size()
+                n_events       +=  obs.events().size()
                 n_obs_unbinned += 1
                 if self.logTerse():
                     self.log("no")
@@ -239,7 +241,7 @@ class csobsinfo(ctools.cscript):
                 self.log("\n")
                 
                 # Log observation time interval
-                self.log.parformat("Time range [MJD]")
+                self.log.parformat("Time range (MJD)")
                 if obs_gti.size() == 0:
                     self.log("undefined")
                 else:    
@@ -257,8 +259,8 @@ class csobsinfo(ctools.cscript):
                 self.log("\n")
                 
                 # Log dead time fraction
-                self.log.parformat("Dead-time fraction [%]")
-                self.log("%.3f"%deadfrac)
+                self.log.parformat("Dead-time fraction (%)")
+                self.log("%.3f" % (deadfrac))
                 self.log("\n")
                 
                 # Log pointing direction
@@ -271,7 +273,7 @@ class csobsinfo(ctools.cscript):
                     offset = pnt_dir.dist_deg(self.obj_dir)
                     self.offsets.append(offset)
                     self.log.parformat("Offset")
-                    self.log("%.2f"%(offset))
+                    self.log("%.2f" % (offset))
                     self.log("\n")
                 else:
                     self.offsets.append(-1.0)
@@ -285,10 +287,10 @@ class csobsinfo(ctools.cscript):
                 # Log Zenith and Azimuth if required
                 if self.logExplicit():
                     self.log.parformat("Zenith angle")
-                    self.log("%.2f"%(zenith))
+                    self.log("%.2f" % (zenith))
                     self.log("\n")
                     self.log.parformat("Azimuth angle")
-                    self.log("%.2f"%(azimuth))
+                    self.log("%.2f" % (azimuth))
                     self.log("\n\n")
                     
         # Log summary
@@ -315,15 +317,15 @@ class csobsinfo(ctools.cscript):
         # Log mean offset if possible
         if self.m_offset:
             self.log.parformat("Mean offset angle")
-            self.log("%.2f"%(sum(self.offsets)/len(self.offsets)))
+            self.log("%.2f" % (sum(self.offsets)/len(self.offsets)))
             self.log("\n")
         
         # Log mean azimuth and zenith angle
         self.log.parformat("Mean zenith angle")
-        self.log("%.2f"%(sum(self.zeniths)/len(self.zeniths)))
+        self.log("%.2f" % (sum(self.zeniths)/len(self.zeniths)))
         self.log("\n")
         self.log.parformat("Mean azimuth angle")
-        self.log("%.2f"%(sum(self.azimuths)/len(self.azimuths)))
+        self.log("%.2f" % (sum(self.azimuths)/len(self.azimuths)))
         self.log("\n")
         
         # Log name of observations if requested
@@ -361,10 +363,10 @@ class csobsinfo(ctools.cscript):
         
         # Log ontime and livetime in different units      
         self.log.parformat("Total ontime")
-        self.log("%.2f s = %.2f min = %.2f h"%(ontime, ontime/60., ontime/3600.))
+        self.log("%.2f s = %.2f min = %.2f h" % (ontime, ontime/60., ontime/3600.))
         self.log("\n")
         self.log.parformat("Total livetime")
-        self.log("%.2f s = %.2f min = %.2f h"%(livetime, livetime/60.0, livetime/3600.))
+        self.log("%.2f s = %.2f min = %.2f h" % (livetime, livetime/60.0, livetime/3600.))
         self.log("\n")        
                 
         # Return
@@ -385,7 +387,6 @@ class csobsinfo(ctools.cscript):
             f.write("fk5\n")
             
             # Loop over pointings
-            
             for i in range(len(self.pnt_ra)):
                 
                 # Create string

@@ -97,7 +97,7 @@ $ECHO " ok"
 
 #
 # Test csmodelinfo
-# ==============
+# ================
 $ECHO -n "Test csmodelinfo: "
 chmod +x @abs_top_srcdir@/cscripts/csmodelinfo.py
 @abs_top_srcdir@/cscripts/csmodelinfo.py \
@@ -116,7 +116,7 @@ $ECHO " ok"
 
 #
 # Test csmodelmerge (space-separated)
-# ==============
+# ===================================
 $ECHO -n "Test csmodelmerge (space-separated): "
 chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
 @abs_top_srcdir@/cscripts/csmodelmerge.py \
@@ -135,7 +135,7 @@ $ECHO " ok"
 
 #
 # Test csmodelmerge (comma-separated)
-# ==============
+# ===================================
 $ECHO -n "Test csmodelmerge (comma-separated): "
 chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
 @abs_top_srcdir@/cscripts/csmodelmerge.py \
@@ -154,7 +154,7 @@ $ECHO " ok"
 
 #
 # Test csmodelmerge (wildcard string)
-# ==============
+# ===================================
 $ECHO -n "Test csmodelmerge (wildcard string): "
 chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
 @abs_top_srcdir@/cscripts/csmodelmerge.py \
@@ -173,7 +173,7 @@ $ECHO " ok"
 
 #
 # Test csmodelmerge (ascii-file)
-# ==============
+# ==============================
 ls data/model_cube_background* > models.txt
 $ECHO -n "Test csmodelmerge (ascii-file): "
 chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
@@ -194,7 +194,7 @@ rm models.txt
 
 #
 # Test cstsmapmerge (comma-separated)
-# ==============
+# ===================================
 $ECHO -n "Test cstsmapmerge (comma-separated): "
 chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
 @abs_top_srcdir@/cscripts/cstsmapmerge.py \
@@ -213,7 +213,7 @@ $ECHO " ok"
 
 #
 # Test cstsmapmerge (space-separated)
-# ==============
+# ===================================
 $ECHO -n "Test cstsmapmerge (space-separated): "
 chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
 @abs_top_srcdir@/cscripts/cstsmapmerge.py \
@@ -232,7 +232,7 @@ $ECHO " ok"
 
 #
 # Test cstsmapmerge (wildcard string)
-# ==============
+# ===================================
 $ECHO -n "Test cstsmapmerge (wildcard string): "
 chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
 @abs_top_srcdir@/cscripts/cstsmapmerge.py \
@@ -251,7 +251,7 @@ $ECHO " ok"
 
 #
 # Test cstsmapmerge (ascii-file)
-# ==============
+# ==============================
 ls data/tsmap_*.fits > tsmaps.txt
 $ECHO -n "Test cstsmapmerge  (ascii-file): "
 chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py

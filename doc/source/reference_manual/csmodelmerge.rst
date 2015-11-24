@@ -1,25 +1,26 @@
 .. _csmodelmerge:
 
 csmodelmerge
-======
+============
 
-Merges an arbitrary number of model XML files into one file.
+Merges an arbitrary number of model XML files into a single file.
 
 
 Synopsis
 --------
 
-This script can be used to merge several model XML file into one output file.
-The files can be passed via the ``inmodels`` parameter. There are 4 options to specify
+This script merges several model XML file into a single model XML file. The
+files are passed via the ``inmodels`` parameter. There are 4 options to specify
 a list of files that should be merged:
 - a space-separated list of file names (e.g. model1.xml model2.xml)
 - a comma-separated list of file names (e.g. model1.xml,model2.xml)
 - a wildcard string (e.g. mymodel*.xml)
 - an ASCII file containing the file names, one file per line (e.g. @mymodels.txt)
 
-Note that the "@" needs to be specified in case of an ASCII file name. It is also important to 
-note that models with the same name cannot be appended. The tool will throw and exception if
-the provided file contain models with the same name.
+Note that the "@" needs to be specified in case of an ASCII file name. It is
+also important to note that models with the same name cannot be appended. The
+tool will throw and exception if the provided file contain models with the same
+name.
 
 
 General parameters
@@ -56,10 +57,11 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = cssens.log) [filename]``
+``(logfile = csmodelmerge.log) [filename]``
     Log filename.
 
 
 Related tools or scripts
 ------------------------
 
+None

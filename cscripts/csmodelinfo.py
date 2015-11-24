@@ -23,15 +23,16 @@ import ctools
 import sys
 
 
-# =============== #
-# cshessobs class #
-# =============== #
+# ================= #
+# csmodelinfo class #
+# ================= #
 class csmodelinfo(ctools.cscript):
     """
-    This class dumps information about a model container into a logfile or on screen.
-    This might be helpful for quick access to the model container, e.g. number of sources,
-    background models, free and fixed parameters etc.
-    The tool can also dump the models into a region file to display e.g. with ds9.
+    This class dumps information about a model container into a logfile or
+    on screen. This might be helpful for quick access to the model container,
+    showing, e.g., number of sources, background models, free and fixed
+    parameters etc. The tool can also dump the models into a region file to
+    display e.g. with ds9.
     """
     def __init__(self, *argv):
         """
@@ -39,7 +40,7 @@ class csmodelinfo(ctools.cscript):
         """
         # Set name
         self.name    = "csmodelinfo"
-        self.version = "0.1.0"
+        self.version = "1.1.0"
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -69,7 +70,8 @@ class csmodelinfo(ctools.cscript):
     def parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
+        default parfile. This kluge avoids shipping the cscript with a
+        parfile.
         """
 
         # Set parfile name
@@ -108,10 +110,10 @@ class csmodelinfo(ctools.cscript):
         Get parameters from parfile and setup the observation.
         """
         # Get models
-        self.models        = gammalib.GModels(self["inmodel"].filename())
+        self.models = gammalib.GModels(self["inmodel"].filename())
         
-        # Get ds9 file
-        self.ds9file       = self["ds9file"].filename()
+        # Get ds9 filename
+        self.ds9file = self["ds9file"].filename()
         
         # Get hidden parameters for region file
         self.pnt_type      = self["pnt_type"].string()
@@ -128,7 +130,6 @@ class csmodelinfo(ctools.cscript):
         
         # Return
         return
- 
         
     def run(self):
         """
@@ -321,7 +322,7 @@ class csmodelinfo(ctools.cscript):
 
     def save(self):
         """ 
-        Save pointings to ds9 region file if required
+        Save models to ds9 region file if required
         """
        
         # Check if ds9 file is valid
@@ -479,7 +480,6 @@ class csmodelinfo(ctools.cscript):
         # Return string
         return ds9string 
 
-            
     def execute(self):
         """
         Execute the script.

@@ -1,19 +1,20 @@
 .. _cstsmapmerge:
 
 cstsmapmerge
-======
+============
 
 Merges slices of splitted tsmap computations.
 
 
 Synopsis
 --------
-In case a TS map has been computed using the option to split the calculations into
-several jobs, this tool is required to merge the output into one final map again.
-Running :doc:`cttsmap` with the hidden parameters ``binmin`` and ``binmax`` specified 
-will result in several sliced TS maps. This script merges them into one FITS file.
-The input slices can be passed via the ``inmaps`` parameter. There are 4 options to specify
-a list of files that should be merged:
+
+In case a TS map has been computed using the option to split the calculations
+into several jobs, this tool is required to merge the output into one final
+map again. Running :doc:`cttsmap` with the hidden parameters ``binmin`` and
+``binmax`` specified will result in several sliced TS maps. This script merges
+them into one FITS file. The input slices can be passed via the ``inmaps``
+parameter. There are 4 options to specify a list of files that should be merged:
 - a space-separated list of file names (e.g. tsmap1.fits tsmap2.fits)
 - a comma-separated list of file names (e.g. tsmap1.fits,tsmap2.fits)
 - a wildcard string (e.g. tsmap*.xml)
@@ -61,7 +62,7 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = cssens.log) [filename]``
+``(logfile = cstsmapmerge.log) [filename]``
     Log filename.
 
 

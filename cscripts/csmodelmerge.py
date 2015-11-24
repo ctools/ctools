@@ -24,12 +24,13 @@ import sys
 import glob
 
 
-# =============== #
-# cshessobs class #
-# =============== #
+# ================== #
+# csmodelmerge class #
+# ================== #
 class csmodelmerge(ctools.cscript):
     """
-    This class merges an arbitray number of model container into one output model XML file
+    This class merges an arbitray number of model container into one output
+    model XML file.
     """
     def __init__(self, *argv):
         """
@@ -37,7 +38,7 @@ class csmodelmerge(ctools.cscript):
         """
         # Set name
         self.name    = "csmodelmerge"
-        self.version = "0.1.0"
+        self.version = "1.1.0"
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -67,7 +68,8 @@ class csmodelmerge(ctools.cscript):
     def parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
+        default parfile. This kluge avoids shipping the cscript with a
+        parfile.
         """
 
         # Set parfile name
@@ -116,7 +118,9 @@ class csmodelmerge(ctools.cscript):
             
         # Throw exception if input models cannot be decoded
         else:
-            msg = "Parameter \"inmodels\" must contain either an @ASCII file, a comma-separated or space-separated list of files or a wildcard string"
+            msg = "Parameter \"inmodels\" must contain either an @ASCII"+\
+                  " file, a comma-separated or whitespace-separated list"+\
+                  " of files or a wildcard string"
             raise gammalib.GException.invalid_argument("csmodelmerge::get_parameters", msg) 
         
         # Get output file
@@ -125,7 +129,6 @@ class csmodelmerge(ctools.cscript):
         # Return
         return
  
-        
     def run(self):
         """
         Run the script.
@@ -141,13 +144,13 @@ class csmodelmerge(ctools.cscript):
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
-            
+
+        # Dump header
         if self.logTerse():
             self.log("\n")
             self.log.header1("Merging Models")
             self.log("\n")
-            
-            
+
         # Initialise output model container
         self.models = gammalib.GModels()
         
@@ -172,7 +175,6 @@ class csmodelmerge(ctools.cscript):
         """ 
         Save pointings to ds9 region file if required
         """
-        
         # Logging
         if self.logExplicit():
             self.log("\n")
@@ -185,7 +187,6 @@ class csmodelmerge(ctools.cscript):
         # Return
         return
 
-            
     def execute(self):
         """
         Execute the script.

@@ -45,7 +45,7 @@ cscripts
    csspec --- Computes spectral points <csspec>
    csresmap --- Generates residual map <csresmap>
    cstsdist --- Generates TS distribution <cstsdist>
-   csobsinfo --- Shows detailled information about an observation container
-   csmodelinfo --- Shows detailled information about a model container
-   csmodelmerge --- Merges several model containers into one file
-   cstsmapmerge --- Merges slices from ts map computations
+   csobsinfo --- Shows observation container content <csobsinfo>
+   csmodelinfo --- Shows model container content <csmodelinfo>
+   csmodelmerge --- Merges several model containers into one file <csmodelmerge>
+   cstsmapmerge --- Merges slices from ts map computations <cstsmapmerge>

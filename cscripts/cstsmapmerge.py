@@ -25,12 +25,12 @@ import glob
 import os
 
 
-# =============== #
-# cshessobs class #
-# =============== #
+# ================== #
+# cstsmapmerge class #
+# ================== #
 class cstsmapmerge(ctools.cscript):
     """
-    This class merges an arbitray number of model container into one output model XML file
+    This class merges TS map files into one TS map
     """
     def __init__(self, *argv):
         """
@@ -38,7 +38,7 @@ class cstsmapmerge(ctools.cscript):
         """
         # Set name
         self.name    = "cstsmapmerge"
-        self.version = "0.1.0"
+        self.version = "1.1.0"
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -68,7 +68,8 @@ class cstsmapmerge(ctools.cscript):
     def parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
+        default parfile. This kluge avoids shipping the cscript with a
+        parfile.
         """
 
         # Set parfile name
@@ -119,12 +120,16 @@ class cstsmapmerge(ctools.cscript):
             
         # Throw exception if input models cannot be decoded
         else:
-            msg = "Parameter \"inmmaps\" must contain either an @ASCII file, a comma-separated or space-separated list of files or a wildcard string"
-            sys.exit(msg)
-                    
+            msg = "Parameter \"inmmaps\" must contain either an @ASCII file,"+\
+                  " a comma-separated or whitespace-separated list of files"+\
+                  " or a wildcard string"
+            raise gammalib.GException.invalid_argument("cstsmapmerge::get_parameters", msg) 
+
+        # Check number of files. We need at least two files.
         if len(self.files) <= 1:
-            msg = "Need at least two files to start merging, "+str(len(self.files))+" given"
-            sys.exit(msg)
+            msg = "Need at least two files to start merging, "+\
+                  str(len(self.files))+" files given."
+            raise gammalib.GException.invalid_argument("cstsmapmerge::get_parameters", msg) 
         
         # Get output file
         self.outmap = self["outmap"].filename()
@@ -136,22 +141,21 @@ class cstsmapmerge(ctools.cscript):
         # Return
         return
  
- 
     def init_map(self, fitsfile):
-        
+        """
+        """
+        # Set filename
         self.in_filename = fitsfile
         
-        # open FITS file
-        
-        fits = gammalib.GFits(fitsfile)
-        self.tsmap = gammalib.GSkyMap()
+        # Open FITS file
+        fits           = gammalib.GFits(fitsfile)
+        self.tsmap     = gammalib.GSkyMap()
         self.tsmap.read(fits[0])
-        
         self.statusmap = gammalib.GSkyMap()
         self.statusmap.read(fits["STATUS MAP"])
         
         # Get other maps 
-        self.maps = []
+        self.maps     = []
         self.mapnames = []
         
         # Loop over extensions
@@ -172,15 +176,13 @@ class cstsmapmerge(ctools.cscript):
         # Return
         return
 
-    # Add map instances to each other
-    # in this way the TS maps get merged  
+    # Add map instances to each other. In this way the TS maps get merged  
     def add(self, fitsfile):
         
         # open FITS file
-        fits = gammalib.GFits(fitsfile)
-        add_tsmap = gammalib.GSkyMap()
+        fits          = gammalib.GFits(fitsfile)
+        add_tsmap     = gammalib.GSkyMap()
         add_tsmap.read(fits[0])
-        
         add_statusmap = gammalib.GSkyMap()
         add_statusmap.read(fits["STATUS MAP"])
         
@@ -209,11 +211,13 @@ class cstsmapmerge(ctools.cscript):
         for i in range(self.tsmap.npix()):
             if add_statusmap[i] > 0.5:
                 
-                # throw exception if this bin has already been computed
+                # Throw exception if this bin has already been computed
                 if self.statusmap[i] > 0.5 and not self.overwrite:
-                    msg = "Attempt to merge bin which apparently has already been merged. File \""+fitsfile+"\" contains already merged bins."
-                    msg += " Set hidden parameter overwrite=yes to avoid this error"
-                    raise gammalib.GException("cstsmapmerge::add", msg)
+                    msg = "Attempt to merge bin which apparently has already"+\
+                          " been merged. File \""+fitsfile+"\" contains"+\
+                          " already merged bins. Set hidden parameter"+\
+                          " overwrite=yes to avoid this error."
+                    raise gammalib.GException.invalid_value("cstsmapmerge::add", msg)
                 
                 # Copy TS values
                 self.tsmap[i] = add_tsmap[i]
@@ -250,7 +254,7 @@ class cstsmapmerge(ctools.cscript):
             self.log("\n")
         
         # Initialise file to start with
-        file0 =""
+        file0 = ""
         
         self.added_files = []
         
@@ -317,8 +321,7 @@ class cstsmapmerge(ctools.cscript):
                 
         # Return
         return
-                
-            
+
     def save(self):
         """ 
         Save merged tsmap file and remove slices if requested
@@ -373,7 +376,6 @@ class cstsmapmerge(ctools.cscript):
         # Return
         return
 
-            
     def execute(self):
         """
         Execute the script.

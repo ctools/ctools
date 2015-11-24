@@ -1,31 +1,33 @@
 .. _csobsinfo:
 
 csobsinfo
-======
+=========
 
-Dumps information about an observation container into log file or on screen
+Dumps information about an observation container into log file or on 
+screen.
 
 
 Synopsis
 --------
 
-This script provides detailled information about a given observation container.
-For IACT observations usually several observations with different 
-configurations are combined. The script computes e.g. the overall energy 
-range which could be an important input for :doc:`ctbin` to create a suitable
-energy range. In addition the script prints the pointing attributes like the average 
-zenith/azimuth angle. If the hidden boolean parameter "offset" is specified to "yes",
-the script queries for the target position and computes the run-by-run offset as well 
-as its average. In the observation summary, the time range of the observations including
-total ontime and (dead-time corrected) livetime is shown.
+This script provides detailed information about a given observation container.
+For IACT observations usually several observations with different configurations
+are combined. The script computes e.g. the overall energy range which could be
+an important input for :doc:`ctbin` to create a suitable energy range. In
+addition the script prints the pointing attributes like the average
+zenith/azimuth angle. If the hidden boolean parameter "offset" is specified to
+"yes", the script queries for the target position and computes the run-by-run
+offset as well as its average. In the observation summary, the time range of
+the observations including total ontime and (dead-time corrected) livetime is
+shown.
 
-The script further contains the hidden parameter "ds9file". If specified with a file
-name, the tool writes out a ds9 region file including a cross for each pointing position
-in the sky.  
+The script further contains the hidden parameter "ds9file". If specified with
+a file name, the tool writes out a ds9 region file including a cross for each
+pointing position in the sky.  
 
-When executed from within python, the script provides methods to return arrays containing
-observation-wise parameters. This might be useful for graphical display within a script. The 
-following methods are implemented:
+When executed from within python, the script provides methods to return arrays
+containing observation-wise parameters. This might be useful for graphical
+display within a script. The following methods are implemented:
 - zeniths (returning all zenith angles)
 - azimuths (returning all azimuth angles)
 - offsets (returning all offset angles, provided the hidden parameter offset=yes)
@@ -76,10 +78,11 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = cssens.log) [filename]``
+``(logfile = csobsinfo.log) [filename]``
     Log filename.
 
 
 Related tools or scripts
 ------------------------
 
+None
