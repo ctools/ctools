@@ -99,10 +99,10 @@ class csobsinfo(ctools.cscript):
         Get parameters from parfile and setup the observation.
         """
         # Get parameters     
-        #self.inobs = self["inobs"].filename()
         self.require_inobs("csobsinfo::get_parameters")
         self.obs = self.get_observations(False)
         
+        # Initialise object position
         self.obj_dir = gammalib.GSkyDir()
         
         self.m_offset = self["offset"].boolean()
