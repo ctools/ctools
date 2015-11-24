@@ -1,19 +1,16 @@
 ## Process this file with automake to produce Makefile.in
 
-# Scripts to be distributed in bindir
-binscripts = tsmerge.py
-
 # Scripts to be distributed in $(pyexecdir)/cscripts
 pythonscripts = __init__.py \
                 cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py \
                 cshessobs.py csobsdef.py csspec.py cslightcrv.py csobsinfo.py \
-                csinfo.py csmodelinfo.py csmodelmerge.py \
+                csinfo.py csmodelinfo.py csmodelmerge.py cstsmapmerge.py \
                 obsutils.py
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
               cshessobs csobsdef csspec cslightcrv csobsinfo csmodelmerge \
-              csinfo csmodelinfo
+              csinfo csmodelinfo cstsmapmerge
 
 # Distribute scripts
 EXTRA_DIST         = $(binscripts) $(pythonscripts)

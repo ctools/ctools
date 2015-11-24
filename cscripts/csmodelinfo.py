@@ -499,7 +499,7 @@ class csmodelinfo(ctools.cscript):
 # ======================== #
 if __name__ == '__main__':
     """
-    Generates caldb entry.
+    Generates model information output.
     """
     # Create instance of application
     app = csmodelinfo(sys.argv)

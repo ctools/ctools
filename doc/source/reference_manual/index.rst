@@ -47,3 +47,5 @@ cscripts
    cstsdist --- Generates TS distribution <cstsdist>
    csobsinfo --- Shows detailled information about an observation container
    csmodelinfo --- Shows detailled information about a model container
+   csmodelmerge --- Merges several model containers into one file
+   cstsmapmerge --- Merges slices from ts map computations

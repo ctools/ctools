@@ -452,7 +452,7 @@ class csobsinfo(ctools.cscript):
 # ======================== #
 if __name__ == '__main__':
     """
-    Generates caldb entry.
+    Generates information about an observation container.
     """
     # Create instance of application
     app = csobsinfo(sys.argv)

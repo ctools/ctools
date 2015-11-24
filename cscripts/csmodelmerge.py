@@ -116,7 +116,7 @@ class csmodelmerge(ctools.cscript):
             
         # Throw exception if input models cannot be decoded
         else:
-            msg = "Parameter \"inmodels\" must contain either an @asci file, a comma-separated or space-separated list of files or a wildcard string"
+            msg = "Parameter \"inmodels\" must contain either an @ASCII file, a comma-separated or space-separated list of files or a wildcard string"
             raise gammalib.GException.invalid_argument("csmodelmerge::get_parameters", msg) 
         
         # Get output file
@@ -205,7 +205,7 @@ class csmodelmerge(ctools.cscript):
 # ======================== #
 if __name__ == '__main__':
     """
-    Generates caldb entry.
+    Merges model XML files
     """
     # Create instance of application
     app = csmodelmerge(sys.argv)
