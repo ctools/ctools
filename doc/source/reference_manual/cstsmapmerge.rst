@@ -69,3 +69,4 @@ Standard parameters
 Related tools or scripts
 ------------------------
 
+:ref:`cstsmap`
