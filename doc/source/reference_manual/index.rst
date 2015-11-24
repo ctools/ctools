@@ -45,4 +45,4 @@ cscripts
    csspec --- Computes spectral points <csspec>
    csresmap --- Generates residual map <csresmap>
    cstsdist --- Generates TS distribution <cstsdist>
-   csobs2caldb --- Creates a <caldb> entry from an input observation
+   csobs2caldb --- Creates a caldb entry from an input observation <csobs2caldb>

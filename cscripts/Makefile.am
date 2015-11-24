@@ -12,8 +12,8 @@ pythonscripts = __init__.py \
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
-              cshessobs csobsdef csspec cslightcrv csobs2caldb \
-              csinfo
+              cshessobs csobsdef csspec cslightcrv \
+              csinfo csobs2caldb
 
 # Distribute scripts
 EXTRA_DIST         = $(binscripts) $(pythonscripts)

@@ -42,11 +42,13 @@ rm -rf *.fits *.xml *.dat
 #
 # Creates pfiles directory
 # ========================
-rm -rf pfiles
-mkdir -p pfiles
-cp -r ../src/*/*.par pfiles/
 export PFILES=pfiles
-export CALDB=$PWD
+export CALDB=$PWD/caldb
+rm -rf $PFILES
+mkdir -p $PFILES
+cp -r ../src/*/*.par pfiles/
+rm -rf $CALDB
+mkdir -p $CALDB
 
 #
 # Test csobsdef
@@ -80,7 +82,7 @@ chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
 @abs_top_srcdir@/cscripts/csobs2caldb.py \
   inobs="data/obs_unbinned.xml" \
   rspname="test_irfs" \
-  chatter=4 > csobs2caldb.log
+  chatter=4 #> csobs2caldb.log
 $ECHO -n "."
 if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
 then

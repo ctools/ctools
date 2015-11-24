@@ -25,15 +25,16 @@ import os
 import datetime
 
 
-# =============== #
-# cshessobs class #
-# =============== #
+# ================= #
+# csobs2caldb class #
+# ================= #
 class csobs2caldb(ctools.cscript):
     """
-    This class implements the creation of a caldb entry for a particular observation,
-    which might be helpful for running simulations for current IACTs.
-    It takes an observation definition file as input and uses the first observation
-    to create a caldb entry which can be used for simulations and sensitivity studies later on  
+    This class implements the creation of a caldb entry for a particular
+    observation, which might be helpful for running simulations for current
+    IACTs. It takes an observation definition file as input and uses the
+    first observation to create a caldb entry which can be used for
+    simulations and sensitivity studies later on.
     """
     def __init__(self, *argv):
         """
@@ -41,7 +42,7 @@ class csobs2caldb(ctools.cscript):
         """
         # Set name
         self.name    = "csobs2caldb"
-        self.version = "0.1.0"
+        self.version = "1.1.0"
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -71,7 +72,8 @@ class csobs2caldb(ctools.cscript):
     def parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
+        default parfile. This kluge avoids shipping the cscript with a
+        parfile.
         """
 
         # Set parfile name
@@ -102,7 +104,7 @@ class csobs2caldb(ctools.cscript):
         """
         # Get parameters     
         self.inobs = self["inobs"].filename()
-        self.obs = gammalib.GObservations(self.inobs)
+        self.obs   = gammalib.GObservations(self.inobs)
         
         # Get index of observation to be used (0=default)
         inx = self["index"].integer()
@@ -135,7 +137,6 @@ class csobs2caldb(ctools.cscript):
         # Return
         return
 
- 
     def make_irf_file(self):
         
         # retrieve response component
@@ -145,10 +146,10 @@ class csobs2caldb(ctools.cscript):
         fits = gammalib.GFits()
     
         # Open FITS files of response components
-        fits_aeff = gammalib.GFits(rsp.aeff().filename())
-        fits_psf = gammalib.GFits(rsp.psf().filename())
+        fits_aeff  = gammalib.GFits(rsp.aeff().filename())
+        fits_psf   = gammalib.GFits(rsp.psf().filename())
         fits_edisp = gammalib.GFits(rsp.edisp().filename())
-        fits_bkg = gammalib.GFits(rsp.background().filename())
+        fits_bkg   = gammalib.GFits(rsp.background().filename())
         
         # Bundle IRFs into one file
         fits.append(fits_aeff["EFFECTIVE AREA"])
@@ -158,7 +159,6 @@ class csobs2caldb(ctools.cscript):
         
         # Return fits file
         return fits
-
 
     def make_caldb_index(self):
         
@@ -227,6 +227,7 @@ class csobs2caldb(ctools.cscript):
             # Set row number
             row = i + row_index-4
 
+            # Set date
             now = str(datetime.datetime.now())
             today, time = now.split()
             
@@ -242,10 +243,10 @@ class csobs2caldb(ctools.cscript):
             table["CAL_VST"][row]  = time.split(".")[0]
             table["REF_TIME"][row] = 51544.0
             table["CAL_QUAL"][row] = 0
-            table["CAL_CBD"][row] = "NAME("+self.m_rspname+")"
+            table["CAL_CBD"][row]  = "NAME("+self.m_rspname+")"
             table["CAL_DATE"][row] = today.replace("-","/")[2:]
-            table["CAL_DIR"][row]   = self.cal_dir
-            table["CAL_FILE"][row]  = self.m_outfile
+            table["CAL_DIR"][row]  = self.cal_dir
+            table["CAL_FILE"][row] = self.m_outfile
 
         # Add effective area information
         row = row_index-4
@@ -269,7 +270,6 @@ class csobs2caldb(ctools.cscript):
         
         # Return CIF FITS file
         return cif
-
         
     def make_dirs(self):
 
@@ -293,17 +293,19 @@ class csobs2caldb(ctools.cscript):
         # Create directories and log information
         if not os.path.isdir(self.rsp_dir):
             if self.logExplicit():
-                self.header3("Creating directory \""+self.rsp_dir+"\"")
+                self.log(gammalib.parformat("Directory"))
+                self.log(self.rsp_dir)
+                self.log("\n")
             os.makedirs(self.rsp_dir)
         else:
             if self.logExplicit():
-                self.log("Directory \""+self.rsp_dir+"\" already exists\n")
+                self.log(gammalib.parformat("Directory (existing)"))
+                self.log(self.rsp_dir)
                 self.log("\n")
 
         # Return
         return
-        
-        
+
     def run(self):
         """
         Run the script.
@@ -318,25 +320,24 @@ class csobs2caldb(ctools.cscript):
         # Write input parameters into logger
         if self.logTerse():
             self.log_parameters()
-            self.log("\n")
+            self.log("\n\n")
             self.log.header1("Creating directory structure")
-            self.log("\n")
         
         # Create directory structure
         self.make_dirs()
 
         # Logging
         if self.logTerse():
-            self.log.header1("Updating calibration database")
             self.log("\n")
+            self.log.header1("Updating calibration database")
          
         # Create/update calibration database   
         self.caldb_inx = self.make_caldb_index()
         
         # Logging
         if self.logTerse():
-            self.log.header1("Creating response file")
             self.log("\n")
+            self.log.header1("Creating response file")
             
         # Create IRF file
         self.irf_fits = self.make_irf_file()
@@ -367,6 +368,7 @@ class csobs2caldb(ctools.cscript):
 
         # Return
         return
+
 
 # ======================== #
 # Main routine entry point #
