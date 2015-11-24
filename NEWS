@@ -1,15 +1,15 @@
-New Features and Important Changes in ctools 1.0.0
+New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-19 November 2015
+24 November 2015
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
 changes made since the last release of ctools. The code complies to GammaLib
-version 1.0.0 or above.
+version 1.1.0 or above.
 
 
 2. Configuration
@@ -82,8 +82,7 @@ None
 
 15. ctcubemask - CTA cube filtering
 -----------------------------------
-Allow to ignore the spatial filtering by specifying NONE parameters for "ra",
-"dec" or "rad".
+None
 
 
 16. ctbutterfly - Generate butterfly diagrams
@@ -103,10 +102,11 @@ None
 
 19. cscripts
 ------------
-The csspec script now handled correctly stacked data. Dependent on the
-requested energy binning, it selects for each spectral energy bin the
-relevant energy bins from the counts cube and performs a maximum likelihood
-analysis.
+The following scripts have been added:
+- csobsinfo: dump information in observation container
+- csmodelinfo: dump information in model container
+- csmodelmerge: merge model containers into single container
+- cstsmapmerge: merge sliced TS map into single map
 
 
 20. Examples
