@@ -45,3 +45,5 @@ cscripts
    csspec --- Computes spectral points <csspec>
    csresmap --- Generates residual map <csresmap>
    cstsdist --- Generates TS distribution <cstsdist>
+   csobsinfo --- Shows detailled information about an observation container
+   csmodelinfo --- Shows detailled information about a model container

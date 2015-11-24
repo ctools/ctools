@@ -89,13 +89,13 @@ class csmodelinfo(ctools.cscript):
             pars.append(gammalib.GApplicationPar("pnt_mark_size","i","h","12","","","Marker size for point sources"))
             pars.append(gammalib.GApplicationPar("show_labels","b","h","yes","yes|no","","Add source labels?"))
             pars.append(gammalib.GApplicationPar("width","i","h","2","","","Line width for regions"))
-            pars.append(gammalib.GApplicationPar("font","s","h","helvetica","","","Font for source labels"))
+            pars.append(gammalib.GApplicationPar("font","s","h","helvetica","helvetica|times|courier","","Font for source labels"))
             pars.append(gammalib.GApplicationPar("fontsize","i","h","12","","","Font size for source labels"))
-            pars.append(gammalib.GApplicationPar("fonttype","s","h","normal","normal|bold","","Normal or bold font?"))
+            pars.append(gammalib.GApplicationPar("fonttype","s","h","normal","normal|bold","","Use normal or bold font?"))
             pars.append(gammalib.GApplicationPar("fonttype2","s","h","roman","roman|italic","","Use roman or italic font?"))
             pars.append(gammalib.GApplicationPar("show_ext_type","b","h","yes","yes|no","","Show type of extended model in source name"))
             pars.append(gammalib.GApplicationPar("free_color","s","h","green","","","Color for sources with free parameters (any ds9 color or hex code)"))
-            pars.append(gammalib.GApplicationPar("fixed_color","s","h","magenta","","","Color for source with fixed parameters (any ds9 color or hex code)"))
+            pars.append(gammalib.GApplicationPar("fixed_color","s","h","magenta","","","Color for source without free parameters (any ds9 color or hex code)"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csmodelinfo.log","","","Log filename"))
             pars.save(parfile)
@@ -473,7 +473,8 @@ class csmodelinfo(ctools.cscript):
             ds9string += "color="+color+" "
             ds9string += "width="+str(self.width)+" "
             ds9string += "font=\""+self.font+" "+str(self.fontsize)+" "+self.fonttype+" "+self.fonttype2+"\" "
-            ds9string += "text={"+modelname+"}"
+            if self.show_labels:
+                ds9string += "text={"+modelname+"}"
         
         # Return string
         return ds9string 
