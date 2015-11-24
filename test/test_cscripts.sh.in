@@ -42,11 +42,13 @@ rm -rf *.fits *.xml *.dat *.reg
 #
 # Creates pfiles directory
 # ========================
-rm -rf pfiles
-mkdir -p pfiles
-cp -r ../src/*/*.par pfiles/
 export PFILES=pfiles
-
+export CALDB=$PWD/caldb
+rm -rf $PFILES
+mkdir -p $PFILES
+cp -r ../src/*/*.par pfiles/
+rm -rf $CALDB
+mkdir -p $CALDB
 
 #
 # Test csobsdef
@@ -72,6 +74,24 @@ else
 fi
 $ECHO " ok"
 
+#
+# Test csobs2caldb
+# ================
+$ECHO -n "Test csobs2caldb: "
+chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
+@abs_top_srcdir@/cscripts/csobs2caldb.py \
+  inobs="data/obs_unbinned.xml" \
+  rspname="test_irfs" \
+  chatter=4 #> csobs2caldb.log
+$ECHO -n "."
+if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " $CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
 
 #
 # Test csobsinfo
@@ -279,8 +299,8 @@ chmod +x @abs_top_srcdir@/cscripts/cspull.py
   inmodel="data/crab.xml" \
   outfile="pull.dat" \
   ntrials="3" \
-  caldb="irf" \
-  irf="cta_dummy_irf" \
+  caldb="cta" \
+  irf="test_irfs" \
   ra=83.6331 \
   dec=22.0145 \
   emin=0.1 \

@@ -49,3 +49,4 @@ cscripts
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
    cstsmapmerge --- Merges slices from ts map computations <cstsmapmerge>
+   csobs2caldb --- Creates a caldb entry from an input observation <csobs2caldb>
