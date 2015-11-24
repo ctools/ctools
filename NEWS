@@ -107,6 +107,7 @@ The following scripts have been added:
 - csmodelinfo: dump information in model container
 - csmodelmerge: merge model containers into single container
 - cstsmapmerge: merge sliced TS map into single map
+- csobs2caldb: creates calibration database from observation
 
 
 20. Examples
