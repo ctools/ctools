@@ -70,6 +70,8 @@ test/*.trs
 test/test_cscripts.sh
 test/reports/*.xml
 test/butterfly.txt
+test/model.reg
+test/obs.reg
 examples/*.fits
 examples/*.xml
 examples/*.dat

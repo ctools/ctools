@@ -36,7 +36,7 @@ $ECHO "*****************"
 #
 # Remove any existing result files
 # ================================
-rm -rf *.fits *.xml *.dat
+rm -rf *.fits *.xml *.dat *.reg
 
 
 #
@@ -71,6 +71,203 @@ else
   exit 1
 fi
 $ECHO " ok"
+
+
+#
+# Test csobsinfo
+# ==============
+$ECHO -n "Test csobsinfo: "
+chmod +x @abs_top_srcdir@/cscripts/csobsinfo.py
+@abs_top_srcdir@/cscripts/csobsinfo.py \
+  inobs="obs.xml" \
+  ds9file="obs.reg" \
+  offset=yes \
+  ra="83.6331" \
+  dec="22.01" > csobsinfo.log
+$ECHO -n "."
+if [ -s "obs.reg" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " obs.reg file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelinfo
+# ================
+$ECHO -n "Test csmodelinfo: "
+chmod +x @abs_top_srcdir@/cscripts/csmodelinfo.py
+@abs_top_srcdir@/cscripts/csmodelinfo.py \
+  inmodel="data/crab.xml" \
+  ds9file="model.reg" > csmodelinfo.log
+$ECHO -n "."
+if [ -s "model.reg" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " model.reg file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (space-separated)
+# ===================================
+$ECHO -n "Test csmodelmerge (space-separated): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="data/crab.xml data/source1.xml" \
+  outmodel="merged_models.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (comma-separated)
+# ===================================
+$ECHO -n "Test csmodelmerge (comma-separated): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="data/crab.xml,data/source1.xml" \
+  outmodel="merged_models2.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models2.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models2.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (wildcard string)
+# ===================================
+$ECHO -n "Test csmodelmerge (wildcard string): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="data/model_cube_background*.xml" \
+  outmodel="merged_models3.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models3.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models3.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (ascii-file)
+# ==============================
+ls data/model_cube_background* > models.txt
+$ECHO -n "Test csmodelmerge (ascii-file): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="@models.txt" \
+  outmodel="merged_models4.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models4.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models4.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+rm models.txt
+
+
+#
+# Test cstsmapmerge (comma-separated)
+# ===================================
+$ECHO -n "Test cstsmapmerge (comma-separated): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="data/tsmap_0.fits,data/tsmap_1.fits" \
+  outmap="merged_tsmap1.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap1.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap1.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cstsmapmerge (space-separated)
+# ===================================
+$ECHO -n "Test cstsmapmerge (space-separated): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="data/tsmap_0.fits data/tsmap_1.fits" \
+  outmap="merged_tsmap2.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap2.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cstsmapmerge (wildcard string)
+# ===================================
+$ECHO -n "Test cstsmapmerge (wildcard string): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="data/tsmap_*.fits" \
+  outmap="merged_tsmap3.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap3.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap3.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cstsmapmerge (ascii-file)
+# ==============================
+ls data/tsmap_*.fits > tsmaps.txt
+$ECHO -n "Test cstsmapmerge  (ascii-file): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="@tsmaps.txt" \
+  outmap="merged_tsmap4.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap4.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap4.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+rm tsmaps.txt
 
 
 #
