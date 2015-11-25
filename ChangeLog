@@ -4,6 +4,7 @@
         ========================
 
         Add csobsinfo, csmodelinfo, csmodelmerge, cstsmapmerge (#1578)
+        Add csobs2caldb script (#1579)
 
 
 2015-11-19  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>

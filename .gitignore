@@ -63,6 +63,7 @@ src/ctbutterfly/ctbutterfly
 src/ctulimit/ctulimit
 src/cterror/cterror
 test/pfiles/
+test/caldb/
 test/*.fits
 test/*.dat
 test/*.xml
