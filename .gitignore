@@ -65,6 +65,7 @@ src/ctbutterfly/ctbutterfly
 src/ctulimit/ctulimit
 src/cterror/cterror
 test/pfiles/
+test/caldb/
 test/*.fits
 test/*.dat
 test/*.xml
@@ -72,6 +73,8 @@ test/*.trs
 test/test_cscripts.sh
 test/reports/*.xml
 test/butterfly.txt
+test/model.reg
+test/obs.reg
 examples/*.fits
 examples/*.xml
 examples/*.dat
