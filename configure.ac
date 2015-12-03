@@ -920,10 +920,12 @@ AC_CONFIG_FILES([Makefile
                  test/test_cscripts.sh
                  pyext/Makefile
                  pyext/setup.py
+                 pyext/ctools/__init__.py
+                 cscripts/__init__.py
+                 cscripts/Makefile
                  caldb/Makefile
                  models/Makefile
                  examples/Makefile
-                 cscripts/Makefile
                  ctools.pc
                  testconf.sh],
                 [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;
