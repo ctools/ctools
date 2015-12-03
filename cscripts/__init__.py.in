@@ -53,3 +53,6 @@ def test():
     Run cscripts tests.
     """
     print("No cscripts unit tests have been implemented so far.")
+
+# Add version
+__version__ = '@PACKAGE_VERSION@'
