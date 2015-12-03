@@ -34,3 +34,6 @@ del tools
 del gammalib
 del bad_entries
 del entry
+
+# Add version
+__version__ = '@PACKAGE_VERSION@'

@@ -920,6 +920,7 @@ AC_CONFIG_FILES([Makefile
                  test/test_cscripts.sh
                  pyext/Makefile
                  pyext/setup.py
+                 pyext/ctools/__init__.py
                  caldb/Makefile
                  models/Makefile
                  examples/Makefile
