@@ -22,6 +22,7 @@ import gammalib
 import ctools
 import sys
 import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_ctobssim
 import test_ctselect
 import test_ctbin
@@ -142,8 +143,8 @@ def test(installed=False):
     else:
         rc = 1
 
-    # Return
-    return rc
+    # Exit with return code
+    sys.exit(rc)
 
 
 # ======================== #
@@ -154,7 +155,4 @@ if __name__ == '__main__':
     Perform unit testing for Python interface.
     """
     # Run tests
-    rc = test()
-
-    # Exit with return code
-    sys.exit(rc)
+    test()
