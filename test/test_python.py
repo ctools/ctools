@@ -126,9 +126,11 @@ def test(installed=False):
         pass
     os.environ['PFILES'] = "pfiles"
 
-    # If we have a non-installed version then copy over pfiles
+    # Copy over pfiles
     if not installed:
         os.system("cp -r ../src/*/*.par pfiles/")
+    else:
+        os.system("cp -r %s/syspfiles/*.par pfiles/" % (os.environ['CTOOLS']))
 
     # Run test suite
     success = suites.run()
