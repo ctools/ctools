@@ -233,11 +233,10 @@ class csmodelinfo(ctools.cscript):
         # Log summary
         self.log("\n")
         self.log.header1("Summary")
-        self.log("\n")
         
         # Log instruments
         self.log.header3("Instrument specific models")
-        for inst, n_inst in instruments.iteritems():
+        for inst, n_inst in instruments.items():
             if inst == "":
                 inst = "All"
             self.log.parformat(inst)
@@ -245,16 +244,15 @@ class csmodelinfo(ctools.cscript):
             self.log("\n")
         
         # Log model types
-        self.log("\n")
         self.log.header3("Model types")
-        for modeltype, n_types in types.iteritems():
+        for modeltype, n_types in types.items():
             self.log.parformat(modeltype)
             self.log(str(n_types))
             self.log("\n")
         
         # Log parameter information
         self.log("\n")
-        self.log.header2("Parameter information")
+        self.log.header1("Parameter information")
         self.log.parformat("All parameters")
         self.log(str(n_par_total))
         self.log("\n")
@@ -285,12 +283,11 @@ class csmodelinfo(ctools.cscript):
         self.log.parformat("Parameters at limit")
         self.log(str(n_par_at_limit))
         self.log("\n")
-        self.log("\n")
         
         # Log parameters at limit (if any)
         if n_par_at_limit > 0:
             self.log.header3("Parameters at limit")
-            for source, parameter in pars_at_limit.iteritems():   
+            for source, parameter in pars_at_limit.items():   
                 if len(parameter):  
                     for par in parameter:
                         self.log.parformat(source)
@@ -301,7 +298,7 @@ class csmodelinfo(ctools.cscript):
         if self.logExplicit() and len(free_src_pars):
             self.log("\n")
             self.log.header2("Free source parameters")
-            for source, parameter in free_src_pars.iteritems():   
+            for source, parameter in free_src_pars.items():   
                 if len(parameter): 
                     self.log.header3(source)
                     for par in parameter:
@@ -312,7 +309,7 @@ class csmodelinfo(ctools.cscript):
         # Log TS values if available
         if len(ts):       
             self.log.header3("Test statistics")
-            for source,tsvalue in ts.iteritems():     
+            for source,tsvalue in ts.items():     
                 self.log.parformat(source)
                 self.log("%.2f"%tsvalue)
                 self.log("\n")     
@@ -330,7 +327,6 @@ class csmodelinfo(ctools.cscript):
             
             self.log("\n")
             self.log.header1("Save region file")
-            self.log("\n")
             
             # Open file   
             f = open(self.ds9file,"w")
