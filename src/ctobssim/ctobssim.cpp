@@ -984,6 +984,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  * @param[in] emax Maximum energy.
  * @param[in] centre Centre of region for photon rate determination.
  * @param[in] radius Radius of region for photon rate determination (degrees).
+ * @param[in] indent Indent for logging.
+ * @param[in,out] wrklog Pointer to logger (default: NULL).
  * @return Model flux (photons/cm2/sec).
  ***************************************************************************/
 double ctobssim::get_model_flux(const GModelSky* model,
