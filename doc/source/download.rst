@@ -82,8 +82,8 @@ To clone the gammalib and ctools source codes, type
 
 .. code-block:: bash
 
-   $ git clone https://cta-git.irap.omp.eu/gammalib
-   $ git clone https://cta-git.irap.omp.eu/ctools
+   $ git clone https://cta-gitlab.irap.omp.eu/gammalib/gammalib.git
+   $ git clone https://cta-gitlab.irap.omp.eu/ctools/ctools.git
   
 This will create directories named gammalib and ctools under the current
 working directory that will contain the gammalib and ctools source code.
