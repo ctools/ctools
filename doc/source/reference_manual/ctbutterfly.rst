@@ -28,19 +28,19 @@ General parameters
     Input event list, counts cube or observation definition XML file.
  	 	 
 ``inmodel [file]``
-    Model XML file containing the source and background definitions.
+    Input model XML file.
  	 	 
 ``srcname [string]``
     Name of model component for which butterfly should be computed.
  	 	 
 ``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
+    Input exposure cube file (only needed for stacked analysis).
 
 ``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
+    Input PSF cube file (only needed for stacked analysis).
 
 ``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
+    Input background cube file (only needed for stacked analysis).
 
 ``caldb [string]``
     Calibration database.

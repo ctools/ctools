@@ -23,20 +23,22 @@ General parameters
     simulation.
 
 ``inmodel [file]``
-    XML file that describes the astrophysical sources and the instrumental
-    background model.
- 	 	 
-``outevents [file]``
-    Output event list or observation definition XML file.
- 	 	 
-``(prefix = sim_events_) [string]``
-    Prefix for event list in observation definition XML file.
+    Input model XML file.
  	 	 
 ``caldb [string]``
     Calibration database.
  	 	 
 ``irf [string]``
     Instrumental response function.
+ 	 	 
+``(edisp = no) [boolean]``
+    Apply energy dispersion?
+ 	 	 
+``outevents [file]``
+    Output event list or observation definition XML file.
+ 	 	 
+``(prefix = sim_events_) [string]``
+    Prefix for event list in observation definition XML file.
  	 	 
 ``(seed = 1) [integer]``
     Integer seed value to be used for Monte Carlo simulations. Keep this 
@@ -64,9 +66,6 @@ General parameters
  	 	 
 ``emax [real]``
     Upper energy limit of simulated events (in TeV).
- 	 	 
-``(edisp = no) [boolean]``
-    Apply energy dispersion?
  	 	 
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.

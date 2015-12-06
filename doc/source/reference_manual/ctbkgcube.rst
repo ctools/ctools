@@ -54,19 +54,19 @@ General parameters
     Input model XML file.
 
 ``incube [file]``
-    Counts cube file to extract background cube definition.
-
-``outcube [file]``
-    Output background cube file.
-
-``outmodel [file]``
-    Output model XML file.
+    Input counts cube file to extract background cube definition.
 
 ``caldb [string]``
     Calibration database.
 
 ``irf [string]``
     Instrument response function.
+
+``outcube [file]``
+    Output background cube file.
+
+``outmodel [file]``
+    Output model XML file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.

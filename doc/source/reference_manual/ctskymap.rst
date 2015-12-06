@@ -19,7 +19,7 @@ General parameters
     Input event list or observation definition XML file.
  	 	 
 ``outmap [file]``
-    Output sky map.
+    Output sky map file.
  	 	 
 ``emin [real]``
     Minimum energy in map (in TeV).

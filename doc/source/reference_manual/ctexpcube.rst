@@ -45,10 +45,7 @@ General parameters
     Input event list or observation definition XML file.
 
 ``incube [file]``
-    Counts cube file to extract exposure cube definition.
-
-``outcube [file]``
-    Output exposure cube file.
+    Input counts cube file to extract exposure cube definition.
 
 ``caldb [string]``
     Calibration database.
@@ -58,6 +55,9 @@ General parameters
 
 ``(edisp = no) [boolean]``
     Apply energy dispersion for response computation?
+
+``outcube [file]``
+    Output exposure cube file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
