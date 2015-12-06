@@ -17,8 +17,9 @@
 #
 # General parameters
 #===================
-inobs,   f, a, "events.fits",,, "Event list or observation definition XML file"
-outcube, f, a, "cntcube.fits",,, "Output counts cube"
+inobs,   f, a, "events.fits",,, "Input event list or observation definition XML file"
+outcube, f, a, "cntcube.fits",,, "Output counts cube file"
+
 #
 # Energy binning parameters
 #==========================
@@ -27,6 +28,7 @@ emin,     r, a, 0.1,,, "Start value for first energy bin in TeV"
 emax,     r, a, 100.0,,, "Stop value for last energy bin in TeV"
 enumbins, i, a, 20,,, "Number of energy bins"
 ebinfile, f, a, "NONE",,, "Name of the file containing the energy bin definition"
+
 #
 # Spatial binning parameters
 #===========================
@@ -38,6 +40,7 @@ coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galac
 xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
 proj,     s, a, "CAR",AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
+
 #
 # Standard parameters
 #====================

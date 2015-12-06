@@ -17,25 +17,27 @@
 #
 # General parameters
 #===================
-incube,   f, a, "NONE",,, "Input counts cube"
+inobs,    f, a, "NONE",,, "Input event list, counts cube or observation definition XML file"
+incube,   f, a, "NONE",,, "Input counts cube file to extract model cube definition"
 inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
-outcube,  f, a, "modcube.fits",,, "Output model cube"
+expcube,  f, a, "NONE",,, "Input exposure cube file (only needed for stacked analysis)"
+psfcube,  f, a, "NONE",,, "Input PSF cube file (only needed for stacked analysis)"
+bkgcube,  f, a, "NONE",,, "Input background cube file (only needed for stacked analysis)"
+caldb,    s, a, "prod2",,, "Calibration database"
+irf,      s, a, "South_50h",,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
+outcube,  f, a, "modcube.fits",,, "Output model cube file"
+
 #
 # Observation parameters
 #=======================
-inobs,    f, a, "NONE",,, "Event list, counts cube or observation definition file"
-expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
-psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
-bkgcube,  f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
-caldb,    s, a, "prod2",,, "Calibration database"
-irf,      s, a, "South_50h",,, "Instrument response function"
 ra,       r, a, 83.63,0,360, "RA of pointing (degrees)"
 dec,      r, a, 22.01,-90,90, "Dec of pointing (degrees)"
 rad,      r, a, 5.0,0,180, "Radius of FOV (degrees)"
 tmin,     r, a, 0.0,,, "Start time (MET in s)"
 tmax,     r, a, 1800.0,,, "End time (MET in s)"
 deadc,    r, h, 0.95,0,1, "Average deadtime correction factor"
+
 #
 # Energy binning parameters
 #==========================
@@ -44,6 +46,7 @@ emin,     r, a, 0.1,,, "Start value for first energy bin in TeV"
 emax,     r, a, 100.0,,, "Stop value for last energy bin in TeV"
 enumbins, i, a, 20,,, "Number of energy bins"
 ebinfile, f, h, "NONE",,, "Name of the file containing the energy bin definition"
+
 #
 # Spatial binning parameters
 #===========================
@@ -55,6 +58,7 @@ coordsys, s, a, "CEL", CEL|GAL,,"Coordinate system (CEL - celestial, GAL - galac
 xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
 yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
 proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
+
 #
 # Standard parameters
 #====================

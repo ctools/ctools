@@ -20,14 +20,14 @@
 #===================
 inobs,    f, a, "events.fits",,, "Input event list, counts cube or observation definition XML file"
 inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
-outmodel, f, a, "results.xml",,, "Output model XML file"
 srcname,  s, a, "Crab",,, "Source of interest"
-expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
-psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
-bkgcube,  f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
+expcube,  f, a, "NONE",,, "Input exposure cube file (only needed for stacked analysis)"
+psfcube,  f, a, "NONE",,, "Input PSF cube file (only needed for stacked analysis)"
+bkgcube,  f, a, "NONE",,, "Input background cube file (only needed for stacked analysis)"
 caldb,    s, a, "prod2",,, "Calibration database"
 irf,      s, a, "South_50h",,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
+outmodel, f, a, "results.xml",,, "Output model XML file"
 
 #
 # Error calculation parameters
