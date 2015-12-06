@@ -101,9 +101,9 @@ class cspull(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
+            pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition XML file"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
+            pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output pull distribution file"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))

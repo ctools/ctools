@@ -17,8 +17,8 @@
 #
 # General parameters
 #===================
-inobs,      f, a, "events.fits",,,"Input event list, counts cube or observation definition file"
-inmodel,    f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+inobs,      f, a, "events.fits",,,"Input event list, counts cube or observation definition XML file"
+inmodel,    f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
 srcname,    s, a, "Crab",,,"Source of interest"
 expcube,    f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
 psfcube,    f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
@@ -26,7 +26,7 @@ bkgcube,    f, a, "NONE",,, "Background cube file (only needed for stacked analy
 caldb,      s, a, "prod2",,, "Calibration database"
 irf,        s, a, "South_50h",,, "Instrument response function"
 edisp,      b, h, no,,, "Apply energy dispersion?"
-outfile,    f, a, "butterfly.txt",,, "Output ascii file"
+outfile,    f, a, "butterfly.txt",,, "Output ASCII file"
 refit,      b, h, no,,, "Do refitting?"
 confidence, r, h, 0.68,0.0,1.0, "Confidence level"
 matrix,     f, h, "NONE",,, "Input covariance Matrix FITS file"

@@ -17,8 +17,8 @@
 #
 # General parameters
 #===================
-inobs,  f, a, "events.fits",,, "Event list or observation definition file"
-outmap, f, a, "skymap.fits",,, "Output file name"
+inobs,  f, a, "events.fits",,, "Event list or observation definition XML file"
+outmap, f, a, "skymap.fits",,, "Output skymap file"
 #
 # Event selection parameters
 #===========================

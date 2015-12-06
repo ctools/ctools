@@ -17,9 +17,9 @@
 #
 # File information
 #=================
-inobs,  f, a, "events.fits",,, "Input event list or observation definition file"
-outobs, f, a, "selected_events.fits",,, "Output event list or observation definition file"
-prefix, s, h, "selected_",,, "Prefix for event lists in observation definition file"
+inobs,  f, a, "events.fits",,, "Input event list or observation definition XML file"
+outobs, f, a, "selected_events.fits",,, "Output event list or observation definition XML file"
+prefix, s, h, "selected_",,, "Prefix for event lists in observation definition XML file"
 #
 # Selection parameters
 #=====================

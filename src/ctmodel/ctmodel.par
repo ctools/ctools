@@ -18,7 +18,7 @@
 # General parameters
 #===================
 incube,   f, a, "NONE",,, "Input counts cube"
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
 outcube,  f, a, "modcube.fits",,, "Output model cube"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 #

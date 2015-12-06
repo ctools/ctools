@@ -17,8 +17,8 @@
 #
 # General parameters
 #===================
-inobs,   f, a, "events.fits",,, "Input event list, counts cube or observation definition file"
-inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+inobs,   f, a, "events.fits",,, "Input event list, counts cube or observation definition XML file"
+inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
 srcname, s, a, "Crab",,, "Test source"
 expcube, f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
 psfcube, f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"

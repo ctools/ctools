@@ -17,7 +17,7 @@
 #
 # Observational parameters
 #===================
-inobs,    f, a, "NONE",,, "Event list or observation definition file"
+inobs,    f, a, "NONE",,, "Event list or observation definition XML file"
 incube,   f, a, "NONE",,, "Counts cube for psf cube definition"
 outcube,  f, a, "psfcube.fits",,, "Output psf cube file"
 caldb,    s, a, "prod2",,, "Calibration database"

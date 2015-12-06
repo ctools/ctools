@@ -106,4 +106,6 @@ Standard parameters
 Related tools
 -------------
 
-None
+:doc:`ctexpcube`
+:doc:`ctpsfcube`
+:doc:`ctbkgcube`

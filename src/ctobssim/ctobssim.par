@@ -17,10 +17,10 @@
 #
 # File information
 #=================
-inobs,     f, h, "NONE",,, "Input event list or observation definition file"
-inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Model"
-outevents, f, a, "events.fits",,, "Output event data file or observation definition file"
-prefix,    s, h, "sim_events_",,, "Prefix for event lists in observation definition file"
+inobs,     f, h, "NONE",,, "Input event list or observation definition XML file"
+inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
+outevents, f, a, "events.fits",,, "Output event data file or observation definition XML file"
+prefix,    s, h, "sim_events_",,, "Prefix for event lists in observation definition XML file"
 #
 # Observation parameters
 #=======================

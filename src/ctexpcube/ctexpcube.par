@@ -17,7 +17,7 @@
 #
 # Observational parameters
 #===================
-inobs,    f, a, "NONE",,, "Event list or observation definition file"
+inobs,    f, a, "NONE",,, "Event list or observation definition XML file"
 incube,   f, a, "NONE",,, "Counts cube for exposure cube definition"
 outcube,  f, a, "expcube.fits",,, "Output exposure cube file"
 caldb,    s, a, "prod2",,, "Calibration database"

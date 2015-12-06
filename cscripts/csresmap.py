@@ -103,12 +103,12 @@ class csresmap(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
+            pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition XML file"))
             pars.append(gammalib.GApplicationPar("modcube","f","a","NONE","","","Model cube file (generated with ctmodel)"))            
             pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","f","a","NONE","","","Background cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
             pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output residual map"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
