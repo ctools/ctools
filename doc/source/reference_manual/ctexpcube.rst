@@ -45,7 +45,7 @@ General parameters
     Input event list or observation definition XML file.
 
 ``incube [file]``
-    Counts cube for exposure cube definition.
+    Counts cube file to extract exposure cube definition.
 
 ``outcube [file]``
     Output exposure cube file.

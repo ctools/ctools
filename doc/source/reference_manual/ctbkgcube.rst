@@ -54,7 +54,7 @@ General parameters
     Input model XML file.
 
 ``incube [file]``
-    Counts cube for background cube definition.
+    Counts cube file to extract background cube definition.
 
 ``outcube [file]``
     Output background cube file.
