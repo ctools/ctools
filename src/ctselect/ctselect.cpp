@@ -574,14 +574,6 @@ void ctselect::get_parameters(void)
     m_expr     = (*this)["expr"].string();
     m_usethres = (*this)["usethres"].string();
 
-    // Check parameters (Kluge as the parfile interface does not yet check
-    // parameters; this can be removed once this is done properly)
-    if (m_usethres != "NONE" && m_usethres != "DEFAULT" && m_usethres != "USER") {
-        std::string msg = "Parameter \"usethres\" must be one of \"NONE\", "
-                          "\"DEFAULT\" or \"USER\".";
-        throw GException::invalid_value(G_GET_PARAMETERS, msg);
-    }
-
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
