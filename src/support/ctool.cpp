@@ -684,6 +684,58 @@ void ctool::require_inobs(const std::string& method)
 
 
 /***********************************************************************//**
+ * @brief Throws exception if inobs parameter is an event list
+ *
+ * @param[in] method Method name.
+ *
+ * Throw an exception if the inobs parameter is an event list.
+ ***************************************************************************/
+void ctool::require_inobs_nolist(const std::string& method)
+{
+    // Get inobs filename
+    std::string filename = (*this)["inobs"].filename();
+
+    // Continue only if we have a FITS file
+    if (gammalib::is_fits(filename)) {
+
+        // Signal no list
+        bool is_list = false;
+    
+        // Try loading file as counts cube. If this is successful then
+        // throw an exception
+        try {
+
+            // Load list from file
+            GCTAEventList list(filename);
+
+            // If we're still alive then signal that we have a list
+            is_list = true;
+
+        }
+
+        // Catch any exceptions
+        catch (...) {
+            ;
+        }
+
+        // If we have an event list then throw an exception
+        if (is_list) {
+            std::string msg = "An event list has been specified for the "
+                              "\"inobs\" parameter, yet no event list "
+                              "can be specified as input observation."
+                              " Instead, specify a counts cube or an "
+                              "observation definition file.";
+            throw GException::invalid_value(method, msg);
+        }
+    
+    } // endif: we had a FITS file
+    
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Throws exception if inobs parameter is a counts cube
  *
  * @param[in] method Method name.
@@ -698,7 +750,7 @@ void ctool::require_inobs_nocube(const std::string& method)
     // Continue only if we have a FITS file
     if (gammalib::is_fits(filename)) {
 
-        // Signal su
+        // Signal no cube
         bool is_cube = false;
     
         // Try loading file as counts cube. If this is successful then
