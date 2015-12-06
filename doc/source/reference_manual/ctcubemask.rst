@@ -3,14 +3,32 @@
 ctcubemask
 ==========
 
-Filter a counts cube.
+Mask out bins of a counts cube.
 
 
 Synopsis
 --------
 
 This tool masks out specific regions from a counts cube by setting the
-corresponding pixels to negative values.
+corresponding bin values to -1. Bins with negative values will be ignored
+in a maximum likelihood analysis. A mask is applied spatially and spectrally.
+
+ctcubemask applies a spatial mask that is comprised of a circular selection
+region and a list of circular exclusion regions. The circular selection region
+is specified by the sky direction of the centre and the radius of the circle.
+The circular exclusion regions are specified by an ASCII file in ds9 format.
+The ASCII file contains one row per exclusion region, given in the format
+
+``circle(83.63, 21.5, 0.4)``
+
+where ``83.63`` and ``21.5`` are the Right Ascension and Declination of 
+the centre and ``0.4`` is the radius (in degrees) of the exclusion circle.
+
+ctcubemask also selects only counts cube energy layers that are fully comprised
+in the energy interval specified by the ``emin`` and ``emax`` parameters.
+
+ctcubemask generates a counts cube FITS file that is a copy of the input 
+counts cube and for which all masked bins have been set to -1.
 
 
 General parameters
@@ -18,9 +36,6 @@ General parameters
 
 ``inobs [file]``
     Input counts cube or observation definition XML file.
-
-``regfile [file]``
-    Exclusion region file in ds9 format.
 
 ``outcube [file]``
     Output counts cube or observation definition XML file.
@@ -40,6 +55,9 @@ General parameters
 
 ``rad [real]``
     Radius of circular selection region (in degrees).
+
+``regfile [file]``
+    Input exclusion region file in ds9 format.
 
 ``emin [real]``
     Lower energy limit (in TeV).
@@ -72,11 +90,11 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctexpcube.log) [string]``
+``(logfile = ctcubemask.log) [string]``
     Name of log file.
 
 
 Related tools
 -------------
 
-None
+:doc:`ctbin`

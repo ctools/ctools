@@ -3,13 +3,25 @@
 cttsmap
 =======
 
-Generate a Test Statistic map.
+Generate a Test Statistic (TS) map.
 
 
 Synopsis
 --------
 
-This tool generates a Test Statistic map.
+This tool generates a Test Statistic (TS) map for a specific source model.
+cttsmap works for point, radial and elliptical source models. The tool
+displaces the specified source on a grid of sky directions and computes for
+each direction the TS value for the model. The TS value is defined as twice
+the difference between the log-likelihood obtained for the full model 
+(including the specified source) and the log-likelihood obtained for a model
+that excludes the specified source. The square-root of the TS values 
+corresponds roughly to the pre-trial detection signifiance of the source (in
+Gaussian sigma).
+
+cttsmap generates a FITS file comprising a sky map of TS values followed by 
+one extension per free parameter that contains sky maps of the fitted 
+parameter values.
 
 
 General parameters
@@ -19,11 +31,10 @@ General parameters
     Input event list, counts cube or observation definition XML file.
 
 ``inmodel [file]``
-    Input source model XML file.
+    Input model XML file.
 
 ``srcname [string]``
-    Name of the source in the source model XML file for which the Test
-    Statistic map should be computed.
+    Name of source model for which the TS map should be computed.
 
 ``expcube [file]``
     Input exposure cube file (only needed for stacked analysis).
@@ -38,7 +49,7 @@ General parameters
     Calibration database.
 
 ``irf [string]``
-    Response function.
+    Instrumental response function.
 
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation.

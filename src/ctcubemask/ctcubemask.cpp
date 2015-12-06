@@ -384,7 +384,7 @@ void ctcubemask::get_parameters(void)
         }
     }
 
-    // Check if radius is vaild for a RoI selection
+    // Check if radius is valid for a RoI selection
     if (m_select_roi && (*this)["rad"].is_valid()) {
        m_rad = (*this)["rad"].real();
     }

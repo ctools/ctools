@@ -13,7 +13,7 @@ This tools computes the upper flux limit for a specific source model. Except
 of the node function, all spectral models are supported. Starting from the
 maximum likelihood model parameters, the tool finds the model flux that leads
 to a decrease of the likelihood that corresponds to a given confidence level.
-By default a confidence level of 95% is used, but the level can be adjusted
+By default a confidence level of 95% is used, but this level can be adjusted
 using the hidden ``confidence`` parameter.
 
 ctulimit writes the differential upper flux limit at a given reference 
@@ -33,7 +33,7 @@ General parameters
     Input model XML file.
  	 	 
 ``srcname [string]``
-    Name of model component for which upper limit should be computed.
+    Name of source model for which the upper flux limit should be computed.
  	 	 
 ``expcube [file]``
     Input exposure cube file (only needed for stacked analysis).
@@ -114,3 +114,4 @@ Related tools
 
 :ref:`ctlike`
 :ref:`cterror`
+:ref:`ctbutterfly`

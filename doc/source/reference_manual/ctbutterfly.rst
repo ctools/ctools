@@ -46,7 +46,7 @@ General parameters
     Input model XML file.
  	 	 
 ``srcname [string]``
-    Name of model component for which butterfly should be computed.
+    Name of source model for which the butterfly diagram should be computed.
  	 	 
 ``expcube [file]``
     Input exposure cube file (only needed for stacked analysis).
