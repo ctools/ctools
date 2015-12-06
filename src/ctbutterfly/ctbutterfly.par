@@ -27,7 +27,11 @@ caldb,      s, a, "prod2",,, "Calibration database"
 irf,        s, a, "South_50h",,, "Instrument response function"
 edisp,      b, h, no,,, "Apply energy dispersion?"
 outfile,    f, a, "butterfly.txt",,, "Output ASCII file"
-refit,      b, h, no,,, "Do refitting?"
+
+#
+# Butterfly parameters
+#=====================
+fit,        b, h, no,,, "Perform maximum likelihood fitting?"
 confidence, r, h, 0.68,0.0,1.0, "Confidence level"
 matrix,     f, h, "NONE",,, "Input covariance Matrix FITS file"
 
