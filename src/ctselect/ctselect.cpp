@@ -510,6 +510,9 @@ void ctselect::get_parameters(void)
         // Throw exception if no input observation file is given
         require_inobs(G_GET_PARAMETERS);
 
+        // Throw exception if counts cube is given
+        require_inobs_nocube(G_GET_PARAMETERS);
+
         // Get observation container without response (not needed)
         m_obs = get_observations(false);
 
