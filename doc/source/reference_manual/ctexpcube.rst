@@ -127,7 +127,7 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
 :doc:`ctbin`
