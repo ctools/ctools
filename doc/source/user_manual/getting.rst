@@ -29,15 +29,15 @@ No system administrator privileges are needed to install ctools.
 
 .. _sec_installing_gammalib:
 
-Installing gammalib
+Installing GammaLib
 -------------------
 
-ctools is built on top of gammalib, hence gammalib needs to be built,
+ctools is built on top of GammaLib, hence GammaLib needs to be built,
 installed and configured before ctools can be installed. In case that
 ctools is already installed on your system you may skip reading this
 section and continue with the :ref:`sec_building_ctools` section.
 
-You will need the following to build the gammalib:
+You will need the following to build the GammaLib:
 
 -  About 200 MB of free disk space.
 
@@ -58,12 +58,12 @@ You will need the following to build the gammalib:
 Furthermore it is recommended to have readline and ncurses installed
 (including the developer packages).
 
-After downloading the gammalib tarball (see :ref:`download`), save it
+After downloading the GammaLib tarball (see :ref:`download`), save it
 in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz gammalib-0.11.0.tar.gz
+  $ tar xvfz gammalib-1.0.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -73,7 +73,7 @@ typing
 
 .. code-block:: bash
 
-  $ cd gammalib-0.11.0
+  $ cd gammalib-1.0.0
   $ ./configure
   $ make
   $ make check
@@ -81,6 +81,8 @@ typing
 
 The last step may require system administator privileges. In this case,
 use
+
+.. code-block:: bash
 
   $ sudo make install
 
@@ -133,7 +135,7 @@ an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz ctools-0.10.0.tar.gz
+  $ tar xvfz ctools-1.0.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -142,7 +144,7 @@ Step in the directory and build the ctools by typing
 
 .. code-block:: bash
 
-  $ cd ctools-0.10.0
+  $ cd ctools-1.0.0
   $ ./configure
   $ make
 
@@ -181,7 +183,7 @@ following output at the end of the unit testing:
   PASS: test_python.py
   make[4]: Nothing to be done for `all'.
   ============================================================================
-  Testsuite summary for ctools 0.10.0
+  Testsuite summary for ctools 1.0.0
   ============================================================================
   # TOTAL: 3
   # PASS:  3
@@ -345,19 +347,8 @@ As a quick check that your setup is okay you can run ``csinfo check``:
      ===> Your Gammalib / ctools setup is OK.
 
 If the setup is not okay, run the ``csinfo info`` command to print
-detailed information about your setup.
-There's also a ``csinfo list`` command to quickly list the available tools:
-
-.. code-block:: bash
-
-  $ csinfo
-
-  Print info about Gammalib and ctools to the console.
-
-  Available commands:
-     csinfo list    List available ctools and cscripts
-     csinfo check   Check Gammalib / ctools setup
-     csinfo info    Print Gammalib / ctools setup info
+detailed information about your setup. There's also a ``csinfo list``
+command to quickly list the available tools.
 
 
 .. _sec_known_problems:

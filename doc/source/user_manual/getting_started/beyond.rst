@@ -3,12 +3,12 @@
 Beyond the first steps
 ----------------------
 
-Assuming that you have read the :ref:`quickstart <quickstart>` tutorial,
-here now some chapters to read if you intend to do more complex
-analyses.
-Once you have gone through these chapters you should have a pretty complete
+Now that you are familiar with the ctools basics, here are some sections 
+to read if you intend to do more complex analyses.
+Once you have gone through these sections you should have a pretty complete
 picture about the capabilities of ctools.
-And you should be ready for doing your own cutting edge analyses.
+And you should be ready for doing your own cutting edge CTA science data
+analyses.
 
 .. toctree::
    :maxdepth: 2
@@ -19,11 +19,3 @@ And you should be ready for doing your own cutting edge analyses.
    beyond_residual
    beyond_irf
    beyond_model
-
-
-
-
-
-
-
-
