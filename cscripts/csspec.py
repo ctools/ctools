@@ -107,7 +107,7 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","f","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("outfile","f","a","spectrum.fits","","","Output spectrum file"))
             pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit for spectral points (TeV)"))

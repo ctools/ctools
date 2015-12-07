@@ -101,7 +101,7 @@ class cstsdist(ctools.cscript):
             pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("outfile","f","a","ts.dat","","","Output Test Statistics distribution file"))

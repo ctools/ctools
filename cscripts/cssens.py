@@ -101,7 +101,7 @@ class cssens(ctools.cscript):
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
             pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
             pars.append(gammalib.GApplicationPar("outfile","f","h","sensitivity.dat","","","Output sensitivity ASCII file"))
             pars.append(gammalib.GApplicationPar("offset","r","h","0.0","","","Source offset angle (deg)"))
