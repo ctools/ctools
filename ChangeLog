@@ -7,11 +7,12 @@
         Add csobs2caldb script (#1579)
 
 
-2015-11-19  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-12-07  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.0.0 released
         ========================
 
+        Update end-user documentation
         Implement handling of stacked data in csspec (#1566)
         Resolve Python test problem on El Capitan (#1563)
 

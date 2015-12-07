@@ -33,6 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
+#define G_GET_PARAMETERS                         "ctobssim::get_parameters()"
 #define G_SIMULATE_SOURCE      "ctobssim::simulate_source(GCTAObservation*, "\
                                                     "GModels&, GRan&, GLog*)"
 
@@ -577,7 +578,13 @@ void ctobssim::get_parameters(void)
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
+
+        // Throw exception if counts cube is given
+        require_inobs_nocube(G_GET_PARAMETERS);
+
+        // Get observation container
         m_obs = get_observations();
+        
     }
 
     // ... otherwise make sure that observation boundaries are set
@@ -984,6 +991,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  * @param[in] emax Maximum energy.
  * @param[in] centre Centre of region for photon rate determination.
  * @param[in] radius Radius of region for photon rate determination (degrees).
+ * @param[in] indent Indent for logging.
+ * @param[in,out] wrklog Pointer to logger (default: NULL).
  * @return Model flux (photons/cm2/sec).
  ***************************************************************************/
 double ctobssim::get_model_flux(const GModelSky* model,

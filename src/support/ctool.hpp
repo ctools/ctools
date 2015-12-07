@@ -81,6 +81,8 @@ protected:
 
     // Protected methods that check user parameters
     void            require_inobs(const std::string& method);
+    void            require_inobs_nolist(const std::string& method);
+    void            require_inobs_nocube(const std::string& method);
 
     // Protected support methods
     void            set_response(GObservations& obs);

@@ -3,15 +3,26 @@
 cterror
 =======
 
-Computes parameter errors for a specific sky model component using
-a likelihood profile method.
+Computes parameter errors for a source model from the likelihood profiles.
 
 
 Synopsis
 --------
 
-This tool computes the parameter errors for a specific sky model using
-a likelihood profile method.
+This tool computes the parameter errors for a specific source model using
+the likelihood profiles. Starting from the maximum likelihood model parameters,
+the tool finds the minimum and maximum model parameters that lead to a decrease
+of the likelihood that corresponds to a given confidence level. By default a
+confidence level of 68% is used, but this level can be adjusted using the hidden
+``confidence`` parameter.
+
+cterror generates an output model XML file that contains the values of the 
+best fitting model parameters. For all free parameters, an ``error`` attribute
+is added that provides the statistical uncertainty in the parameter estimate
+as obtained from the likelihood profile. While cterror computes asymmetrical
+errors, which are written into the log file, the XML file will contain the 
+mean error that is obtained by computing the mean of the negative and the
+positive parameter errors.
 
 
 General parameters
@@ -21,22 +32,19 @@ General parameters
     Input event list, counts cube or observation definition XML file.
  	 	 
 ``inmodel [file]``
-    Model XML file containing the source and background definitions.
- 	 	 
-``outmodel [file]``
-    Model XML file with updated error information.
+    Input model XML file.
  	 	 
 ``srcname [string]``
-    Name of model component for which upper limit should be computed.
+    Name of source model for which the parameter errors should be computed.
  	 	 
 ``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
+    Input exposure cube file (only needed for stacked analysis).
 
 ``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
+    Input PSF cube file (only needed for stacked analysis).
 
 ``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
+    Input background cube file (only needed for stacked analysis).
 
 ``caldb [string]``
     Calibration database.
@@ -46,6 +54,9 @@ General parameters
  	 	 
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation.
+ 	 	 
+``outmodel [file]``
+    Output model XML file with updated error information.
  	 	 
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
@@ -86,8 +97,9 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
+:ref:`ctlike`
 :ref:`ctulimit`
 :ref:`ctbutterfly`

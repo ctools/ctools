@@ -93,7 +93,7 @@ protected:
     double      m_confidence;   //!< Confidence level
     int         m_max_iter;     //!< Maximum number of iterations
     bool        m_apply_edisp;  //!< Apply energy dispersion?
-    bool        m_refit;        //!< Do refit?
+    bool        m_fit;          //!< Do fit?
     GEbounds    m_ebounds;      //!< Energy binning definition
     std::string m_outfile;      //!< Output ascii file
 

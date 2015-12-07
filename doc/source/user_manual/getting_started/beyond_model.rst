@@ -26,20 +26,15 @@ specified by the following observation definition XML file:
     </observation>
   </observation_list>
 
-Each observation has a **unique identifier string** and we can use this 
-unique string to connect that observation to a specific model component.
+Each observation has a **unique identifier string** and you can use this 
+unique string to connect an observation to a specific model component.
 This is illustrated in the model XML file below that now has two background
 components.
-**Model components in a XML file need to have a unique name**, for this
-reason we have named the components ``Background_00001`` and
-``Background_00002``.
-Both components now have an ``id`` attribute that ties the model to
-an observation.
-In other words, the model is only applicable to a specific observation
-(it will be ignored for all other observations).
-In our case, model ``Background_00001`` applies to the ``events1.fits``
-event list while model ``Background_00002`` applies to the ``events2.fits``
-event list.
+Both components have an ``id`` attribute that ties the model to a specific
+observation.
+Using ``id="00001"``, the first background model is tied to the 
+``events1.fits`` file, using ``id="00002"``, the second background model is
+tied to the ``events2.fits`` file.
 
 .. code-block:: xml
 
@@ -72,13 +67,21 @@ event list.
     </source>
   </source_library>
 
-Note that both background model components distinguish in their event rate;
-component ``Background_00002`` has a ten times larger background rate than
-component ``Background_00001``.
-To illustrate this difference, we simulated two observations offset by
-+/- 2 degrees from the Crab nebulae using :ref:`ctobssim`.
-We then performed a joint fit of the observations using :ref:`ctlike`
-and created a resdiual map using :ref:`csresmap` that is shown below.
+.. note::
+
+   **Model components in a XML file need to have a unique name.**
+   For this reason the components are named here ``Background_00001``
+   and ``Background_00002``.
+
+Note that both background model components distinguish in their event rate.
+``Background_00002`` has a ten times larger background rate than
+``Background_00001``.
+To illustrate this difference, two observations offset by +/- 2 degrees from
+the Crab nebulae have been simulated using :ref:`ctobssim`.
+A joint fit of the observations is then performed using :ref:`ctlike` and 
+a residual map is created using :ref:`csresmap`.
+
+The result is shown below.
 Obviously, the upper observation has larger residuals owing to the ten 
 times larger background rate that was used in the simulation of the
 associated data.

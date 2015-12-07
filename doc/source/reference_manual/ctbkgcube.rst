@@ -3,36 +3,70 @@
 ctbkgcube
 =========
 
-Generate a background cube for binned maximum likelihood analysis.
+Generate background cube for a counts cube.
 
 
 Synopsis
 --------
 
-This tool generates a background cube for use in a binned maximum
-likelihood analysis.
+This tool generates a background cube for a counts cube based on an input
+model. A background cube is a 3-dimensional cube spanned by Right Ascension
+or Galactic longitude, Declination or Galactic latitude, and energy. The
+energy binning may be either linear, logarithmic, or custom defined using an
+input file. The input model is used to predict the expected number of
+background counts in each background cube bin.
+
+ctbkgcube requires on input the event list or observation definition file 
+that has been used in the generation of the counts cube using :doc:`ctbin`.
+
+To assure consistency between an existing counts cube and the 
+corresponding background cube, it is recommended to specify the counts 
+cube as ``incube`` parameter. This will instruct ctbkgcube to extract the 
+background cube definition (such as sky coordinates and projection, number 
+of pixels, pixel scale, energy binning) from the counts cube.
+
+ctbkgcube generates a background cube FITS file comprising two extensions.
+The primary extension contains a 3-dimensional image that contains the 
+background cube values. The next extension named ``EBOUNDS`` contains a
+binary table that defines the energy boundaries of the background cube.
+
+ctbkgcube generates also an output model XML file that can serve as input 
+for a maximum likelihood analysis. The output model XML file is a copy of
+the input model XML file where the input background model has been replaced
+by a background model of type ``CTACubeBackground``. The ``CTACubeBackground``
+background model instructs any tool analysing binned data to extract 
+background information from a background cube. The ``CTACubeBackground``
+model has a spectral component that can be adjusted in a maximum 
+likelihood fit to accomodate for uncertainties in the prediction of the 
+energy dependence of the background rate. ctbkgcube will use a power law
+as spectral component, but you can replace this by any component of your
+choice.
+
 
 
 General parameters
 ------------------
 
 ``inobs [file]``
-    Input event list, cube or observation definition XML file.
+    Input event list or observation definition XML file.
 
 ``inmodel [file]``
-    Input (background) model XML file.
+    Input model XML file.
 
 ``incube [file]``
-    Counts cube for background cube definition.
-
-``outcube [file]``
-    Output background cube file.
+    Input counts cube file to extract background cube definition.
 
 ``caldb [string]``
     Calibration database.
 
 ``irf [string]``
-    Response function.
+    Instrument response function.
+
+``outcube [file]``
+    Output background cube file.
+
+``outmodel [file]``
+    Output model XML file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
@@ -102,7 +136,7 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`ctbin`

@@ -1,7 +1,7 @@
 Glossary
 ========
 
--  **GammaLib** (`<http://gammalib.sourceforge.net/>`_)
+-  **GammaLib** (`<http://cta.irap.omp.eu/gammalib/>`_)
 
    A versatile toolbox for scientific analysis of astronomical
    gamma-ray data.

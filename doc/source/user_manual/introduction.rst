@@ -22,6 +22,13 @@ also be specified as arguments separated by a whitespace to the ctool:
 
   $ ctobssim ra=83.63 dec=22.01 rad=5.0 tmin=0 tmax=1800 emin=0.1 emax=100.0 caldb=prod2 irf=South_50h inmodel=$CTOOLS/share/models/crab.xml outevents=events.fits
 
+If you need help about the usage of a ctool or a cscript, type the name of 
+the ctool or cscript followed by the ``--help`` option:
+
+.. code-block:: bash
+
+  $ ctobssim --help
+
 ctools includes also a Python module that declares every ctool as a
 Python class. The following example illustrates the usage:
 
@@ -47,7 +54,7 @@ command line or used as Python classes, as illustrated below:
 
 In this User Manual you will now learn how to install and use the ctools
 package.
-If you encounter any problems, please read the :ref:`issues` section.
-If you're desperate, you may need :ref:`help`.
+If you encounter any problems, please read the :ref:`faq` and :ref:`issues`
+sections. If you're desperate, you may need :ref:`help`.
 And you should read the :ref:`develop` section if you would like to 
 contribute to the ctools developments.

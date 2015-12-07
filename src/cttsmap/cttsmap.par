@@ -17,16 +17,16 @@
 #
 # General parameters
 #===================
-inobs,   f, a, "events.fits",,, "Input event list, counts cube or observation definition file"
-inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
-srcname, s, a, "Crab",,, "Test source"
-expcube, f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
-psfcube, f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
-bkgcube, f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
+inobs,   f, a, "events.fits",,, "Input event list, counts cube or observation definition XML file"
+inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
+srcname, s, a, "Crab",,, "Test source name"
+expcube, f, a, "NONE",,, "Input exposure cube file (only needed for stacked analysis)"
+psfcube, f, a, "NONE",,, "Input PSF cube file (only needed for stacked analysis)"
+bkgcube, f, a, "NONE",,, "Input background cube file (only needed for stacked analysis)"
 caldb,   s, a, "prod2",,, "Calibration database"
-irf,     s, a, "South_50h",,, "Instrument response function"
+irf,     s, a, "South_0.5h",,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
-outmap,  f, a, "tsmap.fits",,, "Output Test Statistic map"
+outmap,  f, a, "tsmap.fits",,, "Output Test Statistic map file"
 
 #
 # Spatial binning parameters
@@ -46,7 +46,6 @@ proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 binmin,   i, h, -1,,, "First bin to compute"
 binmax,   i, h, -1,,, "Last bin to compute"
 logL0,    r, h, 0.0,,, "LogLikelihood value of null hypothesis"
-
 
 #
 # Standard parameters

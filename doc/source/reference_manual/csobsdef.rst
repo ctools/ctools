@@ -46,8 +46,8 @@ Here some usage examples:
       Creates observation definition file with a ROI radius of 5 deg.
 
 ``csobsdef caldb=prod2 irf=South_50h``
-      Creates observation definition file using the "South_50h" IRF in the
-      "prod2" calibration database.
+      Creates observation definition file using the ``South_50h`` IRF in the
+      ``prod2`` calibration database.
 
 
 General parameters

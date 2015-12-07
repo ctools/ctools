@@ -3,13 +3,18 @@
 ctskymap
 ========
 
-Computes sky map from CTA data.
+Generate sky map from event list(s).
 
 
 Synopsis
 --------
 
-This tool generates a sky map from CTA data.
+This tool creates a sky map from either a single event list or event lists
+provided in an observation definition file. The tool will loop over all event
+lists that are provided and fill all events into a single sky map. Only events
+within an energy interval spanned by ``emin`` and ``emax`` are considered.
+
+ctskymap generates a FITS file comprising a sky map as primary extension.
 
 
 General parameters
@@ -19,7 +24,7 @@ General parameters
     Input event list or observation definition XML file.
  	 	 
 ``outmap [file]``
-    Output sky map.
+    Output sky map file.
  	 	 
 ``emin [real]``
     Minimum energy in map (in TeV).
@@ -80,7 +85,7 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
 None

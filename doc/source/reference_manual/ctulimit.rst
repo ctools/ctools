@@ -1,15 +1,26 @@
 .. _ctulimit:
 
 ctulimit
-===========
+========
 
-Computes upper limit for a specific sky model component.
+Computes upper flux limit for a source model.
 
 
 Synopsis
 --------
 
-Computes the upper limit flux of a given source.
+This tools computes the upper flux limit for a specific source model. Except
+of the node function, all spectral models are supported. Starting from the
+maximum likelihood model parameters, the tool finds the model flux that leads
+to a decrease of the likelihood that corresponds to a given confidence level.
+By default a confidence level of 95% is used, but this level can be adjusted
+using the hidden ``confidence`` parameter.
+
+ctulimit writes the differential upper flux limit at a given reference 
+energy (specified by the hidden parameter ``eref``) and the integrated 
+upper flux limit (specified by the hidden parameters ``emin`` and ``emax``)
+into the log file.
+
 
 
 General parameters
@@ -19,19 +30,19 @@ General parameters
     Input event list, counts cube or observation definition XML file.
  	 	 
 ``inmodel [file]``
-    Model XML file containing the source and background definitions.
+    Input model XML file.
  	 	 
 ``srcname [string]``
-    Name of model component for which upper limit should be computed.
+    Name of source model for which the upper flux limit should be computed.
  	 	 
 ``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
+    Input exposure cube file (only needed for stacked analysis).
 
 ``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
+    Input PSF cube file (only needed for stacked analysis).
 
 ``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
+    Input background cube file (only needed for stacked analysis).
 
 ``caldb [string]``
     Calibration database.
@@ -53,11 +64,14 @@ General parameters
     Maximum boundary to start searching for upper limit value.
     Number of standard deviations above best fit value  
  	 	 
+``(eref = 1.0) [real])``
+    Reference energy for differential limit (in TeV).
+ 	 	 
 ``(emin = 1.0) [real])``
-    Minimum energy of flux limits (in TeV).
+    Minimum energy for integral flux limit (in TeV).
  	 	 
 ``(emax = 100) [real]``
-    Maximum energy of flux limits (in TeV).
+    Maximum energy for integral flux limit (in TeV).
  	 	 
 ``(tol = 1e-5) [real]``
     Computation tolerance.
@@ -98,4 +112,6 @@ Standard parameters
 Related tools
 -------------
 
+:ref:`ctlike`
 :ref:`cterror`
+:ref:`ctbutterfly`
