@@ -241,8 +241,8 @@ void ctbutterfly::run(void)
         log << m_obs << std::endl;
     }
 
-    // If refit is selected then do maximum likelihood fit
-    if (m_refit) {
+    // If fit is selected then do maximum likelihood fit
+    if (m_fit) {
 
         // Write header
         if (logTerse()) {
@@ -267,14 +267,14 @@ void ctbutterfly::run(void)
             log << m_covariance << std::endl;
         }
 
-    } // endif: refit selected
+    } // endif: fit selected
 
     // Get model instance for further computations
     GModels models = m_obs.models();
 
-    // If no refit is selected and no covariance matrix has been specified
+    // If no fit is selected and no covariance matrix has been specified
     // then compute now the covariance matrix
-    if (!m_refit && m_covariance.size() == 0) {
+    if (!m_fit && m_covariance.size() == 0) {
 
         // Write header
         if (logTerse()) {
@@ -542,7 +542,7 @@ void ctbutterfly::init_members(void)
     m_confidence  = 0.68;
     m_max_iter    = 50;
     m_apply_edisp = false;
-    m_refit       = false;
+    m_fit         = false;
     m_ebounds.clear();
     m_outfile.clear();
 
@@ -576,7 +576,7 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_confidence  = app.m_confidence;
     m_max_iter    = app.m_max_iter;
     m_apply_edisp = app.m_apply_edisp;
-    m_refit       = app.m_refit;
+    m_fit         = app.m_fit;
     m_ebounds     = app.m_ebounds;
     m_outfile     = app.m_outfile;
  
@@ -668,7 +668,7 @@ void ctbutterfly::get_parameters(void)
 
     // Read other parameters
     m_confidence = (*this)["confidence"].real();
-    m_refit      = (*this)["refit"].boolean();
+    m_fit        = (*this)["fit"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file

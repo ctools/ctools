@@ -656,23 +656,132 @@ GCTAObservation ctool::create_cta_obs(void)
 
 
 /***********************************************************************//**
- * @brief Throws exception in inobs parameter is not valid
+ * @brief Throws exception if inobs parameter is not valid
  *
  * @param[in] method Method name.
+ *
+ * Throw an exception if the inobs parameter is either NONE or an empty
+ * string.
  ***************************************************************************/
 void ctool::require_inobs(const std::string& method)
 {
+    // Get inobs filename
+    std::string filename = (*this)["inobs"].filename();
+
     // Throw exception if no infile is given
-    if ((*this)["inobs"].filename() == "NONE" ||
-        (*this)["inobs"].filename() == "") {
+    if (filename == "NONE" || gammalib::strip_whitespace(filename) == "") {
         std::string msg = "A valid file needs to be specified for the "
-                          "\"inobs\" parameter, yet \""+
-                          (*this)["inobs"].filename()+"\" was given."
+                          "\"inobs\" parameter, yet \""+filename+
+                          "\" was given."
                           " Specify a valid observation definition or "
                           "FITS file to proceed.";
         throw GException::invalid_value(method, msg);
     }
 
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Throws exception if inobs parameter is an event list
+ *
+ * @param[in] method Method name.
+ *
+ * Throw an exception if the inobs parameter is an event list.
+ ***************************************************************************/
+void ctool::require_inobs_nolist(const std::string& method)
+{
+    // Get inobs filename
+    std::string filename = (*this)["inobs"].filename();
+
+    // Continue only if we have a FITS file
+    if (gammalib::is_fits(filename)) {
+
+        // Signal no list
+        bool is_list = false;
+    
+        // Try loading file as counts cube. If this is successful then
+        // throw an exception
+        try {
+
+            // Load list from file
+            GCTAEventList list(filename);
+
+            // If we're still alive then signal that we have a list
+            is_list = true;
+
+        }
+
+        // Catch any exceptions
+        catch (...) {
+            ;
+        }
+
+        // If we have an event list then throw an exception
+        if (is_list) {
+            std::string msg = "An event list has been specified for the "
+                              "\"inobs\" parameter, yet no event list "
+                              "can be specified as input observation."
+                              " Instead, specify a counts cube or an "
+                              "observation definition file.";
+            throw GException::invalid_value(method, msg);
+        }
+    
+    } // endif: we had a FITS file
+    
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Throws exception if inobs parameter is a counts cube
+ *
+ * @param[in] method Method name.
+ *
+ * Throw an exception if the inobs parameter is a counts cube.
+ ***************************************************************************/
+void ctool::require_inobs_nocube(const std::string& method)
+{
+    // Get inobs filename
+    std::string filename = (*this)["inobs"].filename();
+
+    // Continue only if we have a FITS file
+    if (gammalib::is_fits(filename)) {
+
+        // Signal no cube
+        bool is_cube = false;
+    
+        // Try loading file as counts cube. If this is successful then
+        // throw an exception
+        try {
+
+            // Load cube from file
+            GCTAEventCube cube(filename);
+
+            // If we're still alive then signal that we have a cube
+            is_cube = true;
+
+        }
+
+        // Catch any exceptions
+        catch (...) {
+            ;
+        }
+
+        // If we have a counts cube then throw an exception
+        if (is_cube) {
+            std::string msg = "A counts cube has been specified for the "
+                              "\"inobs\" parameter, yet no counts cube "
+                              "can be specified as input observation."
+                              " Instead, specify an event list or an "
+                              "observation definition file.";
+            throw GException::invalid_value(method, msg);
+        }
+    
+    } // endif: we had a FITS file
+    
     // Return
     return;
 }

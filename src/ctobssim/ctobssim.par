@@ -15,17 +15,16 @@
 #                                                                           #
 #############################################################################
 #
-# File information
-#=================
-inobs,     f, h, "NONE",,, "Input event list or observation definition file"
-inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Model"
-outevents, f, a, "events.fits",,, "Output event data file or observation definition file"
-prefix,    s, h, "sim_events_",,, "Prefix for event lists in observation definition file"
-#
-# Observation parameters
-#=======================
-caldb, s, a, "prod2",,, "Calibration database"
-irf,   s, a, "South_50h",,, "Instrument response function"
+# General parameters
+#===================
+inobs,     f, h, "NONE",,, "Input event list or observation definition XML file"
+inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
+caldb,     s, a, "prod2",,, "Calibration database"
+irf,       s, a, "South_0.5h",,, "Instrument response function"
+edisp,     b, h, no,,, "Apply energy dispersion?"
+outevents, f, a, "events.fits",,, "Output event data file or observation definition XML file"
+prefix,    s, h, "sim_events_",,, "Prefix for event lists in observation definition XML file"
+
 #
 # Simulation parameters
 #======================
@@ -37,9 +36,9 @@ tmin,    r, a, 0.0,,, "Start time (MET in s)"
 tmax,    r, a, 1800.0,,, "End time (MET in s)"
 emin,    r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,    r, a, 100.0,,, "Upper energy limit (TeV)"
-edisp,   b, h, no,,, "Apply energy dispersion?"
 deadc,   r, h, 0.95,0,1, "Average deadtime correction factor"
 maxrate, r, h, 1.0e6,,, "Maximum photon rate"
+
 #
 # Standard parameters
 #====================

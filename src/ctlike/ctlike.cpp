@@ -310,7 +310,7 @@ void ctlike::run(void)
     // Write results into logger
     if (logTerse()) {
         log << std::endl;
-        log.header1("Maximum likelihood optimization results");
+        log.header1("Maximum likelihood optimisation results");
         log << *m_opt << std::endl;
         log << gammalib::parformat("Maximum log likelihood");
         log << gammalib::str(m_logL,3) << std::endl;
@@ -545,7 +545,7 @@ double ctlike::reoptimize_lm(void)
     log.indent(0);
     if (logTerse()) {
         log << std::endl;
-        log.header1("Maximum likelihood re-optimization results");
+        log.header1("Maximum likelihood re-optimisation results");
         log << *m_opt << std::endl;
     }
 

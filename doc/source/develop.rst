@@ -8,12 +8,12 @@ to the development.
 Contributions can come in any areas: writing C++ code, contributing Python 
 scripts, writing documentation, testing code, etc.
 
-The ctools development is managed by a development platform that is 
-accessible at `<https://cta-redmine.irap.omp.eu/projects/ctools/>`_.
+The ctools software development is managed by a
+`Redmine <https://cta-redmine.irap.omp.eu/projects/ctools/>`_ platform.
 Please check out the 
 `Wiki <https://cta-redmine.irap.omp.eu/projects/ctools/wiki/Contributing_to_ctools>`_
-on that platform that contains information on how to contribute to the
-ctools development.
+on that platform to learn how you can contribute to the ctools software
+development.
 
 You may also want to get in the ctools information flow by subscribing to 
 the ctools@irap.omp.eu mailing list.
@@ -24,5 +24,5 @@ to allow newcomers to get familiar with the code base and the coding
 practices.
 You are highly invited to join one of the next coding sprints.
 
-You can also follow `@gammalib <https://twitter.com/gammalib>`_ on
-twitter to get informed about new release of GammaLib and ctools.
+You can also follow `@ctools_software <https://twitter.com/ctools_software>`_ on
+twitter to get informed about new ctools releases.

@@ -17,13 +17,15 @@
 #
 # General parameters
 #===================
-inobs,  f, a, "events.fits",,, "Event list or observation definition file"
-outmap, f, a, "skymap.fits",,, "Output file name"
+inobs,  f, a, "events.fits",,, "Input event list or observation definition XML file"
+outmap, f, a, "skymap.fits",,, "Output skymap file"
+
 #
 # Event selection parameters
 #===========================
 emin, r, a, 0.1,,, "Lower energy limit (TeV)"
 emax, r, a, 100.0,,, "Upper energy limit (TeV)"
+
 #
 # Spatial binning parameters
 #===========================

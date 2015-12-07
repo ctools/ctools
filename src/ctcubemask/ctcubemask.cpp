@@ -357,16 +357,11 @@ void ctcubemask::get_parameters(void)
     // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a valid observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
+
+        // Throw exception if event list is given
+        require_inobs_nolist(G_GET_PARAMETERS);
 
         // Build observation container without response (not needed)
         m_obs = get_observations(false);
@@ -389,7 +384,7 @@ void ctcubemask::get_parameters(void)
         }
     }
 
-    // Check if radius is vaild for a RoI selection
+    // Check if radius is valid for a RoI selection
     if (m_select_roi && (*this)["rad"].is_valid()) {
        m_rad = (*this)["rad"].real();
     }

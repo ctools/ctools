@@ -128,8 +128,8 @@ class csobsdef(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Pointing definition file"))
-            pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Output observation definition file"))
+            pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Input pointing definition file"))
+            pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Output observation definition XML file"))
             pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Pointing duration (seconds)"))
             pars.append(gammalib.GApplicationPar("caldb","s","h","","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","h","","","","Instrument response function"))

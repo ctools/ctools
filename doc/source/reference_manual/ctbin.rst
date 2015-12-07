@@ -3,18 +3,27 @@
 ctbin
 =====
 
-Generate a counts cube for binned maximum likelihood analysis.
+Generate counts cube from event list(s).
 
 
 Synopsis
 --------
 
-This tool computes the counts cube for use in a binned maximum likelihood
-analysis. The counts cubes are 3-dimensional data cubes spanned by Right
-Ascension or Galactic longitude, Declination or Galactic latitude, and energy.
-The energy binning may be either linear, logarithmic, or custom defined.
-If an observation definition XML file containing several observations is 
-provided on input, the tool will stack all data into a single counts cube.
+This tool creates a counts cube and fills it with events. A counts cube is 
+a 3-dimensional data cube spanned by Right Ascension or Galactic longitude,
+Declination or Galactic latitude, and energy. The energy binning may be either
+linear, logarithmic, or custom defined using an input file. The events are 
+either taken from a single event list file or from the event lists that are 
+specified in an observation definition file. In case that multiple event 
+lists are given in an observation definition file, the tool will loop over
+all event lists and fill all events into a single counts cube.
+
+ctbin generates a counts cube FITS file comprising three extensions. The
+primary extension contains a 3-dimensional image that contains the counts
+cube values. The next extension named ``EBOUNDS`` contains a binary table
+that defines the energy boundaries of the counts cube. The last extension
+named ``GTI`` contains a binary table that defines the Good Time Intervals
+of all event lists that have been filled into the counts cube.
 
 
 General parameters
@@ -94,7 +103,9 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`ctexpcube`
+:doc:`ctpsfcube`
+:doc:`ctbkgcube`

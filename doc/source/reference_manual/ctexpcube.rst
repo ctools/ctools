@@ -3,14 +3,39 @@
 ctexpcube
 =========
 
-Generate an exposure cube for binned maximum likelihood analysis.
+Generate exposure cube for a counts cube.
 
 
 Synopsis
 --------
 
-This tool generates an exposure cube for use in a binned maximum likelihood
-analysis.
+This tool generates an exposure cube for a counts cube. An exposure cube is
+a 3-dimensional cube spanned by Right Ascension or Galactic longitude,
+Declination or Galactic latitude, and energy, that gives the exposure 
+as function of true sky direction and energy. The energy binning of the cube 
+may be either linear, logarithmic, or custom defined using an input file.
+
+ctexpcube requires on input the event list or observation definition file 
+that has been used in the generation of the counts cube using :doc:`ctbin`.
+
+For the user's convenience, the counts cube can be specified as ``incube``
+parameter which will instruct ctexpcube to extract the exposure cube 
+definition (such as sky coordinates and projection, number of pixels, pixel
+scale, energy binning) from the counts cube. Note, however, that the exposure
+cube is defined in true sky coordinates and energy while the counts cube is 
+defined in measured sky coordinates and energy. Consequently, the sky area
+and energy range covered by the exposure cube should be slightly larger than 
+that of the counts cube to accomodate for spill over of events due to the 
+point spread function and energy dispersion. By computing the exposure map 
+on the same grid as the counts cube, the spill over of events from sources at
+the edge of cube will not be handled correctly.
+
+ctexpcube generates an exposure cube FITS file comprising three extensions.
+The primary extension contains a 3-dimensional image that contains the 
+exposure values. The next extension named ``EBOUNDS`` contains a binary table
+that defines the energy boundaries of the exposure cube. The last extension
+named ``GTI`` contains a binary table that defines the Good Time Intervals
+of the exposure cube.
 
 
 General parameters
@@ -20,19 +45,19 @@ General parameters
     Input event list or observation definition XML file.
 
 ``incube [file]``
-    Counts cube for PSF cube definition.
-
-``outcube [file]``
-    Output exposure cube file.
+    Input counts cube file to extract exposure cube definition.
 
 ``caldb [string]``
     Calibration database.
 
 ``irf [string]``
-    Response function.
+    Instrument response function.
 
 ``(edisp = no) [boolean]``
     Apply energy dispersion for response computation?
+
+``outcube [file]``
+    Output exposure cube file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
@@ -102,7 +127,7 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`ctbin`

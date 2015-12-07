@@ -3,14 +3,39 @@
 ctobssim
 ========
 
-Simulates CTA events.
+Simulate event list(s).
 
 
 Synopsis
 --------
 
-Generate photon events from astrophysical sources and background events 
-from an instrumental background model.
+This tool simulates event list(s) using the instrument characteristics 
+specified by the instrument response function(s) and an input model. The 
+simulation includes photon events from astrophysical sources and background
+events from an instrumental background model.
+
+By default, ctobssim creates a single event list. ctobssim queries a pointing
+direction, the radius of the simulation region, a time interval, an energy
+interval, an instrumental response function, and an input model. ctobssim uses
+a numerical random number generator for the simulations with a seed value
+provided by the hidden ``seed`` parameter. Changing this parameter for
+subsequent runs will lead to different event samples.
+
+ctobssim performs a safety check on the maximum photon rate for all model 
+components to avoid that the tool locks up and requests huge memory 
+ressources, which may happen if a mistake was made in setting up the input 
+model (for example if an error in the flux units is made). The maximum allowed
+photon rate is controlled by the hidden ``maxrate`` parameter, which by default 
+is set to 1e6.
+
+ctobssim can also generate multiple event lists if an observation definition 
+file is specified on input using the hidden ``inobs`` parameter. In that 
+case, simulation information will be gathered from the file, and for each 
+observation an event list will be created.
+
+For each event file, the simulation parameters will be written as data
+selection keywords to the FITS header. These keywords are mandatory for any
+unbinned maximum likelihood analysis of the event data.
 
 
 General parameters
@@ -23,20 +48,22 @@ General parameters
     simulation.
 
 ``inmodel [file]``
-    XML file that describes the astrophysical sources and the instrumental
-    background model.
- 	 	 
-``outevents [file]``
-    Output event list or observation definition XML file.
- 	 	 
-``(prefix = sim_events_) [string]``
-    Prefix for event list in observation definition XML file.
+    Input model XML file.
  	 	 
 ``caldb [string]``
     Calibration database.
  	 	 
 ``irf [string]``
     Instrumental response function.
+ 	 	 
+``(edisp = no) [boolean]``
+    Apply energy dispersion?
+ 	 	 
+``outevents [file]``
+    Output event list or observation definition XML file.
+ 	 	 
+``(prefix = sim_events_) [string]``
+    Prefix for event list in observation definition XML file.
  	 	 
 ``(seed = 1) [integer]``
     Integer seed value to be used for Monte Carlo simulations. Keep this 
@@ -64,9 +91,6 @@ General parameters
  	 	 
 ``emax [real]``
     Upper energy limit of simulated events (in TeV).
- 	 	 
-``(edisp = no) [boolean]``
-    Apply energy dispersion?
  	 	 
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.
@@ -107,7 +131,7 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`csobsdef`

@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file main.cpp
+ * @file cterror/main.cpp
  * @brief CTA parameter error calculation
  * @author Florent Forest
  */

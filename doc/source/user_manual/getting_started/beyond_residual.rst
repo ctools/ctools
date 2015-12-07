@@ -22,11 +22,11 @@ Suppose that you have done the following unbinned ``ctlike`` analysis:
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts cube or observation definition file [events.fits] obs.xml
+  Input event list, counts cube or observation definition XML file [events.fits] obs.xml
   Calibration database [prod2] 
-  Instrument response function [South_50h] 
-  Source model [$CTOOLS/share/models/crab.xml] 
-  Source model output file [crab_results.xml] 
+  Instrument response function [South_0.5h]
+  Input model XML file [$CTOOLS/share/models/crab.xml] 
+  Output model XML file [crab_results.xml] 
 
 The :ref:`csresmap` script is then used as follows:
 
@@ -34,18 +34,19 @@ The :ref:`csresmap` script is then used as follows:
 
   $ csresmap
   Parfile csresmap.par not found. Create default parfile.
-  Event list, counts cube, or observation definition file [events.fits] obs.xml
+  Input event list, counts cube, or observation definition XML file [events.fits] obs.xml
   Calibration database [prod2] 
-  Instrument response function [South_50h] 
-  Source model [$CTOOLS/share/models/crab.xml] crab_results.xml
-  Output residual map [resmap.fits] 
-  First coordinate of image center in degrees (RA or galactic l) [83.63] 
-  Second coordinate of image center in degrees (DEC or galactic b) [22.01] 
+  Instrument response function [South_0.5h] 
+  Input model XML file [$CTOOLS/share/models/crab.xml] crab_results.xml
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
   Coordinate System (CEL|GAL) [CEL] 
-  Projection method e.g. AIT|AZP|CAR|MER|MOL|STG|TAN (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
   Size of the X axis in pixels [200] 
   Size of the Y axis in pixels [200] 
   Pixel size (deg/pixel) [0.02] 
+  Output residual map file [resmap.fits] 
+  Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUBDIV] 
 
 In our example, the map will cover a field of 4 x 4 degrees centred on the 
 Crab nebula at a pixel scale of 0.02 degrees per pixel.
