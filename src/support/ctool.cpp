@@ -414,26 +414,38 @@ GEbounds ctool::create_ebounds(void)
         // Get filename
         std::string ebinfile = (*this)["ebinfile"].filename();
 
-        // Open energy boundary file using the EBOUNDS or ENERGYBINS
-        // extension. Throw an exception if opening fails.
-        GFits file(ebinfile);
-        if (file.contains("EBOUNDS")) {
-            file.close();
-            ebounds.load(ebinfile,"EBOUNDS");
-        }
-        else if (file.contains("ENERGYBINS")) {
-            file.close();
-            ebounds.load(ebinfile,"ENERGYBINS");
+        // Create filename instance
+        GFilename fname(ebinfile);
+
+       // Check if extension name was provided
+        if (!fname.has_extname()) {
+
+            // Open energy boundary file using the EBOUNDS or ENERGYBINS
+            // extension. Throw an exception if opening fails.
+            GFits file(ebinfile);
+            if (file.contains("EBOUNDS")) {
+                file.close();
+                ebounds.load(ebinfile);
+            }
+            else if (file.contains("ENERGYBINS")) {
+                file.close();
+                ebinfile += "[ENERGYBINS]";
+                ebounds.load(ebinfile);
+            }
+            else {
+                file.close();
+                std::string msg = "No extension with name \"EBOUNDS\" or"
+                                  " \"ENERGYBINS\" found in FITS file"
+                                  " \""+ebinfile+"\".\n"
+                                  "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
+                                  " is required if the parameter \"ebinalg\""
+                                  " is set to \"FILE\".";
+                throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
+            }
         }
         else {
-            file.close();
-            std::string msg = "No extension with name \"EBOUNDS\" or"
-                              " \"ENERGYBINS\" found in FITS file"
-                              " \""+ebinfile+"\".\n"
-                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                              " is required if the parameter \"ebinalg\""
-                              " is set to \"FILE\".";
-            throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
+            // Load ebounds from filename including extension
+            ebounds.load(ebinfile);
         }
         
     } // endif: ebinalg was "FILE"
