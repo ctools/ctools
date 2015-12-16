@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-7 December 2015
+16 December 2015
 
 
 1. Introduction
@@ -27,7 +27,10 @@ None
 
 4. Support model
 ----------------
-None
+Adapt the ctool::create_ebounds() method to the change in the GEbounds
+interface (the extname argument has been removed from the GEbounds::load()
+method and replaced by using the GFilename class to handle extension names
+as part of the file name).
 
 
 5. ctobssim - CTA observation simulation
