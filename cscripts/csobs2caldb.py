@@ -146,10 +146,10 @@ class csobs2caldb(ctools.cscript):
         fits = gammalib.GFits()
         
         # Create GFilename instances
-        fname_aeff = gammalib.GFilename(rsp.aeff().filename())
-        fname_psf = gammalib.GFilename(rsp.psf().filename())
+        fname_aeff  = gammalib.GFilename(rsp.aeff().filename())
+        fname_psf   = gammalib.GFilename(rsp.psf().filename())
         fname_edisp = gammalib.GFilename(rsp.edisp().filename())
-        fname_bkg = gammalib.GFilename(rsp.background().filename())
+        fname_bkg   = gammalib.GFilename(rsp.background().filename())
     
         # Open FITS files of response components
         fits_aeff  = gammalib.GFits(fname_aeff.filename())

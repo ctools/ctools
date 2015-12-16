@@ -417,7 +417,7 @@ GEbounds ctool::create_ebounds(void)
         // Create filename instance
         GFilename fname(ebinfile);
 
-       // Check if extension name was provided
+        // Check if extension name was provided
         if (!fname.has_extname()) {
 
             // Open energy boundary file using the EBOUNDS or ENERGYBINS
