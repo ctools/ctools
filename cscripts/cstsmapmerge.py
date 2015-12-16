@@ -123,13 +123,13 @@ class cstsmapmerge(ctools.cscript):
             msg = "Parameter \"inmmaps\" must contain either an @ASCII file,"+\
                   " a comma-separated or whitespace-separated list of files"+\
                   " or a wildcard string"
-            raise gammalib.GException.invalid_argument("cstsmapmerge::get_parameters", msg) 
+            raise RuntimeError(msg) 
 
         # Check number of files. We need at least two files.
         if len(self.files) <= 1:
             msg = "Need at least two files to start merging, "+\
                   str(len(self.files))+" files given."
-            raise gammalib.GException.invalid_argument("cstsmapmerge::get_parameters", msg) 
+            raise RuntimeError(msg) 
         
         # Get output file
         self.outmap = self["outmap"].filename()
@@ -217,7 +217,7 @@ class cstsmapmerge(ctools.cscript):
                           " been merged. File \""+fitsfile+"\" contains"+\
                           " already merged bins. Set hidden parameter"+\
                           " overwrite=yes to avoid this error."
-                    raise gammalib.GException.invalid_value("cstsmapmerge::add", msg)
+                    raise RuntimeError(msg)
                 
                 # Copy TS values
                 self.tsmap[i] = add_tsmap[i]

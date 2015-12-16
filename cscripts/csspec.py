@@ -206,7 +206,7 @@ class csspec(ctools.cscript):
                       "cube does not overlap with specified energy range ["+ \
                       str(emin)+", "+str(emax)+"]. Specify "+ \
                       "overlapping energy range."
-                raise gammalib.GException.invalid_argument("csspec", msg)
+                raise RuntimeError(msg)
 
             # Determine number of layers to use for each spectral bin
             n_layers = int(len(use_layers) / self.m_enumbins)
