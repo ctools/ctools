@@ -95,7 +95,7 @@ all-local: build
 build: ctools/tools_wrap.cpp ctools/tools.py
 	$(PYTHON) setup.py build
 if IS_ELCAPITAN
-	for f in build/ctools/ctools/_*.so; do \
+	-for f in build/ctools/ctools/_*.so; do \
 		echo "Post process module "$$f; \
 		install_name_tool -change $(libdir)/libctools.0.dylib @rpath/libctools.0.dylib $$f; \
 		install_name_tool -change $(libdir)/libgamma.0.dylib @rpath/libgamma.0.dylib $$f; \

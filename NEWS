@@ -17,7 +17,8 @@ version 1.0.0 or above.
 A special post processing of the Python module libraries has been added for
 Mac OS X 10.11 and higher (El Capitan). This post processing is a replacement for
 setting DYLD_LIBRARY_PATH during unit testing since the environment variable is
-ignored in certain circumstances by El Capitan.
+ignored in certain circumstances by El Capitan. Any errors that occur in the
+post-processing will be ignored.
 
 
 3. Python interface

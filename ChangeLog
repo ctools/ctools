@@ -4,6 +4,7 @@
         ========================
 
         Update end-user documentation
+        Ignore errors in El Capitan post processing (#1605)
         Change GException to RuntimeError in cscripts (#1604)
         Adapt to GammaLib interface changs (#1603)
         Implement handling of stacked data in csspec (#1566)
