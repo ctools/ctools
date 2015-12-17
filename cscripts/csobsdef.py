@@ -249,8 +249,7 @@ class csobsdef(ctools.cscript):
                 pntdir = gammalib.GSkyDir()
                 pntdir.lb_deg(lon,lat)
             else:
-                raise gammalib.GException.invalid_value(self.name,
-                      "No (ra,dec) or (lon,lat) columns found in pointing"
+                raise RuntimeError("No (ra,dec) or (lon,lat) columns found in pointing"
                       " definition file.")
             obs.pointing(gammalib.GCTAPointing(pntdir))
 

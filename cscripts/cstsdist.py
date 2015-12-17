@@ -275,7 +275,7 @@ class cstsdist(ctools.cscript):
         if not model.has_par("Prefactor"):
             msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
                   " Only spectral models with a \"Prefactor\" parameter are supported."
-            raise gammalib.GException.invalid_value("cssens", msg)
+            raise RuntimeError(msg)
 
         # Fit or fix spatial parameters
         if fitpos:

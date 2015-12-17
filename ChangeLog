@@ -1,9 +1,10 @@
-2015-12-16  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-12-17  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.0.0 released
         ========================
 
         Update end-user documentation
+        Change GException to RuntimeError in cscripts (#1604)
         Adapt to GammaLib interface changs (#1603)
         Implement handling of stacked data in csspec (#1566)
         Resolve Python test problem on El Capitan (#1563)

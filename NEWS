@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-16 December 2015
+17 December 2015
 
 
 1. Introduction
@@ -110,6 +110,9 @@ The csspec script now handled correctly stacked data. Dependent on the
 requested energy binning, it selects for each spectral energy bin the
 relevant energy bins from the counts cube and performs a maximum likelihood
 analysis.
+
+All GExceptions are replaced by Python RuntimeErrors as the GException
+classes are not exposed to Python.
 
 
 20. Examples

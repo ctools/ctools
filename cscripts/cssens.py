@@ -241,7 +241,7 @@ class cssens(ctools.cscript):
             else:
                 msg = "Invalid sensitivity type \""+self.m_type+"\" encountered."+ \
                       " Either use \"Differential\" or \"Integral\"."
-                raise gammalib.GException.invalid_value("cssens", msg)
+                raise RuntimeError(msg)
 
             # Determine sensitivity
             result = self.get_sensitivity(self.obs, emin, emax,
@@ -347,7 +347,7 @@ class cssens(ctools.cscript):
         if not model.has_par("Prefactor"):
             msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
                   " Only spectral models with a \"Prefactor\" parameter are supported."
-            raise gammalib.GException.invalid_value("cssens", msg)
+            raise RuntimeError(msg)
 
         # Set source position
         if self.m_ra != None and self.m_dec != None:
