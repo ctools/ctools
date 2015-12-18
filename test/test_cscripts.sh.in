@@ -126,12 +126,12 @@ chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
 @abs_top_srcdir@/cscripts/csiactobs.py \
   datapath="iactdata/" \
   prodname="unit-test" \
-  runlistfile="iactdata/runlist.txt" \ 
+  runlistfile="iactdata/runlist.txt" \
   bkgpars="1" \
-  outobs="obs.xml" \
+  outobs="obs2.xml" \
   outmodel="bkgmodels.xml" > csiactobs.log
 $ECHO -n "."
-if [ -s "obs.xml" ]
+if [ -s "obs2.xml" ]
 then
   $ECHO -n "."
 else
