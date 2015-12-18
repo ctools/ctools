@@ -1,15 +1,15 @@
-New Features and Important Changes in ctools 1.1.0
+New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-17 December 2015
+18 December 2015
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
-changes made since the last release of ctools. The code complies to GammaLib
-version 1.1.0 or above.
+changes made since the last release of ctools. The code complies to ctools
+version 1.0.0 or above.
 
 
 2. Configuration
@@ -112,6 +112,9 @@ The following scripts have been added:
 - csmodelmerge: merge model containers into single container
 - cstsmapmerge: merge sliced TS map into single map
 - csobs2caldb: creates calibration database from observation
+- csiactdata: inspects IACT data
+
+The cshessobs script has been renamed to csiactobs.
 
 All GExceptions are replaced by Python RuntimeErrors as the GException
 classes are not exposed to Python.

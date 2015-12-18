@@ -29,13 +29,34 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [1.1.0.dev], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [1.0.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
 AM_INIT_AUTOMAKE([gnu -Wno-portability])
 #AM_INIT_AUTOMAKE([gnu -Wno-portability serial-tests])
 AC_CONFIG_HEADER([config.h])
+
+
+#############################################################################
+# Library versioning (current:revision:age)                                 #
+# ------------------------------------------------------------------------- #
+# Here are a set of rules to update your library version information:       #
+# 1. Update the version information only immediately before a public        #
+#    release of your software. More frequent updates are unnecessary,       #
+#    and only guarantee that the current interface number gets larger       #
+#    faster.                                                                #
+# 2. If the library source code has changed at all since the last update,   #
+#    then increment revision.                                               #
+# 3. If any interfaces have been added, removed, or changed since the last  #
+#    update, increment current, and set revision to 0.                      #
+# 4. If any interfaces have been added since the last public release, then  #
+#    increment age.                                                         #
+# 5. If any interfaces have been removed or changed since the last public   #
+#    release, then set age to 0.                                            #
+#############################################################################
+CTOOLS_LT_VERSION="1:0:0"
+AC_SUBST(CTOOLS_LT_VERSION)
 
 
 #############################################################################

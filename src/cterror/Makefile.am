@@ -12,6 +12,7 @@ sources = cterror.cpp
 # Libtool library
 noinst_LTLIBRARIES = libcterror.la
 libcterror_la_SOURCES = $(sources)
+libcterror_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 cterror_SOURCES = main.cpp

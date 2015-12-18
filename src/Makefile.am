@@ -46,6 +46,7 @@ libctools_la_LIBADD = support/libsupport.la \
                       ctbutterfly/libctbutterfly.la \
                       ctulimit/libctulimit.la \
                       cterror/libcterror.la
+libctools_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
 
 # Distribute scripts
 EXTRA_DIST   = $(scripts)

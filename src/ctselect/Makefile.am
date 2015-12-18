@@ -12,6 +12,7 @@ sources = ctselect.cpp
 # Libtool library (only needed for python bindings)
 noinst_LTLIBRARIES = libctselect.la
 libctselect_la_SOURCES = $(sources)
+libctselect_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctselect_SOURCES = main.cpp
