@@ -41,14 +41,13 @@ class csiactobs(ctools.cscript):
         """
         Constructor.
         """
-        # Set name
+        # Set name and version
         self.name    = "csiactobs"
         self.version = "1.0.0"
-        self.m_erange = gammalib.GEbounds()
-        
-        self.datapath = os.getenv("VHEFITS","")
-        print argv
+
         # Initialise some members
+        self.m_erange = gammalib.GEbounds()
+        self.datapath = os.getenv("VHEFITS","")
         self.inmodels = None
         self.outobs   = "obs.xml"
 
