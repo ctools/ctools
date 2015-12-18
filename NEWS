@@ -1,45 +1,37 @@
-New Features and Important Changes in ctools 0.10.0
+New Features and Important Changes in ctools 1.0.0
 
 Author(s) : Juergen Knoedlseder
 
-31 October 2015
+18 December 2015
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
-changes made since the last release of ctools. The code complies to GammaLib
-version 0.11.0 or above.
+changes made since the last release of ctools. The code complies to ctools
+version 1.0.0 or above.
 
 
 2. Configuration
 -----------------
-None
+A special post processing of the Python module libraries has been added for
+Mac OS X 10.11 and higher (El Capitan). This post processing is a replacement for
+setting DYLD_LIBRARY_PATH during unit testing since the environment variable is
+ignored in certain circumstances by El Capitan. Any errors that occur in the
+post-processing will be ignored.
 
 
 3. Python interface
 -------------------
-A specific cscripts Python module has been created for cscripts. This module
-can be imported using
-
-    >>> import cscripts
-
-The obsutils utility functions have also been moved into the scripts folder.
-
-The obsutils.spectrum() function has been removed as it is now replaced by the
-csspec script.
-
-Some tests for the installed ctools package have been added. They can be
-executed by typing the following under Python:
-
-    >>> cscripts.test()
+None
 
 
 4. Support model
 ----------------
-The ctool base class now handles the specification of the --help option on
-the command line. For each tools or script, a help text that is generated from
-the .rst documentation files is displayed on the console when --help is given.
+Adapt the ctool::create_ebounds() method to the change in the GEbounds
+interface (the extname argument has been removed from the GEbounds::load()
+method and replaced by using the GFilename class to handle extension names
+as part of the file name).
 
 
 5. ctobssim - CTA observation simulation
@@ -54,14 +46,12 @@ None
 
 7. ctbin - CTA event binning
 ----------------------------
-ctbin now verifies if an ROI has been set properly, and throws an exception in
-case that no ROI information could be found.
+None
 
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-The optimizer is now allocated upon construction so that ctlike always returns a
-meaningful object using the opt() method.
+None
 
 
 9. cttsmap - Generation of Test Statistics map
@@ -91,8 +81,7 @@ None
 
 14. ctbkgcube - CTA background cube generation
 ----------------------------------------------
-Limit the power law prefactor to a range of [0.01,100] and the index to [-5,5]. This
-solves some stability problems in csspec (#1547).
+None
 
 
 15. ctcubemask - CTA cube filtering
@@ -112,24 +101,28 @@ None
 
 18. cterror - Likelihood profile error computation
 --------------------------------------------------
-Added initial version of the likelihood profile error computation tool. This
-tool will scan the likelihood function to find the confidence interval for
-all source parameters.
-
-
-19. Examples
-------------
 None
 
 
-20. Scripts
------------
-Added csinfo script to provide some information about the GammaLib and ctools
-installation. To be run in case of problems to help diagnostics.
+19. cscripts
+------------
+The following scripts have been added:
+- csobsinfo: dump information in observation container
+- csmodelinfo: dump information in model container
+- csmodelmerge: merge model containers into single container
+- cstsmapmerge: merge sliced TS map into single map
+- csobs2caldb: creates calibration database from observation
+- csiactdata: inspects IACT data
 
-The cspull script was extended to now also handle stacked analysis in case
-that an observation definition XML file is specified with multiple observations
-by the inobs parameter.
+The cshessobs script has been renamed to csiactobs.
+
+All GExceptions are replaced by Python RuntimeErrors as the GException
+classes are not exposed to Python.
+
+
+20. Examples
+------------
+None
 
 
 21. caldb

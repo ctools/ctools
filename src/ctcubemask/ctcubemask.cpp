@@ -221,7 +221,7 @@ void ctcubemask::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        log.header1("Observations for applying mask");
+        log.header1("Observations");
         log << m_obs << std::endl;
     }
 
@@ -349,20 +349,19 @@ void ctcubemask::save(void)
  ***************************************************************************/
 void ctcubemask::get_parameters(void)
 {
+    // Initialise selection flags
+    m_select_energy = true;
+    m_select_roi    = true;
+
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
 
-        // Throw exception if no infile is given
-        if ((*this)["inobs"].filename() == "NONE" ||
-            (*this)["inobs"].filename() == "") {
-            std::string msg = "A valid file needs to be specified for the "
-                              "\"inobs\" parameter, yet \""+
-                              (*this)["inobs"].filename()+"\" was given."
-                              " Specify a vaild observation definition or "
-                              "event list FITS file to proceed.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+        // Throw exception if no input observation file is given
+        require_inobs(G_GET_PARAMETERS);
+
+        // Throw exception if event list is given
+        require_inobs_nolist(G_GET_PARAMETERS);
 
         // Build observation container without response (not needed)
         m_obs = get_observations(false);
@@ -373,13 +372,36 @@ void ctcubemask::get_parameters(void)
 	m_regfile = (*this)["regfile"].filename();
     m_usepnt  = (*this)["usepnt"].boolean();
     if (!m_usepnt) {
-        m_ra  = (*this)["ra"].real();
-        m_dec = (*this)["dec"].real();
+
+        // Check RA/DEC parameters for validity to read
+        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
+           m_ra         = (*this)["ra"].real();
+           m_dec        = (*this)["dec"].real();
+           m_select_roi = true;
+        }
+        else {
+           m_select_roi = false;
+        }
     }
-    m_rad  = (*this)["rad"].real();
-    m_emin = (*this)["emin"].real();
-    m_emax = (*this)["emax"].real();
-	
+
+    // Check if radius is valid for a RoI selection
+    if (m_select_roi && (*this)["rad"].is_valid()) {
+       m_rad = (*this)["rad"].real();
+    }
+    else {
+       m_select_roi = false;
+    }
+
+    // Check for sanity of energy selection parameters
+    if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
+        m_emin          = (*this)["emin"].real();
+        m_emax          = (*this)["emax"].real();
+        m_select_energy = true;
+    }
+    else {
+        m_select_energy = false;
+    }
+
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
@@ -410,10 +432,27 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         GSkyMap         map     = cube->map();
         const GEbounds& ebounds = cube->ebounds();
 
+        // If no energy selection is required set energy boundaries to cube boundaries
+        if (!m_select_energy) {
+            m_emin = ebounds.emin().TeV();
+            m_emax = ebounds.emax().TeV();
+        }
+
         // Initialise energy selection
+        int npix   = map.npix();
         int n_ebin = ebounds.size();
         int e_idx1 = 0;
         int e_idx2 = n_ebin;
+
+        // Determine number of events before masking
+        double sum_before = 0.0;
+        for (int i = 0; i < n_ebin; ++i) {
+            for (int pixel = 0; pixel < npix; ++pixel) {
+                if (map(pixel, i) >= 0.0) {
+                    sum_before += map(pixel, i);
+                }
+            }
+        }
 
         // Loop over ebounds to find the first valid energy band
         for (int i = 0; i < n_ebin; ++i) {
@@ -434,7 +473,6 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Set all pixels outside the desired energy bands to -1.0
-        int npix = map.npix();
         for (int i = 0; i < e_idx1; ++i) {
             for (int pixel = 0; pixel < npix; ++pixel) {
                 map(pixel,i) = -1.0;
@@ -455,24 +493,26 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Set all pixels inside selected energy bands but outside ROI
-        // to -1.0
-        GSkyRegionCircle roi(m_ra, m_dec, m_rad);
-        for (int i = e_idx1; i <= e_idx2; ++i) {
-            for (int pixel = 0; pixel < npix; ++pixel) {
-                GSkyDir dir = map.inx2dir(pixel);
-                if (!roi.contains(dir)) {
-                    map(pixel,i) = -1.0;
+        // to -1.0 if requested
+        if (m_select_roi) {
+            GSkyRegionCircle roi(m_ra, m_dec, m_rad);
+            for (int i = e_idx1; i <= e_idx2; ++i) {
+                for (int pixel = 0; pixel < npix; ++pixel) {
+                    GSkyDir dir = map.inx2dir(pixel);
+                    if (!roi.contains(dir)) {
+                        map(pixel,i) = -1.0;
+                    }
                 }
             }
-        }
 
-        // Log selected energy band
-        if (logTerse()) {
-            log << gammalib::parformat("Selected ROI");
-            log << "RA=" << m_ra << " deg, ";
-            log << "DEC=" << m_dec << " deg, ";
-            log << "Radius=" << m_rad << " deg";
-            log << std::endl;
+            // Log selected energy band
+            if (logTerse()) {
+                log << gammalib::parformat("Selected ROI");
+                log << "RA=" << m_ra << " deg, ";
+                log << "DEC=" << m_dec << " deg, ";
+                log << "Radius=" << m_rad << " deg";
+                log << std::endl;
+            }
         }
 
         // Set all pixels inside selected energy bands and inside exclusion
@@ -501,6 +541,24 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
                 log << gammalib::parformat("Exclusion regions");
                 log << "None" << std::endl;
             }
+        }
+
+        // Determine number of events after masking
+        double sum_after = 0.0;
+        for (int i = 0; i < n_ebin; ++i) {
+            for (int pixel = 0; pixel < npix; ++pixel) {
+                if (map(pixel, i) >= 0.0) {
+                    sum_after += map(pixel, i);
+                }
+            }
+        }
+
+        // Dump number of events before and after masking
+        if (logTerse()) {
+            log << gammalib::parformat("Events before masking");
+            log << sum_before << std::endl;
+            log << gammalib::parformat("Events after masking");
+            log << sum_after << std::endl;
         }
 
         // Put back map into the event cube
@@ -538,6 +596,8 @@ void ctcubemask::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_infiles.clear();
+    m_select_energy = true;
+    m_select_roi    = true;
 
     // Return
     return;
@@ -563,8 +623,10 @@ void ctcubemask::copy_members(const ctcubemask& app)
     m_emax    = app.m_emax;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_infiles    = app.m_infiles;
+    m_obs           = app.m_obs;
+    m_infiles       = app.m_infiles;
+    m_select_energy = app.m_select_energy;
+    m_select_roi    = app.m_select_roi;
     
     // Return
     return;

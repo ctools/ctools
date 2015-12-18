@@ -3,14 +3,36 @@
 ctselect
 ========
 
-Performs sub-selections of event data.
+Select events from event list(s).
 
 
 Synopsis
 --------
 
-Creates a new FITS file of selected events from an input event list based
-on spatial, temporal, and energy cuts.
+This tool selects events from one or several event lists. Event selection 
+is based on a circular acceptance region, a time interval and an energy 
+interval. In addition, any expression following the cfitsio syntax can be 
+used for event selection.
+
+Optionally, ctselect may also apply energy thresholds. If ``usethres=DEFAULT``
+is specified, ctselect will extract any save thresholds from the instrument
+response functions, and if they exist, will apply them to the respective 
+event list. Alternatively, if ``usethres=USER`` is specified, ctselect will
+extract any user thresholds from the observation definition file (attributes
+``emin`` and ``emax``), and if either of the attributes exists, will apply
+them to the respective event list.
+
+If an event list is provided on input, ctselect creates a new FITS file on 
+output that contains only the selected events. In case that an observation 
+definition file is specified on input, ctselect creates for each event file
+referenced in the observation definition file a new FITS file with the value
+of ``prefix`` prepended to the file name that contains only the selected
+events. In addition, a new observation definition file will be written 
+that references the new FITS files.
+
+For each event file, the event selection parameters will be writted as data
+selection keywords to the FITS header. These keywords are mandatory for any
+unbinned maximum likelihood analysis of the event data.
 
 
 General parameters
@@ -98,7 +120,7 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
 None

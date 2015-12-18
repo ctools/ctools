@@ -22,6 +22,7 @@ import gammalib
 import ctools
 import sys
 import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_ctobssim
 import test_ctselect
 import test_ctbin
@@ -125,9 +126,11 @@ def test(installed=False):
         pass
     os.environ['PFILES'] = "pfiles"
 
-    # If we have a non-installed version then copy over pfiles
+    # Copy over pfiles
     if not installed:
         os.system("cp -r ../src/*/*.par pfiles/")
+    else:
+        os.system("cp -r %s/syspfiles/*.par pfiles/" % (os.environ['CTOOLS']))
 
     # Run test suite
     success = suites.run()
@@ -142,8 +145,8 @@ def test(installed=False):
     else:
         rc = 1
 
-    # Return
-    return rc
+    # Exit with return code
+    sys.exit(rc)
 
 
 # ======================== #
@@ -154,7 +157,4 @@ if __name__ == '__main__':
     Perform unit testing for Python interface.
     """
     # Run tests
-    rc = test()
-
-    # Exit with return code
-    sys.exit(rc)
+    test()

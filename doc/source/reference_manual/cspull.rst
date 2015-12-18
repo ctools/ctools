@@ -3,17 +3,33 @@
 cspull
 ======
 
-Generates pull distribution for all model parameters.
+Generates pull distribution for all free model parameters.
 
 
 Synopsis
 --------
 
-Generates pull distributions for all parameters in a model. The pull is
-defined by the fitted value minus the simulated true value, devided by
-the statistical uncertainty. For unbiased parameter estimates, the pull
-distribution should follow a Gaussian centred on 0 and a sigma parameter
-of 1.
+This script generates pull distributions for all free model parameters.
+The pull is defined as the fitted model parameter value minus the true
+value, devided by the parameter error. cspull will perform ``ntrials`` 
+statistically independent Monte Carlo simulations followed by maximum
+likelihood model fitting to derive the pull distribution for each free
+model parameter. If the model fit is unbiased and the parameters are 
+correct, the pull distribution should follow a Gaussian centred on 0
+and with a sigma parameter of 1.
+
+cspull will generate an ASCII file in comma-separated value (CSV) format,
+containing one row per pull. The first row is a header row providing the 
+column names. The following rows give the pull results, one row per pull. 
+This includes for each parameter the parameter value, error and pull. The 
+maximum likelihood value and the observed and the estimated number of counts 
+are also given.
+
+From the output file, pull distribution plots can be generated using for
+example the ``show_pull_histogram.py`` script in the examples folder. The
+script ``show_pull_evolution.py`` in the same folder shows the evolution
+of the mean and standard deviation of the pull as function of the number
+of trials. Both scripts require matplotlib for plotting.
 
 
 General parameters
@@ -23,8 +39,7 @@ General parameters
     Event list, counts cube, or observation definition XML file.
 
 ``inmodel [file]``
-    XML file that describes the astrophysical sources and the instrumental
-    background.
+    Input model XML file.
  	 	 
 ``outfile [file]``
     ASCII file containing the individual pull values.
@@ -118,7 +133,8 @@ Standard parameters
     Log filename.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
-None
+:doc:`ctlike`
+:doc:`cstsdist`

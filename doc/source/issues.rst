@@ -11,7 +11,6 @@ list of
 
 - :ref:`Certificate problem when cloning from Git <issue_ssl>`
 - :ref:`Python module does not work <issue_python>`
-- :ref:`Python unit test fails on El Capitan <issue_elcapitan>`
 - :ref:`Installing on Solaris <issue_solaris>`
 - :ref:`Installing on OpenSolaris <issue_opensolaris>`
 
@@ -67,16 +66,6 @@ Installation issues
    but if the wrappers don't exist you need `swig <http://www.swig.org/>`_.
    If the ``Python.h`` header file does not exist then install the Python
    development package.
-
-.. _issue_elcapitan:
-
-.. topic:: Python unit test fails on El Capitan
-
-    On Mac OS X 10.11 (El Capitan) the Python unit tests fail when ctools 
-    are not installed due to the way the ``DYLD_LIBRARY_PATH`` environment
-    variable is handled by the operating system. A (not very elegant)
-    workaround is to install the ctools before running the unit test using 
-    ``make check``.
 
 .. _issue_solaris:
 

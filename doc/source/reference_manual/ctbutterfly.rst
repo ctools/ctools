@@ -9,16 +9,31 @@ Computes butterfly diagram for a power law model.
 Synopsis
 --------
 
-Calculates the confidence band of a power law model, taking into account the
-covariance matrix resulting from a maximum likelihood fit. The tool derives
-the envelope of all power law models whose prefactor and spectral index fall
-within the error ellipse that is associated with the covariance of the 
-parameters. It outputs an ASCII file in column separated value (CSV) format
-containing the results. Each row in the result file corresponds to an energy.
-The columns give the energy in MeV, the fitted intensity in ph/cm2/s/MeV,
-and the minimum and maximum intensity that envelope the power law model 
-with a given confidence (by default a confidence level of 68% is used, but 
-the level can be adjusted using the ``confidence`` parameter).
+This tool calculates a butterfly diagram for a specific source with power law
+spectral model. The butterfly diagram is the envelope of all power law models
+that are within a given confidence limit compatible with the data. By default
+a confidence level of 68% is used, but the level can be adjusted using the 
+hidden ``confidence`` parameter. ctbutterfly computes this envelope by
+evaluating for each energy the minimum and maximum intensity of all power law
+models that fall within the error ellipse of the prefactor and index parameters.
+The error ellipse is derived from the covariance matrix of a maximum likelihood
+fit.
+
+ctbutterfly assumes that the input model (parameter ``inmodel``) has been 
+adjusted using :doc:`ctlike` to the data, but if this is not the case you 
+can request a maximum likelihood fit by setting the hidden parameter ``fit=yes``.
+
+ctbutterfly writes the butterfly diagram into an ASCII file with 4 columns 
+separated by a whitespace. Each row in the result file corresponds to a specific
+energy. The meaning of the columns are:
+
+* Energy in MeV
+* Fitted intensity for that energy in ph/cm2/s/MeV
+* Minimum intensity for that energy in ph/cm2/s/MeV
+* Maximum intensity for that energy in ph/cm2/s/MeV
+
+The butterfly diagram can be displayed using the ``show_butterfly.py`` script
+in the example folder.
 
 
 General parameters
@@ -28,19 +43,19 @@ General parameters
     Input event list, counts cube or observation definition XML file.
  	 	 
 ``inmodel [file]``
-    Model XML file containing the source and background definitions.
+    Input model XML file.
  	 	 
 ``srcname [string]``
-    Name of model component for which butterfly should be computed.
+    Name of source model for which the butterfly diagram should be computed.
  	 	 
 ``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
+    Input exposure cube file (only needed for stacked analysis).
 
 ``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
+    Input PSF cube file (only needed for stacked analysis).
 
 ``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
+    Input background cube file (only needed for stacked analysis).
 
 ``caldb [string]``
     Calibration database.
@@ -54,8 +69,9 @@ General parameters
 ``outfile [file]``
     Output butterfly ASCII file name.
 
-``(refit = no) [boolean]``
-    Performs refitting of solution ignoring any provided covariance matrix.
+``(fit = no) [boolean]``
+    Performs maximum likelihood fitting of input model ignoring any provided
+    covariance matrix.
  	 	 
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
@@ -107,8 +123,9 @@ Standard parameters
     Name of log file.
 
 
-Related tools
--------------
+Related tools or scripts
+------------------------
 
+:doc:`ctlike`
 :ref:`ctulimit`
 :ref:`cterror`

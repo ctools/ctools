@@ -101,13 +101,13 @@ class cspull(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Event list, counts cube, or observation definition file"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output file name"))
+            pars.append(gammalib.GApplicationPar("inobs","f","h","NONE","","","Input event list, counts cube, or observation definition XML file"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
+            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","0","1","Deadtime correction factor"))
+            pars.append(gammalib.GApplicationPar("outfile","f","a","pull.dat","","","Output pull distribution file"))
             pars.append(gammalib.GApplicationPar("profile","b","h","no","","","Use likelihood profile method for errors?"))
             pars.append(gammalib.GApplicationPar("ntrials","i","a","10","","","Number of trials"))
             pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","0","360","RA of pointing (deg)"))

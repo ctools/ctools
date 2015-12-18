@@ -29,7 +29,7 @@ import sys
 class csobsdef(ctools.cscript):
     """
     The csobsdef class generates an observation definition file from a
-    pointing list. The pointing list is a colon separated value ASCII
+    pointing list. The pointing list is a comma-separated value ASCII
     file with header keywords in the first row followed by a list of
     pointings (one pointing per row). The following header keywords
     are supported (case sensitive, column order irrelevant):
@@ -51,7 +51,7 @@ class csobsdef(ctools.cscript):
     Only the pairs (ra,dec) or (lon,lat) are mandatory header keywords.
     All other keywords are optional and can be specified when calling
     csobsdef as user parameters. The only exception is the "duration"
-    keyword that will automatically queried.
+    keyword that will automatically be queried.
 
     Here some usage examples:
 
@@ -128,8 +128,8 @@ class csobsdef(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Pointing definition file"))
-            pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Output observation definition file"))
+            pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Input pointing definition file"))
+            pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Output observation definition XML file"))
             pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Pointing duration (seconds)"))
             pars.append(gammalib.GApplicationPar("caldb","s","h","","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","h","","","","Instrument response function"))
@@ -249,8 +249,7 @@ class csobsdef(ctools.cscript):
                 pntdir = gammalib.GSkyDir()
                 pntdir.lb_deg(lon,lat)
             else:
-                raise gammalib.GException.invalid_value(self.name,
-                      "No (ra,dec) or (lon,lat) columns found in pointing"
+                raise RuntimeError("No (ra,dec) or (lon,lat) columns found in pointing"
                       " definition file.")
             obs.pointing(gammalib.GCTAPointing(pntdir))
 

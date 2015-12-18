@@ -8,8 +8,6 @@ User Manual
    introduction
    getting
    getting_started/index
-   enhancing
-   expert
    plotting
    glossary
 

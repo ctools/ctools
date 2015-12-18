@@ -46,8 +46,10 @@ doc/man
 src/ctools-setup
 pyext/build/
 pyext/setup.py
+pyext/ctools/__init__.py
 pyext/ctools/tools.py
 pyext/ctools/tools_wrap.cpp
+cscripts/__init__.py
 src/ctbin/ctbin
 src/ctlike/ctlike
 src/cttsmap/cttsmap
@@ -63,6 +65,7 @@ src/ctbutterfly/ctbutterfly
 src/ctulimit/ctulimit
 src/cterror/cterror
 test/pfiles/
+test/caldb/
 test/*.fits
 test/*.dat
 test/*.xml
@@ -70,6 +73,8 @@ test/*.trs
 test/test_cscripts.sh
 test/reports/*.xml
 test/butterfly.txt
+test/model.reg
+test/obs.reg
 examples/*.fits
 examples/*.xml
 examples/*.dat

@@ -1,3 +1,19 @@
+2015-12-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+        * Version 1.0.0 released
+        ========================
+
+        Update end-user documentation
+        Rename cshessobs to csiactobs and add csiactdata (#1608)
+        Ignore errors in El Capitan post processing (#1605)
+        Change GException to RuntimeError in cscripts (#1604)
+        Adapt to GammaLib interface changs (#1603)
+        Add csobs2caldb script (#1579)
+        Add csobsinfo, csmodelinfo, csmodelmerge, cstsmapmerge (#1578)
+        Implement handling of stacked data in csspec (#1566)
+        Resolve Python test problem on El Capitan (#1563)
+
+
 2015-10-31  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 0.10.0 released

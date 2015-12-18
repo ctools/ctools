@@ -99,7 +99,7 @@ Specifying the response function as input parameters
 ctools that require instrument response functions have two parameters
 to specify the calibration database name and the response function name.
 The following example shows a ``ctobssim`` run using the ``prod2``
-calibration database and the ``South_50h`` response function:
+calibration database and the ``South_0.5h`` response function:
 
 .. code-block:: bash
 
@@ -112,8 +112,9 @@ calibration database and the ``South_50h`` response function:
   Lower energy limit (TeV) [0.1] 
   Upper energy limit (TeV) [100.0] 
   Calibration database [prod2] 
-  Instrument response function [South_50h] 
-  Model [$CTOOLS/share/models/crab.xml] 
+  Instrument response function [South_0.5h] 
+  Input model XML file [$CTOOLS/share/models/crab.xml] 
+  Output event data file or observation definition XML file [events.fits]
 
 Running the other tools is equivalent.
 
@@ -131,7 +132,7 @@ definition file:
   <observation_list title="observation library">
     <observation name="Crab" id="00001" instrument="CTA">
       <parameter name="EventList"   file="events.fits"/>
-      <parameter name="Calibration" database="prod2" response="South_50h"/>
+      <parameter name="Calibration" database="prod2" response="South_0.5h"/>
     </observation>
   </observation_list>
 
@@ -141,9 +142,9 @@ response name. You can then pass this file directly to, e.g., ``ctlike``:
 .. code-block:: bash
 
   $ ctlike
-  Event list, counts cube or observation definition file [events.fits] obs_irf.xml
-  Source model [$CTOOLS/share/models/crab.xml] 
-  Source model output file [crab_results.xml] 
+  Input event list, counts cube or observation definition XML file [events.fits] obs_irf.xml
+  Input model XML file [$CTOOLS/share/models/crab.xml] 
+  Output model XML file [crab_results.xml] 
 
 Note that ``ctlike`` does not ask for the calibration database and
 response name as it found the relevant information in the XML file.
@@ -181,11 +182,11 @@ and response name from within Python:
   import gammalib
   obs   = gammalib.GCTAObservation()
   caldb = gammalib.GCaldb("cta", "prod2")
-  irf   = "South_50h"
+  irf   = "South_0.5h"
   obs.response(irf, caldb)
 
 The calibration database is set by creating a ``GCaldb`` object. The
 constructor takes as argument the mission (always ``cta``) and the 
 database name, in our case ``prod2``. The response function is then set
-by passing the response name (here ``South_50h``) and the calibration
+by passing the response name (here ``South_0.5h``) and the calibration
 database object to the ``response`` method.

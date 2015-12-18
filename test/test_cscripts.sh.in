@@ -36,16 +36,19 @@ $ECHO "*****************"
 #
 # Remove any existing result files
 # ================================
-rm -rf *.fits *.xml *.dat
+rm -rf *.fits *.xml *.dat *.reg
 
 
 #
 # Creates pfiles directory
 # ========================
-rm -rf pfiles
-mkdir -p pfiles
-cp -r ../src/*/*.par pfiles/
 export PFILES=pfiles
+export CALDB=$PWD/caldb
+rm -rf $PFILES
+mkdir -p $PFILES
+cp -r ../src/*/*.par pfiles/
+rm -rf $CALDB
+mkdir -p $CALDB
 
 
 #
@@ -74,6 +77,246 @@ $ECHO " ok"
 
 
 #
+# Test csobs2caldb
+# ================
+$ECHO -n "Test csobs2caldb: "
+chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
+@abs_top_srcdir@/cscripts/csobs2caldb.py \
+  inobs="data/obs_unbinned.xml" \
+  rspname="test_irfs" \
+  chatter=4 #> csobs2caldb.log
+$ECHO -n "."
+if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " $CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csobsinfo
+# ==============
+$ECHO -n "Test csobsinfo: "
+chmod +x @abs_top_srcdir@/cscripts/csobsinfo.py
+@abs_top_srcdir@/cscripts/csobsinfo.py \
+  inobs="obs.xml" \
+  ds9file="obs.reg" \
+  offset=yes \
+  ra="83.6331" \
+  dec="22.01" > csobsinfo.log
+$ECHO -n "."
+if [ -s "obs.reg" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " obs.reg file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csiactobs
+# ==============
+$ECHO -n "Test csiactobs: "
+chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
+@abs_top_srcdir@/cscripts/csiactobs.py \
+  datapath="iactdata/" \
+  prodname="unit-test" \
+  runlistfile="iactdata/runlist.txt" \
+  bkgpars="1" \
+  outobs="obs2.xml" \
+  outmodel="bkgmodels.xml" > csiactobs.log
+$ECHO -n "."
+if [ -s "obs2.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " obs.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelinfo
+# ================
+$ECHO -n "Test csmodelinfo: "
+chmod +x @abs_top_srcdir@/cscripts/csmodelinfo.py
+@abs_top_srcdir@/cscripts/csmodelinfo.py \
+  inmodel="data/crab.xml" \
+  ds9file="model.reg" > csmodelinfo.log
+$ECHO -n "."
+if [ -s "model.reg" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " model.reg file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (space-separated)
+# ===================================
+$ECHO -n "Test csmodelmerge (space-separated): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="data/crab.xml data/source1.xml" \
+  outmodel="merged_models.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (comma-separated)
+# ===================================
+$ECHO -n "Test csmodelmerge (comma-separated): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="data/crab.xml,data/source1.xml" \
+  outmodel="merged_models2.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models2.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models2.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (wildcard string)
+# ===================================
+$ECHO -n "Test csmodelmerge (wildcard string): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="data/model_cube_background*.xml" \
+  outmodel="merged_models3.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models3.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models3.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csmodelmerge (ascii-file)
+# ==============================
+ls data/model_cube_background* > models.txt
+$ECHO -n "Test csmodelmerge (ascii-file): "
+chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="@models.txt" \
+  outmodel="merged_models4.xml" > csmodelmerge.log
+$ECHO -n "."
+if [ -s "merged_models4.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_models4.xml file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+rm models.txt
+
+
+#
+# Test cstsmapmerge (comma-separated)
+# ===================================
+$ECHO -n "Test cstsmapmerge (comma-separated): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="data/tsmap_0.fits,data/tsmap_1.fits" \
+  outmap="merged_tsmap1.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap1.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap1.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cstsmapmerge (space-separated)
+# ===================================
+$ECHO -n "Test cstsmapmerge (space-separated): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="data/tsmap_0.fits data/tsmap_1.fits" \
+  outmap="merged_tsmap2.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap2.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap2.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cstsmapmerge (wildcard string)
+# ===================================
+$ECHO -n "Test cstsmapmerge (wildcard string): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="data/tsmap_*.fits" \
+  outmap="merged_tsmap3.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap3.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap3.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test cstsmapmerge (ascii-file)
+# ==============================
+ls data/tsmap_*.fits > tsmaps.txt
+$ECHO -n "Test cstsmapmerge  (ascii-file): "
+chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="@tsmaps.txt" \
+  outmap="merged_tsmap4.fits" > cstsmapmerge.log
+$ECHO -n "."
+if [ -s "merged_tsmap4.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " merged_tsmap4.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+rm tsmaps.txt
+
+
+#
 # Test cspull
 # ===========
 $ECHO -n "Test cspull: "
@@ -82,8 +325,8 @@ chmod +x @abs_top_srcdir@/cscripts/cspull.py
   inmodel="data/crab.xml" \
   outfile="pull.dat" \
   ntrials="3" \
-  caldb="irf" \
-  irf="cta_dummy_irf" \
+  caldb="cta" \
+  irf="test_irfs" \
   ra=83.6331 \
   dec=22.0145 \
   emin=0.1 \
@@ -205,11 +448,11 @@ chmod +x @abs_top_srcdir@/cscripts/csspec.py
   inmodel="data/crab.xml" \
   caldb="irf" \
   irf="cta_dummy_irf" \
+  ebinalg="LOG" \
   enumbins=5 \
   srcname="Crab" \
   emin=0.1 \
   emax=100.0 \
-  binned=no \
   outfile="spectrum.fits" > csspec.log
 $ECHO -n "."
 if [ -s "spectrum.fits" ]
@@ -228,30 +471,23 @@ $ECHO " ok"
 $ECHO -n "Test csspec (binned): "
 chmod +x @abs_top_srcdir@/cscripts/csspec.py
 @abs_top_srcdir@/cscripts/csspec.py \
-  inobs="data/crab_events.fits" \
-  inmodel="data/crab.xml" \
-  caldb="irf" \
-  irf="cta_dummy_irf" \
-  enumbins=3 \
-  srcname="Crab" \
+  inobs="data/crab_cntmap_small.fits.gz" \
+  expcube="data/crab_expcube.fits.gz" \
+  psfcube="data/crab_psfcube.fits.gz" \
+  bkgcube="data/crab_bkgcube.fits.gz" \
+  inmodel="data/crab_bkgcube.xml" \
+  ebinalg="LOG" \
+  enumbins=2 \
   emin=0.1 \
   emax=100.0 \
-  binned=yes \
-  nxpix=10 \
-  nypix=10 \
-  binsz=0.1 \
-  nebins=2 \
-  coordsys="CEL" \
-  xref=83.63 \
-  yref=22.01 \
-  proj="CAR" \
-  outfile="spectrum.fits" > csspec.log
+  srcname="Crab" \
+  outfile="spectrum_binned.fits" > csspec.log
 $ECHO -n "."
-if [ -s "spectrum.fits" ]
+if [ -s "spectrum_binned.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " spectrum.fits file is not valid"
+  $ECHO " spectrum_binned.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
@@ -309,13 +545,13 @@ chmod +x @abs_top_srcdir@/cscripts/cslightcrv.py
   nxpix=10 \
   nypix=10 \
   binsz=0.1 \
-  outfile="lightcurve.fits" > cslightcrv.log
+  outfile="lightcurve_binned.fits" > cslightcrv.log
 $ECHO -n "."
-if [ -s "lightcurve.fits" ]
+if [ -s "lightcurve_binned.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " lightcurve.fits file is not valid"
+  $ECHO " lightcurve_binned.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"

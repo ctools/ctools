@@ -43,7 +43,7 @@ class csspec(ctools.cscript):
         self.version = "1.0.0"
 
         # Initialise some members
-        self.obs  = None
+        self.obs  = gammalib.GObservations()
         self.fits = None
 
         # Initialise some members
@@ -100,30 +100,21 @@ class csspec(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Event list, counts cube, or observation definition file"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Source model"))
+            pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Input event list, counts cube, or observation definition XML file"))
+            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
             pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","spectrum.fits","","","Output file name"))
-            pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Exposure cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","PSF cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Background cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("bkgcube","f","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_50h","","","Instrument response function"))
+            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
-            pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit for spectral points(TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","h","100.0","","","Upper energy limit for spectral points(TeV)"))
-            pars.append(gammalib.GApplicationPar("enumbins","i","a","20","","","Number of spectral points"))
-            pars.append(gammalib.GApplicationPar("ebinalg","s", "h","LOG","FILE|LIN|LOG","", "Algorithm for defining energy bins"))
-            pars.append(gammalib.GApplicationPar("binned","b","a","no","yes|no","","Use binned analysis in each energy bin"))
-            pars.append(gammalib.GApplicationPar("nebins","i","h","5","","","Number of energy bins per spectral point"))
-            pars.append(gammalib.GApplicationPar("coordsys","s","a","CEL","CEL|GAL","","Coordinate System"))
-            pars.append(gammalib.GApplicationPar("proj","s","a","CAR","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method"))
-            pars.append(gammalib.GApplicationPar("xref","r","a","83.63","0","360","First coordinate of image center in degrees (RA or galactic l)"))
-            pars.append(gammalib.GApplicationPar("yref","r","a","22.01","-90","90","Second coordinate of image center in degrees (DEC or galactic b)"))
-            pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
-            pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
-            pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("anumbins","i","h","200","","","Angular separation bins for PSF cube in binned mode"))
+            pars.append(gammalib.GApplicationPar("outfile","f","a","spectrum.fits","","","Output spectrum file"))
+            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit for spectral points (TeV)"))
+            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit for spectral points (TeV)"))
+            pars.append(gammalib.GApplicationPar("enumbins","i","a","20","1","10000","Number of spectral points"))
+            pars.append(gammalib.GApplicationPar("ebinalg","s","a","LOG","FILE|LIN|LOG","", "Algorithm for defining energy bins"))
+            pars.append(gammalib.GApplicationPar("ebinfile","f","a","NONE","","", "Name of the file containing the energy bin definition"))
             pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value in each bin"))
             pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit in each bin"))
             pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other skymodel parameters"))
@@ -143,6 +134,13 @@ class csspec(ctools.cscript):
         if self.obs == None or self.obs.size() == 0:
             self.require_inobs("csspec::get_parameters()")
             self.obs = self.get_observations()
+        
+        # Check if we have one binned cta observation, i.e. if we are in binned mode
+        self.m_binned_mode = False    
+        if self.obs.size() == 1:
+            if self.obs[0].classname() == "GCTAObservation":
+                if self.obs[0].eventtype() == "CountsCube":                
+                    self.m_binned_mode = True        
 
         # Set models if we have none
         if self.obs.models().size() == 0:
@@ -151,25 +149,11 @@ class csspec(ctools.cscript):
         # Get source name   
         self.m_srcname = self["srcname"].string()
 
-        # Get ebounds             
-        self.m_ebounds = self.create_ebounds()
-
-        # Get binning flag
-        self.m_binned = self["binned"].boolean()
-        
+        # Set ebounds
+        self.set_ebounds()
+                 
         # Get edisp flag
         self.m_edisp = self["edisp"].boolean()
-        
-        if self.m_binned:
-            self.m_xref     = self["xref"].real()
-            self.m_yref     = self["yref"].real()
-            self.m_nxpix    = self["nxpix"].integer()
-            self.m_nypix    = self["nypix"].integer()
-            self.m_binsz    = self["binsz"].real()
-            self.m_coordsys = self["coordsys"].string()
-            self.m_proj     = self["proj"].string()
-            self.m_ebins    = self["nebins"].integer()
-            self.m_anumbins = self["anumbins"].integer()
 
         # Read other parameters
         self.m_outfile = self["outfile"].filename()
@@ -185,6 +169,66 @@ class csspec(ctools.cscript):
         self.m_chatter = self["chatter"].integer()
         self.m_clobber = self["clobber"].boolean()
         self.m_debug   = self["debug"].boolean()
+
+        # Return
+        return
+
+    def set_ebounds(self):
+        """
+        Set energy boundaries.
+        """
+        # Get ebounds
+        if self.m_binned_mode:
+            
+            #  Extract cube ebounds
+            cube_ebounds = self.obs[0].events().ebounds()
+            
+            # Read user parameters
+            self.m_enumbins = self["enumbins"].integer()
+            self.m_emin     = self["emin"].real() - 1e-6 # Rounding tolerance
+            self.m_emax     = self["emax"].real() + 1e-6 # Rounding tolerance
+
+            # Set energy range
+            emin = gammalib.GEnergy(self.m_emin, "TeV")
+            emax = gammalib.GEnergy(self.m_emax, "TeV")
+
+            # Determine all cube layers that overlap with the [emin,emax]
+            # energy range.
+            use_layers = []
+            for i in range(cube_ebounds.size()):
+                if cube_ebounds.emin(i) < emax and cube_ebounds.emax(i) > emin:
+                    use_layers.append(i)
+
+            # If no layers overlap then throw an exception
+            if (len(use_layers) == 0):
+                msg = "Energy range ["+str(cube_ebounds.emin(i))+ \
+                      ", "+str(cube_ebounds.emax(i))+"] of counts "+ \
+                      "cube does not overlap with specified energy range ["+ \
+                      str(emin)+", "+str(emax)+"]. Specify "+ \
+                      "overlapping energy range."
+                raise RuntimeError(msg)
+
+            # Determine number of layers to use for each spectral bin
+            n_layers = int(len(use_layers) / self.m_enumbins)
+
+            # Don't allow zero layers
+            if n_layers == 0:
+                n_layers = 1
+
+            # Create energy boundaries
+            self.m_ebounds = gammalib.GEbounds()
+            for i in range(len(use_layers))[::n_layers]:
+                i_start = i
+                i_stop  = i + n_layers - 1
+                if i_stop >= len(use_layers):
+                    i_stop = len(use_layers) - 1
+                ebinmin = cube_ebounds.emin(use_layers[i_start])
+                ebinmax = cube_ebounds.emax(use_layers[i_stop])
+                self.m_ebounds.append(ebinmin, ebinmax)
+                    
+        # Unbinned mode       
+        else:
+            self.m_ebounds = self.create_ebounds()
 
         # Return
         return
@@ -234,6 +278,24 @@ class csspec(ctools.cscript):
         if self.logTerse():
             self.log_parameters()
             self.log("\n")
+
+        # Write spectral binning into header
+        if self.logTerse():
+            self.log("\n")
+            self.log.header1("Spectral binning")
+            if self.m_binned_mode:
+                cube_ebounds = self.obs[0].events().ebounds()
+                self.log.parformat("Counts cube energy range")
+                self.log(str(cube_ebounds.emin()))
+                self.log(" - ")
+                self.log(str(cube_ebounds.emax()))
+                self.log("\n")
+            for i in range(self.m_ebounds.size()):
+                self.log.parformat("Bin "+str(i+1))
+                self.log(str(self.m_ebounds.emin(i)))
+                self.log(" - ")
+                self.log(str(self.m_ebounds.emax(i)))
+                self.log("\n")
 
         # Write observation into logger
         if self.logTerse():
@@ -286,7 +348,8 @@ class csspec(ctools.cscript):
         # Write header
         if self.logTerse():
             self.log("\n")
-            self.log.header1("Generate spectrum")      
+            self.log.header1("Generate spectrum")  
+            self.log(str(self.m_ebounds))    
 
         # Initialise FITS Table with extension "SPECTRUM"
         table = gammalib.GFitsBinTable(self.m_ebounds.size())
@@ -298,26 +361,25 @@ class csspec(ctools.cscript):
 
         # Create FITS table columns
         energy       = gammalib.GFitsTableDoubleCol("Energy", self.m_ebounds.size())
-        energy.unit("TeV")
         energy_low   = gammalib.GFitsTableDoubleCol("ed_Energy", self.m_ebounds.size())
-        energy_low.unit("TeV")
         energy_high  = gammalib.GFitsTableDoubleCol("eu_Energy", self.m_ebounds.size())
-        energy_high.unit("TeV")
         flux         = gammalib.GFitsTableDoubleCol("Flux", self.m_ebounds.size())
-        flux.unit("erg/cm2/s")
         flux_err     = gammalib.GFitsTableDoubleCol("e_Flux", self.m_ebounds.size())
-        flux_err.unit("erg/cm2/s")
         TSvalues     = gammalib.GFitsTableDoubleCol("TS", self.m_ebounds.size())
         ulim_values  = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_ebounds.size())
-        ulim_values.unit("erg/cm2/s")
         Npred_values = gammalib.GFitsTableDoubleCol("Npred", self.m_ebounds.size())
-
+        energy.unit("TeV")
+        energy_low.unit("TeV")
+        energy_high.unit("TeV")
+        flux.unit("erg/cm2/s")
+        flux_err.unit("erg/cm2/s")
+        ulim_values.unit("erg/cm2/s")
 
         # Loop over energy bins
         for i in range(self.m_ebounds.size()):
 
             # Log information
-            if self.logTerse():
+            if self.logExplicit():
                 self.log("\n")
                 self.log.header2("Energy bin "+str(i+1))
 
@@ -334,8 +396,8 @@ class csspec(ctools.cscript):
             energy_low[i]  = (elogmean - emin).TeV()
             energy_high[i] = (emax - elogmean).TeV()
 
-            # unbinned analysis
-            if not self.m_binned:
+            # use ctselect for unbinned analysis
+            if not self.m_binned_mode:
                 
                 # Log information
                 if self.logExplicit():
@@ -355,129 +417,43 @@ class csspec(ctools.cscript):
                 # Retrieve observation
                 obs = select.obs()
 
-            # Binned analysis
+            # use ctcubemask for binned analysis
             else:
 
                 # Header
-                if self.logTerse():
-                    self.log.header3("Binning events")
+                if self.logExplicit():
+                    self.log.header3("Filtering cube")
 
-                # Bin events
-                bin = ctools.ctbin(self.obs)
-                bin["usepnt"]   = False
-                bin["ebinalg"]  = "LOG"
-                bin["xref"]     = self.m_xref
-                bin["yref"]     = self.m_yref
-                bin["binsz"]    = self.m_binsz
-                bin["nxpix"]    = self.m_nxpix
-                bin["nypix"]    = self.m_nypix
-                bin["enumbins"] = self.m_ebins
-                bin["emin"]     = emin.TeV()
-                bin["emax"]     = emax.TeV()        
-                bin["coordsys"] = self.m_coordsys
-                bin["proj"]     = self.m_proj
-                bin.run()
-
-                # Header
-                if self.logTerse():
-                    self.log.header3("Creating exposure cube")
-
-                # Create exposure cube
-                expcube = ctools.ctexpcube(self.obs)
-                expcube["incube"]   = "NONE"
-                expcube["usepnt"]   = False
-                expcube["ebinalg"]  = "LOG"
-                expcube["edisp"]    = self.m_edisp
-                expcube["xref"]     = self.m_xref
-                expcube["yref"]     = self.m_yref
-                expcube["binsz"]    = self.m_binsz
-                expcube["nxpix"]    = self.m_nxpix
-                expcube["nypix"]    = self.m_nypix
-                expcube["enumbins"] = self.m_ebins
-                expcube["emin"]     = emin.TeV()
-                expcube["emax"]     = emax.TeV() 
-                expcube["coordsys"] = self.m_coordsys
-                expcube["proj"]     = self.m_proj             
-                expcube.run()
-
-                # Header
-                if self.logTerse():
-                    self.log.header3("Creating PSF cube")
-
-                # Create psf cube
-                psfcube = ctools.ctpsfcube(self.obs)
-                psfcube["incube"]   = "NONE"
-                psfcube["usepnt"]   = False
-                psfcube["ebinalg"]  = "LOG"
-                psfcube["edisp"]    = self.m_edisp
-                psfcube["xref"]     = self.m_xref
-                psfcube["yref"]     = self.m_yref
-                psfcube["binsz"]    = self.m_binsz*20.0 # Slow Psf variation
-                psfcube["nxpix"]    = self.m_nxpix/20+1
-                psfcube["nypix"]    = self.m_nypix/20+1
-                psfcube["enumbins"] = self.m_ebins
-                psfcube["anumbins"] = self.m_anumbins
-                psfcube["emin"]     = emin.TeV()
-                psfcube["emax"]     = emax.TeV()  
-                psfcube["coordsys"] = self.m_coordsys
-                psfcube["proj"]     = self.m_proj            
-                psfcube.run()
-
-                # Header
-                if self.logTerse():
-                    self.log.header3("Creating background cube")
-
-                # Create background cube
-                bkgcube = ctools.ctbkgcube(self.obs)
-                bkgcube["incube"]   = "NONE"
-                bkgcube["usepnt"]   = False
-                bkgcube["ebinalg"]  = "LOG"
-                bkgcube["xref"]     = self.m_xref
-                bkgcube["yref"]     = self.m_yref
-                bkgcube["binsz"]    = self.m_binsz
-                bkgcube["nxpix"]    = self.m_nxpix
-                bkgcube["nypix"]    = self.m_nypix
-                bkgcube["enumbins"] = self.m_ebins
-                bkgcube["emin"]     = emin.TeV()
-                bkgcube["emax"]     = emax.TeV() 
-                bkgcube["coordsys"] = self.m_coordsys
-                bkgcube["proj"]     = self.m_proj          
-                bkgcube.run()
-
+                # Select layers
+                cubemask            = ctools.ctcubemask(self.obs)
+                cubemask["regfile"] = "NONE"
+                cubemask["ra"]      = "UNDEFINED"
+                cubemask["dec"]     = "UNDEFINED"
+                cubemask["rad"]     = "UNDEFINED"
+                cubemask["emin"]    = emin.TeV() 
+                cubemask["emax"]    = emax.TeV()
+                cubemask.run() 
+                
                 # Set new binned observation
-                obs = bin.obs()
-
-                # Set precomputed binned response
-                obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
-
-                # Get new models
-                models = bkgcube.models()
-
-                # Fix background models if required
-                if self.m_fix_bkg:
-                    for model in models:
-                        if not model.classname() == "GModelSky":
-                            for par in model:
-                                par.fix()
-
-                # Set new models to binned observation           
-                obs.models(models)
+                obs = cubemask.obs()
 
             # Header
-            if self.logTerse():
+            if self.logExplicit():
                 self.log.header3("Performing fit")
 
             # Likelihood
-            like = ctools.ctlike(obs)
-            like["edisp"].boolean(self.m_edisp)
+            like          = ctools.ctlike(obs)
+            like["edisp"] = self.m_edisp
             like.run()
 
             # Skip bin if no event was present
             if like.obs().logL() == 0.0:
 
                 # Log information
-                if self.logTerse():
-                    self.log("No event in this bin. Likelihood is zero. Bin is skipped\n")
+                if self.logExplicit():
+                    self.log("No event in this bin. ")
+                    self.log("Likelihood is zero. ")
+                    self.log("Bin is skipped.")
 
                 # Set all values to 0
                 flux[i]         = 0.0
@@ -496,21 +472,21 @@ class csspec(ctools.cscript):
             if self.m_calc_ulimit:
 
                 # Logging information
-                if self.logTerse():
+                if self.logExplicit():
                     self.log.header3("Computing upper limit")
 
                 # Create upper limit object  
                 ulimit = ctools.ctulimit(like.obs())
                 ulimit["srcname"] = self.m_srcname
-                ulimit["eref"] = elogmean.TeV()
+                ulimit["eref"]    = elogmean.TeV()
 
                 # Try to run upper limit and catch exceptions
                 try:
                     ulimit.run()
                     ulimit_value = ulimit.diff_ulimit()
                 except:
-                    if self.logTerse():
-                        self.log("Upper limit calculation failed\n")
+                    if self.logExplicit():
+                        self.log("Upper limit calculation failed.")
                     ulimit_value = -1.0
 
             # Get TS value
@@ -518,9 +494,9 @@ class csspec(ctools.cscript):
             if self.m_calc_ts:
                 TS = source.ts() 
 
-            # Compute Npred value
+            # Compute Npred value (only works for unbinned analysis)
             Npred = 0.0
-            if not self.m_binned:
+            if not self.m_binned_mode:
                 for observation in like.obs():
                     Npred += observation.npred(source)  
 
@@ -529,8 +505,8 @@ class csspec(ctools.cscript):
 
             # Compute flux error
             parvalue  = source.spectral()[0].value()
-            rel_error = source.spectral()[0].error()/parvalue        
-            e_flux    = fitted_flux*rel_error
+            rel_error = source.spectral()[0].error() / parvalue        
+            e_flux    = fitted_flux * rel_error
 
             # Set values for storage
             TSvalues[i] = TS
@@ -545,15 +521,17 @@ class csspec(ctools.cscript):
                 ulim_values[i] = ulimit_value * elogmean2 * gammalib.MeV2erg
 
             # Log information
-            if self.logExplicit(): 
-                self.log("Bin "+str(i)+" ["+str(emin.TeV())+"-"+str(emax.TeV())+"] TeV: ")
-                self.log("Flux = "+str(flux[i]))
-                self.log(" +- "+str(flux_err[i])+" [erg/cm2/s]")
-                if self.m_calc_ts and TSvalues[i] > 0.0:
-                    self.log(", TS = "+str(TS))
-                if self.m_calc_ulimit and ulim_values[i] > 0.0:
-                    self.log(", UL = "+str(ulim_values[i])+" [erg/cm2/s]")
+            if self.logTerse(): 
                 self.log("\n")
+                self.log.parformat("Bin "+str(i+1))
+                self.log(str(flux[i]))
+                self.log(" +/- ")
+                self.log(str(flux_err[i]))
+                if self.m_calc_ulimit and ulim_values[i] > 0.0:
+                    self.log(" [< "+str(ulim_values[i])+"]")
+                self.log(" erg/cm2/s")
+                if self.m_calc_ts and TSvalues[i] > 0.0:
+                    self.log(" (TS = "+str(TS)+")")
 
         # Append filled columns to fits table    
         table.append(energy)

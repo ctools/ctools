@@ -17,14 +17,14 @@
 #
 # General parameters
 #===================
-inobs,    f, a, "events.fits",,, "Input event list, counts cube or observation definition file"
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Source model"
+inobs,    f, a, "events.fits",,, "Input event list, counts cube or observation definition XML file"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
 srcname,  s, a, "Crab",,, "Source of interest"
-expcube,  f, a, "NONE",,, "Exposure cube file (only needed for stacked analysis)"
-psfcube,  f, a, "NONE",,, "PSF cube file (only needed for stacked analysis)"
-bkgcube,  f, a, "NONE",,, "Background cube file (only needed for stacked analysis)"
+expcube,  f, a, "NONE",,, "Input exposure cube file (only needed for stacked analysis)"
+psfcube,  f, a, "NONE",,, "Input PSF cube file (only needed for stacked analysis)"
+bkgcube,  f, a, "NONE",,, "Input background cube file (only needed for stacked analysis)"
 caldb,    s, a, "prod2",,, "Calibration database"
-irf,      s, a, "South_50h",,, "Instrument response function"
+irf,      s, a, "South_0.5h",,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
 
 #
@@ -33,9 +33,9 @@ edisp,    b, h, no,,, "Apply energy dispersion?"
 confidence, r, h, 0.95,0.0,1.0, "Confidence level"
 sigma_min,  r, h, 0.0,,, "Start minimum value (multiple sigmas above fit value)"
 sigma_max,  r, h, 10.0,,, "Start maximum value (multiple sigmas above fit value)"
-eref,       r, h, 1.0,,, "Reference energy for differential limits (TeV)"
-emin,       r, h, 1.0,,, "Minimum energy for flux limits (TeV)"
-emax,       r, h, 100.0,,, "Maximum energy for flux limits (TeV)"
+eref,       r, h, 1.0,,, "Reference energy for differential limit (TeV)"
+emin,       r, h, 1.0,,, "Minimum energy for integral flux limit (TeV)"
+emax,       r, h, 100.0,,, "Maximum energy for integral flux limit (TeV)"
 tol,        r, h, 1e-5,,, "Computation tolerance"
 max_iter,   i, h, 50,,, "Maximum number of iterations"
 
