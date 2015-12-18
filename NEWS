@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-7 December 2015
+17 December 2015
 
 
 1. Introduction
@@ -17,7 +17,8 @@ version 1.1.0 or above.
 A special post processing of the Python module libraries has been added for
 Mac OS X 10.11 and higher (El Capitan). This post processing is a replacement for
 setting DYLD_LIBRARY_PATH during unit testing since the environment variable is
-ignored in certain circumstances by El Capitan.
+ignored in certain circumstances by El Capitan. Any errors that occur in the
+post-processing will be ignored.
 
 
 3. Python interface
@@ -27,7 +28,10 @@ None
 
 4. Support model
 ----------------
-None
+Adapt the ctool::create_ebounds() method to the change in the GEbounds
+interface (the extname argument has been removed from the GEbounds::load()
+method and replaced by using the GFilename class to handle extension names
+as part of the file name).
 
 
 5. ctobssim - CTA observation simulation
@@ -108,6 +112,9 @@ The following scripts have been added:
 - csmodelmerge: merge model containers into single container
 - cstsmapmerge: merge sliced TS map into single map
 - csobs2caldb: creates calibration database from observation
+
+All GExceptions are replaced by Python RuntimeErrors as the GException
+classes are not exposed to Python.
 
 
 20. Examples
