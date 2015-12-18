@@ -50,6 +50,7 @@ cp -r ../src/*/*.par pfiles/
 rm -rf $CALDB
 mkdir -p $CALDB
 
+
 #
 # Test csobsdef
 # =============
@@ -74,6 +75,7 @@ else
 fi
 $ECHO " ok"
 
+
 #
 # Test csobs2caldb
 # ================
@@ -92,6 +94,7 @@ else
   exit 1
 fi
 $ECHO " ok"
+
 
 #
 # Test csobsinfo
@@ -113,6 +116,7 @@ else
   exit 1
 fi
 $ECHO " ok"
+
 
 #
 # Test csiactobs

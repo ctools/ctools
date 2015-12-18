@@ -25,14 +25,15 @@ import os
 import json
 
 
-# =============== #
-# cshessobs class #
-# =============== #
+# ================ #
+# csiactdata class #
+# ================ #
 class csiactdata(ctools.cscript):
     """
-    This script inspects the available FITS data storage on the user machine and writes
-    information about the available FITS configurations into a log file or prints it
-    on the screen. These information can be used as input for 'csiactobs'.
+    This script inspects the available FITS data storage on the user machine
+    and writes information about the available FITS configurations into a log
+    file or prints it on the screen. These information can be used as input
+    for 'csiactobs'.
     """
     def __init__(self, *argv):
         """
@@ -71,7 +72,8 @@ class csiactdata(ctools.cscript):
     def parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
+        default parfile. This kluge avoids shipping the cscript with a
+        parfile.
         """
         # Set parfile name
         parfile = self.name+".par"
@@ -87,6 +89,7 @@ class csiactdata(ctools.cscript):
             pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data is located"))     
             pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","csiactdata.log","","","Log filename"))
             pars.save(parfile)
 
         # Return
@@ -111,7 +114,6 @@ class csiactdata(ctools.cscript):
         # Return
         return
 
-  
     def execute(self):
         """
         Execute the script.
@@ -145,10 +147,10 @@ class csiactdata(ctools.cscript):
         self.log("\n")
         self.log("\n")
         
-        
+        # Open and load JSON file
         json_data = open(self.m_master_file).read()
-        data = json.loads(json_data)    
-        configs = data["datasets"]
+        data      = json.loads(json_data)    
+        configs   = data["datasets"]
         
         # Loop over configs and display unavailable storage first        
         for config in configs:
@@ -183,7 +185,6 @@ class csiactdata(ctools.cscript):
 
         # Return
         return       
-
 
 # ======================== #
 # Main routine entry point #

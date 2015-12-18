@@ -26,14 +26,15 @@ import json
 
 
 # =============== #
-# cshessobs class #
+# csiactobs class #
 # =============== #
 class csiactobs(ctools.cscript):
     """
     This class implements the creation of a observation xml file for IACT
-    data analysis. This class is dedicated for use inside a IACT Collaboration,
-    i.e. it can only be used if you have access to IACT data in FITS format.
-    The FITS data has to be structured and in the format described here:
+    data analysis. This class is dedicated for use inside a IACT
+    Collaboration, i.e. it can only be used if you have access to IACT data
+    in FITS format. The FITS data has to be structured and in the format
+    described here:
     http://gamma-astro-data-formats.readthedocs.org/en/latest/
     """
     def __init__(self, *argv):
@@ -112,8 +113,8 @@ class csiactobs(ctools.cscript):
             pars.append(gammalib.GApplicationPar("bkg_aeff_norm","r","h","1e-14","","","Input normalisation for effective area background"))
             pars.append(gammalib.GApplicationPar("bkg_aeff_index","r","h","-2.0","","","Input spectral index for effective area background"))
             pars.append(gammalib.GApplicationPar("bkg_range_factor","r","h","100.0","","","Factor to determine range of background normalisation"))
-
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","csiactobs.log","","","Log filename"))
             pars.save(parfile)
 
         # Return
@@ -131,9 +132,9 @@ class csiactobs(ctools.cscript):
         self.datapath = gammalib.expand_env(self.datapath)
         
         # Read user parameters  
-        self.m_prodname = self["prodname"].string()
+        self.m_prodname    = self["prodname"].string()
         self.m_runlistfile = gammalib.expand_env(self["runlistfile"].filename())
-        self.m_bkgpars  = self["bkgpars"].integer()
+        self.m_bkgpars     = self["bkgpars"].integer()
           
         # Output model file
         self.outmodel = self["outmodel"].filename()
@@ -145,19 +146,19 @@ class csiactobs(ctools.cscript):
         self.m_master_indx = self["master_indx"].string()
         
         # Read hierarchy of file loading
-        self.m_ev_hiera = self["ev_hiera"].string().split("|")
-        self.m_aeff_hiera = self["aeff_hiera"].string().split("|")
-        self.m_psf_hiera = self["psf_hiera"].string().split("|")
-        self.m_bkg_hiera = self["bkg_hiera"].string().split("|")  
-        self.m_edisp_hiera = self["edisp_hiera"].string().split("|") 
+        self.m_ev_hiera      = self["ev_hiera"].string().split("|")
+        self.m_aeff_hiera    = self["aeff_hiera"].string().split("|")
+        self.m_psf_hiera     = self["psf_hiera"].string().split("|")
+        self.m_bkg_hiera     = self["bkg_hiera"].string().split("|")  
+        self.m_edisp_hiera   = self["edisp_hiera"].string().split("|") 
         self.m_bkg_mod_hiera = self["bkg_mod_hiera"].string().split("|")
         
         # Read hidden background parameters
-        self.m_bkg_gauss_norm = self["bkg_gauss_norm"].real()
-        self.m_bkg_gauss_index = self["bkg_gauss_index"].real()
-        self.m_bkg_gauss_sigma = self["bkg_gauss_sigma"].real()
-        self.m_bkg_aeff_index = self["bkg_aeff_index"].real()
-        self.m_bkg_aeff_norm = self["bkg_aeff_norm"].real()
+        self.m_bkg_gauss_norm   = self["bkg_gauss_norm"].real()
+        self.m_bkg_gauss_index  = self["bkg_gauss_index"].real()
+        self.m_bkg_gauss_sigma  = self["bkg_gauss_sigma"].real()
+        self.m_bkg_aeff_index   = self["bkg_aeff_index"].real()
+        self.m_bkg_aeff_norm    = self["bkg_aeff_norm"].real()
         self.m_bkg_range_factor = self["bkg_range_factor"].real()
         
         # Open master index file and look for prodname 
@@ -165,28 +166,32 @@ class csiactobs(ctools.cscript):
         if not os.path.isfile(master_file):
             raise RuntimeError("FITS data store not available. No master index file found. Make sure the file is copied from the server and your datapath is set correctly.")
 
+        # Open and load JSON file
         json_data = open(master_file).read()
-        data = json.loads(json_data)    
-        
+        data      = json.loads(json_data)    
         if not "datasets" in data:
             raise RuntimeError("Key \"datasets\" not available in master index file.")
 
+        # Get configurations
         configs = data["datasets"]
-        
+
+        # Initialise HDUs
         self.m_hdu_index = self.m_obs_index = ""
-        
+
+        # Get HDUs
         for config in configs:
             if self.m_prodname == config["name"]:
                 self.m_hdu_index = str(os.path.join(self.datapath, config["hduindx"]))
                 self.m_obs_index = str(os.path.join(self.datapath, config["obsindx"]))
                 break
-     
+
+        # Check HDUs
         if self.m_hdu_index == "" or self.m_obs_index == "":
             raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csdsinfo to get a list of available storage names")
-        
         if not gammalib.is_fits(self.m_hdu_index+"[HDU_INDEX]"):
             raise RuntimeError("HDU index file \""+self.m_hdu_index+"[HDU_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csdsinfo to get a list of available storage names.")
-        
+
+        # Load index
         if gammalib.is_fits(self.m_obs_index+"[OBS_INDEX]"):
             fits = gammalib.GFits(self.m_obs_index)
             self.has_bkg_scale = fits["OBS_INDEX"].contains("BKG_SCALE")
@@ -195,8 +200,7 @@ class csiactobs(ctools.cscript):
             self.has_bkg_scale = False
         
         # Create base data directory from hdu index file location
-        self.subdir = os.path.dirname(self.m_hdu_index)  
-
+        self.subdir    = os.path.dirname(self.m_hdu_index)  
         self.m_log     = False # Logging in client tools
         self.m_debug   = False # Debugging in client tools
         self.m_clobber = self["clobber"].boolean()
@@ -269,9 +273,8 @@ class csiactobs(ctools.cscript):
         
         # handle IrfBackground
         if bkgtype == "irf":
-            
-            prefactor = 1.0
-            index = 0.0
+            prefactor  = 1.0
+            index      = 0.0
             prefactor *= bkg_scale
             spec = self.background_spectrum(obs_id, prefactor, index, emin, emax)
             
@@ -289,11 +292,10 @@ class csiactobs(ctools.cscript):
             
         # Set Gaussian Background
         elif self.bkgtype == "gauss":
-            
             prefactor = bkg_scale * self.m_bkg_gauss_norm
-            spec = self.background_spectrum(obs_id, prefactor, self.m_bkg_gauss_index, emin, emax)
-            radial = gammalib.GCTAModelRadialGauss(self.m_bkg_gauss_sigma)
-            bck = gammalib.GCTAModelRadialAcceptance(radial, spec)
+            spec      = self.background_spectrum(obs_id, prefactor, self.m_bkg_gauss_index, emin, emax)
+            radial    = gammalib.GCTAModelRadialGauss(self.m_bkg_gauss_sigma)
+            bck       = gammalib.GCTAModelRadialAcceptance(radial, spec)
         
         else:
             sys.exit("Background type \""+self.bkgtype+"\" unsupported")
@@ -315,8 +317,7 @@ class csiactobs(ctools.cscript):
         
         # Return model
         return model
-        
-    
+
     def erange(self):
         """
         Returns runlist energy range
@@ -606,6 +607,8 @@ class csiactobs(ctools.cscript):
         # Save model XML file
         self.models.save(self.outmodel)
 
+        # Return
+        return       
 
 # ======================== #
 # Main routine entry point #
