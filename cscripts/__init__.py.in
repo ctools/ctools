@@ -21,30 +21,42 @@
 # List all scripts in this module
 __all__ = [
     "cscaldb",
-    "cshessobs",
+    "csiactdata",
+    "csiactobs",
     "csinfo",
     "cslightcrv",
+    "csmodelinfo",
+    "csmodelmerge",
+    "csobs2caldb",
     "csobsdef",
+    "csobsinfo",
     "cspull",
     "csresmap",
     "cssens",
     "csspec",
     "cstsdist",
+    "cstsmapmerge",
     "obsutils",
     "test",
 ]
 
 # Import
-from .cscaldb    import cscaldb
-from .cshessobs  import cshessobs
-from .csinfo     import csinfo
-from .cslightcrv import cslightcrv
-from .csobsdef   import csobsdef
-from .cspull     import cspull
-from .csresmap   import csresmap
-from .cssens     import cssens
-from .csspec     import csspec
-from .cstsdist   import cstsdist
+from .cscaldb      import cscaldb
+from .csiactdata   import csiactdata
+from .csiactobs    import csiactobs
+from .csinfo       import csinfo
+from .cslightcrv   import cslightcrv
+from .csmodelinfo  import csmodelinfo
+from .csmodelmerge import csmodelmerge
+from .csobs2caldb  import csobs2caldb
+from .csobsdef     import csobsdef
+from .csobsinfo    import csobsinfo
+from .cspull       import cspull
+from .csresmap     import csresmap
+from .cssens       import cssens
+from .csspec       import csspec
+from .cstsdist     import cstsdist
+from .cstsmapmerge import cstsmapmerge
 from . import obsutils
 
 # Add test function
