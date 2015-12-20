@@ -59,7 +59,8 @@ None
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-None
+The get_obs() method, that has been accidently removed, has been put back
+which allows computation of a model cube for a stacked analysis.
 
 
 12. ctexpcube - CTA exposure cube generation

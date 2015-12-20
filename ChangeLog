@@ -3,6 +3,8 @@
         * Bug fix version 1.0.1 released
         ================================
 
+        Re-enable ctmodel computation for stacked analysis (#1609)
+
 
 2015-12-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
