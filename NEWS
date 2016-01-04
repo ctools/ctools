@@ -1,15 +1,14 @@
-New Features and Important Changes in ctools 1.0.1
+New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-20 December 2015
+4 January 2016
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
-changes made since the last release of ctools. The code complies to ctools
-version 1.0.1 or above.
+changes made since the last release of ctools.
 
 
 2. Configuration
@@ -59,8 +58,7 @@ None
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-The get_obs() method, that has been accidently removed, has been put back
-which allows computation of a model cube for a stacked analysis.
+None
 
 
 12. ctexpcube - CTA exposure cube generation
