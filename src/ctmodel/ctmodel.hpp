@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTMODEL_NAME    "ctmodel"
-#define CTMODEL_VERSION "1.0.0"
+#define CTMODEL_VERSION "1.0.1"
 
 
 /***********************************************************************//**
@@ -79,6 +79,7 @@ protected:
     void copy_members(const ctmodel& app);
     void free_members(void);
     void get_parameters(void);
+    void get_obs(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
     

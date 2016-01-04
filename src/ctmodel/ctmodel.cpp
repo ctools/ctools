@@ -411,7 +411,7 @@ void ctmodel::init_members(void)
     m_gti.clear();
     m_has_cube    = false;
     m_append_cube = false;
-    m_binned = false;
+    m_binned      = false;
 
     // Return
     return;
@@ -435,7 +435,7 @@ void ctmodel::copy_members(const ctmodel& app)
     m_gti         = app.m_gti;
     m_has_cube    = app.m_has_cube;
     m_append_cube = app.m_append_cube;
-    m_binned    = app.m_binned;
+    m_binned      = app.m_binned;
 
     // Return
     return;
@@ -466,7 +466,7 @@ void ctmodel::get_parameters(void)
     // If there are no observations in container then load them via user
     // parameters
     if (m_obs.size() == 0) {
-        m_obs = get_observations();
+        get_obs();
     }
 
     // Check if we got excactly one binned CTA observation
@@ -570,6 +570,134 @@ void ctmodel::get_parameters(void)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get observation container
+ *
+ * Get an observation container according to the user parameters. The method
+ * supports loading of a individual FITS file or an observation definition
+ * file in XML format.
+ *
+ * If the input filename is empty, the method checks for the existence of the
+ * "expcube", "psfcube" and "bkgcube" parameters. If file names have been
+ * specified, the method loads the files and creates a dummy events cube that
+ * is appended to the observation container.
+ *
+ * If no file names are specified for the "expcube", "psfcube" or "bkgcube"
+ * parameters, the method reads the necessary parameters to build a CTA
+ * observation from scratch.
+ ***************************************************************************/
+void ctmodel::get_obs(void)
+{
+    // Get the filename from the input parameters
+    std::string filename = (*this)["inobs"].filename();
+
+    // If no observation definition file has been specified then read all
+    // parameters that are necessary to create an observation from scratch
+    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
+
+        // Get response cube filenames
+        std::string expcube = (*this)["expcube"].filename();
+        std::string psfcube = (*this)["psfcube"].filename();
+        std::string bkgcube = (*this)["bkgcube"].filename();
+
+        // If the filenames are valid then build an observation from cube
+        // response information
+        if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
+            (gammalib::strip_whitespace(expcube) != "") &&
+            (gammalib::strip_whitespace(psfcube) != "") &&
+            (gammalib::strip_whitespace(bkgcube) != "")) {
+
+            // Get exposure, PSF and background cubes
+            GCTACubeExposure   exposure(expcube);
+            GCTACubePsf        psf(psfcube);
+            GCTACubeBackground background(bkgcube);
+
+            // Create energy boundaries
+            GEbounds ebounds = create_ebounds();
+
+            // Create dummy sky map cube
+            GSkyMap map("CAR","GAL",0.0,0.0,1.0,1.0,1,1,ebounds.size());
+            m_append_cube = true;
+
+            // Create event cube
+            GCTAEventCube cube(map, ebounds, exposure.gti());
+
+            // Create CTA observation
+            GCTAObservation cta;
+            cta.events(cube);
+            cta.response(exposure, psf, background);
+
+            // Append observation to container
+            m_obs.append(cta);
+
+        } // endif: cube response information was available
+
+        // ... otherwise build an observation from IRF response information
+        else {
+
+            // Create CTA observation
+            GCTAObservation cta = create_cta_obs();
+
+            // Set response
+            set_obs_response(&cta);
+
+            // Append observation to container
+            m_obs.append(cta);
+            
+        }
+
+    } // endif: filename was "NONE" or ""
+
+    // ... otherwise we have a file name
+    else {
+
+        // If file is a FITS file then create an empty CTA observation
+        // and load file into observation
+        if (gammalib::is_fits(filename)) {
+
+            // Allocate empty CTA observation
+            GCTAObservation cta;
+
+            // Load data
+            cta.load(filename);
+
+            // Set response
+            set_obs_response(&cta);
+
+            // Append observation to container
+            m_obs.append(cta);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+
+        }
+
+        // ... otherwise load file into observation container
+        else {
+
+            // Load observations from XML file
+            m_obs.load(filename);
+
+            // For all observations that have no response, set the response
+            // from the task parameters
+            set_response(m_obs);
+
+            // Set observation boundary parameters (emin, emax, rad)
+            set_obs_bounds(m_obs);
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+        } // endelse: file was an XML file
+
+    }
+
+    // Return
+    return;
+
 }
 
 
