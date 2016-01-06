@@ -12,7 +12,7 @@ sources = ctobssim.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctobssim.la
 libctobssim_la_SOURCES = $(sources)
-libctobssim_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
+libctobssim_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctobssim_SOURCES = main.cpp
