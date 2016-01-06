@@ -12,7 +12,7 @@ sources = ctlike.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctlike.la
 libctlike_la_SOURCES = $(sources)
-libctlike_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
+libctlike_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctlike_SOURCES = main.cpp
