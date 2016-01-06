@@ -121,10 +121,10 @@ if '@IS_ELCAPITAN_TRUE@' != '#':
 # Setup
 setup(name='@PACKAGE_NAME@',
       version='@PACKAGE_VERSION@',
-      description='ctools Python bindings',
+      description='ctools Python module',
       author='Juergen Knoedlseder',
       author_email='@PACKAGE_BUGREPORT@',
-      url='http://gammalib.sourceforge.net/',
+      url='http://cta.irap.omp.eu/ctools/',
       py_modules=['ctools.tools'],
       ext_modules=[Extension('ctools._tools', ['ctools/tools_wrap.cpp'],
                              include_dirs=include_dirs,

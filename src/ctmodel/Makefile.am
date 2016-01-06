@@ -12,7 +12,7 @@ sources = ctmodel.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctmodel.la
 libctmodel_la_SOURCES = $(sources)
-libctmodel_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
+libctmodel_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctmodel_SOURCES = main.cpp

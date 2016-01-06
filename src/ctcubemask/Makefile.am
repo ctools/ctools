@@ -12,7 +12,7 @@ sources = ctcubemask.cpp
 # Libtool library (only needed for python bindings)
 noinst_LTLIBRARIES = libctcubemask.la
 libctcubemask_la_SOURCES = $(sources)
-libctcubemask_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
+libctcubemask_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctcubemask_SOURCES = main.cpp
