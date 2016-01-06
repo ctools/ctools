@@ -119,6 +119,29 @@ $ECHO " ok"
 
 
 #
+# Test csfindobs
+# ==============
+$ECHO -n "Test csfindobs: "
+chmod +x @abs_top_srcdir@/cscripts/csfindobs.py
+@abs_top_srcdir@/cscripts/csfindobs.py \
+  datapath="iactdata/" \
+  prodname="unit-test" \
+  ra="83.6331" \
+  dec="22.01" \
+  rad="1.0" \
+  outfile="iactdata/runlist.txt" > csfindobs.log
+$ECHO -n "."
+if [ -s "iactdata/runlist.txt" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " iactdata/runlist.txt file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
 # Test csiactobs
 # ==============
 $ECHO -n "Test csiactobs: "

@@ -110,7 +110,11 @@ class csiactdata(ctools.cscript):
         # Get filename of master index file
         self.m_master_indx = self["master_indx"].string()
         self.m_master_file = os.path.join(self.datapath, self.m_master_indx)
-
+        
+        # Check for presence of master index file
+        if not os.path.isfile(self.m_master_file):
+            raise RuntimeError("Master index file \""+self.m_master_file+"\" not found. Use hidden parameter \"master_indx\" to specifiy a different filename.")
+        
         # Return
         return
 

@@ -50,3 +50,6 @@ cscripts
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
    cstsmapmerge --- Merges slices from ts map computations <cstsmapmerge>
    csobs2caldb --- Creates a caldb entry from an input observation <csobs2caldb>
+   csiactdata --- Dumps information about the IACT data available on the user machine <csiactdata>
+   csiactobs --- Creates an observation XML file for IACTs using a list of observation IDs as input <csiactobs>
+   csfindobs --- Creates a list of observation IDs <csfindobs>
