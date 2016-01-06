@@ -2,19 +2,22 @@ New Features and Important Changes in ctools 1.0.1
 
 Author(s) : Juergen Knoedlseder
 
-20 December 2015
+6 January 2016
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
-changes made since the last release of ctools. The code complies to ctools
-version 1.0.1 or above.
+changes made since the last release of ctools.
 
 
 2. Configuration
 -----------------
-None
+If ctools is compiled on Mavericks (Mac OS X 10.9) or newer but Python has been
+compiled for an earlier deployment target, a compatibility issue arises due to the
+way how class names are mangled by the compiler. This is now automatically detected
+and fixed, which should solve some compatibility issues that have been encountered
+by user using the Anaconda package on Mac OS X.
 
 
 3. Python interface
