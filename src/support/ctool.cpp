@@ -652,7 +652,7 @@ GCTAObservation ctool::create_cta_obs(void)
     list.gti(gti);
     list.ebounds(ebounds);
 
-    // Attach event list to CTA observation
+    // Attach empty event list to CTA observation
     obs.events(list);
 
     // Set observation ontime, livetime and deadtime correction factor
