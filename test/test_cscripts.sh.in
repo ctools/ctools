@@ -52,6 +52,26 @@ mkdir -p $CALDB
 
 
 #
+# Test csobs2caldb
+# ================
+$ECHO -n "Test csobs2caldb: "
+chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
+@abs_top_srcdir@/cscripts/csobs2caldb.py \
+  inobs="data/obs_unbinned.xml" \
+  rspname="test_irfs" \
+  chatter=4 > csobs2caldb.log
+$ECHO -n "."
+if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " $CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
 # Test csobsdef
 # =============
 $ECHO -n "Test csobsdef: "
@@ -71,26 +91,6 @@ then
   $ECHO -n "."
 else
   $ECHO " obs.xml file is not valid"
-  exit 1
-fi
-$ECHO " ok"
-
-
-#
-# Test csobs2caldb
-# ================
-$ECHO -n "Test csobs2caldb: "
-chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
-@abs_top_srcdir@/cscripts/csobs2caldb.py \
-  inobs="data/obs_unbinned.xml" \
-  rspname="test_irfs" \
-  chatter=4 #> csobs2caldb.log
-$ECHO -n "."
-if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " $CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
@@ -119,52 +119,6 @@ $ECHO " ok"
 
 
 #
-# Test csfindobs
-# ==============
-$ECHO -n "Test csfindobs: "
-chmod +x @abs_top_srcdir@/cscripts/csfindobs.py
-@abs_top_srcdir@/cscripts/csfindobs.py \
-  datapath="iactdata/" \
-  prodname="unit-test" \
-  ra="83.6331" \
-  dec="22.01" \
-  rad="1.0" \
-  outfile="iactdata/runlist.txt" > csfindobs.log
-$ECHO -n "."
-if [ -s "iactdata/runlist.txt" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " iactdata/runlist.txt file is not valid"
-  exit 1
-fi
-$ECHO " ok"
-
-
-#
-# Test csiactobs
-# ==============
-$ECHO -n "Test csiactobs: "
-chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
-@abs_top_srcdir@/cscripts/csiactobs.py \
-  datapath="iactdata/" \
-  prodname="unit-test" \
-  infile="iactdata/runlist.txt" \
-  bkgpars="1" \
-  outobs="obs2.xml" \
-  outmodel="bkgmodels.xml" > csiactobs.log
-$ECHO -n "."
-if [ -s "obs2.xml" ]
-then
-  $ECHO -n "."
-else
-  $ECHO " obs.xml file is not valid"
-  exit 1
-fi
-$ECHO " ok"
-
-
-#
 # Test csmodelinfo
 # ================
 $ECHO -n "Test csmodelinfo: "
@@ -184,9 +138,10 @@ $ECHO " ok"
 
 
 #
-# Test csmodelmerge (space-separated)
-# ===================================
-$ECHO -n "Test csmodelmerge (space-separated): "
+# Test csmodelmerge
+# =================
+$ECHO -n "Test csmodelmerge: "
+# === space-separated ===
 chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
 @abs_top_srcdir@/cscripts/csmodelmerge.py \
   inmodels="data/crab.xml data/source1.xml" \
@@ -199,14 +154,7 @@ else
   $ECHO " merged_models.xml file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test csmodelmerge (comma-separated)
-# ===================================
-$ECHO -n "Test csmodelmerge (comma-separated): "
-chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+# === comma-separated ===
 @abs_top_srcdir@/cscripts/csmodelmerge.py \
   inmodels="data/crab.xml,data/source1.xml" \
   outmodel="merged_models2.xml" > csmodelmerge.log
@@ -218,14 +166,7 @@ else
   $ECHO " merged_models2.xml file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test csmodelmerge (wildcard string)
-# ===================================
-$ECHO -n "Test csmodelmerge (wildcard string): "
-chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
+# === wildcard string ===
 @abs_top_srcdir@/cscripts/csmodelmerge.py \
   inmodels="data/model_cube_background*.xml" \
   outmodel="merged_models3.xml" > csmodelmerge.log
@@ -237,15 +178,8 @@ else
   $ECHO " merged_models3.xml file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test csmodelmerge (ascii-file)
-# ==============================
+# === ascii-file ===
 ls data/model_cube_background* > models.txt
-$ECHO -n "Test csmodelmerge (ascii-file): "
-chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
 @abs_top_srcdir@/cscripts/csmodelmerge.py \
   inmodels="@models.txt" \
   outmodel="merged_models4.xml" > csmodelmerge.log
@@ -262,9 +196,10 @@ rm models.txt
 
 
 #
-# Test cstsmapmerge (comma-separated)
-# ===================================
-$ECHO -n "Test cstsmapmerge (comma-separated): "
+# Test cstsmapmerge
+# =================
+$ECHO -n "Test cstsmapmerge: "
+# === comma-separated ===
 chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
 @abs_top_srcdir@/cscripts/cstsmapmerge.py \
   inmaps="data/tsmap_0.fits,data/tsmap_1.fits" \
@@ -277,14 +212,7 @@ else
   $ECHO " merged_tsmap1.fits file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test cstsmapmerge (space-separated)
-# ===================================
-$ECHO -n "Test cstsmapmerge (space-separated): "
-chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+# === space-separated ===
 @abs_top_srcdir@/cscripts/cstsmapmerge.py \
   inmaps="data/tsmap_0.fits data/tsmap_1.fits" \
   outmap="merged_tsmap2.fits" > cstsmapmerge.log
@@ -296,14 +224,7 @@ else
   $ECHO " merged_tsmap2.fits file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test cstsmapmerge (wildcard string)
-# ===================================
-$ECHO -n "Test cstsmapmerge (wildcard string): "
-chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
+# === wildcard string ===
 @abs_top_srcdir@/cscripts/cstsmapmerge.py \
   inmaps="data/tsmap_*.fits" \
   outmap="merged_tsmap3.fits" > cstsmapmerge.log
@@ -315,15 +236,8 @@ else
   $ECHO " merged_tsmap3.fits file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test cstsmapmerge (ascii-file)
-# ==============================
+# === ascii-file ===
 ls data/tsmap_*.fits > tsmaps.txt
-$ECHO -n "Test cstsmapmerge  (ascii-file): "
-chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
 @abs_top_srcdir@/cscripts/cstsmapmerge.py \
   inmaps="@tsmaps.txt" \
   outmap="merged_tsmap4.fits" > cstsmapmerge.log
@@ -462,9 +376,10 @@ $ECHO " ok"
 
 
 #
-# Test csspec (unbinned)
-# =====================
-$ECHO -n "Test csspec (unbinned): "
+# Test csspec
+# ===========
+$ECHO -n "Test csspec: "
+# === Unbinned ===
 chmod +x @abs_top_srcdir@/cscripts/csspec.py
 @abs_top_srcdir@/cscripts/csspec.py \
   inobs="data/crab_events.fits" \
@@ -485,14 +400,7 @@ else
   $ECHO " spectrum.fits file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test csspec (binned)
-# ====================
-$ECHO -n "Test csspec (binned): "
-chmod +x @abs_top_srcdir@/cscripts/csspec.py
+# === Binned ===
 @abs_top_srcdir@/cscripts/csspec.py \
   inobs="data/crab_cntmap_small.fits.gz" \
   expcube="data/crab_expcube.fits.gz" \
@@ -517,9 +425,10 @@ $ECHO " ok"
 
 
 #
-# Test cslightcrv (unbinned)
-# ==========================
-$ECHO -n "Test cslightcrv (unbinned): "
+# Test cslightcrv
+# ===============
+$ECHO -n "Test cslightcrv: "
+# === unbinned ===
 chmod +x @abs_top_srcdir@/cscripts/cslightcrv.py
 @abs_top_srcdir@/cscripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
@@ -543,14 +452,7 @@ else
   $ECHO " lightcurve.fits file is not valid"
   exit 1
 fi
-$ECHO " ok"
-
-
-#
-# Test cslightcrv (binned)
-# ========================
-$ECHO -n "Test cslightcrv (binned): "
-chmod +x @abs_top_srcdir@/cscripts/cslightcrv.py
+# === binned ===
 @abs_top_srcdir@/cscripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
@@ -575,6 +477,52 @@ then
   $ECHO -n "."
 else
   $ECHO " lightcurve_binned.fits file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csfindobs
+# ==============
+$ECHO -n "Test csfindobs: "
+chmod +x @abs_top_srcdir@/cscripts/csfindobs.py
+@abs_top_srcdir@/cscripts/csfindobs.py \
+  datapath="iactdata/" \
+  prodname="unit-test" \
+  ra="83.6331" \
+  dec="22.01" \
+  rad="1.0" \
+  outfile="iactrunlist.dat" > csfindobs.log
+$ECHO -n "."
+if [ -s "iactrunlist.dat" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " iactdata/runlist.txt file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test csiactobs
+# ==============
+$ECHO -n "Test csiactobs: "
+chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
+@abs_top_srcdir@/cscripts/csiactobs.py \
+  datapath="iactdata/" \
+  prodname="unit-test" \
+  infile="iactrunlist.dat" \
+  bkgpars="1" \
+  outobs="obs2.xml" \
+  outmodel="bkgmodels.xml" > csiactobs.log
+$ECHO -n "."
+if [ -s "obs2.xml" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " obs.xml file is not valid"
   exit 1
 fi
 $ECHO " ok"
