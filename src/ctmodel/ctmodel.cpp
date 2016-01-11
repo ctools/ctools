@@ -284,7 +284,7 @@ void ctmodel::run(void)
 
         // Fill cube and leave loop if we are binned mode (meaning we 
         // only have one binned observation)
-        if (m_binned && m_obs.size() == 1) {
+        if (m_binned) {
             fill_cube(obs);
             break;
         }
@@ -464,13 +464,16 @@ void ctmodel::get_parameters(void)
     m_append_cube = false;
 
     // If there are no observations in container then load them via user
-    // parameters
+    // parameters.
     if (m_obs.size() == 0) {
         get_obs();
     }
 
-    // Check if we got excactly one binned CTA observation
-    if (m_obs.size() == 1) {
+    // If we have now excactly one CTA observation (but no cube has yet been
+    // appended to the observation) then check whether this observation
+    // is a binned observation, and if yes, extract the counts cube for
+    // model generation
+    if ((m_obs.size() == 1) && (m_append_cube == false)) {
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
@@ -498,7 +501,6 @@ void ctmodel::get_parameters(void)
 
     } // endif: had exactly one observation
 
-
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
 
@@ -513,7 +515,9 @@ void ctmodel::get_parameters(void)
     // Get energy dispersion flag parameters
     m_apply_edisp = (*this)["edisp"].boolean();
 
-    // Optionally get input counts cube for model cube definition
+    // If we do not have yet a counts cube for model computation then check
+    // whether we should read it from the "incube" parameter or whether we
+    // should create it from scratch using the task parameters
     if (!m_has_cube) {
 
         // Read cube definition file
@@ -544,18 +548,21 @@ void ctmodel::get_parameters(void)
 
         // Signal that cube has been set
         m_has_cube = true;
-    }
+
+    } // endif: we had no cube yet
 
     // Read optionally output cube filenames
     if (read_ahead()) {
-           m_outcube = (*this)["outcube"].filename();
+        m_outcube = (*this)["outcube"].filename();
     }
 
     // If cube should be appended to first observation then do that now.
     // This is a kluge that makes sure that the cube is passed as part
     // of the observation in case that a cube response is used. The kluge
     // is needed because the GCTACubeSourceDiffuse::set method needs to
-    // get the full event cube from the observation.
+    // get the full event cube from the observation. It is also at this
+    // step that the GTI, which may just be a dummy GTI when create_cube()
+    // has been used, will be set.
     if (m_append_cube) {
 
         //TODO: Check that energy boundaries are compatible
@@ -588,6 +595,11 @@ void ctmodel::get_parameters(void)
  * If no file names are specified for the "expcube", "psfcube" or "bkgcube"
  * parameters, the method reads the necessary parameters to build a CTA
  * observation from scratch.
+ *
+ * The method sets m_append_cube = true and m_binned = true in case that
+ * a stacked observation is requested (as detected by the presence of the
+ * "expcube", "psfcube", and "bkgcube" parameters). In that case, it appended
+ * a dummy event cube to the observation.
  ***************************************************************************/
 void ctmodel::get_obs(void)
 {
@@ -620,7 +632,6 @@ void ctmodel::get_obs(void)
 
             // Create dummy sky map cube
             GSkyMap map("CAR","GAL",0.0,0.0,1.0,1.0,1,1,ebounds.size());
-            m_append_cube = true;
 
             // Create event cube
             GCTAEventCube cube(map, ebounds, exposure.gti());
@@ -632,6 +643,12 @@ void ctmodel::get_obs(void)
 
             // Append observation to container
             m_obs.append(cta);
+
+            // Signal that we are in binned mode
+            m_binned = true;
+
+            // Signal that we appended a cube
+            m_append_cube = true;
 
         } // endif: cube response information was available
 
@@ -646,7 +663,7 @@ void ctmodel::get_obs(void)
 
             // Append observation to container
             m_obs.append(cta);
-            
+
         }
 
     } // endif: filename was "NONE" or ""

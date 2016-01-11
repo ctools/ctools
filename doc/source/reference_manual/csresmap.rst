@@ -31,17 +31,32 @@ General parameters
 ``inobs [file]``
     Input event list, counts cube or observation definition XML file.
 
+``modcube [file]``
+    Input model cube file (generated with ctmodel).
+
+``expcube [file]``
+    Input exposure cube file (only needed for stacked analysis).
+
+``psfcube [file]``
+    Input PSF cube file (only needed for stacked analysis).
+
+``bkgcube [file]``
+    Input background cube file (only needed for stacked analysis).
+
 ``inmodel [file]``
     Input model XML file.
-
-``outmap [file]``
-    Output residual counts map file.
 
 ``caldb [string]``
     Calibration database.
 
 ``irf [string]``
     Instrument response function.
+
+``(edisp = no) [boolean]``
+    Apply energy dispersion?
+
+``outmap [file]``
+    Output residual counts map file.
 
 ``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
@@ -58,6 +73,18 @@ General parameters
 ``(ebinfile = NONE) [file]``
     Name of the file containing the energy bin definition.
  	 	 
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (CEL - celestial, GAL - galactic).
+ 	 	 
+``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+    Projection method.
+
+``xref [real]``
+    Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
+ 	 	 
+``yref [real]``
+    Declination / Galactic latitude of cube centre (J2000, in degrees).
+ 	 	 
 ``nxpix [integer]``
     Number of cube bins in Right Ascension or Galactic longitude.
  	 	 
@@ -67,18 +94,6 @@ General parameters
 ``binsz [real]``
     Cube bin size (in degrees/pixel).
  	 	 
-``coordsys <CEL|GAL> [string]``
-    Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
-``xref [real]``
-    Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
- 	 	 
-``yref [real]``
-    Declination / Galactic latitude of cube centre (J2000, in degrees).
- 	 	 
-``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
-    Projection method.
-
 ``(algorithm = SUBDIV) <SUB|SUBDIV|SUBDIVSQRT> [string]``
     Algorithm used to generate the residual map.
  	 	 
