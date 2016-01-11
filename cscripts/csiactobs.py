@@ -93,19 +93,20 @@ class csiactobs(ctools.cscript):
             # Create default parfile
             pars = gammalib.GApplicationPars()    
             pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data is located"))       
-            pars.append(gammalib.GApplicationPar("prodname","s","a","","","","Data storage name (Run csdsinfo to view your options)"))
-            pars.append(gammalib.GApplicationPar("runlistfile","f","a","runlist.lis","","","Runlist file"))   
-            pars.append(gammalib.GApplicationPar("bkgpars","i","a","1","","","Number of free parameters per background model"))
+            pars.append(gammalib.GApplicationPar("prodname","s","a","","","","Data storage name (Run csiactdata to view your options)"))
+            pars.append(gammalib.GApplicationPar("infile","f","a","runlist.lis","","","Runlist file"))   
+            pars.append(gammalib.GApplicationPar("inmodel","f","h","NONE","","","Input model XML file (optional)"))
             pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Observation XML outfile"))
             pars.append(gammalib.GApplicationPar("outmodel","f","a","bgmodels.xml","","","Output model XML file"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","h","NONE","","","Input model XML file (optional)"))
+            pars.append(gammalib.GApplicationPar("bkgpars","i","a","1","","","Number of free parameters per background model"))
             pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
+            pars.append(gammalib.GApplicationPar("bkg_scale","b","h","yes","","","Specifies whether the background scaling factor from the observation index file should be applied if available. "))
             pars.append(gammalib.GApplicationPar("ev_hiera","s","h","events","","","Hierarchy of event formats"))
             pars.append(gammalib.GApplicationPar("aeff_hiera","s","h","aeff_2d","","","Hierarchy of effective area formats"))
             pars.append(gammalib.GApplicationPar("psf_hiera","s","h","psf_king|psf_3gauss","","","Hierarchy of psf formats"))
             pars.append(gammalib.GApplicationPar("edisp_hiera","s","h","edisp_2d","","","Hierarchy of energy dispersion formats"))
             pars.append(gammalib.GApplicationPar("bkg_hiera","s","h","bkg_3d","","","Hierarchy of background formats"))
-            pars.append(gammalib.GApplicationPar("bkg_mod_hiera","s","h","irf","irf|aeff|gauss","","Hierarchy of background models"))
+            pars.append(gammalib.GApplicationPar("bkg_mod_hiera","s","h","irf|aeff|gauss","","","Hierarchy of background models"))
             pars.append(gammalib.GApplicationPar("bkg_gauss_norm","r","h","1e-8","","","Input normalisation for Gaussian background"))
             pars.append(gammalib.GApplicationPar("bkg_gauss_index","r","h","-2.0","","","Input spectral index for Gaussian background"))
             pars.append(gammalib.GApplicationPar("bkg_gauss_sigma","r","h","2.5","","","Input sigma for Gaussian background"))
@@ -132,7 +133,7 @@ class csiactobs(ctools.cscript):
         
         # Read user parameters  
         self.m_prodname    = self["prodname"].string()
-        self.m_runlistfile = gammalib.expand_env(self["runlistfile"].filename())
+        self.m_runlistfile = gammalib.expand_env(self["infile"].filename())
         self.m_bkgpars     = self["bkgpars"].integer()
           
         # Output model file
@@ -143,6 +144,9 @@ class csiactobs(ctools.cscript):
         
         # Master index file name
         self.m_master_indx = self["master_indx"].string()
+        
+        # Read flag for background scaling factor
+        self.m_use_bkg_scale = self["bkg_scale"].boolean()
         
         # Read hierarchy of file loading
         self.m_ev_hiera      = self["ev_hiera"].string().split("|")
@@ -186,17 +190,19 @@ class csiactobs(ctools.cscript):
 
         # Check HDUs
         if self.m_hdu_index == "" or self.m_obs_index == "":
-            raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csdsinfo to get a list of available storage names")
+            raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
         if not gammalib.is_fits(self.m_hdu_index+"[HDU_INDEX]"):
-            raise RuntimeError("HDU index file \""+self.m_hdu_index+"[HDU_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csdsinfo to get a list of available storage names.")
+            raise RuntimeError("HDU index file \""+self.m_hdu_index+"[HDU_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
 
-        # Load index
-        if gammalib.is_fits(self.m_obs_index+"[OBS_INDEX]"):
-            fits = gammalib.GFits(self.m_obs_index)
-            self.has_bkg_scale = fits["OBS_INDEX"].contains("BKG_SCALE")
-            fits.close()
-        else:
-            self.has_bkg_scale = False
+        # Check for existence of "BKG_SCALE" in the observation index file if required
+        if self.m_use_bkg_scale:
+            if gammalib.is_fits(self.m_obs_index+"[OBS_INDEX]"):
+                fits = gammalib.GFits(self.m_obs_index)
+                if not fits["OBS_INDEX"].contains("BKG_SCALE"):
+                    self.m_use_bkg_scale = False
+                fits.close()
+            else:
+                self.m_use_bkg_scale = False
         
         # Create base data directory from hdu index file location
         self.subdir    = os.path.dirname(self.m_hdu_index)  
@@ -481,7 +487,7 @@ class csiactobs(ctools.cscript):
 
             # Handle background scale information if available
             bkg_scale = 1.0
-            if self.has_bkg_scale:
+            if self.m_use_bkg_scale:
                 obsindx = gammalib.GFits(self.m_obs_index+"[OBS_INDEX]"+obs_selection)
                 bkg_scale = obsindx["OBS_INDEX"]["BKG_SCALE"][0]
                 obsindx.close()
@@ -527,7 +533,7 @@ class csiactobs(ctools.cscript):
                 self.log(" Point spread function: "+psffile+"\n")
                 self.log(" Energy dispersion: "+edispfile+"\n")
                 self.log(" Background file: "+bkgfile+"\n")  
-                if self.has_bkg_scale:
+                if self.m_use_bkg_scale:
                     self.log(" Background scale: "+str(bkg_scale)+"\n")  
                 self.log("\n")
 

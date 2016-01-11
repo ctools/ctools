@@ -31,22 +31,33 @@ ctools
    cterror --- Calculates likelihood profile errors <cterror>
 
 
-cscripts
---------
+General cscripts
+----------------
 
 .. toctree::
    :maxdepth: 1
 
    cscaldb --- Lists available instrument response functions <cscaldb>
-   csobsdef --- Generates observation definition file <csobsdef>
    cslightcrv --- Computes lightcurve <cslightcrv>
-   cspull --- Generates pull distribution <cspull>
-   cssens --- Computes CTA sensitivity <cssens>
-   csspec --- Computes spectral points <csspec>
-   csresmap --- Generates residual map <csresmap>
-   cstsdist --- Generates TS distribution <cstsdist>
-   csobsinfo --- Shows observation container content <csobsinfo>
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
+   csobsdef --- Generates observation definition file <csobsdef>
+   csobsinfo --- Shows observation container content <csobsinfo>
+   cspull --- Generates pull distribution <cspull>
+   csresmap --- Generates residual map <csresmap>
+   cssens --- Computes CTA sensitivity <cssens>
+   csspec --- Computes spectral points <csspec>
+   cstsdist --- Generates TS distribution <cstsdist>
    cstsmapmerge --- Merges slices from ts map computations <cstsmapmerge>
+ 
+
+IACT cscripts
+-------------
+
+.. toctree::
+   :maxdepth: 1
+
    csobs2caldb --- Creates a caldb entry from an input observation <csobs2caldb>
+   csiactdata --- Shows information about IACT data available on the user machine <csiactdata>
+   csiactobs --- Generates observation definition file for IACT data from observation IDs <csiactobs>
+   csfindobs --- Generates a list of IACT observation IDs <csfindobs>
