@@ -3,26 +3,29 @@
 csiactdata
 ===========
 
-Dumps information about the available FITS productions of IACT data on the screen
+Dumps information about the available FITS productions of IACT data on the
+screen.
 
 
 Synopsis
 --------
 
 This script inspects the local IACT FITS data storage and prints the names of
-available and valid data productions on the screen. The first parameter ``datapath``
-is only queried if the environment variable $VHEFITS is not set. The path should be set
-to the location of the `master index file <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/super_index/index.html>`__.
-The output of this script can be used as input for further tools that use IACT data.
+available and valid data productions on the screen. The parameter ``datapath``
+is only queried if the environment variable $VHEFITS is not set. The path should
+be set to the location of the `master index file <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/super_index/index.html>`__.
+The output of this script can be used as input for further tools that use IACT
+data.
+
 
 General parameters
 ------------------
 
 ``datapath [string]``
-    Path were data is located
+    Path were data are located.
     
 ``(master_index = master.json) [string]``
-    Name of master index file
+    Name of master index file.
     
     
 Standard parameters
@@ -56,4 +59,4 @@ Standard parameters
 Related tools or scripts
 ------------------------
 
-None
+:doc:`csfindobs`

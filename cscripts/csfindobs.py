@@ -1,28 +1,45 @@
 #!/usr/bin/env python
+# ==========================================================================
+# Find observations from an IACT data store
+#
+# Copyright (C) 2016 Michael Mayer
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ==========================================================================
 import gammalib
 import ctools
 import sys
 import os
 import json
 
-# ============== #
-# csrunfinder class #
-# ============== #
+
+# =============== #
+# csfindobs class #
+# =============== #
 class csfindobs(ctools.cscript):
     """
-    This class can be used to find observations from an IACT data store. It derives
-    from the GammaLib::GApplication class which provides support for parameter
-    files, command line arguments, and logging. In that way the Python
-    script behaves just as a regular ctool. 
+    This class can be used to find observations from an IACT data store.
     """
     def __init__(self, *argv):
         """
         Constructor.
         """
         # Set name
-        self.name    = "csfindobs"
-        self.version = "1.0.0"
-        self.verbose = False
+        self.name     = "csfindobs"
+        self.version  = "1.0.0"
+        self.verbose  = False
         self.datapath = os.getenv("VHEFITS","")
         
         # Make sure that parfile exists
@@ -70,16 +87,17 @@ class csfindobs(ctools.cscript):
             
             # Create default parfile
             pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data is located"))       
+            pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data are located"))       
             pars.append(gammalib.GApplicationPar("prodname","s","a","prod-name","","","Name of FITS production (Run csiactdata to view your options)"))
+            pars.append(gammalib.GApplicationPar("outfile","f","a","runlist.lis","","","Runlist outfile"))
             pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","","","Right ascension"))
             pars.append(gammalib.GApplicationPar("dec","r","a","22.01","","","Declination"))
             pars.append(gammalib.GApplicationPar("rad","r","a","2.5","","","Search radius"))
             pars.append(gammalib.GApplicationPar("min_qual","i","h","0","0|1|2","","Minimum data quality (0=perfect, 1=ok, 2=bad)"))
             pars.append(gammalib.GApplicationPar("expression","s","h","NONE","","","Additional expression"))
             pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","runlist.lis","","","Runlist outfile"))
             pars.append_standard()
+            pars.append(gammalib.GApplicationPar("logfile","f","h","csfindobs.log","","","Log filename"))
             pars.save(parfile)
         
         # Return
@@ -97,7 +115,7 @@ class csfindobs(ctools.cscript):
         self.datapath = gammalib.expand_env(self.datapath)
         
         # Get production name
-        self.m_prodname    = self["prodname"].string()
+        self.m_prodname = self["prodname"].string()
         
         # Master index file name
         self.m_master_indx = self["master_indx"].string()
@@ -109,8 +127,8 @@ class csfindobs(ctools.cscript):
         if self["ra"].is_valid() and self["dec"].is_valid() and self["rad"].is_valid():
             
             # Read spatial parameters
-            self.m_ra = self["ra"].real()
-            self.m_dec = self["dec"].real()
+            self.m_ra     = self["ra"].real()
+            self.m_dec    = self["dec"].real()
             self.m_radius = self["rad"].real()
             
         else:
@@ -121,7 +139,7 @@ class csfindobs(ctools.cscript):
             self.select_radec = False
             
         # Read other parameters
-        self.m_quality = self["min_qual"].integer()
+        self.m_quality    = self["min_qual"].integer()
         self.m_expression = self["expression"].string()
         
         # Check for validity of expression
@@ -159,9 +177,10 @@ class csfindobs(ctools.cscript):
             raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
         if not gammalib.is_fits(self.m_obs_index+"[OBS_INDEX]"):
             raise RuntimeError("Observation index file \""+self.m_obs_index+"[OBS_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csdsinfo to get a list of available storage names.")
-  
-        self.m_log   = False # Logging in client tools
-        self.m_debug = False # Debugging in client tools
+
+        # Set other members
+        self.m_log     = False # Logging in client tools
+        self.m_debug   = False # Debugging in client tools
         self.m_clobber = self["clobber"].boolean()
   
         # Return
@@ -187,8 +206,7 @@ class csfindobs(ctools.cscript):
         
         # Return
         return
-    
-    
+
     def run(self):
         """
         Run the script.
@@ -241,14 +259,15 @@ class csfindobs(ctools.cscript):
             # Read observation IDs into array
             for i in range(obs_indx.nrows()):
                 self.runs.append(obs_indx["OBS_ID"][i])
-        
+
+        # Dump expression
         if self.logNormal():
             self.log("\n")
             self.log.header3("Expression")
             self.log(expr)
             self.log("\n")
-            
-            
+
+        # Dump number of observations
         if self.logTerse():
             self.log("\n")
             self.log.header3("Observations")
@@ -282,7 +301,7 @@ class csfindobs(ctools.cscript):
 # ======================== #
 if __name__ == '__main__':
     """
-    Generates residual count map.
+    Find IACT observations.
     """
     # Create instance of application
     app = csfindobs(sys.argv)

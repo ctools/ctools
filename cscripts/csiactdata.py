@@ -40,8 +40,8 @@ class csiactdata(ctools.cscript):
         Constructor.
         """
         # Set name
-        self.name    = "csiactdata"
-        self.version = "1.0.0"
+        self.name     = "csiactdata"
+        self.version  = "1.0.0"
         self.datapath = os.getenv("VHEFITS","")
 
         # Make sure that parfile exists

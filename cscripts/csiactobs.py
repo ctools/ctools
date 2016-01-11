@@ -94,11 +94,11 @@ class csiactobs(ctools.cscript):
             pars = gammalib.GApplicationPars()    
             pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data is located"))       
             pars.append(gammalib.GApplicationPar("prodname","s","a","","","","Data storage name (Run csiactdata to view your options)"))
-            pars.append(gammalib.GApplicationPar("runlistfile","f","a","runlist.lis","","","Runlist file"))   
-            pars.append(gammalib.GApplicationPar("bkgpars","i","a","1","","","Number of free parameters per background model"))
+            pars.append(gammalib.GApplicationPar("infile","f","a","runlist.lis","","","Runlist file"))   
+            pars.append(gammalib.GApplicationPar("inmodel","f","h","NONE","","","Input model XML file (optional)"))
             pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Observation XML outfile"))
             pars.append(gammalib.GApplicationPar("outmodel","f","a","bgmodels.xml","","","Output model XML file"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","h","NONE","","","Input model XML file (optional)"))
+            pars.append(gammalib.GApplicationPar("bkgpars","i","a","1","","","Number of free parameters per background model"))
             pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
             pars.append(gammalib.GApplicationPar("bkg_scale","b","h","yes","","","Specifies whether the background scaling factor from the observation index file should be applied if available. "))
             pars.append(gammalib.GApplicationPar("ev_hiera","s","h","events","","","Hierarchy of event formats"))
@@ -133,7 +133,7 @@ class csiactobs(ctools.cscript):
         
         # Read user parameters  
         self.m_prodname    = self["prodname"].string()
-        self.m_runlistfile = gammalib.expand_env(self["runlistfile"].filename())
+        self.m_runlistfile = gammalib.expand_env(self["infile"].filename())
         self.m_bkgpars     = self["bkgpars"].integer()
           
         # Output model file

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all cscripts that are shipped with ctools
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
 @abs_top_srcdir@/cscripts/csiactobs.py \
   datapath="iactdata/" \
   prodname="unit-test" \
-  runlistfile="iactdata/runlist.txt" \
+  infile="iactdata/runlist.txt" \
   bkgpars="1" \
   outobs="obs2.xml" \
   outmodel="bkgmodels.xml" > csiactobs.log
