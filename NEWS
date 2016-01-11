@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.0.1
 
 Author(s) : Juergen Knoedlseder
 
-6 January 2016
+11 January 2016
 
 
 1. Introduction
@@ -63,7 +63,10 @@ None
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
 The get_obs() method, that has been accidently removed, has been put back
-which allows computation of a model cube for a stacked analysis.
+which allows computation of a model cube for a stacked analysis. Another
+bug was corrected that led to the generation of model cubes with a single
+pixel, related to an internal change of the logic in how input information
+was handled. This fixes issue #1609.
 
 
 12. ctexpcube - CTA exposure cube generation
