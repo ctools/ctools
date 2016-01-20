@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-11 January 2016
+20 January 2016
 
 
 1. Introduction
@@ -33,7 +33,36 @@ None
 
 6. ctselect - CTA event selection
 ---------------------------------
-None
+The tool now allows the usage of non-default extension names for the event
+and Good Time Intervals. If the events are not located in the "EVENTS"
+extension, the extension name can be provided by appending the extension
+name to the input file name using the syntax
+
+    <filename>[<event extension name>]
+
+where <filename> needs to be replaced by the name of the FITS file and
+<event extension name> by the name of the FITS extension. ctselect also
+extracts the name of the Good Time Intervals extension from the data sub-
+space keywords provided in the header of the event file.
+
+The user has now also the possibility to specify other extension names for
+the events and the Good Time intervals upon writing of the selected output
+file. The format of the "outobs" parameter for this is
+
+    <filename>[<event extension name;GTI extension name>]
+
+If only an event extension name is provided using
+
+    <filename>[<event extension name>]
+
+the original extension name will be kept for the GTIs. Changing only the
+GTI extension name can be achieved using
+
+    <filename>[;GTI extension name>]
+
+The ctselect tool now can also write the output into the same file that
+was input, replacing the initial event (and eventually also Good Time
+Intervals) extensions.
 
 
 7. ctbin - CTA event binning
