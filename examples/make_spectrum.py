@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script shows how to make a spectrum using obsutils.
 #
-# Copyright (C) 2014-2015 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ def plot_spectrum(spectrum):
     plt.errorbar(energies, flux, yerr=e_flux, xerr=[ed_engs, eu_engs], fmt='ro')
     plt.errorbar(ul_energies, ul_flux, xerr=[ul_ed_engs, ul_eu_engs], yerr=1.0e-11, uplims=True, fmt='ro')
     plt.xlabel("Energy (TeV)")
-    plt.ylabel(r"dN/dE (erg cm$^{-2}$ s$^{-1}$)")    
+    plt.ylabel(r"E$^{2}$dN/dE (erg cm$^{-2}$ s$^{-1}$)")    
 
     # Show spectrum
     plt.show()
