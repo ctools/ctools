@@ -84,7 +84,7 @@ chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
 @abs_top_srcdir@/cscripts/csobs2caldb.py \
   inobs="data/obs_unbinned.xml" \
   rspname="test_irfs" \
-  chatter=4 #> csobs2caldb.log
+  chatter=4 > csobs2caldb.log
 $ECHO -n "."
 if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
 then
