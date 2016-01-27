@@ -55,7 +55,7 @@ AC_CONFIG_HEADER([config.h])
 # 5. If any interfaces have been removed or changed since the last public   #
 #    release, then set age to 0.                                            #
 #############################################################################
-CTOOLS_LT_VERSION="1:0:0"
+CTOOLS_LT_VERSION="1:1:0"
 AC_SUBST(CTOOLS_LT_VERSION)
 
 
