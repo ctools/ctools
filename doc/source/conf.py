@@ -43,7 +43,7 @@ except:
 # This makes it possible to cross-link to the GammaLib Sphinx docs
 # see http://sphinx-doc.org/ext/intersphinx.html
 intersphinx_mapping = dict()
-intersphinx_mapping['gammalib'] = ('http://gammalib.sourceforge.net/', None)
+intersphinx_mapping['gammalib'] = ('http://cta.irap.omp.eu/gammalib/', None)
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
