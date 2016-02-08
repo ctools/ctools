@@ -123,6 +123,9 @@ class csfindobs(ctools.cscript):
         # Intiialise flag if spatial selection is required
         self.select_radec = True
         
+        # Initialise invalid radius
+        self.m_radius = 0.0
+        
         # Check for vailidity of spatial parameters
         if self["ra"].is_valid() and self["dec"].is_valid() and self["rad"].is_valid():
             
@@ -176,7 +179,7 @@ class csfindobs(ctools.cscript):
         if self.m_obs_index == "":
             raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
         if not gammalib.is_fits(self.m_obs_index+"[OBS_INDEX]"):
-            raise RuntimeError("Observation index file \""+self.m_obs_index+"[OBS_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csdsinfo to get a list of available storage names.")
+            raise RuntimeError("Observation index file \""+self.m_obs_index+"[OBS_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
 
         # Set other members
         self.m_log     = False # Logging in client tools
@@ -190,7 +193,7 @@ class csfindobs(ctools.cscript):
         """ 
         Return OBS IDs
         """
-        
+             
         # Return
         return self.runs
     
