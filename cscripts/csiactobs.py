@@ -43,10 +43,10 @@ class csiactobs(ctools.cscript):
         """
         # Set name and version
         self.name    = "csiactobs"
-        self.version = "1.0.0"
+        self.version = "1.1.0"
 
         # Initialise some members
-        self.m_erange = gammalib.GEbounds()
+        self.m_ebounds = gammalib.GEbounds()
         self.datapath = os.getenv("VHEFITS","")
         self.inmodels = None
         self.outobs   = "obs.xml"
@@ -127,7 +127,11 @@ class csiactobs(ctools.cscript):
         
         if self.datapath == "":
             self.datapath = self["datapath"].string()
-            
+        
+        # Check for input models
+        if not self["inmodel"].filename() == "NONE":
+            self.inmodels = gammalib.GModels(self["inmodel"].filename())
+               
         # Expand environment
         self.datapath = gammalib.expand_env(self.datapath)
         
@@ -190,9 +194,9 @@ class csiactobs(ctools.cscript):
 
         # Check HDUs
         if self.m_hdu_index == "" or self.m_obs_index == "":
-            raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
+            raise RuntimeError("*** ERROR: FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
         if not gammalib.is_fits(self.m_hdu_index+"[HDU_INDEX]"):
-            raise RuntimeError("HDU index file \""+self.m_hdu_index+"[HDU_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
+            raise RuntimeError("*** ERROR: HDU index file \""+self.m_hdu_index+"[HDU_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
 
         # Check for existence of "BKG_SCALE" in the observation index file if required
         if self.m_use_bkg_scale:
@@ -213,7 +217,7 @@ class csiactobs(ctools.cscript):
         # Return
         return
     
-    def background_spectrum(self, run, prefactor, index, emin, emax):
+    def background_spectrum(self, run, prefactor, index, emin = 0.01, emax = 100.0):
         
         # Handle constant spectral model 
         if index == 0.0 and self.m_bkgpars <= 1:
@@ -258,7 +262,7 @@ class csiactobs(ctools.cscript):
                 
                 # Create spectral model and energy values
                 spec = gammalib.GModelSpectralNodes()
-                bounds = gammalib.GEbounds(self.bkgpars,gammalib.GEnergy(emin,"TeV"),gammalib.GEnergy(emax,"TeV"),True)
+                bounds = gammalib.GEbounds(self.m_bkgpars,gammalib.GEnergy(emin,"TeV"),gammalib.GEnergy(emax,"TeV"), True)
                 for i in range(bounds.size()):     
                     energy = bounds.elogmean(i)
                     value = plaw.eval(energy, gammalib.GTime())
@@ -274,7 +278,7 @@ class csiactobs(ctools.cscript):
         # Return spectrum
         return spec
 
-    def iact_background(self, telescope, obs_id, bkg_scale, bkgtype, emin=0.1, emax=100):
+    def iact_background(self, telescope, obs_id, bkg_scale, bkgtype, emin=0.01, emax=100):
         
         # handle IrfBackground
         if bkgtype == "irf":
@@ -287,7 +291,7 @@ class csiactobs(ctools.cscript):
             bck = gammalib.GCTAModelIrfBackground(spec)
         
         # Set AeffBackground   
-        elif self.bkgtype == "aeff":
+        elif bkgtype == "aeff":
         
             prefactor = bkg_scale * self.m_bkg_aeff_norm
             spec = self.background_spectrum(obs_id, prefactor, self.m_bkg_aeff_index, emin, emax)
@@ -296,7 +300,7 @@ class csiactobs(ctools.cscript):
             bck = gammalib.GCTAModelAeffBackground(spec)
             
         # Set Gaussian Background
-        elif self.bkgtype == "gauss":
+        elif bkgtype == "gauss":
             prefactor = bkg_scale * self.m_bkg_gauss_norm
             spec      = self.background_spectrum(obs_id, prefactor, self.m_bkg_gauss_index, emin, emax)
             radial    = gammalib.GCTAModelRadialGauss(self.m_bkg_gauss_sigma)
@@ -323,11 +327,11 @@ class csiactobs(ctools.cscript):
         # Return model
         return model
 
-    def erange(self):
+    def ebounds(self):
         """
         Returns runlist energy range
         """
-        return self.m_erange
+        return self.m_ebounds
 
     def execute(self):
         """
@@ -359,7 +363,7 @@ class csiactobs(ctools.cscript):
             self.log("\n")
 
         # Initialise empty models    
-        self.models = gammalib.GModels()
+        self.models = gammalib.GModels()   
 
         # Initialise empty xml file and append an observation list
         self.xml = gammalib.GXml()
@@ -380,23 +384,25 @@ class csiactobs(ctools.cscript):
                 runlist.append('')
         runfile.close()
 
-        # Loop over runs
         # Log output
         if self.logTerse():
             self.log("\n")
-            self.log.header1("Looping over runs")
+            self.log.header1("Looping over "+str(len(runlist))+" runs")
 
         # Initialise energy range values for logging
-        runlist_emin = 100.0
-        runlist_emax = 0.0
+        self.m_ebounds.clear()
 
+        # Loop over runs
         for obs_id in runlist:
 
+            # Create selection string
             obs_selection = "[OBS_ID=="+str(obs_id)+"]"
             
+            # Open HDU index file
             hduindx = gammalib.GFits(self.m_hdu_index+"[HDU_INDEX]"+obs_selection)
             hduindx_hdu = hduindx["HDU_INDEX"]
             
+            # Initialise files and hdu names
             eventfile = aefffile = psffile = edispfile = bkgfile = ""
             eventhdu = aeffhdu = ""
             
@@ -481,9 +487,12 @@ class csiactobs(ctools.cscript):
                 bkgfile += "["+hduindx_hdu["HDU_NAME"][index]+"]"
             if not gammalib.is_fits(bkgfile):
                 if self.logTerse():
-                    self.log("Warning: observation "+str(obs_id)+" has no background information in \""+bkgfile+"\". IRF background cannot be used\n")
+                    self.log("Warning: observation "+str(obs_id)+" has no background information (file=\""+bkgfile+"\"). IRF background cannot be used\n")
                     bkgfile = ""
                     bkg_mod_hierarchy.remove("irf")
+
+            # Close hdu index file
+            hduindx.close()
 
             # Handle background scale information if available
             bkg_scale = 1.0
@@ -505,24 +514,27 @@ class csiactobs(ctools.cscript):
             aeff_fits = gammalib.GFits(aefffile)
             aeff_table = aeff_fits[aeffhdu]
             
-            # Initialise energy range in case no threshold is available
-            run_emin = 0.1
-            run_emax = 100.0
+            # Set energy range from header keyword if present
+            if aeff_table.has_card("LO_THRES") and aeff_table.has_card("HI_THRES"):
+                
+                # Get safe energy range
+                run_emin = gammalib.GEnergy(aeff_table.real("LO_THRES"), "TeV")
+                run_emax = gammalib.GEnergy(aeff_table.real("HI_THRES"), "TeV")
+                
+                # Append to ebounds
+                self.m_ebounds.append(run_emin, run_emax)
             
-            # Set energy range from heady keywords
-            if aeff_table.has_card("LO_THRES") and aeff_table.has_card["HI_THRES"]:
-                run_emin = aeff_table.real("LO_THRES")
-                run_emax = aeff_table.real("HI_THRES")
+            else:
+                # Set default values for energy range
+                run_emin = gammalib.GEnergy(10,"GeV")
+                run_emax = gammalib.GEnergy(100,"TeV")
             
             # Close Aeff fits file
             aeff_fits.close()     
-                
-            # Adapt runlist energy range if necessary
-            if run_emin < runlist_emin:
-                runlist_emin = run_emin
-            if run_emax > runlist_emax:
-                runlist_emax = run_emax
-                
+            
+            # Append instrumental background model
+            self.models.append(self.iact_background(telescope, obs_id, bkg_scale, bkg_mod_hierarchy[0], run_emin.TeV(), run_emax.TeV()))
+
             # Logging
             if self.logTerse():
                 self.log("Adding observation "+str(obs_id)+" (\""+object_name+"\")\n")
@@ -570,20 +582,25 @@ class csiactobs(ctools.cscript):
             obs.append(edisp)
             obs.append(bck)
             
-            # Append instrumental background model
-            self.models.append(self.iact_background(telescope, obs_id, bkg_scale, bkg_mod_hierarchy[0], run_emin, run_emax))
-
         # Continue only if there are observations available
         if lib.size():
             
-            # Store energy range as member
-            self.m_erange = gammalib.GEbounds(gammalib.GEnergy(runlist_emin,"TeV"),gammalib.GEnergy(runlist_emax,"TeV"))
-               
-            # Write energy range into log file    
+            # Log header of energy range
             if self.logTerse():
                 self.log("\n")
-                self.log("Eenrgy range of obervation list: ")
-                self.log(("% 3.2f" % runlist_emin)+" - "+("% 3.2f" % runlist_emax)+" TeV")
+                self.log.header3("Eenrgy range of obervation list: ")
+            
+            # Logging if energy range is available
+            if self.m_ebounds.size() > 0:
+                               
+                # Write energy range into log file    
+                self.log(str(self.m_ebounds.emin())+" - "+str(self.m_ebounds.emax()))
+                self.log("\n")
+                
+            else:
+               
+                # Write 'not available' into log file    
+                self.log("not available")
                 self.log("\n")
         
         else:
@@ -614,6 +631,7 @@ class csiactobs(ctools.cscript):
 
         # Return
         return       
+
 
 # ======================== #
 # Main routine entry point #

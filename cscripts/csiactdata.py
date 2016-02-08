@@ -169,6 +169,10 @@ class csiactdata(ctools.cscript):
                 self.log("Not available")
                 self.log("\n")
         
+        
+        self.log("\n")
+        self.log.header2("Available data configs")
+        
         # Loop over configs and log available configs       
         for config in configs:       
             
