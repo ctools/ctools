@@ -20,8 +20,8 @@ The parameter ``datapath`` is only queried if the environment variable $VHEFITS
 is not set.
 
 Besides creating an observation XML file, this script also stores a model XML
-file that contains background models for each observation. The number of free
-parameters is steered via the ``bkgpars`` parameter. 
+file that contains a background model for each observation. The number of free
+parameters per background model is steered via the ``bkgpars`` parameter. 
 
 The user can also specify as ``inmodel`` parameter an XML model file with e.g.
 sky models. The output model will then contain these models as well.
@@ -36,7 +36,7 @@ In addition, the user can specify start parameters for the background parameters
 that will be in the output XML model. 
 
 If an observation that given in the input ASCII file is not available on the user
-machine, the script dumps a warning into the logfile and the obsservation is
+machine, the script dumps a warning into the logfile and the observation is
 skipped. 
  
 
