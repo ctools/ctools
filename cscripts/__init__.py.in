@@ -36,6 +36,9 @@ __all__ = [
     "csspec",
     "cstsdist",
     "cstsmapmerge",
+    "csfindobs",
+    "csiactobs",
+    "csiactdata",
     "obsutils",
     "test",
 ]
@@ -57,6 +60,9 @@ from .cssens       import cssens
 from .csspec       import csspec
 from .cstsdist     import cstsdist
 from .cstsmapmerge import cstsmapmerge
+from .csfindobs    import csfindobs
+from .csiactobs    import csiactobs
+from .csiactdata   import csiactdata
 from . import obsutils
 
 # Add test function
