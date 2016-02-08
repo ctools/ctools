@@ -588,7 +588,7 @@ class csiactobs(ctools.cscript):
             # Log header of energy range
             if self.logTerse():
                 self.log("\n")
-                self.log.header3("Eenrgy range of obervation list: ")
+                self.log.header3("Energy range of obervation list")
             
             # Logging if energy range is available
             if self.m_ebounds.size() > 0:
