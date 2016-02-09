@@ -4,7 +4,7 @@
 # (unbinned, binned, stacked), and if matplotlib is installed, creates
 # a plot of the benchmark results.
 #
-# Copyright (C) 2014-2015 Jurgen Knodlseder
+# Copyright (C) 2014-2016 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ def binned_pipeline(duration):
 # ========================= #
 def stacked_pipeline(duration):
     """
-    Cube-style analysis pipeline.
+    Stacked analysis pipeline.
     """
     # Set script parameters
     model_name  = "${CTOOLS}/share/models/crab.xml"
@@ -351,7 +351,7 @@ if __name__ == '__main__':
         plt.title("CTA analysis benchmark")
         plt.loglog(a_duration, a_unbinned, 'ro-', label='unbinned')
         plt.loglog(a_duration, a_binned, 'bo-', label='binned')
-        plt.loglog(a_duration, a_stacked, 'go-', label='cube-style')
+        plt.loglog(a_duration, a_stacked, 'go-', label='stacked')
         plt.loglog(a_duration, c_unbinned, 'ro--')
         plt.loglog(a_duration, c_binned, 'bo--')
         plt.loglog(a_duration, c_stacked, 'go--')
