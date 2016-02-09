@@ -530,23 +530,26 @@ double ctlike::reoptimize_lm(void)
         log.indent(1);
     }
 
+    // Create a clone of the optimizer for the  re-optimisation
+    GOptimizer* opt = m_opt->clone();
+
     // Perform LM optimization
-    m_obs.optimize(*m_opt);
+    m_obs.optimize(*opt);
 
     // Optionally refit
     if (m_refit) {
-        m_obs.optimize(*m_opt);
+        m_obs.optimize(*opt);
     }
 
     // Store maximum log likelihood value
-    double logL = -(m_opt->value());
+    double logL = -(opt->value());
 
     // Write optimization results
     log.indent(0);
     if (logTerse()) {
         log << std::endl;
         log.header1("Maximum likelihood re-optimisation results");
-        log << *m_opt << std::endl;
+        log << *opt << std::endl;
     }
 
     // Return
