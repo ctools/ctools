@@ -24,7 +24,7 @@ cube definition, although this is formally possibly by specifying the counts
 cube as ``incube`` parameter. This leads however to a large FITS file on 
 output since the number of bins in the counts cube will be multiplied by 
 the number of offset angle bins (typically 200). Since the point spread 
-function varies only little over the field of fiew of the camera it is 
+function varies only little over the field of view of the camera it is 
 recommended to use a rather coarse spatial binning to keep the file size 
 manageable (with a typical value of ``binsz=1.0``).
 

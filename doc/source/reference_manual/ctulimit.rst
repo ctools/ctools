@@ -9,7 +9,7 @@ Computes upper flux limit for a source model.
 Synopsis
 --------
 
-This tools computes the upper flux limit for a specific source model. Except
+This tool computes the upper flux limit for a specific source model. Except
 of the node function, all spectral models are supported. Starting from the
 maximum likelihood model parameters, the tool finds the model flux that leads
 to a decrease of the likelihood that corresponds to a given confidence level.

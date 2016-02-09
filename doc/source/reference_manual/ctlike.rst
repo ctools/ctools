@@ -30,7 +30,7 @@ response function (parameters ``caldb`` and ``irf``).
 
 Multiple observations, including data collected with different instruments,
 can be handled by specifying an observation definition file on input. Each of
-the observations will be kept separatly and  associated with its appropriate
+the observations will be kept separately and  associated with its appropriate
 instrument response functions, as opposed to a stacked analysis where average
 response functions, computed using :doc:`ctexpcube`, :doc:`ctpsfcube` and :doc:`ctbkgcube`,
 are used. If an observation definition file is provided, ctlike will use the
@@ -38,12 +38,12 @@ joint likelihood of all the observations for parameter optimisation.
 
 By default, ctlike will use the Poisson statistics for likelihood computation,
 but for binned analysis also Gaussian statistics can be specified (parameter
-``stat``). Optionally, a refit can be done after an initial fit (parameter ``refit``),
-but normally this is not needed. For all model components that have the
-``tscalc="1"`` attribute set, ctlike will also compute the Test Statistics 
-value that is a measure of the source significance. Optionally, the spatial 
-model parameters can be kept fixed during that computation (parameter
-``fix_spat_for_ts``).
+``stat``). Optionally, a refit can be requested after an initial fit (parameter
+``refit``), but normally this is not needed. For all model components that
+have the ``tscalc="1"`` attribute set, ctlike will also compute the Test
+Statistics value that is a measure of the source significance. Optionally,
+the spatial model parameters can be kept fixed during that computation
+(parameter ``fix_spat_for_ts``).
 
 ctlike generates an output model XML file that contains the values of the 
 best fitting model parameters. For all free parameters, an ``error`` attribute

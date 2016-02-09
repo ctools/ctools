@@ -16,7 +16,7 @@ each direction the TS value for the model. The TS value is defined as twice
 the difference between the log-likelihood obtained for the full model 
 (including the specified source) and the log-likelihood obtained for a model
 that excludes the specified source. The square-root of the TS values 
-corresponds roughly to the pre-trial detection signifiance of the source (in
+corresponds roughly to the pre-trial detection significance of the source (in
 Gaussian sigma).
 
 cttsmap generates a FITS file comprising a sky map of TS values followed by 

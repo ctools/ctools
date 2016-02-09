@@ -16,7 +16,7 @@ source of interest (hidden parameter ``fix_srcs``) or to fix the background
 model component(s) (hidden parameter ``fix_bkg``). The script computes the
 source flux and its uncertainty in each spectral bin, as well as the
 significance of the source detection. Optionally, it also computes an upper
-flux limit that is particularily useful in case that the source is not
+flux limit that is particularly useful in case that the source is not
 significantly detected within a spectral bin (hidden parameter ``calc_ulim``).
 
 The script works on binned and unbinned data.
