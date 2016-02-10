@@ -483,6 +483,26 @@ $ECHO " ok"
 
 
 #
+# Test csiactdload
+# ==============
+$ECHO -n "Test csiactdload: "
+chmod +x @abs_top_srcdir@/cscripts/csiactdload.py
+@abs_top_srcdir@/cscripts/csiactdload.py \
+  remote_master="iactdata/master.json" \
+  outpath="iactdata_test" \
+  prodname="unit-test" > csiactdload.log
+$ECHO -n "."
+if [ -s "iactdata_test/master.json" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " iactdata_test/master.json file is not valid"
+  exit 1
+fi
+$ECHO " ok"
+
+
+#
 # Test csfindobs
 # ==============
 $ECHO -n "Test csfindobs: "

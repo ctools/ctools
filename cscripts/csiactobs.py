@@ -49,7 +49,8 @@ class csiactobs(ctools.cscript):
         self.m_ebounds = gammalib.GEbounds()
         self.datapath = os.getenv("VHEFITS","")
         self.inmodels = None
-        self.outobs   = "obs.xml"
+        self.xml = gammalib.GXml()
+        self.models = gammalib.GModels()
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -141,10 +142,10 @@ class csiactobs(ctools.cscript):
         self.m_bkgpars     = self["bkgpars"].integer()
           
         # Output model file
-        self.outmodel = self["outmodel"].filename()
+        self.m_outmodel = self["outmodel"].filename()
         
         # Observation outfile
-        self.outobs = self["outobs"].filename()
+        self.m_outobs = self["outobs"].filename()
         
         # Master index file name
         self.m_master_indx = self["master_indx"].string()
@@ -332,6 +333,24 @@ class csiactobs(ctools.cscript):
         Returns runlist energy range
         """
         return self.m_ebounds
+    
+    def obs(self):
+        """
+        Returns GObservations object
+        """   
+        # Initialise observations
+        obs = gammalib.GObservations()
+        
+        # Read observations if XML is filled
+        if self.xml.size():   
+            obs.read(self.xml)
+        
+        # Assign models
+        obs.models(self.models)
+        
+        # Return observations
+        return obs
+        
 
     def execute(self):
         """
@@ -341,7 +360,7 @@ class csiactobs(ctools.cscript):
         self.run()
 
         # Save residual map
-        self.save(self.outobs, self.m_clobber)
+        self.save(self.m_outobs, self.m_clobber)
 
         # Return
         return
@@ -362,11 +381,11 @@ class csiactobs(ctools.cscript):
             self.log_parameters()
             self.log("\n")
 
-        # Initialise empty models    
-        self.models = gammalib.GModels()   
+        # Clear models
+        self.models.clear()
 
-        # Initialise empty xml file and append an observation list
-        self.xml = gammalib.GXml()
+        # Clear xml file and append an observation list
+        self.xml.clear()
         self.xml.append(gammalib.GXmlElement("observation_list title=\"observation list\""))
         lib = self.xml.element("observation_list", 0)
 
@@ -627,7 +646,7 @@ class csiactobs(ctools.cscript):
         self.xml.save(outfile)
 
         # Save model XML file
-        self.models.save(self.outmodel)
+        self.models.save(self.m_outmodel)
 
         # Return
         return       
