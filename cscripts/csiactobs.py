@@ -495,7 +495,7 @@ class csiactobs(ctools.cscript):
                 
             # Handle background
             index = -1
-            bkg_mod_hierarchy = self.m_bkg_mod_hiera
+            bkg_mod_hierarchy = list(self.m_bkg_mod_hiera)
             for version in self.m_bkg_hiera:
                 n = formats.count(version) 
                 if n > 0:
@@ -508,7 +508,8 @@ class csiactobs(ctools.cscript):
                 if self.logTerse():
                     self.log("Warning: observation "+str(obs_id)+" has no background information (file=\""+bkgfile+"\"). IRF background cannot be used\n")
                     bkgfile = ""
-                    bkg_mod_hierarchy.remove("irf")
+                    if "irf" in bkg_mod_hierarchy:
+                        bkg_mod_hierarchy.remove("irf")
 
             # Close hdu index file
             hduindx.close()
