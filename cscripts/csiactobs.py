@@ -344,7 +344,7 @@ class csiactobs(ctools.cscript):
         # Read observations if XML is filled
         if self.xml.size():   
             obs.read(self.xml)
-        
+                
         # Assign models
         obs.models(self.models)
         
