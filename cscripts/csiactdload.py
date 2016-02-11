@@ -388,13 +388,14 @@ class csiactdload(ctools.cscript):
             self.log("\n")
             self.log.header1("Updating index files")
         
+        # Build local index file names
+        local_hdu = os.path.join(self.m_outpath, os.path.relpath(remote_hdu, self.remote_base))
+        local_obs = os.path.join(self.m_outpath, os.path.relpath(remote_obs, self.remote_base))
+        
         # If we have a runlist then merge index file
         if len(self.runlist):
             
-            # Check if there are local index files
-            local_hdu = os.path.join(self.m_outpath,os.path.relpath(remote_hdu, self.remote_base))
-            local_obs = os.path.join(self.m_outpath,os.path.relpath(remote_obs, self.remote_base))
-            
+            # Logging            
             if self.logTerse():
                 self.log("\n")
                 self.log.header3("HDU index")
@@ -466,6 +467,9 @@ class csiactdload(ctools.cscript):
             newdict["hduindx"] = os.path.relpath(local_hdu, self.m_outpath)
             newdict["obsindx"] = os.path.relpath(local_obs, self.m_outpath)
             newconfigs.append(newdict)
+            if self.logTerse():
+                self.log("Adding \""+str(newdict["name"])+"\"")
+                self.log("\n")
         
         # Write new json master file
         f = open(localmaster, "w")
@@ -506,7 +510,6 @@ class csiactdload(ctools.cscript):
         # Get file destination
         destination = os.path.join(self.m_outpath,os.path.relpath(source, self.remote_base))
             
-                    
         # Initialise return value
         filesize = 0.0
         
@@ -567,6 +570,7 @@ class csiactdload(ctools.cscript):
     def merge(self, localfits, remotefits, hduname, clobber):
         """
         merge remote and local fits file
+        If local fits file not present, a new one is created
         """    
         
         if self.logTerse():
