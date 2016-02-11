@@ -364,7 +364,7 @@ class csiactcopy(ctools.cscript):
             
             # Log progress
             fraction = float(k) / float(len(files)) * 100.0
-            if fraction > last_fraction:
+            while fraction > last_fraction:
                 if self.logNormal() and not self.logVerbose():
                     self.log.parformat("Status")
                     self.log(str(int(last_fraction))+"%")
