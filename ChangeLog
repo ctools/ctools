@@ -3,6 +3,7 @@
         * Version 1.1.0 released
         ========================
 
+        Delete existing events before simulation in ctobssim (#1663)
         Add csiactcopy script (#1661)
         ctselect allows usage of non-default events and GTI extensions (#1598)
 

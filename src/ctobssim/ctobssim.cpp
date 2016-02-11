@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -360,6 +360,14 @@ void ctobssim::run(void)
                 continue;
             }
 
+            // Remove now all events from the event list but keep the
+            // event list information such as ROI, Good Time Intervals,
+            // energy boundaries. This will also keep additional columns
+            // in an event list file.
+            GCTAEventList* events =
+                static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+            events->remove(0, events->size());
+
             // Work on a clone of the CTA observation. This makes sure that
             // any memory allocated for computing (for example a response
             // cache) is properly de-allocated on exit of this run
@@ -407,7 +415,8 @@ void ctobssim::run(void)
                 // to avoid multiple threads writing simultaneously
                 #pragma omp critical
                 {
-                    obs_clone.save(outfile, clobber());
+                    //obs_clone.save(outfile, clobber());
+                    obs->save(outfile, clobber());
                 }
 
                 // Dispose events

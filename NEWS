@@ -28,7 +28,11 @@ None
 
 5. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+Any existing events in an event list are now removed before starting the
+simulation to enable providing an existing event file on input from which
+only the observation attributes are extracted (for example GTI, ROI, energy
+range, etc.) while the measured events are replaced by the simulated ones
+(#1663).
 
 
 6. ctselect - CTA event selection
