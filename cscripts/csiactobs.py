@@ -47,10 +47,10 @@ class csiactobs(ctools.cscript):
 
         # Initialise some members
         self.m_ebounds = gammalib.GEbounds()
-        self.datapath = os.getenv("VHEFITS","")
-        self.inmodels = None
-        self.xml = gammalib.GXml()
-        self.models = gammalib.GModels()
+        self.datapath  = os.getenv("VHEFITS","")
+        self.inmodels  = None
+        self.xml       = gammalib.GXml()
+        self.models    = gammalib.GModels()
 
         # Make sure that parfile exists
         file = self.parfile()

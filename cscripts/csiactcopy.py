@@ -2,7 +2,7 @@
 # ==========================================================================
 # Download IACT data from remote machine
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import shutil
 # ================ #
 # csiactdata class #
 # ================ #
-class csiactdload(ctools.cscript):
+class csiactcopy(ctools.cscript):
     """
     This script copies IACT data from one location to another.
     It can take a list of observation IDs to allow the download specific
@@ -39,7 +39,7 @@ class csiactdload(ctools.cscript):
         Constructor.
         """
         # Set name
-        self.name     = "csiactdload"
+        self.name     = "csiactcopy"
         self.version  = "1.1.0"
         self.datapath = os.getenv("VHEFITS","")
 
@@ -91,7 +91,7 @@ class csiactdload(ctools.cscript):
             pars.append(gammalib.GApplicationPar("outpath","s","a","/path/to/fits","","","Destination path of FITS data"))        
             pars.append(gammalib.GApplicationPar("runlist","f","h","NONE","","","List of observation IDs"))
             pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csiactdload.log","","","Log filename"))
+            pars.append(gammalib.GApplicationPar("logfile","f","h","csiactcopy.log","","","Log filename"))
             pars.save(parfile)
 
         # Return
@@ -169,11 +169,13 @@ class csiactdload(ctools.cscript):
                 self.log.parformat("Number of observations")
                 self.log(str(len(self.runlist)))
                 self.log("\n")
+        
         # Copy all data if runlist file is "NONE"
         elif self.m_runlist == "NONE":
             if self.logTerse():
                 self.log("Copy all available data")
                 self.log("\n")
+        
         # Raise exception if file not valid
         else:
             raise RuntimeError("*** ERROR: Runlist file \""+self.m_runlist+"\" not available")
@@ -374,7 +376,7 @@ class csiactdload(ctools.cscript):
             
             if filesize > 0.0:
                 total_size += filesize
-                n_copied += 1
+                n_copied   += 1
             
             # Increment counter
             k += 1
@@ -724,7 +726,7 @@ if __name__ == '__main__':
     Copy IACT data
     """
     # Create instance of application
-    app = csiactdload(sys.argv)
+    app = csiactcopy(sys.argv)
 
     # Open logfile
     app.logFileOpen()

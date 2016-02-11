@@ -39,7 +39,7 @@ __all__ = [
     "csfindobs",
     "csiactobs",
     "csiactdata",
-    "csiactdload",
+    "csiactcopy",
     "obsutils",
     "test",
 ]
@@ -64,7 +64,7 @@ from .cstsmapmerge import cstsmapmerge
 from .csfindobs    import csfindobs
 from .csiactobs    import csiactobs
 from .csiactdata   import csiactdata
-from .csiactdload   import csiactdload
+from .csiactcopy   import csiactcopy
 from . import obsutils
 
 # Add test function

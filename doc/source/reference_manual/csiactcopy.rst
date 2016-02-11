@@ -1,6 +1,6 @@
-.. _csiactdload:
+.. _csiactcopy:
 
-csiactdload
+csiactcopy
 ===========
 
 Copies IACT data from one location to another
