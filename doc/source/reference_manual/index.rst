@@ -61,3 +61,4 @@ IACT cscripts
    csiactdata --- Shows information about IACT data available on the user machine <csiactdata>
    csiactobs --- Generates observation definition file for IACT data from observation IDs <csiactobs>
    csfindobs --- Generates a list of IACT observation IDs <csfindobs>
+   csiactcopy --- Copies IACT data from one location to another <csiactcopy>

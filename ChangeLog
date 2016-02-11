@@ -1,8 +1,9 @@
-2016-01-20  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-02-11  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Add csiactcopy script (#1661)
         ctselect allows usage of non-default events and GTI extensions (#1598)
 
 
