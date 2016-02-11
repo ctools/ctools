@@ -483,14 +483,14 @@ $ECHO " ok"
 
 
 #
-# Test csiactdload
-# ==============
-$ECHO -n "Test csiactdload: "
-chmod +x @abs_top_srcdir@/cscripts/csiactdload.py
-@abs_top_srcdir@/cscripts/csiactdload.py \
+# Test csiactcopy
+# ===============
+$ECHO -n "Test csiactcopy: "
+chmod +x @abs_top_srcdir@/cscripts/csiactcopy.py
+@abs_top_srcdir@/cscripts/csiactcopy.py \
   remote_master="iactdata/master.json" \
   outpath="iactdata_test" \
-  prodname="unit-test" > csiactdload.log
+  prodname="unit-test" > csiactcopy.log
 $ECHO -n "."
 if [ -s "iactdata_test/master.json" ]
 then
