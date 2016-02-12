@@ -364,8 +364,7 @@ void ctobssim::run(void)
             // event list information such as ROI, Good Time Intervals,
             // energy boundaries. This will also keep additional columns
             // in an event list file.
-            GCTAEventList* events =
-                static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+            GCTAEventList* events = static_cast<GCTAEventList*>(obs->events());
             events->remove(0, events->size());
 
             // Work on a clone of the CTA observation. This makes sure that
