@@ -104,7 +104,6 @@ class csiactcopy(ctools.cscript):
         
         # Get Parameters
         self.m_remote_master = self["remote_master"].filename()
-        #if not os.path.isfile(self.m_remote_master):
         if not self.m_remote_master.exists():
             raise RuntimeError("*** ERROR: FITS data not available. No master index file found in \""+self.m_remote_master.url()+"\". Make sure remote file system is properly mounted")
         
@@ -182,20 +181,20 @@ class csiactcopy(ctools.cscript):
             raise RuntimeError("*** ERROR: Runlist file \""+self.m_runlist+"\" not available")
         
         # Check for availability of remote master file
-        if not os.path.isfile(self.m_remote_master):
-            raise RuntimeError("*** ERROR: Remote master file \""+self.m_remote_master+"\" does not exist")
+        if not self.m_remote_master.exists():
+            raise RuntimeError("*** ERROR: Remote master file \""+self.m_remote_master.url()+"\" does not exist")
         
         # Retrieve json data from remote master
-        json_data = open(self.m_remote_master).read()
+        json_data = open(self.m_remote_master.url()).read()
         data      = json.loads(json_data) 
         if not "datasets" in data:
-            raise RuntimeError("*** ERROR: Key \"datasets\" not available in remote master index file \""+self.m_remote_master+"\".")
+            raise RuntimeError("*** ERROR: Key \"datasets\" not available in remote master index file \""+self.m_remote_master.url()+"\".")
         
         # Get array of configurations
         configs   = data["datasets"]
         
         # Get remote paths
-        self.remote_base = os.path.dirname(self.m_remote_master)
+        self.remote_base = os.path.dirname(self.m_remote_master.url())
                 
         # Initialise flag if prod has been found
         has_prod = False
@@ -427,7 +426,7 @@ class csiactcopy(ctools.cscript):
         
         # If no local master is found, copy master over first
         if not os.path.isfile(localmaster):
-            self.copy(self.m_remote_master, self.clobber())
+            self.copy(self.m_remote_master.url(), self.clobber())
             
         # Load local master
         json_data = open(localmaster).read()
