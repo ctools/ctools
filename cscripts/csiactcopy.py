@@ -103,9 +103,10 @@ class csiactcopy(ctools.cscript):
         """
         
         # Get Parameters
-        self.m_remote_master = gammalib.expand_env(self["remote_master"].filename())
-        if not os.path.isfile(self.m_remote_master):
-            raise RuntimeError("*** ERROR: FITS data not available. No master index file found in \""+self.m_remote_master+"\". Make sure remote file system is properly mounted")
+        self.m_remote_master = self["remote_master"].filename()
+        #if not os.path.isfile(self.m_remote_master):
+        if not self.m_remote_master.exists():
+            raise RuntimeError("*** ERROR: FITS data not available. No master index file found in \""+self.m_remote_master.url()+"\". Make sure remote file system is properly mounted")
         
         # Get parameters
         self.m_prodname = self["prodname"].string()
@@ -153,7 +154,7 @@ class csiactcopy(ctools.cscript):
         self.runlist = []
         
         # Check if runlist file is available
-        if os.path.isfile(self.m_runlist):
+        if self.m_runlist.exists():
             runfile = open(self.m_runlist)
             for line in runfile.readlines():
                 if len(line) == 0:

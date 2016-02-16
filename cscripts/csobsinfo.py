@@ -2,7 +2,7 @@
 # ==========================================================================
 # Dump information about observation into log file
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -381,7 +381,7 @@ class csobsinfo(ctools.cscript):
         if not self.ds9file == "NONE":      
             
             # Open file   
-            f = open(self.ds9file,"w")
+            f = open(self.ds9file.url(),"w")
             
             # Write coordinate system
             f.write("fk5\n")

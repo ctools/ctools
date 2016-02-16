@@ -287,12 +287,12 @@ class csfindobs(ctools.cscript):
     def save(self, outfile):
         
         # Check for clobber
-        if os.path.isfile(outfile) and not self.clobber():
-            self.log("File "+outfile+" already exists. Set clobber=yes to overwrite file")
+        if outfile.exists() and not self.clobber():
+            self.log("File "+outfile.url()+" already exists. Set clobber=yes to overwrite file")
             self.log("\n")
         else:
             # Write runs to file
-            f = open(outfile,"w")
+            f = open(outfile.url(),"w")
             for run in self.runs:
                 f.write(str(run)+" \n")
             f.close()

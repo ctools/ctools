@@ -249,13 +249,13 @@ class cssens(ctools.cscript):
 
             # Write results
             if ieng == 0:
-                f      = open(self.m_outfile, 'w')
+                f      = open(self.m_outfile.url(), 'w')
                 writer = csv.DictWriter(f, colnames)
                 writer.writerow(dict((_,_) for _ in colnames))
                 writer.writerow(result)
                 f.close()
             else:
-                f = open(self.m_outfile, 'a')
+                f      = open(self.m_outfile.url(), 'a')
                 writer = csv.DictWriter(f, colnames)
                 writer.writerow(result)
                 f.close()

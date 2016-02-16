@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generation of an IACT observation definition file.
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ class csiactobs(ctools.cscript):
         
         # Read user parameters  
         self.m_prodname    = self["prodname"].string()
-        self.m_runlistfile = gammalib.expand_env(self["infile"].filename())
+        self.m_runlistfile = self["infile"].filename()
         self.m_bkgpars     = self["bkgpars"].integer()
           
         # Output model file
@@ -288,16 +288,15 @@ class csiactobs(ctools.cscript):
             prefactor  = 1.0
             index      = 0.0
             prefactor *= bkg_scale
-            spec = self.background_spectrum(obs_id, prefactor, index, emin, emax)
+            spec       = self.background_spectrum(obs_id, prefactor, index, emin, emax)
             
             # Create background model instance
             bck = gammalib.GCTAModelIrfBackground(spec)
         
         # Set AeffBackground   
         elif bkgtype == "aeff":
-        
             prefactor = bkg_scale * self.m_bkg_aeff_norm
-            spec = self.background_spectrum(obs_id, prefactor, self.m_bkg_aeff_index, emin, emax)
+            spec      = self.background_spectrum(obs_id, prefactor, self.m_bkg_aeff_index, emin, emax)
                 
             # Create background model instance
             bck = gammalib.GCTAModelAeffBackground(spec)
@@ -393,7 +392,7 @@ class csiactobs(ctools.cscript):
 
         # Read runlist from file
         runlist = []
-        runfile = open(self.m_runlistfile)
+        runfile = open(self.m_runlistfile.url())
         for line in runfile.readlines():
             if len(line) == 0:
                 continue
@@ -420,12 +419,12 @@ class csiactobs(ctools.cscript):
             obs_selection = "[OBS_ID=="+str(obs_id)+"]"
             
             # Open HDU index file
-            hduindx = gammalib.GFits(self.m_hdu_index+"[HDU_INDEX]"+obs_selection)
+            hduindx     = gammalib.GFits(self.m_hdu_index+"[HDU_INDEX]"+obs_selection)
             hduindx_hdu = hduindx["HDU_INDEX"]
             
             # Initialise files and hdu names
             eventfile = aefffile = psffile = edispfile = bkgfile = ""
-            eventhdu = aeffhdu = ""
+            eventhdu  = aeffhdu  = ""
             
             types = []
             formats = []
@@ -533,7 +532,7 @@ class csiactobs(ctools.cscript):
             fits.close()
             
             # Open effective area file to look for threshold
-            aeff_fits = gammalib.GFits(aefffile)
+            aeff_fits  = gammalib.GFits(aefffile)
             aeff_table = aeff_fits[aeffhdu]
             
             # Set energy range from header keyword if present
