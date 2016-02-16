@@ -288,11 +288,11 @@ class csfindobs(ctools.cscript):
         
         # Check for clobber
         if outfile.exists() and not self.clobber():
-            self.log("File "+outfile.url()+" already exists. Set clobber=yes to overwrite file")
+            self.log("File "+outfile+" already exists. Set clobber=yes to overwrite file")
             self.log("\n")
         else:
             # Write runs to file
-            f = open(outfile.url(),"w")
+            f = open(repr(outfile),"w")
             for run in self.runs:
                 f.write(str(run)+" \n")
             f.close()
