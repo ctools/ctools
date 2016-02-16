@@ -2,7 +2,7 @@
 # ==========================================================================
 # Residual map generation script.
 #
-# Copyright (C) 2014-2015 Michael Mayer
+# Copyright (C) 2014-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -143,9 +143,10 @@ class csresmap(ctools.cscript):
 
         # First check if the inobs parameter is a counts cube
         if self.obs.size() == 0 and self["inobs"].filename() != "NONE":
-            if gammalib.is_fits(self["inobs"].filename()):
+            filename = gammalib.GFilename(self["inobs"].filename())
+            if filename.is_fits():
                 cta = gammalib.GCTAObservation()
-                cta.load(self["inobs"].filename())
+                cta.load(filename)
                 if cta.eventtype() == "CountsCube":
                     self.m_skip_binning = True
 

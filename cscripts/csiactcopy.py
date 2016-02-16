@@ -447,7 +447,8 @@ class csiactcopy(ctools.cscript):
             obs = os.path.join(self.m_outpath, config["obsindx"])
             
             # Check if index files are available
-            if not (gammalib.is_fits(str(hdu)) and gammalib.is_fits(str(obs))):
+            if not (gammalib.GFilename(str(hdu)).is_fits() and
+                    gammalib.GFilename(str(obs)).is_fits()):
                 if self.logTerse():
                     self.log("Removing \""+str(config["name"])+"\" (not available)")
                     self.log("\n")

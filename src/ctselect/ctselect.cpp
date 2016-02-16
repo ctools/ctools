@@ -295,7 +295,7 @@ void ctselect::run(void)
         if (fname.has_extname()) {
             m_evtname[i] = fname.extname();
         }
-        m_gtiname[i] = get_gtiname(fname.filename(), m_evtname[i]);
+        m_gtiname[i] = get_gtiname(fname.url(), m_evtname[i]);
 
         // Log input file information
         if (logTerse()) {
@@ -1184,7 +1184,7 @@ std::string ctselect::set_outfile_name(const std::string& filename) const
     GFilename fname(filename);
 
     // Split input filename without any extensions into path elements
-    std::vector<std::string> elements = gammalib::split(fname.filename(), "/");
+    std::vector<std::string> elements = gammalib::split(fname.url(), "/");
 
     // The last path element is the filename
     std::string outname = m_prefix + elements[elements.size()-1];
@@ -1254,7 +1254,7 @@ void ctselect::save_fits(void)
             GFilename fname(m_outobs);
 
             // Extract filename and event extension name
-            std::string outfile = fname.filename();
+            std::string outfile = fname.url();
 
             // Append event extension name. We handle here the possibility
             // to write the events into a different extension.
@@ -1458,7 +1458,7 @@ void ctselect::save_event_list(const GCTAObservation* obs,
             infits.close();
 
             // Save file to disk and close it (we need both operations)
-            outfits.saveto(outname.filename(), clobber());
+            outfits.saveto(outname.url(), clobber());
             outfits.close();
 
         } // endif: observation was unbinned

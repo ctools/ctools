@@ -178,7 +178,8 @@ class csfindobs(ctools.cscript):
         # Check HDUs
         if self.m_obs_index == "":
             raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
-        if not gammalib.is_fits(self.m_obs_index+"[OBS_INDEX]"):
+        filename = gammalib.GFilename(self.m_obs_index+"[OBS_INDEX]")
+        if not filename.is_fits():
             raise RuntimeError("Observation index file \""+self.m_obs_index+"[OBS_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
 
         # Set other members

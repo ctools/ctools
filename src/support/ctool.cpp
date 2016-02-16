@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -327,7 +327,7 @@ GObservations ctool::get_observations(const bool& get_response)
 
         // If file is a FITS file then create an empty CTA observation
         // and load file into observation
-        if (gammalib::is_fits(filename)) {
+        if (GFilename(filename).is_fits()) {
 
             // Allocate empty CTA observation
             GCTAObservation cta_obs;
@@ -705,10 +705,10 @@ void ctool::require_inobs(const std::string& method)
 void ctool::require_inobs_nolist(const std::string& method)
 {
     // Get inobs filename
-    std::string filename = (*this)["inobs"].filename();
+    GFilename filename = (*this)["inobs"].filename();
 
     // Continue only if we have a FITS file
-    if (gammalib::is_fits(filename)) {
+    if (filename.is_fits()) {
 
         // Signal no list
         bool is_list = false;
@@ -757,10 +757,10 @@ void ctool::require_inobs_nolist(const std::string& method)
 void ctool::require_inobs_nocube(const std::string& method)
 {
     // Get inobs filename
-    std::string filename = (*this)["inobs"].filename();
+    GFilename filename = (*this)["inobs"].filename();
 
     // Continue only if we have a FITS file
-    if (gammalib::is_fits(filename)) {
+    if (filename.is_fits()) {
 
         // Signal no cube
         bool is_cube = false;

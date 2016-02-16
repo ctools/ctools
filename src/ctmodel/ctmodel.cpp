@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -303,8 +303,7 @@ void ctmodel::run(void)
         fill_cube(obs);
 
         // Dispose events to free memory if event file exists on disk
-        if (obs->eventfile().length() > 0 &&
-            gammalib::file_exists(obs->eventfile())) {
+        if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
             obs->dispose_events();
         }
 
@@ -673,7 +672,7 @@ void ctmodel::get_obs(void)
 
         // If file is a FITS file then create an empty CTA observation
         // and load file into observation
-        if (gammalib::is_fits(filename)) {
+        if (GFilename(filename).is_fits()) {
 
             // Allocate empty CTA observation
             GCTAObservation cta;

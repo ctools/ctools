@@ -2,7 +2,7 @@
 # ==========================================================================
 # Merges sliced TS map files into one map
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -261,7 +261,7 @@ class cstsmapmerge(ctools.cscript):
         # Test files for the entry status map
         # use the first one to appear useful
         for fitsfile in self.files:    
-            if not gammalib.is_fits(fitsfile):
+            if not gammalib.GFilename(fitsfile).is_fits():
                 self.log("Skipping file \""+fitsfile+" (not a FITS file)\n")
             fits = gammalib.GFits(fitsfile)
             
@@ -297,7 +297,7 @@ class cstsmapmerge(ctools.cscript):
             for fitsfile in workfiles:
                 
                 # Skip if file is not FITS
-                if not gammalib.is_fits(fitsfile):
+                if not gammalib.GFilename(fitsfile).is_fits():
                     if self.logTerse():
                         self.log("Skipping file \""+fitsfile+" (not a FITS file)\n") 
                     continue   

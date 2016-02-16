@@ -196,12 +196,14 @@ class csiactobs(ctools.cscript):
         # Check HDUs
         if self.m_hdu_index == "" or self.m_obs_index == "":
             raise RuntimeError("*** ERROR: FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
-        if not gammalib.is_fits(self.m_hdu_index+"[HDU_INDEX]"):
+        filename = gammalib.GFilename(self.m_hdu_index+"[HDU_INDEX]")
+        if not filename.is_fits():
             raise RuntimeError("*** ERROR: HDU index file \""+self.m_hdu_index+"[HDU_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
 
         # Check for existence of "BKG_SCALE" in the observation index file if required
         if self.m_use_bkg_scale:
-            if gammalib.is_fits(self.m_obs_index+"[OBS_INDEX]"):
+            filename = gammalib.GFilename(self.m_obs_index+"[OBS_INDEX]")
+            if filename.is_fits():
                 fits = gammalib.GFits(self.m_obs_index)
                 if not fits["OBS_INDEX"].contains("BKG_SCALE"):
                     self.m_use_bkg_scale = False
@@ -439,10 +441,10 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                eventfile = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
-                eventhdu = hduindx_hdu["HDU_NAME"][index]
+                eventfile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
+                eventhdu   = hduindx_hdu["HDU_NAME"][index]
                 eventfile += "["+eventhdu+"]"
-            if not gammalib.is_fits(eventfile):
+            if not gammalib.GFilename(eventfile).is_fits():
                 if self.logTerse():
                     self.log("Skipping observation "+str(obs_id)+": eventfile \""+eventfile+"\" not found\n")
                 continue
@@ -455,10 +457,10 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                aefffile = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
-                aeffhdu  = hduindx_hdu["HDU_NAME"][index]
+                aefffile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
+                aeffhdu   = hduindx_hdu["HDU_NAME"][index]
                 aefffile += "["+aeffhdu+"]"
-            if not gammalib.is_fits(aefffile):
+            if not gammalib.GFilename(aefffile).is_fits():
                 if self.logTerse():
                     self.log("Skipping observation "+str(obs_id)+": effective area \""+aefffile+"\" not found\n")
                 continue
@@ -471,9 +473,9 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                psffile = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
+                psffile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
                 psffile += "["+hduindx_hdu["HDU_NAME"][index]+"]"
-            if not gammalib.is_fits(psffile):
+            if not gammalib.GFilename(psffile).is_fits():
                 if self.logTerse():
                     self.log("Skipping observation "+str(obs_id)+": point spread function \""+psffile+"\" not found\n")
                 continue
@@ -486,9 +488,9 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                edispfile = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])   
+                edispfile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])   
                 edispfile += "["+hduindx_hdu["HDU_NAME"][index]+"]"
-            if not gammalib.is_fits(edispfile):
+            if not gammalib.GFilename(edispfile).is_fits():
                 if self.logTerse():
                     self.log("Warning: observation "+str(obs_id)+" has no energy dispersion \""+edispfile+"\" information\n")
                     edispfile = ""
@@ -502,9 +504,9 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                bkgfile = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])    
+                bkgfile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])    
                 bkgfile += "["+hduindx_hdu["HDU_NAME"][index]+"]"
-            if not gammalib.is_fits(bkgfile):
+            if not gammalib.GFilename(bkgfile).is_fits():
                 if self.logTerse():
                     self.log("Warning: observation "+str(obs_id)+" has no background information (file=\""+bkgfile+"\"). IRF background cannot be used\n")
                     bkgfile = ""

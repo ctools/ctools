@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generation of an caldb entry from general IACT observation.
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -152,10 +152,10 @@ class csobs2caldb(ctools.cscript):
         fname_bkg   = gammalib.GFilename(rsp.background().filename())
     
         # Open FITS files of response components
-        fits_aeff  = gammalib.GFits(fname_aeff.filename())
-        fits_psf   = gammalib.GFits(fname_psf.filename())
-        fits_edisp = gammalib.GFits(fname_edisp.filename())
-        fits_bkg   = gammalib.GFits(fname_bkg.filename())
+        fits_aeff  = gammalib.GFits(fname_aeff)
+        fits_psf   = gammalib.GFits(fname_psf)
+        fits_edisp = gammalib.GFits(fname_edisp)
+        fits_bkg   = gammalib.GFits(fname_bkg)
         
         # Bundle IRFs into one file
         fits.append(fits_aeff[fname_aeff.extname("EFFECTIVE AREA")])
