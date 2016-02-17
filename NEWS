@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-11 February 2016
+17 February 2016
 
 
 1. Introduction
@@ -28,6 +28,16 @@ None
 
 5. ctobssim - CTA observation simulation
 ----------------------------------------
+The simulation energy range is subdivided internally to avoid having a too
+large difference between simulation area and effective area. Before, there
+was a simulation area of 19634954 m^2 that was applied to all energies, which
+led to the simulation of a huge number of low energy photons that were thrown
+away later due to the small effective area. Now, the energy range is subdivided
+(controlled using the "eslices" parameter), and for each energy range, the
+simulation area is computed from the maximum effective area in that energy
+range multiplied by a security factor of 2. This leads to a much more efficient
+simulation of low-energy events (#1673).
+
 Any existing events in an event list are now removed before starting the
 simulation to enable providing an existing event file on input from which
 only the observation attributes are extracted (for example GTI, ROI, energy
