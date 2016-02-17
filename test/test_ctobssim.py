@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctobssim tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ class Test(gammalib.GPythonTestSuite):
         self.test_value(obs.livetime(), 1710.0, 1.0e-6, "Livetime is not 1710 sec")
         self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6, "ROI Right Ascension is not 83.63 deg")
         self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6, "ROI Declination is not 22.01 deg")
-        self.test_value(evt.size(), 4134, "Number of events is not 4134")
+        self.test_value(evt.size(), 4119, "Number of events is not 4119")
 
         # Save events
         self.test_try("Save events")
