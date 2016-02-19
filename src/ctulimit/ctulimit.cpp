@@ -378,13 +378,13 @@ void ctulimit::run(void)
  ***************************************************************************/
 void ctulimit::save(void)
 {
+    /*
     // Write header
     if (logTerse()) {
         log << std::endl;
         log.header1("Save upper limit");
     }
 
-    /*
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
 
