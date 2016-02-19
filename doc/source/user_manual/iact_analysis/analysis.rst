@@ -385,6 +385,37 @@ sky cube. In the output model the background models per obseervation will be rem
 for the newly created background cube is included. Sky models present in the input model XML file will also be included in the 
 new XML file, which subsequently can be used for binned :ref:`ctlike`.
 
+Example for stacked model XML file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The output model of :ref:`ctbkgcube` looks the following:
+
+.. code-block:: xml
+
+	<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<source_library title="source library">
+	  <source name="BackgroundModel" type="CTACubeBackground" instrument="CTA,HESS,MAGIC,VERITAS">
+	    <spectrum type="PowerLaw">
+	      <parameter name="Prefactor" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	      <parameter name="Index" value="0" error="0" scale="1" min="-5" max="5" free="1" />
+	      <parameter name="Scale" value="1" scale="1e+06" free="0" />
+	    </spectrum>
+	  </source>
+	  <source name="Crab" type="PointSource">
+	    <spectrum type="PowerLaw">
+	       <parameter name="Prefactor" scale="1e-17" value="3.0"  min="1e-07" max="1000.0" free="1"/>
+	       <parameter name="Index"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+	       <parameter name="Scale"     scale="1e6"   value="1."  min="0.01"  max="1000.0" free="0"/>
+	    </spectrum>
+	    <spatialModel type="SkyDirFunction">
+	      <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
+	      <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
+	    </spatialModel>
+	  </source>
+	</source_library>
+	
+The background model with ``type=CTACubeBackground`` is used to scale the background cube stored in the FITS file
+created by :ref:`ctbkgcube`.
+
 Run ctlike
 ^^^^^^^^^^
 Having all the intermediate data products ready, a binned analysis can be conducted using :ref:`ctlike`.

@@ -111,13 +111,64 @@ source of interest. For this purpose, the tool :ref:`cterror` can be used:
 	Input event list, counts cube or observation definition XML file [selected_obs.xml] 
 	Input model XML file [crab_models.xml] 
 	Source of interest [Crab] 
+	Output model XML file [cterror_results.xml] 
 
+The output model does not contain asymmetric errors yet. The positive and negative uncertainties can be read from the
+logfile (or from screen) if ``debug=yes`` was specified.
 
 Compute spectral points
 -----------------------
+A very common task in astronomy is to compute spectral data points. To determine a spectral data point, a small energy
+range is considered and the model prefactor and its uncertainty is evaluated. The tool :ref:`csspec` works on both, binned
+and unbinned data. 
+
+Unbinned
+^^^^^^^^
+
+.. code-block:: bash
+
+	$ csspec debug=yes
+	Input event list, counts cube, or observation definition XML file [events.fits] selected_obs.xml 
+	Input model XML file [$CTOOLS/share/models/crab.xml] crab_models.xml 
+	Source name [Crab] 
+	Algorithm for defining energy bins (FILE|LIN|LOG) [LOG] 
+	Lower energy limit for spectral points (TeV) [0.1] 0.5
+	Upper energy limit for spectral points (TeV) [100.0] 50.0
+	Number of spectral points (1-10000) [20] 10
+	Output spectrum file [spectrum.fits] 
+	
+Binned
+^^^^^^
+
+.. code-block:: bash
+
+	$ csspec debug=yes
+	Input event list, counts cube, or observation definition XML file [cntcube.fits] 
+	Input exposure cube file (only needed for stacked analysis) [expcube.fits] 
+	Input PSF cube file (only needed for stacked analysis) [psfcube.fits] 
+	Input background cube file (only needed for stacked analysis) [bkgcube.fits] 
+	Input model XML file [binned_models.xml] 
+	Source name [Crab] 
+	Number of spectral points (1-10000) [10] 
+	Lower energy limit for spectral points (TeV) [0.5] 
+	Upper energy limit for spectral points (TeV) [50.0] 
+	Output spectrum file [spectrum.fits] 
+
+
+Plot spectral points
+^^^^^^^^^^^^^^^^^^^^
+Instead of supporting a plotting library, simple example scripts are available to visualise data products.
+Have a look at ``$CTOOLS/examples/show_spectrum.py`` how a spectrum can be plotted using ``matplotlib``.
+To have first glance at the above computed spectrum one can use this script in the following way:
+
+.. code-block:: bash
+  
+  $ python $CTOOLS/examples/show_spectrum.py spectrum.fits
+
 
 Compute light curves
 --------------------
+Euqally common in astronomy are light curves from a time-series analysis.
 
 Compute a residual map
 ----------------------

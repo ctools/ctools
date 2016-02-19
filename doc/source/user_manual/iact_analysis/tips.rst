@@ -9,6 +9,9 @@ Visualise observations
 Visualise models
 ----------------
 
+Increase analysis speed
+-----------------------
+
 Create count map with one energy bin
 ------------------------------------
 
