@@ -204,16 +204,114 @@ observations and binning and reduces the loss of data.
 
 Create exposure cube
 ^^^^^^^^^^^^^^^^^^^^
+After binning the events into a three-dimensional cube, an exposure cube has to be computed.
+The exposure is defined as the effective area times the dead-time corrected observation time.
+Each observation from the input container gets stacked in the resulting cube. The exposure is stored
+in units of cm^2 s. The exposure cube does not have to contain the same binning as the event cube
+but for simplicity, the event cube can be passed to adopt the binning parameters. This task is performed by
+:ref:`ctexpcube`.
+
+.. code-block:: bash
+
+  $ ctexpcube
+  Event list or observation definition file [NONE] selected_obs.xml
+  Input counts cube file to extract exposure cube definition [NONE] cntcube.fits
+  Output exposure cube file [expcube.fits]
+  
+Alternatively, the exposure cube can be created with different binning than the event cube:
+
+.. code-block:: bash
+
+  $ ctexpcube
+  Input event list or observation definition XML file [NONE] selected_obs.xml 
+  Input counts cube file to extract exposure cube definition [NONE] 
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
+  Image scale (in degrees/pixel) [0.02] 0.04
+  Size of the X axis in pixels [200] 100
+  Size of the Y axis in pixels [200] 100
+  Lower energy limit (TeV) [0.5] 
+  Upper energy limit (TeV) [50.0] 
+  Number of energy bins [20] 30
+  Output exposure cube file [expcube.fits] 
 
 Create psf cube
 ^^^^^^^^^^^^^^^
+As a next step for the binned analysis, a cube containing the point spread function (PSF) must be computed.
+Since the PSF cannot be stored by one single parameter, The PSF cube computed by :ref:`ctpsfcube` has a fourth dimension.
+In each bin of the cube, the PSF ist stored as a function of offset from source. The granularity of the
+PSF histogram is determined by the hidden parameter ``anumbins`` (default: 200). Therefore, when passing
+the event cube ot adopt the sky binning for the PSF cube, the resulting FITS file can become quite large due to
+the fourth dimension. Usually in IACT analysis, the PSF doesn't change too dramatically across the field of view.
+Therefore the user can think about reducing the spatial binning of the PSF cube:
+
+.. code-block:: bash
+
+  $ ctpsfcube
+  Input event list or observation definition XML file [NONE] selected_obs.xml 
+  Input counts cube file to extract PSF cube definition [NONE] 
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
+  Image scale (in degrees/pixel) [1.0] 0.2
+  Size of the X axis in pixels [10] 20
+  Size of the Y axis in pixels [10] 20
+  Lower energy limit (TeV) [0.1] 0.5
+  Upper energy limit (TeV) [100.0] 50
+  Number of energy bins [20] 
+  Output PSF cube file [psfcube.fits]
+  
+Depending on the required PSF precision, one could reduce the number of offset bins via the hidden parameter
+``anumbins``:
+
+.. code-block:: bash
+
+  $ ctpsfcube anumbins=100
 
 Create background cube
 ^^^^^^^^^^^^^^^^^^^^^^
+Last but not least, for a binned IACT analysis a cube containing the background rate in sky coordinates and
+reconstructed energy has to be computed. This task is performed by :ref:`ctbkgcube`. The binning here can also differ
+from the event cube. For simplicity, however, the example below uses the event cube to adopt the binning.
+
+.. code-block:: bash
+
+  $ ctbkgcube debug=yes
+  Input event list or observation definition XML file [NONE] selected_obs.xml 
+  Input counts cube file to extract background cube definition [NONE] cntcube.fits 
+  Input model XML file [NONE] crab_models.xml 
+  Output background cube file [bkgcube.fits] 
+  Output model XML file [NONE] binned_models.xml
+
+Note that this tool also requires the parameters of an input and output model. In the model XML file that came out of
+:ref:`csiactobs`, one background model per observation is included. This models get merged and averaged in the background
+sky cube. In the output model the background models per obseervation will be removed. Instead, a global background model
+for the newly created background cube is included. Sky models present in the input model XML file will also be included in the 
+new XML file, which subsequently can be used for binned :ref:`ctlike`.
 
 Run ctlike
 ^^^^^^^^^^
+Having all the intermediate data products ready, a binned analysis can be conducted using :ref:`ctlike`.
 
-Compute spectral points
------------------------
+.. code-block:: bash
+
+  $ ctlike
+  Input event list, counts cube or observation definition XML file [events.fits] cntcube.fits 
+  Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits 
+  Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits 
+  Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits 
+  Input model XML file [binned_models.xml]
+  Output model XML file [binned_results.xml]
+	
+Note that when passing an event cube to :ref:`ctlike`, the tool behaves differently than in unbinned mode.
+It queries directly for the additional ingredients for the binned analysis. It is important to pass the background model
+generated by :ref:`ctbkgcube` here to ensure the proper modelling of the background in the fit.
+The usage of energy dispersion cannot be included in binned analyses yet. Therefore, the hidden parameter ``edisp=yes``
+has no effect in this case.
+
+
+
 

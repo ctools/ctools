@@ -55,8 +55,8 @@ parameter ``runlist`` then needs to be specified.
   
   $ csiactcopy runlist=myrunlist.txt debug=yes
   
-Notes
------
+Troubleshooting
+---------------
 In case a download was interupted (e.g. the remote file system was disconnected), the script can simply be rerun.
 The index files which list the files available on the system are refreshed after the copying process.
 The hidden boolean parameter ``clobber`` (default=yes) specifies if the user wishes that local content should be overwritten with
