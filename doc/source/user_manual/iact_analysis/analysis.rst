@@ -109,8 +109,6 @@ model XML file will then contain both, the background model and the input sky mo
 
   $ csiactobs inmodel="mymodel.xml"
   
-A list of available sky models can be found here: `models <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_
-
 Alternatively, models can be merged at any times using the simple tool :ref:`csmodelmerge`:
 
 .. code-block:: bash
@@ -120,7 +118,100 @@ Alternatively, models can be merged at any times using the simple tool :ref:`csm
   Output model file [crab_models.xml]
   
 Note that the number of files to merge is not limited to two. Detailled options how the input model XML file can
-be passed is given on the reference page of :ref:`csmodelmerge`.
+be passed is given on the reference page of :ref:`csmodelmerge`. It is also important to know that each model in the container
+must have a unique name. This implies, for instance, merging the same XML model twice will result in an exception.
+
+A list of available sky models can be found here: `models <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_.
+Of particular help to create sky models for your dataset is the section about :ref:`modelling CTA data <models>`.
+
+
+Example XML files
+-----------------
+To get familiar with the XML syntax and format example files for an observation container and a model container
+are shown in the following.
+
+Observation XML file
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: xml
+
+	<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<observation_list title="observation list">
+	  <observation name="Crab Nebula" id="11111" instrument="HESS">
+	    <parameter name="EventList" file="/path/to/fits/file/events_11111.fits.gz" />
+	    <parameter name="EffectiveArea" file="/path/to/fits/file/aeff_11111.fits.gz" />
+	    <parameter name="PointSpreadFunction" file="/path/to/fits/file/psf_11111.fits.gz" />
+	    <parameter name="EnergyDispersion" file="/path/to/fits/file/edisp_11111.fits.gz" />
+	    <parameter name="Background" file="/path/to/fits/file/bgmodel_11111.fits.gz" />
+	  </observation>
+	  <observation name="Crab Nebula" id="11112" instrument="HESS">
+	    <parameter name="EventList" file="/path/to/fits/file/events_11112.fits.gz" />
+	    <parameter name="EffectiveArea" file="/path/to/fits/file/aeff_11112.fits.gz" />
+	    <parameter name="PointSpreadFunction" file="/path/to/fits/file/psf_11112.fits.gz" />
+	    <parameter name="EnergyDispersion" file="/path/to/fits/file/edisp_11112.fits.gz" />
+	    <parameter name="Background" file="/path/to/fits/file/bgmodel_11112.fits.gz" />
+	  </observation>
+	  <observation name="Crab Nebula" id="11113" instrument="HESS">
+	    <parameter name="EventList" file="/path/to/fits/file/events_11113.fits.gz" />
+	    <parameter name="EffectiveArea" file="/path/to/fits/file/aeff_11113.fits.gz" />
+	    <parameter name="PointSpreadFunction" file="/path/to/fits/file/psf_11113.fits.gz" />
+	    <parameter name="EnergyDispersion" file="/path/to/fits/file/edisp_11113.fits.gz" />
+	    <parameter name="Background" file="/path/to/fits/file/bgmodel_11113.fits.gz" />
+	  </observation>
+	  <observation name="Crab Nebula" id="11114" instrument="HESS">
+	    <parameter name="EventList" file="/path/to/fits/file/events_11114.fits.gz" />
+	    <parameter name="EffectiveArea" file="/path/to/fits/file/aeff_11114.fits.gz" />
+	    <parameter name="PointSpreadFunction" file="/path/to/fits/file/psf_11114.fits.gz" />
+	    <parameter name="EnergyDispersion" file="/path/to/fits/file/edisp_11114.fits.gz" />
+	    <parameter name="Background" file="/path/to/fits/file/bgmodel_11114.fits.gz" />
+	  </observation>
+	</observation_list>
+
+Model XML file
+^^^^^^^^^^^^^^
+
+.. code-block:: xml
+
+	<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<source_library title="source library">
+	  <source name="bkg_11111" type="CTAIrfBackground" instrument="HESS" id="11111">
+	    <spectrum type="ConstantValue">
+	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	    </spectrum>
+	  </source>
+	  <source name="bkg_11112" type="CTAIrfBackground" instrument="HESS" id="11112">
+	    <spectrum type="ConstantValue">
+	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	    </spectrum>
+	  </source>
+	  <source name="bkg_11113" type="CTAIrfBackground" instrument="HESS" id="11113">
+	    <spectrum type="ConstantValue">
+	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	    </spectrum>
+	  </source>
+	  <source name="bkg_11114" type="CTAIrfBackground" instrument="HESS" id="11114">
+	    <spectrum type="ConstantValue">
+	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	    </spectrum>
+	  </source>
+	    <source name="Crab" type="PointSource">
+	    <spectrum type="PowerLaw">
+	       <parameter name="Prefactor" scale="1e-17" value="3.0"  min="1e-07" max="1000.0" free="1"/>
+	       <parameter name="Index"     scale="-1"    value="2.5" min="0.0"   max="+5.0"   free="1"/>
+	       <parameter name="Scale"     scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="0"/>
+	    </spectrum>
+	    <spatialModel type="SkyDirFunction">
+	      <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+	      <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+	    </spatialModel>
+	  </source>
+	</source_library>
+
+.. note::
+
+   It is important to ensure background models are properly linked to their respective observation.
+   Therefore it is required to keep the attributes ``instrument`` and ``id`` the same for the observation
+   and the corresponding background model. The tool :ref:`csiactobs` makes sure this is the case.
 
 Run ctselect
 ------------
@@ -173,9 +264,11 @@ On default, energy dispersion is not considered in the fit. To switch on the usa
 the hidden parameter ``edisp=yes`` can be provided. Note that this will cause a significant reduction of the computing
 speed.
 
-Binned analysis
----------------
-For binned analysis, some intermediated data products have to be produced. The products are a binned data cube,
+Stacked (binned) analysis
+-------------------------
+The stacked analysis mode is using a binned analysis where all observations are included and stacked into one event cube.
+This analysis mode is much faster than unbinned analysis when having a large dataset (e.g. > 100 hours).
+For this type of binned analysis, some intermediate data products have to be produced. The products are a binned data cube,
 an exposure cube, a psf cube, and a background cube. 
 
 Bin events

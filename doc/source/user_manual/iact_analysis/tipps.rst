@@ -21,6 +21,9 @@ Split TS map computation
 Accessing fit parameters in python
 ----------------------------------
 
+Accessing upper limits in python
+--------------------------------
+
 Manipulate models in python
 ---------------------------
 
