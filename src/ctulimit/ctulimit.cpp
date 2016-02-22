@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015 by Michael Mayer                                    *
+ *  copyright (C) 2015-2016 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -52,6 +52,8 @@
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty ctulimit tool.
  ***************************************************************************/
 ctulimit::ctulimit(void) : ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
 {
@@ -68,8 +70,8 @@ ctulimit::ctulimit(void) : ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
  *
  * param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs an instance of the ctulimit tool that will operate on the
+ * provided observation container.
  ***************************************************************************/
 ctulimit::ctulimit(const GObservations& obs) :
           ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
@@ -91,6 +93,9 @@ ctulimit::ctulimit(const GObservations& obs) :
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs an instance of the ctulimit tool that will parse user
+ * parameters that are provided as command line arguments.
  ***************************************************************************/
 ctulimit::ctulimit(int argc, char *argv[]) :
           ctool(CTULIMIT_NAME, CTULIMIT_VERSION, argc, argv)
@@ -107,6 +112,9 @@ ctulimit::ctulimit(int argc, char *argv[]) :
  * @brief Copy constructor
  *
  * @param[in] app Application.
+ *
+ * Constructs an instance of the ctulimit tool by copying information from
+ * another ctulimit tool.
  ***************************************************************************/
 ctulimit::ctulimit(const ctulimit& app) : ctool(app)
 {
@@ -123,6 +131,8 @@ ctulimit::ctulimit(const ctulimit& app) : ctool(app)
 
 /***********************************************************************//**
  * @brief Destructor
+ *
+ * Destructs the ctulimit tool.
  ***************************************************************************/
 ctulimit::~ctulimit(void)
 {
@@ -145,6 +155,8 @@ ctulimit::~ctulimit(void)
  *
  * @param[in] app Application.
  * @return Application.
+ *
+ * Assigns a ctulimit tool.
  ***************************************************************************/
 ctulimit& ctulimit::operator=(const ctulimit& app)
 {
@@ -177,7 +189,9 @@ ctulimit& ctulimit::operator=(const ctulimit& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear ctulimit tool
+ *
+ * Resets the ctulimit tool to a clean initial state.
  ***************************************************************************/
 void ctulimit::clear(void)
 {
@@ -197,9 +211,9 @@ void ctulimit::clear(void)
 
 
 /***********************************************************************//**
- * @brief Computes the upper limit
+ * @brief Compute upper limit
  *
- * This method calculates the upper limit depending on the given algorithm
+ * Computes the upper limit depending on the given algorithm
  ***************************************************************************/
 void ctulimit::run(void)
 {
@@ -369,9 +383,9 @@ void ctulimit::run(void)
 
 
 /***********************************************************************//**
- * @brief Save maps
+ * @brief Save upper limits
  *
- * This method saves the upper limit to an ascii file.
+ * Saves the upper limit to an ASCII file in comma-separated value format.
  *
  * @todo No yet implemented as we have no clear use case yet for saving
  * the result.
@@ -417,14 +431,14 @@ void ctulimit::init_members(void)
 {
     // Initialise user parameters
     m_srcname.clear();
-    m_confidence = 0.95;
-    m_sigma_min  = 0.0;
-    m_sigma_max  = 0.0;
-    m_eref       = 0.0;
-    m_emin       = 0.0;
-    m_emax       = 0.0;
-    m_tol        = 1.0e-6;
-    m_max_iter   = 50;
+    m_confidence  = 0.95;
+    m_sigma_min   = 0.0;
+    m_sigma_max   = 0.0;
+    m_eref        = 0.0;
+    m_emin        = 0.0;
+    m_emax        = 0.0;
+    m_tol         = 1.0e-6;
+    m_max_iter    = 50;
     m_apply_edisp = false;
 
     // Initialise protected members
@@ -455,15 +469,15 @@ void ctulimit::init_members(void)
 void ctulimit::copy_members(const ctulimit& app)
 {
     // Copy user parameters
-    m_srcname    = app.m_srcname;
-    m_confidence = app.m_confidence;
-    m_sigma_min  = app.m_sigma_min;
-    m_sigma_max  = app.m_sigma_max;
-    m_eref       = app.m_eref;
-    m_emin       = app.m_emin;
-    m_emax       = app.m_emax;
-    m_tol        = app.m_tol;
-    m_max_iter   = app.m_max_iter;
+    m_srcname     = app.m_srcname;
+    m_confidence  = app.m_confidence;
+    m_sigma_min   = app.m_sigma_min;
+    m_sigma_max   = app.m_sigma_max;
+    m_eref        = app.m_eref;
+    m_emin        = app.m_emin;
+    m_emax        = app.m_emax;
+    m_tol         = app.m_tol;
+    m_max_iter    = app.m_max_iter;
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
@@ -624,12 +638,12 @@ void ctulimit::get_model_parameter(void)
 
 
 /***********************************************************************//**
- * @brief Performs upper limit computation by using a bisection method
+ * @brief Calculate upper limit using a bisection method
  *
  * @param[in] min Minimum parameter value
  * @param[in] max Maximum parameter value
  *
- * This method calculates the upper limit using a bisection method.
+ * Calculates the upper limit using a bisection method.
  ***************************************************************************/
 void ctulimit::ulimit_bisection(const double& min, const double& max)
 {
@@ -697,8 +711,7 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
  * @param[in] value Parameter factor value
  * @return Log-likelihood value
  *
- * This method evaluates the log-likelihood as a function of the parameter
- * of interest.
+ * Evaluates the log-likelihood as a function of the parameter of interest.
  ***************************************************************************/
 double ctulimit::evaluate(const double& value)
 {
