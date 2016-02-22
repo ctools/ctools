@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015 by Florent Forest                                   *
+ *  copyright (C) 2015-2016 by Florent Forest                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -51,6 +51,8 @@
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty cterror tool.
  ***************************************************************************/
 cterror::cterror(void) : ctool(CTERROR_NAME, CTERROR_VERSION)
 {
@@ -67,8 +69,8 @@ cterror::cterror(void) : ctool(CTERROR_NAME, CTERROR_VERSION)
  *
  * param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs an instance of the cterror tool that will operate on the
+ * provided observation container.
  ***************************************************************************/
 cterror::cterror(const GObservations& obs) :
          ctool(CTERROR_NAME, CTERROR_VERSION)
@@ -90,6 +92,9 @@ cterror::cterror(const GObservations& obs) :
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs an instance of the cterror tool that will parse user
+ * parameters that are provided as command line arguments.
  ***************************************************************************/
 cterror::cterror(int argc, char *argv[]) :
          ctool(CTERROR_NAME, CTERROR_VERSION, argc, argv)
@@ -106,6 +111,9 @@ cterror::cterror(int argc, char *argv[]) :
  * @brief Copy constructor
  *
  * @param[in] app Application.
+ *
+ * Constructs an instance of the cterror tool by copying information from
+ * another ctulimit tool.
  ***************************************************************************/
 cterror::cterror(const cterror& app) : ctool(app)
 {
@@ -122,6 +130,8 @@ cterror::cterror(const cterror& app) : ctool(app)
 
 /***********************************************************************//**
  * @brief Destructor
+ *
+ * Destructs the cterror tool.
  ***************************************************************************/
 cterror::~cterror(void)
 {
@@ -144,6 +154,8 @@ cterror::~cterror(void)
  *
  * @param[in] app Application.
  * @return Application.
+ *
+ * Assigns a cterror tool.
  ***************************************************************************/
 cterror& cterror::operator=(const cterror& app)
 {
@@ -177,6 +189,8 @@ cterror& cterror::operator=(const cterror& app)
 
 /***********************************************************************//**
  * @brief Clear instance
+ *
+ * Resets the cterror tool to a clean initial state.
  ***************************************************************************/
 void cterror::clear(void)
 {
@@ -196,7 +210,9 @@ void cterror::clear(void)
 
 
 /***********************************************************************//**
- * @brief Computes 
+ * @brief Compute parameter errors using a likelihood profile method
+ *
+ * Computes the parameter errors using a likelihood profile method.
  ***************************************************************************/
 void cterror::run(void)
 {
@@ -381,9 +397,9 @@ void cterror::run(void)
 
 
 /***********************************************************************//**
- * @brief Save source model
+ * @brief Save model
  *
- * This method saves the soutce model to an XML file.
+ * Saves the model into an XML file.
  ***************************************************************************/
 void cterror::save(void)
 {
@@ -394,11 +410,11 @@ void cterror::save(void)
     }
 
     // Get output filename
-    std::string outmodel = (*this)["outmodel"].filename();
+    m_outmodel = (*this)["outmodel"].filename();
 
      // Write results out as XML model
-    if (gammalib::toupper(outmodel) != "NONE") {
-        m_obs.models().save(outmodel);
+    if (gammalib::toupper(m_outmodel.url()) != "NONE") {
+        m_obs.models().save(m_outmodel);
     }
 
     // Return
@@ -419,6 +435,7 @@ void cterror::init_members(void)
 {
     // Initialise user parameters
     m_srcname.clear();
+    m_outmodel.clear();
     m_confidence = 0.68;
     m_tol        = 1.0e-3;
     m_max_iter   = 50;
@@ -427,9 +444,9 @@ void cterror::init_members(void)
     // Initialise protected members
     m_obs.clear();
     m_opt.clear();
-    m_dlogL        = 0.0;
-    m_best_logL    = 0.0;
-    m_model_par    = NULL;
+    m_dlogL       = 0.0;
+    m_best_logL   = 0.0;
+    m_model_par   = NULL;
     m_apply_edisp = false;
 
     // Set optimizer parameters
@@ -449,10 +466,11 @@ void cterror::init_members(void)
 void cterror::copy_members(const cterror& app)
 {
     // Copy user parameters
-    m_srcname    = app.m_srcname;
-    m_confidence = app.m_confidence;
-    m_tol        = app.m_tol;
-    m_max_iter   = app.m_max_iter;
+    m_srcname     = app.m_srcname;
+    m_outmodel    = app.m_outmodel;
+    m_confidence  = app.m_confidence;
+    m_tol         = app.m_tol;
+    m_max_iter    = app.m_max_iter;
     m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
@@ -534,18 +552,24 @@ void cterror::get_parameters(void)
     m_tol      = (*this)["tol"].real();
     m_max_iter = (*this)["max_iter"].integer();
 
+    // Read ahead parameters that are only needed when the tool gets
+    // executed
+    if (read_ahead()) {
+        m_outmodel = (*this)["outmodel"].filename();
+    }
+
     // Return
     return;
 }
 
 
 /***********************************************************************//**
- * @brief Performs error computation by using a bisection method
+ * @brief Calculate error using a bisection method
  *
  * @param[in] min Minimum parameter value
  * @param[in] max Maximum parameter value
  *
- * This method calculates the error using a bisection method.
+ * Calculates the error using a bisection method.
  ***************************************************************************/
 double cterror::error_bisection(const double& min, const double& max)
 {
@@ -667,8 +691,7 @@ double cterror::error_bisection(const double& min, const double& max)
  * @param[in] value Parameter factor value
  * @return Log-likelihood value
  *
- * This method evaluates the log-likelihood as a function of the parameter
- * of interest.
+ * Evaluates the log-likelihood as a function of the parameter of interest.
  ***************************************************************************/
 double cterror::evaluate(const double& value)
 {
