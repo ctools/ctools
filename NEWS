@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-17 February 2016
+22 February 2016
 
 
 1. Introduction
@@ -136,7 +136,8 @@ None
 
 18. cterror - Likelihood profile error computation
 --------------------------------------------------
-None
+The output filename is now read ahead in case that the tool is executed
+(#1700).
 
 
 19. cscripts
