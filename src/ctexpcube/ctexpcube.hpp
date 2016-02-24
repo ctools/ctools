@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTEXPCUBE_NAME    "ctexpcube"
-#define CTEXPCUBE_VERSION "1.0.0"
+#define CTEXPCUBE_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -59,6 +59,7 @@ public:
     void                    clear(void);
     void                    run(void);
     void                    save(void);
+    void                    publish(const std::string& name = "");
     const GCTACubeExposure& expcube(void) const;
 
 protected:
@@ -69,8 +70,9 @@ protected:
     void get_parameters(void);
 
     // User parameters
-    std::string   m_outcube;     //!< Output exposure cube file
-    bool          m_apply_edisp; //!< Apply energy dispersion?
+    GFilename m_outcube;     //!< Output exposure cube file
+    bool      m_apply_edisp; //!< Apply energy dispersion?
+    bool      m_publish;     //!< Publish exposure cube?
 
     // Protected members
     GObservations    m_obs;         //!< Observation container

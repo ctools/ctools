@@ -111,7 +111,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether an existing output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

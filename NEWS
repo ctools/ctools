@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-17 February 2016
+24 February 2016
 
 
 1. Introduction
@@ -81,7 +81,8 @@ Intervals) extensions.
 
 7. ctbin - CTA event binning
 ----------------------------
-None
+Add publish() method to publish the counts cube via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
 
 
 8. ctlike - Maximum likelihood fitting
@@ -89,24 +90,28 @@ None
 None
 
 
-9. cttsmap - Generation of Test Statistics map
-----------------------------------------------
-None
+9. cttsmap - Generation of Test Statistic map
+---------------------------------------------
+Add publish() method to publish the Test Statistic map via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 10. ctskymap - CTA sky mapping
 ------------------------------
-None
+Add publish() method to publish the sky map via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
 
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-None
+Add publish() method to publish the model cube via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
 
 
 12. ctexpcube - CTA exposure cube generation
 --------------------------------------------
-None
+Add publish() method to publish the exposure cube via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 13. ctpsfcube - CTA point spread function cube generation
@@ -116,12 +121,14 @@ None
 
 14. ctbkgcube - CTA background cube generation
 ----------------------------------------------
-None
+Add publish() method to publish the background cube via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 15. ctcubemask - CTA cube filtering
 -----------------------------------
-None
+Add publish() method to publish the masked counts cube via a SAMP Hub
+to Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 16. ctbutterfly - Generate butterfly diagrams
@@ -136,13 +143,17 @@ None
 
 18. cterror - Likelihood profile error computation
 --------------------------------------------------
-None
+The output filename is now read ahead in case that the tool is executed
+(#1700).
 
 
 19. cscripts
 ------------
 Added the csiactcopy script that copies IACT data from a remote machine to
 the user's machine (#1661).
+
+Add csresmap::publish() method to publish the residual map via a SAMP Hub
+to Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 20. Examples

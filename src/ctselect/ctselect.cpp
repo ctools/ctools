@@ -413,10 +413,10 @@ void ctselect::save(void)
     if (logTerse()) {
         log << std::endl;
         if (m_obs.size() > 1) {
-            log.header1("Save observations");
+            log.header1("Save event lists");
         }
         else {
-            log.header1("Save observation");
+            log.header1("Save event list");
         }
     }
 
@@ -1267,7 +1267,8 @@ void ctselect::save_fits(void)
 
             // Log filename
             if (logTerse()) {
-                log << "Save \""+outfile+"\"" << std::endl;
+                log << "Save event list into file \""+outfile+"\".";
+                log << std::endl;
             }
 
             // Save event list
@@ -1335,7 +1336,8 @@ void ctselect::save_xml(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save \""+outfile+"\"" << std::endl;
+            log << "Save event list into file \""+outfile+"\".";
+            log << std::endl;
         }
 
         // Store output file name in observation

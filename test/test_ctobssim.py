@@ -84,8 +84,9 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.run()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctobssim.")
+        except Exception, e:
+            msg = "Exception occured in ctobssim: %s." % (e,)
+            self.test_try_failure(msg)
 
         # Retrieve observation and check content
         obs = gammalib.GCTAObservation(sim.obs()[0])
@@ -104,8 +105,9 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.save()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in saving events.")
+        except Exception, e:
+            msg = "Exception occured in saving events: %s." % (e,)
+            self.test_try_failure(msg)
 
     # Test ctobssim on observation container
     def test_container(self):
@@ -124,8 +126,9 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.run()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctobssim.")
+        except Exception, e:
+            msg = "Exception occured in ctobssim: %s." % (e,)
+            self.test_try_failure(msg)
 
         # Retrieve observation and check content
         self.test_value(sim.obs().size(), 4, "There are not 4 observations")
@@ -135,8 +138,9 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.save()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in saving events.")
+        except Exception, e:
+            msg = "Exception occured in saving events: %s." % (e,)
+            self.test_try_failure(msg)
 
     # Setup observation container
     def set_obs(self, number):

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTPSFCUBE_NAME    "ctpsfcube"
-#define CTPSFCUBE_VERSION "1.0.0"
+#define CTPSFCUBE_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -69,7 +69,7 @@ protected:
     void get_parameters(void);
 
     // User parameters
-    std::string   m_outcube;     //!< Output PSF cube file
+    GFilename     m_outcube;     //!< Output PSF cube file name
     bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctbutterfly - butterfly calculation tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Michael Mayer                               *
+ *  copyright (C) 2014-2016 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBUTTERFLY_NAME    "ctbutterfly"
-#define CTBUTTERFLY_VERSION "1.0.0"
+#define CTBUTTERFLY_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -95,7 +95,7 @@ protected:
     bool        m_apply_edisp;  //!< Apply energy dispersion?
     bool        m_fit;          //!< Do fit?
     GEbounds    m_ebounds;      //!< Energy binning definition
-    std::string m_outfile;      //!< Output ascii file
+    GFilename   m_outfile;      //!< Output ASCII file name
 
     // Protected members
     GOptimizerLM        m_opt;             //!< Optimizer
@@ -106,6 +106,7 @@ protected:
     std::vector<double> m_min_intensities; //!< Minimum intensities
     std::vector<double> m_max_intensities; //!< Maximum intensities
 };
+
 
 /***********************************************************************//**
  * @brief Return observation container

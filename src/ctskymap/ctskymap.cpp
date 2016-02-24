@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -290,15 +290,21 @@ void ctskymap::run(void)
 
     } // endfor: looped over observations
 
+    // Optionally publish sky map
+    if (m_publish) {
+        publish();
+    }
+
     // Return
     return;
 }
 
 
 /***********************************************************************//**
- * @brief Save observation
+ * @brief Save sky map
  *
- * This method saves the counts map(s) into (a) FITS file(s).
+ * Saves the sky map into a FITS file. The FITS file name is specified by the
+ * @p outname parameter.
  ***************************************************************************/
 void ctskymap::save(void)
 {
@@ -308,21 +314,53 @@ void ctskymap::save(void)
         log.header1("Save sky map");
     }
 
-    // Get output filename
-    m_outmap = (*this)["outmap"].filename();
+    // Get sky map filename
+    m_outmap  = (*this)["outmap"].filename();
 
     // Save only if filename is non-empty
-    if (m_outmap.length() > 0) {
+    if (!m_outmap.is_empty()) {
 
-        // Dump filename
+        // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outmap+"\"" << std::endl;
+            log << "Save sky map into file \""+m_outmap+"\"." << std::endl;
         }
 
         // Save sky map
         m_skymap.save(m_outmap, clobber());
 
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish sky map
+ *
+ * @param[in] name Sky map name.
+ ***************************************************************************/
+void ctskymap::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish sky map");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTSKYMAP_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << "Publish \""+user_name+"\" sky map." << std::endl;
+    }
+
+    // Publish sky map
+    m_skymap.publish(user_name);
 
     // Return
     return;
@@ -359,12 +397,13 @@ void ctskymap::get_parameters(void)
     m_skymap = create_map(m_obs);
 
     // Get remaining parameters
-    m_emin = (*this)["emin"].real();
-    m_emax = (*this)["emax"].real();
+    m_emin    = (*this)["emin"].real();
+    m_emax    = (*this)["emax"].real();
+    m_publish = (*this)["publish"].boolean();
 
     // Read ahead parameters
     if (read_ahead()) {
-        m_outmap = (*this)["outmap"].filename();
+        m_outmap  = (*this)["outmap"].filename();
     }
 
     // Return
@@ -478,8 +517,9 @@ void ctskymap::init_members(void)
     // Initialise members
     m_obs.clear();
     m_skymap.clear();
-    m_emin = 0.0;
-    m_emax = 0.0;
+    m_emin    = 0.0;
+    m_emax    = 0.0;
+    m_publish = false;
 
     // Return
     return;
@@ -494,10 +534,11 @@ void ctskymap::init_members(void)
 void ctskymap::copy_members(const ctskymap& app)
 {
     // Copy attributes
-    m_obs    = app.m_obs;
-    m_skymap = app.m_skymap;
-    m_emin   = app.m_emin;
-    m_emax   = app.m_emax;
+    m_obs     = app.m_obs;
+    m_skymap  = app.m_skymap;
+    m_emin    = app.m_emin;
+    m_emax    = app.m_emax;
+    m_publish = app.m_publish;
 
     // Return
     return;

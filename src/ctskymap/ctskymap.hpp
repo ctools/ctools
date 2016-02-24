@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSKYMAP_NAME    "ctskymap"
-#define CTSKYMAP_VERSION "1.0.0"
+#define CTSKYMAP_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -61,6 +61,7 @@ public:
     void           clear(void);
     void           run(void);
     void           save(void);
+    void           publish(const std::string& name = "");
     const GSkyMap& map(void) const;
 
 protected:
@@ -72,10 +73,10 @@ protected:
     void map_events(GCTAObservation* obs);
 
     // User parameters
-    std::string   m_outmap;     //!< Output counts map
+    GFilename     m_outmap;     //!< Output file name
     double        m_emin;       //!< Minimum energy (TeV)
     double        m_emax;       //!< Maximum energy (TeV)
-
+    bool          m_publish;    //!< Publish sky map?
 
     // Protected members
     GObservations m_obs;        //!< Observation container

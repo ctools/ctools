@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015 by Florent Forest                                   *
+ *  copyright (C) 2015-2016 by Florent Forest                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -28,20 +28,20 @@
 #define CTERROR_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTERROR_NAME    "cterror"
-#define CTERROR_VERSION "01-00-00"
+#define CTERROR_VERSION "1.1.0"
 
 
 /***********************************************************************//**
  * @class cterror
  *
  * @brief Parameter error calculation tool
- *
  ***************************************************************************/
 class cterror : public ctool {
 
@@ -74,6 +74,7 @@ protected:
 
     // User parameters
     std::string   m_srcname;      //!< Name of source
+    GFilename     m_outmodel;     //!< Output model XML file
     double        m_confidence;   //!< Confidence level
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
