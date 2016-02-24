@@ -3,7 +3,7 @@
         * Version 1.1.0 released
         ========================
 
-        Add publish() methods to tools producing images (#1231)
+        Add publish() methods to tools producing images (#1710)
         Read ahead output filename in cterror (#1700)
         Subdivide simulation energy range in ctobssim (#1673)
         Delete existing events before simulation in ctobssim (#1663)
