@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -36,7 +36,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME    "ctcubemask"
-#define CTCUBEMASK_VERSION "1.0.0"
+#define CTCUBEMASK_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -61,6 +61,7 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
+    void                 publish(const std::string& name = "");
     const GObservations& obs(void) const;
 
 protected:
@@ -78,9 +79,8 @@ protected:
                                 const std::string&     outfile) const;
 
     // User parameters
-    //std::string m_infile;     //!< Input event list or XML file
-	std::string m_regfile;    //!< ds9 region file
-    std::string m_outcube;    //!< Output event list or XML file
+	GFilename   m_regfile;    //!< ds9 region file
+    GFilename   m_outcube;    //!< Output event list or XML file
 	std::string m_prefix;     //!< Prefix for multiple counts maps
     bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
     double      m_ra;         //!< RA of ROI centre
@@ -88,6 +88,7 @@ protected:
     double      m_rad;        //!< ROI radius
     double      m_emin;       //!< Lower energy
     double      m_emax;       //!< Upper energy
+    bool        m_publish;    //!< Publish counts cube?
 
     // Protected members
     GObservations            m_obs;           //!< Observations container

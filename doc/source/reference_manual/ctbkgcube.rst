@@ -111,6 +111,9 @@ General parameters
 Standard parameters
 -------------------
 
+``(publish = no) [boolean]``
+    Specifies whether the background cube should be published on VO Hub.
+
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      chatter = 0: no information will be logged
@@ -124,7 +127,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output background cube should be overwritten.
+    Specifies whether an existing output background cube file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

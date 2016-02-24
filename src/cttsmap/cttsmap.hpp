@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Michael Mayer                               *
+ *  copyright (C) 2014-2016 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTTSMAP_NAME    "cttsmap"
-#define CTTSMAP_VERSION "1.0.0"
+#define CTTSMAP_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -72,6 +72,7 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
+    void                 publish(const std::string& name = "");
     const GObservations& obs(void) const;
     const GSkyMap&       tsmap(void) const;
 
@@ -85,8 +86,9 @@ protected:
 
     // User parameters
     std::string              m_srcname;     //!< Name of source which is moved around
-    std::string              m_outmap;      //!< Output counts map or XML file
+    GFilename                m_outmap;      //!< Output TS map file name
     bool                     m_apply_edisp; //!< Apply energy dispersion?
+    bool                     m_publish;     //!< Publish TS map?
 
     // Parameters to control speed and job splitting
     int                      m_binmin;      //!< Map bin number from which computation should start
