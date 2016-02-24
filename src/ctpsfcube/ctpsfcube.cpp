@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -276,8 +276,19 @@ void ctpsfcube::save(void)
     // Get output filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save PSF cube
-    m_psfcube.save(m_outcube, clobber());
+    // Save only if filename is non-empty
+    if (!m_outcube.is_empty()) {
+
+        // Log filename
+        if (logTerse()) {
+            log << "Save PSF cube into file \""+m_outcube+"\".";
+            log << std::endl;
+        }
+
+        // Save PSF cube
+        m_psfcube.save(m_outcube, clobber());
+
+    }
 
     // Return
     return;

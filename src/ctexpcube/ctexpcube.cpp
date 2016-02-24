@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -258,6 +258,11 @@ void ctexpcube::run(void)
         }
     }
 
+    // Optionally publish exposure cube
+    if (m_publish) {
+        publish();
+    }
+
     // Return
     return;
 }
@@ -265,6 +270,8 @@ void ctexpcube::run(void)
 
 /***********************************************************************//**
  * @brief Save exposure cube
+ *
+ * Saves the exposure cube into a FITS file.
  ***************************************************************************/
 void ctexpcube::save(void)
 {
@@ -274,11 +281,54 @@ void ctexpcube::save(void)
         log.header1("Save exposure cube");
     }
 
-    // Get output filename
+    // Get exposure cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save exposure cube
-    m_expcube.save(m_outcube, clobber());
+    // Save only if filename is non-empty
+    if (!m_outcube.is_empty()) {
+
+        // Log filename
+        if (logTerse()) {
+            log << "Save exposure cube into file \""+m_outcube+"\".";
+            log << std::endl;
+        }
+
+        // Save exposure cube
+        m_expcube.save(m_outcube, clobber());
+
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish exposure cube
+ *
+ * @param[in] name Exposure cube name.
+ ***************************************************************************/
+void ctexpcube::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish exposure cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTEXPCUBE_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << "Publish \""+user_name+"\" exposure cube." << std::endl;
+    }
+
+    // Publish exposure cube
+    m_expcube.cube().publish(user_name);
 
     // Return
     return;
@@ -299,6 +349,7 @@ void ctexpcube::init_members(void)
     // Initialise members
     m_outcube.clear();
     m_apply_edisp = false;
+    m_publish     = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -319,6 +370,7 @@ void ctexpcube::copy_members(const ctexpcube& app)
     // Copy attributes
     m_outcube     = app.m_outcube;
     m_apply_edisp = app.m_apply_edisp;
+    m_publish     = app.m_publish;
 
     // Copy protected members
     m_obs     = app.m_obs;
@@ -389,6 +441,9 @@ void ctexpcube::get_parameters(void)
         m_expcube = GCTACubeExposure(cube);
 
     } // endelse: cube loaded from file
+
+    // Get remaining parameters
+    m_publish = (*this)["publish"].boolean();
 
     // Read output filename (if needed)
     if (read_ahead()) {

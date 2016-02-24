@@ -136,3 +136,14 @@ public:
     virtual void save(void);
 };
 
+
+/***********************************************************************//**
+ * @brief ctool base class Python extension
+ ***************************************************************************/
+%extend ctool {
+    void read_ahead(const bool& flag) {
+        self->m_read_ahead = flag;
+        return;
+    }
+}
+

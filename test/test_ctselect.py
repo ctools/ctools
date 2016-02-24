@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctselect tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,16 +79,18 @@ class Test(gammalib.GPythonTestSuite):
         try:
             select.run()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctselect.")
+        except Exception, e:
+            msg = "Exception occured in ctselect: %s." % (e,)
+            self.test_try_failure(msg)
 
         # Save events
         self.test_try("Save events")
         try:
             select.save()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in saving events.")
+        except Exception, e:
+            msg = "Exception occured in saving events: %s." % (e,)
+            self.test_try_failure(msg)
 
         # Return
         return

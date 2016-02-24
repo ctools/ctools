@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctbin tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -83,16 +83,18 @@ class Test(gammalib.GPythonTestSuite):
         try:
             bin.run()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctbin.")
+        except Exception, e:
+            msg = "Exception occured in ctbin: %s." % (e,)
+            self.test_try_failure(msg)
 
         # Save counts cube
         self.test_try("Save counts cube")
         try:
             bin.save()
             self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in saving counts cube.")
+        except Exception, e:
+            msg = "Exception occured in saving counts cube: %s." % (e,)
+            self.test_try_failure(msg)
 
         # Return
         return

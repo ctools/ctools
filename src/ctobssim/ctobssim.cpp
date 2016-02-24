@@ -1454,6 +1454,12 @@ void ctobssim::save_fits(void)
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
+        // Log filename
+        if (logTerse()) {
+            log << "Save event list into file \""+m_outevents+"\".";
+            log << std::endl;
+        }
+
         // Save observation into FITS file
         obs->save(m_outevents, clobber());
 
@@ -1512,6 +1518,12 @@ void ctobssim::save_xml(void)
 
                     // Store output file name in observation
                     obs->eventfile(outfile);
+
+                    // Log filename
+                    if (logTerse()) {
+                        log << "Save event list into file \""+outfile+"\".";
+                        log << std::endl;
+                    }
 
                     // Save observation into FITS file
                     obs->save(outfile, clobber());

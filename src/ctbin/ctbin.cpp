@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -302,6 +302,11 @@ void ctbin::run(void)
         log << m_obs << std::endl;
     }
 
+    // Optionally publish counts cube
+    if (m_publish) {
+        publish();
+    }
+
     // Return
     return;
 }
@@ -310,26 +315,21 @@ void ctbin::run(void)
 /***********************************************************************//**
  * @brief Save counts cube
  *
- * This method saves the counts cube into a FITS file.
+ * Saves the counts cube into a FITS file.
  ***************************************************************************/
 void ctbin::save(void)
 {
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Save observations");
-        }
-        else {
-            log.header1("Save observation");
-        }
+        log.header1("Save counts cube");
     }
 
-    // Get output filename
+    // Get counts cube filename
     m_outcube = (*this)["outcube"].filename();
 
     // Save only if filename is non-empty
-    if (m_outcube.length() > 0) {
+    if (!m_outcube.is_empty()) {
 
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
@@ -337,9 +337,10 @@ void ctbin::save(void)
         // Save only if observation is valid
         if (obs != NULL) {
         
-            // Dump filename
+            // Log filename
             if (logTerse()) {
-                log << "Save \""+m_outcube+"\"" << std::endl;
+                log << "Save counts cube into file \""+m_outcube+"\".";
+                log << std::endl;
             }
             
             // Save cube
@@ -348,6 +349,38 @@ void ctbin::save(void)
         } // endif: observation was valid
 
     } // endif: outcube file was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish counts cube
+ *
+ * @param[in] name Counts cube name.
+ ***************************************************************************/
+void ctbin::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish counts cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTBIN_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << "Publish \""+user_name+"\" counts cube." << std::endl;
+    }
+
+    // Publish counts cube
+    m_cube.publish(user_name);
 
     // Return
     return;
@@ -367,7 +400,8 @@ void ctbin::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-    m_usepnt = false;
+    m_usepnt  = false;
+    m_publish = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -392,6 +426,7 @@ void ctbin::copy_members(const ctbin& app)
     // Copy attributes
     m_outcube = app.m_outcube;
     m_usepnt  = app.m_usepnt;
+    m_publish = app.m_publish;
 
     // Copy protected members
     m_obs      = app.m_obs;
@@ -451,6 +486,9 @@ void ctbin::get_parameters(void)
 
     // Get energy boundaries
     m_ebounds  = cube.ebounds();
+
+    // Get remaining parameters
+    m_publish = (*this)["publish"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
