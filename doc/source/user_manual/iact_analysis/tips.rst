@@ -1,4 +1,4 @@
-.. _sec_tipps:
+.. _sec_tips:
 
 Tips, Tricks and FAQs
 =====================
@@ -6,20 +6,26 @@ Tips, Tricks and FAQs
 Visualise observations
 ----------------------
 
+Plot zenith angle distribution of observations
+----------------------------------------------
+
 Visualise models
 ----------------
 
-Increase analysis speed
------------------------
+Speed up analysis
+-----------------
 
 Create count map with one energy bin
 ------------------------------------
 
-Plot zenith angle distribution of observations
-----------------------------------------------
+Compute excess map
+------------------
 
 Split TS map computation
 ------------------------
+
+Compute flux maps
+-----------------
 
 Accessing fit parameters in python
 ----------------------------------

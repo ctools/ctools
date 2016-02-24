@@ -9,5 +9,5 @@ Analysis using current IACT data
    analysis
    high_level
    simulation
-   tipps
+   tips
 

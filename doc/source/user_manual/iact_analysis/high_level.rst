@@ -168,13 +168,45 @@ To have first glance at the above computed spectrum one can use this script in t
 
 Compute light curves
 --------------------
-Euqally common in astronomy are light curves from a time-series analysis.
+Euqally common in astronomy are light curves from a time-series analysis. The tool :ref:`cslightcrv` takes as input only
+an unbinned observation container (or a single event list). Counts cube are not possible as inout since the time informstion
+is lost during the binning procedure. Nevertheless, in case of large time bins, it is possible to require a binned analysis
+in each time bin. The tool will accordingly slice the event list and create the data products for the stacked analysis in each
+time span.
+
+.. code-block:: bash
+
+	$ cslightcrv
+	Input event list, counts cube, or observation definition XML file [selected_obs.xml]
+	Input model XML file [crab_models.xml]  
+	Source name [Crab] 
+	Algorithm for defining time bins (FILE|LIN|GTI) [GTI] 
+	Number of energy bins per light curve bin (0=unbinned) [0] 
+	Lower energy limit of events (TeV) [0.1] 0.5
+	Upper energy limit of events (TeV) [100.0] 50
+	Output light curve file [lightcurve.fits]  
 
 Compute a residual map
 ----------------------
+A frequent means to visually inspect the fitted model with respect to the input data is to create residual maps.
+Using :ref:`csresmap` such a map can easily be computed. The tool internally bins the data according to user parameters.
+(if data is not already provided in a binned state). Taking into account the corresponding IRFs,
+:reF:`csresmap` computes a model map (running :ref:`ctmodel`). Subsequently, there are several choices how data
+and model should be compared. There are three options:
+
+* ``SUB``: the subtraction of the model from the counts. The resulting map will display differences in absolute counts.
+* ``SUBDIV``: the subtraction and division by the model. The resulting map will display relative differences of the data with respect to the model.
+* ``SUBDIVSQRT``: the subtraction and division by the square root of the model. The resulting map will display an approximation of a residual significance map. In case of sufficient count statistic per bin, the bin value represents the significance. 
+
 
 Compute a test statistics (TS) map
 ----------------------------------
+The test statistics is more precise measurement of statistic than the ``SUBDIVSQRT`` option in :ref:`csresmap`. 
+To get familiar with the concept of this procedure, :ref:`read more about TS maps <sec_tsmap>`.
 
-Compute flux maps
------------------
+.. code-block:: bash
+
+  $ cttsmap
+
+Since :ref:`cttsmap` has to run a parameter optimisation in each skymap bin, it is very time comsuming to
+compute a fine-granulated TS sky map. Read here how to split up the :ref:`computation into several jobs <sec_tips>`.
