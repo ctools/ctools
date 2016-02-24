@@ -3,10 +3,16 @@
 High level analysis tools for IACT data
 =======================================
 
-* :ref:`csspec` - calculate spectral points
-* :ref:`cslightcrv` - calculate a light curve
-* :ref:`csresmap` - compute a residual map
-* :ref:`cttsmap` - compute a TS map (and flux map)
+This section describes and explains how to create high level output. The following tools are explained:
+
+* :ref:`csobsinfo` (inspect and observation XML files)
+* :ref:`csmodelinfo` (inspect model XML files)
+* :ref:`ctulimit` (compute upper limits)
+* :ref:`cterror` (compute asymmetric errors)
+* :ref:`csspec` (compute spectral points)
+* :ref:`cslightcrv` (compute a light curve)
+* :ref:`csresmap` (compute a residual map)
+* :ref:`cttsmap` (compute a test statistics map)
 
 Inspecting observation definition files
 ---------------------------------------
@@ -198,15 +204,103 @@ and model should be compared. There are three options:
 * ``SUBDIV``: the subtraction and division by the model. The resulting map will display relative differences of the data with respect to the model.
 * ``SUBDIVSQRT``: the subtraction and division by the square root of the model. The resulting map will display an approximation of a residual significance map. In case of sufficient count statistic per bin, the bin value represents the significance. 
 
+Example unbinned observation container
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+	$ csresmap
+	Input event list, counts cube, or observation definition XML file [selected_obs.xml]
+	Input model XML file [crab_results.xml]
+	First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+	Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+	Coordinate System (CEL|GAL) [CEL] 
+	Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+	Size of the X axis in pixels [100]
+	Size of the Y axis in pixels [100]
+	Pixel size (deg/pixel) [0.02]
+	Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUB]
+	Output residual map file [resmap.fits] 
+
+Example binned/stacked observation container
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The tool behaves differently if the input observation parameter is a count cube. It will query for the additional binned reponse components.
+
+.. code-block:: bash
+
+	$ csresmap 
+	Input event list, counts cube, or observation definition XML file [cntcube.fits]
+	Input model cube file (generated with ctmodel) [NONE] 
+	Input exposure cube file (only needed for stacked analysis) [expcube.fits]
+	Input PSF cube file (only needed for stacked analysis) [psfcube.fits]  
+	Input background cube file (only needed for stacked analysis) [bkgcube.fits] 
+	Input model XML file [binned_results.xml] 
+	Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUB] 
+	Output residual map file [resmap.fits] 
+	
+Note that the tool also queries for an input model cube file (which we set to ``NONE`` here). This is very convenient in case the model cube has already been precomputed
+using :ref:`ctmodel`.
+
+Example with input model cube
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In case a model cube can be provided, :ref:`csresmap` simply collapses both cube into one skymap and applies the specified algorithm.
+
+.. code-block:: bash
+
+	$ csresmap
+	Input event list, counts cube, or observation definition XML file [cntcube.fits]
+	Input model cube file (generated with ctmodel) [modcube.fits] 
+	Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUB] 
+	Output residual map file [resmap.fits] 
+
 
 Compute a test statistics (TS) map
 ----------------------------------
-The test statistics is more precise measurement of statistic than the ``SUBDIVSQRT`` option in :ref:`csresmap`. 
+The test statistics quantity is a more precise measurement of statistic than the ``SUBDIVSQRT`` option in :ref:`csresmap`. 
 To get familiar with the concept of this procedure, :ref:`read more about TS maps <sec_tsmap>`.
 
 .. code-block:: bash
 
-  $ cttsmap
+	$ cttsmap
+	Input event list, counts cube or observation definition XML file [selected_obs.xml]  
+	Input model XML file [crab_results.xml] 
+	Test source name [Crab] 
+	First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+	Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+	Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+	Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
+	Image scale (in degrees/pixel) [0.05]
+	Size of the X axis in pixels [20]
+	Size of the Y axis in pixels [20]
+	Output Test Statistic map file [tsmap.fits] 
+
+The output file will contain a sky map holding the TS map. In complementary extensions, for each free parameter of the source model, a map displaying the parameter
+value is added to the output file. For instance a map of the prefactor can be visualised with `DS9 <http://ds9.si.edu/>`_ as follows:
+
+.. code-block:: bash
+  
+  $ ds9 tsmap.fits[Prefactor] 
 
 Since :ref:`cttsmap` has to run a parameter optimisation in each skymap bin, it is very time comsuming to
-compute a fine-granulated TS sky map. Read here how to split up the :ref:`computation into several jobs <sec_tips>`.
+compute a fine-granulated TS sky map. Read here how to split up the :ref:`computation into several jobs <sec_tips>`. 
+Similar as many other tools :ref:`cttsmap` can also work on binned observation input:
+
+.. code-block:: bash
+  
+	$ cttsmap debug=yes
+	Input event list, counts cube or observation definition XML file [cntcube.fits]
+	Input exposure cube file (only needed for stacked analysis) [expcube.fits] 
+	Input PSF cube file (only needed for stacked analysis) [psfcube.fits] 
+	Input background cube file (only needed for stacked analysis) [bkgcube.fits] 
+	Input model XML file [binned_results.xml] 
+	Test source name [Crab] 
+	First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+	Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+	Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+	Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
+	Image scale (in degrees/pixel) [0.05] 
+	Size of the X axis in pixels [20] 
+	Size of the Y axis in pixels [20] 
+	Output Test Statistic map file [tsmap.fits] 
+
+	
