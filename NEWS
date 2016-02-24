@@ -152,6 +152,9 @@ The output filename is now read ahead in case that the tool is executed
 Added the csiactcopy script that copies IACT data from a remote machine to
 the user's machine (#1661).
 
+Add csresmap::publish() method to publish the residual map via a SAMP Hub
+to Virtual Observatory interoperable tools (e.g. Aladin).
+
 
 20. Examples
 ------------
