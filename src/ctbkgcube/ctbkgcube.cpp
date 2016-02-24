@@ -364,12 +364,17 @@ void ctbkgcube::save(void)
         log.header1("Save background cube");
     }
 
+    // Get background cube and model file names
+    m_outcube  = (*this)["outcube"].filename();
+    m_outmodel = (*this)["outmodel"].filename();
+
     // Save only if filename is non-empty
     if (!m_outcube.is_empty()) {
 
         // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outcube+"\"." << std::endl;
+            log << "Save background cube into file \""+m_outcube+"\".";
+            log << std::endl;
         }
 
         // Save background cube
@@ -383,7 +388,8 @@ void ctbkgcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outmodel.url()+"\"." << std::endl;
+            log << "Save model into file \""+m_outmodel.url()+"\".";
+            log << std::endl;
         }
 
         // Save output model for stacked analyses

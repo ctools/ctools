@@ -325,6 +325,9 @@ void ctbin::save(void)
         log.header1("Save counts cube");
     }
 
+    // Get counts cube filename
+    m_outcube = (*this)["outcube"].filename();
+
     // Save only if filename is non-empty
     if (!m_outcube.is_empty()) {
 
@@ -336,7 +339,8 @@ void ctbin::save(void)
         
             // Log filename
             if (logTerse()) {
-                log << "Save \""+m_outcube+"\"." << std::endl;
+                log << "Save counts cube into file \""+m_outcube+"\".";
+                log << std::endl;
             }
             
             // Save cube

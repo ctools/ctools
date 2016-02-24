@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -314,12 +314,15 @@ void ctskymap::save(void)
         log.header1("Save sky map");
     }
 
+    // Get sky map filename
+    m_outmap  = (*this)["outmap"].filename();
+
     // Save only if filename is non-empty
     if (!m_outmap.is_empty()) {
 
         // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outmap+"\"." << std::endl;
+            log << "Save sky map into file \""+m_outmap+"\"." << std::endl;
         }
 
         // Save sky map

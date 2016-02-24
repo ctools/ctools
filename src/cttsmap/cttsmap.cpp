@@ -391,28 +391,41 @@ void cttsmap::save(void)
         log.header1("Save TS map");
     }
 
-    // Create fits file
-    GFits fits;
+    // Get TS map filename
+    m_outmap = (*this)["outmap"].filename();
 
-    // Write the sky maps to the FITS file
-    m_tsmap.write(fits);
-    for (int i = 0; i < m_mapnames.size(); i++) {
-    	m_maps[i].write(fits);
-    }
+    // Save only if filename is non-empty
+    if (!m_outmap.is_empty()) {
 
-    // Set extension name for all maps
-    for (int i = 0; i < m_mapnames.size(); i++) {
-    	fits[i+1]->extname(m_mapnames[i]);
-    }
+        // Log filename
+        if (logTerse()) {
+            log << "Save TS map into file \""+m_outmap+"\"." << std::endl;
+        }
 
-	// Add computation log if not all bins are computed
-    if (m_binmin != -1 || m_binmax != -1) {
-    	m_statusmap.write(fits);
-    	fits[m_mapnames.size()+1]->extname("STATUS MAP");
-    }
+        // Create fits file
+        GFits fits;
 
-    // Save FITS file
-    fits.saveto(m_outmap, clobber());
+        // Write the sky maps to the FITS file
+        m_tsmap.write(fits);
+        for (int i = 0; i < m_mapnames.size(); i++) {
+            m_maps[i].write(fits);
+        }
+
+        // Set extension name for all maps
+        for (int i = 0; i < m_mapnames.size(); i++) {
+            fits[i+1]->extname(m_mapnames[i]);
+        }
+
+        // Add computation log if not all bins are computed
+        if (m_binmin != -1 || m_binmax != -1) {
+            m_statusmap.write(fits);
+            fits[m_mapnames.size()+1]->extname("STATUS MAP");
+        }
+
+        // Save FITS file
+        fits.saveto(m_outmap, clobber());
+
+    } // endif: TS map filename was valid
 
     // Return
     return;

@@ -324,8 +324,16 @@ void ctcubemask::save(void)
         }
     }
 
+    // Get counts cube filename
+    m_outcube = (*this)["outcube"].filename();
+
     // Case A: Save event file(s) and XML metadata information
     if (m_use_xml) {
+
+        // Get prefix
+        m_prefix = (*this)["prefix"].string();
+
+        // Save XML
         save_xml();
     }
 
@@ -755,9 +763,9 @@ std::string ctcubemask::set_outfile_name(const std::string& filename) const
 
 
 /***********************************************************************//**
- * @brief Save counts map in FITS format.
+ * @brief Save counts cube in FITS format.
  *
- * Save the counts map as a FITS file. The filename of the FITS file is
+ * Save the counts cube as a FITS file. The filename of the FITS file is
  * specified by the m_outfile member.
  ***************************************************************************/
 void ctcubemask::save_fits(void)
@@ -770,7 +778,8 @@ void ctcubemask::save_fits(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outcube+"\"." << std::endl;
+            log << "Save counts cube into file \""+m_outcube+"\".";
+            log << std::endl;
         }
 
         // Save event list
@@ -825,7 +834,8 @@ void ctcubemask::save_xml(void)
 
             // Log filename
             if (logTerse()) {
-                log << "Save \""+outfile+"\"." << std::endl;
+                log << "Save counts cube into file \""+outfile+"\".";
+                log << std::endl;
             }
 
             // Save event list

@@ -348,12 +348,16 @@ void ctmodel::save(void)
         log.header1("Save cube");
     }
 
+    // Get model cube filename
+    m_outcube = (*this)["outcube"].filename();
+
     // Save only if filename is non-empty
     if (!m_outcube.is_empty()) {
 
-        // Dump filename
+        // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outcube+"\"." << std::endl;
+            log << "Save model cube into file \""+m_outcube+"\".";
+            log << std::endl;
         }
 
         // Save model cube into FITS file

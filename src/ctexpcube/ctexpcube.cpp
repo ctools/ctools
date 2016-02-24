@@ -281,12 +281,16 @@ void ctexpcube::save(void)
         log.header1("Save exposure cube");
     }
 
+    // Get exposure cube filename
+    m_outcube = (*this)["outcube"].filename();
+
     // Save only if filename is non-empty
     if (!m_outcube.is_empty()) {
 
         // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outcube+"\"." << std::endl;
+            log << "Save exposure cube into file \""+m_outcube+"\".";
+            log << std::endl;
         }
 
         // Save exposure cube

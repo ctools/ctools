@@ -353,9 +353,19 @@ void ctlike::save(void)
     // Get output filename
     m_outmodel = (*this)["outmodel"].filename();
 
-    // Write results out as XML model
-    if (gammalib::toupper(m_outmodel) != "NONE") {
+    // Save only if filename is non-empty
+    if (!m_outmodel.is_empty() &&
+        gammalib::toupper(m_outmodel.url()) != "NONE") {
+
+        // Log filename
+        if (logTerse()) {
+            log << "Save fitted parameters into file \""+m_outmodel+"\".";
+            log << std::endl;
+        }
+
+        // Write results out as XML model
         m_obs.models().save(m_outmodel);
+
     }
 
     // Return
