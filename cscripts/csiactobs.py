@@ -220,6 +220,25 @@ class csiactobs(ctools.cscript):
         # Return
         return
     
+    def runlist(self, runlist):
+        """
+        Set observation list
+        """
+        
+        # Type check
+        if isinstance(runlist, list):
+            
+            # Store a copy of input argument
+            self.runlist = list(runlist)
+            
+        else:
+            
+            # raise error if wrong type detected
+            raise RuntimeError("Argument of csiactobs.runlist() must be of type 'list'")
+        
+        # Return
+        return
+    
     def background_spectrum(self, run, prefactor, index, emin = 0.01, emax = 100.0):
         
         # Handle constant spectral model 
