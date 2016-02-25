@@ -2,7 +2,7 @@
 
 Tips, Tricks and FAQs
 =====================
-This section shows some of the wrinkles that could fascilitate the users' life when running analyses.
+This section shows some of the wrinkles that could fascilitate the users' life when running IACT analyses.
 
 Visualise observations
 ----------------------
@@ -12,7 +12,7 @@ Create a skymap of counts
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The tool :ref:`ctskymap` allows to create a single map of counts contained inside an observation container.
 In contrast to :ref:`ctbin`, ctskymap takes into account all events that fall into the skymap energy range and spatial range.
-Since :ref:`ctbin` is indended for binned/stacked analysis, it respects energy thresholds, RoI selections etc.
+Since :ref:`ctbin` is intended for binned/stacked analysis, it respects energy thresholds, RoI selections etc.
 Accordingly, :ref:`ctskymap` should be used for a simple visualisation of the counts.
 
 
@@ -39,8 +39,7 @@ contains these information:
 
 .. code-block:: bash
 
-	$ csobsinfo ds9file=pointings.reg
-	Parfile "csobsinfo.par" not found. Create default parfile.
+	$ csobsinfo ds9file=pointings.reg debug=yes
 	Event list, counts cube, or observation definition file [obs.xml] 
 	
 Together with the previously produced skymap, one can plot the pointings using e.g. ds9:
@@ -51,7 +50,7 @@ Together with the previously produced skymap, one can plot the pointings using e
 
 Plot zenith angle distribution of observations
 ----------------------------------------------
-The tool :ref:`csobsinfo` dumps more information into the log file that might be of interest to catch in a script.
+The tool :ref:`csobsinfo` dumps more information into the log file. Some of them might be of interest to catch in a script.
 Therefore, one could simply use this tool via python and plot some distributions:
 
 .. code-block:: python
@@ -86,7 +85,7 @@ position and sizes of the model on top of a skymap, this tool has the hidden par
 
 .. code-block:: bash
 
-	csmodelinfo ds9file=models.reg
+	csmodelinfo ds9file=models.reg debug=yes
 	Input model XML file [$CTOOLS/share/models/crab.xml]
 
 There are several options regarding the color, text and other attributes of the region file. To see a full list, 
@@ -118,7 +117,7 @@ This step will give some guidance how to work with model XML files in python and
 	
 	# Print the spectral parameter "Prefactor"
 	prefactor = src.spectral()["Prefactor"]
-	print("Prefactor:",prefactor.value(),"+-",prefactor.error())
+	print("Prefactor: "+str(prefactor.value())+" +- "+str(prefactor.error()))
 	
 	# Set the prefactor value
 	prefactor.value(3.5e-17)
@@ -140,7 +139,7 @@ This step will give some guidance how to work with model XML files in python and
 	models["Crab"]["Prefactor"].max(1e-16)
 	
 	# ... or in one step:
-	models["Crab"]["Prefactor].range(1e-18, 1e-16)
+	models["Crab"]["Prefactor"].range(1e-18, 1e-16)
 	
 	# Remove model from container
 	models.remove("Crab")
@@ -231,16 +230,16 @@ should consist of a spectral component using a PowerLaw2 model:
 .. code-block:: xml
 
 	<source name="TestSource" type="PointSource">
-		<spectrum type="PowerLaw2">
-			<parameter scale="1e-07" name="Integral"   min="1e-07" max="1000.0"    value="1.0" free="1"/>
-			<parameter scale="1.0"   name="Index"      min="-5.0"  max="+5.0"      value="-2.0" free="1"/>
-			<parameter scale="1.0"   name="LowerLimit" min="10.0"  max="1000000.0" value="100.0" free="0"/>
-			<parameter scale="1.0"   name="UpperLimit" min="10.0"  max="1000000.0" value="500000.0" free="0"/>
-		</spectrum>
-		<spatialModel type="SkyDirFunction">
-			<parameter free="0" max="360" min="-360" name="RA" scale="1" value="83.6331" />
-			<parameter free="0" max="90" min="-90" name="DEC" scale="1" value="22.0145" />
-		</spatialModel>
+	 <spectrum type="PowerLaw2">
+	  <parameter scale="1e-07" name="Integral"   min="1e-07" max="1000.0"    value="1.0" free="1"/>
+	  <parameter scale="1.0"   name="Index"      min="-5.0"  max="+5.0"      value="-2.0" free="1"/>
+	  <parameter scale="1.0"   name="LowerLimit" min="10.0"  max="1000000.0" value="100.0" free="0"/>
+	  <parameter scale="1.0"   name="UpperLimit" min="10.0"  max="1000000.0" value="500000.0" free="0"/>
+	 </spectrum>
+	 <spatialModel type="SkyDirFunction">
+	  <parameter free="0" max="360" min="-360" name="RA" scale="1" value="83.6331" />
+	  <parameter free="0" max="90" min="-90" name="DEC" scale="1" value="22.0145" />
+	 </spatialModel>
 	</source>
 
 The further content of the rest of the XML model file depends on the user requirements:
@@ -260,23 +259,23 @@ is supported. This might be of particular interest if the user has access to a b
 Split TS map computation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 For the purpose of job splitting, the hidden parameter ``binmin`` and ``binmax`` were included in the tool. These are integer parameter
-that specify which bins should be computed. For instance, if the map should consist of 30x30 =90 pixels, the use could e.g. execute
+that specify which bins should be computed. For instance, if the map should consist of 30x30(=900) pixels, the user could e.g. execute
 
 .. code-block:: bash
 
-	$ cttsmap binmin=0 binmax=299
+	$ cttsmap binmin=0 binmax=299 outmap=tsmap_0_299.fits
 	...
-	$ cttsmap binmin=300 binmax=599
+	$ cttsmap binmin=300 binmax=599 outmap=tsmap_300_599.fits
 	...
-	$ cttsmap binmin=600 binmax=899
+	$ cttsmap binmin=600 binmax=899 outmap=tsmap_600_899.fits
 	...
 	
-on different machines.
+Each command could run on a different machine.
 
 .. note::
 
-  The output file name of individual jobs can be the same. If the parameters are specified, the output file name will be appended by the suffix
-  "_<binmin>_<binmax>" to distinguish between the sliced TS maps.
+  The output file name of individual jobs should be different. Otherwise files could overwrite each other. The naming of the individual slices
+  is up to the user.
   
 Merge sliced TS maps
 ^^^^^^^^^^^^^^^^^^^^
@@ -303,3 +302,121 @@ In this example the ASCII file method is presented:
 
 Creating a python analysis pipeline
 -----------------------------------
+It is easily possible to build an own analysis workflow with a simple python script. The following source code example shows a python script
+running from gathering observations until fitting spectral points without storing intermediate data products on disk. It assumes that the
+environment variable ``$VHEFITS`` is set to the path where IACT FITS data is located.
+
+.. code-block:: python
+  
+	import gammalib
+	import ctools
+	import cscripts
+	
+	# Set debug flag
+	debug = True
+	
+	# Set flag to use energy dispersion
+	edisp = False
+	
+	# Set inmodel file name
+	inmodel = "$GAMMALIB/test/data/model_point_plaw.xml"
+	
+	# Expand environment variable
+	inmodel = gammalib.expand_env(inmodel)
+	
+	# Extract coordinates and model properties
+	models  = gammalib.GModels(inmodel)
+	srcname = models[0].name()
+	ra      = models[0]["RA"].value()
+	dec     = models[0]["DEC"].value()
+	
+	# Find FITS production name
+	iactdata          = cscripts.csiactdata()
+	iactdata["debug"] = debug
+	iactdata.run()
+	
+	# Use first available production
+	prodname = iactdata.names()[0]
+	
+	# Run csfindobs
+	findobs             = cscripts.csfindobs()
+	findobs["ra"]       = ra
+	findobs["dec"]      = dec
+	findobs["rad"]      = 2.5
+	findobs["prodname"] = prodname
+	findobs["debug"]    = debug
+	findobs["outfile"]  = "NONE"
+	findobs.run()
+	
+	# Retrieve obervation IDs (runlist)
+	obs_ids = findobs.obs_ids()
+	
+	# Build observation container
+	iactobs             = cscripts.csiactobs()
+	iactobs["prodname"] = prodname
+	iactobs["inmodel"]  = inmodel
+	iactobs["bkgpars"]  = 1
+	iactobs["outobs"]   = "NONE"
+	iactobs["outmodel"] = "NONE"	
+	iactobs["debug"]    = debug
+	iactobs.runlist(obs_ids)
+	iactobs.run()
+	
+	# Retrieve observation container and energy boundaries
+	obs     = iactobs.obs()
+	ebounds = iactobs.ebounds()
+	
+	# Run ctselect
+	select             = ctools.ctselect(obs)
+	select["usepnt"]   = True
+	select["rad"]      = 2.5
+	select["usethres"] = "DEFAULT"
+	select["tmin"]     = 0.0
+	select["tmax"]     = 0.0
+	select["emin"]     = 0.1
+	select["emax"]     = 100.0
+	select["debug"]    = debug
+	select.run()
+	
+	# Pass selected observations to ctlike
+	like          = ctools.ctlike(select.obs())
+	like["debug"] = debug
+	like["edisp"] = edisp
+	like.run()
+	
+	# Compute a spectrum and save
+	spec             = cscripts.csspec(like.obs())
+	spec["srcname"]  = srcname
+	spec["emin"]     = ebounds.emin().TeV()
+	spec["emax"]     = ebounds.emax().TeV()
+	spec["enumbins"] = 10
+	spec["edisp"]    = edisp
+	spec["ebinalg"]  = "LOG"
+	spec["debug"]    = debug
+	spec["outfile"]  = "spectrum.fits"
+	spec.execute()
+	
+	# Remove model for excess map computation
+	like.obs().models().remove(srcname)
+	
+	# Compute an excess map
+	resmap             = cscripts.csresmap(like.obs())
+	resmap["xref"]     = ra
+	resmap["yref"]     = dec
+	resmap["proj"]     = "CAR"
+	resmap["coordsys"] = "CEL"
+	resmap["emin"]     = ebounds.emin().TeV()
+	resmap["emax"]     = ebounds.emax().TeV()
+	resmap["nxpix"]    = 100
+	resmap["nypix"]    = 100
+	resmap["binsz"]    = 0.02
+	resmap["outmap"]   = "excessmap.fits"
+	resmap.execute()
+
+The results of this analysis workflow can be inspected using an example python script and e.g. ds9:
+
+.. code-block:: bash
+  
+  $ python $CTOOLS/examples/show_spectrum.py spectrum.fits
+  $ ds9 excessmap.fits
+  

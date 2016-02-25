@@ -301,8 +301,15 @@ After binning the events into a three-dimensional cube, an exposure cube has to 
 The exposure is defined as the effective area times the dead-time corrected observation time.
 Each observation from the input container gets stacked in the resulting cube. The exposure is stored
 in units of cm^2 s. The exposure cube does not have to contain the same binning as the event cube
-but for simplicity, the event cube can be passed to adopt the binning parameters. This task is performed by
-:ref:`ctexpcube`.
+but for simplicity, the event cube can be passed to adopt the binning parameters. Note, however, that the
+exposure cube is defined in true sky coordinates and energy while the counts cube is defined in reconstructed
+sky coordinates and energy. Consequently, the sky area and energy range covered by the exposure cube should be
+slightly larger than that of the counts cube to accommodate for spill over of events due to the point spread function
+and energy dispersion. By computing the exposure cube on the same grid as the counts cube, the spill over of events
+from sources at the edge of cube will not be handled correctly. In the example below, however, no source at the edge of the
+field of view is present. Therefore, for simplicity, the count cube is used as input cube to extract the binning.
+
+This task of computing the exposure cube is is performed by:ref:`ctexpcube`. 
 
 .. code-block:: bash
 
