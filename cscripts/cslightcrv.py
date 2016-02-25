@@ -2,7 +2,7 @@
 # ==========================================================================
 # Light curve generation script.
 #
-# Copyright (C) 2014-2015 Michael Mayer
+# Copyright (C) 2014-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 import gammalib
 import ctools
 import sys
+
 
 # ============ #
 # csspec class #
@@ -358,14 +359,12 @@ class cslightcrv(ctools.cscript):
             tmax = self.m_tbins.tstop(i)
 
             # Compute time bin center and time width
-            tmean   = (tmin + tmax)
-            tmean  *= 0.5
-            twidth  = (tmax - tmin)
-            twidth *= 0.5 
+            twidth = 0.5 * (tmax - tmin) # in seconds
+            tmean  = tmin + twidth
 
             # Store time as MJD
-            MJD[i] = tmean.mjd()
-            e_MJD[i] = twidth.days()
+            MJD[i]   = tmean.mjd()
+            e_MJD[i] = twidth / gammalib.sec_in_day # in days
 
             # Log information
             if self.logExplicit():

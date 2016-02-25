@@ -1,8 +1,9 @@
-2016-02-24  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-02-25  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Adapt to revise GTime operators (#1714)
         Add publish() methods to tools producing images (#1710)
         Read ahead output filename in cterror (#1700)
         Subdivide simulation energy range in ctobssim (#1673)

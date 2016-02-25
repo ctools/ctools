@@ -947,17 +947,16 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
         double flux     = get_model_flux(model, emin, emax, dir, rad,
                                          indent, wrklog);
         double rate     = flux * area;
-        double duration = 1800.0;  // default: 1800 sec
+        double duration = 1800.0;           // default: 1800 sec
         if (rate > 0.0) {
             duration = m_max_photons / rate;
-            if (duration < 1.0) {  // not <1 sec
+            if (duration < 1.0) {           // not <1 sec
                 duration = 1.0;
             }
             else if (duration > 180000.0) { // not >50 hr
                 duration = 180000.0;
             }
         }
-        GTime tslice(duration, "sec");
 
         // Skip model if photon rate is 0
         if (rate <= 0.0) {
@@ -983,16 +982,16 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
                               " photons/s for model \""+mod+"\" exceeds "
                               "maximum allowed photon rate of "+
                               gammalib::str(m_max_rate)+" photons/s. "
-                              "Please check the model parameters for "
-                              "model \""+mod+"\" or increase the value "
-                              "of the \"maxrate\" parameter.";
+                              "Please check the parameters of model "
+                              "\""+mod+"\" or increase the value of the "
+                              "\"maxrate\" parameter.";
             throw GException::invalid_value(G_SIMULATE_INTERVAL, msg);
         }
 
         // To reduce memory requirements we split long time intervals into
         // several time slices
         GTime tstart = tmin;
-        GTime tstop  = tstart + tslice;
+        GTime tstop  = tstart + duration;
 
         // Save state of photon and event counters before doing the
         // simulation
@@ -1009,7 +1008,7 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
 
             // Log time slice
             if (logExplicit()) {
-                if (tmax - tmin > tslice) {
+                if (tmax - tmin > duration) {
                     indent++;
                     wrklog->indent(indent);
                 }
@@ -1030,11 +1029,11 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
 
             // Go to next time slice
             tstart = tstop;
-            tstop  = tstart + tslice;
+            tstop  = tstart + duration;
 
             // Reset indentation
             if (logExplicit()) {
-                if (tmax - tmin > tslice) {
+                if (tmax - tmin > duration) {
                     indent--;
                     wrklog->indent(indent);
                 }

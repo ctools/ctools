@@ -186,9 +186,7 @@ class csobsinfo(ctools.cscript):
             obs_gti = obs.events().gti()
             
             # Compute mean time and dead time fraction in percent
-            tmean    = (obs_gti.tstart() + obs_gti.tstop())
-            tmean   *= 0.5
-            deadfrac = (1.0-obs.deadc(tmean))*100.0
+            deadfrac = (1.0-obs.deadc())*100.0
             
             # Retrieve pointing and store Ra,Dec
             pnt_dir = obs.pointing().dir()  
@@ -202,8 +200,8 @@ class csobsinfo(ctools.cscript):
             # Append time interval
             self.gti.merge(obs_gti.tstart(), obs_gti.tstop())
             
-            # increment global livetime and ontime
-            ontime += obs.ontime()
+            # Increment global livetime and ontime
+            ontime   += obs.ontime()
             livetime += obs.livetime()
             
             # Log the event type (binned or unbinned)

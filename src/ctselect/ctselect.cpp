@@ -954,9 +954,8 @@ void ctselect::select_events(GCTAObservation*   obs,
     }
 
     // Recompute ontime and livetime.
-    GTime meantime = 0.5 * (list->gti().tstart() + list->gti().tstop());
     obs->ontime(list->gti().ontime());
-    obs->livetime(list->gti().ontime() * obs->deadc(meantime));
+    obs->livetime(list->gti().ontime() * obs->deadc());
 
     // Return
     return;
