@@ -78,8 +78,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             ulimit.run()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in ctulimit: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctulimit: %s." % (e,)
+        except:
+            msg = "Exception occured in ctulimit."
             self.test_try_failure(msg)
 
         # Save results
@@ -87,8 +89,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             ulimit.save()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in saving results: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving results: %s." % (e,)
+        except:
+            msg = "Exception occured in saving results."
             self.test_try_failure(msg)
 
         # Return

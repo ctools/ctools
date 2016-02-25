@@ -81,8 +81,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             butterfly.run()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in ctbutterfly: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctbutterfly: %s." % (e,)
+        except:
+            msg = "Exception occured in ctbutterfly."
             self.test_try_failure(msg)
 
         # Save results
@@ -90,8 +92,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             butterfly.save()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in saving butterfly diagram: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving butterfly diagram: %s." % (e,)
+        except:
+            msg = "Exception occured in saving butterfly diagram."
             self.test_try_failure(msg)
 
         # Return

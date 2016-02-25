@@ -88,8 +88,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             expcube.run()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in ctexpcube: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctexpcube: %s." % (e,)
+        except:
+            msg = "Exception occured in ctexpcube."
             self.test_try_failure(msg)
 
         # Save exposure cube
@@ -97,8 +99,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             expcube.save()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in saving exposure cube: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving exposure cube: %s." % (e,)
+        except:
+            msg = "Exception occured in saving exposure cube."
             self.test_try_failure(msg)
 
         # Return
