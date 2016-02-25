@@ -40,6 +40,14 @@ class csobsinfo(ctools.cscript):
         self.name    = "csobsinfo"
         self.version = "1.1.0"
 
+        # Initialise some members
+        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
+            self.obs = argv[0]
+            argv     = argv[1:]
+        else:      
+            self.obs = gammalib.GObservations()
+            self.obs.clear()   
+
         # Make sure that parfile exists
         file = self.parfile()
 
@@ -99,9 +107,10 @@ class csobsinfo(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters     
-        self.require_inobs("csobsinfo::get_parameters")
-        self.obs = self.get_observations(False)
+        # Get parameters   
+        if self.obs.size() == 0:  
+            self.require_inobs("csobsinfo::get_parameters")
+            self.obs = self.get_observations(False)
         
         # Initialise object position
         self.obj_dir = gammalib.GSkyDir()

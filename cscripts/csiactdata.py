@@ -40,9 +40,10 @@ class csiactdata(ctools.cscript):
         Constructor.
         """
         # Set name
-        self.name     = "csiactdata"
-        self.version  = "1.0.0"
-        self.datapath = os.getenv("VHEFITS","")
+        self.name      = "csiactdata"
+        self.version   = "1.0.0"
+        self.datapath  = os.getenv("VHEFITS","")
+        self.prodnames = []
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -156,6 +157,9 @@ class csiactdata(ctools.cscript):
         data      = json.loads(json_data)    
         configs   = data["datasets"]
         
+        # Initialise array for available names
+        self.prodnames = []
+        
         # Loop over configs and display unavailable storage first        
         for config in configs:
             
@@ -204,6 +208,9 @@ class csiactdata(ctools.cscript):
                 self.log(str(config["hduindx"]))
                 self.log("\n") 
                 
+                # Append to available names
+                self.prodnames.append(str(config["name"]))
+                
                 # Print additional information
                 for key in config:
                     if key in ["name","hduindx","obsindx"]:
@@ -214,6 +221,14 @@ class csiactdata(ctools.cscript):
 
         # Return
         return       
+
+    def names(self):
+        """ 
+        Return available FITS production names
+        """
+        
+        # Return 
+        return self.prodnames
 
 # ======================== #
 # Main routine entry point #
