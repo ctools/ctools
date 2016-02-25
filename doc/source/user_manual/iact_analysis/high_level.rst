@@ -219,7 +219,7 @@ Example unbinned observation container
 	Size of the X axis in pixels [100]
 	Size of the Y axis in pixels [100]
 	Pixel size (deg/pixel) [0.02]
-	Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUB]
+	Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUBDIV]
 	Output residual map file [resmap.fits] 
 
 Example binned/stacked observation container
@@ -235,7 +235,7 @@ The tool behaves differently if the input observation parameter is a count cube.
 	Input PSF cube file (only needed for stacked analysis) [psfcube.fits]  
 	Input background cube file (only needed for stacked analysis) [bkgcube.fits] 
 	Input model XML file [binned_results.xml] 
-	Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUB] 
+	Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUBDIV] 
 	Output residual map file [resmap.fits] 
 	
 Note that the tool also queries for an input model cube file (which we set to ``NONE`` here). This is very convenient in case the model cube has already been precomputed

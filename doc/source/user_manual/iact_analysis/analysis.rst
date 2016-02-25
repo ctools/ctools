@@ -74,10 +74,10 @@ For this purpose one can simply pass an invalid coordinate to :ref:`csfindobs`.
 
 The selection by region will simply be omitted.
 
-Note
-^^^^
-On default, :ref:`csfindobs` only select data of highest quality (i.e. QUALITY=0). Specifying the hidden parameter e.g. ``min_qual=1``
-allows to select all data with looser quality criteria.
+.. note::
+
+	On default, :ref:`csfindobs` only select data of highest quality (i.e. QUALITY=0). Specifying the hidden parameter e.g. ``min_qual=1``
+	allows to select all data with looser quality criteria.
 
 Create an observation list
 --------------------------
