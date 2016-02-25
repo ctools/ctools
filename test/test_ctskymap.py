@@ -81,7 +81,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             skymap.run()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in ctskymap: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -90,7 +90,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             skymap.save()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in saving sky map: %s." % (e,)
             self.test_try_failure(msg)
 

@@ -84,7 +84,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.run()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in ctobssim: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -105,7 +105,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.save()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in saving events: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -126,7 +126,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.run()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in ctobssim: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -138,7 +138,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.save()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in saving events: %s." % (e,)
             self.test_try_failure(msg)
 

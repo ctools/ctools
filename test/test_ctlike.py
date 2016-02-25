@@ -78,7 +78,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             like.run()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in ctlike: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -87,7 +87,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             like.save()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in saving results: %s." % (e,)
             self.test_try_failure(msg)
 

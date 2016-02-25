@@ -96,7 +96,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             model.run()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in ctmodel: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -105,7 +105,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             model.save()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in saving model cube: %s." % (e,)
             self.test_try_failure(msg)
 

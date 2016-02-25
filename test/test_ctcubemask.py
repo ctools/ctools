@@ -79,7 +79,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             mask.run()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in ctcubemask: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -88,7 +88,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             mask.save()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in saving counts cube: %s." % (e,)
             self.test_try_failure(msg)
 

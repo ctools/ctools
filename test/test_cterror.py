@@ -80,7 +80,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             error.run()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in cterror: %s." % (e,)
             self.test_try_failure(msg)
 
@@ -89,7 +89,7 @@ class Test(gammalib.GPythonTestSuite):
         try:
             error.save()
             self.test_try_success()
-        except Exception, e:
+        except Exception as e:
             msg = "Exception occured in saving results: %s." % (e,)
             self.test_try_failure(msg)
 
