@@ -79,8 +79,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             select.run()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in ctselect: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctselect: %s." % (e,)
+        except:
+            msg = "Exception occured in ctselect."
             self.test_try_failure(msg)
 
         # Save events
@@ -88,8 +90,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             select.save()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in saving events: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving events: %s." % (e,)
+        except:
+            msg = "Exception occured in saving events."
             self.test_try_failure(msg)
 
         # Return

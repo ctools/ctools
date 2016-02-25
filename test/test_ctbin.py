@@ -83,8 +83,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             bin.run()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in ctbin: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctbin: %s." % (e,)
+        except:
+            msg = "Exception occured in ctbin."
             self.test_try_failure(msg)
 
         # Save counts cube
@@ -92,8 +94,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             bin.save()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in saving counts cube: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving counts cube: %s." % (e,)
+        except:
+            msg = "Exception occured in saving counts cube."
             self.test_try_failure(msg)
 
         # Return

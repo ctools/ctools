@@ -86,8 +86,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             tsmap.run()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in cttsmap: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in cttsmap: %s." % (e,)
+        except:
+            msg = "Exception occured in cttsmap."
             self.test_try_failure(msg)
 
         # Save results
@@ -95,8 +97,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             tsmap.save()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in saving results: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving results: %s." % (e,)
+        except:
+            msg = "Exception occured in saving results."
             self.test_try_failure(msg)
 
         # Return

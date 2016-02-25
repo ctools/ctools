@@ -91,8 +91,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             bkgcube.run()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in ctbkgcube: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctbkgcube: %s." % (e,)
+        except:
+            msg = "Exception occured in ctbkgcube."
             self.test_try_failure(msg)
 
         # Save background cube
@@ -100,8 +102,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             bkgcube.save()
             self.test_try_success()
-        except Exception as e:
-            msg = "Exception occured in saving background cube: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving background cube: %s." % (e,)
+        except:
+            msg = "Exception occured in saving background cube."
             self.test_try_failure(msg)
 
         # Return
