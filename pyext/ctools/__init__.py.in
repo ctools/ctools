@@ -21,12 +21,7 @@
 import gammalib
 
 # Import sub modules
-#from .tools import *
-import sys
-if sys.version_info[0] < 3:
-    from tools import *
-else:
-    from .tools import *
+from @PYTHON_RELATIVE_IMPORT@tools import *
 
 # Remove swig register stuff
 bad_entries = [entry for entry in list(locals())

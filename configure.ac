@@ -624,14 +624,11 @@ else
 
     # Set opening and closing symbols to make setup.py compatible for versions 2 and 3
     if test ${PYTHON_VERSION} '<' 3; then
-      PYTHON_OPEN=" "
-      PYTHON_CLOSE=""
+      PYTHON_RELATIVE_IMPORT=" "
     else
-      PYTHON_OPEN="("
-      PYTHON_CLOSE=")"
+      PYTHON_RELATIVE_IMPORT="."
     fi
-    AC_SUBST(PYTHON_OPEN)  
-    AC_SUBST(PYTHON_CLOSE)
+    AC_SUBST(PYTHON_RELATIVE_IMPORT)  
 
     # Do we have distutils?
     AC_MSG_CHECKING([for the distutils Python package])
