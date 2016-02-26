@@ -27,7 +27,7 @@ in the mounted directory.
 
 Copy data 
 ---------
-After mounting the file system to a folder of your choosing (``/path/to/mountpoint/`` in this case), the copying of the data can be initiated.
+After mounting the file system to a folder of your choice (``/path/to/mountpoint/`` in this case), the copying of the data can be initiated.
 To monitor the progress on the screen, the hidden parameter ``debug=yes`` can be used. To increase the chattiness of the output,
 the hidden parameter ``chatter`` can e.g. be set to 3.
 
@@ -38,8 +38,9 @@ the hidden parameter ``chatter`` can e.g. be set to 3.
   Name of FITS production to download [iact-fits]
   Destination path of FITS data [/path/to/local/fits/data/] 
   
-The name of the FITS production must be available in the remote ``master.json`` file. In case the names of the available productions is unkown
-there are two options to find out:
+The name of the FITS production must be available in the remote 
+``master.json`` file. In case the names of the available productions are unkown
+there are two options to determine an appropriate name:
 
 *  Run :ref:`csiactdata` and set as ``datapath`` the mountpoint
 *  Try any name, :ref:`csiactcopy` will throw a ``RuntimeError`` with the available production names if the input name is not found

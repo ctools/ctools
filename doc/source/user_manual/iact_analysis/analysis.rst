@@ -20,15 +20,16 @@ To check the available names of FITS data sets, it is recommended to run :ref:`c
   $ csiactdata
   Path were data is located [] /path/to/fits/data/
   
-This will list names of available FITS data sets on the screen. In the following it is assumed the users' choice
-of the data set is called ``fits-data-name``. The query for the path where the data is located can be
-omitted by setting environment variable ``$VHEFITS`` to this locations. This might be convenient
-since some other tools also query for the same parameter and can use ``$VHEFITS`` instead.
+This will list names of available FITS data sets on the screen. In the 
+following it is assumed the user has selected a data set called ``fits-data-name``.
+The query for the path where the data is located can be
+omitted by setting the environment variable ``VHEFITS`` to this locations. This might be convenient
+since some other tools also query for the same parameter and can use ``VHEFITS`` instead.
 
 Find observations
 -----------------
 To start an analysis, it is required to assemble a list of observations that should be used. For this purpose,
-:ref:`csfindobs` searches for observations according to the user requirement.
+:ref:`csfindobs` searches for observations according to user criteria.
 
 Search for sky pointings
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -44,11 +45,14 @@ The most common search for observations is by pointing position in the sky.
   Runlist outfile [runlist.lis]
   
   
-Specifying additional search requirements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The search for observations can be further constrained arbitrarily. For this purpose, :ref:`csfindobs` contains a hidden parameter
-``expression``. It is possible to use any FITS selection expression that is `supported by cfitsio <http://www.isdc.unige.ch/integral/download/osa/doc/10.1/osa_um_intro/node38.html>`_.
-Available properties (i.e. column names) for selection, can be found `here <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/obs_index/index.html>`_ or by simply browsing the observation index file with a FITS viewer.
+Specifying additional search criteria
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The search for observations can be further constrained arbitrarily. For this purpose,
+:ref:`csfindobs` contains a hidden parameter ``expression``. It is possible to use any
+FITS selection expression that is `supported by cfitsio <http://www.isdc.unige.ch/integral/download/osa/doc/10.1/osa_um_intro/node38.html>`_.
+Available properties (i.e. column names) for selection, can be found 
+`here <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/obs_index/index.html>`_
+or by simply browsing the observation index file with a FITS viewer.
 
 Example:
 
@@ -57,13 +61,16 @@ Example:
   $ csfindobs expression="ZEN_PNT<30&&LIVETIME>1800"
   ...
   
-This command selects all observations that have a zenith angle less than 30 degrees and a livetime larger than 30 minutes.
+This command selects all observations that have a zenith angle less than 
+30 degrees and a livetime larger than 1800 seconds (i.e. 30 minutes).
 
-Selections that don't include sky coordinates
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The sky selection can also be omitted. For instance one does not always know the sky coordinate of a certain object.
-Therefore, it is possible to search for the object name instead.
-For this purpose one can simply pass an invalid coordinate to :ref:`csfindobs`.
+
+Omitting the pointing selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You can also omit the pointing selection, for example in case where you 
+don't know the sky coordinates of your object of interest. In that case, you 
+may directly use the object name in the expression and pass ``NONE`` as
+coordinate to :ref:`csfindobs`:
 
 .. code-block:: bash
 
@@ -72,18 +79,20 @@ For this purpose one can simply pass an invalid coordinate to :ref:`csfindobs`.
   Right ascension [NONE]
   Runlist outfile [runlist.lis]
 
-The selection by region will simply be omitted.
+This will omit the selection of pointing positions.
 
 .. note::
 
-	On default, :ref:`csfindobs` only select data of highest quality (i.e. QUALITY=0). Specifying the hidden parameter e.g. ``min_qual=1``
-	allows to select all data with looser quality criteria.
+   By default, :ref:`csfindobs` only selects data of highest quality (i.e. QUALITY=0).
+   You may overwrite this default by specifying the hidden parameter 
+   ``min_qual``. For example, ``min_qual=1`` selects all data with a 
+   looser quality criteria.
 
 Create an observation list
 --------------------------
 The runlist ASCII file containing a list of selected observation IDs must now be converted to an
-observation XML file. This file contains information about the location of the files that are required
-for the analysis. The tool :ref:`csiactobs` is intended to do this conversion.
+observation definition XML file. This file contains information about the location of the files that are required
+for the analysis. The purpose of the tool :ref:`csiactobs` is to do this conversion.
 
 .. code-block:: bash
 
@@ -100,7 +109,7 @@ This tools has now performed various tasks:
 * Create a model XML file that contains the background models. In ctools, each observation has its own independent background model. The number of free parameters per model was set to 1, i.e. the normalisation of the background is left free for each observation. The models were saved in ``bgmodels.xml``.
 * The tool uses an internal hierarchy for assigning the background models. The hidden parameter ``bkg_mod_hiera`` (default=irf|aeff|gauss) steers the order how background models should be created. In case the IRF background model is not available, the script automatically falls back to the background model from effective area (GCTAModelAeffBackground). 
 * There are some further hidden parameters to steer the start parameters for the Aeff and Gaussian background model. Have a look at :ref:`csiactobs` to view a full list of parameters.
-* In ``csiactobs.log`` (or on screen if ``debug=yes``), the script dumps the complete energy range of the observation container. These values might be important for later usage (e.g. in binned analysis).
+* In ``csiactobs.log`` (or on screen if ``debug=yes``), the script logs the complete energy range of the observation container. These values might be important for later usage (e.g. in binned analysis).
 
 In case a sky model is already prepared, it is possible to also provide the hidden parameter ``inmodel``. The output
 model XML file will then contain both, the background model and the input sky model:
@@ -121,13 +130,13 @@ Note that the number of files to merge is not limited to two. Detailled options 
 be passed is given on the reference page of :ref:`csmodelmerge`. It is also important to know that each model in the container
 must have a unique name. This implies, for instance, merging the same XML model twice will result in an exception.
 
-A list of available sky models can be found here: `models <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_.
+A list of available sky models can be found `here <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_.
 Of particular help to create sky models for your dataset is the section about :ref:`modelling CTA data <models>`.
 
 
 Example XML files
 -----------------
-To get familiar with the XML syntax and format example files for an observation container and a model container
+To get familiar with the XML syntax and format, example files for an observation container and a model container
 are shown in the following.
 
 Observation XML file
@@ -211,7 +220,7 @@ Model XML file
 
    It is important to ensure background models are properly linked to their respective observation.
    Therefore it is required to keep the attributes ``instrument`` and ``id`` the same for the observation
-   and the corresponding background model. The tool :ref:`csiactobs` makes sure this is the case.
+   and the corresponding background model. The tool :ref:`csiactobs` assures this automatically.
 
 Run ctselect
 ------------
@@ -239,7 +248,8 @@ to extract the safe energy range from the instrument response functions and appl
 is thus superior to the energy limit passed via the user parameters. In addition, to analyse the complete field of view,
 the parameter ``usepnt=yes`` uses, for each observation, the pointing position as centre for the selection radius.
 The radius parameter is dependent on the intrument, for an instrument with a 5 degree field of view, a radius of 2.5 degrees
-seems reasonable. The time selection is not applied in the above example since an invalid time range was provided.
+seems reasonable. The time selection is not applied in the above example; 
+specifying 0 as start and end time skips the time selection.
 For time-resolved analysis, it is important to know the MET time that is required to extract.
 The result of the selection step is written into the observation XML file ``selected_obs.xml``, which now contains references
 to the new selected event FITS files.
@@ -256,7 +266,7 @@ file must now contain the background models and source components to describe th
   Source model [$CTOOLS/share/models/crab.xml] crab_models.xml
   Source model output file [crab_results.xml]
   
-The result of the fit was stored in 'crab_results.xml'. Note that fitted parameters, ``Prefactors`` in particular,
+The result of the fit was stored in ``crab_results.xml``. Note that fitted parameters, ``Prefactors`` in particular,
 typically use MeV as energy unit. To monitor the progress of the fit on the screen, one can simply run with the option ``debug=yes``.
 Alternatively, the logfile ``ctlike.log`` can be inspected after the fit. 
 
@@ -269,7 +279,7 @@ Stacked (binned) analysis
 The stacked analysis mode is using a binned analysis where all observations are included and stacked into one event cube.
 This analysis mode is much faster than unbinned analysis when having a large dataset (e.g. > 100 hours).
 For this type of binned analysis, some intermediate data products have to be produced. The products are a binned data cube,
-an exposure cube, a psf cube, and a background cube. 
+an exposure cube, a PSF cube, and a background cube. 
 
 Bin events
 ^^^^^^^^^^
@@ -291,7 +301,7 @@ Bin events
   Number of energy bins [20]
   Output counts cube [cntcube.fits]
 
-Note that bins only get filled if bin of the cube is fully contained in the energy range and RoI of a considered observation.
+Note that bins only get filled if the bin of the cube is fully contained in the energy range and RoI of a considered observation.
 It is therefore useful to provide the energy range given by :ref:`csiactobs` above. This ensures a maximum agreement between
 observations and binning and reduces the loss of data.
 
@@ -300,7 +310,7 @@ Create exposure cube
 After binning the events into a three-dimensional cube, an exposure cube has to be computed.
 The exposure is defined as the effective area times the dead-time corrected observation time.
 Each observation from the input container gets stacked in the resulting cube. The exposure is stored
-in units of cm^2 s. The exposure cube does not have to contain the same binning as the event cube
+in units of :math:`cm^2 s`. The exposure cube does not have to contain the same binning as the event cube
 but for simplicity, the event cube can be passed to adopt the binning parameters. Note, however, that the
 exposure cube is defined in true sky coordinates and energy while the counts cube is defined in reconstructed
 sky coordinates and energy. Consequently, the sky area and energy range covered by the exposure cube should be
@@ -309,7 +319,7 @@ and energy dispersion. By computing the exposure cube on the same grid as the co
 from sources at the edge of cube will not be handled correctly. In the example below, however, no source at the edge of the
 field of view is present. Therefore, for simplicity, the count cube is used as input cube to extract the binning.
 
-This task of computing the exposure cube is is performed by:ref:`ctexpcube`. 
+This task of computing the exposure cube is is performed by :ref:`ctexpcube`. 
 
 .. code-block:: bash
 
@@ -337,13 +347,13 @@ Alternatively, the exposure cube can be created with different binning than the 
   Number of energy bins [20] 30
   Output exposure cube file [expcube.fits] 
 
-Create psf cube
+Create PSF cube
 ^^^^^^^^^^^^^^^
 As a next step for the binned analysis, a cube containing the point spread function (PSF) must be computed.
-Since the PSF cannot be stored by one single parameter, The PSF cube computed by :ref:`ctpsfcube` has a fourth dimension.
-In each bin of the cube, the PSF ist stored as a function of offset from source. The granularity of the
+Since the PSF cannot be stored by one single parameter, the PSF cube computed by :ref:`ctpsfcube` has a fourth dimension.
+In each bin of the cube, the PSF is stored as a function of offset from source. The granularity of the
 PSF histogram is determined by the hidden parameter ``anumbins`` (default: 200). Therefore, when passing
-the event cube ot adopt the sky binning for the PSF cube, the resulting FITS file can become quite large due to
+the event cube to adopt the sky binning for the PSF cube, the resulting FITS file can become quite large due to
 the fourth dimension. Usually in IACT analysis, the PSF doesn't change too dramatically across the field of view.
 Therefore the user can think about reducing the spatial binning of the PSF cube:
 

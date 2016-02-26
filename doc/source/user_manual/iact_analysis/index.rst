@@ -1,6 +1,5 @@
-================================
-Analysis using current IACT data
-================================
+Analysing current IACT data
+===========================
 
 .. toctree::
    :maxdepth: 2
