@@ -81,8 +81,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             skymap.run()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in ctskymap: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctskymap: %s." % (e,)
+        except:
+            msg = "Exception occured in ctskymap."
             self.test_try_failure(msg)
 
         # Save counts cube
@@ -90,8 +92,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             skymap.save()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in saving sky map: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving sky map: %s." % (e,)
+        except:
+            msg = "Exception occured in saving sky map."
             self.test_try_failure(msg)
 
         # Return

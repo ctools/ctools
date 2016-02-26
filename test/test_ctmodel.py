@@ -96,8 +96,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             model.run()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in ctmodel: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in ctmodel: %s." % (e,)
+        except:
+            msg = "Exception occured in ctmodel."
             self.test_try_failure(msg)
 
         # Save counts cube
@@ -105,8 +107,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             model.save()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in saving model cube: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving model cube: %s." % (e,)
+        except:
+            msg = "Exception occured in saving model cube."
             self.test_try_failure(msg)
 
         # Return

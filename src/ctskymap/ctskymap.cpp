@@ -325,8 +325,14 @@ void ctskymap::save(void)
             log << "Save sky map into file \""+m_outmap+"\"." << std::endl;
         }
 
-        // Save sky map
-        m_skymap.save(m_outmap, clobber());
+        // Create empty FITS file
+        GFits fits;
+
+        // Write sky map into FITS file
+        m_skymap.write(fits);
+
+        // Save FITS file to disk
+        fits.saveto(m_outmap, clobber());
 
     }
 

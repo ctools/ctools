@@ -603,9 +603,9 @@ if test "x$ac_enable_python_binding" = "xno"; then
 else
 
   # Do we have Python and Python.h?
-  AM_PATH_PYTHON([2.2],
+  AM_PATH_PYTHON([2.5],
                  [has_python="yes"],
-                 [AC_MSG_WARN([Python >= 2.2 not found. Python >= 2.2 is required to build python binding. Python can be obtained from http://www.python.org])])
+                 [AC_MSG_WARN([Python >= 2.5 not found. Python >= 2.5 is required to build python binding. Python can be obtained from http://www.python.org])])
 
   # It would really be weired if Python has not been found, as barely every system has Python. Maybe
   # it was not found because the autoconf is so old, and in an early version of the AM_PATH_PYTHON
@@ -624,14 +624,11 @@ else
 
     # Set opening and closing symbols to make setup.py compatible for versions 2 and 3
     if test ${PYTHON_VERSION} '<' 3; then
-      PYTHON_OPEN=" "
-      PYTHON_CLOSE=""
+      PYTHON_RELATIVE_IMPORT=" "
     else
-      PYTHON_OPEN="("
-      PYTHON_CLOSE=")"
+      PYTHON_RELATIVE_IMPORT="."
     fi
-    AC_SUBST(PYTHON_OPEN)  
-    AC_SUBST(PYTHON_CLOSE)
+    AC_SUBST(PYTHON_RELATIVE_IMPORT)  
 
     # Do we have distutils?
     AC_MSG_CHECKING([for the distutils Python package])

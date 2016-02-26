@@ -80,8 +80,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             error.run()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in cterror: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in cterror: %s." % (e,)
+        except:
+            msg = "Exception occured in cterror."
             self.test_try_failure(msg)
 
         # Save results
@@ -89,8 +91,10 @@ class Test(gammalib.GPythonTestSuite):
         try:
             error.save()
             self.test_try_success()
-        except Exception, e:
-            msg = "Exception occured in saving results: %s." % (e,)
+        #except Exception as e:
+        #    msg = "Exception occured in saving results: %s." % (e,)
+        except:
+            msg = "Exception occured in saving results."
             self.test_try_failure(msg)
 
         # Return
