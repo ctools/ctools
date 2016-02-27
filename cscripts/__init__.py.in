@@ -50,26 +50,26 @@ if cur_version > req_version:
 
 
 # Import
-from .cscaldb      import cscaldb
-from .csinfo       import csinfo
-from .cslightcrv   import cslightcrv
-from .csmodelinfo  import csmodelinfo
-from .csmodelmerge import csmodelmerge
-from .csobs2caldb  import csobs2caldb
-from .csobsdef     import csobsdef
-from .csobsinfo    import csobsinfo
-from .cspull       import cspull
-from .csresmap     import csresmap
-from .cssens       import cssens
-from .csspec       import csspec
-from .cstsdist     import cstsdist
-from .cstsmapmerge import cstsmapmerge
+from @PYTHON_RELATIVE_IMPORT@cscaldb      import cscaldb
+from @PYTHON_RELATIVE_IMPORT@csinfo       import csinfo
+from @PYTHON_RELATIVE_IMPORT@cslightcrv   import cslightcrv
+from @PYTHON_RELATIVE_IMPORT@csmodelinfo  import csmodelinfo
+from @PYTHON_RELATIVE_IMPORT@csmodelmerge import csmodelmerge
+from @PYTHON_RELATIVE_IMPORT@csobs2caldb  import csobs2caldb
+from @PYTHON_RELATIVE_IMPORT@csobsdef     import csobsdef
+from @PYTHON_RELATIVE_IMPORT@csobsinfo    import csobsinfo
+from @PYTHON_RELATIVE_IMPORT@cspull       import cspull
+from @PYTHON_RELATIVE_IMPORT@csresmap     import csresmap
+from @PYTHON_RELATIVE_IMPORT@cssens       import cssens
+from @PYTHON_RELATIVE_IMPORT@csspec       import csspec
+from @PYTHON_RELATIVE_IMPORT@cstsdist     import cstsdist
+from @PYTHON_RELATIVE_IMPORT@cstsmapmerge import cstsmapmerge
 from . import obsutils
 if cur_version > req_version:
-    from .csfindobs    import csfindobs
-    from .csiactcopy   import csiactcopy
-    from .csiactdata   import csiactdata
-    from .csiactobs    import csiactobs
+    from @PYTHON_RELATIVE_IMPORT@csfindobs    import csfindobs
+    from @PYTHON_RELATIVE_IMPORT@csiactcopy   import csiactcopy
+    from @PYTHON_RELATIVE_IMPORT@csiactdata   import csiactdata
+    from @PYTHON_RELATIVE_IMPORT@csiactobs    import csiactobs
 
 # Delete version check variables
 del sys
