@@ -51,6 +51,7 @@ class csiactobs(ctools.cscript):
         self.inmodels  = None
         self.xml       = gammalib.GXml()
         self.models    = gammalib.GModels()
+        self.m_runlist = []
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -136,9 +137,27 @@ class csiactobs(ctools.cscript):
         # Expand environment
         self.datapath = gammalib.expand_env(self.datapath)
         
-        # Read user parameters  
+        # Read FITS production
         self.m_prodname    = self["prodname"].string()
-        self.m_runlistfile = self["infile"].filename()
+        
+        # Read runlist file if list not already filled
+        if len(self.m_runlist) == 0:
+            
+            # Get file name
+            self.m_runlistfile = self["infile"].filename()
+            
+            # Read runlist from file
+            runfile = open(self.m_runlistfile.url())
+            for line in runfile.readlines():
+                if len(line) == 0:
+                    continue
+                if line[0] == '#':
+                    continue
+                if len(line.split()) > 0:
+                    self.m_runlist.append(line.split()[0])
+            runfile.close()
+        
+        # Read number of background parameters
         self.m_bkgpars     = self["bkgpars"].integer()
           
         # Output model file
@@ -217,6 +236,25 @@ class csiactobs(ctools.cscript):
         self.m_debug   = False # Debugging in client tools
         self.m_clobber = self["clobber"].boolean()
 
+        # Return
+        return
+    
+    def runlist(self, runlist):
+        """
+        Set observation list
+        """
+        
+        # Check if convertable to a python list
+        try:
+            
+            # Store a copy of input argument
+            self.m_runlist = list(runlist)
+            
+        except:
+            
+            # raise error if wrong type detected
+            raise RuntimeError("Argument of csiactobs.runlist() must be of type 'list'")
+        
         # Return
         return
     
@@ -390,30 +428,16 @@ class csiactobs(ctools.cscript):
         self.xml.append(gammalib.GXmlElement("observation_list title=\"observation list\""))
         lib = self.xml.element("observation_list", 0)
 
-        # Read runlist from file
-        runlist = []
-        runfile = open(self.m_runlistfile.url())
-        for line in runfile.readlines():
-            if len(line) == 0:
-                continue
-            if line[0] == '#':
-                continue
-            if len(line.split()) > 0:
-                runlist.append(line.split()[0])
-            else:
-                runlist.append('')
-        runfile.close()
-
         # Log output
         if self.logTerse():
             self.log("\n")
-            self.log.header1("Looping over "+str(len(runlist))+" runs")
+            self.log.header1("Looping over "+str(len(self.m_runlist))+" runs")
 
         # Initialise energy range values for logging
         self.m_ebounds.clear()
 
         # Loop over runs
-        for obs_id in runlist:
+        for obs_id in self.m_runlist:
 
             # Create selection string
             obs_selection = "[OBS_ID=="+str(obs_id)+"]"

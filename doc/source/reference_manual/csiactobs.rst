@@ -67,7 +67,7 @@ General parameters
 ``(master_indx = master.json) [file]``
     Name of master index file.
     
-``(bkg_scale = yes) [boolean]
+``(bkg_scale = yes) [boolean]``
     Specifies whether the background scaling factor from the observation index
     file should be applied if available. 
 

@@ -2,7 +2,7 @@ New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-25 February 2016
+26 February 2016
 
 
 1. Introduction
@@ -18,7 +18,10 @@ None
 
 3. Python interface
 -------------------
-None
+The IACT scripts csfindobs, csiactcopy, csiactdata, and csiactobs are only
+imported into th cscripts module and tested if the Python version is 2.6 or
+newer. These scripts make use of the json Python module that is only became
+available from Python 2.6 on.
 
 
 4. Support model

@@ -217,14 +217,24 @@ class csspec(ctools.cscript):
 
             # Create energy boundaries
             self.m_ebounds = gammalib.GEbounds()
-            for i in range(len(use_layers))[::n_layers]:
-                i_start = i
-                i_stop  = i + n_layers - 1
+            i_start = 0
+            i_stop  = n_layers - 1
+            while i_start < len(use_layers):
                 if i_stop >= len(use_layers):
                     i_stop = len(use_layers) - 1
                 ebinmin = cube_ebounds.emin(use_layers[i_start])
                 ebinmax = cube_ebounds.emax(use_layers[i_stop])
                 self.m_ebounds.append(ebinmin, ebinmax)
+                i_start += n_layers
+                i_stop  += n_layers
+            #for i in range(len(use_layers))[::n_layers]:
+            #    i_start = i
+            #    i_stop  = i + n_layers - 1
+            #    if i_stop >= len(use_layers):
+            #        i_stop = len(use_layers) - 1
+            #    ebinmin = cube_ebounds.emin(use_layers[i_start])
+            #    ebinmax = cube_ebounds.emax(use_layers[i_stop])
+            #    self.m_ebounds.append(ebinmin, ebinmax)
                     
         # Unbinned mode       
         else:

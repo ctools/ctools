@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script computes the CTA sensitivity.
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -251,7 +251,11 @@ class cssens(ctools.cscript):
             if ieng == 0:
                 f      = open(self.m_outfile.url(), 'w')
                 writer = csv.DictWriter(f, colnames)
-                writer.writerow(dict((_,_) for _ in colnames))
+                headers = {}
+                for n in colnames:
+                    headers[n] = n
+                writer.writerow(headers)
+                #writer.writerow(dict((_,_) for _ in colnames))
                 writer.writerow(result)
                 f.close()
             else:

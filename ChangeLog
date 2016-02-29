@@ -1,8 +1,10 @@
-2016-02-25  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-02-26  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Test and import IACT scripts only for Python 2.6+ (#1715)
+        Add documentation for IACT analysis (#1646)
         Adapt to revise GTime operators (#1714)
         Add publish() methods to tools producing images (#1710)
         Read ahead output filename in cterror (#1700)

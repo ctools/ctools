@@ -483,66 +483,74 @@ $ECHO " ok"
 
 
 #
-# Test csiactcopy
-# ===============
-$ECHO -n "Test csiactcopy: "
-chmod +x @abs_top_srcdir@/cscripts/csiactcopy.py
-@abs_top_srcdir@/cscripts/csiactcopy.py \
-  remote_master="iactdata/master.json" \
-  outpath="iactdata_test" \
-  prodname="unit-test" > csiactcopy.log
-$ECHO -n "."
-if [ -s "iactdata_test/master.json" ]
-then
+# Optional tests for Python 2.6++ (scripts needing json module)
+# =============================================================
+python_version=`echo @PYTHON_VERSION@ | sed 's/\(10\.[[0-9]]*\).*/\1/' | sed -e 's/\.//g'`
+if [ $python_version -ge 26 ]; then
+
+  #
+  # Test csfindobs
+  # ==============
+  $ECHO -n "Test csfindobs: "
+  chmod +x @abs_top_srcdir@/cscripts/csfindobs.py
+  @abs_top_srcdir@/cscripts/csfindobs.py \
+    datapath="iactdata/" \
+    prodname="unit-test" \
+    ra="83.6331" \
+    dec="22.01" \
+    rad="1.0" \
+    outfile="iactrunlist.dat" > csfindobs.log
   $ECHO -n "."
-else
-  $ECHO " iactdata_test/master.json file is not valid"
-  exit 1
-fi
-$ECHO " ok"
+  if [ -s "iactrunlist.dat" ]
+  then
+    $ECHO -n "."
+  else
+    $ECHO " iactdata/runlist.txt file is not valid"
+    exit 1
+  fi
+  $ECHO " ok"
 
 
-#
-# Test csfindobs
-# ==============
-$ECHO -n "Test csfindobs: "
-chmod +x @abs_top_srcdir@/cscripts/csfindobs.py
-@abs_top_srcdir@/cscripts/csfindobs.py \
-  datapath="iactdata/" \
-  prodname="unit-test" \
-  ra="83.6331" \
-  dec="22.01" \
-  rad="1.0" \
-  outfile="iactrunlist.dat" > csfindobs.log
-$ECHO -n "."
-if [ -s "iactrunlist.dat" ]
-then
+  #
+  # Test csiactcopy
+  # ===============
+  $ECHO -n "Test csiactcopy: "
+  chmod +x @abs_top_srcdir@/cscripts/csiactcopy.py
+  @abs_top_srcdir@/cscripts/csiactcopy.py \
+    remote_master="iactdata/master.json" \
+    outpath="iactdata_test" \
+    prodname="unit-test" > csiactcopy.log
   $ECHO -n "."
-else
-  $ECHO " iactdata/runlist.txt file is not valid"
-  exit 1
-fi
-$ECHO " ok"
+  if [ -s "iactdata_test/master.json" ]
+  then
+    $ECHO -n "."
+  else
+    $ECHO " iactdata_test/master.json file is not valid"
+    exit 1
+  fi
+  $ECHO " ok"
 
 
-#
-# Test csiactobs
-# ==============
-$ECHO -n "Test csiactobs: "
-chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
-@abs_top_srcdir@/cscripts/csiactobs.py \
-  datapath="iactdata/" \
-  prodname="unit-test" \
-  infile="iactrunlist.dat" \
-  bkgpars="1" \
-  outobs="obs2.xml" \
-  outmodel="bkgmodels.xml" > csiactobs.log
-$ECHO -n "."
-if [ -s "obs2.xml" ]
-then
+  #
+  # Test csiactobs
+  # ==============
+  $ECHO -n "Test csiactobs: "
+  chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
+  @abs_top_srcdir@/cscripts/csiactobs.py \
+    datapath="iactdata/" \
+    prodname="unit-test" \
+    infile="iactrunlist.dat" \
+    bkgpars="1" \
+    outobs="obs2.xml" \
+    outmodel="bkgmodels.xml" > csiactobs.log
   $ECHO -n "."
-else
-  $ECHO " obs.xml file is not valid"
-  exit 1
-fi
-$ECHO " ok"
+  if [ -s "obs2.xml" ]
+  then
+    $ECHO -n "."
+  else
+    $ECHO " obs.xml file is not valid"
+    exit 1
+  fi
+  $ECHO " ok"
+
+fi  # Python 2.6+ specific tests

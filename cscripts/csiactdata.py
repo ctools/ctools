@@ -40,9 +40,10 @@ class csiactdata(ctools.cscript):
         Constructor.
         """
         # Set name
-        self.name     = "csiactdata"
-        self.version  = "1.0.0"
-        self.datapath = os.getenv("VHEFITS","")
+        self.name      = "csiactdata"
+        self.version   = "1.0.0"
+        self.datapath  = os.getenv("VHEFITS","")
+        self.prodnames = []
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -156,6 +157,9 @@ class csiactdata(ctools.cscript):
         data      = json.loads(json_data)    
         configs   = data["datasets"]
         
+        # Initialise array for available names
+        self.prodnames = []
+        
         # Loop over configs and display unavailable storage first        
         for config in configs:
             
@@ -163,8 +167,11 @@ class csiactdata(ctools.cscript):
             hdu = os.path.join(self.datapath, config["hduindx"])
             obs = os.path.join(self.datapath, config["obsindx"])
             
+            filename_hdu = gammalib.GFilename(str(hdu)+"[HDU_INDEX]")
+            filename_obs = gammalib.GFilename(str(obs)+"[OBS_INDEX]")
+            
             # Check if index files are available
-            if not (gammalib.is_fits(str(hdu)) and gammalib.is_fits(str(obs))):
+            if not (filename_hdu.is_fits() and filename_obs.is_fits()):
                 self.log.parformat(str(config["name"]))
                 self.log("Not available")
                 self.log("\n")
@@ -180,19 +187,48 @@ class csiactdata(ctools.cscript):
             hdu = os.path.join(self.datapath, config["hduindx"])
             obs = os.path.join(self.datapath, config["obsindx"])
             
+            filename_hdu = gammalib.GFilename(str(hdu)+"[HDU_INDEX]")
+            filename_obs = gammalib.GFilename(str(obs)+"[OBS_INDEX]")
+            
             # Check if index files are available
-            if gammalib.is_fits(str(hdu)) and gammalib.is_fits(str(obs)):   
+            if (filename_hdu.is_fits() and filename_obs.is_fits()):
                 
                 # Log data information  
                 self.log("\n")
                 self.log.header3(str(config["name"]))
+                
+                # Print important informations first
+                self.log.parformat("Name")
+                self.log(str(config["name"]))
+                self.log("\n")  
+                self.log.parformat("Observation index")
+                self.log(str(config["obsindx"]))
+                self.log("\n") 
+                self.log.parformat("HDU index")
+                self.log(str(config["hduindx"]))
+                self.log("\n") 
+                
+                # Append to available names
+                self.prodnames.append(str(config["name"]))
+                
+                # Print additional information
                 for key in config:
+                    if key in ["name","hduindx","obsindx"]:
+                        continue
                     self.log.parformat(str(key))
                     self.log(str(config[key]))
                     self.log("\n")  
 
         # Return
         return       
+
+    def names(self):
+        """ 
+        Return available FITS production names
+        """
+        
+        # Return 
+        return self.prodnames
 
 # ======================== #
 # Main routine entry point #
