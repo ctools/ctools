@@ -19,7 +19,7 @@
 # ==========================================================================
 # Python version check
 import sys
-req_version = (2,7)
+req_version = (2,6)
 cur_version = sys.version_info
 
 # List all scripts in this module
