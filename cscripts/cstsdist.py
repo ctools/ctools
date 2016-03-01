@@ -251,7 +251,11 @@ class cstsdist(ctools.cscript):
             if seed == 0:
                 file   = open(self.m_outfile.url(), 'w')
                 writer = csv.DictWriter(file, result['colnames'])
-                writer.writerow(dict((_,_) for _ in result['colnames']))
+                headers = {}
+                for n in result['colnames']:
+                    headers[n] = n
+                writer.writerow(headers)
+                #writer.writerow(dict((_,_) for _ in result['colnames']))
             else:
                 file = open(self.m_outfile.url(), 'a')
             writer = csv.DictWriter(file, result['colnames'])
