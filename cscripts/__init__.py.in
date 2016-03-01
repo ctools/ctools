@@ -48,28 +48,27 @@ if cur_version > req_version:
                     "csiactdata",
                     "csiactobs"])
 
-
 # Import
-import cscaldb
-import csinfo
-import cslightcrv
-import csmodelinfo
-import csmodelmerge
-import csobs2caldb
-import csobsdef
-import csobsinfo
-import cspull
-import csresmap
-import cssens
-import csspec
-import cstsdist
-import cstsmapmerge
-import obsutils
+from .cscaldb      import cscaldb
+from .csinfo       import csinfo
+from .cslightcrv   import cslightcrv
+from .csmodelinfo  import csmodelinfo
+from .csmodelmerge import csmodelmerge
+from .csobs2caldb  import csobs2caldb
+from .csobsdef     import csobsdef
+from .csobsinfo    import csobsinfo
+from .cspull       import cspull
+from .csresmap     import csresmap
+from .cssens       import cssens
+from .csspec       import csspec
+from .cstsdist     import cstsdist
+from .cstsmapmerge import cstsmapmerge
+from . import obsutils
 if cur_version > req_version:
-    import csfindobs
-    import csiactcopy
-    import csiactdata
-    import csiactobs
+    from .csfindobs    import csfindobs
+    from .csiactcopy   import csiactcopy
+    from .csiactdata   import csiactdata
+    from .csiactobs    import csiactobs
 
 # Delete version check variables
 del sys
