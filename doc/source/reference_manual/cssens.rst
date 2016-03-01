@@ -31,7 +31,7 @@ containing the sensitivity as function of energy. The first row is a header
 row providing the column names. The following rows provide the mean
 logarithmic energy and the boundaries of the energy bin for which the
 sensitivity was computed. They also provide the flux within the energy bin
-in Crab units, in photons (ph/cm2/s) and in energy (ers/cm2/s). Finally, 
+in Crab units, in photons (ph/cm2/s) and in energy (erg/cm2/s). Finally, 
 the sensitivity is given as the test source spectrum evaluated at the mean 
 logarithmic energy multiplied by the energy squared (erg/cm2/s).
 
@@ -120,7 +120,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether an existing output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctobssim tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -84,8 +84,11 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctobssim: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in ctobssim.")
+            msg = "Exception occured in ctobssim."
+            self.test_try_failure(msg)
 
         # Retrieve observation and check content
         obs = gammalib.GCTAObservation(sim.obs()[0])
@@ -97,15 +100,18 @@ class Test(gammalib.GPythonTestSuite):
         self.test_value(obs.livetime(), 1710.0, 1.0e-6, "Livetime is not 1710 sec")
         self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6, "ROI Right Ascension is not 83.63 deg")
         self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6, "ROI Declination is not 22.01 deg")
-        self.test_value(evt.size(), 4134, "Number of events is not 4134")
+        self.test_value(evt.size(), 4119, "Number of events is not 4119")
 
         # Save events
         self.test_try("Save events")
         try:
             sim.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving events: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving events.")
+            msg = "Exception occured in saving events."
+            self.test_try_failure(msg)
 
     # Test ctobssim on observation container
     def test_container(self):
@@ -124,8 +130,11 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctobssim: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in ctobssim.")
+            msg = "Exception occured in ctobssim."
+            self.test_try_failure(msg)
 
         # Retrieve observation and check content
         self.test_value(sim.obs().size(), 4, "There are not 4 observations")
@@ -135,8 +144,11 @@ class Test(gammalib.GPythonTestSuite):
         try:
             sim.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving events: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving events.")
+            msg = "Exception occured in saving events."
+            self.test_try_failure(msg)
 
     # Setup observation container
     def set_obs(self, number):

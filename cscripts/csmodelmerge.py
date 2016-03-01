@@ -121,7 +121,7 @@ class csmodelmerge(ctools.cscript):
             msg = "Parameter \"inmodels\" must contain either an @ASCII"+\
                   " file, a comma-separated or whitespace-separated list"+\
                   " of files or a wildcard string"
-            raise gammalib.GException.invalid_argument("csmodelmerge::get_parameters", msg) 
+            raise RuntimeError(msg) 
         
         # Get output file
         self.outmodel = self["outmodel"].filename()

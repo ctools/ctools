@@ -12,6 +12,7 @@ sources = cttsmap.cpp
 # Libtool library
 noinst_LTLIBRARIES = libcttsmap.la
 libcttsmap_la_SOURCES = $(sources)
+libcttsmap_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 cttsmap_SOURCES = main.cpp

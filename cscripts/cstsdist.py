@@ -3,7 +3,7 @@
 # This script generates the TS distribution for a particular model based
 # on Monte-Carlo simulations.
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -249,11 +249,15 @@ class cstsdist(ctools.cscript):
 
             # Write out result immediately
             if seed == 0:
-                file = open(self.m_outfile, 'w')
+                file   = open(self.m_outfile.url(), 'w')
                 writer = csv.DictWriter(file, result['colnames'])
-                writer.writerow(dict((_,_) for _ in result['colnames']))
+                headers = {}
+                for n in result['colnames']:
+                    headers[n] = n
+                writer.writerow(headers)
+                #writer.writerow(dict((_,_) for _ in result['colnames']))
             else:
-                file = open(self.m_outfile, 'a')
+                file = open(self.m_outfile.url(), 'a')
             writer = csv.DictWriter(file, result['colnames'])
             writer.writerow(result['values'])
             file.close()
@@ -275,7 +279,7 @@ class cstsdist(ctools.cscript):
         if not model.has_par("Prefactor"):
             msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
                   " Only spectral models with a \"Prefactor\" parameter are supported."
-            raise gammalib.GException.invalid_value("cssens", msg)
+            raise RuntimeError(msg)
 
         # Fit or fix spatial parameters
         if fitpos:

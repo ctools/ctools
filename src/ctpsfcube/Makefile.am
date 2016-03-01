@@ -12,6 +12,7 @@ sources = ctpsfcube.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctpsfcube.la
 libctpsfcube_la_SOURCES = $(sources)
+libctpsfcube_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctpsfcube_SOURCES = main.cpp

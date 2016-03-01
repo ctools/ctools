@@ -2,7 +2,7 @@
 # ==========================================================================
 # Residual map generation script.
 #
-# Copyright (C) 2014-2015 Michael Mayer
+# Copyright (C) 2014-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,18 +36,19 @@ class csresmap(ctools.cscript):
         """
         Constructor.
         """
-
         # Set name
         self.name    = "csresmap"
-        self.version = "1.0.0"
+        self.version = "1.1.0"
 
         # Initialise some members
         self.obs            = None 
         self.algorithm      = "SUB"
         self.resmap         = None
         self.m_modcube      = "None"
+        self.m_outmap       = "None"
         self.m_use_maps     = False
         self.m_skip_binning = False
+        self.m_publish      = False
 
         # Initialise some members
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
@@ -126,6 +127,7 @@ class csresmap(ctools.cscript):
             pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
             pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
             pars.append(gammalib.GApplicationPar("algorithm","s","a","SUBDIV","SUB|SUBDIV|SUBDIVSQRT","","Residual map computation algorithm"))
+            pars.append(gammalib.GApplicationPar("publish","b","h","no","","","Publish residual map on VO Hub?"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csresmap.log","","","Log filename"))
             pars.save(parfile)
@@ -143,9 +145,10 @@ class csresmap(ctools.cscript):
 
         # First check if the inobs parameter is a counts cube
         if self.obs.size() == 0 and self["inobs"].filename() != "NONE":
-            if gammalib.is_fits(self["inobs"].filename()):
+            filename = gammalib.GFilename(self["inobs"].filename())
+            if filename.is_fits():
                 cta = gammalib.GCTAObservation()
-                cta.load(self["inobs"].filename())
+                cta.load(filename)
                 if cta.eventtype() == "CountsCube":
                     self.m_skip_binning = True
 
@@ -192,17 +195,21 @@ class csresmap(ctools.cscript):
                 self.m_binsz     = self["binsz"].real()
                 
         # Read energy dispersion flag
-        self.m_edisp     = self["edisp"].boolean()
+        self.m_edisp = self["edisp"].boolean()
 
-        # Read necessary parameters
-        self.m_outfile   = self["outmap"].filename()    
+        # Read algorithm
         self.m_algorithm = self["algorithm"].string()
 
-        # Set some fixed parameters
+        # Read standard parameters
+        self.m_publish = self["publish"].boolean()
         self.m_log     = False # Logging in client tools
         self.m_chatter = self["chatter"].integer()
         self.m_clobber = self["clobber"].boolean()
         self.m_debug   = self["debug"].boolean()
+
+        # Read ahead output parameters
+        if (self.read_ahead()):
+            self.m_outmap = self["outmap"].filename()
 
         # Return
         return
@@ -221,11 +228,64 @@ class csresmap(ctools.cscript):
         """
         Execute the script.
         """
+        # Read ahead output parameters
+        self.read_ahead(True)
+
         # Run the script
         self.run()
 
         # Save residual map
-        self.resmap.save(self.m_outfile, self.m_clobber)
+        self.save()
+
+        # Return
+        return
+
+    def save(self):
+        """
+        Save residual map.
+        """
+        # Write header
+        if self.logTerse():
+            self.log("\n")
+            self.log.header1("Save residual map")
+
+        # Continue only filename and residual map are valid
+        if self.m_outmap != "None" and self.resmap != None:
+
+            # Log file name
+            if self.logTerse():
+                self.log("Save residual map into \""+self.m_outmap+"\".\n")
+
+            # Save residual map
+            self.resmap.save(self.m_outmap, self.m_clobber)
+
+        # Return
+        return
+
+    def publish(self, name=""):
+        """
+        Publish residual map.
+        """
+        # Write header
+        if self.logTerse():
+            self.log("\n")
+            self.log.header1("Publish sky map")
+
+        # Continue only if residual map is valid
+        if self.resmap != None:
+        
+            # Set default name is user name is empty
+            if not name:
+                user_name = self.name
+            else:
+                user_name = name
+
+            # Log map name
+            if self.logTerse():
+                self.log("Publish residual map \""+user_name+"\".\n")
+
+            # Publish map
+            self.resmap.publish(user_name)
 
         # Return
         return
@@ -351,6 +411,10 @@ class csresmap(ctools.cscript):
 
             # Raise error if algorithm is unkown
             raise TypeError("Algorithm \""+self.m_algorithm+"\" not known")
+
+        # Optionally publish map
+        if self.m_publish:
+            self.publish()
 
         # Return
         return

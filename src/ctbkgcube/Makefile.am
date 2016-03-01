@@ -12,6 +12,7 @@ sources = ctbkgcube.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctbkgcube.la
 libctbkgcube_la_SOURCES = $(sources)
+libctbkgcube_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctbkgcube_SOURCES = main.cpp

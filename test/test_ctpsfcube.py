@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctpsfcube tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -90,16 +90,22 @@ class Test(gammalib.GPythonTestSuite):
         try:
             psfcube.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctpsfcube: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in ctpsfcube.")
+            msg = "Exception occured in ctpsfcube."
+            self.test_try_failure(msg)
 
         # Save PSF cube
         self.test_try("Save PSF cube")
         try:
             psfcube.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving PSF cube: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving PSF cube.")
+            msg = "Exception occured in saving PSF cubes."
+            self.test_try_failure(msg)
 
         # Return
         return

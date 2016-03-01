@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -70,15 +70,23 @@ protected:
     void        copy_members(const ctselect& app);
     void        free_members(void);
     void        get_parameters(void);
-    void        select_events(GCTAObservation* obs, const std::string& filename);
+    void        select_events(GCTAObservation* obs,
+                              const std::string& filename,
+                              const std::string& evtname,
+                              const std::string& gtiname);
     GEbounds    set_ebounds(GCTAObservation* obs,
                             const GEbounds& ebounds) const;
-    std::string check_infile(const std::string& filename) const;
+    std::string check_infile(const std::string& filename,
+                             const std::string& evtname) const;
     std::string set_outfile_name(const std::string& filename) const;
+    std::string get_gtiname(const std::string& filename,
+                            const std::string& evtname) const;
     void        save_fits(void);
     void        save_xml(void);
     void        save_event_list(const GCTAObservation* obs,
                                 const std::string&     infile,
+                                const std::string&     evtname,
+                                const std::string&     gtiname,
                                 const std::string&     outfile) const;
 
     // User parameters
@@ -98,12 +106,13 @@ protected:
     // Protected members
     GObservations            m_obs;           //!< Observations container
     std::vector<std::string> m_infiles;       //!< Input event filenames
+    std::vector<std::string> m_evtname;       //!< Event extension names
+    std::vector<std::string> m_gtiname;       //!< GTI extension names
     GTime                    m_timemin;       //!< Earliest time
     GTime                    m_timemax;       //!< Latest time
     bool                     m_select_energy; //!< Perform energy selection
     bool                     m_select_roi;    //!< Perform ROI selection
     bool                     m_select_time;   //!< Perform time selection
-
 };
 
 

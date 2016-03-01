@@ -2,7 +2,7 @@
 # ==========================================================================
 # Dump information about observation into log file
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,6 +39,14 @@ class csobsinfo(ctools.cscript):
         # Set name
         self.name    = "csobsinfo"
         self.version = "1.1.0"
+
+        # Initialise some members
+        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
+            self.obs = argv[0]
+            argv     = argv[1:]
+        else:      
+            self.obs = gammalib.GObservations()
+            self.obs.clear()   
 
         # Make sure that parfile exists
         file = self.parfile()
@@ -99,9 +107,10 @@ class csobsinfo(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        # Get parameters     
-        self.require_inobs("csobsinfo::get_parameters")
-        self.obs = self.get_observations(False)
+        # Get parameters   
+        if self.obs.size() == 0:  
+            self.require_inobs("csobsinfo::get_parameters")
+            self.obs = self.get_observations(False)
         
         # Initialise object position
         self.obj_dir = gammalib.GSkyDir()
@@ -137,16 +146,16 @@ class csobsinfo(ctools.cscript):
         
         # Initialise arrays to store certain values for reuse
         # Todo, think about using a python dictionary
-        self.offsets  = []
-        self.zeniths  = []
-        self.azimuths = []
+        self.m_offsets  = []
+        self.m_zeniths  = []
+        self.m_azimuths = []
         self.pnt_ra   = []
         self.pnt_dec  = []
         obs_names     = []
         
         # Initialise output to be filled
-        self.ebounds   = gammalib.GEbounds()
-        self.gti       = gammalib.GGti()
+        self.m_ebounds   = gammalib.GEbounds()
+        self.m_gti       = gammalib.GGti()
         ontime         = 0.0
         livetime       = 0.0
         n_events       = 0
@@ -186,9 +195,7 @@ class csobsinfo(ctools.cscript):
             obs_gti = obs.events().gti()
             
             # Compute mean time and dead time fraction in percent
-            tmean    = (obs_gti.tstart() + obs_gti.tstop())
-            tmean   *= 0.5
-            deadfrac = (1.0-obs.deadc(tmean))*100.0
+            deadfrac = (1.0-obs.deadc())*100.0
             
             # Retrieve pointing and store Ra,Dec
             pnt_dir = obs.pointing().dir()  
@@ -197,13 +204,13 @@ class csobsinfo(ctools.cscript):
             
             # If avaliable append energy boundaries
             if obs_bounds.size() > 0 : 
-                self.ebounds.merge(obs_bounds.emin(),obs_bounds.emax())
+                self.m_ebounds.append(obs_bounds.emin(),obs_bounds.emax())
             
             # Append time interval
-            self.gti.merge(obs_gti.tstart(), obs_gti.tstop())
+            self.m_gti.append(obs_gti.tstart(), obs_gti.tstop())
             
-            # increment global livetime and ontime
-            ontime += obs.ontime()
+            # Increment global livetime and ontime
+            ontime   += obs.ontime()
             livetime += obs.livetime()
             
             # Log the event type (binned or unbinned)
@@ -271,18 +278,18 @@ class csobsinfo(ctools.cscript):
                 # Log offset if possible
                 if self.m_offset:
                     offset = pnt_dir.dist_deg(self.obj_dir)
-                    self.offsets.append(offset)
+                    self.m_offsets.append(offset)
                     self.log.parformat("Offset")
                     self.log("%.2f" % (offset))
                     self.log("\n")
                 else:
-                    self.offsets.append(-1.0)
+                    self.m_offsets.append(-1.0)
                     
                 # Retrieve zenith and azimuth and store for later use
                 zenith = obs.pointing().zenith()
                 azimuth = obs.pointing().azimuth()
-                self.zeniths.append(zenith)
-                self.azimuths.append(azimuth)
+                self.m_zeniths.append(zenith)
+                self.m_azimuths.append(azimuth)
                 
                 # Log Zenith and Azimuth if required
                 if self.logExplicit():
@@ -317,15 +324,15 @@ class csobsinfo(ctools.cscript):
         # Log mean offset if possible
         if self.m_offset:
             self.log.parformat("Mean offset angle")
-            self.log("%.2f" % (sum(self.offsets)/len(self.offsets)))
+            self.log("%.2f" % (sum(self.m_offsets)/len(self.m_offsets)))
             self.log("\n")
         
         # Log mean azimuth and zenith angle
         self.log.parformat("Mean zenith angle")
-        self.log("%.2f" % (sum(self.zeniths)/len(self.zeniths)))
+        self.log("%.2f" % (sum(self.m_zeniths)/len(self.m_zeniths)))
         self.log("\n")
         self.log.parformat("Mean azimuth angle")
-        self.log("%.2f" % (sum(self.azimuths)/len(self.azimuths)))
+        self.log("%.2f" % (sum(self.m_azimuths)/len(self.m_azimuths)))
         self.log("\n")
         
         # Log name of observations if requested
@@ -340,25 +347,25 @@ class csobsinfo(ctools.cscript):
         # Log energy range
         self.log.header3("Energy range")
         self.log.parformat("Emin")
-        if self.ebounds.size() == 0:
+        if self.m_ebounds.size() == 0:
             self.log("undefined")
         else:
-            self.log(str(self.ebounds.emin()))
+            self.log(str(self.m_ebounds.emin()))
         self.log("\n")
         self.log.parformat("Emax")
-        if self.ebounds.size() == 0:
+        if self.m_ebounds.size() == 0:
             self.log("undefined")
         else:
-            self.log(str(self.ebounds.emax()))
+            self.log(str(self.m_ebounds.emax()))
         self.log("\n\n")
         
         # Log time range
         self.log.header3("Time range")
         self.log.parformat("Start [MJD]")
-        self.log(str(self.gti.tstart().mjd()))
+        self.log(str(self.m_gti.tstart().mjd()))
         self.log("\n")
         self.log.parformat("Stop [MJD]")
-        self.log(str(self.gti.tstop().mjd()))
+        self.log(str(self.m_gti.tstop().mjd()))
         self.log("\n")  
         
         # Log ontime and livetime in different units      
@@ -381,7 +388,7 @@ class csobsinfo(ctools.cscript):
         if not self.ds9file == "NONE":      
             
             # Open file   
-            f = open(self.ds9file,"w")
+            f = open(self.ds9file.url(),"w")
             
             # Write coordinate system
             f.write("fk5\n")
@@ -408,31 +415,31 @@ class csobsinfo(ctools.cscript):
         """
         Return zenith angles
         """
-        return self.zeniths
+        return self.m_zeniths
     
     def azimuths(self):
         """
         Return azimuth angles
         """
-        return self.azimuths
+        return self.m_azimuths
     
     def offsets(self):
         """
         Return offset angles
         """
-        return self.offsets
+        return self.m_offsets
 
     def ebounds(self):
         """
         Return energy boundaries
         """
-        return self.ebounds
+        return self.m_ebounds
     
     def gti(self):
         """
         Return good time intervals
         """
-        return self.gti
+        return self.m_gti
             
     def execute(self):
         """

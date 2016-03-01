@@ -12,6 +12,7 @@ sources = ctulimit.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctulimit.la
 libctulimit_la_SOURCES = $(sources)
+libctulimit_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctulimit_SOURCES = main.cpp

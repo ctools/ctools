@@ -1,0 +1,9 @@
+{
+    "datasets": [
+        {
+            "name": "unit-test",
+	    "obsindx": "obs-index.fits.gz",
+            "hduindx": "hdu-index.fits.gz"
+        }
+    ]
+}

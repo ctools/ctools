@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctbutterfly tool.
 #
-# Copyright (C) 2014 Michal Mayer
+# Copyright (C) 2014-2016 Michal Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -81,16 +81,22 @@ class Test(gammalib.GPythonTestSuite):
         try:
             butterfly.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctbutterfly: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in butterfly.")
+            msg = "Exception occured in ctbutterfly."
+            self.test_try_failure(msg)
 
         # Save results
         self.test_try("Save results")
         try:
             butterfly.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving butterfly diagram: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving results.")
+            msg = "Exception occured in saving butterfly diagram."
+            self.test_try_failure(msg)
 
         # Return
         return

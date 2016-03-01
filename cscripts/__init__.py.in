@@ -1,7 +1,7 @@
 # ==========================================================================
 # cscripts Python module
 #
-# Copyright (C) 2015 Juergen Knoedlseder
+# Copyright (C) 2015-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,35 +17,64 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+# Python version check
+import sys
+req_version = (2,7)
+cur_version = sys.version_info
 
 # List all scripts in this module
 __all__ = [
     "cscaldb",
-    "cshessobs",
     "csinfo",
     "cslightcrv",
+    "csmodelinfo",
+    "csmodelmerge",
+    "csobs2caldb",
     "csobsdef",
+    "csobsinfo",
     "cspull",
     "csresmap",
     "cssens",
     "csspec",
     "cstsdist",
+    "cstsmapmerge",
+    "csfindobs",
     "obsutils",
     "test",
 ]
+if cur_version > req_version:
+    __all__.extend(["csfindobs",
+                    "csiactcopy",
+                    "csiactdata",
+                    "csiactobs"])
+
 
 # Import
-from .cscaldb    import cscaldb
-from .cshessobs  import cshessobs
-from .csinfo     import csinfo
-from .cslightcrv import cslightcrv
-from .csobsdef   import csobsdef
-from .cspull     import cspull
-from .csresmap   import csresmap
-from .cssens     import cssens
-from .csspec     import csspec
-from .cstsdist   import cstsdist
-from . import obsutils
+import cscaldb
+import csinfo
+import cslightcrv
+import csmodelinfo
+import csmodelmerge
+import csobs2caldb
+import csobsdef
+import csobsinfo
+import cspull
+import csresmap
+import cssens
+import csspec
+import cstsdist
+import cstsmapmerge
+import obsutils
+if cur_version > req_version:
+    import csfindobs
+    import csiactcopy
+    import csiactdata
+    import csiactobs
+
+# Delete version check variables
+del sys
+del req_version
+del cur_version
 
 # Add test function
 def test():

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -353,9 +353,19 @@ void ctlike::save(void)
     // Get output filename
     m_outmodel = (*this)["outmodel"].filename();
 
-    // Write results out as XML model
-    if (gammalib::toupper(m_outmodel) != "NONE") {
+    // Save only if filename is non-empty
+    if (!m_outmodel.is_empty() &&
+        gammalib::toupper(m_outmodel.url()) != "NONE") {
+
+        // Log filename
+        if (logTerse()) {
+            log << "Save fitted parameters into file \""+m_outmodel+"\".";
+            log << std::endl;
+        }
+
+        // Write results out as XML model
         m_obs.models().save(m_outmodel);
+
     }
 
     // Return
@@ -441,7 +451,9 @@ void ctlike::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Optimize model parameters using Levenberg-Marquardt method
+ * @brief Optimise model parameters
+ *
+ * Optimise model parameters using a maximum likelihood fit.
  ***************************************************************************/
 void ctlike::optimize_lm(void)
 {
@@ -518,8 +530,10 @@ void ctlike::optimize_lm(void)
 
 
 /***********************************************************************//**
- * @brief Re-optimize model parameters using Levenberg-Marquardt method
- *        for TS computation
+ * @brief Re-optimise model parameters for TS computation
+ *
+ * Re-optimise the model parameters using a maximum likelihood fit for
+ * computation of the Test Statistic value for a given source.
  ***************************************************************************/
 double ctlike::reoptimize_lm(void)
 {
@@ -530,23 +544,26 @@ double ctlike::reoptimize_lm(void)
         log.indent(1);
     }
 
+    // Create a clone of the optimizer for the re-optimisation
+    GOptimizer* opt = m_opt->clone();
+
     // Perform LM optimization
-    m_obs.optimize(*m_opt);
+    m_obs.optimize(*opt);
 
     // Optionally refit
     if (m_refit) {
-        m_obs.optimize(*m_opt);
+        m_obs.optimize(*opt);
     }
 
     // Store maximum log likelihood value
-    double logL = -(m_opt->value());
+    double logL = -(opt->value());
 
     // Write optimization results
     log.indent(0);
     if (logTerse()) {
         log << std::endl;
         log.header1("Maximum likelihood re-optimisation results");
-        log << *m_opt << std::endl;
+        log << *opt << std::endl;
     }
 
     // Return

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "1.0.0"
+#define CTBIN_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -78,6 +78,7 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
+    void                 publish(const std::string& name = "");
     const GObservations& obs(void) const;
     GCTAEventCube        cube(void) const;
 
@@ -91,8 +92,9 @@ protected:
     void obs_cube(void);
 
     // User parameters
-    std::string   m_outcube;    //!< Output counts map file
+    GFilename     m_outcube;    //!< Output counts map file name
     bool          m_usepnt;     //!< Use pointing instead of xref/yref parameters
+    bool          m_publish;    //!< Publish counts cube?
 
     // Protected members
     GObservations m_obs;        //!< Observation container

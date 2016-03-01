@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generation of an caldb entry from general IACT observation.
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -141,21 +141,27 @@ class csobs2caldb(ctools.cscript):
         
         # retrieve response component
         rsp = self.observation.response()
-    
+        
         # Initialise FITS file
         fits = gammalib.GFits()
+        
+        # Create GFilename instances
+        fname_aeff  = gammalib.GFilename(rsp.aeff().filename())
+        fname_psf   = gammalib.GFilename(rsp.psf().filename())
+        fname_edisp = gammalib.GFilename(rsp.edisp().filename())
+        fname_bkg   = gammalib.GFilename(rsp.background().filename())
     
         # Open FITS files of response components
-        fits_aeff  = gammalib.GFits(rsp.aeff().filename())
-        fits_psf   = gammalib.GFits(rsp.psf().filename())
-        fits_edisp = gammalib.GFits(rsp.edisp().filename())
-        fits_bkg   = gammalib.GFits(rsp.background().filename())
+        fits_aeff  = gammalib.GFits(fname_aeff)
+        fits_psf   = gammalib.GFits(fname_psf)
+        fits_edisp = gammalib.GFits(fname_edisp)
+        fits_bkg   = gammalib.GFits(fname_bkg)
         
         # Bundle IRFs into one file
-        fits.append(fits_aeff["EFFECTIVE AREA"])
-        fits.append(fits_psf["POINT SPREAD FUNCTION"])
-        fits.append(fits_edisp["ENERGY DISPERSION"])
-        fits.append(fits_bkg["BACKGROUND"])
+        fits.append(fits_aeff[fname_aeff.extname("EFFECTIVE AREA")])
+        fits.append(fits_psf[fname_psf.extname("POINT SPREAD FUNCTION")])
+        fits.append(fits_edisp[fname_edisp.extname("ENERGY DISPERSION")])
+        fits.append(fits_bkg[fname_bkg.extname("BACKGROUND")])
         
         # Return fits file
         return fits

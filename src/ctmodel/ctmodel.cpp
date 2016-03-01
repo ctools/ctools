@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -284,7 +284,7 @@ void ctmodel::run(void)
 
         // Fill cube and leave loop if we are binned mode (meaning we 
         // only have one binned observation)
-        if (m_binned && m_obs.size() == 1) {
+        if (m_binned) {
             fill_cube(obs);
             break;
         }
@@ -303,8 +303,7 @@ void ctmodel::run(void)
         fill_cube(obs);
 
         // Dispose events to free memory if event file exists on disk
-        if (obs->eventfile().length() > 0 &&
-            gammalib::file_exists(obs->eventfile())) {
+        if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
             obs->dispose_events();
         }
 
@@ -323,6 +322,11 @@ void ctmodel::run(void)
         if (obs != NULL) {
             obs->response()->apply_edisp(save_edisp[i]);
         }
+    }
+
+    // Optionally publish model cube
+    if (m_publish) {
+        publish();
     }
 
     // Return
@@ -344,21 +348,54 @@ void ctmodel::save(void)
         log.header1("Save cube");
     }
 
-    // Make sure we have the FITS filename
+    // Get model cube filename
     m_outcube = (*this)["outcube"].filename();
 
     // Save only if filename is non-empty
-    if (m_outcube.length() > 0) {
+    if (!m_outcube.is_empty()) {
 
-        // Dump filename
+        // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outcube+"\"" << std::endl;
+            log << "Save model cube into file \""+m_outcube+"\".";
+            log << std::endl;
         }
 
         // Save model cube into FITS file
         m_cube.save(m_outcube, clobber());
 
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish model cube
+ *
+ * @param[in] name Model cube name.
+ ***************************************************************************/
+void ctmodel::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish model cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTMODEL_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << "Publish \""+user_name+"\" model cube." << std::endl;
+    }
+
+    // Publish model cube
+    m_cube.map().publish(user_name);
 
     // Return
     return;
@@ -404,6 +441,7 @@ void ctmodel::init_members(void)
     // Initialise members
     m_outcube.clear();
     m_apply_edisp = false;
+    m_publish     = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -411,7 +449,7 @@ void ctmodel::init_members(void)
     m_gti.clear();
     m_has_cube    = false;
     m_append_cube = false;
-    m_binned = false;
+    m_binned      = false;
 
     // Return
     return;
@@ -428,6 +466,7 @@ void ctmodel::copy_members(const ctmodel& app)
     // Copy attributes
     m_outcube     = app.m_outcube;
     m_apply_edisp = app.m_apply_edisp;
+    m_publish     = app.m_publish;
 
     // Copy protected members
     m_obs         = app.m_obs;
@@ -435,7 +474,7 @@ void ctmodel::copy_members(const ctmodel& app)
     m_gti         = app.m_gti;
     m_has_cube    = app.m_has_cube;
     m_append_cube = app.m_append_cube;
-    m_binned    = app.m_binned;
+    m_binned      = app.m_binned;
 
     // Return
     return;
@@ -464,13 +503,16 @@ void ctmodel::get_parameters(void)
     m_append_cube = false;
 
     // If there are no observations in container then load them via user
-    // parameters
+    // parameters.
     if (m_obs.size() == 0) {
-        m_obs = get_observations();
+        get_obs();
     }
 
-    // Check if we got excactly one binned CTA observation
-    if (m_obs.size() == 1) {
+    // If we have now excactly one CTA observation (but no cube has yet been
+    // appended to the observation) then check whether this observation
+    // is a binned observation, and if yes, extract the counts cube for
+    // model generation
+    if ((m_obs.size() == 1) && (m_append_cube == false)) {
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
@@ -498,7 +540,6 @@ void ctmodel::get_parameters(void)
 
     } // endif: had exactly one observation
 
-
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
 
@@ -513,7 +554,9 @@ void ctmodel::get_parameters(void)
     // Get energy dispersion flag parameters
     m_apply_edisp = (*this)["edisp"].boolean();
 
-    // Optionally get input counts cube for model cube definition
+    // If we do not have yet a counts cube for model computation then check
+    // whether we should read it from the "incube" parameter or whether we
+    // should create it from scratch using the task parameters
     if (!m_has_cube) {
 
         // Read cube definition file
@@ -544,18 +587,24 @@ void ctmodel::get_parameters(void)
 
         // Signal that cube has been set
         m_has_cube = true;
-    }
+
+    } // endif: we had no cube yet
+
+    // Get remaining parameters
+    m_publish = (*this)["publish"].boolean();
 
     // Read optionally output cube filenames
     if (read_ahead()) {
-           m_outcube = (*this)["outcube"].filename();
+        m_outcube = (*this)["outcube"].filename();
     }
 
     // If cube should be appended to first observation then do that now.
     // This is a kluge that makes sure that the cube is passed as part
     // of the observation in case that a cube response is used. The kluge
     // is needed because the GCTACubeSourceDiffuse::set method needs to
-    // get the full event cube from the observation.
+    // get the full event cube from the observation. It is also at this
+    // step that the GTI, which may just be a dummy GTI when create_cube()
+    // has been used, will be set.
     if (m_append_cube) {
 
         //TODO: Check that energy boundaries are compatible
@@ -570,6 +619,144 @@ void ctmodel::get_parameters(void)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get observation container
+ *
+ * Get an observation container according to the user parameters. The method
+ * supports loading of a individual FITS file or an observation definition
+ * file in XML format.
+ *
+ * If the input filename is empty, the method checks for the existence of the
+ * "expcube", "psfcube" and "bkgcube" parameters. If file names have been
+ * specified, the method loads the files and creates a dummy events cube that
+ * is appended to the observation container.
+ *
+ * If no file names are specified for the "expcube", "psfcube" or "bkgcube"
+ * parameters, the method reads the necessary parameters to build a CTA
+ * observation from scratch.
+ *
+ * The method sets m_append_cube = true and m_binned = true in case that
+ * a stacked observation is requested (as detected by the presence of the
+ * "expcube", "psfcube", and "bkgcube" parameters). In that case, it appended
+ * a dummy event cube to the observation.
+ ***************************************************************************/
+void ctmodel::get_obs(void)
+{
+    // Get the filename from the input parameters
+    std::string filename = (*this)["inobs"].filename();
+
+    // If no observation definition file has been specified then read all
+    // parameters that are necessary to create an observation from scratch
+    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
+
+        // Get response cube filenames
+        std::string expcube = (*this)["expcube"].filename();
+        std::string psfcube = (*this)["psfcube"].filename();
+        std::string bkgcube = (*this)["bkgcube"].filename();
+
+        // If the filenames are valid then build an observation from cube
+        // response information
+        if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
+            (gammalib::strip_whitespace(expcube) != "") &&
+            (gammalib::strip_whitespace(psfcube) != "") &&
+            (gammalib::strip_whitespace(bkgcube) != "")) {
+
+            // Get exposure, PSF and background cubes
+            GCTACubeExposure   exposure(expcube);
+            GCTACubePsf        psf(psfcube);
+            GCTACubeBackground background(bkgcube);
+
+            // Create energy boundaries
+            GEbounds ebounds = create_ebounds();
+
+            // Create dummy sky map cube
+            GSkyMap map("CAR","GAL",0.0,0.0,1.0,1.0,1,1,ebounds.size());
+
+            // Create event cube
+            GCTAEventCube cube(map, ebounds, exposure.gti());
+
+            // Create CTA observation
+            GCTAObservation cta;
+            cta.events(cube);
+            cta.response(exposure, psf, background);
+
+            // Append observation to container
+            m_obs.append(cta);
+
+            // Signal that we are in binned mode
+            m_binned = true;
+
+            // Signal that we appended a cube
+            m_append_cube = true;
+
+        } // endif: cube response information was available
+
+        // ... otherwise build an observation from IRF response information
+        else {
+
+            // Create CTA observation
+            GCTAObservation cta = create_cta_obs();
+
+            // Set response
+            set_obs_response(&cta);
+
+            // Append observation to container
+            m_obs.append(cta);
+
+        }
+
+    } // endif: filename was "NONE" or ""
+
+    // ... otherwise we have a file name
+    else {
+
+        // If file is a FITS file then create an empty CTA observation
+        // and load file into observation
+        if (GFilename(filename).is_fits()) {
+
+            // Allocate empty CTA observation
+            GCTAObservation cta;
+
+            // Load data
+            cta.load(filename);
+
+            // Set response
+            set_obs_response(&cta);
+
+            // Append observation to container
+            m_obs.append(cta);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+
+        }
+
+        // ... otherwise load file into observation container
+        else {
+
+            // Load observations from XML file
+            m_obs.load(filename);
+
+            // For all observations that have no response, set the response
+            // from the task parameters
+            set_response(m_obs);
+
+            // Set observation boundary parameters (emin, emax, rad)
+            set_obs_bounds(m_obs);
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+        } // endelse: file was an XML file
+
+    }
+
+    // Return
+    return;
+
 }
 
 

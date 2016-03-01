@@ -11,7 +11,7 @@ Synopsis
 
 This script generates pull distributions for all free model parameters.
 The pull is defined as the fitted model parameter value minus the true
-value, devided by the parameter error. cspull will perform ``ntrials`` 
+value, divided by the parameter error. cspull will perform ``ntrials`` 
 statistically independent Monte Carlo simulations followed by maximum
 likelihood model fitting to derive the pull distribution for each free
 model parameter. If the model fit is unbiased and the parameters are 
@@ -121,7 +121,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether an existing output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

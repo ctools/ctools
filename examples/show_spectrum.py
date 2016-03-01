@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script shows a spectrum created with csspec
 #
-# Copyright (C) 2015 Juergen Knoedlseder
+# Copyright (C) 2015-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,6 @@ if __name__ == "__main__":
     plt.grid()
     plt.errorbar(energies, flux, yerr=e_flux, xerr=[ed_engs, eu_engs], fmt='ro')
     plt.errorbar(ul_energies, ul_flux, xerr=[ul_ed_engs, ul_eu_engs], yerr=1.0e-11, uplims=True, fmt='ro')
-    plt.xlabel("Energy [TeV]")
-    plt.ylabel(r"dN/dE [erg cm$^{-2}$ s$^{-1}$]")    
+    plt.xlabel("Energy (TeV)")
+    plt.ylabel(r"E dN/dE (erg cm$^{-2}$ s$^{-1}$)")    
     plt.show()

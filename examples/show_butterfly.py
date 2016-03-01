@@ -76,5 +76,5 @@ if __name__ == "__main__":
     plt.plot(line_x,line_y,color='black',ls='-')
     plt.fill(butterfly_x,butterfly_y,color='green',alpha=0.5)
     plt.xlabel("Energy (MeV)")
-    plt.ylabel(r"dN/dE (MeV$^{-1}$ s$^{-1}$ cm$^{-2}$)")    
+    plt.ylabel(r"E dN/dE (MeV$^{-1}$ s$^{-1}$ cm$^{-2}$)")    
     plt.show()

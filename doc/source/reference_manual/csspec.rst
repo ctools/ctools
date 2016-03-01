@@ -16,7 +16,7 @@ source of interest (hidden parameter ``fix_srcs``) or to fix the background
 model component(s) (hidden parameter ``fix_bkg``). The script computes the
 source flux and its uncertainty in each spectral bin, as well as the
 significance of the source detection. Optionally, it also computes an upper
-flux limit that is particularily useful in case that the source is not
+flux limit that is particularly useful in case that the source is not
 significantly detected within a spectral bin (hidden parameter ``calc_ulim``).
 
 The script works on binned and unbinned data.
@@ -123,7 +123,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether an existing source spectrum output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

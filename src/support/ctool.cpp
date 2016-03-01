@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -327,7 +327,7 @@ GObservations ctool::get_observations(const bool& get_response)
 
         // If file is a FITS file then create an empty CTA observation
         // and load file into observation
-        if (gammalib::is_fits(filename)) {
+        if (GFilename(filename).is_fits()) {
 
             // Allocate empty CTA observation
             GCTAObservation cta_obs;
@@ -414,26 +414,38 @@ GEbounds ctool::create_ebounds(void)
         // Get filename
         std::string ebinfile = (*this)["ebinfile"].filename();
 
-        // Open energy boundary file using the EBOUNDS or ENERGYBINS
-        // extension. Throw an exception if opening fails.
-        GFits file(ebinfile);
-        if (file.contains("EBOUNDS")) {
-            file.close();
-            ebounds.load(ebinfile,"EBOUNDS");
-        }
-        else if (file.contains("ENERGYBINS")) {
-            file.close();
-            ebounds.load(ebinfile,"ENERGYBINS");
+        // Create filename instance
+        GFilename fname(ebinfile);
+
+        // Check if extension name was provided
+        if (!fname.has_extname()) {
+
+            // Open energy boundary file using the EBOUNDS or ENERGYBINS
+            // extension. Throw an exception if opening fails.
+            GFits file(ebinfile);
+            if (file.contains("EBOUNDS")) {
+                file.close();
+                ebounds.load(ebinfile);
+            }
+            else if (file.contains("ENERGYBINS")) {
+                file.close();
+                ebinfile += "[ENERGYBINS]";
+                ebounds.load(ebinfile);
+            }
+            else {
+                file.close();
+                std::string msg = "No extension with name \"EBOUNDS\" or"
+                                  " \"ENERGYBINS\" found in FITS file"
+                                  " \""+ebinfile+"\".\n"
+                                  "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
+                                  " is required if the parameter \"ebinalg\""
+                                  " is set to \"FILE\".";
+                throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
+            }
         }
         else {
-            file.close();
-            std::string msg = "No extension with name \"EBOUNDS\" or"
-                              " \"ENERGYBINS\" found in FITS file"
-                              " \""+ebinfile+"\".\n"
-                              "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                              " is required if the parameter \"ebinalg\""
-                              " is set to \"FILE\".";
-            throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
+            // Load ebounds from filename including extension
+            ebounds.load(ebinfile);
         }
         
     } // endif: ebinalg was "FILE"
@@ -640,7 +652,7 @@ GCTAObservation ctool::create_cta_obs(void)
     list.gti(gti);
     list.ebounds(ebounds);
 
-    // Attach event list to CTA observation
+    // Attach empty event list to CTA observation
     obs.events(list);
 
     // Set observation ontime, livetime and deadtime correction factor
@@ -693,10 +705,10 @@ void ctool::require_inobs(const std::string& method)
 void ctool::require_inobs_nolist(const std::string& method)
 {
     // Get inobs filename
-    std::string filename = (*this)["inobs"].filename();
+    GFilename filename = (*this)["inobs"].filename();
 
     // Continue only if we have a FITS file
-    if (gammalib::is_fits(filename)) {
+    if (filename.is_fits()) {
 
         // Signal no list
         bool is_list = false;
@@ -745,10 +757,10 @@ void ctool::require_inobs_nolist(const std::string& method)
 void ctool::require_inobs_nocube(const std::string& method)
 {
     // Get inobs filename
-    std::string filename = (*this)["inobs"].filename();
+    GFilename filename = (*this)["inobs"].filename();
 
     // Continue only if we have a FITS file
-    if (gammalib::is_fits(filename)) {
+    if (filename.is_fits()) {
 
         // Signal no cube
         bool is_cube = false;

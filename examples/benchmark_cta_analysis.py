@@ -4,7 +4,7 @@
 # (unbinned, binned, stacked), and if matplotlib is installed, creates
 # a plot of the benchmark results.
 #
-# Copyright (C) 2014-2015 Jurgen Knodlseder
+# Copyright (C) 2014-2016 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,12 +32,11 @@ except:
 # ========================== #
 # Unbinned analysis pipeline #
 # ========================== #
-def unbinned_pipeline(duration):
+def unbinned_pipeline(model_name, duration):
     """
     Unbinned analysis pipeline.
     """
     # Set script parameters
-    model_name  = "${CTOOLS}/share/models/crab.xml"
     caldb       = "prod2"
     irf         = "South_50h"
     ra          =   83.63
@@ -50,7 +49,7 @@ def unbinned_pipeline(duration):
     rad_select  =    3.0
 
     # Get start CPU time
-    tstart = time.clock()
+    cpu_start = time.clock()
 
     # Simulate events
     sim = ctools.ctobssim()
@@ -78,30 +77,29 @@ def unbinned_pipeline(duration):
     select.run()
 
     # Get ctlike start CPU time
-    tctlike = time.clock()
+    cpu_ctlike = time.clock()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(select.obs())
     like.run()
 
-    # Get stop CPU time
-    tstop    = time.clock()
-    telapsed = tstop - tstart
-    tctlike  = tstop - tctlike
+    # Get stop CPU time and compute elapsed times
+    cpu_stop    = time.clock()
+    cpu_elapsed = cpu_stop - cpu_start
+    cpu_ctlike  = cpu_stop - cpu_ctlike
 
     # Return
-    return telapsed, tctlike
+    return cpu_elapsed, cpu_ctlike
 
 
 # ======================== #
 # Binned analysis pipeline #
 # ======================== #
-def binned_pipeline(duration):
+def binned_pipeline(model_name, duration):
     """
     Binned analysis pipeline.
     """
     # Set script parameters
-    model_name  = "${CTOOLS}/share/models/crab.xml"
     caldb       = "prod2"
     irf         = "South_50h"
     ra          =   83.63
@@ -119,7 +117,7 @@ def binned_pipeline(duration):
     proj        = "CAR"
 
     # Get start CPU time
-    tstart = time.clock()
+    cpu_start = time.clock()
 
     # Simulate events
     sim = ctools.ctobssim()
@@ -151,30 +149,29 @@ def binned_pipeline(duration):
     bin.run()
 
     # Get ctlike start CPU time
-    tctlike = time.clock()
+    cpu_ctlike = time.clock()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(bin.obs())
     like.run()
 
-    # Get stop CPU time
-    tstop    = time.clock()
-    telapsed = tstop - tstart
-    tctlike  = tstop - tctlike
+    # Get stop CPU time and compute elapsed times
+    cpu_stop    = time.clock()
+    cpu_elapsed = cpu_stop - cpu_start
+    cpu_ctlike  = cpu_stop - cpu_ctlike
 
     # Return
-    return telapsed, tctlike
+    return cpu_elapsed, cpu_ctlike
 
 
 # ========================= #
 # Stacked analysis pipeline #
 # ========================= #
-def stacked_pipeline(duration):
+def stacked_pipeline(model_name, duration):
     """
-    Cube-style analysis pipeline.
+    Stacked analysis pipeline.
     """
     # Set script parameters
-    model_name  = "${CTOOLS}/share/models/crab.xml"
     caldb       = "prod2"
     irf         = "South_50h"
     ra          =   83.63
@@ -192,7 +189,7 @@ def stacked_pipeline(duration):
     proj        = "CAR"
 
     # Get start CPU time
-    tstart = time.clock()
+    cpu_start = time.clock()
 
     # Simulate events
     sim = ctools.ctobssim()
@@ -283,19 +280,19 @@ def stacked_pipeline(duration):
     bin.obs()[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
     # Get ctlike start CPU time
-    tctlike = time.clock()
+    cpu_ctlike = time.clock()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(bin.obs())
     like.run()
 
-    # Get stop CPU time
-    tstop    = time.clock()
-    telapsed = tstop - tstart
-    tctlike  = tstop - tctlike
+    # Get stop CPU time and compute elapsed times
+    cpu_stop    = time.clock()
+    cpu_elapsed = cpu_stop - cpu_start
+    cpu_ctlike  = cpu_stop - cpu_ctlike
 
     # Return
-    return telapsed, tctlike
+    return cpu_elapsed, cpu_ctlike
 
 
 #==========================#
@@ -304,7 +301,11 @@ def stacked_pipeline(duration):
 if __name__ == '__main__':
     """
     """
-    # Dump header
+    # Initialise parameters
+    title      = "CTA analysis benchmark"
+    model_name = "${CTOOLS}/share/models/crab.xml"
+
+    # Log header
     print("*************************************")
     print("*      CTA analysis benchmark       *")
     print("*************************************")
@@ -324,9 +325,9 @@ if __name__ == '__main__':
     for i in range(10):
 
         # Perform analyses
-        t_unbinned, ct_unbinned = unbinned_pipeline(duration)
-        t_binned,   ct_binned   = binned_pipeline(duration)
-        t_stacked,  ct_stacked  = stacked_pipeline(duration)
+        t_unbinned, ct_unbinned = unbinned_pipeline(model_name, duration)
+        t_binned,   ct_binned   = binned_pipeline(model_name, duration)
+        t_stacked,  ct_stacked  = stacked_pipeline(model_name, duration)
 
         # Collect results
         a_duration.append(duration/3600.0)
@@ -348,14 +349,14 @@ if __name__ == '__main__':
     # Optionally plot results
     if has_matplotlib:
         plt.figure(1)
-        plt.title("CTA analysis benchmark")
+        plt.title(title)
         plt.loglog(a_duration, a_unbinned, 'ro-', label='unbinned')
         plt.loglog(a_duration, a_binned, 'bo-', label='binned')
-        plt.loglog(a_duration, a_stacked, 'go-', label='cube-style')
+        plt.loglog(a_duration, a_stacked, 'go-', label='stacked')
         plt.loglog(a_duration, c_unbinned, 'ro--')
         plt.loglog(a_duration, c_binned, 'bo--')
         plt.loglog(a_duration, c_stacked, 'go--')
-        plt.xlabel("Duration (hours)")
+        plt.xlabel("Observation duration (hours)")
         plt.ylabel("CPU time (seconds)")
         plt.legend(loc="lower right")
         plt.show()

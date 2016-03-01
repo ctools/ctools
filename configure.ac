@@ -2,7 +2,7 @@
 # Configuration for ctools - a set of tools for science analysis of CTA     #
 #                            data                                           #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2015 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2016 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -29,13 +29,34 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [1.1.0.dev], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [1.1.0dev], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
 AM_INIT_AUTOMAKE([gnu -Wno-portability])
 #AM_INIT_AUTOMAKE([gnu -Wno-portability serial-tests])
 AC_CONFIG_HEADER([config.h])
+
+
+#############################################################################
+# Library versioning (current:revision:age)                                 #
+# ------------------------------------------------------------------------- #
+# Here are a set of rules to update your library version information:       #
+# 1. Update the version information only immediately before a public        #
+#    release of your software. More frequent updates are unnecessary,       #
+#    and only guarantee that the current interface number gets larger       #
+#    faster.                                                                #
+# 2. If the library source code has changed at all since the last update,   #
+#    then increment revision.                                               #
+# 3. If any interfaces have been added, removed, or changed since the last  #
+#    update, increment current, and set revision to 0.                      #
+# 4. If any interfaces have been added since the last public release, then  #
+#    increment age.                                                         #
+# 5. If any interfaces have been removed or changed since the last public   #
+#    release, then set age to 0.                                            #
+#############################################################################
+CTOOLS_LT_VERSION="1:1:0"
+AC_SUBST(CTOOLS_LT_VERSION)
 
 
 #############################################################################
@@ -72,10 +93,12 @@ AC_CANONICAL_HOST
 # A special kluge was added for Mac OS X >=10.7. As Apple switched to clang #
 # we search from this version on for the clang compiler.                    #
 #                                                                           #
-# We also signal whether Mac OS X >=10.11 (El Capitan).                     #
+# We also signal whether Mac OS X >=10.9 (Mavericks) and Mac OS X >=10.11   #
+# (El Capitan).                                                             #
 #############################################################################
 # Set default Mac OS X version flags
 osx_lion=no
+osx_mavericks=no
 osx_el_capitan=no
 
 # Set default compiler lists
@@ -90,12 +113,21 @@ if test `uname -s` = "Darwin"; then
     cc_list="clang gcc cc cl.exe"
     osx_lion=yes
   fi
+  if [ test $version -ge 109 ]; then
+    osx_mavericks=yes
+  fi
   if [ test $version -ge 1011 ]; then
     osx_el_capitan=yes
   fi
 fi
 AC_MSG_CHECKING([for Mac OS X >= 10.7])
 if [test "x$osx_lion" = "xyes"]; then
+        AC_MSG_RESULT(yes)
+else
+        AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING([for Mac OS X >= 10.9])
+if [test "x$osx_mavericks" = "xyes"]; then
         AC_MSG_RESULT(yes)
 else
         AC_MSG_RESULT(no)
@@ -571,9 +603,9 @@ if test "x$ac_enable_python_binding" = "xno"; then
 else
 
   # Do we have Python and Python.h?
-  AM_PATH_PYTHON([2.2],
+  AM_PATH_PYTHON([2.3],
                  [has_python="yes"],
-                 [AC_MSG_WARN([Python >= 2.2 not found. Python >= 2.2 is required to build python binding. Python can be obtained from http://www.python.org])])
+                 [AC_MSG_WARN([Python >= 2.3 not found. Python >= 2.3 is required to build python binding. Python can be obtained from http://www.python.org])])
 
   # It would really be weired if Python has not been found, as barely every system has Python. Maybe
   # it was not found because the autoconf is so old, and in an early version of the AM_PATH_PYTHON
@@ -592,14 +624,11 @@ else
 
     # Set opening and closing symbols to make setup.py compatible for versions 2 and 3
     if test ${PYTHON_VERSION} '<' 3; then
-      PYTHON_OPEN=" "
-      PYTHON_CLOSE=""
+      PYTHON_RELATIVE_IMPORT=" "
     else
-      PYTHON_OPEN="("
-      PYTHON_CLOSE=")"
+      PYTHON_RELATIVE_IMPORT="."
     fi
-    AC_SUBST(PYTHON_OPEN)  
-    AC_SUBST(PYTHON_CLOSE)
+    AC_SUBST(PYTHON_RELATIVE_IMPORT)  
 
     # Do we have distutils?
     AC_MSG_CHECKING([for the distutils Python package])
@@ -612,20 +641,40 @@ else
 
     # If we have distutils then get python path from distutils ...
     if test -z "$ac_distutils_result"; then
-      if test ${PYTHON_VERSION} '<' 3; then
-        python_path=`$PYTHON -c "import distutils.sysconfig; \
-                                 print distutils.sysconfig.get_python_inc();"`
-      else
-        python_path=`$PYTHON -c "import distutils.sysconfig; \
-                                 print(distutils.sysconfig.get_python_inc());"`
-      fi                                         
+      python_path=`$PYTHON -c "import distutils.sysconfig; \
+                               print(distutils.sysconfig.get_python_inc());"`
       if test -n "${python_path}"; then
         AC_CHECK_HEADERS($python_path/Python.h, [has_python_h="yes"], [has_python_h="no"]) 
         python_path="-I$python_path"
       fi
       PYTHON_CPPFLAGS=$python_path
-      CPPFLAGS="${CPPFLAGS} ${python_path}"
       AC_SUBST([PYTHON_CPPFLAGS])
+
+      # If we have Mavericks then get the MACOSX_DEPLOYMENT_TARGET from Python
+      # If the target is older then Mavericks then set the MACOSX_DEPLOYMENT_TARGET
+      # to this value as otherwise we get trouble with name mangling (that changed)
+      if [test "x$osx_mavericks" = "xyes"]; then
+        AC_MSG_CHECKING([Python MACOSX_DEPLOYMENT_TARGET])
+        python_target=`$PYTHON -c "from distutils import sysconfig; \
+                                   print(sysconfig.get_config_vars()[['MACOSX_DEPLOYMENT_TARGET']]);" 2> /dev/null`
+        python_compact_target=`echo $python_target | sed 's/\(10\.[[0-9]]*\).*/\1/' | sed -e 's/\.//g'`
+        case $python_compact_target in
+          (*[!0-9]*|'')
+            AC_MSG_RESULT(unknown)
+            ;;
+          (*)
+            AC_MSG_RESULT(${python_target})
+            if [ test $python_compact_target -le 108 ]; then
+              CONFIGURE_MACOSX_DEPLOYMENT_TARGET="$python_target"
+              MACOSX_DEPLOYMENT_TARGET="$python_target"
+              export MACOSX_DEPLOYMENT_TARGET
+              EXPORT_MACOSX_DEPLOYMENT_TARGET=''
+              LIBS="${LIBS} -lstdc++"
+              AC_MSG_NOTICE([set MACOSX_DEPLOYMENT_TARGET to ${python_target}])
+            fi
+            ;;
+        esac
+      fi
 
     # ... otherwise check for includes relative to exectuable (obsolete?)
     else                             

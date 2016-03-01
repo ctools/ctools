@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTBKGCUBE_NAME    "ctbkgcube"
-#define CTBKGCUBE_VERSION "1.0.0"
+#define CTBKGCUBE_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -59,6 +59,7 @@ public:
     void                      clear(void);
     void                      run(void);
     void                      save(void);
+    void                      publish(const std::string& name = "");
     const GCTACubeBackground& bkgcube(void) const;
     const GModels&            models(void) const;
 
@@ -70,11 +71,14 @@ protected:
     void get_parameters(void);
     void fill_cube(GCTAObservation* obs);
 
+    // User parameters
+    GFilename          m_outcube;     //!< Filename of output cube
+    GFilename          m_outmodel;    //!< Filename of output XML model
+    bool               m_publish;     //!< Publish background cube?
+
     // Protected members
-    std::string        m_outcube;     //!< Filename of output cube
-    std::string        m_outmodel;    //!< Filename of output XML model
     GObservations      m_obs;         //!< Observation container
-    GCTACubeBackground m_background;  //!< Background cube response
+    GCTACubeBackground m_background;  //!< Background cube
     GModels            m_bkgmdl;      //!< CTA background models
     GModels            m_outmdl;      //!< Output models
 };

@@ -12,6 +12,7 @@ sources = ctbin.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctbin.la
 libctbin_la_SOURCES = $(sources)
+libctbin_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctbin_SOURCES = main.cpp

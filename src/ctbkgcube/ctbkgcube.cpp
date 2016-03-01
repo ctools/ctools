@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -340,6 +340,11 @@ void ctbkgcube::run(void)
     // Recover original models
     m_obs.models(models_orig);
 
+    // Optionally publish background cube
+    if (m_publish) {
+        publish();
+    }
+
     // Return
     return;
 }
@@ -348,7 +353,8 @@ void ctbkgcube::run(void)
 /***********************************************************************//**
  * @brief Save background cube
  *
- * Save the background cube into the file specified by the outfile parameter.
+ * Save the background cube into a FITS file and the output model into an
+ * XML file.
  ***************************************************************************/
 void ctbkgcube::save(void)
 {
@@ -358,20 +364,70 @@ void ctbkgcube::save(void)
         log.header1("Save background cube");
     }
 
-    // Get output filenames
-    std::string outfile  = (*this)["outcube"].filename();
-    std::string outmodel = (*this)["outmodel"].filename();
+    // Get background cube and model file names
+    m_outcube  = (*this)["outcube"].filename();
+    m_outmodel = (*this)["outmodel"].filename();
 
-    // Save background cube
-    m_background.save(outfile, clobber());
+    // Save only if filename is non-empty
+    if (!m_outcube.is_empty()) {
+
+        // Log filename
+        if (logTerse()) {
+            log << "Save background cube into file \""+m_outcube+"\".";
+            log << std::endl;
+        }
+
+        // Save background cube
+        m_background.save(m_outcube, clobber());
+    
+    }
 
     // Write output models if filename is valid
-    if ((outmodel.length() > 0) && (gammalib::tolower(outmodel) != "none")) {
+    if ((!m_outmodel.is_empty()) &&
+        (gammalib::tolower(m_outmodel.url()) != "none")) {
 
-        // Save output model for binned analyses
-        m_outmdl.save(outmodel);
+        // Log filename
+        if (logTerse()) {
+            log << "Save model into file \""+m_outmodel.url()+"\".";
+            log << std::endl;
+        }
+
+        // Save output model for stacked analyses
+        m_outmdl.save(m_outmodel.url());
 
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish background cube
+ *
+ * @param[in] name Background cube name.
+ ***************************************************************************/
+void ctbkgcube::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish background cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTBKGCUBE_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << "Publish \""+user_name+"\" background cube." << std::endl;
+    }
+
+    // Publish exposure cube
+    m_background.cube().publish(user_name);
 
     // Return
     return;
@@ -392,6 +448,7 @@ void ctbkgcube::init_members(void)
     // Initialise members
     m_outcube.clear();
     m_outmodel.clear();
+    m_publish = false;
     m_obs.clear();
     m_background.clear();
     m_bkgmdl.clear();
@@ -412,6 +469,7 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
     // Copy members
     m_outmodel   = app.m_outmodel;
     m_outcube    = app.m_outcube;
+    m_publish    = app.m_publish;
     m_obs        = app.m_obs;
     m_background = app.m_background;
     m_bkgmdl     = app.m_bkgmdl;
@@ -498,6 +556,9 @@ void ctbkgcube::get_parameters(void)
         GModels     models(inmodel);
         m_obs.models(models);
     }
+
+    // Get remaining parameters
+    m_publish = (*this)["publish"].boolean();
 
     // Read output filenames (if needed)
     if (read_ahead()) {

@@ -9,7 +9,7 @@ Computes upper flux limit for a source model.
 Synopsis
 --------
 
-This tools computes the upper flux limit for a specific source model. Except
+This tool computes the upper flux limit for a specific source model. Except
 of the node function, all spectral models are supported. Starting from the
 maximum likelihood model parameters, the tool finds the model flux that leads
 to a decrease of the likelihood that corresponds to a given confidence level.
@@ -97,7 +97,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether an existing output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

@@ -221,6 +221,18 @@ For older automake version, you should see
   * Test cscripts *
   *****************
   Test csobsdef: .. ok
+  Test csobs2caldb: .. ok
+  Test csobsinfo: .. ok
+  Test csiactobs: .. ok
+  Test csmodelinfo: .. ok
+  Test csmodelmerge (space-separated): .. ok
+  Test csmodelmerge (comma-separated): .. ok
+  Test csmodelmerge (wildcard string): .. ok
+  Test csmodelmerge (ascii-file): .. ok
+  Test cstsmapmerge (comma-separated): .. ok
+  Test cstsmapmerge (space-separated): .. ok
+  Test cstsmapmerge (wildcard string): .. ok
+  Test cstsmapmerge  (ascii-file): .. ok
   Test cspull: .. ok
   Test cssens: .. ok
   Test cstsdist: .. ok

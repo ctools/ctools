@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Michael Mayer                               *
+ *  copyright (C) 2014-2016 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -368,6 +368,11 @@ void cttsmap::run(void)
         }
     }
 
+    // Optionally publish TS map
+    if (m_publish) {
+        publish();
+    }
+
     // Return
     return;
 }
@@ -386,31 +391,73 @@ void cttsmap::save(void)
         log.header1("Save TS map");
     }
 
-    // Get output filename
+    // Get TS map filename
     m_outmap = (*this)["outmap"].filename();
 
-    // Create fits file instance
-    GFits fitsfile = GFits();
+    // Save only if filename is non-empty
+    if (!m_outmap.is_empty()) {
 
-    // Write the sky maps to the FITS file
-    m_tsmap.write(fitsfile);
-    for (int i = 0; i < m_mapnames.size(); i++) {
-    	m_maps[i].write(fitsfile);
+        // Log filename
+        if (logTerse()) {
+            log << "Save TS map into file \""+m_outmap+"\"." << std::endl;
+        }
+
+        // Create fits file
+        GFits fits;
+
+        // Write the sky maps to the FITS file
+        m_tsmap.write(fits);
+        for (int i = 0; i < m_mapnames.size(); i++) {
+            m_maps[i].write(fits);
+        }
+
+        // Set extension name for all maps
+        for (int i = 0; i < m_mapnames.size(); i++) {
+            fits[i+1]->extname(m_mapnames[i]);
+        }
+
+        // Add computation log if not all bins are computed
+        if (m_binmin != -1 || m_binmax != -1) {
+            m_statusmap.write(fits);
+            fits[m_mapnames.size()+1]->extname("STATUS MAP");
+        }
+
+        // Save FITS file
+        fits.saveto(m_outmap, clobber());
+
+    } // endif: TS map filename was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish TS map
+ *
+ * @param[in] name TS map name.
+ ***************************************************************************/
+void cttsmap::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish TS map");
     }
 
-    // Set extension name for all maps
-    for (int i = 0; i < m_mapnames.size(); i++) {
-    	fitsfile[i+1]->extname(m_mapnames[i]);
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTTSMAP_NAME;
     }
 
-	// Add computation log if not all bins are computed
-    if (m_binmin != -1 || m_binmax != -1) {
-    	m_statusmap.write(fitsfile);
-    	fitsfile[m_mapnames.size()+1]->extname("STATUS MAP");
+    // Log filename
+    if (logTerse()) {
+        log << "Publish \""+user_name+"\" TS map." << std::endl;
     }
 
-    // Save FITS file
-    fitsfile.saveto(m_outmap,true);
+    // Publish TS map
+    m_tsmap.publish(user_name);
 
     // Return
     return;
@@ -432,6 +479,7 @@ void cttsmap::init_members(void)
     m_srcname.clear();
     m_outmap.clear();
     m_apply_edisp = false;
+    m_publish     = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -457,9 +505,10 @@ void cttsmap::init_members(void)
 void cttsmap::copy_members(const cttsmap& app)
 {
     // Copy attributes
-    m_srcname = app.m_srcname;
-    m_outmap  = app.m_outmap;
+    m_srcname     = app.m_srcname;
+    m_outmap      = app.m_outmap;
     m_apply_edisp = app.m_apply_edisp;
+    m_publish     = app.m_publish;
 
     // Copy protected members
     m_binmin    = app.m_binmin;
@@ -568,9 +617,10 @@ void cttsmap::get_parameters(void)
     m_apply_edisp = (*this)["edisp"].boolean();
 
     // Get optional splitting parameters
-    m_binmin = (*this)["binmin"].integer();
-    m_binmax = (*this)["binmax"].integer();
-    m_logL0  = (*this)["logL0"].real();
+    m_binmin  = (*this)["binmin"].integer();
+    m_binmax  = (*this)["binmax"].integer();
+    m_logL0   = (*this)["logL0"].real();
+    m_publish = (*this)["publish"].boolean();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file

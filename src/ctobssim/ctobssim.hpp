@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "1.0.0"
+#define CTOBSSIM_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -71,38 +71,74 @@ public:
 
 protected:
     // Protected methods
-    void   init_members(void);
-    void   copy_members(const ctobssim& app);
-    void   free_members(void);
-    void   get_parameters(void);
-    void   simulate_source(GCTAObservation* obs,
-                         const GModels&   models,
-                         GRan&            ran, 
-                         GLog*            wrklog = NULL);
-    double get_model_flux(const GModelSky* model,
-                          const GEnergy&   emin,
-                          const GEnergy&   emax,
-                          const GSkyDir&   centre,
-                          const double&    radius,
-                          const int&       indent,
-                          GLog*            wrklog = NULL);
-    void   simulate_background(GCTAObservation* obs,
-                               const GModels&   models,
-                               GRan&            ran,
-                               GLog*            wrklog = NULL);
-    void   save_fits(void);
-    void   save_xml(void);
+    void     init_members(void);
+    void     copy_members(const ctobssim& app);
+    void     free_members(void);
+    void     get_parameters(void);
+    void     simulate_source(GCTAObservation* obs,
+                           const GModels&   models,
+                           GRan&            ran, 
+                           GLog*            wrklog = NULL);
+    void     simulate_interval(GCTAObservation*       obs,
+                               const GCTAResponseIrf* rsp,
+                               GCTAEventList*         events,
+                               const GModels&         models,
+                               const GTime&           tmin,
+                               const GTime&           tmax,
+                               const GEnergy&         emin,
+                               const GEnergy&         emax,
+                               const GSkyDir&         dir,
+                               const double&          rad,
+                               const double&          area,
+                               GRan&                  ran,
+                               GLog*                  wrklog,
+                               int&                   indent,
+                               std::vector<int>&      nphotons,
+                               std::vector<int>&      nevents);
+    void     simulate_time_slice(GCTAObservation*       obs,
+                                 const GCTAResponseIrf* rsp,
+                                 GCTAEventList*         events,
+                                 const GModelSky*       model,
+                                 const GTime&           tstart,
+                                 const GTime&           tstop,
+                                 const GEnergy&         emin,
+                                 const GEnergy&         emax,
+                                 const GSkyDir&         dir,
+                                 const double&          rad,
+                                 const double&          area,
+                                 GRan&                  ran,
+                                 GLog*                  wrklog,
+                                 int&                   indent,
+                                 int&                   nphotons,
+                                 int&                   nevents);
+    GEbounds get_ebounds(const GEbounds& ebounds) const;
+    double   get_area(GCTAObservation* obs,
+                      const GEnergy&   emin,
+                      const GEnergy&   emax) const;
+    double   get_model_flux(const GModelSky* model,
+                            const GEnergy&   emin,
+                            const GEnergy&   emax,
+                            const GSkyDir&   centre,
+                            const double&    radius,
+                            const int&       indent,
+                            GLog*            wrklog);
+    void     simulate_background(GCTAObservation* obs,
+                                 const GModels&   models,
+                                 GRan&            ran,
+                                 GLog*            wrklog = NULL);
+    void     save_fits(void);
+    void     save_xml(void);
 
     // User parameters
     std::string m_outevents;   //!< Output events file
     std::string m_prefix;      //!< Prefix for multiple event lists
     int         m_seed;        //!< Random number generator seed
+    int         m_eslices;     //!< Number of energy slices
     bool        m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
     mutable GObservations m_obs;              //!< Observation container
     mutable bool          m_save_and_dispose; //!< Save and dispose immediately
-    double                m_area;             //!< Surface area for simulation (cm2)
     int                   m_max_photons;      //!< Maximum number of photons/slice
     double                m_max_rate;         //!< Maximum photon rate
     std::vector<GRan>     m_rans;             //!< Random number generators

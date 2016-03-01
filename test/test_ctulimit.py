@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctulimit tool.
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,16 +78,22 @@ class Test(gammalib.GPythonTestSuite):
         try:
             ulimit.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctulimit: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in ctulimit.")
+            msg = "Exception occured in ctulimit."
+            self.test_try_failure(msg)
 
         # Save results
         self.test_try("Save results")
         try:
             ulimit.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving results: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving results.")
+            msg = "Exception occured in saving results."
+            self.test_try_failure(msg)
 
         # Return
         return

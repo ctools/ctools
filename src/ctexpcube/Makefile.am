@@ -12,6 +12,7 @@ sources = ctexpcube.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctexpcube.la
 libctexpcube_la_SOURCES = $(sources)
+libctexpcube_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctexpcube_SOURCES = main.cpp

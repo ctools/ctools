@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTMODEL_NAME    "ctmodel"
-#define CTMODEL_VERSION "1.0.0"
+#define CTMODEL_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -68,6 +68,7 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
+    void                 publish(const std::string& name = "");
     const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
     void                 cube(const GCTAEventCube& cube);
@@ -79,12 +80,14 @@ protected:
     void copy_members(const ctmodel& app);
     void free_members(void);
     void get_parameters(void);
+    void get_obs(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
     
     // User parameters
-    std::string m_outcube;     //!< Output model cube
-    bool        m_apply_edisp; //!< Apply energy dispersion?
+    GFilename m_outcube;      //!< Output model cube
+    bool      m_apply_edisp;  //!< Apply energy dispersion?
+    bool      m_publish;      //!< Publish model cube?
 
     // Protected members
     GObservations m_obs;         //!< Observation container

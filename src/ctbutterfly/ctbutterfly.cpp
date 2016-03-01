@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctbutterfly - butterfly calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Michael Mayer                               *
+ *  copyright (C) 2014-2016 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -501,25 +501,36 @@ void ctbutterfly::save(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Save Butterfly to file");
+        log.header1("Save Butterfly diagram");
     }
 
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
 
-    // Create CSV table with 4 columns
-    GCsv table(m_energies.size(), 4);
+    // Save only if filename is non-empty
+    if (!m_outfile.is_empty()) {
 
-    // Fill CSV table
-    for (int i = 0; i < m_energies.size(); ++i) {
-        table.real(i, 0, m_energies[i]);
-        table.real(i, 1, m_intensities[i]);
-        table.real(i, 2, m_min_intensities[i]);
-        table.real(i, 3, m_max_intensities[i]);
+        // Log filename
+        if (logTerse()) {
+            log << "Save butterfly diagram into file \""+m_outfile+"\".";
+            log << std::endl;
+        }
+
+        // Create CSV table with 4 columns
+        GCsv table(m_energies.size(), 4);
+
+        // Fill CSV table
+        for (int i = 0; i < m_energies.size(); ++i) {
+            table.real(i, 0, m_energies[i]);
+            table.real(i, 1, m_intensities[i]);
+            table.real(i, 2, m_min_intensities[i]);
+            table.real(i, 3, m_max_intensities[i]);
+        }
+
+        // Save CSV table
+        table.save(m_outfile, " ", clobber());
+
     }
-
-    // Save CSV table
-    table.save(m_outfile, " ", clobber());
 
     // Return
     return;

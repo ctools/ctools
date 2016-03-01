@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctcubemask.par                                                #
-#  Version:   1.0.0                                                         #
+#  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-inobs,   f, a, "cntmap.fits",,, "Input counts cube or observation definition XML file"
+inobs,   f, a, "cntcube.fits",,, "Input counts cube or observation definition XML file"
 outcube, f, a, "filtered_cube.fits",,, "Output counts cube or observation definition XML file"
 prefix,  s, h, "filtered_",,, "Prefix for counts cube in observation definition XML file"
 
@@ -35,7 +35,9 @@ emax,    r, a, 100.0,,, "Upper energy limit (TeV)"
 #
 # Standard parameters
 #====================
+publish, b, h, no,,, "Publish counts cube on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, "ql",,, "Mode of automatic parameters"
+logfile, f, h, "ctcubemask.par.log",,, "Log filename"

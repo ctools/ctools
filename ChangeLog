@@ -1,18 +1,41 @@
-2015-11-24  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-02-26  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
-        Add csobsinfo, csmodelinfo, csmodelmerge, cstsmapmerge (#1578)
-        Add csobs2caldb script (#1579)
+        Test and import IACT scripts only for Python 2.6+ (#1715)
+        Add documentation for IACT analysis (#1646)
+        Adapt to revise GTime operators (#1714)
+        Add publish() methods to tools producing images (#1710)
+        Read ahead output filename in cterror (#1700)
+        Subdivide simulation energy range in ctobssim (#1673)
+        Delete existing events before simulation in ctobssim (#1663)
+        Add csiactcopy script (#1661)
+        ctselect allows usage of non-default events and GTI extensions (#1598)
 
 
-2015-12-07  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-01-27  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+        * Bug fix version 1.0.1 released
+        ================================
+
+        Re-enable ctmodel computation for stacked analysis (#1609)
+        Solve compatibility issues with Anaconda on Mac OS X (#1607)
+        Change diffuse map for science verification
+
+
+2015-12-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.0.0 released
         ========================
 
         Update end-user documentation
+        Rename cshessobs to csiactobs and add csiactdata (#1608)
+        Ignore errors in El Capitan post processing (#1605)
+        Change GException to RuntimeError in cscripts (#1604)
+        Adapt to GammaLib interface changs (#1603)
+        Add csobs2caldb script (#1579)
+        Add csobsinfo, csmodelinfo, csmodelmerge, cstsmapmerge (#1578)
         Implement handling of stacked data in csspec (#1566)
         Resolve Python test problem on El Capitan (#1563)
 

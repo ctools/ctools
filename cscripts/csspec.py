@@ -206,7 +206,7 @@ class csspec(ctools.cscript):
                       "cube does not overlap with specified energy range ["+ \
                       str(emin)+", "+str(emax)+"]. Specify "+ \
                       "overlapping energy range."
-                raise gammalib.GException.invalid_argument("csspec", msg)
+                raise RuntimeError(msg)
 
             # Determine number of layers to use for each spectral bin
             n_layers = int(len(use_layers) / self.m_enumbins)
@@ -217,14 +217,24 @@ class csspec(ctools.cscript):
 
             # Create energy boundaries
             self.m_ebounds = gammalib.GEbounds()
-            for i in range(len(use_layers))[::n_layers]:
-                i_start = i
-                i_stop  = i + n_layers - 1
+            i_start = 0
+            i_stop  = n_layers - 1
+            while i_start < len(use_layers):
                 if i_stop >= len(use_layers):
                     i_stop = len(use_layers) - 1
                 ebinmin = cube_ebounds.emin(use_layers[i_start])
                 ebinmax = cube_ebounds.emax(use_layers[i_stop])
                 self.m_ebounds.append(ebinmin, ebinmax)
+                i_start += n_layers
+                i_stop  += n_layers
+            #for i in range(len(use_layers))[::n_layers]:
+            #    i_start = i
+            #    i_stop  = i + n_layers - 1
+            #    if i_stop >= len(use_layers):
+            #        i_stop = len(use_layers) - 1
+            #    ebinmin = cube_ebounds.emin(use_layers[i_start])
+            #    ebinmax = cube_ebounds.emax(use_layers[i_stop])
+            #    self.m_ebounds.append(ebinmin, ebinmax)
                     
         # Unbinned mode       
         else:

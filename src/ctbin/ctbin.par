@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctbin.par                                                     #
-#  Version:   1.0.0                                                         #
+#  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -44,6 +44,7 @@ proj,     s, a, "CAR",AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 #
 # Standard parameters
 #====================
+publish, b, h, no,,, "Publish counts cube on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"

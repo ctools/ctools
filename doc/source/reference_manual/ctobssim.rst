@@ -23,7 +23,7 @@ subsequent runs will lead to different event samples.
 
 ctobssim performs a safety check on the maximum photon rate for all model 
 components to avoid that the tool locks up and requests huge memory 
-ressources, which may happen if a mistake was made in setting up the input 
+resources, which may happen if a mistake was made in setting up the input 
 model (for example if an error in the flux units is made). The maximum allowed
 photon rate is controlled by the hidden ``maxrate`` parameter, which by default 
 is set to 1e6.
@@ -119,7 +119,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether existing files should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

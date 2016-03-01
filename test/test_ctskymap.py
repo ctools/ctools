@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctskymap tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -81,16 +81,22 @@ class Test(gammalib.GPythonTestSuite):
         try:
             skymap.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctskymap: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in ctskymap.")
+            msg = "Exception occured in ctskymap."
+            self.test_try_failure(msg)
 
         # Save counts cube
         self.test_try("Save sky map")
         try:
             skymap.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving sky map: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving sky map.")
+            msg = "Exception occured in saving sky map."
+            self.test_try_failure(msg)
 
         # Return
         return

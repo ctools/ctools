@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctcubemask tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,16 +79,22 @@ class Test(gammalib.GPythonTestSuite):
         try:
             mask.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctcubemask: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in ctcubemask.")
+            msg = "Exception occured in ctcubemask."
+            self.test_try_failure(msg)
 
         # Save counts cube
         self.test_try("Save counts cube")
         try:
             mask.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving counts cube: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving counts cube.")
+            msg = "Exception occured in saving counts cube."
+            self.test_try_failure(msg)
 
         # Return
         return

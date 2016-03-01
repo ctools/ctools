@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctlike tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,16 +78,22 @@ class Test(gammalib.GPythonTestSuite):
         try:
             like.run()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in ctlike: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in ctlike.")
+            msg = "Exception occured in ctlike."
+            self.test_try_failure(msg)
 
         # Save results
         self.test_try("Save results")
         try:
             like.save()
             self.test_try_success()
+        #except Exception as e:
+        #    msg = "Exception occured in saving results: %s." % (e,)
         except:
-            self.test_try_failure("Exception occured in saving results.")
+            msg = "Exception occured in saving results."
+            self.test_try_failure(msg)
 
         # Return
         return

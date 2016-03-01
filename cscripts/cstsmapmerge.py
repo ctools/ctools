@@ -2,7 +2,7 @@
 # ==========================================================================
 # Merges sliced TS map files into one map
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -123,13 +123,13 @@ class cstsmapmerge(ctools.cscript):
             msg = "Parameter \"inmmaps\" must contain either an @ASCII file,"+\
                   " a comma-separated or whitespace-separated list of files"+\
                   " or a wildcard string"
-            raise gammalib.GException.invalid_argument("cstsmapmerge::get_parameters", msg) 
+            raise RuntimeError(msg) 
 
         # Check number of files. We need at least two files.
         if len(self.files) <= 1:
             msg = "Need at least two files to start merging, "+\
                   str(len(self.files))+" files given."
-            raise gammalib.GException.invalid_argument("cstsmapmerge::get_parameters", msg) 
+            raise RuntimeError(msg) 
         
         # Get output file
         self.outmap = self["outmap"].filename()
@@ -217,7 +217,7 @@ class cstsmapmerge(ctools.cscript):
                           " been merged. File \""+fitsfile+"\" contains"+\
                           " already merged bins. Set hidden parameter"+\
                           " overwrite=yes to avoid this error."
-                    raise gammalib.GException.invalid_value("cstsmapmerge::add", msg)
+                    raise RuntimeError(msg)
                 
                 # Copy TS values
                 self.tsmap[i] = add_tsmap[i]
@@ -261,7 +261,7 @@ class cstsmapmerge(ctools.cscript):
         # Test files for the entry status map
         # use the first one to appear useful
         for fitsfile in self.files:    
-            if not gammalib.is_fits(fitsfile):
+            if not gammalib.GFilename(fitsfile).is_fits():
                 self.log("Skipping file \""+fitsfile+" (not a FITS file)\n")
             fits = gammalib.GFits(fitsfile)
             
@@ -297,7 +297,7 @@ class cstsmapmerge(ctools.cscript):
             for fitsfile in workfiles:
                 
                 # Skip if file is not FITS
-                if not gammalib.is_fits(fitsfile):
+                if not gammalib.GFilename(fitsfile).is_fits():
                     if self.logTerse():
                         self.log("Skipping file \""+fitsfile+" (not a FITS file)\n") 
                     continue   

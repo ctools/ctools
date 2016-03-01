@@ -12,6 +12,7 @@ sources = ctbutterfly.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctbutterfly.la
 libctbutterfly_la_SOURCES = $(sources)
+libctbutterfly_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctbutterfly_SOURCES = main.cpp

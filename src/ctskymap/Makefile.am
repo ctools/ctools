@@ -12,6 +12,7 @@ sources = ctskymap.cpp
 # Libtool library
 noinst_LTLIBRARIES = libctskymap.la
 libctskymap_la_SOURCES = $(sources)
+libctskymap_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
 ctskymap_SOURCES = main.cpp

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script computes the CTA sensitivity.
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ class cssens(ctools.cscript):
             else:
                 msg = "Invalid sensitivity type \""+self.m_type+"\" encountered."+ \
                       " Either use \"Differential\" or \"Integral\"."
-                raise gammalib.GException.invalid_value("cssens", msg)
+                raise RuntimeError(msg)
 
             # Determine sensitivity
             result = self.get_sensitivity(self.obs, emin, emax,
@@ -249,13 +249,17 @@ class cssens(ctools.cscript):
 
             # Write results
             if ieng == 0:
-                f      = open(self.m_outfile, 'w')
+                f      = open(self.m_outfile.url(), 'w')
                 writer = csv.DictWriter(f, colnames)
-                writer.writerow(dict((_,_) for _ in colnames))
+                headers = {}
+                for n in colnames:
+                    headers[n] = n
+                writer.writerow(headers)
+                #writer.writerow(dict((_,_) for _ in colnames))
                 writer.writerow(result)
                 f.close()
             else:
-                f = open(self.m_outfile, 'a')
+                f      = open(self.m_outfile.url(), 'a')
                 writer = csv.DictWriter(f, colnames)
                 writer.writerow(result)
                 f.close()
@@ -347,7 +351,7 @@ class cssens(ctools.cscript):
         if not model.has_par("Prefactor"):
             msg = "Model \""+self.m_srcname+"\" has no parameter \"Prefactor\"."+ \
                   " Only spectral models with a \"Prefactor\" parameter are supported."
-            raise gammalib.GException.invalid_value("cssens", msg)
+            raise RuntimeError(msg)
 
         # Set source position
         if self.m_ra != None and self.m_dec != None:

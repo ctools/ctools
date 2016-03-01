@@ -16,7 +16,7 @@ each direction the TS value for the model. The TS value is defined as twice
 the difference between the log-likelihood obtained for the full model 
 (including the specified source) and the log-likelihood obtained for a model
 that excludes the specified source. The square-root of the TS values 
-corresponds roughly to the pre-trial detection signifiance of the source (in
+corresponds roughly to the pre-trial detection significance of the source (in
 Gaussian sigma).
 
 cttsmap generates a FITS file comprising a sky map of TS values followed by 
@@ -94,6 +94,9 @@ General parameters
 Standard parameters
 -------------------
 
+``(publish = no) [boolean]``
+    Specifies whether the TS map should be published on VO Hub.
+
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      chatter = 0: no information will be logged
@@ -107,7 +110,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether an existing output TS map file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

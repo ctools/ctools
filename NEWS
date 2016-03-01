@@ -2,27 +2,26 @@ New Features and Important Changes in ctools 1.1.0
 
 Author(s) : Juergen Knoedlseder
 
-7 December 2015
+26 February 2016
 
 
 1. Introduction
 ---------------
 This document briefly summarizes executable by executable the most important
-changes made since the last release of ctools. The code complies to GammaLib
-version 1.1.0 or above.
+changes made since the last release of ctools.
 
 
 2. Configuration
 -----------------
-A special post processing of the Python module libraries has been added for
-Mac OS X 10.11 and higher (El Capitan). This post processing is a replacement for
-setting DYLD_LIBRARY_PATH during unit testing since the environment variable is
-ignored in certain circumstances by El Capitan.
+None
 
 
 3. Python interface
 -------------------
-None
+The IACT scripts csfindobs, csiactcopy, csiactdata, and csiactobs are only
+imported into th cscripts module and tested if the Python version is 2.6 or
+newer. These scripts make use of the json Python module that is only became
+available from Python 2.6 on.
 
 
 4. Support model
@@ -32,17 +31,61 @@ None
 
 5. ctobssim - CTA observation simulation
 ----------------------------------------
-None
+The simulation energy range is subdivided internally to avoid having a too
+large difference between simulation area and effective area. Before, there
+was a simulation area of 19634954 m^2 that was applied to all energies, which
+led to the simulation of a huge number of low energy photons that were thrown
+away later due to the small effective area. Now, the energy range is subdivided
+(controlled using the "eslices" parameter), and for each energy range, the
+simulation area is computed from the maximum effective area in that energy
+range multiplied by a security factor of 2. This leads to a much more efficient
+simulation of low-energy events (#1673).
+
+Any existing events in an event list are now removed before starting the
+simulation to enable providing an existing event file on input from which
+only the observation attributes are extracted (for example GTI, ROI, energy
+range, etc.) while the measured events are replaced by the simulated ones
+(#1663).
 
 
 6. ctselect - CTA event selection
 ---------------------------------
-None
+The tool now allows the usage of non-default extension names for the event
+and Good Time Intervals. If the events are not located in the "EVENTS"
+extension, the extension name can be provided by appending the extension
+name to the input file name using the syntax
+
+    <filename>[<event extension name>]
+
+where <filename> needs to be replaced by the name of the FITS file and
+<event extension name> by the name of the FITS extension. ctselect also
+extracts the name of the Good Time Intervals extension from the data sub-
+space keywords provided in the header of the event file.
+
+The user has now also the possibility to specify other extension names for
+the events and the Good Time intervals upon writing of the selected output
+file. The format of the "outobs" parameter for this is
+
+    <filename>[<event extension name;GTI extension name>]
+
+If only an event extension name is provided using
+
+    <filename>[<event extension name>]
+
+the original extension name will be kept for the GTIs. Changing only the
+GTI extension name can be achieved using
+
+    <filename>[;GTI extension name>]
+
+The ctselect tool now can also write the output into the same file that
+was input, replacing the initial event (and eventually also Good Time
+Intervals) extensions.
 
 
 7. ctbin - CTA event binning
 ----------------------------
-None
+Add publish() method to publish the counts cube via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
 
 
 8. ctlike - Maximum likelihood fitting
@@ -50,24 +93,28 @@ None
 None
 
 
-9. cttsmap - Generation of Test Statistics map
-----------------------------------------------
-None
+9. cttsmap - Generation of Test Statistic map
+---------------------------------------------
+Add publish() method to publish the Test Statistic map via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 10. ctskymap - CTA sky mapping
 ------------------------------
-None
+Add publish() method to publish the sky map via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
 
 
 11. ctmodel - CTA counts cube modelling
 ---------------------------------------
-None
+Add publish() method to publish the model cube via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
 
 
 12. ctexpcube - CTA exposure cube generation
 --------------------------------------------
-None
+Add publish() method to publish the exposure cube via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 13. ctpsfcube - CTA point spread function cube generation
@@ -77,12 +124,14 @@ None
 
 14. ctbkgcube - CTA background cube generation
 ----------------------------------------------
-None
+Add publish() method to publish the background cube via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 15. ctcubemask - CTA cube filtering
 -----------------------------------
-None
+Add publish() method to publish the masked counts cube via a SAMP Hub
+to Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 16. ctbutterfly - Generate butterfly diagrams
@@ -97,17 +146,17 @@ None
 
 18. cterror - Likelihood profile error computation
 --------------------------------------------------
-None
+The output filename is now read ahead in case that the tool is executed
+(#1700).
 
 
 19. cscripts
 ------------
-The following scripts have been added:
-- csobsinfo: dump information in observation container
-- csmodelinfo: dump information in model container
-- csmodelmerge: merge model containers into single container
-- cstsmapmerge: merge sliced TS map into single map
-- csobs2caldb: creates calibration database from observation
+Added the csiactcopy script that copies IACT data from a remote machine to
+the user's machine (#1661).
+
+Add csresmap::publish() method to publish the residual map via a SAMP Hub
+to Virtual Observatory interoperable tools (e.g. Aladin).
 
 
 20. Examples

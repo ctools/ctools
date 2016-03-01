@@ -15,10 +15,11 @@ map again. Running :doc:`cttsmap` with the hidden parameters ``binmin`` and
 ``binmax`` specified will result in several sliced TS maps. This script merges
 them into one FITS file. The input slices can be passed via the ``inmaps``
 parameter. There are 4 options to specify a list of files that should be merged:
-- a space-separated list of file names (e.g. tsmap1.fits tsmap2.fits)
-- a comma-separated list of file names (e.g. tsmap1.fits,tsmap2.fits)
-- a wildcard string (e.g. tsmap*.xml)
-- an ASCII file containing the file names, one file per line (e.g. @mymaps.txt)
+
+* a space-separated list of file names (e.g. tsmap1.fits tsmap2.fits)
+* a comma-separated list of file names (e.g. tsmap1.fits,tsmap2.fits)
+* a wildcard string (e.g. tsmap*.xml)
+* an ASCII file containing the file names, one file per line (e.g. @mymaps.txt)
 
 Note that the "@" needs to be specified in case of an ASCII file name. 
 
@@ -54,7 +55,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output counts cube should be overwritten.
+    Specifies whether an existing output TS map file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
@@ -69,4 +70,4 @@ Standard parameters
 Related tools or scripts
 ------------------------
 
-:ref:`cstsmap`
+:ref:`cttsmap`

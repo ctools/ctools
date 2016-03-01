@@ -175,6 +175,7 @@ class Test(gammalib.GPythonTestSuite):
         select["tmax"] = tstop
         select["emin"] = emin
         select["emax"] = emax
+        select.run()
         self.test_try("Run ctselect")
         try:
             select.run()
