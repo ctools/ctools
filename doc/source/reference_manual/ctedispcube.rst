@@ -1,41 +1,40 @@
-.. _ctpsfcube:
+.. _ctedispcube:
 
-ctpsfcube
+ctedispcube
 =========
 
-Generate point spread function cube for a counts cube.
+Generate energy dispersion cube for a counts cube.
 
 
 Synopsis
 --------
 
-This tool generates a point spread function cube for a counts cube. A point
-spread function cube is a 4-dimensional cube spanned by Right Ascension or
-Galactic longitude, Declination or Galactic latitude, energy, and offset 
-angle between true and measured arrival direction of a photon. The energy
-binning of the cube may be either linear, logarithmic, or custom defined
-using an input file.
+This tool generates an energy dispersion cube for a counts cube. An energy 
+dispersion cube is a 4-dimensional cube spanned by Right Ascension or
+Galactic longitude, Declination or Galactic latitude, energy, and fraction 
+between recontructed and true photon energy. The energy binning of the cube 
+may be either linear, logarithmic, or custom defined using an input file.
 
-ctpsfcube requires on input the event list or observation definition file 
+ctedispcube requires on input the event list or observation definition file 
 that has been used in the generation of the counts cube using :doc:`ctbin`.
 
-It is not recommended to use the counts cube for the point spread function 
+It is not recommended to use the counts cube for the energy dispersion 
 cube definition, although this is formally possible by specifying the counts 
 cube as ``incube`` parameter. This leads however to a large FITS file on 
 output since the number of bins in the counts cube will be multiplied by 
-the number of offset angle bins (typically 200). Since the point spread 
-function varies only little over the field of view of the camera it is 
+the number of offset angle bins (typically 200). Since the energy dispersion 
+varies only little over the field of view of the camera it is 
 recommended to use a rather coarse spatial binning to keep the file size 
 manageable (with a typical value of ``binsz=1.0``).
 
-ctpsfcube generates a point spread function cube FITS file comprising three
+ctedispcube generates an energy dispersion cube FITS file comprising three
 extensions. The primary extension contains a 3-dimensional image that contains
-the point spread function values. The energy and offset angle dimensions 
-of the point spread function cube are folded into the 3rd dimension of the 
-FITS image. The next extension named ``EBOUNDS`` contains a binary table
-that defines the energy boundaries of the exposure cube. The last extension
-named ``DELTAS`` contains a binary table that defines the offset angles 
-between true and measured arrival direction of the photon.
+the energy disperison values. The energy and fraction dimensions of the enrgy 
+dispersion cube are folded into the 3rd dimension of the FITS image. The next 
+extension named ``EBOUNDS`` contains a binary table that defines the energy 
+boundaries of the exposure cube. The last extension named ``DELTAS`` contains 
+a binary table that defines the fraction between recontructed and true photon 
+energy.
 
 
 General parameters
@@ -45,7 +44,7 @@ General parameters
     Input event list or observation definition XML file.
 
 ``incube [file]``
-    Input counts cube file to extract point spread function cube definition.
+    Input counts cube file to extract energy dispersion cube definition.
 
 ``caldb [string]``
     Calibration database.
@@ -57,7 +56,7 @@ General parameters
     Apply energy dispersion for response computation.
 
 ``outcube [file]``
-    Output point spread function cube file.
+    Output energy dispersion cube file.
 
 ``ebinalg <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
@@ -98,12 +97,11 @@ General parameters
 ``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
 
-``(amax = 0.3) [real]``
-    Upper bound of angular separation between true and measued photon
-    direction (in degrees).
+``(mmax = 10.0) [real]``
+    Upper bound of fraction between recontructed and true photon energy.
 
-``(anumbins = 200) [integer]``
-    Number of angular separation bins.
+``(migrabins = 200) [integer]``
+    Number of migration bins.
  	 	 
 
 Standard parameters
@@ -122,7 +120,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing output point spread function cube file should be overwritten.
+    Specifies whether an existing output energy dispersion cube file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
@@ -130,7 +128,7 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctpsfcube.log) [string]``
+``(logfile = ctedispcube.log) [string]``
     Name of log file.
 
 

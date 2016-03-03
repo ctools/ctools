@@ -4,14 +4,14 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      ctpsfcube.par                                                 #
-#  Version:   1.0.0                                                         #
+#  File:      ctedispcube.par                                               #
+#  Version:   1.1.0                                                         #
 #                                                                           #
-#  Author:    Chia-Chun Lu                                                  #
-#             c.lu@mpi-hd.mpg.de                                            #
-#             MPIK                                                          #
+#  Author:    Maria Haupt                                                   #
+#             maria.haupt@desy.de                                           #
+#             DESY                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the ctpsfcube application                  #
+#  Purpose:   Parameter file for the ctedispcube application                #
 #                                                                           #
 #############################################################################
 #
@@ -48,8 +48,8 @@ proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 #
 # Angular separation binning parameters
 #======================================
-amax,     r, h, 0.3,,, "Upper bound of angular separation between true and measued photon direction (degrees)"
-anumbins, i, h, 200,,, "Number of angular separation bins"
+mmax,     r, h, 10.0,,, "Upper bound of fraction between recontructed and true photon energy"
+migrabins, i, h, 100,,, "Number of migration bins"
 
 #
 # Standard parameters

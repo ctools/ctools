@@ -376,8 +376,8 @@ void ctedispcube::get_parameters(void)
     std::string incube = (*this)["incube"].filename();
 
     // Get additional binning parameters
-    double amax     = (*this)["amax"].real();
-    int    anumbins = (*this)["anumbins"].integer();
+    double mmax     = (*this)["mmax"].real();
+    int    migrabins = (*this)["migrabins"].integer();
 
     // Check for filename validity
     if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
@@ -386,7 +386,7 @@ void ctedispcube::get_parameters(void)
         GCTAEventCube cube = create_cube(m_obs);
 
         // Define edisp cube
-        m_edispcube = GCTACubeEdisp(cube, amax, anumbins);
+        m_edispcube = GCTACubeEdisp(cube, mmax, migrabins);
 
     }
 
@@ -397,7 +397,7 @@ void ctedispcube::get_parameters(void)
         GCTAEventCube cube(incube);
 
         // Define edisp cube
-        m_edispcube = GCTACubeEdisp(cube, amax, anumbins);
+        m_edispcube = GCTACubeEdisp(cube, mmax, migrabins);
 
     } // endelse: cube loaded from file
 
