@@ -63,7 +63,7 @@ from @PYTHON_RELATIVE_IMPORT@cssens       import cssens
 from @PYTHON_RELATIVE_IMPORT@csspec       import csspec
 from @PYTHON_RELATIVE_IMPORT@cstsdist     import cstsdist
 from @PYTHON_RELATIVE_IMPORT@cstsmapmerge import cstsmapmerge
-from . import obsutils
+@PYTHON_FROM_DOT_@import obsutils
 if cur_version > req_version:
     from @PYTHON_RELATIVE_IMPORT@csfindobs    import csfindobs
     from @PYTHON_RELATIVE_IMPORT@csiactcopy   import csiactcopy
