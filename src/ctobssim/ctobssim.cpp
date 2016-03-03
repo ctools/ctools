@@ -419,7 +419,7 @@ void ctobssim::run(void)
 
                 // Save observation into FITS file. This is a critical zone
                 // to avoid multiple threads writing simultaneously
-                #pragma omp critical
+                #pragma omp critical(ctobssim_run)
                 {
                     //obs_clone.save(outfile, clobber());
                     obs->save(outfile, clobber());
