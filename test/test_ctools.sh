@@ -43,6 +43,7 @@ ctselect=../src/ctselect/ctselect
 ctskymap=../src/ctskymap/ctskymap
 ctexpcube=../src/ctexpcube/ctexpcube
 ctpsfcube=../src/ctpsfcube/ctpsfcube
+ctedispcube=../src/ctedispcube/ctedispcube
 ctbkgcube=../src/ctbkgcube/ctbkgcube
 ctcubemask=../src/ctcubemask/ctcubemask
 ctbutterfly=../src/ctbutterfly/ctbutterfly
@@ -266,6 +267,57 @@ then
 $ECHO -n "."
 else
 $ECHO " psfcube2.fits file is not found"
+exit 1
+fi
+$ECHO " ok"
+
+
+#
+# Test ctedispcube
+# ==============
+$ECHO -n "Test ctedispcube: "
+#
+# Run 1
+$ctedispcube inobs="data/crab_events.fits" \
+             incube="NONE" \
+             outcube="edispcube1.fits" \
+             caldb="irf" \
+             irf="cta_dummy_irf" \
+             emin=0.1 \
+             emax=100.0 \
+             enumbins=20 \
+             nxpix=10 \
+             nypix=10 \
+             binsz=0.4 \
+             coordsys="CEL" \
+             xref=83.63 \
+             yref=22.01 \
+             proj="CAR" \
+             mmax=10.0 \
+             migrabins=100
+$ECHO -n "."
+if [ -s "edispcube1.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " edispcube1.fits file is not found"
+exit 1
+fi
+#
+# Run 2
+$ctedispcube inobs="events.fits" \
+             incube="cntmap2.fits" \
+             outcube="edispcube2.fits" \
+             caldb="irf" \
+             irf="cta_dummy_irf" \
+             mmax=10.0 \
+             migrabins=5
+$ECHO -n "."
+if [ -s "edispcube2.fits" ]
+then
+$ECHO -n "."
+else
+$ECHO " edispcube2.fits file is not found"
 exit 1
 fi
 $ECHO " ok"
