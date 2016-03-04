@@ -862,11 +862,12 @@ void ctool::set_obs_response(GCTAObservation* obs)
     // If the observation contains a counts cube, then first check whether
     // the expcube and psfcube parameters exist and are not NONE
     if (dynamic_cast<const GCTAEventCube*>(obs->events()) != NULL) {
-        if (has_par("expcube") && has_par("psfcube") && has_par("bkgcube")) {
+        if (has_par("expcube") && has_par("psfcube") && has_par("bkgcube") && has_par("edispcube")) {
 
             // Get filenames
             std::string expcube = (*this)["expcube"].filename();
             std::string psfcube = (*this)["psfcube"].filename();
+            std::string edispcube = (*this)["edispcube"].filename();
             std::string bkgcube = (*this)["bkgcube"].filename();
 
             // Extract response information if available
@@ -880,8 +881,15 @@ void ctool::set_obs_response(GCTAObservation* obs)
                 GCTACubePsf        psf(psfcube);
                 GCTACubeBackground background(bkgcube);
 
-                // Set reponse
-                obs->response(exposure, psf, background);
+                // Optionally load Edisp cube
+                if (edispcube != "NONE" && (gammalib::strip_whitespace(edispcube) != "")) {
+                	GCTACubeEdisp edisp(edispcube);
+                	obs->response(exposure, psf, edisp, background);
+                }
+                else {
+					// Set reponse
+					obs->response(exposure, psf, background);
+                }
 
                 // Signal response availability
                 has_response = true;

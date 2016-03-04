@@ -104,7 +104,9 @@ class cslightcrv(ctools.cscript):
             pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
             pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("edispcube","f","a","NONE","","","Input energy dispersion cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
             pars.append(gammalib.GApplicationPar("outfile","f","a","lightcurve.fits","","","Output light curve file"))
@@ -190,6 +192,9 @@ class cslightcrv(ctools.cscript):
         # Get source name   
         self.m_srcname = self["srcname"].string()
 
+        # Get energy dispersion flag
+        self.m_edisp = self["edisp"].boolean()
+        
         # Get time boundaries             
         self.create_tbounds()
 
@@ -472,12 +477,35 @@ class cslightcrv(ctools.cscript):
 
                 # Set new binned observation
                 obs = bin.obs()
-
+                
+                # Get new models
+                models = bkgcube.models()
+                
                 # Set precomputed binned response
                 obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
-                # Get new models
-                models = bkgcube.models()
+#                 # Check if we need to include energy dispersion
+#                 if self.m_edisp:
+#                     
+#                     # Create edisp cube
+#                     edispcube = ctools.ctedispcube(select.obs())
+#                     edispcube["incube"]   = "NONE"
+#                     edispcube["usepnt"]   = False
+#                     edispcube["ebinalg"]  = "LOG"
+#                     edispcube["xref"]     = self.m_xref
+#                     edispcube["yref"]     = self.m_yref
+#                     edispcube["binsz"]    = self.m_binsz
+#                     edispcube["nxpix"]    = self.m_nxpix
+#                     edispcube["nypix"]    = self.m_nypix
+#                     edispcube["enumbins"] = self.m_ebins
+#                     edispcube["emin"]     = self.m_emin
+#                     edispcube["emax"]     = self.m_emax    
+#                     edispcube["coordsys"] = self.m_coordsys
+#                     edispcube["proj"]     = self.m_proj               
+#                     edispcube.run()
+#                     
+#                     # Set precomputed binned response including energy dispersion
+#                     obs[0].response(expcube.expcube(), psfcube.psfcube(), edispcube.edispcube(), bkgcube.bkgcube())                    
 
                 # Fix background models if required
                 if self.m_fix_bkg:
@@ -495,6 +523,7 @@ class cslightcrv(ctools.cscript):
 
             # Likelihood
             like = ctools.ctlike(obs)
+            like["edisp"] = self.m_edisp
             like.run()
 
             # Skip bin if no event was present

@@ -217,18 +217,6 @@ void ctexpcube::run(void)
         log << std::endl;
     }
 
-    // Set energy dispersion flag for all CTA observations and save old
-    // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
-    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -249,14 +237,6 @@ void ctexpcube::run(void)
 
     // Fill exposure
     m_expcube.fill(m_obs, &log);
-
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
-    }
 
     // Optionally publish exposure cube
     if (m_publish) {
@@ -348,7 +328,6 @@ void ctexpcube::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-    m_apply_edisp = false;
     m_publish     = false;
 
     // Initialise protected members
@@ -369,7 +348,6 @@ void ctexpcube::copy_members(const ctexpcube& app)
 {
     // Copy attributes
     m_outcube     = app.m_outcube;
-    m_apply_edisp = app.m_apply_edisp;
     m_publish     = app.m_publish;
 
     // Copy protected members
@@ -413,9 +391,6 @@ void ctexpcube::get_parameters(void)
         m_obs = get_observations();
 
     } // endif: there was no observation in the container
-
-    // Read energy dispersion flag
-    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Get the incube filename
     std::string incube = (*this)["incube"].filename();

@@ -216,18 +216,6 @@ void ctedispcube::run(void)
         log << std::endl;
     }
 
-    // Set energy dispersion flag for all CTA observations and save old
-    // values in save_edisp vector
-//    std::vector<bool> save_edisp;
-//    save_edisp.assign(m_obs.size(), false);
-//    for (int i = 0; i < m_obs.size(); ++i) {
-//        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-//        if (obs != NULL) {
-//            save_edisp[i] = obs->response()->apply_edisp();
-//            obs->response()->apply_edisp(m_apply_edisp);
-//        }
-//    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -246,16 +234,8 @@ void ctedispcube::run(void)
         log.header1("Generate EDISP cube");
     }
 
-    // Fill EDISP
+    // Fill Edisp
     m_edispcube.fill(m_obs, &log);
-
-    // Restore energy dispersion flag for all CTA observations
-//    for (int i = 0; i < m_obs.size(); ++i) {
-//        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-//        if (obs != NULL) {
-//            obs->response()->apply_edisp(save_edisp[i]);
-//        }
-//    }
 
     // Return
     return;
@@ -263,14 +243,14 @@ void ctedispcube::run(void)
 
 
 /***********************************************************************//**
- * @brief Save EDISP cube
+ * @brief Save Edisp cube
  ***************************************************************************/
 void ctedispcube::save(void)
 {
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Save EDISP cube");
+        log.header1("Save Edisp cube");
     }
 
     // Get output filename
@@ -281,7 +261,7 @@ void ctedispcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save EDISP cube into file \""+m_outcube+"\".";
+            log << "Save Edisp cube into file \""+m_outcube+"\".";
             log << std::endl;
         }
 
@@ -308,7 +288,6 @@ void ctedispcube::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-//    m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -328,7 +307,6 @@ void ctedispcube::copy_members(const ctedispcube& app)
 {
     // Copy attributes
     m_outcube     = app.m_outcube;
-//    m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs        = app.m_obs;
@@ -396,13 +374,10 @@ void ctedispcube::get_parameters(void)
         // Load event cube from filename
         GCTAEventCube cube(incube);
 
-        // Define edisp cube
+        // Define Edisp cube
         m_edispcube = GCTACubeEdisp(cube, mmax, migrabins);
 
     } // endelse: cube loaded from file
-
-    // Read energy dispersion flag
-//    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Read output filename (if needed)
     if (read_ahead()) {

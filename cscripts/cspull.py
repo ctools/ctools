@@ -52,6 +52,7 @@ class cspull(ctools.cscript):
         self.m_exposure    = None
         self.m_psfcube     = None
         self.m_bckcube     = None
+        self.m_edispcube   = None
         self.m_stackmodels = None
         self.m_coordsys    = "CEL"
         self.m_proj        = "TAN"
@@ -246,6 +247,30 @@ class cspull(ctools.cscript):
         psfcube["proj"]     = self.m_proj
         psfcube.run()
 
+        if self.m_edisp:
+            
+            # Get stacked Edisp
+            edispcube = ctools.ctpsfcube(self.obs)
+            edispcube["incube"]   = "NONE"
+            edispcube["usepnt"]   = True
+            edispcube["ebinalg"]  = "LOG"
+            edispcube["binsz"]    = self.m_binsz*10.0
+            edispcube["nxpix"]    = self.m_npix/10
+            edispcube["nypix"]    = self.m_npix/10
+            edispcube["enumbins"] = self.m_enumbins
+            edispcube["emin"]     = self["emin"].real()
+            edispcube["emax"]     = self["emax"].real()
+            edispcube["coordsys"] = self.m_coordsys
+            edispcube["proj"]     = self.m_proj
+            edispcube.run()   
+            
+            # Store result
+            self.m_edispcube = edispcube.edispcube().copy()
+            
+            # Logging
+            if self.logTerse():
+                self.log("Computed Edisp cube\n")
+
         # Notify Psf computation
         if self.logTerse():
             self.log("Computed Psf cube\n")
@@ -391,7 +416,10 @@ class cspull(ctools.cscript):
 
         # If stacked, add stacked responses and model
         if self.obs.size() > 1 and self.m_enumbins > 0:
-            obs[0].response(self.m_exposure, self.m_psfcube, self.m_bckcube)
+            if self.m_edisp:
+                obs[0].response(self.m_exposure, self.m_psfcube, self.m_edispcube, self.m_bckcube)
+            else:
+                obs[0].response(self.m_exposure, self.m_psfcube, self.m_bckcube)
             obs.models(self.m_stackmodels)
 
         # Determine number of events in simulation

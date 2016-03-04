@@ -69,12 +69,11 @@ protected:
     void get_parameters(void);
 
     // User parameters
-    GFilename     m_outcube;     //!< Output EDISP cube file name
-    bool          m_apply_edisp; //!< Apply energy dispersion?
+    GFilename     m_outcube;     //!< Output Edisp cube file name
 
     // Protected members
     GObservations m_obs;         //!< Observation container
-    GCTACubeEdisp   m_edispcube;     //!< EDISP cube
+    GCTACubeEdisp   m_edispcube;     //!< Edisp cube
 };
 
 
