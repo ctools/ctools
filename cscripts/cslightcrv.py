@@ -484,28 +484,28 @@ class cslightcrv(ctools.cscript):
                 # Set precomputed binned response
                 obs[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
-#                 # Check if we need to include energy dispersion
-#                 if self.m_edisp:
-#                     
-#                     # Create edisp cube
-#                     edispcube = ctools.ctedispcube(select.obs())
-#                     edispcube["incube"]   = "NONE"
-#                     edispcube["usepnt"]   = False
-#                     edispcube["ebinalg"]  = "LOG"
-#                     edispcube["xref"]     = self.m_xref
-#                     edispcube["yref"]     = self.m_yref
-#                     edispcube["binsz"]    = self.m_binsz
-#                     edispcube["nxpix"]    = self.m_nxpix
-#                     edispcube["nypix"]    = self.m_nypix
-#                     edispcube["enumbins"] = self.m_ebins
-#                     edispcube["emin"]     = self.m_emin
-#                     edispcube["emax"]     = self.m_emax    
-#                     edispcube["coordsys"] = self.m_coordsys
-#                     edispcube["proj"]     = self.m_proj               
-#                     edispcube.run()
-#                     
-#                     # Set precomputed binned response including energy dispersion
-#                     obs[0].response(expcube.expcube(), psfcube.psfcube(), edispcube.edispcube(), bkgcube.bkgcube())                    
+                # Check if we need to include energy dispersion
+                if self.m_edisp:
+                    
+                    # Create edisp cube
+                    edispcube = ctools.ctedispcube(select.obs())
+                    edispcube["incube"]   = "NONE"
+                    edispcube["usepnt"]   = False
+                    edispcube["ebinalg"]  = "LOG"
+                    edispcube["xref"]     = self.m_xref
+                    edispcube["yref"]     = self.m_yref
+                    edispcube["binsz"]    = self.m_binsz
+                    edispcube["nxpix"]    = self.m_nxpix
+                    edispcube["nypix"]    = self.m_nypix
+                    edispcube["enumbins"] = self.m_ebins
+                    edispcube["emin"]     = self.m_emin
+                    edispcube["emax"]     = self.m_emax    
+                    edispcube["coordsys"] = self.m_coordsys
+                    edispcube["proj"]     = self.m_proj               
+                    edispcube.run()
+                    
+                    # Set precomputed binned response including energy dispersion
+                    obs[0].response(expcube.expcube(), psfcube.psfcube(), edispcube.edispcube(), bkgcube.bkgcube())                    
 
                 # Fix background models if required
                 if self.m_fix_bkg:
