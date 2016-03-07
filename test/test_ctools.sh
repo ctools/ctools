@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all ctools
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -293,7 +293,7 @@ $ctedispcube inobs="data/crab_events.fits" \
              xref=83.63 \
              yref=22.01 \
              proj="CAR" \
-             mmax=3.0 \
+             migramax=3.0 \
              migrabins=10
 $ECHO -n "."
 if [ -s "edispcube1.fits" ]
@@ -310,7 +310,7 @@ $ctedispcube inobs="events.fits" \
              outcube="edispcube2.fits" \
              caldb="irf" \
              irf="cta_dummy_irf" \
-             mmax=3.0 \
+             migramax=3.0 \
              migrabins=3
 $ECHO -n "."
 if [ -s "edispcube2.fits" ]
@@ -386,7 +386,6 @@ $ECHO " bkgcube2.xml file is not found"
 exit 1
 fi
 $ECHO " ok"
-
 
 
 #
@@ -580,7 +579,6 @@ fi
 $ECHO " ok"
 
 
-
 #
 # Test cttsmap
 # ============
@@ -607,8 +605,6 @@ else
   exit 1
 fi
 $ECHO " ok"
-
-
 
 
 #

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Spectral points generation script.
 #
-# Copyright (C) 2014-2015 Michael Mayer
+# Copyright (C) 2014-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class csspec(ctools.cscript):
 
         # Set name
         self.name    = "csspec"
-        self.version = "1.0.0"
+        self.version = "1.1.0"
 
         # Initialise some members
         self.obs  = gammalib.GObservations()

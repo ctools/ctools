@@ -1,5 +1,5 @@
 /***************************************************************************
- *                  ctedispcube - EDISP cube generation tool               *
+ *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2016 by Maria Haupt                                      *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctedispcube.cpp
- * @brief EDISP cube generation tool implementation
+ * @brief Energy dispersion cube generation tool implementation
  * @author Maria Haupt
  */
 
@@ -34,7 +34,7 @@
 #include "GWcs.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                        "ctedispcube::get_parameters()"
+#define G_GET_PARAMETERS                      "ctedispcube::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -49,6 +49,8 @@
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty energy dispersion tool.
  ***************************************************************************/
 ctedispcube::ctedispcube(void) : ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
 {
@@ -65,11 +67,11 @@ ctedispcube::ctedispcube(void) : ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
  *
  * @param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs an energy dispersion tool from the information that is provided
+ * in an observation container @p obs.
  ***************************************************************************/
 ctedispcube::ctedispcube(const GObservations& obs) :
-           ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
+             ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -88,9 +90,12 @@ ctedispcube::ctedispcube(const GObservations& obs) :
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs an energy dispersion tool by parsing the arguments provided
+ * on the command line.
  ***************************************************************************/
 ctedispcube::ctedispcube(int argc, char *argv[]) :
-           ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, argc, argv)
+             ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -103,7 +108,10 @@ ctedispcube::ctedispcube(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app Application.
+ * @param[in] app Energy dispersion tool.
+ *
+ * Constructs an energy dispersion tool by copying anothere energy
+ * dispersion tool.
  ***************************************************************************/
 ctedispcube::ctedispcube(const ctedispcube& app) : ctool(app)
 {
@@ -120,6 +128,8 @@ ctedispcube::ctedispcube(const ctedispcube& app) : ctool(app)
 
 /***********************************************************************//**
  * @brief Destructor
+ *
+ * Desctructs an energy dispersion tool.
  ***************************************************************************/
 ctedispcube::~ctedispcube(void)
 {
@@ -140,8 +150,10 @@ ctedispcube::~ctedispcube(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Application.
- * @return Application.
+ * @param[in] app Energy dispersion tool.
+ * @return Energy dispersion tool.
+ *
+ * Assigns energy dispersion tool.
  ***************************************************************************/
 ctedispcube& ctedispcube::operator=(const ctedispcube& app)
 {
@@ -174,7 +186,9 @@ ctedispcube& ctedispcube::operator=(const ctedispcube& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear energy dispersion tool
+ *
+ * Set the energy disperison tool to an empty tool.
  ***************************************************************************/
 void ctedispcube::clear(void)
 {
@@ -194,11 +208,10 @@ void ctedispcube::clear(void)
 
 
 /***********************************************************************//**
- * @brief Generate the model map(s)
+ * @brief Generate the energy dispersion cube
  *
- * This method reads the task parameters from the parfile, sets up the
- * observation container, loops over all CTA observations in the container
- * and generates an EDISP cube from the CTA observations.
+ * Generates the energy dispersion cube by looping over all unbinned CTA
+ * observations in the observation container.
  ***************************************************************************/
 void ctedispcube::run(void)
 {
@@ -231,7 +244,7 @@ void ctedispcube::run(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Generate EDISP cube");
+        log.header1("Generate energy dispersion cube");
     }
 
     // Fill Edisp
@@ -243,7 +256,10 @@ void ctedispcube::run(void)
 
 
 /***********************************************************************//**
- * @brief Save Edisp cube
+ * @brief Save energy dispersion cube
+ *
+ * Saves the energy dispersion cube in a FITS file. The FITS filename is
+ * provided by the "outcube" parameter.
  ***************************************************************************/
 void ctedispcube::save(void)
 {
@@ -261,11 +277,11 @@ void ctedispcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save Edisp cube into file \""+m_outcube+"\".";
+            log << "Save energy dispersion cube into file \""+m_outcube+"\".";
             log << std::endl;
         }
 
-        // Save EDISP cube
+        // Save energy dispersion cube
         m_edispcube.save(m_outcube, clobber());
 
     }
@@ -288,8 +304,6 @@ void ctedispcube::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-
-    // Initialise protected members
     m_obs.clear();
     m_edispcube.clear();
 
@@ -301,16 +315,14 @@ void ctedispcube::init_members(void)
 /***********************************************************************//**
  * @brief Copy class members
  *
- * @param[in] app Application.
+ * @param[in] app Energy dispersion cube.
  ***************************************************************************/
 void ctedispcube::copy_members(const ctedispcube& app)
 {
-    // Copy attributes
-    m_outcube     = app.m_outcube;
-
-    // Copy protected members
-    m_obs        = app.m_obs;
-    m_edispcube    = app.m_edispcube;
+    // Copy members
+    m_outcube   = app.m_outcube;
+    m_obs       = app.m_obs;
+    m_edispcube = app.m_edispcube;
 
     // Return
     return;
@@ -354,7 +366,7 @@ void ctedispcube::get_parameters(void)
     std::string incube = (*this)["incube"].filename();
 
     // Get additional binning parameters
-    double mmax     = (*this)["mmax"].real();
+    double migramax  = (*this)["migramax"].real();
     int    migrabins = (*this)["migrabins"].integer();
 
     // Check for filename validity
@@ -364,7 +376,7 @@ void ctedispcube::get_parameters(void)
         GCTAEventCube cube = create_cube(m_obs);
 
         // Define edisp cube
-        m_edispcube = GCTACubeEdisp(cube, mmax, migrabins);
+        m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
 
     }
 
@@ -375,7 +387,7 @@ void ctedispcube::get_parameters(void)
         GCTAEventCube cube(incube);
 
         // Define Edisp cube
-        m_edispcube = GCTACubeEdisp(cube, mmax, migrabins);
+        m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
 
     } // endelse: cube loaded from file
 

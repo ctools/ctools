@@ -175,7 +175,6 @@ class csresmap(ctools.cscript):
                         # Skip ctbin step later on
                         self.m_skip_binning = True
 
-
             # Set models if we have none
             if self.obs.models().size() == 0:
                 self.obs.models(self["inmodel"].filename())
@@ -371,7 +370,6 @@ class csresmap(ctools.cscript):
 
             # Get model map into GSkyMap object
             modelmap = model.cube().map().copy()
-
 
         # Store counts map as residual map. Note that we need a
         # special construct here to avoid memory leaks. This seems

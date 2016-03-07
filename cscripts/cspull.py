@@ -247,10 +247,13 @@ class cspull(ctools.cscript):
         psfcube["proj"]     = self.m_proj
         psfcube.run()
 
+        # Notify Psf computation
+        if self.logTerse():
+            self.log("Computed Psf cube\n")
+
+        # Optionally get stacked Edisp
         if self.m_edisp:
-            
-            # Get stacked Edisp
-            edispcube = ctools.ctpsfcube(self.obs)
+            edispcube = ctools.edispcube(self.obs)
             edispcube["incube"]   = "NONE"
             edispcube["usepnt"]   = True
             edispcube["ebinalg"]  = "LOG"
@@ -263,17 +266,13 @@ class cspull(ctools.cscript):
             edispcube["coordsys"] = self.m_coordsys
             edispcube["proj"]     = self.m_proj
             edispcube.run()   
-            
+
             # Store result
             self.m_edispcube = edispcube.edispcube().copy()
             
             # Logging
             if self.logTerse():
-                self.log("Computed Edisp cube\n")
-
-        # Notify Psf computation
-        if self.logTerse():
-            self.log("Computed Psf cube\n")
+                self.log("Computed energy dispersion cube\n")
 
         # Get stacked background
         bkgcube = ctools.ctbkgcube(self.obs)
@@ -350,7 +349,6 @@ class cspull(ctools.cscript):
                 for n in result['colnames']:
                     headers[n] = n
                 writer.writerow(headers)
-                #writer.writerow(dict((_,_) for _ in result['colnames']))
             else:
                 file = open(self.m_outfile.url(), 'a')
             writer = csv.DictWriter(file, result['colnames'])
@@ -417,9 +415,11 @@ class cspull(ctools.cscript):
         # If stacked, add stacked responses and model
         if self.obs.size() > 1 and self.m_enumbins > 0:
             if self.m_edisp:
-                obs[0].response(self.m_exposure, self.m_psfcube, self.m_edispcube, self.m_bckcube)
+                obs[0].response(self.m_exposure,  self.m_psfcube,
+                                self.m_edispcube, self.m_bckcube)
             else:
-                obs[0].response(self.m_exposure, self.m_psfcube, self.m_bckcube)
+                obs[0].response(self.m_exposure, self.m_psfcube,
+                                self.m_bckcube)
             obs.models(self.m_stackmodels)
 
         # Determine number of events in simulation

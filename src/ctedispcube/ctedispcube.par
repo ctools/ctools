@@ -18,10 +18,10 @@
 # Observational parameters
 #===================
 inobs,    f, a, "NONE",,, "Input event list or observation definition XML file"
-incube,   f, a, "NONE",,, "Input counts cube file to extract PSF cube definition"
+incube,   f, a, "NONE",,, "Input counts cube file to extract energy dispersion cube definition"
 caldb,    s, a, "prod2",,, "Calibration database"
 irf,      s, a, "South_0.5h",,, "Instrument response function"
-outcube,  f, a, "edispcube.fits",,, "Output PSF cube file"
+outcube,  f, a, "edispcube.fits",,, "Output energy dispersion cube file"
 
 #
 # Energy binning parameters
@@ -47,7 +47,7 @@ proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 #
 # Angular separation binning parameters
 #======================================
-mmax,     r, h, 10.0,,, "Upper bound of fraction between recontructed and true photon energy"
+migramax,  r, h, 2.0,,, "Upper bound of ratio of recontructed to true photon energy"
 migrabins, i, h, 100,,, "Number of migration bins"
 
 #

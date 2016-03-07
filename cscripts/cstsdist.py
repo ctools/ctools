@@ -42,7 +42,7 @@ class cstsdist(ctools.cscript):
         """
         # Set name
         self.name    = "cstsdist"
-        self.version = "1.0.0"
+        self.version = "1.1.0"
 
         # Initialise some members
         self.obs        = None
