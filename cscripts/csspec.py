@@ -2,7 +2,7 @@
 # ==========================================================================
 # Spectral points generation script.
 #
-# Copyright (C) 2014-2015 Michael Mayer
+# Copyright (C) 2014-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class csspec(ctools.cscript):
 
         # Set name
         self.name    = "csspec"
-        self.version = "1.0.0"
+        self.version = "1.1.0"
 
         # Initialise some members
         self.obs  = gammalib.GObservations()
@@ -105,6 +105,7 @@ class csspec(ctools.cscript):
             pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
             pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("edispcube","f","a","NONE","","","Input energy dispersion cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","f","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))

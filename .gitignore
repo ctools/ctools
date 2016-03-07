@@ -59,6 +59,7 @@ src/ctselect/ctselect
 src/ctskymap/ctskymap
 src/ctexpcube/ctexpcube
 src/ctpsfcube/ctpsfcube
+src/ctedispcube/ctedispcube
 src/ctbkgcube/ctbkgcube
 src/ctcubemask/ctcubemask
 src/ctbutterfly/ctbutterfly

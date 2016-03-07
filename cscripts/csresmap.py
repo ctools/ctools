@@ -108,6 +108,7 @@ class csresmap(ctools.cscript):
             pars.append(gammalib.GApplicationPar("modcube","f","a","NONE","","","Input model cube file (generated with ctmodel)"))            
             pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("edispcube","f","a","NONE","","","Input energy dispersion cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","f","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
@@ -173,7 +174,6 @@ class csresmap(ctools.cscript):
                     if self.obs[0].eventtype() == "CountsCube":                
                         # Skip ctbin step later on
                         self.m_skip_binning = True
-
 
             # Set models if we have none
             if self.obs.models().size() == 0:
@@ -370,7 +370,6 @@ class csresmap(ctools.cscript):
 
             # Get model map into GSkyMap object
             modelmap = model.cube().map().copy()
-
 
         # Store counts map as residual map. Note that we need a
         # special construct here to avoid memory leaks. This seems

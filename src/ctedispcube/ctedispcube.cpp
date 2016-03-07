@@ -1,7 +1,7 @@
 /***************************************************************************
- *                  ctpsfcube - PSF cube generation tool                   *
+ *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2016 by Maria Haupt                                      *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctpsfcube.cpp
- * @brief PSF cube generation tool implementation
- * @author Chia-Chun Lu
+ * @file ctedispcube.cpp
+ * @brief Energy dispersion cube generation tool implementation
+ * @author Maria Haupt
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -29,12 +29,12 @@
 #include <config.h>
 #endif
 #include <cstdio>
-#include "ctpsfcube.hpp"
+#include "ctedispcube.hpp"
 #include "GTools.hpp"
 #include "GWcs.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                        "ctpsfcube::get_parameters()"
+#define G_GET_PARAMETERS                      "ctedispcube::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -49,8 +49,10 @@
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty energy dispersion tool.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(void) : ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+ctedispcube::ctedispcube(void) : ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -65,11 +67,11 @@ ctpsfcube::ctpsfcube(void) : ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
  *
  * @param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs an energy dispersion tool from the information that is provided
+ * in an observation container @p obs.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(const GObservations& obs) :
-           ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+ctedispcube::ctedispcube(const GObservations& obs) :
+             ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -88,9 +90,12 @@ ctpsfcube::ctpsfcube(const GObservations& obs) :
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs an energy dispersion tool by parsing the arguments provided
+ * on the command line.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(int argc, char *argv[]) :
-           ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, argc, argv)
+ctedispcube::ctedispcube(int argc, char *argv[]) :
+             ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -103,9 +108,12 @@ ctpsfcube::ctpsfcube(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app Application.
+ * @param[in] app Energy dispersion tool.
+ *
+ * Constructs an energy dispersion tool by copying anothere energy
+ * dispersion tool.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(const ctpsfcube& app) : ctool(app)
+ctedispcube::ctedispcube(const ctedispcube& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -120,8 +128,10 @@ ctpsfcube::ctpsfcube(const ctpsfcube& app) : ctool(app)
 
 /***********************************************************************//**
  * @brief Destructor
+ *
+ * Desctructs an energy dispersion tool.
  ***************************************************************************/
-ctpsfcube::~ctpsfcube(void)
+ctedispcube::~ctedispcube(void)
 {
     // Free members
     free_members();
@@ -140,10 +150,12 @@ ctpsfcube::~ctpsfcube(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Application.
- * @return Application.
+ * @param[in] app Energy dispersion tool.
+ * @return Energy dispersion tool.
+ *
+ * Assigns energy dispersion tool.
  ***************************************************************************/
-ctpsfcube& ctpsfcube::operator=(const ctpsfcube& app)
+ctedispcube& ctedispcube::operator=(const ctedispcube& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
@@ -174,9 +186,11 @@ ctpsfcube& ctpsfcube::operator=(const ctpsfcube& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear energy dispersion tool
+ *
+ * Set the energy disperison tool to an empty tool.
  ***************************************************************************/
-void ctpsfcube::clear(void)
+void ctedispcube::clear(void)
 {
     // Free members
     free_members();
@@ -194,13 +208,12 @@ void ctpsfcube::clear(void)
 
 
 /***********************************************************************//**
- * @brief Generate the model map(s)
+ * @brief Generate the energy dispersion cube
  *
- * This method reads the task parameters from the parfile, sets up the
- * observation container, loops over all CTA observations in the container
- * and generates a PSF cube from the CTA observations.
+ * Generates the energy dispersion cube by looping over all unbinned CTA
+ * observations in the observation container.
  ***************************************************************************/
-void ctpsfcube::run(void)
+void ctedispcube::run(void)
 {
     // If we're in debug mode then all output is also dumped on the screen
     if (logDebug()) {
@@ -231,11 +244,11 @@ void ctpsfcube::run(void)
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Generate PSF cube");
+        log.header1("Generate energy dispersion cube");
     }
 
-    // Fill PSF 
-    m_psfcube.fill(m_obs, &log);
+    // Fill Edisp
+    m_edispcube.fill(m_obs, &log);
 
     // Return
     return;
@@ -243,14 +256,17 @@ void ctpsfcube::run(void)
 
 
 /***********************************************************************//**
- * @brief Save PSF cube
+ * @brief Save energy dispersion cube
+ *
+ * Saves the energy dispersion cube in a FITS file. The FITS filename is
+ * provided by the "outcube" parameter.
  ***************************************************************************/
-void ctpsfcube::save(void)
+void ctedispcube::save(void)
 {
     // Write header
     if (logTerse()) {
         log << std::endl;
-        log.header1("Save PSF cube");
+        log.header1("Save Edisp cube");
     }
 
     // Get output filename
@@ -261,12 +277,12 @@ void ctpsfcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save PSF cube into file \""+m_outcube+"\".";
+            log << "Save energy dispersion cube into file \""+m_outcube+"\".";
             log << std::endl;
         }
 
-        // Save PSF cube
-        m_psfcube.save(m_outcube, clobber());
+        // Save energy dispersion cube
+        m_edispcube.save(m_outcube, clobber());
 
     }
 
@@ -284,14 +300,12 @@ void ctpsfcube::save(void)
 /***********************************************************************//**
  * @brief Initialise class members
  ***************************************************************************/
-void ctpsfcube::init_members(void)
+void ctedispcube::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-
-    // Initialise protected members
     m_obs.clear();
-    m_psfcube.clear();
+    m_edispcube.clear();
 
     // Return
     return;
@@ -301,16 +315,14 @@ void ctpsfcube::init_members(void)
 /***********************************************************************//**
  * @brief Copy class members
  *
- * @param[in] app Application.
+ * @param[in] app Energy dispersion cube.
  ***************************************************************************/
-void ctpsfcube::copy_members(const ctpsfcube& app)
+void ctedispcube::copy_members(const ctedispcube& app)
 {
-    // Copy attributes
-    m_outcube     = app.m_outcube;
-
-    // Copy protected members
-    m_obs        = app.m_obs;
-    m_psfcube    = app.m_psfcube;
+    // Copy members
+    m_outcube   = app.m_outcube;
+    m_obs       = app.m_obs;
+    m_edispcube = app.m_edispcube;
 
     // Return
     return;
@@ -320,7 +332,7 @@ void ctpsfcube::copy_members(const ctpsfcube& app)
 /***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
-void ctpsfcube::free_members(void)
+void ctedispcube::free_members(void)
 {
     // Return
     return;
@@ -333,7 +345,7 @@ void ctpsfcube::free_members(void)
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
  ***************************************************************************/
-void ctpsfcube::get_parameters(void)
+void ctedispcube::get_parameters(void)
 {
     // If there are no observations in container then load them via user
     // parameters
@@ -354,8 +366,8 @@ void ctpsfcube::get_parameters(void)
     std::string incube = (*this)["incube"].filename();
 
     // Get additional binning parameters
-    double amax     = (*this)["amax"].real();
-    int    anumbins = (*this)["anumbins"].integer();
+    double migramax  = (*this)["migramax"].real();
+    int    migrabins = (*this)["migrabins"].integer();
 
     // Check for filename validity
     if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
@@ -363,8 +375,8 @@ void ctpsfcube::get_parameters(void)
         // Create an event cube based on task parameters
         GCTAEventCube cube = create_cube(m_obs);
 
-        // Define psf cube
-        m_psfcube = GCTACubePsf(cube, amax, anumbins);
+        // Define edisp cube
+        m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
 
     }
 
@@ -374,8 +386,8 @@ void ctpsfcube::get_parameters(void)
         // Load event cube from filename
         GCTAEventCube cube(incube);
 
-        // Define psf cube
-        m_psfcube = GCTACubePsf(cube, amax, anumbins);
+        // Define Edisp cube
+        m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
 
     } // endelse: cube loaded from file
 

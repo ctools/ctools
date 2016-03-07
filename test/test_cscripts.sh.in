@@ -405,6 +405,7 @@ fi
   inobs="data/crab_cntmap_small.fits.gz" \
   expcube="data/crab_expcube.fits.gz" \
   psfcube="data/crab_psfcube.fits.gz" \
+  edispcube="data/crab_edispcube.fits.gz" \
   bkgcube="data/crab_bkgcube.fits.gz" \
   inmodel="data/crab_bkgcube.xml" \
   ebinalg="LOG" \

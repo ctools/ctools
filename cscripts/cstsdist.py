@@ -42,7 +42,7 @@ class cstsdist(ctools.cscript):
         """
         # Set name
         self.name    = "cstsdist"
-        self.version = "1.0.0"
+        self.version = "1.1.0"
 
         # Initialise some members
         self.obs        = None
@@ -99,6 +99,7 @@ class cstsdist(ctools.cscript):
             pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
             pars.append(gammalib.GApplicationPar("expcube","s","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("psfcube","s","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
+            pars.append(gammalib.GApplicationPar("edispcube","f","a","NONE","","","Input energy dispersion cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
             pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
             pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))

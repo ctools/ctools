@@ -1,7 +1,7 @@
 /***************************************************************************
- *                  ctpsfcube - PSF cube generation tool                   *
+ *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2016 by Maria Haupt                                      *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,13 +19,13 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctpsfcube.hpp
- * @brief PSF cube generation tool definition
+ * @file ctedispcube.hpp
+ * @brief Energy dispersion cube generation tool definition
  * @author Chia-Chun Lu
  */
 
-#ifndef CTPSFCUBE_HPP
-#define CTPSFCUBE_HPP
+#ifndef CTEDISPCUBE_HPP
+#define CTEDISPCUBE_HPP
 
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
@@ -33,59 +33,59 @@
 #include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTPSFCUBE_NAME    "ctpsfcube"
-#define CTPSFCUBE_VERSION "1.1.0"
+#define CTEDISPCUBE_NAME    "ctedispcube"
+#define CTEDISPCUBE_VERSION "1.1.0"
 
 
 /***********************************************************************//**
- * @class ctpsfcube
+ * @class ctedispcube
  *
- * @brief PSF cube generation tool
+ * @brief Energy dispersion cube generation tool
  ***************************************************************************/
-class ctpsfcube : public ctool {
+class ctedispcube : public ctool {
 
 public:
     // Constructors and destructors
-    ctpsfcube(void);
-    explicit ctpsfcube(const GObservations& obs);
-    ctpsfcube(int argc, char *argv[]);
-    ctpsfcube(const ctpsfcube& app);
-    virtual ~ctpsfcube(void);
+    ctedispcube(void);
+    explicit ctedispcube(const GObservations& obs);
+    ctedispcube(int argc, char *argv[]);
+    ctedispcube(const ctedispcube& app);
+    virtual ~ctedispcube(void);
 
     // Operators
-    ctpsfcube& operator=(const ctpsfcube& app);
+    ctedispcube& operator=(const ctedispcube& app);
 
     // Methods
-    void               clear(void);
-    void               run(void);
-    void               save(void);
-    const GCTACubePsf& psfcube(void) const;
+    void                 clear(void);
+    void                 run(void);
+    void                 save(void);
+    const GCTACubeEdisp& edispcube(void) const;
 
 protected:
     // Protected methods
     void init_members(void);
-    void copy_members(const ctpsfcube& app);
+    void copy_members(const ctedispcube& app);
     void free_members(void);
     void get_parameters(void);
 
     // User parameters
-    GFilename     m_outcube;     //!< Output PSF cube file name
+    GFilename     m_outcube;   //!< Output energy dispersion cube file name
 
     // Protected members
-    GObservations m_obs;         //!< Observation container
-    GCTACubePsf   m_psfcube;     //!< PSF cube
+    GObservations m_obs;       //!< Observation container
+    GCTACubeEdisp m_edispcube; //!< Energy dispersion cube
 };
 
 
 /***********************************************************************//**
- * @brief Return PSF cube
+ * @brief Return energy dispersion cube
  *
- * @return PSF cube
+ * @return Energy dispersion cube
  ***************************************************************************/
 inline
-const GCTACubePsf& ctpsfcube::psfcube(void) const
+const GCTACubeEdisp& ctedispcube::edispcube(void) const
 {
-    return (m_psfcube);
+    return (m_edispcube);
 }
 
-#endif /* CTPSFCUBE_HPP */
+#endif /* CTEDISPCUBE_HPP */

@@ -71,7 +71,6 @@ protected:
 
     // User parameters
     GFilename m_outcube;     //!< Output exposure cube file
-    bool      m_apply_edisp; //!< Apply energy dispersion?
     bool      m_publish;     //!< Publish exposure cube?
 
     // Protected members

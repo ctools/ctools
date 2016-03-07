@@ -862,15 +862,18 @@ void ctool::set_obs_response(GCTAObservation* obs)
     // If the observation contains a counts cube, then first check whether
     // the expcube and psfcube parameters exist and are not NONE
     if (dynamic_cast<const GCTAEventCube*>(obs->events()) != NULL) {
-        if (has_par("expcube") && has_par("psfcube") && has_par("bkgcube")) {
+        if (has_par("expcube")   && has_par("psfcube") &&
+            has_par("edispcube") && has_par("bkgcube")) {
 
             // Get filenames
-            std::string expcube = (*this)["expcube"].filename();
-            std::string psfcube = (*this)["psfcube"].filename();
-            std::string bkgcube = (*this)["bkgcube"].filename();
+            std::string expcube   = (*this)["expcube"].filename();
+            std::string psfcube   = (*this)["psfcube"].filename();
+            std::string edispcube = (*this)["edispcube"].filename();
+            std::string bkgcube   = (*this)["bkgcube"].filename();
 
             // Extract response information if available
-            if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
+            if ((expcube != "NONE") && (psfcube != "NONE") &&
+                (bkgcube != "NONE") &&
                 (gammalib::strip_whitespace(expcube) != "") &&
                 (gammalib::strip_whitespace(psfcube) != "") &&
                 (gammalib::strip_whitespace(bkgcube) != "")) {
@@ -880,8 +883,16 @@ void ctool::set_obs_response(GCTAObservation* obs)
                 GCTACubePsf        psf(psfcube);
                 GCTACubeBackground background(bkgcube);
 
-                // Set reponse
-                obs->response(exposure, psf, background);
+                // Optionally load energy dispersion cube
+                if ((edispcube != "NONE") &&
+                    (gammalib::strip_whitespace(edispcube) != "")) {
+                	GCTACubeEdisp edisp(edispcube);
+                	obs->response(exposure, psf, edisp, background);
+                }
+                else {
+					// Set reponse
+					obs->response(exposure, psf, background);
+                }
 
                 // Signal response availability
                 has_response = true;
@@ -904,8 +915,9 @@ void ctool::set_obs_response(GCTAObservation* obs)
         // to the observation definition XML file, in case an observation
         // definition XML file is written.
         std::string parameter = "parameter name=\"Calibration\""
-                                         " database=\""+database+"\""
-                                         " response=\""+irf+"\"";
+                                " database=\""+database+"\""
+                                " response=\""+irf+"\"";
+
         GXmlElement xml;
         xml.append(parameter);
 
@@ -915,22 +927,6 @@ void ctool::set_obs_response(GCTAObservation* obs)
         // Attach response to observation
         obs->response(response);
         
-        // Set calibration database. If "database" is a valid directory then use
-        // this as the pathname to the calibration database. Otherwise, interpret
-        // "database" as the instrument name, the mission being "cta"
-        /*
-        GCaldb caldb;
-        if (gammalib::dir_exists(database)) {
-            caldb.rootdir(database);
-        }
-        else {
-            caldb.open("cta", database);
-        }
-        */
-
-        // Set reponse
-        //obs->response(irf, caldb);
-
         // Signal response availability
         has_response = true;
 
@@ -967,11 +963,13 @@ void ctool::set_obs_bounds(GObservations& obs)
                 // parameters and add them
                 if (list->ebounds().is_empty()) {
 
-                    // If there are "emin" and "emax" parameters then use them
+                    // If there are "emin" and "emax" parameters then use
+                    // them
                     if (has_par("emin") && has_par("emax")) {
                         double emin = (*this)["emin"].real();
                         double emax = (*this)["emax"].real();
-                        GEbounds ebounds(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
+                        GEbounds ebounds(GEnergy(emin, "TeV"),
+                                         GEnergy(emax, "TeV"));
                         list->ebounds(ebounds);
                     }
                     
@@ -995,7 +993,6 @@ void ctool::set_obs_bounds(GObservations& obs)
         } // endif: observation was CTA
         
     } // endfor: looped over observations
-
 
     // Return
     return;
@@ -1126,7 +1123,7 @@ void ctool::provide_help(void) const
     char* ptr = std::getenv("CTOOLS");
     if (ptr == NULL) {
         std::string msg = "CTOOLS environment variable not set, cannot "
-                          "display help file. Please define CTOOLS "
+                          "display help file. Please set the CTOOLS "
                           "environment variable.";
         throw GException::invalid_value(G_PROVIDE_HELP, msg);
     }
