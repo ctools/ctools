@@ -3,21 +3,21 @@
 ctpsfcube
 =========
 
-Generate point spread function cube for a counts cube.
+Generate point spread function cube for a stacked analysis.
 
 
 Synopsis
 --------
 
-This tool generates a point spread function cube for a counts cube. A point
-spread function cube is a 4-dimensional cube spanned by Right Ascension or
-Galactic longitude, Declination or Galactic latitude, energy, and offset 
-angle between true and measured arrival direction of a photon. The energy
-binning of the cube may be either linear, logarithmic, or custom defined
-using an input file.
+This tool generates a point spread function cube for a stacked analysis.
+A point spread function cube is a 4-dimensional cube spanned by Right
+Ascension or Galactic longitude, Declination or Galactic latitude, energy,
+and offset angle between true and measured arrival direction of a photon.
+The energy binning of the cube may be either linear, logarithmic, or custom
+defined using an input file.
 
-ctpsfcube requires on input the event list or observation definition file 
-that has been used in the generation of the counts cube using :doc:`ctbin`.
+ctpsfcube requires on input the event list or observation definition XML
+file that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 It is not recommended to use the counts cube for the point spread function 
 cube definition, although this is formally possible by specifying the counts 
@@ -52,9 +52,6 @@ General parameters
 
 ``irf [string]``
     Instrument response function.
-
-``(edisp = no) [boolean]``
-    Apply energy dispersion for response computation.
 
 ``outcube [file]``
     Output point spread function cube file.

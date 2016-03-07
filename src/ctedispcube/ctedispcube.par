@@ -47,7 +47,7 @@ proj,     s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 #
 # Angular separation binning parameters
 #======================================
-migramax,  r, h, 2.0,,, "Upper bound of ratio of recontructed to true photon energy"
+migramax,  r, h, 2.0,,, "Upper bound of ratio between reconstructed and true photon energy"
 migrabins, i, h, 100,,, "Number of migration bins"
 
 #

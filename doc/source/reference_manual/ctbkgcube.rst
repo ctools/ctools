@@ -3,17 +3,17 @@
 ctbkgcube
 =========
 
-Generate background cube for a counts cube.
+Generate background cube for a stacked analysis.
 
 
 Synopsis
 --------
 
-This tool generates a background cube for a counts cube based on an input
-model. A background cube is a 3-dimensional cube spanned by Right Ascension
-or Galactic longitude, Declination or Galactic latitude, and energy. The
-energy binning may be either linear, logarithmic, or custom defined using an
-input file. The input model is used to predict the expected number of
+This tool generates a background cube for a stacked analysis based on an
+input model. A background cube is a 3-dimensional cube spanned by Right
+Ascension or Galactic longitude, Declination or Galactic latitude, and energy.
+The energy binning may be either linear, logarithmic, or custom defined using
+an input file. The input model is used to predict the expected number of
 background counts in each background cube bin.
 
 ctbkgcube requires on input the event list or observation definition file 

@@ -1,40 +1,41 @@
 .. _ctedispcube:
 
 ctedispcube
-=========
+===========
 
-Generate energy dispersion cube for a counts cube.
+Generate energy dispersion cube for a stacked analysis.
 
 
 Synopsis
 --------
 
-This tool generates an energy dispersion cube for a counts cube. An energy 
-dispersion cube is a 4-dimensional cube spanned by Right Ascension or
-Galactic longitude, Declination or Galactic latitude, energy, and fraction 
-between recontructed and true photon energy. The energy binning of the cube 
-may be either linear, logarithmic, or custom defined using an input file.
+This tool generates an energy dispersion cube for a stacked analysis. An
+energy dispersion cube is a 4-dimensional cube spanned by Right Ascension or
+Galactic longitude, Declination or Galactic latitude, energy, and migration
+which is the ratio between reconstructed and true photon energy. The energy
+binning of the cube may be either linear, logarithmic, or custom defined
+using an input file
 
-ctedispcube requires on input the event list or observation definition file 
-that has been used in the generation of the counts cube using :doc:`ctbin`.
+ctedispcube requires on input the event list or observation definition XML
+file that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 It is not recommended to use the counts cube for the energy dispersion 
 cube definition, although this is formally possible by specifying the counts 
 cube as ``incube`` parameter. This leads however to a large FITS file on 
 output since the number of bins in the counts cube will be multiplied by 
-the number of offset angle bins (typically 200). Since the energy dispersion 
-varies only little over the field of view of the camera it is 
-recommended to use a rather coarse spatial binning to keep the file size 
-manageable (with a typical value of ``binsz=1.0``).
+the number of migration (typically 100). Since the energy dispersion varies
+only little over the field of view of the camera it is recommended to use a
+rather coarse spatial binning to keep the file size manageable (with a typical
+value of ``binsz=1.0``).
 
 ctedispcube generates an energy dispersion cube FITS file comprising three
 extensions. The primary extension contains a 3-dimensional image that contains
 the energy disperison values. The energy and fraction dimensions of the enrgy 
 dispersion cube are folded into the 3rd dimension of the FITS image. The next 
-extension named ``EBOUNDS`` contains a binary table that defines the energy 
-boundaries of the exposure cube. The last extension named ``DELTAS`` contains 
-a binary table that defines the fraction between recontructed and true photon 
-energy.
+extension named ``ENERGIES`` contains a binary table that defines the energy 
+values of the energy dispersion cube. The last extension named ``MIGRAS``
+contains a binary table that defines the migration values of the cube which
+is the ratio between reconstructed and true photon energy.
 
 
 General parameters
@@ -51,9 +52,6 @@ General parameters
 
 ``irf [string]``
     Instrument response function.
-
-``(edisp = no) [boolean]``
-    Apply energy dispersion for response computation.
 
 ``outcube [file]``
     Output energy dispersion cube file.
@@ -97,10 +95,10 @@ General parameters
 ``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
 
-``(mmax = 10.0) [real]``
-    Upper bound of fraction between recontructed and true photon energy.
+``(migramax = 2.0) [real]``
+    Upper bound of ratio between reconstructed and true photon energy.
 
-``(migrabins = 200) [integer]``
+``(migrabins = 100) [integer]``
     Number of migration bins.
  	 	 
 
