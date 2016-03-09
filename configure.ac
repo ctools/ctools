@@ -754,6 +754,32 @@ fi
 
 
 #############################################################################
+# Checks for coverage option                                                #
+#############################################################################
+# Initialise Python coverage with empty string
+PYTHON_COVERAGE=
+
+# Check for coverage option
+AC_MSG_CHECKING(whether to build ctools for code coverage measure)
+AC_ARG_ENABLE([coverage],
+              AS_HELP_STRING([--enable-coverage],
+                             [turn on code coverage measure [default=no]]),
+              [enable_coverage="$enableval"],
+              [enable_coverage="no"])
+if test "x$enable_coverage" = "xyes"; then
+  CXXFLAGS="--coverage $CXXFLAGS"
+  LDFLAGS="--coverage $LDFLAGS"
+  if test "x$has_python" = "xyes"; then
+    PYTHON_COVERAGE="coverage run --append "
+  fi
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+AC_SUBST(PYTHON_COVERAGE)
+
+
+#############################################################################
 # Checks for GammaLib library                                               #
 #############################################################################
 # Initialise GammaLib availability
@@ -971,6 +997,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctools-setup
                  test/Makefile
                  test/test_cscripts.sh
+                 test/test_python.sh
                  pyext/Makefile
                  pyext/setup.py
                  pyext/ctools/__init__.py
@@ -982,6 +1009,7 @@ AC_CONFIG_FILES([Makefile
                  ctools.pc
                  testconf.sh],
                 [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;
+                 if test -f test/test_python.sh; then chmod +x test/test_python.sh; fi;
                  if test -f testconf.sh; then chmod +x testconf.sh; fi])
 AC_OUTPUT
 

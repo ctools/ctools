@@ -40,6 +40,7 @@ stamp-h1
 depcomp
 test-driver
 testconf.sh
+coverage-report-python.xml
 
 doc/html
 doc/man
@@ -77,6 +78,8 @@ test/reports/*.xml
 test/butterfly.txt
 test/model.reg
 test/obs.reg
+test/.coverage
+test/test_python.sh
 examples/*.fits
 examples/*.xml
 examples/*.dat

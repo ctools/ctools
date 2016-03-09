@@ -93,9 +93,15 @@ cppncss:
 # Add coverage rule
 coverage:
 	@if type gcovr >/dev/null 2>&1; then \
-		gcovr -r . -x -o gcovr-reports-data.xml; \
+		gcovr -r . -x -o coverage-report-cxx.xml; \
 	else \
 		echo "gcovr script not found in PATH."; \
+	fi; \
+	if type coverage >/dev/null 2>&1; then \
+	    export COVERAGE_FILE=test/.coverage; \
+		coverage xml --omit=**/gammalib/** -o coverage-report-python.xml; \
+	else \
+		echo "coverage script not found in PATH."; \
 	fi
 
 # Add Valgrind rule
