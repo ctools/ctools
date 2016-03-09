@@ -76,7 +76,7 @@ cppcheck:
 sloccount:
 	@if type sloccount >/dev/null 2>&1; then \
 		sloccount --duplicates --wide --details \
-		src test > sloccount.sc; \
+		cscripts src test > sloccount.sc; \
 	else \
 		echo "sloccount not found in PATH."; \
 	fi
@@ -85,7 +85,7 @@ sloccount:
 cppncss:
 	@if type cppncss >/dev/null 2>&1; then \
 		cppncss -r -v -x -k -f=cppncss-raw-report.xml \
-		src inst/*/src; \
+		src; \
 	else \
 		echo "cppncss not found in PATH."; \
 	fi
