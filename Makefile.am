@@ -66,7 +66,7 @@ dynamic-analysis: coverage valgrind
 # Add cppcheck rule
 cppcheck:
 	@if type cppcheck >/dev/null 2>&1; then \
-		cppcheck -v --enable=all --xml \
+		cppcheck -v --enable=all --xml --xml-version=2 \
 		src 2> cppcheck-result.xml; \
 	else \
 		echo "cppcheck not found in PATH."; \
