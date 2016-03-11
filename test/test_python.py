@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctools package.
 #
-# Copyright (C) 2012-2015 Juergen Knoedlseder
+# Copyright (C) 2012-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ import test_ctcubemask
 import test_ctbutterfly
 import test_ctulimit
 import test_cterror
-import test_cscaldb
 import test_pipelines
 
 
@@ -66,7 +65,6 @@ def test(installed=False):
     suite_ctbutterfly = test_ctbutterfly.Test()
     suite_ctulimit    = test_ctulimit.Test()
     suite_cterror     = test_cterror.Test()
-    suite_cscaldb     = test_cscaldb.Test()
     suite_pipelines   = test_pipelines.Test()
 
     # Setup unit tests
@@ -84,7 +82,6 @@ def test(installed=False):
     suite_ctbutterfly.set()
     suite_ctulimit.set()
     suite_cterror.set()
-    suite_cscaldb.set()
     suite_pipelines.set()
 
     # Append tests to container
@@ -102,7 +99,6 @@ def test(installed=False):
     suites.append(suite_ctbutterfly)
     suites.append(suite_ctulimit)
     suites.append(suite_cterror)
-    suites.append(suite_cscaldb)
     suites.append(suite_pipelines)
 
     # If we have an installed version then create a temporary
@@ -133,7 +129,6 @@ def test(installed=False):
     # Copy over pfiles
     if not installed:
         os.system("cp -r ../src/*/*.par pfiles/")
-        os.system("cp -r ../cscripts/*.par pfiles/")
     else:
         os.system("cp -r %s/syspfiles/*.par pfiles/" % (os.environ['CTOOLS']))
 

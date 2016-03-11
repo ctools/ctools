@@ -80,6 +80,7 @@ test/model.reg
 test/obs.reg
 test/.coverage
 test/test_python.sh
+test/test_python_cscripts.sh
 examples/*.fits
 examples/*.xml
 examples/*.dat
