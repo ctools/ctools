@@ -49,7 +49,8 @@ if cur_version > req_version:
                     "csiactobs"])
 
 # Import
-from @PYTHON_RELATIVE_IMPORT@cscaldb      import cscaldb
+from cscripts.cscaldb      import cscaldb
+#from @PYTHON_RELATIVE_IMPORT@cscaldb      import cscaldb
 from @PYTHON_RELATIVE_IMPORT@csinfo       import csinfo
 from @PYTHON_RELATIVE_IMPORT@cslightcrv   import cslightcrv
 from @PYTHON_RELATIVE_IMPORT@csmodelinfo  import csmodelinfo
