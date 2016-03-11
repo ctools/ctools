@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2015 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2016 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -46,6 +46,7 @@ testscripts = ctools/tests/__init__.py \
               ../test/test_ctbutterfly.py \
               ../test/test_ctulimit.py \
               ../test/test_cterror.py \
+              ../test/test_cscaldb.py \
               ../test/test_pipelines.py
 testdata    = ../test/data/crab.xml \
               ../test/data/crab_events.fits.gz \

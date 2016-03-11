@@ -9,6 +9,9 @@ pythonscripts = __init__.py \
                 csfindobs.py csiactcopy.py csiactdata.py csiactobs.py \
                 obsutils.py
 
+# Parfiles to be distributed in $(prefix)/syspfiles
+parfiles = cscaldb.par
+
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
               csobsdef csspec cslightcrv csobsinfo \
@@ -16,12 +19,14 @@ linkscripts = cspull cssens cstsdist cscaldb csresmap \
               csobs2caldb \
               csfindobs csiactcopy csiactdata csiactobs
 
-# Distribute scripts
+# Distribute scripts and parfiles
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
 binscriptsdir      = $(bindir)
 binscripts_DATA    = $(binscripts)
 pythonscriptsdir   = $(pyexecdir)/cscripts
 pythonscripts_DATA = $(pythonscripts)
+pfilesdir          = $(prefix)/syspfiles
+pfiles_DATA        = $(parfiles)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:
