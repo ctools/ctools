@@ -49,26 +49,26 @@ if cur_version > req_version:
                     "csiactobs"])
 
 # Import
-from @PYTHON_RELATIVE_IMPORT@cscaldb      import cscaldb
-from @PYTHON_RELATIVE_IMPORT@csinfo       import csinfo
-from @PYTHON_RELATIVE_IMPORT@cslightcrv   import cslightcrv
-from @PYTHON_RELATIVE_IMPORT@csmodelinfo  import csmodelinfo
-from @PYTHON_RELATIVE_IMPORT@csmodelmerge import csmodelmerge
-from @PYTHON_RELATIVE_IMPORT@csobs2caldb  import csobs2caldb
-from @PYTHON_RELATIVE_IMPORT@csobsdef     import csobsdef
-from @PYTHON_RELATIVE_IMPORT@csobsinfo    import csobsinfo
-from @PYTHON_RELATIVE_IMPORT@cspull       import cspull
-from @PYTHON_RELATIVE_IMPORT@csresmap     import csresmap
-from @PYTHON_RELATIVE_IMPORT@cssens       import cssens
-from @PYTHON_RELATIVE_IMPORT@csspec       import csspec
-from @PYTHON_RELATIVE_IMPORT@cstsdist     import cstsdist
-from @PYTHON_RELATIVE_IMPORT@cstsmapmerge import cstsmapmerge
-@PYTHON_FROM_DOT_@import obsutils
+from cscripts.cscaldb      import cscaldb
+from cscripts.csinfo       import csinfo
+from cscripts.cslightcrv   import cslightcrv
+from cscripts.csmodelinfo  import csmodelinfo
+from cscripts.csmodelmerge import csmodelmerge
+from cscripts.csobs2caldb  import csobs2caldb
+from cscripts.csobsdef     import csobsdef
+from cscripts.csobsinfo    import csobsinfo
+from cscripts.cspull       import cspull
+from cscripts.csresmap     import csresmap
+from cscripts.cssens       import cssens
+from cscripts.csspec       import csspec
+from cscripts.cstsdist     import cstsdist
+from cscripts.cstsmapmerge import cstsmapmerge
+from cscripts              import obsutils
 if cur_version > req_version:
-    from @PYTHON_RELATIVE_IMPORT@csfindobs    import csfindobs
-    from @PYTHON_RELATIVE_IMPORT@csiactcopy   import csiactcopy
-    from @PYTHON_RELATIVE_IMPORT@csiactdata   import csiactdata
-    from @PYTHON_RELATIVE_IMPORT@csiactobs    import csiactobs
+    from cscripts.csfindobs  import csfindobs
+    from cscripts.csiactcopy import csiactcopy
+    from cscripts.csiactdata import csiactdata
+    from cscripts.csiactobs  import csiactobs
 
 # Delete version check variables
 del sys
