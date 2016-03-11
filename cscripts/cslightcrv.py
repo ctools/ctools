@@ -182,8 +182,8 @@ class cslightcrv(ctools.cscript):
         """
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
-            self.require_inobs("cslightcrv::get_parameters()")
-            self.obs = self.get_observations()
+            self._require_inobs("cslightcrv::get_parameters()")
+            self.obs = self._get_observations()
 
         # Set models if we have none
         if self.obs.models().size() == 0:
@@ -379,8 +379,8 @@ class cslightcrv(ctools.cscript):
             select = ctools.ctselect(self.obs)
             select["emin"] = self.m_emin    
             select["emax"] = self.m_emax 
-            select["tmin"] = tmin.convert(select.time_reference())
-            select["tmax"] = tmax.convert(select.time_reference())
+            select["tmin"] = tmin.convert(select._time_reference())
+            select["tmax"] = tmax.convert(select._time_reference())
             select["rad"]  = "UNDEFINED"
             select["ra"]   = "UNDEFINED"
             select["dec"]  = "UNDEFINED"

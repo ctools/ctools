@@ -164,8 +164,8 @@ class csresmap(ctools.cscript):
 
             # Set observation if not done before
             if self.obs.size() == 0:
-                self.require_inobs("csresmap.get_parameters()")
-                self.obs = self.get_observations()
+                self._require_inobs("csresmap.get_parameters()")
+                self.obs = self._get_observations()
 
             # Check if we have exactly one binned CTA observation
             if self.obs.size() == 1:
@@ -208,7 +208,7 @@ class csresmap(ctools.cscript):
         self.m_debug   = self["debug"].boolean()
 
         # Read ahead output parameters
-        if (self.read_ahead()):
+        if (self._read_ahead()):
             self.m_outmap = self["outmap"].filename()
 
         # Return
@@ -229,7 +229,7 @@ class csresmap(ctools.cscript):
         Execute the script.
         """
         # Read ahead output parameters
-        self.read_ahead(True)
+        self._read_ahead(True)
 
         # Run the script
         self.run()

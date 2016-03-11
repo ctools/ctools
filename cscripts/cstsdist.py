@@ -133,7 +133,7 @@ class cstsdist(ctools.cscript):
 
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
-            self.obs = self.get_observations()
+            self.obs = self._get_observations()
 
             # Check for requested pattern and use above
             # observation parameters to set wobble pattern

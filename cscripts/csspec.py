@@ -133,8 +133,8 @@ class csspec(ctools.cscript):
         """
         # Set observation if not done before
         if self.obs == None or self.obs.size() == 0:
-            self.require_inobs("csspec::get_parameters()")
-            self.obs = self.get_observations()
+            self._require_inobs("csspec::get_parameters()")
+            self.obs = self._get_observations()
         
         # Check if we have one binned cta observation, i.e. if we are in binned mode
         self.m_binned_mode = False    
@@ -239,7 +239,7 @@ class csspec(ctools.cscript):
                     
         # Unbinned mode       
         else:
-            self.m_ebounds = self.create_ebounds()
+            self.m_ebounds = self._create_ebounds()
 
         # Return
         return
