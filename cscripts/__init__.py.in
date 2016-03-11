@@ -52,7 +52,7 @@ if cur_version > req_version:
 from cscripts.cscaldb      import cscaldb
 from cscripts.csinfo       import csinfo
 from cscripts.cslightcrv   import cslightcrv
-from cscripts.smodelinfo   import csmodelinfo
+from cscripts.csmodelinfo  import csmodelinfo
 from cscripts.csmodelmerge import csmodelmerge
 from cscripts.csobs2caldb  import csobs2caldb
 from cscripts.csobsdef     import csobsdef
