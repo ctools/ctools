@@ -30,17 +30,21 @@ import os
 # ============= #
 class cscaldb(ctools.cscript):
     """
-    The cscaldb class logs the content of the ctools calibration database
-    into the log file. Optionally, if the "debug" parameter is set to "yes"
-    the calibration database is also logged into the console.
+    Shows the content of the ctools calibration database.
+    
+    If the "debug" parameter is set to "yes" the calibration database
+    is shown in the console, otherwise the content is only written
+    into the "cscaldb.log" log file.
     """
+
+    # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
         """
         # Set name
         self._name    = "cscaldb"
-        self._version = "1.0.0"
+        self._version = "1.1.0"
 
         # Initialise application
         if len(argv) == 0:
@@ -51,8 +55,8 @@ class cscaldb(ctools.cscript):
             raise TypeError("Invalid number of arguments given.")
 
         # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -64,6 +68,8 @@ class cscaldb(ctools.cscript):
         # Return
         return
 
+
+    # Private methods
     def _get_parameters(self):
         """
         Get parameters from parfile.
@@ -156,6 +162,8 @@ class cscaldb(ctools.cscript):
         # Return response names
         return names
 
+
+    # Public methods
     def execute(self):
         """
         Execute the script.
@@ -171,16 +179,16 @@ class cscaldb(ctools.cscript):
         Run the script.
         """
         # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
         self._get_parameters()
 
         #  Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
 
         # Get the calibration database
         caldb = gammalib.GCaldb()
@@ -196,9 +204,9 @@ class cscaldb(ctools.cscript):
                 continue
 
             # Write mission into logger
-            if self.logTerse():
-                self.log("\n")
-                self.log.header1("Mission: "+mission)
+            if self._logTerse():
+                self._log("\n")
+                self._log.header1("Mission: "+mission)
 
             # Extract instruments
             instruments = self._get_instruments(caldb, mission)
@@ -207,25 +215,25 @@ class cscaldb(ctools.cscript):
             for instrument in instruments:
 
                 # Write mission into logger
-                if self.logTerse():
-                    self.log.header3("Response functions in database \""+
-                                     instrument+"\"")
+                if self._logTerse():
+                    self._log.header3("Response functions in database \""+
+                                      instrument+"\"")
 
                 # Open calibration index file and retrieve calibrations
                 filename = "/data/"+mission+"/"+instrument+"/caldb.indx"
                 cifname  = caldb.rootdir() + filename
                 fits     = gammalib.GFits(cifname)
                 cif      = fits["CIF"]
-                cals     = cif["CAL_CBD"]
+                caltable = cif["CAL_CBD"]
 
                 # Extract response names
-                names = self._get_response_names(cals)
+                names = self._get_response_names(caltable)
 
                 # Print response name
-                if self.logTerse():
+                if self._logTerse():
                     for name in names:
-                        self.log(name+"\n")
-                    self.log("\n")
+                        self._log(name+"\n")
+                    self._log("\n")
 
         # Return
         return
@@ -235,14 +243,12 @@ class cscaldb(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Logs calibration database into the log file.
-    """
+
     # Create instance of application
     app = cscaldb(sys.argv)
 
     # Open logfile
-    app.logFileOpen()
+    app._logFileOpen()
 
     # Execute application
     app.execute()
