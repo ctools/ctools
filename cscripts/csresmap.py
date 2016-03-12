@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Residual map generation script.
+# Generates a residual map.
 #
 # Copyright (C) 2014-2016 Michael Mayer
 #
@@ -22,57 +22,76 @@ import gammalib
 import ctools
 import sys
 
+
 # ============== #
-# cstsdist class #
+# csresmap class #
 # ============== #
 class csresmap(ctools.cscript):
     """
+    Generates a residual map.
+    
     This class implements the creation of a residual map. It derives from
     the ctools.cscript class which provides support for parameter files,
     command line arguments, and logging. In that way the Python script
     behaves just as a regular ctool. 
     """
+
+    # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
         """
         # Set name
-        self.name    = "csresmap"
-        self.version = "1.1.0"
+        self._name    = "csresmap"
+        self._version = "1.1.0"
 
-        # Initialise some members
-        self.obs            = None 
-        self.algorithm      = "SUB"
-        self.resmap         = None
-        self.m_modcube      = "None"
-        self.m_outmap       = "None"
-        self.m_use_maps     = False
-        self.m_skip_binning = False
-        self.m_publish      = False
+        # Initialise class members
+        self._algorithm    = "SUB"
+        self._resmap       = None
+        self._modcube      = "NONE"
+        self._outmap       = "NONE"
+        self._use_maps     = False
+        self._skip_binning = False
+        self._publish      = False
+        self._outfile      = ""
+        self._use_maps     = False
+        self._skip_binning = False
+        self._edisp        = False
+        self._xref         = 83.63
+        self._yref         = 22.01
+        self._emin         = 0.1
+        self._emax         = 100.0
+        self._enumbins     = 0
+        self._ebinalg      = "LOG"
+        self._coordsys     = "CEL"
+        self._proj         = "CAR"
+        self._nxpix        = 200
+        self._nypix        = 200
+        self._binsz        = 0.02
+        self._publish      = False
+        self._chatter      = 2
+        self._clobber      = True
+        self._debug        = False
+        self._log_clients  = False
 
-        # Initialise some members
+        # Initialise observation
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-            self.obs = argv[0]
-            argv     = argv[1:]
+            self._obs = argv[0]
+            argv      = argv[1:]
         else:      
-            self.obs = gammalib.GObservations()
-            self.obs.clear()   
-        self.outfile = ""
-
-        # Make sure that parfile exists
-        file = self.parfile()
+            self._obs = gammalib.GObservations()
 
         # Initialise application
         if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self._name, self._version)
         elif len(argv) ==1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
         # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -81,145 +100,216 @@ class csresmap(ctools.cscript):
         """
         Destructor.
         """
-        #  Write separator into logger
-        if self.logTerse():
-            self.log("\n")
-
         # Return
         return
 
-    def parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
-        """
-        # Set parfile name
-        parfile = self.name+".par"
 
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Input event list, counts cube, or observation definition XML file"))
-            pars.append(gammalib.GApplicationPar("modcube","f","a","NONE","","","Input model cube file (generated with ctmodel)"))            
-            pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("edispcube","f","a","NONE","","","Input energy dispersion cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("bkgcube","f","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
-            pars.append(gammalib.GApplicationPar("outmap","f","a","resmap.fits","","","Output residual map file"))
-            pars.append(gammalib.GApplicationPar("ebinalg","s","h","LOG","LIN|LOG|FILE","","Binning algorithm"))
-            pars.append(gammalib.GApplicationPar("emin","r","h","0.1","","","Lower energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","h","100.0","","","Upper energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("enumbins","i","h","20","","","Number of energy bins"))
-            pars.append(gammalib.GApplicationPar("ebinfile","f","h","NONE","","","Name of the file containing the energy bin definition"))
-            pars.append(gammalib.GApplicationPar("coordsys","s","a","CEL","CEL|GAL","","Coordinate System"))
-            pars.append(gammalib.GApplicationPar("proj","s","a","CAR","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method"))
-            pars.append(gammalib.GApplicationPar("xref","r","a","83.63","0","360","First coordinate of image center in degrees (RA or galactic l)"))
-            pars.append(gammalib.GApplicationPar("yref","r","a","22.01","-90","90","Second coordinate of image center in degrees (DEC or galactic b)"))
-            pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
-            pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
-            pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("algorithm","s","a","SUBDIV","SUB|SUBDIV|SUBDIVSQRT","","Residual map computation algorithm"))
-            pars.append(gammalib.GApplicationPar("publish","b","h","no","","","Publish residual map on VO Hub?"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csresmap.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
-    def get_parameters(self):
+    # Private methods
+    def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
         # Initialise some flags
-        self.m_use_maps     = False
-        self.m_skip_binning = False
+        self._use_maps     = False
+        self._skip_binning = False
 
         # First check if the inobs parameter is a counts cube
-        if self.obs.size() == 0 and self["inobs"].filename() != "NONE":
+        if self._obs.size() == 0 and self["inobs"].filename() != "NONE":
             filename = gammalib.GFilename(self["inobs"].filename())
             if filename.is_fits():
                 cta = gammalib.GCTAObservation()
                 cta.load(filename)
                 if cta.eventtype() == "CountsCube":
-                    self.m_skip_binning = True
+                    self._skip_binning = True
 
         # If we have a counts cube, then ask whether we also have a model
-        if self.m_skip_binning:
-            self.m_modcube = self["modcube"].filename()
-            if self.m_modcube != "NONE":
-                self.m_use_maps = True
+        if self._skip_binning:
+            self._modcube = self["modcube"].filename()
+            if self._modcube != "NONE":
+                self._use_maps = True
 
         # If not two maps are given, proceed to set up observation
-        if not self.m_use_maps:
+        if not self._use_maps:
 
             # Set observation if not done before
-            if self.obs.size() == 0:
+            if self._obs.size() == 0:
                 self._require_inobs("csresmap.get_parameters()")
-                self.obs = self._get_observations()
+                self._obs = self._get_observations()
 
             # Check if we have exactly one binned CTA observation
-            if self.obs.size() == 1:
+            if self._obs.size() == 1:
 
-                if self.obs[0].classname() == "GCTAObservation":
-                    if self.obs[0].eventtype() == "CountsCube":                
+                if self._obs[0].classname() == "GCTAObservation":
+                    if self._obs[0].eventtype() == "CountsCube":                
                         # Skip ctbin step later on
-                        self.m_skip_binning = True
+                        self._skip_binning = True
 
             # Set models if we have none
-            if self.obs.models().size() == 0:
-                self.obs.models(self["inmodel"].filename())
+            if self._obs.models().size() == 0:
+                self._obs.models(self["inmodel"].filename())
 
             # Skip query for spatial parameters if a binning is provided in the observation
-            if not self.m_skip_binning:
+            if not self._skip_binning:
                 # Read other parameters        
-                self.m_xref      = self["xref"].real()
-                self.m_yref      = self["yref"].real()
-                self.m_emin      = self["emin"].real()
-                self.m_emax      = self["emax"].real()
-                self.m_enumbins  = self["enumbins"].integer()
-                self.m_ebinalg   = self["ebinalg"].string()
-                self.m_coordsys  = self["coordsys"].string()
-                self.m_proj      = self["proj"].string()
-                self.m_nxpix     = self["nxpix"].integer()
-                self.m_nypix     = self["nypix"].integer()
-                self.m_binsz     = self["binsz"].real()
+                self._xref     = self["xref"].real()
+                self._yref     = self["yref"].real()
+                self._emin     = self["emin"].real()
+                self._emax     = self["emax"].real()
+                self._enumbins = self["enumbins"].integer()
+                self._ebinalg  = self["ebinalg"].string()
+                self._coordsys = self["coordsys"].string()
+                self._proj     = self["proj"].string()
+                self._nxpix    = self["nxpix"].integer()
+                self._nypix    = self["nypix"].integer()
+                self._binsz    = self["binsz"].real()
                 
         # Read energy dispersion flag
-        self.m_edisp = self["edisp"].boolean()
+        self._edisp = self["edisp"].boolean()
 
         # Read algorithm
-        self.m_algorithm = self["algorithm"].string()
+        self._algorithm = self["algorithm"].string()
 
         # Read standard parameters
-        self.m_publish = self["publish"].boolean()
-        self.m_log     = False # Logging in client tools
-        self.m_chatter = self["chatter"].integer()
-        self.m_clobber = self["clobber"].boolean()
-        self.m_debug   = self["debug"].boolean()
+        self._publish = self["publish"].boolean()
+        self._chatter = self["chatter"].integer()
+        self._clobber = self["clobber"].boolean()
+        self._debug   = self["debug"].boolean()
 
         # Read ahead output parameters
         if (self._read_ahead()):
-            self.m_outmap = self["outmap"].filename()
+            self._outmap = self["outmap"].filename()
+
+        # Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
 
         # Return
         return
 
-    def models(self, models):
+
+    # Public methods
+    def run(self):
         """
-        Set model.
+        Run the script.
         """
-        # Copy models
-        self.obs.models(models.clone())
+        # Switch screen logging on in debug mode
+        if self._logDebug():
+            self._log.cout(True)
+
+        # Get parameters
+        self._get_parameters()
+
+        # Write observation into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Observation")
+            self._log(str(self._obs))
+            self._log("\n")
+
+        # Use input file directly if given
+        if self._use_maps:
+            countmap = gammalib.GSkyMap(self["inobs"].filename())
+            modelmap = gammalib.GSkyMap(self._modcube)
+
+        else:
+
+            # ...
+            if self._skip_binning:
+                cta_counts_cube = gammalib.GCTAEventCube(self._obs[0].events().clone())   
+
+            # ...
+            else:
+
+                # Write header
+                if self._logTerse():
+                    self._log("\n")
+                    self._log.header1("Generate binned map (ctbin)")
+
+                # Create countsmap
+                bin = ctools.ctbin(self._obs)
+                bin["nxpix"].integer(self._nxpix)
+                bin["nypix"].integer(self._nypix)
+                bin["proj"].string(self._proj)
+                bin["coordsys"].string(self._coordsys)
+                bin["xref"].real(self._xref)
+                bin["yref"].real(self._yref)
+                bin["enumbins"].integer(self._enumbins)
+                bin["ebinalg"].string(self._ebinalg)
+                bin["emin"].real(self._emin)
+                bin["emax"].real(self._emax)
+                bin["binsz"].real(self._binsz)
+                bin["chatter"].integer(self._chatter)
+                bin["clobber"].boolean(self._clobber)
+                bin["debug"].boolean(self._debug)
+                bin.run()
+
+                # Retrieve counts cube
+                cta_counts_cube = bin.cube()
+
+            # Assign GCTAEventCube to skymap
+            countmap = cta_counts_cube.map()
+
+            # Write header
+            if self._logTerse():
+                self._log("\n")
+                self._log.header1("Generate model map (ctmodel)")
+
+            # Create model map
+            model = ctools.ctmodel(self._obs)
+            model.cube(cta_counts_cube)
+            model["chatter"].integer(self._chatter)
+            model["clobber"].boolean(self._clobber)
+            model["debug"].boolean(self._debug)
+            model["edisp"].boolean(self._edisp)
+            model.run()
+
+            # Get model map into GSkyMap object
+            modelmap = model.cube().map().copy()
+
+        # Store counts map as residual map. Note that we need a
+        # special construct here to avoid memory leaks. This seems
+        # to be a SWIG feature as SWIG creates a new object when
+        # calling bin.cube()
+        #residualmap = bin.cube().map() 
+        self._resmap = countmap.copy()
+        self._resmap.stack_maps()
+        modelmap.stack_maps()
+
+        # Continue calculations depending on given algorithm
+        if self._algorithm == "SUB":
+
+            # Subtract maps 
+            self._resmap -= modelmap
+
+        elif self._algorithm == "SUBDIV":
+
+            # Subtract and divide by model map
+            self._resmap -= modelmap
+            self._resmap /= modelmap
+            #for pixel in modelmap:
+            #    if pixel != 0.0:
+            #        pixel = 1.0/pixel
+            #self._resmap *= modelmap
+
+        elif self._algorithm == "SUBDIVSQRT":
+
+            # subtract and divide by sqrt of model map
+            self._resmap -= modelmap
+            self._resmap /= modelmap.sqrt()
+            #for pixel in modelmap:
+            #    if pixel != 0.0:
+            #        pixel = 1.0/math.sqrt(pixel)
+            #self._resmap *= modelmap
+
+        else:
+
+            # Raise error if algorithm is unkown
+            raise TypeError("Algorithm \""+self._algorithm+"\" not known")
+
+        # Optionally publish map
+        if self._publish:
+            self.publish()
 
         # Return
         return
@@ -245,19 +335,22 @@ class csresmap(ctools.cscript):
         Save residual map.
         """
         # Write header
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Save residual map")
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Save residual map")
 
+        # Get outmap parameter
+        self._outmap = self["outmap"].filename()
+        
         # Continue only filename and residual map are valid
-        if self.m_outmap != "None" and self.resmap != None:
+        if self._outmap != "NONE" and self._resmap != None:
 
             # Log file name
-            if self.logTerse():
-                self.log("Save residual map into \""+self.m_outmap+"\".\n")
+            if self._logTerse():
+                self._log("Save residual map into \""+self._outmap+"\".\n")
 
             # Save residual map
-            self.resmap.save(self.m_outmap, self.m_clobber)
+            self._resmap.save(self._outmap, self._clobber)
 
         # Return
         return
@@ -265,14 +358,17 @@ class csresmap(ctools.cscript):
     def publish(self, name=""):
         """
         Publish residual map.
+
+        Kwargs:
+            name: Name of residual map.
         """
         # Write header
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Publish sky map")
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Publish residual map")
 
         # Continue only if residual map is valid
-        if self.resmap != None:
+        if self._resmap != None:
         
             # Set default name is user name is empty
             if not name:
@@ -281,139 +377,21 @@ class csresmap(ctools.cscript):
                 user_name = name
 
             # Log map name
-            if self.logTerse():
-                self.log("Publish residual map \""+user_name+"\".\n")
+            if self._logTerse():
+                self._log("Publish residual map \""+user_name+"\".\n")
 
             # Publish map
-            self.resmap.publish(user_name)
+            self._resmap.publish(user_name)
 
         # Return
         return
 
-    def run(self):
+    def models(self, models):
         """
-        Run the script.
+        Set model.
         """
-        # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
-
-        # Get parameters
-        self.get_parameters()
-
-        #  Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
-
-        # Write observation into logger
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Observation")
-            self.log(str(self.obs))
-            self.log("\n")
-
-        # Use input file directly if given
-        if self.m_use_maps:
-            countmap = gammalib.GSkyMap(self["inobs"].filename())
-            modelmap = gammalib.GSkyMap(self.m_modcube)
-
-        else:
-
-            if self.m_skip_binning:
-                cta_counts_cube = gammalib.GCTAEventCube(self.obs[0].events().clone())   
-
-            else:
-
-                # Write header
-                if self.logTerse():
-                    self.log("\n")
-                    self.log.header1("Generate binned map (ctbin)")
-
-                # Create countsmap
-                bin = ctools.ctbin(self.obs)
-                bin["nxpix"].integer(self.m_nxpix)
-                bin["nypix"].integer(self.m_nypix)
-                bin["proj"].string(self.m_proj)
-                bin["coordsys"].string(self.m_coordsys)
-                bin["xref"].real(self.m_xref)
-                bin["yref"].real(self.m_yref)
-                bin["enumbins"].integer(self.m_enumbins)
-                bin["ebinalg"].string(self.m_ebinalg)
-                bin["emin"].real(self.m_emin)
-                bin["emax"].real(self.m_emax)
-                bin["binsz"].real(self.m_binsz)
-                bin["chatter"].integer(self.m_chatter)
-                bin["clobber"].boolean(self.m_clobber)
-                bin["debug"].boolean(self.m_debug)
-                bin.run()
-
-                # Retrieve counts cube
-                cta_counts_cube = bin.cube()
-
-            # Assign GCTAEventCube to skymap
-            countmap = cta_counts_cube.map()
-
-            # Write header
-            if self.logTerse():
-                self.log("\n")
-                self.log.header1("Generate model map (ctmodel)")
-
-            # Create model map
-            model = ctools.ctmodel(self.obs)
-            model.cube(cta_counts_cube)
-            model["chatter"].integer(self.m_chatter)
-            model["clobber"].boolean(self.m_clobber)
-            model["debug"].boolean(self.m_debug)
-            model["edisp"].boolean(self.m_edisp)
-            model.run()
-
-            # Get model map into GSkyMap object
-            modelmap = model.cube().map().copy()
-
-        # Store counts map as residual map. Note that we need a
-        # special construct here to avoid memory leaks. This seems
-        # to be a SWIG feature as SWIG creates a new object when
-        # calling bin.cube()
-        #residualmap = bin.cube().map() 
-        self.resmap = countmap.copy()
-        self.resmap.stack_maps()
-        modelmap.stack_maps()
-
-        # Continue calculations depending on given algorithm
-        if self.m_algorithm == "SUB":
-
-            # Subtract maps 
-            self.resmap -= modelmap
-
-        elif self.m_algorithm == "SUBDIV":
-
-            # Subtract and divide by model map
-            self.resmap -= modelmap
-            self.resmap /= modelmap
-            #for pixel in modelmap:
-            #    if pixel != 0.0:
-            #        pixel = 1.0/pixel
-            #self.resmap *= modelmap
-
-        elif self.m_algorithm == "SUBDIVSQRT":
-
-            # subtract and divide by sqrt of model map
-            self.resmap -= modelmap
-            self.resmap /= modelmap.sqrt()
-            #for pixel in modelmap:
-            #    if pixel != 0.0:
-            #        pixel = 1.0/math.sqrt(pixel)
-            #self.resmap *= modelmap
-
-        else:
-
-            # Raise error if algorithm is unkown
-            raise TypeError("Algorithm \""+self.m_algorithm+"\" not known")
-
-        # Optionally publish map
-        if self.m_publish:
-            self.publish()
+        # Copy models
+        self._obs.models(models.clone())
 
         # Return
         return
@@ -423,14 +401,12 @@ class csresmap(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Generates residual count map.
-    """
+
     # Create instance of application
     app = csresmap(sys.argv)
 
     # Open logfile
-    app.logFileOpen()
+    app._logFileOpen()
 
     # Execute application
     app.execute()

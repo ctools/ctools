@@ -1,0 +1,57 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      cstsdist.par                                                  #
+#  Version:   1.1.0                                                         #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the cstsdist script                        #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, h, NONE,,, "Input event list, counts cube, or observation definition XML file"
+inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
+srcname,   s, a, Crab,,, "Source name"
+expcube,   f, a, NONE,,, "Input exposure cube file (only needed for stacked analysis)"
+psfcube,   f, a, NONE,,, "Input PSF cube file (only needed for stacked analysis)"
+edispcube, f, a, NONE,,, "Input energy dispersion cube file (only needed for stacked analysis)"
+bkgcube,   f, a, NONE,,, "Input background cube file (only needed for stacked analysis)"
+caldb,     s, a, prod2,,, "Calibration database"
+irf,       s, a, South_0.5h,,, "Instrument response function"
+edisp,     b, h, no,,, "Apply energy dispersion?"
+deadc,     r, h, 0.95,0,1, "Deadtime correction factor"
+outfile,   f, a, ts.dat,,, "Output Test Statistic distribution file"
+
+#
+# Script parameters
+#==================
+ntrials,  i, a, 10,,, "Number of trials"
+ra,       r, a, 83.63,0,360, "RA of pointing (deg)"
+dec,      r, a, 22.01,-90,90, "Dec of pointing (deg)"
+emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins, i, a, 0,,, "Number of energy bins (0=unbinned)"
+tmin,     r, h, 0.0,,, "Start time (MET in s)"
+tmax,     r, a, 1800.0,,, "Duration (s)"
+npix,     i, a, 200,,, "Number of pixels for binned"
+binsz,    r, a, 0.05,,, "Pixel size for binned (deg/pixel)"
+rad,      r, h, 5.0,0,180, "Radius of ROI (deg)"
+pattern,  s, h, single,single|four,, "Observation pattern"
+offset,   r, h, 1.5,,, "Observation pattern offset (deg)"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, cstsdist.log,,, "Log filename"
