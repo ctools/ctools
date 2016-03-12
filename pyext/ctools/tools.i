@@ -64,6 +64,6 @@
 /* __ Test function ______________________________________________________ */
 %pythoncode %{
 def test():
-    from ctools.tests import test_python
-    test_python.test(installed=True)
+    from ctools.tests import test_python_ctools
+    test_python_ctools.test(installed=True)
 %}

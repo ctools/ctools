@@ -1,6 +1,6 @@
 #! /bin/sh
 # ==========================================================================
-# This script tests the ctools Python module
+# This script tests the cscripts Python module
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -22,4 +22,4 @@
 #
 # Run the Python test
 # ===================
-@PYTHON_COVERAGE@./test_python.py
+@PYTHON_COVERAGE@./test_python_cscripts.py

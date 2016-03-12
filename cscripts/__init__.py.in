@@ -39,8 +39,7 @@ __all__ = [
     "cstsdist",
     "cstsmapmerge",
     "csfindobs",
-    "obsutils",
-    "test",
+    "obsutils"
 ]
 if cur_version > req_version:
     __all__.extend(["csfindobs",
@@ -80,7 +79,8 @@ def test():
     """
     Run cscripts tests.
     """
-    print("No cscripts unit tests have been implemented so far.")
+    from cscripts.tests import test_python_cscripts
+    test_python_cscripts.test(installed=True)
 
 # Add version
 __version__ = '@PACKAGE_VERSION@'

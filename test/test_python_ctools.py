@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctools package.
 #
-# Copyright (C) 2012-2015 Juergen Knoedlseder
+# Copyright (C) 2012-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -113,11 +113,11 @@ def test(installed=False):
         # Get test directory
         import inspect
         testdir = inspect.getfile(ctools.tests)
-        head, tail = os.path.split(testdir)
+        dirname = os.path.dirname(testdir)
 
         # Copy over test data and irf
-        os.system("cp -r %s %s" % (head+"/data", "data"))
-        os.system("cp -r %s %s" % (head+"/irf",  "irf"))
+        os.system("cp -r %s %s" % (dirname+"/data", "data"))
+        os.system("cp -r %s %s" % (dirname+"/irf",  "irf"))
 
     # Set PFILES environment variable
     try:

@@ -47,8 +47,27 @@ export CALDB=$PWD/caldb
 rm -rf $PFILES
 mkdir -p $PFILES
 cp -r ../src/*/*.par pfiles/
+cp -r ../cscripts/*.par pfiles/
 rm -rf $CALDB
 mkdir -p $CALDB
+
+
+#
+# Test cscaldb
+# ============
+$ECHO -n "Test cscaldb: "
+chmod +x @abs_top_srcdir@/cscripts/cscaldb.py
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cscaldb.py \
+  chatter=4 > cscaldb.log
+$ECHO -n "."
+if [ -s "cscaldb.log" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " cscaldb.log file is not valid"
+  exit 1
+fi
+$ECHO " ok"
 
 
 #

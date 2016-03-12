@@ -109,8 +109,8 @@ class csobsinfo(ctools.cscript):
         """
         # Get parameters   
         if self.obs.size() == 0:  
-            self.require_inobs("csobsinfo::get_parameters")
-            self.obs = self.get_observations(False)
+            self._require_inobs("csobsinfo::get_parameters")
+            self.obs = self._get_observations(False)
         
         # Initialise object position
         self.obj_dir = gammalib.GSkyDir()
