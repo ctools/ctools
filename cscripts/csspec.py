@@ -59,7 +59,6 @@ class csspec(ctools.cscript):
         self._chatter     = 2
         self._clobber     = True
         self._debug       = False
-        self._log_clients = False
 
         # Initialise observation
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
@@ -206,6 +205,8 @@ class csspec(ctools.cscript):
         # Return
         return
 
+
+    # Public methods
     def run(self):
         """
         Run the script.

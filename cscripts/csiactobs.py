@@ -42,31 +42,31 @@ class csiactobs(ctools.cscript):
         Constructor.
         """
         # Set name and version
-        self.name    = "csiactobs"
-        self.version = "1.1.0"
+        self._name    = "csiactobs"
+        self._version = "1.1.0"
 
         # Initialise some members
-        self.m_ebounds = gammalib.GEbounds()
-        self.datapath  = os.getenv("VHEFITS","")
-        self.inmodels  = None
-        self.xml       = gammalib.GXml()
-        self.models    = gammalib.GModels()
-        self.m_runlist = []
+        self._ebounds  = gammalib.GEbounds()
+        self._datapath = os.getenv("VHEFITS","")
+        self._inmodels = None
+        self._xml      = gammalib.GXml()
+        self._models   = gammalib.GModels()
+        self._runlist  = []
 
         # Make sure that parfile exists
-        file = self.parfile()
+        file = self._parfile()
 
         # Initialise application
         if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self._name, self._version)
         elif len(argv) == 1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
         # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -78,13 +78,13 @@ class csiactobs(ctools.cscript):
         # Return
         return
 
-    def parfile(self):
+    def _parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
         default parfile. This kluge avoids shipping the cscript with a parfile.
         """
         # Set parfile name
-        parfile = self.name+".par"
+        parfile = self._name+".par"
 
         try:
             pars = gammalib.GApplicationPars(parfile)
@@ -94,7 +94,7 @@ class csiactobs(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()    
-            pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data is located"))       
+            pars.append(gammalib.GApplicationPar("datapath","s","a",self._datapath,"","","Path were data is located"))       
             pars.append(gammalib.GApplicationPar("prodname","s","a","","","","Data storage name (Run csiactdata to view your options)"))
             pars.append(gammalib.GApplicationPar("infile","f","a","runlist.lis","","","Runlist file"))   
             pars.append(gammalib.GApplicationPar("inmodel","f","h","NONE","","","Input model XML file (optional)"))
@@ -122,74 +122,74 @@ class csiactobs(ctools.cscript):
         # Return
         return
 
-    def get_parameters(self):
+    def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
         
-        if self.datapath == "":
-            self.datapath = self["datapath"].string()
+        if self._datapath == "":
+            self._datapath = self["datapath"].string()
         
         # Check for input models
         if not self["inmodel"].filename() == "NONE":
-            self.inmodels = gammalib.GModels(self["inmodel"].filename())
+            self._inmodels = gammalib.GModels(self["inmodel"].filename())
                
         # Expand environment
-        self.datapath = gammalib.expand_env(self.datapath)
+        self._datapath = gammalib.expand_env(self._datapath)
         
         # Read FITS production
-        self.m_prodname    = self["prodname"].string()
+        self._prodname    = self["prodname"].string()
         
         # Read runlist file if list not already filled
-        if len(self.m_runlist) == 0:
+        if len(self._runlist) == 0:
             
             # Get file name
-            self.m_runlistfile = self["infile"].filename()
+            self._runlistfile = self["infile"].filename()
             
             # Read runlist from file
-            runfile = open(self.m_runlistfile.url())
+            runfile = open(self._runlistfile.url())
             for line in runfile.readlines():
                 if len(line) == 0:
                     continue
                 if line[0] == '#':
                     continue
                 if len(line.split()) > 0:
-                    self.m_runlist.append(line.split()[0])
+                    self._runlist.append(line.split()[0])
             runfile.close()
         
         # Read number of background parameters
-        self.m_bkgpars     = self["bkgpars"].integer()
+        self._bkgpars     = self["bkgpars"].integer()
           
         # Output model file
-        self.m_outmodel = self["outmodel"].filename()
+        self._outmodel = self["outmodel"].filename()
         
         # Observation outfile
-        self.m_outobs = self["outobs"].filename()
+        self._outobs = self["outobs"].filename()
         
         # Master index file name
-        self.m_master_indx = self["master_indx"].string()
+        self._master_indx = self["master_indx"].string()
         
         # Read flag for background scaling factor
-        self.m_use_bkg_scale = self["bkg_scale"].boolean()
+        self._use_bkg_scale = self["bkg_scale"].boolean()
         
         # Read hierarchy of file loading
-        self.m_ev_hiera      = self["ev_hiera"].string().split("|")
-        self.m_aeff_hiera    = self["aeff_hiera"].string().split("|")
-        self.m_psf_hiera     = self["psf_hiera"].string().split("|")
-        self.m_bkg_hiera     = self["bkg_hiera"].string().split("|")  
-        self.m_edisp_hiera   = self["edisp_hiera"].string().split("|") 
-        self.m_bkg_mod_hiera = self["bkg_mod_hiera"].string().split("|")
+        self._ev_hiera      = self["ev_hiera"].string().split("|")
+        self._aeff_hiera    = self["aeff_hiera"].string().split("|")
+        self._psf_hiera     = self["psf_hiera"].string().split("|")
+        self._bkg_hiera     = self["bkg_hiera"].string().split("|")  
+        self._edisp_hiera   = self["edisp_hiera"].string().split("|") 
+        self._bkg_mod_hiera = self["bkg_mod_hiera"].string().split("|")
         
         # Read hidden background parameters
-        self.m_bkg_gauss_norm   = self["bkg_gauss_norm"].real()
-        self.m_bkg_gauss_index  = self["bkg_gauss_index"].real()
-        self.m_bkg_gauss_sigma  = self["bkg_gauss_sigma"].real()
-        self.m_bkg_aeff_index   = self["bkg_aeff_index"].real()
-        self.m_bkg_aeff_norm    = self["bkg_aeff_norm"].real()
-        self.m_bkg_range_factor = self["bkg_range_factor"].real()
+        self._bkg_gauss_norm   = self["bkg_gauss_norm"].real()
+        self._bkg_gauss_index  = self["bkg_gauss_index"].real()
+        self._bkg_gauss_sigma  = self["bkg_gauss_sigma"].real()
+        self._bkg_aeff_index   = self["bkg_aeff_index"].real()
+        self._bkg_aeff_norm    = self["bkg_aeff_norm"].real()
+        self._bkg_range_factor = self["bkg_range_factor"].real()
         
         # Open master index file and look for prodname 
-        master_file = os.path.join(self.datapath, self.m_master_indx)
+        master_file = os.path.join(self._datapath, self._master_indx)
         if not os.path.isfile(master_file):
             raise RuntimeError("FITS data store not available. No master index file found. Make sure the file is copied from the server and your datapath is set correctly.")
 
@@ -203,38 +203,37 @@ class csiactobs(ctools.cscript):
         configs = data["datasets"]
 
         # Initialise HDUs
-        self.m_hdu_index = self.m_obs_index = ""
+        self._hdu_index = self._obs_index = ""
 
         # Get HDUs
         for config in configs:
-            if self.m_prodname == config["name"]:
-                self.m_hdu_index = str(os.path.join(self.datapath, config["hduindx"]))
-                self.m_obs_index = str(os.path.join(self.datapath, config["obsindx"]))
+            if self._prodname == config["name"]:
+                self._hdu_index = str(os.path.join(self._datapath, config["hduindx"]))
+                self._obs_index = str(os.path.join(self._datapath, config["obsindx"]))
                 break
 
         # Check HDUs
-        if self.m_hdu_index == "" or self.m_obs_index == "":
-            raise RuntimeError("*** ERROR: FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
-        filename = gammalib.GFilename(self.m_hdu_index+"[HDU_INDEX]")
+        if self._hdu_index == "" or self._obs_index == "":
+            raise RuntimeError("*** ERROR: FITS data store \""+self._prodname+"\" not available. Run csiactdata to get a list of available storage names")
+        filename = gammalib.GFilename(self._hdu_index+"[HDU_INDEX]")
         if not filename.is_fits():
-            raise RuntimeError("*** ERROR: HDU index file \""+self.m_hdu_index+"[HDU_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
+            raise RuntimeError("*** ERROR: HDU index file \""+self._hdu_index+"[HDU_INDEX]\" for FITS data store \""+self._prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
 
         # Check for existence of "BKG_SCALE" in the observation index file if required
-        if self.m_use_bkg_scale:
-            filename = gammalib.GFilename(self.m_obs_index+"[OBS_INDEX]")
+        if self._use_bkg_scale:
+            filename = gammalib.GFilename(self._obs_index+"[OBS_INDEX]")
             if filename.is_fits():
-                fits = gammalib.GFits(self.m_obs_index)
+                fits = gammalib.GFits(self._obs_index)
                 if not fits["OBS_INDEX"].contains("BKG_SCALE"):
-                    self.m_use_bkg_scale = False
+                    self._use_bkg_scale = False
                 fits.close()
             else:
-                self.m_use_bkg_scale = False
+                self._use_bkg_scale = False
         
         # Create base data directory from hdu index file location
-        self.subdir    = os.path.dirname(self.m_hdu_index)  
-        self.m_log     = False # Logging in client tools
-        self.m_debug   = False # Debugging in client tools
-        self.m_clobber = self["clobber"].boolean()
+        self._subdir  = os.path.dirname(self._hdu_index)  
+        self._debug   = False # Debugging in client tools
+        self._clobber = self["clobber"].boolean()
 
         # Return
         return
@@ -248,7 +247,7 @@ class csiactobs(ctools.cscript):
         try:
             
             # Store a copy of input argument
-            self.m_runlist = list(runlist)
+            self._runlist = list(runlist)
             
         except:
             
@@ -258,15 +257,15 @@ class csiactobs(ctools.cscript):
         # Return
         return
     
-    def background_spectrum(self, run, prefactor, index, emin = 0.01, emax = 100.0):
+    def _background_spectrum(self, run, prefactor, index, emin = 0.01, emax = 100.0):
         
         # Handle constant spectral model 
-        if index == 0.0 and self.m_bkgpars <= 1:
+        if index == 0.0 and self._bkgpars <= 1:
             spec = gammalib.GModelSpectralConst()
-            spec["Value"].min(prefactor / self.m_bkg_range_factor)
-            spec["Value"].max(prefactor * self.m_bkg_range_factor)
+            spec["Value"].min(prefactor / self._bkg_range_factor)
+            spec["Value"].max(prefactor * self._bkg_range_factor)
             spec["Value"].value(prefactor)
-            if self.m_bkgpars == 0:
+            if self._bkgpars == 0:
                 spec["Value"].fix()
             else:
                 spec["Value"].free()
@@ -274,7 +273,7 @@ class csiactobs(ctools.cscript):
         else:
                 
             # Create power law model 
-            if self.m_bkgpars <= 2:
+            if self._bkgpars <= 2:
                 e    = gammalib.GEnergy(1.0,"TeV")
                 spec = gammalib.GModelSpectralPlaw(prefactor, index, e)  
                  
@@ -286,10 +285,10 @@ class csiactobs(ctools.cscript):
                 spec[1].max(5.0)
                 
                 # Set number of free parameters
-                if self.m_bkgpars == 0:
+                if self._bkgpars == 0:
                     spec[0].fix()
                     spec[1].fix()
-                elif self.m_bkgpars == 1:
+                elif self._bkgpars == 1:
                     spec[0].free()
                     spec[1].fix()
                 else:
@@ -303,7 +302,7 @@ class csiactobs(ctools.cscript):
                 
                 # Create spectral model and energy values
                 spec = gammalib.GModelSpectralNodes()
-                bounds = gammalib.GEbounds(self.m_bkgpars,gammalib.GEnergy(emin,"TeV"),gammalib.GEnergy(emax,"TeV"), True)
+                bounds = gammalib.GEbounds(self._bkgpars,gammalib.GEnergy(emin,"TeV"),gammalib.GEnergy(emax,"TeV"), True)
                 for i in range(bounds.size()):     
                     energy = bounds.elogmean(i)
                     value = plaw.eval(energy, gammalib.GTime())
@@ -313,41 +312,41 @@ class csiactobs(ctools.cscript):
                     if "Energy" in par.name():
                         par.fix()
                     elif "Intensity" in par.name():        
-                        par.min(value / self.m_bkg_range_factor)
-                        par.max(value * self.m_bkg_range_factor)
+                        par.min(value / self._bkg_range_factor)
+                        par.max(value * self._bkg_range_factor)
                         
         # Return spectrum
         return spec
 
-    def iact_background(self, telescope, obs_id, bkg_scale, bkgtype, emin=0.01, emax=100):
+    def _iact_background(self, telescope, obs_id, bkg_scale, bkgtype, emin=0.01, emax=100):
         
         # handle IrfBackground
         if bkgtype == "irf":
             prefactor  = 1.0
             index      = 0.0
             prefactor *= bkg_scale
-            spec       = self.background_spectrum(obs_id, prefactor, index, emin, emax)
+            spec       = self._background_spectrum(obs_id, prefactor, index, emin, emax)
             
             # Create background model instance
             bck = gammalib.GCTAModelIrfBackground(spec)
         
         # Set AeffBackground   
         elif bkgtype == "aeff":
-            prefactor = bkg_scale * self.m_bkg_aeff_norm
-            spec      = self.background_spectrum(obs_id, prefactor, self.m_bkg_aeff_index, emin, emax)
+            prefactor = bkg_scale * self._bkg_aeff_norm
+            spec      = self._background_spectrum(obs_id, prefactor, self._bkg_aeff_index, emin, emax)
                 
             # Create background model instance
             bck = gammalib.GCTAModelAeffBackground(spec)
             
         # Set Gaussian Background
         elif bkgtype == "gauss":
-            prefactor = bkg_scale * self.m_bkg_gauss_norm
-            spec      = self.background_spectrum(obs_id, prefactor, self.m_bkg_gauss_index, emin, emax)
-            radial    = gammalib.GCTAModelRadialGauss(self.m_bkg_gauss_sigma)
+            prefactor = bkg_scale * self._bkg_gauss_norm
+            spec      = self._background_spectrum(obs_id, prefactor, self._bkg_gauss_index, emin, emax)
+            radial    = gammalib.GCTAModelRadialGauss(self._bkg_gauss_sigma)
             bck       = gammalib.GCTAModelRadialAcceptance(radial, spec)
         
         else:
-            sys.exit("Background type \""+self.bkgtype+"\" unsupported")
+            sys.exit("Background type \""+self._bkgtype+"\" unsupported")
         
         # Copy model
         model = bck.clone()
@@ -371,7 +370,7 @@ class csiactobs(ctools.cscript):
         """
         Returns runlist energy range
         """
-        return self.m_ebounds
+        return self._ebounds
     
     def obs(self):
         """
@@ -381,11 +380,11 @@ class csiactobs(ctools.cscript):
         obs = gammalib.GObservations()
         
         # Read observations if XML is filled
-        if self.xml.size():   
-            obs.read(self.xml)
+        if self._xml.size():   
+            obs.read(self._xml)
                 
         # Assign models
-        obs.models(self.models)
+        obs.models(self._models)
         
         # Return observations
         return obs
@@ -399,7 +398,7 @@ class csiactobs(ctools.cscript):
         self.run()
 
         # Save residual map
-        self.save(self.m_outobs, self.m_clobber)
+        self.save(self._outobs, self._clobber)
 
         # Return
         return
@@ -409,41 +408,41 @@ class csiactobs(ctools.cscript):
         Run the script.
         """
         # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
-        self.get_parameters()
+        self._get_parameters()
 
         # Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
 
         # Clear models
-        self.models.clear()
+        self._models.clear()
 
         # Clear xml file and append an observation list
-        self.xml.clear()
-        self.xml.append(gammalib.GXmlElement("observation_list title=\"observation list\""))
-        lib = self.xml.element("observation_list", 0)
+        self._xml.clear()
+        self._xml.append(gammalib.GXmlElement("observation_list title=\"observation list\""))
+        lib = self._xml.element("observation_list", 0)
 
         # Log output
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Looping over "+str(len(self.m_runlist))+" runs")
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Looping over "+str(len(self._runlist))+" runs")
 
         # Initialise energy range values for logging
-        self.m_ebounds.clear()
+        self._ebounds.clear()
 
         # Loop over runs
-        for obs_id in self.m_runlist:
+        for obs_id in self._runlist:
 
             # Create selection string
             obs_selection = "[OBS_ID=="+str(obs_id)+"]"
             
             # Open HDU index file
-            hduindx     = gammalib.GFits(self.m_hdu_index+"[HDU_INDEX]"+obs_selection)
+            hduindx     = gammalib.GFits(self._hdu_index+"[HDU_INDEX]"+obs_selection)
             hduindx_hdu = hduindx["HDU_INDEX"]
             
             # Initialise files and hdu names
@@ -458,80 +457,80 @@ class csiactobs(ctools.cscript):
             
             # Handle events
             index = -1
-            for version in self.m_ev_hiera:
+            for version in self._ev_hiera:
                 n = formats.count(version) 
                 if n > 0:
                     index = formats.index(version)
                     break
             if index >= 0:
-                eventfile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
+                eventfile  = os.path.join(self._subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
                 eventhdu   = hduindx_hdu["HDU_NAME"][index]
                 eventfile += "["+eventhdu+"]"
             if not gammalib.GFilename(eventfile).is_fits():
-                if self.logTerse():
-                    self.log("Skipping observation "+str(obs_id)+": eventfile \""+eventfile+"\" not found\n")
+                if self._logTerse():
+                    self._log("Skipping observation "+str(obs_id)+": eventfile \""+eventfile+"\" not found\n")
                 continue
             
             # Handle Aeff
             index = -1
-            for version in self.m_aeff_hiera:
+            for version in self._aeff_hiera:
                 n = formats.count(version) 
                 if n > 0:
                     index = formats.index(version)
                     break
             if index >= 0:
-                aefffile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
+                aefffile  = os.path.join(self._subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
                 aeffhdu   = hduindx_hdu["HDU_NAME"][index]
                 aefffile += "["+aeffhdu+"]"
             if not gammalib.GFilename(aefffile).is_fits():
-                if self.logTerse():
-                    self.log("Skipping observation "+str(obs_id)+": effective area \""+aefffile+"\" not found\n")
+                if self._logTerse():
+                    self._log("Skipping observation "+str(obs_id)+": effective area \""+aefffile+"\" not found\n")
                 continue
                                 
             # Handle psf
             index = -1
-            for version in self.m_psf_hiera:
+            for version in self._psf_hiera:
                 n = formats.count(version) 
                 if n > 0:
                     index = formats.index(version)
                     break
             if index >= 0:
-                psffile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
+                psffile  = os.path.join(self._subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])
                 psffile += "["+hduindx_hdu["HDU_NAME"][index]+"]"
             if not gammalib.GFilename(psffile).is_fits():
-                if self.logTerse():
-                    self.log("Skipping observation "+str(obs_id)+": point spread function \""+psffile+"\" not found\n")
+                if self._logTerse():
+                    self._log("Skipping observation "+str(obs_id)+": point spread function \""+psffile+"\" not found\n")
                 continue
                 
             # Handle edisp
             index = -1
-            for version in self.m_edisp_hiera:
+            for version in self._edisp_hiera:
                 n = formats.count(version) 
                 if n > 0:
                     index = formats.index(version)
                     break
             if index >= 0:
-                edispfile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])   
+                edispfile  = os.path.join(self._subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])   
                 edispfile += "["+hduindx_hdu["HDU_NAME"][index]+"]"
             if not gammalib.GFilename(edispfile).is_fits():
-                if self.logTerse():
-                    self.log("Warning: observation "+str(obs_id)+" has no energy dispersion \""+edispfile+"\" information\n")
+                if self._logTerse():
+                    self._log("Warning: observation "+str(obs_id)+" has no energy dispersion \""+edispfile+"\" information\n")
                     edispfile = ""
                 
             # Handle background
             index = -1
-            bkg_mod_hierarchy = list(self.m_bkg_mod_hiera)
-            for version in self.m_bkg_hiera:
+            bkg_mod_hierarchy = list(self._bkg_mod_hiera)
+            for version in self._bkg_hiera:
                 n = formats.count(version) 
                 if n > 0:
                     index = formats.index(version)
                     break
             if index >= 0:
-                bkgfile  = os.path.join(self.subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])    
+                bkgfile  = os.path.join(self._subdir, hduindx_hdu["FILE_DIR"][index], hduindx_hdu["FILE_NAME"][index])    
                 bkgfile += "["+hduindx_hdu["HDU_NAME"][index]+"]"
             if not gammalib.GFilename(bkgfile).is_fits():
-                if self.logTerse():
-                    self.log("Warning: observation "+str(obs_id)+" has no background information (file=\""+bkgfile+"\"). IRF background cannot be used\n")
+                if self._logTerse():
+                    self._log("Warning: observation "+str(obs_id)+" has no background information (file=\""+bkgfile+"\"). IRF background cannot be used\n")
                     bkgfile = ""
                     if "irf" in bkg_mod_hierarchy:
                         bkg_mod_hierarchy.remove("irf")
@@ -541,8 +540,8 @@ class csiactobs(ctools.cscript):
 
             # Handle background scale information if available
             bkg_scale = 1.0
-            if self.m_use_bkg_scale:
-                obsindx = gammalib.GFits(self.m_obs_index+"[OBS_INDEX]"+obs_selection)
+            if self._use_bkg_scale:
+                obsindx = gammalib.GFits(self._obs_index+"[OBS_INDEX]"+obs_selection)
                 bkg_scale = obsindx["OBS_INDEX"]["BKG_SCALE"][0]
                 obsindx.close()
             
@@ -567,7 +566,7 @@ class csiactobs(ctools.cscript):
                 run_emax = gammalib.GEnergy(aeff_table.real("HI_THRES"), "TeV")
                 
                 # Append to ebounds
-                self.m_ebounds.append(run_emin, run_emax)
+                self._ebounds.append(run_emin, run_emax)
             
             else:
                 # Set default values for energy range
@@ -578,21 +577,21 @@ class csiactobs(ctools.cscript):
             aeff_fits.close()     
             
             # Append instrumental background model
-            self.models.append(self.iact_background(telescope, obs_id, bkg_scale, bkg_mod_hierarchy[0], run_emin.TeV(), run_emax.TeV()))
+            self._models.append(self._iact_background(telescope, obs_id, bkg_scale, bkg_mod_hierarchy[0], run_emin.TeV(), run_emax.TeV()))
 
             # Logging
-            if self.logTerse():
-                self.log("Adding observation "+str(obs_id)+" (\""+object_name+"\")\n")
+            if self._logTerse():
+                self._log("Adding observation "+str(obs_id)+" (\""+object_name+"\")\n")
 
-            if self.logExplicit():
-                self.log(" Event file: "+eventfile+"\n")
-                self.log(" Effective area: "+aefffile+"\n")
-                self.log(" Point spread function: "+psffile+"\n")
-                self.log(" Energy dispersion: "+edispfile+"\n")
-                self.log(" Background file: "+bkgfile+"\n")  
-                if self.m_use_bkg_scale:
-                    self.log(" Background scale: "+str(bkg_scale)+"\n")  
-                self.log("\n")
+            if self._logExplicit():
+                self._log(" Event file: "+eventfile+"\n")
+                self._log(" Effective area: "+aefffile+"\n")
+                self._log(" Point spread function: "+psffile+"\n")
+                self._log(" Energy dispersion: "+edispfile+"\n")
+                self._log(" Background file: "+bkgfile+"\n")  
+                if self._use_bkg_scale:
+                    self._log(" Background scale: "+str(bkg_scale)+"\n")  
+                self._log("\n")
 
             # Append observation to XML and set attributes
             obs = lib.append("observation");
@@ -631,37 +630,37 @@ class csiactobs(ctools.cscript):
         if lib.size():
             
             # Log header of energy range
-            if self.logTerse():
-                self.log("\n")
-                self.log.header3("Energy range of obervation list")
+            if self._logTerse():
+                self._log("\n")
+                self._log.header3("Energy range of obervation list")
             
             # Logging if energy range is available
-            if self.m_ebounds.size() > 0:
+            if self._ebounds.size() > 0:
                                
                 # Write energy range into log file    
-                self.log(str(self.m_ebounds.emin())+" - "+str(self.m_ebounds.emax()))
-                self.log("\n")
+                self._log(str(self._ebounds.emin())+" - "+str(self._ebounds.emax()))
+                self._log("\n")
                 
             else:
                
                 # Write 'not available' into log file    
-                self.log("not available")
-                self.log("\n")
+                self._log("not available")
+                self._log("\n")
         
         else:
-            self.log.header2("WARNING: No observation from given runlist available")
+            self._log.header2("WARNING: No observation from given runlist available")
 
         # Append models provided by 'inmodels' if necessary
-        if not self.inmodels == None:
-            if self.logTerse():
-                self.log("\n")
-                self.log.header1("Appending models")
+        if not self._inmodels == None:
+            if self._logTerse():
+                self._log("\n")
+                self._log.header1("Appending models")
 
             # Loop over input models    
-            for model in self.inmodels:
-                if self.logTerse():
-                    self.log.header3("Adding model \""+model.name()+"\"")
-                self.models.append(model)
+            for model in self._inmodels:
+                if self._logTerse():
+                    self._log.header3("Adding model \""+model.name()+"\"")
+                self._models.append(model)
 
         # Return
         return       
@@ -669,10 +668,10 @@ class csiactobs(ctools.cscript):
     def save(self,outfile,clobber):
 
         # Save observation XML file
-        self.xml.save(outfile)
+        self._xml.save(outfile)
 
         # Save model XML file
-        self.models.save(self.m_outmodel)
+        self._models.save(self._outmodel)
 
         # Return
         return       
@@ -682,14 +681,12 @@ class csiactobs(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Generates observation file.
-    """
+
     # Create instance of application
     app = csiactobs(sys.argv)
 
     # Open logfile
-    app.logFileOpen()
+    app._logFileOpen()
 
     # Execute application
     app.execute()
