@@ -40,25 +40,25 @@ class csiactdata(ctools.cscript):
         Constructor.
         """
         # Set name
-        self.name      = "csiactdata"
-        self.version   = "1.0.0"
-        self.datapath  = os.getenv("VHEFITS","")
-        self.prodnames = []
+        self._name      = "csiactdata"
+        self._version   = "1.1.0"
+        self._datapath  = os.getenv("VHEFITS","")
+        self._prodnames = []
 
         # Make sure that parfile exists
-        file = self.parfile()
+        file = self._parfile()
 
         # Initialise application
         if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self._name, self._version)
         elif len(argv) == 1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
         # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -70,14 +70,14 @@ class csiactdata(ctools.cscript):
         # Return
         return
 
-    def parfile(self):
+    def _parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
         default parfile. This kluge avoids shipping the cscript with a
         parfile.
         """
         # Set parfile name
-        parfile = self.name+".par"
+        parfile = self._name+".par"
 
         try:
             pars = gammalib.GApplicationPars(parfile)
@@ -87,7 +87,7 @@ class csiactdata(ctools.cscript):
 
             # Create default parfile
             pars = gammalib.GApplicationPars()    
-            pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data is located"))     
+            pars.append(gammalib.GApplicationPar("datapath","s","a",self._datapath,"","","Path were data is located"))     
             pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
             pars.append_standard()
             pars.append(gammalib.GApplicationPar("logfile","f","h","csiactdata.log","","","Log filename"))
@@ -102,19 +102,19 @@ class csiactdata(ctools.cscript):
         """
         
         # Get datapath if not already set
-        if self.datapath == "":
-            self.datapath = self["datapath"].string()
+        if self._datapath == "":
+            self._datapath = self["datapath"].string()
         
         # Expand environment
-        self.datapath = gammalib.expand_env(self.datapath)
+        self._datapath = gammalib.expand_env(self._datapath)
         
         # Get filename of master index file
-        self.m_master_indx = self["master_indx"].string()
-        self.m_master_file = os.path.join(self.datapath, self.m_master_indx)
+        self._master_indx = self["master_indx"].string()
+        self._master_file = os.path.join(self._datapath, self._master_indx)
         
         # Check for presence of master index file
-        if not os.path.isfile(self.m_master_file):
-            raise RuntimeError("Master index file \""+self.m_master_file+"\" not found. Use hidden parameter \"master_indx\" to specifiy a different filename.")
+        if not os.path.isfile(self._master_file):
+            raise RuntimeError("Master index file \""+self._master_file+"\" not found. Use hidden parameter \"master_indx\" to specifiy a different filename.")
         
         # Return
         return
@@ -134,58 +134,58 @@ class csiactdata(ctools.cscript):
         Run the script.
         """
         # Switch screen logging on
-        self.log.cout(True)
+        self._log.cout(True)
 
         # Get parameters
-        self.get_parameters()
+        self._get_parameters()
 
         # Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
         
-        self.log("\n")
-        self.log.header1("Data storage entries")
-        self.log("\n")
-        self.log.parformat("Master index file")
-        self.log(self.m_master_file)
-        self.log("\n")
-        self.log("\n")
+        self._log("\n")
+        self._log.header1("Data storage entries")
+        self._log("\n")
+        self._log.parformat("Master index file")
+        self._log(self._master_file)
+        self._log("\n")
+        self._log("\n")
         
         # Open and load JSON file
-        json_data = open(self.m_master_file).read()
+        json_data = open(self._master_file).read()
         data      = json.loads(json_data)    
         configs   = data["datasets"]
         
         # Initialise array for available names
-        self.prodnames = []
+        self._prodnames = []
         
         # Loop over configs and display unavailable storage first        
         for config in configs:
             
             # Create hdu and obs index files
-            hdu = os.path.join(self.datapath, config["hduindx"])
-            obs = os.path.join(self.datapath, config["obsindx"])
+            hdu = os.path.join(self._datapath, config["hduindx"])
+            obs = os.path.join(self._datapath, config["obsindx"])
             
             filename_hdu = gammalib.GFilename(str(hdu)+"[HDU_INDEX]")
             filename_obs = gammalib.GFilename(str(obs)+"[OBS_INDEX]")
             
             # Check if index files are available
             if not (filename_hdu.is_fits() and filename_obs.is_fits()):
-                self.log.parformat(str(config["name"]))
-                self.log("Not available")
-                self.log("\n")
+                self._log.parformat(str(config["name"]))
+                self._log("Not available")
+                self._log("\n")
         
         
-        self.log("\n")
-        self.log.header2("Available data configs")
+        self._log("\n")
+        self._log.header2("Available data configs")
         
         # Loop over configs and log available configs       
         for config in configs:       
             
             # Create hdu and obs index files
-            hdu = os.path.join(self.datapath, config["hduindx"])
-            obs = os.path.join(self.datapath, config["obsindx"])
+            hdu = os.path.join(self._datapath, config["hduindx"])
+            obs = os.path.join(self._datapath, config["obsindx"])
             
             filename_hdu = gammalib.GFilename(str(hdu)+"[HDU_INDEX]")
             filename_obs = gammalib.GFilename(str(obs)+"[OBS_INDEX]")
@@ -194,30 +194,30 @@ class csiactdata(ctools.cscript):
             if (filename_hdu.is_fits() and filename_obs.is_fits()):
                 
                 # Log data information  
-                self.log("\n")
-                self.log.header3(str(config["name"]))
+                self._log("\n")
+                self._log.header3(str(config["name"]))
                 
                 # Print important informations first
-                self.log.parformat("Name")
-                self.log(str(config["name"]))
-                self.log("\n")  
-                self.log.parformat("Observation index")
-                self.log(str(config["obsindx"]))
-                self.log("\n") 
-                self.log.parformat("HDU index")
-                self.log(str(config["hduindx"]))
-                self.log("\n") 
+                self._log.parformat("Name")
+                self._log(str(config["name"]))
+                self._log("\n")  
+                self._log.parformat("Observation index")
+                self._log(str(config["obsindx"]))
+                self._log("\n") 
+                self._log.parformat("HDU index")
+                self._log(str(config["hduindx"]))
+                self._log("\n") 
                 
                 # Append to available names
-                self.prodnames.append(str(config["name"]))
+                self._prodnames.append(str(config["name"]))
                 
                 # Print additional information
                 for key in config:
                     if key in ["name","hduindx","obsindx"]:
                         continue
-                    self.log.parformat(str(key))
-                    self.log(str(config[key]))
-                    self.log("\n")  
+                    self._log.parformat(str(key))
+                    self._log(str(config[key]))
+                    self._log("\n")  
 
         # Return
         return       
@@ -228,20 +228,19 @@ class csiactdata(ctools.cscript):
         """
         
         # Return 
-        return self.prodnames
+        return self._prodnames
+
 
 # ======================== #
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Shows data storage information
-    """
+
     # Create instance of application
     app = csiactdata(sys.argv)
 
     # Open logfile
-    app.logFileOpen()
+    app._logFileOpen()
 
     # Execute application
     app.execute()

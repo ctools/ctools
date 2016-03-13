@@ -28,11 +28,12 @@ import sys
 # ============== #
 class csobsdef(ctools.cscript):
     """
-    The csobsdef class generates an observation definition file from a
-    pointing list. The pointing list is a comma-separated value ASCII
-    file with header keywords in the first row followed by a list of
-    pointings (one pointing per row). The following header keywords
-    are supported (case sensitive, column order irrelevant):
+    Creates an observation definition file from a pointing list.
+    
+    The pointing list is a comma-separated value ASCII file with header
+    keywords in the first row followed by a list of pointings (one
+    pointing per row). The following header keywords are supported (case
+    sensitive, column order irrelevant):
 
     name     - Observation name string
     id       - Unique observation identifier string
@@ -53,53 +54,54 @@ class csobsdef(ctools.cscript):
     csobsdef as user parameters. The only exception is the "duration"
     keyword that will automatically be queried.
 
-    Here some usage examples:
+    Examples:
 
-    csobsdef
-      Creates minimal observation definition file.
+        ./csobsdef
+            Creates minimal observation definition file.
 
-    csobsdef emin=0.1 emax=100.0
-      Creates observation definition file with an energy range 100 GeV - 100 TeV.
+        ./csobsdef emin=0.1 emax=100.0
+            Creates observation definition file with an energy range
+            100 GeV - 100 TeV.
 
-    csobsdef rad=5
-      Creates observation definition file with a ROI radius of 5 deg.
+        ./csobsdef rad=5
+            Creates observation definition file with a ROI radius of
+            5 degrees.
 
-    csobsdef caldb=dummy irf=cta_dummy_irf
-      Creates observation definition file using the "cta_dummy_irf" IRF in the
-      "dummy" calibration database.
+        ./csobsdef caldb=dummy irf=cta_dummy_irf
+            Creates observation definition file using the "cta_dummy_irf"
+            IRF in the "dummy" calibration database.
     """
+
+    # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
         """
         # Set name and version
-        self.name    = "csobsdef"
-        self.version = "1.0.0"
+        self._name    = "csobsdef"
+        self._version = "1.1.0"
 
         # Initialise class members
-        self.obs        = gammalib.GObservations()
-        self.inpnt      = ""
-        self.tmin       = 0.0
-        self.outfile    = ""
-        self.chatter    = 2
-        self.clobber    = True
-        self.debug      = False
-        self.read_ahead = False
-
-        # Make sure that parfile exists
-        file = self.parfile()
+        self._obs        = gammalib.GObservations()
+        self._inpnt      = ""
+        self._tmin       = 0.0
+        self._outobs     = "NONE"
+        self._chatter    = 2
+        self._clobber    = True
+        self._debug      = False
+        self._read_ahead = False
 
         # Initialise application
         if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self._name, self._version)
         elif len(argv) ==1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
         # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -111,92 +113,78 @@ class csobsdef(ctools.cscript):
         # Return
         return
 
-    def parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
-        """
-        # Set parfile name
-        parfile = self.name+".par"
 
-        # Test parfile existence, and create parfile if it does not exist
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal that parfile was not found
-            print("Parfile \""+parfile+"\" not found. Create default parfile.")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inpnt","f","a","NONE","","","Input pointing definition file"))
-            pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Output observation definition XML file"))
-            pars.append(gammalib.GApplicationPar("duration","r","a","1800.0","","","Pointing duration (seconds)"))
-            pars.append(gammalib.GApplicationPar("caldb","s","h","","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","h","","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("emin","r","h","UNDEF","","","Lower energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","h","UNDEF","","","Upper energy limit (TeV)"))
-            pars.append(gammalib.GApplicationPar("rad","r","h","UNDEF","","","Radius of ROI (degrees)"))
-            pars.append(gammalib.GApplicationPar("deadc","r","h","0.95","","","Deadtime correction factor"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csobsdef.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
-    def get_parameters(self):
+    # Private methods
+    def _get_parameters(self):
         """
         Get parameters from parfile.
         """
         # Read parameters    
-        self.inpnt = self["inpnt"].filename()
+        self._inpnt = self["inpnt"].filename()
 
         # Read ahead parameters
-        if self.read_ahead:
-            self.outfile = self["outobs"].filename()
+        if self._read_ahead:
+            self._outobs = self["outobs"].filename()
 
         # Set some fixed parameters
-        self.chatter = self["chatter"].integer()
-        self.clobber = self["clobber"].boolean()
-        self.debug   = self["debug"].boolean()
+        self._chatter = self["chatter"].integer()
+        self._clobber = self["clobber"].boolean()
+        self._debug   = self["debug"].boolean()
+
+        # Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
 
         # Return
         return
 
-    def execute(self):
+    def _set_response(self, obs, caldb, irf):
         """
-        Execute the script.
+        Set response for an observation.
+        
+        The method creates an XML element so that that the response XML
+        writer will write the database and response name into the
+        observation definition file.
         """
-        # Set read ahead flag
-        self.read_ahead = True
+        # Create XML element
+        xml = gammalib.GXmlElement()
 
-        # Run the script
-        self.run()
+        # Append parameter
+        parameter = "parameter name=\"Calibration\" database=\""+\
+                    caldb+"\" response=\""+irf+"\""
+        xml.append(gammalib.GXmlElement(parameter))
 
-        # Save observation definition file
-        self.obs.save(self.outfile)
+        # Create CTA response
+        response = gammalib.GCTAResponseIrf()
+        response.read(xml)
 
-        # Return
-        return
+        # Attach response to observation
+        obs.response(response)
 
+        # Return observation
+        return obs
+
+ 
+    # Public methods
     def run(self):
         """
         Run the script.
         """
         # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
-        self.get_parameters()
+        self._get_parameters()
 
-        # Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
+        # Write header into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Creating observation definition XML file")
 
         # Load pointing definition file
-        pntdef = gammalib.GCsv(self.inpnt, ",")
+        pntdef = gammalib.GCsv(self._inpnt, ",")
         ncols  = pntdef.ncols()
         npnt   = pntdef.nrows()-1
 
@@ -205,8 +193,8 @@ class csobsdef(ctools.cscript):
             raise RuntimeError("No header found in pointing definition file.")
 
         # Clear observation container
-        self.obs.clear()
-        self.id = 1
+        self._obs.clear()
+        self._id = 1
 
         # Extract header from pointing definition file
         header = []
@@ -233,8 +221,8 @@ class csobsdef(ctools.cscript):
             if "id" in header:
                 id = pntdef[row, header.index("id")]
             else:
-                id       = "%6.6d" % self.id
-                self.id += 1
+                id        = "%6.6d" % self._id
+                self._id += 1
             obs.id(id)
 
             # Set pointing
@@ -249,8 +237,8 @@ class csobsdef(ctools.cscript):
                 pntdir = gammalib.GSkyDir()
                 pntdir.lb_deg(lon,lat)
             else:
-                raise RuntimeError("No (ra,dec) or (lon,lat) columns found in pointing"
-                      " definition file.")
+                raise RuntimeError("No (ra,dec) or (lon,lat) columns "
+                                   "found in pointing definition file.")
             obs.pointing(gammalib.GCTAPointing(pntdir))
 
             # Set response function
@@ -263,7 +251,7 @@ class csobsdef(ctools.cscript):
             else:
                 irf = self["irf"].string()
             if caldb != "" and irf != "":
-                obs = self.__set_response(obs, caldb, irf)
+                obs = self._set_response(obs, caldb, irf)
 
             # Set deadtime correction factor
             if "deadc" in header:
@@ -277,12 +265,12 @@ class csobsdef(ctools.cscript):
                 duration = float(pntdef[row, header.index("duration")])
             else:
                 duration = self["duration"].real()
-            tmin      = self.tmin
-            tmax      = self.tmin + duration
-            gti       = gammalib.GGti(self._time_reference())
-            tstart    = gammalib.GTime(tmin, self._time_reference())
-            tstop     = gammalib.GTime(tmax, self._time_reference())
-            self.tmin = tmax
+            tmin       = self._tmin
+            tmax       = self._tmin + duration
+            gti        = gammalib.GGti(self._time_reference())
+            tstart     = gammalib.GTime(tmin, self._time_reference())
+            tstop      = gammalib.GTime(tmax, self._time_reference())
+            self._tmin = tmax
             gti.append(tstart, tstop)
             obs.ontime(gti.ontime())
             obs.livetime(gti.ontime()*deadc)
@@ -334,49 +322,75 @@ class csobsdef(ctools.cscript):
             # Attach event list to CTA observation
             obs.events(list)
 
+            # Write observation into logger
+            if self._logExplicit():
+                self._log(str(obs))
+                self._log("\n")
+            elif self._logTerse():
+                self._log(gammalib.parformat(obs.instrument()+" observation"))
+                self._log("Name=\""+obs.name()+"\" ")
+                self._log("ID=\""+obs.id()+"\"\n")
+
             # Append observation
-            self.obs.append(obs)
+            self._obs.append(obs)
 
         # Return
         return
 
-    def __set_response(self, obs, caldb, irf):
+    def save(self):
         """
-        Set response for an observation. We create an XML element for that
-        so that the response XML writer will write the database and response
-        name into the observation definition file.
+        Save observation definition XML file.
         """
-        # Create XML element
-        xml = gammalib.GXmlElement()
+        # Write header and filename into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Save observation definition XML file")
 
-        # Append parameter
-        parameter = "parameter name=\"Calibration\" database=\""+\
-                    caldb+"\" response=\""+irf+"\""
-        xml.append(gammalib.GXmlElement(parameter))
+        # Get output filename in case it was not read ahead
+        self._outobs = self["outobs"].filename()
 
-        # Create CTA response
-        response = gammalib.GCTAResponseIrf()
-        response.read(xml)
+        # Check if observation definition XML file is valid
+        if self._outobs != "NONE":      
 
-        # Attach response to observation
-        obs.response(response)
+            # Log filename
+            if self._logTerse():
+                self._log(gammalib.parformat("Observation XML file"))
+                self._log(self._outobs.url())
+                self._log("\n")
 
-        # Return observation
-        return obs
+            # Save observation definition XML file
+            self._obs.save(self._outobs)
+        
+        # Return
+        return
+
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Set read ahead flag
+        self._read_ahead = True
+
+        # Run the script
+        self.run()
+
+        # Save observation definition file
+        self.save()
+
+        # Return
+        return
 
 
 # ======================== #
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Generates observation definition file.
-    """
+
     # Create instance of application
     app = csobsdef(sys.argv)
 
     # Open logfile
-    app.logFileOpen()
+    app._logFileOpen()
 
     # Execute application
     app.execute()

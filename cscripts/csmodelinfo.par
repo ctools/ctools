@@ -4,16 +4,37 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      cscaldb.par                                                   #
+#  File:      csmodelinfo.par                                               #
 #  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
 #             IRAP                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the cscaldb script                         #
+#  Purpose:   Parameter file for the csmodelinfo script                     #
 #                                                                           #
 #############################################################################
+#
+# Input and output parameters
+#============================
+inmodel, f, a, model.xml,,, "Input model XML file"
+ds9file, f, h, NONE,,, "Output DS9 region file containing models"
+
+#
+# Script parameters
+#==================
+pnt_type,      s, h, cross,circle|box|diamond|cross|x|arrow|boxcircle,, "Marker type for point sources"
+pnt_mark_size, i, h, 12,,, "Marker size for point sources"
+show_labels,   b, h, yes,yes|no,, "Add source labels?"
+width,         i, h, 2,,, "Line width for regions"
+fontfamily,    s, h, helvetica,helvetica|times|courier,, "Font family for source labels"
+fontsize,      i, h, 12,,, "Font size for source labels"
+fontweight,    s, h, normal,normal|bold,, "Font weight for source labels"
+fontslant,     s, h, roman,roman|italic,, "Font slant for source labels"
+show_ext_type, b, h, yes,,, "Show type of extended model in source name?"
+free_color,    s, h, green,,, "Color for sources with free parameters (any DS9 color or hex code)"
+fixed_color,   s, h, magenta,,, "Color for source without free parameters (any DS9 color or hex code)"
+
 #
 # Standard parameters
 #====================
@@ -21,4 +42,4 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, ql,,, "Mode of automatic parameters"
-logfile, f, h, cscaldb.log,,, "Log filename"
+logfile, f, h, csmodelinfo.log,,, "Log filename"

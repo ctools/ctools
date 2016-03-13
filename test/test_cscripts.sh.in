@@ -173,9 +173,9 @@ else
   $ECHO " merged_models.xml file is not valid"
   exit 1
 fi
-# === comma-separated ===
+# === semi-colon separated ===
 @PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csmodelmerge.py \
-  inmodels="data/crab.xml,data/source1.xml" \
+  inmodels="data/crab.xml;data/source1.xml" \
   outmodel="merged_models2.xml" > csmodelmerge.log
 $ECHO -n "."
 if [ -s "merged_models2.xml" ]
@@ -218,10 +218,10 @@ rm models.txt
 # Test cstsmapmerge
 # =================
 $ECHO -n "Test cstsmapmerge: "
-# === comma-separated ===
+# === semi-colon separated ===
 chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
 @PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cstsmapmerge.py \
-  inmaps="data/tsmap_0.fits,data/tsmap_1.fits" \
+  inmaps="data/tsmap_0.fits;data/tsmap_1.fits" \
   outmap="merged_tsmap1.fits" > cstsmapmerge.log
 $ECHO -n "."
 if [ -s "merged_tsmap1.fits" ]

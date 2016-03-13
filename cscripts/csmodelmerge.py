@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Merges model XML files into one file
+# Merge model definition XML files
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,31 +29,38 @@ import glob
 # ================== #
 class csmodelmerge(ctools.cscript):
     """
-    This class merges an arbitray number of model container into one output
-    model XML file.
+    Merge model definition XML files.
+
+    An arbitrary number of model definition XML files will be merged into
+    a single model definition XML file.    
     """
+
+    # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
         """
         # Set name
-        self.name    = "csmodelmerge"
-        self.version = "1.1.0"
+        self._name    = "csmodelmerge"
+        self._version = "1.1.0"
 
-        # Make sure that parfile exists
-        file = self.parfile()
+        # Initialise class members
+        self._files      = None
+        self._models     = gammalib.GModels()
+        self._outmodel   = "NONE"
+        self._read_ahead = False
 
         # Initialise application
         if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self._name, self._version)
         elif len(argv) == 1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
         # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -65,124 +72,122 @@ class csmodelmerge(ctools.cscript):
         # Return
         return
 
-    def parfile(self):
+
+    # Private methods
+    def _get_parameters(self):
         """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a
-        parfile.
+        Get parameters from parfile.
         """
-
-        # Set parfile name
-        parfile = self.name+".par"
-
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal that parfile was not found
-            print("Parfile \""+parfile+"\" not found. Create default parfile.")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inmodels","s","a","model.xml","","","Input model XML files"))
-            pars.append(gammalib.GApplicationPar("outmodel","f","a","NONE","","","Output model file"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csmodelmerge.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
-    def get_parameters(self):
-        """
-        Get parameters from parfile and setup the observation.
-        """
-        # Get input models
-        self.inmodels = self["inmodels"].string()
+        # Get input models string
+        inmodels = self["inmodels"].string()
         
-        # Interpet inmodels string
         # Handle ascii files
-        if "@" == self.inmodels[0]:
-            self.files = open(self.inmodels.replace("@","")).read().splitlines()  
+        if "@" == inmodels[0]:
+            self._files = open(inmodels.replace("@","")).read().splitlines()  
             
         # Handle wild card strings
-        elif "*" in self.inmodels:
-            self.files = glob.glob(self.inmodels)
+        elif "*" in inmodels:
+            self._files = glob.glob(inmodels)
         
-        # Handle space-separated list
-        elif " " in self.inmodels:
-            self.files = self.inmodels.split(" ")
+        # Handle space separated list
+        elif " " in inmodels:
+            self._files = inmodels.split(" ")
         
-        # Handle comma-separated list
-        elif "," in self.inmodels:
-            self.files = self.inmodels.split(",")
+        # Handle semi-colon separated list
+        elif ";" in inmodels:
+            self._files = inmodels.split(";")
             
         # Throw exception if input models cannot be decoded
         else:
-            msg = "Parameter \"inmodels\" must contain either an @ASCII"+\
-                  " file, a comma-separated or whitespace-separated list"+\
-                  " of files or a wildcard string"
+            msg = "Parameter \"inmodels\" must contain either an @ASCII "\
+                  "file, a semi-colon-separated or whitespace-separated "\
+                  "list of files or a wildcard string."
             raise RuntimeError(msg) 
         
-        # Get output file
-        self.outmodel = self["outmodel"].filename()
+        # Read ahead output filename
+        if self._read_ahead:
+            self.outmodel = self["outmodel"].filename()
+
+        # Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
 
         # Return
         return
  
+
+    # Public methods
     def run(self):
         """
         Run the script.
         """
         # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
-        self.get_parameters()
+        self._get_parameters()
         
-        # Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
+        # Write header
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Merge models")
 
-        # Dump header
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Merging Models")
-            self.log("\n")
-
-        # Initialise output model container
-        self.models = gammalib.GModels()
+        # Initialise model container
+        self._models = gammalib.GModels()
         
         # Loop over model files
-        for modelfile in self.files:
+        for file in self._files:
+
+            # Construct container from XML file
+            models = gammalib.GModels(file)
             
-            # Logging
-            self.log("Adding "+modelfile)
-            self.log("\n")
+            # Log number of models to add
+            if self._logTerse():
+                nmodels = models.size()
+                if nmodels == 0:
+                    self._log(gammalib.parformat("Add no model from file"))
+                elif nmodels == 1:
+                    self._log(gammalib.parformat("Add 1 model from file"))
+                else:
+                    self._log(gammalib.parformat("Add %d models from file" % 
+                                                 nmodels))
+                self._log(file)
+                self._log("\n")
             
-            # Open models
-            model_add = gammalib.GModels(modelfile)
-            
-            # Append models to container
-            for model in model_add:
-                self.models.append(model)
+            # Extend model container by adding all models in the model file
+            self._models.extend(models)
                 
+        # Log total number of models
+        if self._logTerse():
+            self._log(gammalib.parformat("Models after merging"))
+            self._log(self._models.size())
+            self._log("\n")
+
         # Return
         return
 
     def save(self):
         """ 
-        Save pointings to ds9 region file if required
+        Save model definition XML file
         """
-        # Logging
-        if self.logExplicit():
-            self.log("\n")
-            self.log.header1("Saving model file")
-            self.log("\n") 
+        # Write header
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Save models")
+
+        # Get output filename in case it was not read ahead
+        self._outmodel = self["outmodel"].filename()
         
+        # Log filename
+        if self._logTerse():
+            self._log(gammalib.parformat("Model definition XML file"))
+            self._log(self._outmodel.url())
+            self._log("\n")
+
         # Save models
-        self.models.save(self.outmodel)
+        self._models.save(self._outmodel)
         
         # Return
         return
@@ -191,6 +196,9 @@ class csmodelmerge(ctools.cscript):
         """
         Execute the script.
         """
+        # Set read ahead flag
+        self._read_ahead = True
+
         # Run the script
         self.run()
 
@@ -205,14 +213,12 @@ class csmodelmerge(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Merges model XML files
-    """
+
     # Create instance of application
     app = csmodelmerge(sys.argv)
     
     # Open logfile
-    app.logFileOpen()
+    app._logFileOpen()
 
     # Execute application
     app.execute()

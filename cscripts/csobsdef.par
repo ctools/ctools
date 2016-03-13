@@ -4,16 +4,33 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      cscaldb.par                                                   #
+#  File:      csobsdef.par                                                  #
 #  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
 #             IRAP                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the cscaldb script                         #
+#  Purpose:   Parameter file for the csobsdef script                        #
 #                                                                           #
 #############################################################################
+#
+# General parameters
+#===================
+inpnt,  f, a, NONE,,, "Input pointing definition ASCII file"
+outobs, f, a, obs.xml,,, "Output observation definition XML file"
+
+#
+# Common pointing parameter values
+#=================================
+duration, r, a, 1800.0,,, "Pointing duration (seconds)"
+caldb,    s, h, ,,, "Calibration database"
+irf,      s, h, ,,, "Instrument response function"
+emin,     r, h, UNDEF,,, "Lower energy limit (TeV)"
+emax,     r, h, UNDEF,,, "Upper energy limit (TeV)"
+rad,      r, h, UNDEF,,, "Radius of ROI (degrees)"
+deadc,    r, h, 0.95,,, "Deadtime correction factor"
+
 #
 # Standard parameters
 #====================
@@ -21,4 +38,4 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, ql,,, "Mode of automatic parameters"
-logfile, f, h, cscaldb.log,,, "Log filename"
+logfile, f, h, csobsdef.log,,, "Log filename"

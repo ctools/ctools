@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Light curve generation script.
+# Generates a lightcurve.
 #
 # Copyright (C) 2014-2016 Michael Mayer
 #
@@ -23,51 +23,53 @@ import ctools
 import sys
 
 
-# ============ #
-# csspec class #
-# ============ #
+# ================ #
+# cslightcrv class #
+# ================ #
 class cslightcrv(ctools.cscript):
     """
+    Generates a lightcurve.
+
     This class implements the creation of a light curve. It derives from
     the ctools.cscript class which provides support for parameter files,
     command line arguments, and logging. In that way the Python script
     behaves just as a regular ctool. 
     """
+
+    # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
         """
 
         # Set name
-        self.name    = "cslightcrv"
-        self.version = "1.1.0"
+        self._name    = "cslightcrv"
+        self._version = "1.1.0"
 
         # Initialise some members
-        self.obs = None 
+        self._outfile = ""
 
-        # Initialise some members
+        # Initialise observation
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-            self.obs = argv[0]
-            argv     = argv[1:]
+            self._obs = argv[0]
+            argv      = argv[1:]
         else:      
-            self.obs = gammalib.GObservations()
-            self.obs.clear()   
-        self.m_outfile = ""
+            self._obs = gammalib.GObservations()
 
         # Make sure that parfile exists
-        file = self.parfile()
+        self._parfile()
 
         # Initialise application
         if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
+            ctools.cscript.__init__(self, self._name, self._version)
         elif len(argv) ==1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
+            ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
 
         # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -76,20 +78,18 @@ class cslightcrv(ctools.cscript):
         """
         Destructor.
         """
-        #  Write separator into logger
-        if self.logTerse():
-            self.log("\n")
-
         # Return
         return
 
-    def parfile(self):
+
+    # Private methods
+    def _parfile(self):
         """
         Check if parfile exists. If parfile does not exist then create a
         default parfile. This kluge avoids shipping the cscript with a parfile.
         """
         # Set parfile name
-        parfile = self.name+".par"
+        parfile = self._name+".par"
 
         try:
             pars = gammalib.GApplicationPars(parfile)
@@ -136,15 +136,15 @@ class cslightcrv(ctools.cscript):
         # Return
         return
 
-    def create_tbounds(self):
+    def _create_tbounds(self):
 
         # Create time bin container
-        self.m_tbins = gammalib.GGti()
+        self._tbins = gammalib.GGti()
 
         # check for binning algorithm
         if self["tbinalg"].string() == "FILE":
             try:
-                self.m_tbins.load(self["tbinfile"].filename())
+                self._tbins.load(self["tbinfile"].filename())
             except:               
                 csv = gammalib.GCsv(self["tbinfile"].filename())
                 for i in range(csv.nrows()):
@@ -152,7 +152,7 @@ class cslightcrv(ctools.cscript):
                     tmax = gammalib.GTime()
                     tmin.mjd(csv.real(i,0))
                     tmax.mjd(csv.real(i,1))
-                    self.m_tbins.append(tmin,tmax)
+                    self._tbins.append(tmin,tmax)
         elif self["tbinalg"].string() == "LIN":
             # Use linear time binning
             time_min = self["tmin"].real()
@@ -164,165 +164,143 @@ class cslightcrv(ctools.cscript):
                 tmin.mjd(time_min + i*step)# ref)
                 tmax = gammalib.GTime()
                 tmax.mjd(time_min + (i+1)*step)#ref)
-                self.m_tbins.append(tmin,tmax)
+                self._tbins.append(tmin,tmax)
         elif self["tbinalg"].string() == "GTI":
             # Use GTIs of observations
-            for obs in self.obs:
+            for obs in self._obs:
                 for i in range(obs.events().gti().size()):
-                    self.m_tbins.append(obs.events().gti().tstart(i),obs.events().gti().tstop(i))
+                    self._tbins.append(obs.events().gti().tstart(i),obs.events().gti().tstop(i))
         else:
             raise AttributeError("tbinalg=\""+self["tbinalg"].string()+"\" unkown. Must be one of \"FILE\", \"LIN\" or \"GTI\"")
 
         # Return
         return
 
-    def get_parameters(self):
+    def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
         # Set observation if not done before
-        if self.obs == None or self.obs.size() == 0:
+        if self._obs == None or self._obs.size() == 0:
             self._require_inobs("cslightcrv::get_parameters()")
-            self.obs = self._get_observations()
+            self._obs = self._get_observations()
 
         # Set models if we have none
-        if self.obs.models().size() == 0:
-            self.obs.models(self["inmodel"].filename())
+        if self._obs.models().size() == 0:
+            self._obs.models(self["inmodel"].filename())
 
         # Get source name   
-        self.m_srcname = self["srcname"].string()
+        self._srcname = self["srcname"].string()
 
         # Get energy dispersion flag
-        self.m_edisp = self["edisp"].boolean()
+        self._edisp = self["edisp"].boolean()
         
         # Get time boundaries             
-        self.create_tbounds()
+        self._create_tbounds()
 
         # Unbinned or binned analysis?
-        self.m_ebins    = self["enumbins"].integer()
-        if self.m_ebins == 0:
-            self.m_binned = False
+        self._ebins    = self["enumbins"].integer()
+        if self._ebins == 0:
+            self._binned = False
         else:
-            self.m_binned = True
+            self._binned = True
 
         # Get energy range
-        self.m_emin = self["emin"].real()
-        self.m_emax = self["emax"].real()
+        self._emin = self["emin"].real()
+        self._emax = self["emax"].real()
 
         # Get binning flag
-        if self.m_binned:
-            self.m_coordsys = self["coordsys"].string()
-            self.m_proj     = self["proj"].string()
-            self.m_xref     = self["xref"].real()
-            self.m_yref     = self["yref"].real()
-            self.m_nxpix    = self["nxpix"].integer()
-            self.m_nypix    = self["nypix"].integer()
-            self.m_binsz    = self["binsz"].real()
+        if self._binned:
+            self._coordsys = self["coordsys"].string()
+            self._proj     = self["proj"].string()
+            self._xref     = self["xref"].real()
+            self._yref     = self["yref"].real()
+            self._nxpix    = self["nxpix"].integer()
+            self._nypix    = self["nypix"].integer()
+            self._binsz    = self["binsz"].real()
 
         # Read other parameters
-        self.m_outfile = self["outfile"].filename()
+        self._outfile = self["outfile"].filename()
 
         # Get other parameeters
-        self.m_calc_ulimit = self["calc_ulim"].boolean()
-        self.m_calc_ts     = self["calc_ts"].boolean()
-        self.m_fix_bkg     = self["fix_bkg"].boolean()
-        self.m_fix_srcs    = self["fix_srcs"].boolean()
+        self._calc_ulimit = self["calc_ulim"].boolean()
+        self._calc_ts     = self["calc_ts"].boolean()
+        self._fix_bkg     = self["fix_bkg"].boolean()
+        self._fix_srcs    = self["fix_srcs"].boolean()
 
         # Set some fixed parameters
-        self.m_log     = False # Logging in client tools
-        self.m_chatter = self["chatter"].integer()
-        self.m_clobber = self["clobber"].boolean()
-        self.m_debug   = self["debug"].boolean()
+        self._chatter = self["chatter"].integer()
+        self._clobber = self["clobber"].boolean()
+        self._debug   = self["debug"].boolean()
+
+        #  Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
 
         # Return
         return
 
-    def models(self, models):
-        """
-        Set model.
-        """
-        # Copy models
-        self.obs.models(models.clone())
 
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-
-        # Save residual map
-        self.fits.saveto(self.m_outfile, self.m_clobber)
-
-        # Return
-        return
-
+    # Public methods
     def run(self):
         """
         Run the script.
         """
         # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
-        self.get_parameters()
-
-        #  Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
+        self._get_parameters()
 
         # Write observation into logger
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Observation")
-            self.log(str(self.obs))
-            self.log("\n")
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Observation")
+            self._log(str(self._obs))
+            self._log("\n")
 
         # Write header
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Adjust model parameters")
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Adjust model parameters")
 
         # Adjust model parameters dependent on input user parameters
-        for model in self.obs.models():
+        for model in self._obs.models():
 
             # Set TS flag for all models to false.
             # Source of interest will be set to true later
             model.tscalc(False)
 
             # Log model name
-            if self.logExplicit():
-                self.log.header3(model.name())
+            if self._logExplicit():
+                self._log.header3(model.name())
 
             # Deal with the source of interest    
-            if model.name() == self.m_srcname:
-                if self.m_calc_ts:
+            if model.name() == self._srcname:
+                if self._calc_ts:
                     model.tscalc(True)
 
-            elif self.m_fix_bkg and not model.classname() == "GModelSky":
+            elif self._fix_bkg and not model.classname() == "GModelSky":
                 for par in model:
-                    if par.is_free() and self.logExplicit():
-                        self.log(" Fixing \""+par.name()+"\"\n")
+                    if par.is_free() and self._logExplicit():
+                        self._log(" Fixing \""+par.name()+"\"\n")
                     par.fix()
 
-            elif self.m_fix_srcs and model.classname() == "GModelSky":
+            elif self._fix_srcs and model.classname() == "GModelSky":
                 for par in model:
-                    if par.is_free() and self.logExplicit():
-                        self.log(" Fixing \""+par.name()+"\"\n")
+                    if par.is_free() and self._logExplicit():
+                        self._log(" Fixing \""+par.name()+"\"\n")
                     par.fix()
 
         # Write header
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Generate lightcurve")      
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Generate lightcurve")      
 
         # Initialise FITS Table with extension "LIGHTCURVE"
-        table = gammalib.GFitsBinTable(self.m_tbins.size())
+        table = gammalib.GFitsBinTable(self._tbins.size())
         table.extname("LIGHTCURVE")
 
         # Add Header for compatibility with gammalib.GMWLSpectrum
@@ -330,38 +308,38 @@ class cslightcrv(ctools.cscript):
         table.card("TELESCOP", "CTA", "Name of Telescope")
 
         # Create FITS table columns        
-        MJD = gammalib.GFitsTableDoubleCol("MJD", self.m_tbins.size())
+        MJD = gammalib.GFitsTableDoubleCol("MJD", self._tbins.size())
         MJD.unit("days")
-        e_MJD = gammalib.GFitsTableDoubleCol("e_MJD", self.m_tbins.size())
+        e_MJD = gammalib.GFitsTableDoubleCol("e_MJD", self._tbins.size())
         e_MJD.unit("days")
 
         # Create a FITS column for every free parameter
         columns = []
-        for par in self.obs.models()[self.m_srcname]:
+        for par in self._obs.models()[self._srcname]:
             if par.is_free():
-                col = gammalib.GFitsTableDoubleCol(par.name(), self.m_tbins.size())
+                col = gammalib.GFitsTableDoubleCol(par.name(), self._tbins.size())
                 col.unit(par.unit())
                 columns.append(col)
-                e_col = gammalib.GFitsTableDoubleCol("e_"+par.name(), self.m_tbins.size())
+                e_col = gammalib.GFitsTableDoubleCol("e_"+par.name(), self._tbins.size())
                 e_col.unit(par.unit())
                 columns.append(e_col)
 
         # Create TS and upper limit columns
-        TSvalues    = gammalib.GFitsTableDoubleCol("TS", self.m_tbins.size())
-        ulim_values = gammalib.GFitsTableDoubleCol("UpperLimit", self.m_tbins.size())
+        TSvalues    = gammalib.GFitsTableDoubleCol("TS", self._tbins.size())
+        ulim_values = gammalib.GFitsTableDoubleCol("UpperLimit", self._tbins.size())
         ulim_values.unit("ph/cm2/s")
 
         # Loop over energy bins
-        for i in range(self.m_tbins.size()):
+        for i in range(self._tbins.size()):
 
             # Log information
-            if self.logTerse():
-                self.log("\n")
-                self.log.header2("Time bin "+str(i))
+            if self._logTerse():
+                self._log("\n")
+                self._log.header2("Time bin "+str(i))
 
             # Get time boundaries
-            tmin = self.m_tbins.tstart(i)
-            tmax = self.m_tbins.tstop(i)
+            tmin = self._tbins.tstart(i)
+            tmax = self._tbins.tstop(i)
 
             # Compute time bin center and time width
             twidth = 0.5 * (tmax - tmin) # in seconds
@@ -372,13 +350,13 @@ class cslightcrv(ctools.cscript):
             e_MJD[i] = twidth / gammalib.sec_in_day # in days
 
             # Log information
-            if self.logExplicit():
-                self.log.header3("Selecting events")
+            if self._logExplicit():
+                self._log.header3("Selecting events")
 
             # Select events
-            select = ctools.ctselect(self.obs)
-            select["emin"] = self.m_emin    
-            select["emax"] = self.m_emax 
+            select = ctools.ctselect(self._obs)
+            select["emin"] = self._emin    
+            select["emax"] = self._emax 
             select["tmin"] = tmin.convert(select._time_reference())
             select["tmax"] = tmax.convert(select._time_reference())
             select["rad"]  = "UNDEFINED"
@@ -390,113 +368,113 @@ class cslightcrv(ctools.cscript):
             obs = select.obs()
 
             # Binned analysis
-            if self.m_binned:
+            if self._binned:
 
                 # Header
-                if self.logTerse():
-                    self.log.header3("Binning events")
+                if self._logTerse():
+                    self._log.header3("Binning events")
 
                 # Bin events
                 bin = ctools.ctbin(select.obs())
                 bin["usepnt"]   = False
                 bin["ebinalg"]  = "LOG"
-                bin["xref"]     = self.m_xref
-                bin["yref"]     = self.m_yref
-                bin["binsz"]    = self.m_binsz
-                bin["nxpix"]    = self.m_nxpix
-                bin["nypix"]    = self.m_nypix
-                bin["enumbins"] = self.m_ebins
-                bin["emin"]     = self.m_emin
-                bin["emax"]     = self.m_emax        
-                bin["coordsys"] = self.m_coordsys
-                bin["proj"]     = self.m_proj            
+                bin["xref"]     = self._xref
+                bin["yref"]     = self._yref
+                bin["binsz"]    = self._binsz
+                bin["nxpix"]    = self._nxpix
+                bin["nypix"]    = self._nypix
+                bin["enumbins"] = self._ebins
+                bin["emin"]     = self._emin
+                bin["emax"]     = self._emax        
+                bin["coordsys"] = self._coordsys
+                bin["proj"]     = self._proj            
                 bin.run()
 
                 # Header
-                if self.logTerse():
-                    self.log.header3("Creating exposure cube")
+                if self._logTerse():
+                    self._log.header3("Creating exposure cube")
 
                 # Create exposure cube
                 expcube = ctools.ctexpcube(select.obs())
                 expcube["incube"]   = "NONE"
                 expcube["usepnt"]   = False
                 expcube["ebinalg"]  = "LOG"
-                expcube["xref"]     = self.m_xref
-                expcube["yref"]     = self.m_yref
-                expcube["binsz"]    = self.m_binsz
-                expcube["nxpix"]    = self.m_nxpix
-                expcube["nypix"]    = self.m_nypix
-                expcube["enumbins"] = self.m_ebins
-                expcube["emin"]     = self.m_emin
-                expcube["emax"]     = self.m_emax   
-                expcube["coordsys"] = self.m_coordsys
-                expcube["proj"]     = self.m_proj               
+                expcube["xref"]     = self._xref
+                expcube["yref"]     = self._yref
+                expcube["binsz"]    = self._binsz
+                expcube["nxpix"]    = self._nxpix
+                expcube["nypix"]    = self._nypix
+                expcube["enumbins"] = self._ebins
+                expcube["emin"]     = self._emin
+                expcube["emax"]     = self._emax   
+                expcube["coordsys"] = self._coordsys
+                expcube["proj"]     = self._proj               
                 expcube.run()
 
                 # Header
-                if self.logTerse():
-                    self.log.header3("Creating point spread function cube")
+                if self._logTerse():
+                    self._log.header3("Creating point spread function cube")
 
                 # Create psf cube
                 psfcube = ctools.ctpsfcube(select.obs())
                 psfcube["incube"]   = "NONE"
                 psfcube["usepnt"]   = False
                 psfcube["ebinalg"]  = "LOG"
-                psfcube["xref"]     = self.m_xref
-                psfcube["yref"]     = self.m_yref
-                psfcube["binsz"]    = self.m_binsz
-                psfcube["nxpix"]    = self.m_nxpix
-                psfcube["nypix"]    = self.m_nypix
-                psfcube["enumbins"] = self.m_ebins
-                psfcube["emin"]     = self.m_emin
-                psfcube["emax"]     = self.m_emax    
-                psfcube["coordsys"] = self.m_coordsys
-                psfcube["proj"]     = self.m_proj               
+                psfcube["xref"]     = self._xref
+                psfcube["yref"]     = self._yref
+                psfcube["binsz"]    = self._binsz
+                psfcube["nxpix"]    = self._nxpix
+                psfcube["nypix"]    = self._nypix
+                psfcube["enumbins"] = self._ebins
+                psfcube["emin"]     = self._emin
+                psfcube["emax"]     = self._emax    
+                psfcube["coordsys"] = self._coordsys
+                psfcube["proj"]     = self._proj               
                 psfcube.run()
 
                 # Check if we need to include energy dispersion
-                if self.m_edisp:
+                if self._edisp:
 
                     # Header
-                    if self.logTerse():
-                        self.log.header3("Creating energy dispersion cube")
+                    if self._logTerse():
+                        self._log.header3("Creating energy dispersion cube")
                     
                     # Create edisp cube
                     edispcube = ctools.ctedispcube(select.obs())
                     edispcube["incube"]   = "NONE"
                     edispcube["usepnt"]   = False
                     edispcube["ebinalg"]  = "LOG"
-                    edispcube["xref"]     = self.m_xref
-                    edispcube["yref"]     = self.m_yref
-                    edispcube["binsz"]    = self.m_binsz
-                    edispcube["nxpix"]    = self.m_nxpix
-                    edispcube["nypix"]    = self.m_nypix
-                    edispcube["enumbins"] = self.m_ebins
-                    edispcube["emin"]     = self.m_emin
-                    edispcube["emax"]     = self.m_emax    
-                    edispcube["coordsys"] = self.m_coordsys
-                    edispcube["proj"]     = self.m_proj               
+                    edispcube["xref"]     = self._xref
+                    edispcube["yref"]     = self._yref
+                    edispcube["binsz"]    = self._binsz
+                    edispcube["nxpix"]    = self._nxpix
+                    edispcube["nypix"]    = self._nypix
+                    edispcube["enumbins"] = self._ebins
+                    edispcube["emin"]     = self._emin
+                    edispcube["emax"]     = self._emax    
+                    edispcube["coordsys"] = self._coordsys
+                    edispcube["proj"]     = self._proj               
                     edispcube.run()
 
                 # Header
-                if self.logTerse():
-                    self.log.header3("Creating background cube")
+                if self._logTerse():
+                    self._log.header3("Creating background cube")
 
                 # Create background cube
                 bkgcube = ctools.ctbkgcube(select.obs())
                 bkgcube["incube"]   = "NONE"
                 bkgcube["usepnt"]   = False
                 bkgcube["ebinalg"]  = "LOG"
-                bkgcube["xref"]     = self.m_xref
-                bkgcube["yref"]     = self.m_yref
-                bkgcube["binsz"]    = self.m_binsz
-                bkgcube["nxpix"]    = self.m_nxpix
-                bkgcube["nypix"]    = self.m_nypix
-                bkgcube["enumbins"] = self.m_ebins
-                bkgcube["emin"]     = self.m_emin
-                bkgcube["emax"]     = self.m_emax   
-                bkgcube["coordsys"] = self.m_coordsys
-                bkgcube["proj"]     = self.m_proj                
+                bkgcube["xref"]     = self._xref
+                bkgcube["yref"]     = self._yref
+                bkgcube["binsz"]    = self._binsz
+                bkgcube["nxpix"]    = self._nxpix
+                bkgcube["nypix"]    = self._nypix
+                bkgcube["enumbins"] = self._ebins
+                bkgcube["emin"]     = self._emin
+                bkgcube["emax"]     = self._emax   
+                bkgcube["coordsys"] = self._coordsys
+                bkgcube["proj"]     = self._proj                
                 bkgcube.run()
 
                 # Set new binned observation
@@ -506,7 +484,7 @@ class cslightcrv(ctools.cscript):
                 models = bkgcube.models()
                 
                 # Set precomputed binned response
-                if self.m_edisp:
+                if self._edisp:
                     obs[0].response(expcube.expcube(), psfcube.psfcube(),
                                     edispcube.edispcube(), bkgcube.bkgcube())                    
                 else:
@@ -514,7 +492,7 @@ class cslightcrv(ctools.cscript):
                                     bkgcube.bkgcube())
 
                 # Fix background models if required
-                if self.m_fix_bkg:
+                if self._fix_bkg:
                     for model in models:
                         if not model.classname() == "GModelSky":
                             for par in model:
@@ -524,20 +502,20 @@ class cslightcrv(ctools.cscript):
                 obs.models(models)
 
             # Header
-            if self.logTerse():
-                self.log.header3("Performing fit")
+            if self._logTerse():
+                self._log.header3("Performing fit")
 
             # Likelihood
             like = ctools.ctlike(obs)
-            like["edisp"] = self.m_edisp
+            like["edisp"] = self._edisp
             like.run()
 
             # Skip bin if no event was present
             if like.obs().logL() == 0.0:
 
                 # Log information
-                if self.logTerse():
-                    self.log("No event in this time bin. Bin is skipped\n")
+                if self._logTerse():
+                    self._log("No event in this time bin. Bin is skipped\n")
 
                 # Set all values to 0
                 for col in columns:
@@ -548,19 +526,19 @@ class cslightcrv(ctools.cscript):
 
             # Get results
             fitted_models = like.obs().models()
-            source        = fitted_models[self.m_srcname]
+            source        = fitted_models[self._srcname]
 
             # Calculate Upper Limit            
             ulimit_value = -1.0
-            if self.m_calc_ulimit:
+            if self._calc_ulimit:
 
                 # Logging information
-                if self.logTerse():
-                    self.log.header3("Computing upper limit")
+                if self._logTerse():
+                    self._log.header3("Computing upper limit")
 
                 # Create upper limit object  
                 ulimit = ctools.ctulimit(like.obs())
-                ulimit["srcname"] = self.m_srcname
+                ulimit["srcname"] = self._srcname
                 ulimit["eref"] = 1.0
 
                 # Try to run upper limit and catch exceptions
@@ -568,13 +546,13 @@ class cslightcrv(ctools.cscript):
                     ulimit.run()
                     ulimit_value = ulimit.flux_ulimit()
                 except:
-                    if self.logTerse():
-                        self.log("Upper limit calculation failed\n")
+                    if self._logTerse():
+                        self._log("Upper limit calculation failed\n")
                     ulimit_value = -1.0
 
             # Get TS value
             TS = -1.0
-            if self.m_calc_ts:
+            if self._calc_ts:
                 TS = source.ts() 
 
             # Set values for storage
@@ -592,20 +570,20 @@ class cslightcrv(ctools.cscript):
                 ulim_values[i] = ulimit_value
 
             # Log information
-            if self.logExplicit(): 
-                self.log.header3("Results of bin "+str(i)+": MJD "+str(tmin.mjd())+"-"+str(tmax.mjd()))
+            if self._logExplicit(): 
+                self._log.header3("Results of bin "+str(i)+": MJD "+str(tmin.mjd())+"-"+str(tmax.mjd()))
                 for col in columns:
                     if "e_" == col.name()[:2]:
                         continue
                     value = source.spectral()[col.name()].value()
                     error = source.spectral()[col.name()].error()
                     unit = source.spectral()[col.name()].unit()
-                    self.log(" > "+col.name()+": "+str(value)+" +- "+str(error)+" "+unit+"\n")
-                if self.m_calc_ts and TSvalues[i] > 0.0:
-                    self.log(" > TS = "+str(TS)+" \n")
-                if self.m_calc_ulimit and ulim_values[i] > 0.0:
-                    self.log(" > UL = "+str(ulim_values[i])+" [ph/cm2/s]")
-                self.log("\n")
+                    self._log(" > "+col.name()+": "+str(value)+" +- "+str(error)+" "+unit+"\n")
+                if self._calc_ts and TSvalues[i] > 0.0:
+                    self._log(" > TS = "+str(TS)+" \n")
+                if self._calc_ulimit and ulim_values[i] > 0.0:
+                    self._log(" > UL = "+str(ulim_values[i])+" [ph/cm2/s]")
+                self._log("\n")
 
         # Append filles columns to fits table    
         table.append(MJD)
@@ -616,8 +594,69 @@ class cslightcrv(ctools.cscript):
         table.append(ulim_values)
 
         # Create the FITS file now
-        self.fits = gammalib.GFits()
-        self.fits.append(table)
+        self._fits = gammalib.GFits()
+        self._fits.append(table)
+
+        # Return
+        return
+
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Read ahead output parameters
+        self._read_ahead(True)
+
+        # Run the script
+        self.run()
+
+        # Save lightcurve
+        self.save()
+
+        # Return
+        return
+
+    def save(self):
+        """
+        Save lightcurve.
+        """
+        # Write header
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Save lightcurve")
+
+        # Get outmap parameter
+        self._outfile = self["outfile"].filename()
+        
+        # Continue only filename and residual map are valid
+        if self._outfile != "NONE" and self._fits != None:
+
+            # Log file name
+            if self._logTerse():
+                self._log("Save lightcurve into \""+self._outfile+"\".\n")
+
+            # Save spectrum
+            self._fits.saveto(self._outfile, self._clobber)
+
+        # Return
+        return
+
+    def lightcurve(self):
+        """
+        Return lightcurve FITS file.
+
+        Returns:
+            FITS file containing lightcurve.
+        """
+        # Return
+        return self._fits
+
+    def models(self, models):
+        """
+        Set model.
+        """
+        # Copy models
+        self._obs.models(models.clone())
 
         # Return
         return
@@ -627,14 +666,12 @@ class cslightcrv(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Generates light curve.
-    """
+
     # Create instance of application
     app = cslightcrv(sys.argv)
 
     # Open logfile
-    app.logFileOpen()
+    app._logFileOpen()
 
     # Execute application
     app.execute()

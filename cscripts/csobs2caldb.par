@@ -4,16 +4,24 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      cscaldb.par                                                   #
+#  File:      csobs2caldb.par                                               #
 #  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
 #             IRAP                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the cscaldb script                         #
+#  Purpose:   Parameter file for the csobs2caldb script                     #
 #                                                                           #
 #############################################################################
+#
+# General parameters
+#===================
+inobs,   f, a, obs.xml,,, "Observation definition XML file"
+rspname, s, a, NONE,,, "Response output name (e.g. Zenith50)"
+outirfs, f, h, irf_file.fits,,, "Output IRF file name"
+index,   i, h, 0,,, "Index of observation to be used from XML file"
+
 #
 # Standard parameters
 #====================
@@ -21,4 +29,4 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, ql,,, "Mode of automatic parameters"
-logfile, f, h, cscaldb.log,,, "Log filename"
+logfile, f, h, csobs2caldb.log,,, "Log filename"
