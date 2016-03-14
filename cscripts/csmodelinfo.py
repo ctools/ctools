@@ -47,7 +47,7 @@ class csmodelinfo(ctools.cscript):
 
         # Initialise class members
         self._models        = gammalib.GModels()
-        self._ds9file       = "NONE"
+        self._ds9file       = gammalib.GFilename("NONE")
         self._pnt_type      = ""
         self._pnt_mark_size = 12
         self._show_labels   = True
