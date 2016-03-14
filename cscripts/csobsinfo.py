@@ -31,7 +31,7 @@ class csobsinfo(ctools.cscript):
     Shows the content of an observation container.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -51,33 +51,13 @@ class csobsinfo(ctools.cscript):
         self._ebounds        = gammalib.GEbounds()
         self._gti            = gammalib.GGti()
 
-        # Initialise observation
-        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-            self._obs = argv[0]
-            argv      = argv[1:]
-        else:      
-            self._obs = gammalib.GObservations()
-            self._obs.clear()   
+        # Initialise observation container from constructor arguments.
+        self._obs = self._set_input_obs(argv)
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 

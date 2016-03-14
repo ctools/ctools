@@ -152,7 +152,7 @@ public:
 
 
 /***********************************************************************//**
- * @brief ctool base class Python extension
+ * @brief ctool base class Python extensions
  ***************************************************************************/
 %extend ctool {
     void _read_ahead(const bool& flag) {
@@ -160,3 +160,35 @@ public:
         return;
     }
 }
+
+/***********************************************************************//**
+ * @brief cscript base class Python extensions
+ ***************************************************************************/
+%pythoncode %{
+
+# Initialise observation container from constructor arguments. In case that
+# an observation container is provided as argument, this container will be
+# used to initialise the class.
+def _set_input_obs(self, argv):
+    if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
+        obs  = argv[0]
+        argv = argv[1:]
+    else:      
+        obs = gammalib.GObservations()
+    return obs
+cscript._set_input_obs = _set_input_obs 
+
+# Initialise application by calling the appropriate class constructor.
+def _init_cscript(self, argv):
+    if len(argv) == 0:
+        cscript.__init__(self, self._name, self._version)
+    elif len(argv) == 1:
+        cscript.__init__(self, self._name, self._version, *argv)
+    else:
+        raise TypeError("Invalid number of arguments given.")
+    # Set logger properties
+    self._log_header()
+    self._log.date(True)
+cscript._init_cscript = _init_cscript
+
+%}

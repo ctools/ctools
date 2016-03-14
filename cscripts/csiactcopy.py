@@ -35,7 +35,7 @@ class csiactcopy(ctools.cscript):
     observations. Index files get merged and updated accordingly.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -45,26 +45,10 @@ class csiactcopy(ctools.cscript):
         self._version  = "1.1.0"
         self._datapath = os.getenv("VHEFITS","")
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
-        
         # Return
         return
 

@@ -33,7 +33,7 @@ class csfindobs(ctools.cscript):
     Find observations from an IACT data store.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -44,32 +44,13 @@ class csfindobs(ctools.cscript):
         self._verbose  = False
         self._datapath = os.getenv("VHEFITS","")
         
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
-
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
         # Return
         return
     
-    def __del__(self):
-        """
-        Destructor.
-        """
-        #  Write separator into logger
-        if self._logTerse():
-            self._log("\n")
-        
-        # Return
-        return
-
 
     # Private methods
     def _get_parameters(self):
