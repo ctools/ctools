@@ -2,7 +2,7 @@
 # ==========================================================================
 # Inspection of IACT data storage
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@ class csiactdata(ctools.cscript):
     file or prints it on the screen. These information can be used as input
     for 'csiactobs'.
     """
+
+    # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
@@ -44,9 +46,6 @@ class csiactdata(ctools.cscript):
         self._version   = "1.1.0"
         self._datapath  = os.getenv("VHEFITS","")
         self._prodnames = []
-
-        # Make sure that parfile exists
-        file = self._parfile()
 
         # Initialise application
         if len(argv) == 0:
@@ -70,32 +69,8 @@ class csiactdata(ctools.cscript):
         # Return
         return
 
-    def _parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a
-        parfile.
-        """
-        # Set parfile name
-        parfile = self._name+".par"
 
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()    
-            pars.append(gammalib.GApplicationPar("datapath","s","a",self._datapath,"","","Path were data is located"))     
-            pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csiactdata.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
+    # Private methods
     def get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -119,16 +94,7 @@ class csiactdata(ctools.cscript):
         # Return
         return
 
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-
-        # Return
-        return
-
+    # Public methods
     def run(self):
         """
         Run the script.
@@ -222,6 +188,20 @@ class csiactdata(ctools.cscript):
         # Return
         return       
 
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Open logfile
+        self._logFileOpen()
+
+        # Run the script
+        self.run()
+
+        # Return
+        return
+
+
     def names(self):
         """ 
         Return available FITS production names
@@ -238,9 +218,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csiactdata(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

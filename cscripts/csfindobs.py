@@ -44,9 +44,6 @@ class csfindobs(ctools.cscript):
         self._verbose  = False
         self._datapath = os.getenv("VHEFITS","")
         
-        # Make sure that parfile exists
-        self._parfile()
-
         # Initialise application
         if len(argv) == 0:
             ctools.cscript.__init__(self, self._name, self._version)
@@ -73,39 +70,8 @@ class csfindobs(ctools.cscript):
         # Return
         return
 
-    def _parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a
-        parfile.
-        """
-        # Set parfile name
-        parfile = self._name+".par"
-        
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-            
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("datapath","s","a",self._datapath,"","","Path were data are located"))       
-            pars.append(gammalib.GApplicationPar("prodname","s","a","prod-name","","","Name of FITS production (Run csiactdata to view your options)"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","runlist.lis","","","Runlist outfile"))
-            pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","","","Right ascension"))
-            pars.append(gammalib.GApplicationPar("dec","r","a","22.01","","","Declination"))
-            pars.append(gammalib.GApplicationPar("rad","r","a","2.5","","","Search radius"))
-            pars.append(gammalib.GApplicationPar("min_qual","i","h","0","0|1|2","","Minimum data quality (0=perfect, 1=ok, 2=bad)"))
-            pars.append(gammalib.GApplicationPar("expression","s","h","NONE","","","Additional expression"))
-            pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csfindobs.log","","","Log filename"))
-            pars.save(parfile)
-        
-        # Return
-        return
-        
+
+    # Private methods
     def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -209,27 +175,7 @@ class csfindobs(ctools.cscript):
         # Return
         return
 
-    def obs_ids(self):
-        """ 
-        Return OBS IDs
-        """
-             
-        # Return
-        return self.runs
-    
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-        
-        # Save residual map
-        self.save(self._outfile)
-        
-        # Return
-        return
-
+    # Public methods
     def run(self):
         """
         Run the script.
@@ -304,6 +250,19 @@ class csfindobs(ctools.cscript):
         # Return
         return
     
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Run the script
+        self.run()
+        
+        # Save residual map
+        self.save(self._outfile)
+        
+        # Return
+        return
+
     def save(self, outfile):
         """
         Save.
@@ -323,6 +282,14 @@ class csfindobs(ctools.cscript):
         # Return
         return
 
+    def obs_ids(self):
+        """ 
+        Return OBS IDs
+        """
+             
+        # Return
+        return self._runs
+    
 
 # ======================== #
 # Main routine entry point #

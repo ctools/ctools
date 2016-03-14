@@ -56,9 +56,6 @@ class cslightcrv(ctools.cscript):
         else:      
             self._obs = gammalib.GObservations()
 
-        # Make sure that parfile exists
-        self._parfile()
-
         # Initialise application
         if len(argv) == 0:
             ctools.cscript.__init__(self, self._name, self._version)
@@ -83,59 +80,6 @@ class cslightcrv(ctools.cscript):
 
 
     # Private methods
-    def _parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
-        """
-        # Set parfile name
-        parfile = self._name+".par"
-
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Input event list, counts cube, or observation definition XML file"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
-            pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
-            pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("edispcube","f","a","NONE","","","Input energy dispersion cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","lightcurve.fits","","","Output light curve file"))
-            pars.append(gammalib.GApplicationPar("tbinalg","s","a","GTI","FILE|LIN|GTI","", "Algorithm for defining time bins"))
-            pars.append(gammalib.GApplicationPar("tmin","r","a","51544.5","","days","Lightcurve start time [MJD]"))
-            pars.append(gammalib.GApplicationPar("tmax","r","a","51544.6","","days","Lightcurve stop time [MJD]"))
-            pars.append(gammalib.GApplicationPar("tbins","i","a","5","","","Number of time bins"))
-            pars.append(gammalib.GApplicationPar("tbinfile","f","a","tbins.fits","","", "File defining the time binning"))
-            pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins per light curve bin (0=unbinned)"))
-            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit of events (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit of events (TeV)"))
-            pars.append(gammalib.GApplicationPar("coordsys","s","a","CEL","CEL|GAL","","Coordinate System"))
-            pars.append(gammalib.GApplicationPar("proj","s","a","CAR","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method"))
-            pars.append(gammalib.GApplicationPar("xref","r","a","83.63","0","360","First coordinate of image center in degrees (RA or galactic l)"))
-            pars.append(gammalib.GApplicationPar("yref","r","a","22.01","-90","90","Second coordinate of image center in degrees (DEC or galactic b)"))
-            pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
-            pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
-            pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value for each bin?"))
-            pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit for each bin?"))
-            pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other sky model parameters?"))
-            pars.append(gammalib.GApplicationPar("fix_bkg","b","h","no","yes|no","","Fix background model parameters?"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","cslightcrv.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
     def _create_tbounds(self):
 
         # Create time bin container

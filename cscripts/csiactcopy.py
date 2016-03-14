@@ -34,6 +34,8 @@ class csiactcopy(ctools.cscript):
     It can take a list of observation IDs to allow the download specific
     observations. Index files get merged and updated accordingly.
     """
+
+    # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
@@ -42,9 +44,6 @@ class csiactcopy(ctools.cscript):
         self._name     = "csiactcopy"
         self._version  = "1.1.0"
         self._datapath = os.getenv("VHEFITS","")
-
-        # Make sure that parfile exists
-        self._parfile()
 
         # Initialise application
         if len(argv) == 0:
@@ -69,34 +68,8 @@ class csiactcopy(ctools.cscript):
         # Return
         return
 
-    def _parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a
-        parfile.
-        """
-        # Set parfile name
-        parfile = self._name+".par"
 
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            print("Parfile "+parfile+" not found. Create default parfile.")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()    
-            pars.append(gammalib.GApplicationPar("remote_master","f","a","/Volumes/mountpoint/master.json","","","Location of remote master file"))      
-            pars.append(gammalib.GApplicationPar("prodname","s","a","iact-fits","","","Name of FITS production to download"))   
-            pars.append(gammalib.GApplicationPar("outpath","s","a","/path/to/fits","","","Destination path of FITS data"))        
-            pars.append(gammalib.GApplicationPar("runlist","f","h","NONE","","","List of observation IDs"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csiactcopy.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
+    # Private methods
     def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -114,20 +87,233 @@ class csiactcopy(ctools.cscript):
         self._prodname = self["prodname"].string()
         self._outpath  = gammalib.expand_env(self["outpath"].string())
         self._runlist  = self["runlist"].filename()            
+
+        # Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
+                
+        # Return
+        return
+
+    def copy(self, source, clobber):     
+        """
+        copy file to _outpath
+        """
+        # Get file destination
+        destination = os.path.join(self._outpath,
+                                   os.path.relpath(source, self._remote_base))
+            
+        # Initialise return value
+        filesize = 0.0
         
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-
-        # Return
-        return
+        # Logging
+        if self._logVerbose():
+            self._log("\n")  
+            self._log.header3("Copy file")
+            self._log.parformat("Source")
+            self._log(str(source))
+            self._log("\n")
+            self._log.parformat("Destination")
+            self._log(str(destination))
+            self._log("\n")  
+            self._log.parformat("Already exists")
+            self._log(str(os.path.isfile(destination)))
+            self._log("\n")
+            self._log.parformat("Overwrite")
+            self._log(str(clobber))
+            self._log("\n")
+            self._log.parformat("Copying")
+        
+        # Flag if file destination is already available
+        is_file = os.path.isfile(destination)
+                
+        # check if file could be skipped because clobber=no
+        if is_file and clobber == False:
+            if self._logVerbose():
+                self._log("Skip (clobber=no)")
+                self._log("\n")
+        
+        # check if file could be skipped because it is the same file
+        elif is_file and os.path.samefile(destination, source):
+            if self._logVerbose():
+                self._log("Skip (same file)")
+                self._log("\n")
+            
+        else:  
+            # Create directory if not existent
+            dest_dir = os.path.dirname(destination)         
+            if not os.path.isdir(dest_dir):
+                os.makedirs(dest_dir)
+            
+            # Copy file (if source not identical to destination)
+            shutil.copy2(source, destination)
+            
+            # Get filesize
+            filesize = os.stat(destination).st_size
+            
+            # Logging
+            if self._logVerbose():
+                self._log("Done!")
+                self._log("\n")
+                   
+        # Return 
+        return filesize
     
+    
+    def merge(self, localfits, remotefits, hduname, clobber):
+        """
+        merge remote and local fits file
+        If local fits file not present, a new one is created
+        """    
+        
+        if self._logTerse():
+            self._log.parformat("Local file")
+            self._log(str(localfits))
+            self._log("\n")
+            self._log.parformat("Remote file")
+            self._log(str(remotefits))
+            self._log("\n")
+            self._log.parformat("HDU name")
+            self._log(str(hduname))
+            self._log("\n")
+            self._log.parformat("Conflict preference")
+            if clobber:
+                self._log("Remote")
+            else:
+                self._log("Local")
+            self._log("\n")
+        
+        # Check if local fits file is available
+        if os.path.isfile(localfits):    
+            local = gammalib.GFits(str(localfits))
+            local_hdu = local[hduname]
+        else:
+            # Otherwise load remote fits file and delete rows
+            local = gammalib.GFits(str(remotefits))
+            local_hdu = local[hduname]
+            local_hdu.remove_rows(0,local_hdu.nrows())
+        
+        # find local obs_id 
+        local_obs = []
+        lobs_col = local_hdu["OBS_ID"]
+        for obs_id in lobs_col:
+            local_obs.append(obs_id)      
+        
+        # Create selection expression for opening remote fits file
+        selection = ""
+        if len(self._runs):
+            selection += "["+hduname+"]["
+            for run in self._runs:
+                selection += "OBS_ID=="+str(run)
+                selection += "||"
+            selection = selection[:-2]
+            selection += "]"
+        
+        # Create file name
+        remotefile = remotefits + selection
+        
+        # open remote fits file
+        remote = gammalib.GFits(str(remotefile))
+        remote_hdu = remote[hduname]
+        
+        # Get remote obs_id
+        remote_obs = []
+        robs_col = remote_hdu["OBS_ID"]
+        for obs_id in robs_col:
+            remote_obs.append(obs_id)
+            
+        if self._logTerse():
+            self._log.parformat("Remote entries")
+            self._log(str(len(remote_obs)))
+            self._log("\n")
+            self._log.parformat("Local entries")
+            self._log(str(len(local_obs)))
+            self._log("\n")
+        
+        # initialise counter for logging
+        removed_rows = 0
+        
+        # If clobber=yes, we use the remote content to overwrite
+        # corresponding local content
+        if clobber:
+            
+            # Loop over remote obs_ids
+            for remote_obs_id in remote_obs:
+                
+                # Check if remote obs_id is present locally
+                if remote_obs_id in local_obs:
+                    
+                    # Remove local obs_id entries
+                    table_has_obsid = True
+                    while table_has_obsid:
+                        for i in range(local_hdu.nrows()):
+                            if remote_obs_id == local_hdu["OBS_ID"][i]:
+                                local_hdu.remove_rows(i,1)
+                                removed_rows += 1
+                                break
+                        table_has_obsid = False
+                        for i in range(local_hdu.nrows()):
+                            if remote_obs_id == local_hdu["OBS_ID"][i]:
+                                table_has_obsid = True
+                                break
+                            
+        # If clobber=false, we keep the local content unchanged and just
+        # expand by remote content        
+        else:
+            # Loop over remote obs_ids
+            for local_obs_id in local_obs:
+                
+                # Check if local obs_id is present remotely
+                if local_obs_id in remote_obs:
+                    
+                    # Remove remote obs_id entries
+                    table_has_obsid = True
+                    while table_has_obsid:
+                        for i in range(remote_hdu.nrows()):
+                            if local_obs_id == remote_hdu["OBS_ID"][i]:
+                                remote_hdu.remove_rows(i,1)
+                                removed_rows += 1
+                                break
+                        table_has_obsid = False
+                        for i in range(remote_hdu.nrows()):
+                            if local_obs_id == remote_hdu["OBS_ID"][i]:
+                                table_has_obsid = True
+                                break
+    
+        # Store number of local rows
+        old_local_rows = local_hdu.nrows()
+        
+        # Add rmeote HDUs
+        local_hdu.insert_rows(old_local_rows, remote_hdu.nrows())
+        
+        if self._logTerse():
+            if clobber:
+                self._log.parformat("Removed local rows")
+            else:
+                self._log.parformat("Skipped remote rows")
+            self._log(str(removed_rows))
+            self._log("\n")
+
+        # Loop over columns 
+        for i in range(local_hdu.ncols()):
+            
+            # Get local and remote columns
+            local_col = local_hdu[i]
+            remote_col = remote_hdu[i]    
+            
+            # Loop over entries and merge
+            for j in range(remote_col.length()):
+                local_col[j+old_local_rows] = remote_col[j]
+        
+        # Save local fits file
+        local.saveto(str(localfits), True)
+               
+        # Return
+        return
+
+
+    # Public methods
     def run(self):
         """
         Run the script.
@@ -138,11 +324,6 @@ class csiactcopy(ctools.cscript):
         # Get parameters
         self._get_parameters()
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log("\n")
-        
         # Make destination directory if not available
         if not os.path.isdir(self._outpath):            
             os.makedirs(self._outpath)   
@@ -516,221 +697,19 @@ class csiactcopy(ctools.cscript):
         # Return
         return       
 
-    def copy(self, source, clobber):     
+    def execute(self):
         """
-        copy file to m_outpath
+        Execute the script.
         """
-        # Get file destination
-        destination = os.path.join(self._outpath,
-                                   os.path.relpath(source, self._remote_base))
-            
-        # Initialise return value
-        filesize = 0.0
-        
-        # Logging
-        if self._logVerbose():
-            self._log("\n")  
-            self._log.header3("Copy file")
-            self._log.parformat("Source")
-            self._log(str(source))
-            self._log("\n")
-            self._log.parformat("Destination")
-            self._log(str(destination))
-            self._log("\n")  
-            self._log.parformat("Already exists")
-            self._log(str(os.path.isfile(destination)))
-            self._log("\n")
-            self._log.parformat("Overwrite")
-            self._log(str(clobber))
-            self._log("\n")
-            self._log.parformat("Copying")
-        
-        # Flag if file destination is already available
-        is_file = os.path.isfile(destination)
-                
-        # check if file could be skipped because clobber=no
-        if is_file and clobber == False:
-            if self._logVerbose():
-                self._log("Skip (clobber=no)")
-                self._log("\n")
-        
-        # check if file could be skipped because it is the same file
-        elif is_file and os.path.samefile(destination, source):
-            if self._logVerbose():
-                self._log("Skip (same file)")
-                self._log("\n")
-            
-        else:  
-            # Create directory if not existent
-            dest_dir = os.path.dirname(destination)         
-            if not os.path.isdir(dest_dir):
-                os.makedirs(dest_dir)
-            
-            # Copy file (if source not identical to destination)
-            shutil.copy2(source, destination)
-            
-            # Get filesize
-            filesize = os.stat(destination).st_size
-            
-            # Logging
-            if self._logVerbose():
-                self._log("Done!")
-                self._log("\n")
-                   
-        # Return 
-        return filesize
-    
-    
-    def merge(self, localfits, remotefits, hduname, clobber):
-        """
-        merge remote and local fits file
-        If local fits file not present, a new one is created
-        """    
-        
-        if self._logTerse():
-            self._log.parformat("Local file")
-            self._log(str(localfits))
-            self._log("\n")
-            self._log.parformat("Remote file")
-            self._log(str(remotefits))
-            self._log("\n")
-            self._log.parformat("HDU name")
-            self._log(str(hduname))
-            self._log("\n")
-            self._log.parformat("Conflict preference")
-            if clobber:
-                self._log("Remote")
-            else:
-                self._log("Local")
-            self._log("\n")
-        
-        # Check if local fits file is available
-        if os.path.isfile(localfits):    
-            local = gammalib.GFits(str(localfits))
-            local_hdu = local[hduname]
-        else:
-            # Otherwise load remote fits file and delete rows
-            local = gammalib.GFits(str(remotefits))
-            local_hdu = local[hduname]
-            local_hdu.remove_rows(0,local_hdu.nrows())
-        
-        # find local obs_id 
-        local_obs = []
-        lobs_col = local_hdu["OBS_ID"]
-        for obs_id in lobs_col:
-            local_obs.append(obs_id)      
-        
-        # Create selection expression for opening remote fits file
-        selection = ""
-        if len(self._runs):
-            selection += "["+hduname+"]["
-            for run in self._runs:
-                selection += "OBS_ID=="+str(run)
-                selection += "||"
-            selection = selection[:-2]
-            selection += "]"
-        
-        # Create file name
-        remotefile = remotefits + selection
-        
-        # open remote fits file
-        remote = gammalib.GFits(str(remotefile))
-        remote_hdu = remote[hduname]
-        
-        # Get remote obs_id
-        remote_obs = []
-        robs_col = remote_hdu["OBS_ID"]
-        for obs_id in robs_col:
-            remote_obs.append(obs_id)
-            
-        if self._logTerse():
-            self._log.parformat("Remote entries")
-            self._log(str(len(remote_obs)))
-            self._log("\n")
-            self._log.parformat("Local entries")
-            self._log(str(len(local_obs)))
-            self._log("\n")
-        
-        # initialise counter for logging
-        removed_rows = 0
-        
-        # If clobber=yes, we use the remote content to overwrite
-        # corresponding local content
-        if clobber:
-            
-            # Loop over remote obs_ids
-            for remote_obs_id in remote_obs:
-                
-                # Check if remote obs_id is present locally
-                if remote_obs_id in local_obs:
-                    
-                    # Remove local obs_id entries
-                    table_has_obsid = True
-                    while table_has_obsid:
-                        for i in range(local_hdu.nrows()):
-                            if remote_obs_id == local_hdu["OBS_ID"][i]:
-                                local_hdu.remove_rows(i,1)
-                                removed_rows += 1
-                                break
-                        table_has_obsid = False
-                        for i in range(local_hdu.nrows()):
-                            if remote_obs_id == local_hdu["OBS_ID"][i]:
-                                table_has_obsid = True
-                                break
-                            
-        # If clobber=false, we keep the local content unchanged and just
-        # expand by remote content        
-        else:
-            # Loop over remote obs_ids
-            for local_obs_id in local_obs:
-                
-                # Check if local obs_id is present remotely
-                if local_obs_id in remote_obs:
-                    
-                    # Remove remote obs_id entries
-                    table_has_obsid = True
-                    while table_has_obsid:
-                        for i in range(remote_hdu.nrows()):
-                            if local_obs_id == remote_hdu["OBS_ID"][i]:
-                                remote_hdu.remove_rows(i,1)
-                                removed_rows += 1
-                                break
-                        table_has_obsid = False
-                        for i in range(remote_hdu.nrows()):
-                            if local_obs_id == remote_hdu["OBS_ID"][i]:
-                                table_has_obsid = True
-                                break
-    
-        # Store number of local rows
-        old_local_rows = local_hdu.nrows()
-        
-        # Add rmeote HDUs
-        local_hdu.insert_rows(old_local_rows, remote_hdu.nrows())
-        
-        if self._logTerse():
-            if clobber:
-                self._log.parformat("Removed local rows")
-            else:
-                self._log.parformat("Skipped remote rows")
-            self._log(str(removed_rows))
-            self._log("\n")
+        # Open logfile
+        self._logFileOpen()
 
-        # Loop over columns 
-        for i in range(local_hdu.ncols()):
-            
-            # Get local and remote columns
-            local_col = local_hdu[i]
-            remote_col = remote_hdu[i]    
-            
-            # Loop over entries and merge
-            for j in range(remote_col.length()):
-                local_col[j+old_local_rows] = remote_col[j]
-        
-        # Save local fits file
-        local.saveto(str(localfits), True)
-               
+        # Run the script
+        self.run()
+
         # Return
         return
+    
         
 # ======================== #
 # Main routine entry point #
@@ -739,9 +718,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csiactcopy(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()
