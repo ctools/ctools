@@ -73,10 +73,11 @@ class cslightcrv(ctools.cscript):
         # Initialise some members
         self._srcname = ""
         self._tbins   = gammalib.GGti()
-        self._ebins   = gammalib.GEbounds()
-        self._binned  = False
+        self._stacked = False
 
-        # Initialise observation
+        # Initialise observation container. In case that an observation
+        # container is provided on the command line, this container will
+        # be used to initialise the class.
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
             self._obs = argv[0]
             argv      = argv[1:]
@@ -86,7 +87,7 @@ class cslightcrv(ctools.cscript):
         # Initialise application
         if len(argv) == 0:
             ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
+        elif len(argv) == 1:
             ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
             raise TypeError("Invalid number of arguments given.")
@@ -126,17 +127,14 @@ class cslightcrv(ctools.cscript):
         # Get time boundaries             
         self._tbins = self._create_tbounds()
 
-        # Unbinned or binned analysis?
-        self._ebins    = self["enumbins"].integer()
-        if self._ebins == 0:
-            self._binned = False
-        else:
-            self._binned = True
+        # Set stacked analysis flag if the requested number of energy bins
+        # is not zero; otherwise an unbinned analysis will be done.
+        self._stacked = False if self["enumbins"].integer() == 0 else True
 
         # Make sure that other parameters are queried now and not later
         self["emin"].real()
         self["emax"].real()
-        if self._binned:
+        if self._stacked:
             self["coordsys"].string()
             self["proj"].string()
             self["xref"].real()
@@ -420,7 +418,7 @@ class cslightcrv(ctools.cscript):
         bin["binsz"]    = self["binsz"].real()
         bin["nxpix"]    = self["nxpix"].integer()
         bin["nypix"]    = self["nypix"].integer()
-        bin["enumbins"] = self._ebins
+        bin["enumbins"] = self["enumbins"].integer()
         bin["emin"]     = self["emin"].real()
         bin["emax"]     = self["emax"].real()        
         bin["coordsys"] = self["coordsys"].string()
@@ -441,7 +439,7 @@ class cslightcrv(ctools.cscript):
         expcube["binsz"]    = self["binsz"].real()
         expcube["nxpix"]    = self["nxpix"].integer()
         expcube["nypix"]    = self["nypix"].integer()
-        expcube["enumbins"] = self._ebins
+        expcube["enumbins"] = self["enumbins"].integer()
         expcube["emin"]     = self["emin"].real()
         expcube["emax"]     = self["emax"].real()   
         expcube["coordsys"] = self["coordsys"].string()
@@ -462,7 +460,7 @@ class cslightcrv(ctools.cscript):
         psfcube["binsz"]    = self["binsz"].real()
         psfcube["nxpix"]    = self["nxpix"].integer()
         psfcube["nypix"]    = self["nypix"].integer()
-        psfcube["enumbins"] = self._ebins
+        psfcube["enumbins"] = self["enumbins"].integer()
         psfcube["emin"]     = self["emin"].real()
         psfcube["emax"]     = self["emax"].real()    
         psfcube["coordsys"] = self["coordsys"].string()
@@ -486,7 +484,7 @@ class cslightcrv(ctools.cscript):
             edispcube["binsz"]    = self["binsz"].real()
             edispcube["nxpix"]    = self["nxpix"].integer()
             edispcube["nypix"]    = self["nypix"].integer()
-            edispcube["enumbins"] = self._ebins
+            edispcube["enumbins"] = self["enumbins"].integer()
             edispcube["emin"]     = self["emin"].real()
             edispcube["emax"]     = self["emax"].real()    
             edispcube["coordsys"] = self["coordsys"].string()
@@ -507,7 +505,7 @@ class cslightcrv(ctools.cscript):
         bkgcube["binsz"]    = self["binsz"].real()
         bkgcube["nxpix"]    = self["nxpix"].integer()
         bkgcube["nypix"]    = self["nypix"].integer()
-        bkgcube["enumbins"] = self._ebins
+        bkgcube["enumbins"] = self["enumbins"].integer()
         bkgcube["emin"]     = self["emin"].real()
         bkgcube["emax"]     = self["emax"].real()   
         bkgcube["coordsys"] = self["coordsys"].string()
@@ -624,7 +622,7 @@ class cslightcrv(ctools.cscript):
             # If a stacked analysis is requested then bin the events
             # and compute the stacked response functions and setup
             # an observation container with a single stacked observation.
-            if self._binned:
+            if self._stacked:
                 obs = self._bin_observation(obs)
 
             # Header
@@ -700,7 +698,7 @@ class cslightcrv(ctools.cscript):
         # Create FITS table from results
         table = self._create_fits_table(results)
 
-        # Create FITS file and append FITS table
+        # Create FITS file and append FITS table to FITS file
         self._fits = gammalib.GFits()
         self._fits.append(table)
 
