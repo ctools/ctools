@@ -48,7 +48,6 @@ class cspull(ctools.cscript):
         self._version = "1.1.0"
 
         # Initialise some members
-        self._obs         = None
         self._model       = None
         self._inmodel     = None
         self._edisp       = False
@@ -61,6 +60,9 @@ class cspull(ctools.cscript):
         self._coordsys    = "CEL"
         self._proj        = "TAN"
         self._log_clients = False
+
+        # Initialise observation container from constructor arguments.
+        self._obs = self._set_input_obs(argv)
 
         # Initialise application by calling the appropriate class
         # constructor.
