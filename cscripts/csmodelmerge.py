@@ -48,7 +48,6 @@ class csmodelmerge(ctools.cscript):
         self._files      = None
         self._models     = gammalib.GModels()
         self._outmodel   = "NONE"
-        self._read_ahead = False
 
         # Initialise application
         if len(argv) == 0:
@@ -105,7 +104,7 @@ class csmodelmerge(ctools.cscript):
             raise RuntimeError(msg) 
         
         # Read ahead output filename
-        if self._read_ahead:
+        if self._read_ahead():
             self.outmodel = self["outmodel"].filename()
 
         # Write input parameters into logger
@@ -196,8 +195,11 @@ class csmodelmerge(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -217,8 +219,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = csmodelmerge(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()

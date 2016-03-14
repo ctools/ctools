@@ -89,7 +89,6 @@ class csobsdef(ctools.cscript):
         self._chatter    = 2
         self._clobber    = True
         self._debug      = False
-        self._read_ahead = False
 
         # Initialise application
         if len(argv) == 0:
@@ -123,7 +122,7 @@ class csobsdef(ctools.cscript):
         self._inpnt = self["inpnt"].filename()
 
         # Read ahead parameters
-        if self._read_ahead:
+        if self._read_ahead():
             self._outobs = self["outobs"].filename()
 
         # Set some fixed parameters
@@ -368,8 +367,11 @@ class csobsdef(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -388,9 +390,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csobsdef(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

@@ -164,16 +164,6 @@ class cscaldb(ctools.cscript):
 
 
     # Public methods
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-
-        # Return
-        return
-
     def run(self):
         """
         Run the script.
@@ -238,6 +228,19 @@ class cscaldb(ctools.cscript):
         # Return
         return
 
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Open logfile
+        self._logFileOpen()
+
+        # Run the script
+        self.run()
+
+        # Return
+        return
+
 
 # ======================== #
 # Main routine entry point #
@@ -246,9 +249,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = cscaldb(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

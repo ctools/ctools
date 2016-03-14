@@ -442,6 +442,9 @@ class cspull(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Run the script
         self.run()
 
@@ -466,9 +469,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = cspull(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

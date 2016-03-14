@@ -318,6 +318,9 @@ class csresmap(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Read ahead output parameters
         self._read_ahead(True)
 
@@ -404,9 +407,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csresmap(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

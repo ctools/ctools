@@ -51,7 +51,8 @@ class csobsinfo(ctools.cscript):
         self._pnt_dec        = []
         self._ebounds        = gammalib.GEbounds()
         self._gti            = gammalib.GGti()
-        self._read_ahead     = False
+
+        # Initialise observation
         if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
             self._obs = argv[0]
             argv      = argv[1:]
@@ -103,7 +104,7 @@ class csobsinfo(ctools.cscript):
             self._obj_dir.radec_deg(ra,dec)
 
         # Read ahead DS9 filename
-        if self._read_ahead:
+        if self._read_ahead():
             self._ds9file = self["ds9file"].filename()
 
         # Write input parameters into logger
@@ -455,8 +456,11 @@ class csobsinfo(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -476,8 +480,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = csobsinfo(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()

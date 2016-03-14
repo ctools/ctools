@@ -132,7 +132,7 @@ class csspec(ctools.cscript):
         self._debug   = self["debug"].boolean()
 
         # Read ahead output parameters
-        if (self._read_ahead()):
+        if self._read_ahead():
             self._outfile = self["outfile"].filename()
 
         # Write input parameters into logger
@@ -494,6 +494,9 @@ class csspec(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Read ahead output parameters
         self._read_ahead(True)
 
@@ -559,9 +562,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csspec(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

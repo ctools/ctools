@@ -59,7 +59,6 @@ class csmodelinfo(ctools.cscript):
         self._show_ext_type = True
         self._free_color    = "green"
         self._fixed_color   = "magenta"
-        self._read_ahead    = False
 
         # Initialise application
         if len(argv) == 0:
@@ -106,7 +105,7 @@ class csmodelinfo(ctools.cscript):
         self._fixed_color   = self["fixed_color"].string()
 
         # Read ahead DS9 filename
-        if self._read_ahead:
+        if self._read_ahead():
             self._ds9file = self["ds9file"].filename()
 
         # Write input parameters into logger
@@ -500,8 +499,11 @@ class csmodelinfo(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -521,8 +523,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = csmodelinfo(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()

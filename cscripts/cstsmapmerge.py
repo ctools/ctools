@@ -53,7 +53,6 @@ class cstsmapmerge(ctools.cscript):
         self._overwrite    = True
         self._delete       = False
         self._outmap       = "NONE"
-        self._read_ahead   = False
 
         # Initialise application
         if len(argv) == 0:
@@ -120,7 +119,7 @@ class cstsmapmerge(ctools.cscript):
         self._delete    = self["delete"].boolean()
         
         # Read ahead output filename
-        if self._read_ahead:
+        if self._read_ahead():
             self._outmap = self["outmap"].filename()
         
         # Write input parameters into logger
@@ -444,8 +443,11 @@ class cstsmapmerge(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -465,8 +467,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = cstsmapmerge(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()
