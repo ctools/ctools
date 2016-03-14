@@ -47,7 +47,6 @@ class csmodelmerge(ctools.cscript):
         # Initialise class members
         self._files      = None
         self._models     = gammalib.GModels()
-        self._outmodel   = "NONE"
 
         # Initialise application
         if len(argv) == 0:
@@ -105,7 +104,7 @@ class csmodelmerge(ctools.cscript):
         
         # Read ahead output filename
         if self._read_ahead():
-            self.outmodel = self["outmodel"].filename()
+            self["outmodel"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -177,16 +176,16 @@ class csmodelmerge(ctools.cscript):
             self._log.header1("Save models")
 
         # Get output filename in case it was not read ahead
-        self._outmodel = self["outmodel"].filename()
+        outmodel = self["outmodel"].filename()
         
         # Log filename
         if self._logTerse():
             self._log(gammalib.parformat("Model definition XML file"))
-            self._log(self._outmodel.url())
+            self._log(outmodel.url())
             self._log("\n")
 
         # Save models
-        self._models.save(self._outmodel)
+        self._models.save(outmodel)
         
         # Return
         return

@@ -52,7 +52,6 @@ class cstsmapmerge(ctools.cscript):
         self._merged_files = []
         self._overwrite    = True
         self._delete       = False
-        self._outmap       = "NONE"
 
         # Initialise application
         if len(argv) == 0:
@@ -120,7 +119,7 @@ class cstsmapmerge(ctools.cscript):
         
         # Read ahead output filename
         if self._read_ahead():
-            self._outmap = self["outmap"].filename()
+            self["outmap"].filename()
         
         # Write input parameters into logger
         if self._logTerse():
@@ -390,12 +389,12 @@ class cstsmapmerge(ctools.cscript):
             self._log.header1("Save TS map")
 
         # Get output filename in case it was not read ahead
-        self._outmap = self["outmap"].filename()
+        outmap = self["outmap"].filename()
 
         # Log filename
         if self._logTerse():
             self._log(gammalib.parformat("TS map file"))
-            self._log(self._outmap.url())
+            self._log(outmap.url())
             self._log("\n")
         
         # Create FITS file
@@ -425,7 +424,7 @@ class cstsmapmerge(ctools.cscript):
             fits[fits.size()-1].extname("STATUS MAP")
         
         # Save FITS file
-        fits.saveto(self._outmap, self._clobber())
+        fits.saveto(outmap, self._clobber())
 
         # Delete TS input maps if requested
         if self._delete:

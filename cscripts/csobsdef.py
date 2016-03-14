@@ -85,7 +85,6 @@ class csobsdef(ctools.cscript):
         self._obs        = gammalib.GObservations()
         self._inpnt      = ""
         self._tmin       = 0.0
-        self._outobs     = "NONE"
         self._chatter    = 2
         self._clobber    = True
         self._debug      = False
@@ -123,7 +122,7 @@ class csobsdef(ctools.cscript):
 
         # Read ahead parameters
         if self._read_ahead():
-            self._outobs = self["outobs"].filename()
+            self["outobs"].filename()
 
         # Set some fixed parameters
         self._chatter = self["chatter"].integer()
@@ -346,19 +345,19 @@ class csobsdef(ctools.cscript):
             self._log.header1("Save observation definition XML file")
 
         # Get output filename in case it was not read ahead
-        self._outobs = self["outobs"].filename()
+        outobs = self["outobs"].filename()
 
         # Check if observation definition XML file is valid
-        if self._outobs != "NONE":      
+        if outobs.url() != "NONE":      
 
             # Log filename
             if self._logTerse():
                 self._log(gammalib.parformat("Observation XML file"))
-                self._log(self._outobs.url())
+                self._log(outobs.url())
                 self._log("\n")
 
             # Save observation definition XML file
-            self._obs.save(self._outobs)
+            self._obs.save(outobs)
         
         # Return
         return

@@ -310,10 +310,10 @@ class cspull(ctools.cscript):
 
         # Fit model
         if self._profile:
-            models = _obs.models()
+            models = self._obs.models()
             for i in range(models.size()):
                 model_name = models[i].name()
-                like       = obsutils.cterror(_obs, model_name,
+                like       = obsutils.cterror(self._obs, model_name,
                                               log=self._log_clients,
                                               debug=self._debug,
                                               chatter=self._chatter)

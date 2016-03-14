@@ -55,7 +55,7 @@ class cstsdist(ctools.cscript):
         self._enumbins    = 0
         self._npix        = 0
         self._binsz       = 0.0
-        self._outfile     = "ts.dat"
+        self._outfile     = gammalib.GFilename("ts.dat")
         self._ntrials     = 10
         self._edisp       = False
         self._debug       = False

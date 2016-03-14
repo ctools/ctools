@@ -43,7 +43,6 @@ class csobsinfo(ctools.cscript):
         # Initialise class members
         self._obj_dir        = None
         self._compute_offset = False
-        self._ds9file        = ""
         self._offsets        = []
         self._zeniths        = []
         self._azimuths       = []
@@ -105,7 +104,7 @@ class csobsinfo(ctools.cscript):
 
         # Read ahead DS9 filename
         if self._read_ahead():
-            self._ds9file = self["ds9file"].filename()
+            self["ds9file"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -388,19 +387,19 @@ class csobsinfo(ctools.cscript):
             self._log.header1("Save pointings in DS9 file")
 
         # Get output filename in case it was not read ahead
-        self._ds9file = self["ds9file"].filename()
+        ds9file = self["ds9file"].filename()
 
         # Check if DS9 file is valid
-        if self._ds9file != "NONE":      
+        if ds9file.url() != "NONE":      
 
             # Log filename
             if self._logTerse():
                 self._log(gammalib.parformat("DS9 filename"))
-                self._log(self._ds9file.url())
+                self._log(ds9file.url())
                 self._log("\n")
             
             # Open file   
-            f = open(self._ds9file.url(),"w")
+            f = open(ds9file.url(),"w")
             
             # Write coordinate system
             f.write("fk5\n")

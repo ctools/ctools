@@ -54,7 +54,7 @@ class cssens(ctools.cscript):
         self._obs         = gammalib.GObservations()
         self._ebounds     = gammalib.GEbounds()
         self._srcname     = ""
-        self._outfile     = ""
+        self._outfile     = gammalib.GFilename()
         self._ra          = None
         self._dec         = None
         self._edisp       = False
