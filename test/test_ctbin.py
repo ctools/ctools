@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the ctbin tool.
+# This scripts performs unit tests for the ctbin module.
 #
 # Copyright (C) 2014-2016 Juergen Knoedlseder
 #
@@ -27,8 +27,9 @@ import ctools
 # ========================= #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for ctbin tool.
+    Test class for ctbin module.
     """
+
     # Constructor
     def __init__(self):
         """
@@ -78,14 +79,8 @@ class Test(gammalib.GPythonTestSuite):
         bin["xref"]     = 83.63
         bin["yref"]     = 22.01
 
-        # Run tool
-        self.test_try("Run ctbin")
-        try:
-            bin.run()
-            self.test_try_success()
-        except:
-            msg = "Exception occured in ctbin."
-            self.test_try_failure(msg)
+        # Run ctbin tool
+        bin.run()
 
         # Check content of observation and cube
         self._test_observation(bin, 5542)
@@ -98,7 +93,7 @@ class Test(gammalib.GPythonTestSuite):
         self._test_observation(cpy_bin, 5542)
         self._test_cube(cpy_bin.cube(), 5542)
 
-        # Run copy of ctbin again
+        # Run copy of ctbin tool again
         cpy_bin.run()
 
         # Check content of observation and cube. We expect now an empty
@@ -128,46 +123,116 @@ class Test(gammalib.GPythonTestSuite):
         evt = gammalib.GCTAEventCube("cntmap.fits")
         self._test_cube(evt, 5542)
 
+        # Prepare observation container for stacked analysis
+        cta = gammalib.GCTAObservation(self.events_name)
+        obs = gammalib.GObservations()
+        cta.id("0001")
+        obs.append(cta)
+        cta.id("0002")
+        obs.append(cta)
+        cta.id("0003")
+        obs.append(cta)
+
+        # Set-up ctbin using an observation container
+        bin = ctools.ctbin(obs)
+        bin["outcube"]  = "cntmap.fits"
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = 0.1
+        bin["emax"]     = 100.0
+        bin["enumbins"] = 20
+        bin["nxpix"]    = 200
+        bin["nypix"]    = 200
+        bin["binsz"]    = 0.02
+        bin["coordsys"] = "CEL"
+        bin["proj"]     = "CAR"
+        bin["xref"]     = 83.63
+        bin["yref"]     = 22.01
+
+        # Run ctbin tool
+        bin.run()
+
+        # Check content of observation and cube (need multiplier=3 since
+        # three identical observations have been appended)
+        self._test_observation(bin, 5542, multiplier=3)
+        self._test_cube(bin.cube(), 5542, multiplier=3)
+
+        # Set-up ctbin with invalid event file
+        bin = ctools.ctbin()
+        bin["inobs"]    = "event_file_that_does_not_exist.fits"
+        bin["outcube"]  = "cntmap.fits"
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = 0.1
+        bin["emax"]     = 100.0
+        bin["enumbins"] = 20
+        bin["nxpix"]    = 200
+        bin["nypix"]    = 200
+        bin["binsz"]    = 0.02
+        bin["coordsys"] = "CEL"
+        bin["proj"]     = "CAR"
+        bin["xref"]     = 83.63
+        bin["yref"]     = 22.01
+
+        # Run ctbin tool
+        self.test_try("Run ctbin with invalid event file")
+        try:
+            bin.run()
+            self.test_try_failure()
+        except:
+            self.test_try_success()
+
         # Return
         return
 
     # Check observation
-    def _test_observation(self, ctbin, nevents):
+    def _test_observation(self, ctbin, nevents, multiplier=1):
         """
         Test content of an observation.
         
         Args:
             ctbin:   ctbin instance
             nevents: Expected number of events
+
+        Kwargs:
+            multiplier: Observation multiplier
         """
         # Test observation container
         obs = gammalib.GCTAObservation(ctbin.obs()[0])
         pnt = obs.pointing()
-        self.test_value(ctbin.obs().size(), 1, "There is one observation")
-        self.test_assert(obs.instrument() == "CTA", "Observation is CTA observation")
-        self.test_value(obs.ontime(), 1800.0, 1.0e-6, "Ontime is 1800 sec")
-        self.test_value(obs.livetime(), 1710.0, 1.0e-6, "Livetime is 1710 sec")
-        self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6, "Pointing Right Ascension is 83.63 deg")
-        self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6, "Pointing Declination is 22.01 deg")
+        self.test_value(ctbin.obs().size(), 1,
+                        "There is one observation")
+        self.test_assert(obs.instrument() == "CTA",
+                        "Observation is CTA observation")
+        self.test_value(obs.ontime(), 1800.0*multiplier, 1.0e-6,
+                        "Ontime is 1800 sec")
+        self.test_value(obs.livetime(), 1710.0*multiplier, 1.0e-6,
+                        "Livetime is 1710 sec")
+        self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6,
+                        "Pointing Right Ascension is 83.63 deg")
+        self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6,
+                        "Pointing Declination is 22.01 deg")
 
         # Test event cube
-        self._test_cube(obs.events(), nevents)
+        self._test_cube(obs.events(), nevents, multiplier=multiplier)
 
         # Return
         return
 
     # Check event cube
-    def _test_cube(self, cube, nevents):
+    def _test_cube(self, cube, nevents, multiplier=1):
         """
         Test content of event cube."
         
         Args:
             cube:    Event cube
             nevents: Expected number of events.
+
+        Kwargs:
+            multiplier: Event number multiplier
         """
         # Test event cube
         self.test_value(cube.size(), 800000, "800000 event bins")
-        self.test_value(cube.number(), nevents, str(nevents)+" events")
+        self.test_value(cube.number(), nevents*multiplier,
+                        str(nevents*multiplier)+" events")
 
         # Return
         return
