@@ -27,7 +27,7 @@ Code lay-out
      sum    += par.sum
 
 - Each function or method must terminate with a single return statement
-  that is placed at the end.
+  that is placed at the end of the function or method.
 
 - Always use English words (class names, method and function names,
   comments, documentation, etc.).
