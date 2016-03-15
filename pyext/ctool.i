@@ -99,6 +99,7 @@ public:
     %rename(_set_obs_bounds)       set_obs_bounds(GObservations& obs);
     %rename(_get_mean_pointing)    get_mean_pointing(const GObservations& obs);
     %rename(_get_current_rss)      get_current_rss();
+    %rename(_get_obs_header)       get_obs_header();
 
     // Protected methods
     const bool&           read_ahead(void) const;
@@ -122,6 +123,7 @@ public:
     void            set_obs_bounds(GObservations& obs);
     GSkyDir         get_mean_pointing(const GObservations& obs);
     size_t          get_current_rss(void);
+    std::string     get_obs_header(const GObservation* obs);
 };
 
 
