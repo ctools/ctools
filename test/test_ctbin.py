@@ -150,10 +150,9 @@ class Test(gammalib.GPythonTestSuite):
         self._test_observation(bin, 5542, multiplier=3)
         self._test_cube(bin.cube(), 5542, multiplier=3)
 
-        # Set-up ctbin with invalid event file
-        bin = ctools.ctbin()
-        bin["inobs"]    = "event_file_that_does_not_exist.fits"
-        bin["outcube"]  = "cntmap.fits"
+        # Set-up ctbin using an observation container
+        bin = ctools.ctbin(obs)
+        bin["outcube"]  = "cntmap2.fits"
         bin["ebinalg"]  = "LOG"
         bin["emin"]     = 0.1
         bin["emax"]     = 100.0
@@ -166,13 +165,21 @@ class Test(gammalib.GPythonTestSuite):
         bin["xref"]     = 83.63
         bin["yref"]     = 22.01
 
-        # Run ctbin tool
-        self.test_try("Run ctbin with invalid event file")
-        try:
-            bin.run()
-            self.test_try_failure()
-        except:
-            self.test_try_success()
+        # Execute ctbin tool
+        bin.execute()
+
+        # Load counts cube and check content.
+        evt = gammalib.GCTAEventCube("cntmap2.fits")
+        self._test_cube(evt, 5542, multiplier=3)
+
+        # Clear tool
+        #bin.clear()
+#what():  *** ERROR in GApplicationPars::write(std::string&): Unable to open parameter file "pfiles/".
+
+        # Check content of observation and cube
+        #self.test_value(bin.obs().size(), 0, "There is no observation")
+        #self.test_value(bin.cube().size(), 0, "0 event bins")
+        #self.test_value(bin.cube().number(), 0, "0 events")
 
         # Return
         return
