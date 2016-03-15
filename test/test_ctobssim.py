@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the ctobssim tool.
+# This scripts performs unit tests for the ctobssim module.
 #
 # Copyright (C) 2014-2016 Juergen Knoedlseder
 #
@@ -20,15 +20,17 @@
 # ==========================================================================
 import gammalib
 import ctools
+from cscripts import obsutils
 
 
-# ============================ #
-# Test class for ctobssim tool #
-# ============================ #
+# ============================== #
+# Test class for ctobssim module #
+# ============================== #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for ctobssim tool.
+    Test class for ctobssim module.
     """
+
     # Constructor
     def __init__(self):
         """
@@ -38,9 +40,9 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
-        self.model_name = "data/crab.xml"
-        self.caldb      = "irf"
-        self.irf        = "cta_dummy_irf"
+        self._model_name = "data/crab.xml"
+        self._caldb      = "irf"
+        self._irf        = "cta_dummy_irf"
 
         # Return
         return
@@ -54,23 +56,23 @@ class Test(gammalib.GPythonTestSuite):
         self.name("ctobssim")
 
         # Append tests
-        self.append(self.test_functional, "Test ctobssim functionality")
-        self.append(self.test_container, "Test ctobssim on observation container")
+        self.append(self._test_ctobssim, "Test ctobssim")
+        #self.append(self._test_container, "Test ctobssim on observation container")
 
         # Return
         return
 
-    # Test ctobssim functionnality
-    def test_functional(self):
+    # Test ctobssim
+    def _test_ctobssim(self):
         """
-        Test ctobssim functionnality.
+        Test ctobssim.
         """
         # Set-up ctobssim
         sim = ctools.ctobssim()
-        sim["inmodel"]   = self.model_name
+        sim["inmodel"]   = self._model_name
         sim["outevents"] = "events.fits"
-        sim["caldb"]     = self.caldb
-        sim["irf"]       = self.irf
+        sim["caldb"]     = self._caldb
+        sim["irf"]       = self._irf
         sim["ra"]        = 83.63
         sim["dec"]       = 22.01
         sim["rad"]       = 10.0
@@ -80,154 +82,123 @@ class Test(gammalib.GPythonTestSuite):
         sim["emax"]      = 100.0
 
         # Run tool
-        self.test_try("Run ctobssim")
-        try:
-            sim.run()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in ctobssim: %s." % (e,)
-        except:
-            msg = "Exception occured in ctobssim."
-            self.test_try_failure(msg)
+        sim.run()
 
-        # Retrieve observation and check content
-        obs = gammalib.GCTAObservation(sim.obs()[0])
-        pnt = obs.pointing()
-        evt = obs.events()
-        self.test_assert(obs.instrument() == "CTA", "Observation not a CTA observation")
-        self.test_value(sim.obs().size(), 1, "There is not a single observation")
-        self.test_value(obs.ontime(), 1800.0, 1.0e-6, "Ontime is not 1800 sec")
-        self.test_value(obs.livetime(), 1710.0, 1.0e-6, "Livetime is not 1710 sec")
-        self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6, "ROI Right Ascension is not 83.63 deg")
-        self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6, "ROI Declination is not 22.01 deg")
-        self.test_value(evt.size(), 4119, "Number of events is not 4119")
+        # Check content of observation
+        self._test_observation(sim)
+        self._test_list(sim.obs()[0].events(), 4119)
 
         # Save events
-        self.test_try("Save events")
-        try:
-            sim.save()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in saving events: %s." % (e,)
-        except:
-            msg = "Exception occured in saving events."
-            self.test_try_failure(msg)
+        sim.save()
 
-    # Test ctobssim on observation container
-    def test_container(self):
-        """
-        Test ctobssim on observation container.
-        """
+        # Load counts cube and check content.
+        evt = gammalib.GCTAEventList("events.fits")
+        self._test_list(evt, 4119)
+
         # Set-up observation container
-        obs = self.set_obs(4)
+        pnts = [{'ra': 83.63, 'dec': 21.01},
+                {'ra': 84.63, 'dec': 22.01},
+                {'ra': 83.63, 'dec': 23.01},
+                {'ra': 82.63, 'dec': 22.01}]
+        obs = obsutils.set_obs_list(pnts, caldb=self._caldb, irf=self._irf)
 
-        # Set-up ctobssim
+        # Set-up ctobssim from observation container
         sim = ctools.ctobssim(obs)
         sim["outevents"] = "sim_events.xml"
-        sim["inmodel"]   = self.model_name
+        sim["inmodel"]   = self._model_name
+
         # Run tool
-        self.test_try("Run ctobssim")
-        try:
-            sim.run()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in ctobssim: %s." % (e,)
-        except:
-            msg = "Exception occured in ctobssim."
-            self.test_try_failure(msg)
+        sim.run()
 
         # Retrieve observation and check content
-        self.test_value(sim.obs().size(), 4, "There are not 4 observations")
+        self._test_observation(sim, nobs=4, pnts=pnts)
+        self._test_list(sim.obs()[0].events(), 4063)
+        self._test_list(sim.obs()[1].events(), 4059)
+        self._test_list(sim.obs()[2].events(), 4010)
+        self._test_list(sim.obs()[3].events(), 4138)
 
         # Save events
-        self.test_try("Save events")
+        sim.save()
+
+        # Load events
+        obs = gammalib.GObservations("sim_events.xml")
+
+        # Retrieve observation and check content
+        self._test_list(obs[0].events(), 4063)
+        self._test_list(obs[1].events(), 4059)
+        self._test_list(obs[2].events(), 4010)
+        self._test_list(obs[3].events(), 4138)
+
+        # Set-up ctobssim with invalid event file
+        sim = ctools.ctobssim()
+        sim["inmodel"]   = "model_file_that_does_not_exist.xml"
+        sim["outevents"] = "events.fits"
+        sim["caldb"]     = self._caldb
+        sim["irf"]       = self._irf
+        sim["ra"]        = 83.63
+        sim["dec"]       = 22.01
+        sim["rad"]       = 10.0
+        sim["tmin"]      = 0.0
+        sim["tmax"]      = 1800.0
+        sim["emin"]      = 0.1
+        sim["emax"]      = 100.0
+
+        # Run ctbin tool
+        self.test_try("Run ctobssim with invalid model file")
         try:
-            sim.save()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in saving events: %s." % (e,)
+            sim.run()
+            self.test_try_failure()
         except:
-            msg = "Exception occured in saving events."
-            self.test_try_failure(msg)
+            self.test_try_success()
 
-    # Setup observation container
-    def set_obs(self, number):
+        # Return
+        return
+
+    # Check observation
+    def _test_observation(self, ctobssim, nobs=1,
+                          pnts=[{'ra': 83.63, 'dec': 22.01}]):
         """
-        Setup observation container.
+        Test content of an observation.
+        
+        Args:
+            ctobssim: ctobssim instance
+
+        Kwargs:
+            nobs:     Number of observations
+            pnts:     List of pointing dictionaries
         """
-        # Initialise empty observation container
-        obs = gammalib.GObservations()
+        # Test observation container
+        self.test_value(ctobssim.obs().size(), nobs,
+             "There is one observation")
+        for i in range(ctobssim.obs().size()):
+            obs = gammalib.GCTAObservation(ctobssim.obs()[i])
+            pnt = obs.pointing()
+            self.test_assert(obs.instrument() == "CTA",
+                 "Observation is CTA observation")
+            self.test_value(obs.ontime(), 1800.0, 1.0e-6,
+                 "Ontime is 1800 sec")
+            self.test_value(obs.livetime(), 1710.0, 1.0e-6,
+                 "Livetime is 1710 sec")
+            self.test_value(pnt.dir().ra_deg(), pnts[i]['ra'], 1.0e-6,
+                 "Pointing Right Ascension is "+str(pnts[i]['ra'])+" deg")
+            self.test_value(pnt.dir().dec_deg(), pnts[i]['dec'], 1.0e-6,
+                 "Pointing Declination is "+str(pnts[i]['dec'])+" deg")
 
-        # Initialise first time and identifier
-        tstart = 0.0
-        offset = -float(number)/2.0
+        # Return
+        return
 
-        # Loop over number of observations
-        for i in range(number):
-            id      = "%6.6d" % i
-            obs_cta = self.set_one_obs(id, offset)
-            offset += 1.0
-            tstart += 1830.0
-            obs.append(obs_cta)
-
-        # Return observation container
-        return obs
-
-    # Setup one observation
-    def set_one_obs(self, id, offset, \
-                    tstart=0.0, duration=1800.0, deadc=0.95, \
-                    emin=0.1, emax=100.0, rad=5.0, \
-                    irf="cta_dummy_irf", caldb="dummy"):
+    # Check event list
+    def _test_list(self, list, nevents):
         """
-        Setup one observation for test purposes.
+        Test content of event list."
+        
+        Args:
+            list:    Event list
+            nevents: Expected number of events.
         """
-        # Allocate CTA observation
-        obs_cta = gammalib.GCTAObservation()
+        # Test event list
+        self.test_value(list.size(), nevents, str(nevents)+" elements")
+        self.test_value(list.number(), nevents, str(nevents)+" events")
 
-        # Set calibration database
-        db = gammalib.GCaldb()
-        if (gammalib.dir_exists(self.caldb)):
-            db.rootdir(self.caldb)
-        else:
-            db.open("cta", self.caldb)
-
-        # Set pointing direction
-        pntdir = gammalib.GSkyDir()
-        pntdir.radec_deg(83.63, 22.01+offset)
-        pnt = gammalib.GCTAPointing()
-        pnt.dir(pntdir)
-        obs_cta.pointing(pnt)
-
-        # Set ROI
-        roi     = gammalib.GCTARoi()
-        instdir = gammalib.GCTAInstDir()
-        instdir.dir(pntdir)
-        roi.centre(instdir)
-        roi.radius(rad)
-
-        # Set GTI
-        gti = gammalib.GGti()
-        gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
-
-        # Set energy boundaries
-        ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"), \
-                                    gammalib.GEnergy(emax, "TeV"))
-
-        # Allocate event list
-        events = gammalib.GCTAEventList()
-        events.roi(roi)
-        events.gti(gti)
-        events.ebounds(ebounds)
-        obs_cta.events(events)
-
-        # Set instrument response
-        obs_cta.response(self.irf, db)
-
-        # Set ontime, livetime, and deadtime correction factor
-        obs_cta.ontime(duration)
-        obs_cta.livetime(duration*deadc)
-        obs_cta.deadc(deadc)
-        obs_cta.id(id)
-
-        # Return CTA observation
-        return obs_cta
+        # Return
+        return

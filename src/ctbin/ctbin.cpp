@@ -70,7 +70,7 @@ ctbin::ctbin(void) : ctool(CTBIN_NAME, CTBIN_VERSION)
  *
  * param[in] obs Observation container.
  *
- * Constructs a ctbin tool from an observation container.
+ * Constructs ctbin tool from an observation container.
  ***************************************************************************/
 ctbin::ctbin(const GObservations& obs) : ctool(CTBIN_NAME, CTBIN_VERSION)
 {
@@ -92,7 +92,8 @@ ctbin::ctbin(const GObservations& obs) : ctool(CTBIN_NAME, CTBIN_VERSION)
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  *
- * Constructs ctbin tool from command line arguments.
+ * Constructs ctbin tool using command line arguments for user parameter
+ * setting.
  ***************************************************************************/
 ctbin::ctbin(int argc, char *argv[]) : 
        ctool(CTBIN_NAME, CTBIN_VERSION, argc, argv)
@@ -149,7 +150,7 @@ ctbin::~ctbin(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Application.
+ * @param[in] app ctbin tool.
  * @return ctbin tool.
  *
  * Assigns ctbin tool.
@@ -240,14 +241,7 @@ void ctbin::run(void)
 
         // Write header for observation
         if (logTerse()) {
-            std::string header = m_obs[i]->instrument() + " observation";
-            if (!m_obs[i]->name().empty()) {
-                header += " \"" + m_obs[i]->name() + "\"";
-            }
-            if (!m_obs[i]->id().empty()) {
-                header += " (id=" + m_obs[i]->id() +")";
-            }
-            log.header3(header);
+            log.header3(get_obs_header(m_obs[i]));
         }
 
         // Get CTA observation
@@ -328,8 +322,8 @@ void ctbin::save(void)
         
             // Log filename
             if (logTerse()) {
-                log << "Save counts cube into file \""+m_outcube+"\".";
-                log << std::endl;
+                log << gammalib::parformat("Counts cube file");
+                log << m_outcube.url() << std::endl;
             }
             
             // Save cube

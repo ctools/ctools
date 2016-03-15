@@ -7,7 +7,7 @@
 #  File:      ctobssim.par                                                  #
 #  Version:   1.1.0                                                         #
 #                                                                           #
-#  Author:    Jurgen Knodlseder                                             #
+#  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
 #             IRAP                                                          #
 #                                                                           #
@@ -17,13 +17,13 @@
 #
 # General parameters
 #===================
-inobs,     f, h, "NONE",,, "Input event list or observation definition XML file"
-inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
-caldb,     s, a, "prod2",,, "Calibration database"
-irf,       s, a, "South_0.5h",,, "Instrument response function"
+inobs,     f, h, NONE,,, "Input event list or observation definition XML file"
+inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
+caldb,     s, a, prod2,,, "Calibration database"
+irf,       s, a, South_0.5h,,, "Instrument response function"
 edisp,     b, h, no,,, "Apply energy dispersion?"
-outevents, f, a, "events.fits",,, "Output event data file or observation definition XML file"
-prefix,    s, h, "sim_events_",,, "Prefix for event lists in observation definition XML file"
+outevents, f, a, events.fits,,, "Output event data file or observation definition XML file"
+prefix,    s, h, sim_events_,,, "Prefix for event lists in observation definition XML file"
 
 #
 # Simulation parameters
@@ -38,7 +38,7 @@ emin,    r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,    r, a, 100.0,,, "Upper energy limit (TeV)"
 deadc,   r, h, 0.95,0,1, "Average deadtime correction factor"
 maxrate, r, h, 1.0e6,,, "Maximum photon rate"
-eslices, i, h, 10,1,100,"Number of energy slices"
+eslices, i, h, 10,1,100, "Number of energy slices"
 
 #
 # Standard parameters
@@ -46,5 +46,5 @@ eslices, i, h, 10,1,100,"Number of energy slices"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
-mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctobssim.log",,, "Log filename"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, ctobssim.log,,, "Log filename"

@@ -22,9 +22,9 @@ import gammalib
 import ctools
 
 
-# ========================= #
-# Test class for ctbin tool #
-# ========================= #
+# =========================== #
+# Test class for ctbin module #
+# =========================== #
 class Test(gammalib.GPythonTestSuite):
     """
     Test class for ctbin module.
@@ -39,7 +39,7 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
-        self.events_name = "data/crab_events.fits"
+        self._events_name = "data/crab_events.fits"
 
         # Return
         return
@@ -65,7 +65,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctbin
         bin = ctools.ctbin()
-        bin["inobs"]    = self.events_name
+        bin["inobs"]    = self._events_name
         bin["outcube"]  = "cntmap.fits"
         bin["ebinalg"]  = "LOG"
         bin["emin"]     = 0.1
@@ -111,20 +111,14 @@ class Test(gammalib.GPythonTestSuite):
 #Please specify a valid parameter name.
 
         # Save counts cube
-        self.test_try("Save counts cube")
-        try:
-            bin.save()
-            self.test_try_success()
-        except:
-            msg = "Exception occured in saving counts cube."
-            self.test_try_failure(msg)
+        bin.save()
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube("cntmap.fits")
         self._test_cube(evt, 5542)
 
         # Prepare observation container for stacked analysis
-        cta = gammalib.GCTAObservation(self.events_name)
+        cta = gammalib.GCTAObservation(self._events_name)
         obs = gammalib.GObservations()
         cta.id("0001")
         obs.append(cta)
