@@ -365,7 +365,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     to the observation container.
 
     Args:
-        pntdir   - Pointing direction [GSkyDir]
+        pntdir: Pointing direction [GSkyDir]
 
     Kwargs:
         tstart:   Start time (seconds) (default: 0.0)
