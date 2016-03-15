@@ -51,7 +51,6 @@ class csspec(ctools.cscript):
         self._binned_mode = False
         self._srcname     = ""
         self._edisp       = False
-        self._outfile     = "NONE"
         self._calc_ulimit = True
         self._calc_ts     = True
         self._fix_bkg     = False
@@ -121,7 +120,7 @@ class csspec(ctools.cscript):
 
         # Read ahead output parameters
         if self._read_ahead():
-            self._outfile = self["outfile"].filename()
+            self["outfile"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -507,17 +506,19 @@ class csspec(ctools.cscript):
             self._log.header1("Save spectrum")
 
         # Get outmap parameter
-        self._outfile = self["outfile"].filename()
+        outfile = self["outfile"].filename()
         
         # Continue only filename and residual map are valid
-        if self._outfile != "NONE" and self._fits != None:
+        if self._fits != None:
 
             # Log file name
             if self._logTerse():
-                self._log("Save spectrum into \""+self._outfile+"\".\n")
+                self._log(gammalib.parformat("Spectrum file"))
+                self._log(outfile.url())
+                self._log("\n")
 
             # Save spectrum
-            self._fits.saveto(self._outfile, self._clobber)
+            self._fits.saveto(outfile, self._clobber)
 
         # Return
         return

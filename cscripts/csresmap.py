@@ -49,7 +49,6 @@ class csresmap(ctools.cscript):
         self._algorithm    = "SUB"
         self._resmap       = None
         self._modcube      = "NONE"
-        self._outmap       = "NONE"
         self._use_maps     = False
         self._skip_binning = False
         self._publish      = False
@@ -158,7 +157,7 @@ class csresmap(ctools.cscript):
 
         # Read ahead output parameters
         if (self._read_ahead()):
-            self._outmap = self["outmap"].filename()
+            self["outmap"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -324,17 +323,19 @@ class csresmap(ctools.cscript):
             self._log.header1("Save residual map")
 
         # Get outmap parameter
-        self._outmap = self["outmap"].filename()
+        outmap = self["outmap"].filename()
         
         # Continue only filename and residual map are valid
-        if self._outmap != "NONE" and self._resmap != None:
+        if self._resmap != None:
 
             # Log file name
             if self._logTerse():
-                self._log("Save residual map into \""+self._outmap+"\".\n")
+                self._log(gammalib.parformat("Residual map file"))
+                self._log(outmap.url())
+                self._log("\n")
 
             # Save residual map
-            self._resmap.save(self._outmap, self._clobber)
+            self._resmap.save(outmap, self._clobber)
 
         # Return
         return
