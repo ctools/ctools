@@ -83,7 +83,7 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute ctbin, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null")
+            rc = os.system(cmd+" >/dev/null 2>&1")
         except:
             pass
 
@@ -104,7 +104,7 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute ctbin, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null")
+            rc = os.system(cmd+" >/dev/null 2>&1")
         except:
             pass
 
