@@ -4,7 +4,7 @@
 # logarithmically spaced energy bins. The intensity scale is set to the
 # HESS Crab intensity (assuming a power law).
 #
-# Copyright (C) 2012-2014 Juergen Knoedlseder
+# Copyright (C) 2012-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from gammalib import *
+#import gammalib
 import sys
 import math
 
