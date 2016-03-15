@@ -108,11 +108,16 @@ data_files=[('@prefix@/share/ctools/swig', install_files)]
 
 # Optionally enable OpenMP
 if '@OPENMP_TRUE@' != '#':
-	extra_compile_args = ['@OPENMP_CXXFLAGS@','@COVERAGE_CXXFLAGS@']
+	extra_compile_args = ['@OPENMP_CXXFLAGS@']
 	extra_link_args    = ['@OPENMP_CXXFLAGS@']
 else:
-	extra_compile_args = ['@COVERAGE_CXXFLAGS@']
+	extra_compile_args = []
 	extra_link_args    = []
+
+# Append coverage CXXFLAGS
+if len('@COVERAGE_CXXFLAGS@') > 0:
+    extra_compile_args.append('@COVERAGE_CXXFLAGS@')
+    extra_link_args.append('@COVERAGE_CXXFLAGS@')
 
 # Optionally add link flag for El Capitan post-processing of modules
 if '@IS_ELCAPITAN_TRUE@' != '#':
