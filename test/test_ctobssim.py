@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the ctobssim module.
+# This scripts performs unit tests for the ctobssim tool.
 #
 # Copyright (C) 2014-2016 Juergen Knoedlseder
 #
@@ -18,17 +18,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from cscripts import obsutils
 
 
-# ============================== #
-# Test class for ctobssim module #
-# ============================== #
+# ============================ #
+# Test class for ctobssim tool #
+# ============================ #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for ctobssim module.
+    Test class for ctobssim tools.
+    
+    This test class makes unit tests for the ctobssim tool by using it from
+    the command line and from Python.
     """
 
     # Constructor
@@ -56,16 +60,67 @@ class Test(gammalib.GPythonTestSuite):
         self.name("ctobssim")
 
         # Append tests
-        self.append(self._test_ctobssim, "Test ctobssim")
-        #self.append(self._test_container, "Test ctobssim on observation container")
+        self.append(self._test_ctobssim_cmd, "Test ctobssim on command line")
+        self.append(self._test_ctobssim_python, "Test ctobssim from Python")
 
         # Return
         return
 
-    # Test ctobssim
-    def _test_ctobssim(self):
+    # Test ctobssim on command line
+    def _test_ctobssim_cmd(self):
         """
-        Test ctobssim.
+        Test ctobssim on the command line.
+        """
+        # Kluge to set the command (installed version has no README file)
+        if os.path.isfile("README"):
+            ctobssim = "../src/ctobssim/ctobssim"
+        else:
+            ctobssim = "ctobssim"
+
+        # Setup ctobssim command
+        cmd = ctobssim+' inmodel="data/crab.xml" outevents="events.fits"'+ \
+                       ' caldb="irf" irf="cta_dummy_irf" '+ \
+                       ' ra=83.63 dec=22.01 rad=10.0'+ \
+                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
+
+        # Execute ctobssim, make sure we catch any exception
+        try:
+            rc = os.system(cmd+" >/dev/null")
+        except:
+            pass
+
+        # Check if execution was successful
+        self.test_assert(rc == 0,
+                         "Successful ctobssim execution on command line")
+
+        # Load counts cube and check content.
+        evt = gammalib.GCTAEventList("events.fits")
+        self._test_list(evt, 4119)
+
+        # Setup ctobssim command
+        cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
+                       ' outevents="events.fits"'+ \
+                       ' caldb="irf" irf="cta_dummy_irf" '+ \
+                       ' ra=83.63 dec=22.01 rad=10.0'+ \
+                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
+
+        # Execute ctobssim, make sure we catch any exception
+        try:
+            rc = os.system(cmd+" >/dev/null")
+        except:
+            pass
+
+        # Check if execution failed
+        self.test_assert(rc != 0,
+                         "Failure of ctobssim execution on command line")
+
+        # Return
+        return
+
+    # Test ctobssim from Python
+    def _test_ctobssim_python(self):
+        """
+        Test ctobssim from Python.
         """
         # Set-up ctobssim
         sim = ctools.ctobssim()
