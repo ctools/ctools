@@ -76,4 +76,4 @@ int main (int argc, char *argv[])
 
     // Return
     return rc;
-} // GCOV_EXCL_LINE
+}
