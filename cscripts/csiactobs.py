@@ -501,14 +501,14 @@ class csiactobs(ctools.cscript):
                 self._log("\n")
 
             # Append observation to XML and set attributes
-            obs = lib.append("observation");
-            obs.attribute("name", object_name);
-            obs.attribute("id", str(obs_id));
-            obs.attribute("instrument", telescope);
+            obs = lib.append("observation")
+            obs.attribute("name", object_name)
+            obs.attribute("id", str(obs_id))
+            obs.attribute("instrument", telescope)
 
             # Append event file
             ev = gammalib.GXmlElement("parameter name=\"EventList\"")
-            ev.attribute("file", eventfile);
+            ev.attribute("file", eventfile)
 
             # Append effective area
             aeff = gammalib.GXmlElement("parameter name=\"EffectiveArea\"")
