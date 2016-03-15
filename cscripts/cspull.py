@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
+#import gammalib
 import ctools
 from cscripts import obsutils
 import sys
@@ -410,17 +410,17 @@ class cspull(ctools.cscript):
 
             # Write out result immediately
             if seed == 0:
-                file   = open(self._outfile.url(), 'w')
-                writer = csv.DictWriter(file, result['colnames'])
+                f      = open(self._outfile.url(), 'w')
+                writer = csv.DictWriter(f, result['colnames'])
                 headers = {}
                 for n in result['colnames']:
                     headers[n] = n
                 writer.writerow(headers)
             else:
-                file = open(self._outfile.url(), 'a')
-            writer = csv.DictWriter(file, result['colnames'])
+                f = open(self._outfile.url(), 'a')
+            writer = csv.DictWriter(f, result['colnames'])
             writer.writerow(result['values'])
-            file.close()
+            f.close()
 
         # Return
         return

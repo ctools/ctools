@@ -419,17 +419,17 @@ class cstsdist(ctools.cscript):
 
             # Write out result immediately
             if seed == 0:
-                file   = open(self._outfile.url(), 'w')
-                writer = csv.DictWriter(file, result['colnames'])
+                f      = open(self._outfile.url(), 'w')
+                writer = csv.DictWriter(f, result['colnames'])
                 headers = {}
                 for n in result['colnames']:
                     headers[n] = n
                 writer.writerow(headers)
             else:
-                file = open(self._outfile.url(), 'a')
-            writer = csv.DictWriter(file, result['colnames'])
+                f = open(self._outfile.url(), 'a')
+            writer = csv.DictWriter(f, result['colnames'])
             writer.writerow(result['values'])
-            file.close()
+            f.close()
 
         # Return
         return

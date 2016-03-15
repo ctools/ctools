@@ -347,18 +347,18 @@ class cssens(ctools.cscript):
         photon_flux_value = []
         energy_flux_value = []
         sensitivity_value = []
-        iter              = 0
+        iterations        = 0
         test_crab_flux    = 0.1 # Initial test flux in Crab units (100 mCrab)
 
         # Loop until we break
         while True:
 
             # Update iteration counter
-            iter += 1
+            iterations += 1
 
             # Write header
             if self._logExplicit():
-                self._log.header2("Iteration "+str(iter))
+                self._log.header2("Iteration "+str(iterations))
 
             # Set source model. crab_prefactor is the Prefactor that
             # corresponds to 1 Crab
@@ -370,7 +370,7 @@ class cssens(ctools.cscript):
             self._obs.models(src_model)
 
             # Simulate events
-            sim = obsutils.sim(self._obs, nbins=self._enumbins, seed=iter,
+            sim = obsutils.sim(self._obs, nbins=self._enumbins, seed=iterations,
                                binsz=self._binsz, npix=self._npix,
                                log=self._log_clients, debug=self._debug,
                                edisp=self._edisp)
@@ -464,8 +464,8 @@ class cssens(ctools.cscript):
             # Get fitted Crab, photon and energy fluxes
             crab_flux     = result_all[self._srcname]['Prefactor'].value() / \
                             crab_prefactor
-            crab_flux_err = result_all[self._srcname]['Prefactor'].error() / \
-                            crab_prefactor
+            #crab_flux_err = result_all[self._srcname]['Prefactor'].error() / \
+            #                crab_prefactor
             photon_flux   = result_all[self._srcname].spectral().flux(emin, emax)
             energy_flux   = result_all[self._srcname].spectral().eflux(emin, emax)
 
@@ -511,7 +511,7 @@ class cssens(ctools.cscript):
                     for par in model:
                         self._log(str(par)+"\n")
             elif self._logTerse():
-                self._log.parformat("Iteration "+str(iter))
+                self._log.parformat("Iteration "+str(iterations))
                 self._log("TS=")
                 self._log(ts)
                 self._log(" ")
@@ -549,7 +549,7 @@ class cssens(ctools.cscript):
             sensitivity /= num
 
             # Compare average flux to last average
-            if iter > self._num_avg:
+            if iterations > self._num_avg:
                 if test_crab_flux > 0:
                     ratio = crab_flux/test_crab_flux
 
@@ -570,7 +570,7 @@ class cssens(ctools.cscript):
             test_crab_flux = crab_flux
 
             # Exit loop if number of trials exhausted
-            if (iter >= self._max_iter):
+            if (iterations >= self._max_iter):
                 if self._logTerse():
                     self._log(" Test ended after "+str(self._max_iter)+
                               " iterations.\n")

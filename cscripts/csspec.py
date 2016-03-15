@@ -158,9 +158,10 @@ class csspec(ctools.cscript):
 
             # If no layers overlap then throw an exception
             if (len(use_layers) == 0):
-                msg = "Energy range ["+str(cube_ebounds.emin(i))+ \
-                      ", "+str(cube_ebounds.emax(i))+"] of counts "+ \
-                      "cube does not overlap with specified energy range ["+ \
+                msg = "Energy range ["+str(cube_ebounds.emin())+ \
+                      ", "+str(cube_ebounds.emax())+"] of counts "+ \
+                      "cube does not overlap with specified energy "+ \
+                      "range ["+ \
                       str(emin)+", "+str(emax)+"]. Specify "+ \
                       "overlapping energy range."
                 raise RuntimeError(msg)

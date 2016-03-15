@@ -4,7 +4,7 @@
 # into a column separated file function table. The table is automatically
 # named "bkg_XXX.txt" where "XXX" is for example "kb_E_50h_v3".
 #
-# Copyright (C) 2011-2014 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ def make_file_function(irfname, filename):
      filename - File function filename
     """
     # Open performance file and file function
-    irf  = open(irfname, "r")
-    file = open(filename, "w")
+    irf = open(irfname, "r")
+    f   = open(filename, "w")
 
     # Read data
     for row in irf:
@@ -53,12 +53,12 @@ def make_file_function(irfname, filename):
         # Extract data
         fields = row.replace(" ",",").replace(",,",",").rstrip("\n").split(",")
         logE   = float(fields[0])
-        aeff   = float(fields[1])
-        r68    = float(fields[2])
+        #aeff   = float(fields[1])
+        #r68    = float(fields[2])
         r80    = float(fields[3])
-        eres   = float(fields[4])
+        #eres   = float(fields[4])
         bgd    = float(fields[5])
-        sens   = float(fields[6])
+        #sens   = float(fields[6])
 
         # Compute energy (in MeV)
         energy = math.pow(10.0, logE)*1.0e6
@@ -76,11 +76,11 @@ def make_file_function(irfname, filename):
             bkg_rate = 0.0
 
         # Write
-        file.write(str(energy)+" "+str(bkg_rate)+"\n")
+        f.write(str(energy)+" "+str(bkg_rate)+"\n")
 
     # Close files
     irf.close()
-    file.close()
+    f.close()
 
     # Return
     return
@@ -90,9 +90,7 @@ def make_file_function(irfname, filename):
 # Main entry point #
 # ================ #
 if __name__ == '__main__':
-    """
-    Main entry point
-    """
+
     # Set parameters
     caldb = "/usr/local/gamma/share/caldb/data/cta/kb/"
 
