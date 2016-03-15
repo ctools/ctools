@@ -359,7 +359,8 @@ void ctbin::publish(const std::string& name)
 
     // Log filename
     if (logTerse()) {
-        log << "Publish \""+user_name+"\" counts cube." << std::endl;
+        log << gammalib::parformat("Counts cube name");
+        log << user_name << std::endl;
     }
 
     // Publish counts cube
