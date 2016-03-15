@@ -758,6 +758,7 @@ fi
 #############################################################################
 # Initialise Python coverage with empty string
 PYTHON_COVERAGE=
+COVERAGE_CXXFLAGS=
 
 # Check for coverage option
 AC_MSG_CHECKING(whether to build ctools for code coverage measure)
@@ -768,15 +769,17 @@ AC_ARG_ENABLE([coverage],
               [enable_coverage="no"])
 if test "x$enable_coverage" = "xyes"; then
   CXXFLAGS="--coverage $CXXFLAGS"
+  COVERAGE_CXXFLAGS="--coverage"
   LDFLAGS="--coverage $LDFLAGS"
   if test "x$has_python" = "xyes"; then
-    PYTHON_COVERAGE="coverage run --append "
+    PYTHON_COVERAGE="coverage run --branch --append "
   fi
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
 fi
 AC_SUBST(PYTHON_COVERAGE)
+AC_SUBST(COVERAGE_CXXFLAGS)
 
 
 #############################################################################
@@ -937,7 +940,7 @@ OPENMP_LIB_LDFLAGS=
 #fi
 AC_SUBST(OPENMP_LIB_LDFLAGS)
 
-# Signal if ctools cannot be compiled as gammalibe requires OpenMP but ctools
+# Signal if ctools cannot be compiled as gammalib requires OpenMP but ctools
 # cannot be compiled with OpenMP
 if test "x$enable_openmp" = "xno" && test "x$gammalib_with_openmp" = "xyes"; then
   AC_MSG_ERROR([The GammaLib library has been built with openMP support but OpenMP is not available on this system. Please install OpenMP or re-build GammaLib without OpenMP support.])

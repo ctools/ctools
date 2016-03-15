@@ -106,11 +106,18 @@ class cslightcrv(ctools.cscript):
         # Get time boundaries             
         self._tbins = self._create_tbounds()
 
-        # Set stacked analysis flag if the requested number of energy bins
-        # is not zero; otherwise an unbinned analysis will be done.
-        self._stacked = False if self["enumbins"].integer() == 0 else True
+        # Set stacked analysis flag to True if the requested number of
+        # energy bins is positive. Otherwise an unbinned analysis will
+        # be done and the stacked analysis flag will be set to False.
+        if self["enumbins"].integer() > 0:
+            self._stacked = True
+        else:
+            self._stacked = False
 
-        # Make sure that other parameters are queried now and not later
+        # Make sure that remaining user parameters are queried now. We
+        # do not store the actual parameter values as we do not want
+        # too many instance attributes with enhances the maintenance
+        # costs.
         self["emin"].real()
         self["emax"].real()
         if self._stacked:
