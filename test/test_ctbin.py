@@ -70,7 +70,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set ctbin tool
         ctbin = "../src/ctbin/ctbin"
-        noout = " >/dev/null"
+        if os.system("type "+ctbin) != 0:
+            ctbin = "ctbin"
         
         # Setup ctbin command
         cmd = ctbin+' inobs="'+self._events_name+'"'+ \
