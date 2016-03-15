@@ -17,10 +17,11 @@ TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDI
                     $(TEST_PYTHON_ENV)
 
 # Tests (these are the tests to be executed)
-TESTS = test_ctools.sh \
-        $(TEST_CSCRIPTS) \
-        $(TEST_PYTHON_CTOOLS) \
-        $(TEST_PYTHON_CSCRIPTS)
+#TESTS = test_ctools.sh \
+#        $(TEST_CSCRIPTS) \
+#        $(TEST_PYTHON_CTOOLS) \
+#        $(TEST_PYTHON_CSCRIPTS)
+TESTS = $(TEST_PYTHON_CTOOLS)
 
 # Add Valgrind rule
 valgrind:
