@@ -62,7 +62,7 @@ ctbin::ctbin(void) : ctool(CTBIN_NAME, CTBIN_VERSION)
 
     // Return
     return;
-}
+} // GCOV_EXCL_LINE
 
 
 /***********************************************************************//**

@@ -93,7 +93,7 @@ cppncss:
 # Add coverage rule
 coverage:
 	@if type gcovr >/dev/null 2>&1; then \
-		gcovr -r . -x -o coverage-report-cxx.xml; \
+		gcovr -r . -x --exclude-unreachable-branches -o coverage-report-cxx.xml; \
 	else \
 		echo "gcovr script not found in PATH."; \
 	fi; \
