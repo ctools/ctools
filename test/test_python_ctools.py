@@ -40,15 +40,15 @@ import test_cterror
 import test_pipelines
 
 
-# ================== #
-# Perform unit tests #
-# ================== #
+# ========================= #
+# Perform ctools unit tests #
+# ========================= #
 def test(installed=False):
     """
-    Perform unit testing for Python interface.
+    Perform unit testing for ctools.
     """
     # Allocate test suite container
-    suites = gammalib.GTestSuites("ctools Python module unit testing")
+    suites = gammalib.GTestSuites("ctools unit testing")
 
     # Allocate test suites and append them to the container
     suite_ctobssim    = test_ctobssim.Test()
@@ -153,8 +153,6 @@ def test(installed=False):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Perform unit testing for Python interface.
-    """
+
     # Run tests
     test()

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the ctbin module.
+# This scripts performs unit tests for the ctbin tool.
 #
 # Copyright (C) 2014-2016 Juergen Knoedlseder
 #
@@ -18,16 +18,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 
 
-# =========================== #
-# Test class for ctbin module #
-# =========================== #
+# ========================= #
+# Test class for ctbin tool #
+# ========================= #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for ctbin module.
+    Test class for ctbin tool.
+    
+    This test class makes unit tests for the ctbin tool by using it from
+    the command line and from Python.
     """
 
     # Constructor
@@ -53,15 +57,66 @@ class Test(gammalib.GPythonTestSuite):
         self.name("ctbin")
 
         # Append tests
-        self.append(self._test_ctbin, "Test ctbin")
+        self.append(self._test_ctbin_cmd, "Test ctbin on command line")
+        self.append(self._test_ctbin_python, "Test ctbin from Python")
 
         # Return
         return
 
-    # Test ctbin
-    def _test_ctbin(self):
+    # Test ctbin on command line
+    def _test_ctbin_cmd(self):
         """
-        Test ctbin.
+        Test ctbin on the command line.
+        """
+        # Set ctbin tool
+        ctbin = "../src/ctbin/ctbin"
+        noout = " >/dev/null"
+        
+        # Setup ctbin command
+        cmd = ctbin+' inobs="'+self._events_name+'"'+ \
+                    ' outcube="cntmap_cmd1.fits"'+\
+                    ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"'+ \
+                    ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
+                    ' xref=83.63 yref=22.01 proj="CAR"'+noout
+
+        # Execute ctbin, make sure we catch any exception
+        try:
+            rc = os.system(cmd)
+        except:
+            pass
+
+        # Check if execution was successful
+        self.test_assert(rc == 0,
+                         "Successful ctbin execution on command line")
+
+        # Load counts cube and check content.
+        evt = gammalib.GCTAEventCube("cntmap_cmd1.fits")
+        self._test_cube(evt, 5542)
+
+        # Setup ctbin command
+        cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
+                    ' outcube="cntmap_cmd2.fits"'+\
+                    ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"'+ \
+                    ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
+                    ' xref=83.63 yref=22.01 proj="CAR"'+noout
+
+        # Execute ctbin, make sure we catch any exception
+        try:
+            rc = os.system(cmd)
+        except:
+            pass
+
+        # Check if execution failed
+        self.test_assert(rc != 0,
+                         "Failure of ctbin execution on command line")
+
+        # Return
+        return
+
+    # Test ctbin from Python
+    def _test_ctbin_python(self):
+        """
+        Test ctbin from Python.
         """
         # Set-up ctbin
         bin = ctools.ctbin()
