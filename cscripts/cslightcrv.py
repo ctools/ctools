@@ -76,11 +76,14 @@ class cslightcrv(ctools.cscript):
         self._stacked = False
 
         # Initialise observation container from constructor arguments.
-        self._obs = self._set_input_obs(argv)
+        self._obs, argv = self._set_input_obs(argv)
 
-        # Initialise application by calling the appropriate class
-        # constructor.
+        # Initialise script by calling the appropriate class constructor.
         self._init_cscript(argv)
+
+        # Set logger properties
+        self._log_header()
+        self._log.date(True)
 
         # Return
         return
@@ -91,12 +94,10 @@ class cslightcrv(ctools.cscript):
         """
         Get parameters from parfile.
         """
-        # Set observation if not done before
-        if self._obs == None or self._obs.size() == 0:
-            self._require_inobs("cslightcrv::_get_parameters()")
-            self._obs = self._get_observations()
+        # Setup observations
+        self._setup_observations(self._obs)
 
-        # Set models if we have none
+        # Set models if there are none in the container
         if self._obs.models().size() == 0:
             self._obs.models(self["inmodel"].filename())
 
@@ -436,16 +437,26 @@ class cslightcrv(ctools.cscript):
         if self._logExplicit():
             self._log.header3("Creating point spread function cube")
 
-        # Create psf cube
+        # Compute spatial binning for point spread function and
+        # energy dispersion cubes
+        binsz = 0.1 * self["binsz"].real()
+        nxpix = self["nxpix"].integer() / 10
+        nypix = self["nypix"].integer() / 10
+        if nxpix < 2:
+            nxpix = 2
+        if nypix < 2:
+            nypix = 2
+
+        # Create point spread function cube
         psfcube = ctools.ctpsfcube(obs)
         psfcube["incube"]   = "NONE"
         psfcube["usepnt"]   = False
         psfcube["ebinalg"]  = "LOG"
         psfcube["xref"]     = self["xref"].real()
         psfcube["yref"]     = self["yref"].real()
-        psfcube["binsz"]    = self["binsz"].real()
-        psfcube["nxpix"]    = self["nxpix"].integer()
-        psfcube["nypix"]    = self["nypix"].integer()
+        psfcube["binsz"]    = binsz
+        psfcube["nxpix"]    = nxpix
+        psfcube["nypix"]    = nypix
         psfcube["enumbins"] = self["enumbins"].integer()
         psfcube["emin"]     = self["emin"].real()
         psfcube["emax"]     = self["emax"].real()    
@@ -460,16 +471,16 @@ class cslightcrv(ctools.cscript):
             if self._logExplicit():
                 self._log.header3("Creating energy dispersion cube")
             
-            # Create edisp cube
+            # Create energy dispersion cube
             edispcube = ctools.ctedispcube(obs)
             edispcube["incube"]   = "NONE"
             edispcube["usepnt"]   = False
             edispcube["ebinalg"]  = "LOG"
             edispcube["xref"]     = self["xref"].real()
             edispcube["yref"]     = self["yref"].real()
-            edispcube["binsz"]    = self["binsz"].real()
-            edispcube["nxpix"]    = self["nxpix"].integer()
-            edispcube["nypix"]    = self["nypix"].integer()
+            edispcube["binsz"]    = binsz
+            edispcube["nxpix"]    = nxpix
+            edispcube["nypix"]    = nypix
             edispcube["enumbins"] = self["enumbins"].integer()
             edispcube["emin"]     = self["emin"].real()
             edispcube["emax"]     = self["emax"].real()    

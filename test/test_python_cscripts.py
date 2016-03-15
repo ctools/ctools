@@ -18,12 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
+import sys
 import gammalib
 import cscripts
-import sys
-import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_cscaldb
+import test_cslightcrv
 
 
 # ================== #
@@ -37,13 +38,16 @@ def test(installed=False):
     suites = gammalib.GTestSuites("cscripts Python module unit testing")
 
     # Allocate test suites and append them to the container
-    suite_cscaldb = test_cscaldb.Test()
+    suite_cscaldb    = test_cscaldb.Test()
+    suite_cslightcrv = test_cslightcrv.Test()
 
     # Setup unit tests
     suite_cscaldb.set()
+    suite_cslightcrv.set()
 
     # Append tests to container
     suites.append(suite_cscaldb)
+    suites.append(suite_cslightcrv)
 
     # If we have an installed version then create a temporary directory and
     # copy over all information that is needed
@@ -60,8 +64,12 @@ def test(installed=False):
         dirname = os.path.dirname(testdir)
 
         # Copy over test data and irf
-        #os.system("cp -r %s %s" % (dirname+"/data", "data"))
+        os.system("cp -r %s %s" % (dirname+"/data", "data"))
         #os.system("cp -r %s %s" % (dirname+"/irf",  "irf"))
+
+    # ... otherwise set the calibration database
+    else:
+        os.environ['CALDB'] = "../caldb"
 
     # Set PFILES environment variable
     try:
@@ -97,8 +105,6 @@ def test(installed=False):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Perform unit testing for cscripts used from Python.
-    """
+
     # Run tests
     test()

@@ -57,14 +57,14 @@ class Test(gammalib.GPythonTestSuite):
         self.name("ctbin")
 
         # Append tests
-        self.append(self._test_ctbin_cmd, "Test ctbin on command line")
-        self.append(self._test_ctbin_python, "Test ctbin from Python")
+        self.append(self._test_cmd, "Test ctbin on command line")
+        self.append(self._test_python, "Test ctbin from Python")
 
         # Return
         return
 
     # Test ctbin on command line
-    def _test_ctbin_cmd(self):
+    def _test_cmd(self):
         """
         Test ctbin on the command line.
         """
@@ -93,7 +93,7 @@ class Test(gammalib.GPythonTestSuite):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube("cntmap_cmd1.fits")
-        self._test_cube(evt, 5542)
+        self._check_cube(evt, 5542)
 
         # Setup ctbin command
         cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
@@ -116,7 +116,7 @@ class Test(gammalib.GPythonTestSuite):
         return
 
     # Test ctbin from Python
-    def _test_ctbin_python(self):
+    def _test_python(self):
         """
         Test ctbin from Python.
         """
@@ -140,15 +140,15 @@ class Test(gammalib.GPythonTestSuite):
         bin.run()
 
         # Check content of observation and cube
-        self._test_observation(bin, 5542)
-        self._test_cube(bin.cube(), 5542)
+        self._check_observation(bin, 5542)
+        self._check_cube(bin.cube(), 5542)
 
         # Test copy constructor
         cpy_bin = bin.copy()
 
         # Check content of observation and cube
-        self._test_observation(cpy_bin, 5542)
-        self._test_cube(cpy_bin.cube(), 5542)
+        self._check_observation(cpy_bin, 5542)
+        self._check_cube(cpy_bin.cube(), 5542)
 
         # Run copy of ctbin tool again
         cpy_bin.run()
@@ -157,8 +157,8 @@ class Test(gammalib.GPythonTestSuite):
         # event cube as on input the observation is binned, and any binned
         # observation will be skipped, hence the counts cube should be
         # empty.
-        self._test_observation(cpy_bin, 0)
-        self._test_cube(cpy_bin.cube(), 0)
+        self._check_observation(cpy_bin, 0)
+        self._check_cube(cpy_bin.cube(), 0)
 
         # Clear and run copy of ctbin again
         #cpy_bin.clear()
@@ -172,7 +172,7 @@ class Test(gammalib.GPythonTestSuite):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube("cntmap.fits")
-        self._test_cube(evt, 5542)
+        self._check_cube(evt, 5542)
 
         # Prepare observation container for stacked analysis
         cta = gammalib.GCTAObservation(self._events_name)
@@ -204,8 +204,8 @@ class Test(gammalib.GPythonTestSuite):
 
         # Check content of observation and cube (need multiplier=3 since
         # three identical observations have been appended)
-        self._test_observation(bin, 5542, multiplier=3)
-        self._test_cube(bin.cube(), 5542, multiplier=3)
+        self._check_observation(bin, 5542, multiplier=3)
+        self._check_cube(bin.cube(), 5542, multiplier=3)
 
         # Set-up ctbin using an observation container
         bin = ctools.ctbin(obs)
@@ -227,7 +227,7 @@ class Test(gammalib.GPythonTestSuite):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube("cntmap2.fits")
-        self._test_cube(evt, 5542, multiplier=3)
+        self._check_cube(evt, 5542, multiplier=3)
 
         # Clear tool
         #bin.clear()
@@ -242,9 +242,9 @@ class Test(gammalib.GPythonTestSuite):
         return
 
     # Check observation
-    def _test_observation(self, ctbin, nevents, multiplier=1):
+    def _check_observation(self, ctbin, nevents, multiplier=1):
         """
-        Test content of an observation.
+        Check content of an observation.
         
         Args:
             ctbin:   ctbin instance
@@ -270,15 +270,15 @@ class Test(gammalib.GPythonTestSuite):
                         "Pointing Declination is 22.01 deg")
 
         # Test event cube
-        self._test_cube(obs.events(), nevents, multiplier=multiplier)
+        self._check_cube(obs.events(), nevents, multiplier=multiplier)
 
         # Return
         return
 
     # Check event cube
-    def _test_cube(self, cube, nevents, multiplier=1):
+    def _check_cube(self, cube, nevents, multiplier=1):
         """
-        Test content of event cube."
+        Check content of event cube."
         
         Args:
             cube:    Event cube
