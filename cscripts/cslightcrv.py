@@ -30,159 +30,70 @@ class cslightcrv(ctools.cscript):
     """
     Generates a lightcurve.
 
-    This class implements the creation of a light curve. It derives from
-    the ctools.cscript class which provides support for parameter files,
-    command line arguments, and logging. In that way the Python script
-    behaves just as a regular ctool. 
+    The cslightcrv class generates a light curve for Imaging Air Cherenkov
+    Telescope event data by performing a maximum likelihood fit using
+    ctlike in a series of time bins. The time bins can be either
+    specified in an ASCII file, as an interval divided into equally
+    sized time bins, or can be taken from the Good Time Intervals of the
+    observation(s).
+
+    The format of the ASCII file is one row per time bin, each specifying
+    the start of stop value of the bin, separated by a whitespace. The
+    times are given in Modified Julian Days (MJD). 
+    
+    Examples:
+            >>> lcrv = cslightcrv()
+            >>> lcrv.run()
+            >>> ... (querying for parameters) ...
+            >>> fits = lcrv.lightcurve()
+                Generates a light curve and retrieves the results in
+                a FITS file.
+
+            >>> lcrv = cslightcrv()
+            >>> lcrv.execute()
+            >>> ... (querying for parameters) ...
+                Generates a light curve and saves results in a FITS file.
+
+            >>> lcrv = cslightcrv(obs)
+            >>> lcrv.execute()
+            >>> ... (querying for parameters) ...
+                Generates a light curve from the observations in an
+                observation container and saves results in a FITS file.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
         """
-
         # Set name
         self._name    = "cslightcrv"
         self._version = "1.1.0"
 
         # Initialise some members
-        self._outfile = ""
+        self._srcname = ""
+        self._tbins   = gammalib.GGti()
+        self._stacked = False
 
-        # Initialise observation
-        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-            self._obs = argv[0]
-            argv      = argv[1:]
-        else:      
-            self._obs = gammalib.GObservations()
+        # Initialise observation container from constructor arguments.
+        self._obs = self._set_input_obs(argv)
 
-        # Make sure that parfile exists
-        self._parfile()
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
-
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
 
     # Private methods
-    def _parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
-        """
-        # Set parfile name
-        parfile = self._name+".par"
-
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","a","events.fits","","","Input event list, counts cube, or observation definition XML file"))
-            pars.append(gammalib.GApplicationPar("inmodel","f","a","$CTOOLS/share/models/crab.xml","","","Input model XML file"))
-            pars.append(gammalib.GApplicationPar("srcname","s","a","Crab","","","Source name"))
-            pars.append(gammalib.GApplicationPar("expcube","f","a","NONE","","","Input exposure cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("psfcube","f","a","NONE","","","Input PSF cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("edispcube","f","a","NONE","","","Input energy dispersion cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("bkgcube","s","a","NONE","","","Input background cube file (only needed for stacked analysis)"))
-            pars.append(gammalib.GApplicationPar("edisp","b","h","no","","","Apply energy dispersion?"))
-            pars.append(gammalib.GApplicationPar("caldb","s","a","prod2","","","Calibration database"))
-            pars.append(gammalib.GApplicationPar("irf","s","a","South_0.5h","","","Instrument response function"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","lightcurve.fits","","","Output light curve file"))
-            pars.append(gammalib.GApplicationPar("tbinalg","s","a","GTI","FILE|LIN|GTI","", "Algorithm for defining time bins"))
-            pars.append(gammalib.GApplicationPar("tmin","r","a","51544.5","","days","Lightcurve start time [MJD]"))
-            pars.append(gammalib.GApplicationPar("tmax","r","a","51544.6","","days","Lightcurve stop time [MJD]"))
-            pars.append(gammalib.GApplicationPar("tbins","i","a","5","","","Number of time bins"))
-            pars.append(gammalib.GApplicationPar("tbinfile","f","a","tbins.fits","","", "File defining the time binning"))
-            pars.append(gammalib.GApplicationPar("enumbins","i","a","0","","","Number of energy bins per light curve bin (0=unbinned)"))
-            pars.append(gammalib.GApplicationPar("emin","r","a","0.1","","","Lower energy limit of events (TeV)"))
-            pars.append(gammalib.GApplicationPar("emax","r","a","100.0","","","Upper energy limit of events (TeV)"))
-            pars.append(gammalib.GApplicationPar("coordsys","s","a","CEL","CEL|GAL","","Coordinate System"))
-            pars.append(gammalib.GApplicationPar("proj","s","a","CAR","AIT|AZP|CAR|MER|MOL|STG|TAN","","Projection method"))
-            pars.append(gammalib.GApplicationPar("xref","r","a","83.63","0","360","First coordinate of image center in degrees (RA or galactic l)"))
-            pars.append(gammalib.GApplicationPar("yref","r","a","22.01","-90","90","Second coordinate of image center in degrees (DEC or galactic b)"))
-            pars.append(gammalib.GApplicationPar("nxpix","i","a","200","","","Size of the X axis in pixels"))
-            pars.append(gammalib.GApplicationPar("nypix","i","a","200","","","Size of the Y axis in pixels"))
-            pars.append(gammalib.GApplicationPar("binsz","r","a","0.02","","","Pixel size (deg/pixel)"))
-            pars.append(gammalib.GApplicationPar("calc_ts","b","h","yes","yes|no","","Compute TS value for each bin?"))
-            pars.append(gammalib.GApplicationPar("calc_ulim","b","h","yes","yes|no","","Compute upper limit for each bin?"))
-            pars.append(gammalib.GApplicationPar("fix_srcs","b","h","yes","yes|no","","Fix other sky model parameters?"))
-            pars.append(gammalib.GApplicationPar("fix_bkg","b","h","no","yes|no","","Fix background model parameters?"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","cslightcrv.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
-    def _create_tbounds(self):
-
-        # Create time bin container
-        self._tbins = gammalib.GGti()
-
-        # check for binning algorithm
-        if self["tbinalg"].string() == "FILE":
-            try:
-                self._tbins.load(self["tbinfile"].filename())
-            except:               
-                csv = gammalib.GCsv(self["tbinfile"].filename())
-                for i in range(csv.nrows()):
-                    tmin = gammalib.GTime()
-                    tmax = gammalib.GTime()
-                    tmin.mjd(csv.real(i,0))
-                    tmax.mjd(csv.real(i,1))
-                    self._tbins.append(tmin,tmax)
-        elif self["tbinalg"].string() == "LIN":
-            # Use linear time binning
-            time_min = self["tmin"].real()
-            time_max = self["tmax"].real()
-            nbins    = self["tbins"].integer()            
-            step     = (time_max - time_min) / float(nbins)
-            for i in range(nbins):
-                tmin = gammalib.GTime()
-                tmin.mjd(time_min + i*step)# ref)
-                tmax = gammalib.GTime()
-                tmax.mjd(time_min + (i+1)*step)#ref)
-                self._tbins.append(tmin,tmax)
-        elif self["tbinalg"].string() == "GTI":
-            # Use GTIs of observations
-            for obs in self._obs:
-                for i in range(obs.events().gti().size()):
-                    self._tbins.append(obs.events().gti().tstart(i),obs.events().gti().tstop(i))
-        else:
-            raise AttributeError("tbinalg=\""+self["tbinalg"].string()+"\" unkown. Must be one of \"FILE\", \"LIN\" or \"GTI\"")
-
-        # Return
-        return
-
     def _get_parameters(self):
         """
-        Get parameters from parfile and setup the observation.
+        Get parameters from parfile.
         """
         # Set observation if not done before
         if self._obs == None or self._obs.size() == 0:
-            self._require_inobs("cslightcrv::get_parameters()")
+            self._require_inobs("cslightcrv::_get_parameters()")
             self._obs = self._get_observations()
 
         # Set models if we have none
@@ -192,46 +103,35 @@ class cslightcrv(ctools.cscript):
         # Get source name   
         self._srcname = self["srcname"].string()
 
-        # Get energy dispersion flag
-        self._edisp = self["edisp"].boolean()
-        
         # Get time boundaries             
-        self._create_tbounds()
+        self._tbins = self._create_tbounds()
 
-        # Unbinned or binned analysis?
-        self._ebins    = self["enumbins"].integer()
-        if self._ebins == 0:
-            self._binned = False
-        else:
-            self._binned = True
+        # Set stacked analysis flag if the requested number of energy bins
+        # is not zero; otherwise an unbinned analysis will be done.
+        self._stacked = False if self["enumbins"].integer() == 0 else True
 
-        # Get energy range
-        self._emin = self["emin"].real()
-        self._emax = self["emax"].real()
+        # Make sure that other parameters are queried now and not later
+        self["emin"].real()
+        self["emax"].real()
+        if self._stacked:
+            self["coordsys"].string()
+            self["proj"].string()
+            self["xref"].real()
+            self["yref"].real()
+            self["nxpix"].integer()
+            self["nypix"].integer()
+            self["binsz"].real()
+        
+        # Do the same for the hidden parameters, just in case
+        self["edisp"].boolean()
+        self["calc_ulim"].boolean()
+        self["calc_ts"].boolean()
+        self["fix_bkg"].boolean()
+        self["fix_srcs"].boolean()
 
-        # Get binning flag
-        if self._binned:
-            self._coordsys = self["coordsys"].string()
-            self._proj     = self["proj"].string()
-            self._xref     = self["xref"].real()
-            self._yref     = self["yref"].real()
-            self._nxpix    = self["nxpix"].integer()
-            self._nypix    = self["nypix"].integer()
-            self._binsz    = self["binsz"].real()
-
-        # Read other parameters
-        self._outfile = self["outfile"].filename()
-
-        # Get other parameeters
-        self._calc_ulimit = self["calc_ulim"].boolean()
-        self._calc_ts     = self["calc_ts"].boolean()
-        self._fix_bkg     = self["fix_bkg"].boolean()
-        self._fix_srcs    = self["fix_srcs"].boolean()
-
-        # Set some fixed parameters
-        self._chatter = self["chatter"].integer()
-        self._clobber = self["clobber"].boolean()
-        self._debug   = self["debug"].boolean()
+        # Read ahead output parameters
+        if self._read_ahead():
+            self["outfile"].filename()
 
         #  Write input parameters into logger
         if self._logTerse():
@@ -240,6 +140,386 @@ class cslightcrv(ctools.cscript):
 
         # Return
         return
+
+    def _create_tbounds(self):
+        """
+        Creates light curve time bins.
+
+        The method reads the following user parameters:
+            tbinalg:  Time binning algorithm
+            tbinfile: Time binning file (FITS or ASCII)
+            tmin:     Start time (MJD)
+            tmax:     Stop time (MJD)
+            tbins:    Number of time bins
+
+        Returns:
+            Light curve bins in form of a GTI.
+        """
+        # Initialise Good Time Intervals
+        gti = gammalib.GGti()
+
+        # Get algorithm to use for defining the time intervals
+        algorithm = self["tbinalg"].string()
+        
+        # Handle a FITS or a ASCII file for time bin definition
+        if algorithm == "FILE":
+
+            # Get the filename
+            filename = self["tbinfile"].filename()
+            
+            # If the file a FITS file then load GTIs
+            if filename.is_fits():
+                gti.load(filename)
+
+            # ... otherwise load file as CSV ASCII file
+            csv = gammalib.GCsv(filename)
+            for i in range(csv.nrows()):
+                tmin = gammalib.GTime()
+                tmax = gammalib.GTime()
+                tmin.mjd(csv.real(i,0))
+                tmax.mjd(csv.real(i,1))
+                gti.append(tmin,tmax)
+
+        # Handle linear time binning
+        elif algorithm == "LIN":
+
+            # Get start and stop time and number of time bins
+            time_min = self["tmin"].real()
+            time_max = self["tmax"].real()
+            nbins    = self["tbins"].integer()            
+
+            # Compute time step and setup time intervals
+            time_step = (time_max - time_min) / float(nbins)
+            for i in range(nbins):
+                tmin = gammalib.GTime()
+                tmax = gammalib.GTime()
+                tmin.mjd(time_min +    i *time_step)
+                tmax.mjd(time_min + (i+1)*time_step)
+                gti.append(tmin,tmax)
+
+        # Handle usage of observation GTIs
+        elif algorithm == "GTI":
+
+            # Append the GTIs of all observations
+            for obs in self._obs:
+                for i in range(obs.events().gti().size()):
+                    gti.append(obs.events().gti().tstart(i),
+                               obs.events().gti().tstop(i))
+    
+        # ... otherwise raise an exception (this should never occur)
+        else:
+            raise AttributeError('Paramter tbinalg="'+algorithm+'" unknown. '
+                                 'Must be one of "FILE", "LIN" or "GTI".')
+
+        # Return Good Time Intervals
+        return gti
+
+    def _get_free_par_names(self):
+        """
+        Return list of free parameter names.
+        
+        Returns:
+            List of free parameter names.
+        """
+        # Initialise list of free parameter names
+        names = []
+
+        # Collect list of free parameter names
+        for par in self._obs.models()[self._srcname]:
+            if par.is_free():
+                names.append(par.name())
+
+        # Return names
+        return names
+
+    def _adjust_model_pars(self):
+        """
+        Adjust model parameters dependent on user parameters.
+        """
+        # Write header
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Adjust model parameters")
+
+        # Adjust model parameters dependent on input user parameters
+        for model in self._obs.models():
+
+            # Set TS flag for all models to false. The source of interest
+            # will be set to true later
+            model.tscalc(False)
+
+            # Log model name
+            if self._logNormal():
+                self._log.header3(model.name())
+
+            # Deal with the source of interest    
+            if model.name() == self._srcname:
+                if self["calc_ts"].boolean():
+                    model.tscalc(True)
+
+            elif (self["fix_bkg"].boolean() and
+                  model.classname() != "GModelSky"):
+                for par in model:
+                    if par.is_free():
+                        par.fix()
+                        if self._logNormal():
+                            self._log(gammalib.parformat(par.name()))
+                            self._log("fixed\n")
+
+            elif (self["fix_srcs"].boolean() and
+                  model.classname() == "GModelSky"):
+                for par in model:
+                    if par.is_free():
+                        par.fix()
+                        if self._logNormal():
+                            self._log(gammalib.parformat(par.name()))
+                            self._log("fixed\n")
+
+        # Return
+        return
+
+    def _create_fits_table(self, results):
+        """
+        Creates FITS binary table containing light curve results.
+
+        Args:
+            results: List of result dictionaries.
+
+        Returns:
+            FITS binary table containing light curve.
+        """
+        # Determine number of rows in FITS table
+        nrows = len(results)
+
+        # Create FITS Table with extension "LIGHTCURVE"
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname("LIGHTCURVE")
+
+        # Append time columns        
+        mjd   = gammalib.GFitsTableDoubleCol("MJD", nrows)
+        e_mjd = gammalib.GFitsTableDoubleCol("e_MJD", nrows)
+        mjd.unit("days")
+        e_mjd.unit("days")
+        for i, result in enumerate(results):
+            mjd[i]   = result["mjd"]
+            e_mjd[i] = result["e_mjd"]
+        table.append(mjd)
+        table.append(e_mjd)
+
+        # Create parameter columns
+        for par in self._obs.models()[self._srcname]:
+            if par.is_free():
+                name   = par.name()
+                e_name = "e_"+par.name()
+                col    = gammalib.GFitsTableDoubleCol(name, nrows)
+                e_col  = gammalib.GFitsTableDoubleCol(e_name, nrows)
+                col.unit(par.unit())
+                e_col.unit(par.unit())
+                for i, result in enumerate(results):
+                    col[i]   = result['values'][name]
+                    e_col[i] = result['values'][e_name]
+                table.append(col)
+                table.append(e_col)
+
+        # Append Test Statistic column
+        ts = gammalib.GFitsTableDoubleCol("TS", nrows)
+        for i, result in enumerate(results):
+            ts[i] = result["ts"]
+        table.append(ts)
+
+        # Append upper limit column
+        ulimit = gammalib.GFitsTableDoubleCol("UpperLimit", nrows)
+        ulimit.unit("ph/cm2/s")
+        for i, result in enumerate(results):
+            ulimit[i] = result['ulimit']
+        table.append(ulimit)
+
+        # Return table
+        return table
+
+    def _compute_ulimit(self, obs):
+        """
+        Computes upper flux limit.
+
+        Args:
+            obs: Observation container.
+
+        Returns:
+            Upper flux limit (-1 of not computed).
+        """
+        # Initialise upper flux limit
+        ulimit_value = -1.0
+        
+        # Perform computation only if requested
+        if self["calc_ulim"].boolean():
+
+            # Write header in logger
+            if self._logExplicit():
+                self._log.header3("Computing upper flux limit")
+
+            # Create upper limit object  
+            ulimit = ctools.ctulimit(obs)
+            ulimit["srcname"] = self._srcname
+            ulimit["eref"]    = 1.0
+
+            # Try to run upper limit and catch exceptions
+            try:
+                ulimit.run()
+                ulimit_value = ulimit.flux_ulimit()
+            except:
+                if self._logTerse():
+                    self._log("Upper limit flux calculation failed.s\n")
+                ulimit_value = -1.0
+
+        # Return upper limit
+        return ulimit_value
+
+    def _bin_observation(self, obs):
+        """
+        Bin an observation is a binned analysis was requested.
+
+        Args:
+            obs: Observation container.
+
+        Returns:
+            Observation container with a binned.
+        """
+        # Header
+        if self._logExplicit():
+            self._log.header3("Binning events")
+
+        # Bin events
+        bin = ctools.ctbin(obs)
+        bin["usepnt"]   = False
+        bin["ebinalg"]  = "LOG"
+        bin["xref"]     = self["xref"].real()
+        bin["yref"]     = self["yref"].real()
+        bin["binsz"]    = self["binsz"].real()
+        bin["nxpix"]    = self["nxpix"].integer()
+        bin["nypix"]    = self["nypix"].integer()
+        bin["enumbins"] = self["enumbins"].integer()
+        bin["emin"]     = self["emin"].real()
+        bin["emax"]     = self["emax"].real()        
+        bin["coordsys"] = self["coordsys"].string()
+        bin["proj"]     = self["proj"].string()            
+        bin.run()
+
+        # Header
+        if self._logExplicit():
+            self._log.header3("Creating exposure cube")
+
+        # Create exposure cube
+        expcube = ctools.ctexpcube(obs)
+        expcube["incube"]   = "NONE"
+        expcube["usepnt"]   = False
+        expcube["ebinalg"]  = "LOG"
+        expcube["xref"]     = self["xref"].real()
+        expcube["yref"]     = self["yref"].real()
+        expcube["binsz"]    = self["binsz"].real()
+        expcube["nxpix"]    = self["nxpix"].integer()
+        expcube["nypix"]    = self["nypix"].integer()
+        expcube["enumbins"] = self["enumbins"].integer()
+        expcube["emin"]     = self["emin"].real()
+        expcube["emax"]     = self["emax"].real()   
+        expcube["coordsys"] = self["coordsys"].string()
+        expcube["proj"]     = self["proj"].string()               
+        expcube.run()
+
+        # Header
+        if self._logExplicit():
+            self._log.header3("Creating point spread function cube")
+
+        # Create psf cube
+        psfcube = ctools.ctpsfcube(obs)
+        psfcube["incube"]   = "NONE"
+        psfcube["usepnt"]   = False
+        psfcube["ebinalg"]  = "LOG"
+        psfcube["xref"]     = self["xref"].real()
+        psfcube["yref"]     = self["yref"].real()
+        psfcube["binsz"]    = self["binsz"].real()
+        psfcube["nxpix"]    = self["nxpix"].integer()
+        psfcube["nypix"]    = self["nypix"].integer()
+        psfcube["enumbins"] = self["enumbins"].integer()
+        psfcube["emin"]     = self["emin"].real()
+        psfcube["emax"]     = self["emax"].real()    
+        psfcube["coordsys"] = self["coordsys"].string()
+        psfcube["proj"]     = self["proj"].string()               
+        psfcube.run()
+
+        # Check if we need to include energy dispersion
+        if self["edisp"].boolean():
+
+            # Header
+            if self._logExplicit():
+                self._log.header3("Creating energy dispersion cube")
+            
+            # Create edisp cube
+            edispcube = ctools.ctedispcube(obs)
+            edispcube["incube"]   = "NONE"
+            edispcube["usepnt"]   = False
+            edispcube["ebinalg"]  = "LOG"
+            edispcube["xref"]     = self["xref"].real()
+            edispcube["yref"]     = self["yref"].real()
+            edispcube["binsz"]    = self["binsz"].real()
+            edispcube["nxpix"]    = self["nxpix"].integer()
+            edispcube["nypix"]    = self["nypix"].integer()
+            edispcube["enumbins"] = self["enumbins"].integer()
+            edispcube["emin"]     = self["emin"].real()
+            edispcube["emax"]     = self["emax"].real()    
+            edispcube["coordsys"] = self["coordsys"].string()
+            edispcube["proj"]     = self["proj"].string()               
+            edispcube.run()
+
+        # Header
+        if self._logExplicit():
+            self._log.header3("Creating background cube")
+
+        # Create background cube
+        bkgcube = ctools.ctbkgcube(obs)
+        bkgcube["incube"]   = "NONE"
+        bkgcube["usepnt"]   = False
+        bkgcube["ebinalg"]  = "LOG"
+        bkgcube["xref"]     = self["xref"].real()
+        bkgcube["yref"]     = self["yref"].real()
+        bkgcube["binsz"]    = self["binsz"].real()
+        bkgcube["nxpix"]    = self["nxpix"].integer()
+        bkgcube["nypix"]    = self["nypix"].integer()
+        bkgcube["enumbins"] = self["enumbins"].integer()
+        bkgcube["emin"]     = self["emin"].real()
+        bkgcube["emax"]     = self["emax"].real()   
+        bkgcube["coordsys"] = self["coordsys"].string()
+        bkgcube["proj"]     = self["proj"].string()                
+        bkgcube.run()
+
+        # Retrieve a new oberservation container
+        new_obs = bin.obs().copy()
+        
+        # Get new models
+        models = bkgcube.models()
+        
+        # Set stacked response
+        if self["edisp"].boolean():
+            new_obs[0].response(expcube.expcube(),
+                                psfcube.psfcube(),
+                                edispcube.edispcube(),
+                                bkgcube.bkgcube())                    
+        else:
+            new_obs[0].response(expcube.expcube(),
+                                psfcube.psfcube(),
+                                bkgcube.bkgcube())
+
+        # Fix background models if required
+        if self["fix_bkg"].boolean():
+            for model in models:
+                if model.classname() != "GModelSky":
+                    for par in model:
+                        par.fix()
+
+        # Set models for new oberservation container     
+        new_obs.models(models)
+
+        # Return new oberservation container
+        return new_obs
 
 
     # Public methods
@@ -261,93 +541,44 @@ class cslightcrv(ctools.cscript):
             self._log(str(self._obs))
             self._log("\n")
 
-        # Write header
-        if self._logTerse():
-            self._log("\n")
-            self._log.header1("Adjust model parameters")
-
-        # Adjust model parameters dependent on input user parameters
-        for model in self._obs.models():
-
-            # Set TS flag for all models to false.
-            # Source of interest will be set to true later
-            model.tscalc(False)
-
-            # Log model name
-            if self._logExplicit():
-                self._log.header3(model.name())
-
-            # Deal with the source of interest    
-            if model.name() == self._srcname:
-                if self._calc_ts:
-                    model.tscalc(True)
-
-            elif self._fix_bkg and not model.classname() == "GModelSky":
-                for par in model:
-                    if par.is_free() and self._logExplicit():
-                        self._log(" Fixing \""+par.name()+"\"\n")
-                    par.fix()
-
-            elif self._fix_srcs and model.classname() == "GModelSky":
-                for par in model:
-                    if par.is_free() and self._logExplicit():
-                        self._log(" Fixing \""+par.name()+"\"\n")
-                    par.fix()
+        # Adjust model parameters dependent on user parameters
+        self._adjust_model_pars()
 
         # Write header
         if self._logTerse():
             self._log("\n")
             self._log.header1("Generate lightcurve")      
 
-        # Initialise FITS Table with extension "LIGHTCURVE"
-        table = gammalib.GFitsBinTable(self._tbins.size())
-        table.extname("LIGHTCURVE")
+        # Initialise list of result dictionaries
+        results = []
 
-        # Add Header for compatibility with gammalib.GMWLSpectrum
-        table.card("INSTRUME", "CTA", "Name of Instrument")
-        table.card("TELESCOP", "CTA", "Name of Telescope")
+        # Get source parameters
+        pars = self._get_free_par_names()
 
-        # Create FITS table columns        
-        MJD = gammalib.GFitsTableDoubleCol("MJD", self._tbins.size())
-        MJD.unit("days")
-        e_MJD = gammalib.GFitsTableDoubleCol("e_MJD", self._tbins.size())
-        e_MJD.unit("days")
-
-        # Create a FITS column for every free parameter
-        columns = []
-        for par in self._obs.models()[self._srcname]:
-            if par.is_free():
-                col = gammalib.GFitsTableDoubleCol(par.name(), self._tbins.size())
-                col.unit(par.unit())
-                columns.append(col)
-                e_col = gammalib.GFitsTableDoubleCol("e_"+par.name(), self._tbins.size())
-                e_col.unit(par.unit())
-                columns.append(e_col)
-
-        # Create TS and upper limit columns
-        TSvalues    = gammalib.GFitsTableDoubleCol("TS", self._tbins.size())
-        ulim_values = gammalib.GFitsTableDoubleCol("UpperLimit", self._tbins.size())
-        ulim_values.unit("ph/cm2/s")
-
-        # Loop over energy bins
+        # Loop over time bins
         for i in range(self._tbins.size()):
-
-            # Log information
-            if self._logTerse():
-                self._log("\n")
-                self._log.header2("Time bin "+str(i))
 
             # Get time boundaries
             tmin = self._tbins.tstart(i)
             tmax = self._tbins.tstop(i)
 
+            # Write time bin into header
+            if self._logTerse():
+                self._log.header2("MJD "+
+                                  str(tmin.mjd())+"-"+
+                                  str(tmax.mjd()))
+
             # Compute time bin center and time width
             twidth = 0.5 * (tmax - tmin) # in seconds
             tmean  = tmin + twidth
 
-            # Store time as MJD
-            MJD[i]   = tmean.mjd()
-            e_MJD[i] = twidth / gammalib.sec_in_day # in days
+            # Initialise result dictionary
+            result = {'mjd': tmean.mjd(),
+                      'e_mjd': twidth / gammalib.sec_in_day,
+                      'ts': 0.0,
+                      'ulimit': 0.0,
+                      'pars': pars,
+                      'values': {}}
 
             # Log information
             if self._logExplicit():
@@ -355,8 +586,8 @@ class cslightcrv(ctools.cscript):
 
             # Select events
             select = ctools.ctselect(self._obs)
-            select["emin"] = self._emin    
-            select["emax"] = self._emax 
+            select["emin"] = self["emin"].real()    
+            select["emax"] = self["emax"].real() 
             select["tmin"] = tmin.convert(select._time_reference())
             select["tmax"] = tmax.convert(select._time_reference())
             select["rad"]  = "UNDEFINED"
@@ -367,233 +598,86 @@ class cslightcrv(ctools.cscript):
             # Retrieve observation
             obs = select.obs()
 
-            # Binned analysis
-            if self._binned:
-
-                # Header
-                if self._logTerse():
-                    self._log.header3("Binning events")
-
-                # Bin events
-                bin = ctools.ctbin(select.obs())
-                bin["usepnt"]   = False
-                bin["ebinalg"]  = "LOG"
-                bin["xref"]     = self._xref
-                bin["yref"]     = self._yref
-                bin["binsz"]    = self._binsz
-                bin["nxpix"]    = self._nxpix
-                bin["nypix"]    = self._nypix
-                bin["enumbins"] = self._ebins
-                bin["emin"]     = self._emin
-                bin["emax"]     = self._emax        
-                bin["coordsys"] = self._coordsys
-                bin["proj"]     = self._proj            
-                bin.run()
-
-                # Header
-                if self._logTerse():
-                    self._log.header3("Creating exposure cube")
-
-                # Create exposure cube
-                expcube = ctools.ctexpcube(select.obs())
-                expcube["incube"]   = "NONE"
-                expcube["usepnt"]   = False
-                expcube["ebinalg"]  = "LOG"
-                expcube["xref"]     = self._xref
-                expcube["yref"]     = self._yref
-                expcube["binsz"]    = self._binsz
-                expcube["nxpix"]    = self._nxpix
-                expcube["nypix"]    = self._nypix
-                expcube["enumbins"] = self._ebins
-                expcube["emin"]     = self._emin
-                expcube["emax"]     = self._emax   
-                expcube["coordsys"] = self._coordsys
-                expcube["proj"]     = self._proj               
-                expcube.run()
-
-                # Header
-                if self._logTerse():
-                    self._log.header3("Creating point spread function cube")
-
-                # Create psf cube
-                psfcube = ctools.ctpsfcube(select.obs())
-                psfcube["incube"]   = "NONE"
-                psfcube["usepnt"]   = False
-                psfcube["ebinalg"]  = "LOG"
-                psfcube["xref"]     = self._xref
-                psfcube["yref"]     = self._yref
-                psfcube["binsz"]    = self._binsz
-                psfcube["nxpix"]    = self._nxpix
-                psfcube["nypix"]    = self._nypix
-                psfcube["enumbins"] = self._ebins
-                psfcube["emin"]     = self._emin
-                psfcube["emax"]     = self._emax    
-                psfcube["coordsys"] = self._coordsys
-                psfcube["proj"]     = self._proj               
-                psfcube.run()
-
-                # Check if we need to include energy dispersion
-                if self._edisp:
-
-                    # Header
-                    if self._logTerse():
-                        self._log.header3("Creating energy dispersion cube")
-                    
-                    # Create edisp cube
-                    edispcube = ctools.ctedispcube(select.obs())
-                    edispcube["incube"]   = "NONE"
-                    edispcube["usepnt"]   = False
-                    edispcube["ebinalg"]  = "LOG"
-                    edispcube["xref"]     = self._xref
-                    edispcube["yref"]     = self._yref
-                    edispcube["binsz"]    = self._binsz
-                    edispcube["nxpix"]    = self._nxpix
-                    edispcube["nypix"]    = self._nypix
-                    edispcube["enumbins"] = self._ebins
-                    edispcube["emin"]     = self._emin
-                    edispcube["emax"]     = self._emax    
-                    edispcube["coordsys"] = self._coordsys
-                    edispcube["proj"]     = self._proj               
-                    edispcube.run()
-
-                # Header
-                if self._logTerse():
-                    self._log.header3("Creating background cube")
-
-                # Create background cube
-                bkgcube = ctools.ctbkgcube(select.obs())
-                bkgcube["incube"]   = "NONE"
-                bkgcube["usepnt"]   = False
-                bkgcube["ebinalg"]  = "LOG"
-                bkgcube["xref"]     = self._xref
-                bkgcube["yref"]     = self._yref
-                bkgcube["binsz"]    = self._binsz
-                bkgcube["nxpix"]    = self._nxpix
-                bkgcube["nypix"]    = self._nypix
-                bkgcube["enumbins"] = self._ebins
-                bkgcube["emin"]     = self._emin
-                bkgcube["emax"]     = self._emax   
-                bkgcube["coordsys"] = self._coordsys
-                bkgcube["proj"]     = self._proj                
-                bkgcube.run()
-
-                # Set new binned observation
-                obs = bin.obs()
-                
-                # Get new models
-                models = bkgcube.models()
-                
-                # Set precomputed binned response
-                if self._edisp:
-                    obs[0].response(expcube.expcube(), psfcube.psfcube(),
-                                    edispcube.edispcube(), bkgcube.bkgcube())                    
-                else:
-                    obs[0].response(expcube.expcube(), psfcube.psfcube(),
-                                    bkgcube.bkgcube())
-
-                # Fix background models if required
-                if self._fix_bkg:
-                    for model in models:
-                        if not model.classname() == "GModelSky":
-                            for par in model:
-                                par.fix()
-
-                # Set new models to binned observation           
-                obs.models(models)
+            # If a stacked analysis is requested then bin the events
+            # and compute the stacked response functions and setup
+            # an observation container with a single stacked observation.
+            if self._stacked:
+                obs = self._bin_observation(obs)
 
             # Header
-            if self._logTerse():
-                self._log.header3("Performing fit")
+            if self._logExplicit():
+                self._log.header3("Fitting the data")
 
-            # Likelihood
+            # Do maximum likelihood model fitting
             like = ctools.ctlike(obs)
-            like["edisp"] = self._edisp
+            like["edisp"] = self["edisp"].boolean()
             like.run()
 
             # Skip bin if no event was present
             if like.obs().logL() == 0.0:
 
-                # Log information
+                # Signal skipping of bin
                 if self._logTerse():
-                    self._log("No event in this time bin. Bin is skipped\n")
+                    self._log(gammalib.parformat("Warning"))
+                    self._log("No event in this time bin, skip bin.\n")
 
-                # Set all values to 0
-                for col in columns:
-                    col[i] = 0.0
-                TSvalues[i]    = 0.0
-                ulim_values[i] = 0.0
+                # Set all results to 0
+                for par in pars:
+                    result['values'][par]      = 0.0
+                    result['values']["e_"+par] = 0.0
+
+                # Append result
+                results.append(result)
+
+                # Continue with next time bin
                 continue
 
-            # Get results
-            fitted_models = like.obs().models()
-            source        = fitted_models[self._srcname]
+            # Retrieve model fitting results for source of interest
+            source = like.obs().models()[self._srcname]
 
-            # Calculate Upper Limit            
-            ulimit_value = -1.0
-            if self._calc_ulimit:
+            # Extract parameter values
+            for par in pars:
+                result['values'][par]      = source.spectral()[par].value()
+                result['values']["e_"+par] = source.spectral()[par].error()
 
-                # Logging information
-                if self._logTerse():
-                    self._log.header3("Computing upper limit")
-
-                # Create upper limit object  
-                ulimit = ctools.ctulimit(like.obs())
-                ulimit["srcname"] = self._srcname
-                ulimit["eref"] = 1.0
-
-                # Try to run upper limit and catch exceptions
-                try:
-                    ulimit.run()
-                    ulimit_value = ulimit.flux_ulimit()
-                except:
-                    if self._logTerse():
-                        self._log("Upper limit calculation failed\n")
-                    ulimit_value = -1.0
-
-            # Get TS value
-            TS = -1.0
-            if self._calc_ts:
-                TS = source.ts() 
-
-            # Set values for storage
-            TSvalues[i] = TS
-
-            # Set FITS column values
-            for col in columns:
-                if "e_" == col.name()[:2]:
-                    col[i] = source.spectral()[col.name()[2:]].error()
-                else:
-                    col[i] = source.spectral()[col.name()].value()
-
-            # Store upper limit value if available
+            # Calculate upper limit (-1 if not computed)
+            ulimit_value = self._compute_ulimit(like.obs())
             if ulimit_value > 0.0:
-                ulim_values[i] = ulimit_value
+                result['ulimit'] = ulimit_value
 
-            # Log information
-            if self._logExplicit(): 
-                self._log.header3("Results of bin "+str(i)+": MJD "+str(tmin.mjd())+"-"+str(tmax.mjd()))
-                for col in columns:
-                    if "e_" == col.name()[:2]:
-                        continue
-                    value = source.spectral()[col.name()].value()
-                    error = source.spectral()[col.name()].error()
-                    unit = source.spectral()[col.name()].unit()
-                    self._log(" > "+col.name()+": "+str(value)+" +- "+str(error)+" "+unit+"\n")
-                if self._calc_ts and TSvalues[i] > 0.0:
-                    self._log(" > TS = "+str(TS)+" \n")
-                if self._calc_ulimit and ulim_values[i] > 0.0:
-                    self._log(" > UL = "+str(ulim_values[i])+" [ph/cm2/s]")
-                self._log("\n")
+            # Extract Test Statistic value
+            if self["calc_ts"].boolean():
+                result['ts'] = source.ts() 
 
-        # Append filles columns to fits table    
-        table.append(MJD)
-        table.append(e_MJD)
-        for col in columns:
-            table.append(col)
-        table.append(TSvalues)
-        table.append(ulim_values)
+            # Append result to list of dictionaries
+            results.append(result)
 
-        # Create the FITS file now
+            # Log results for this time bin
+            if self._logNormal():
+                self._log.header3("Results")
+                pars = self._get_free_par_names()
+                for par in pars:
+                    value = source.spectral()[par].value()
+                    error = source.spectral()[par].error()
+                    unit  = source.spectral()[par].unit()
+                    self._log(gammalib.parformat(par))
+                    self._log(str(value))
+                    self._log(" +/- ")
+                    self._log(str(error))
+                    self._log(" ")
+                    self._log(unit)
+                    self._log("\n")
+                if result['ulimit'] > 0.0:
+                    self._log(gammalib.parformat("Upper flux limit"))
+                    self._log(str(result['ulimit'])+" ph/cm2/s\n")
+                if self["calc_ts"].boolean():
+                    self._log(gammalib.parformat("Test Statistic"))
+                    self._log(str(result['ts'])+"\n")
+
+        # Create FITS table from results
+        table = self._create_fits_table(results)
+
+        # Create FITS file and append FITS table to FITS file
         self._fits = gammalib.GFits()
         self._fits.append(table)
 
@@ -604,6 +688,9 @@ class cslightcrv(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Read ahead output parameters
         self._read_ahead(True)
 
@@ -618,35 +705,37 @@ class cslightcrv(ctools.cscript):
 
     def save(self):
         """
-        Save lightcurve.
+        Save light curve.
         """
         # Write header
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save lightcurve")
+            self._log('\n')
+            self._log.header1('Save light curve')
 
-        # Get outmap parameter
-        self._outfile = self["outfile"].filename()
+        # Get light curve filename
+        outfile = self["outfile"].filename()
         
         # Continue only filename and residual map are valid
-        if self._outfile != "NONE" and self._fits != None:
+        if self._fits != None:
 
             # Log file name
             if self._logTerse():
-                self._log("Save lightcurve into \""+self._outfile+"\".\n")
+                self._log(gammalib.parformat("Light curve file"))
+                self._log(outfile.url())
+                self._log("\n")
 
             # Save spectrum
-            self._fits.saveto(self._outfile, self._clobber)
+            self._fits.saveto(outfile, self._clobber())
 
         # Return
         return
 
     def lightcurve(self):
         """
-        Return lightcurve FITS file.
+        Return light curve FITS file.
 
         Returns:
-            FITS file containing lightcurve.
+            FITS file containing light curve.
         """
         # Return
         return self._fits
@@ -669,9 +758,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = cslightcrv(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

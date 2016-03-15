@@ -35,7 +35,7 @@ class csmodelmerge(ctools.cscript):
     a single model definition XML file.    
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -47,28 +47,11 @@ class csmodelmerge(ctools.cscript):
         # Initialise class members
         self._files      = None
         self._models     = gammalib.GModels()
-        self._outmodel   = "NONE"
-        self._read_ahead = False
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -105,8 +88,8 @@ class csmodelmerge(ctools.cscript):
             raise RuntimeError(msg) 
         
         # Read ahead output filename
-        if self._read_ahead:
-            self.outmodel = self["outmodel"].filename()
+        if self._read_ahead():
+            self["outmodel"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -178,16 +161,16 @@ class csmodelmerge(ctools.cscript):
             self._log.header1("Save models")
 
         # Get output filename in case it was not read ahead
-        self._outmodel = self["outmodel"].filename()
+        outmodel = self["outmodel"].filename()
         
         # Log filename
         if self._logTerse():
             self._log(gammalib.parformat("Model definition XML file"))
-            self._log(self._outmodel.url())
+            self._log(outmodel.url())
             self._log("\n")
 
         # Save models
-        self._models.save(self._outmodel)
+        self._models.save(outmodel)
         
         # Return
         return
@@ -196,8 +179,11 @@ class csmodelmerge(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -217,8 +203,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = csmodelmerge(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()

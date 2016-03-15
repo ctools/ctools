@@ -1108,6 +1108,39 @@ size_t ctool::get_current_rss(void)
 
 
 /***********************************************************************//**
+ * @brief Return observation header string
+ *
+ * @param[in] obs Pointer to observation.
+ * @return String containing observation information.
+ *
+ * Returns a string that contains observation information, including the
+ * instrument name, the observation name, and the observation ID. The format
+ * of the string is
+ *
+ *      XXX observation "name" (id=YYYYY)
+ *
+ ***************************************************************************/
+std::string ctool::get_obs_header(const GObservation* obs)
+{
+    // Initialise header string
+    std::string header = obs->instrument() + " observation";
+
+    // If observation name is not empty then add name
+    if (!obs->name().empty()) {
+        header += " \"" + obs->name() + "\"";
+    }
+
+    // If observation ID is not empty then add ID
+    if (!obs->id().empty()) {
+        header += " (id=" + obs->id() +")";
+    }
+
+    // Return header
+    return header;
+}
+
+
+/***********************************************************************//**
  * @brief Dumps help text in the console
  ***************************************************************************/
 void ctool::provide_help(void) const

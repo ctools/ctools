@@ -41,7 +41,7 @@ class cssens(ctools.cscript):
     the likelihood difference between fitting with and  without the test source.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -54,7 +54,7 @@ class cssens(ctools.cscript):
         self._obs         = gammalib.GObservations()
         self._ebounds     = gammalib.GEbounds()
         self._srcname     = ""
-        self._outfile     = ""
+        self._outfile     = gammalib.GFilename()
         self._ra          = None
         self._dec         = None
         self._edisp       = False
@@ -71,25 +71,10 @@ class cssens(ctools.cscript):
         self._log_clients = False
         self._debug       = False
         
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -734,6 +719,9 @@ class cssens(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Run the script
         self.run()
 
@@ -749,9 +737,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = cssens(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Run application
     app.execute()

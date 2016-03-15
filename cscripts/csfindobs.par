@@ -4,23 +4,32 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      csobs2caldb.par                                               #
+#  File:      csfindobs.par                                                 #
 #  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Michael Mayer                                                 #
 #             michael.mayer@physik.hu-berlin.de                             #
 #             HU Berlin                                                     #
 #                                                                           #
-#  Purpose:   Parameter file for the csobs2caldb script                     #
+#  Purpose:   Parameter file for the csfindobs script                       #
 #                                                                           #
 #############################################################################
 #
-# General parameters
-#===================
-inobs,   f, a, obs.xml,,, "Observation definition XML file"
-rspname, s, a, NONE,,, "Response output name (e.g. Zenith50)"
-outirfs, f, h, irf_file.fits,,, "Output IRF file name"
-index,   i, h, 0,,, "Index of observation to be used from XML file"
+# Input and output parameters
+#============================
+datapath, s, a, $VHEFITS,,, "Path were data are located"
+prodname, s, a, prod-name,,, "Name of FITS production (Run csiactdata to view your options)"
+outfile,  f, a, runlist.lis,,, "Output runlist file"
+
+#
+# Script parameters
+#==================
+ra,          r, a, 83.63,,, "Right ascension of selection region centre (deg)"
+dec,         r, a, 22.01,,, "Declination of selection region centre (deg)"
+rad,         r, a, 2.5,,, "Search radius of selection region (deg)"
+min_qual,    i, h, 0,0|1|2,, "Minimum data quality (0=perfect, 1=ok, 2=bad)"
+expression,  s, h, NONE,,, "Additional expression"
+master_indx, s, h, master.json,,, "Name of master index file"
 
 #
 # Standard parameters
@@ -29,4 +38,7 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, ql,,, "Mode of automatic parameters"
-logfile, f, h, csobs2caldb.log,,, "Log filename"
+logfile, f, h, csfindobs.log,,, "Log filename"
+
+
+

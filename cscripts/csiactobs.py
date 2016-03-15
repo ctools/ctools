@@ -37,6 +37,8 @@ class csiactobs(ctools.cscript):
     described here:
     http://gamma-astro-data-formats.readthedocs.org/en/latest/
     """
+
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -53,75 +55,15 @@ class csiactobs(ctools.cscript):
         self._models   = gammalib.GModels()
         self._runlist  = []
 
-        # Make sure that parfile exists
-        file = self._parfile()
-
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
-
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
         # Return
         return
 
-    def __del__(self):
-        """
-        Destructor.
-        """
-        # Return
-        return
 
-    def _parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
-        """
-        # Set parfile name
-        parfile = self._name+".par"
-
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()    
-            pars.append(gammalib.GApplicationPar("datapath","s","a",self._datapath,"","","Path were data is located"))       
-            pars.append(gammalib.GApplicationPar("prodname","s","a","","","","Data storage name (Run csiactdata to view your options)"))
-            pars.append(gammalib.GApplicationPar("infile","f","a","runlist.lis","","","Runlist file"))   
-            pars.append(gammalib.GApplicationPar("inmodel","f","h","NONE","","","Input model XML file (optional)"))
-            pars.append(gammalib.GApplicationPar("outobs","f","a","obs.xml","","","Observation XML outfile"))
-            pars.append(gammalib.GApplicationPar("outmodel","f","a","bgmodels.xml","","","Output model XML file"))
-            pars.append(gammalib.GApplicationPar("bkgpars","i","a","1","","","Number of free parameters per background model"))
-            pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
-            pars.append(gammalib.GApplicationPar("bkg_scale","b","h","yes","","","Specifies whether the background scaling factor from the observation index file should be applied if available. "))
-            pars.append(gammalib.GApplicationPar("ev_hiera","s","h","events","","","Hierarchy of event formats"))
-            pars.append(gammalib.GApplicationPar("aeff_hiera","s","h","aeff_2d","","","Hierarchy of effective area formats"))
-            pars.append(gammalib.GApplicationPar("psf_hiera","s","h","psf_king|psf_3gauss","","","Hierarchy of psf formats"))
-            pars.append(gammalib.GApplicationPar("edisp_hiera","s","h","edisp_2d","","","Hierarchy of energy dispersion formats"))
-            pars.append(gammalib.GApplicationPar("bkg_hiera","s","h","bkg_3d","","","Hierarchy of background formats"))
-            pars.append(gammalib.GApplicationPar("bkg_mod_hiera","s","h","irf|aeff|gauss","","","Hierarchy of background models"))
-            pars.append(gammalib.GApplicationPar("bkg_gauss_norm","r","h","1e-8","","","Input normalisation for Gaussian background"))
-            pars.append(gammalib.GApplicationPar("bkg_gauss_index","r","h","-2.0","","","Input spectral index for Gaussian background"))
-            pars.append(gammalib.GApplicationPar("bkg_gauss_sigma","r","h","2.5","","","Input sigma for Gaussian background"))
-            pars.append(gammalib.GApplicationPar("bkg_aeff_norm","r","h","1e-14","","","Input normalisation for effective area background"))
-            pars.append(gammalib.GApplicationPar("bkg_aeff_index","r","h","-2.0","","","Input spectral index for effective area background"))
-            pars.append(gammalib.GApplicationPar("bkg_range_factor","r","h","100.0","","","Factor to determine range of background normalisation"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csiactobs.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
+    # Private methods
     def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
@@ -366,43 +308,8 @@ class csiactobs(ctools.cscript):
         # Return model
         return model
 
-    def ebounds(self):
-        """
-        Returns runlist energy range
-        """
-        return self._ebounds
-    
-    def obs(self):
-        """
-        Returns GObservations object
-        """   
-        # Initialise observations
-        obs = gammalib.GObservations()
-        
-        # Read observations if XML is filled
-        if self._xml.size():   
-            obs.read(self._xml)
-                
-        # Assign models
-        obs.models(self._models)
-        
-        # Return observations
-        return obs
-        
 
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-
-        # Save residual map
-        self.save(self._outobs, self._clobber)
-
-        # Return
-        return
-
+    # Public methods
     def run(self):
         """
         Run the script.
@@ -665,6 +572,22 @@ class csiactobs(ctools.cscript):
         # Return
         return       
     
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Open logfile
+        self._logFileOpen()
+
+        # Run the script
+        self.run()
+
+        # Save residual map
+        self.save(self._outobs, self._clobber)
+
+        # Return
+        return
+
     def save(self,outfile,clobber):
 
         # Save observation XML file
@@ -676,6 +599,29 @@ class csiactobs(ctools.cscript):
         # Return
         return       
 
+    def ebounds(self):
+        """
+        Returns runlist energy range
+        """
+        return self._ebounds
+    
+    def obs(self):
+        """
+        Returns GObservations object
+        """   
+        # Initialise observations
+        obs = gammalib.GObservations()
+        
+        # Read observations if XML is filled
+        if self._xml.size():   
+            obs.read(self._xml)
+                
+        # Assign models
+        obs.models(self._models)
+        
+        # Return observations
+        return obs
+
 
 # ======================== #
 # Main routine entry point #
@@ -684,9 +630,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csiactobs(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

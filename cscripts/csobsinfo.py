@@ -31,7 +31,7 @@ class csobsinfo(ctools.cscript):
     Shows the content of an observation container.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -43,7 +43,6 @@ class csobsinfo(ctools.cscript):
         # Initialise class members
         self._obj_dir        = None
         self._compute_offset = False
-        self._ds9file        = ""
         self._offsets        = []
         self._zeniths        = []
         self._azimuths       = []
@@ -51,33 +50,14 @@ class csobsinfo(ctools.cscript):
         self._pnt_dec        = []
         self._ebounds        = gammalib.GEbounds()
         self._gti            = gammalib.GGti()
-        self._read_ahead     = False
-        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-            self._obs = argv[0]
-            argv      = argv[1:]
-        else:      
-            self._obs = gammalib.GObservations()
-            self._obs.clear()   
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise observation container from constructor arguments.
+        self._obs = self._set_input_obs(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -103,8 +83,8 @@ class csobsinfo(ctools.cscript):
             self._obj_dir.radec_deg(ra,dec)
 
         # Read ahead DS9 filename
-        if self._read_ahead:
-            self._ds9file = self["ds9file"].filename()
+        if self._read_ahead():
+            self["ds9file"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -387,19 +367,19 @@ class csobsinfo(ctools.cscript):
             self._log.header1("Save pointings in DS9 file")
 
         # Get output filename in case it was not read ahead
-        self._ds9file = self["ds9file"].filename()
+        ds9file = self["ds9file"].filename()
 
         # Check if DS9 file is valid
-        if self._ds9file != "NONE":      
+        if ds9file.url() != "NONE":      
 
             # Log filename
             if self._logTerse():
                 self._log(gammalib.parformat("DS9 filename"))
-                self._log(self._ds9file.url())
+                self._log(ds9file.url())
                 self._log("\n")
             
             # Open file   
-            f = open(self._ds9file.url(),"w")
+            f = open(ds9file.url(),"w")
             
             # Write coordinate system
             f.write("fk5\n")
@@ -455,8 +435,11 @@ class csobsinfo(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -476,8 +459,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = csobsinfo(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()

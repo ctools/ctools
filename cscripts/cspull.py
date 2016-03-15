@@ -38,7 +38,7 @@ class cspull(ctools.cscript):
     script behaves just as a regular ctool.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -48,7 +48,6 @@ class cspull(ctools.cscript):
         self._version = "1.1.0"
 
         # Initialise some members
-        self._obs         = None
         self._model       = None
         self._inmodel     = None
         self._edisp       = False
@@ -62,25 +61,13 @@ class cspull(ctools.cscript):
         self._proj        = "TAN"
         self._log_clients = False
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise observation container from constructor arguments.
+        self._obs = self._set_input_obs(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -310,10 +297,10 @@ class cspull(ctools.cscript):
 
         # Fit model
         if self._profile:
-            models = _obs.models()
+            models = self._obs.models()
             for i in range(models.size()):
                 model_name = models[i].name()
-                like       = obsutils.cterror(_obs, model_name,
+                like       = obsutils.cterror(self._obs, model_name,
                                               log=self._log_clients,
                                               debug=self._debug,
                                               chatter=self._chatter)
@@ -442,6 +429,9 @@ class cspull(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Run the script
         self.run()
 
@@ -466,9 +456,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = cspull(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

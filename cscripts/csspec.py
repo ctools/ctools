@@ -51,7 +51,6 @@ class csspec(ctools.cscript):
         self._binned_mode = False
         self._srcname     = ""
         self._edisp       = False
-        self._outfile     = "NONE"
         self._calc_ulimit = True
         self._calc_ts     = True
         self._fix_bkg     = False
@@ -60,24 +59,12 @@ class csspec(ctools.cscript):
         self._clobber     = True
         self._debug       = False
 
-        # Initialise observation
-        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-            self._obs = argv[0]
-            argv      = argv[1:]
-        else:      
-            self._obs = gammalib.GObservations()
+        # Initialise observation container from constructor arguments.
+        self._obs = self._set_input_obs(argv)
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
-
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
         # Return
         return
@@ -132,8 +119,8 @@ class csspec(ctools.cscript):
         self._debug   = self["debug"].boolean()
 
         # Read ahead output parameters
-        if (self._read_ahead()):
-            self._outfile = self["outfile"].filename()
+        if self._read_ahead():
+            self["outfile"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -494,6 +481,9 @@ class csspec(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Read ahead output parameters
         self._read_ahead(True)
 
@@ -516,17 +506,19 @@ class csspec(ctools.cscript):
             self._log.header1("Save spectrum")
 
         # Get outmap parameter
-        self._outfile = self["outfile"].filename()
+        outfile = self["outfile"].filename()
         
         # Continue only filename and residual map are valid
-        if self._outfile != "NONE" and self._fits != None:
+        if self._fits != None:
 
             # Log file name
             if self._logTerse():
-                self._log("Save spectrum into \""+self._outfile+"\".\n")
+                self._log(gammalib.parformat("Spectrum file"))
+                self._log(outfile.url())
+                self._log("\n")
 
             # Save spectrum
-            self._fits.saveto(self._outfile, self._clobber)
+            self._fits.saveto(outfile, self._clobber)
 
         # Return
         return
@@ -559,9 +551,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csspec(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

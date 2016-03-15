@@ -11,9 +11,10 @@ pythonscripts = __init__.py \
 
 # Parfiles to be distributed in $(prefix)/syspfiles
 parfiles = cspull.par cssens.par cstsdist.par cscaldb.par csresmap.par \
-           csobsdef.par csspec.par csobsinfo.par \
+           csobsdef.par csspec.par cslightcrv.par csobsinfo.par \
            csmodelinfo.par csmodelmerge.par cstsmapmerge.par \
-           csobs2caldb.par 
+           csobs2caldb.par \
+           csfindobs.par csiactcopy.par csiactdata.par csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \

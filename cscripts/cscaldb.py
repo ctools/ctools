@@ -37,7 +37,7 @@ class cscaldb(ctools.cscript):
     into the "cscaldb.log" log file.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -46,25 +46,10 @@ class cscaldb(ctools.cscript):
         self._name    = "cscaldb"
         self._version = "1.1.0"
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -164,16 +149,6 @@ class cscaldb(ctools.cscript):
 
 
     # Public methods
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-
-        # Return
-        return
-
     def run(self):
         """
         Run the script.
@@ -238,6 +213,19 @@ class cscaldb(ctools.cscript):
         # Return
         return
 
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Open logfile
+        self._logFileOpen()
+
+        # Run the script
+        self.run()
+
+        # Return
+        return
+
 
 # ======================== #
 # Main routine entry point #
@@ -246,9 +234,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = cscaldb(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

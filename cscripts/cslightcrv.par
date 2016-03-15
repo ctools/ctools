@@ -4,14 +4,14 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      csresmap.par                                                  #
+#  File:      cslightcrv.par                                                #
 #  Version:   1.1.0                                                         #
 #                                                                           #
-#  Author:    Michael Mayer                                                 #
-#             michael.mayer@physik.hu-berlin.de                             #
-#             HU Berlin                                                     #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the csresmap script                        #
+#  Purpose:   Parameter file for the cslightcrv script                      #
 #                                                                           #
 #############################################################################
 #
@@ -19,7 +19,7 @@
 #============================
 inobs,     f, h, events.fits,,, "Input event list, counts cube, or observation definition XML file"
 inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
-modcube,   f, a, NONE,,, "Input model cube file (generated with ctmodel)"           
+srcname,   s, a, Crab,,, "Source name"
 expcube,   f, a, NONE,,, "Input exposure cube file (only needed for stacked analysis)"
 psfcube,   f, a, NONE,,, "Input PSF cube file (only needed for stacked analysis)"
 edispcube, f, a, NONE,,, "Input energy dispersion cube file (only needed for stacked analysis)"
@@ -27,16 +27,19 @@ bkgcube,   f, a, NONE,,, "Input background cube file (only needed for stacked an
 caldb,     s, a, prod2,,, "Calibration database"
 irf,       s, a, South_0.5h,,, "Instrument response function"
 edisp,     b, h, no,,, "Apply energy dispersion?"
-outmap,    f, a, resmap.fits,,, "Output residual map file"
+outfile,   f, a, lightcurve.fits,,, "Output light curve file"
 
 #
 # Script parameters
 #==================
-ebinalg,   s, h, LOG,LIN|LOG|FILE,, "Binning algorithm"
-emin,      r, h, 0.1,,, "Lower energy limit (TeV)"
-emax,      r, h, 100.0,,, "Upper energy limit (TeV)"
-enumbins,  i, h, 20,,, "Number of energy bins (0=unbinned)"
-ebinfile,  f, h, NONE,,, "Name of the file containing the energy bin definition"
+tbinalg,   s, a, GTI,FILE|LIN|GTI,, "Algorithm for defining time bins"
+tmin,      r, a, 51544.5,,,"Lightcurve start time (MJD])"
+tmax,      r, a, 51544.6,,,"Lightcurve stop time (MJD)"
+tbins,     i, a, 5,1,10000, "Number of time bins"
+tbinfile,  f, a, NONE,,, "File defining the time binning"
+emin,      r, a, 0.1,,, "Lower energy limit of events (TeV)"
+emax,      r, a, 100.0,,, "Upper energy limit of events (TeV)"
+enumbins,  i, a, 0,0,100, "Number of energy bins for binned (0=unbinned)"
 coordsys,  s, a, CEL,CEL|GAL,, "Coordinate System"
 proj,      s, a, CAR,AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 xref,      r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
@@ -44,14 +47,19 @@ yref,      r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DE
 nxpix,     i, a, 200,,, "Size of the X axis in pixels"
 nypix,     i, a, 200,,, "Size of the Y axis in pixels"
 binsz,     r, a, 0.02,,, "Pixel size (deg/pixel)"
-algorithm, s, a, SUBDIV,SUB|SUBDIV|SUBDIVSQRT,, "Residual map computation algorithm"
+calc_ts,   b, h, yes,,, "Compute TS value for each bin?"
+calc_ulim, b, h, yes,,, "Compute upper limit for each bin?"
+fix_srcs,  b, h, yes,,, "Fix other sky model parameters?"
+fix_bkg,   b, h, no,,, "Fix background model parameters?"
 
 #
 # Standard parameters
 #====================
-publish, b, h, no,,, "Publish residual map on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, ql,,, "Mode of automatic parameters"
-logfile, f, h, csresmap.log,,, "Log filename"
+logfile, f, h, cslightcrv.log,,, "Log filename"
+
+
+

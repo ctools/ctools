@@ -36,7 +36,7 @@ class csresmap(ctools.cscript):
     behaves just as a regular ctool. 
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -49,7 +49,6 @@ class csresmap(ctools.cscript):
         self._algorithm    = "SUB"
         self._resmap       = None
         self._modcube      = "NONE"
-        self._outmap       = "NONE"
         self._use_maps     = False
         self._skip_binning = False
         self._publish      = False
@@ -74,32 +73,13 @@ class csresmap(ctools.cscript):
         self._debug        = False
         self._log_clients  = False
 
-        # Initialise observation
-        if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
-            self._obs = argv[0]
-            argv      = argv[1:]
-        else:      
-            self._obs = gammalib.GObservations()
+        # Initialise observation container from constructor arguments.
+        self._obs = self._set_input_obs(argv)
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -177,7 +157,7 @@ class csresmap(ctools.cscript):
 
         # Read ahead output parameters
         if (self._read_ahead()):
-            self._outmap = self["outmap"].filename()
+            self["outmap"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -318,6 +298,9 @@ class csresmap(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Read ahead output parameters
         self._read_ahead(True)
 
@@ -340,17 +323,19 @@ class csresmap(ctools.cscript):
             self._log.header1("Save residual map")
 
         # Get outmap parameter
-        self._outmap = self["outmap"].filename()
+        outmap = self["outmap"].filename()
         
         # Continue only filename and residual map are valid
-        if self._outmap != "NONE" and self._resmap != None:
+        if self._resmap != None:
 
             # Log file name
             if self._logTerse():
-                self._log("Save residual map into \""+self._outmap+"\".\n")
+                self._log(gammalib.parformat("Residual map file"))
+                self._log(outmap.url())
+                self._log("\n")
 
             # Save residual map
-            self._resmap.save(self._outmap, self._clobber)
+            self._resmap.save(outmap, self._clobber)
 
         # Return
         return
@@ -404,9 +389,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csresmap(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

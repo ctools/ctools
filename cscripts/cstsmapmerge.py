@@ -33,7 +33,7 @@ class cstsmapmerge(ctools.cscript):
     Merge Test Statistic maps.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -52,28 +52,11 @@ class cstsmapmerge(ctools.cscript):
         self._merged_files = []
         self._overwrite    = True
         self._delete       = False
-        self._outmap       = "NONE"
-        self._read_ahead   = False
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -120,8 +103,8 @@ class cstsmapmerge(ctools.cscript):
         self._delete    = self["delete"].boolean()
         
         # Read ahead output filename
-        if self._read_ahead:
-            self._outmap = self["outmap"].filename()
+        if self._read_ahead():
+            self["outmap"].filename()
         
         # Write input parameters into logger
         if self._logTerse():
@@ -391,12 +374,12 @@ class cstsmapmerge(ctools.cscript):
             self._log.header1("Save TS map")
 
         # Get output filename in case it was not read ahead
-        self._outmap = self["outmap"].filename()
+        outmap = self["outmap"].filename()
 
         # Log filename
         if self._logTerse():
             self._log(gammalib.parformat("TS map file"))
-            self._log(self._outmap.url())
+            self._log(outmap.url())
             self._log("\n")
         
         # Create FITS file
@@ -426,7 +409,7 @@ class cstsmapmerge(ctools.cscript):
             fits[fits.size()-1].extname("STATUS MAP")
         
         # Save FITS file
-        fits.saveto(self._outmap, self._clobber())
+        fits.saveto(outmap, self._clobber())
 
         # Delete TS input maps if requested
         if self._delete:
@@ -444,8 +427,11 @@ class cstsmapmerge(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -465,8 +451,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = cstsmapmerge(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()

@@ -34,7 +34,7 @@ def test(installed=False):
     Perform unit testing for Python interface.
     """
     # Allocate test suite container
-    suites = gammalib.GTestSuites("cscripts unit testing")
+    suites = gammalib.GTestSuites("cscripts Python module unit testing")
 
     # Allocate test suites and append them to the container
     suite_cscaldb = test_cscaldb.Test()

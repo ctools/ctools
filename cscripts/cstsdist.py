@@ -39,7 +39,7 @@ class cstsdist(ctools.cscript):
     script behaves just as a regular ctool.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -55,31 +55,16 @@ class cstsdist(ctools.cscript):
         self._enumbins    = 0
         self._npix        = 0
         self._binsz       = 0.0
-        self._outfile     = "ts.dat"
+        self._outfile     = gammalib.GFilename("ts.dat")
         self._ntrials     = 10
         self._edisp       = False
         self._debug       = False
         self._log_clients = False        
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -463,6 +448,9 @@ class cstsdist(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self._logFileOpen()
+
         # Run the script
         self.run()
 
@@ -477,9 +465,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = cstsdist(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

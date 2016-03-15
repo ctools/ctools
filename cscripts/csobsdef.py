@@ -72,7 +72,7 @@ class csobsdef(ctools.cscript):
             IRF in the "dummy" calibration database.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -85,31 +85,14 @@ class csobsdef(ctools.cscript):
         self._obs        = gammalib.GObservations()
         self._inpnt      = ""
         self._tmin       = 0.0
-        self._outobs     = "NONE"
         self._chatter    = 2
         self._clobber    = True
         self._debug      = False
-        self._read_ahead = False
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -123,8 +106,8 @@ class csobsdef(ctools.cscript):
         self._inpnt = self["inpnt"].filename()
 
         # Read ahead parameters
-        if self._read_ahead:
-            self._outobs = self["outobs"].filename()
+        if self._read_ahead():
+            self["outobs"].filename()
 
         # Set some fixed parameters
         self._chatter = self["chatter"].integer()
@@ -347,19 +330,19 @@ class csobsdef(ctools.cscript):
             self._log.header1("Save observation definition XML file")
 
         # Get output filename in case it was not read ahead
-        self._outobs = self["outobs"].filename()
+        outobs = self["outobs"].filename()
 
         # Check if observation definition XML file is valid
-        if self._outobs != "NONE":      
+        if outobs.url() != "NONE":      
 
             # Log filename
             if self._logTerse():
                 self._log(gammalib.parformat("Observation XML file"))
-                self._log(self._outobs.url())
+                self._log(outobs.url())
                 self._log("\n")
 
             # Save observation definition XML file
-            self._obs.save(self._outobs)
+            self._obs.save(outobs)
         
         # Return
         return
@@ -368,8 +351,11 @@ class csobsdef(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -388,9 +374,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csobsdef(sys.argv)
-
-    # Open logfile
-    app._logFileOpen()
 
     # Execute application
     app.execute()

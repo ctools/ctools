@@ -36,7 +36,7 @@ class csmodelinfo(ctools.cscript):
     with DS9.
     """
 
-    # Constructors and destructors
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
@@ -47,7 +47,7 @@ class csmodelinfo(ctools.cscript):
 
         # Initialise class members
         self._models        = gammalib.GModels()
-        self._ds9file       = "NONE"
+        self._ds9file       = gammalib.GFilename("NONE")
         self._pnt_type      = ""
         self._pnt_mark_size = 12
         self._show_labels   = True
@@ -59,27 +59,11 @@ class csmodelinfo(ctools.cscript):
         self._show_ext_type = True
         self._free_color    = "green"
         self._fixed_color   = "magenta"
-        self._read_ahead    = False
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self._name, self._version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self._name, self._version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
-        # Set logger properties
-        self._log_header()
-        self._log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
         # Return
         return
 
@@ -106,7 +90,7 @@ class csmodelinfo(ctools.cscript):
         self._fixed_color   = self["fixed_color"].string()
 
         # Read ahead DS9 filename
-        if self._read_ahead:
+        if self._read_ahead():
             self._ds9file = self["ds9file"].filename()
 
         # Write input parameters into logger
@@ -500,8 +484,11 @@ class csmodelinfo(ctools.cscript):
         """
         Execute the script.
         """
-        # Set read ahead flag
-        self._read_ahead = True
+        # Open logfile
+        self._logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
 
         # Run the script
         self.run()
@@ -521,8 +508,5 @@ if __name__ == '__main__':
     # Create instance of application
     app = csmodelinfo(sys.argv)
     
-    # Open logfile
-    app._logFileOpen()
-
     # Execute application
     app.execute()
