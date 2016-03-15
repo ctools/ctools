@@ -72,6 +72,7 @@ protected:
     const bool&           read_ahead(void) const;
     const GTimeReference& time_reference(void) const;
     GObservations         get_observations(const bool& get_response = true);
+    void                  setup_observations(GObservations& obs);
 
     // Protected methods that create objects from user parameters
     GEbounds        create_ebounds(void);
