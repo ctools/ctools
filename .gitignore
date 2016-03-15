@@ -12,6 +12,8 @@
 *.toc
 *.Pi
 *.Tpi
+*.gcno
+*.gcda
 .DS_Store
 .cproject
 .project
