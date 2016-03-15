@@ -69,21 +69,20 @@ class Test(gammalib.GPythonTestSuite):
         Test ctbin on the command line.
         """
         # Set ctbin tool
-        noout = " &>/dev/null"
         ctbin = "../src/ctbin/ctbin"
-        if os.system("type "+ctbin+noout) != 0:
+        if os.system("type "+ctbin+" &>/dev/null") != 0:
             ctbin = "ctbin"
-        
+
         # Setup ctbin command
         cmd = ctbin+' inobs="'+self._events_name+'"'+ \
                     ' outcube="cntmap_cmd1.fits"'+\
                     ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"'+ \
                     ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
-                    ' xref=83.63 yref=22.01 proj="CAR"'+noout
+                    ' xref=83.63 yref=22.01 proj="CAR"'
 
         # Execute ctbin, make sure we catch any exception
         try:
-            rc = os.system(cmd)
+            rc = os.system(cmd+" >/dev/null")
         except:
             pass
 
@@ -100,11 +99,11 @@ class Test(gammalib.GPythonTestSuite):
                     ' outcube="cntmap_cmd2.fits"'+\
                     ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"'+ \
                     ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
-                    ' xref=83.63 yref=22.01 proj="CAR"'+noout
+                    ' xref=83.63 yref=22.01 proj="CAR"'
 
         # Execute ctbin, make sure we catch any exception
         try:
-            rc = os.system(cmd)
+            rc = os.system(cmd+" >/dev/null")
         except:
             pass
 
