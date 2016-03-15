@@ -69,8 +69,9 @@ class Test(gammalib.GPythonTestSuite):
         Test ctbin on the command line.
         """
         # Set ctbin tool
+        noout = " >/dev/null"
         ctbin = "../src/ctbin/ctbin"
-        if os.system("type "+ctbin) != 0:
+        if os.system("type "+ctbin+noout) != 0:
             ctbin = "ctbin"
         
         # Setup ctbin command
