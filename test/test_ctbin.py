@@ -68,9 +68,10 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctbin on the command line.
         """
-        # Set ctbin tool
-        ctbin = "../src/ctbin/ctbin"
-        if os.system("type "+ctbin+" &>/dev/null") != 0:
+        # Kluge to set the command (installed version has no README file)
+        if os.path.isfile("README"):
+            ctbin = "../src/ctbin/ctbin"
+        else:
             ctbin = "ctbin"
 
         # Setup ctbin command
