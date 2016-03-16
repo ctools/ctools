@@ -38,7 +38,7 @@ testdata    = ../test/data/crab.xml \
               ../test/data/exclusion.reg
 
 # Test IRFs to be distributed in $(pyexecdir)/cscripts/tests/irf
-#testirf     = 
+testirf     = ../test/irf/irf_file.fits.gz
 
 # Distribute scripts and parfiles
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
@@ -52,8 +52,8 @@ testscriptsdir     = $(pyexecdir)/cscripts/tests
 testscripts_DATA   = $(testscripts)
 testdatadir        = $(pyexecdir)/cscripts/tests/data
 testdata_DATA      = $(testdata)
-#testirfdir         = $(pyexecdir)/cscripts/tests/irf
-#testirf_DATA       = $(testirf)
+testirfdir         = $(pyexecdir)/cscripts/tests/irf
+testirf_DATA       = $(testirf)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:

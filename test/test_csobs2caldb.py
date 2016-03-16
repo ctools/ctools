@@ -43,7 +43,7 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
-        self._inobs   = "data/obs_unbinned.xml"
+        self._inobs = "data/obs_unbinned.xml"
 
         # Clean calibration database
         os.system("rm -rf caldb >/dev/null 2>&1")
