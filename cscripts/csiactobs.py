@@ -577,7 +577,7 @@ class csiactobs(ctools.cscript):
         Execute the script.
         """
         # Open logfile
-        self._logFileOpen()
+        self.logFileOpen()
 
         # Run the script
         self.run()

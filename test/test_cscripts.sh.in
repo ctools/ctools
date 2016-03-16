@@ -77,14 +77,15 @@ $ECHO -n "Test csobs2caldb: "
 chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
 @PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csobs2caldb.py \
   inobs="data/obs_unbinned.xml" \
-  rspname="test_irfs" \
+  caldb="cta" \
+  irf="Standard" \
   chatter=4 > csobs2caldb.log
 $ECHO -n "."
-if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
+if [ -s "$CALDB/data/cta/cta/bcf/Standard/irf_file.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " $CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits file is not valid"
+  $ECHO " $CALDB/data/cta/cta/bcf/Standard/irf_file.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
@@ -282,7 +283,7 @@ chmod +x @abs_top_srcdir@/cscripts/cspull.py
   outfile="pull.dat" \
   ntrials="3" \
   caldb="cta" \
-  irf="test_irfs" \
+  irf="Standard" \
   ra=83.6331 \
   dec=22.0145 \
   emin=0.1 \
