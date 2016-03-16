@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for cscripts used from Python.
+# This scripts performs unit tests for cscripts.
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -24,6 +24,7 @@ import gammalib
 import cscripts
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_cscaldb
+import test_csobs2caldb
 import test_cslightcrv
 
 
@@ -32,21 +33,24 @@ import test_cslightcrv
 # ================== #
 def test(installed=False):
     """
-    Perform unit testing for Python interface.
+    Perform cscripts unit testing.
     """
     # Allocate test suite container
-    suites = gammalib.GTestSuites("cscripts Python module unit testing")
+    suites = gammalib.GTestSuites("cscripts unit testing")
 
     # Allocate test suites and append them to the container
-    suite_cscaldb    = test_cscaldb.Test()
-    suite_cslightcrv = test_cslightcrv.Test()
+    suite_cscaldb     = test_cscaldb.Test()
+    suite_csobs2caldb = test_csobs2caldb.Test()
+    suite_cslightcrv  = test_cslightcrv.Test()
 
     # Setup unit tests
     suite_cscaldb.set()
+    suite_csobs2caldb.set()
     suite_cslightcrv.set()
 
     # Append tests to container
     suites.append(suite_cscaldb)
+    suites.append(suite_csobs2caldb)
     suites.append(suite_cslightcrv)
 
     # If we have an installed version then create a temporary directory and

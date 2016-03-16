@@ -15,11 +15,13 @@
 #                                                                           #
 #############################################################################
 #
-# General parameters
-#===================
+# Input and output parameters
+#============================
 inobs,   f, a, obs.xml,,, "Observation definition XML file"
-rspname, s, a, NONE,,, "Response output name (e.g. Zenith50)"
-outirfs, f, h, irf_file.fits,,, "Output IRF file name"
+caldb,   s, a, cta,,, "Calibration database"
+irf,     s, a, Standard,,, "Instrument response function (e.g. Standard)"
+outfile, f, h, irf_file.fits,,, "Output IRF file name"
+rootdir, s, h, ,,, "Optional CALDB root directory"
 index,   i, h, 0,,, "Index of observation to be used from XML file"
 
 #

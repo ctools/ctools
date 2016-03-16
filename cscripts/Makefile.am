@@ -27,10 +27,12 @@ linkscripts = cspull cssens cstsdist cscaldb csresmap \
 testscripts = tests/__init__.py \
               ../test/test_python_cscripts.py \
               ../test/test_cscaldb.py \
+              ../test/test_csobs2caldb.py \
               ../test/test_cslightcrv.py
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data
 testdata    = ../test/data/crab.xml \
+              ../test/data/obs_unbinned.xml \
               ../test/data/crab_events.fits.gz \
               ../test/data/crab_cntmap.fits.gz \
               ../test/data/exclusion.reg

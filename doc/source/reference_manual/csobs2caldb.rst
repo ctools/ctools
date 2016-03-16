@@ -28,11 +28,17 @@ General parameters
 ``inobs [file]``
     Input event list, counts cube or observation definition XML file.
 
-``rspname [string]``
-    Response output name (e.g. Zenith50).
+``caldb [string]``
+    Calibration database.
+
+``irf [string]``
+    Instrument response function (e.g. Standard).
 
 ``(outirfs = irf_file.fits) [file]``
     Output IRF file name.
+
+``(rootdir = ) [string]``
+    Optional CALDB root directory.
 
 ``(index = 0) [integer]``
     Index of observation to be used from XML file.
