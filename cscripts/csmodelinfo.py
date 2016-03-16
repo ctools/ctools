@@ -485,7 +485,7 @@ class csmodelinfo(ctools.cscript):
         Execute the script.
         """
         # Open logfile
-        self._logFileOpen()
+        self.logFileOpen()
 
         # Read ahead output parameters
         self._read_ahead(True)
