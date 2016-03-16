@@ -12,6 +12,8 @@
 *.toc
 *.Pi
 *.Tpi
+*.gcno
+*.gcda
 .DS_Store
 .cproject
 .project
@@ -41,6 +43,7 @@ depcomp
 test-driver
 testconf.sh
 coverage-report-python.xml
+coverage-report-cxx.xml
 
 doc/html
 doc/man

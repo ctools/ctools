@@ -414,8 +414,8 @@ class cstsmapmerge(ctools.cscript):
         # Delete TS input maps if requested
         if self._delete:
             for filename in self._merged_files:
-                 os.remove(filename)
-                 if self._logTerse():
+                os.remove(filename)
+                if self._logTerse():
                     self._log(gammalib.parformat("Deleted input file"))
                     self._log(filename)
                     self._log("\n")

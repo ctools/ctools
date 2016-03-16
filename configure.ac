@@ -87,6 +87,22 @@ AC_CANONICAL_HOST
 
 
 #############################################################################
+# Check for --enable-coverage option
+#############################################################################
+AC_MSG_CHECKING(whether to build ctools for code coverage measure)
+AC_ARG_ENABLE([coverage],
+              AS_HELP_STRING([--enable-coverage],
+                             [turn on code coverage measure [default=no]]),
+              [enable_coverage="$enableval"],
+              [enable_coverage="no"])
+if test "x$enable_coverage" = "xyes"; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+
+#############################################################################
 # Check for valid C++ compiler.  This has to come before the check for      #
 # header files, otherwise we won't detect if the C++ compiler is missing.   #
 #                                                                           #
@@ -140,10 +156,22 @@ else
 fi
 AM_CONDITIONAL(IS_ELCAPITAN, test "x$osx_el_capitan" = "xyes")
 
+# If coverage is selected then save current C++ options
+if test "x$enable_coverage" = "xyes"; then
+  SAVED_CXXFLAGS=$CXXFLAGS
+  SAVED_CFLAGS=$CFLAGS
+fi
+
 # Our language is C++
 AC_LANG(C++)
 AC_PROG_CXX($cxx_list)
 AC_PROG_CC($cc_list)
+
+# If coverage is selected then restore former C++ options
+if test "x$enable_coverage" = "xyes"; then
+  CXXFLAGS=$SAVED_CXXFLAGS
+  CFLAGS=$SAVED_CFLAGS
+fi
 
 
 #############################################################################
@@ -758,25 +786,22 @@ fi
 #############################################################################
 # Initialise Python coverage with empty string
 PYTHON_COVERAGE=
+COVERAGE_CXXFLAGS=
 
-# Check for coverage option
-AC_MSG_CHECKING(whether to build ctools for code coverage measure)
-AC_ARG_ENABLE([coverage],
-              AS_HELP_STRING([--enable-coverage],
-                             [turn on code coverage measure [default=no]]),
-              [enable_coverage="$enableval"],
-              [enable_coverage="no"])
+# If coverage option has been selected then set some variables
 if test "x$enable_coverage" = "xyes"; then
   CXXFLAGS="--coverage $CXXFLAGS"
+  COVERAGE_CXXFLAGS="--coverage"
   LDFLAGS="--coverage $LDFLAGS"
   if test "x$has_python" = "xyes"; then
-    PYTHON_COVERAGE="coverage run --append "
+    PYTHON_COVERAGE="coverage run --branch --append "
   fi
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
 fi
 AC_SUBST(PYTHON_COVERAGE)
+AC_SUBST(COVERAGE_CXXFLAGS)
 
 
 #############################################################################
@@ -937,7 +962,7 @@ OPENMP_LIB_LDFLAGS=
 #fi
 AC_SUBST(OPENMP_LIB_LDFLAGS)
 
-# Signal if ctools cannot be compiled as gammalibe requires OpenMP but ctools
+# Signal if ctools cannot be compiled as gammalib requires OpenMP but ctools
 # cannot be compiled with OpenMP
 if test "x$enable_openmp" = "xno" && test "x$gammalib_with_openmp" = "xyes"; then
   AC_MSG_ERROR([The GammaLib library has been built with openMP support but OpenMP is not available on this system. Please install OpenMP or re-build GammaLib without OpenMP support.])

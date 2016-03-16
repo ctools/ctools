@@ -74,7 +74,7 @@ class csresmap(ctools.cscript):
         self._log_clients  = False
 
         # Initialise observation container from constructor arguments.
-        self._obs = self._set_input_obs(argv)
+        self._obs, argv = self._set_input_obs(argv)
 
         # Initialise application by calling the appropriate class
         # constructor.

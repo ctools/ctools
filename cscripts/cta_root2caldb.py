@@ -3,7 +3,7 @@
 # This script generates IRFs in the CALDB format of HEASARC using ROOT
 # offaxis performance files.
 # -------------------------------------------------------------------------
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 # -------------------------------------------------------------------------
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,12 +24,13 @@
 # - gammalib
 # - pyroot
 # ==========================================================================
-from ROOT import TFile, TH1F, TH2F, TH3F
+#from ROOT import TFile, TH1F, TH2F, TH3F
+from ROOT import TFile, TH2F, TH3F
 import gammalib
 from datetime import datetime
 import math
-import sys
-import glob
+#import sys
+#import glob
 import os
 
 

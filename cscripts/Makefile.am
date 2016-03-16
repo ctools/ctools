@@ -26,13 +26,17 @@ linkscripts = cspull cssens cstsdist cscaldb csresmap \
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
 testscripts = tests/__init__.py \
               ../test/test_python_cscripts.py \
-              ../test/test_cscaldb.py
+              ../test/test_cscaldb.py \
+              ../test/test_cslightcrv.py
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data
-testdata    = 
+testdata    = ../test/data/crab.xml \
+              ../test/data/crab_events.fits.gz \
+              ../test/data/crab_cntmap.fits.gz \
+              ../test/data/exclusion.reg
 
 # Test IRFs to be distributed in $(pyexecdir)/cscripts/tests/irf
-testirf     = 
+#testirf     = 
 
 # Distribute scripts and parfiles
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
@@ -46,8 +50,8 @@ testscriptsdir     = $(pyexecdir)/cscripts/tests
 testscripts_DATA   = $(testscripts)
 testdatadir        = $(pyexecdir)/cscripts/tests/data
 testdata_DATA      = $(testdata)
-testirfdir         = $(pyexecdir)/cscripts/tests/irf
-testirf_DATA       = $(testirf)
+#testirfdir         = $(pyexecdir)/cscripts/tests/irf
+#testirf_DATA       = $(testirf)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:

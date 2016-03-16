@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import cscripts
 
@@ -28,7 +29,11 @@ import cscripts
 class Test(gammalib.GPythonTestSuite):
     """
     Test class for cscaldb script.
+
+    This test class makes unit tests for the cslightcrv script by using it
+    from the command line and from Python.
     """
+
     # Constructor
     def __init__(self):
         """
@@ -49,15 +54,15 @@ class Test(gammalib.GPythonTestSuite):
         self.name("cscaldb")
 
         # Append tests
-        self.append(self._test_functional, "Test cscaldb functionality")
+        self.append(self._test_python, "Test cscaldb from Python")
 
         # Return
         return
 
-    # Test cscaldb functionality
-    def _test_functional(self):
+    # Test cscaldb from Python
+    def _test_python(self):
         """
-        Test cscaldb functionality.
+        Test cscaldb from Python.
         """
         # Set-up cscaldb
         caldb = cscripts.cscaldb()
