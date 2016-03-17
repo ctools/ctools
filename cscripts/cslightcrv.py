@@ -74,6 +74,7 @@ class cslightcrv(ctools.cscript):
         self._srcname = ""
         self._tbins   = gammalib.GGti()
         self._stacked = False
+        self._fits    = gammalib.GFits()
 
         # Initialise observation container from constructor arguments.
         self._obs, argv = self._set_input_obs(argv)
@@ -397,20 +398,20 @@ class cslightcrv(ctools.cscript):
             self._log.header3("Binning events")
 
         # Bin events
-        bin = ctools.ctbin(obs)
-        bin["usepnt"]   = False
-        bin["ebinalg"]  = "LOG"
-        bin["xref"]     = self["xref"].real()
-        bin["yref"]     = self["yref"].real()
-        bin["binsz"]    = self["binsz"].real()
-        bin["nxpix"]    = self["nxpix"].integer()
-        bin["nypix"]    = self["nypix"].integer()
-        bin["enumbins"] = self["enumbins"].integer()
-        bin["emin"]     = self["emin"].real()
-        bin["emax"]     = self["emax"].real()        
-        bin["coordsys"] = self["coordsys"].string()
-        bin["proj"]     = self["proj"].string()            
-        bin.run()
+        cntcube = ctools.ctbin(obs)
+        cntcube["usepnt"]   = False
+        cntcube["ebinalg"]  = "LOG"
+        cntcube["xref"]     = self["xref"].real()
+        cntcube["yref"]     = self["yref"].real()
+        cntcube["binsz"]    = self["binsz"].real()
+        cntcube["nxpix"]    = self["nxpix"].integer()
+        cntcube["nypix"]    = self["nypix"].integer()
+        cntcube["enumbins"] = self["enumbins"].integer()
+        cntcube["emin"]     = self["emin"].real()
+        cntcube["emax"]     = self["emax"].real()        
+        cntcube["coordsys"] = self["coordsys"].string()
+        cntcube["proj"]     = self["proj"].string()            
+        cntcube.run()
 
         # Header
         if self._logExplicit():
@@ -510,7 +511,7 @@ class cslightcrv(ctools.cscript):
         bkgcube.run()
 
         # Retrieve a new oberservation container
-        new_obs = bin.obs().copy()
+        new_obs = cntcube.obs().copy()
         
         # Get new models
         models = bkgcube.models()
@@ -606,8 +607,8 @@ class cslightcrv(ctools.cscript):
             select = ctools.ctselect(self._obs)
             select["emin"] = self["emin"].real()    
             select["emax"] = self["emax"].real() 
-            select["tmin"] = tmin.convert(select._time_reference())
-            select["tmax"] = tmax.convert(select._time_reference())
+            select["tmin"] = tmin.convert(self._time_reference())
+            select["tmax"] = tmax.convert(self._time_reference())
             select["rad"]  = "UNDEFINED"
             select["ra"]   = "UNDEFINED"
             select["dec"]  = "UNDEFINED"
