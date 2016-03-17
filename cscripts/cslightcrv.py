@@ -439,9 +439,9 @@ class cslightcrv(ctools.cscript):
 
         # Compute spatial binning for point spread function and
         # energy dispersion cubes
-        binsz = 0.1 * self["binsz"].real()
-        nxpix = self["nxpix"].integer() / 10
-        nypix = self["nypix"].integer() / 10
+        binsz = 10.0 * self["binsz"].real()
+        nxpix = self["nxpix"].integer() // 10  # Make sure result is int
+        nypix = self["nypix"].integer() // 10  # Make sure result is int
         if nxpix < 2:
             nxpix = 2
         if nypix < 2:
