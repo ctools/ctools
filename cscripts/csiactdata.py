@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Inspection of IACT data storage
+# Inspect an IACT data storage
 #
 # Copyright (C) 2015-2016 Michael Mayer
 #
@@ -30,6 +30,8 @@ import json
 # ================ #
 class csiactdata(ctools.cscript):
     """
+    Inspect an IACT data storage.
+    
     This script inspects the available FITS data storage on the user machine
     and writes information about the available FITS configurations into a log
     file or prints it on the screen. These information can be used as input
@@ -42,10 +44,12 @@ class csiactdata(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name      = "csiactdata"
-        self._version   = "1.1.0"
-        self._datapath  = os.getenv("VHEFITS","")
-        self._prodnames = []
+        self._name        = "csiactdata"
+        self._version     = "1.1.0"
+        self._datapath    = os.getenv("VHEFITS","")
+        self._prodnames   = []
+        self._master_indx = ""
+        self._master_file = ""
 
         # Initialise application by calling the appropriate class
         # constructor.
@@ -74,7 +78,10 @@ class csiactdata(ctools.cscript):
         
         # Check for presence of master index file
         if not os.path.isfile(self._master_file):
-            raise RuntimeError("Master index file \""+self._master_file+"\" not found. Use hidden parameter \"master_indx\" to specifiy a different filename.")
+            raise RuntimeError('Master index file "'+self._master_file+
+                               '" not found. Use hidden parameter '+
+                               '"master_indx" to specifiy a different '+
+                               'filename.')
         
         # Return
         return

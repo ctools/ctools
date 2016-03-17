@@ -39,10 +39,15 @@ class csfindobs(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name     = "csfindobs"
-        self._version  = "1.1.0"
-        self._verbose  = False
-        self._datapath = os.getenv("VHEFITS","")
+        self._name         = "csfindobs"
+        self._version      = "1.1.0"
+        self._datapath     = os.getenv("VHEFITS","")
+        self._prodname     = ""
+        self._select_radec = True
+        self._radius       = 0.0
+        self._ra           = 0.0
+        self._dec          = 0.0
+        self._obs_index    = ""
         
         # Initialise application by calling the appropriate class
         # constructor.
@@ -68,7 +73,7 @@ class csfindobs(ctools.cscript):
         self._prodname = self["prodname"].string()
         
         # Master index file name
-        self._master_indx = self["master_indx"].string()
+        master_indx = self["master_indx"].string()
         
         # Intiialise flag if spatial selection is required
         self._select_radec = True
@@ -93,32 +98,29 @@ class csfindobs(ctools.cscript):
         if self._radius <= 0.0:
             self._select_radec = False
             
-        # Read other parameters
-        self._quality    = self["min_qual"].integer()
-        self._expression = self["expression"].string()
-        
-        # Check for validity of expression
-        if self._expression == "NONE" or self._expression == "INDEF":
-            self._expression = ""
-        
-        # Read outfile
-        self._outfile = self["outfile"].filename()
+        # Query other parameters
+        self["min_qual"].integer()
+        self["expression"].string()
+
+        # Read ahead output parameters
+        if self._read_ahead():
+            self["outfile"].filename()
         
         # Open master index file and look for prodname 
-        master_file = os.path.join(self._datapath, self._master_indx)
+        master_file = os.path.join(self._datapath, master_indx)
         if not os.path.isfile(master_file):
-            raise RuntimeError("FITS data store not available. "+
-                               "No master index file found at \""+
-                               master_file+"\". Make sure the file "+
-                               "is copied from the server and your "+
-                               "datapath is set correctly.")
+            raise RuntimeError('FITS data store not available. '+
+                               'No master index file found at "'+
+                               master_file+'". Make sure the file '+
+                               'is copied from the server and your '+
+                               'datapath is set correctly.')
 
         # Open and load JSON file
         json_data = open(master_file).read()
         data      = json.loads(json_data)    
         if not "datasets" in data:
-            raise RuntimeError("Key \"datasets\" not available in "+
-                               "master index file.")
+            raise RuntimeError('Key "datasets" not available in '+
+                               'master index file.')
 
         # Get configurations
         configs = data["datasets"]
@@ -135,26 +137,22 @@ class csfindobs(ctools.cscript):
 
         # Check HDUs
         if self._obs_index == "":
-            raise RuntimeError("FITS data store \""+self._prodname+
-                               "\" not available. Run csiactdata to get "+
-                               "a list of available storage names")
+            raise RuntimeError('FITS data store "'+self._prodname+
+                               '" not available. Run csiactdata to get '+
+                               'a list of available storage names')
         filename = gammalib.GFilename(self._obs_index+"[OBS_INDEX]")
         if not filename.is_fits():
-            raise RuntimeError("Observation index file \""+
+            raise RuntimeError('Observation index file "'+
                                self._obs_index+
-                               "[OBS_INDEX]\" for FITS data store \""+
+                               '[OBS_INDEX]" for FITS data store "'+
                                self._prodname+
-                               "\" not available. "+
-                               "Check your master index file or run "+
-                               "csiactdata to get a list of available "+
-                               "storage names.")
+                               '" not available. Check your master index '+
+                               'file or run csiactdata to get a list of '+
+                               'available storage names.')
 
-        # Set other members
-        self._debug   = False # Debugging in client tools
-        self._clobber = self["clobber"].boolean()
-  
         # Return
         return
+
 
     # Public methods
     def run(self):
@@ -189,11 +187,13 @@ class csfindobs(ctools.cscript):
             expr += "&&"
         
         # Add quality expression
-        expr += "QUALITY<="+str(self._quality)
+        expr += "QUALITY<="+str(self["min_qual"].integer())
         
-        # Add user expression      
-        if self._expression == "NONE" or len(self._expression) > 0:
-            expr += "&&"+self._expression   
+        # Add user expression
+        expression = self["expression"].string()    
+        if (expression != "NONE" and expression != "INDEF" and
+            len(expression) > 0):
+            expr += "&&" + expression   
             
         # Initialise filename   
         openfile = self._obs_index+"[OBS_INDEX]["+expr+"]"    
@@ -238,27 +238,46 @@ class csfindobs(ctools.cscript):
         # Open logfile
         self.logFileOpen()
     
+        # Read ahead output parameters
+        self._read_ahead(True)
+
         # Run the script
         self.run()
         
         # Save residual map
-        self.save(self._outfile)
+        self.save()
         
         # Return
         return
 
-    def save(self, outfile):
+    def save(self):
         """
-        Save.
+        Save runlist.
         """
+        # Write header
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1('Save runlist')
+
+        # Get filename
+        outfile = self["outfile"].filename()
+
         # Check for clobber
         if outfile.exists() and not self._clobber():
-            self._log("File \""+outfile+"\" already exists. ")
-            self._log("Set clobber=yes to overwrite file.")
-            self._log("\n")
+            if self._logTerse():
+                self._log('File "+outfile+" already exists. ')
+                self._log('Set clobber=yes to overwrite file.')
+                self._log('\n')
         else:
+
+            # Log file name
+            if self._logTerse():
+                self._log(gammalib.parformat("Runlist file"))
+                self._log(outfile.url())
+                self._log("\n")
+
             # Write runs to file
-            f = open(repr(outfile),"w")
+            f = open(outfile.url(),"w")
             for run in self._runs:
                 f.write(str(run)+" \n")
             f.close()
@@ -266,9 +285,12 @@ class csfindobs(ctools.cscript):
         # Return
         return
 
-    def obs_ids(self):
+    def runs(self):
         """ 
-        Return OBS IDs
+        Return run list.
+
+        Returns:
+            A list of runs.
         """
              
         # Return

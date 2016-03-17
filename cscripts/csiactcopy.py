@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Download IACT data from remote machine
+# Copies IACT data from remote machine
 #
 # Copyright (C) 2016 Michael Mayer
 #
@@ -30,8 +30,10 @@ import shutil
 # ================ #
 class csiactcopy(ctools.cscript):
     """
-    This script copies IACT data from one location to another.
-    It can take a list of observation IDs to allow the download specific
+    Copies IACT data from remote machine.
+    
+    This script copies IACT data from one location to another. It can
+    take a list of observation IDs to allow the download specific
     observations. Index files get merged and updated accordingly.
     """
 
@@ -41,9 +43,15 @@ class csiactcopy(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name     = "csiactcopy"
-        self._version  = "1.1.0"
-        self._datapath = os.getenv("VHEFITS","")
+        self._name          = "csiactcopy"
+        self._version       = "1.1.0"
+        self._datapath      = os.getenv("VHEFITS","")
+        self._remote_master = gammalib.GFilename()
+        self._remote_base   = ""
+        self._prodname      = ""
+        self._outpath       = ""
+        self._runlist       = gammalib.GFilename()
+        self._runs          = []
 
         # Initialise application by calling the appropriate class
         # constructor.
@@ -62,10 +70,10 @@ class csiactcopy(ctools.cscript):
         # Get Parameters
         self._remote_master = self["remote_master"].filename()
         if not self._remote_master.exists():
-            raise RuntimeError("*** ERROR: FITS data not available. No "
-                               "master index file found in \""+
-                               self._remote_master+"\". Make sure remote "
-                               "file system is properly mounted.")
+            raise RuntimeError('*** ERROR: FITS data not available. No '
+                               'master index file found in "'+
+                               self._remote_master+'". Make sure remote '
+                               'file system is properly mounted.')
         
         # Get parameters
         self._prodname = self["prodname"].string()
@@ -80,9 +88,9 @@ class csiactcopy(ctools.cscript):
         # Return
         return
 
-    def copy(self, source, clobber):     
+    def _copy(self, source, clobber):     
         """
-        copy file to _outpath
+        Copy file to outpath
         """
         # Get file destination
         destination = os.path.join(self._outpath,
@@ -143,9 +151,8 @@ class csiactcopy(ctools.cscript):
                    
         # Return 
         return filesize
-    
-    
-    def merge(self, localfits, remotefits, hduname, clobber):
+
+    def _merge(self, localfits, remotefits, hduname, clobber):
         """
         merge remote and local fits file
         If local fits file not present, a new one is created
@@ -180,7 +187,7 @@ class csiactcopy(ctools.cscript):
         
         # find local obs_id 
         local_obs = []
-        lobs_col = local_hdu["OBS_ID"]
+        lobs_col  = local_hdu["OBS_ID"]
         for obs_id in lobs_col:
             local_obs.append(obs_id)      
         
@@ -198,12 +205,12 @@ class csiactcopy(ctools.cscript):
         remotefile = remotefits + selection
         
         # open remote fits file
-        remote = gammalib.GFits(str(remotefile))
+        remote     = gammalib.GFits(str(remotefile))
         remote_hdu = remote[hduname]
         
         # Get remote obs_id
         remote_obs = []
-        robs_col = remote_hdu["OBS_ID"]
+        robs_col   = remote_hdu["OBS_ID"]
         for obs_id in robs_col:
             remote_obs.append(obs_id)
             
@@ -346,27 +353,26 @@ class csiactcopy(ctools.cscript):
         
         # Raise exception if file not valid
         else:
-            raise RuntimeError("*** ERROR: Runlist file \""+
-                               self._runlist+"\" not available.")
+            raise RuntimeError('*** ERROR: Runlist file "'+
+                               self._runlist+'" not available.')
         
         # Check for availability of remote master file
         if not self._remote_master.exists():
-            raise RuntimeError("*** ERROR: Remote master file \""+
-                               self._remote_master+"\" does not exist.")
+            raise RuntimeError('*** ERROR: Remote master file "'+
+                               self._remote_master+'" does not exist.')
         
         # Retrieve json data from remote master
         json_data = open(self._remote_master.url()).read()
         data      = json.loads(json_data) 
         if not "datasets" in data:
-            raise RuntimeError("*** ERROR: Key \"datasets\" not available "
-                               "in remote master index file \""+
-                               self._remote_master+"\".")
+            raise RuntimeError('*** ERROR: Key "datasets" not available '
+                               'in remote master index file "'+
+                               self._remote_master+'".')
         
         # Get array of configurations
         configs = data["datasets"]
         
         # Get remote paths
-        #self._remote_base = os.path.dirname(self._remote_master.url())
         self._remote_base = self._remote_master.path()
                 
         # Initialise flag if prod has been found
@@ -399,13 +405,13 @@ class csiactcopy(ctools.cscript):
                 
                 # Log information
                 if self._logTerse():
-                    self._log.header3("Remote config \""+self._prodname+"\"")
-                    self._log.parformat("HDU index")
+                    self._log.header3('Remote config "'+self._prodname+'"')
+                    self._log.parformat('HDU index')
                     self._log(str(remote_hdu))
-                    self._log("\n")
-                    self._log.parformat("Observation index")
+                    self._log('\n')
+                    self._log.parformat('Observation index')
                     self._log(str(remote_obs))
-                    self._log("\n")
+                    self._log('\n')
                     
                 # Open remote HDU index file
                 fits = gammalib.GFits(str(remote_hdu))
@@ -427,9 +433,9 @@ class csiactcopy(ctools.cscript):
                 for run in self._runs:
                     if not run in remote_ids:  
                         if self._logNormal():
-                            self._log("Skip observation "+str(run)+": ")
-                            self._log("ID not available remotely")
-                            self._log("\n")
+                            self._log('Skip observation '+str(run)+': ')
+                            self._log('ID not available remotely')
+                            self._log('\n')
                 
                 # Loop over remote HDU index file
                 for row in range(table.nrows()):
@@ -450,7 +456,8 @@ class csiactcopy(ctools.cscript):
                         if obs_id in self._runs:                                    
                             
                             # Get filename
-                            fname = os.path.join(os.path.dirname(remote_hdu), file_dir, file_name)
+                            fname = os.path.join(os.path.dirname(remote_hdu),
+                                                 file_dir, file_name)
                             
                             # Add file
                             oldlen = len(files)
@@ -464,7 +471,8 @@ class csiactcopy(ctools.cscript):
                     # Otherwise add every file       
                     else:
                         # Get filename
-                        fname = os.path.join(os.path.dirname(remote_hdu), file_dir, file_name)
+                        fname = os.path.join(os.path.dirname(remote_hdu),
+                                             file_dir, file_name)
                         
                         # Add file
                         oldlen = len(files)
@@ -499,13 +507,14 @@ class csiactcopy(ctools.cscript):
             else:
                 if self._logExplicit():
                     self._log("\n")
-                    self._log.header3("Skipping config \""+str(config["name"])+"\"")
+                    self._log.header3('Skipping config "'+
+                                      str(config["name"])+'"')
                     self._log("\n")
                     
         # Raise Exception if prodname was not found                                    
         if not has_prod: 
-            msg = "*** ERROR: FITS production \""+self._prodname+\
-                  "\" not available. Available productions are:\n"
+            msg = '*** ERROR: FITS production "'+self._prodname+\
+                  '" not available. Available productions are:\n'
             for config in configs:
                 msg += " - "+config["name"]+"\n"
             raise RuntimeError(msg)
@@ -545,7 +554,7 @@ class csiactcopy(ctools.cscript):
                 last_fraction += fraction_increment
             
             # Copy file
-            filesize = self.copy(filename, self._clobber())
+            filesize = self._copy(filename, self._clobber())
             
             if filesize > 0.0:
                 total_size += filesize
@@ -564,8 +573,12 @@ class csiactcopy(ctools.cscript):
             self._log.header1("Updating index files")
         
         # Build local index file names
-        local_hdu = os.path.join(self._outpath, os.path.relpath(remote_hdu, self._remote_base))
-        local_obs = os.path.join(self._outpath, os.path.relpath(remote_obs, self._remote_base))
+        local_hdu = os.path.join(self._outpath,
+                                 os.path.relpath(remote_hdu,
+                                                 self._remote_base))
+        local_obs = os.path.join(self._outpath,
+                                 os.path.relpath(remote_obs,
+                                                 self._remote_base))
         
         # If we have a runlist then merge index file
         if len(self._runs):
@@ -576,19 +589,19 @@ class csiactcopy(ctools.cscript):
                 self._log.header3("HDU index")
                 
             # Merge remote index files with local files
-            self.merge(local_hdu, remote_hdu, "HDU_INDEX", self._clobber())
+            self._merge(local_hdu, remote_hdu, "HDU_INDEX", self._clobber())
             
             if self._logTerse():
                 self._log("\n")
                 self._log.header3("OBS index")    
                 
             # Merge remote index files with local files
-            self.merge(local_obs, remote_obs, "OBS_INDEX", self._clobber())
+            self._merge(local_obs, remote_obs, "OBS_INDEX", self._clobber())
             
         else: 
             # If all files were copied, just copy index files too
-            self.copy(remote_hdu, self._clobber())
-            self.copy(remote_obs, self._clobber())
+            self._copy(remote_hdu, self._clobber())
+            self._copy(remote_obs, self._clobber())
   
         if self._logTerse():
             self._log("\n")
@@ -599,7 +612,7 @@ class csiactcopy(ctools.cscript):
         
         # If no local master is found, copy master over first
         if not os.path.isfile(localmaster):
-            self.copy(self._remote_master.url(), self._clobber())
+            self._copy(self._remote_master.url(), self._clobber())
             
         # Load local master
         json_data = open(localmaster).read()
@@ -624,15 +637,15 @@ class csiactcopy(ctools.cscript):
             if not (gammalib.GFilename(str(hdu)).is_fits() and
                     gammalib.GFilename(str(obs)).is_fits()):
                 if self._logTerse():
-                    self._log("Removing \""+str(config["name"])+"\" ")
-                    self._log("(not available)")
-                    self._log("\n")
+                    self._log('Removing "'+str(config["name"])+'" ')
+                    self._log('(not available)')
+                    self._log('\n')
             else:
                 # Append config if valid
                 newconfigs.append(config)
                 if self._logTerse():
-                    self._log("Keeping \""+str(config["name"])+"\"")
-                    self._log("\n")
+                    self._log('Keeping "'+str(config["name"])+'"')
+                    self._log('\n')
             
             # Signals that downloaded config is available          
             if config["name"] == self._prodname:
@@ -646,8 +659,8 @@ class csiactcopy(ctools.cscript):
             newdict["obsindx"] = os.path.relpath(local_obs, self._outpath)
             newconfigs.append(newdict)
             if self._logTerse():
-                self._log("Adding \""+str(newdict["name"])+"\"")
-                self._log("\n")
+                self._log('Adding "'+str(newdict["name"])+'"')
+                self._log('\n')
         
         # Write new json master file
         f = open(localmaster, "w")
