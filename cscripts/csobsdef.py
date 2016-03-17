@@ -177,7 +177,7 @@ class csobsdef(ctools.cscript):
 
         # Clear observation container
         self._obs.clear()
-        self._id = 1
+        identifier = 1
 
         # Extract header from pointing definition file
         header = []
@@ -202,11 +202,11 @@ class csobsdef(ctools.cscript):
 
             # Set identifier
             if "id" in header:
-                id = pntdef[row, header.index("id")]
+                id_ = pntdef[row, header.index("id")]
             else:
-                id        = "%6.6d" % self._id
-                self._id += 1
-            obs.id(id)
+                id_         = "%6.6d" % identifier
+                identifier += 1
+            obs.id(id_)
 
             # Set pointing
             if "ra" in header and "dec" in header:
@@ -293,17 +293,17 @@ class csobsdef(ctools.cscript):
                 roi = gammalib.GCTARoi(gammalib.GCTAInstDir(pntdir), rad)
 
             # Create an empty event list
-            list = gammalib.GCTAEventList()
-            list.gti(gti)
+            list_ = gammalib.GCTAEventList()
+            list_.gti(gti)
 
             # Set optional information
             if has_ebounds:
-                list.ebounds(ebounds)
+                list_.ebounds(ebounds)
             if has_roi:
-                list.roi(roi)
+                list_.roi(roi)
 
             # Attach event list to CTA observation
-            obs.events(list)
+            obs.events(list_)
 
             # Write observation into logger
             if self._logExplicit():

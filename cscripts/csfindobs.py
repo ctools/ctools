@@ -48,6 +48,7 @@ class csfindobs(ctools.cscript):
         self._ra           = 0.0
         self._dec          = 0.0
         self._obs_index    = ""
+        self._runs         = []
         
         # Initialise application by calling the appropriate class
         # constructor.

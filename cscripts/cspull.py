@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-#import gammalib
+import gammalib
 import ctools
 from cscripts import obsutils
 import sys
@@ -48,10 +48,7 @@ class cspull(ctools.cscript):
         self._version = "1.1.0"
 
         # Initialise some members
-        self._model       = None
-        self._inmodel     = None
         self._edisp       = False
-        self._profile     = False
         self._exposure    = None
         self._psfcube     = None
         self._bckcube     = None
@@ -60,6 +57,14 @@ class cspull(ctools.cscript):
         self._coordsys    = "CEL"
         self._proj        = "TAN"
         self._log_clients = False
+        self._offset      = 0.0
+        self._ntrials     = 0
+        self._outfile     = gammalib.GFilename()
+        self._npix        = 0
+        self._binsz       = 0.0
+        self._pattern     = "single"
+        self._enumbins    = 0
+        self._chatter     = 2
 
         # Initialise observation container from constructor arguments.
         self._obs, argv = self._set_input_obs(argv)
@@ -93,15 +98,11 @@ class cspull(ctools.cscript):
         self._enumbins = self["enumbins"].integer()
 
         # Read parameters for binned if requested
-        if not self._enumbins == 0:
+        if self._enumbins != 0:
             self._npix     = self["npix"].integer()
             self._binsz    = self["binsz"].real()
             self._coordsys = self["coordsys"].string()
             self._proj     = self["proj"].string()
-        else:
-            # Set dummy values (required by obsutils)
-            self._npix  = 0
-            self._binsz = 0.0
 
         # Set models if we have none
         if self._obs.models().size() == 0:
@@ -109,12 +110,13 @@ class cspull(ctools.cscript):
 
         # Read other parameters    
         self._outfile = self["outfile"].filename()
-        self._ntrials = self["ntrials"].integer()   
+        self._ntrials = self["ntrials"].integer()
         self._edisp   = self["edisp"].boolean()
-        self._offset  = self["offset"].real()   
-        self._profile = self["profile"].boolean()
+        self._offset  = self["offset"].real()
         self._chatter = self["chatter"].integer()
-        self._debug   = self["debug"].boolean()
+
+        # Query some parameters
+        self["profile"].boolean()
 
         #  Write input parameters into logger
         if self._logTerse():
@@ -270,7 +272,7 @@ class cspull(ctools.cscript):
                            coord=self._coordsys,
                            edisp=self._edisp,
                            log=self._log_clients,
-                           debug=self._debug,
+                           debug=self._logDebug(),
                            chatter=self._chatter)
 
         # Set response for a stacked observation
@@ -296,18 +298,18 @@ class cspull(ctools.cscript):
             self._log("\n")
 
         # Fit model
-        if self._profile:
+        if self["profile"].boolean():
             models = self._obs.models()
             for i in range(models.size()):
                 model_name = models[i].name()
                 like       = obsutils.cterror(self._obs, model_name,
                                               log=self._log_clients,
-                                              debug=self._debug,
+                                              debug=self._logDebug(),
                                               chatter=self._chatter)
         else:
             like = obsutils.fit(obs, edisp=self._edisp,
                                 log=self._log_clients,
-                                debug=self._debug,
+                                debug=self._logDebug(),
                                 chatter=self._chatter)
 
         # Store results

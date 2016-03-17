@@ -56,6 +56,9 @@ class csobs2caldb(ctools.cscript):
         self._outfile     = gammalib.GFilename("irf_file.fits")
         self._base_dir    = ""
         self._cal_dir     = ""
+        self._rsp_dir     = ""
+        self._caldb_inx   = gammalib.GFits()
+        self._irf_fits    = gammalib.GFits()
 
         # Initialise observation container from constructor arguments.
         self._obs, argv = self._set_input_obs(argv)
