@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Generation of an IACT observation definition file.
+# Generates an IACT observation definition XML file.
 #
 # Copyright (C) 2015-2016 Michael Mayer
 #
@@ -30,6 +30,8 @@ import json
 # =============== #
 class csiactobs(ctools.cscript):
     """
+    Generates an IACT observation definition XML file.
+    
     This class implements the creation of a observation xml file for IACT
     data analysis. This class is dedicated for use inside a IACT
     Collaboration, i.e. it can only be used if you have access to IACT data
@@ -48,12 +50,35 @@ class csiactobs(ctools.cscript):
         self._version = "1.1.0"
 
         # Initialise some members
-        self._ebounds  = gammalib.GEbounds()
-        self._datapath = os.getenv("VHEFITS","")
-        self._inmodels = None
-        self._xml      = gammalib.GXml()
-        self._models   = gammalib.GModels()
-        self._runlist  = []
+        self._ebounds          = gammalib.GEbounds()
+        self._datapath         = os.getenv("VHEFITS","")
+        self._inmodels         = gammalib.GModels()
+        self._prodname         = ""
+        self._xml              = gammalib.GXml()
+        self._models           = gammalib.GModels()
+        self._runlist          = []
+        self._runlistfile      = gammalib.GFilename()
+        self._bkgpars          = 0
+        self._outmodel         = gammalib.GFilename()
+        self._outobs           = gammalib.GFilename()
+        self._master_indx      = ""
+        self._use_bkg_scale    = False
+        self._ev_hiera         = [""]
+        self._aeff_hiera       = [""]
+        self._psf_hiera        = [""]
+        self._bkg_hiera        = [""]
+        self._edisp_hiera      = [""]
+        self._bkg_mod_hiera    = [""]
+        self._bkg_gauss_norm   = 1.0
+        self._bkg_gauss_index  = 0.0
+        self._bkg_gauss_sigma  = 1.0
+        self._bkg_aeff_index   = 0.0
+        self._bkg_aeff_norm    = 1.0
+        self._bkg_range_factor = 1.0
+        self._hdu_index        = ""
+        self._obs_index        = ""
+        self._subdir           = ""
+        self._debug            = False
 
         # Initialise application by calling the appropriate class
         # constructor.
@@ -68,7 +93,7 @@ class csiactobs(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-        
+        # Set data path
         if self._datapath == "":
             self._datapath = self["datapath"].string()
         
@@ -175,7 +200,6 @@ class csiactobs(ctools.cscript):
         # Create base data directory from hdu index file location
         self._subdir  = os.path.dirname(self._hdu_index)  
         self._debug   = False # Debugging in client tools
-        self._clobber = self["clobber"].boolean()
 
         # Return
         return
@@ -583,18 +607,18 @@ class csiactobs(ctools.cscript):
         self.run()
 
         # Save residual map
-        self.save(self._outobs, self._clobber)
+        self.save()
 
         # Return
         return
 
-    def save(self,outfile,clobber):
+    def save(self):
 
         # Save observation XML file
-        self._xml.save(outfile)
+        self._xml.save(self._outobs)
 
         # Save model XML file
-        self._models.save(self._outmodel)
+        self._models.save(self._outmodel, self._clobber())
 
         # Return
         return       
