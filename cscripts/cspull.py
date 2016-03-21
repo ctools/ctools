@@ -202,7 +202,7 @@ class cspull(ctools.cscript):
 
         # Optionally get stacked Edisp
         if self._edisp:
-            edispcube = ctools.edispcube(self._obs)
+            edispcube = ctools.ctedispcube(self._obs)
             edispcube["incube"]   = "NONE"
             edispcube["usepnt"]   = True
             edispcube["ebinalg"]  = "LOG"
