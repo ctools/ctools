@@ -121,10 +121,10 @@ class csmodelmerge(ctools.cscript):
         self._models = gammalib.GModels()
         
         # Loop over model files
-        for file in self._files:
+        for file_ in self._files:
 
             # Construct container from XML file
-            models = gammalib.GModels(file)
+            models = gammalib.GModels(file_)
             
             # Log number of models to add
             if self._logTerse():
@@ -136,7 +136,7 @@ class csmodelmerge(ctools.cscript):
                 else:
                     self._log(gammalib.parformat("Add %d models from file" % 
                                                  nmodels))
-                self._log(file)
+                self._log(file_)
                 self._log("\n")
             
             # Extend model container by adding all models in the model file
