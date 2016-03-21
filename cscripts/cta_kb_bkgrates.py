@@ -105,10 +105,8 @@ if __name__ == '__main__':
     for irfname in irfs:
 
         # Build background filename
-        head, tail = os.path.split(irfname)
-        irf      = tail.strip(".dat")
-        filename = "bkg_"+irf+".txt"
-        print(filename)
+        fname = "bkg_"+os.path.basename(irf).strip(".dat")+".txt"
+        print(fname)
 
         # Make background file
-        make_file_function(irfname, filename)
+        make_file_function(irf, fname)
