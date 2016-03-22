@@ -24,9 +24,10 @@ import gammalib
 import cscripts
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_cscaldb
-import test_csfindobs
 import test_csobs2caldb
 import test_cslightcrv
+import test_csfindobs
+import test_csiactcopy
 
 
 # ================== #
@@ -95,13 +96,16 @@ def test(installed=False, debug=False):
     if ver >= '2.6.0':
 
         # Allocate test suites
-        suite_csfindobs   = test_csfindobs.Test()
+        suite_csfindobs  = test_csfindobs.Test()
+        suite_csiactcopy = test_csiactcopy.Test()
 
         # Setup unit tests
         suite_csfindobs.set()
+        suite_csiactcopy.set()
 
         # Append tests to container
         suites.append(suite_csfindobs)
+        suites.append(suite_csiactcopy)
 
     # Run test suite
     success = suites.run()
