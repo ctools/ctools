@@ -309,8 +309,9 @@ class csiactcopy(ctools.cscript):
         """
         Run the script.
         """
-        # Switch screen logging on
-        self._log.cout(True)
+        # Switch screen logging on in debug mode
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
         self._get_parameters()
