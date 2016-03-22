@@ -81,7 +81,8 @@ class Test(gammalib.GPythonTestSuite):
                          ' srcname="Crab" caldb="prod2" irf="South_0.5h"'+ \
                          ' tbinalg="LIN" tmin=51544.50 tmax=51544.53'+ \
                          ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
-                         ' outfile="lightcurve_cmd1.fits"'
+                         ' outfile="lightcurve_cmd1.fits"'+ \
+                         ' logfile="cslightcrv_cmd1.log" chatter=1'
 
         # Execute cslightcrv, make sure we catch any exception
         try:
@@ -102,7 +103,8 @@ class Test(gammalib.GPythonTestSuite):
                          ' srcname="Crab" caldb="prod2" irf="South_0.5h"'+ \
                          ' tbinalg="LIN" tmin=51544.50 tmax=51544.53'+ \
                          ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
-                         ' outfile="lightcurve_cmd1.fits"'
+                         ' outfile="lightcurve_cmd1.fits"'+ \
+                         ' logfile="cslightcrv_cmd2.log"'
 
         # Execute cslightcrv, make sure we catch any exception
         try:
@@ -137,8 +139,11 @@ class Test(gammalib.GPythonTestSuite):
         lcrv["emin"]     = 0.1
         lcrv["emax"]     = 100.0
         lcrv["outfile"]  = "lightcurve_py1.fits"
+        lcrv["logfile"]  = "cslightcrv_py1.log"
+        lcrv["chatter"]  = 2
 
         # Run cslightcrv script and save light curve
+        lcrv.logFileOpen()   # Make sure we get a log file
         lcrv.run()
         lcrv.save()
 
@@ -169,6 +174,8 @@ class Test(gammalib.GPythonTestSuite):
         lcrv["emin"]     = 0.1
         lcrv["emax"]     = 100.0
         lcrv["outfile"]  = "lightcurve_py2.fits"
+        lcrv["logfile"]  = "cslightcrv_py2.log"
+        lcrv["chatter"]  = 3
 
         # Execute cslightcrv script
         lcrv.execute()
@@ -195,6 +202,8 @@ class Test(gammalib.GPythonTestSuite):
         lcrv["emin"]     = 0.1
         lcrv["emax"]     = 100.0
         lcrv["outfile"]  = "lightcurve_py3.fits"
+        lcrv["logfile"]  = "cslightcrv_py3.log"
+        lcrv["chatter"]  = 4
 
         # Execute cslightcrv script
         lcrv.execute()
@@ -224,6 +233,8 @@ class Test(gammalib.GPythonTestSuite):
         lcrv["nypix"]    = 20
         lcrv["binsz"]    = 0.02
         lcrv["outfile"]  = "lightcurve_py4.fits"
+        lcrv["logfile"]  = "cslightcrv_py4.log"
+        lcrv["chatter"]  = 4
 
         # Execute cslightcrv script
         lcrv.execute()

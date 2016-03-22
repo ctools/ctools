@@ -24,6 +24,7 @@ import gammalib
 import cscripts
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_cscaldb
+import test_csfindobs
 import test_csobs2caldb
 import test_cslightcrv
 
@@ -73,7 +74,7 @@ def test(installed=False, debug=False):
     # Allocate test suite container
     suites = gammalib.GTestSuites("cscripts unit testing")
 
-    # Allocate test suites and append them to the container
+    # Allocate test suites
     suite_cscaldb     = test_cscaldb.Test()
     suite_csobs2caldb = test_csobs2caldb.Test()
     suite_cslightcrv  = test_cslightcrv.Test()
@@ -87,6 +88,20 @@ def test(installed=False, debug=False):
     suites.append(suite_cscaldb)
     suites.append(suite_csobs2caldb)
     suites.append(suite_cslightcrv)
+
+    # Append tests for Python 2.6+ (the IACT cscripts depend on the json
+    # module which is only available since Python 2.6+
+    ver = sys.version.split()[0]
+    if ver >= '2.6.0':
+
+        # Allocate test suites
+        suite_csfindobs   = test_csfindobs.Test()
+
+        # Setup unit tests
+        suite_csfindobs.set()
+
+        # Append tests to container
+        suites.append(suite_csfindobs)
 
     # Run test suite
     success = suites.run()

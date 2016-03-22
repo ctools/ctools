@@ -54,7 +54,35 @@ class Test(gammalib.GPythonTestSuite):
         self.name("cscaldb")
 
         # Append tests
+        self.append(self._test_cmd, "Test cscaldb on command line")
         self.append(self._test_python, "Test cscaldb from Python")
+
+        # Return
+        return
+
+    # Test cscaldb on command line
+    def _test_cmd(self):
+        """
+        Test cscaldb on the command line.
+        """
+        # Kluge to set the command (installed version has no README file)
+        if os.path.isfile("README"):
+            cscaldb = "../cscripts/cscaldb.py"
+        else:
+            cscaldb = "csfindobs"
+
+        # Setup cscaldb command
+        cmd = cscaldb+' logfile="cscaldb_cmd1.log" chatter=1'
+
+        # Execute cscaldb, make sure we catch any exception
+        try:
+            rc = os.system(cmd+" >/dev/null 2>&1")
+        except:
+            pass
+
+        # Check if execution was successful
+        self.test_assert(rc == 0,
+                         "Successful cscaldb execution on command line")
 
         # Return
         return
@@ -66,15 +94,12 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up cscaldb
         caldb = cscripts.cscaldb()
+        caldb["logfile"]  = "cscaldb_py1.log"
+        caldb["chatter"]  = 2
 
         # Run script
-        self.test_try("Run cscaldb")
-        try:
-            caldb.run()
-            self.test_try_success()
-        except:
-            msg = "Exception occured in cscaldb."
-            self.test_try_failure(msg)
+        caldb.logFileOpen()   # Make sure we get a log file
+        caldb.run()
 
         # Return
         return

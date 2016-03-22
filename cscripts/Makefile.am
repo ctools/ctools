@@ -27,6 +27,7 @@ linkscripts = cspull cssens cstsdist cscaldb csresmap \
 testscripts = tests/__init__.py \
               ../test/test_python_cscripts.py \
               ../test/test_cscaldb.py \
+              ../test/test_csfindobs.py \
               ../test/test_csobs2caldb.py \
               ../test/test_cslightcrv.py
 
@@ -36,6 +37,11 @@ testdata    = ../test/data/crab.xml \
               ../test/data/crab_events.fits.gz \
               ../test/data/crab_cntmap.fits.gz \
               ../test/data/exclusion.reg
+
+# Test data to be distributed in $(pyexecdir)/cscripts/tests/iactdata
+testiactdata = ../test/iactdata/hdu-index.fits.gz \
+               ../test/iactdata/master.json \
+               ../test/iactdata/obs-index.fits.gz
 
 # Test IRFs to be distributed in $(pyexecdir)/cscripts/tests/irf
 testirf     = ../test/irf/irf_file.fits.gz
@@ -52,6 +58,8 @@ testscriptsdir     = $(pyexecdir)/cscripts/tests
 testscripts_DATA   = $(testscripts)
 testdatadir        = $(pyexecdir)/cscripts/tests/data
 testdata_DATA      = $(testdata)
+testiactdatadir    = $(pyexecdir)/cscripts/tests/iactdata
+testiactdata_DATA  = $(testiactdata)
 testirfdir         = $(pyexecdir)/cscripts/tests/irf
 testirf_DATA       = $(testirf)
 
