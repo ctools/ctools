@@ -151,6 +151,11 @@ class csfindobs(ctools.cscript):
                                'file or run csiactdata to get a list of '+
                                'available storage names.')
 
+        # Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
+
         # Return
         return
 
@@ -166,12 +171,7 @@ class csfindobs(ctools.cscript):
 
         # Get parameters
         self._get_parameters()
-        
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log("\n")
-        
+                
         # Initialise run list
         self._runs = []
         

@@ -60,7 +60,7 @@ class csiactdata(ctools.cscript):
 
 
     # Private methods
-    def get_parameters(self):
+    def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
@@ -82,33 +82,64 @@ class csiactdata(ctools.cscript):
                                '" not found. Use hidden parameter '+
                                '"master_indx" to specifiy a different '+
                                'filename.')
-        
-        # Return
-        return
-
-    # Public methods
-    def run(self):
-        """
-        Run the script.
-        """
-        # Switch screen logging on
-        self._log.cout(True)
-
-        # Get parameters
-        self._get_parameters()
 
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
             self._log("\n")
         
-        self._log("\n")
-        self._log.header1("Data storage entries")
-        self._log("\n")
-        self._log.parformat("Master index file")
-        self._log(self._master_file)
-        self._log("\n")
-        self._log("\n")
+        # Return
+        return
+
+    # Log configuration
+    def _log_configuration(self, config):
+        """
+        Log configuration.
+        """
+        # Log information
+        if self._logTerse():
+            self._log.header3(str(config["name"]))
+            self._log.parformat("Name")
+            self._log(str(config["name"]))
+            self._log("\n")  
+            self._log.parformat("Observation index")
+            self._log(str(config["obsindx"]))
+            self._log("\n") 
+            self._log.parformat("HDU index")
+            self._log(str(config["hduindx"]))
+            self._log("\n") 
+                
+            # Print additional information
+            for key in config:
+                if key in ["name","hduindx","obsindx"]:
+                    continue
+                self._log.parformat(str(key))
+                self._log(str(config[key]))
+                self._log("\n")  
+
+        # Return
+        return
+
+
+    # Public methods
+    def run(self):
+        """
+        Run the script.
+        """
+        # Switch screen logging on in debug mode
+        if self._logDebug():
+            self._log.cout(True)
+
+        # Get parameters
+        self._get_parameters()
+
+        # Write header into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Data storage entries")
+            self._log.parformat("Master index file")
+            self._log(self._master_file)
+            self._log("\n")
         
         # Open and load JSON file
         json_data = open(self._master_file).read()
@@ -117,24 +148,8 @@ class csiactdata(ctools.cscript):
         
         # Initialise array for available names
         self._prodnames = []
-        
-        # Loop over configs and display unavailable storage first        
-        for config in configs:
-            
-            # Create hdu and obs index files
-            hdu = os.path.join(self._datapath, config["hduindx"])
-            obs = os.path.join(self._datapath, config["obsindx"])
-            
-            filename_hdu = gammalib.GFilename(str(hdu)+"[HDU_INDEX]")
-            filename_obs = gammalib.GFilename(str(obs)+"[OBS_INDEX]")
-            
-            # Check if index files are available
-            if not (filename_hdu.is_fits() and filename_obs.is_fits()):
-                self._log.parformat(str(config["name"]))
-                self._log("Not available")
-                self._log("\n")
-        
-        
+
+        # Write header into logger
         self._log("\n")
         self._log.header2("Available data configs")
         
@@ -142,40 +157,26 @@ class csiactdata(ctools.cscript):
         for config in configs:       
             
             # Create hdu and obs index files
-            hdu = os.path.join(self._datapath, config["hduindx"])
-            obs = os.path.join(self._datapath, config["obsindx"])
-            
+            hdu          = os.path.join(self._datapath, config["hduindx"])
+            obs          = os.path.join(self._datapath, config["obsindx"])
             filename_hdu = gammalib.GFilename(str(hdu)+"[HDU_INDEX]")
             filename_obs = gammalib.GFilename(str(obs)+"[OBS_INDEX]")
             
-            # Check if index files are available
+            # If index files are available then log configuration
+            # information ...
             if (filename_hdu.is_fits() and filename_obs.is_fits()):
-                
-                # Log data information  
-                self._log("\n")
-                self._log.header3(str(config["name"]))
-                
-                # Print important informations first
-                self._log.parformat("Name")
-                self._log(str(config["name"]))
-                self._log("\n")  
-                self._log.parformat("Observation index")
-                self._log(str(config["obsindx"]))
-                self._log("\n") 
-                self._log.parformat("HDU index")
-                self._log(str(config["hduindx"]))
-                self._log("\n") 
-                
+
                 # Append to available names
                 self._prodnames.append(str(config["name"]))
                 
-                # Print additional information
-                for key in config:
-                    if key in ["name","hduindx","obsindx"]:
-                        continue
-                    self._log.parformat(str(key))
-                    self._log(str(config[key]))
-                    self._log("\n")  
+                # Log information
+                self._log_configuration(config)
+
+            # ... otherwise log that the configuration is not available
+            else:
+                if self._logTerse():
+                    self._log.header3(str(config["name"]))
+                    self._log(" Not available\n")
 
         # Return
         return       
@@ -193,10 +194,12 @@ class csiactdata(ctools.cscript):
         # Return
         return
 
-
     def names(self):
         """ 
         Return available FITS production names
+        
+        Returns:
+            List of available FITS production names.
         """
         
         # Return 

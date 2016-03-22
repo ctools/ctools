@@ -59,6 +59,11 @@ class cscaldb(ctools.cscript):
         """
         Get parameters from parfile.
         """
+        #  Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
+
         # Return
         return
 
@@ -159,11 +164,6 @@ class cscaldb(ctools.cscript):
 
         # Get parameters
         self._get_parameters()
-
-        #  Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log("\n")
 
         # Get the calibration database
         caldb = gammalib.GCaldb()

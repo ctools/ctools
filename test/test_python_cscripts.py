@@ -28,6 +28,7 @@ import test_csobs2caldb
 import test_cslightcrv
 import test_csfindobs
 import test_csiactcopy
+import test_csiactdata
 
 
 # ================== #
@@ -98,14 +99,17 @@ def test(installed=False, debug=False):
         # Allocate test suites
         suite_csfindobs  = test_csfindobs.Test()
         suite_csiactcopy = test_csiactcopy.Test()
+        suite_csiactdata = test_csiactdata.Test()
 
         # Setup unit tests
         suite_csfindobs.set()
         suite_csiactcopy.set()
+        suite_csiactdata.set()
 
         # Append tests to container
         suites.append(suite_csfindobs)
         suites.append(suite_csiactcopy)
+        suites.append(suite_csiactdata)
 
     # Run test suite
     success = suites.run()
