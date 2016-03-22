@@ -201,6 +201,11 @@ class csiactobs(ctools.cscript):
         self._subdir  = os.path.dirname(self._hdu_index)  
         self._debug   = False # Debugging in client tools
 
+        # Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
+
         # Return
         return
     
@@ -344,11 +349,6 @@ class csiactobs(ctools.cscript):
 
         # Get parameters
         self._get_parameters()
-
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log("\n")
 
         # Clear models
         self._models.clear()
@@ -618,7 +618,7 @@ class csiactobs(ctools.cscript):
         self._xml.save(self._outobs)
 
         # Save model XML file
-        self._models.save(self._outmodel, self._clobber())
+        self._models.save(self._outmodel)
 
         # Return
         return       

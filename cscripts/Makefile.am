@@ -31,7 +31,8 @@ testscripts = tests/__init__.py \
               ../test/test_cslightcrv.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
-              ../test/test_csiactdata.py
+              ../test/test_csiactdata.py \
+              ../test/test_csiactobs.py
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data
 testdata    = ../test/data/crab.xml \

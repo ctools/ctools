@@ -29,6 +29,7 @@ import test_cslightcrv
 import test_csfindobs
 import test_csiactcopy
 import test_csiactdata
+import test_csiactobs
 
 
 # ================== #
@@ -100,16 +101,19 @@ def test(installed=False, debug=False):
         suite_csfindobs  = test_csfindobs.Test()
         suite_csiactcopy = test_csiactcopy.Test()
         suite_csiactdata = test_csiactdata.Test()
+        suite_csiactobs  = test_csiactobs.Test()
 
         # Setup unit tests
         suite_csfindobs.set()
         suite_csiactcopy.set()
         suite_csiactdata.set()
+        suite_csiactobs.set()
 
         # Append tests to container
         suites.append(suite_csfindobs)
         suites.append(suite_csiactcopy)
         suites.append(suite_csiactdata)
+        suites.append(suite_csiactobs)
 
     # Run test suite
     success = suites.run()
