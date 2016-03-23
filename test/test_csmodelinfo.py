@@ -122,7 +122,7 @@ class Test(gammalib.GPythonTestSuite):
         modelinfo["logfile"]  = "csmodelinfo_py1.log"
         modelinfo["chatter"]  = 2
 
-        # Run csmodelinfo script and save light curve
+        # Run csmodelinfo script and save DS9 file
         modelinfo.logFileOpen()   # Make sure we get a log file
         modelinfo.run()
         modelinfo.save()
