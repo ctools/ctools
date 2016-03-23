@@ -26,6 +26,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_cscaldb
 import test_csobs2caldb
 import test_cslightcrv
+import test_csmodelinfo
 import test_csfindobs
 import test_csiactcopy
 import test_csiactdata
@@ -81,16 +82,19 @@ def test(installed=False, debug=False):
     suite_cscaldb     = test_cscaldb.Test()
     suite_csobs2caldb = test_csobs2caldb.Test()
     suite_cslightcrv  = test_cslightcrv.Test()
+    suite_csmodelinfo = test_csmodelinfo.Test()
 
     # Setup unit tests
     suite_cscaldb.set()
     suite_csobs2caldb.set()
     suite_cslightcrv.set()
+    suite_csmodelinfo.set()
 
     # Append tests to container
     suites.append(suite_cscaldb)
     suites.append(suite_csobs2caldb)
     suites.append(suite_cslightcrv)
+    suites.append(suite_csmodelinfo)
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
     # module which is only available since Python 2.6+

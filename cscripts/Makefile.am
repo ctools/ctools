@@ -29,6 +29,7 @@ testscripts = tests/__init__.py \
               ../test/test_cscaldb.py \
               ../test/test_csobs2caldb.py \
               ../test/test_cslightcrv.py \
+              ../test/test_csmodelinfo.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
               ../test/test_csiactdata.py \

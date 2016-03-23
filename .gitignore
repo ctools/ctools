@@ -75,12 +75,11 @@ test/iactdata_*
 test/*.fits
 test/*.dat
 test/*.xml
+test/*.reg
 test/*.trs
 test/test_cscripts.sh
 test/reports/*.xml
 test/butterfly.txt
-test/model.reg
-test/obs.reg
 test/.coverage
 test/test_python_ctools.sh
 test/test_python_cscripts.sh
