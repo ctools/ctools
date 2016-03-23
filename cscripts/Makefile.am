@@ -27,10 +27,11 @@ linkscripts = cspull cssens cstsdist cscaldb csresmap \
 testscripts = tests/__init__.py \
               ../test/test_python_cscripts.py \
               ../test/test_cscaldb.py \
-              ../test/test_csobs2caldb.py \
               ../test/test_cslightcrv.py \
               ../test/test_csmodelinfo.py \
               ../test/test_csmodelmerge.py \
+              ../test/test_csobs2caldb.py \
+              ../test/test_csobsdef.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
               ../test/test_csiactdata.py \
@@ -42,6 +43,7 @@ testdata    = ../test/data/crab.xml \
               ../test/data/crab_events.fits.gz \
               ../test/data/crab_cntmap.fits.gz \
               ../test/data/exclusion.reg \
+              ../test/data/pntdef.dat \
               ../test/data/models.txt \
               ../test/data/model_cube_background.xml \
               ../test/data/model_cube_background2.xml
