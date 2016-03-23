@@ -32,6 +32,7 @@ testscripts = tests/__init__.py \
               ../test/test_csmodelmerge.py \
               ../test/test_csobs2caldb.py \
               ../test/test_csobsdef.py \
+              ../test/test_csobsinfo.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
               ../test/test_csiactdata.py \

@@ -90,7 +90,7 @@ class Test(gammalib.GPythonTestSuite):
                          "Successful csmodelinfo execution on command line")
 
         # Check region file
-        self._check_region_file("model_cmd1.reg")
+        self._check_ds9_file("model_cmd1.reg")
 
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="model_that_does_not_exist.xml"'+ \
@@ -118,7 +118,7 @@ class Test(gammalib.GPythonTestSuite):
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
         modelinfo["inmodel"]  = self._model_name
-        modelinfo["ds9file"]  = "model_py2.reg"
+        modelinfo["ds9file"]  = "csmodelinfo_py1.reg"
         modelinfo["logfile"]  = "csmodelinfo_py1.log"
         modelinfo["chatter"]  = 2
 
@@ -128,13 +128,26 @@ class Test(gammalib.GPythonTestSuite):
         modelinfo.save()
 
         # Check region file
-        self._check_region_file("model_py2.reg")
+        self._check_ds9_file("csmodelinfo_py1.reg")
+
+        # Set-up csmodelinfo
+        modelinfo = cscripts.csmodelinfo()
+        modelinfo["inmodel"]  = self._model_name
+        modelinfo["ds9file"]  = "csmodelinfo_py2.reg"
+        modelinfo["logfile"]  = "csmodelinfo_py2.log"
+        modelinfo["chatter"]  = 3
+
+        # Execute csmodelinfo script
+        modelinfo.execute()
+
+        # Check region file
+        self._check_ds9_file("csmodelinfo_py2.reg")
 
         # Return
         return
 
     # Check region file
-    def _check_region_file(self, filename):
+    def _check_ds9_file(self, filename):
         """
         Check region file.
         """
