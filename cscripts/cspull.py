@@ -82,10 +82,8 @@ class cspull(ctools.cscript):
         """
         Get parameters from parfile.
         """
-        # Get parameters
-
-        # Set observation if not done before
-        if self._obs == None or self._obs.size() == 0:
+        # If there are no observations in container then get some ...
+        if self._obs.size() == 0:
             self._obs = self._get_observations()
 
             # Check for requested pattern and use above
@@ -93,6 +91,11 @@ class cspull(ctools.cscript):
             self._pattern = self["pattern"].string()
             if self._pattern == "four":
                 self._obs = self._set_obs()
+
+        # ... otherwise add response information and energy boundaries
+        # in case they are missing.
+        else:
+            self._setup_observations(self._obs)
 
         # Get number of energy bins
         self._enumbins = self["enumbins"].integer()

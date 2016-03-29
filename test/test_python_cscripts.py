@@ -30,6 +30,7 @@ import test_csmodelmerge
 import test_csobs2caldb
 import test_csobsdef
 import test_csobsinfo
+import test_cspull
 import test_csfindobs
 import test_csiactcopy
 import test_csiactdata
@@ -89,6 +90,7 @@ def test(installed=False, debug=False):
     suite_csobs2caldb  = test_csobs2caldb.Test()
     suite_csobsdef     = test_csobsdef.Test()
     suite_csobsinfo    = test_csobsinfo.Test()
+    suite_cspull       = test_cspull.Test()
 
     # Setup unit tests
     suite_cscaldb.set()
@@ -98,6 +100,7 @@ def test(installed=False, debug=False):
     suite_csobs2caldb.set()
     suite_csobsdef.set()
     suite_csobsinfo.set()
+    suite_cspull.set()
 
     # Append tests to container
     suites.append(suite_cscaldb)
@@ -107,6 +110,7 @@ def test(installed=False, debug=False):
     suites.append(suite_csobs2caldb)
     suites.append(suite_csobsdef)
     suites.append(suite_csobsinfo)
+    suites.append(suite_cspull)
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
     # module which is only available since Python 2.6+
