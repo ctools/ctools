@@ -69,7 +69,7 @@ class Test(gammalib.GPythonTestSuite):
         if os.path.isfile("README"):
             cscaldb = "../cscripts/cscaldb.py"
         else:
-            cscaldb = "csfindobs"
+            cscaldb = "cscaldb"
 
         # Setup cscaldb command
         cmd = cscaldb+' logfile="cscaldb_cmd1.log" chatter=1'

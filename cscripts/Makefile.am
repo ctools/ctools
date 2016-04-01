@@ -42,13 +42,18 @@ testscripts = tests/__init__.py \
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data
 testdata    = ../test/data/crab.xml \
               ../test/data/obs_unbinned.xml \
+              ../test/data/obs_stacked.xml \
               ../test/data/crab_events.fits.gz \
               ../test/data/crab_cntmap.fits.gz \
+              ../test/data/crab_expcube.fits.gz \
+              ../test/data/crab_psfcube.fits.gz \
+              ../test/data/crab_bkgcube.fits.gz \
               ../test/data/exclusion.reg \
               ../test/data/pntdef.dat \
               ../test/data/models.txt \
               ../test/data/model_cube_background.xml \
-              ../test/data/model_cube_background2.xml
+              ../test/data/model_cube_background2.xml \
+              ../test/data/crab_bkgcube.xml
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/iactdata
 testiactdata = ../test/iactdata/hdu-index.fits.gz \

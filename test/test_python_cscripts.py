@@ -59,8 +59,9 @@ def test(installed=False, debug=False):
         dirname = os.path.dirname(testdir)
 
         # Copy over test data and irf
-        os.system("cp -r %s %s" % (dirname+"/data", "data"))
-        os.system("cp -r %s %s" % (dirname+"/irf",  "irf"))
+        os.system("cp -r %s %s" % (dirname+"/data",     "data"))
+        os.system("cp -r %s %s" % (dirname+"/iactdata", "iactdata"))
+        os.system("cp -r %s %s" % (dirname+"/irf",      "irf"))
 
     # ... otherwise set the calibration database
     else:
