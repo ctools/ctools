@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctedispcube tool.
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2016 Maria Haupt
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,23 +66,23 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up ctedispcube
         edispcube = ctools.ctedispcube()
-        edispcube["inobs"]    = self.events_name
-        edispcube["incube"]   = "NONE"
-        edispcube["outcube"]  = "edispcube.fits"
-        edispcube["caldb"]    = self.caldb
-        edispcube["irf"]      = self.irf
-        edispcube["ebinalg"]  = "LOG"
-        edispcube["emin"]     = 0.1
-        edispcube["emax"]     = 100
-        edispcube["enumbins"] = 20
-        edispcube["nxpix"]    = 10
-        edispcube["nypix"]    = 10
-        edispcube["binsz"]    = 0.4
-        edispcube["coordsys"] = "CEL"
-        edispcube["proj"]     = "CAR"
-        edispcube["xref"]     = 83.63
-        edispcube["yref"]     = 22.01
-        edispcube["mmax"]     = 0.3
+        edispcube["inobs"]     = self.events_name
+        edispcube["incube"]    = "NONE"
+        edispcube["outcube"]   = "edispcube.fits"
+        edispcube["caldb"]     = self.caldb
+        edispcube["irf"]       = self.irf
+        edispcube["ebinalg"]   = "LOG"
+        edispcube["emin"]      = 0.1
+        edispcube["emax"]      = 100
+        edispcube["enumbins"]  = 20
+        edispcube["nxpix"]     = 10
+        edispcube["nypix"]     = 10
+        edispcube["binsz"]     = 0.4
+        edispcube["coordsys"]  = "CEL"
+        edispcube["proj"]      = "CAR"
+        edispcube["xref"]      = 83.63
+        edispcube["yref"]      = 22.01
+        edispcube["migramax"]  = 2.0
         edispcube["migrabins"] = 10
 
         # Run tool

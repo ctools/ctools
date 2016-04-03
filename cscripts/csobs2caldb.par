@@ -1,0 +1,34 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csobs2caldb.par                                               #
+#  Version:   1.1.0                                                         #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
+#                                                                           #
+#  Purpose:   Parameter file for the csobs2caldb script                     #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,   f, a, obs.xml,,, "Observation definition XML file"
+caldb,   s, a, cta,,, "Calibration database"
+irf,     s, a, Standard,,, "Instrument response function (e.g. Standard)"
+outfile, f, h, irf_file.fits,,, "Output IRF file name"
+rootdir, s, h, ,,, "Optional CALDB root directory"
+index,   i, h, 0,,, "Index of observation to be used from XML file"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csobs2caldb.log,,, "Log filename"

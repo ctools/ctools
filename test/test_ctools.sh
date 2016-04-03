@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script tests all ctools
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -293,8 +293,8 @@ $ctedispcube inobs="data/crab_events.fits" \
              xref=83.63 \
              yref=22.01 \
              proj="CAR" \
-             mmax=10.0 \
-             migrabins=100
+             migramax=3.0 \
+             migrabins=10
 $ECHO -n "."
 if [ -s "edispcube1.fits" ]
 then
@@ -310,8 +310,8 @@ $ctedispcube inobs="events.fits" \
              outcube="edispcube2.fits" \
              caldb="irf" \
              irf="cta_dummy_irf" \
-             mmax=10.0 \
-             migrabins=5
+             migramax=3.0 \
+             migrabins=3
 $ECHO -n "."
 if [ -s "edispcube2.fits" ]
 then
@@ -388,7 +388,6 @@ fi
 $ECHO " ok"
 
 
-
 #
 # Test ctmodel
 # ============
@@ -401,6 +400,7 @@ $ctmodel inobs="cntmap1.fits" \
          expcube="NONE" \
          psfcube="NONE" \
          bkgcube="NONE" \
+         edispcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
          inmodel="data/crab.xml"
@@ -420,6 +420,7 @@ $ctmodel inobs="cntmap2.fits" \
          outcube="modmap2.fits" \
          expcube="expcube2.fits" \
          psfcube="psfcube2.fits" \
+         edispcube="edispcube2.fits" \
          bkgcube="bkgcube2.fits" \
          caldb="irf" \
          irf="cta_dummy_irf" \
@@ -440,6 +441,7 @@ $ctmodel inobs="NONE" \
          outcube="modmap3.fits" \
          expcube="NONE" \
          psfcube="NONE" \
+         edispcube="NONE" \
          bkgcube="NONE" \
          caldb="irf" \
          irf="cta_dummy_irf" \
@@ -505,6 +507,7 @@ $ctlike inobs="cntmap1.fits" \
         outmodel="results_binned.xml" \
         expcube="NONE" \
         psfcube="NONE" \
+        edispcube="NONE" \
         bkgcube="NONE" \
         caldb="irf" \
         irf="cta_dummy_irf"
@@ -539,6 +542,7 @@ $ctlike inobs="cntmap2.fits" \
         outmodel="results_binned_cube_background.xml" \
         expcube="expcube2.fits" \
         psfcube="psfcube2.fits" \
+        edispcube="NONE" \
         bkgcube="bkgcube2.fits" \
         caldb="irf" \
         irf="cta_dummy_irf"
@@ -549,6 +553,28 @@ then
 else
   $ECHO " results_binned_cube_background.xml file is not found"
   exit 1
+fi
+
+
+#
+# Run 4
+$ctlike inobs="cntmap2.fits" \
+        inmodel="bkgcube2.xml" \
+        outmodel="results_binned_cube_background_edisp.xml" \
+        expcube="expcube2.fits" \
+        psfcube="psfcube2.fits" \
+        edispcube="edispcube2.fits" \
+        bkgcube="bkgcube2.fits" \
+        edisp="yes"
+        caldb="irf" \
+        irf="cta_dummy_irf"
+$ECHO -n "."
+if [ -s "results_binned_cube_background_edisp.xml" ]
+then
+    $ECHO -n "."
+else
+    $ECHO " results_binned_cube_background_edisp.xml file is not found"
+    exit 1
 fi
 $ECHO " ok"
 
@@ -579,8 +605,6 @@ else
   exit 1
 fi
 $ECHO " ok"
-
-
 
 
 #

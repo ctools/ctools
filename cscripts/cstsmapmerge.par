@@ -1,0 +1,38 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      cstsmapmerge.par                                              #
+#  Version:   1.1.0                                                         #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
+#                                                                           #
+#  Purpose:   Parameter file for the cstsmapmerge script                    #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inmaps, s, a, tsmap.fits,,, "Input TS map FITS files"
+outmap, f, a, NONE,,, "Output TS map FITS file"
+
+#
+# Script parameters
+#==================
+overwrite, b, h, yes,,, "Overwrite previously filled bins?"
+delete,    b, h, no,,, "Delete merged files?"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, cstsmapmerge.log,,, "Log filename"
+
+

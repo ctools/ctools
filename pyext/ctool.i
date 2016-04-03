@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -83,13 +83,30 @@ public:
     // Public methods
     virtual void execute(void);
 
+    // Make methods private in Python by prepending an underscore
+    %rename(_read_ahead)           read_ahead() const;
+    %rename(_time_reference)       time_reference() const;
+    %rename(_get_observations)     get_observations(const bool& get_response = true);
+    %rename(_setup_observations)   setup_observations(GObservations& obs);
+    %rename(_create_ebounds)       create_ebounds();
+    %rename(_create_map)           create_map(const GObservations& obs);
+    %rename(_create_cube)          create_cube(const GObservations& obs);
+    %rename(_create_cta_obs)       create_cta_obs();
+    %rename(_require_inobs)        require_inobs(const std::string& method);
+    %rename(_require_inobs_nolist) require_inobs_nolist(const std::string& method);
+    %rename(_require_inobs_nocube) require_inobs_nocube(const std::string& method);
+    %rename(_set_response)         set_response(GObservations& obs);
+    %rename(_set_obs_response)     set_obs_response(GCTAObservation* obs);
+    %rename(_set_obs_bounds)       set_obs_bounds(GObservations& obs);
+    %rename(_get_mean_pointing)    get_mean_pointing(const GObservations& obs);
+    %rename(_get_current_rss)      get_current_rss();
+    %rename(_get_obs_header)       get_obs_header();
+
     // Protected methods
-    void                  init_members(void);
-    void                  copy_members(const ctool& app);
-    void                  free_members(void);
     const bool&           read_ahead(void) const;
     const GTimeReference& time_reference(void) const;
     GObservations         get_observations(const bool& get_response = true);
+    void                  setup_observations(GObservations& obs);
 
     // Protected methods that create objects from user parameters
     GEbounds        create_ebounds(void);
@@ -108,6 +125,7 @@ public:
     void            set_obs_bounds(GObservations& obs);
     GSkyDir         get_mean_pointing(const GObservations& obs);
     size_t          get_current_rss(void);
+    std::string     get_obs_header(const GObservation* obs);
 };
 
 
@@ -117,7 +135,7 @@ public:
  * @brief cscript base class
  *
  * This is the base class from which all cscripts should derive. This
- * enabled using of ctool base class methods for generic parameter
+ * enables using of ctool base class methods for generic parameter
  * handling.
  ***************************************************************************/
 class cscript : public ctool  {
@@ -138,12 +156,44 @@ public:
 
 
 /***********************************************************************//**
- * @brief ctool base class Python extension
+ * @brief ctool base class Python extensions
  ***************************************************************************/
 %extend ctool {
-    void read_ahead(const bool& flag) {
+    void _read_ahead(const bool& flag) {
         self->m_read_ahead = flag;
         return;
     }
 }
 
+/***********************************************************************//**
+ * @brief cscript base class Python extensions
+ ***************************************************************************/
+%pythoncode %{
+
+# Initialise observation container from constructor arguments. In case that
+# an observation container is provided as argument, this container will be
+# used to initialise the class. The function returns a tuple containing the
+# observation container and the eventually reduced argument list.
+def _set_input_obs(self, argv):
+    if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
+        obs  = argv[0]
+        argv = argv[1:]
+    else:      
+        obs = gammalib.GObservations()
+    return (obs, argv)
+cscript._set_input_obs = _set_input_obs 
+
+# Initialise application by calling the appropriate class constructor.
+def _init_cscript(self, argv):
+    if len(argv) == 0:
+        cscript.__init__(self, self._name, self._version)
+    elif len(argv) == 1:
+        cscript.__init__(self, self._name, self._version, *argv)
+    else:
+        raise TypeError("Invalid number of arguments given.")
+    # Set logger properties
+    self._log_header()
+    self._log.date(True)
+cscript._init_cscript = _init_cscript
+
+%}

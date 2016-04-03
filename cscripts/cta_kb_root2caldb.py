@@ -7,7 +7,7 @@
 # area (i.e. the area before applying any theta cut). This is required by
 # GammaLib as the maximum likelihood analysis does not imply any theta cut.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-from ROOT import TFile, TH1F, TH2F
+#from ROOT import TFile, TH1F, TH2F
+from ROOT import TFile, TH1F
 from datetime import datetime
 import gammalib
 import math
@@ -506,11 +507,11 @@ if __name__ == '__main__':
     """
     """
     # Get ROOT filename from command line argument
-    if (len(sys.argv) > 1):
-        filename = sys.argv[1]
-    else:
-        db = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/Kb_all_20deg_root"
-        #db = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/Kb_all_50deg_root"
+    #if (len(sys.argv) > 1):
+    #    filename = sys.argv[1]
+    #else:
+    db = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/Kb_all_20deg_root"
+    #db = "/Users/jurgen/Documents/Travail/Projects/CTA/WP-MC/root/Kb_all_50deg_root"
 
     # Get list of all performance files
     files = glob.glob(db+"/*.root")
@@ -520,26 +521,26 @@ if __name__ == '__main__':
     irf = caldb("kb")
 
     # Loop over all files
-    for file in files:
+    for f in files:
 
         # Get filename
-        head, tail = os.path.split(file)
+        head, tail = os.path.split(f)
 
         # Build name
         name = tail.strip(".root")
         if name.find("kb_") != -1:
             name = name.replace("_20deg", "")
         elif name.find("IFAE_") != -1:
-            name = name.replace("Subarray", "")
-            name = name.replace("IFAE_", "")
-            name = "IFAE_"+name
-            i    = name.find("hours")
-            if i != -1:
-                name = name[0:i+1]
+            name  = name.replace("Subarray", "")
+            name  = name.replace("IFAE_", "")
+            name  = "IFAE_"+name
+            index = name.find("hours")
+            if index != -1:
+                name = name[0:index+1]
         print(tail)
 
         # Open calibration file
         irf.add(name)
 
         # Translate ROOT to CALDB information
-        irf.root2caldb(file)
+        irf.root2caldb(f)

@@ -1,7 +1,7 @@
 #############################################################################
 # Disutils setup file for ctools Python extension module                    #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2014 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2016 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,35 +27,35 @@ import sys
 # Detect execution mode
 is_build = True
 if (len(sys.argv) >= 2):
-	if (sys.argv[1] == 'install'):
-		is_build = False
+    if (sys.argv[1] == 'install'):
+        is_build = False
 if is_build:
-	sys.stdout.write("Python extension module building:\n")
+    sys.stdout.write("Python extension module building:\n")
 else:
-	sys.stdout.write("Python extension module installation:\n")
+    sys.stdout.write("Python extension module installation:\n")
 
 # Darwin MacPorts kluge: Remove -L/opt/local/lib path from LDSHARED as this
 # overrides the GammaLib settings. Otherwise, MacPorts libraries would be
 # used instead of the libraries selected by GammaLib
 if sys.platform.lower().startswith("darwin"):
-	
-	# Get configuration variables
-	cvars = sysconfig.get_config_vars()
-	
-	# Extract LDSHARED
-	ldshared_old = cvars.get('LDSHARED')
-	ldshared_new = ''
-	ldshared_rm  = ''
-	for option in ldshared_old.split(' '):
-		if option.lstrip().find('-L/opt/local/lib') != 0:
-			ldshared_new += option + ' '
-		else:
-			ldshared_rm += option + ' '
-	if (len(ldshared_rm) > 0):
-		sys.stdout.write("Removed following option(s) from LDSHARED: "+ldshared_rm+"\n");
-	
-	# Set LDSHARED
-	cvars['LDSHARED'] = ldshared_new
+    
+    # Get configuration variables
+    cvars = sysconfig.get_config_vars()
+    
+    # Extract LDSHARED
+    ldshared_old = cvars.get('LDSHARED')
+    ldshared_new = ''
+    ldshared_rm  = ''
+    for option in ldshared_old.split(' '):
+        if option.lstrip().find('-L/opt/local/lib') != 0:
+            ldshared_new += option + ' '
+        else:
+            ldshared_rm += option + ' '
+    if (len(ldshared_rm) > 0):
+        sys.stdout.write("Removed following option(s) from LDSHARED: "+ldshared_rm+"\n");
+    
+    # Set LDSHARED
+    cvars['LDSHARED'] = ldshared_new
 
 # Set default include directories and data files
 include_dirs         = ['@prefix@/include/gammalib']
@@ -66,8 +66,8 @@ libraries            = ['ctools','gamma']
 
 # Add install directory to runtime library path
 if os.path.exists('@prefix@/lib'):
-	library_dirs.append('@prefix@/lib')
-	runtime_library_dirs.append('@prefix@/lib')
+    library_dirs.append('@prefix@/lib')
+    runtime_library_dirs.append('@prefix@/lib')
 
 # Add application include files. The method we use here is not very
 # intelligent as it simple will add all names that start with 'ct'
@@ -75,44 +75,49 @@ if os.path.exists('@prefix@/lib'):
 # add an explicit filter to avoid appending those.
 dirs = glob.glob('../src/ct*')
 for dir in dirs:
-	if len(dir) > 0 and 'ctools' not in dir:
-		path = os.path.abspath(dir)
-		include_dirs.append(path)
+    if len(dir) > 0 and 'ctools' not in dir:
+        path = os.path.abspath(dir)
+        include_dirs.append(path)
 include_dirs.append(os.path.abspath('../src/support'))
 
 # Add extra libraries
 extra_libs = ('@PYTHON_EXTRA_LIBS@').split(',')
 for extra_lib in extra_libs:
-	if len(extra_lib) > 0:
-		libraries.append(extra_lib)
+    if len(extra_lib) > 0:
+        libraries.append(extra_lib)
 
 # Get extra library paths
 extra_lib_paths = ('@LDFLAGS@').split(' ')
 for extra_lib_path in extra_lib_paths:
-	if extra_lib_path.lstrip().find('-L') == 0:
-		dir = extra_lib_path.lstrip().lstrip('-L')
-		if len(dir) > 0:
-			library_dirs.append(dir)
-			runtime_library_dirs.append(dir)
+    if extra_lib_path.lstrip().find('-L') == 0:
+        dir = extra_lib_path.lstrip().lstrip('-L')
+        if len(dir) > 0:
+            library_dirs.append(dir)
+            runtime_library_dirs.append(dir)
 
 # Get extra include directories
 extra_include_dirs = ('@CPPFLAGS@').split(' ')
 for extra_include_dir in extra_include_dirs:
-	if extra_include_dir.lstrip().find('-I') == 0:
-		dir = extra_include_dir.lstrip().lstrip('-I')
-		if len(dir) > 0:
-			include_dirs.append(dir)
+    if extra_include_dir.lstrip().find('-I') == 0:
+        dir = extra_include_dir.lstrip().lstrip('-I')
+        if len(dir) > 0:
+            include_dirs.append(dir)
 
 # Set data files to install.
 data_files=[('@prefix@/share/ctools/swig', install_files)]
 
 # Optionally enable OpenMP
 if '@OPENMP_TRUE@' != '#':
-	extra_compile_args = ['@OPENMP_CXXFLAGS@']
-	extra_link_args    = ['@OPENMP_CXXFLAGS@']
+    extra_compile_args = ['@OPENMP_CXXFLAGS@']
+    extra_link_args    = ['@OPENMP_CXXFLAGS@']
 else:
-	extra_compile_args = []
-	extra_link_args    = []
+    extra_compile_args = []
+    extra_link_args    = []
+
+# Append coverage CXXFLAGS
+if len('@COVERAGE_CXXFLAGS@') > 0:
+    extra_compile_args.append('@COVERAGE_CXXFLAGS@')
+    extra_link_args.append('@COVERAGE_CXXFLAGS@')
 
 # Optionally add link flag for El Capitan post-processing of modules
 if '@IS_ELCAPITAN_TRUE@' != '#':
@@ -133,25 +138,25 @@ setup(name='@PACKAGE_NAME@',
                              runtime_library_dirs=runtime_library_dirs,
                              extra_compile_args=extra_compile_args,
                              extra_link_args=extra_link_args)],
-	  data_files=data_files,
-	  license="GNU GPL v3",
-	  long_description="CTA science analysis tools",
-	  platforms=["Linux", "Solaris", "Mac OS-X", "Unix", "BSD"],
+      data_files=data_files,
+      license="GNU GPL v3",
+      long_description="CTA science analysis tools",
+      platforms=["Linux", "Solaris", "Mac OS-X", "Unix", "BSD"],
       )
 
 # Post-processing. A symbolic link is created to the directory containing the
 # shared wrapper libraries so that we can add this directory to the PYTHONPATH
 # for testing.
 if is_build:
-	try:
-		os.chdir('build')
-		os.remove('ctools')
-		sys.stdout.write("Removed symbolic link build/ctools.\n")
-	except:
-		pass
-	try:
-		path = glob.glob('lib.*')
-		os.symlink(path[0], 'ctools')
-		sys.stdout.write("Created symbolic link build/ctools.\n")
-	except:
-		sys.stdout.write("WARNING: Failed to create symbolic link build/ctools.\n")
+    try:
+        os.chdir('build')
+        os.remove('ctools')
+        sys.stdout.write("Removed symbolic link build/ctools.\n")
+    except:
+        pass
+    try:
+        path = glob.glob('lib.*')
+        os.symlink(path[0], 'ctools')
+        sys.stdout.write("Created symbolic link build/ctools.\n")
+    except:
+        sys.stdout.write("WARNING: Failed to create symbolic link build/ctools.\n")

@@ -30,226 +30,174 @@ import json
 # =============== #
 class csfindobs(ctools.cscript):
     """
-    This class can be used to find observations from an IACT data store.
+    Find observations from an IACT data store.
     """
+
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
         """
         # Set name
-        self.name     = "csfindobs"
-        self.version  = "1.0.0"
-        self.verbose  = False
-        self.datapath = os.getenv("VHEFITS","")
+        self._name         = "csfindobs"
+        self._version      = "1.1.0"
+        self._datapath     = os.getenv("VHEFITS","")
+        self._prodname     = ""
+        self._select_radec = True
+        self._radius       = 0.0
+        self._ra           = 0.0
+        self._dec          = 0.0
+        self._obs_index    = ""
+        self._runs         = []
         
-        # Make sure that parfile exists
-        file = self.parfile()
-
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
-        elif len(argv) ==1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
-
-        # Set logger properties
-        self.log_header()
-        self.log.date(True)
+        # Initialise application by calling the appropriate class
+        # constructor.
+        self._init_cscript(argv)
 
         # Return
         return
     
-    def __del__(self):
-        """
-        Destructor.
-        """
-        #  Write separator into logger
-        if self.logTerse():
-            self.log("\n")
-        
-        # Return
-        return
 
-    def parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a parfile.
-        """
-        # Set parfile name
-        parfile = self.name+".par"
-        
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal if parfile was not found
-            sys.stdout.write("Parfile "+parfile+" not found. Create default parfile.\n")
-            
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("datapath","s","a",self.datapath,"","","Path were data are located"))       
-            pars.append(gammalib.GApplicationPar("prodname","s","a","prod-name","","","Name of FITS production (Run csiactdata to view your options)"))
-            pars.append(gammalib.GApplicationPar("outfile","f","a","runlist.lis","","","Runlist outfile"))
-            pars.append(gammalib.GApplicationPar("ra","r","a","83.6331","","","Right ascension"))
-            pars.append(gammalib.GApplicationPar("dec","r","a","22.01","","","Declination"))
-            pars.append(gammalib.GApplicationPar("rad","r","a","2.5","","","Search radius"))
-            pars.append(gammalib.GApplicationPar("min_qual","i","h","0","0|1|2","","Minimum data quality (0=perfect, 1=ok, 2=bad)"))
-            pars.append(gammalib.GApplicationPar("expression","s","h","NONE","","","Additional expression"))
-            pars.append(gammalib.GApplicationPar("master_indx","s","h","master.json","","","Name of master index file"))
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csfindobs.log","","","Log filename"))
-            pars.save(parfile)
-        
-        # Return
-        return
-        
-    def get_parameters(self):
+    # Private methods
+    def _get_parameters(self):
         """
         Get parameters from parfile and setup the observation.
         """
         # Get parameters
-        if self.datapath == "":
-            self.datapath = self["datapath"].string()
+        if self._datapath == "":
+            self._datapath = self["datapath"].string()
         
         # Expand environment
-        self.datapath = gammalib.expand_env(self.datapath)
+        self._datapath = gammalib.expand_env(self._datapath)
         
         # Get production name
-        self.m_prodname = self["prodname"].string()
+        self._prodname = self["prodname"].string()
         
         # Master index file name
-        self.m_master_indx = self["master_indx"].string()
+        master_indx = self["master_indx"].string()
         
         # Intiialise flag if spatial selection is required
-        self.select_radec = True
+        self._select_radec = True
         
         # Initialise invalid radius
-        self.m_radius = 0.0
+        self._radius = 0.0
         
         # Check for vailidity of spatial parameters
-        if self["ra"].is_valid() and self["dec"].is_valid() and self["rad"].is_valid():
+        if (self["ra"].is_valid() and
+            self["dec"].is_valid() and 
+            self["rad"].is_valid()):
             
             # Read spatial parameters
-            self.m_ra     = self["ra"].real()
-            self.m_dec    = self["dec"].real()
-            self.m_radius = self["rad"].real()
+            self._ra     = self["ra"].real()
+            self._dec    = self["dec"].real()
+            self._radius = self["rad"].real()
             
         else:
-            self.select_radec = False
+            self._select_radec = False
         
         # Check Radius for validity
-        if self.m_radius <= 0.0:
-            self.select_radec = False
+        if self._radius <= 0.0:
+            self._select_radec = False
             
-        # Read other parameters
-        self.m_quality    = self["min_qual"].integer()
-        self.m_expression = self["expression"].string()
-        
-        # Check for validity of expression
-        if self.m_expression == "NONE" or self.m_expression == "INDEF":
-            self.m_expression = ""
-        
-        # Read outfile
-        self.m_outfile = self["outfile"].filename()
+        # Query other parameters
+        self["min_qual"].integer()
+        self["expression"].string()
+
+        # Read ahead output parameters
+        if self._read_ahead():
+            self["outfile"].filename()
         
         # Open master index file and look for prodname 
-        master_file = os.path.join(self.datapath, self.m_master_indx)
+        master_file = os.path.join(self._datapath, master_indx)
         if not os.path.isfile(master_file):
-            raise RuntimeError("FITS data store not available. No master index file found at \""+master_file+"\". Make sure the file is copied from the server and your datapath is set correctly.")
+            raise RuntimeError('FITS data store not available. '+
+                               'No master index file found at "'+
+                               master_file+'". Make sure the file '+
+                               'is copied from the server and your '+
+                               'datapath is set correctly.')
 
         # Open and load JSON file
         json_data = open(master_file).read()
         data      = json.loads(json_data)    
         if not "datasets" in data:
-            raise RuntimeError("Key \"datasets\" not available in master index file.")
+            raise RuntimeError('Key "datasets" not available in '+
+                               'master index file.')
 
         # Get configurations
         configs = data["datasets"]
 
         # Initialise obs index file
-        self.m_obs_index = ""
+        self._obs_index = ""
 
         # Get HDUs
         for config in configs:
-            if self.m_prodname == config["name"]:
-                self.m_obs_index = str(os.path.join(self.datapath, config["obsindx"]))
+            if self._prodname == config["name"]:
+                self._obs_index = str(os.path.join(self._datapath,
+                                                     config["obsindx"]))
                 break
 
         # Check HDUs
-        if self.m_obs_index == "":
-            raise RuntimeError("FITS data store \""+self.m_prodname+"\" not available. Run csiactdata to get a list of available storage names")
-        filename = gammalib.GFilename(self.m_obs_index+"[OBS_INDEX]")
+        if self._obs_index == "":
+            raise RuntimeError('FITS data store "'+self._prodname+
+                               '" not available. Run csiactdata to get '+
+                               'a list of available storage names')
+        filename = gammalib.GFilename(self._obs_index+"[OBS_INDEX]")
         if not filename.is_fits():
-            raise RuntimeError("Observation index file \""+self.m_obs_index+"[OBS_INDEX]\" for FITS data store \""+self.m_prodname+"\" not available. Check your master index file or run csiactdata to get a list of available storage names.")
+            raise RuntimeError('Observation index file "'+
+                               self._obs_index+
+                               '[OBS_INDEX]" for FITS data store "'+
+                               self._prodname+
+                               '" not available. Check your master index '+
+                               'file or run csiactdata to get a list of '+
+                               'available storage names.')
 
-        # Set other members
-        self.m_log     = False # Logging in client tools
-        self.m_debug   = False # Debugging in client tools
-        self.m_clobber = self["clobber"].boolean()
-  
+        # Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log("\n")
+
         # Return
         return
 
-    def obs_ids(self):
-        """ 
-        Return OBS IDs
-        """
-             
-        # Return
-        return self.runs
-    
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-        
-        # Save residual map
-        self.save(self.m_outfile)
-        
-        # Return
-        return
 
+    # Public methods
     def run(self):
         """
         Run the script.
         """
         # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
-        self.get_parameters()
-        
-        # Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n")
-        
+        self._get_parameters()
+                
         # Initialise run list
-        self.runs = []
+        self._runs = []
         
         # Initialise selction expression
         expr = ""
         
         # Add spatial expression if possible
-        if self.select_radec:
-            expr += "ANGSEP("+str(self.m_ra)+","+str(self.m_dec)+",RA_PNT,DEC_PNT)<="+str(self.m_radius)
+        if self._select_radec:
+            expr += "ANGSEP("+str(self._ra)+","+str(self._dec)+ \
+                    ",RA_PNT,DEC_PNT)<="+str(self._radius)
         
         # Add connector if expression is empty
         if len(expr):
             expr += "&&"
         
         # Add quality expression
-        expr += "QUALITY<="+str(self.m_quality)
+        expr += "QUALITY<="+str(self["min_qual"].integer())
         
-        # Add user expression      
-        if self.m_expression == "NONE" or len(self.m_expression) > 0:
-            expr += "&&"+self.m_expression   
+        # Add user expression
+        expression = self["expression"].string()    
+        if (expression != "NONE" and expression != "INDEF" and
+            len(expression) > 0):
+            expr += "&&" + expression   
             
         # Initialise filename   
-        openfile = self.m_obs_index+"[OBS_INDEX]["+expr+"]"    
+        openfile = self._obs_index+"[OBS_INDEX]["+expr+"]"    
         
         # Open file
         fits = gammalib.GFits(openfile)
@@ -262,21 +210,21 @@ class csfindobs(ctools.cscript):
             
             # Read observation IDs into array
             for i in range(obs_indx.nrows()):
-                self.runs.append(obs_indx["OBS_ID"][i])
+                self._runs.append(obs_indx["OBS_ID"][i])
 
         # Dump expression
-        if self.logNormal():
-            self.log("\n")
-            self.log.header3("Expression")
-            self.log(expr)
-            self.log("\n")
+        if self._logNormal():
+            self._log("\n")
+            self._log.header3("Expression")
+            self._log(expr)
+            self._log("\n")
 
         # Dump number of observations
-        if self.logTerse():
-            self.log("\n")
-            self.log.header3("Observations")
-            self.log("Found "+str(len(self.runs))+" observations")
-            self.log("\n")
+        if self._logTerse():
+            self._log("\n")
+            self._log.header3("Observations")
+            self._log("Found "+str(len(self._runs))+" observations")
+            self._log("\n")
         
         # Close file
         fits.close()
@@ -284,35 +232,79 @@ class csfindobs(ctools.cscript):
         # Return
         return
     
-    def save(self, outfile):
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Open logfile
+        self.logFileOpen()
+    
+        # Read ahead output parameters
+        self._read_ahead(True)
+
+        # Run the script
+        self.run()
         
+        # Save residual map
+        self.save()
+        
+        # Return
+        return
+
+    def save(self):
+        """
+        Save runlist.
+        """
+        # Write header
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1('Save runlist')
+
+        # Get filename
+        outfile = self["outfile"].filename()
+
         # Check for clobber
-        if outfile.exists() and not self.clobber():
-            self.log("File "+outfile+" already exists. Set clobber=yes to overwrite file")
-            self.log("\n")
+        if outfile.exists() and not self._clobber():
+            if self._logTerse():
+                self._log('File "+outfile+" already exists. ')
+                self._log('Set clobber=yes to overwrite file.')
+                self._log('\n')
         else:
+
+            # Log file name
+            if self._logTerse():
+                self._log(gammalib.parformat("Runlist file"))
+                self._log(outfile.url())
+                self._log("\n")
+
             # Write runs to file
-            f = open(repr(outfile),"w")
-            for run in self.runs:
+            f = open(outfile.url(),"w")
+            for run in self._runs:
                 f.write(str(run)+" \n")
             f.close()
 
         # Return
         return
-        
+
+    def runs(self):
+        """ 
+        Return run list.
+
+        Returns:
+            A list of runs.
+        """
+             
+        # Return
+        return self._runs
+    
+
 # ======================== #
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Find IACT observations.
-    """
+
     # Create instance of application
     app = csfindobs(sys.argv)
     
-    # Open logfile
-    app.logFileOpen()
-    
     # Execute application
     app.execute()
-    

@@ -1,7 +1,7 @@
 /***************************************************************************
- *                  ctedispcube - EDISP cube generation tool               *
+ *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2016 by Maria Haupt                                      *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctedispcube.hpp
- * @brief EDISP cube generation tool definition
+ * @brief Energy dispersion cube generation tool definition
  * @author Chia-Chun Lu
  */
 
@@ -40,7 +40,7 @@
 /***********************************************************************//**
  * @class ctedispcube
  *
- * @brief EDISP cube generation tool
+ * @brief Energy dispersion cube generation tool
  ***************************************************************************/
 class ctedispcube : public ctool {
 
@@ -56,9 +56,9 @@ public:
     ctedispcube& operator=(const ctedispcube& app);
 
     // Methods
-    void               clear(void);
-    void               run(void);
-    void               save(void);
+    void                 clear(void);
+    void                 run(void);
+    void                 save(void);
     const GCTACubeEdisp& edispcube(void) const;
 
 protected:
@@ -69,19 +69,18 @@ protected:
     void get_parameters(void);
 
     // User parameters
-    GFilename     m_outcube;     //!< Output EDISP cube file name
-    bool          m_apply_edisp; //!< Apply energy dispersion?
+    GFilename     m_outcube;   //!< Output energy dispersion cube file name
 
     // Protected members
-    GObservations m_obs;         //!< Observation container
-    GCTACubeEdisp   m_edispcube;     //!< EDISP cube
+    GObservations m_obs;       //!< Observation container
+    GCTACubeEdisp m_edispcube; //!< Energy dispersion cube
 };
 
 
 /***********************************************************************//**
- * @brief Return EDISP cube
+ * @brief Return energy dispersion cube
  *
- * @return EDISP cube
+ * @return Energy dispersion cube
  ***************************************************************************/
 inline
 const GCTACubeEdisp& ctedispcube::edispcube(void) const

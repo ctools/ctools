@@ -3,14 +3,14 @@
 ctexpcube
 =========
 
-Generate exposure cube for a counts cube.
+Generate exposure cube for a stacked analysis.
 
 
 Synopsis
 --------
 
-This tool generates an exposure cube for a counts cube. An exposure cube is
-a 3-dimensional cube spanned by Right Ascension or Galactic longitude,
+This tool generates an exposure cube for a stacked analysis. An exposure
+cube is a 3-dimensional cube spanned by Right Ascension or Galactic longitude,
 Declination or Galactic latitude, and energy, that gives the exposure 
 as function of true sky direction and energy. The energy binning of the cube 
 may be either linear, logarithmic, or custom defined using an input file.
@@ -55,9 +55,6 @@ General parameters
 
 ``irf [string]``
     Instrument response function.
-
-``(edisp = no) [boolean]``
-    Apply energy dispersion for response computation?
 
 ``outcube [file]``
     Output exposure cube file.

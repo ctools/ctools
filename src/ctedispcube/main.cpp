@@ -1,5 +1,5 @@
 /***************************************************************************
- *                    ctedispcube - CTA EDISP cube tool                    *
+ *          ctedispcube - Energy dispersion cube generation tool           *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2016 by Maria Haupt                                      *
  * ----------------------------------------------------------------------- *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctedispcube/main.cpp
- * @brief CTA EDISP cube tool main code
+ * @brief Energy dispersion cube tool main code
  * @author Maria Haupt
  */
 

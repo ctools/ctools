@@ -70,7 +70,6 @@ protected:
 
     // User parameters
     GFilename     m_outcube;     //!< Output PSF cube file name
-    bool          m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
     GObservations m_obs;         //!< Observation container

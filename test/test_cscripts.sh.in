@@ -36,7 +36,7 @@ $ECHO "*****************"
 #
 # Remove any existing result files
 # ================================
-rm -rf *.fits *.xml *.dat *.reg
+rm -rf *.fits *.xml *.dat *.reg .coverage
 
 
 #
@@ -47,8 +47,27 @@ export CALDB=$PWD/caldb
 rm -rf $PFILES
 mkdir -p $PFILES
 cp -r ../src/*/*.par pfiles/
+cp -r ../cscripts/*.par pfiles/
 rm -rf $CALDB
 mkdir -p $CALDB
+
+
+#
+# Test cscaldb
+# ============
+$ECHO -n "Test cscaldb: "
+chmod +x @abs_top_srcdir@/cscripts/cscaldb.py
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cscaldb.py \
+  chatter=4 > cscaldb.log
+$ECHO -n "."
+if [ -s "cscaldb.log" ]
+then
+  $ECHO -n "."
+else
+  $ECHO " cscaldb.log file is not valid"
+  exit 1
+fi
+$ECHO " ok"
 
 
 #
@@ -56,16 +75,17 @@ mkdir -p $CALDB
 # ================
 $ECHO -n "Test csobs2caldb: "
 chmod +x @abs_top_srcdir@/cscripts/csobs2caldb.py
-@abs_top_srcdir@/cscripts/csobs2caldb.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csobs2caldb.py \
   inobs="data/obs_unbinned.xml" \
-  rspname="test_irfs" \
+  caldb="cta" \
+  irf="Standard" \
   chatter=4 > csobs2caldb.log
 $ECHO -n "."
-if [ -s "$CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits" ]
+if [ -s "$CALDB/data/cta/cta/bcf/Standard/irf_file.fits" ]
 then
   $ECHO -n "."
 else
-  $ECHO " $CALDB/data/cta/cta/bcf/test_irfs/irf_file.fits file is not valid"
+  $ECHO " $CALDB/data/cta/cta/bcf/Standard/irf_file.fits file is not valid"
   exit 1
 fi
 $ECHO " ok"
@@ -76,7 +96,7 @@ $ECHO " ok"
 # =============
 $ECHO -n "Test csobsdef: "
 chmod +x @abs_top_srcdir@/cscripts/csobsdef.py
-@abs_top_srcdir@/cscripts/csobsdef.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csobsdef.py \
   inpnt="data/pntdef.dat" \
   outobs="obs.xml" \
   caldb="irf" \
@@ -101,7 +121,7 @@ $ECHO " ok"
 # ==============
 $ECHO -n "Test csobsinfo: "
 chmod +x @abs_top_srcdir@/cscripts/csobsinfo.py
-@abs_top_srcdir@/cscripts/csobsinfo.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csobsinfo.py \
   inobs="obs.xml" \
   ds9file="obs.reg" \
   offset=yes \
@@ -123,7 +143,7 @@ $ECHO " ok"
 # ================
 $ECHO -n "Test csmodelinfo: "
 chmod +x @abs_top_srcdir@/cscripts/csmodelinfo.py
-@abs_top_srcdir@/cscripts/csmodelinfo.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csmodelinfo.py \
   inmodel="data/crab.xml" \
   ds9file="model.reg" > csmodelinfo.log
 $ECHO -n "."
@@ -143,7 +163,7 @@ $ECHO " ok"
 $ECHO -n "Test csmodelmerge: "
 # === space-separated ===
 chmod +x @abs_top_srcdir@/cscripts/csmodelmerge.py
-@abs_top_srcdir@/cscripts/csmodelmerge.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csmodelmerge.py \
   inmodels="data/crab.xml data/source1.xml" \
   outmodel="merged_models.xml" > csmodelmerge.log
 $ECHO -n "."
@@ -154,9 +174,9 @@ else
   $ECHO " merged_models.xml file is not valid"
   exit 1
 fi
-# === comma-separated ===
-@abs_top_srcdir@/cscripts/csmodelmerge.py \
-  inmodels="data/crab.xml,data/source1.xml" \
+# === semi-colon separated ===
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csmodelmerge.py \
+  inmodels="data/crab.xml;data/source1.xml" \
   outmodel="merged_models2.xml" > csmodelmerge.log
 $ECHO -n "."
 if [ -s "merged_models2.xml" ]
@@ -167,7 +187,7 @@ else
   exit 1
 fi
 # === wildcard string ===
-@abs_top_srcdir@/cscripts/csmodelmerge.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csmodelmerge.py \
   inmodels="data/model_cube_background*.xml" \
   outmodel="merged_models3.xml" > csmodelmerge.log
 $ECHO -n "."
@@ -180,7 +200,7 @@ else
 fi
 # === ascii-file ===
 ls data/model_cube_background* > models.txt
-@abs_top_srcdir@/cscripts/csmodelmerge.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csmodelmerge.py \
   inmodels="@models.txt" \
   outmodel="merged_models4.xml" > csmodelmerge.log
 $ECHO -n "."
@@ -199,10 +219,10 @@ rm models.txt
 # Test cstsmapmerge
 # =================
 $ECHO -n "Test cstsmapmerge: "
-# === comma-separated ===
+# === semi-colon separated ===
 chmod +x @abs_top_srcdir@/cscripts/cstsmapmerge.py
-@abs_top_srcdir@/cscripts/cstsmapmerge.py \
-  inmaps="data/tsmap_0.fits,data/tsmap_1.fits" \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+  inmaps="data/tsmap_0.fits;data/tsmap_1.fits" \
   outmap="merged_tsmap1.fits" > cstsmapmerge.log
 $ECHO -n "."
 if [ -s "merged_tsmap1.fits" ]
@@ -213,7 +233,7 @@ else
   exit 1
 fi
 # === space-separated ===
-@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cstsmapmerge.py \
   inmaps="data/tsmap_0.fits data/tsmap_1.fits" \
   outmap="merged_tsmap2.fits" > cstsmapmerge.log
 $ECHO -n "."
@@ -225,7 +245,7 @@ else
   exit 1
 fi
 # === wildcard string ===
-@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cstsmapmerge.py \
   inmaps="data/tsmap_*.fits" \
   outmap="merged_tsmap3.fits" > cstsmapmerge.log
 $ECHO -n "."
@@ -238,7 +258,7 @@ else
 fi
 # === ascii-file ===
 ls data/tsmap_*.fits > tsmaps.txt
-@abs_top_srcdir@/cscripts/cstsmapmerge.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cstsmapmerge.py \
   inmaps="@tsmaps.txt" \
   outmap="merged_tsmap4.fits" > cstsmapmerge.log
 $ECHO -n "."
@@ -258,12 +278,12 @@ rm tsmaps.txt
 # ===========
 $ECHO -n "Test cspull: "
 chmod +x @abs_top_srcdir@/cscripts/cspull.py
-@abs_top_srcdir@/cscripts/cspull.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cspull.py \
   inmodel="data/crab.xml" \
   outfile="pull.dat" \
   ntrials="3" \
   caldb="cta" \
-  irf="test_irfs" \
+  irf="Standard" \
   ra=83.6331 \
   dec=22.0145 \
   emin=0.1 \
@@ -291,7 +311,7 @@ $ECHO " ok"
 # ===========
 $ECHO -n "Test cssens: "
 chmod +x @abs_top_srcdir@/cscripts/cssens.py
-@abs_top_srcdir@/cscripts/cssens.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cssens.py \
   inmodel="data/crab.xml" \
   srcname="Crab" \
   caldb="irf" \
@@ -317,7 +337,7 @@ $ECHO " ok"
 # =============
 $ECHO -n "Test cstsdist: "
 chmod +x @abs_top_srcdir@/cscripts/cstsdist.py
-@abs_top_srcdir@/cscripts/cstsdist.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cstsdist.py \
   inmodel="data/crab.xml" \
   srcname="Crab" \
   outfile="ts.dat" \
@@ -349,7 +369,7 @@ $ECHO " ok"
 # =============
 $ECHO -n "Test csresmap: "
 chmod +x @abs_top_srcdir@/cscripts/csresmap.py
-@abs_top_srcdir@/cscripts/csresmap.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csresmap.py \
   inobs="data/crab_events.fits" \
   outmap="resmap.fits" \
   inmodel="data/crab.xml" \
@@ -381,7 +401,7 @@ $ECHO " ok"
 $ECHO -n "Test csspec: "
 # === Unbinned ===
 chmod +x @abs_top_srcdir@/cscripts/csspec.py
-@abs_top_srcdir@/cscripts/csspec.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csspec.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
   caldb="irf" \
@@ -401,10 +421,11 @@ else
   exit 1
 fi
 # === Binned ===
-@abs_top_srcdir@/cscripts/csspec.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csspec.py \
   inobs="data/crab_cntmap_small.fits.gz" \
   expcube="data/crab_expcube.fits.gz" \
   psfcube="data/crab_psfcube.fits.gz" \
+  edispcube="data/crab_edispcube.fits.gz" \
   bkgcube="data/crab_bkgcube.fits.gz" \
   inmodel="data/crab_bkgcube.xml" \
   ebinalg="LOG" \
@@ -430,7 +451,7 @@ $ECHO " ok"
 $ECHO -n "Test cslightcrv: "
 # === unbinned ===
 chmod +x @abs_top_srcdir@/cscripts/cslightcrv.py
-@abs_top_srcdir@/cscripts/cslightcrv.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
   srcname="Crab" \
@@ -453,7 +474,7 @@ else
   exit 1
 fi
 # === binned ===
-@abs_top_srcdir@/cscripts/cslightcrv.py \
+@PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cslightcrv.py \
   inobs="data/crab_events.fits" \
   inmodel="data/crab.xml" \
   srcname="Crab" \
@@ -493,7 +514,7 @@ if [ $python_version -ge 26 ]; then
   # ==============
   $ECHO -n "Test csfindobs: "
   chmod +x @abs_top_srcdir@/cscripts/csfindobs.py
-  @abs_top_srcdir@/cscripts/csfindobs.py \
+  @PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csfindobs.py \
     datapath="iactdata/" \
     prodname="unit-test" \
     ra="83.6331" \
@@ -516,7 +537,7 @@ if [ $python_version -ge 26 ]; then
   # ===============
   $ECHO -n "Test csiactcopy: "
   chmod +x @abs_top_srcdir@/cscripts/csiactcopy.py
-  @abs_top_srcdir@/cscripts/csiactcopy.py \
+  @PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csiactcopy.py \
     remote_master="iactdata/master.json" \
     outpath="iactdata_test" \
     prodname="unit-test" > csiactcopy.log
@@ -536,7 +557,7 @@ if [ $python_version -ge 26 ]; then
   # ==============
   $ECHO -n "Test csiactobs: "
   chmod +x @abs_top_srcdir@/cscripts/csiactobs.py
-  @abs_top_srcdir@/cscripts/csiactobs.py \
+  @PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/csiactobs.py \
     datapath="iactdata/" \
     prodname="unit-test" \
     infile="iactrunlist.dat" \
