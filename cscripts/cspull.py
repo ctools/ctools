@@ -64,6 +64,7 @@ class cspull(ctools.cscript):
         self._binsz       = 0.0
         self._pattern     = "single"
         self._enumbins    = 0
+        self._seed        = 1
         self._chatter     = 2
 
         # Initialise observation container from constructor arguments.
@@ -116,6 +117,7 @@ class cspull(ctools.cscript):
         self._ntrials = self["ntrials"].integer()
         self._edisp   = self["edisp"].boolean()
         self._offset  = self["offset"].real()
+        self._seed    = self["seed"].integer()
         self._chatter = self["chatter"].integer()
 
         # Query some parameters
@@ -410,8 +412,8 @@ class cspull(ctools.cscript):
         # Loop over trials
         for seed in range(self._ntrials):
 
-            # Make a trial
-            result = self._trial(seed)
+            # Make a trial and add initial seed
+            result = self._trial(seed + self._seed)
 
             # Write out result immediately
             if seed == 0:

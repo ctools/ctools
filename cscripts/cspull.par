@@ -44,6 +44,8 @@ rad,      r, h, 5.0,0,180, "Radius of ROI (deg)"
 pattern,  s, h, single,single|four,, "Observation pattern"
 offset,   r, h, 1.5,,, "Observation pattern offset (deg)"
 profile,  b, h, no,,, "Use likelihood profile method for errors?"
+seed,     i, h, 1,,, "Initial random number generator seed"
+
 
 #
 # Standard parameters
