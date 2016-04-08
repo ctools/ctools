@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<workflow>
+    <actor name="input">
+        <output>
+            <parameter name="inmodel" value="$CTOOLS/share/models/crab.xml" />
+            <parameter name="caldb"   value="prod2" />
+            <parameter name="irf"     value="South_50h" />
+            <parameter name="edisp"   value="no" />
+            <parameter name="deadc"   value="0.95" />
+            <parameter name="ra"      value="83.63" />
+            <parameter name="dec"     value="22.01" />
+            <parameter name="target"  value="Crab" />
+            <parameter name="emin"    value="0.1" />
+            <parameter name="emax"    value="100.0" />
+            <parameter name="tmin"    value="0.0" />
+            <parameter name="tmax"    value="1800.0" />
+            <parameter name="chatter" value="2" />
+            <parameter name="clobber" value="yes" />
+            <parameter name="debug"   value="no" />
+            <parameter name="mode"    value="ql" />
+        </output>
+    </actor>
+    <actor name="ctobssim" tool="ctobssim">
+        <input>
+            <parameter name="inobs"   value="NONE" />
+            <parameter name="inmodel" value="inmodel" actor="input" />
+            <parameter name="caldb"   value="caldb" actor="input" />
+            <parameter name="irf"     value="irf"   actor="input" />
+            <parameter name="edisp"   value="edisp" actor="input" />
+            <parameter name="prefix"  value="sim_events_" />
+            <parameter name="seed"    value="1" />
+            <parameter name="ra"      value="ra" actor="input" />
+            <parameter name="dec"     value="dec" actor="input" />
+            <parameter name="rad"     value="5.0" />
+            <parameter name="tmin"    value="tmin" actor="input" />
+            <parameter name="tmax"    value="tmax" actor="input" />
+            <parameter name="emin"    value="emin" actor="input" />
+            <parameter name="emax"    value="emax" actor="input" />
+            <parameter name="deadc"   value="deadc" actor="input" />
+            <parameter name="maxrate" value="1.0e6" />
+            <parameter name="eslices" value="10" />
+            <parameter name="chatter" value="chatter" actor="input" />
+            <parameter name="clobber" value="clobber" actor="input" />
+            <parameter name="debug"   value="debug" actor="input" />
+            <parameter name="mode"    value="mode" actor="input" />
+            <parameter name="logfile" value="ctobssim.log" />
+        </input>
+        <output>
+            <parameter name="outevents" value="events.fits" />
+        </output>
+    </actor>
+    <actor name="ctselect" tool="ctselect">
+        <input>
+            <parameter name="inobs"    value="outevents" actor="ctobssim" />
+            <parameter name="prefix"   value="selected_" />
+            <parameter name="usepnt"   value="no" />
+            <parameter name="ra"       value="ra" actor="input" />
+            <parameter name="dec"      value="dec" actor="input" />
+            <parameter name="rad"      value="3.0" />
+            <parameter name="tmin"     value="tmin" actor="input" />
+            <parameter name="tmax"     value="tmax" actor="input" />
+            <parameter name="emin"     value="emin" actor="input" />
+            <parameter name="emax"     value="emax" actor="input" />
+            <parameter name="expr"     value="" />
+            <parameter name="usethres" value="NONE" />
+            <parameter name="chatter"  value="chatter" actor="input" />
+            <parameter name="clobber"  value="clobber" actor="input" />
+            <parameter name="debug"    value="debug" actor="input" />
+            <parameter name="mode"     value="mode" actor="input" />
+            <parameter name="logfile"  value="ctselect.log" />
+        </input>
+        <output>
+            <parameter name="outobs" value="selected_events.fits" />
+        </output>
+    </actor>
+    <actor name="ctlike" tool="ctlike">
+        <input>
+            <parameter name="inobs"   value="outobs"  actor="ctselect" />
+            <parameter name="inmodel" value="inmodel" actor="input" />
+            <parameter name="expcube" value="NONE" />
+            <parameter name="psfcube" value="NONE" />
+            <parameter name="bkgcube" value="NONE" />
+            <parameter name="caldb"   value="caldb" actor="input" />
+            <parameter name="irf"     value="irf"   actor="input" />
+            <parameter name="edisp"   value="edisp" actor="input" />
+            <parameter name="stat"    value="POISSON" />
+            <parameter name="edisp"   value="no" />
+            <parameter name="refit"   value="no" />
+            <parameter name="chatter" value="chatter" actor="input" />
+            <parameter name="clobber" value="clobber" actor="input" />
+            <parameter name="debug"   value="debug" actor="input" />
+            <parameter name="mode"    value="mode" actor="input" />
+            <parameter name="logfile" value="ctlike.log" />
+        </input>
+        <output>
+            <parameter name="outmodel" value="crab_results.xml" />
+        </output>
+    </actor>
+    <actor name="csspec" tool="csspec">
+        <input>
+            <parameter name="inobs"     value="outobs"   actor="ctselect" />
+            <parameter name="inmodel"   value="outmodel" actor="ctlike" />
+            <parameter name="srcname"   value="target"   actor="input" />
+            <parameter name="expcube"   value="NONE" />
+            <parameter name="psfcube"   value="NONE" />
+            <parameter name="bkgcube"   value="NONE" />
+            <parameter name="caldb"     value="caldb" actor="input" />
+            <parameter name="irf"       value="irf"   actor="input" />
+            <parameter name="edisp"     value="edisp" actor="input" />
+            <parameter name="emin"      value="emin" actor="input" />
+            <parameter name="emax"      value="emax" actor="input" />
+            <parameter name="enumbins"  value="10" />
+            <parameter name="ebinalg"   value="LOG" />
+            <parameter name="ebinfile"  value="NONE" />
+            <parameter name="calc_ts"   value="yes" />
+            <parameter name="calc_ulim" value="yes" />
+            <parameter name="fix_srcs"  value="yes" />
+            <parameter name="fix_bkg"   value="no" />
+            <parameter name="chatter"   value="chatter" actor="input" />
+            <parameter name="clobber"   value="clobber" actor="input" />
+            <parameter name="debug"     value="debug" actor="input" />
+            <parameter name="mode"      value="mode" actor="input" />
+            <parameter name="logfile"   value="csspec.log" />
+        </input>
+        <output>
+            <parameter name="outfile" value="spectrum.fits" />
+        </output>
+    </actor>
+</workflow>
