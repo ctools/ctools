@@ -330,7 +330,7 @@ class csiactcopy(ctools.cscript):
         
         # Check if runlist file is available
         if self._runlist.exists():
-            runfile = open(self._runlist)
+            runfile = open(self._runlist.url())
             for line in runfile.readlines():
                 if len(line) == 0:
                     continue
