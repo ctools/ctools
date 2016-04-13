@@ -33,7 +33,6 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                        "ctmapcube::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -194,20 +193,8 @@ void ctmapcube::run(void)
         log << m_models << std::endl;
     }
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate map cube");
-    }
-
-    //TODO
-
-    // Log cube
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Map cube");
-        log << m_cube << std::endl;
-    }
+    // Generate map cube
+    create_cube();
 
     // Optionally publish map cube
     if (m_publish) {
@@ -240,8 +227,8 @@ void ctmapcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save map cube into file \""+m_outcube+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Map cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save map cube into FITS file
@@ -275,7 +262,8 @@ void ctmapcube::publish(const std::string& name)
 
     // Log filename
     if (logTerse()) {
-        log << "Publish \""+user_name+"\" map cube." << std::endl;
+        log << gammalib::parformat("Map cube");
+        log << user_name << std::endl;
     }
 
     // Publish map cube
@@ -360,13 +348,6 @@ void ctmapcube::get_parameters(void)
     int         nxpix    = (*this)["nxpix"].integer();
     int         nypix    = (*this)["nypix"].integer();
 
-    // Allocate map cube
-    GSkyMap cube(proj, coordsys, xref, yref, -binsz, binsz, nxpix, nypix,
-                 energies.size());
-
-    // Allocate map cube
-    m_cube = GModelSpatialDiffuseCube(cube, energies);
-
     // Read model definition file if required
     if (m_models.size() == 0) {
 
@@ -386,6 +367,13 @@ void ctmapcube::get_parameters(void)
         m_outcube = (*this)["outcube"].filename();
     }
 
+    // Allocate map cube
+    GSkyMap cube(proj, coordsys, xref, yref, -binsz, binsz, nxpix, nypix,
+                 energies.size());
+
+    // Allocate map cube
+    m_cube = GModelSpatialDiffuseCube(cube, energies);
+
     // Write parameters into logger
     if (logTerse()) {
         log_parameters();
@@ -399,9 +387,6 @@ void ctmapcube::get_parameters(void)
 
 /***********************************************************************//**
  * @brief Create energy vector from user parameters
- *
- * @exception GException::invalid_value
- *            No valid energy boundary extension found.
  *
  * Get the energy vector according to the user parameters. The method
  * supports loading of energy information from the ENERGIES extension (or
@@ -458,4 +443,153 @@ GEnergies ctmapcube::create_energies(void)
 
     // Return energies
     return energies;
+}
+
+
+/***********************************************************************//**
+ * @brief Generate map cube
+ *
+ * Generate map cube by looping over all sky models in the container.
+ ***************************************************************************/
+void ctmapcube::create_cube(void)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Generate map cube");
+    }
+
+    // Loop over all models
+    for (int i = 0; i < m_models.size(); ++i) {
+
+        // Get pointer to sky model
+        GModelSky* model = dynamic_cast<GModelSky*>(m_models[i]);
+
+        // Fall through if model is not a sky model
+        if (model == NULL) {
+
+            // Signal that model is skipped
+            if (logNormal()) {
+                log << gammalib::parformat("Skip model");
+                log << m_models[i]->name() << std::endl;
+            }
+
+            // Continue
+            continue;
+
+        }
+
+        // Signal that model is used
+        if (logNormal()) {
+            log << gammalib::parformat("Use model");
+            log << m_models[i]->name() << std::endl;
+        }
+
+        // Add sky model
+        if (dynamic_cast<GModelSpatialPointSource*>(model->spatial()) != NULL) {
+            add_ptsrc_model(model);
+        }
+        else {
+            add_model(model);
+        }
+
+    } // endfor: looped over energies
+
+    // Log cube
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Map cube");
+        log << m_cube << std::endl;
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Add one model to map cube
+ *
+ * Adds one model to map cube.
+ ***************************************************************************/
+void ctmapcube::add_model(GModelSky* model)
+{
+    // Get cube energies
+    GEnergies energies = m_cube.energies();
+
+    // Get pointer to sky map
+    GSkyMap* map = const_cast<GSkyMap*>(&m_cube.cube());
+
+    // Loop over all energy bins
+    for (int iebin = 0; iebin < energies.size(); ++iebin) {
+
+        // Loop over all spatial pixels
+        for (int ipixel = 0; ipixel < map->npix(); ++ipixel) {
+
+            // Set photon
+            GPhoton photon(map->inx2dir(ipixel), energies[iebin], GTime());
+
+            // Add model value
+            map->operator()(ipixel, iebin) += model->value(photon);
+
+        } // endfor: looped over all pixels
+
+    } // endfor: looped over all energies
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Add one point source model to map cube
+ *
+ * Adds one point source model to map cube.
+ ***************************************************************************/
+void ctmapcube::add_ptsrc_model(GModelSky* model)
+{
+    // Get point source spatial component
+    GModelSpatialPointSource* ptsrc = static_cast<GModelSpatialPointSource*>(model->spatial());
+
+    // Get point source direction
+    GSkyDir dir = ptsrc->dir();
+
+    // Get cube energies
+    GEnergies energies = m_cube.energies();
+
+    // Get pointer to sky map
+    GSkyMap* map = const_cast<GSkyMap*>(&m_cube.cube());
+
+    // Get test sky map for flux computation
+    GSkyMap test_map(*map);
+
+    // Continue only if map contains point source sky direction
+    if (map->contains(dir)) {
+
+        // Get map pixel
+        int ipixel = map->dir2inx(dir);
+
+        // Loop over all energy bins
+        for (int iebin = 0; iebin < energies.size(); ++iebin) {
+
+            // Set photon using the point source sky direction
+            GPhoton photon(dir, energies[iebin], GTime());
+
+            // Compute model value
+            double value = model->value(photon);
+
+            // Compute flux normalization
+            test_map(ipixel, iebin) = value;
+            double flux = test_map.flux(ipixel, iebin);
+            double norm = (flux > 0.0) ? value / flux : 0.0;
+
+            // Add model to sky map
+            map->operator()(ipixel, iebin) += norm * value;
+
+        } // endfor: looped over all energies
+
+    } // endif: map contained sky direction
+
+    // Return
+    return;
 }

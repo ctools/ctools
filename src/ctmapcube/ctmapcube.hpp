@@ -68,6 +68,9 @@ protected:
     void      free_members(void);
     void      get_parameters(void);
     GEnergies create_energies(void);
+    void      create_cube(void);
+    void      add_model(GModelSky* model);
+    void      add_ptsrc_model(GModelSky* model);
 
     // User parameters
     GFilename m_outcube;                //!< Output map cube filename
