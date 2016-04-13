@@ -1013,6 +1013,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctpsfcube/Makefile
                  src/ctedispcube/Makefile
                  src/ctbkgcube/Makefile
+                 src/ctmapcube/Makefile
                  src/ctcubemask/Makefile
                  src/cttsmap/Makefile
                  src/ctbutterfly/Makefile

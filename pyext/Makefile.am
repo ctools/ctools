@@ -42,6 +42,7 @@ testscripts = ctools/tests/__init__.py \
               ../test/test_ctexpcube.py \
               ../test/test_ctpsfcube.py \
               ../test/test_ctbkgcube.py \
+              ../test/test_ctmapcube.py \
               ../test/test_ctcubemask.py \
               ../test/test_ctbutterfly.py \
               ../test/test_ctulimit.py \
