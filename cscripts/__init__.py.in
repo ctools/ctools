@@ -19,7 +19,7 @@
 # ==========================================================================
 # Python version check
 import sys
-req_version = (2,7)
+req_version = (2,6)
 cur_version = sys.version_info
 
 # List all scripts in this module
@@ -39,8 +39,7 @@ __all__ = [
     "cstsdist",
     "cstsmapmerge",
     "csfindobs",
-    "obsutils",
-    "test",
+    "obsutils"
 ]
 if cur_version > req_version:
     __all__.extend(["csfindobs",
@@ -48,28 +47,27 @@ if cur_version > req_version:
                     "csiactdata",
                     "csiactobs"])
 
-
 # Import
-import cscaldb
-import csinfo
-import cslightcrv
-import csmodelinfo
-import csmodelmerge
-import csobs2caldb
-import csobsdef
-import csobsinfo
-import cspull
-import csresmap
-import cssens
-import csspec
-import cstsdist
-import cstsmapmerge
-import obsutils
+from cscripts.cscaldb      import cscaldb
+from cscripts.csinfo       import csinfo
+from cscripts.cslightcrv   import cslightcrv
+from cscripts.csmodelinfo  import csmodelinfo
+from cscripts.csmodelmerge import csmodelmerge
+from cscripts.csobs2caldb  import csobs2caldb
+from cscripts.csobsdef     import csobsdef
+from cscripts.csobsinfo    import csobsinfo
+from cscripts.cspull       import cspull
+from cscripts.csresmap     import csresmap
+from cscripts.cssens       import cssens
+from cscripts.csspec       import csspec
+from cscripts.cstsdist     import cstsdist
+from cscripts.cstsmapmerge import cstsmapmerge
+from cscripts              import obsutils
 if cur_version > req_version:
-    import csfindobs
-    import csiactcopy
-    import csiactdata
-    import csiactobs
+    from cscripts.csfindobs  import csfindobs
+    from cscripts.csiactcopy import csiactcopy
+    from cscripts.csiactdata import csiactdata
+    from cscripts.csiactobs  import csiactobs
 
 # Delete version check variables
 del sys
@@ -81,7 +79,8 @@ def test():
     """
     Run cscripts tests.
     """
-    print("No cscripts unit tests have been implemented so far.")
+    from cscripts.tests import test_python_cscripts
+    test_python_cscripts.test(installed=True)
 
 # Add version
 __version__ = '@PACKAGE_VERSION@'

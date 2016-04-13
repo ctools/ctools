@@ -1,14 +1,12 @@
 New Features and Important Changes in ctools 1.1.0
 
-Author(s) : Juergen Knoedlseder
-
-26 February 2016
+7 March 2016
 
 
 1. Introduction
 ---------------
-This document briefly summarizes executable by executable the most important
-changes made since the last release of ctools.
+This document briefly summarizes the changes that have been made in this
+ctools release with respect to the precedent release.
 
 
 2. Configuration
@@ -19,14 +17,17 @@ None
 3. Python interface
 -------------------
 The IACT scripts csfindobs, csiactcopy, csiactdata, and csiactobs are only
-imported into th cscripts module and tested if the Python version is 2.6 or
+imported into the cscripts module and tested if the Python version is 2.6 or
 newer. These scripts make use of the json Python module that is only became
 available from Python 2.6 on.
 
 
 4. Support model
 ----------------
-None
+The "edispcube" parameter is expected in any tool that supports stacked
+analysis. If the parameter is not "NONE" or empty, the ctool::set_obs_response()
+method will load the energy dispersion cube and use it in the response
+definition of the first observations (#1724).
 
 
 5. ctobssim - CTA observation simulation
@@ -90,13 +91,17 @@ Observatory interoperable tools (e.g. Aladin).
 
 8. ctlike - Maximum likelihood fitting
 --------------------------------------
-None
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
 
 
 9. cttsmap - Generation of Test Statistic map
 ---------------------------------------------
 Add publish() method to publish the Test Statistic map via a SAMP Hub to
 Virtual Observatory interoperable tools (e.g. Aladin).
+
+Add "edispcube" parameter to support energy dispersion for stacked analysis 
+(#1724).
 
 
 10. ctskymap - CTA sky mapping
@@ -110,47 +115,65 @@ Observatory interoperable tools (e.g. Aladin).
 Add publish() method to publish the model cube via a SAMP Hub to Virtual
 Observatory interoperable tools (e.g. Aladin).
 
+Add "edispcube" parameter to support energy dispersion for stacked analysis 
+(#1724).
+
 
 12. ctexpcube - CTA exposure cube generation
 --------------------------------------------
 Add publish() method to publish the exposure cube via a SAMP Hub to
 Virtual Observatory interoperable tools (e.g. Aladin).
 
+Remove "edisp" parameter as this is parameter is not needed (#1724).
+
 
 13. ctpsfcube - CTA point spread function cube generation
 ---------------------------------------------------------
-None
+Remove "edisp" parameter as this is parameter is not needed (#1724).
 
 
-14. ctbkgcube - CTA background cube generation
+14. ctedispcube - CTA energy dispersion cube generation
+-------------------------------------------------------
+This tool generates an energy dispersion cube for a stacked analysis. The
+energy dispersion cube holds the migration matrix as function of sky
+direction, true photon energy and the migration value which is the ratio
+of reconstructed over true energy (#1724).
+
+
+15. ctbkgcube - CTA background cube generation
 ----------------------------------------------
 Add publish() method to publish the background cube via a SAMP Hub to
 Virtual Observatory interoperable tools (e.g. Aladin).
 
 
-15. ctcubemask - CTA cube filtering
+16. ctcubemask - CTA cube filtering
 -----------------------------------
 Add publish() method to publish the masked counts cube via a SAMP Hub
 to Virtual Observatory interoperable tools (e.g. Aladin).
 
 
-16. ctbutterfly - Generate butterfly diagrams
+17. ctbutterfly - Generate butterfly diagrams
 ---------------------------------------------
-None
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
 
 
-17. ctulimit - Compute upper limit
+18. ctulimit - Compute upper limit
 ----------------------------------
-None
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
 
 
-18. cterror - Likelihood profile error computation
+19. cterror - Likelihood profile error computation
 --------------------------------------------------
 The output filename is now read ahead in case that the tool is executed
 (#1700).
 
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
 
-19. cscripts
+
+20. cscripts
 ------------
 Added the csiactcopy script that copies IACT data from a remote machine to
 the user's machine (#1661).
@@ -158,17 +181,20 @@ the user's machine (#1661).
 Add csresmap::publish() method to publish the residual map via a SAMP Hub
 to Virtual Observatory interoperable tools (e.g. Aladin).
 
+Add "edispcube" parameter to cslightcrv, csresmap, and csspec scripts to
+support energy dispersion for stacked analysis (#1724).
 
-20. Examples
+
+21. Examples
 ------------
 None
 
 
-21. caldb
+22. caldb
 ---------
 None
 
 
-22. models
+23. models
 ----------
 None

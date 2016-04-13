@@ -1,0 +1,52 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csspec.par                                                    #
+#  Version:   1.1.0                                                         #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csspec script                          #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,     f, h, events.fits,,, "Input event list, counts cube, or observation definition XML file"
+inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
+srcname,   s, a, Crab,,, "Source name"
+expcube,   f, a, NONE,,, "Input exposure cube file (only needed for stacked analysis)"
+psfcube,   f, a, NONE,,, "Input PSF cube file (only needed for stacked analysis)"
+edispcube, f, a, NONE,,, "Input energy dispersion cube file (only needed for stacked analysis)"
+bkgcube,   f, a, NONE,,, "Input background cube file (only needed for stacked analysis)"
+caldb,     s, a, prod2,,, "Calibration database"
+irf,       s, a, South_0.5h,,, "Instrument response function"
+edisp,     b, h, no,,, "Apply energy dispersion?"
+outfile,   f, a, spectrum.fits,,, "Output spectrum file"
+
+#
+# Script parameters
+#==================
+emin,      r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins,  i, a, 20,,, "Number of energy bins (0=unbinned)"
+ebinalg,   s, a, LOG,LIN|LOG|FILE,, "Binning algorithm"
+ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
+calc_ts,   b, h, yes,,, "Compute TS value in each bin"
+calc_ulim, b, h, yes,,, "Compute upper limit in each bin"
+fix_srcs,  b, h, yes,,, "Fix other skymodel parameters"
+fix_bkg,   b, h, no,,, "Fix background parameters"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csspec.log,,, "Log filename"

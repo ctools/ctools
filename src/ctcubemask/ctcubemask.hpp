@@ -71,7 +71,6 @@ protected:
     void        free_members(void);
     void        get_parameters(void);
     void        apply_mask(GCTAObservation* obs);
-    std::string check_infile(const std::string& filename) const;
     std::string set_outfile_name(const std::string& filename) const;
     void        save_fits(void);
     void        save_xml(void);

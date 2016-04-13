@@ -709,38 +709,6 @@ void ctcubemask::free_members(void)
 
 
 /***********************************************************************//**
- * @brief Check input filename
- *
- * @param[in] filename File name.
- *
- * This method checks if the input FITS file is correct.
- ***************************************************************************/
-std::string ctcubemask::check_infile(const std::string& filename) const
-{
-    // Initialise message string
-    std::string message = "";
-
-    // Open FITS file
-    GFits file(filename);
-
-    // Check for IMAGE HDU
-    GFitsImage* image = NULL;
-    try {
-
-        // Get pointer to FITS image
-        image = file.image("IMAGE");
-    }
-    catch (GException::fits_hdu_not_found& e) {
-        message = "No \"IMAGE\" extension found in input file \""
-                + m_outcube + "\".";
-    }
-
-    // Return
-    return message;
-}
-
-
-/***********************************************************************//**
  * @brief Set output file name.
  *
  * @param[in] filename Input file name.

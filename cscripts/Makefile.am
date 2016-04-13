@@ -9,6 +9,13 @@ pythonscripts = __init__.py \
                 csfindobs.py csiactcopy.py csiactdata.py csiactobs.py \
                 obsutils.py
 
+# Parfiles to be distributed in $(prefix)/syspfiles
+parfiles = cspull.par cssens.par cstsdist.par cscaldb.par csresmap.par \
+           csobsdef.par csspec.par cslightcrv.par csobsinfo.par \
+           csmodelinfo.par csmodelmerge.par cstsmapmerge.par \
+           csobs2caldb.par \
+           csfindobs.par csiactcopy.par csiactdata.par csiactobs.par
+
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
               csobsdef csspec cslightcrv csobsinfo \
@@ -16,12 +23,62 @@ linkscripts = cspull cssens cstsdist cscaldb csresmap \
               csobs2caldb \
               csfindobs csiactcopy csiactdata csiactobs
 
-# Distribute scripts
+# Test scripts to be distributed in $(pyexecdir)/cscripts/tests
+testscripts = tests/__init__.py \
+              ../test/test_python_cscripts.py \
+              ../test/test_cscaldb.py \
+              ../test/test_cslightcrv.py \
+              ../test/test_csmodelinfo.py \
+              ../test/test_csmodelmerge.py \
+              ../test/test_csobs2caldb.py \
+              ../test/test_csobsdef.py \
+              ../test/test_csobsinfo.py \
+              ../test/test_cspull.py \
+              ../test/test_csfindobs.py \
+              ../test/test_csiactcopy.py \
+              ../test/test_csiactdata.py \
+              ../test/test_csiactobs.py
+
+# Test data to be distributed in $(pyexecdir)/cscripts/tests/data
+testdata    = ../test/data/crab.xml \
+              ../test/data/obs_unbinned.xml \
+              ../test/data/obs_stacked.xml \
+              ../test/data/crab_events.fits.gz \
+              ../test/data/crab_cntmap.fits.gz \
+              ../test/data/crab_expcube.fits.gz \
+              ../test/data/crab_psfcube.fits.gz \
+              ../test/data/crab_bkgcube.fits.gz \
+              ../test/data/exclusion.reg \
+              ../test/data/pntdef.dat \
+              ../test/data/models.txt \
+              ../test/data/model_cube_background.xml \
+              ../test/data/model_cube_background2.xml \
+              ../test/data/crab_bkgcube.xml
+
+# Test data to be distributed in $(pyexecdir)/cscripts/tests/iactdata
+testiactdata = ../test/iactdata/hdu-index.fits.gz \
+               ../test/iactdata/master.json \
+               ../test/iactdata/obs-index.fits.gz
+
+# Test IRFs to be distributed in $(pyexecdir)/cscripts/tests/irf
+testirf     = ../test/irf/irf_file.fits.gz
+
+# Distribute scripts and parfiles
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
 binscriptsdir      = $(bindir)
 binscripts_DATA    = $(binscripts)
 pythonscriptsdir   = $(pyexecdir)/cscripts
 pythonscripts_DATA = $(pythonscripts)
+pfilesdir          = $(prefix)/syspfiles
+pfiles_DATA        = $(parfiles)
+testscriptsdir     = $(pyexecdir)/cscripts/tests
+testscripts_DATA   = $(testscripts)
+testdatadir        = $(pyexecdir)/cscripts/tests/data
+testdata_DATA      = $(testdata)
+testiactdatadir    = $(pyexecdir)/cscripts/tests/iactdata
+testiactdata_DATA  = $(testiactdata)
+testirfdir         = $(pyexecdir)/cscripts/tests/irf
+testirf_DATA       = $(testirf)
 
 # Add hook rule to create symbolic links for cscripts
 install-data-hook:

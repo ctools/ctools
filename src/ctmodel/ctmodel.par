@@ -22,6 +22,7 @@ incube,   f, a, "NONE",,, "Input counts cube file to extract model cube definiti
 inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
 expcube,  f, a, "NONE",,, "Input exposure cube file (only needed for stacked analysis)"
 psfcube,  f, a, "NONE",,, "Input PSF cube file (only needed for stacked analysis)"
+edispcube,f, a, "NONE",,, "Input energy dispersion cube file (only needed for stacked analysis)"
 bkgcube,  f, a, "NONE",,, "Input background cube file (only needed for stacked analysis)"
 caldb,    s, a, "prod2",,, "Calibration database"
 irf,      s, a, "South_0.5h",,, "Instrument response function"

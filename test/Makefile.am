@@ -6,9 +6,10 @@ MACOSX_DEPLOYMENT_TARGET=@CONFIGURE_MACOSX_DEPLOYMENT_TARGET@
 
 # Optional python bindings
 if WITH_PYTHON
-  TEST_CSCRIPTS      = test_cscripts.sh
-  TEST_PYTHON_SCRIPT = test_python.py
-  TEST_PYTHON_ENV    = PYTHONPATH=$(top_builddir):$(top_builddir)/pyext:$(top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
+  TEST_CSCRIPTS        = test_cscripts.sh
+  TEST_PYTHON_CTOOLS   = test_python_ctools.sh
+  TEST_PYTHON_CSCRIPTS = test_python_cscripts.sh
+  TEST_PYTHON_ENV      = PYTHONPATH=$(top_builddir):$(top_builddir)/pyext:$(top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
 endif
 
 # Set test environment
@@ -18,7 +19,8 @@ TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDI
 # Tests (these are the tests to be executed)
 TESTS = test_ctools.sh \
         $(TEST_CSCRIPTS) \
-        $(TEST_PYTHON_SCRIPT)
+        $(TEST_PYTHON_CTOOLS) \
+        $(TEST_PYTHON_CSCRIPTS)
 
 # Add Valgrind rule
 valgrind:

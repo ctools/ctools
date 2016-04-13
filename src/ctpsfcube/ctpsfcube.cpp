@@ -216,18 +216,6 @@ void ctpsfcube::run(void)
         log << std::endl;
     }
 
-    // Set energy dispersion flag for all CTA observations and save old
-    // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
-    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -248,14 +236,6 @@ void ctpsfcube::run(void)
 
     // Fill PSF 
     m_psfcube.fill(m_obs, &log);
-
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
-    }
 
     // Return
     return;
@@ -308,7 +288,6 @@ void ctpsfcube::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-    m_apply_edisp = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -328,7 +307,6 @@ void ctpsfcube::copy_members(const ctpsfcube& app)
 {
     // Copy attributes
     m_outcube     = app.m_outcube;
-    m_apply_edisp = app.m_apply_edisp;
 
     // Copy protected members
     m_obs        = app.m_obs;
@@ -400,9 +378,6 @@ void ctpsfcube::get_parameters(void)
         m_psfcube = GCTACubePsf(cube, amax, anumbins);
 
     } // endelse: cube loaded from file
-
-    // Read energy dispersion flag
-    m_apply_edisp = (*this)["edisp"].boolean();
 
     // Read output filename (if needed)
     if (read_ahead()) {

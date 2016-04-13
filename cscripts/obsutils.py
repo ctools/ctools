@@ -1,8 +1,7 @@
 # ==========================================================================
-# This script provides a number of functions that are useful for handling
-# CTA observations.
+# CTA observation handling support functions.
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +19,7 @@
 # ==========================================================================
 import gammalib
 import ctools
-import math
+#import math
 
 
 # ===================== #
@@ -31,21 +30,28 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
     """
     Simulate events for all observations in the container.
 
-    Parameters:
-     obs   - Observation container
-    Keywords:
-     log   - Create log file(s)
-     debug - Create console dump?
-     edisp - Apply energy dispersion?
-     seed  - Seed value for simulations (default: 0)
-     nbins - Number of energy bins (default: 0=unbinned)
-     binsz - Pixel size for binned simulation (deg/pixel)
-     npix  - Number of pixels in X and Y for binned simulation
+    Args:
+        obs: Observation container without events
+
+    Kwargs:
+        log:     Create log file(s)
+        debug:   Create console dump?
+        chatter: Chatter level
+        edisp:   Apply energy dispersion?
+        seed:    Seed value for simulations (default: 0)
+        nbins:   Number of energy bins (default: 0=unbinned)
+        binsz:   Pixel size for binned simulation (deg/pixel)
+        npix:    Number of pixels in X and Y for binned simulation
+        proj:    Projection for binned simulation
+        coord:   Coordinate system for binned simulation
+
+    Returns:
+        Observation container, filled with simulated events.
     """
 
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
-    sim["seed"] = seed
+    sim["seed"]  = seed
     sim["edisp"] = edisp
 
     # Optionally open the log file
@@ -85,16 +91,16 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
 
         # Allocate ctbin application and set parameters
         bin = ctools.ctbin(sim.obs())
-        bin["ebinalg"] = "LOG"
-        bin["emin"] = emin
-        bin["emax"] = emax
+        bin["ebinalg"]  = "LOG"
+        bin["emin"]     = emin
+        bin["emax"]     = emax
         bin["enumbins"] = nbins
-        bin["usepnt"] = True # Use pointing for map centre
-        bin["nxpix"] = npix
-        bin["nypix"] = npix
-        bin["binsz"] = binsz
+        bin["usepnt"]   = True # Use pointing for map centre
+        bin["nxpix"]    = npix
+        bin["nypix"]    = npix
+        bin["binsz"]    = binsz
         bin["coordsys"] = coord
-        bin["proj"] = proj
+        bin["proj"]     = proj
 
         # Optionally open the log file
         if log:
@@ -350,28 +356,30 @@ def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf="South_50h", caldb="prod2", id="000000", instrument="CTA"):
+            irf="South_50h", caldb="prod2", id="000000"):
     """
-    Returns a single CTA observation containing an empty CTA event list.
-    By looping over this function you can add CTA observations to the
-    observation container.
+    Set a single CTA observation.
+    
+    The function sets a single CTA observation containing an empty CTA
+    event list. By looping over this function you can add CTA observations
+    to the observation container.
 
-    Parameters:
-     pntdir   - Pointing direction [GSkyDir]
-    Keywords:
-     tstart     - Start time [seconds] (default: 0.0)
-     duration   - Duration of observation [seconds] (default: 1800.0)
-     deadc      - Deadtime correction factor (default: 0.95)
-     emin       - Minimum event energy [TeV] (default: 0.1)
-     emax       - Maximum event energy [TeV] (default: 100.0)
-     rad        - ROI radius used for analysis [deg] (default: 5.0)
-     irf        - Instrument response function (default: cta_dummy_irf)
-     caldb      - Calibration database path (default: "dummy")
-     id         - Run identifier (default: "000000")
-     instrument - Intrument (default: "CTA")
+    Args:
+        pntdir: Pointing direction [GSkyDir]
+
+    Kwargs:
+        tstart:   Start time (seconds) (default: 0.0)
+        duration: Duration of observation (seconds) (default: 1800.0)
+        deadc:    Deadtime correction factor (default: 0.95)
+        emin:     Minimum event energy (TeV) (default: 0.1)
+        emax:     Maximum event energy (TeV) (default: 100.0)
+        rad:      ROI radius used for analysis (deg) (default: 5.0)
+        irf:      Instrument response function (default: "South_50h")
+        caldb:    Calibration database path (default: "prod2")
+        id:       Run identifier (default: "000000")
     """
     # Allocate CTA observation
-    obs_cta = gammalib.GCTAObservation(instrument)
+    obs_cta = gammalib.GCTAObservation()
 
     # Set calibration database
     db = gammalib.GCaldb()
@@ -397,7 +405,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
 
     # Set energy boundaries
-    ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"), \
+    ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"),
                                 gammalib.GEnergy(emax, "TeV"))
 
     # Allocate event list

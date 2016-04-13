@@ -66,7 +66,7 @@ dynamic-analysis: coverage valgrind
 # Add cppcheck rule
 cppcheck:
 	@if type cppcheck >/dev/null 2>&1; then \
-		cppcheck -v --enable=all --xml \
+		cppcheck -v --enable=all --xml --xml-version=2 \
 		src 2> cppcheck-result.xml; \
 	else \
 		echo "cppcheck not found in PATH."; \
@@ -76,7 +76,7 @@ cppcheck:
 sloccount:
 	@if type sloccount >/dev/null 2>&1; then \
 		sloccount --duplicates --wide --details \
-		src test > sloccount.sc; \
+		cscripts src test > sloccount.sc; \
 	else \
 		echo "sloccount not found in PATH."; \
 	fi
@@ -85,7 +85,7 @@ sloccount:
 cppncss:
 	@if type cppncss >/dev/null 2>&1; then \
 		cppncss -r -v -x -k -f=cppncss-raw-report.xml \
-		src inst/*/src; \
+		src; \
 	else \
 		echo "cppncss not found in PATH."; \
 	fi
@@ -93,9 +93,15 @@ cppncss:
 # Add coverage rule
 coverage:
 	@if type gcovr >/dev/null 2>&1; then \
-		gcovr -r . -x -o gcovr-reports-data.xml; \
+		gcovr -r . -x --exclude-unreachable-branches -o coverage-report-cxx.xml; \
 	else \
 		echo "gcovr script not found in PATH."; \
+	fi; \
+	if type coverage >/dev/null 2>&1; then \
+	    export COVERAGE_FILE=test/.coverage; \
+		coverage xml --omit=**/gammalib/**,/usr/** -o coverage-report-python.xml; \
+	else \
+		echo "coverage script not found in PATH."; \
 	fi
 
 # Add Valgrind rule

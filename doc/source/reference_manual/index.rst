@@ -19,6 +19,7 @@ ctools
    ctbkgcube --- Generates background cube <ctbkgcube>
    ctbutterfly --- Compute butterfly <ctbutterfly>
    ctcubemask --- Filter counts cube <ctcubemask>
+   ctedispcube --- Generates energy dispersion cube <ctedispcube>
    ctexpcube --- Generates exposure cube <ctexpcube>
    ctlike --- Performs maximum likelihood fitting <ctlike>
    ctmodel --- Computes model counts cube <ctmodel>

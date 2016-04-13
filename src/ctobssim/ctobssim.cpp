@@ -60,6 +60,8 @@ const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty ctobssim tool.
  ***************************************************************************/
 ctobssim::ctobssim(void) : ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
@@ -76,7 +78,7 @@ ctobssim::ctobssim(void) : ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
  *
  * @param[in] obs Observation container.
  *
- * Constructs application by initialising from an observation container.
+ * Constructs ctobssim tool from an observation container.
  ***************************************************************************/
 ctobssim::ctobssim(const GObservations& obs) :
           ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
@@ -98,7 +100,8 @@ ctobssim::ctobssim(const GObservations& obs) :
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  *
- * Constructs application using command line arguments for parameter setting.
+ * Constructs ctobssim tool using command line arguments for user parameter
+ * setting.
  ***************************************************************************/
 ctobssim::ctobssim(int argc, char *argv[]) :
           ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
@@ -115,6 +118,8 @@ ctobssim::ctobssim(int argc, char *argv[]) :
  * @brief Copy constructor
  *
  * @param[in] app Application.
+ *
+ * Constructs ctobssim tool from another ctobssim instance.
  ***************************************************************************/
 ctobssim::ctobssim(const ctobssim& app) : ctool(app)
 {
@@ -131,6 +136,8 @@ ctobssim::ctobssim(const ctobssim& app) : ctool(app)
 
 /***********************************************************************//**
  * @brief Destructor
+ *
+ * Destructs ctobssim tool.
  ***************************************************************************/
 ctobssim::~ctobssim(void)
 {
@@ -151,8 +158,10 @@ ctobssim::~ctobssim(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Application.
- * @return Application.
+ * @param[in] app ctobssim tool.
+ * @return ctobssim tool.
+ *
+ * Assigns ctobssim tool.
  ***************************************************************************/
 ctobssim& ctobssim::operator=(const ctobssim& app)
 {
@@ -185,7 +194,9 @@ ctobssim& ctobssim::operator=(const ctobssim& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear application
+ * @brief Clear ctobssim tool
+ *
+ * Clears ctobssim tool.
  ***************************************************************************/
 void ctobssim::clear(void)
 {
@@ -205,10 +216,10 @@ void ctobssim::clear(void)
 
 
 /***********************************************************************//**
- * @brief Simulate event data
+ * @brief Run the ctobssim tool.
  *
- * This method runs the simulation. Results are not saved by this method.
- * Invoke "save" to save the results.
+ * Gets the user parameters, loops over all CTA observations in the
+ * observation container, and simulate events for each observation. 
  ***************************************************************************/
 void ctobssim::run(void)
 {
@@ -286,24 +297,14 @@ void ctobssim::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
+        log.header1(gammalib::number("Observation", m_obs.size()));
         log << m_obs << std::endl;
     }
 
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Simulate observations");
-        }
-        else {
-            log.header1("Simulate observation");
-        }
+        log.header1(gammalib::number("Simulate observation", m_obs.size()));
     }
 
     // From here on the code can be parallelized if OpenMP support
@@ -334,14 +335,7 @@ void ctobssim::run(void)
 
             // Write header for observation
             if (logTerse()) {
-                std::string header = m_obs[i]->instrument() + " observation";
-                if (m_obs[i]->name().length() > 1) {
-                    header += " \"" + m_obs[i]->name() + "\"";
-                }
-                if (m_obs[i]->id().length() > 1) {
-                    header += " (id=" + m_obs[i]->id() +")";
-                }
-                wrklog.header3(header);
+                wrklog.header3(get_obs_header(m_obs[i]));
             }
 
             // Get pointer on CTA observation
@@ -419,7 +413,7 @@ void ctobssim::run(void)
 
                 // Save observation into FITS file. This is a critical zone
                 // to avoid multiple threads writing simultaneously
-                #pragma omp critical
+                #pragma omp critical(ctobssim_run)
                 {
                     //obs_clone.save(outfile, clobber());
                     obs->save(outfile, clobber());
@@ -1455,8 +1449,8 @@ void ctobssim::save_fits(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save event list into file \""+m_outevents+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Event list file");
+            log << m_outevents << std::endl;
         }
 
         // Save observation into FITS file
@@ -1483,7 +1477,7 @@ void ctobssim::save_xml(void)
 {
     // Get output filename and prefix
     m_outevents = (*this)["outevents"].filename();
-    m_prefix  = (*this)["prefix"].string();
+    m_prefix    = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
     std::string suffix = gammalib::tolower(m_outevents.substr(m_outevents.length()-4,4));
@@ -1513,15 +1507,16 @@ void ctobssim::save_xml(void)
                 if (obs->events()->size() != 0) {
 
                     // Set event output file name
-                    std::string outfile = m_prefix + gammalib::str(i) + ".fits";
+                    std::string outfile = m_prefix + gammalib::str(i) +
+                                          ".fits";
 
                     // Store output file name in observation
                     obs->eventfile(outfile);
 
                     // Log filename
                     if (logTerse()) {
-                        log << "Save event list into file \""+outfile+"\".";
-                        log << std::endl;
+                        log << gammalib::parformat("Event list file");
+                        log << outfile << std::endl;
                     }
 
                     // Save observation into FITS file
