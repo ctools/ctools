@@ -151,7 +151,7 @@ ctmapcube& ctmapcube::operator=(const ctmapcube& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear tool
  ***************************************************************************/
 void ctmapcube::clear(void)
 {
@@ -245,6 +245,8 @@ void ctmapcube::save(void)
  * @brief Publish map cube
  *
  * @param[in] name Map cube name.
+ *
+ * Publishes the map cube on a VO Hub.
  ***************************************************************************/
 void ctmapcube::publish(const std::string& name)
 {
@@ -287,7 +289,8 @@ void ctmapcube::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-    m_publish = false;
+    m_ptsrcsig = 1.0;
+    m_publish  = false;
 
     // Initialise protected members
     m_models.clear();
@@ -306,8 +309,9 @@ void ctmapcube::init_members(void)
 void ctmapcube::copy_members(const ctmapcube& app)
 {
     // Copy attributes
-    m_outcube = app.m_outcube;
-    m_publish = app.m_publish;
+    m_outcube  = app.m_outcube;
+    m_ptsrcsig = app.m_ptsrcsig;
+    m_publish  = app.m_publish;
 
     // Copy protected members
     m_models = app.m_models;
@@ -332,10 +336,21 @@ void ctmapcube::free_members(void)
  * @brief Get application parameters
  *
  * Get all task parameters from parameter file or (if required) by querying
- * the user. The parameters are read in the correct order.
+ * the user.
  ***************************************************************************/
 void ctmapcube::get_parameters(void)
 {
+    // Read model definition file if required
+    if (m_models.size() == 0) {
+
+        // Get model filename
+        GFilename inmodel = (*this)["inmodel"].filename();
+
+        // Load models from file
+        m_models.load(inmodel);
+
+    } // endif: there were no models
+
     // Get energy binning parameters
     GEnergies energies = create_energies();
 
@@ -348,19 +363,9 @@ void ctmapcube::get_parameters(void)
     int         nxpix    = (*this)["nxpix"].integer();
     int         nypix    = (*this)["nypix"].integer();
 
-    // Read model definition file if required
-    if (m_models.size() == 0) {
-
-        // Get model filename
-        GFilename inmodel = (*this)["inmodel"].filename();
-
-        // Load models from file
-        m_models.load(inmodel);
-
-    } // endif: there were no models
-
-    // Get remaining parameters
-    m_publish = (*this)["publish"].boolean();
+    // Get remaining hidden parameters
+    m_ptsrcsig = (*this)["ptsrcsig"].real();
+    m_publish  = (*this)["publish"].boolean();
 
     // Read optionally output cube filenames
     if (read_ahead()) {
@@ -386,18 +391,19 @@ void ctmapcube::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Create energy vector from user parameters
+ * @brief Create map cube energies from user parameters
  *
- * Get the energy vector according to the user parameters. The method
- * supports loading of energy information from the ENERGIES extension (or
- * any other extension specified by the "ebinfile" parameters), or setting
- * energies using a linear or logarithmical spacing.
+ * Creates the map cube energies according to the user parameters. If the
+ * @p ebinfile parameter is "FILE" the method loads the energy information
+ * from a FITS file. The name of the FITS file is given by the @p ebinfile
+ * parameter. If no extension name is specified the method will use assume
+ * the name to be "ENERGIES".
  *
- * The following parameters are read:
- *      ebinalg - Energy binning algorithm
- *      emin - Minimum energy (if ebinalg != FILE)
- *      emax - Maximum energy (if ebinalg != FILE)
- *      enumbins - Number of energies (if ebinalg != FILE)
+ * If the @p ebinfile parameter is "LIN" the method will create a linearly
+ * spaced series of @p enumbins energies in the interval @p emin to @p emax.
+ * Otherwise, the @p ebinfile parameter is assumed to be "LOG" and the method
+ * will create a logarithmically spaced series of @p enumbins energies in the
+ * interval @p emin to @p emax.
  ***************************************************************************/
 GEnergies ctmapcube::create_energies(void)
 {
@@ -510,6 +516,8 @@ void ctmapcube::create_cube(void)
 /***********************************************************************//**
  * @brief Add one model to map cube
  *
+ * @param[in] model Pointer to point source sky model.
+ *
  * Adds one model to map cube.
  ***************************************************************************/
 void ctmapcube::add_model(GModelSky* model)
@@ -520,21 +528,37 @@ void ctmapcube::add_model(GModelSky* model)
     // Get pointer to sky map
     GSkyMap* map = const_cast<GSkyMap*>(&m_cube.cube());
 
-    // Loop over all energy bins
-    for (int iebin = 0; iebin < energies.size(); ++iebin) {
+    // Get the model's bounding circle
+    GSkyDir centre;
+    double  radius;
+    get_bounding_circle(model, &centre, &radius);
 
-        // Loop over all spatial pixels
-        for (int ipixel = 0; ipixel < map->npix(); ++ipixel) {
+    // Add some margin to circle radius
+    radius += 0.1;
+
+    // Loop over all map cube pixels
+    for (int ipixel = 0; ipixel < map->npix(); ++ipixel) {
+
+        // Get pixel sky direction
+        GSkyDir dir = map->inx2dir(ipixel);
+
+        // Skip pixel if it's outside the bounding circle
+        if (centre.dist_deg(dir) > radius) {
+            continue;
+        }
+
+        // Loop over all energy bins
+        for (int iebin = 0; iebin < energies.size(); ++iebin) {
 
             // Set photon
-            GPhoton photon(map->inx2dir(ipixel), energies[iebin], GTime());
+            GPhoton photon(dir, energies[iebin], GTime());
 
             // Add model value
             map->operator()(ipixel, iebin) += model->value(photon);
 
-        } // endfor: looped over all pixels
+        } // endfor: looped over all energies
 
-    } // endfor: looped over all energies
+    } // endfor: looped over all pixels
 
     // Return
     return;
@@ -544,51 +568,141 @@ void ctmapcube::add_model(GModelSky* model)
 /***********************************************************************//**
  * @brief Add one point source model to map cube
  *
+ * @param[in] model Pointer to point source sky model.
+ *
  * Adds one point source model to map cube.
  ***************************************************************************/
 void ctmapcube::add_ptsrc_model(GModelSky* model)
 {
-    // Get point source spatial component
-    GModelSpatialPointSource* ptsrc = static_cast<GModelSpatialPointSource*>(model->spatial());
-
-    // Get point source direction
-    GSkyDir dir = ptsrc->dir();
-
-    // Get cube energies
-    GEnergies energies = m_cube.energies();
-
     // Get pointer to sky map
     GSkyMap* map = const_cast<GSkyMap*>(&m_cube.cube());
 
-    // Get test sky map for flux computation
-    GSkyMap test_map(*map);
+    // If Gaussian sigma is positive then replace the point sources by a
+    // Gaussian with the user defined width
+    if (m_ptsrcsig > 0.0) {
 
-    // Continue only if map contains point source sky direction
-    if (map->contains(dir)) {
+        // Get the point source centre (radius is ignored)
+        GSkyDir centre;
+        double  radius;
+        get_bounding_circle(model, &centre, &radius);
 
-        // Get map pixel
-        int ipixel = map->dir2inx(dir);
+        // Set the Gaussian sigma in degrees (m_ptsrcsig is in arcmin)
+        double sigma = m_ptsrcsig/60.0;
 
-        // Loop over all energy bins
-        for (int iebin = 0; iebin < energies.size(); ++iebin) {
+        // Create a Gaussian spatial model
+        GModelSpatialRadialGauss spatial(centre, sigma);
 
-            // Set photon using the point source sky direction
-            GPhoton photon(dir, energies[iebin], GTime());
+        // Create a new model reusing the spectral and temporal components
+        // of the original model
+        GModelSky skymodel(spatial, *(model->spectral()), *(model->temporal()));
 
-            // Compute model value
-            double value = model->value(photon);
+        // Add model
+        add_model(&skymodel);
 
-            // Compute flux normalization
-            test_map(ipixel, iebin) = value;
-            double flux = test_map.flux(ipixel, iebin);
-            double norm = (flux > 0.0) ? value / flux : 0.0;
+    } // endif: Gaussian sigma was positive
 
-            // Add model to sky map
-            map->operator()(ipixel, iebin) += norm * value;
+    // ... otherwise set a single map pixel
+    else {
 
-        } // endfor: looped over all energies
+        // Get point source spatial component
+        GModelSpatialPointSource* ptsrc =
+                    static_cast<GModelSpatialPointSource*>(model->spatial());
 
-    } // endif: map contained sky direction
+        // Get point source direction
+        GSkyDir dir = ptsrc->dir();
+
+        // Get cube energies
+        GEnergies energies = m_cube.energies();
+
+        // Get test sky map for flux computation
+        GSkyMap test_map(*map);
+
+        // Continue only if map contains point source sky direction
+        if (map->contains(dir)) {
+
+            // Get map pixel
+            int ipixel = map->dir2inx(dir);
+
+            // Loop over all energy bins
+            for (int iebin = 0; iebin < energies.size(); ++iebin) {
+
+                // Set photon using the point source sky direction
+                GPhoton photon(dir, energies[iebin], GTime());
+
+                // Compute model value
+                double value = model->value(photon);
+
+                // Compute flux normalization
+                test_map(ipixel, iebin) = value;
+                double flux = test_map.flux(ipixel, iebin);
+                double norm = (flux > 0.0) ? value / flux : 0.0;
+
+                // Add model to sky map
+                map->operator()(ipixel, iebin) += norm * value;
+
+            } // endfor: looped over all energies
+
+        } // endif: map contained sky direction
+
+    } // endelse: Gaussian sigma was non positive
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get bounding circle for a sky model
+ *
+ * @param[in] model Pointer to sky model.
+ * @param[out] dir Centre of bounding circle.
+ * @param[out] radius Radius of bounding circle (degrees).
+ *
+ * Determine for any spatial model the bounding circle. The bounding circle
+ * is a circular region that fully enclosed the model.
+ *
+ * The method does not verify the validity of the pointer arguments.
+ ***************************************************************************/
+void ctmapcube::get_bounding_circle(GModelSky* model,
+                                    GSkyDir*   dir,
+                                    double*    radius) const
+{
+    // Interpret the spatial model component as point source, radial source
+    // or elliptical source
+    GModelSpatialPointSource* ptsrc =
+                 dynamic_cast<GModelSpatialPointSource*>(model->spatial());
+    GModelSpatialRadial* radial =
+                 dynamic_cast<GModelSpatialRadial*>(model->spatial());
+    GModelSpatialElliptical* elliptical =
+                 dynamic_cast<GModelSpatialElliptical*>(model->spatial());
+
+    // If the spatial component as a point source then extract the source
+    // position and set the radius of the bounding box to 0.1 degrees
+    if (ptsrc != NULL) {
+        *dir    = ptsrc->dir();
+        *radius = 0.1;
+    }
+
+    // ... otherwise, if the spatial component is a radial source then extract
+    // the source position and set the radius of the bounding box from the
+    // value returned by theta_max() in radians
+    else if (radial != NULL) {
+        *dir    = radial->dir();
+        *radius = radial->theta_max() * gammalib::rad2deg;
+    }
+
+    // ... otherwise, if the spatial component is an elliptical source then
+    // extract the source position and set the radius of the bounding box from
+    // the value returned by theta_max() in radians
+    else if (elliptical != NULL) {
+        *dir    = elliptical->dir();
+        *radius = elliptical->theta_max() * gammalib::rad2deg;
+    }
+
+    // ... otherwise use the entire sky
+    else {
+        *radius = 180.0;
+    }
 
     // Return
     return;

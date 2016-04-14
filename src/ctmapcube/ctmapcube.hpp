@@ -71,9 +71,13 @@ protected:
     void      create_cube(void);
     void      add_model(GModelSky* model);
     void      add_ptsrc_model(GModelSky* model);
+    void      get_bounding_circle(GModelSky* model,
+                                  GSkyDir*   dir,
+                                  double*    radius) const;
 
     // User parameters
     GFilename m_outcube;                //!< Output map cube filename
+    double    m_ptsrcsig;               //!< Point source sigma (arcmin)
     bool      m_publish;                //!< Publish map cube?
 
     // Protected members

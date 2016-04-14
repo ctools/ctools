@@ -20,16 +20,17 @@ ctools
    ctbutterfly --- Compute butterfly <ctbutterfly>
    ctcubemask --- Filter counts cube <ctcubemask>
    ctedispcube --- Generates energy dispersion cube <ctedispcube>
+   cterror --- Calculates likelihood profile errors <cterror>
    ctexpcube --- Generates exposure cube <ctexpcube>
    ctlike --- Performs maximum likelihood fitting <ctlike>
+   ctmapcube --- Generates a map cube <ctmapcube>
    ctmodel --- Computes model counts cube <ctmodel>
-   ctobssim --- Simulate CTA observations <ctobssim>
+   ctobssim --- Simulate observations <ctobssim>
    ctpsfcube --- Generates point spread function cube <ctpsfcube>
    ctselect --- Selects event data <ctselect>
    ctskymap --- Generates sky map <ctskymap>
-   cttsmap --- Generates Test Statistics map <cttsmap>
+   cttsmap --- Generates Test Statistic map <cttsmap>
    ctulimit --- Calculates upper limit <ctulimit>
-   cterror --- Calculates likelihood profile errors <cterror>
 
 
 General cscripts
