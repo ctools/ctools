@@ -698,7 +698,7 @@ class csroot2caldb(ctools.cscript):
                                    self._psf_bounds, self._psf_desc)
 
             # SCALE
-            #self._make_2D(scale, self._hdu_psf, "SCALE", "")
+            self._make_2D(scale, self._hdu_psf, "SCALE", "")
 
             # SIGMA_1
             self._make_2D(r68, self._hdu_psf, "SIGMA_1", "deg")
