@@ -5,7 +5,7 @@ pythonscripts = __init__.py \
                 cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py \
                 csobsdef.py csspec.py cslightcrv.py csobsinfo.py \
                 csinfo.py csmodelinfo.py csmodelmerge.py cstsmapmerge.py \
-                csobs2caldb.py \
+                csroot2caldb.py csobs2caldb.py \
                 csfindobs.py csiactcopy.py csiactdata.py csiactobs.py \
                 obsutils.py
 
@@ -13,14 +13,14 @@ pythonscripts = __init__.py \
 parfiles = cspull.par cssens.par cstsdist.par cscaldb.par csresmap.par \
            csobsdef.par csspec.par cslightcrv.par csobsinfo.par \
            csmodelinfo.par csmodelmerge.par cstsmapmerge.par \
-           csobs2caldb.par \
+           csroot2caldb.par csobs2caldb.par \
            csfindobs.par csiactcopy.par csiactdata.par csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cspull cssens cstsdist cscaldb csresmap \
               csobsdef csspec cslightcrv csobsinfo \
               csinfo csmodelinfo csmodelmerge cstsmapmerge \
-              csobs2caldb \
+              csroot2caldb csobs2caldb \
               csfindobs csiactcopy csiactdata csiactobs
 
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
@@ -34,6 +34,7 @@ testscripts = tests/__init__.py \
               ../test/test_csobsdef.py \
               ../test/test_csobsinfo.py \
               ../test/test_cspull.py \
+              ../test/test_csroot2caldb.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
               ../test/test_csiactdata.py \
@@ -53,7 +54,8 @@ testdata    = ../test/data/crab.xml \
               ../test/data/models.txt \
               ../test/data/model_cube_background.xml \
               ../test/data/model_cube_background2.xml \
-              ../test/data/crab_bkgcube.xml
+              ../test/data/crab_bkgcube.xml \
+              ../test/data/irf.root
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/iactdata
 testiactdata = ../test/iactdata/hdu-index.fits.gz \
@@ -61,7 +63,7 @@ testiactdata = ../test/iactdata/hdu-index.fits.gz \
                ../test/iactdata/obs-index.fits.gz
 
 # Test IRFs to be distributed in $(pyexecdir)/cscripts/tests/irf
-testirf     = ../test/irf/irf_file.fits.gz
+testirf      = ../test/irf/irf_file.fits.gz
 
 # Distribute scripts and parfiles
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
