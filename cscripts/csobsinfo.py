@@ -309,8 +309,11 @@ class csobsinfo(ctools.cscript):
             self._log("%.2f" % (sum(self._azimuths)/len(self._azimuths)))
             self._log(" deg\n")
         
-            # Optionally log name of observations
-            if self._logExplicit():
+            # Optionally log names of observations. Note that the set class
+            # is used to extract all different observation names from the
+            # list of observation names, and the set class is only available
+            # from Python 2.4 on.
+            if self._logExplicit() and sys.version_info >= (2,4):
                 obs_set = set(obs_names)
                 for name in obs_set:
                     self._log.parformat("\""+name+"\"")

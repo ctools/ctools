@@ -29,7 +29,7 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [1.1.0dev], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [1.1.0.dev1], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies])
@@ -1013,6 +1013,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctpsfcube/Makefile
                  src/ctedispcube/Makefile
                  src/ctbkgcube/Makefile
+                 src/ctmapcube/Makefile
                  src/ctcubemask/Makefile
                  src/cttsmap/Makefile
                  src/ctbutterfly/Makefile
