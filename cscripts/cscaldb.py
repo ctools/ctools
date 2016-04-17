@@ -206,16 +206,6 @@ class cscaldb(ctools.cscript):
         """
         Execute the script.
         """
-        # Run the script
-        self.run()
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script.
-        """
         # Open logfile
         self.logFileOpen()
 

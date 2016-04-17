@@ -2,26 +2,70 @@
 
 # Scripts to be distributed in $(pyexecdir)/cscripts
 pythonscripts = __init__.py \
-                cspull.py cssens.py cstsdist.py cscaldb.py csresmap.py \
-                csobsdef.py csspec.py cslightcrv.py csobsinfo.py \
-                csinfo.py csmodelinfo.py csmodelmerge.py cstsmapmerge.py \
-                csroot2caldb.py csobs2caldb.py \
-                csfindobs.py csiactcopy.py csiactdata.py csiactobs.py \
+                cscaldb.py \
+                csinfo.py \
+                cslightcrv.py \
+                csmodelinfo.py \
+                csmodelmerge.py \
+                csobs2caldb.py \
+                csobsdef.py \
+                csobsinfo.py \
+                cspull.py \
+                csresmap.py \
+                csroot2caldb.py  \
+                cssens.py \
+                csspec.py \
+                cstsdist.py \
+                cstsmapmerge.py \
+                csworkflow.py \
+                csfindobs.py \
+                csiactcopy.py \
+                csiactdata.py \
+                csiactobs.py \
                 obsutils.py
 
 # Parfiles to be distributed in $(prefix)/syspfiles
-parfiles = cspull.par cssens.par cstsdist.par cscaldb.par csresmap.par \
-           csobsdef.par csspec.par cslightcrv.par csobsinfo.par \
-           csmodelinfo.par csmodelmerge.par cstsmapmerge.par \
-           csroot2caldb.par csobs2caldb.par \
-           csfindobs.par csiactcopy.par csiactdata.par csiactobs.par
+parfiles = cscaldb.par \
+           cslightcrv.par \
+           csmodelinfo.par \
+           csmodelmerge.par \
+           csobs2caldb.par \
+           csobsdef.par \
+           csobsinfo.par \
+           cspull.par \
+           csresmap.par \
+           csroot2caldb.par \
+           cssens.par \
+           csspec.par \
+           cstsdist.par \
+           cstsmapmerge.par \
+           csworkflow.par \
+           csfindobs.par \
+           csiactcopy.par \
+           csiactdata.par \
+           csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
-linkscripts = cspull cssens cstsdist cscaldb csresmap \
-              csobsdef csspec cslightcrv csobsinfo \
-              csinfo csmodelinfo csmodelmerge cstsmapmerge \
-              csroot2caldb csobs2caldb \
-              csfindobs csiactcopy csiactdata csiactobs
+linkscripts = cscaldb \
+              csinfo \
+              cslightcrv \
+              csmodelinfo \
+              csmodelmerge \
+              csobs2caldb \
+              csobsdef \
+              csobsinfo \
+              cspull \
+              csresmap \
+              csroot2caldb \
+              cssens \
+              csspec \
+              cstsdist \
+              cstsmapmerge \
+              csworkflow \
+              csfindobs \
+              csiactcopy \
+              csiactdata \
+              csiactobs
 
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
 testscripts = tests/__init__.py \
@@ -35,6 +79,7 @@ testscripts = tests/__init__.py \
               ../test/test_csobsinfo.py \
               ../test/test_cspull.py \
               ../test/test_csroot2caldb.py \
+              ../test/test_csworkflow.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
               ../test/test_csiactdata.py \
@@ -55,7 +100,8 @@ testdata    = ../test/data/crab.xml \
               ../test/data/model_cube_background.xml \
               ../test/data/model_cube_background2.xml \
               ../test/data/crab_bkgcube.xml \
-              ../test/data/irf.root
+              ../test/data/irf.root \
+              ../test/data/workflow.xml
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/iactdata
 testiactdata = ../test/iactdata/hdu-index.fits.gz \

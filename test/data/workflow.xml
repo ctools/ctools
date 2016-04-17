@@ -46,7 +46,7 @@
             <parameter name="logfile" value="ctobssim.log" />
         </input>
         <output>
-            <parameter name="outevents" value="events.fits" />
+            <parameter name="outevents" value="wf_events.fits" />
         </output>
     </actor>
     <actor name="ctselect" tool="ctselect">
@@ -70,7 +70,7 @@
             <parameter name="logfile"  value="ctselect.log" />
         </input>
         <output>
-            <parameter name="outobs" value="selected_events.fits" />
+            <parameter name="outobs" value="wf_selected_events.fits" />
         </output>
     </actor>
     <actor name="ctlike" tool="ctlike">
@@ -93,37 +93,7 @@
             <parameter name="logfile" value="ctlike.log" />
         </input>
         <output>
-            <parameter name="outmodel" value="crab_results.xml" />
-        </output>
-    </actor>
-    <actor name="csspec" tool="csspec">
-        <input>
-            <parameter name="inobs"     value="outobs"   actor="ctselect" />
-            <parameter name="inmodel"   value="outmodel" actor="ctlike" />
-            <parameter name="srcname"   value="target"   actor="input" />
-            <parameter name="expcube"   value="NONE" />
-            <parameter name="psfcube"   value="NONE" />
-            <parameter name="bkgcube"   value="NONE" />
-            <parameter name="caldb"     value="caldb" actor="input" />
-            <parameter name="irf"       value="irf"   actor="input" />
-            <parameter name="edisp"     value="edisp" actor="input" />
-            <parameter name="emin"      value="emin" actor="input" />
-            <parameter name="emax"      value="emax" actor="input" />
-            <parameter name="enumbins"  value="10" />
-            <parameter name="ebinalg"   value="LOG" />
-            <parameter name="ebinfile"  value="NONE" />
-            <parameter name="calc_ts"   value="yes" />
-            <parameter name="calc_ulim" value="yes" />
-            <parameter name="fix_srcs"  value="yes" />
-            <parameter name="fix_bkg"   value="no" />
-            <parameter name="chatter"   value="chatter" actor="input" />
-            <parameter name="clobber"   value="clobber" actor="input" />
-            <parameter name="debug"     value="debug" actor="input" />
-            <parameter name="mode"      value="mode" actor="input" />
-            <parameter name="logfile"   value="csspec.log" />
-        </input>
-        <output>
-            <parameter name="outfile" value="spectrum.fits" />
+            <parameter name="outmodel" value="wf_crab_results.xml" />
         </output>
     </actor>
 </workflow>
