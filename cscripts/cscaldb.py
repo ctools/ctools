@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script dumps all available calibrations into the console.
+# Show the content of the ctools calibration database
 #
 # Copyright (C) 2014-2016 Juergen Knoedlseder
 #
@@ -32,19 +32,30 @@ class cscaldb(ctools.cscript):
     """
     Shows the content of the ctools calibration database.
     
-    If the "debug" parameter is set to "yes" the calibration database
-    is shown in the console, otherwise the content is only written
-    into the "cscaldb.log" log file.
+    The ``cscaldb`` script writes the content of the calibration database
+    into the ``cscaldb.log`` log file. If the ``debug`` parameter is set
+    to ``yes`` the calibration database is also logged in the console.
     """
 
     # Constructors and destructors
     def __init__(self, *argv):
         """
         Constructor.
+        
+        Parameters
+        ----------
+        argv : list of str
+            List of IRAF command line parameter strings of the form
+            ``parameter=3``.
+
+        Raises
+        ------
+        TypeError
+            An invalid number of command line arguments was provided.
         """
         # Set name
-        self._name    = "cscaldb"
-        self._version = "1.1.0"
+        self._name    = 'cscaldb'
+        self._version = '1.1.0'
 
         # Initialise application
         if len(argv) == 0:
@@ -52,7 +63,7 @@ class cscaldb(ctools.cscript):
         elif len(argv) ==1:
             ctools.cscript.__init__(self, self._name, self._version, *argv)
         else:
-            raise TypeError("Invalid number of arguments given.")
+            raise TypeError('Invalid number of arguments provided.')
 
         # Set logger properties
         self._log_header()
@@ -61,37 +72,28 @@ class cscaldb(ctools.cscript):
         # Return
         return
 
-    def __del__(self):
-        """
-        Destructor.
-        """
-        # Return
-        return
-
 
     # Private methods
+    #
+    # Query all user parameters
     def _get_parameters(self):
-        """
-        Get parameters from parfile.
-        """
+
+        #  Write input parameters into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log('\n')
+
         # Return
         return
 
+    # Extract mission names from a calibration database
     def _get_missions(self, caldb):
-        """
-        Extract mission names from a calibration database.
 
-        Args:
-            caldb: Calibration database.
-
-        Returns:
-            A list of mission names.
-        """
         # Initialise mission list
         missions = []
 
         # Extract missions
-        paths = glob.glob(caldb.rootdir()+"/data/*")
+        paths = glob.glob(caldb.rootdir()+'/data/*')
         paths.sort()
         for path in paths:
             missions.append(os.path.basename(path))
@@ -102,22 +104,14 @@ class cscaldb(ctools.cscript):
         # Return missions
         return missions
 
+    # Extract instrument names from a calibration database
     def _get_instruments(self, caldb, mission):
-        """
-        Extract instrument names from a calibration database.
 
-        Args:
-            caldb:   Calibration database.
-            mission: Mission name.
-
-        Returns:
-            A list of instrument names.
-        """
         # Initialise instrument list
         instruments = []
 
         # Extract instruments
-        paths       = glob.glob(caldb.rootdir()+"/data/"+mission+"/*")
+        paths       = glob.glob(caldb.rootdir()+'/data/'+mission+'/*')
         paths.sort()
         for path in paths:
             instruments.append(os.path.basename(path))
@@ -128,17 +122,10 @@ class cscaldb(ctools.cscript):
         # Return instruments
         return instruments
 
+    # Extract response names from a calibrations FITS table and return them
+    # in form of a list
     def _get_response_names(self, calibrations):
-        """
-        Extract response names from a calibrations FITS table and return
-        them in form of a list.
 
-        Args:
-            calibrations: FITS table containing the calibrations.
-
-        Returns:
-            A list of response names.
-        """
         # Initialise response name list
         names = []
 
@@ -149,9 +136,9 @@ class cscaldb(ctools.cscript):
         for row in range(nrows):
             for col in range(ncols):
                 cal    = calibrations.string(row, col)
-                istart = cal.find("NAME(")
+                istart = cal.find('NAME(')
                 if istart != -1:
-                    istop = cal.find(")")
+                    istop = cal.find(')')
                     name  = cal[5:istop]
                     if names.count(name) == 0:
                         names.append(name)
@@ -164,16 +151,6 @@ class cscaldb(ctools.cscript):
 
 
     # Public methods
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Run the script
-        self.run()
-
-        # Return
-        return
-
     def run(self):
         """
         Run the script.
@@ -185,11 +162,6 @@ class cscaldb(ctools.cscript):
         # Get parameters
         self._get_parameters()
 
-        #  Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log("\n")
-
         # Get the calibration database
         caldb = gammalib.GCaldb()
 
@@ -200,13 +172,13 @@ class cscaldb(ctools.cscript):
         for mission in missions:
 
             # Skip all non-CTA instruments
-            if mission != "cta":
+            if mission != 'cta':
                 continue
 
             # Write mission into logger
             if self._logTerse():
-                self._log("\n")
-                self._log.header1("Mission: "+mission)
+                self._log('\n')
+                self._log.header1('Mission: '+mission)
 
             # Extract instruments
             instruments = self._get_instruments(caldb, mission)
@@ -216,15 +188,15 @@ class cscaldb(ctools.cscript):
 
                 # Write mission into logger
                 if self._logTerse():
-                    self._log.header3("Response functions in database \""+
-                                      instrument+"\"")
+                    self._log.header3('Response functions in database "'+
+                                      instrument+'"')
 
                 # Open calibration index file and retrieve calibrations
-                filename = "/data/"+mission+"/"+instrument+"/caldb.indx"
+                filename = '/data/'+mission+'/'+instrument+'/caldb.indx'
                 cifname  = caldb.rootdir() + filename
                 fits     = gammalib.GFits(cifname)
-                cif      = fits["CIF"]
-                caltable = cif["CAL_CBD"]
+                cif      = fits['CIF']
+                caltable = cif['CAL_CBD']
 
                 # Extract response names
                 names = self._get_response_names(caltable)
@@ -232,8 +204,18 @@ class cscaldb(ctools.cscript):
                 # Print response name
                 if self._logTerse():
                     for name in names:
-                        self._log(name+"\n")
-                    self._log("\n")
+                        self._log(name+'\n')
+                    self._log('\n')
+
+        # Return
+        return
+
+    def execute(self):
+        """
+        Execute the script.
+        """
+        # Run the script
+        self.run()
 
         # Return
         return
@@ -248,7 +230,7 @@ if __name__ == '__main__':
     app = cscaldb(sys.argv)
 
     # Open logfile
-    app._logFileOpen()
+    app.logFileOpen()
 
     # Execute application
     app.execute()
