@@ -16,7 +16,7 @@
             <parameter name="tmax"    value="1800.0" />
             <parameter name="chatter" value="2" />
             <parameter name="clobber" value="yes" />
-            <parameter name="debug"   value="yes" />
+            <parameter name="debug"   value="no" />
             <parameter name="mode"    value="ql" />
         </output>
     </actor>
