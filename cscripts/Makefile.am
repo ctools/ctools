@@ -109,7 +109,8 @@ testiactdata = ../test/iactdata/hdu-index.fits.gz \
                ../test/iactdata/obs-index.fits.gz
 
 # Test IRFs to be distributed in $(pyexecdir)/cscripts/tests/irf
-testirf      = ../test/irf/irf_file.fits.gz
+testirf      = ../test/irf/irf_file.fits.gz \
+               ../test/irf/cta_dummy_irf.dat
 
 # Distribute scripts and parfiles
 EXTRA_DIST         = $(binscripts) $(pythonscripts)
