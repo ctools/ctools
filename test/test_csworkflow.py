@@ -78,7 +78,8 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute csworkflow, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd)
+            #rc = os.system(cmd+" >/dev/null 2>&1")
         except:
             pass
 
@@ -137,13 +138,15 @@ class Test(gammalib.GPythonTestSuite):
 
         # Check fit result values
         self.test_value(models['Crab'][2].value(),
-                        5.73787e-16, 1.0e-5, 'Crab prefactor')
+                        5.71055e-16, 1.0e-5, 'Crab prefactor')
         self.test_value(models['Crab'][3].value(),
-                        -2.47386, 1.0e-5, 'Crab index')
-        self.test_value(models['CTABackgroundModel'][0].value(),
-                        1.01414, 1.0e-5, 'Background model prefactor')
-        self.test_value(models['CTABackgroundModel'][1].value(),
-                        0.00242827, 1.0e-5, 'Background model index')
+                        -2.50996, 1.0e-5, 'Crab index')
+        self.test_value(models['Background'][0].value(),
+                        2.98499, 1.0e-5, 'Background model sigma')
+        self.test_value(models['Background'][1].value(),
+                        6.27131e-05, 1.0e-5, 'Background model prefactor')
+        self.test_value(models['Background'][2].value(),
+                        -1.85037, 1.0e-5, 'Background model index')
 
         # Return
         return

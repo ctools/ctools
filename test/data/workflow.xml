@@ -2,9 +2,9 @@
 <workflow>
     <actor name="input">
         <output>
-            <parameter name="inmodel" value="$CTOOLS/share/models/crab.xml" />
-            <parameter name="caldb"   value="prod2" />
-            <parameter name="irf"     value="South_50h" />
+            <parameter name="inmodel" value="data/crab.xml" />
+            <parameter name="caldb"   value="irf" />
+            <parameter name="irf"     value="cta_dummy_irf" />
             <parameter name="edisp"   value="no" />
             <parameter name="deadc"   value="0.95" />
             <parameter name="ra"      value="83.63" />
@@ -16,7 +16,7 @@
             <parameter name="tmax"    value="1800.0" />
             <parameter name="chatter" value="2" />
             <parameter name="clobber" value="yes" />
-            <parameter name="debug"   value="no" />
+            <parameter name="debug"   value="yes" />
             <parameter name="mode"    value="ql" />
         </output>
     </actor>
