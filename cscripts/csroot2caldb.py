@@ -27,10 +27,9 @@ from datetime import datetime
 
 # Optional ROOT import
 try:
-    from ROOT import TFile, TH2F, TH3F
+    from ROOTx import TFile, TH2F, TH3F
     _has_root = True
 except:
-    print('ROOT module not present, so csroot2caldb script will not work.')
     _has_root = False
 
 
@@ -1228,6 +1227,11 @@ class csroot2caldb(ctools.cscript):
         """
         Run the script.
         """
+        # Warn if ROOT module is missing
+        if not _has_root:
+            gammalib.warning('csroot2caldb', 'ROOT Python module not present, '
+                             'script will create empty IRF.')
+
         # Switch screen logging on in debug mode
         if self._logDebug():
             self._log.cout(True)
