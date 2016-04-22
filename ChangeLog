@@ -1,8 +1,9 @@
-2016-04-17  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-04-22  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Add csobsdef.pntdef() method (#1771)
         Add ctmapcube tool (#1760)
         Add "seed" parameter to cspull (#1755)
         Add ctedispcube tool (#1724)

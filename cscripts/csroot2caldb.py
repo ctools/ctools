@@ -27,7 +27,7 @@ from datetime import datetime
 
 # Optional ROOT import
 try:
-    from ROOTx import TFile, TH2F, TH3F
+    from ROOT import TFile, TH2F, TH3F
     _has_root = True
 except:
     _has_root = False
