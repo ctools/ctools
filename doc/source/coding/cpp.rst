@@ -13,6 +13,13 @@ only finished implementing C++11 in 2013 and using C++11 features in
 ctools would make it impossible to use the code on many systems.
 
 
+Dependencies
+^^^^^^^^^^^^
+
+- All ctools code must only depend on the ISO standard C++98 libraries and the
+  GammaLib library.
+
+
 Code lay-out
 ^^^^^^^^^^^^
 
@@ -58,14 +65,17 @@ Code lay-out
      std::string print(void) const;
 
 
-String quotes
-^^^^^^^^^^^^^
+.. To be written:
 
-Whitespace in Expressions and Statements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   String quotes
+   ^^^^^^^^^^^^^
 
-Comments
-^^^^^^^^
+   Whitespace in Expressions and Statements
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Comments
+   ^^^^^^^^
+
 
 Naming Conventions
 ^^^^^^^^^^^^^^^^^^

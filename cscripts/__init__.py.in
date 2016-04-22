@@ -34,11 +34,12 @@ __all__ = [
     "csobsinfo",
     "cspull",
     "csresmap",
+    "csroot2caldb",
     "cssens",
     "csspec",
     "cstsdist",
     "cstsmapmerge",
-    "csfindobs",
+    "csworkflow",
     "obsutils"
 ]
 if cur_version > req_version:
@@ -58,10 +59,12 @@ from cscripts.csobsdef     import csobsdef
 from cscripts.csobsinfo    import csobsinfo
 from cscripts.cspull       import cspull
 from cscripts.csresmap     import csresmap
+from cscripts.csroot2caldb import csroot2caldb
 from cscripts.cssens       import cssens
 from cscripts.csspec       import csspec
 from cscripts.cstsdist     import cstsdist
 from cscripts.cstsmapmerge import cstsmapmerge
+from cscripts.csworkflow   import csworkflow
 from cscripts              import obsutils
 if cur_version > req_version:
     from cscripts.csfindobs  import csfindobs

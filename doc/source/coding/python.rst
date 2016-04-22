@@ -7,9 +7,15 @@ You can check whether you code complies to these rules using the
 `pep8 tool <https://github.com/jcrocholl/pep8>`_ that you should run
 on your Python code before committing.
 
-All ctools code must be compatible with Python 2.3 or higher, and
-Python 3.0 and higher. No Python modules that are not available in
-these Python version shall be used.
+
+Dependencies
+^^^^^^^^^^^^
+
+- All ctools code must be compatible with Python 2.3 or higher, and
+  Python 3.0 and higher.
+
+- ctools should be importable with no dependencies other than the
+  `Python Standard Library <https://docs.python.org/release/2.3/lib/lib.html>`_.
 
 
 Code lay-out
@@ -130,11 +136,27 @@ Comments
 
      x = x + 1  # Compensate for border
 
+
+User Documentation
+^^^^^^^^^^^^^^^^^^
+
 - Write documentation strings (a.k.a. docstrings) for all modules, functions,
-  classes, and methods.
+  classes, and public methods.
   Read `PEP 257 <http://www.python.org/dev/peps/pep-0257/>`_ to learn
   about the general Python conventions for writing good documentation
   strings.
+
+- The docstring conventions follow the common standards developed by
+  `NumPy <http://www.numpy.org>`_ and `SciPy <http://www.scipy.org>`_
+  and that are also adopted by
+  `AstroPy <http://docs.astropy.org/en/stable/development/docrules.html>`_.
+  This docstring standard uses
+  `re-structured text (reST) <http://docutils.sourceforge.net/rst.html>`_
+  syntax and is rendered using
+  `Sphinx <http://www.sphinx-doc.org/en/stable/>`_.
+  While a rich set of markup is available, limit yourself to a very basic
+  subset, in order to provide docstrings that are easy to read on text-only
+  terminals.
 
 - Format each docstring as follows (sections can be omitted if they do
   not apply, for example you do not need to specify that nothing is 
@@ -143,35 +165,104 @@ Comments
   .. code-block:: python
 
      """
-     Extract mission names from a calibration database.
+     Extract calibrations for a mission from a calibration database.
 
-     The method extract mission names from a calibration database by
+     .. note:: Deprecated in ctools 1.1
+               The `instrument` string will be removed in ctools 2.0 because
+               it's in fact not used by the method.
+
+     The method extract calibration names from a calibration database by
      scanning all index files.
 
-     Args:
-         caldb:  Calibration database.
+     Parameters
+     ----------
+     caldb :  `~gammalib.GCaldb`
+         Calibration database.
+     instrument : str
+         Instrument names.
+     debug : bool, optional
+         Turn on debugging if needed.
 
-     Kwargs:
-         kwarg:  A keyword argument.
+     Returns
+     -------
+     missions : list of str
+         List of mission names.
 
-     Returns:
-         A list of mission names.
+     Raises
+     ------
+     ValueError
+         If `instrument` is not recognised as among the ones implemented.
 
-     Raises:
-         ZeroDivisionError, AssertionError, & ValueError.
+     See Also
+     --------
+     irfs : Return all irfs for a given calibration.
 
-     Examples:
-         >>> extraction_missions(self, caldb, kwarg=False)
-         ['CTA']
-         >>> extraction_missions(self, junk, kwarg=False)
-         Traceback (most recent call last):
+     Notes
+     -----
+     See https//my.site.edu for documentation. The method computes
+
+     .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+
+     where the value of :math:`\omega` is larger than 5.
+
+     References
+     ----------
+     .. [1] J. Public, "The art of programming", Computers & Geosciences,
+        vol. 22, pp. 585-588, 1996.
+
+     Examples
+     --------
+     >>> calibrations(caldb, "CTA", debug=False)
+     ['Prod2', 'Prod3']
      """
+
+- For the parameter types, be as precise as possible. Below are a few examples
+  of parameters and their types.
+
+  .. code-block:: python
+
+     Parameters
+     ----------
+     filename : str
+     copy : bool
+     dtype : data-type
+     iterable : iterable object
+     shape : int or tuple of int
+     files : list of str
+
+- For classes, use the same sections as outlined above. The constructor
+  (``__init__``) should also be documented here, the Parameters section of
+  the docstring details the constructors parameters. An Attributes section,
+  located below the Parameters section, may be used to describe class
+  variables:
+
+  .. code-block:: python
+
+     Attributes
+     ----------
+     x : float
+         The X coordinate.
+     y : float
+         The Y coordinate.
+
+- In general, it is not necessary to list class methods. In some cases,
+  however, a class may have many methods, and then it becomes useful to have
+  an additional ``Methods`` section:
+
+  .. code-block:: python
+
+    Methods
+    -------
+    read(filename)
+        Read a table from a file
+    sort(column, order='ascending')
+        Sort by `column`
 
 
 Naming Conventions
 ^^^^^^^^^^^^^^^^^^
 
-- Use short lowercase abbreivate words for cscripts, e.g.:
+- Use short lowercase abbreviate words for cscripts, e.g.:
 
   .. code-block:: python
 
@@ -188,8 +279,8 @@ Naming Conventions
      def __init__(self, name):
 	     self._name = name
 
-- Use one leading underscore for non-public methods and instance
-  variables, e.g.:
+- Use one leading underscore for private methods and instance variables,
+  e.g.:
 
   .. code-block:: python
 
@@ -197,12 +288,12 @@ Naming Conventions
      self._has_ebounds = True
 
 - Always decide whether a class's methods and instance variables
-  (collectively: "attributes") should be public or non-public. If in doubt,
-  choose non-public; it's easier to make it public later than to make
-  a public attribute non-public.
+  (collectively: "attributes") should be public or private. If in doubt,
+  choose private; it's easier to make it public later than to make
+  a public attribute private.
 
 
-Programming Recommendations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. To be written:
 
-
+   Programming Recommendations
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^

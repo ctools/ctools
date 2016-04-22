@@ -72,6 +72,7 @@ src/ctulimit/ctulimit
 src/cterror/cterror
 test/pfiles/
 test/caldb/
+test/csroot2caldb_*
 test/iactdata_*
 test/*.fits
 test/*.dat
