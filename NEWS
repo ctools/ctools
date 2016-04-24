@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.1.0
 
-22 April 2016
+25 April 2016
 
 
 Introduction
@@ -198,7 +198,12 @@ support energy dispersion for stacked analysis (#1724).
 
 Add csworkflow script that executes an arbitrary analysis workflow (#1508).
 
-Transformed cta_root2caldb into csroot2caldb script.
+Transformed cta_root2caldb into csroot2caldb script. The parameters
+"bgdoversample" and "bgdinfill" have been added to the parameter file to
+provide more control over the background template generation. The background
+template is now generated using linear interpolation, and the
+"bgdoversample" allows to generate the background template at a finer
+sampling than the spatial sampling in the ROOT file.
 
 Add csobsdef.pntdef() method to set directly a pointing definition from a
 gammalib.GCsv object (#1771).

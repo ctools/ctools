@@ -73,16 +73,18 @@ class csroot2caldb(ctools.cscript):
         Get parameters from parfile.
         """
         # Query parameters
-        self["infile"].filename()
-        self["outdir"].string()
-        self["inst"].string()
-        self["id"].string()
-        self["analysis"].string()
-        self["version"].string()
-        self["psftype"].string()
-        self["rebin"].boolean()
-        self["eascale"].real()
-        self["bgdscale"].real()
+        self['infile'].filename()
+        self['outdir'].string()
+        self['inst'].string()
+        self['id'].string()
+        self['analysis'].string()
+        self['version'].string()
+        self['psftype'].string()
+        self['rebin'].boolean()
+        self['eascale'].real()
+        self['bgdscale'].real()
+        self['bgdoversample'].integer()
+        self['bgdinfill'].boolean()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -545,7 +547,7 @@ class csroot2caldb(ctools.cscript):
 
         # Create background
         #self._root2bgd(file)
-        self._root2bgd3D(file, bgdscale=self["bgdscale"].real())
+        self._root2bgd3D(file)
 
         # Return
         return
@@ -912,34 +914,34 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
-    def _root2bgd3D(self, file, bgdscale=1.0):
+    def _root2bgd3D(self, file):
         """
-        Translate ROOT to CALDB background extension. The following ROOT
-        histograms are used:
-
+        Translate ROOT to CALDB background extension.
+        
+        The following ROOT histograms are used:
         BGRatePerSqDeg_offaxis -> BGD
 
-        Parameters:
-         file - ROOT file.
-        Keywords:
-         scale - Background rate scaling factor
+        Parameters
+        ----------
+        file : `~ROOT.TFile`
+            ROOT file.
         """
         # Continue only if background HDU has been opened
         if self._hdu_bgd != None:
 
             # Allocate ROOT 2D array
             array = TH2F()
-            file.GetObject("BGRatePerSqDeg_offaxis", array)
+            file.GetObject('BGRatePerSqDeg_offaxis', array)
 
             # Set boundaries
-            bounds = self._make_3D(array, self._hdu_bgd, None, "deg")
+            bounds = self._make_3D(array, self._hdu_bgd, None, 'deg')
             for b in bounds:
                 self._bgd_bounds.append(b)
-            self._set_cif_keywords(self._hdu_bgd, self._bgd_name, \
+            self._set_cif_keywords(self._hdu_bgd, self._bgd_name,
                                    self._bgd_bounds, self._bgd_desc)
 
             # BGD (reconstructed energy)
-            self._make_3D(array, self._hdu_bgd, "BGD", "1/s/MeV/sr", scale=bgdscale)
+            self._make_3D(array, self._hdu_bgd, 'BGD', '1/s/MeV/sr')
 
         # Return
         return
@@ -1038,40 +1040,76 @@ class csroot2caldb(ctools.cscript):
         # Return boundary information
         return bounds
 
-    def _make_3D(self, array, hdu, name, unit, scale=1.0):
+    def _make_3D(self, array, hdu, name, unit):
         """
-        Make 3D cube as function of DETX, DETY and energy from a
+        Generate background 3D cube
+        
+        Generates 3D cube as function of DETX, DETY and energy from a
         ROOT 2D histogram. If the HDU has already the energy and
         offset angle columns, this method will simply add another data
-        column.
-        If name==None, the method will not append any data column.
+        column. If name==None, the method will not append any data column.
 
-        Parameters:
-         array - ROOT 2D histogram.
-         hdu   - FITS HDU.
-         name  - Data column name.
-         unit  - Data unit.
-        Keywords:
-         scale - Scaling factor for histogram values.
+        Parameters
+        ----------
+        array : `~ROOT.TH2F`
+            ROOT 2D histogram.
+        hdu : `~gammalib.GFitsHDU`
+            FITS HDU.
+        name : str
+            Data column name.
+        unit : str
+            Data unit.
         """
+        # Get User parameters
+        scale      = self['bgdscale'].real()
+        oversample = self['bgdoversample'].integer()
+        infill     = self['bgdinfill'].boolean()
+
         # Set constants
         deg2sr = 0.01745329*0.01745329
 
         # Extract energy and offset angle vectors
-        energies = array.GetXaxis()
-        neng     = energies.GetNbins()
-        offsets  = array.GetYaxis()
-        noffset  = offsets.GetNbins()
-        ewidth   = [] # in MeV
+        energies  = array.GetXaxis()
+        neng      = energies.GetNbins()
+        offsets   = array.GetYaxis()
+        noffset   = offsets.GetNbins()
+        theta_max = offsets.GetBinUpEdge(noffset) # Maximum theta
+        ewidth    = [] # in MeV
         for ieng in range(neng):
-            ewidth.append(pow(10.0, energies.GetBinUpEdge(ieng+1) +6.0) - \
+            ewidth.append(pow(10.0, energies.GetBinUpEdge(ieng+1) +6.0) -
                           pow(10.0, energies.GetBinLowEdge(ieng+1)+6.0))
+
+        # Optionally fill all empty bins by the preceding value that occur
+        # for all offset angles between the first and the last non zero
+        # bin
+        if infill:
+            for ioff in range(noffset):
+                i_start = -1
+                i_stop  = -1
+                value   = 0.0
+                for ieng in range(neng):
+                    if array.GetBinContent(ieng+1,ioff+1) > 0.0:
+                        i_start = ieng
+                        value   = array.GetBinContent(ieng+1,ioff+1)
+                        break
+                for ieng in range(neng-1, -1, -1):
+                    if array.GetBinContent(ieng+1,ioff+1) > 0.0:
+                        i_stop = ieng
+                        break
+                if i_start > -1 and i_stop > -1:
+                    for ieng in range(i_start, i_stop+1):
+                        if array.GetBinContent(ieng+1,ioff+1) == 0.0:
+                            array.SetBinContent(ieng+1,ioff+1,value)
+                            print('Background infill ieng=%d ioff=%d value=%f' %
+                                  (ieng,ioff,value))
+                        else:
+                            value = array.GetBinContent(ieng+1,ioff+1)
 
         # Build DETX and DETY axes
         ndet     = array.GetYaxis().GetNbins()
-        ndets    = 2*ndet
+        ndets    = 2*ndet*oversample
         det_max  = array.GetYaxis().GetBinUpEdge(ndet)
-        det_bin  = det_max/float(ndet)
+        det_bin  = det_max/float(ndet*oversample)
         dets_lo  = []
         dets_hi  = []
         dets2    = []
@@ -1084,36 +1122,36 @@ class csroot2caldb(ctools.cscript):
             dets2.append(det_val*det_val)
 
         # Append DETX_LO column
-        if not hdu.contains("DETX_LO"):
-            hdu.append(gammalib.GFitsTableFloatCol("DETX_LO", 1, ndets))
-            hdu["DETX_LO"].unit("deg")
+        if not hdu.contains('DETX_LO'):
+            hdu.append(gammalib.GFitsTableFloatCol('DETX_LO', 1, ndets))
+            hdu['DETX_LO'].unit('deg')
             for i in range(ndets):
-                hdu["DETX_LO"][0,i] = dets_lo[i]
+                hdu['DETX_LO'][0,i] = dets_lo[i]
 
         # Append DETX_HI column
-        if not hdu.contains("DETX_HI"):
-            hdu.append(gammalib.GFitsTableFloatCol("DETX_HI", 1, ndets))
-            hdu["DETX_HI"].unit("deg")
+        if not hdu.contains('DETX_HI'):
+            hdu.append(gammalib.GFitsTableFloatCol('DETX_HI', 1, ndets))
+            hdu['DETX_HI'].unit('deg')
             for i in range(ndets):
-                hdu["DETX_HI"][0,i] = dets_hi[i]
+                hdu['DETX_HI'][0,i] = dets_hi[i]
 
         # Append DETY_LO column
-        if not hdu.contains("DETY_LO"):
-            hdu.append(gammalib.GFitsTableFloatCol("DETY_LO", 1, ndets))
-            hdu["DETY_LO"].unit("deg")
+        if not hdu.contains('DETY_LO'):
+            hdu.append(gammalib.GFitsTableFloatCol('DETY_LO', 1, ndets))
+            hdu['DETY_LO'].unit('deg')
             for i in range(ndets):
-                hdu["DETY_LO"][0,i] = dets_lo[i]
+                hdu['DETY_LO'][0,i] = dets_lo[i]
 
         # Append DETY_HI column
-        if not hdu.contains("DETY_HI"):
-            hdu.append(gammalib.GFitsTableFloatCol("DETY_HI", 1, ndets))
-            hdu["DETY_HI"].unit("deg")
+        if not hdu.contains('DETY_HI'):
+            hdu.append(gammalib.GFitsTableFloatCol('DETY_HI', 1, ndets))
+            hdu['DETY_HI'].unit('deg')
             for i in range(ndets):
-                hdu["DETY_HI"][0,i] = dets_hi[i]
+                hdu['DETY_HI'][0,i] = dets_hi[i]
 
         # Append ENERG_LO and ENERG_HI columns
-        self._append_column(hdu, "ENERG_LO", "TeV", energies, log=True)
-        self._append_column(hdu, "ENERG_HI", "TeV", energies, log=True)
+        self._append_column(hdu, 'ENERG_LO', 'TeV', energies, log=True)
+        self._append_column(hdu, 'ENERG_HI', 'TeV', energies, log=True)
 
         # Append array column
         if name != None and not hdu.contains(name):
@@ -1125,12 +1163,11 @@ class csroot2caldb(ctools.cscript):
                     for ieng in range(neng):
                         index = ix + (iy + ieng * ndets) * ndets
                         theta = math.sqrt(dets2[ix] + dets2[iy])
-                        ioff  = offsets.FindBin(theta)
-                        if ioff > 0 and ioff <= noffset:
-                            binsq = array.GetBinContent(ieng+1,ioff)
-                            if binsq >= 0:
-                                value = binsq / deg2sr / (ewidth[ieng])
-                                hdu[name][0,index] = value * scale
+                        if theta < theta_max:
+                            binsq = array.Interpolate(energies.GetBinCenter(ieng+1),
+                                                      theta)
+                            value = binsq / deg2sr / (ewidth[ieng])
+                            hdu[name][0,index] = value * scale
 
         # Debugging
         if False:
@@ -1144,13 +1181,13 @@ class csroot2caldb(ctools.cscript):
                     if ioff == 0:
                         peak = value
                         peaksq = binsq
-                print(pow(10.0, energies.GetBinLowEdge(ieng+1))+ \
+                print(pow(10.0, energies.GetBinLowEdge(ieng+1))+
                       pow(10.0, energies.GetBinUpEdge(ieng+1)), sum, peak, peaksq)
 
         # Collect boundary information
-        bd_detx = "DETX(%.2f-%.2f)deg" % (-det_max, det_max)
-        bd_dety = "DETY(%.2f-%.2f)deg" % (-det_max, det_max)
-        bd_eng  = "ENERG(%.4f-%.2f)TeV" % \
+        bd_detx = 'DETX(%.2f-%.2f)deg' % (-det_max, det_max)
+        bd_dety = 'DETY(%.2f-%.2f)deg' % (-det_max, det_max)
+        bd_eng  = 'ENERG(%.4f-%.2f)TeV' % \
                   (pow(10.0, energies.GetBinLowEdge(1)),
                    pow(10.0, energies.GetBinUpEdge(neng)))
         bounds  = [bd_detx, bd_dety, bd_eng]
