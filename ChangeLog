@@ -1,9 +1,13 @@
-2016-03-07  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-04-25  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
-        Add support for stacked analysis energy dispersion (#1724)
+        Add "bgdoversample" and "bgdinfill" parameters to csroot2caldb
+        Add csobsdef.pntdef() method (#1771)
+        Add ctmapcube tool (#1760)
+        Add "seed" parameter to cspull (#1755)
+        Add ctedispcube tool (#1724)
         Test and import IACT scripts only for Python 2.6+ (#1715)
         Add documentation for IACT analysis (#1646)
         Adapt to revise GTime operators (#1714)
@@ -13,6 +17,7 @@
         Delete existing events before simulation in ctobssim (#1663)
         Add csiactcopy script (#1661)
         ctselect allows usage of non-default events and GTI extensions (#1598)
+        Add csworkflow workflow manager script (#1508)
 
 
 2016-01-27  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>

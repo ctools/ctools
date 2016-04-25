@@ -65,12 +65,14 @@ src/ctexpcube/ctexpcube
 src/ctpsfcube/ctpsfcube
 src/ctedispcube/ctedispcube
 src/ctbkgcube/ctbkgcube
+src/ctmapcube/ctmapcube
 src/ctcubemask/ctcubemask
 src/ctbutterfly/ctbutterfly
 src/ctulimit/ctulimit
 src/cterror/cterror
 test/pfiles/
 test/caldb/
+test/csroot2caldb_*
 test/iactdata_*
 test/*.fits
 test/*.dat

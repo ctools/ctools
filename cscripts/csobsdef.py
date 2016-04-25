@@ -76,18 +76,21 @@ class csobsdef(ctools.cscript):
     def __init__(self, *argv):
         """
         Constructor.
+
+        Parameters
+        ----------
+        argv : list of str
+            List of IRAF command line parameter strings of the form
+            ``parameter=3``.
         """
         # Set name and version
-        self._name    = "csobsdef"
-        self._version = "1.1.0"
+        self._name    = 'csobsdef'
+        self._version = '1.1.0'
 
         # Initialise class members
-        self._obs        = gammalib.GObservations()
-        self._inpnt      = ""
-        self._tmin       = 0.0
-        self._chatter    = 2
-        self._clobber    = True
-        self._debug      = False
+        self._obs    = gammalib.GObservations()
+        self._pntdef = gammalib.GCsv()
+        self._tmin   = 0.0
 
         # Initialise application by calling the appropriate class
         # constructor.
@@ -102,22 +105,18 @@ class csobsdef(ctools.cscript):
         """
         Get parameters from parfile.
         """
-        # Read parameters    
-        self._inpnt = self["inpnt"].filename()
+        # Query input filename if necessary
+        if self._pntdef.size() == 0:
+            self['inpnt'].filename()
 
         # Read ahead parameters
         if self._read_ahead():
-            self["outobs"].filename()
-
-        # Set some fixed parameters
-        self._chatter = self["chatter"].integer()
-        self._clobber = self["clobber"].boolean()
-        self._debug   = self["debug"].boolean()
+            self['outobs'].filename()
 
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
@@ -134,8 +133,8 @@ class csobsdef(ctools.cscript):
         xml = gammalib.GXmlElement()
 
         # Append parameter
-        parameter = "parameter name=\"Calibration\" database=\""+\
-                    caldb+"\" response=\""+irf+"\""
+        parameter = 'parameter name="Calibration" database="'+caldb+\
+                    '" response="'+irf+'"'
         xml.append(gammalib.GXmlElement(parameter))
 
         # Create CTA response
@@ -153,6 +152,11 @@ class csobsdef(ctools.cscript):
     def run(self):
         """
         Run the script.
+
+        Raises
+        ------
+        RuntimeError
+            Invalid pointing definition file format.
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -163,17 +167,18 @@ class csobsdef(ctools.cscript):
 
         # Write header into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Creating observation definition XML file")
+            self._log('\n')
+            self._log.header1('Creating observation definition XML file')
 
-        # Load pointing definition file
-        pntdef = gammalib.GCsv(self._inpnt, ",")
-        ncols  = pntdef.ncols()
-        npnt   = pntdef.nrows()-1
+        # Load pointing definition file if it is not already set
+        if self._pntdef.size() == 0:
+            self._pntdef = gammalib.GCsv(self['inpnt'].filename(), ',')
+        ncols = self._pntdef.ncols()
+        npnt  = self._pntdef.nrows()-1
 
         # Throw an exception is there is no header information
-        if pntdef.nrows() < 1:
-            raise RuntimeError("No header found in pointing definition file.")
+        if self._pntdef.nrows() < 1:
+            raise RuntimeError('No header found in pointing definition file.')
 
         # Clear observation container
         self._obs.clear()
@@ -182,7 +187,7 @@ class csobsdef(ctools.cscript):
         # Extract header from pointing definition file
         header = []
         for col in range(ncols):
-            header.append(pntdef[0,col])
+            header.append(self._pntdef[0,col])
 
         # Loop over all pointings
         for pnt in range(npnt):
@@ -194,60 +199,60 @@ class csobsdef(ctools.cscript):
             obs = gammalib.GCTAObservation()
 
             # Set observation name
-            if "name" in header:
-                name = pntdef[row, header.index("name")]
+            if 'name' in header:
+                name = self._pntdef[row, header.index('name')]
             else:
-                name = "None"
+                name = 'None'
             obs.name(name)
 
             # Set identifier
-            if "id" in header:
-                id_ = pntdef[row, header.index("id")]
+            if 'id' in header:
+                id_ = self._pntdef[row, header.index('id')]
             else:
-                id_         = "%6.6d" % identifier
+                id_ = '%6.6d' % identifier
                 identifier += 1
             obs.id(id_)
 
             # Set pointing
-            if "ra" in header and "dec" in header:
-                ra     = float(pntdef[row, header.index("ra")])
-                dec    = float(pntdef[row, header.index("dec")])
+            if 'ra' in header and 'dec' in header:
+                ra     = float(self._pntdef[row, header.index('ra')])
+                dec    = float(self._pntdef[row, header.index('dec')])
                 pntdir = gammalib.GSkyDir()
                 pntdir.radec_deg(ra,dec)
-            elif "lon" in header and "lat" in header:
-                lon    = float(pntdef[row, header.index("lon")])
-                lat    = float(pntdef[row, header.index("lat")])
+            elif 'lon' in header and 'lat' in header:
+                lon    = float(self._pntdef[row, header.index('lon')])
+                lat    = float(self._pntdef[row, header.index('lat')])
                 pntdir = gammalib.GSkyDir()
                 pntdir.lb_deg(lon,lat)
             else:
-                raise RuntimeError("No (ra,dec) or (lon,lat) columns "
-                                   "found in pointing definition file.")
+                raise RuntimeError('No (ra,dec) or (lon,lat) columns '
+                                   'found in pointing definition file.')
             obs.pointing(gammalib.GCTAPointing(pntdir))
 
             # Set response function
-            if "caldb" in header:
-                caldb = pntdef[row, header.index("caldb")]
+            if 'caldb' in header:
+                caldb = self._pntdef[row, header.index('caldb')]
             else:
-                caldb = self["caldb"].string()
-            if "irf" in header:
-                irf = pntdef[row, header.index("irf")]
+                caldb = self['caldb'].string()
+            if 'irf' in header:
+                irf = self._pntdef[row, header.index('irf')]
             else:
-                irf = self["irf"].string()
-            if caldb != "" and irf != "":
+                irf = self['irf'].string()
+            if caldb != '' and irf != '':
                 obs = self._set_response(obs, caldb, irf)
 
             # Set deadtime correction factor
-            if "deadc" in header:
-                deadc = float(pntdef[row, header.index("deadc")])
+            if 'deadc' in header:
+                deadc = float(self._pntdef[row, header.index('deadc')])
             else:
-                deadc = self["deadc"].real()
+                deadc = self['deadc'].real()
             obs.deadc(deadc)
 
             # Set Good Time Interval
-            if "duration" in header:
-                duration = float(pntdef[row, header.index("duration")])
+            if 'duration' in header:
+                duration = float(self._pntdef[row, header.index('duration')])
             else:
-                duration = self["duration"].real()
+                duration = self['duration'].real()
             tmin       = self._tmin
             tmax       = self._tmin + duration
             gti        = gammalib.GGti(self._time_reference())
@@ -261,33 +266,33 @@ class csobsdef(ctools.cscript):
             # Set Energy Boundaries
             has_emin = False
             has_emax = False
-            if "emin" in header:
-                emin     = float(pntdef[row, header.index("emin")])
+            if 'emin' in header:
+                emin     = float(self._pntdef[row, header.index('emin')])
                 has_emin = True
             else:
-                if self["emin"].is_valid():
-                    emin     = self["emin"].real()
+                if self['emin'].is_valid():
+                    emin     = self['emin'].real()
                     has_emin = True
-            if "emax" in header:
-                emax     = float(pntdef[row, header.index("emax")])
+            if 'emax' in header:
+                emax     = float(self._pntdef[row, header.index('emax')])
                 has_emax = True
             else:
-                if self["emax"].is_valid():
-                    emax     = self["emax"].real()
+                if self['emax'].is_valid():
+                    emax     = self['emax'].real()
                     has_emax = True
             has_ebounds = has_emin and has_emax
             if has_ebounds:
-                ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"),
-                                            gammalib.GEnergy(emax, "TeV"))
+                ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, 'TeV'),
+                                            gammalib.GEnergy(emax, 'TeV'))
 
             # Set ROI
             has_roi = False
-            if "rad" in header:
-                rad     = float(pntdef[row, header.index("rad")])
+            if 'rad' in header:
+                rad     = float(self._pntdef[row, header.index('rad')])
                 has_roi = True
             else:
-                if self["rad"].is_valid():
-                    rad     = self["rad"].real()
+                if self['rad'].is_valid():
+                    rad     = self['rad'].real()
                     has_roi = True
             if has_roi:
                 roi = gammalib.GCTARoi(gammalib.GCTAInstDir(pntdir), rad)
@@ -308,11 +313,11 @@ class csobsdef(ctools.cscript):
             # Write observation into logger
             if self._logExplicit():
                 self._log(str(obs))
-                self._log("\n")
+                self._log('\n')
             elif self._logTerse():
-                self._log(gammalib.parformat(obs.instrument()+" observation"))
-                self._log("Name=\""+obs.name()+"\" ")
-                self._log("ID=\""+obs.id()+"\"\n")
+                self._log(gammalib.parformat(obs.instrument()+' observation'))
+                self._log('Name="'+obs.name()+'" ')
+                self._log('ID="'+obs.id()+'"\n')
 
             # Append observation
             self._obs.append(obs)
@@ -326,20 +331,20 @@ class csobsdef(ctools.cscript):
         """
         # Write header and filename into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save observation definition XML file")
+            self._log('\n')
+            self._log.header1('Save observation definition XML file')
 
         # Get output filename in case it was not read ahead
-        outobs = self["outobs"].filename()
+        outobs = self['outobs'].filename()
 
         # Check if observation definition XML file is valid
-        if outobs.url() != "NONE":      
+        if outobs.url() != 'NONE':
 
             # Log filename
             if self._logTerse():
-                self._log(gammalib.parformat("Observation XML file"))
+                self._log(gammalib.parformat('Observation XML file'))
                 self._log(outobs.url())
-                self._log("\n")
+                self._log('\n')
 
             # Save observation definition XML file
             self._obs.save(outobs)
@@ -362,6 +367,21 @@ class csobsdef(ctools.cscript):
 
         # Save observation definition file
         self.save()
+
+        # Return
+        return
+
+    def pntdef(self, csv):
+        """
+        Set pointing definition from a CSV table.
+
+        Parameters
+        ----------
+        csv : `~gammalib.GCsv`
+            Comma-separated values table
+        """
+        # Set pointing definition
+        self._pntdef = csv
 
         # Return
         return

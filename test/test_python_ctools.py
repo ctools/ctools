@@ -33,6 +33,7 @@ import test_ctskymap
 import test_ctexpcube
 import test_ctpsfcube
 import test_ctbkgcube
+import test_ctmapcube
 import test_ctcubemask
 import test_ctbutterfly
 import test_ctulimit
@@ -61,6 +62,7 @@ def test(installed=False):
     suite_ctexpcube   = test_ctexpcube.Test()
     suite_ctpsfcube   = test_ctpsfcube.Test()
     suite_ctbkgcube   = test_ctbkgcube.Test()
+    suite_ctmapcube   = test_ctmapcube.Test()
     suite_ctcubemask  = test_ctcubemask.Test()
     suite_ctbutterfly = test_ctbutterfly.Test()
     suite_ctulimit    = test_ctulimit.Test()
@@ -78,6 +80,7 @@ def test(installed=False):
     suite_ctexpcube.set()
     suite_ctpsfcube.set()
     suite_ctbkgcube.set()
+    suite_ctmapcube.set()
     suite_ctcubemask.set()
     suite_ctbutterfly.set()
     suite_ctulimit.set()
@@ -95,6 +98,7 @@ def test(installed=False):
     suites.append(suite_ctexpcube)
     suites.append(suite_ctpsfcube)
     suites.append(suite_ctbkgcube)
+    suites.append(suite_ctmapcube)
     suites.append(suite_ctcubemask)
     suites.append(suite_ctbutterfly)
     suites.append(suite_ctulimit)

@@ -1,0 +1,40 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csroot2caldb.par                                              #
+#  Version:   1.0.0                                                         #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csroot2caldb script                    #
+#                                                                           #
+#############################################################################
+#
+# Input parameters
+#=================
+infile,        f, a, irf.root,,, "Input ROOT file"
+outdir,        s, h, ,,, "Output CALDB directory"
+inst,          s, a, prod3,,, "Instrument name"
+id,            s, a, South_50h,,, "Instrument Response Function identifier"
+version,       s, a, prod3,,, "Instrument Response Function version"
+analysis,      s, a, DESY,,, "Instrument Response Function analysis"
+psftype,       s, h, Gauss,Gauss|King,, "Point spread function type"
+rebin,         b, h, no,,, "Rebin"
+eascale,       r, h, 1.0,,, "Scaling factor for effective areas"
+bgdscale,      r, h, 1.0,,, "Scaling factor for background rates"
+bgdoversample, i, h, 1,,, "Spatial oversampling factor for background template"
+bgdinfill,     b, h, no,,, "Infill of background template?"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csroot2caldb.log,,, "Log filename"

@@ -51,11 +51,11 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("csobsdef")
+        self.name('csobsdef')
 
         # Append tests
-        self.append(self._test_cmd, "Test csobsdef on command line")
-        self.append(self._test_python, "Test csobsdef from Python")
+        self.append(self._test_cmd, 'Test csobsdef on command line')
+        self.append(self._test_python, 'Test csobsdef from Python')
 
         # Return
         return
@@ -66,47 +66,47 @@ class Test(gammalib.GPythonTestSuite):
         Test csobsdef on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            csobsdef = "../cscripts/csobsdef.py"
+        if os.path.isfile('README'):
+            csobsdef = '../cscripts/csobsdef.py'
         else:
-            csobsdef = "csobsdef"
+            csobsdef = 'csobsdef'
 
         # Setup csobsdef command
         cmd = csobsdef+' inpnt="data/pntdef.dat"'+ \
-                       ' outobs="obsdef_cmd1.xml"'+ \
+                       ' outobs="csobsdef_cmd1.xml"'+ \
                        ' caldb="prod2" irf="South_0.5h"'+ \
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
                        ' logfile="csobsdef_cmd1.log" chatter=1'
 
         # Execute csobsdef, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             pass
 
         # Check if execution was successful
         self.test_assert(rc == 0,
-                         "Successful csobsdef execution on command line")
+                         'Successful csobsdef execution on command line')
 
         # Check observation definition file
-        self._check_obsdef_file("obsdef_cmd1.xml")
+        self._check_obsdef_file('csobsdef_cmd1.xml')
 
         # Setup csobsdef command
         cmd = csobsdef+' inpnt="obs_definition_that_does_not_exist.dat"'+ \
-                       ' outobs="obsdef_cmd1.xml"'+ \
+                       ' outobs="csobsdef_cmd1.xml"'+ \
                        ' caldb="prod2" irf="South_0.5h"'+ \
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
                        ' logfile="csobsdef_cmd2.log"'
 
         # Execute csobsdef, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             pass
 
         # Check if execution failed
         self.test_assert(rc != 0,
-                         "Failure of csobsdef execution on command line")
+                         'Failure of csobsdef execution on command line')
 
         # Return
         return
@@ -118,16 +118,16 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up csobsdef
         obsdef = cscripts.csobsdef()
-        obsdef["inpnt"]    = "data/pntdef.dat"
-        obsdef["outobs"]   = "obsdef_py1.xml"
-        obsdef["caldb"]    = "prod2"
-        obsdef["irf"]      = "South_0.5h"
-        obsdef["emin"]     = 0.1
-        obsdef["emax"]     = 100.0
-        obsdef["duration"] = 1800.0
-        obsdef["rad"]      = 5.0
-        obsdef["logfile"]  = "csobsdef_py1.log"
-        obsdef["chatter"]  = 2
+        obsdef['inpnt']    = 'data/pntdef.dat'
+        obsdef['outobs']   = 'csobsdef_py1.xml'
+        obsdef['caldb']    = 'prod2'
+        obsdef['irf']      = 'South_0.5h'
+        obsdef['emin']     = 0.1
+        obsdef['emax']     = 100.0
+        obsdef['duration'] = 1800.0
+        obsdef['rad']      = 5.0
+        obsdef['logfile']  = 'csobsdef_py1.log'
+        obsdef['chatter']  = 2
 
         # Run csobsdef script and save XML file
         obsdef.logFileOpen()   # Make sure we get a log file
@@ -135,26 +135,48 @@ class Test(gammalib.GPythonTestSuite):
         obsdef.save()
 
         # Check model file
-        self._check_obsdef_file("obsdef_py1.xml")
+        self._check_obsdef_file('csobsdef_py1.xml')
 
         # Set-up csobsdef
         obsdef = cscripts.csobsdef()
-        obsdef["inpnt"]    = "data/pntdef.dat"
-        obsdef["outobs"]   = "obsdef_py2.xml"
-        obsdef["caldb"]    = "prod2"
-        obsdef["irf"]      = "South_0.5h"
-        obsdef["emin"]     = 0.1
-        obsdef["emax"]     = 100.0
-        obsdef["duration"] = 1800.0
-        obsdef["rad"]      = 5.0
-        obsdef["logfile"]  = "csobsdef_py2.log"
-        obsdef["chatter"]  = 3
+        obsdef['inpnt']    = 'data/pntdef.dat'
+        obsdef['outobs']   = 'csobsdef_py2.xml'
+        obsdef['caldb']    = 'prod2'
+        obsdef['irf']      = 'South_0.5h'
+        obsdef['emin']     = 0.1
+        obsdef['emax']     = 100.0
+        obsdef['duration'] = 1800.0
+        obsdef['rad']      = 5.0
+        obsdef['logfile']  = 'csobsdef_py2.log'
+        obsdef['chatter']  = 3
 
         # Execute csobsdef script
         obsdef.execute()
 
         # Check model file
-        self._check_obsdef_file("obsdef_py2.xml")
+        self._check_obsdef_file('csobsdef_py2.xml')
+
+        # Load CSV table
+        csv = gammalib.GCsv('data/pntdef.dat', ',')
+ 
+        # Set-up csobsdef
+        obsdef = cscripts.csobsdef()
+        obsdef.pntdef(csv)
+        obsdef['outobs']   = 'csobsdef_py3.xml'
+        obsdef['caldb']    = 'prod2'
+        obsdef['irf']      = 'South_0.5h'
+        obsdef['emin']     = 0.1
+        obsdef['emax']     = 100.0
+        obsdef['duration'] = 1800.0
+        obsdef['rad']      = 5.0
+        obsdef['logfile']  = 'csobsdef_py3.log'
+        obsdef['chatter']  = 4
+
+        # Execute csobsdef script
+        obsdef.execute()
+
+        # Check model file
+        self._check_obsdef_file('csobsdef_py3.xml')
 
         # Return
         return
@@ -173,7 +195,7 @@ class Test(gammalib.GPythonTestSuite):
 
         # Loop over all observations
         for o in obs:
-            self.test_assert(o.instrument() == "CTA",
+            self.test_value(o.instrument(), 'CTA',
                             'Check for "CTA" instrument')
             self.test_value(o.ontime(), 1800.0, 1.0e-6,
                             'Check for ontime of 1800 sec')

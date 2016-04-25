@@ -56,6 +56,7 @@
 %include "ctpsfcube.i"
 %include "ctedispcube.i"
 %include "ctbkgcube.i"
+%include "ctmapcube.i"
 %include "ctcubemask.i"
 %include "cttsmap.i"
 %include "ctbutterfly.i"

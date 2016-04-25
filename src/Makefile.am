@@ -16,6 +16,7 @@ SUBDIRS = support \
           ctpsfcube \
           ctedispcube \
           ctbkgcube \
+          ctmapcube \
           ctcubemask \
           cttsmap \
           ctbutterfly \
@@ -43,6 +44,7 @@ libctools_la_LIBADD = support/libsupport.la \
                       ctpsfcube/libctpsfcube.la \
                       ctedispcube/libctedispcube.la \
                       ctbkgcube/libctbkgcube.la \
+                      ctmapcube/libctmapcube.la \
                       ctcubemask/libctcubemask.la \
                       cttsmap/libcttsmap.la \
                       ctbutterfly/libctbutterfly.la \
