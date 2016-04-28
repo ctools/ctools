@@ -27,7 +27,7 @@ from datetime import datetime
 
 # Optional ROOT import
 try:
-    from ROOT import TFile, TH2F, TH3F
+    from ROOT import TFile, TH1F, TH2F, TH3F
     _has_root = True
 except:
     _has_root = False
@@ -80,6 +80,7 @@ class csroot2caldb(ctools.cscript):
         self['analysis'].string()
         self['version'].string()
         self['psftype'].string()
+        self['norm1d'].boolean()
         self['rebin'].boolean()
         self['eascale'].real()
         self['bgdscale'].real()
@@ -570,11 +571,23 @@ class csroot2caldb(ctools.cscript):
         # Continue only if effective area HDU has been opened
         if self._hdu_ea != None:
 
+            # Get User parameters
+            norm1d = self['norm1d'].boolean()
+
             # Allocate ROOT 2D arrays
             etrue = TH2F()
             ereco = TH2F()
-            file.GetObject("EffectiveAreaEtrue_offaxis", etrue)
-            file.GetObject("EffectiveArea_offaxis",      ereco)
+            file.GetObject('EffectiveAreaEtrue_offaxis', etrue)
+            file.GetObject('EffectiveArea_offaxis',      ereco)
+
+            # Normalize 2D histogram on on-axis 1D histogram
+            if norm1d:
+                etrue_1D = TH1F()
+                ereco_1D = TH1F()
+                file.GetObject('EffectiveAreaEtrue', etrue_1D)
+                file.GetObject('EffectiveArea',      ereco_1D)
+                self._renorm_onaxis(etrue, etrue_1D)
+                self._renorm_onaxis(ereco, ereco_1D)
 
             # Rebin etrue histogram
             if rebin:
@@ -929,9 +942,18 @@ class csroot2caldb(ctools.cscript):
         # Continue only if background HDU has been opened
         if self._hdu_bgd != None:
 
+            # Get User parameters
+            norm1d = self['norm1d'].boolean()
+
             # Allocate ROOT 2D array
             array = TH2F()
             file.GetObject('BGRatePerSqDeg_offaxis', array)
+
+            # Normalize 2D histogram on on-axis 1D histogram
+            if norm1d:
+                array_1D = TH1F()
+                file.GetObject('BGRatePerSqDeg', array_1D)
+                self._renorm_onaxis(array, array_1D)
 
             # Set boundaries
             bounds = self._make_3D(array, self._hdu_bgd, None, 'deg')
@@ -970,7 +992,7 @@ class csroot2caldb(ctools.cscript):
             hdu[name].unit(unit)
 
             # Do we have a LO axis? If not we have a HI axis
-            if name[-2:] == "LO":
+            if name[-2:] == 'LO':
                 low = True
             else:
                 low = False
@@ -984,6 +1006,83 @@ class csroot2caldb(ctools.cscript):
                 if log:
                     value = pow(10.0, value)
                 hdu[name][0,i] = value
+
+        # Return
+        return
+
+    def _renorm_onaxis(self, hist2D, hist1D):
+        """
+        Renormalise 2D histogram (energy,offset) on 1D histogram (energy)
+
+        This method makes sure that a 2D histogram has the same onaxis values
+        as the corresponding 1D histogram.
+
+        Parameters
+        ----------
+        hist2D : `~ROOT.TH2F`
+            ROOT 2D histogram.
+        hist1D : `~ROOT.TH1F`
+            ROOT 1D histogram.
+        """
+        # Get 2D dimensions
+        neng    = hist2D.GetXaxis().GetNbins()
+        noffset = hist2D.GetYaxis().GetNbins()
+
+        # Continue only if the 1D and 2D histograms have the same number
+        # of energy bins
+        if neng != hist1D.GetXaxis().GetNbins():
+            # Write header
+            if self._logTerse():
+                self._log('Difference in energy binning between 2D histogram'
+                          ' "%s" and 1D histogram "%s".\n' %
+                          (hist2D.GetName(), hist1D.GetName()))
+        else:
+            # Write header
+            if self._logTerse():
+                self._log('Renormalize 2D histogram "%s" on 1D histogram "%s".\n' %
+                          (hist2D.GetName(), hist1D.GetName()))
+
+            # Get a copy of 2D histogram
+            hist2D_copy = hist2D.Clone()
+
+            # Divide 2D histogram by onaxis values to remove the energy
+            # dependence
+            for ieng in range(neng):
+                onaxis = hist1D.GetBinContent(ieng+1)
+                if onaxis > 0.0:
+                    for ioff in range(noffset):
+                        value = hist2D.GetBinContent(ieng+1,ioff+1) / onaxis
+                        hist2D.SetBinContent(ieng+1,ioff+1,value)
+
+            # Smooth in energy direction to reduce statistical fluctuations
+            for ieng in range(neng):
+                for ioff in range(noffset):
+                    if ieng == 0:
+                        value = (2.0 * hist2D.GetBinContent(ieng+1,ioff+1) +
+                                 1.0 * hist2D.GetBinContent(ieng+2,ioff+1)) / 3.0
+                    elif ieng == neng-1:
+                        value = (2.0 * hist2D.GetBinContent(ieng+1,ioff+1) +
+                                 1.0 * hist2D.GetBinContent(ieng+0,ioff+1)) / 3.0
+                    else:
+                        value = (2.0 * hist2D.GetBinContent(ieng+1,ioff+1) +
+                                 1.0 * hist2D.GetBinContent(ieng+0,ioff+1) +
+                                 1.0 * hist2D.GetBinContent(ieng+2,ioff+1)) / 4.0
+                    hist2D_copy.SetBinContent(ieng+1,ioff+1,value)
+
+            # Normalize now for an onaxis value of 1
+            for ieng in range(neng):
+                onaxis = hist2D_copy.GetBinContent(ieng+1,1)
+                if onaxis > 0.0:
+                    for ioff in range(noffset):
+                        value = hist2D_copy.GetBinContent(ieng+1,ioff+1) / onaxis
+                        hist2D_copy.SetBinContent(ieng+1,ioff+1,value)
+            
+            # Put back the energy dependence
+            for ieng in range(neng):
+                onaxis = hist1D.GetBinContent(ieng+1)
+                for ioff in range(noffset):
+                    value = hist2D_copy.GetBinContent(ieng+1,ioff+1) * onaxis
+                    hist2D.SetBinContent(ieng+1,ioff+1,value)
 
         # Return
         return
