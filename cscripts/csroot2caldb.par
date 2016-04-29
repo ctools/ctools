@@ -29,6 +29,7 @@ rebin,         b, h, no,,, "Rebin"
 eascale,       r, h, 1.0,,, "Scaling factor for effective areas"
 bgdscale,      r, h, 1.0,,, "Scaling factor for background rates"
 bgdoversample, i, h, 1,,, "Spatial oversampling factor for background template"
+bgdethres,     r, h, 1000.0,,, "Energy above which to replace background by power law (TeV)"
 bgdinfill,     b, h, no,,, "Infill of background template?"
 
 #
