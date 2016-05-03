@@ -1175,17 +1175,19 @@ class csroot2caldb(ctools.cscript):
                 # Get power law coefficients
                 coeff = self._plaw_coefficients(axis, rates, emin, ethres)
 
-                # Replace histogram values by power law values
-                for ieng in range(neng):
-                    energy = engs[ieng]
-                    if energy > ethres:
-                        value = self._plaw_value(coeff, energy)
-                        hist2D.SetBinContent(ieng+1,ioff+1,value)
-                        if self._logTerse():
-                            self._log(gammalib.parformat('Power law replacement'))
-                            self._log('%e cts/s/deg2 (E=%8.4f TeV (%d) '
-                                      'Off=%.2f deg (%d)\n' %
-                                      (value,engs[ieng],ieng,offset,ioff))
+                # Replace histogram values by power law values if coefficients
+                # are valid
+                if coeff['m'] != 0.0 and coeff['t'] != 0.0:
+                    for ieng in range(neng):
+                        energy = engs[ieng]
+                        if energy > ethres:
+                            value = self._plaw_value(coeff, energy)
+                            hist2D.SetBinContent(ieng+1,ioff+1,value)
+                            if self._logTerse():
+                                self._log(gammalib.parformat('Power law replacement'))
+                                self._log('%e cts/s/deg2 (E=%8.4f TeV (%d) '
+                                          'Off=%.2f deg (%d)\n' %
+                                          (value,engs[ieng],ieng,offset,ioff))
 
         # Return
         return
@@ -1248,12 +1250,18 @@ class csroot2caldb(ctools.cscript):
                 i_emax     = ieng
 
         # Determine coefficients of power law
-        x1 = math.log10(energies[i_emin])
-        x2 = math.log10(energies[i_emax])
-        y1 = math.log10(rates[i_emin])
-        y2 = math.log10(rates[i_emax])
-        m  = (y2-y1)/(x2-x1)
-        t  = y1 - m * x1
+        while rates[i_emax] == 0.0 and i_emax > i_emin:
+            i_emax -= 1
+        if rates[i_emax] > 0.0:
+            x1 = math.log10(energies[i_emin])
+            x2 = math.log10(energies[i_emax])
+            y1 = math.log10(rates[i_emin])
+            y2 = math.log10(rates[i_emax])
+            m  = (y2-y1)/(x2-x1)
+            t  = y1 - m * x1
+        else:
+            m = 0.0
+            t = 0.0
 
         # Return coefficients
         return {'m': m, 't': t}
