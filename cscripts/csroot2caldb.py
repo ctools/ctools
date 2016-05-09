@@ -571,6 +571,11 @@ class csroot2caldb(ctools.cscript):
         # Continue only if effective area HDU has been opened
         if self._hdu_ea != None:
 
+            # Write header
+            if self._logTerse():
+                self._log('\n')
+                self._log.header1('Generate effective area extension')
+
             # Get User parameters
             norm1d = self['norm1d'].boolean()
 
@@ -642,8 +647,13 @@ class csroot2caldb(ctools.cscript):
         # Continue only if point spread function HDU has been opened
         if self._hdu_psf != None:
 
+            # Write header
+            if self._logTerse():
+                self._log('\n')
+                self._log.header1('Generate point spread function extension')
+
             # King profile PSF
-            if psftype == "King":
+            if psftype == 'King':
                 self._root2psf_king(file)
             else:
                 self._root2psf_gauss(file)
@@ -874,19 +884,24 @@ class csroot2caldb(ctools.cscript):
         # Continue only if energy dispersion HDU has been opened
         if self._hdu_edisp != None:
 
+            # Write header
+            if self._logTerse():
+                self._log('\n')
+                self._log.header1('Generate energy dispersion extension')
+
             # Allocate ROOT 3D array
             matrix  = TH3F()
-            file.GetObject("EestOverEtrue_offaxis", matrix)
+            file.GetObject('EestOverEtrue_offaxis', matrix)
 
             # Set boundaries
-            bounds = self._make_3D_migra(matrix, self._hdu_edisp, None, "")
+            bounds = self._make_3D_migra(matrix, self._hdu_edisp, None, '')
             for b in bounds:
                 self._edisp_bounds.append(b)
             self._set_cif_keywords(self._hdu_edisp, self._edisp_name, \
                                    self._edisp_bounds, self._edisp_desc)
 
             # MATRIX
-            self._make_3D_migra(matrix, self._hdu_edisp, "MATRIX", "")
+            self._make_3D_migra(matrix, self._hdu_edisp, 'MATRIX', '')
 
         # Return
         return
@@ -907,22 +922,27 @@ class csroot2caldb(ctools.cscript):
         # Continue only if background HDU has been opened
         if self._hdu_bgd != None:
 
+            # Write header
+            if self._logTerse():
+                self._log('\n')
+                self._log.header1('Generate 2D background extension')
+
             # Allocate ROOT 2D array
             array = TH2F()
-            file.GetObject("BGRatePerSqDeg_offaxis", array)
+            file.GetObject('BGRatePerSqDeg_offaxis', array)
 
             # Set boundaries
-            bounds = self._make_2D(array, self._hdu_bgd, None, "deg")
+            bounds = self._make_2D(array, self._hdu_bgd, None, 'deg')
             for b in bounds:
                 self._bgd_bounds.append(b)
             self._set_cif_keywords(self._hdu_bgd, self._bgd_name, \
                                    self._bgd_bounds, self._bgd_desc)
 
             # BGD
-            self._make_2D(array, self._hdu_bgd, "BGD", "")
+            self._make_2D(array, self._hdu_bgd, 'BGD', '')
 
             # BGD_RECO
-            self._make_2D(array, self._hdu_bgd, "BGD_RECO", "")
+            self._make_2D(array, self._hdu_bgd, 'BGD_RECO', '')
 
         # Return
         return
@@ -942,14 +962,28 @@ class csroot2caldb(ctools.cscript):
         # Continue only if background HDU has been opened
         if self._hdu_bgd != None:
 
+            # Write header
+            if self._logTerse():
+                self._log('\n')
+                self._log.header1('Generate 3D background extension')
+
             # Get User parameters
-            norm1d = self['norm1d'].boolean()
+            norm1d    = self['norm1d'].boolean()
+            bgdethres = self['bgdethres'].real()
+            bgdinfill = self['bgdinfill'].boolean()
 
             # Allocate ROOT 2D array
             array = TH2F()
             file.GetObject('BGRatePerSqDeg_offaxis', array)
 
-            # Normalize 2D histogram on on-axis 1D histogram
+            # Replace 2D histogram values by power law extrapolation
+            self._plaw_replace(array, bgdethres)
+
+            # Optionally fill in empty values in 2D histogram
+            if bgdinfill:
+                self._infill_bgd(array)
+
+            # Optionally normalize 2D histogram on on-axis 1D histogram
             if norm1d:
                 array_1D = TH1F()
                 file.GetObject('BGRatePerSqDeg', array_1D)
@@ -1033,14 +1067,17 @@ class csroot2caldb(ctools.cscript):
         if neng != hist1D.GetXaxis().GetNbins():
             # Write header
             if self._logTerse():
-                self._log('Difference in energy binning between 2D histogram'
-                          ' "%s" and 1D histogram "%s".\n' %
-                          (hist2D.GetName(), hist1D.GetName()))
+                self._log(gammalib.parformat('On-axis normalisation'))
+                self._log('Impossible since energy binning of 1D histogram '
+                          '"%s" does not match that of 2D histogram "%s".\n' %
+                          (hist1D.GetName(), hist2D.GetName()))
         else:
             # Write header
             if self._logTerse():
-                self._log('Renormalize 2D histogram "%s" on 1D histogram "%s".\n' %
-                          (hist2D.GetName(), hist1D.GetName()))
+                self._log(gammalib.parformat('On-axis normalisation'))
+                self._log('On-axis values of 1D histogram "%s" imposed on '
+                          '2D histogram "%s".\n' %
+                          (hist1D.GetName(), hist2D.GetName()))
 
             # Get a copy of 2D histogram
             hist2D_copy = hist2D.Clone()
@@ -1083,6 +1120,226 @@ class csroot2caldb(ctools.cscript):
                 for ioff in range(noffset):
                     value = hist2D_copy.GetBinContent(ieng+1,ioff+1) * onaxis
                     hist2D.SetBinContent(ieng+1,ioff+1,value)
+
+        # Return
+        return
+
+    def _plaw_replace(self, hist2D, ethres):
+        """
+        Replace background rate values by power law values
+
+        Parameters
+        ----------
+        hist2D : `~ROOT.TH2F`
+            ROOT 2D histogram.
+        ethres : float
+            Energy threshold.
+        """
+        # Extract energy and offset angle vectors
+        energies = hist2D.GetXaxis()
+        neng     = energies.GetNbins()
+        offsets  = hist2D.GetYaxis()
+        noffset  = offsets.GetNbins()
+
+        # Continue only if threshold is low enough
+        if ethres < math.pow(10.0, energies.GetBinUpEdge(neng)):
+
+            # Determine mean energy values
+            engs = []
+            for ieng in range(neng):
+                energy = 0.5 * (math.pow(10.0, energies.GetBinLowEdge(ieng+1)) +
+                                math.pow(10.0, energies.GetBinUpEdge(ieng+1)))
+                engs.append(energy)
+
+            # Loop over all offaxis angles
+            for ioff in range(noffset):
+
+                # Determine offset angle (for logging)
+                offset = 0.5 * (offsets.GetBinLowEdge(ioff+1) +
+                                offsets.GetBinUpEdge(ioff+1))
+
+                # Initialise vectors
+                axis  = []
+                rates = []
+
+                # Extract values
+                for ieng in range(neng):
+                    energy = engs[ieng]
+                    rate   = hist2D.GetBinContent(ieng+1,ioff+1)
+                    axis.append(energy)
+                    rates.append(rate)
+
+                # Determine energy range
+                emin, emax = self._plaw_energy_range(axis, rates)
+
+                # Get power law coefficients
+                coeff = self._plaw_coefficients(axis, rates, emin, ethres)
+
+                # Replace histogram values by power law values if coefficients
+                # are valid
+                if coeff['m'] != 0.0 and coeff['t'] != 0.0:
+                    for ieng in range(neng):
+                        energy = engs[ieng]
+                        if energy > ethres:
+                            value = self._plaw_value(coeff, energy)
+                            hist2D.SetBinContent(ieng+1,ioff+1,value)
+                            if self._logTerse():
+                                self._log(gammalib.parformat('Power law replacement'))
+                                self._log('%e cts/s/deg2 (E=%8.4f TeV (%d) '
+                                          'Off=%.2f deg (%d)\n' %
+                                          (value,engs[ieng],ieng,offset,ioff))
+
+        # Return
+        return
+
+    def _plaw_energy_range(self, energies, rates):
+        """
+        Determine the energy range over which the power law is valid
+
+        Parameters
+        ----------
+        energies : list of float
+            Energy values (TeV)
+        rates : list of float
+            Background rate values
+        """
+        # Find energy at which background rate takes a maximum
+        min_energy = 0.0
+        max_rate   = 0.0
+        for ieng, energy in enumerate(energies):
+            if rates[ieng] > max_rate:
+                max_rate   = rates[ieng]
+                min_energy = energy
+
+        # Find last data point
+        max_energy = 0.0
+        for ieng in range(len(energies)-1,-1,-1):
+            if rates[ieng] > 0.0:
+                max_energy = energies[ieng]
+                break
+
+        # Return
+        return (min_energy, max_energy)
+
+    def _plaw_coefficients(self, energies, rates, emin, emax):
+        """
+        Determines the power law coefficients
+
+        Parameters
+        ----------
+        energies : list of float
+            Energy values (TeV)
+        rates : list of float
+            Background rate values
+        emin : float
+            Minimum energy (TeV)
+        emax : float
+            Maximum energy (TeV)
+        """
+        # Determine nearest energy indices
+        i_emin     = 0
+        i_emax     = 0
+        delta_emin = 1.0e30
+        delta_emax = 1.0e30
+        for ieng, energy in enumerate(energies):
+            if abs(energy-emin) < delta_emin:
+                delta_emin = abs(energy-emin)
+                i_emin     = ieng
+            if abs(energy-emax) < delta_emax:
+                delta_emax = abs(energy-emax)
+                i_emax     = ieng
+
+        # Determine coefficients of power law
+        while rates[i_emax] == 0.0 and i_emax > i_emin:
+            i_emax -= 1
+        if rates[i_emax] > 0.0:
+            x1 = math.log10(energies[i_emin])
+            x2 = math.log10(energies[i_emax])
+            y1 = math.log10(rates[i_emin])
+            y2 = math.log10(rates[i_emax])
+            m  = (y2-y1)/(x2-x1)
+            t  = y1 - m * x1
+        else:
+            m = 0.0
+            t = 0.0
+
+        # Return coefficients
+        return {'m': m, 't': t}
+
+    def _plaw_value(self, coeff, energy):
+        """
+        Determine the power law value
+
+        Parameters
+        ----------
+        coeff : dict
+            Dictionary of coefficients
+        energy : float
+            Energy value (TeV)
+        """
+        # Compute value
+        value = math.pow(10.0, coeff['m'] * math.log10(energy) + coeff['t'])
+
+        # Return value
+        return value
+
+    def _infill_bgd(self, hist2D):
+        """
+        Fill all empty bins in 2D histogram by preceeding values in energy
+
+        Parameters
+        ----------
+        hist2D : `~ROOT.TH2F`
+            ROOT 2D histogram.
+        """
+        # Extract energy and offset angle vectors
+        energies = hist2D.GetXaxis()
+        neng     = energies.GetNbins()
+        offsets  = hist2D.GetYaxis()
+        noffset  = offsets.GetNbins()
+
+        # Determine mean energy values (for logging)
+        engs = []
+        for ieng in range(neng):
+            energy = 0.5 * (math.pow(10.0, energies.GetBinLowEdge(ieng+1)) +
+                            math.pow(10.0, energies.GetBinUpEdge(ieng+1)))
+            engs.append(energy)
+
+        # Loop over all offaxis angles
+        for ioff in range(noffset):
+
+            # Determine offset angle (for logging)
+            offset = 0.5 * (offsets.GetBinLowEdge(ioff+1) +
+                            offsets.GetBinUpEdge(ioff+1))
+
+            # Initialise indices and value
+            i_start = -1
+            i_stop  = -1
+            value   = 0.0
+
+            # First start and stop indices for infill
+            for ieng in range(neng):
+                if hist2D.GetBinContent(ieng+1,ioff+1) > 0.0:
+                    i_start = ieng
+                    value   = hist2D.GetBinContent(ieng+1,ioff+1)
+                    break
+            for ieng in range(neng-1, -1, -1):
+                if hist2D.GetBinContent(ieng+1,ioff+1) > 0.0:
+                    i_stop = ieng
+                    break
+
+            # If indices are valid then fill in background rates
+            if i_start > -1 and i_stop > -1:
+                for ieng in range(i_start, i_stop+1):
+                    if hist2D.GetBinContent(ieng+1,ioff+1) == 0.0:
+                        hist2D.SetBinContent(ieng+1,ioff+1,value)
+                        if self._logTerse():
+                            self._log(gammalib.parformat('Background infill'))
+                            self._log('%e cts/s/deg2 (E=%8.4f TeV (%d) '
+                                      'Off=%.2f deg (%d)\n' %
+                                      (value,engs[ieng],ieng,offset,ioff))
+                    else:
+                        value = hist2D.GetBinContent(ieng+1,ioff+1)
 
         # Return
         return
@@ -1162,7 +1419,6 @@ class csroot2caldb(ctools.cscript):
         # Get User parameters
         scale      = self['bgdscale'].real()
         oversample = self['bgdoversample'].integer()
-        infill     = self['bgdinfill'].boolean()
 
         # Set constants
         deg2sr = 0.01745329*0.01745329
@@ -1177,32 +1433,6 @@ class csroot2caldb(ctools.cscript):
         for ieng in range(neng):
             ewidth.append(pow(10.0, energies.GetBinUpEdge(ieng+1) +6.0) -
                           pow(10.0, energies.GetBinLowEdge(ieng+1)+6.0))
-
-        # Optionally fill all empty bins by the preceding value that occur
-        # for all offset angles between the first and the last non zero
-        # bin
-        if infill:
-            for ioff in range(noffset):
-                i_start = -1
-                i_stop  = -1
-                value   = 0.0
-                for ieng in range(neng):
-                    if array.GetBinContent(ieng+1,ioff+1) > 0.0:
-                        i_start = ieng
-                        value   = array.GetBinContent(ieng+1,ioff+1)
-                        break
-                for ieng in range(neng-1, -1, -1):
-                    if array.GetBinContent(ieng+1,ioff+1) > 0.0:
-                        i_stop = ieng
-                        break
-                if i_start > -1 and i_stop > -1:
-                    for ieng in range(i_start, i_stop+1):
-                        if array.GetBinContent(ieng+1,ioff+1) == 0.0:
-                            array.SetBinContent(ieng+1,ioff+1,value)
-                            print('Background infill ieng=%d ioff=%d value=%f' %
-                                  (ieng,ioff,value))
-                        else:
-                            value = array.GetBinContent(ieng+1,ioff+1)
 
         # Build DETX and DETY axes
         ndet     = array.GetYaxis().GetNbins()
