@@ -270,8 +270,41 @@ class cssens(ctools.cscript):
         # Loop over all observations in container
         for obs in self._obs:
 
+            # Get observation energy boundaries
+            obs_ebounds = obs.events().ebounds()
+            
+            # Get minimum and maximum energy
+            obs_emin = obs_ebounds.emin()
+            obs_emax = obs_ebounds.emax()
+            
+            # Case A: bin fully contained in observation ebounds
+            if obs_emin <= emin and obs_emax >= emax:
+                ebounds = gammalib.GEbounds(emin, emax)
+            
+            # Case B: bin fully outside of obs ebounds
+            elif emax < obs_emin or emin > obs_emax:
+                
+                # Set zero range (inspired by ctselect)
+                e0 = gammalib.GEnergy(0.0, "TeV")
+                ebounds = gammalib.GEbounds(e0, e0)
+            
+            # Case C:  bin partly overlapping with observation ebounds
+            else:
+                
+                # Set energy range as obs ebounds were fully contained inside energy bin
+                set_emin = emin
+                set_emax = emax
+                
+                # Adjust energy bin to respect observation energy boundary
+                if emin < obs_emin: 
+                    set_emin = obs_emin
+                if emax > obs_emax:
+                    set_emax = obs_emax
+                
+                #Set energy boundaries   
+                ebounds = gammalib.GEbounds(set_emin, set_emax)
+            
             # Set energy boundaries
-            ebounds = gammalib.GEbounds(emin, emax)
             obs.events().ebounds(ebounds)
 
         # Return
