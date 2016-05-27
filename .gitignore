@@ -79,6 +79,7 @@ test/*.dat
 test/*.xml
 test/*.reg
 test/*.trs
+test/*.txt
 test/test_cscripts.sh
 test/reports/*.xml
 test/butterfly.txt

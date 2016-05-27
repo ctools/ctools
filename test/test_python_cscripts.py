@@ -50,6 +50,13 @@ import test_csiactobs
 def test(installed=False, debug=False):
     """
     Perform cscripts unit testing.
+
+    Parameters
+    ----------
+    installed : bool, optional
+        Flag indicating whether the script has been installed or not
+    debug : bool, optional
+        Enables debugging
     """
     # If we have an installed version then create a temporary directory and
     # copy over all information that is needed

@@ -3,7 +3,7 @@
         * Version 1.1.0 released
         ========================
 
-        Add cscript unit tests.
+        Add ctools and cscripts unit tests.
         Add "bgdoversample" and "bgdinfill" parameters to csroot2caldb
         Add csobsdef.pntdef() method (#1771)
         Add ctmapcube tool (#1760)
