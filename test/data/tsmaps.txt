@@ -1,0 +1,2 @@
+data/tsmap_0.fits
+data/tsmap_1.fits

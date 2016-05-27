@@ -39,12 +39,12 @@ class cstsmapmerge(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name    = "cstsmapmerge"
-        self._version = "1.1.0"
+        self._name    = 'cstsmapmerge'
+        self._version = '1.1.0'
 
         # Initialise class members
         self._files        = None
-        self._in_filename  = ""
+        self._in_filename  = ''
         self._tsmap        = gammalib.GSkyMap() # Empty sky map
         self._statusmap    = gammalib.GSkyMap() # Empty sky map
         self._maps         = []
@@ -67,49 +67,49 @@ class cstsmapmerge(ctools.cscript):
         Get parameters from parfile.
         """
         # Get input maps string
-        inmaps = self["inmaps"].string()
+        inmaps = self['inmaps'].string()
         
         # Handle ascii files
-        if "@" == inmaps[0]:
-            self._files = open(inmaps.replace("@","")).read().splitlines()  
+        if '@' == inmaps[0]:
+            self._files = open(inmaps.replace('@','')).read().splitlines()
             
         # Handle wild card strings
-        elif "*" in inmaps:
+        elif '*' in inmaps:
             self._files = glob.glob(inmaps)
         
         # Handle space-separated list
-        elif " " in inmaps:
-            self._files = inmaps.split(" ")
+        elif ' ' in inmaps:
+            self._files = inmaps.split(' ')
         
         # Handle semi-colon separated list
-        elif ";" in inmaps:
-            self._files = inmaps.split(";")
+        elif ';' in inmaps:
+            self._files = inmaps.split(';')
             
         # Throw exception if input models cannot be decoded
         else:
-            msg = "Parameter \"inmaps\" must contain either an @ASCII "\
-                  "file, a semi-colon-separated or whitespace-separated "\
-                  "list of files or a wildcard string."
+            msg = 'Parameter "inmaps" must contain either an @ASCII '\
+                  'file, a semi-colon-separated or whitespace-separated '\
+                  'list of files or a wildcard string.'
             raise RuntimeError(msg) 
 
         # Check number of files. We need at least two files.
         if len(self._files) <= 1:
-            msg = "Need at least two files to start merging, "+\
-                  str(len(self._files))+" file(s) given."
+            msg = 'Need at least two files to start merging, '+\
+                  str(len(self._files))+' file(s) given.'
             raise RuntimeError(msg) 
 
         # Get other parameters
-        self._overwrite = self["overwrite"].boolean()
-        self._delete    = self["delete"].boolean()
+        self._overwrite = self['overwrite'].boolean()
+        self._delete    = self['delete'].boolean()
         
         # Read ahead output filename
         if self._read_ahead():
-            self["outmap"].filename()
+            self['outmap'].filename()
         
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
