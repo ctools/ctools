@@ -277,7 +277,7 @@ Naming Conventions
   .. code-block:: python
 
      def __init__(self, name):
-	     self._name = name
+        self._name = name
 
 - Use one leading underscore for private methods and instance variables,
   e.g.:

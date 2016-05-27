@@ -39,8 +39,8 @@
                                                     "GModels&, GRan&, GLog*)"
 #define G_SIMULATE_INTERVAL    "ctobssim::simulate_interval(GCTAObservation*"\
                        ", GCTAEventList*, GCTAResponseIrf*, GModels&, GTime&"\
-                            ", GTime&, GEnergy&, GEnergy&, GSkyDir&, double&"\
-                                             ", double&, GRan&, GLog*, int&)"
+                           ", GTime&, GEnergy&, GEnergy&, GEnergy&, GEnergy&"\
+                          ", GSkyDir&, double&, double&, GRan&, GLog*, int&)"
 #define G_GET_AREA      "ctobssim::get_area(GCTAObservation* obs, GEnergy&, "\
                                                                   "GEnergy&)"
 
@@ -711,7 +711,8 @@ void ctobssim::simulate_source(GCTAObservation* obs,
         GCTAEventList* events = static_cast<GCTAEventList*>(obs->events());
 
         // Get CTA response
-        const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+        const GCTAResponseIrf* rsp =
+              dynamic_cast<const GCTAResponseIrf*>(obs->response());
         if (rsp == NULL) {
             std::string cls = std::string(typeid(obs->response()).name());
             std::string msg = "Response of type \""+cls+"\" is not a CTA "
@@ -767,28 +768,28 @@ void ctobssim::simulate_source(GCTAObservation* obs,
             // Loop over all energy boundaries
             for (int ie = 0; ie <  ebounds.size(); ++ie) {
 
-                // Set energy interval
-                GEnergy emin = ebounds.emin(ie);
-                GEnergy emax = ebounds.emax(ie);
+                // Set reconstructed energy interval
+                GEnergy ereco_min = ebounds.emin(ie);
+                GEnergy ereco_max = ebounds.emax(ie);
 
                 // Set true photon energy limits for simulation. If the
                 // observation has energy dispersion then add a margin.
-                GEnergy e_true_min = emin;
-                GEnergy e_true_max = emax;
+                GEnergy etrue_min = ereco_min;
+                GEnergy etrue_max = ereco_max;
                 if (rsp->use_edisp()) {
-                    e_true_min = rsp->ebounds(e_true_min).emin();
-                    e_true_max = rsp->ebounds(e_true_max).emax();
+                    etrue_min = rsp->ebounds(etrue_min).emin();
+                    etrue_max = rsp->ebounds(etrue_max).emax();
                 }
 
                 // Determine simulation area
-                double area = get_area(obs, emin, emax);
+                double area = get_area(obs, ereco_min, ereco_max);
 
                 // Log energy range and simulation area
                 if (logNormal()) {
                     *wrklog << gammalib::parformat("Photon energy range", indent);
-                    *wrklog << e_true_min << " - " << e_true_max << std::endl;
+                    *wrklog << etrue_min << " - " << etrue_max << std::endl;
                     *wrklog << gammalib::parformat("Event energy range", indent);
-                    *wrklog << emin << " - " << emax << std::endl;
+                    *wrklog << ereco_min << " - " << ereco_max << std::endl;
                 }
 
                 // Increment indentation if there are several energy
@@ -811,7 +812,8 @@ void ctobssim::simulate_source(GCTAObservation* obs,
 
                 // Simulate events for this time and energy interval
                 simulate_interval(obs, rsp, events, models, tmin, tmax,
-                                  e_true_min, e_true_max, dir, rad, area,
+                                  etrue_min, etrue_max, ereco_min, ereco_max,
+                                  dir, rad, area,
                                   ran, wrklog, indent, nphotons, nevents);
 
                 // Log simulation results
@@ -887,8 +889,10 @@ void ctobssim::simulate_source(GCTAObservation* obs,
  * @param[in] models Model list.
  * @param[in] tmin Start time.
  * @param[in] tmax Stop time.
- * @param[in] emin Minimum energy.
- * @param[in] emax Maximum energy.
+ * @param[in] etrue_min Minimum true energy.
+ * @param[in] etrue_max Maximum true energy.
+ * @param[in] ereco_min Minimum reconstructed energy.
+ * @param[in] ereco_max Maximum reconstructed energy.
  * @param[in] dir Simulation cone centre.
  * @param[in] rad Simulation cone radius (degrees).
  * @param[in] area Simulation area (cm^2).
@@ -906,8 +910,10 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
                                  const GModels&         models,
                                  const GTime&           tmin,
                                  const GTime&           tmax,
-                                 const GEnergy&         emin,
-                                 const GEnergy&         emax,
+                                 const GEnergy&         etrue_min,
+                                 const GEnergy&         etrue_max,
+                                 const GEnergy&         ereco_min,
+                                 const GEnergy&         ereco_max,
                                  const GSkyDir&         dir,
                                  const double&          rad,
                                  const double&          area,
@@ -938,7 +944,7 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
         // simulated photons to m_max_photons. The photon rate is estimated
         // from the model flux and used to set the duration of the time
         // slice.
-        double flux     = get_model_flux(model, emin, emax, dir, rad,
+        double flux     = get_model_flux(model, etrue_min, etrue_max, dir, rad,
                                          indent, wrklog);
         double rate     = flux * area;
         double duration = 1800.0;           // default: 1800 sec
@@ -1017,7 +1023,8 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
 
             // Simulate time slice
             simulate_time_slice(obs, rsp, events, model, tstart, tstop,
-                                emin, emax, dir, rad, area,
+                                etrue_min, etrue_max, ereco_min, ereco_max,
+                                dir, rad, area,
                                 ran, wrklog, indent,
                                 nphotons[i], nevents[i]);
 
@@ -1067,8 +1074,10 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
  * @param[in] models Model list.
  * @param[in] tmin Start time.
  * @param[in] tmax Stop time.
- * @param[in] emin Minimum energy.
- * @param[in] emax Maximum energy.
+ * @param[in] etrue_min Minimum true energy.
+ * @param[in] etrue_max Maximum true energy.
+ * @param[in] ereco_min Minimum reconstructed energy.
+ * @param[in] ereco_max Maximum reconstructed energy.
  * @param[in] dir Simulation cone centre.
  * @param[in] rad Simulation cone radius (degrees).
  * @param[in] area Simulation area (cm^2).
@@ -1086,8 +1095,10 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
                                    const GModelSky*       model,
                                    const GTime&           tstart,
                                    const GTime&           tstop,
-                                   const GEnergy&         emin,
-                                   const GEnergy&         emax,
+                                   const GEnergy&         etrue_min,
+                                   const GEnergy&         etrue_max,
+                                   const GEnergy&         ereco_min,
+                                   const GEnergy&         ereco_max,
                                    const GSkyDir&         dir,
                                    const double&          rad,
                                    const double&          area,
@@ -1098,8 +1109,8 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
                                    int&                   nevents)
 {
     // Get photons
-    GPhotons photons = model->mc(area, dir, rad, emin, emax, tstart, tstop,
-                                 ran);
+    GPhotons photons = model->mc(area, dir, rad, etrue_min, etrue_max,
+                                 tstart, tstop, ran);
 
     // Dump number of simulated photons
     if (logExplicit()) {
@@ -1122,11 +1133,11 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
         GCTAEventAtom* event = rsp->mc(area, photons[i], *obs, ran);
 
         // Use event only if it exists and if it falls within ROI, the
-        // energy interval and the time slice
+        // reconstructed energy interval and the time slice
         if (event != NULL) {
             if (events->roi().contains(*event) &&
-                event->energy() >= emin &&
-                event->energy() <= emax &&
+                event->energy() >= ereco_min &&
+                event->energy() <= ereco_max &&
                 event->time() >= tstart &&
                 event->time() <= tstop) {
                 event->event_id(m_event_id);

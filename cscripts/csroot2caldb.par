@@ -24,10 +24,12 @@ id,            s, a, South_50h,,, "Instrument Response Function identifier"
 version,       s, a, prod3,,, "Instrument Response Function version"
 analysis,      s, a, DESY,,, "Instrument Response Function analysis"
 psftype,       s, h, Gauss,Gauss|King,, "Point spread function type"
+norm1d,        b, h, no,,, "Normalize on 1D histograms"
 rebin,         b, h, no,,, "Rebin"
 eascale,       r, h, 1.0,,, "Scaling factor for effective areas"
 bgdscale,      r, h, 1.0,,, "Scaling factor for background rates"
 bgdoversample, i, h, 1,,, "Spatial oversampling factor for background template"
+bgdethres,     r, h, 1000.0,,, "Energy above which to replace background by power law (TeV)"
 bgdinfill,     b, h, no,,, "Infill of background template?"
 
 #

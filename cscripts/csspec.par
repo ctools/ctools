@@ -17,7 +17,7 @@
 #
 # Input and output parameters
 #============================
-inobs,     f, h, events.fits,,, "Input event list, counts cube, or observation definition XML file"
+inobs,     f, a, events.fits,,, "Input event list, counts cube, or observation definition XML file"
 inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
 srcname,   s, a, Crab,,, "Source name"
 expcube,   f, a, NONE,,, "Input exposure cube file (only needed for stacked analysis)"
