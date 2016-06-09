@@ -90,7 +90,7 @@ def generate_pull_distribution(model, trials=100, \
     pattern : str, optional
         Pointing pattern
     offset : float, optional
-        Source offset from pointing direction
+        Offset between pointing directions
     debug : bool, optional
         Enable debugging?
     chatter : int, optional
