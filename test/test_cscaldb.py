@@ -51,11 +51,11 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("cscaldb")
+        self.name('cscaldb')
 
         # Append tests
-        self.append(self._test_cmd, "Test cscaldb on command line")
-        self.append(self._test_python, "Test cscaldb from Python")
+        self.append(self._test_cmd, 'Test cscaldb on command line')
+        self.append(self._test_python, 'Test cscaldb from Python')
 
         # Return
         return
@@ -66,23 +66,23 @@ class Test(gammalib.GPythonTestSuite):
         Test cscaldb on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            cscaldb = "../cscripts/cscaldb.py"
+        if os.path.isfile('README'):
+            cscaldb = '../cscripts/cscaldb.py'
         else:
-            cscaldb = "cscaldb"
+            cscaldb = 'cscaldb'
 
         # Setup cscaldb command
         cmd = cscaldb+' logfile="cscaldb_cmd1.log" chatter=1'
 
         # Execute cscaldb, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             pass
 
         # Check if execution was successful
         self.test_assert(rc == 0,
-                         "Successful cscaldb execution on command line")
+                         'Successful cscaldb execution on command line')
 
         # Return
         return
@@ -94,8 +94,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up cscaldb
         caldb = cscripts.cscaldb()
-        caldb["logfile"]  = "cscaldb_py1.log"
-        caldb["chatter"]  = 2
+        caldb['logfile']  = 'cscaldb_py1.log'
+        caldb['chatter']  = 2
 
         # Run script
         caldb.logFileOpen()   # Make sure we get a log file

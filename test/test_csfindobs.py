@@ -51,11 +51,11 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("csfindobs")
+        self.name('csfindobs')
 
         # Append tests
-        self.append(self._test_cmd, "Test csfindobs on command line")
-        self.append(self._test_python, "Test csfindobs from Python")
+        self.append(self._test_cmd, 'Test csfindobs on command line')
+        self.append(self._test_python, 'Test csfindobs from Python')
 
         # Return
         return
@@ -66,10 +66,10 @@ class Test(gammalib.GPythonTestSuite):
         Test csfindobs on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            csfindobs = "../cscripts/csfindobs.py"
+        if os.path.isfile('README'):
+            csfindobs = '../cscripts/csfindobs.py'
         else:
-            csfindobs = "csfindobs"
+            csfindobs = 'csfindobs'
 
         # Setup csfindobs command
         cmd = csfindobs+' datapath="iactdata/"'+ \
@@ -80,16 +80,16 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute csfindobs, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             pass
 
         # Check if execution was successful
         self.test_assert(rc == 0,
-                         "Successful csfindobs execution on command line")
+                         'Successful csfindobs execution on command line')
 
         # Check run list
-        self._check_runlist("runlist_cmd1.dat")
+        self._check_runlist('runlist_cmd1.dat')
 
         # Setup csfindobs command
         cmd = csfindobs+' datapath="path_that_does_not_exist"'+ \
@@ -100,13 +100,13 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute csfindobs, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             pass
 
         # Check if execution failed
         self.test_assert(rc != 0,
-                         "Failure of csfindobs execution on command line")
+                         'Failure of csfindobs execution on command line')
 
         # Return
         return
@@ -118,14 +118,14 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up csfindobs
         findobs = cscripts.csfindobs()
-        findobs["datapath"] = "iactdata/"
-        findobs["prodname"] = "unit-test"
-        findobs["outfile"]  = "runlist_py1.dat"
-        findobs["ra"]       = 83.63
-        findobs["dec"]      = 22.01
-        findobs["rad"]      = 1.0
-        findobs["logfile"]  = "csfindobs_py1.log"
-        findobs["chatter"]  = 2
+        findobs['datapath'] = 'iactdata/'
+        findobs['prodname'] = 'unit-test'
+        findobs['outfile']  = 'runlist_py1.dat'
+        findobs['ra']       = 83.63
+        findobs['dec']      = 22.01
+        findobs['rad']      = 1.0
+        findobs['logfile']  = 'csfindobs_py1.log'
+        findobs['chatter']  = 2
 
         # Run csfindobs script and save run list
         findobs.logFileOpen()   # Make sure we get a log file
@@ -133,7 +133,7 @@ class Test(gammalib.GPythonTestSuite):
         findobs.save()
 
         # Check run list
-        self._check_runlist("runlist_py1.dat")
+        self._check_runlist('runlist_py1.dat')
 
         # Return
         return

@@ -43,8 +43,8 @@ class Test(gammalib.GPythonTestSuite):
         gammalib.GPythonTestSuite.__init__(self)
 
         # Set members
-        self._events_name = "data/crab_events.fits"
-        self._model_name  = "data/crab.xml"
+        self._events_name = 'data/crab_events.fits'
+        self._model_name  = 'data/crab.xml'
 
         # Return
         return
@@ -55,11 +55,11 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("cslightcrv")
+        self.name('cslightcrv')
 
         # Append tests
-        self.append(self._test_cmd, "Test cslightcrv on command line")
-        self.append(self._test_python, "Test cslightcrv from Python")
+        self.append(self._test_cmd, 'Test cslightcrv on command line')
+        self.append(self._test_python, 'Test cslightcrv from Python')
 
         # Return
         return
@@ -70,10 +70,10 @@ class Test(gammalib.GPythonTestSuite):
         Test cslightcrv on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            cslightcrv = "../cscripts/cslightcrv.py"
+        if os.path.isfile('README'):
+            cslightcrv = '../cscripts/cslightcrv.py'
         else:
-            cslightcrv = "cslightcrv"
+            cslightcrv = 'cslightcrv'
 
         # Setup cslightcrv command
         cmd = cslightcrv+' inobs="'+self._events_name+'"'+ \
@@ -86,16 +86,16 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute cslightcrv, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             pass
 
         # Check if execution was successful
         self.test_assert(rc == 0,
-                         "Successful cslightcrv execution on command line")
+                         'Successful cslightcrv execution on command line')
 
         # Check light curve
-        self._check_light_curve("lightcurve_cmd1.fits", 3)
+        self._check_light_curve('lightcurve_cmd1.fits', 3)
 
         # Setup cslightcrv command
         cmd = cslightcrv+' inobs="events_that_do_not_exist.fits"'+ \
@@ -108,13 +108,13 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute cslightcrv, make sure we catch any exception
         try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
+            rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             pass
 
         # Check if execution failed
         self.test_assert(rc != 0,
-                         "Failure of cslightcrv execution on command line")
+                         'Failure of cslightcrv execution on command line')
 
         # Return
         return
@@ -126,21 +126,21 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up unbinned cslightcrv
         lcrv = cscripts.cslightcrv()
-        lcrv["inobs"]    = self._events_name
-        lcrv["inmodel"]  = self._model_name
-        lcrv["srcname"]  = "Crab"
-        lcrv["caldb"]    = "prod2"
-        lcrv["irf"]      = "South_0.5h"
-        lcrv["tbinalg"]  = "LIN"
-        lcrv["tmin"]     = 51544.50
-        lcrv["tmax"]     = 51544.53
-        lcrv["tbins"]    = 3
-        lcrv["enumbins"] = 0
-        lcrv["emin"]     = 0.1
-        lcrv["emax"]     = 100.0
-        lcrv["outfile"]  = "lightcurve_py1.fits"
-        lcrv["logfile"]  = "cslightcrv_py1.log"
-        lcrv["chatter"]  = 2
+        lcrv['inobs']    = self._events_name
+        lcrv['inmodel']  = self._model_name
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = 'prod2'
+        lcrv['irf']      = 'South_0.5h'
+        lcrv['tbinalg']  = 'LIN'
+        lcrv['tmin']     = 51544.50
+        lcrv['tmax']     = 51544.53
+        lcrv['tbins']    = 3
+        lcrv['enumbins'] = 0
+        lcrv['emin']     = 0.1
+        lcrv['emax']     = 100.0
+        lcrv['outfile']  = 'cslightcrv_py1.fits'
+        lcrv['logfile']  = 'cslightcrv_py1.log'
+        lcrv['chatter']  = 2
 
         # Run cslightcrv script and save light curve
         lcrv.logFileOpen()   # Make sure we get a log file
@@ -148,7 +148,7 @@ class Test(gammalib.GPythonTestSuite):
         lcrv.save()
 
         # Check light curve
-        self._check_light_curve("lightcurve_py1.fits", 3)
+        self._check_light_curve('cslightcrv_py1.fits', 3)
 
         # Now use FILE as time bin algorithm. For this we need first to
         # create an ASCII file. We use now 6 time bins. The ASCII file
@@ -157,31 +157,32 @@ class Test(gammalib.GPythonTestSuite):
         tmin   = 51544.50
         tdelta = 0.01
         for i in range(csv.nrows()):
-            csv[i,0] = "%.5f" % (tmin +  i    * tdelta)
-            csv[i,1] = "%.5f" % (tmin + (i+1) * tdelta)
-        csv.save("lightcurve_py2.dat", " ", True)
+            csv[i,0] = '%.5f' % (tmin +  i    * tdelta)
+            csv[i,1] = '%.5f' % (tmin + (i+1) * tdelta)
+        csv.save('cslightcrv_py2.dat', ' ', True)
 
         # Set-up unbinned cslightcrv
         lcrv = cscripts.cslightcrv()
-        lcrv["inobs"]    = self._events_name
-        lcrv["inmodel"]  = self._model_name
-        lcrv["srcname"]  = "Crab"
-        lcrv["caldb"]    = "prod2"
-        lcrv["irf"]      = "South_0.5h"
-        lcrv["tbinalg"]  = "FILE"
-        lcrv["tbinfile"] = "lightcurve_py2.dat"
-        lcrv["enumbins"] = 0
-        lcrv["emin"]     = 0.1
-        lcrv["emax"]     = 100.0
-        lcrv["outfile"]  = "lightcurve_py2.fits"
-        lcrv["logfile"]  = "cslightcrv_py2.log"
-        lcrv["chatter"]  = 3
+        lcrv['inobs']    = self._events_name
+        lcrv['inmodel']  = self._model_name
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = 'prod2'
+        lcrv['irf']      = 'South_0.5h'
+        lcrv['tbinalg']  = 'FILE'
+        lcrv['tbinfile'] = 'cslightcrv_py2.dat'
+        lcrv['enumbins'] = 0
+        lcrv['emin']     = 0.1
+        lcrv['emax']     = 100.0
+        lcrv['fix_bkg']  =  True
+        lcrv['outfile']  = 'cslightcrv_py2.fits'
+        lcrv['logfile']  = 'cslightcrv_py2.log'
+        lcrv['chatter']  = 3
 
         # Execute cslightcrv script
         lcrv.execute()
 
         # Check light curve
-        self._check_light_curve("lightcurve_py2.fits", 2)
+        self._check_light_curve('cslightcrv_py2.fits', 2)
 
         # Now we setup an observation container on input. We attached the
         # model to the observation container so that cslightcrv should
@@ -194,53 +195,53 @@ class Test(gammalib.GPythonTestSuite):
         # Set-up unbinned cslightcrv from observation container. Now use
         # the GTI algorithm so that we test all timing algorithms.
         lcrv = cscripts.cslightcrv(obs)
-        lcrv["srcname"]  = "Crab"
-        lcrv["caldb"]    = "prod2"
-        lcrv["irf"]      = "South_0.5h"
-        lcrv["tbinalg"]  = "GTI"
-        lcrv["enumbins"] = 0
-        lcrv["emin"]     = 0.1
-        lcrv["emax"]     = 100.0
-        lcrv["outfile"]  = "lightcurve_py3.fits"
-        lcrv["logfile"]  = "cslightcrv_py3.log"
-        lcrv["chatter"]  = 4
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = 'prod2'
+        lcrv['irf']      = 'South_0.5h'
+        lcrv['tbinalg']  = 'GTI'
+        lcrv['enumbins'] = 0
+        lcrv['emin']     = 0.1
+        lcrv['emax']     = 100.0
+        lcrv['outfile']  = 'cslightcrv_py3.fits'
+        lcrv['logfile']  = 'cslightcrv_py3.log'
+        lcrv['chatter']  = 4
 
         # Execute cslightcrv script
         lcrv.execute()
 
         # Check light curve
-        self._check_light_curve("lightcurve_py3.fits", 1)
+        self._check_light_curve('cslightcrv_py3.fits', 1)
 
         # Finally we set-up a binned cslightcrv
         lcrv = cscripts.cslightcrv()
-        lcrv["inobs"]    = self._events_name
-        lcrv["inmodel"]  = self._model_name
-        lcrv["srcname"]  = "Crab"
-        lcrv["caldb"]    = "prod2"
-        lcrv["irf"]      = "South_0.5h"
-        lcrv["tbinalg"]  = "LIN"
-        lcrv["tmin"]     = 51544.50
-        lcrv["tmax"]     = 51544.53
-        lcrv["tbins"]    = 2
-        lcrv["emin"]     = 0.1
-        lcrv["emax"]     = 100.0
-        lcrv["enumbins"] = 10
-        lcrv["coordsys"] = "CEL"
-        lcrv["proj"]     = "TAN"
-        lcrv["xref"]     = 83.63
-        lcrv["yref"]     = 22.01
-        lcrv["nxpix"]    = 20
-        lcrv["nypix"]    = 20
-        lcrv["binsz"]    = 0.02
-        lcrv["outfile"]  = "lightcurve_py4.fits"
-        lcrv["logfile"]  = "cslightcrv_py4.log"
-        lcrv["chatter"]  = 4
+        lcrv['inobs']    = self._events_name
+        lcrv['inmodel']  = self._model_name
+        lcrv['srcname']  = 'Crab'
+        lcrv['caldb']    = 'prod2'
+        lcrv['irf']      = 'South_0.5h'
+        lcrv['tbinalg']  = 'LIN'
+        lcrv['tmin']     = 51544.50
+        lcrv['tmax']     = 51544.53
+        lcrv['tbins']    = 2
+        lcrv['emin']     = 0.1
+        lcrv['emax']     = 100.0
+        lcrv['enumbins'] = 10
+        lcrv['coordsys'] = 'CEL'
+        lcrv['proj']     = 'TAN'
+        lcrv['xref']     = 83.63
+        lcrv['yref']     = 22.01
+        lcrv['nxpix']    = 20
+        lcrv['nypix']    = 20
+        lcrv['binsz']    = 0.02
+        lcrv['outfile']  = 'cslightcrv_py4.fits'
+        lcrv['logfile']  = 'cslightcrv_py4.log'
+        lcrv['chatter']  = 4
 
         # Execute cslightcrv script
         lcrv.execute()
 
         # Check light curve
-        self._check_light_curve("lightcurve_py4.fits", 2)
+        self._check_light_curve('cslightcrv_py4.fits', 2)
 
         # Return
         return
@@ -251,8 +252,8 @@ class Test(gammalib.GPythonTestSuite):
         Check light curve file.
         """
         # Expected column names
-        cols = ["MJD", "e_MJD", "Prefactor", "e_Prefactor",
-                "Index", "e_Index", "TS", "UpperLimit"]
+        cols = ['MJD', 'e_MJD', 'Prefactor', 'e_Prefactor',
+                'Index', 'e_Index', 'TS', 'UpperLimit']
 
         # Open FITS file
         fits = gammalib.GFits(filename)
@@ -260,11 +261,11 @@ class Test(gammalib.GPythonTestSuite):
         # Check FITS file structure
         self.test_value(fits.size(), 2,
              'Check for 2 extensions in light curve FITS file')
-        self.test_assert(fits.contains("LIGHTCURVE"),
+        self.test_assert(fits.contains('LIGHTCURVE'),
              'FITS file contains "LIGHTCURVE" extension')
 
         # Get LIGHTCURVE table
-        table = fits["LIGHTCURVE"]
+        table = fits['LIGHTCURVE']
 
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),

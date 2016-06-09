@@ -42,8 +42,8 @@ class csspec(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name    = "csspec"
-        self._version = "1.1.0"
+        self._name    = 'csspec'
+        self._version = '1.1.0'
 
         # Initialise some members
         self._ebounds     = gammalib.GEbounds()
@@ -136,56 +136,58 @@ class csspec(ctools.cscript):
         """
         # Get ebounds
         if self._binned_mode:
-            
+
+            # Initialise energy boundaries for spectrum
+            self._ebounds = gammalib.GEbounds()
+
+            # Create energy boundaries according to user parameters
+            ebounds = self._create_ebounds()
+
             #  Extract cube ebounds
             cube_ebounds = self._obs[0].events().ebounds()
-            
-            # Read user parameters
-            enumbins = self["enumbins"].integer()
-            emin_val = self["emin"].real() - 1e-6 # Rounding tolerance
-            emax_val = self["emax"].real() + 1e-6 # Rounding tolerance
 
-            # Set energy range
-            emin = gammalib.GEnergy(emin_val, "TeV")
-            emax = gammalib.GEnergy(emax_val, "TeV")
+            # Loop over user energy boundaries and collect all layers
+            # that overlap
+            for i in range(ebounds.size()):
 
-            # Determine all cube layers that overlap with the [emin,emax]
-            # energy range.
-            use_layers = []
-            for i in range(cube_ebounds.size()):
-                if cube_ebounds.emin(i) < emax and cube_ebounds.emax(i) > emin:
-                    use_layers.append(i)
+                # Extract minimum and maximum energy of user energy bin,
+                # including some rounding tolerance
+                emin = ebounds.emin(i).TeV() - 1e-6 # Rounding tolerance
+                emax = ebounds.emax(i).TeV() + 1e-6 # Rounding tolerance
 
-            # If no layers overlap then throw an exception
-            if (len(use_layers) == 0):
-                msg = "Energy range ["+str(cube_ebounds.emin())+ \
-                      ", "+str(cube_ebounds.emax())+"] of counts "+ \
-                      "cube does not overlap with specified energy "+ \
-                      "range ["+ \
-                      str(emin)+", "+str(emax)+"]. Specify "+ \
-                      "overlapping energy range."
+                # Set number of overlapping energy bins
+                nbins = 0
+
+                # Search first cube bin that is comprised within user energy bin
+                for k in range(cube_ebounds.size()):
+                    if cube_ebounds.emin(k).TeV() >= emin and \
+                       cube_ebounds.emax(k).TeV() <= emax:
+                        emin_value = cube_ebounds.emin(k).TeV()
+                        break
+
+                # Search last cube bin that is comprised within user energy bin
+                for k in range(cube_ebounds.size()):
+                    if cube_ebounds.emin(k).TeV() >= emin and \
+                       cube_ebounds.emax(k).TeV() <= emax:
+                        emax_value = cube_ebounds.emax(k).TeV()
+                        nbins += 1
+
+                # Append energy bin if there are overlapping bins in the
+                # counts cube
+                if nbins > 0:
+                    self._ebounds.append(gammalib.GEnergy(emin_value, 'TeV'),
+                                         gammalib.GEnergy(emax_value, 'TeV'))
+
+            # Raise an exception if there are no overlapping layers
+            if (len(self._ebounds) == 0):
+                msg = 'Energy range ['+str(cube_ebounds.emin())+ \
+                      ', '+str(cube_ebounds.emax())+'] of counts '+ \
+                      'cube does not overlap with specified energy '+ \
+                      'range ['+ \
+                      str(ebounds.emin())+', '+str(ebounds.emax())+'].'+ \
+                      ' Specify overlapping energy range.'
                 raise RuntimeError(msg)
 
-            # Determine number of layers to use for each spectral bin
-            n_layers = int(len(use_layers) / enumbins)
-
-            # Don't allow zero layers
-            if n_layers == 0:
-                n_layers = 1
-
-            # Create energy boundaries
-            self._ebounds = gammalib.GEbounds()
-            i_start = 0
-            i_stop  = n_layers - 1
-            while i_start < len(use_layers):
-                if i_stop >= len(use_layers):
-                    i_stop = len(use_layers) - 1
-                ebinmin = cube_ebounds.emin(use_layers[i_start])
-                ebinmax = cube_ebounds.emax(use_layers[i_stop])
-                self._ebounds.append(ebinmin, ebinmax)
-                i_start += n_layers
-                i_stop  += n_layers
-                    
         # Unbinned mode       
         else:
             self._ebounds = self._create_ebounds()
