@@ -61,16 +61,16 @@ General parameters
 ``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
  	 	 
-``(emin = 0.1) [real]``
+``emin [real]``
     Lower energy value for first energy bin (in TeV).
  	 	 
-``(emax = 100.0) [real]``
+``emax [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
-``(enumbins = 20) [integer]``
+``enumbins [integer]``
     Number of energy bins.
  	 	 
-``(ebinfile = NONE) [file]``
+``ebinfile [file]``
     Name of the file containing the energy bin definition.
  	 	 
 ``coordsys <CEL|GAL> [string]``

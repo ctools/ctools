@@ -32,6 +32,7 @@ import test_ctmodel
 import test_ctskymap
 import test_ctexpcube
 import test_ctpsfcube
+import test_ctedispcube
 import test_ctbkgcube
 import test_ctmapcube
 import test_ctcubemask
@@ -47,9 +48,14 @@ import test_pipelines
 def test(installed=False):
     """
     Perform unit testing for ctools.
+
+    Parameters
+    ----------
+    installed : bool, optional
+        Flag indicating whether the script has been installed or not
     """
     # Allocate test suite container
-    suites = gammalib.GTestSuites("ctools unit testing")
+    suites = gammalib.GTestSuites('ctools unit testing')
 
     # Allocate test suites and append them to the container
     suite_ctobssim    = test_ctobssim.Test()
@@ -61,6 +67,7 @@ def test(installed=False):
     suite_ctskymap    = test_ctskymap.Test()
     suite_ctexpcube   = test_ctexpcube.Test()
     suite_ctpsfcube   = test_ctpsfcube.Test()
+    suite_ctedispcube = test_ctedispcube.Test()
     suite_ctbkgcube   = test_ctbkgcube.Test()
     suite_ctmapcube   = test_ctmapcube.Test()
     suite_ctcubemask  = test_ctcubemask.Test()
@@ -79,6 +86,7 @@ def test(installed=False):
     suite_ctskymap.set()
     suite_ctexpcube.set()
     suite_ctpsfcube.set()
+    suite_ctedispcube.set()
     suite_ctbkgcube.set()
     suite_ctmapcube.set()
     suite_ctcubemask.set()
@@ -97,6 +105,7 @@ def test(installed=False):
     suites.append(suite_ctskymap)
     suites.append(suite_ctexpcube)
     suites.append(suite_ctpsfcube)
+    suites.append(suite_ctedispcube)
     suites.append(suite_ctbkgcube)
     suites.append(suite_ctmapcube)
     suites.append(suite_ctcubemask)
@@ -120,28 +129,28 @@ def test(installed=False):
         dirname = os.path.dirname(testdir)
 
         # Copy over test data and irf
-        os.system("cp -r %s %s" % (dirname+"/data", "data"))
-        os.system("cp -r %s %s" % (dirname+"/irf",  "irf"))
+        os.system('cp -r %s %s' % (dirname+'/data', 'data'))
+        os.system('cp -r %s %s' % (dirname+'/irf',  'irf'))
 
     # Set PFILES environment variable
     try:
-        os.mkdir("pfiles")
+        os.mkdir('pfiles')
     except:
         pass
-    os.environ['PFILES'] = "pfiles"
+    os.environ['PFILES'] = 'pfiles'
 
     # Copy over pfiles
     if not installed:
-        os.system("cp -r ../src/*/*.par pfiles/")
+        os.system('cp -r ../src/*/*.par pfiles/')
     else:
-        os.system("cp -r %s/syspfiles/*.par pfiles/" % (os.environ['CTOOLS']))
+        os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
 
     # Run test suite
     success = suites.run()
 
     # If we have a non-installed version then save test results
     if not installed:
-        suites.save("reports/ctools.xml")
+        suites.save('reports/ctools.xml')
 
     # Set return code
     if success:

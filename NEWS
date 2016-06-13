@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.1.0
 
-25 April 2016
+27 May 2016
 
 
 Introduction
@@ -207,6 +207,8 @@ sampling than the spatial sampling in the ROOT file.
 
 Add csobsdef.pntdef() method to set directly a pointing definition from a
 gammalib.GCsv object (#1771).
+
+Unit tests have been added for all cscripts.
 
 
 Examples

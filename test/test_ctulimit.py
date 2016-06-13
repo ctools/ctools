@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 
@@ -37,12 +38,6 @@ class Test(gammalib.GPythonTestSuite):
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
 
-        # Set members
-        self.events_name = "data/crab_events.fits"
-        self.model_name  = "data/crab.xml"
-        self.caldb       = "irf"
-        self.irf         = "cta_dummy_irf"
-
         # Return
         return
 
@@ -52,48 +47,94 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("ctulimit")
+        self.name('ctulimit')
 
         # Append tests
-        self.append(self.test_functional, "Test ctulimit functionality")
+        self.append(self._test_cmd, 'Test ctulimit on command line')
+        self.append(self._test_python, 'Test ctulimit from Python')
 
         # Return
         return
 
-    # Test cttsmap functionnality
-    def test_functional(self):
+    # Test ctulimit on command line
+    def _test_cmd(self):
         """
-        Test ctulimit functionnality.
+        Test ctulimit on the command line.
         """
-        # Set-up cttsmap
+        # Kluge to set the command (installed version has no README file)
+        if os.path.isfile('README'):
+            ctulimit = '../src/ctulimit/ctulimit'
+        else:
+            ctulimit = 'ctulimit'
+
+        # Setup ctulimit command
+        cmd = ctulimit+' inobs="data/crab_events.fits"'+ \
+                       ' inmodel="data/crab.xml" srcname="Crab"'+ \
+                       ' caldb="prod2" irf="South_0.5h"'+ \
+                       ' logfile="ctulimit_cmd1.log" chatter=1'
+
+        # Execute ctulimit, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution was successful
+        self.test_assert(rc == 0,
+                         'Successful ctulimit execution on command line')
+
+        # Check result file
+        self._check_result_file('ctulimit_cmd1.log')
+
+        # Setup ctulimit command
+        cmd = ctulimit+' inobs="event_file_that_does_not_exist.fits"'+ \
+                       ' inmodel="data/crab.xml" srcname="Crab"'+ \
+                       ' caldb="prod2" irf="South_0.5h"'+ \
+                       ' logfile="ctulimit_cmd2.log" chatter=1'
+
+        # Execute ctulimit, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution failed
+        self.test_assert(rc != 0,
+                         'Failure of ctulimit execution on command line')
+
+        # Return
+        return
+
+    # Test ctulimit from Python
+    def _test_python(self):
+        """
+        Test ctulimit from Python.
+        """
+        # Set-up ctulimit
         ulimit = ctools.ctulimit()
-        ulimit["inobs"]   = self.events_name
-        ulimit["inmodel"] = self.model_name
-        ulimit["srcname"] = "Crab"
-        ulimit["caldb"]   = self.caldb
-        ulimit["irf"]     = self.irf
+        ulimit['inobs']   = 'data/crab_events.fits'
+        ulimit['inmodel'] = 'data/crab.xml'
+        ulimit['srcname'] = 'Crab'
+        ulimit['caldb']   = 'prod2'
+        ulimit['irf']     = 'South_0.5h'
+        ulimit['logfile'] = 'ctulimit_py1.log'
+        ulimit['chatter'] = 2
 
-        # Run tool
-        self.test_try("Run ctulimit")
-        try:
-            ulimit.run()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in ctulimit: %s." % (e,)
-        except:
-            msg = "Exception occured in ctulimit."
-            self.test_try_failure(msg)
+        # Run ctulimit tool
+        ulimit.logFileOpen()   # Make sure we get a log file
+        ulimit.run()
+        ulimit.save()
 
-        # Save results
-        self.test_try("Save results")
-        try:
-            ulimit.save()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in saving results: %s." % (e,)
-        except:
-            msg = "Exception occured in saving results."
-            self.test_try_failure(msg)
+        # Check result file
+        self._check_result_file('ctulimit_py1.log')
 
+        # Return
+        return
+
+    # Check result file
+    def _check_result_file(self, filename):
+        """
+        Check result file.
+        """
         # Return
         return

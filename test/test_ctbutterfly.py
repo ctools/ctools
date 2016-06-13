@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 
@@ -37,12 +38,6 @@ class Test(gammalib.GPythonTestSuite):
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
 
-        # Set members
-        self.events_name = "data/crab_events.fits"
-        self.model_name  = "data/crab.xml"
-        self.caldb       = "irf"
-        self.irf         = "cta_dummy_irf"
-
         # Return
         return
 
@@ -52,51 +47,108 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("ctbutterfly")
+        self.name('ctbutterfly')
 
         # Append tests
-        self.append(self.test_functional, "Test ctbutterfly functionality")
+        self.append(self._test_cmd, 'Test ctbutterfly on command line')
+        self.append(self._test_python, 'Test ctbutterfly from Python')
 
         # Return
         return
 
-    # Test ctbutterfly functionnality
-    def test_functional(self):
+    # Test ctbutterfly on command line
+    def _test_cmd(self):
         """
-        Test ctbutterfly functionnality.
+        Test ctbutterfly on the command line.
+        """
+        # Kluge to set the command (installed version has no README file)
+        if os.path.isfile('README'):
+            ctbutterfly = '../src/ctbutterfly/ctbutterfly'
+        else:
+            ctbutterfly = 'ctbutterfly'
+
+        # Setup ctbutterfly command
+        cmd = ctbutterfly+' inobs="data/crab_events.fits"'+\
+                          ' outfile="ctbutterfly_cmd1.txt"'+ \
+                          ' inmodel="data/crab.xml" srcname="Crab"'+ \
+                          ' caldb="prod2" irf="South_0.5h"'+ \
+                          ' emin=0.1 emax=100.0'+ \
+                          ' logfile="ctbutterfly_cmd1.log" chatter=1'
+
+        # Execute ctbutterfly, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution was successful
+        self.test_assert(rc == 0,
+                         'Successful ctbutterfly execution on command line')
+
+        # Check result file
+        self._check_result_file('ctbutterfly_cmd1.txt')
+
+        # Setup ctbutterfly command
+        cmd = ctbutterfly+' inobs="event_file_that_does_not_exist.fits"'+\
+                          ' outfile="ctbutterfly_cmd2.txt"'+ \
+                          ' inmodel="data/crab.xml" srcname="Crab"'+ \
+                          ' caldb="prod2" irf="South_0.5h"'+ \
+                          ' emin=0.1 emax=100.0'+ \
+                          ' logfile="ctbutterfly_cmd2.log" chatter=1'
+
+        # Execute ctbutterfly, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution failed
+        self.test_assert(rc != 0,
+                         'Failure of ctbutterfly execution on command line')
+
+        # Return
+        return
+
+    # Test ctbutterfly from Python
+    def _test_python(self):
+        """
+        Test ctbutterfly from Python.
         """
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
-        butterfly["inobs"]   = self.events_name
-        butterfly["inmodel"] = self.model_name
-        butterfly["srcname"] = "Crab"
-        butterfly["caldb"]   = self.caldb
-        butterfly["irf"]     = self.irf
-        butterfly["emin"]    = 0.1
-        butterfly["emax"]    = 100
-        butterfly["outfile"] = "butterfly.txt"
+        butterfly['inobs']   = 'data/crab_events.fits'
+        butterfly['inmodel'] = 'data/crab.xml'
+        butterfly['srcname'] = 'Crab'
+        butterfly['caldb']   = 'prod2'
+        butterfly['irf']     = 'South_0.5h'
+        butterfly['emin']    = 0.1
+        butterfly['emax']    = 100.0
+        butterfly['outfile'] = 'ctbutterfly_py1.txt'
+        butterfly['logfile'] = 'ctbutterfly_py1.log'
+        butterfly['chatter'] = 2
 
-        # Run tool
-        self.test_try("Run ctbutterfly")
-        try:
-            butterfly.run()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in ctbutterfly: %s." % (e,)
-        except:
-            msg = "Exception occured in ctbutterfly."
-            self.test_try_failure(msg)
+        # Run ctbutterfly tool
+        butterfly.logFileOpen()   # Make sure we get a log file
+        butterfly.run()
+        butterfly.save()
 
-        # Save results
-        self.test_try("Save results")
-        try:
-            butterfly.save()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in saving butterfly diagram: %s." % (e,)
-        except:
-            msg = "Exception occured in saving butterfly diagram."
-            self.test_try_failure(msg)
+        # Check result file
+        self._check_result_file('ctbutterfly_py1.txt')
+
+        # Return
+        return
+
+    # Check result file
+    def _check_result_file(self, filename):
+        """
+        Check result file.
+        """
+        # Open result file as CSV file
+        results = gammalib.GCsv(filename)
+
+        # Check dimensions
+        self.test_value(results.nrows(), 100, 'Check for 100 rows in butterfly file')
+        self.test_value(results.ncols(), 4, 'Check for 4 columns in butterfly file')
 
         # Return
         return
