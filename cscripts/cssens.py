@@ -53,6 +53,7 @@ class cssens(ctools.cscript):
         # Initialise class members
         self._obs         = gammalib.GObservations()
         self._ebounds     = gammalib.GEbounds()
+        self._obs_ebounds = []
         self._srcname     = ""
         self._outfile     = gammalib.GFilename()
         self._ra          = None
@@ -657,6 +658,10 @@ class cssens(ctools.cscript):
                 for par in model:
                     self._log(str(par)+"\n")
 
+        # Restore energy boundaries of observation container
+        for i, obs in enumerate(self._obs):
+            obs.events().ebounds(self._obs_ebounds[i])
+        
         # Store result
         result = {'loge': loge, 'emin': emin.TeV(), 'emax': emax.TeV(), \
                   'crab_flux': crab_flux, 'photon_flux': photon_flux, \
@@ -678,7 +683,11 @@ class cssens(ctools.cscript):
 
         # Get parameters
         self._get_parameters()
-
+        
+        # Loop over observations and store ebounds
+        for obs in self._obs:
+            self._obs_ebounds.append(obs.events().ebounds())
+        
         # Initialise script
         colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux',
                     'energy_flux', 'sensitivity']
