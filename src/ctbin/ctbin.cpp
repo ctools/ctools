@@ -465,7 +465,7 @@ void ctbin::get_parameters(void)
     GCTAEventCube cube = create_cube(m_obs);
 
     // Get the skymap from the cube and initialise all pixels to zero
-    m_cube = cube.map();
+    m_cube = cube.counts();
     m_cube = 0.0;
 
     // Get energy boundaries
