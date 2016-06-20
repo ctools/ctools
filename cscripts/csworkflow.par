@@ -17,7 +17,7 @@
 #
 # Input parameters
 #=================
-inflow, f, h, workflow.xml,,, "Input workflow XML file"
+inflow, f, a, workflow.xml,,, "Input workflow XML file"
 
 #
 # Standard parameters
