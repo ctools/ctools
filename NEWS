@@ -183,6 +183,9 @@ ctulimit - Compute upper limit
 Add "edispcube" parameter to support energy dispersion for stacked analysis
 (#1724).
 
+In case that the parameter error is zero, the parameter value is taken as
+parameter error to define the bracketing parameter values (#1795).
+
 
 cterror - Likelihood profile error computation
 ----------------------------------------------

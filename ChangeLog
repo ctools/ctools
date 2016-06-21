@@ -3,6 +3,7 @@
         * Version 1.1.0 released
         ========================
 
+        Handle zero parameter errors in ctulimit (#1795)
         Compute counts cube weights in ctbin (#1789)
         Adapt to new stacked cube interface (#1788)
         Add ctools and cscripts unit tests
