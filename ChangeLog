@@ -1,8 +1,9 @@
-2016-06-20  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-06-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Compute counts cube weights in ctbin (#1789)
         Adapt to new stacked cube interface (#1788)
         Add ctools and cscripts unit tests
         Add "bgdoversample" and "bgdinfill" parameters to csroot2caldb

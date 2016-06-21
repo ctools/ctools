@@ -28,6 +28,7 @@
 #define CTBIN_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <vector>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "ctool.hpp"
@@ -84,12 +85,14 @@ public:
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctbin& app);
-    void free_members(void);
-    void get_parameters(void);
-    void fill_cube(GCTAObservation* obs);
-    void obs_cube(void);
+    void                init_members(void);
+    void                copy_members(const ctbin& app);
+    void                free_members(void);
+    void                get_parameters(void);
+    void                fill_cube(GCTAObservation* obs);
+    void                obs_cube(void);
+    GSkyMap             set_roi_weights(const GCTARoi& roi) const;
+    std::vector<double> set_energy_weights(const GEbounds& ebounds) const;
 
     // User parameters
     GFilename     m_outcube;    //!< Output counts map file name
@@ -98,7 +101,8 @@ protected:
 
     // Protected members
     GObservations m_obs;        //!< Observation container
-    GSkyMap       m_cube;       //!< Event cube
+    GSkyMap       m_counts;     //!< Event cube counts
+    GSkyMap       m_weights;    //!< Event cube weights
     GEbounds      m_ebounds;    //!< Energy boundaries
     GGti          m_gti;        //!< Good time intervals
     double        m_ontime;     //!< Total ontime
@@ -128,7 +132,7 @@ inline
 GCTAEventCube ctbin::cube(void) const
 {
     // Build event cube
-    GCTAEventCube cube(m_cube, m_ebounds, m_gti);
+    GCTAEventCube cube(m_counts, m_weights, m_ebounds, m_gti);
     
     // Return cube
     return cube;
