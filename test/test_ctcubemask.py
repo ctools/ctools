@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 
@@ -37,10 +38,6 @@ class Test(gammalib.GPythonTestSuite):
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
 
-        # Set members
-        self.cntmap_name = "data/crab_cntmap.fits"
-        self.regfile     = "data/exclusion.reg"
-
         # Return
         return
 
@@ -50,51 +47,108 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("ctcubemask")
+        self.name('ctcubemask')
 
         # Append tests
-        self.append(self.test_functional, "Test ctcubemask functionality")
+        self.append(self._test_cmd, 'Test ctcubemask on command line')
+        self.append(self._test_python, 'Test ctcubemask from Python')
 
         # Return
         return
 
-    # Test ctcubemask functionnality
-    def test_functional(self):
+    # Test ctcubemask on command line
+    def _test_cmd(self):
         """
-        Test ctcubemask functionnality.
+        Test ctcubemask on the command line.
+        """
+        # Kluge to set the command (installed version has no README file)
+        if os.path.isfile('README'):
+            ctcubemask = '../src/ctcubemask/ctcubemask'
+        else:
+            ctcubemask = 'ctcubemask'
+
+        # Setup ctcubemask command
+        cmd = ctcubemask+' inobs="data/crab_cntmap.fits"'+ \
+                         ' regfile="data/exclusion.reg"'+ \
+                         ' outcube="ctcubemask_cmd1.fits"'+ \
+                         ' ra=83.63 dec=22.01 rad=2.0'+ \
+                         ' emin=0.1 emax=100.0'+ \
+                         ' logfile="ctcubemask_cmd1.log" chatter=1'
+
+        # Execute ctcubemask, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution was successful
+        self.test_assert(rc == 0,
+                         'Successful ctcubemask execution on command line')
+
+        # Check result file
+        self._check_result_file('ctcubemask_cmd1.fits')
+
+        # Setup ctcubemask command
+        cmd = ctcubemask+' inobs="counts_cube_that_does_not_exist.fits"'+ \
+                         ' regfile="data/exclusion.reg"'+ \
+                         ' outcube="ctcubemask_cmd2.fits"'+ \
+                         ' ra=83.63 dec=22.01 rad=2.0'+ \
+                         ' emin=0.1 emax=100.0'+ \
+                         ' logfile="ctcubemask_cmd2.log" chatter=2'
+
+        # Execute ctcubemask, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution failed
+        self.test_assert(rc != 0,
+                         'Failure of ctcubemask execution on command line')
+
+        # Return
+        return
+
+    # Test ctcubemask from Python
+    def _test_python(self):
+        """
+        Test ctcubemask from Python.
         """
         # Set-up ctcubemask
         mask = ctools.ctcubemask()
-        mask["inobs"]   = self.cntmap_name
-        mask["regfile"] = self.regfile
-        mask["outcube"] = "filtered_cntmap.fits"
-        mask["ra"]      = 83.63
-        mask["dec"]     = 22.01
-        mask["rad"]     = 2.0
-        mask["emin"]    = 0.1
-        mask["emax"]    = 100
+        mask['inobs']   = 'data/crab_cntmap.fits'
+        mask['regfile'] = 'data/exclusion.reg'
+        mask['outcube'] = 'ctcubemask_py1.fits'
+        mask['ra']      = 83.63
+        mask['dec']     = 22.01
+        mask['rad']     = 2.0
+        mask['emin']    = 0.1
+        mask['emax']    = 100.0
+        mask['logfile'] = 'ctcubemask_py1.log'
+        mask['chatter'] = 2
 
-        # Run tool
-        self.test_try("Run ctcubemask")
-        try:
-            mask.run()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in ctcubemask: %s." % (e,)
-        except:
-            msg = "Exception occured in ctcubemask."
-            self.test_try_failure(msg)
+        # Run ctcubemask tool
+        mask.logFileOpen()   # Make sure we get a log file
+        mask.run()
+        mask.save()
 
-        # Save counts cube
-        self.test_try("Save counts cube")
-        try:
-            mask.save()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in saving counts cube: %s." % (e,)
-        except:
-            msg = "Exception occured in saving counts cube."
-            self.test_try_failure(msg)
+        # Check result file
+        self._check_result_file('ctcubemask_py1.fits')
+
+        # Return
+        return
+
+    # Check result file
+    def _check_result_file(self, filename):
+        """
+        Check result file.
+        """
+        # Load counts cube
+        cube = gammalib.GCTAEventCube(filename)
+
+        # Check counts cube
+        self.test_value(cube.size(), 800000, 'Check for 800000 cube bins')
+        self.test_value(cube.number(), 4921, 'Check for 4921 events')
 
         # Return
         return

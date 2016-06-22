@@ -290,14 +290,20 @@ void ctulimit::run(void)
 
     } // endif: likelihood was zero
 
-    // Extract current value
+    // Extract current value and error
     double value = m_model_par->factor_value();
+    double error = m_model_par->factor_error();
 
-    // Compute parameter bracketing
+    // If parameter error is zero then take parameter value as error
+    if (error == 0) {
+        error = value;
+    }
+
+    // Compute parameter bracketing. In case that the parameter error is
     double parmin = std::max(m_model_par->factor_min(),
-                             value - m_sigma_min * m_model_par->factor_error());
+                             value - m_sigma_min * error);
     double parmax = std::min(m_model_par->factor_max(),
-                             value + m_sigma_max * m_model_par->factor_error());
+                             value + m_sigma_max * error);
 
     // Write header
     if (logTerse()) {

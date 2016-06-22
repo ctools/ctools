@@ -71,14 +71,19 @@ linkscripts = cscaldb \
 testscripts = tests/__init__.py \
               ../test/test_python_cscripts.py \
               ../test/test_cscaldb.py \
-              ../test/test_cslightcrv.py \
               ../test/test_csmodelinfo.py \
               ../test/test_csmodelmerge.py \
               ../test/test_csobs2caldb.py \
               ../test/test_csobsdef.py \
               ../test/test_csobsinfo.py \
+              ../test/test_cslightcrv.py \
               ../test/test_cspull.py \
+              ../test/test_csresmap.py \
               ../test/test_csroot2caldb.py \
+              ../test/test_cssens.py \
+              ../test/test_csspec.py \
+              ../test/test_cstsdist.py \
+              ../test/test_cstsmapmerge.py \
               ../test/test_csworkflow.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
@@ -91,12 +96,17 @@ testdata    = ../test/data/crab.xml \
               ../test/data/obs_stacked.xml \
               ../test/data/crab_events.fits.gz \
               ../test/data/crab_cntmap.fits.gz \
+              ../test/data/crab_cntmap_small.fits.gz \
               ../test/data/crab_expcube.fits.gz \
               ../test/data/crab_psfcube.fits.gz \
+              ../test/data/crab_edispcube.fits.gz \
               ../test/data/crab_bkgcube.fits.gz \
+              ../test/data/tsmap_0.fits \
+              ../test/data/tsmap_1.fits \
               ../test/data/exclusion.reg \
               ../test/data/pntdef.dat \
               ../test/data/models.txt \
+              ../test/data/tsmaps.txt \
               ../test/data/model_cube_background.xml \
               ../test/data/model_cube_background2.xml \
               ../test/data/crab_bkgcube.xml \

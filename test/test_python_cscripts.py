@@ -32,11 +32,16 @@ import test_csobs2caldb
 import test_csobsdef
 import test_csobsinfo
 import test_cspull
+import test_csresmap
 import test_csroot2caldb
+import test_cssens
+import test_csspec
+import test_cstsdist
+import test_cstsmapmerge
+import test_csworkflow
 import test_csiactcopy
 import test_csiactdata
 import test_csiactobs
-import test_csworkflow
 
 
 # ================== #
@@ -45,6 +50,13 @@ import test_csworkflow
 def test(installed=False, debug=False):
     """
     Perform cscripts unit testing.
+
+    Parameters
+    ----------
+    installed : bool, optional
+        Flag indicating whether the script has been installed or not
+    debug : bool, optional
+        Enables debugging
     """
     # If we have an installed version then create a temporary directory and
     # copy over all information that is needed
@@ -61,29 +73,29 @@ def test(installed=False, debug=False):
         dirname = os.path.dirname(testdir)
 
         # Copy over test data and irf
-        os.system("cp -r %s %s" % (dirname+"/data",     "data"))
-        os.system("cp -r %s %s" % (dirname+"/iactdata", "iactdata"))
-        os.system("cp -r %s %s" % (dirname+"/irf",      "irf"))
+        os.system('cp -r %s %s' % (dirname+'/data',     'data'))
+        os.system('cp -r %s %s' % (dirname+'/iactdata', 'iactdata'))
+        os.system('cp -r %s %s' % (dirname+'/irf',      'irf'))
 
     # ... otherwise set the calibration database
     else:
-        os.environ['CALDB'] = "../caldb"
+        os.environ['CALDB'] = '../caldb'
 
     # Set PFILES environment variable
     try:
-        os.mkdir("pfiles")
+        os.mkdir('pfiles')
     except:
         pass
-    os.environ['PFILES'] = "pfiles"
+    os.environ['PFILES'] = 'pfiles'
 
     # Copy over pfiles
     if not installed:
-        os.system("cp -r ../cscripts/*.par pfiles/")
+        os.system('cp -r ../cscripts/*.par pfiles/')
     else:
-        os.system("cp -r %s/syspfiles/*.par pfiles/" % (os.environ['CTOOLS']))
+        os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
 
     # Allocate test suite container
-    suites = gammalib.GTestSuites("cscripts unit testing")
+    suites = gammalib.GTestSuites('cscripts unit testing')
 
     # Allocate test suites
     suite_cscaldb      = test_cscaldb.Test()
@@ -94,7 +106,12 @@ def test(installed=False, debug=False):
     suite_csobsdef     = test_csobsdef.Test()
     suite_csobsinfo    = test_csobsinfo.Test()
     suite_cspull       = test_cspull.Test()
+    suite_csresmap     = test_csresmap.Test()
     suite_csroot2caldb = test_csroot2caldb.Test()
+    suite_cssens       = test_cssens.Test()
+    suite_csspec       = test_csspec.Test()
+    suite_cstsdist     = test_cstsdist.Test()
+    suite_cstsmapmerge = test_cstsmapmerge.Test()
     suite_csworkflow   = test_csworkflow.Test()
 
     # Setup unit tests
@@ -106,7 +123,12 @@ def test(installed=False, debug=False):
     suite_csobsdef.set()
     suite_csobsinfo.set()
     suite_cspull.set()
+    suite_csresmap.set()
     suite_csroot2caldb.set()
+    suite_cssens.set()
+    suite_csspec.set()
+    suite_cstsdist.set()
+    suite_cstsmapmerge.set()
     suite_csworkflow.set()
 
     # Append tests to container
@@ -118,7 +140,12 @@ def test(installed=False, debug=False):
     suites.append(suite_csobsdef)
     suites.append(suite_csobsinfo)
     suites.append(suite_cspull)
+    suites.append(suite_csresmap)
     suites.append(suite_csroot2caldb)
+    suites.append(suite_cssens)
+    suites.append(suite_csspec)
+    suites.append(suite_cstsdist)
+    suites.append(suite_cstsmapmerge)
     suites.append(suite_csworkflow)
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
@@ -149,7 +176,7 @@ def test(installed=False, debug=False):
 
     # If we have a non-installed version then save test results
     if not installed:
-        suites.save("reports/cscripts.xml")
+        suites.save('reports/cscripts.xml')
 
     # If debuging is requested then print test suites
     if debug:

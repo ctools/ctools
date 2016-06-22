@@ -257,9 +257,9 @@ else
   exit 1
 fi
 # === ascii-file ===
-ls data/tsmap_*.fits > tsmaps.txt
+#ls data/tsmap_*.fits > tsmaps.txt
 @PYTHON_COVERAGE@@abs_top_srcdir@/cscripts/cstsmapmerge.py \
-  inmaps="@tsmaps.txt" \
+  inmaps="@data/tsmaps.txt" \
   outmap="merged_tsmap4.fits" > cstsmapmerge.log
 $ECHO -n "."
 if [ -s "merged_tsmap4.fits" ]

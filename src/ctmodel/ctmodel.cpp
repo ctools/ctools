@@ -395,7 +395,7 @@ void ctmodel::publish(const std::string& name)
     }
 
     // Publish model cube
-    m_cube.map().publish(user_name);
+    m_cube.counts().publish(user_name);
 
     // Return
     return;

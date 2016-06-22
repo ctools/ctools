@@ -22,7 +22,7 @@ doc_DATA = \
 	   COPYING \
 	   INSTALL \
 	   NEWS \
-	   README
+	   README.md
 docdir = ${datadir}/doc/${PACKAGE}
 
 #install-data-local: $(HTML_INSTALL_DATA_TARGETS)

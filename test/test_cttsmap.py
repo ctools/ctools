@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 
@@ -37,12 +38,6 @@ class Test(gammalib.GPythonTestSuite):
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
 
-        # Set members
-        self.events_name = "data/crab_events.fits"
-        self.model_name  = "data/crab.xml"
-        self.caldb       = "irf"
-        self.irf         = "cta_dummy_irf"
-
         # Return
         return
 
@@ -52,56 +47,127 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("cttsmap")
+        self.name('cttsmap')
 
         # Append tests
-        self.append(self.test_functional, "Test cttsmap functionality")
+        self.append(self._test_cmd, 'Test cttsmap on command line')
+        self.append(self._test_python, 'Test cttsmap from Python')
 
         # Return
         return
 
-    # Test cttsmap functionnality
-    def test_functional(self):
+    # Test cttsmap on command line
+    def _test_cmd(self):
         """
-        Test cttsmap functionality.
+        Test cttsmap on the command line.
+        """
+        # Kluge to set the command (installed version has no README file)
+        if os.path.isfile('README'):
+            cttsmap = '../src/cttsmap/cttsmap'
+        else:
+            cttsmap = 'cttsmap'
+
+        # Setup cttsmap command
+        cmd = cttsmap+' inobs="data/crab_events.fits"'+ \
+                      ' inmodel="data/crab.xml" srcname="Crab"'+ \
+                      ' caldb="prod2" irf="South_0.5h"'+ \
+                      ' outmap="cttsmap_cmd1.fits"'+ \
+                      ' nxpix=5 nypix=5 binsz=0.02'+ \
+                      ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
+                      ' logfile="cttsmap_cmd1.log" chatter=1'
+
+        # Execute cttsmap, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution was successful
+        self.test_assert(rc == 0,
+                         'Successful cttsmap execution on command line')
+
+        # Check result file
+        self._check_result_file('cttsmap_cmd1.fits')
+
+        # Setup cttsmap command
+        cmd = cttsmap+' inobs="event_file_that_does_not_exist.fits"'+ \
+                      ' inmodel="data/crab.xml" srcname="Crab"'+ \
+                      ' caldb="prod2" irf="South_0.5h"'+ \
+                      ' outmap="cttsmap_cmd2.fits"'+ \
+                      ' nxpix=5 nypix=5 binsz=0.02'+ \
+                      ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
+                      ' logfile="cttsmap_cmd2.log" chatter=2'
+
+        # Execute cttsmap, make sure we catch any exception
+        try:
+            rc = os.system(cmd+' >/dev/null 2>&1')
+        except:
+            pass
+
+        # Check if execution failed
+        self.test_assert(rc != 0,
+                         'Failure of cttsmap execution on command line')
+
+        # Return
+        return
+
+    # Test cttsmap from Python
+    def _test_python(self):
+        """
+        Test cttsmap from Python.
         """
         # Set-up cttsmap
         tsmap = ctools.cttsmap()
-        tsmap["inobs"]    = self.events_name
-        tsmap["inmodel"]  = self.model_name
-        tsmap["srcname"]  = "Crab"
-        tsmap["caldb"]    = self.caldb
-        tsmap["irf"]      = self.irf
-        tsmap["outmap"]   = "tsmap.fits"
-        tsmap["nxpix"]    = 5
-        tsmap["nypix"]    = 5
-        tsmap["binsz"]    = 0.02
-        tsmap["coordsys"] = "CEL"
-        tsmap["proj"]     = "CAR"
-        tsmap["xref"]     = 83.63
-        tsmap["yref"]     = 22.01
+        tsmap['inobs']    = 'data/crab_events.fits'
+        tsmap['inmodel']  = 'data/crab.xml'
+        tsmap['srcname']  = 'Crab'
+        tsmap['caldb']    = 'prod2'
+        tsmap['irf']      = 'South_0.5h'
+        tsmap['outmap']   = 'cttsmap_py1.fits'
+        tsmap['nxpix']    = 5
+        tsmap['nypix']    = 5
+        tsmap['binsz']    = 0.02
+        tsmap['coordsys'] = 'CEL'
+        tsmap['proj']     = 'CAR'
+        tsmap['xref']     = 83.63
+        tsmap['yref']     = 22.01
+        tsmap['logfile']  = 'cttsmap_py1.log'
+        tsmap['chatter']  = 2
 
-        # Run tool
-        self.test_try("Run cttsmap")
-        try:
-            tsmap.run()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in cttsmap: %s." % (e,)
-        except:
-            msg = "Exception occured in cttsmap."
-            self.test_try_failure(msg)
+        # Run cttsmap tool
+        tsmap.logFileOpen()   # Make sure we get a log file
+        tsmap.run()
+        tsmap.save()
 
-        # Save results
-        self.test_try("Save results")
-        try:
-            tsmap.save()
-            self.test_try_success()
-        #except Exception as e:
-        #    msg = "Exception occured in saving results: %s." % (e,)
-        except:
-            msg = "Exception occured in saving results."
-            self.test_try_failure(msg)
+        # Check result file
+        self._check_result_file('cttsmap_py1.fits')
+
+        # Return
+        return
+
+    # Check result file
+    def _check_result_file(self, filename):
+        """
+        Check result file.
+        """
+        # Open result file
+        fits = gammalib.GFits(filename)
+
+        # Get HDUs
+        ts        = fits['Primary']
+        prefactor = fits['Prefactor']
+        index     = fits['Index']
+
+        # Check dimensions
+        self.test_value(ts.naxis(), 2, 'Check for 2 dimensions')
+        self.test_value(ts.naxes(0), 5, 'Check for 5 pixels in X')
+        self.test_value(ts.naxes(1), 5, 'Check for 5 pixels in Y')
+        self.test_value(prefactor.naxis(), 2, 'Check for 2 dimensions')
+        self.test_value(prefactor.naxes(0), 5, 'Check for 5 pixels in X')
+        self.test_value(prefactor.naxes(1), 5, 'Check for 5 pixels in Y')
+        self.test_value(index.naxis(), 2, 'Check for 2 dimensions')
+        self.test_value(index.naxes(0), 5, 'Check for 5 pixels in X')
+        self.test_value(index.naxes(1), 5, 'Check for 5 pixels in Y')
 
         # Return
         return

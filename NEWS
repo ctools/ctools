@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.1.0
 
-25 April 2016
+21 June 2016
 
 
 Introduction
@@ -92,6 +92,14 @@ ctbin - CTA event binning
 Add publish() method to publish the counts cube via a SAMP Hub to Virtual
 Observatory interoperable tools (e.g. Aladin).
 
+The tool now computes the counts cube weights according to the overlaps
+between the Region of Interests and energy boundaries with the counts
+cube bins. This allows in particular for a proper handling of different
+energy thresholds between observations that will be stacked into a single
+cube. Also different Region of Interests are now properly handled, and
+there is no longer an issue with counts cubes that are larger than the
+Region of Interest of the event list (#1789).
+
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
@@ -175,6 +183,9 @@ ctulimit - Compute upper limit
 Add "edispcube" parameter to support energy dispersion for stacked analysis
 (#1724).
 
+In case that the parameter error is zero, the parameter value is taken as
+parameter error to define the bracketing parameter values (#1795).
+
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
@@ -207,6 +218,8 @@ sampling than the spatial sampling in the ROOT file.
 
 Add csobsdef.pntdef() method to set directly a pointing definition from a
 gammalib.GCsv object (#1771).
+
+Unit tests have been added for all cscripts.
 
 
 Examples

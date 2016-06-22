@@ -52,7 +52,7 @@ if sys.platform.lower().startswith("darwin"):
         else:
             ldshared_rm += option + ' '
     if (len(ldshared_rm) > 0):
-        sys.stdout.write("Removed following option(s) from LDSHARED: "+ldshared_rm+"\n");
+        sys.stdout.write("Removed following option(s) from LDSHARED: "+ldshared_rm+"\n")
     
     # Set LDSHARED
     cvars['LDSHARED'] = ldshared_new
