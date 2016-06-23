@@ -383,7 +383,7 @@ void ctcubemask::publish(const std::string& name)
             }
 
             // Publish counts cube
-            cube->map().publish(user_name);
+            cube->counts().publish(user_name);
 
         }
     }
@@ -492,7 +492,7 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
     if (cube != NULL) {
 
         // Extract event cube and energy boundaries
-        GSkyMap         map     = cube->map();
+        GSkyMap         map     = cube->counts();
         const GEbounds& ebounds = cube->ebounds();
 
         // If no energy selection is required set energy boundaries to cube boundaries
@@ -625,7 +625,7 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Put back map into the event cube
-        cube->map(map);
+        cube->counts(map);
 
     } // endif: observation contained an event cube
 

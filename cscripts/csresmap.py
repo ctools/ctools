@@ -228,7 +228,7 @@ class csresmap(ctools.cscript):
                 cta_counts_cube = bin.cube()
 
             # Assign GCTAEventCube to skymap
-            countmap = cta_counts_cube.map()
+            countmap = cta_counts_cube.counts()
 
             # Write header
             if self._logTerse():
@@ -245,13 +245,13 @@ class csresmap(ctools.cscript):
             model.run()
 
             # Get model map into GSkyMap object
-            modelmap = model.cube().map().copy()
+            modelmap = model.cube().counts().copy()
 
         # Store counts map as residual map. Note that we need a
         # special construct here to avoid memory leaks. This seems
         # to be a SWIG feature as SWIG creates a new object when
         # calling bin.cube()
-        #residualmap = bin.cube().map() 
+        #residualmap = bin.cube().counts()
         self._resmap = countmap.copy()
         self._resmap.stack_maps()
         modelmap.stack_maps()

@@ -76,6 +76,7 @@ class Test(gammalib.GPythonTestSuite):
                        ' outmap="csresmap_cmd1.fits"'+ \
                        ' inmodel="data/crab.xml"'+ \
                        ' caldb="prod2" irf="South_0.5h"' + \
+                       ' emin=0.1 emax=100.0 enumbins=20'+ \
                        ' nxpix=50 nypix=50 binsz=0.02'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                        ' algorithm="SUBDIV"'+ \
@@ -99,6 +100,7 @@ class Test(gammalib.GPythonTestSuite):
                        ' outmap="csresmap_cmd1.fits"'+ \
                        ' inmodel="data/crab.xml"'+ \
                        ' caldb="prod2" irf="South_0.5h"' + \
+                       ' emin=0.1 emax=100.0 enumbins=20'+ \
                        ' nxpix=50 nypix=50 binsz=0.02'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                        ' algorithm="SUBDIV"'+ \
@@ -129,6 +131,9 @@ class Test(gammalib.GPythonTestSuite):
         resmap['inmodel']   = 'data/crab.xml'
         resmap['caldb']     = 'prod2'
         resmap['irf']       = 'South_0.5h'
+        resmap['emin']      = 0.1
+        resmap['emax']      = 100.0
+        resmap['enumbins']  = 20
         resmap['nxpix']     = 50
         resmap['nypix']     = 50
         resmap['binsz']     = 0.02
