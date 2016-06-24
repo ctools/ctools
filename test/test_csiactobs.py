@@ -66,7 +66,7 @@ class Test(gammalib.GPythonTestSuite):
         Test csiactobs on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
+        if os.path.isfile("README.md"):
             csiactobs = "../cscripts/csiactobs.py"
         else:
             csiactobs = "csiactobs"

@@ -70,7 +70,7 @@ class Test(gammalib.GPythonTestSuite):
         Test cslightcrv on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
+        if os.path.isfile('README.md'):
             cslightcrv = '../cscripts/cslightcrv.py'
         else:
             cslightcrv = 'cslightcrv'

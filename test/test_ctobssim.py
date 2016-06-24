@@ -72,7 +72,7 @@ class Test(gammalib.GPythonTestSuite):
         Test ctobssim on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
+        if os.path.isfile("README.md"):
             ctobssim = "../src/ctobssim/ctobssim"
         else:
             ctobssim = "ctobssim"

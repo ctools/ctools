@@ -62,7 +62,7 @@ class Test(gammalib.GPythonTestSuite):
         Test ctpsfcube on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
+        if os.path.isfile('README.md'):
             ctpsfcube = '../src/ctpsfcube/ctpsfcube'
         else:
             ctpsfcube = 'ctpsfcube'

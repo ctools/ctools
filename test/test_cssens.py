@@ -66,7 +66,7 @@ class Test(gammalib.GPythonTestSuite):
         Test cssens on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
+        if os.path.isfile('README.md'):
             cssens = '../cscripts/cssens.py'
         else:
             cssens = 'cssens'

@@ -66,7 +66,7 @@ class Test(gammalib.GPythonTestSuite):
         Test cstsmapmerge on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
+        if os.path.isfile('README.md'):
             cstsmapmerge = '../cscripts/cstsmapmerge.py'
         else:
             cstsmapmerge = 'cstsmapmerge'

@@ -73,7 +73,7 @@ class Test(gammalib.GPythonTestSuite):
         Test csobs2caldb on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
+        if os.path.isfile("README.md"):
             csobs2caldb = "../cscripts/csobs2caldb.py"
         else:
             csobs2caldb = "csobs2caldb"
