@@ -203,8 +203,7 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    """
+
     # Dump header
     print("********************************************")
     print("*      CTA stacked analysis pipeline       *")

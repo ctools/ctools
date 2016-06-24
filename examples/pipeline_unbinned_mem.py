@@ -139,8 +139,7 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0,
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    """
+
     # Dump header
     print("********************************************")
     print("*      CTA unbinned analysis pipeline      *")

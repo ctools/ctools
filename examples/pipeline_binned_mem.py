@@ -153,8 +153,7 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    """
+
     # Dump header
     print("********************************************")
     print("*       CTA binned analysis pipeline       *")

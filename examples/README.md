@@ -1,86 +1,99 @@
+ctools examples
+===============
+
 This folder contains Python example scripts that illustrate the
 usage of the ctools.
 
-benchmark_cta_analysis.py
-  This script peforms a benchmark of the various CTA analysis types
-  (unbinned, binned, stacked), and if matplotlib is installed, creates
-  a plot of the benchmark results.
+`benchmark_cta_analysis.py`
+>  This script peforms a benchmark of the various CTA analysis types
+>  (unbinned, binned, stacked), and if matplotlib is installed, creates
+>  a plot of the benchmark results.
 
-check_models.py
-  Checks a variety of models using an unbinned analysis.
+`check_models.py`
+>  Checks a variety of models using an unbinned analysis.
 
-make_pointings.py
-  This script creates pointings for CTA surveys. For the moment the
-  Galactic Plane Survey (gps), the Extragalactic Survey (extgal),
-  the Galactic Centre Survey (gc) and the LMC survey (lmc) are
-  implemented. The script outputs and ASCII file that can be used by
-  csobsdef.
+`generate_prod3_irfs/py`
+>  Generate Prod3 Instrument Response Functions from FITS files.
 
-make_pull_at_sensitivity_limit.py
-  This script creates pull distributions as function of energy
-  for a test source that is at the 5 sigma sensitivity limit for
-  50h of effective observing time. It takes as input file the
-  output file generated using cspull.
-  If the Python processing module is installed the script can make
-  use of multiple cores and runs in parallel.
+`make_pointings.py`
+>  This script creates pointings for CTA surveys. For the moment the
+>  Galactic Plane Survey (gps), the Extragalactic Survey (extgal),
+>  the Galactic Centre Survey (gc) and the LMC survey (lmc) are
+>  implemented. The script outputs and ASCII file that can be used by
+>  csobsdef.
 
-make_spectrum.py
-  This script shows how to make a spectrum using obsutils.
+`make_pull_at_sensitivity_limit.py`
+>  This script creates pull distributions as function of energy
+>  for a test source that is at the 5 sigma sensitivity limit for
+>  50h of effective observing time. It takes as input file the
+>  output file generated using cspull.
+>  If the Python processing module is installed the script can make
+>  use of multiple cores and runs in parallel.
 
-make_survey.py
-  This script simulates a CTA galactic plane survey.
+`make_spectrum.py`
+>  This script shows how to make a spectrum using obsutils.
 
-make_ts_distributions.py
-  This script creates TS distributions as function of energy for
-  an off observation of 50h effective observing time.
-  If the Python processing module is installed the script can make
-  use of multiple cores and runs in parallel.
+`make_survey.py`
+>  This script simulates a CTA galactic plane survey.
 
-benchmark_cta_analysis.py
-  Performs performance benchmarks of the various CTA analysis types.
+`make_ts_distributions.py`
+>  This script creates TS distributions as function of energy for
+>  an off observation of 50h effective observing time.
+>  If the Python processing module is installed the script can make
+>  use of multiple cores and runs in parallel.
 
-pipeline_binned_disk.py
-  Example pipeline for simulating events and performing a binned
-  analysis by saving intermediate results to disk.
+`pipeline_binned_disk.py`
+>  Example pipeline for simulating events and performing a binned
+>  analysis by saving intermediate results to disk.
 
-pipeline_binned_mem.py
-  Example pipeline for simulating events and performing a binned
-  analysis in memory. No files will be written to disk.
+`pipeline_binned_mem.py`
+>  Example pipeline for simulating events and performing a binned
+>  analysis in memory. No files will be written to disk.
 
-pipeline_stacked_disk.py
-  Example pipeline for simulating events and performing a stacked
-  analysis by saving intermediate results to disk.
+`pipeline_stacked_disk.py`
+>  Example pipeline for simulating events and performing a stacked
+>  analysis by saving intermediate results to disk.
 
-pipeline_stacked_mem.py
-  Example pipeline for simulating events and performing a stacked
-  analysis in memory. No files will be written to disk.
+`pipeline_stacked_mem.py`
+>  Example pipeline for simulating events and performing a stacked
+>  analysis in memory. No files will be written to disk.
 
-pipeline_unbinned_disk.py
-  Example pipeline for simulating events and performing an unbinned
-  analysis by saving intermediate results to disk.
+`pipeline_unbinned_disk.py`
+>  Example pipeline for simulating events and performing an unbinned
+>  analysis by saving intermediate results to disk.
 
-pipeline_unbinned_mem.py
-  Example pipeline for simulating events and performing an unbinned
-  analysis in memory. No files will be written to disk.
+`pipeline_unbinned_mem.py`
+>  Example pipeline for simulating events and performing an unbinned
+>  analysis in memory. No files will be written to disk.
 
-show_butterfly.py
-  Displays a butterfly generated using the ctbutterfly tool.
+`show_butterfly.py`
+>  Displays a butterfly generated using the ctbutterfly tool.
 
-show_model.py
-  Displays a spectral model.
+`show_model.py`
+>  Displays a spectral model.
 
-show_pha.py
-  Displays a spectrum in PHA format.
+`show_pha.py`
+>  Displays a spectrum in PHA format.
 
-show_pull_histogram.py
-  Displays pull histograms generated by the cspull script.
+`show_pull_evolution.py`
+>  Displays the evolution of the mean and rms pull as function of number of
+>  trials.
 
-show_response.py
-  Displays one or several CTA response functions.
+`show_pull_histogram.py`
+>  Displays pull histograms generated by the cspull script.
 
-show_sensitivity.py
-  Displays sensitivity information generated by the cssens script.
+`show_response.py`
+>  Displays one or several CTA response functions.
 
-show_ts_distribution.py
-  Displays Test Statistic histograms generated using the cstsdist
-  script.
+`show_sensitivity.py`
+>  Displays sensitivity information generated by the cssens script.
+
+`show_spectrum.py`
+>  Displays spectrum generated by the csspec script.
+
+`show_ts_distribution.py`
+>  Displays Test Statistic histograms generated using the cstsdist
+>  script.
+
+`simulate_events.py`
+>  Simulates events and compares the simulation to the model.

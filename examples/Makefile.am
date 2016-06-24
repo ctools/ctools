@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 # Scripts to be distributed
-scripts = README \
+scripts = README.md \
           benchmark_cta_analysis.py \
           check_models.py \
           make_pull_at_sensitivity_limit.py \
