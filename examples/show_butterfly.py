@@ -30,8 +30,7 @@ except:
 # Script entry #
 # ============ #    
 if __name__ == "__main__":
-    """
-    """
+
     # Check for given butterfly file
     if not len(sys.argv) == 2:
         sys.exit("Usage: show_butterfly.py butterfly.txt")

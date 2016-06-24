@@ -303,9 +303,7 @@ def survey_gplane(lrange=10, lstep=2):
 # Main routine entry point #
 #==========================#
 if __name__ == '__main__':
-    """
-    CTA survey simulation and analysis script.
-    """
+
     # Initialise flags
     need_help = False
 

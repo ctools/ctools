@@ -167,9 +167,7 @@ def plot_spectrum(spectrum):
 # Main routine entry point #
 #==========================#
 if __name__ == '__main__':
-    """
-    Generate a Crab spectrum.
-    """
+
     # Generate spectrum
     spectrum = make_spectrum()
 

@@ -94,9 +94,7 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Create TS distribution in a number of energy bands.
-    """
+
     # Get input arguments
     usage = "make_ts_distributions [-n ntrials] [-e enumbins] [-m max_threads]"
     if len(sys.argv) < 1:

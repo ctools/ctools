@@ -119,8 +119,7 @@ def show_sensitivity(sensitivity, filename):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    """
+
     # Print usage information
     usage = "Usage: show_sensitivity [filename]"
     if len(sys.argv) < 1:

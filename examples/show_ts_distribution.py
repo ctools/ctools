@@ -219,9 +219,7 @@ def dist_pdf(values, nbins, title):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Display TS distribution generated using cstsdist using matplotlib.
-    """
+
     # Print usage information
     usage = "Usage: show_ts_distribution filename" \
             " [-n bins] [-c column] [-t title] [-p plot]"

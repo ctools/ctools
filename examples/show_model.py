@@ -82,8 +82,7 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100):
 # Script entry  #
 # ============= #    
 if __name__ == "__main__":
-    """
-    """
+
     # Check for model filename
     if len(sys.argv) < 2:
         sys.exit("Usage: show_model.py model.xml [index]")

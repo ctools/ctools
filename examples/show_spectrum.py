@@ -31,8 +31,6 @@ except:
 # Script entry #
 # ============ #    
 if __name__ == "__main__":
-    """
-    """
 
     # Check for given spectrum file
     if not len(sys.argv) == 2:

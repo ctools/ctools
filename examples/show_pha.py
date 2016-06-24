@@ -79,9 +79,7 @@ def show_pha(pha):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Display spectrum in PHA format.
-    """
+
     # Print usage information
     usage = "Usage: show_pha filename" \
             " [-n bins] [-c column] [-t title] [-p plot]"

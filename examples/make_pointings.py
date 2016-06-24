@@ -336,9 +336,7 @@ def write_obsdef(filename, obsdef):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    CTA pointing pattern generation.
-    """
+
     # Initialise flags
     need_help = False
 

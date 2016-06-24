@@ -252,9 +252,7 @@ def show_one_response(rspname, dbname, name, rootdir=None, color="r"):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Display response information.
-    """
+
     # Create figures
     plt.figure(1)
     plt.title("Effective area")
