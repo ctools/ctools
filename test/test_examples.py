@@ -71,7 +71,6 @@ class Test(gammalib.GPythonTestSuite):
         # Execute Python script, make sure we catch any exception
         try:
             rc = os.system(cmd+' > example_'+logname+'.log 2>&1')
-            #rc = os.system(cmd)
         except:
             pass
 
@@ -93,6 +92,7 @@ class Test(gammalib.GPythonTestSuite):
         self.append(self.test_generate_prod3_irfs, 'Test generate_prod3_irfs')
         self.append(self.test_make_pointings, 'Test make_pointings')
         self.append(self.test_make_spectrum, 'Test make_spectrum')
+        self.append(self.test_make_ts_distributions, 'Test make_ts_distributions')
         self.append(self.test_pipeline_binned_disk, 'Test pipeline_binned_disk')
         self.append(self.test_pipeline_binned_mem, 'Test pipeline_binned_mem')
         self.append(self.test_pipeline_stacked_disk, 'Test pipeline_stacked_disk')
@@ -124,6 +124,19 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
+    # Test generate_prod3_irfs
+    def test_generate_prod3_irfs(self):
+        """
+        Test generate_prod3_irfs
+        """
+        # Execute script
+        self._execute_python('generate_prod3_irfs')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
     # Test make_spectrum
     def test_make_spectrum(self):
         """
@@ -137,13 +150,13 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
-    # Test generate_prod3_irfs
-    def test_generate_prod3_irfs(self):
+    # Test make_ts_distributions
+    def test_make_ts_distributions(self):
         """
-        Test generate_prod3_irfs
+        Test make_ts_distributions
         """
         # Execute script
-        self._execute_python('generate_prod3_irfs')
+        self._execute_python('make_ts_distributions', args='-n 2 -e 0 -d 1800')
 
         #TODO: Do any testing
 
