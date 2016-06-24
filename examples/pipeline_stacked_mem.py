@@ -75,7 +75,7 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
 # =========== #
 # Setup model #
 # =========== #
-def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
+def setup_model(obs, model="data/crab.xml"):
     """
     Setup model for analysis.
 

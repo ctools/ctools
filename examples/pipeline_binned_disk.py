@@ -84,7 +84,7 @@ def setup_observations(pattern='four', ra=83.63, dec=22.01, offset=1.5,
 # =========== #
 # Setup model #
 # =========== #
-def setup_model(obs, model='${CTOOLS}/share/models/crab.xml'):
+def setup_model(obs, model='data/crab.xml'):
     """
     Setup model for analysis.
 
@@ -113,7 +113,7 @@ def setup_model(obs, model='${CTOOLS}/share/models/crab.xml'):
 def run_pipeline(obs, emin=0.1, emax=100.0,
                  enumbins=20, nxpix=200, nypix=200, binsz=0.02,
                  coordsys='CEL', proj='CAR',
-                 model='${CTOOLS}/share/models/crab.xml',
+                 model='data/crab.xml',
                  caldb='prod2', irf='South_0.5h',
                  debug=False):
     """
