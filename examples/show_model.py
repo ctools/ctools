@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script shows a model 
+# Shows the photon spectrum of a model
 #
-# Copyright (C) 2015 Juergen Knoedlseder
+# Copyright (C) 2015-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,27 +18,41 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
 import sys
 import math
+import gammalib
 try:
     import matplotlib.pyplot as plt
 except:
-    sys.exit("This script needs matplotlib")
+    sys.exit('This script needs the "matplotlib" module')
 
 
 # ======================= #
 # Plot spectral component #
 # ======================= #    
-def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100):
+def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
     """
+    Plot spectral model component
+
+    Parameters
+    ----------
+    model : `~gammalib.GModel`
+        Model
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    enumbins : integer, optional
+        Number of energy bins
+    plotfile : str, optional
+        Name of plot file
     """
     # Get spectral component
     spectrum = model.spectral()
 
     # Setup energy axis
-    e_min   = gammalib.GEnergy(emin, "TeV")
-    e_max   = gammalib.GEnergy(emax, "TeV")
+    e_min   = gammalib.GEnergy(emin, 'TeV')
+    e_max   = gammalib.GEnergy(emax, 'TeV')
     ebounds = gammalib.GEbounds(enumbins, e_min, e_max)
 
     # Setup model plot
@@ -48,7 +62,7 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100):
     max = 0.0
     for i in range(enumbins):
         energy = ebounds.elogmean(i)
-        value  = spectrum.eval(energy, gammalib.GTime())
+        value  = spectrum.eval(energy)
         if value > max:
             max = value
         if value < min:
@@ -57,22 +71,27 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100):
         y.append(value)
 
     # Set minimum and maximum
-    max = math.pow(10.0, math.log10(max)+1)
-    if min < 0.0001*max:
-        min = 0.0001*max
-    min = math.pow(10.0, math.log10(min)-1)
+    #max = math.pow(10.0, math.log10(max)+1)
+    #if min < 0.0001*max:
+    #    min = 0.0001*max
+    #min = math.pow(10.0, math.log10(min)-1)
 
 
     # Show spectrum
     plt.figure()
-    plt.title(model.name()+" ("+spectrum.type()+")")
+    plt.title(model.name()+' ('+spectrum.type()+')')
     plt.loglog()
     plt.grid()
     plt.loglog(x, y, color='red')
-    plt.xlabel("Energy [TeV]")
-    plt.ylabel(r"dN/dE [ph s$^{-1}$ cm$^{-2}$ MeV$^{-1}$]")
-    plt.ylim([min,max]) 
-    plt.show()
+    plt.xlabel('Energy (TeV)')
+    plt.ylabel(r'dN/dE (ph s$^{-1}$ cm$^{-2}$ MeV$^{-1}$)')
+    #plt.ylim([min,max])
+
+    # Show spectrum or save it into file
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()
 
     # Return
     return
@@ -85,20 +104,24 @@ if __name__ == "__main__":
 
     # Check for model filename
     if len(sys.argv) < 2:
-        sys.exit("Usage: show_model.py model.xml [index]")
+        sys.exit('Usage: show_model.py model.xml [name] [file]')
 
     # Get optional model index
-    if len(sys.argv) == 3:
-        index = int(sys.argv[2])
+    if len(sys.argv) >= 3:
+        name = sys.argv[2]
     else:
-        index = 0
+        name = 0
+    if len(sys.argv) == 4:
+        plotfile = sys.argv[3]
+    else:
+        plotfile = ''
 
     # Read models XML file
     filename = sys.argv[1]
     models   = gammalib.GModels(filename)
 
     # Extract relevant model
-    model = models[index]
+    model = models[name]
 
     # Plot spectrum
-    plot_spectrum(model)
+    plot_spectrum(model, plotfile=plotfile)

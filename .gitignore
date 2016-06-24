@@ -81,6 +81,7 @@ test/*.xml
 test/*.reg
 test/*.trs
 test/*.txt
+test/*.eps
 test/test_cscripts.sh
 test/test_examples.sh
 test/reports/*.xml

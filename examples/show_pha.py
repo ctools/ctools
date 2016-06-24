@@ -1,12 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script displays a spectrum in PHA format.
+# Show a spectrum in PHA format.
 #
-# Required 3rd party modules:
-# - matplotlib
-# - numpy
-#
-# Copyright (C) 2013 Juergen Knoedlseder
+# Copyright (C) 2013-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,17 +21,29 @@
 import sys
 import math
 import gammalib
+try:
+    import matplotlib.pyplot as plt
+except:
+    sys.exit('This script needs the "matplotlib" module')
 
 
 # ================= #
 # Show PHA spectrum #
 # ================= #
-def show_pha(pha):
+def show_pha(pha, plotfile=''):
     """
+    Show PHA spectrum
+
+    Parameters
+    ----------
+    spectrum : `~gammalib.GPha`
+        PHA file
+    plotfile : str, optional
+        Plot file name
     """
     # Create figure
     plt.figure(1)
-    plt.title("PHA spectrum (" + pha.filename() + ")")
+    plt.title('PHA spectrum (' + pha.filename() + ')')
 
     # Generate energy vector
     energy   = []
@@ -63,16 +71,19 @@ def show_pha(pha):
 
     # Set axes
     if channels:
-        plt.xlabel("Channels")
+        plt.xlabel('Channels')
     else:
-        plt.xlabel("Energy (TeV)")
-    plt.ylabel("Counts")
+        plt.xlabel('Energy (TeV)')
+    plt.ylabel('Counts')
 
-    # Show plot
-    plt.show()
+    # Show spectrum or save it into file
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()
 
     # Return
-    #return
+    return
 
 
 # ======================== #
@@ -81,27 +92,21 @@ def show_pha(pha):
 if __name__ == '__main__':
 
     # Print usage information
-    usage = "Usage: show_pha filename" \
-            " [-n bins] [-c column] [-t title] [-p plot]"
+    usage = 'Usage: show_pha filename [file]'
     if len(sys.argv) < 2:
         print(usage)
         sys.exit()
+
+    # Check if plotting in file is requested
+    plotfile = ''
+    if len(sys.argv) == 3:
+        plotfile = sys.argv[2]
 
     # Extract parameters
     filename = sys.argv[1]
 
     # Load PHA spectrum
     pha = gammalib.GPha(filename)
-    #print(pha)
-
-    # Try importing matplotlib
-    try:
-        import matplotlib.pyplot as plt
-        has_matplotlib = True
-    except ImportError:
-        print("Matplotlib is not (correctly) installed on your system.")
-        has_matplotlib = False
 
     # Show PHA spectrum
-    if has_matplotlib:
-        show_pha(pha)
+    show_pha(pha, plotfile=plotfile)

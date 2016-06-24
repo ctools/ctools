@@ -1,8 +1,8 @@
 #!/bin/sh
 # =====================================================================
-# Run all test and example scripts that come with the package.
+# Run some test scripts that come with the package
 #
-# Copyright (C) 2011-2015 Juergen Knoedlseder
+# Copyright (C) 2011-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ base=$PWD
 
 
 #
-# examples
+# test/dev
 # ========
 echo
-echo "=====> examples"
-cd examples
+echo "=====> test/dev"
+cd test/dev
 
 # Create local environment
 rm -rf ctools
@@ -41,18 +41,8 @@ export CTOOLS=$PWD/ctools
 # Run checkers
 ./check_models.py
 
-# Run pipelines
-./pipeline_binned_disk.py
-./pipeline_binned_mem.py    
-./pipeline_stacked_disk.py
-./pipeline_stacked_mem.py 
-./pipeline_unbinned_disk.py
-./pipeline_unbinned_mem.py 
-
 # Run makers
 ./make_survey.py
-./make_ts_distributions.py -n 2 -e 0 -d 1800
-#./make_pull_at_sensitivity_limit.py
 
 # Remove local environment
 rm -rf ctools

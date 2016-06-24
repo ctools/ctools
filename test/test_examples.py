@@ -89,16 +89,21 @@ class Test(gammalib.GPythonTestSuite):
         self.name('examples')
 
         # Append tests
-        self.append(self.test_generate_prod3_irfs, 'Test generate_prod3_irfs')
-        self.append(self.test_make_pointings, 'Test make_pointings')
-        self.append(self.test_make_spectrum, 'Test make_spectrum')
-        self.append(self.test_make_ts_distributions, 'Test make_ts_distributions')
-        self.append(self.test_pipeline_binned_disk, 'Test pipeline_binned_disk')
-        self.append(self.test_pipeline_binned_mem, 'Test pipeline_binned_mem')
-        self.append(self.test_pipeline_stacked_disk, 'Test pipeline_stacked_disk')
-        self.append(self.test_pipeline_stacked_mem, 'Test pipeline_stacked_mem')
-        self.append(self.test_pipeline_unbinned_disk, 'Test pipeline_unbinned_disk')
-        self.append(self.test_pipeline_unbinned_mem, 'Test pipeline_unbinned_mem')
+        self.append(self.test_generate_prod3_irfs, 'Test generate_prod3_irfs.py')
+        self.append(self.test_make_pointings, 'Test make_pointings.py')
+        self.append(self.test_make_spectrum, 'Test make_spectrum.py')
+        self.append(self.test_make_ts_distributions, 'Test make_ts_distributions.py')
+        self.append(self.test_pipeline_binned_disk, 'Test pipeline_binned_disk.py')
+        self.append(self.test_pipeline_binned_mem, 'Test pipeline_binned_mem.py')
+        self.append(self.test_pipeline_stacked_disk, 'Test pipeline_stacked_disk.py')
+        self.append(self.test_pipeline_stacked_mem, 'Test pipeline_stacked_mem.py')
+        self.append(self.test_pipeline_unbinned_disk, 'Test pipeline_unbinned_disk.py')
+        self.append(self.test_pipeline_unbinned_mem, 'Test pipeline_unbinned_mem.py')
+        self.append(self.test_show_butterfly, 'Test show_butterfly.py')
+        self.append(self.test_show_model, 'Test show_model.py')
+        self.append(self.test_show_pha, 'Test show_pha.py')
+        self.append(self.test_show_pull_evolution, 'Test show_pull_evolution.py')
+        self.append(self.test_show_pull_histogram, 'Test show_pull_histogram.py')
 
         # Return
         return
@@ -235,6 +240,77 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('pipeline_unbinned_mem')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_butterfly
+    def test_show_butterfly(self):
+        """
+        Test show_butterfly
+        """
+        # Execute script
+        self._execute_python('show_butterfly',
+                             args='data/butterfly.txt example_butterfly.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_model
+    def test_show_model(self):
+        """
+        Test show_model
+        """
+        # Execute script
+        self._execute_python('show_model',
+                             args='data/crab.xml Crab example_model.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_pha
+    def test_show_pha(self):
+        """
+        Test show_pha
+        """
+        # Execute script
+        self._execute_python('show_pha', args='data/pha.fits example_pha.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_pull_evolution
+    def test_show_pull_evolution(self):
+        """
+        Test show_pull_evolution
+        """
+        # Execute script
+        self._execute_python('show_pull_evolution',
+                             args='data/pull.dat Pull_Crab_Prefactor '
+                                  'example_pull_evolution.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_pull_histogram
+    def test_show_pull_histogram(self):
+        """
+        Test show_pull_histogram
+        """
+        # Execute script
+        self._execute_python('show_pull_histogram',
+                             args='data/pull.dat Pull_Crab_Prefactor 50 '
+                                  'example_pull_histogram.eps')
 
         #TODO: Do any testing
 

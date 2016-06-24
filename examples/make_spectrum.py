@@ -94,14 +94,14 @@ def make_spectrum():
 # ============= #
 def plot_spectrum(spectrum, file=False):
     """
-    Plot spectrum.
+    Plot spectrum
 
     Parameters
     ----------
     spectrum : `~gammalib.GFits`
         Spectrum FITS file
-    type : str, optional
-        Plot type (blank means display on screen)
+    file : bool, optional
+        Plot into a file
     """
     # Extract columns from spectrum file
     table    = spectrum.table(1)

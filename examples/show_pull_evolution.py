@@ -1,19 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script displays the evolution of the pull distributions as function
-# of the number of samples. The pull distributions are generated using the
-# cspull script. The pull is defined by
+# Shows the evolution of the mean and rms pull
 #
-#           (fitted value - simulated value) / estimated error
-#
-# and the pull histogram allows to assess possible biases in the fit
-# parameters and errors.
-#
-# Required 3rd party modules:
-# - matplotlib
-# - numpy
-#
-# Copyright (C) 2015 Juergen Knoedlseder
+# Copyright (C) 2015-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,10 +18,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import matplotlib.pyplot as plt
-import numpy as np
 import sys
 import csv
+try:
+    import matplotlib.pyplot as plt
+except:
+    sys.exit('This script needs the "matplotlib" module')
+try:
+    import numpy as np
+except:
+    sys.exit('This script needs the "numpy" module')
 
 
 # ====================== #
@@ -40,7 +35,14 @@ import csv
 # ====================== #
 def read_pull(filename, parname):
     """
-    Read pull distribution.
+    Read pull distribution
+    
+    Parameters
+    ----------
+    filename : str
+        Pull distribution ASCII file
+    parname : str
+        Parameter
     """
     # Initialise list
     values = []
@@ -58,9 +60,9 @@ def read_pull(filename, parname):
             try:
                 index = row.index(parname)
             except:
-                sys.stdout.write('ERROR: Parameter "'+parname+'" not found in list:\n')
+                print('ERROR: Parameter "'+parname+'" not found in list:')
                 for p in row:
-                    sys.stdout.write('       "'+p+'"\n')
+                    print('       "'+p+'"')
                 raise NameError(parname)
 
         # Handle data rows
@@ -83,10 +85,15 @@ def read_pull(filename, parname):
 if __name__ == '__main__':
 
     # Print usage information
-    usage = "Usage: show_pull_evolution filename parname"
+    usage = 'Usage: show_pull_evolution filename parname [file]'
     if len(sys.argv) < 3:
-        sys.stdout.write(usage+"\n")
+        print(usage)
         sys.exit()
+
+    # Check if plotting in file is requested
+    plotfile = ''
+    if len(sys.argv) == 4:
+        plotfile = sys.argv[3]
 
     # Extract parameters
     filename = sys.argv[1]
@@ -106,17 +113,20 @@ if __name__ == '__main__':
         rms.append(np.std(values[0:i]))
 
     # Plot mean and rms evolution
-    plt.semilogx(samples, mean, 'r-', label="Mean")
-    plt.semilogx(samples, rms, 'b-', label="Std. deviation")
+    plt.semilogx(samples, mean, 'r-', label='Mean')
+    plt.semilogx(samples, rms, 'b-', label='Std. deviation')
 
     # Set plot
-    plt.xlabel("Samples")
-    plt.ylabel("Value")
+    plt.xlabel('Samples')
+    plt.ylabel('Value')
     plt.title(parname)
     plt.grid(True)
 
     # Set legend
-    plt.legend(loc="upper left")
+    plt.legend(loc='upper left')
 
-    # Show histogram
-    plt.show()
+    # Show figure
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()
