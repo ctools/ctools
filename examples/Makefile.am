@@ -3,7 +3,6 @@
 # Scripts to be distributed
 scripts = README.md \
           make_pointings.py \
-          make_pull_at_sensitivity_limit.py \
           make_spectrum.py \
           make_survey.py \
           make_ts_distributions.py \
