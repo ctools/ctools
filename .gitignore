@@ -81,6 +81,7 @@ test/*.reg
 test/*.trs
 test/*.txt
 test/test_cscripts.sh
+test/test_examples.sh
 test/reports/*.xml
 test/butterfly.txt
 test/.coverage
