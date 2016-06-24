@@ -1,10 +1,9 @@
-## Process this file with automake to produce Makefile.in
+..## Process this file with automake to produce Makefile.in
 
 # Scripts to be distributed
 scripts = README.md \
           make_pointings.py \
           make_spectrum.py \
-          make_survey.py \
           make_ts_distributions.py \
           pipeline_binned_disk.py \
           pipeline_binned_mem.py \
