@@ -44,21 +44,33 @@ class Test(gammalib.GPythonTestSuite):
         return
 
     # Execute Python script
-    def _execute_python(self, name):
+    def _execute_python(self, name, args='', log=''):
         """
         Execute Python script
         
         Parameters
         ----------
         name : str
-            Python script name with .py extension.
+            Python script name with .py extension
+        args : str, optional
+            String with arguments to be passed to script
+        log : str, optional
+            String with name to be used for logging
         """
         # Setup command
         cmd = '../examples/' + name + '.py'
+        if len(args) > 0:
+            cmd += ' ' + args
+
+        # Set logname
+        if len(log) > 0:
+            logname = log
+        else:
+            logname = name
 
         # Execute Python script, make sure we catch any exception
         try:
-            rc = os.system(cmd+' > example_'+name+'.log 2>&1')
+            rc = os.system(cmd+' > example_'+logname+'.log 2>&1')
         except:
             pass
 
@@ -78,12 +90,34 @@ class Test(gammalib.GPythonTestSuite):
 
         # Append tests
         self.append(self.test_generate_prod3_irfs, 'Test generate_prod3_irfs')
+        self.append(self.test_make_pointings, 'Test make_pointings')
         self.append(self.test_pipeline_binned_disk, 'Test pipeline_binned_disk')
         self.append(self.test_pipeline_binned_mem, 'Test pipeline_binned_mem')
         self.append(self.test_pipeline_stacked_disk, 'Test pipeline_stacked_disk')
         self.append(self.test_pipeline_stacked_mem, 'Test pipeline_stacked_mem')
         self.append(self.test_pipeline_unbinned_disk, 'Test pipeline_unbinned_disk')
         self.append(self.test_pipeline_unbinned_mem, 'Test pipeline_unbinned_mem')
+
+        # Return
+        return
+
+    # Test make_pointings
+    def test_make_pointings(self):
+        """
+        Test make_pointings
+        """
+        # Set script name
+        script = 'make_pointings'
+
+        # Execute script
+        self._execute_python(script, args='-h', log='make_pointings_help')
+        self._execute_python(script, args='gps', log='make_pointings_gps')
+        self._execute_python(script, args='gps3', log='make_pointings_gps3')
+        self._execute_python(script, args='extgal', log='make_pointings_extgal')
+        self._execute_python(script, args='gc', log='make_pointings_gc')
+        self._execute_python(script, args='lmc', log='make_pointings_lmc')
+
+        #TODO: Do any testing
 
         # Return
         return
