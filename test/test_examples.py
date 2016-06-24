@@ -77,12 +77,26 @@ class Test(gammalib.GPythonTestSuite):
         self.name('examples')
 
         # Append tests
+        self.append(self.test_generate_prod3_irfs, 'Test generate_prod3_irfs')
         self.append(self.test_pipeline_binned_disk, 'Test pipeline_binned_disk')
         self.append(self.test_pipeline_binned_mem, 'Test pipeline_binned_mem')
         self.append(self.test_pipeline_stacked_disk, 'Test pipeline_stacked_disk')
         self.append(self.test_pipeline_stacked_mem, 'Test pipeline_stacked_mem')
         self.append(self.test_pipeline_unbinned_disk, 'Test pipeline_unbinned_disk')
         self.append(self.test_pipeline_unbinned_mem, 'Test pipeline_unbinned_mem')
+
+        # Return
+        return
+
+    # Test generate_prod3_irfs
+    def test_generate_prod3_irfs(self):
+        """
+        Test generate_prod3_irfs
+        """
+        # Execute script
+        self._execute_python('generate_prod3_irfs')
+
+        #TODO: Do any testing
 
         # Return
         return
