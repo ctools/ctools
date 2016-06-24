@@ -1,15 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script illustrates how to perform a binned CTA analysis based on
-# simulated CTA data. You may use and adapt this script to implement your
-# own pipeline.
+# Perform binned in-memory analysis of simulated CTA data.
 #
-# Usage:
-#   ./pipeline_binned_mem.py
-#
-# ==========================================================================
-#
-# Copyright (C) 2015 Juergen Knoedlseder
+# Copyright (C) 2015-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,25 +26,41 @@ from cscripts import obsutils
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
+def setup_observations(pattern='four', ra=83.63, dec=22.01, offset=1.5,
                        emin=0.1, emax=100.0, rad=5.0, duration=180.0,
-                       deadc=0.95,
-                       caldb="prod2", irf="South_50h"):
+                       deadc=0.95, caldb='prod2', irf='South_0.5h'):
     """
-    Returns an observation container.
+    Returns an observation container
 
-    Keywords:
-     pattern   - Pointing pattern, either "single" or "four"
-     ra        - RA of pattern centre [deg] (default: 83.6331)
-     dec       - DEC of pattern centre [deg] (default: 22.0145)
-     offset    - Offset between observations of pattern [deg] (default: 1.5)
-     emin      - Minimum energy [TeV] (default: 0.1)
-     emax      - Maximum energy [TeV] (default: 100.0)
-     rad       - ROI radius used for analysis [deg] (default: 5.0)
-     duration  - Duration of one CTA observation [seconds] (default: 1800.0)
-     deadc     - Deadtime correction factor (default: 0.95)
-     caldb     - Calibration database path (default: "dummy")
-     irf       - Instrument response function (default: cta_dummy_irf)
+    Parameters
+    ----------
+    pattern : str, optional
+        Pointing pattern, either 'single' or 'four'
+    ra : float, optional
+        Right Ascension of pattern centre (deg)
+    dec : float, optional
+        Declination of pattern centre (deg)
+    offset : float, optional
+        Offset between observations of pattern (deg)
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    rad : float, optional
+        ROI radius used for analysis (deg)
+    duration : float, optional
+        Duration of one CTA observation (s)
+    deadc : float, optional
+        Deadtime correction factor
+    caldb : str, optional
+        Calibration database path
+    irf : str, optional
+        Instrument response function
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container
     """
     # Set list of observations
     obs_def_list = obsutils.set_obs_patterns(pattern,
@@ -77,10 +86,19 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
 # =========== #
 def setup_model(obs, model='data/crab.xml'):
     """
-    Setup model for analysis.
+    Setup model for analysis
 
-    Keywords:
-     model - Model Xml file
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    model : str, optional
+        Model definition XML file
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
@@ -94,24 +112,36 @@ def setup_model(obs, model='data/crab.xml'):
 # ================================ #
 def run_pipeline(obs, emin=0.1, emax=100.0,
                  enumbins=20, nxpix=200, nypix=200, binsz=0.02,
-                 coordsys="CEL", proj="CAR", debug=False):
+                 coordsys='CEL', proj='CAR', debug=False):
     """
-    Simulation and binned analysis pipeline.
+    Simulation and binned analysis pipeline
 
-    Keywords:
-     emin     - Minimum energy of cube [TeV] (default: 0.1)
-     emax     - Maximum energy of cube [TeV] (default: 100.0)
-     enumbins - Number of energy bins in cube (default: 20)
-     nxpix    - Number of RA pixels in cube (default: 200)
-     nypix    - Number of DEC pixels in cube (default: 200)
-     binsz    - Spatial cube bin size [deg] (default: 0.02)
-     coordsys - Cube coordinate system (CEL or GAL)
-     proj     - Cube World Coordinate System (WCS) projection
-     debug    - Enable debugging (default: False)
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    enumbins : int, optional
+        Number of energy bins
+    nxpix : int, optional
+        Number of pixels in X axis
+    nypix : int, optional
+        Number of pixels in Y axis
+    binsz : float, optional
+        Pixel size (deg)
+    coordsys : str, optional
+        Coordinate system
+    proj : str, optional
+        Coordinate projection
+    debug : bool, optional
+        Debug function
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"] = debug
+    sim['debug'] = debug
     sim.run()
 
     # Bin events by looping over all observations in the container
@@ -125,16 +155,16 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
 
         # Bin events for that observation
         bin = ctools.ctbin(container)
-        bin["ebinalg"]  = "LOG"
-        bin["emin"]     = emin
-        bin["emax"]     = emax
-        bin["enumbins"] = enumbins
-        bin["nxpix"]    = nxpix
-        bin["nypix"]    = nypix
-        bin["binsz"]    = binsz
-        bin["coordsys"] = coordsys
-        bin["usepnt"]   = True
-        bin["proj"]     = proj
+        bin['ebinalg']  = 'LOG'
+        bin['emin']     = emin
+        bin['emax']     = emax
+        bin['enumbins'] = enumbins
+        bin['nxpix']    = nxpix
+        bin['nypix']    = nypix
+        bin['binsz']    = binsz
+        bin['coordsys'] = coordsys
+        bin['usepnt']   = True
+        bin['proj']     = proj
         bin.run()
 
         # Append result to observations
@@ -142,7 +172,7 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(obs)
-    like["debug"] = True # Switch this always on for results in console
+    like['debug'] = True # Switch this always on for results in console
     like.run()
 
     # Return
@@ -155,9 +185,9 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
 if __name__ == '__main__':
 
     # Dump header
-    print("********************************************")
-    print("*       CTA binned analysis pipeline       *")
-    print("********************************************")
+    print('********************************************')
+    print('*       CTA binned analysis pipeline       *')
+    print('********************************************')
 
     # Setup observations
     obs = setup_observations()

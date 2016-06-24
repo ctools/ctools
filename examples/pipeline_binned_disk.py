@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Perform binned CTA analysis based of simulated CTA data.
+# Perform binned analysis of simulated CTA data.
 #
 # Copyright (C) 2015-2016 Juergen Knoedlseder
 #
@@ -30,26 +30,26 @@ def setup_observations(pattern='four', ra=83.63, dec=22.01, offset=1.5,
                        emin=0.1, emax=100.0, rad=5.0, duration=180.0,
                        deadc=0.95, caldb='prod2', irf='South_0.5h'):
     """
-    Returns an observation container.
+    Returns an observation container
 
     Parameters
     ----------
     pattern : str, optional
         Pointing pattern, either 'single' or 'four'
     ra : float, optional
-        Right Ascension of pattern centre [deg]
+        Right Ascension of pattern centre (deg)
     dec : float, optional
-        Delication of pattern centre [deg]
+        Declination of pattern centre (deg)
     offset : float, optional
-        Offset between observations of pattern [deg]
+        Offset between observations of pattern (deg)
     emin : float, optional
-        Minimum energy [TeV]
+        Minimum energy (TeV)
     emax : float, optional
-        Maximum energy [TeV]
+        Maximum energy (TeV)
     rad : float, optional
-        ROI radius used for analysis [deg]
+        ROI radius used for analysis (deg)
     duration : float, optional
-        Duration of one CTA observation [seconds]
+        Duration of one CTA observation (s)
     deadc : float, optional
         Deadtime correction factor
     caldb : str, optional
@@ -86,7 +86,7 @@ def setup_observations(pattern='four', ra=83.63, dec=22.01, offset=1.5,
 # =========== #
 def setup_model(obs, model='data/crab.xml'):
     """
-    Setup model for analysis.
+    Setup model for analysis
 
     Parameters
     ----------
@@ -117,16 +117,16 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
                  caldb='prod2', irf='South_0.5h',
                  debug=False):
     """
-    Simulation and binned analysis pipeline.
+    Simulation and binned analysis pipeline
 
     Parameters
     ----------
     obs : `~gammalib.GObservations`
         Observation container
     emin : float, optional
-        Minimum energy [TeV]
+        Minimum energy (TeV)
     emax : float, optional
-        Maximum energy [TeV]
+        Maximum energy (TeV)
     enumbins : int, optional
         Number of energy bins
     nxpix : int, optional
@@ -134,7 +134,7 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
     nypix : int, optional
         Number of pixels in Y axis
     binsz : float, optional
-        Pixel size [deg/pixel]
+        Pixel size (deg)
     coordsys : str, optional
         Coordinate system
     proj : str, optional
