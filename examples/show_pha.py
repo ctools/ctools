@@ -24,7 +24,8 @@ import gammalib
 try:
     import matplotlib.pyplot as plt
 except:
-    sys.exit('This script needs the "matplotlib" module')
+    print('This script needs the "matplotlib" module')
+    sys.exit()
 
 
 # ================= #

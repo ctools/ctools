@@ -24,11 +24,13 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.mlab as mlab
 except:
-    sys.exit('This script needs the "matplotlib" module')
+    print('This script needs the "matplotlib" module')
+    sys.exit()
 try:
     import numpy as np
 except:
-    sys.exit('This script needs the "numpy" module')
+    print('This script needs the "numpy" module')
+    sys.exit()
 
 
 # ====================== #
