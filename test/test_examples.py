@@ -71,6 +71,7 @@ class Test(gammalib.GPythonTestSuite):
         # Execute Python script, make sure we catch any exception
         try:
             rc = os.system(cmd+' > example_'+logname+'.log 2>&1')
+            #rc = os.system(cmd)
         except:
             pass
 
@@ -91,6 +92,7 @@ class Test(gammalib.GPythonTestSuite):
         # Append tests
         self.append(self.test_generate_prod3_irfs, 'Test generate_prod3_irfs')
         self.append(self.test_make_pointings, 'Test make_pointings')
+        self.append(self.test_make_spectrum, 'Test make_spectrum')
         self.append(self.test_pipeline_binned_disk, 'Test pipeline_binned_disk')
         self.append(self.test_pipeline_binned_mem, 'Test pipeline_binned_mem')
         self.append(self.test_pipeline_stacked_disk, 'Test pipeline_stacked_disk')
@@ -110,12 +112,25 @@ class Test(gammalib.GPythonTestSuite):
         script = 'make_pointings'
 
         # Execute script
-        self._execute_python(script, args='-h', log='make_pointings_help')
+        self._execute_python(script, args='-h', log='make_pointings_h')
         self._execute_python(script, args='gps', log='make_pointings_gps')
         self._execute_python(script, args='gps3', log='make_pointings_gps3')
         self._execute_python(script, args='extgal', log='make_pointings_extgal')
         self._execute_python(script, args='gc', log='make_pointings_gc')
         self._execute_python(script, args='lmc', log='make_pointings_lmc')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test make_spectrum
+    def test_make_spectrum(self):
+        """
+        Test make_spectrum
+        """
+        # Execute script
+        self._execute_python('make_spectrum', args='eps')
 
         #TODO: Do any testing
 
