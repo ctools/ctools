@@ -165,7 +165,7 @@ class Test(gammalib.GPythonTestSuite):
         result = gammalib.GCTACubeBackground(filename)
 
         # Check dimensions
-        self.test_value(len(result.elogmeans()), 20, 'Check for 20 energy bins')
+        self.test_value(len(result.energies()), 21, 'Check for 21 energy values')
 
         # Return
         return

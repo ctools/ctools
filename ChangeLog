@@ -1,22 +1,25 @@
-2016-05-27  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-06-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
-        Add ctools and cscripts unit tests.
+        Handle zero parameter errors in ctulimit (#1795)
+        Compute counts cube weights in ctbin (#1789)
+        Adapt to new stacked cube interface (#1788)
+        Add ctools and cscripts unit tests
         Add "bgdoversample" and "bgdinfill" parameters to csroot2caldb
         Add csobsdef.pntdef() method (#1771)
         Add ctmapcube tool (#1760)
         Add "seed" parameter to cspull (#1755)
         Add ctedispcube tool (#1724)
         Test and import IACT scripts only for Python 2.6+ (#1715)
-        Add documentation for IACT analysis (#1646)
         Adapt to revise GTime operators (#1714)
         Add publish() methods to tools producing images (#1710)
         Read ahead output filename in cterror (#1700)
         Subdivide simulation energy range in ctobssim (#1673)
         Delete existing events before simulation in ctobssim (#1663)
         Add csiactcopy script (#1661)
+        Add documentation for IACT analysis (#1646)
         ctselect allows usage of non-default events and GTI extensions (#1598)
         Add csworkflow workflow manager script (#1508)
 
