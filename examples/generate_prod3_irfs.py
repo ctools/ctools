@@ -27,7 +27,12 @@ import cscripts
 # ======================= #
 def set_prod3_desy():
     """
-    Set Prod3 DESY database.
+    Set Prod3 DESY database
+
+    This function sets the calibration database. By adding dictionaries to
+    the db list a number of calibrations can be defined for which IRFs
+    should be generated. All calibrations will be added to the calibration
+    database.
     """
     # Set database attributes
     #path       = '/project-data/cta/performance/prod3'
@@ -36,7 +41,8 @@ def set_prod3_desy():
     file       = 'irf.root'
     psftype    = 'Gauss'
     oversample = 3
-    norm1d     = True
+    #norm1d     = True   # Will normalise the on-axis 2D IRFs on the 1D IRFs
+    norm1d     = False
     bgdinfill  = False
     bgdethres  = 10.0
 
