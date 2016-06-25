@@ -70,7 +70,7 @@ def show_pha(pha, plotfile=''):
         plt.semilogy(energy, counts, 'ro')
     else:
         plt.loglog(energy, counts, 'ro')
-    plt.errorbar(energy, counts, error, fmt='none', ecolor='r')
+    plt.errorbar(energy, counts, error, fmt='ro', ecolor='r')
 
     # Set axes
     if channels:
