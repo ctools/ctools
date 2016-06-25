@@ -160,7 +160,7 @@ def test(installed=False):
 
     # Remove temporary direction
     if installed:
-        os.rmdir(path)
+        os.system('rm -f %s' % (path))
 
     # Exit with return code
     sys.exit(rc)
