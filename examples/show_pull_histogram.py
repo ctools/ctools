@@ -23,6 +23,8 @@ import csv
 try:
     import matplotlib.pyplot as plt
     import matplotlib.mlab as mlab
+    plt.figure()
+    plt.close()
 except:
     print('This script needs the "matplotlib" module')
     sys.exit()

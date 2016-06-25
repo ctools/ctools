@@ -22,6 +22,8 @@ import sys
 import gammalib
 try:
     import matplotlib.pyplot as plt
+    plt.figure()
+    plt.close()
 except:
     print('This script needs the "matplotlib" module')
     sys.exit()

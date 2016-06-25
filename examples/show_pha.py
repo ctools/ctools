@@ -23,6 +23,8 @@ import math
 import gammalib
 try:
     import matplotlib.pyplot as plt
+    plt.figure()
+    plt.close()
 except:
     print('This script needs the "matplotlib" module')
     sys.exit()
@@ -68,7 +70,7 @@ def show_pha(pha, plotfile=''):
         plt.semilogy(energy, counts, 'ro')
     else:
         plt.loglog(energy, counts, 'ro')
-    plt.errorbar(energy, counts, error, fmt=None, ecolor='r')
+    plt.errorbar(energy, counts, error, fmt='none', ecolor='r')
 
     # Set axes
     if channels:

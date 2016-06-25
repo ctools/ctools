@@ -24,6 +24,8 @@ try:
     import matplotlib.pyplot as plt
 except:
     print('This script needs the "matplotlib" module')
+    plt.figure()
+    plt.close()
     sys.exit()
 try:
     import numpy as np

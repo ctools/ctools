@@ -23,6 +23,8 @@ import ctools
 import cscripts
 try:
     import matplotlib.pyplot as plt
+    plt.figure()
+    plt.close()
     has_matplotlib = True
 except:
     has_matplotlib = False
