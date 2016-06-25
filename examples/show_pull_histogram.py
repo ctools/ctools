@@ -90,7 +90,7 @@ def read_pull(filename, parname):
 if __name__ == '__main__':
 
     # Print usage information
-    usage = 'Usage: show_pull_histogram filename parname [bins] [file]'
+    usage = 'Usage: show_pull_histogram.py filename parname [bins] [file]'
     if len(sys.argv) < 3:
         print(usage)
         sys.exit()

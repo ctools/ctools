@@ -1,8 +1,9 @@
-2016-06-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-06-25  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Add unit tests for all example scripts
         Handle zero parameter errors in ctulimit (#1795)
         Compute counts cube weights in ctbin (#1789)
         Adapt to new stacked cube interface (#1788)

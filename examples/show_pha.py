@@ -95,7 +95,7 @@ def show_pha(pha, plotfile=''):
 if __name__ == '__main__':
 
     # Print usage information
-    usage = 'Usage: show_pha filename [file]'
+    usage = 'Usage: show_pha.py filename [file]'
     if len(sys.argv) < 2:
         print(usage)
         sys.exit()

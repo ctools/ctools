@@ -89,7 +89,7 @@ def read_pull(filename, parname):
 if __name__ == '__main__':
 
     # Print usage information
-    usage = 'Usage: show_pull_evolution filename parname [file]'
+    usage = 'Usage: show_pull_evolution.py filename parname [file]'
     if len(sys.argv) < 3:
         print(usage)
         sys.exit()

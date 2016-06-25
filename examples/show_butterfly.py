@@ -32,7 +32,7 @@ except:
 # ============ #
 # Script entry #
 # ============ #    
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # Check for given butterfly file
     if len(sys.argv) < 2:
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     plt.plot(line_x,line_y,color='black',ls='-')
     plt.fill(butterfly_x,butterfly_y,color='green',alpha=0.5)
     plt.xlabel('Energy (MeV)')
-    plt.ylabel('E dN/dE (MeV$^{-1}$ s$^{-1}$ cm$^{-2}$)')
+    plt.ylabel(r'E $\times$ dN/dE (MeV$^{-1}$ s$^{-1}$ cm$^{-2}$)')
 
     # Show spectrum or save it into file
     if len(plotfile) > 0:

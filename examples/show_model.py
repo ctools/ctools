@@ -103,7 +103,7 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
 # ============= #
 # Script entry  #
 # ============= #    
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # Check for model filename
     if len(sys.argv) < 2:

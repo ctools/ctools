@@ -104,6 +104,10 @@ class Test(gammalib.GPythonTestSuite):
         self.append(self.test_show_pha, 'Test show_pha.py')
         self.append(self.test_show_pull_evolution, 'Test show_pull_evolution.py')
         self.append(self.test_show_pull_histogram, 'Test show_pull_histogram.py')
+        self.append(self.test_show_response, 'Test test_show_response.py')
+        self.append(self.test_show_sensitivity, 'Test test_show_sensitivity.py')
+        self.append(self.test_show_spectrum, 'Test test_show_spectrum.py')
+        self.append(self.test_show_ts_distribution, 'Test show_ts_distribution.py')
 
         # Return
         return
@@ -253,7 +257,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_butterfly',
-                             args='data/butterfly.txt example_butterfly.eps')
+                             args='data/butterfly.txt '
+                                  'example_show_butterfly.eps')
 
         #TODO: Do any testing
 
@@ -267,7 +272,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_model',
-                             args='data/crab.xml Crab example_model.eps')
+                             args='data/crab.xml Crab example_show_model.eps')
 
         #TODO: Do any testing
 
@@ -280,7 +285,8 @@ class Test(gammalib.GPythonTestSuite):
         Test show_pha
         """
         # Execute script
-        self._execute_python('show_pha', args='data/pha.fits example_pha.eps')
+        self._execute_python('show_pha',
+                             args='data/pha.fits example_show_pha.eps')
 
         #TODO: Do any testing
 
@@ -295,7 +301,7 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('show_pull_evolution',
                              args='data/pull.dat Pull_Crab_Prefactor '
-                                  'example_pull_evolution.eps')
+                                  'example_show_pull_evolution.eps')
 
         #TODO: Do any testing
 
@@ -310,7 +316,65 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('show_pull_histogram',
                              args='data/pull.dat Pull_Crab_Prefactor 50 '
-                                  'example_pull_histogram.eps')
+                                  'example_show_pull_histogram.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_response
+    def test_show_response(self):
+        """
+        Test show_response
+        """
+        # Execute script
+        self._execute_python('show_response', args='example_show_response.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_sensitivity
+    def test_show_sensitivity(self):
+        """
+        Test show_sensitivity
+        """
+        # Execute script
+        self._execute_python('show_sensitivity',
+                             args='data/sensitivity.dat '
+                                  'example_show_sensitivity.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_spectrum
+    def test_show_spectrum(self):
+        """
+        Test show_spectrum
+        """
+        # Execute script
+        self._execute_python('show_spectrum',
+                             args='data/spectrum.fits '
+                                  'example_show_spectrum.eps')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+
+    # Test show_ts_distribution
+    def test_show_ts_distribution(self):
+        """
+        Test show_ts_distribution
+        """
+        # Execute script
+        self._execute_python('show_ts_distribution',
+                             args='data/ts.dat -n 100 '
+                                  '-f example_show_ts_distribution.eps')
 
         #TODO: Do any testing
 

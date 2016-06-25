@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Generate TS distribution
+# Generate TS distributions as function of energy for an OFF observation
 #
 # Copyright (C) 2011-2016 Jurgen Knodlseder
 #
@@ -65,7 +65,7 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
     tsdist['outfile']  = outfile
     tsdist['ntrials']  = ntrials
     tsdist['caldb']    = 'prod2'
-    tsdist['irf']      = 'South_0.5h'
+    tsdist['irf']      = 'South_50h'
     tsdist['ra']       = 83.63
     tsdist['dec']      = 22.01
     tsdist['emin']     = emin
@@ -76,7 +76,6 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
     tsdist['rad']      = 5.0
     tsdist['npix']     = 200
     tsdist['binsz']    = 0.05
-    #tsdist['debug']    = True
 
     # Optionally open the log file
     if log:
@@ -95,7 +94,7 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
 if __name__ == '__main__':
 
     # Get input arguments
-    usage = 'make_ts_distributions [-n ntrials] [-e enumbins] [-m max_threads]'
+    usage = 'make_ts_distributions.py [-n ntrials] [-e enumbins] [-m max_threads]'
     if len(sys.argv) < 1:
         print(usage)
         sys.exit()
