@@ -299,8 +299,7 @@ def stacked_pipeline(model_name, duration):
 # Main routine entry point #
 #==========================#
 if __name__ == '__main__':
-    """
-    """
+
     # Initialise parameters
     title      = "CTA analysis benchmark"
     model_name = "${CTOOLS}/share/models/crab.xml"

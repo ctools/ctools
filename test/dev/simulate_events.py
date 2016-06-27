@@ -239,17 +239,15 @@ def show_events(events, xmlname, duration, emin, emax, ebins=30):
 # Main routine entry point #
 #==========================#
 if __name__ == '__main__':
-    """
-    Simulate events.
-    """
+
     # Dump header
-    print("")
-    print("*******************")
-    print("* Simulate events *")
-    print("*******************")
+    print('')
+    print('*******************')
+    print('* Simulate events *')
+    print('*******************')
 
     # Set XML names
-    xmlname = "model_bgd.xml"
+    xmlname = 'model_bgd.xml'
 
     # Set simulation parameters
     duration = 360000.0 # Observation duration (s)

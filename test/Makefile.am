@@ -9,6 +9,7 @@ if WITH_PYTHON
   TEST_CSCRIPTS        = test_cscripts.sh
   TEST_PYTHON_CTOOLS   = test_python_ctools.sh
   TEST_PYTHON_CSCRIPTS = test_python_cscripts.sh
+  TEST_PYTHON_EXAMPLES = test_examples.sh
   TEST_PYTHON_ENV      = PYTHONPATH=$(top_builddir):$(top_builddir)/pyext:$(top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
 endif
 
@@ -18,7 +19,8 @@ TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDI
 
 # Tests (these are the tests to be executed)
 TESTS = $(TEST_PYTHON_CTOOLS) \
-        $(TEST_PYTHON_CSCRIPTS)
+        $(TEST_PYTHON_CSCRIPTS) \
+        $(TEST_PYTHON_EXAMPLES)
 
 # Add Valgrind rule
 valgrind:

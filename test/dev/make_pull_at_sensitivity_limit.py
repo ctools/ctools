@@ -135,11 +135,7 @@ def create_model(flux, index=-2.48, fitidx=False):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Create pull distributions for the energy bands and fluxes given in the
-    file specified in the argument. The file needs to be created using the
-    cssens script.
-    """
+
     # Get input arguments
     usage = """
     make_pull_at_sensitivity_limit filename [max_threads]

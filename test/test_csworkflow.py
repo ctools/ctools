@@ -64,7 +64,7 @@ class Test(gammalib.GPythonTestSuite):
     def _test_cmd(self):
 
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
+        if os.path.isfile('README.md'):
             csworkflow = '../cscripts/csworkflow.py'
         else:
             csworkflow = 'csworkflow'
