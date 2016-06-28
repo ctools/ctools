@@ -1025,7 +1025,7 @@ AC_CONFIG_FILES([Makefile
                  test/test_cscripts.sh
                  test/test_python_ctools.sh
                  test/test_python_cscripts.sh
-                 test/test_examples.sh
+                 test/test_examples.py
                  pyext/Makefile
                  pyext/setup.py
                  pyext/ctools/__init__.py
@@ -1039,7 +1039,7 @@ AC_CONFIG_FILES([Makefile
                 [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;
                  if test -f test/test_python_ctools.sh; then chmod +x test/test_python_ctools.sh; fi;
                  if test -f test/test_python_cscripts.sh; then chmod +x test/test_python_cscripts.sh; fi;
-                 if test -f test/test_examples.sh; then chmod +x test/test_examples.sh; fi;
+                 if test -f test/test_examples.py; then chmod +x test/test_examples.py; fi;
                  if test -f testconf.sh; then chmod +x testconf.sh; fi])
 AC_OUTPUT
 

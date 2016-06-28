@@ -58,7 +58,7 @@ class Test(gammalib.GPythonTestSuite):
             String with name to be used for logging
         """
         # Setup command
-        cmd = '../examples/' + name + '.py'
+        cmd = '@PYTHON_COVERAGE@../examples/' + name + '.py'
         if len(args) > 0:
             cmd += ' ' + args
 
