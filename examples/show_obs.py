@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script displays a summary of an observation container stored in an XML file
+# Display summary of observation definition XML file
 #
 # Required 3rd party modules:
 # - matplotlib
