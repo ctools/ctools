@@ -52,6 +52,7 @@
 #define G_SETUP_OBSERVATION       "ctool::setup_observations(GObservations&)"
 #define G_GET_MEAN_POINTING        "ctool::get_mean_pointing(GObservations&)"
 #define G_CREATE_EBOUNDS                            "ctool::create_ebounds()"
+#define G_SET_OBS_RESPONSE        "ctool::set_obs_response(GCTAObservation*)"
 #define G_PROVIDE_HELP                                "ctool::provide_help()"
 
 /* __ Debug definitions __________________________________________________ */
@@ -931,6 +932,9 @@ void ctool::set_response(GObservations& obs)
  *
  * @param[in,out] obs CTA observation
  *
+ * @exception GException::invalid_value
+ *            Energy dispersion requested but not energy dispersion cube given
+ *
  * Set the response for one CTA observation. If the CTA observation contains
  * a counts cube the method first attempts to set the response information
  * using the following user parameters
@@ -964,13 +968,23 @@ void ctool::set_obs_response(GCTAObservation* obs)
     // response information for a stacked analysis is provided, and if so,
     // set that response information for the CTA observation
     if (dynamic_cast<const GCTAEventCube*>(obs->events()) != NULL) {
-        if (has_par("expcube")   && has_par("psfcube") &&
-            has_par("edispcube") && has_par("bkgcube")) {
+
+        // Check if response cube parameters are provided. We need all four
+        // response cube parameters.
+        if (has_par("expcube") && has_par("psfcube") &&
+            has_par("bkgcube") && has_par("edispcube")) {
+
+            // Check if we need to query the energy dispersion cube. We do
+            // not need to query the cube is an "edisp" parameter exists and
+            // if this parameter is set to "no".
+            bool query_edisp = true;
+            if (has_par("edisp")) {
+                query_edisp = (*this)["edisp"].boolean();
+            }
 
             // Get filenames
             GFilename expcube((*this)["expcube"].filename());
             GFilename psfcube((*this)["psfcube"].filename());
-            GFilename edispcube((*this)["edispcube"].filename());
             GFilename bkgcube((*this)["bkgcube"].filename());
 
             // Extract stacked response information if available
@@ -981,21 +995,53 @@ void ctool::set_obs_response(GCTAObservation* obs)
                 !psfcube.is_empty() &&
                 !bkgcube.is_empty()) {
 
-                // Get exposure, PSF and background cubes
+                // Load exposure, PSF and background cubes
                 GCTACubeExposure   exposure(expcube);
                 GCTACubePsf        psf(psfcube);
                 GCTACubeBackground background(bkgcube);
 
-                // If an energy dispersion cube is available, get also
-                // this cube, and set all information as stacked response
-                // for this CTA observation
-                if ((gammalib::toupper(edispcube.url()) != "NONE") &&
-                    !edispcube.is_empty()) {
-                	GCTACubeEdisp edisp(edispcube);
-                	obs->response(exposure, psf, edisp, background);
-                }
+                // If querying of energy dispersion cube is requested then
+                // query it now
+                if (query_edisp) {
+
+                    // Get filename
+                    GFilename edispcube((*this)["edispcube"].filename());
+
+                    // If filename is valid then use energy dispersion ...
+                    if ((gammalib::toupper(edispcube.url()) != "NONE") &&
+                        !edispcube.is_empty()) {
+
+                        // Load energy dispersion cube
+                        GCTACubeEdisp edisp(edispcube);
+
+                        // Set response with all four cubes
+                        obs->response(exposure, psf, edisp, background);
+
+                    } // endif: energy dispersion cube was provided
+
+                    // ... otherwise work without energy dispersion
+                    else {
+
+                        // If energy dispersion was requested but no cube
+                        // was provided then throw an exception
+                        if (has_par("edisp") && (*this)["edisp"].boolean()) {
+                            std::string msg = "Energy dispersion requested but "
+                                              "no energy dispersion cube was "
+                                              "specified.";
+                            throw GException::invalid_value(G_SET_OBS_RESPONSE,
+                                                            msg);
+                        }
+
+                        // Set response without energy dispersion
+                        obs->response(exposure, psf, background);
+                        
+                    } // endelse: no energy dispersion was available
+
+                } // endif: energy dispersion needed
+
+                // ... otherwise work without energy dispersion
                 else {
-					obs->response(exposure, psf, background);
+                    obs->response(exposure, psf, background);
                 }
 
                 // Signal that response is available

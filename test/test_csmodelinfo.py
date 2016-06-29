@@ -69,7 +69,7 @@ class Test(gammalib.GPythonTestSuite):
         Test csmodelinfo on the command line.
         """
         # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
+        if os.path.isfile("README.md"):
             csmodelinfo = "../cscripts/csmodelinfo.py"
         else:
             csmodelinfo = "csmodelinfo"

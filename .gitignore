@@ -72,6 +72,7 @@ src/ctulimit/ctulimit
 src/cterror/cterror
 test/pfiles/
 test/caldb/
+test/prod3
 test/csroot2caldb_*
 test/iactdata_*
 test/*.fits
@@ -80,7 +81,9 @@ test/*.xml
 test/*.reg
 test/*.trs
 test/*.txt
+test/*.eps
 test/test_cscripts.sh
+test/test_examples.py
 test/reports/*.xml
 test/butterfly.txt
 test/.coverage

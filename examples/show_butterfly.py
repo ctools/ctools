@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script shows how to plot a butterfly created with ctbutterfly 
+# Shows butterfly diagram created with ctbutterfly
 #
-# Copyright (C) 2014-2015 Michael Mayer
+# Copyright (C) 2014-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,23 +18,30 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
 import sys
+import gammalib
 try:
     import matplotlib.pyplot as plt
+    plt.figure()
+    plt.close()
 except:
-    sys.exit("This script needs matplotlib")
+    print('This script needs the "matplotlib" module')
+    sys.exit()
 
 
 # ============ #
 # Script entry #
 # ============ #    
-if __name__ == "__main__":
-    """
-    """
+if __name__ == '__main__':
+
     # Check for given butterfly file
-    if not len(sys.argv) == 2:
-        sys.exit("Usage: show_butterfly.py butterfly.txt")
+    if len(sys.argv) < 2:
+        sys.exit('Usage: show_butterfly.py butterfly.txt [file]')
+
+    # Check if plotting in file is requested
+    plotfile = ''
+    if len(sys.argv) == 3:
+        plotfile = sys.argv[2]
 
     # Read given butterfly file    
     filename = sys.argv[1]
@@ -75,6 +82,11 @@ if __name__ == "__main__":
     plt.grid()
     plt.plot(line_x,line_y,color='black',ls='-')
     plt.fill(butterfly_x,butterfly_y,color='green',alpha=0.5)
-    plt.xlabel("Energy (MeV)")
-    plt.ylabel(r"E dN/dE (MeV$^{-1}$ s$^{-1}$ cm$^{-2}$)")    
-    plt.show()
+    plt.xlabel('Energy (MeV)')
+    plt.ylabel(r'E $\times$ dN/dE (MeV$^{-1}$ s$^{-1}$ cm$^{-2}$)')
+
+    # Show spectrum or save it into file
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()

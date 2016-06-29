@@ -1,15 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script illustrates how to perform an unbinned CTA analysis based on
-# simulated CTA data. You may use and adapt this script to implement your
-# own pipeline.
+# Perform unbinned analysis of simulated CTA data.
 #
-# Usage:
-#   ./pipeline_unbinned_disk.py
-#
-# ==========================================================================
-#
-# Copyright (C) 2015 Juergen Knoedlseder
+# Copyright (C) 2015-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,25 +26,41 @@ from cscripts import obsutils
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
-                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0,
-                       deadc=0.95,
-                       caldb="prod2", irf="South_50h"):
+def setup_observations(pattern='four', ra=83.63, dec=22.01, offset=1.5,
+                       emin=0.1, emax=100.0, rad=5.0, duration=180.0,
+                       deadc=0.95, caldb='prod2', irf='South_0.5h'):
     """
-    Returns an observation container.
+    Returns an observation container
 
-    Keywords:
-     pattern   - Pointing pattern, either "single" or "four"
-     ra        - RA of pattern centre [deg] (default: 83.6331)
-     dec       - DEC of pattern centre [deg] (default: 22.0145)
-     offset    - Offset between observations of pattern [deg] (default: 1.5)
-     emin      - Minimum energy [TeV] (default: 0.1)
-     emax      - Maximum energy [TeV] (default: 100.0)
-     rad       - ROI radius used for analysis [deg] (default: 5.0)
-     duration  - Duration of one CTA observation [seconds] (default: 1800.0)
-     deadc     - Deadtime correction factor (default: 0.95)
-     caldb     - Calibration database path (default: "dummy")
-     irf       - Instrument response function (default: cta_dummy_irf)
+    Parameters
+    ----------
+    pattern : str, optional
+        Pointing pattern, either 'single' or 'four'
+    ra : float, optional
+        Right Ascension of pattern centre (deg)
+    dec : float, optional
+        Declination of pattern centre (deg)
+    offset : float, optional
+        Offset between observations of pattern (deg)
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    rad : float, optional
+        ROI radius used for analysis (deg)
+    duration : float, optional
+        Duration of one CTA observation (s)
+    deadc : float, optional
+        Deadtime correction factor
+    caldb : str, optional
+        Calibration database path
+    irf : str, optional
+        Instrument response function
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container
     """
     # Set list of observations
     obs_def_list = obsutils.set_obs_patterns(pattern,
@@ -75,12 +84,21 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
 # =========== #
 # Setup model #
 # =========== #
-def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
+def setup_model(obs, model='data/crab.xml'):
     """
-    Setup model for analysis.
+    Setup model for analysis
 
-    Keywords:
-     model - Model Xml file
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    model : str, optional
+        Model definition XML file
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
@@ -95,55 +113,69 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0,
                  emin=0.1, emax=100.0,
                  tmin=0.0, tmax=0.0,
-                 model="${CTOOLS}/share/models/crab.xml",
-                 caldb="prod2", irf="South_50h",
+                 model='data/crab.xml',
+                 caldb='prod2', irf='South_0.5h',
                  debug=False):
     """
-    Simulation and unbinned analysis pipeline.
+    Simulation and unbinned analysis pipeline
 
-    Keywords:
-     ra    - RA of cube centre [deg] (default: 83.63)
-     dec   - DEC of cube centre [deg] (default: 22.01)
-     rad   - Selection radius [deg] (default: 3.0)
-     emin  - Minimum energy of cube [TeV] (default: 0.1)
-     emax  - Maximum energy of cube [TeV] (default: 100.0)
-     tmin  - Start time [MET] (default: 0.0)
-     tmax  - Stop time [MET] (default: 0.0)
-     model - Model Xml file
-     caldb - Calibration database path (default: "dummy")
-     irf   - Instrument response function (default: cta_dummy_irf)
-     debug - Enable debugging (default: False)
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    ra : float, optional
+        Right Ascension of Region of Interest centre (deg)
+    dec : float, optional
+        Declination of Region of Interest centre (deg)
+    rad : float, optional
+        Radius of Region of Interest (deg)
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    tmin : float, optional
+        Start time (s)
+    tmax : float, optional
+        Stop time (s)
+    model : str, optional
+        Model definition XML file
+    caldb : str, optional
+        Calibration database path
+    irf : str, optional
+        Instrument response function
+    debug : bool, optional
+        Debug function
     """
     # Get model
 
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"]     = debug
-    sim["outevents"] = "obs.xml"
+    sim['debug']     = debug
+    sim['outevents'] = 'obs.xml'
     sim.execute()
 
     # Select events
     select = ctools.ctselect()
-    select["inobs"]  = "obs.xml"
-    select["outobs"] = "obs_selected.xml"
-    select["ra"]     = ra
-    select["dec"]    = dec
-    select["rad"]    = rad
-    select["emin"]   = emin
-    select["emax"]   = emax
-    select["tmin"]   = tmin
-    select["tmax"]   = tmax
-    select["debug"]  = debug
+    select['inobs']  = 'obs.xml'
+    select['outobs'] = 'obs_selected.xml'
+    select['ra']     = ra
+    select['dec']    = dec
+    select['rad']    = rad
+    select['emin']   = emin
+    select['emax']   = emax
+    select['tmin']   = tmin
+    select['tmax']   = tmax
+    select['debug']  = debug
     select.execute()
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"]    = "obs_selected.xml"
-    like["inmodel"]  = model
-    like["outmodel"] = "fit_results.xml"
-    like["caldb"]    = caldb
-    like["irf"]      = irf
-    like["debug"]    = True # Switch this always on for results in console
+    like['inobs']    = 'obs_selected.xml'
+    like['inmodel']  = model
+    like['outmodel'] = 'fit_results.xml'
+    like['caldb']    = caldb
+    like['irf']      = irf
+    like['debug']    = True # Switch this always on for results in console
     like.execute()
 
     # Return
@@ -154,12 +186,11 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0,
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    """
+
     # Dump header
-    print("********************************************")
-    print("*      CTA unbinned analysis pipeline      *")
-    print("********************************************")
+    print('********************************************')
+    print('*      CTA unbinned analysis pipeline      *')
+    print('********************************************')
 
     # Setup observations
     obs = setup_observations()
