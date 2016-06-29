@@ -21,24 +21,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-
+import sys
 import gammalib
 import ctools
 import cscripts
-import sys
 try:
     import matplotlib.pyplot as plt
+    plt.figure()
+    plt.close()
 except:
-    sys.exit("This script requires matplotlib")
+    print('This script needs the "matplotlib" module')
+    sys.exit()
 
 
 # ======================== #
 # Main routine entry point #
 # ======================== #
-if __name__ == "__main__":
-    """
-    Print and display details of the observation container using matplotlib.
-    """
+if __name__ == '__main__':
 
     # Print help if wrong number of arguments provided
     if not len(sys.argv) > 1:
@@ -91,7 +90,7 @@ if __name__ == "__main__":
     amin = min(azimuths)
     amax = max(azimuths)
     plt.hist(azimuths, bins=30, range=(amin, amax),fc='blue')
-    plt.xlabel("Azimuth Angle [deg]")
+    plt.xlabel("Azimuth Angle (deg)")
     plt.ylabel("Abundance")
     plt.title("Azimuth distribution")
     
@@ -101,7 +100,7 @@ if __name__ == "__main__":
         omin = min(offsets)
         omax = max(offsets)  
         plt.hist(offsets, bins=30, range=(omin, omax),fc='blue')
-        plt.xlabel("Offset from (RA, DEC)=("+str(ra)+","+str(dec)+") [deg]")
+        plt.xlabel("Offset from (RA, DEC)=("+str(ra)+","+str(dec)+") (deg)")
         plt.ylabel("Abundance")
         plt.title("Offset distribution")
     
@@ -116,7 +115,7 @@ if __name__ == "__main__":
         plt.figure()
         plt.hist(emin, bins=80, range=(-1.0, 2.0), fc='red',label="emin")
         plt.hist(emax, bins=80, range=(-1.0, 2.0), fc='blue', label ="emax")  
-        plt.xlabel("Energy threshold [log10 (E/TeV)]")
+        plt.xlabel("Energy threshold (log10 (E/TeV))")
         plt.ylabel("Abundance")
         plt.legend(loc="upper left")
         plt.title("Energy threshold")
@@ -128,8 +127,8 @@ if __name__ == "__main__":
         tmean = gti.tstart(i) + 0.5*(gti.tstart(i)-gti.tstart(i))
         times.append(tmean.mjd())
     plt.plot(times, zeniths, 'o',lw=2.0, color='black')
-    plt.xlabel("Time [MJD]")
-    plt.ylabel("Zenith Angle [deg]")
+    plt.xlabel("Time (MJD)")
+    plt.ylabel("Zenith Angle (deg)")
     plt.title("Observation time")
 
     # Show plots
