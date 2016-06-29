@@ -33,8 +33,8 @@ ctools
    ctulimit --- Calculates upper limit <ctulimit>
 
 
-General cscripts
-----------------
+cscripts
+--------
 
 .. toctree::
    :maxdepth: 1
@@ -53,8 +53,8 @@ General cscripts
    cstsmapmerge --- Merges slices from ts map computations <cstsmapmerge>
  
 
-IACT cscripts
--------------
+Scripts to manage an IACT database
+----------------------------------
 
 .. toctree::
    :maxdepth: 1
