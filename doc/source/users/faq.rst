@@ -112,9 +112,9 @@ asked.
   Consequently, for short observation times (below 30 hours), unbinned
   analysis is faster, while for longer times it is advantageous to use
   a binned analysis.
-  If you want to take the energy dispersion into account (which is required
-  if your analysis covers the lowest energies), you need to use unbinned
-  analysis, since binned analysis does not yet implement energy dispersion.
+  If you go to very low energies, either make sure that you have enough
+  energy bins in a binned analysis to sample properly the strong drop in the
+  effective area towards small energies, or better, use unbinned analysis.
   If you'd like to fit a Gaussian line to your data you may also prefer
   unbinned over binned analysis, as the fine sampling required to resolve
   the line may require a prohibitive large number of energy bins for a binned
