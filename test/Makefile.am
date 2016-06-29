@@ -9,7 +9,7 @@ if WITH_PYTHON
   TEST_CSCRIPTS        = test_cscripts.sh
   TEST_PYTHON_CTOOLS   = test_python_ctools.sh
   TEST_PYTHON_CSCRIPTS = test_python_cscripts.sh
-  TEST_PYTHON_EXAMPLES = test_examples.sh
+  TEST_PYTHON_EXAMPLES = test_examples.py
   TEST_PYTHON_ENV      = PYTHONPATH=$(top_builddir):$(top_builddir)/pyext:$(top_builddir)/pyext/build/ctools/ctools:$(pythondir):$(pyexecdir):$(PYTHONPATH)
 endif
 

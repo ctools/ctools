@@ -69,31 +69,31 @@ if __name__ == '__main__':
     for entry in entries:
 
         # Set optional attributes
-        if entry.has_key('rebin'):
+        if 'rebin' in entry:
             rebin = entry['rebin']
         else:
             rebin = False
-        if entry.has_key('eascale'):
+        if 'eascale' in entry:
             eascale = entry['eascale']
         else:
             eascale = 1.0
-        if entry.has_key('bgdscale'):
+        if 'bgdscale' in entry:
             bgdscale = entry['bgdscale']
         else:
             bgdscale = 1.0
-        if entry.has_key('bgdethres'):
+        if 'bgdethres' in entry:
             bgdethres = entry['bgdethres']
         else:
             bgdethres = 1000.0
-        if entry.has_key('bgdinfill'):
+        if 'bgdinfill' in entry:
             bgdinfill = entry['bgdinfill']
         else:
             bgdinfill = False
-        if entry.has_key('oversample'):
+        if 'oversample' in entry:
             oversample = entry['oversample']
         else:
             oversample = 1
-        if entry.has_key('norm1d'):
+        if 'norm1d' in entry:
             norm1d = entry['norm1d']
         else:
             norm1d = False
