@@ -364,16 +364,17 @@ class csobsinfo(ctools.cscript):
         observation container into a DS9 region file. If "NONE" is
         specified for the "ds9file" parameter the method does nothing.
         """
-        # Write header
-        if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save pointings in DS9 file")
 
         # Get output filename in case it was not read ahead
         ds9file = self["ds9file"].filename()
 
         # Check if DS9 file is valid
-        if ds9file.url() != "NONE":      
+        if ds9file.url() != "NONE":   
+            
+            # Write header
+            if self._logTerse():
+                self._log("\n")
+                self._log.header1("Save pointings in DS9 file")   
 
             # Log filename
             if self._logTerse():

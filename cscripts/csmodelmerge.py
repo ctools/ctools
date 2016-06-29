@@ -90,6 +90,9 @@ class csmodelmerge(ctools.cscript):
         # Read ahead output filename
         if self._read_ahead():
             self["outmodel"].filename()
+            
+        # Get clobber parameter
+        self._clobber = self["clobber"].boolean()
 
         # Write input parameters into logger
         if self._logTerse():
@@ -163,14 +166,26 @@ class csmodelmerge(ctools.cscript):
         # Get output filename in case it was not read ahead
         outmodel = self["outmodel"].filename()
         
-        # Log filename
-        if self._logTerse():
-            self._log(gammalib.parformat("Model definition XML file"))
-            self._log(outmodel.url())
-            self._log("\n")
-
-        # Save models
-        self._models.save(outmodel)
+        # Check if file exists and apply clobber if false
+        if outmodel.exists() and not self._clobber:
+            
+            # Set error message
+            msg = "Cannot save \""+outmodel.url()+"\": File already exists "
+            msg += "Use parameter clobber=yes to allow overwriting of files."
+                        
+            # Throw exception since file cannnot be overwritten
+            raise RuntimeError(msg)
+        
+        else:
+            
+            # Log filename
+            if self._logTerse():
+                self._log(gammalib.parformat("Model definition XML file"))
+                self._log(outmodel.url())
+                self._log("\n")
+    
+            # Save models
+            self._models.save(outmodel)
         
         # Return
         return

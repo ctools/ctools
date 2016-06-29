@@ -43,13 +43,13 @@ class csiactcopy(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name          = "csiactcopy"
-        self._version       = "1.1.0"
-        self._datapath      = os.getenv("VHEFITS","")
+        self._name          = 'csiactcopy'
+        self._version       = '1.1.0'
+        self._datapath      = os.getenv('VHEFITS','')
         self._remote_master = gammalib.GFilename()
-        self._remote_base   = ""
-        self._prodname      = ""
-        self._outpath       = ""
+        self._remote_base   = ''
+        self._prodname      = ''
+        self._outpath       = ''
         self._runlist       = gammalib.GFilename()
         self._runs          = []
 
@@ -68,7 +68,7 @@ class csiactcopy(ctools.cscript):
         """
         
         # Get Parameters
-        self._remote_master = self["remote_master"].filename()
+        self._remote_master = self['remote_master'].filename()
         if not self._remote_master.exists():
             raise RuntimeError('*** ERROR: FITS data not available. No '
                                'master index file found in "'+
@@ -76,14 +76,14 @@ class csiactcopy(ctools.cscript):
                                'file system is properly mounted.')
         
         # Get parameters
-        self._prodname = self["prodname"].string()
-        self._outpath  = gammalib.expand_env(self["outpath"].string())
-        self._runlist  = self["runlist"].filename()            
+        self._prodname = self['prodname'].string()
+        self._outpath  = gammalib.expand_env(self['outpath'].string())
+        self._runlist  = self['runlist'].filename()            
 
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
                 
         # Return
         return
@@ -101,21 +101,21 @@ class csiactcopy(ctools.cscript):
         
         # Logging
         if self._logVerbose():
-            self._log("\n")  
-            self._log.header3("Copy file")
-            self._log.parformat("Source")
+            self._log('\n')  
+            self._log.header3('Copy file')
+            self._log.parformat('Source')
             self._log(str(source))
-            self._log("\n")
-            self._log.parformat("Destination")
+            self._log('\n')
+            self._log.parformat('Destination')
             self._log(str(destination))
-            self._log("\n")  
-            self._log.parformat("Already exists")
+            self._log('\n')  
+            self._log.parformat('Already exists')
             self._log(str(os.path.isfile(destination)))
-            self._log("\n")
-            self._log.parformat("Overwrite")
+            self._log('\n')
+            self._log.parformat('Overwrite')
             self._log(str(clobber))
-            self._log("\n")
-            self._log.parformat("Copying")
+            self._log('\n')
+            self._log.parformat('Copying')
         
         # Flag if file destination is already available
         is_file = os.path.isfile(destination)
@@ -123,14 +123,14 @@ class csiactcopy(ctools.cscript):
         # check if file could be skipped because clobber=no
         if is_file and clobber == False:
             if self._logVerbose():
-                self._log("Skip (clobber=no)")
-                self._log("\n")
+                self._log('Skip (clobber=no)')
+                self._log('\n')
         
         # check if file could be skipped because it is the same file
         elif is_file and os.path.samefile(destination, source):
             if self._logVerbose():
-                self._log("Skip (same file)")
-                self._log("\n")
+                self._log('Skip (same file)')
+                self._log('\n')
             
         else:  
             # Create directory if not existent
@@ -146,8 +146,8 @@ class csiactcopy(ctools.cscript):
             
             # Logging
             if self._logVerbose():
-                self._log("Done!")
-                self._log("\n")
+                self._log('Done!')
+                self._log('\n')
                    
         # Return 
         return filesize
@@ -159,21 +159,21 @@ class csiactcopy(ctools.cscript):
         """    
         
         if self._logTerse():
-            self._log.parformat("Local file")
+            self._log.parformat('Local file')
             self._log(str(localfits))
-            self._log("\n")
-            self._log.parformat("Remote file")
+            self._log('\n')
+            self._log.parformat('Remote file')
             self._log(str(remotefits))
-            self._log("\n")
-            self._log.parformat("HDU name")
+            self._log('\n')
+            self._log.parformat('HDU name')
             self._log(str(hduname))
-            self._log("\n")
-            self._log.parformat("Conflict preference")
+            self._log('\n')
+            self._log.parformat('Conflict preference')
             if clobber:
-                self._log("Remote")
+                self._log('Remote')
             else:
-                self._log("Local")
-            self._log("\n")
+                self._log('Local')
+            self._log('\n')
         
         # Check if local fits file is available
         if os.path.isfile(localfits):    
@@ -187,40 +187,70 @@ class csiactcopy(ctools.cscript):
         
         # find local obs_id 
         local_obs = []
-        lobs_col  = local_hdu["OBS_ID"]
+        lobs_col  = local_hdu['OBS_ID']
         for obs_id in lobs_col:
             local_obs.append(obs_id)      
+             
+        # Initialise list of runlists
+        # This is kluge: to circumvent a too long file name, we split the 
+        # runlists into chunks of 50 observations maximum
+        runlists = []
+        runs_per_chunk = 50
+        for i in range(len(self._runs) / runs_per_chunk + 1):
+            chunk = self._runs[i * runs_per_chunk : (i + 1) * runs_per_chunk]
+            runlists.append(chunk)
+
+        # Loop over runlist chunks
+        for i, runlist in enumerate(runlists):
         
-        # Create selection expression for opening remote fits file
-        selection = ""
-        if len(self._runs):
-            selection += "["+hduname+"]["
-            for run in self._runs:
-                selection += "OBS_ID=="+str(run)
-                selection += "||"
-            selection = selection[:-2]
-            selection += "]"
+            # Create selection expression for opening remote fits file
+            selection = ''
+            if len(runlist):
+                selection += '['+hduname+']['
+                for run in runlist:
+                    selection += 'OBS_ID=='+str(run)
+                    selection += '||'
+                selection = selection[:-2]
+                selection += ']'
         
-        # Create file name
-        remotefile = remotefits + selection
-        
-        # open remote fits file
-        remote     = gammalib.GFits(str(remotefile))
-        remote_hdu = remote[hduname]
-        
+            # Create file name
+            remotefile = remotefits + selection
+            
+            # open remote fits file
+            remote     = gammalib.GFits(str(remotefile))
+            
+            # If first iteration, create clone of FITS column for later use
+            if i == 0:
+                remote_hdu = remote[hduname].clone()
+            else:
+                
+                # get temporary hdu to be added to current HDU
+                tmp_hdu = remote[hduname]
+                
+                # Get old size of remote HDU
+                size = remote_hdu.size()
+                
+                # Extend remote HDU
+                remote_hdu.append_rows(tmp_hdu.nrows())
+                
+                # Loop over rows and columns to copy over values exteding remote HDU
+                for col in tmp_hdu:
+                    for row in range(col.length()):
+                        remote_hdu[col.name()][size + row] = col[row]                
+
         # Get remote obs_id
         remote_obs = []
-        robs_col   = remote_hdu["OBS_ID"]
+        robs_col   = remote_hdu['OBS_ID']
         for obs_id in robs_col:
             remote_obs.append(obs_id)
             
         if self._logTerse():
-            self._log.parformat("Remote entries")
+            self._log.parformat('Remote entries')
             self._log(str(len(remote_obs)))
-            self._log("\n")
-            self._log.parformat("Local entries")
+            self._log('\n')
+            self._log.parformat('Local entries')
             self._log(str(len(local_obs)))
-            self._log("\n")
+            self._log('\n')
         
         # initialise counter for logging
         removed_rows = 0
@@ -239,13 +269,13 @@ class csiactcopy(ctools.cscript):
                     table_has_obsid = True
                     while table_has_obsid:
                         for i in range(local_hdu.nrows()):
-                            if remote_obs_id == local_hdu["OBS_ID"][i]:
+                            if remote_obs_id == local_hdu['OBS_ID'][i]:
                                 local_hdu.remove_rows(i,1)
                                 removed_rows += 1
                                 break
                         table_has_obsid = False
                         for i in range(local_hdu.nrows()):
-                            if remote_obs_id == local_hdu["OBS_ID"][i]:
+                            if remote_obs_id == local_hdu['OBS_ID'][i]:
                                 table_has_obsid = True
                                 break
                             
@@ -262,13 +292,13 @@ class csiactcopy(ctools.cscript):
                     table_has_obsid = True
                     while table_has_obsid:
                         for i in range(remote_hdu.nrows()):
-                            if local_obs_id == remote_hdu["OBS_ID"][i]:
+                            if local_obs_id == remote_hdu['OBS_ID'][i]:
                                 remote_hdu.remove_rows(i,1)
                                 removed_rows += 1
                                 break
                         table_has_obsid = False
                         for i in range(remote_hdu.nrows()):
-                            if local_obs_id == remote_hdu["OBS_ID"][i]:
+                            if local_obs_id == remote_hdu['OBS_ID'][i]:
                                 table_has_obsid = True
                                 break
     
@@ -280,11 +310,11 @@ class csiactcopy(ctools.cscript):
         
         if self._logTerse():
             if clobber:
-                self._log.parformat("Removed local rows")
+                self._log.parformat('Removed local rows')
             else:
-                self._log.parformat("Skipped remote rows")
+                self._log.parformat('Skipped remote rows')
             self._log(str(removed_rows))
-            self._log("\n")
+            self._log('\n')
 
         # Loop over columns 
         for i in range(local_hdu.ncols()):
@@ -322,8 +352,8 @@ class csiactcopy(ctools.cscript):
         
         # Log output
         if self._logTerse():
-            self._log("\n")
-            self._log.header2("Runlist information")
+            self._log('\n')
+            self._log.header2('Runlist information')
         
         # Initialise runlist array   
         self._runs = []
@@ -342,15 +372,15 @@ class csiactcopy(ctools.cscript):
             
             # Logging
             if self._logTerse():
-                self._log.parformat("Number of observations")
+                self._log.parformat('Number of observations')
                 self._log(str(len(self._runs)))
-                self._log("\n")
+                self._log('\n')
         
-        # Copy all data if runlist file is "NONE"
-        elif self._runlist == "NONE":
+        # Copy all data if runlist file is 'NONE'
+        elif self._runlist == 'NONE':
             if self._logTerse():
-                self._log("Copy all available data")
-                self._log("\n")
+                self._log('Copy all available data')
+                self._log('\n')
         
         # Raise exception if file not valid
         else:
@@ -365,13 +395,13 @@ class csiactcopy(ctools.cscript):
         # Retrieve json data from remote master
         json_data = open(self._remote_master.url()).read()
         data      = json.loads(json_data) 
-        if not "datasets" in data:
+        if not 'datasets' in data:
             raise RuntimeError('*** ERROR: Key "datasets" not available '
                                'in remote master index file "'+
                                self._remote_master+'".')
         
         # Get array of configurations
-        configs = data["datasets"]
+        configs = data['datasets']
         
         # Get remote paths
         self._remote_base = self._remote_master.path()
@@ -384,25 +414,25 @@ class csiactcopy(ctools.cscript):
         
         # Logging
         if self._logTerse():
-            self._log("\n")
-            self._log.header2("Loop over remote configs")
+            self._log('\n')
+            self._log.header2('Loop over remote configs')
         
         # Loop over configs
         for config in configs: 
             
             # Logging          
             if self._logVerbose():
-                self._log.header2(str(config["name"]))
+                self._log.header2(str(config['name']))
             
             # Check if prodname was found
-            if config["name"] == self._prodname:
+            if config['name'] == self._prodname:
                 
                 # Inidicate that prodname has been found
                 has_prod = True           
                 
                 # Build path of index files
-                remote_hdu = os.path.join(self._remote_base, config["hduindx"])
-                remote_obs = os.path.join(self._remote_base, config["obsindx"])
+                remote_hdu = os.path.join(self._remote_base, config['hduindx'])
+                remote_obs = os.path.join(self._remote_base, config['obsindx'])
                 
                 # Log information
                 if self._logTerse():
@@ -416,10 +446,10 @@ class csiactcopy(ctools.cscript):
                     
                 # Open remote HDU index file
                 fits = gammalib.GFits(str(remote_hdu))
-                table = fits["HDU_INDEX"]
+                table = fits['HDU_INDEX']
                 
                 # Initialise flag if SIZE column is present
-                has_size = table.contains("SIZE")
+                has_size = table.contains('SIZE')
                 
                 if has_size:
                     # Initialise file size
@@ -428,7 +458,7 @@ class csiactcopy(ctools.cscript):
                 # Initialise remote observation IDs
                 remote_ids = set()
                 for row in range(table.nrows()):
-                    remote_ids.add(table["OBS_ID"][row])
+                    remote_ids.add(table['OBS_ID'][row])
                 
                 # Log runs that are not available remotely
                 for run in self._runs:
@@ -442,12 +472,12 @@ class csiactcopy(ctools.cscript):
                 for row in range(table.nrows()):
                     
                     # Get observation ID
-                    obs_id    = table["OBS_ID"][row]   
-                    file_dir  = table["FILE_DIR"][row]              
-                    file_name = table["FILE_NAME"][row] 
+                    obs_id    = table['OBS_ID'][row]   
+                    file_dir  = table['FILE_DIR'][row]              
+                    file_name = table['FILE_NAME'][row] 
                     
                     # Skip if filename is empty
-                    if file_name == "":
+                    if file_name == '':
                         continue
                                         
                     # Check if we need to consider an input runlist
@@ -467,7 +497,7 @@ class csiactcopy(ctools.cscript):
                             
                             # Add file size
                             if has_size and newlen > oldlen:
-                                cp_size += table["SIZE"][row]
+                                cp_size += table['SIZE'][row]
                         
                     # Otherwise add every file       
                     else:
@@ -482,24 +512,24 @@ class csiactcopy(ctools.cscript):
                         
                         # Add file size
                         if has_size and newlen > oldlen:
-                            cp_size += table["SIZE"][row]
+                            cp_size += table['SIZE'][row]
                             
                 # Log file information
                 if self._logTerse():
-                    self._log("\n")
-                    self._log.header2("File information")
-                    self._log.parformat("Number of files")
+                    self._log('\n')
+                    self._log.header2('File information')
+                    self._log.parformat('Number of files')
                     self._log(str(len(files)))
-                    self._log("\n")
+                    self._log('\n')
                     if has_size:
-                        self._log.parformat("Size")
-                        self._log("%.2f"%(float(cp_size)*1e-6)+" MB")
-                        self._log("\n")
+                        self._log.parformat('Size')
+                        self._log('%.2f'%(float(cp_size)*1e-6)+' MB')
+                        self._log('\n')
                 if self._logVerbose():
-                    self._log("\n")
-                    self._log.header3("File names")
+                    self._log('\n')
+                    self._log.header3('File names')
                     for filename in files:
-                        self._log(str(filename)+"\n")
+                        self._log(str(filename)+'\n')
                 
                 # Close HDU index file         
                 fits.close()
@@ -507,23 +537,23 @@ class csiactcopy(ctools.cscript):
             # If prodname is not found just log that we skip the config
             else:
                 if self._logExplicit():
-                    self._log("\n")
+                    self._log('\n')
                     self._log.header3('Skipping config "'+
-                                      str(config["name"])+'"')
-                    self._log("\n")
+                                      str(config['name'])+'"')
+                    self._log('\n')
                     
         # Raise Exception if prodname was not found                                    
         if not has_prod: 
-            msg = '*** ERROR: FITS production "'+self._prodname+\
-                  '" not available. Available productions are:\n'
+            msg = '*** ERROR: FITS production "'+self._prodname+'" not '
+            msg += 'available. Available productions are:\n'
             for config in configs:
-                msg += " - "+config["name"]+"\n"
+                msg += ' - '+config['name']+'\n'
             raise RuntimeError(msg)
                 
         # Logging
         if self._logNormal():
-            self._log("\n")
-            self._log.header1("Copying files")
+            self._log('\n')
+            self._log.header1('Copying files')
         
         # intialise counter
         k = 0
@@ -549,9 +579,9 @@ class csiactcopy(ctools.cscript):
             fraction = float(k) / float(len(files)) * 100.0
             while fraction > last_fraction:
                 if self._logNormal() and not self._logVerbose():
-                    self._log.parformat("Status")
-                    self._log(str(int(last_fraction))+"%")
-                    self._log("\n")
+                    self._log.parformat('Status')
+                    self._log(str(int(last_fraction))+'%')
+                    self._log('\n')
                 last_fraction += fraction_increment
             
             # Copy file
@@ -566,12 +596,12 @@ class csiactcopy(ctools.cscript):
         
         # Logging
         if self._logNormal() and not self._logVerbose():
-            self._log.parformat("Status")
-            self._log("Finished")
-            self._log("\n")
+            self._log.parformat('Status')
+            self._log('Finished')
+            self._log('\n')
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Updating index files")
+            self._log('\n')
+            self._log.header1('Updating index files')
         
         # Build local index file names
         local_hdu = os.path.join(self._outpath,
@@ -586,18 +616,18 @@ class csiactcopy(ctools.cscript):
             
             # Logging            
             if self._logTerse():
-                self._log("\n")
-                self._log.header3("HDU index")
+                self._log('\n')
+                self._log.header3('HDU index')
                 
             # Merge remote index files with local files
-            self._merge(local_hdu, remote_hdu, "HDU_INDEX", self._clobber())
+            self._merge(local_hdu, remote_hdu, 'HDU_INDEX', self._clobber())
             
             if self._logTerse():
-                self._log("\n")
-                self._log.header3("OBS index")    
+                self._log('\n')
+                self._log.header3('OBS index')    
                 
             # Merge remote index files with local files
-            self._merge(local_obs, remote_obs, "OBS_INDEX", self._clobber())
+            self._merge(local_obs, remote_obs, 'OBS_INDEX', self._clobber())
             
         else: 
             # If all files were copied, just copy index files too
@@ -605,11 +635,11 @@ class csiactcopy(ctools.cscript):
             self._copy(remote_obs, self._clobber())
   
         if self._logTerse():
-            self._log("\n")
-            self._log.header3("Master index file")
+            self._log('\n')
+            self._log.header3('Master index file')
         
         # Adding prodname to local master
-        localmaster = os.path.join(self._outpath, "master.json")
+        localmaster = os.path.join(self._outpath, 'master.json')
         
         # If no local master is found, copy master over first
         if not os.path.isfile(localmaster):
@@ -618,7 +648,7 @@ class csiactcopy(ctools.cscript):
         # Load local master
         json_data = open(localmaster).read()
         data      = json.loads(json_data) 
-        configs   = data["datasets"]
+        configs   = data['datasets']
         
         # Initialise flag indicating if we already have prodname in master
         # file
@@ -631,66 +661,66 @@ class csiactcopy(ctools.cscript):
         for config in configs:
             
             # Get hdu and obs index files
-            hdu = os.path.join(self._outpath, config["hduindx"])
-            obs = os.path.join(self._outpath, config["obsindx"])
+            hdu = os.path.join(self._outpath, config['hduindx'])
+            obs = os.path.join(self._outpath, config['obsindx'])
             
             # Check if index files are available
             if not (gammalib.GFilename(str(hdu)).is_fits() and
                     gammalib.GFilename(str(obs)).is_fits()):
                 if self._logTerse():
-                    self._log('Removing "'+str(config["name"])+'" ')
+                    self._log('Removing "'+str(config['name'])+'" ')
                     self._log('(not available)')
                     self._log('\n')
             else:
                 # Append config if valid
                 newconfigs.append(config)
                 if self._logTerse():
-                    self._log('Keeping "'+str(config["name"])+'"')
+                    self._log('Keeping "'+str(config['name'])+'"')
                     self._log('\n')
             
             # Signals that downloaded config is available          
-            if config["name"] == self._prodname:
+            if config['name'] == self._prodname:
                 has_config = True
         
         # Create new entry if config was not available    
         if not has_config:
-            newdict            = dict.fromkeys(["name","hduindx","obsindx"])
-            newdict["name"]    = self._prodname
-            newdict["hduindx"] = os.path.relpath(local_hdu, self._outpath)
-            newdict["obsindx"] = os.path.relpath(local_obs, self._outpath)
+            newdict            = dict.fromkeys(['name','hduindx','obsindx'])
+            newdict['name']    = self._prodname
+            newdict['hduindx'] = os.path.relpath(local_hdu, self._outpath)
+            newdict['obsindx'] = os.path.relpath(local_obs, self._outpath)
             newconfigs.append(newdict)
             if self._logTerse():
-                self._log('Adding "'+str(newdict["name"])+'"')
+                self._log('Adding "'+str(newdict['name'])+'"')
                 self._log('\n')
         
         # Write new json master file
-        f = open(localmaster, "w")
-        data["datasets"] = newconfigs
+        f = open(localmaster, 'w')
+        data['datasets'] = newconfigs
         json.dump(data, f, indent=2)
         f.close()        
 
         # Log summary
         if self._logNormal():
-            self._log("\n")
-            self._log.header1("Summary")
-            self._log.parformat("Data files found")
+            self._log('\n')
+            self._log.header1('Summary')
+            self._log.parformat('Data files found')
             self._log(str(len(files)))
-            self._log("\n")
-            self._log.parformat("Data files copied")
+            self._log('\n')
+            self._log.parformat('Data files copied')
             self._log(str(n_copied))
-            self._log("\n")
-            self._log.parformat("Size")
-            self._log("%.2f"%(float(total_size)*1e-6)+" MB")
-            self._log("\n")
-            self._log.parformat("Local configs")
+            self._log('\n')
+            self._log.parformat('Size')
+            self._log('%.2f'%(float(total_size)*1e-6)+' MB')
+            self._log('\n')
+            self._log.parformat('Local configs')
             self._log(str(len(newconfigs)))
-            self._log("\n")
+            self._log('\n')
             if self._logTerse():
-                self._log("\n")
-                self._log.header3("Content of master index")
+                self._log('\n')
+                self._log.header3('Content of master index')
                 for config in newconfigs:
-                    self._log(str(config["name"]))
-                    self._log("\n")
+                    self._log(str(config['name']))
+                    self._log('\n')
         
         # Return
         return       
