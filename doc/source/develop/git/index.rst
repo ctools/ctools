@@ -84,29 +84,14 @@ account on
 `Redmine <https://cta-redmine.irap.omp.eu/projects/ctools>`_ then go
 ahead and create one).
 Select the `ctools <https://cta-gitlab.irap.omp.eu/ctools/ctools>`_
-project and click on ``Fork`` (see below).
-
-.. image:: gitlab-fork-step1.jpg
-   :width: 600px
-   :alt: Forking the ctools repository
-   :align: center
+project and click on ``Fork``.
 
 This brings you to a screen that invites you to fork the project into
 your user space.
-Click on your user (see below).
-
-.. image:: gitlab-fork-step2.jpg
-   :width: 600px
-   :alt: Select user
-   :align: center
+Click on your user.
 
 After a short while a fork will be created that now is under your
-ownership (see below).
-
-.. image:: gitlab-fork-step3.jpg
-   :width: 600px
-   :alt: Forked created successfully
-   :align: center
+ownership.
 
 Now you can clone this fork using
 
@@ -146,51 +131,43 @@ You do this by typing
 
    $ git checkout devel
    $ git pull upstream devel
-   $ git checkout -b 9101-skymap-smooth-method
+   $ git checkout -b 5783-correct-event-selection
 
 which makes sure that you are on your ``devel`` branch, then pulls in changes
 from the ctools repository, and finally creates the
-``9101-skymap-smooth-method`` branch.
+``5783-correct-event-selection`` branch.
 New branches should always start with an issue number, followed by
 a meaningful name that indicates what the branch is good for (use hyphens
 to separate words).
 You can find the relevant issue number using the
 `Redmine issue tracker <https://cta-redmine.irap.omp.eu/projects/ctools/issues>`_.
 
-Suppose that your goal is to add a ``smooth()`` method to the ``GSkyMap``
-class.
-You would then add this method to ``GSkyMap`` by editing the
-``GSkyMap.hpp``, ``GSkyMap.cpp`` and ``GSkyMap.i`` files.
-You should also add unit tests for the new method, and you would do
-this by editing the ``test_GSky.hpp`` and ``test_GSky.cpp`` files.
-Once you have verified that the new method works you should commit
-your changes.
+Suppose that your goal is to correct a bug in the event selection in
+``ctselect``.
+You would then probably modify the ``ctselect.cpp`` file that is found in the
+``src/ctselect`` repository.
+Once you have verified that the bug is correct you should commit your changes.
 
-First stage all files you want to commit.
-To commit for example only the new class method you should type
+First stage the files you want to commit:
 
 .. code-block:: sh
 
-   $ git add src/sky/GSkyMap.hpp
-   $ git add src/sky/GSkyMap.cpp
-   $ git add src/sky/GSkyMap.i
+   $ git add src/ctselect/ctselect.cpp
 
-followed by
+and then commit your change:
 
 .. code-block:: sh
 
-   $ git commit -m "Add GSkyMap::smooth() method (#9101)
+   $ git commit -m "Corrected event selection in ctselect (#5783)
    >
-   > The GSkyMap::smooth() allows the smoothing of sky maps using
-   > various kernels."
+   > The event selection in ctselect was not done correctly in case
+   > that no time intervals are specified. This is fixed now."
 
 where the message in quotes should be comprised of a single line subject
 that describes what was changed, and a message body that describes why
 the change was made. Subject line and message body should be separated
 by a blank line (see `How to Write a Git Commit Message
 <http://chris.beams.io/posts/git-commit/>`_).
-
-You should then also stage and commit the remaining files.
 
 To make the changes available to other users, and specifically to allow
 their merging into the ctools repository, you need to push you local
@@ -201,19 +178,10 @@ You do this by typing
 
 .. code-block:: sh
 
-   $ git push origin 9101-skymap-smooth-method
+   $ git push origin 5783-correct-event-selection
 
 Note that the ``origin`` argument specifies that you want to push your
 changes into the same repository from which you cloned the code.
-
-You can now verify on
-`GitLab's <https://cta-gitlab.irap.omp.eu/ctools/ctools>`_
-that a new branch exists in your project:
-
-.. image:: gitlab-push.jpg
-   :width: 600px
-   :alt: Pushing a new branch
-   :align: center
 
 
 Creating a pull request
