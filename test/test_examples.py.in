@@ -108,6 +108,7 @@ class Test(gammalib.GPythonTestSuite):
         self.append(self.test_show_sensitivity, 'Test test_show_sensitivity.py')
         self.append(self.test_show_spectrum, 'Test test_show_spectrum.py')
         self.append(self.test_show_ts_distribution, 'Test show_ts_distribution.py')
+        self.append(self.test_show_obs, 'Test show_obs.py')
 
         # Return
         return
@@ -381,6 +382,20 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
+    # Test show_obs
+    def test_show_obs(self):
+        """
+        Test show_obs
+        """
+        # Execute script
+        self._execute_python('show_obs',
+                             args='obs_selected.xml save')
+
+        #TODO: Do any testing
+
+        # Return
+        return
+        
 
 # ======================== #
 # Main routine entry point #

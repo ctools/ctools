@@ -41,32 +41,37 @@ if __name__ == '__main__':
 
     # Print help if wrong number of arguments provided
     if not len(sys.argv) > 1:
-        msg = "usage: inspect_obs.py <inobs.xml> <ra> <dec>\n"
-        msg += "or\n"
-        msg += "inspect_obs.py <inobs.xml>"
+        msg = 'Usage: inspect_obs.py <inobs.xml> <ra> <dec>\n'
+        msg += 'or\n'
+        msg += 'inspect_obs.py <inobs.xml>'
         sys.exit(msg)
-    
+        
+    # Initialise flag if plots should be shown or saved
+    save = False
+    if 'save' in sys.argv:
+        save = True
+        
     # Get input observation XML file
     inobs = gammalib.GFilename(sys.argv[1])
     
-    # Assert more than one observation (circumvents having a binned observation without e.g.
-    # zenith and azimuth
+    # Assert more than one observation (circumvents having a binned
+    # observation without e.g. zenith and azimuth)
     if inobs.is_fits():
-        raise RuntimeError("Input observation container should be an XML file")    
+        raise RuntimeError('Input observation container should be an XML file')
     
     # Run csobsinfo
     info = cscripts.csobsinfo()
-    info["offset"] = False
+    info['offset'] = False
     
     # Add offset if coordinates are provided
     if len(sys.argv) == 4:
         ra = float(sys.argv[2])
         dec = float(sys.argv[3])
-        info["ra"] = ra
-        info["dec"] = dec
-        info["offset"] = True 
-    info["inobs"] = inobs.url()
-    info["debug"] = True
+        info['ra'] = ra
+        info['dec'] = dec
+        info['offset'] = True
+    info['inobs'] = inobs.url()
+    info['debug'] = True
     info.run()
     
     # Retrieve observation info
@@ -81,28 +86,34 @@ if __name__ == '__main__':
     zmin = min(zeniths)
     zmax = max(zeniths)
     plt.hist(zeniths, bins=30, range=(zmin, zmax), fc='blue')
-    plt.xlabel("Zenith Angle [deg]")
-    plt.ylabel("Abundance")
-    plt.title("Zenith angle distribution")
+    plt.xlabel('Zenith Angle [deg]')
+    plt.ylabel('Abundance')
+    plt.title('Zenith angle distribution')
+    if save:
+        plt.savefig('Zenith angle distribution.eps')
     
     # Plot azimuth angle distribution
     plt.figure()
     amin = min(azimuths)
     amax = max(azimuths)
-    plt.hist(azimuths, bins=30, range=(amin, amax),fc='blue')
-    plt.xlabel("Azimuth Angle (deg)")
-    plt.ylabel("Abundance")
-    plt.title("Azimuth distribution")
+    plt.hist(azimuths, bins=30, range=(amin, amax), fc='blue')
+    plt.xlabel('Azimuth Angle (deg)')
+    plt.ylabel('Abundance')
+    plt.title('Azimuth distribution')
+    if save:
+        plt.savefig('Azimuth distribution.eps')
     
     # Plot offset if possible
-    if info["offset"].boolean():
+    if info['offset'].boolean():
         plt.figure()
         omin = min(offsets)
-        omax = max(offsets)  
-        plt.hist(offsets, bins=30, range=(omin, omax),fc='blue')
-        plt.xlabel("Offset from (RA, DEC)=("+str(ra)+","+str(dec)+") (deg)")
-        plt.ylabel("Abundance")
-        plt.title("Offset distribution")
+        omax = max(offsets)
+        plt.hist(offsets, bins=30, range=(omin, omax), fc='blue')
+        plt.xlabel('Offset from (RA, DEC)=('+str(ra)+','+str(dec)+') (deg)')
+        plt.ylabel('Abundance')
+        plt.title('Offset distribution')
+        if save:
+            plt.savefig('Offset distribution.eps')
     
     # Plot energy thresholds if possible
     if ebounds.size():
@@ -113,12 +124,14 @@ if __name__ == '__main__':
             emin.append(ebounds.emin(i).log10TeV())
             emax.append(ebounds.emax(i).log10TeV())
         plt.figure()
-        plt.hist(emin, bins=80, range=(-1.0, 2.0), fc='red',label="emin")
-        plt.hist(emax, bins=80, range=(-1.0, 2.0), fc='blue', label ="emax")  
-        plt.xlabel("Energy threshold (log10 (E/TeV))")
-        plt.ylabel("Abundance")
-        plt.legend(loc="upper left")
-        plt.title("Energy threshold")
+        plt.hist(emin, bins=80, range=(-1.0, 2.0), fc='red', label='emin')
+        plt.hist(emax, bins=80, range=(-1.0, 2.0), fc='blue', label='emax')  
+        plt.xlabel('Energy threshold (log10 (E/TeV))')
+        plt.ylabel('Abundance')
+        plt.legend(loc='upper left')
+        plt.title('Energy threshold')
+        if save:
+            plt.savefig('Energy threshold.eps')
     
     # Plot observation point in time wrt zenith angle
     plt.figure()
@@ -126,11 +139,16 @@ if __name__ == '__main__':
     for i in range(gti.size()):
         tmean = gti.tstart(i) + 0.5*(gti.tstart(i)-gti.tstart(i))
         times.append(tmean.mjd())
-    plt.plot(times, zeniths, 'o',lw=2.0, color='black')
-    plt.xlabel("Time (MJD)")
-    plt.ylabel("Zenith Angle (deg)")
-    plt.title("Observation time")
+    plt.plot(times, zeniths, 'o', lw=2.0, color='black')
+    plt.xlabel('Time (MJD)')
+    plt.ylabel('Zenith Angle (deg)')
+    plt.title('Observation time')
+    if save:
+        plt.savefig('Observation time.eps')
 
-    # Show plots
-    plt.show()
-    
+    # Display plots if possible
+    if not save:
+        
+        # Show plots
+        plt.show()
+        
