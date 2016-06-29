@@ -3,12 +3,11 @@
 Binning CTA data
 ~~~~~~~~~~~~~~~~
 
-As next analysis step you will bin the data in a counts cube using 
+As next analysis step you will bin the data into a counts cube using
 :ref:`ctbin`.
-A counts cube is a 3 dimensional data cube, spanned by
+A counts cube is a 3-dimensional data cube, spanned by
 Right Ascension (or Galactic longitude), Declination (or Galactic latitude),
-and energy (typically logarithmically spaced, but this is under user
-control).
+and energy (by default logarithmically spaced, but this is under your control).
 
 :ref:`ctbin` is executed by typing:
 
@@ -29,28 +28,37 @@ control).
   Number of energy bins [20] 
   Output counts cube file [cntcube.fits] 
 
-The counts cube will be centred on the location of the Crab (Right Ascension
-83.63 degrees, Declination 22.01 degrees) and will be aligned in celestial
-coordinates. A cartesian projection has been selected. The counts cube has 
-200 x 200 spatial pixels of 0.02 x 0.02 degrees in size, hence it covers a 
-total area of 4 x 4 degrees.
+In this example the events from file ``events.fits`` will be binned into
+a counts cube stored into the file ``cntcube.fits``. The counts cube
+is centred on the location of the Crab nebula (Right Ascension 83.63°,
+Declination 22.01°). A cartesian projection aligned in celestial
+coordinates is used and the counts cube has
+200 x 200 spatial pixels of 0.02 x 0.02 degrees in size, covering
+an area of 4° x 4°, and 20 logarithmically spaced energy bins, covering
+an energy range from 0.1 TeV to 100 TeV.
 
-The counts cube will contain 20 maps, which are logarithmically spaced
-in energy, and which cover the energy range from 0.1 TeV to 100 TeV. In this
-example, the counts cube will be saved as ``cntcube.fits`` in the working
-directory. In addition to the counts cube, that is stored as the primary
-image extension, the FITS file also contains an extension named ``EBOUNDS``
-that defines the energy boundaries that were used, and an extension ``GTI``
-that defines the Good Time Intervals that have been used. The following
-image shows the resulting FITS file. The ``EBOUNDS`` table has 20 rows, one
-for each energy bin, while the ``GTI`` table has just a single row, indicating
-the start and stop time of the simulated data.
+The ``cntcube.fits`` file produced by :ref:`ctbin` contains four extensions:
+
+* A primary 3-dimensional image extension providing the number of events
+  per counts cube bin,
+* a 3-dimensional image extension ``WEIGHT`` where each bin gives the
+  fractional overlap between a counts cube bin and the Region of Interest
+  covered by the event list,
+* a table extension ``EBOUNDS`` that defines the energy boundaries of the
+  counts cube, and
+* a table extension ``GTI`` that defines the Good Time Intervals of the counts
+  cube.
+
+The following image shows the ``cntcube.fits`` file produced in the example
+above. The ``EBOUNDS`` table has 20 rows, one for each energy bin, while the
+``GTI`` table has just a single row, indicating the start and stop time of the
+simulated data.
 
 .. figure:: cntmap-fits.jpg
    :width: 600px
    :align: center
 
-   *Counts cube FITS file*
+   *Extensions of a counts cube FITS file*
 
 
 An image of the first bin, covering the energy range 100 - 141 GeV, is 
@@ -60,24 +68,23 @@ shown below:
    :height: 400px
    :align: center
 
-   *Counts cube for first energy bin*
+   *Image of first energy bin of a counts cube*
 
 For illustration, the last few lines of the log file ``ctbin.log`` are 
 reproduced below:
 
-.. code-block:: xml
+.. code-block:: none
 
-  2015-12-07T20:52:41: +=================+
-  2015-12-07T20:52:41: | Bin observation |
-  2015-12-07T20:52:41: +=================+
-  2015-12-07T20:52:41: === CTA observation ===
-  2015-12-07T20:52:41:  Events in list ............: 22685
-  2015-12-07T20:52:41:  Events in cube ............: 18195
-  2015-12-07T20:52:41:  Event bins outside RoI ....: 0
-  2015-12-07T20:52:41:  Events outside cube area ..: 4490
-  2015-12-07T20:52:41:  Events outside energy bins : 0
+  2016-06-29T10:33:23: +=================+
+  2016-06-29T10:33:23: | Bin observation |
+  2016-06-29T10:33:23: +=================+
+  2016-06-29T10:33:23: === CTA observation ===
+  2016-06-29T10:33:23:  Events in list ............: 23099
+  2016-06-29T10:33:23:  Events in cube ............: 18532
+  2016-06-29T10:33:23:  Event bins outside RoI ....: 0
+  2016-06-29T10:33:23:  Events outside cube area ..: 4567
+  2016-06-29T10:33:23:  Events outside energy bins : 0
 
-From the 22685 events that have been simulated and stored in the 
-``events.fits`` file, 18195 lie within the cube boundaries and are thus put
-into the resulting counts cube. The counts cube is stored in a cartesian
-projection in a World Coordinate System (WCS) compliant format.
+From the 23099 events that have been simulated and stored in the
+``events.fits`` file, 18532 lie within the cube boundaries and are thus put
+into the resulting counts cube.

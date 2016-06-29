@@ -29,17 +29,20 @@ into a single counts cube:
   Output counts cube file [cntcube.fits]
 
 You now have a stacked counts cube ``cntcube.fits`` on disk.
-Before you can use that counts cube in a maximum likelihood
-analysis, you have to compute the instrument response and the
-background model that are needed to describe the stacked data.
+Before you can use that counts cube in a maximum likelihood analysis, you have
+to compute the instrument response function and the background model that is
+needed for the analysis.
 
-For the former, you have to compute the total exposure for the stacked
-cube (i.e. the sum of the effective areas for each observation multiplied
-by the corresponding livetimes) and an effective point spread function
-(i.e. the point spread function of the different observations weighted by
-the corresponding exposures).
-To get both informations you use the :ref:`ctexpcube` and 
-:ref:`ctpsfcube` tools:
+For the instrument response function, you have to compute the total exposure
+for the stacked cube (i.e. the sum of the effective areas for each observation
+multiplied by the corresponding livetimes) and an effective point spread
+function (i.e. the point spread function of the different observations
+weighted by the corresponding exposures).
+Optionally, you can also compute an effective energy dispersion (i.e. the
+energy dispersion of the different observations weighted by the corresponding
+exposures).
+To get these informations you use the :ref:`ctexpcube`, :ref:`ctpsfcube` and
+:ref:`ctedispcube` tools:
 
 .. code-block:: bash
 
@@ -69,22 +72,47 @@ To get both informations you use the :ref:`ctexpcube` and
   Number of energy bins [20] 
   Output PSF cube file [psfcube.fits] 
 
-The ``obs.xml`` file has been provided on input to specify for both tools
-which observations have been combined.
-You further provided the counts cube on input so that :ref:`ctexpcube` can 
-read the cub definition from that file and apply it to the exposure cube.
-This is a trick to reduce the number of user parameters that you need to 
-provide.
+.. code-block:: bash
 
-You do not apply this trick when using :ref:`ctpsfcube` as this 
-would lead to a hugh output file owing to the fine spatial
-pixelisation of the counts cube.
-Such a fine binning is not needed for the PSF cube, as the PSF evolves 
-only slowly over the field of view.
-It is thus sufficient to compute a PSF cube with a rather coarse spatial 
-binning; here you used a spatial binning of 1 degree covering a grid of
-10 x 10 degrees.
+  $ ctedispcube
+  Input event list or observation definition XML file [NONE] obs.xml
+  Calibration database [prod2]
+  Instrument response function [South_0.5h]
+  Input counts cube file to extract energy dispersion cube definition [NONE]
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
+  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+  Image scale (in degrees/pixel) [1.0]
+  Size of the X axis in pixels [10]
+  Size of the Y axis in pixels [10]
+  Lower energy limit (TeV) [0.1]
+  Upper energy limit (TeV) [100.0]
+  Number of energy bins [20]
+  Output energy dispersion cube file [edispcube.fits]
 
+.. note::
+
+   You may have noticed that for :ref:`ctexpcube` you provided an input counts
+   cube, while for the other tools you specified ``NONE``.
+   By providing an input counts cube you instructed :ref:`ctexpcube` to
+   extract the definition of the exposure cube from the counts cube. This is
+   a convenient trick to reduce the number of user parameters that you need
+   to specify. You did however not apply this trick for
+   :ref:`ctpsfcube` and :ref:`ctedispcube`. In fact, the point spread function
+   and energy dispersion do not vary significantly on spatial scales of 0.02°,
+   and using the counts cube definition for these cubes would lead to large
+   response cube files with a spatial precision that is actually not needed
+   (the point spread function and energy dispersion cubes are actually
+   4-dimensional data cubes, hence their size increases quickly for a large
+   number of spatial pixels). Therefore, you have specified a larger image
+   scale of 1° for both cubes and only a small number of 10x10 spatial pixels,
+   leading to point spread function and energy dispersion cubes of modest size
+   (a few MB).
+
+You provided the ``obs.xml`` file that defines all observations on input
+so that the tools know which observations were combined in the :ref:`ctbin`
+run.
 As final step of the analysis preparation, you need to generate a
 background cube using the :ref:`ctbkgcube` tool:
 
@@ -100,13 +128,13 @@ background cube using the :ref:`ctbkgcube` tool:
   Output model XML file [NONE] model.xml
 
 The usage of :ref:`ctbkgcube` is very similar to that of :ref:`ctexpcube`,
-yet it takes the model XML file as an additional input parameter.
+yet it takes the model definition XML file as an additional input parameter.
 You used here the usual ``$CTOOLS/share/models/crab.xml`` model
 file that is shipped with the ctools.
 :ref:`ctbkgcube` provides on output the background cube file
-``bkgcube.fits`` and the model XML file ``model.xml`` that can
+``bkgcube.fits`` and the model definition XML file ``model.xml`` that can
 be used for further analysis.
-Having a look at ``model.xml`` illustrates how the background
+Having a look at the ``model.xml`` file illustrates how the background
 modelling works:
 
 .. code-block:: xml
@@ -147,11 +175,10 @@ as an appropriate multiplicator to the background cube.
 .. note::
 
    There is no constraint on providing the same spatial binning or
-   the same energy binning for an exposure cube, a PSF cube,
-   a background cube and a counts cube.
-   ctools interpolates internally the exposure cube, PSF cube and
-   background cube values, hence any arbitrary appropriate binning may
-   be used.
+   the same energy binning for an exposure cube, a PSF cube, an energy
+   dispersion cube, a background cube and a counts cube.
+   ctools interpolates internally all response cubes hence any arbitrary
+   appropriate binning may be used.
    Using the same binning for the exposure cube, the background cube and
    the counts cube is only a convenience.
 
@@ -170,73 +197,86 @@ analysis using the :ref:`ctlike` tool:
 
 :ref:`ctlike` recognises that a counts cube should be analysed and queries
 for the exposure cube, the PSF cube, and the background cube file names.
-You specified here the names of the files produced by the :ref:`ctexpcube`,
-the :ref:`ctpsfcube` and the :ref:`ctbkgcube` tools.
-Furthermore you provided as model the ``model.xml`` file that has been
-generated by the :ref:`ctbkgcube` tool.
+If you want to consider also the energy dispersion during the maximum likelihood
+fitting you should pass the hidden ``edisp`` parameter to ctlike, and the tool
+will also query of the energy dispersion cube:
 
-The log file of the :ref:`ctlike` run is shown below.
-Note that the spectral model that is multiplied with the background
-cube has a Prefactor of 0.998 +/- 0.011 and an Index of 0.006 +/- 0.007,
-indicating a very small correction to the actual spectrum of the background
-cube.
-Real life situations may of course require larger correction factors.
+.. code-block:: bash
 
-.. code-block:: xml
+  $ ctlike edisp=yes
+  Input event list, counts cube or observation definition XML file [cntcube.fits]
+  Input exposure cube file (only needed for stacked analysis) [expcube.fits]
+  Input PSF cube file (only needed for stacked analysis) [psfcube.fits]
+  Input background cube file (only needed for stacked analysis) [bkgcube.fits]
+  Input energy dispersion cube file (only needed for stacked analysis) [NONE] edispcube.fits
+  Input model XML file [model.xml]
+  Output model XML file [crab_results.xml]
 
-  2015-12-07T21:37:45: +=================================+
-  2015-12-07T21:37:45: | Maximum likelihood optimisation |
-  2015-12-07T21:37:45: +=================================+
-  2015-12-07T21:37:46:  >Iteration   0: -logL=83748.453, Lambda=1.0e-03
-  2015-12-07T21:37:47:  >Iteration   1: -logL=83736.039, Lambda=1.0e-03, delta=12.413, max(|grad|)=15.134616 [Index:3]
-  2015-12-07T21:37:48:  >Iteration   2: -logL=83736.021, Lambda=1.0e-04, delta=0.018, max(|grad|)=0.108613 [Index:3]
-  2015-12-07T21:37:49:  >Iteration   3: -logL=83736.021, Lambda=1.0e-05, delta=0.000, max(|grad|)=0.000570 [Index:3]
+.. warning::
+
+   The maximum likelihood computations including energy dispersion are
+   relatively time consuming, and in many situations the impact of the
+   energy dispersion on the analysis results will be very small. So make
+   sure that you really need energy dispersion before you are using it.
+
+The log file of the :ref:`ctlike` run (without energy dispersion) is shown
+below.
+
+.. code-block:: none
+
+  2016-06-29T19:54:14: +=================================+
+  2016-06-29T19:54:14: | Maximum likelihood optimisation |
+  2016-06-29T19:54:14: +=================================+
+  2016-06-29T19:54:15:  >Iteration   0: -logL=83633.454, Lambda=1.0e-03
+  2016-06-29T19:54:15:  >Iteration   1: -logL=83561.979, Lambda=1.0e-03, delta=71.475, max(|grad|)=153.136163 [Index:7]
+  2016-06-29T19:54:16:  >Iteration   2: -logL=83561.823, Lambda=1.0e-04, delta=0.156, max(|grad|)=-0.183495 [Prefactor:6]
+  2016-06-29T19:54:16:  >Iteration   3: -logL=83561.823, Lambda=1.0e-05, delta=0.000, max(|grad|)=-0.003347 [Index:3]
   ...
-  2015-12-07T21:37:51: +=========================================+
-  2015-12-07T21:37:51: | Maximum likelihood optimisation results |
-  2015-12-07T21:37:51: +=========================================+
-  2015-12-07T21:37:51: === GOptimizerLM ===
-  2015-12-07T21:37:51:  Optimized function value ..: 83736.021
-  2015-12-07T21:37:51:  Absolute precision ........: 0.005
-  2015-12-07T21:37:51:  Acceptable value decrease .: 2
-  2015-12-07T21:37:51:  Optimization status .......: converged
-  2015-12-07T21:37:51:  Number of parameters ......: 10
-  2015-12-07T21:37:51:  Number of free parameters .: 4
-  2015-12-07T21:37:51:  Number of iterations ......: 3
-  2015-12-07T21:37:51:  Lambda ....................: 1e-06
-  2015-12-07T21:37:51:  Maximum log likelihood ....: -83736.021
-  2015-12-07T21:37:51:  Observed events  (Nobs) ...: 35198.000
-  2015-12-07T21:37:51:  Predicted events (Npred) ..: 35198.000 (Nobs - Npred = 7.6773e-07)
-  2015-12-07T21:37:51: === GModels ===
-  2015-12-07T21:37:51:  Number of models ..........: 2
-  2015-12-07T21:37:51:  Number of parameters ......: 10
-  2015-12-07T21:37:51: === GModelSky ===
-  2015-12-07T21:37:51:  Name ......................: Crab
-  2015-12-07T21:37:51:  Instruments ...............: all
-  2015-12-07T21:37:51:  Instrument scale factors ..: unity
-  2015-12-07T21:37:51:  Observation identifiers ...: all
-  2015-12-07T21:37:51:  Model type ................: PointSource
-  2015-12-07T21:37:51:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
-  2015-12-07T21:37:51:  Number of parameters ......: 6
-  2015-12-07T21:37:51:  Number of spatial par's ...: 2
-  2015-12-07T21:37:51:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-  2015-12-07T21:37:51:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-  2015-12-07T21:37:51:  Number of spectral par's ..: 3
-  2015-12-07T21:37:51:   Prefactor ................: 5.75289e-16 +/- 7.24749e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-  2015-12-07T21:37:51:   Index ....................: -2.53122 +/- 0.0113068 [-0,-5]  (free,scale=-1,gradient)
-  2015-12-07T21:37:51:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
-  2015-12-07T21:37:51:  Number of temporal par's ..: 1
-  2015-12-07T21:37:51:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-  2015-12-07T21:37:51: === GCTAModelCubeBackground ===
-  2015-12-07T21:37:51:  Name ......................: BackgroundModel
-  2015-12-07T21:37:51:  Instruments ...............: CTA, HESS, MAGIC, VERITAS
-  2015-12-07T21:37:51:  Instrument scale factors ..: unity
-  2015-12-07T21:37:51:  Observation identifiers ...: all
-  2015-12-07T21:37:51:  Model type ................: "PowerLaw" * "Constant"
-  2015-12-07T21:37:51:  Number of parameters ......: 4
-  2015-12-07T21:37:51:  Number of spectral par's ..: 3
-  2015-12-07T21:37:51:   Prefactor ................: 0.998055 +/- 0.0114979 [0.01,100] ph/cm2/s/MeV (free,scale=1,gradient)
-  2015-12-07T21:37:51:   Index ....................: 0.00648796 +/- 0.00697365 [-5,5]  (free,scale=1,gradient)
-  2015-12-07T21:37:51:   PivotEnergy ..............: 1e+06 MeV (fixed,scale=1e+06,gradient)
-  2015-12-07T21:37:51:  Number of temporal par's ..: 1
-  2015-12-07T21:37:51:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+  2016-06-29T19:54:17: +=========================================+
+  2016-06-29T19:54:17: | Maximum likelihood optimisation results |
+  2016-06-29T19:54:17: +=========================================+
+  2016-06-29T19:54:17: === GOptimizerLM ===
+  2016-06-29T19:54:17:  Optimized function value ..: 83561.823
+  2016-06-29T19:54:17:  Absolute precision ........: 0.005
+  2016-06-29T19:54:17:  Acceptable value decrease .: 2
+  2016-06-29T19:54:17:  Optimization status .......: converged
+  2016-06-29T19:54:17:  Number of parameters ......: 10
+  2016-06-29T19:54:17:  Number of free parameters .: 4
+  2016-06-29T19:54:17:  Number of iterations ......: 3
+  2016-06-29T19:54:17:  Lambda ....................: 1e-06
+  2016-06-29T19:54:17:  Maximum log likelihood ....: -83561.823
+  2016-06-29T19:54:17:  Observed events  (Nobs) ...: 35946.000
+  2016-06-29T19:54:17:  Predicted events (Npred) ..: 35946.000 (Nobs - Npred = 1.56502e-05)
+  2016-06-29T19:54:17: === GModels ===
+  2016-06-29T19:54:17:  Number of models ..........: 2
+  2016-06-29T19:54:17:  Number of parameters ......: 10
+  2016-06-29T19:54:17: === GModelSky ===
+  2016-06-29T19:54:17:  Name ......................: Crab
+  2016-06-29T19:54:17:  Instruments ...............: all
+  2016-06-29T19:54:17:  Instrument scale factors ..: unity
+  2016-06-29T19:54:17:  Observation identifiers ...: all
+  2016-06-29T19:54:17:  Model type ................: PointSource
+  2016-06-29T19:54:17:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2016-06-29T19:54:17:  Number of parameters ......: 6
+  2016-06-29T19:54:17:  Number of spatial par's ...: 2
+  2016-06-29T19:54:17:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+  2016-06-29T19:54:17:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+  2016-06-29T19:54:17:  Number of spectral par's ..: 3
+  2016-06-29T19:54:17:   Prefactor ................: 5.70255e-16 +/- 7.24185e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+  2016-06-29T19:54:17:   Index ....................: -2.46568 +/- 0.0110458 [-0,-5]  (free,scale=-1,gradient)
+  2016-06-29T19:54:17:   PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
+  2016-06-29T19:54:17:  Number of temporal par's ..: 1
+  2016-06-29T19:54:17:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+  2016-06-29T19:54:17: === GCTAModelCubeBackground ===
+  2016-06-29T19:54:17:  Name ......................: BackgroundModel
+  2016-06-29T19:54:17:  Instruments ...............: CTA, HESS, MAGIC, VERITAS
+  2016-06-29T19:54:17:  Instrument scale factors ..: unity
+  2016-06-29T19:54:17:  Observation identifiers ...: all
+  2016-06-29T19:54:17:  Model type ................: "PowerLaw" * "Constant"
+  2016-06-29T19:54:17:  Number of parameters ......: 4
+  2016-06-29T19:54:17:  Number of spectral par's ..: 3
+  2016-06-29T19:54:17:   Prefactor ................: 0.964885 +/- 0.0109395 [0.01,100] ph/cm2/s/MeV (free,scale=1,gradient)
+  2016-06-29T19:54:17:   Index ....................: 0.0220427 +/- 0.00686292 [-5,5]  (free,scale=1,gradient)
+  2016-06-29T19:54:17:   PivotEnergy ..............: 1e+06 MeV (fixed,scale=1e+06,gradient)
+  2016-06-29T19:54:17:  Number of temporal par's ..: 1
+  2016-06-29T19:54:17:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)

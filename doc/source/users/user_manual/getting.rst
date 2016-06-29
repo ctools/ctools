@@ -63,7 +63,7 @@ in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz gammalib-1.0.0.tar.gz
+  $ tar xvfz gammalib-1.1.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -73,7 +73,7 @@ typing
 
 .. code-block:: bash
 
-  $ cd gammalib-1.0.0
+  $ cd gammalib-1.1.0
   $ ./configure
   $ make
   $ make check
@@ -135,7 +135,7 @@ an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz ctools-1.0.0.tar.gz
+  $ tar xvfz ctools-1.1.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -144,7 +144,7 @@ Step in the directory and build the ctools by typing
 
 .. code-block:: bash
 
-  $ cd ctools-1.0.0
+  $ cd ctools-1.1.0
   $ ./configure
   $ make
 
@@ -178,95 +178,61 @@ following output at the end of the unit testing:
 
 .. code-block:: bash
 
-  PASS: test_ctools.sh
-  PASS: test_cscripts.sh
-  PASS: test_python.py
-  make[4]: Nothing to be done for `all'.
-  ============================================================================
-  Testsuite summary for ctools 1.0.0
-  ============================================================================
-  # TOTAL: 3
-  # PASS:  3
-  # SKIP:  0
-  # XFAIL: 0
-  # FAIL:  0
-  # XPASS: 0
-  # ERROR: 0
-  ============================================================================
+   PASS: test_python_ctools.sh
+   PASS: test_python_cscripts.sh
+   PASS: test_examples.py
+   ============================================================================
+   Testsuite summary for ctools 1.1.0
+   ============================================================================
+   # TOTAL: 3
+   # PASS:  3
+   # SKIP:  0
+   # XFAIL: 0
+   # FAIL:  0
+   # XPASS: 0
+   # ERROR: 0
+   ============================================================================
 
 For older automake version, you should see
 
 .. code-block:: bash
 
-  ***************
-  * Test ctools *
-  ***************
-  Test ctobssim: .. ok
-  Test ctskymap: .. ok
-  Test ctbin: .... ok
-  Test ctexpcube: .... ok
-  Test ctpsfcube: .... ok
-  Test ctbkgcube: ...... ok
-  Test ctmodel: ...... ok
-  Test ctselect: .. ok
-  Test ctlike: ...... ok
-  Test cttsmap: .. ok
-  Test ctcubemask: .. ok
-  Test ctbutterfly: .. ok
-  Test ctulimit: .. ok
-  Test cterror: .. ok
-  PASS: test_ctools.sh
+   ***********************
+   * ctools unit testing *
+   ***********************
+   Test ctobssim on command line: ..... ok
+   Test ctobssim from Python: ................................................. ok
+   Test ctselect on command line: ....... ok
+   Test ctselect from Python: ..... ok
+   Test ctbin on command line: ..... ok
+   Test ctbin from Python: ............................................. ok
+   ...
+   PASS test_python_ctools.sh
 
-  *****************
-  * Test cscripts *
-  *****************
-  Test csobsdef: .. ok
-  Test csobs2caldb: .. ok
-  Test csobsinfo: .. ok
-  Test csiactobs: .. ok
-  Test csmodelinfo: .. ok
-  Test csmodelmerge (space-separated): .. ok
-  Test csmodelmerge (comma-separated): .. ok
-  Test csmodelmerge (wildcard string): .. ok
-  Test csmodelmerge (ascii-file): .. ok
-  Test cstsmapmerge (comma-separated): .. ok
-  Test cstsmapmerge (space-separated): .. ok
-  Test cstsmapmerge (wildcard string): .. ok
-  Test cstsmapmerge  (ascii-file): .. ok
-  Test cspull: .. ok
-  Test cssens: .. ok
-  Test cstsdist: .. ok
-  Test csresmap: .. ok
-  Test csspec (unbinned): .. ok
-  Test csspec (binned): .. ok
-  Test cslightcrv (unbinned): .. ok
-  Test cslightcrv (binned): .. ok
-  PASS: test_cscripts.sh
+   *************************
+   * cscripts unit testing *
+   *************************
+   Test cscaldb on command line: .. ok
+   Test cscaldb from Python: . ok
+   Test cslightcrv on command line: ............... ok
+   Test cslightcrv from Python: ................................................. ok
+   Test csmodelinfo on command line: ..... ok
+   Test csmodelinfo from Python: ..... ok
+   ...
+   PASS test_python_cscripts.sh
 
-  ***********************
-  * ctools unit testing *
-  ***********************
-  Test ctobssim functionality: .......... ok
-  Test ctobssim on observation container: .... ok
-  Test ctselect functionality: ... ok
-  Test ctbin functionality: ... ok
-  Test ctlike functionality: ... ok
-  Test cttsmap functionality: ... ok
-  Test ctmodel functionality: ... ok
-  Test ctskymap functionality: ... ok
-  Test ctexpcube functionality: ... ok
-  Test ctpsfcube functionality: ... ok
-  Test ctbkgcube functionality: ... ok
-  Test ctcubemask functionality: ... ok
-  Test ctbutterfly functionality: ... ok
-  Test ctulimit functionality: ... ok
-  Test cterror functionality: ... ok
-  Test unbinned pipeline with FITS file saving: .... ok
-  Test unbinned in-memory pipeline: .... ok
-  PASS: test_python.py
-  ==================
-  All 3 tests passed
-  ==================
+   ********************
+   * Examples testing *
+   ********************
+   Test generate_prod3_irfs.py: .. ok
+   Test make_pointings.py: ....... ok
+   Test make_spectrum.py: .. ok
+   Test make_ts_distributions.py: .. ok
+   ...
+   PASS test_examples.py
+   ==================
+   All 3 tests passed
+   ==================
 
 The same detailed information is also available for the newer automake 
 versions, but there it is written in log files that you can find in the 
@@ -274,9 +240,9 @@ versions, but there it is written in log files that you can find in the
 
 .. code-block:: bash
 
-  test_ctools.sh.log
-  test_cscripts.sh.log
-  test_python.py.log
+  test_python_ctools.sh.log
+  test_python_cscripts.sh.log
+  test_examples.py.log
 
 If you do not see the same output, but a failure message, please check
 first the :ref:`issues` section. If you cannot fix the problem, please

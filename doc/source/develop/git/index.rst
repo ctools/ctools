@@ -33,14 +33,14 @@ Before you start
 Make sure you configured your `Git <https://git-scm.com/>`_ using your user
 name and e-mail address (you only need to do this once on your machine):
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git config --global user.name "John Doe"
    $ git config --global user.email johndoe@example.com
 
 In addition, you may need to add
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git config --global http.sslverify "false"
 
@@ -95,7 +95,7 @@ ownership.
 
 Now you can clone this fork using
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git clone https://cta-gitlab.irap.omp.eu/[user]/ctools.git
 
@@ -106,13 +106,13 @@ user name.
 To keep in sync with the ctools repository you should add it as
 a remote repository using
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git remote add upstream https://cta-gitlab.irap.omp.eu/ctools/ctools.git
 
 You can then type
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git pull upstream devel
 
@@ -127,7 +127,7 @@ To work on a new feature or to correct a bug you should always create a new
 branch.
 You do this by typing
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git checkout devel
    $ git pull upstream devel
@@ -150,13 +150,13 @@ Once you have verified that the bug is correct you should commit your changes.
 
 First stage the files you want to commit:
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git add src/ctselect/ctselect.cpp
 
 and then commit your change:
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git commit -m "Corrected event selection in ctselect (#5783)
    >
@@ -176,7 +176,7 @@ changes into your
 repository.
 You do this by typing
 
-.. code-block:: sh
+.. code-block:: bash
 
    $ git push origin 5783-correct-event-selection
 

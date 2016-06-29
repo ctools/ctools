@@ -64,26 +64,9 @@ To visualise this container, type:
    >>> print(sim.obs())
    === GObservations ===
     Number of observations ....: 1
+    Number of models ..........: 2
+    Number of observed events .: 23099
     Number of predicted events : 0
-   === GCTAObservation ===
-    Name ......................: 
-    Identifier ................: 
-    Instrument ................: CTA
-    Event file ................: events.fits
-    Event type ................: EventList
-    Statistics ................: Poisson
-    Ontime ....................: 1800 s
-    Livetime ..................: 1710 s
-    Deadtime correction .......: 0.95
-    User energy range .........: undefined
-   === GCTAPointing ===
-    Pointing direction ........: (RA,Dec)=(83.63,22.01)
-   === GCTAResponseIrf ===
-    Caldb mission .............: cta
-    Caldb instrument ..........: prod2
-    Response name .............: South_0.5h
-    Energy dispersion .........: Not used
-    Save energy range .........: undefined
 
 There is one CTA observation in the container and to visualise the events 
 in that observation you may type:
@@ -92,7 +75,7 @@ in that observation you may type:
 
    >>> print(sim.obs()[0].events())
    === GCTAEventList ===
-    Number of events ..........: 45370
+    Number of events ..........: 23099 (disposed in "events.fits")
     Time interval .............: 51544.5 - 51544.5 days
    === GEbounds ===
     Number of intervals .......: 1
@@ -125,37 +108,10 @@ terrestrial times (TT) of all events.
    >>> for event in events:
    ...     print(event)
    ...
-   Dir=RA=83.5743, DEC=21.9746 [-0.000617357,-0.000902194] Energy=328.153 GeV Time=-3.15576e+08 s (TT)
-   Dir=RA=83.5756, DEC=22.0127 [4.78931e-05,-0.000879886] Energy=353.264 GeV Time=-3.15576e+08 s (TT)
-   Dir=RA=83.6811, DEC=22.0034 [-0.000114612,0.000826825] Energy=550.35 GeV Time=-3.15576e+08 s (TT)
+   Dir=RA=83.6308, DEC=21.8881 [-0.00212759,1.33661e-05] Energy=106.465 GeV Time=-3.15576e+08 s (TT)
+   Dir=RA=83.7518, DEC=21.8064 [-0.0035525,0.00197398] Energy=117.706 GeV Time=-3.15576e+08 s (TT)
+   Dir=RA=83.5545, DEC=22.0933 [0.00145377,-0.00122121] Energy=138.624 GeV Time=-3.15576e+08 s (TT)
    ...
-
-.. note::
-
-   If you inspect the event list in detail you may recognise that all 
-   events appear twice in the event list.
-   This is because we ran :ref:`ctobssim` twice (a first time when calling
-   the ``execute()`` method and a second time when calling the ``run()`` 
-   method).
-   **ctobssim will append simulated events to any pre-existing
-   events in an observation container.**
-   To get a single simulation you should clear the observation container 
-   and re-run :ref:`ctobssim`:
-
-   .. code-block:: python
-
-     >>> sim.obs().clear()           
-     >>> sim.run()                   
-     >>> print(sim.obs()[0].events())
-     === GCTAEventList ===
-      Number of events ..........: 22685
-      Time interval .............: 51544.5 - 51544.5 days
-     === GEbounds ===
-      Number of intervals .......: 1
-      Energy range ..............: 100 GeV - 100 TeV
-     === GCTARoi ===
-      ROI centre ................: RA=83.63, DEC=22.01 [0,0]
-      ROI radius ................: 5 deg
 
 
 Performing a maximum likelihood analysis in Python
@@ -187,7 +143,7 @@ To check how the fit went you can inspect the optimiser used by
 
    >>> print(like.opt())         
    === GOptimizerLM ===
-    Optimized function value ..: 152299.205
+    Optimized function value ..: 154553.422
     Absolute precision ........: 0.005
     Acceptable value decrease .: 2
     Optimization status .......: converged
@@ -220,8 +176,8 @@ member of the observation container:
      RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
      DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
     Number of spectral par's ..: 3
-     Prefactor ................: 5.81591e-16 +/- 1.01725e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-     Index ....................: -2.50618 +/- 0.0153538 [-0,-5]  (free,scale=-1,gradient)
+     Prefactor ................: 5.82698e-16 +/- 1.02186e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+     Index ....................: -2.47534 +/- 0.0154764 [-0,-5]  (free,scale=-1,gradient)
      PivotEnergy ..............: 300000 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
     Number of temporal par's ..: 1
      Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
@@ -233,8 +189,8 @@ member of the observation container:
     Model type ................: "PowerLaw" * "Constant"
     Number of parameters ......: 4
     Number of spectral par's ..: 3
-     Prefactor ................: 0.998788 +/- 0.0118567 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
-     Index ....................: 0.00990034 +/- 0.00735768 [-5,5]  (free,scale=1,gradient)
+     Prefactor ................: 1.01266 +/- 0.0119676 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+     Index ....................: 0.00474762 +/- 0.00731725 [-5,5]  (free,scale=1,gradient)
      PivotEnergy ..............: 1e+06 [10000,1e+09] MeV (fixed,scale=1e+06,gradient)
     Number of temporal par's ..: 1
      Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
@@ -250,8 +206,8 @@ This is easy from Python:
    >>> like.run()
    >>> print(like.obs().models())
    ...
-     RA .......................: 83.6334 +/- 0.000917669 [-360,360] deg (free,scale=1)
-     DEC ......................: 22.0144 +/- 0.000836554 [-90,90] deg (free,scale=1)
+     RA .......................: 83.6327 +/- 0.000916983 [-360,360] deg (free,scale=1)
+     DEC ......................: 22.0141 +/- 0.00086378 [-90,90] deg (free,scale=1)
 
 The ``like.obs().models()`` method provides the model container, using the 
 ``["Crab"]`` operator we access the Crab model in that container and using 
@@ -293,7 +249,9 @@ the ``fix()`` method.
       >>> print(like.obs())
       === GObservations ===
        Number of observations ....: 1
-       Number of predicted events : 22685
+       Number of models ..........: 2
+       Number of observed events .: 23099
+       Number of predicted events : 23099
 
    is okay as the ``ctools.ctlike(sim.obs())`` constructor will create
    a copy of the observation container that lives within the :ref:`ctlike`
@@ -309,6 +267,8 @@ the ``fix()`` method.
       >>> print(obs)
       === GObservations ===
        Number of observations ....: 1
+       Number of models ..........: 2
+       Number of observed events .: 23099
        Number of predicted events : 0
 
 
@@ -338,8 +298,9 @@ Here an example of how to use ``obsutils``:
    >>> print(obs)   
    === GObservations ===
     Number of observations ....: 4
+    Number of models ..........: 0
+    Number of observed events .: 0
     Number of predicted events : 0
-   ...
    >>> obs.models(gammalib.GModels("${CTOOLS}/share/models/crab.xml"))
    >>> obs = obsutils.sim(obs)
    >>> like = obsutils.fit(obs)
@@ -355,8 +316,8 @@ pattern of four observations located at offset angles of 1 degree from the
 nominal location of the Crab nebula.
 The ``obsutils.set_obs_list()`` will build an observation container from 
 that pattern where each pointing will have a duration of 1800 seconds, 
-cover the 0.1-100 TeV energy range and a field of view of 5 degrees.
-The standard dummy CTA calibration information will be used.
+cover the 0.1-100 TeV energy range and a field of view of 5°.
+The ``South_0.5h`` IRF from the Prod2 calibration database will be used.
 A model is then appended to the observation container using the
 ``obs.models()`` method.
 The ``obsutils.sim()`` function then simulates the event data, the
@@ -484,4 +445,4 @@ Beyond the first steps
 You now have learned the basics of using ctools and GammaLib within Python.
 To go beyond these initial steps you may check the Python scripts in the
 ``examples`` folder that provide useful analysis examples.
-Check the ``README`` file in that folder for an explanation of the scripts.
+Check the ``README.md`` file in that folder for an explanation of the scripts.

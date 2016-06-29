@@ -153,34 +153,48 @@ The second file produced by :ref:`ctobssim` is a human readable log file that
 contains information about the job execution. As example, the last lines
 from this file are shown here:
 
-.. code-block:: xml
+.. code-block:: none
 
-  2015-12-07T20:48:30: +======================+
-  2015-12-07T20:48:30: | Simulate observation |
-  2015-12-07T20:48:30: +======================+
-  2015-12-07T20:48:30: === CTA observation ===
-  2015-12-07T20:48:30:  Simulation area ...........: 1.9635e+11 cm2
-  2015-12-07T20:48:30:  Simulation cone ...........: RA=83.63 deg, Dec=22.01 deg, r=5.5 deg
-  2015-12-07T20:48:30:  Time interval .............: 0 - 1800 s
-  2015-12-07T20:48:30:  Photon energy range .......: 100 GeV - 100 TeV
-  2015-12-07T20:48:30:  Event energy range ........: 100 GeV - 100 TeV
-  2015-12-07T20:48:30:  Use model .................: Crab
-  2015-12-07T20:48:30:  Normalization .............: 1 [Crab]
-  2015-12-07T20:48:30:  Flux ......................: 5.87297e-10 [Crab] photons/cm2/s
-  2015-12-07T20:48:30:  Normalized flux ...........: 5.87297e-10 [Crab] photons/cm2/s
-  2015-12-07T20:48:30:  Photon rate ...............: 115.316 photons/s [Crab]
-  2015-12-07T20:48:31:  MC source photons .........: 207547 [Crab]
-  2015-12-07T20:48:31:  MC source events ..........: 3646 [Crab]
-  2015-12-07T20:48:31:  MC source events ..........: 3646 (all source models)
-  2015-12-07T20:48:33:  MC events outside ROI .....: 0
-  2015-12-07T20:48:33:  MC background events ......: 19039
-  2015-12-07T20:48:33:  MC events .................: 22685 (all models)
+  2016-06-29T10:21:57: +======================+
+  2016-06-29T10:21:57: | Simulate observation |
+  2016-06-29T10:21:57: +======================+
+  2016-06-29T10:21:57: === CTA observation ===
+  2016-06-29T10:21:57:  Simulation cone ...........: RA=83.63 deg, Dec=22.01 deg, radius=5.5 deg
+  2016-06-29T10:21:57:  Time interval .............: 0 - 1800 s
+  2016-06-29T10:21:57:  Photon energy range .......: 100 GeV - 199.526 GeV
+  2016-06-29T10:21:57:  Event energy range ........: 100 GeV - 199.526 GeV
+  2016-06-29T10:21:57:   Simulation area ..........: 5.75561e+09 cm2
+  2016-06-29T10:21:57:   Use model ................: Crab
+  2016-06-29T10:21:57:   Normalization ............: 1 [Crab]
+  2016-06-29T10:21:57:   Flux .....................: 3.76031e-10 [Crab] photons/cm2/s
+  2016-06-29T10:21:57:   Normalized flux ..........: 3.76031e-10 [Crab] photons/cm2/s
+  2016-06-29T10:21:57:   Photon rate ..............: 2.16429 photons/s [Crab]
+  2016-06-29T10:21:57:   MC source photons ........: 3889 [Crab]
+  2016-06-29T10:21:57:   MC source events .........: 1226 [Crab]
+  2016-06-29T10:21:57:   MC source events .........: 1226 (all source models)
+  2016-06-29T10:21:57:  Photon energy range .......: 199.526 GeV - 398.107 GeV
+  ...
+  2016-06-29T10:21:57:  MC source photons .........: 10759 [Crab]
+  2016-06-29T10:21:57:  MC source events ..........: 3686 [Crab]
+  2016-06-29T10:21:57:  MC events outside ROI .....: 0
+  2016-06-29T10:21:57:  MC background events ......: 19413
+  2016-06-29T10:21:57:  MC events .................: 23099 (all models)
 
 Each line starts with the UTC time at which the line has been written. In
-this run, 207547 Crab photons have been thrown over an area of 19.6 square
-kilometres during a time interval of 1800 seconds. 3646 of these photons have
-been registered by CTA as events. In the same time interval, 19039 background
-events have been registred by CTA.
+this run, 10759 Crab photons have been thrown during a time interval of 1800
+seconds. 3686 of these photons have been registered by CTA as events. In the
+same time interval, 19413 background events have been registred by CTA.
+
+.. note::
+
+   :ref:`ctobssim` will split the simulated energy range into a number of
+   slices, controlled via the hidden ``eslices`` parameter (ten energy slices
+   are used by default). For each energy slice, the simulation area
+   will be adapted to the effective area of the array in that energy slice,
+   which helps to keep the computing time low. The log file will provide
+   information about the simulation in each slice. In the example above, the
+   simulation results for the first energy slice are shown, followed by a
+   summary of the results for all slices.
 
 You may change the name of the log file using the hidden parameter 
 ``logfile``:

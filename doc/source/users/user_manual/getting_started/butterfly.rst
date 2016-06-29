@@ -39,7 +39,7 @@ to make this work. To launch the script, type:
 
 .. code-block:: bash
 
-  python $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
+  $CTOOLS/share/examples/python/show_butterfly.py butterfly.txt
 	
 This will result in a canvas which should look like the following:
 
@@ -47,5 +47,5 @@ This will result in a canvas which should look like the following:
    :height: 400px
    :align: center
 
-   *Confidence band of the fit*
+   *Confidence band of the power law fit*
  

@@ -9,7 +9,7 @@ necessarily be the case.
 You thus need a means to search for significant excess emission in your data.
 One possibility to accomplish this task is to compute the Test Statistic
 for a specific source at a grid of trial positions.
-The :ref:`cttsmap` tool will exactly do that job.
+The :ref:`cttsmap` tool will do exactly that job.
 
 The Test Statistic is defined as twice the log-likelihood difference 
 between fitting a source at a given position on top of a model or fitting
@@ -20,14 +20,14 @@ exact relation depends somewhat on the formulation of the statistical
 problem.
 
 Here an example of how to apply the :ref:`cttsmap` tool to the two
-simulated observations of the Crab in unbinned mode.
-On input we provide a source model XML file and the name of the source
+simulated observations of the Crab nebula in unbinned mode.
+On input you provide a source model XML file and the name of the source
 in the XML file that should be moved on a grid of test positions.
 This means that the position of the source given in the XML file is
 in fact ignored and replaced by the grid positions that are defined by
 the user parameters.
-In the example we defined a grid of 10 x 10 positions around the
-nominal position of the Crab nebula with a grid spacing of 0.02 degrees.
+In the example you defined a grid of 10 x 10 positions around the
+nominal position of the Crab nebula with a grid spacing of 0.02°.
 
 .. code-block:: bash
 
@@ -51,7 +51,7 @@ that contains one extension for the Test Statistic value and further
 extensions for the spectral parameters that have been fitted for the
 source at each position of the grid.
 The figure below show the Test Statistic map which reaches a maximum
-value of 40733 near the centre of the map.
+value of 42622 near the centre of the map.
 
 .. figure:: tsmap-crab.png
    :height: 400px
@@ -61,7 +61,7 @@ value of 40733 near the centre of the map.
 
 .. note::
 
-   Alike :ref:`ctlike`, the :ref:`cttsmap` tool works either for unbinned,
+   Similar to :ref:`ctlike` the :ref:`cttsmap` tool works either for unbinned,
    binned or stacked analysis. On input it takes either a single event 
    list, a single counts cube, or an observation definition XML file that
    allows a joint analysis of multiple observations.
