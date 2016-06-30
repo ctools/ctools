@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
+from testing import test
 
 
-# ========================== #
+# =========================== #
 # Test class for cttsmap tool #
-# ========================== #
-class Test(gammalib.GPythonTestSuite):
+# =========================== #
+class Test(test):
     """
-    Test class for cttsmap tool.
+    Test class for cttsmap tool
     """
     # Constructor
     def __init__(self):
@@ -36,7 +36,7 @@ class Test(gammalib.GPythonTestSuite):
         Constructor.
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -44,7 +44,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('cttsmap')
@@ -59,13 +59,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test cttsmap on command line
     def _test_cmd(self):
         """
-        Test cttsmap on the command line.
+        Test cttsmap on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README.md'):
-            cttsmap = '../src/cttsmap/cttsmap'
-        else:
-            cttsmap = 'cttsmap'
+        # Set tool name
+        cttsmap = self._tool('cttsmap')
 
         # Setup cttsmap command
         cmd = cttsmap+' inobs="data/crab_events.fits"'+ \
@@ -76,15 +73,13 @@ class Test(gammalib.GPythonTestSuite):
                       ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                       ' logfile="cttsmap_cmd1.log" chatter=1'
 
-        # Execute cttsmap, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful cttsmap execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('cttsmap_cmd1.fits')
@@ -98,15 +93,9 @@ class Test(gammalib.GPythonTestSuite):
                       ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                       ' logfile="cttsmap_cmd2.log" chatter=2'
 
-        # Execute cttsmap, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of cttsmap execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -114,7 +103,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test cttsmap from Python
     def _test_python(self):
         """
-        Test cttsmap from Python.
+        Test cttsmap from Python
         """
         # Set-up cttsmap
         tsmap = ctools.cttsmap()
@@ -148,7 +137,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Open result file
         fits = gammalib.GFits(filename)

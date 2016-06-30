@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ============================ #
 # Test class for csspec script #
 # ============================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csspec script.
+    Test class for csspec script
 
     This test class makes unit tests for the csspec script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,7 +48,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('csspec')
@@ -63,13 +63,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test csspec on command line
     def _test_cmd(self):
         """
-        Test csspec on the command line.
+        Test csspec on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README.md'):
-            csspec = '../cscripts/csspec.py'
-        else:
-            csspec = 'csspec'
+        # Set script name
+        csspec = self._script('csspec')
 
         # Setup csspec command
         cmd = csspec+' inobs="data/crab_events.fits"'+ \
@@ -79,15 +76,13 @@ class Test(gammalib.GPythonTestSuite):
                      ' outfile="csspec_cmd1.fits"'+ \
                      ' logfile="csspec_cmd1.log" chatter=1'
 
-        # Execute csspec, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful csspec execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('csspec_cmd1.fits', 5)
@@ -100,15 +95,9 @@ class Test(gammalib.GPythonTestSuite):
                      ' outfile="csspec_cmd2.fits"'+ \
                      ' logfile="csspec_cmd2.log" chatter=1'
 
-        # Execute csspec, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of csspec execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -116,7 +105,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test csspec from Python
     def _test_python(self):
         """
-        Test csspec from Python.
+        Test csspec from Python
         """
         # Set-up unbinned csspec
         spec = cscripts.csspec()
@@ -170,7 +159,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename, bins):
         """
-        Check result file.
+        Check result file
         """
         # Open result file
         fits = gammalib.GFits(filename)

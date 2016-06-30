@@ -18,25 +18,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
+from testing import test
 
 
 # ============================= #
 # Test class for ctpsfcube tool #
 # ============================= #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for ctpsfcube tool.
+    Test class for ctpsfcube tool
     """
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -44,7 +44,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('ctpsfcube')
@@ -61,11 +61,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctpsfcube on the command line.
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README.md'):
-            ctpsfcube = '../src/ctpsfcube/ctpsfcube'
-        else:
-            ctpsfcube = 'ctpsfcube'
+        # Set tool name
+        ctpsfcube = self._tool('ctpsfcube')
 
         # Setup ctpsfcube command
         cmd = ctpsfcube+' inobs="data/crab_events.fits"'+ \
@@ -78,15 +75,13 @@ class Test(gammalib.GPythonTestSuite):
                         ' amax=0.3 anumbins=10'+ \
                         ' logfile="ctpsfcube_cmd1.log" chatter=1'
 
-        # Execute ctpsfcube, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful ctpsfcube execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('ctpsfcube_cmd1.fits')
@@ -102,15 +97,9 @@ class Test(gammalib.GPythonTestSuite):
                         ' amax=0.3 anumbins=10'+ \
                         ' logfile="ctpsfcube_cmd2.log" chatter=1'
 
-        # Execute ctpsfcube, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of ctpsfcube execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -118,7 +107,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctpsfcube from Python
     def _test_python(self):
         """
-        Test ctpsfcube from Python.
+        Test ctpsfcube from Python
         """
         # Set-up ctpsfcube
         psfcube = ctools.ctpsfcube()
@@ -157,7 +146,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Open result file
         result = gammalib.GCTACubePsf(filename)

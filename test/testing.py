@@ -1,5 +1,5 @@
 # ==========================================================================
-# cscripts test base class
+# Python base class for unit tests
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -21,12 +21,12 @@ import os
 import gammalib
 
 
-# ======================================= #
-# Base class for unit testing of cscripts #
-# ======================================= #
-class cscripts_test(gammalib.GPythonTestSuite):
+# ================================ #
+# Python base class for unit tests #
+# ================================ #
+class test(gammalib.GPythonTestSuite):
     """
-    Test class for scripts
+    Python base class for unit tests
     """
 
     # Constructor
@@ -45,7 +45,7 @@ class cscripts_test(gammalib.GPythonTestSuite):
         """
         Set script name
         """
-        # Kluge to set the command. The installed version has no README file
+        # Kluge to set the command. The installed version has no README.md file
         if os.path.isfile('README.md'):
             script = '../cscripts/'+name+'.py'
         else:
@@ -53,6 +53,20 @@ class cscripts_test(gammalib.GPythonTestSuite):
 
         # Return script name
         return script
+
+    # Set tool name
+    def _tool(self, name):
+        """
+        Set tool name
+        """
+        # Kluge to set the command. The installed version has no README.md file
+        if os.path.isfile('README.md'):
+            tool = '../src/'+name+'/'+name
+        else:
+            tool = name
+
+        # Return tool name
+        return tool
 
     # Execute command and catch any exception
     def _execute(self, cmd):

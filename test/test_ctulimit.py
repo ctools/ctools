@@ -18,25 +18,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
+from testing import test
 
 
 # ============================ #
 # Test class for ctulimit tool #
 # ============================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for ctulimit tool.
+    Test class for ctulimit tool
     """
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -44,7 +44,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('ctulimit')
@@ -59,13 +59,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctulimit on command line
     def _test_cmd(self):
         """
-        Test ctulimit on the command line.
+        Test ctulimit on the command lines
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README.md'):
-            ctulimit = '../src/ctulimit/ctulimit'
-        else:
-            ctulimit = 'ctulimit'
+        # Set tool name
+        ctulimit = self._tool('ctulimit')
 
         # Setup ctulimit command
         cmd = ctulimit+' inobs="data/crab_events.fits"'+ \
@@ -73,15 +70,13 @@ class Test(gammalib.GPythonTestSuite):
                        ' caldb="prod2" irf="South_0.5h"'+ \
                        ' logfile="ctulimit_cmd1.log" chatter=1'
 
-        # Execute ctulimit, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful ctulimit execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('ctulimit_cmd1.log')
@@ -92,15 +87,9 @@ class Test(gammalib.GPythonTestSuite):
                        ' caldb="prod2" irf="South_0.5h"'+ \
                        ' logfile="ctulimit_cmd2.log" chatter=1'
 
-        # Execute ctulimit, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of ctulimit execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -108,7 +97,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctulimit from Python
     def _test_python(self):
         """
-        Test ctulimit from Python.
+        Test ctulimit from Python
         """
         # Set-up ctulimit
         ulimit = ctools.ctulimit()
@@ -134,7 +123,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Return
         return

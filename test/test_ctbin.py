@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
+from testing import test
 
 
 # ========================= #
 # Test class for ctbin tool #
 # ========================= #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for ctbin tool.
+    Test class for ctbin tool
     
     This test class makes unit tests for the ctbin tool by using it from
     the command line and from Python.
@@ -37,13 +37,13 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Set members
-        self._events_name = "data/crab_events.fits"
+        self._events_name = 'data/crab_events.fits'
 
         # Return
         return
@@ -51,14 +51,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("ctbin")
+        self.name('ctbin')
 
         # Append tests
-        self.append(self._test_cmd, "Test ctbin on command line")
-        self.append(self._test_python, "Test ctbin from Python")
+        self.append(self._test_cmd, 'Test ctbin on command line')
+        self.append(self._test_python, 'Test ctbin from Python')
 
         # Return
         return
@@ -66,13 +66,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctbin on command line
     def _test_cmd(self):
         """
-        Test ctbin on the command line.
+        Test ctbin on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README.md"):
-            ctbin = "../src/ctbin/ctbin"
-        else:
-            ctbin = "ctbin"
+        # Set tool name
+        ctbin = self._tool('ctbin')
 
         # Setup ctbin command
         cmd = ctbin+' inobs="'+self._events_name+'"'+ \
@@ -81,18 +78,16 @@ class Test(gammalib.GPythonTestSuite):
                     ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'
 
-        # Execute ctbin, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful ctbin execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Load counts cube and check content.
-        evt = gammalib.GCTAEventCube("cntmap_cmd1.fits")
+        evt = gammalib.GCTAEventCube('cntmap_cmd1.fits')
         self._check_cube(evt, 5542)
 
         # Setup ctbin command
@@ -102,15 +97,9 @@ class Test(gammalib.GPythonTestSuite):
                     ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'
 
-        # Execute ctbin, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of ctbin execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -118,23 +107,23 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctbin from Python
     def _test_python(self):
         """
-        Test ctbin from Python.
+        Test ctbin from Python
         """
         # Set-up ctbin
         bin = ctools.ctbin()
-        bin["inobs"]    = self._events_name
-        bin["outcube"]  = "cntmap.fits"
-        bin["ebinalg"]  = "LOG"
-        bin["emin"]     = 0.1
-        bin["emax"]     = 100.0
-        bin["enumbins"] = 20
-        bin["nxpix"]    = 200
-        bin["nypix"]    = 200
-        bin["binsz"]    = 0.02
-        bin["coordsys"] = "CEL"
-        bin["proj"]     = "CAR"
-        bin["xref"]     = 83.63
-        bin["yref"]     = 22.01
+        bin['inobs']    = self._events_name
+        bin['outcube']  = 'cntmap.fits'
+        bin['ebinalg']  = 'LOG'
+        bin['emin']     = 0.1
+        bin['emax']     = 100.0
+        bin['enumbins'] = 20
+        bin['nxpix']    = 200
+        bin['nypix']    = 200
+        bin['binsz']    = 0.02
+        bin['coordsys'] = 'CEL'
+        bin['proj']     = 'CAR'
+        bin['xref']     = 83.63
+        bin['yref']     = 22.01
 
         # Run ctbin tool
         bin.run()
@@ -160,44 +149,37 @@ class Test(gammalib.GPythonTestSuite):
         self._check_observation(cpy_bin, 0)
         self._check_cube(cpy_bin.cube(), 0)
 
-        # Clear and run copy of ctbin again
-        #cpy_bin.clear()
-        #cpy_bin.run()
-#RuntimeError: *** ERROR in GXmlAttribute::value(std::string): Invalid XML attribute value: *** ERROR in GPythonTestSuite::test: <type 'exceptions.RuntimeError'>
-#*** ERROR in GApplicationPars::operator[](std::string&): Invalid argument. Parameter "debug" has not been found in parameter file.
-#Please specify a valid parameter name.
-
         # Save counts cube
         bin.save()
 
         # Load counts cube and check content.
-        evt = gammalib.GCTAEventCube("cntmap.fits")
+        evt = gammalib.GCTAEventCube('cntmap.fits')
         self._check_cube(evt, 5542)
 
         # Prepare observation container for stacked analysis
         cta = gammalib.GCTAObservation(self._events_name)
         obs = gammalib.GObservations()
-        cta.id("0001")
+        cta.id('0001')
         obs.append(cta)
-        cta.id("0002")
+        cta.id('0002')
         obs.append(cta)
-        cta.id("0003")
+        cta.id('0003')
         obs.append(cta)
 
         # Set-up ctbin using an observation container
         bin = ctools.ctbin(obs)
-        bin["outcube"]  = "cntmap.fits"
-        bin["ebinalg"]  = "LOG"
-        bin["emin"]     = 0.1
-        bin["emax"]     = 100.0
-        bin["enumbins"] = 20
-        bin["nxpix"]    = 200
-        bin["nypix"]    = 200
-        bin["binsz"]    = 0.02
-        bin["coordsys"] = "CEL"
-        bin["proj"]     = "CAR"
-        bin["xref"]     = 83.63
-        bin["yref"]     = 22.01
+        bin['outcube']  = 'cntmap.fits'
+        bin['ebinalg']  = 'LOG'
+        bin['emin']     = 0.1
+        bin['emax']     = 100.0
+        bin['enumbins'] = 20
+        bin['nxpix']    = 200
+        bin['nypix']    = 200
+        bin['binsz']    = 0.02
+        bin['coordsys'] = 'CEL'
+        bin['proj']     = 'CAR'
+        bin['xref']     = 83.63
+        bin['yref']     = 22.01
 
         # Run ctbin tool
         bin.run()
@@ -209,34 +191,25 @@ class Test(gammalib.GPythonTestSuite):
 
         # Set-up ctbin using an observation container
         bin = ctools.ctbin(obs)
-        bin["outcube"]  = "cntmap2.fits"
-        bin["ebinalg"]  = "LOG"
-        bin["emin"]     = 0.1
-        bin["emax"]     = 100.0
-        bin["enumbins"] = 20
-        bin["nxpix"]    = 200
-        bin["nypix"]    = 200
-        bin["binsz"]    = 0.02
-        bin["coordsys"] = "CEL"
-        bin["proj"]     = "CAR"
-        bin["xref"]     = 83.63
-        bin["yref"]     = 22.01
+        bin['outcube']  = 'cntmap2.fits'
+        bin['ebinalg']  = 'LOG'
+        bin['emin']     = 0.1
+        bin['emax']     = 100.0
+        bin['enumbins'] = 20
+        bin['nxpix']    = 200
+        bin['nypix']    = 200
+        bin['binsz']    = 0.02
+        bin['coordsys'] = 'CEL'
+        bin['proj']     = 'CAR'
+        bin['xref']     = 83.63
+        bin['yref']     = 22.01
 
         # Execute ctbin tool
         bin.execute()
 
         # Load counts cube and check content.
-        evt = gammalib.GCTAEventCube("cntmap2.fits")
+        evt = gammalib.GCTAEventCube('cntmap2.fits')
         self._check_cube(evt, 5542, multiplier=3)
-
-        # Clear tool
-        #bin.clear()
-#what():  *** ERROR in GApplicationPars::write(std::string&): Unable to open parameter file "pfiles/".
-
-        # Check content of observation and cube
-        #self.test_value(bin.obs().size(), 0, "There is no observation")
-        #self.test_value(bin.cube().size(), 0, "0 event bins")
-        #self.test_value(bin.cube().number(), 0, "0 events")
 
         # Return
         return
@@ -244,30 +217,32 @@ class Test(gammalib.GPythonTestSuite):
     # Check observation
     def _check_observation(self, ctbin, nevents, multiplier=1):
         """
-        Check content of an observation.
+        Check content of an observation
         
-        Args:
-            ctbin:   ctbin instance
-            nevents: Expected number of events
-
-        Kwargs:
-            multiplier: Observation multiplier
+        Parameters
+        ----------
+        ctbin : `~ctools.ctbin`
+            ctbin instance
+        nevents : int
+            Expected number of events
+        multiplier : float, optional
+            Observation multiplier
         """
         # Test observation container
         obs = gammalib.GCTAObservation(ctbin.obs()[0])
         pnt = obs.pointing()
         self.test_value(ctbin.obs().size(), 1,
-                        "There is one observation")
-        self.test_assert(obs.instrument() == "CTA",
-                        "Observation is CTA observation")
+                        'There is one observation')
+        self.test_assert(obs.instrument() == 'CTA',
+                        'Observation is CTA observation')
         self.test_value(obs.ontime(), 1800.0*multiplier, 1.0e-6,
-                        "Ontime is 1800 sec")
+                        'Ontime is 1800 sec')
         self.test_value(obs.livetime(), 1710.0*multiplier, 1.0e-6,
-                        "Livetime is 1710 sec")
+                        'Livetime is 1710 sec')
         self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6,
-                        "Pointing Right Ascension is 83.63 deg")
+                        'Pointing Right Ascension is 83.63 deg')
         self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6,
-                        "Pointing Declination is 22.01 deg")
+                        'Pointing Declination is 22.01 deg')
 
         # Test event cube
         self._check_cube(obs.events(), nevents, multiplier=multiplier)
@@ -278,19 +253,21 @@ class Test(gammalib.GPythonTestSuite):
     # Check event cube
     def _check_cube(self, cube, nevents, multiplier=1):
         """
-        Check content of event cube."
+        Check content of event cube
         
-        Args:
-            cube:    Event cube
-            nevents: Expected number of events.
-
-        Kwargs:
-            multiplier: Event number multiplier
+        Parameters
+        ----------
+        cube : `~gammalib.GCTAEventCube`
+            Event cube
+        nevents : int
+            Expected number of events
+        multiplier : float
+            Event number multiplier
         """
         # Test event cube
-        self.test_value(cube.size(), 800000, "800000 event bins")
+        self.test_value(cube.size(), 800000, '800000 event bins')
         self.test_value(cube.number(), nevents*multiplier,
-                        str(nevents*multiplier)+" events")
+                        str(nevents*multiplier)+' events')
 
         # Return
         return

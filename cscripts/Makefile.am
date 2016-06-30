@@ -69,8 +69,8 @@ linkscripts = cscaldb \
 
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
 testscripts = tests/__init__.py \
+              ../test/testing.py \
               ../test/test_python_cscripts.py \
-              ../test/test_cscripts_class.py \
               ../test/test_cscaldb.py \
               ../test/test_csmodelinfo.py \
               ../test/test_csmodelmerge.py \

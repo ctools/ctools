@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ================================ #
 # Test class for csiactdata script #
 # ================================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csiactdata script.
+    Test class for csiactdata script
 
     This test class makes unit tests for the csiactdata script by using it
     from the command line and from Python.
@@ -40,7 +40,7 @@ class Test(gammalib.GPythonTestSuite):
         Constructor.
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,14 +48,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("csiactdata")
+        self.name('csiactdata')
 
         # Append tests
-        self.append(self._test_cmd, "Test csiactdata on command line")
-        self.append(self._test_python, "Test csiactdata from Python")
+        self.append(self._test_cmd, 'Test csiactdata on command line')
+        self.append(self._test_python, 'Test csiactdata from Python')
 
         # Return
         return
@@ -63,41 +63,30 @@ class Test(gammalib.GPythonTestSuite):
     # Test csiactdata on command line
     def _test_cmd(self):
         """
-        Test csiactdata on the command line.
+        Test csiactdata on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README.md"):
-            csiactdata = "../cscripts/csiactdata.py"
-        else:
-            csiactdata = "csiactdata"
+        # Set script name
+        csiactdata = self._script('csiactdata')
 
         # Setup csiactdata command
         cmd = csiactdata+' datapath="iactdata"'+ \
                          ' logfile="csiactdata_cmd1.log" chatter=1'
 
-        # Execute csiactdata, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful csiactdata execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Setup csiactdata command
         cmd = csiactdata+' datapath="data_path_that_does_not_exist"'+ \
                          ' logfile="csiactdata_cmd2.log"'
 
-        # Execute csiactdata, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of csiactdata execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -105,13 +94,13 @@ class Test(gammalib.GPythonTestSuite):
     # Test csiactdata from Python
     def _test_python(self):
         """
-        Test csiactdata from Python.
+        Test csiactdata from Python
         """
         # Set-up csiactdata
         iactdata = cscripts.csiactdata()
-        iactdata["datapath"] = "iactdata"
-        iactdata["logfile"]  = "csiactdata_py1.log"
-        iactdata["chatter"]  = 2
+        iactdata['datapath'] = 'iactdata'
+        iactdata['logfile']  = 'csiactdata_py1.log'
+        iactdata['chatter']  = 2
 
         # Run csiactdata script and save run list
         iactdata.logFileOpen()   # Make sure we get a log file

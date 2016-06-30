@@ -31,6 +31,7 @@ if WITH_PYTHON
 
 # Test scripts to be distributed in $(pyexecdir)/ctools/tests
 testscripts = ctools/tests/__init__.py \
+              ../test/testing.py \
               ../test/test_python_ctools.py \
               ../test/test_ctobssim.py \
               ../test/test_ctselect.py \

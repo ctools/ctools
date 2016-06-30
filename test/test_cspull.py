@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ============================ #
 # Test class for cspull script #
 # ============================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for cspull script.
+    Test class for cspull script
 
     This test class makes unit tests for the cspull script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,14 +48,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("cspull")
+        self.name('cspull')
 
         # Append tests
-        self.append(self._test_cmd, "Test cspull on command line")
-        self.append(self._test_python, "Test cspull from Python")
+        self.append(self._test_cmd, 'Test cspull on command line')
+        self.append(self._test_python, 'Test cspull from Python')
 
         # Return
         return
@@ -63,13 +63,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test cspull on command line
     def _test_cmd(self):
         """
-        Test cspull on the command line.
+        Test cspull on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README.md"):
-            cspull = "../cscripts/cspull.py"
-        else:
-            cspull = "cspull"
+        # Set script name
+        cspull = self._script('cspull')
 
         # Setup cspull command
         cmd = cspull+' inmodel="data/crab.xml"'+ \
@@ -80,18 +77,16 @@ class Test(gammalib.GPythonTestSuite):
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd1.log" chatter=1'
 
-        # Execute cspull, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful cspull execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check pull distribution file
-        self._check_pull_file("cspull_cmd1.dat")
+        self._check_pull_file('cspull_cmd1.dat')
 
         # Setup cspull command
         cmd = cspull+' inmodel="model_that_does_not_exist.xml"'+ \
@@ -102,15 +97,9 @@ class Test(gammalib.GPythonTestSuite):
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd2.log"'
 
-        # Execute cspull, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of cspull execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -118,25 +107,25 @@ class Test(gammalib.GPythonTestSuite):
     # Test cspull from Python
     def _test_python(self):
         """
-        Test cspull from Python.
+        Test cspull from Python
         """
         # Set-up unbinned cspull
         pull = cscripts.cspull()
-        pull["inmodel"]  = "data/crab.xml"
-        pull["outfile"]  = "cspull_py1.dat"
-        pull["ntrials"]  = 3
-        pull["caldb"]    = "prod2"
-        pull["irf"]      = "South_0.5h"
-        pull["ra"]       = 83.6331
-        pull["dec"]      = 22.0145
-        pull["emin"]     = 0.1
-        pull["emax"]     = 100.0
-        pull["enumbins"] = 0
-        pull["tmax"]     = 1800.0
-        pull["deadc"]    = 0.95
-        pull["rad"]      = 5.0
-        pull["logfile"]  = "cspull_py1.log"
-        pull["chatter"]  = 2
+        pull['inmodel']  = 'data/crab.xml'
+        pull['outfile']  = 'cspull_py1.dat'
+        pull['ntrials']  = 3
+        pull['caldb']    = 'prod2'
+        pull['irf']      = 'South_0.5h'
+        pull['ra']       = 83.6331
+        pull['dec']      = 22.0145
+        pull['emin']     = 0.1
+        pull['emax']     = 100.0
+        pull['enumbins'] = 0
+        pull['tmax']     = 1800.0
+        pull['deadc']    = 0.95
+        pull['rad']      = 5.0
+        pull['logfile']  = 'cspull_py1.log'
+        pull['chatter']  = 2
 
         # Run cspull script
         pull.logFileOpen()   # Make sure we get a log file
@@ -144,93 +133,93 @@ class Test(gammalib.GPythonTestSuite):
         #pull.save()
 
         # Check pull distribution file
-        self._check_pull_file("cspull_py1.dat")
+        self._check_pull_file('cspull_py1.dat')
 
         # Set-up binned cspull
         pull = cscripts.cspull()
-        pull["inmodel"]  = "data/crab.xml"
-        pull["outfile"]  = "cspull_py2.dat"
-        pull["ntrials"]  = 3
-        pull["caldb"]    = "prod2"
-        pull["irf"]      = "South_0.5h"
-        pull["ra"]       = 83.6331
-        pull["dec"]      = 22.0145
-        pull["emin"]     = 0.1
-        pull["emax"]     = 100.0
-        pull["enumbins"] = 10
-        pull["tmax"]     = 1800.0
-        pull["deadc"]    = 0.95
-        pull["rad"]      = 5.0
-        pull["npix"]     = 100
-        pull["binsz"]    = 0.02
-        pull["coordsys"] = "CEL"
-        pull["proj"]     = "TAN"
-        pull["logfile"]  = "cspull_py2.log"
-        pull["chatter"]  = 3
+        pull['inmodel']  = 'data/crab.xml'
+        pull['outfile']  = 'cspull_py2.dat'
+        pull['ntrials']  = 3
+        pull['caldb']    = 'prod2'
+        pull['irf']      = 'South_0.5h'
+        pull['ra']       = 83.6331
+        pull['dec']      = 22.0145
+        pull['emin']     = 0.1
+        pull['emax']     = 100.0
+        pull['enumbins'] = 10
+        pull['tmax']     = 1800.0
+        pull['deadc']    = 0.95
+        pull['rad']      = 5.0
+        pull['npix']     = 100
+        pull['binsz']    = 0.02
+        pull['coordsys'] = 'CEL'
+        pull['proj']     = 'TAN'
+        pull['logfile']  = 'cspull_py2.log'
+        pull['chatter']  = 3
 
         # Execute cspull script
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file("cspull_py2.dat")
+        self._check_pull_file('cspull_py2.dat')
 
         # Set-up cspull from event list
         pull = cscripts.cspull()
-        pull["inobs"]    = "data/crab_events.fits"
-        pull["inmodel"]  = "data/crab.xml"
-        pull["outfile"]  = "cspull_py3.dat"
-        pull["ntrials"]  = 3
-        pull["caldb"]    = "prod2"
-        pull["irf"]      = "South_0.5h"
-        pull["enumbins"] = 0
-        pull["logfile"]  = "cspull_py3.log"
-        pull["chatter"]  = 4
+        pull['inobs']    = 'data/crab_events.fits'
+        pull['inmodel']  = 'data/crab.xml'
+        pull['outfile']  = 'cspull_py3.dat'
+        pull['ntrials']  = 3
+        pull['caldb']    = 'prod2'
+        pull['irf']      = 'South_0.5h'
+        pull['enumbins'] = 0
+        pull['logfile']  = 'cspull_py3.log'
+        pull['chatter']  = 4
 
         # Execute cspull script
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file("cspull_py3.dat")
+        self._check_pull_file('cspull_py3.dat')
 
         # Build observation container with unbinned observation
-        cta = gammalib.GCTAObservation("data/crab_events.fits")
+        cta = gammalib.GCTAObservation('data/crab_events.fits')
         obs = gammalib.GObservations()
         obs.append(cta)
 
         # Set-up cspull from observation container with unbinned observation
         pull = cscripts.cspull(obs)
-        pull["inmodel"]  = "data/crab.xml"
-        pull["outfile"]  = "cspull_py4.dat"
-        pull["ntrials"]  = 3
-        pull["caldb"]    = "prod2"
-        pull["irf"]      = "South_0.5h"
-        pull["enumbins"] = 0
-        pull["logfile"]  = "cspull_py4.log"
-        pull["chatter"]  = 4
+        pull['inmodel']  = 'data/crab.xml'
+        pull['outfile']  = 'cspull_py4.dat'
+        pull['ntrials']  = 3
+        pull['caldb']    = 'prod2'
+        pull['irf']      = 'South_0.5h'
+        pull['enumbins'] = 0
+        pull['logfile']  = 'cspull_py4.log'
+        pull['chatter']  = 4
 
         # Execute cspull script
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file("cspull_py4.dat")
+        self._check_pull_file('cspull_py4.dat')
 
         # Set-up stacked cspull
         pull = cscripts.cspull()
-        pull["inobs"]    = "data/obs_stacked.xml"
-        pull["inmodel"]  = "data/crab_bkgcube.xml"
-        pull["outfile"]  = "cspull_py5.dat"
-        pull["ntrials"]  = 3
-        pull["caldb"]    = "prod2"
-        pull["irf"]      = "South_0.5h"
-        pull["enumbins"] = 0
-        pull["logfile"]  = "cspull_py5.log"
-        pull["chatter"]  = 4
+        pull['inobs']    = 'data/obs_stacked.xml'
+        pull['inmodel']  = 'data/crab_bkgcube.xml'
+        pull['outfile']  = 'cspull_py5.dat'
+        pull['ntrials']  = 3
+        pull['caldb']    = 'prod2'
+        pull['irf']      = 'South_0.5h'
+        pull['enumbins'] = 0
+        pull['logfile']  = 'cspull_py5.log'
+        pull['chatter']  = 4
 
         # Execute cspull script
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file("cspull_py5.dat")
+        self._check_pull_file('cspull_py5.dat')
 
         # Return
         return
@@ -238,7 +227,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check pull file
     def _check_pull_file(self, filename):
         """
-        Check pull file.
+        Check pull file
         """
         # Open pull file as CSV file
         pulls = gammalib.GCsv(filename)

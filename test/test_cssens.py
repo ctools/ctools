@@ -20,13 +20,13 @@
 # ==========================================================================
 import gammalib
 import cscripts
-import test_cscripts_class
+from testing import test
 
 
 # ============================ #
 # Test class for cssens script #
 # ============================ #
-class Test(test_cscripts_class.cscripts_test):
+class Test(test):
     """
     Test class for cssens script
 
@@ -40,7 +40,7 @@ class Test(test_cscripts_class.cscripts_test):
         Constructor
         """
         # Call base class constructor
-        test_cscripts_class.cscripts_test.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -103,7 +103,7 @@ class Test(test_cscripts_class.cscripts_test):
     # Test cssens from Python
     def _test_python(self):
         """
-        Test cssens from Python.
+        Test cssens from Python
         """
         # Set-up cssens
         sens = cscripts.cssens()
@@ -135,7 +135,7 @@ class Test(test_cscripts_class.cscripts_test):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Open result file as CSV file
         results = gammalib.GCsv(filename, ',')

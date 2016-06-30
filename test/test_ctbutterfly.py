@@ -18,15 +18,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
+from testing import test
 
 
 # =============================== #
 # Test class for ctbutterfly tool #
 # =============================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
     Test class for ctbutterfly tool.
     """
@@ -36,7 +36,7 @@ class Test(gammalib.GPythonTestSuite):
         Constructor.
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -61,11 +61,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test ctbutterfly on the command line.
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README.md'):
-            ctbutterfly = '../src/ctbutterfly/ctbutterfly'
-        else:
-            ctbutterfly = 'ctbutterfly'
+        # Set tool name
+        ctbutterfly = self._tool('ctbutterfly')
 
         # Setup ctbutterfly command
         cmd = ctbutterfly+' inobs="data/crab_events.fits"'+\
@@ -75,15 +72,13 @@ class Test(gammalib.GPythonTestSuite):
                           ' emin=0.1 emax=100.0'+ \
                           ' logfile="ctbutterfly_cmd1.log" chatter=1'
 
-        # Execute ctbutterfly, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful ctbutterfly execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('ctbutterfly_cmd1.txt')
@@ -96,15 +91,9 @@ class Test(gammalib.GPythonTestSuite):
                           ' emin=0.1 emax=100.0'+ \
                           ' logfile="ctbutterfly_cmd2.log" chatter=1'
 
-        # Execute ctbutterfly, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of ctbutterfly execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -112,7 +101,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctbutterfly from Python
     def _test_python(self):
         """
-        Test ctbutterfly from Python.
+        Test ctbutterfly from Python
         """
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
@@ -141,7 +130,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Open result file as CSV file
         results = gammalib.GCsv(filename)

@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ================================ #
 # Test class for cslightcrv script #
 # ================================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for cslightcrv script.
+    Test class for cslightcrv script
 
     This test class makes unit tests for the cslightcrv script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Set members
         self._events_name = 'data/crab_events.fits'
@@ -69,11 +69,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test cslightcrv on the command line.
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README.md'):
-            cslightcrv = '../cscripts/cslightcrv.py'
-        else:
-            cslightcrv = 'cslightcrv'
+        # Set script name
+        cslightcrv = self._script('cslightcrv')
 
         # Setup cslightcrv command
         cmd = cslightcrv+' inobs="'+self._events_name+'"'+ \
@@ -84,15 +81,13 @@ class Test(gammalib.GPythonTestSuite):
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd1.log" chatter=1'
 
-        # Execute cslightcrv, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful cslightcrv execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check light curve
         self._check_light_curve('lightcurve_cmd1.fits', 3)
@@ -106,15 +101,9 @@ class Test(gammalib.GPythonTestSuite):
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd2.log"'
 
-        # Execute cslightcrv, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of cslightcrv execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -122,7 +111,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test cslightcrv from Python
     def _test_python(self):
         """
-        Test cslightcrv from Python.
+        Test cslightcrv from Python
         """
         # Set-up unbinned cslightcrv
         lcrv = cscripts.cslightcrv()
@@ -249,7 +238,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check light curve result file
     def _check_light_curve(self, filename, bins):
         """
-        Check light curve file.
+        Check light curve file
         """
         # Expected column names
         cols = ['MJD', 'e_MJD', 'Prefactor', 'e_Prefactor',
