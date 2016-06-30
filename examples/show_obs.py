@@ -31,43 +31,66 @@ except:
     sys.exit()
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
+# ==================== #
+# Run csobsinfo script #
+# ==================== #
+def run_csobsinfo(filename, ra=None, dec=None, debug=True):
+    """
+    Run csobsinfo script
 
-    # Print help if wrong number of arguments provided
-    if len(sys.argv) < 2:
-        sys.exit('Usage: inspect_obs.py inobs.xml [ra] [dec] [file]')
+    Parameters
+    ----------
+    filename : str
+        File name of observation definition XML file
+    ra : float, optional
+        Target Right Ascension (deg)
+    dec : float, optional
+        Target declination of pointing (deg)
+    debug : bool, optional
+        Switch on debugging in csobsinfo run
 
-    # Check if plotting in file is requested
-    plotfile = ''
-    if len(sys.argv) == 3:
-        plotfile = sys.argv[2]
+    Returns
+    -------
+    info : `~cscripts.csobsinfo`
+        csobsinfo instance
+    """
+    # Get observation definition XML filename
+    obsdef = gammalib.GFilename(filename)
 
-    # Get input observation XML file
-    inobs = gammalib.GFilename(sys.argv[1])
-    
-    # Assert more than one observation (circumvents having a binned
-    # observation without e.g. zenith and azimuth)
-    if inobs.is_fits():
-        raise RuntimeError('Input observation container should be an XML file')
-    
-    # Run csobsinfo
+    # Setup csobsinfo script
     info = cscripts.csobsinfo()
-    info['offset'] = False
-    
-    # Add offset if coordinates are provided
-    if len(sys.argv) == 4:
-        ra  = float(sys.argv[2])
-        dec = float(sys.argv[3])
+    info['inobs'] = obsdef.url()
+    info['debug'] = debug
+
+    # Set offset
+    if ra != None and dec != None:
         info['ra']     = ra
         info['dec']    = dec
         info['offset'] = True
-    info['inobs'] = inobs.url()
-    info['debug'] = True
+    else:
+        info['offset'] = False
+
+    # Run csobsinfo
     info.run()
-    
+
+    # Return
+    return info
+
+
+# ================ #
+# Plot information #
+# ================ #
+def plot_information(info, plotfile=''):
+    """
+    Plot information
+
+    Parameters
+    ----------
+    info : `~cscripts.csobsinfo`
+        csobsinfo instance
+    plotfile : str, optional
+        Plot filename
+    """
     # Retrieve observation info
     zeniths  = info.zeniths()
     azimuths = info.azimuths()
@@ -88,8 +111,8 @@ if __name__ == '__main__':
     zmin = min(zeniths)
     zmax = max(zeniths)
     plt.hist(zeniths, bins=30, range=(zmin, zmax), fc='blue')
-    plt.xlabel('Zenith Angle [deg]')
-    plt.ylabel('Abundance')
+    plt.xlabel('Zenith Angle (deg)')
+    plt.ylabel('Frequency')
     plt.title('Zenith angle distribution')
 
     # Plot azimuth angle distribution
@@ -99,7 +122,7 @@ if __name__ == '__main__':
     amax = max(azimuths)
     plt.hist(azimuths, bins=30, range=(amin, amax), fc='blue')
     plt.xlabel('Azimuth Angle (deg)')
-    plt.ylabel('Abundance')
+    plt.ylabel('Frequency')
     plt.title('Azimuth distribution')
 
     # Plot offset if possible
@@ -110,7 +133,7 @@ if __name__ == '__main__':
         omax = max(offsets)
         plt.hist(offsets, bins=30, range=(omin, omax), fc='blue')
         plt.xlabel('Offset from (RA, DEC)=('+str(ra)+','+str(dec)+') (deg)')
-        plt.ylabel('Abundance')
+        plt.ylabel('Frequency')
         plt.title('Offset distribution')
 
     # Plot energy thresholds if possible
@@ -125,7 +148,7 @@ if __name__ == '__main__':
         plt.hist(emin, bins=80, range=(-1.0, 2.0), fc='red', label='emin')
         plt.hist(emax, bins=80, range=(-1.0, 2.0), fc='blue', label='emax')  
         plt.xlabel('Energy threshold (log10 (E/TeV))')
-        plt.ylabel('Abundance')
+        plt.ylabel('Frequency')
         plt.legend(loc='upper left')
         plt.title('Energy threshold')
 
@@ -146,3 +169,32 @@ if __name__ == '__main__':
         plt.savefig(plotfile)
     else:
         plt.show()
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Print usage message if wrong number of arguments is provided
+    if len(sys.argv) < 2:
+        sys.exit('Usage: inspect_obs.py inobs.xml [ra] [dec] [file]')
+
+    # Extract optional parameters
+    plotfile = ''
+    ra       = None
+    dec      = None
+    if len(sys.argv) == 3:
+        plotfile = sys.argv[2]
+    elif len(sys.argv) == 4:
+        ra  = float(sys.argv[2])
+        dec = float(sys.argv[3])
+
+    # Run csobsinfo
+    info = run_csobsinfo(sys.argv[1], ra=ra, dec=dec)
+
+    # Plot information
+    plot_information(info, plotfile=plotfile)
