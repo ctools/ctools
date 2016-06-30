@@ -108,6 +108,7 @@ class Test(gammalib.GPythonTestSuite):
         self.append(self.test_show_sensitivity, 'Test test_show_sensitivity.py')
         self.append(self.test_show_spectrum, 'Test test_show_spectrum.py')
         self.append(self.test_show_ts_distribution, 'Test show_ts_distribution.py')
+        self.append(self.test_show_obs, 'Test show_obs.py')
 
         # Return
         return
@@ -128,8 +129,6 @@ class Test(gammalib.GPythonTestSuite):
         self._execute_python(script, args='gc', log='make_pointings_gc')
         self._execute_python(script, args='lmc', log='make_pointings_lmc')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -140,8 +139,6 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('generate_prod3_irfs')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -154,8 +151,6 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('make_spectrum', args='eps')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -166,8 +161,6 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('make_ts_distributions', args='-n 2 -e 0 -d 1800')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -180,8 +173,6 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('pipeline_binned_disk')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -192,8 +183,6 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('pipeline_binned_mem')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -206,8 +195,6 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('pipeline_stacked_disk')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -218,8 +205,6 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('pipeline_stacked_mem')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -232,8 +217,6 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('pipeline_unbinned_disk')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -244,8 +227,6 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('pipeline_unbinned_mem')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -260,8 +241,6 @@ class Test(gammalib.GPythonTestSuite):
                              args='data/butterfly.txt '
                                   'example_show_butterfly.eps')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -274,8 +253,6 @@ class Test(gammalib.GPythonTestSuite):
         self._execute_python('show_model',
                              args='data/crab.xml Crab example_show_model.eps')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -287,8 +264,6 @@ class Test(gammalib.GPythonTestSuite):
         # Execute script
         self._execute_python('show_pha',
                              args='data/pha.fits example_show_pha.eps')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -303,8 +278,6 @@ class Test(gammalib.GPythonTestSuite):
                              args='data/pull.dat Pull_Crab_Prefactor '
                                   'example_show_pull_evolution.eps')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -318,8 +291,6 @@ class Test(gammalib.GPythonTestSuite):
                              args='data/pull.dat Pull_Crab_Prefactor 50 '
                                   'example_show_pull_histogram.eps')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -330,8 +301,6 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_response', args='example_show_response.eps')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -346,8 +315,6 @@ class Test(gammalib.GPythonTestSuite):
                              args='data/sensitivity.dat '
                                   'example_show_sensitivity.eps')
 
-        #TODO: Do any testing
-
         # Return
         return
 
@@ -360,8 +327,6 @@ class Test(gammalib.GPythonTestSuite):
         self._execute_python('show_spectrum',
                              args='data/spectrum.fits '
                                   'example_show_spectrum.eps')
-
-        #TODO: Do any testing
 
         # Return
         return
@@ -376,7 +341,17 @@ class Test(gammalib.GPythonTestSuite):
                              args='data/ts.dat -n 100 '
                                   '-f example_show_ts_distribution.eps')
 
-        #TODO: Do any testing
+        # Return
+        return
+
+    # Test show_obs
+    def test_show_obs(self):
+        """
+        Test show_obs
+        """
+        # Execute script
+        self._execute_python('show_obs',
+                             args='obs_selected.xml example_show_obs.jpg')
 
         # Return
         return
