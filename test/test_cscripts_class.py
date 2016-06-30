@@ -34,6 +34,9 @@ class cscripts_test(gammalib.GPythonTestSuite):
         """
         Constructor
         """
+        # Call base class constructor
+        gammalib.GPythonTestSuite.__init__(self)
+
         # Return
         return
 
@@ -49,7 +52,7 @@ class cscripts_test(gammalib.GPythonTestSuite):
             script = name
 
         # Return script name
-        return name
+        return script
 
     # Execute command and catch any exception
     def _execute(self, cmd):

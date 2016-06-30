@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
 import test_cscripts_class
@@ -40,9 +39,6 @@ class Test(test_cscripts_class.cscripts_test):
         """
         Constructor
         """
-        # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
-
         # Return
         return
 
