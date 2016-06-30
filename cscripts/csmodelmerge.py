@@ -18,10 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
 import glob
+import gammalib
+import ctools
 
 
 # ================== #
@@ -29,7 +29,7 @@ import glob
 # ================== #
 class csmodelmerge(ctools.cscript):
     """
-    Merge model definition XML files.
+    Merge model definition XML files
 
     An arbitrary number of model definition XML files will be merged into
     a single model definition XML file.    
@@ -41,8 +41,8 @@ class csmodelmerge(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name    = "csmodelmerge"
-        self._version = "1.1.0"
+        self._name    = 'csmodelmerge'
+        self._version = '1.1.0'
 
         # Initialise class members
         self._files      = None
@@ -59,45 +59,45 @@ class csmodelmerge(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile.
+        Get parameters from parfile
         """
         # Get input models string
-        inmodels = self["inmodels"].string()
+        inmodels = self['inmodels'].string()
         
         # Handle ascii files
-        if "@" == inmodels[0]:
-            self._files = open(inmodels.replace("@","")).read().splitlines()  
+        if '@' == inmodels[0]:
+            self._files = open(inmodels.replace('@','')).read().splitlines()
             
         # Handle wild card strings
-        elif "*" in inmodels:
+        elif '*' in inmodels:
             self._files = glob.glob(inmodels)
         
         # Handle space separated list
-        elif " " in inmodels:
-            self._files = inmodels.split(" ")
+        elif ' ' in inmodels:
+            self._files = inmodels.split(' ')
         
         # Handle semi-colon separated list
-        elif ";" in inmodels:
-            self._files = inmodels.split(";")
+        elif ';' in inmodels:
+            self._files = inmodels.split(';')
             
         # Throw exception if input models cannot be decoded
         else:
-            msg = "Parameter \"inmodels\" must contain either an @ASCII "\
-                  "file, a semi-colon-separated or whitespace-separated "\
-                  "list of files or a wildcard string."
-            raise RuntimeError(msg) 
+            msg = 'Parameter "inmodels" must contain either an @ASCII '\
+                  'file, a semi-colon-separated or whitespace-separated '\
+                  'list of files or a wildcard string.'
+            raise RuntimeError(msg)
         
         # Read ahead output filename
         if self._read_ahead():
-            self["outmodel"].filename()
+            self['outmodel'].filename()
             
         # Get clobber parameter
-        self._clobber = self["clobber"].boolean()
+        self._clobber = self['clobber'].boolean()
 
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
@@ -106,7 +106,7 @@ class csmodelmerge(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -117,8 +117,8 @@ class csmodelmerge(ctools.cscript):
         
         # Write header
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Merge models")
+            self._log('\n')
+            self._log.header1('Merge models')
 
         # Initialise model container
         self._models = gammalib.GModels()
@@ -133,23 +133,23 @@ class csmodelmerge(ctools.cscript):
             if self._logTerse():
                 nmodels = models.size()
                 if nmodels == 0:
-                    self._log(gammalib.parformat("Add no model from file"))
+                    self._log(gammalib.parformat('Add no model from file'))
                 elif nmodels == 1:
-                    self._log(gammalib.parformat("Add 1 model from file"))
+                    self._log(gammalib.parformat('Add 1 model from file'))
                 else:
-                    self._log(gammalib.parformat("Add %d models from file" % 
+                    self._log(gammalib.parformat('Add %d models from file' %
                                                  nmodels))
                 self._log(file_)
-                self._log("\n")
+                self._log('\n')
             
             # Extend model container by adding all models in the model file
             self._models.extend(models)
                 
         # Log total number of models
         if self._logTerse():
-            self._log(gammalib.parformat("Models after merging"))
+            self._log(gammalib.parformat('Models after merging'))
             self._log(self._models.size())
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
@@ -160,29 +160,25 @@ class csmodelmerge(ctools.cscript):
         """
         # Write header
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save models")
+            self._log('\n')
+            self._log.header1('Save models')
 
         # Get output filename in case it was not read ahead
-        outmodel = self["outmodel"].filename()
+        outmodel = self['outmodel'].filename()
         
-        # Check if file exists and apply clobber if false
+        # If file exists and clobber flag is false then raise an exception
         if outmodel.exists() and not self._clobber:
-            
-            # Set error message
-            msg = "Cannot save \""+outmodel.url()+"\": File already exists "
-            msg += "Use parameter clobber=yes to allow overwriting of files."
-                        
-            # Throw exception since file cannnot be overwritten
+            msg = 'Cannot save ""+outmodel.url()+"": File already exists. '\
+                  'Use parameter clobber=yes to allow overwriting of files.'
             raise RuntimeError(msg)
         
         else:
             
             # Log filename
             if self._logTerse():
-                self._log(gammalib.parformat("Model definition XML file"))
+                self._log(gammalib.parformat('Model definition XML file'))
                 self._log(outmodel.url())
-                self._log("\n")
+                self._log('\n')
     
             # Save models
             self._models.save(outmodel)
@@ -192,7 +188,7 @@ class csmodelmerge(ctools.cscript):
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

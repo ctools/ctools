@@ -18,11 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
 import os
 import json
+import gammalib
+import ctools
 
 
 # =============== #
@@ -145,7 +145,7 @@ class csfindobs(ctools.cscript):
         if not filename.is_fits():
             raise RuntimeError('Observation index file "'+
                                self._obs_index+
-                               '"[OBS_INDEX]" for FITS data store "'+
+                               '[OBS_INDEX]" for FITS data store "'+
                                self._prodname+
                                '" not available. Check your master index '+
                                'file or run csiactdata to get a list of '+

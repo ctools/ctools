@@ -18,19 +18,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
 import os
 import json
 import shutil
+import gammalib
+import ctools
 
 # ================ #
 # csiactdata class #
 # ================ #
 class csiactcopy(ctools.cscript):
     """
-    Copies IACT data from remote machine.
+    Copies IACT data from remote machine
     
     This script copies IACT data from one location to another. It can
     take a list of observation IDs to allow the download specific
@@ -64,7 +64,7 @@ class csiactcopy(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile and setup the observation.
+        Get parameters from parfile and setup the observation
         """
         
         # Get Parameters
@@ -134,7 +134,7 @@ class csiactcopy(ctools.cscript):
             
         else:  
             # Create directory if not existent
-            dest_dir = os.path.dirname(destination)         
+            dest_dir = os.path.dirname(destination)
             if not os.path.isdir(dest_dir):
                 os.makedirs(dest_dir)
             
@@ -154,8 +154,9 @@ class csiactcopy(ctools.cscript):
 
     def _merge(self, localfits, remotefits, hduname, clobber):
         """
-        merge remote and local fits file
-        If local fits file not present, a new one is created
+        Merge remote and local fits files
+        
+        If the local fits file is not present, a new one is created.
         """    
         
         if self._logTerse():
@@ -216,8 +217,8 @@ class csiactcopy(ctools.cscript):
             # Create file name
             remotefile = remotefits + selection
             
-            # open remote fits file
-            remote     = gammalib.GFits(str(remotefile))
+            # Open remote fits file
+            remote = gammalib.GFits(str(remotefile))
             
             # If first iteration, create clone of FITS column for later use
             if i == 0:
@@ -236,7 +237,7 @@ class csiactcopy(ctools.cscript):
                 # Loop over rows and columns to copy over values exteding remote HDU
                 for col in tmp_hdu:
                     for row in range(col.length()):
-                        remote_hdu[col.name()][size + row] = col[row]                
+                        remote_hdu[col.name()][size + row] = col[row]
 
         # Get remote obs_id
         remote_obs = []
@@ -472,14 +473,14 @@ class csiactcopy(ctools.cscript):
                 for row in range(table.nrows()):
                     
                     # Get observation ID
-                    obs_id    = table['OBS_ID'][row]   
-                    file_dir  = table['FILE_DIR'][row]              
-                    file_name = table['FILE_NAME'][row] 
+                    obs_id    = table['OBS_ID'][row]
+                    file_dir  = table['FILE_DIR'][row]
+                    file_name = table['FILE_NAME'][row]
                     
                     # Skip if filename is empty
                     if file_name == '':
                         continue
-                                        
+                    
                     # Check if we need to consider an input runlist
                     if len(self._runs):
                         
@@ -499,7 +500,7 @@ class csiactcopy(ctools.cscript):
                             if has_size and newlen > oldlen:
                                 cp_size += table['SIZE'][row]
                         
-                    # Otherwise add every file       
+                    # Otherwise add every file
                     else:
                         # Get filename
                         fname = os.path.join(os.path.dirname(remote_hdu),
@@ -531,7 +532,7 @@ class csiactcopy(ctools.cscript):
                     for filename in files:
                         self._log(str(filename)+'\n')
                 
-                # Close HDU index file         
+                # Close HDU index file
                 fits.close()
                 
             # If prodname is not found just log that we skip the config
@@ -541,15 +542,15 @@ class csiactcopy(ctools.cscript):
                     self._log.header3('Skipping config "'+
                                       str(config['name'])+'"')
                     self._log('\n')
-                    
-        # Raise Exception if prodname was not found                                    
+        
+        # Raise Exception if prodname was not found
         if not has_prod: 
             msg = '*** ERROR: FITS production "'+self._prodname+'" not '
             msg += 'available. Available productions are:\n'
             for config in configs:
                 msg += ' - '+config['name']+'\n'
             raise RuntimeError(msg)
-                
+
         # Logging
         if self._logNormal():
             self._log('\n')
@@ -624,7 +625,7 @@ class csiactcopy(ctools.cscript):
             
             if self._logTerse():
                 self._log('\n')
-                self._log.header3('OBS index')    
+                self._log.header3('OBS index')
                 
             # Merge remote index files with local files
             self._merge(local_obs, remote_obs, 'OBS_INDEX', self._clobber())
@@ -678,7 +679,7 @@ class csiactcopy(ctools.cscript):
                     self._log('Keeping "'+str(config['name'])+'"')
                     self._log('\n')
             
-            # Signals that downloaded config is available          
+            # Signals that downloaded config is available
             if config['name'] == self._prodname:
                 has_config = True
         
@@ -697,7 +698,7 @@ class csiactcopy(ctools.cscript):
         f = open(localmaster, 'w')
         data['datasets'] = newconfigs
         json.dump(data, f, indent=2)
-        f.close()        
+        f.close()
 
         # Log summary
         if self._logNormal():

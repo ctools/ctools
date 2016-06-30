@@ -18,11 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
 import os
 import json
+import gammalib
+import ctools
 
 
 # =============== #
@@ -30,7 +30,7 @@ import json
 # =============== #
 class csiactobs(ctools.cscript):
     """
-    Generates an IACT observation definition XML file.
+    Generates an IACT observation definition XML file
     
     This class implements the creation of a observation xml file for IACT
     data analysis. This class is dedicated for use inside a IACT
@@ -143,8 +143,8 @@ class csiactobs(ctools.cscript):
         self._ev_hiera      = self['ev_hiera'].string().split('|')
         self._aeff_hiera    = self['aeff_hiera'].string().split('|')
         self._psf_hiera     = self['psf_hiera'].string().split('|')
-        self._bkg_hiera     = self['bkg_hiera'].string().split('|')  
-        self._edisp_hiera   = self['edisp_hiera'].string().split('|') 
+        self._bkg_hiera     = self['bkg_hiera'].string().split('|')
+        self._edisp_hiera   = self['edisp_hiera'].string().split('|')
         self._bkg_mod_hiera = self['bkg_mod_hiera'].string().split('|')
         
         # Read hidden background parameters
@@ -264,7 +264,7 @@ class csiactobs(ctools.cscript):
                     spec[1].fix()
                 else:
                     spec[0].free()
-                    spec[1].free()           
+                    spec[1].free()
             
             else:
                 
@@ -319,7 +319,8 @@ class csiactobs(ctools.cscript):
             bck       = gammalib.GCTAModelRadialAcceptance(radial, spec)
         
         else:
-            sys.exit('Background type "'+self._bkgtype+'" unsupported')
+            msg = 'Background type "'+self._bkgtype+'" unsupported'
+            raise RuntimeError(msg)
         
         # Copy model
         model = bck.clone()
@@ -366,7 +367,7 @@ class csiactobs(ctools.cscript):
             self._log.header1('Looping over '+str(len(self._runlist))+' runs')
 
         # Initialise energy range values for logging
-        self._ebounds.clear()        
+        self._ebounds.clear()
 
         # Loop over runs
         for obs_id in self._runlist:
@@ -396,12 +397,15 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                eventfile  = os.path.join(self._subdir, hduindx_hdu['FILE_DIR'][index], hduindx_hdu['FILE_NAME'][index])
+                eventfile  = os.path.join(self._subdir,
+                                          hduindx_hdu['FILE_DIR'][index],
+                                          hduindx_hdu['FILE_NAME'][index])
                 eventhdu   = hduindx_hdu['HDU_NAME'][index]
                 eventfile += '['+eventhdu+']'
             if not gammalib.GFilename(eventfile).is_fits():
                 if self._logTerse():
-                    self._log('Skipping observation '+str(obs_id)+': eventfile "'+eventfile+'" not found\n')
+                    self._log('Skipping observation '+str(obs_id)+
+                              ': eventfile "'+eventfile+'" not found\n')
                 continue
             
             # Handle Aeff
@@ -412,12 +416,15 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                aefffile  = os.path.join(self._subdir, hduindx_hdu['FILE_DIR'][index], hduindx_hdu['FILE_NAME'][index])
+                aefffile  = os.path.join(self._subdir,
+                                         hduindx_hdu['FILE_DIR'][index],
+                                         hduindx_hdu['FILE_NAME'][index])
                 aeffhdu   = hduindx_hdu['HDU_NAME'][index]
                 aefffile += '['+aeffhdu+']'
             if not gammalib.GFilename(aefffile).is_fits():
                 if self._logTerse():
-                    self._log('Skipping observation '+str(obs_id)+': effective area "'+aefffile+'" not found\n')
+                    self._log('Skipping observation '+str(obs_id)+
+                              ': effective area "'+aefffile+'" not found\n')
                 continue
                                 
             # Handle psf
@@ -428,11 +435,15 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                psffile  = os.path.join(self._subdir, hduindx_hdu['FILE_DIR'][index], hduindx_hdu['FILE_NAME'][index])
+                psffile  = os.path.join(self._subdir,
+                                        hduindx_hdu['FILE_DIR'][index],
+                                        hduindx_hdu['FILE_NAME'][index])
                 psffile += '['+hduindx_hdu['HDU_NAME'][index]+']'
             if not gammalib.GFilename(psffile).is_fits():
                 if self._logTerse():
-                    self._log('Skipping observation '+str(obs_id)+': point spread function "'+psffile+'" not found\n')
+                    self._log('Skipping observation '+str(obs_id)+
+                              ': point spread function "'+psffile+
+                              '" not found\n')
                 continue
                 
             # Handle edisp
@@ -443,11 +454,15 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                edispfile  = os.path.join(self._subdir, hduindx_hdu['FILE_DIR'][index], hduindx_hdu['FILE_NAME'][index])   
+                edispfile  = os.path.join(self._subdir,
+                                          hduindx_hdu['FILE_DIR'][index],
+                                          hduindx_hdu['FILE_NAME'][index])
                 edispfile += '['+hduindx_hdu['HDU_NAME'][index]+']'
             if not gammalib.GFilename(edispfile).is_fits():
                 if self._logTerse():
-                    self._log('Warning: observation '+str(obs_id)+' has no energy dispersion "'+edispfile+'" information\n')
+                    self._log('Warning: observation '+str(obs_id)+
+                              ' has no energy dispersion "'+edispfile+
+                              '" information\n')
                     edispfile = ''
                 
             # Handle background
@@ -459,20 +474,27 @@ class csiactobs(ctools.cscript):
                     index = formats.index(version)
                     break
             if index >= 0:
-                bkgfile  = os.path.join(self._subdir, hduindx_hdu['FILE_DIR'][index], hduindx_hdu['FILE_NAME'][index])    
+                bkgfile  = os.path.join(self._subdir,
+                                        hduindx_hdu['FILE_DIR'][index],
+                                        hduindx_hdu['FILE_NAME'][index])
                 bkgfile += '['+hduindx_hdu['HDU_NAME'][index]+']'
             if 'irf' in bkg_mod_hierarchy and not gammalib.GFilename(bkgfile).is_fits():
                 bkg_mod_hierarchy.remove('irf')
                 if self._logTerse():
-                    self._log('Warning: observation '+str(obs_id)+' has no background information (file="'+bkgfile+'"). IRF background cannot be used\n')
+                    self._log('Warning: observation '+str(obs_id)+
+                              ' has no background information (file="'+
+                              bkgfile+'"). IRF background cannot be used\n')
                     bkgfile = ''       
                     if len(bkg_mod_hierarchy) == 0:
                         if self._logTerse():
-                            self._log('Skipping observation '+str(obs_id)+': No background can be used\n')
+                            self._log('Skipping observation '+str(obs_id)+
+                                      ': No background can be used\n')
                         continue
                     else:
                         if self._logTerse():
-                            self._log('Observation '+str(obs_id)+': Falling back to background "'+bkg_mod_hierarchy[0]+'"\n')
+                            self._log('Observation '+str(obs_id)+
+                                      ': Falling back to background "'+
+                                      bkg_mod_hierarchy[0]+'"\n')
 
             # Close hdu index file
             hduindx.close()
@@ -480,15 +502,15 @@ class csiactobs(ctools.cscript):
             # Handle background scale information if available
             bkg_scale = 1.0
             if self._use_bkg_scale:
-                obsindx = gammalib.GFits(self._obs_index+'[OBS_INDEX]'+obs_selection)
+                obsindx   = gammalib.GFits(self._obs_index+'[OBS_INDEX]'+obs_selection)
                 bkg_scale = obsindx['OBS_INDEX']['BKG_SCALE'][0]
                 obsindx.close()
             
             # Open fits file to determine the observation name
-            fits = gammalib.GFits(eventfile)  
-            events = fits[eventhdu]      
+            fits        = gammalib.GFits(eventfile)
+            events      = fits[eventhdu]
             object_name = events.string('OBJECT')
-            telescope = events.string('TELESCOP')
+            telescope   = events.string('TELESCOP')
 
             # Close FITS file
             fits.close()
@@ -516,11 +538,17 @@ class csiactobs(ctools.cscript):
             aeff_fits.close()     
             
             # Append instrumental background model
-            self._models.append(self._iact_background(telescope, obs_id, bkg_scale, bkg_mod_hierarchy[0], run_emin.TeV(), run_emax.TeV()))
+            self._models.append(self._iact_background(telescope,
+                                                      obs_id,
+                                                      bkg_scale,
+                                                      bkg_mod_hierarchy[0],
+                                                      run_emin.TeV(),
+                                                      run_emax.TeV()))
 
             # Logging
             if self._logTerse():
-                self._log('Adding observation '+str(obs_id)+' ("'+object_name+'")\n')
+                self._log('Adding observation '+str(obs_id)+
+                          ' ("'+object_name+'")\n')
 
             if self._logExplicit():
                 self._log(' Event file: '+eventfile+'\n')
@@ -606,7 +634,7 @@ class csiactobs(ctools.cscript):
     
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()
@@ -621,7 +649,9 @@ class csiactobs(ctools.cscript):
         return
 
     def save(self):
-
+        """
+        Save model definition XML file
+        """
         # Save observation XML file
         self._xml.save(self._outobs)
 
@@ -633,8 +663,9 @@ class csiactobs(ctools.cscript):
 
     def ebounds(self):
         """
-        Returns runlist energy range
+        Return runlist energy boundaries
         """
+        # Return energy boundaries
         return self._ebounds
     
     def obs(self):
