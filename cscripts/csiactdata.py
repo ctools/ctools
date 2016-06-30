@@ -18,11 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
 import os
 import json
+import gammalib
+import ctools
 
 
 # ================ #
@@ -30,7 +30,7 @@ import json
 # ================ #
 class csiactdata(ctools.cscript):
     """
-    Inspect an IACT data storage.
+    Inspect an IACT data storage
     
     This script inspects the available FITS data storage on the user machine
     and writes information about the available FITS configurations into a log
@@ -44,12 +44,12 @@ class csiactdata(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name        = "csiactdata"
-        self._version     = "1.1.0"
-        self._datapath    = os.getenv("VHEFITS","")
+        self._name        = 'csiactdata'
+        self._version     = '1.1.0'
+        self._datapath    = os.getenv('VHEFITS','')
         self._prodnames   = []
-        self._master_indx = ""
-        self._master_file = ""
+        self._master_indx = ''
+        self._master_file = ''
 
         # Initialise application by calling the appropriate class
         # constructor.
@@ -62,18 +62,18 @@ class csiactdata(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile and setup the observation.
+        Get parameters from parfile and setup the observation
         """
         
         # Get datapath if not already set
-        if self._datapath == "":
-            self._datapath = self["datapath"].string()
+        if self._datapath == '':
+            self._datapath = self['datapath'].string()
         
         # Expand environment
         self._datapath = gammalib.expand_env(self._datapath)
         
         # Get filename of master index file
-        self._master_indx = self["master_indx"].string()
+        self._master_indx = self['master_indx'].string()
         self._master_file = os.path.join(self._datapath, self._master_indx)
         
         # Check for presence of master index file
@@ -86,7 +86,7 @@ class csiactdata(ctools.cscript):
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
         
         # Return
         return
@@ -94,28 +94,28 @@ class csiactdata(ctools.cscript):
     # Log configuration
     def _log_configuration(self, config):
         """
-        Log configuration.
+        Log configuration
         """
         # Log information
         if self._logTerse():
-            self._log.header3(str(config["name"]))
-            self._log.parformat("Name")
-            self._log(str(config["name"]))
-            self._log("\n")  
-            self._log.parformat("Observation index")
-            self._log(str(config["obsindx"]))
-            self._log("\n") 
-            self._log.parformat("HDU index")
-            self._log(str(config["hduindx"]))
-            self._log("\n") 
+            self._log.header3(str(config['name']))
+            self._log.parformat('Name')
+            self._log(str(config['name']))
+            self._log('\n')
+            self._log.parformat('Observation index')
+            self._log(str(config['obsindx']))
+            self._log('\n')
+            self._log.parformat('HDU index')
+            self._log(str(config['hduindx']))
+            self._log('\n')
                 
             # Print additional information
             for key in config:
-                if key in ["name","hduindx","obsindx"]:
+                if key in ['name','hduindx','obsindx']:
                     continue
                 self._log.parformat(str(key))
                 self._log(str(config[key]))
-                self._log("\n")  
+                self._log('\n')
 
         # Return
         return
@@ -124,7 +124,7 @@ class csiactdata(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -135,39 +135,39 @@ class csiactdata(ctools.cscript):
 
         # Write header into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Data storage entries")
-            self._log.parformat("Master index file")
+            self._log('\n')
+            self._log.header1('Data storage entries')
+            self._log.parformat('Master index file')
             self._log(self._master_file)
-            self._log("\n")
+            self._log('\n')
         
         # Open and load JSON file
         json_data = open(self._master_file).read()
         data      = json.loads(json_data)    
-        configs   = data["datasets"]
+        configs   = data['datasets']
         
         # Initialise array for available names
         self._prodnames = []
 
         # Write header into logger
-        self._log("\n")
-        self._log.header2("Available data configs")
+        self._log('\n')
+        self._log.header2('Available data configs')
         
         # Loop over configs and log available configs       
         for config in configs:       
             
             # Create hdu and obs index files
-            hdu          = os.path.join(self._datapath, config["hduindx"])
-            obs          = os.path.join(self._datapath, config["obsindx"])
-            filename_hdu = gammalib.GFilename(str(hdu)+"[HDU_INDEX]")
-            filename_obs = gammalib.GFilename(str(obs)+"[OBS_INDEX]")
+            hdu          = os.path.join(self._datapath, config['hduindx'])
+            obs          = os.path.join(self._datapath, config['obsindx'])
+            filename_hdu = gammalib.GFilename(str(hdu)+'[HDU_INDEX]')
+            filename_obs = gammalib.GFilename(str(obs)+'[OBS_INDEX]')
             
             # If index files are available then log configuration
             # information ...
             if (filename_hdu.is_fits() and filename_obs.is_fits()):
 
                 # Append to available names
-                self._prodnames.append(str(config["name"]))
+                self._prodnames.append(str(config['name']))
                 
                 # Log information
                 self._log_configuration(config)
@@ -175,15 +175,15 @@ class csiactdata(ctools.cscript):
             # ... otherwise log that the configuration is not available
             else:
                 if self._logTerse():
-                    self._log.header3(str(config["name"]))
-                    self._log(" Not available\n")
+                    self._log.header3(str(config['name']))
+                    self._log(' Not available\n')
 
         # Return
         return       
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()
@@ -198,11 +198,12 @@ class csiactdata(ctools.cscript):
         """ 
         Return available FITS production names
         
-        Returns:
+        Returns
+        -------
+        names : list of str
             List of available FITS production names.
         """
-        
-        # Return 
+        # Return
         return self._prodnames
 
 
