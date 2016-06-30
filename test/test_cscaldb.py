@@ -20,13 +20,13 @@
 # ==========================================================================
 import gammalib
 import cscripts
-import test_cscripts_class
+from testing import test
 
 
 # ============================= #
 # Test class for cscaldb script #
 # ============================= #
-class Test(test_cscripts_class.cscripts_test):
+class Test(test):
     """
     Test class for cscaldb script
 
@@ -40,7 +40,7 @@ class Test(test_cscripts_class.cscripts_test):
         Constructor.
         """
         # Call base class constructor
-        test_cscripts_class.cscripts_test.__init__(self)
+        test.__init__(self)
 
         # Return
         return
