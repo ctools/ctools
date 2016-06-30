@@ -2,9 +2,6 @@
 # ==========================================================================
 # Display summary of observation definition XML file
 #
-# Required 3rd party modules:
-# - matplotlib
-#
 # Copyright (C) 2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
@@ -40,17 +37,14 @@ except:
 if __name__ == '__main__':
 
     # Print help if wrong number of arguments provided
-    if not len(sys.argv) > 1:
-        msg = 'Usage: inspect_obs.py <inobs.xml> <ra> <dec>\n'
-        msg += 'or\n'
-        msg += 'inspect_obs.py <inobs.xml>'
-        sys.exit(msg)
-        
-    # Initialise flag if plots should be shown or saved
-    save = False
-    if 'save' in sys.argv:
-        save = True
-        
+    if len(sys.argv) < 2:
+        sys.exit('Usage: inspect_obs.py inobs.xml [ra] [dec] [file]')
+
+    # Check if plotting in file is requested
+    plotfile = ''
+    if len(sys.argv) == 3:
+        plotfile = sys.argv[2]
+
     # Get input observation XML file
     inobs = gammalib.GFilename(sys.argv[1])
     
@@ -65,10 +59,10 @@ if __name__ == '__main__':
     
     # Add offset if coordinates are provided
     if len(sys.argv) == 4:
-        ra = float(sys.argv[2])
+        ra  = float(sys.argv[2])
         dec = float(sys.argv[3])
-        info['ra'] = ra
-        info['dec'] = dec
+        info['ra']     = ra
+        info['dec']    = dec
         info['offset'] = True
     info['inobs'] = inobs.url()
     info['debug'] = True
@@ -80,61 +74,64 @@ if __name__ == '__main__':
     offsets  = info.offsets()
     ebounds  = info.ebounds()
     gti      = info.gti()
-    
-    # Plot zenith angle distribution
+
+    # Create figure with subplots
+    nrows = 2
+    ncols = 2
+    if info['offset'].boolean() and ebounds.size() > 0:
+        ncols += 1
+    iplot = 1
     plt.figure()
+    plt.subplot(nrows, ncols, iplot)
+
+    # Plot zenith angle distribution
     zmin = min(zeniths)
     zmax = max(zeniths)
     plt.hist(zeniths, bins=30, range=(zmin, zmax), fc='blue')
     plt.xlabel('Zenith Angle [deg]')
     plt.ylabel('Abundance')
     plt.title('Zenith angle distribution')
-    if save:
-        plt.savefig('Zenith angle distribution.eps')
-    
+
     # Plot azimuth angle distribution
-    plt.figure()
+    iplot += 1
+    plt.subplot(nrows, ncols, iplot)
     amin = min(azimuths)
     amax = max(azimuths)
     plt.hist(azimuths, bins=30, range=(amin, amax), fc='blue')
     plt.xlabel('Azimuth Angle (deg)')
     plt.ylabel('Abundance')
     plt.title('Azimuth distribution')
-    if save:
-        plt.savefig('Azimuth distribution.eps')
-    
+
     # Plot offset if possible
     if info['offset'].boolean():
-        plt.figure()
+        iplot += 1
+        plt.subplot(nrows, ncols, iplot)
         omin = min(offsets)
         omax = max(offsets)
         plt.hist(offsets, bins=30, range=(omin, omax), fc='blue')
         plt.xlabel('Offset from (RA, DEC)=('+str(ra)+','+str(dec)+') (deg)')
         plt.ylabel('Abundance')
         plt.title('Offset distribution')
-        if save:
-            plt.savefig('Offset distribution.eps')
-    
+
     # Plot energy thresholds if possible
-    if ebounds.size():
-        
+    if ebounds.size() > 0:
         emin = []
         emax = []
         for i in range(ebounds.size()):
             emin.append(ebounds.emin(i).log10TeV())
             emax.append(ebounds.emax(i).log10TeV())
-        plt.figure()
+        iplot += 1
+        plt.subplot(nrows, ncols, iplot)
         plt.hist(emin, bins=80, range=(-1.0, 2.0), fc='red', label='emin')
         plt.hist(emax, bins=80, range=(-1.0, 2.0), fc='blue', label='emax')  
         plt.xlabel('Energy threshold (log10 (E/TeV))')
         plt.ylabel('Abundance')
         plt.legend(loc='upper left')
         plt.title('Energy threshold')
-        if save:
-            plt.savefig('Energy threshold.eps')
-    
+
     # Plot observation point in time wrt zenith angle
-    plt.figure()
+    iplot += 1
+    plt.subplot(nrows, ncols, iplot)
     times = []
     for i in range(gti.size()):
         tmean = gti.tstart(i) + 0.5*(gti.tstart(i)-gti.tstart(i))
@@ -143,12 +140,9 @@ if __name__ == '__main__':
     plt.xlabel('Time (MJD)')
     plt.ylabel('Zenith Angle (deg)')
     plt.title('Observation time')
-    if save:
-        plt.savefig('Observation time.eps')
 
-    # Display plots if possible
-    if not save:
-        
-        # Show plots
+    # Show plots or save it into file
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
         plt.show()
-        
