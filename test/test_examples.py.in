@@ -351,7 +351,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_obs',
-                             args='obs_selected.xml example_show_obs.jpg')
+                             args='obs_selected.xml example_show_obs.eps')
 
         # Return
         return
