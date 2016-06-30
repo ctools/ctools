@@ -21,14 +21,15 @@
 import os
 import gammalib
 import cscripts
+import test_cscripts_class
 
 
 # ============================ #
 # Test class for cssens script #
 # ============================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test_cscripts_class.cscripts_test):
     """
-    Test class for cssens script.
+    Test class for cssens script
 
     This test class makes unit tests for the cssens script by using it
     from the command line and from Python.
@@ -37,7 +38,7 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
@@ -48,7 +49,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('cssens')
@@ -63,13 +64,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test cssens on command line
     def _test_cmd(self):
         """
-        Test cssens on the command line.
+        Test cssens on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README.md'):
-            cssens = '../cscripts/cssens.py'
-        else:
-            cssens = 'cssens'
+        # Set script name
+        cssens = self._script('cssens')
 
         # Setup cssens command
         cmd = cssens+' inmodel="data/crab.xml"'+ \
@@ -78,15 +76,13 @@ class Test(gammalib.GPythonTestSuite):
                      ' outfile="cssens_cmd1.dat"'+ \
                      ' logfile="cssens_cmd1.log" chatter=1'
 
-        # Execute cssens, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command that does not exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful cssens execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('cssens_cmd1.dat')
@@ -98,15 +94,9 @@ class Test(gammalib.GPythonTestSuite):
                      ' outfile="cssens_cmd2.dat"'+ \
                      ' logfile="cssens_cmd2.log" chatter=2'
 
-        # Execute cssens, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of cssens execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
