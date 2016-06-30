@@ -56,6 +56,12 @@ cscripts
 Scripts to manage an IACT database
 ----------------------------------
 
+.. warning::
+
+   The ``csiactdata``, ``csiactobs``, ``csfindobs`` and ``csiactcopy`` scripts
+   rely on the ``json`` Python module which is only available in Python 2.6
+   or higher. These scripts will not work on older Python versions.
+
 .. toctree::
    :maxdepth: 1
 
