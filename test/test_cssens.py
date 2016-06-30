@@ -39,6 +39,9 @@ class Test(test_cscripts_class.cscripts_test):
         """
         Constructor
         """
+        # Call base class constructor
+        test_cscripts_class.cscripts_test.__init__(self)
+
         # Return
         return
 

@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # ==========================================================================
 # cscripts test base class
 #
@@ -22,13 +21,14 @@ import os
 import gammalib
 
 
-# ======================= #
-# Test class for cscripts #
-# ======================= #
+# ======================================= #
+# Base class for unit testing of cscripts #
+# ======================================= #
 class cscripts_test(gammalib.GPythonTestSuite):
     """
     Test class for scripts
     """
+
     # Constructor
     def __init__(self):
         """
