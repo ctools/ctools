@@ -50,7 +50,9 @@ cscripts
    cssens --- Computes CTA sensitivity <cssens>
    csspec --- Computes spectral points <csspec>
    cstsdist --- Generates TS distribution <cstsdist>
+   cstssplit --- Creates commands to slice the ts map computations <cstssplit>
    cstsmapmerge --- Merges slices from ts map computations <cstsmapmerge>
+   
  
 
 Scripts to manage an IACT database

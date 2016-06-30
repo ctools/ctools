@@ -42,6 +42,7 @@ import test_csworkflow
 import test_csiactcopy
 import test_csiactdata
 import test_csiactobs
+import test_cstssplit
 
 
 # ================== #
@@ -113,6 +114,7 @@ def test(installed=False, debug=False):
     suite_cstsdist     = test_cstsdist.Test()
     suite_cstsmapmerge = test_cstsmapmerge.Test()
     suite_csworkflow   = test_csworkflow.Test()
+    suite_cstssplit    = test_cstssplit.Test()
 
     # Setup unit tests
     suite_cscaldb.set()
@@ -130,6 +132,7 @@ def test(installed=False, debug=False):
     suite_cstsdist.set()
     suite_cstsmapmerge.set()
     suite_csworkflow.set()
+    suite_cstssplit.set()
 
     # Append tests to container
     suites.append(suite_cscaldb)
@@ -147,6 +150,7 @@ def test(installed=False, debug=False):
     suites.append(suite_cstsdist)
     suites.append(suite_cstsmapmerge)
     suites.append(suite_csworkflow)
+    suites.append(suite_cstssplit)
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
     # module which is only available since Python 2.6+
