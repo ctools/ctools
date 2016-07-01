@@ -57,6 +57,42 @@ def get_current():
     return version
 
 
+# ========================== #
+# Get libtool version number #
+# ========================== #
+def get_libtool():
+    """
+    Get libtools version number
+
+    Returns
+    -------
+    version : str
+        Version number
+    """
+    # Initialse version number of empty string
+    version = ''
+
+    # Open configure.ac file
+    f = open('configure.ac', 'r')
+
+    # Read all lines
+    for line in f:
+
+        # Search for pattern
+        if line.startswith('CTOOLS_LT_VERSION='):
+
+            # Extract version number
+            start   = line.find('"')+1
+            stop    = line.find('"', start)
+            version = line[start:stop].strip()
+
+    # Close file
+    f.close()
+
+    # Return version
+    return version
+
+
 # ============================== #
 # Set version number in one file #
 # ============================== #
@@ -84,7 +120,6 @@ def set_version(filename, version, current):
 
     # Replace version number
     new_content = content.replace(current, version)
-    #print(new_content)
 
     # Open file in write mode
     f = open(filename, 'w')
@@ -130,29 +165,58 @@ def set_versions(version, current):
 
 
 # =============================================== #
-# Set special version number in configure.ac file #
+# Set libtool version number in configure.ac file #
 # =============================================== #
-def set_special_configure(version, current):
+def set_libtool_version(library=False, added=False, removed=False, changed=False):
     """
     Set special version numbers in configure.ac file
 
     Parameters
     ----------
-    version : str
-        Version number
-    current : str
-        Current version number
+    library : bool, optional
+        Library source code changed
+    added : bool, optional
+        Interfaces added
+    removed : bool, optional
+        Interfaces removed
+    changed : bool, optional
+        Interfaces changed
     """
-    # Generate current version number
-    split = current.split('.')
-    cur   = '%s:%s:%s' % (split[0], split[1], split[2])
+    # Get libtool version number
+    old   = get_libtool()
+    split = old.split(':')
 
-    # Generate new version number
-    split = version.split('.')
-    ver   = '%s:%s:%s' % (split[0], split[1], split[2])
+    # Decompose libtool version number
+    current  = int(split[0])
+    revision = int(split[1])
+    age      = int(split[2])
 
-    # Set version number
-    set_version('configure.ac', ver, cur)
+    # If the library source code has changed at all since the last update, then
+    # increment revision
+    if library:
+        revision += 1
+
+    # If any interfaces have been added, removed, or changed since the last
+    # update, increment current, and set revision to 0
+    if added or removed or changed:
+        current  += 1
+        revision  = 0
+
+    # If any interfaces have been added since the last public release, then
+    # increment age
+    if added:
+        age += 1
+
+    # If any interfaces have been removed or changed since the last public
+    # release, then set age to 0
+    if removed or changed:
+        age = 0
+
+    # Build new libtool version number
+    version = '%d:%d:%d' % (current, revision, age)
+
+    # Set libtool version number
+    set_version('configure.ac', version, old)
 
     # Return
     return
@@ -193,11 +257,34 @@ def set_special_conf(version, current):
 if __name__ == '__main__':
 
     # Check for version number
-    if len(sys.argv) < 2:
-        sys.exit('Usage: set_version.py version')
+    if len(sys.argv) < 3:
+        print('Usage: set_version.py version [larc]')
+        print('       l : source code changed')
+        print('       a : interface(s) added')
+        print('       r : interface(s) removed')
+        print('       c : interface(s) changed')
+        sys.exit()
 
     # Extract version number
     version = sys.argv[1]
+
+    # Extract code change flags
+    if len(sys.argv) == 3:
+        flags = sys.argv[2]
+
+    # Set change flags
+    library = False
+    added   = False
+    removed = False
+    changed = False
+    if flags.find('l') != -1:
+        library = True
+    if flags.find('a') != -1:
+        added = True
+    if flags.find('r') != -1:
+        removed = True
+    if flags.find('c') != -1:
+        changed = True
 
     # Get the current version
     current = get_current()
@@ -205,7 +292,10 @@ if __name__ == '__main__':
     # Set versions
     set_versions(version, current)
 
-    # Set special version number:
-    set_special_configure(version, current) # CTOOLS_LT_VERSION="x:y:z"
-    set_special_conf(version, current)      # version = 'x.y'
+    # Set libtool version
+    set_libtool_version(library=library, added=added, removed=removed,
+                        changed=changed)
+
+    # Set special version number in doc/source/conf.py file
+    set_special_conf(version, current)
 
