@@ -137,7 +137,7 @@ effective area and the Gaussian background models. You may have a look at
 You may also note that the :ref:`csiactobs` script has created a ``csiactobs.log``
 file that logs the complete energy range of the observations that have been
 selected. These values may be important for later, in particular if you
-intend to do a binned or stacked analysis.
+intend to do a stacked analysis.
 
 In case that you have already a model definition XML file that describes a model
 of the celestial source distribution (a.k.a. a sky model), you may provide this
@@ -179,11 +179,11 @@ about :ref:`modelling CTA data <models>`.
 
 Example XML files
 -----------------
-To get familiar with the XML syntax and format, example files for an observation container and a model container
-are shown in the following.
+To get familiar with the XML syntax and format, example files for an observation
+definition XML file and a model definition XML file are shown in the following.
 
-Observation XML file
-^^^^^^^^^^^^^^^^^^^^
+Observation definition XML file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: xml
 
@@ -219,8 +219,9 @@ Observation XML file
 	  </observation>
 	</observation_list>
 
-Model XML file
-^^^^^^^^^^^^^^
+
+Model definition XML file
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: xml
 
@@ -261,15 +262,20 @@ Model XML file
 
 .. note::
 
-   It is important to ensure background models are properly linked to their respective observation.
-   Therefore it is required to keep the attributes ``instrument`` and ``id`` the same for the observation
-   and the corresponding background model. The tool :ref:`csiactobs` assures this automatically.
+   It is important to ensure background models are properly linked to their
+   respective observation. Therefore it is required to keep the attributes
+   ``instrument`` and ``id`` the same for the observation and the corresponding
+   background model. The tool :ref:`csiactobs` assures this automatically.
+
 
 Run ctselect
 ------------
-To prepare the data for analysis, cuts have to be applied to the event data. The selection is performed by :ref:`ctselect`.
-This tool writes out selected event lists into the local directory. If the observation XML file contains several runs, it is recommended
-to first create a separate folder and specify this folder in the hidden ``prefix`` argument.
+To prepare the data for analysis, cuts have to be applied to the event data.
+The selection is performed by :ref:`ctselect`.
+This tool writes out selected event lists into the local directory. If the
+observation definition XML file contains several runs, it is recommended
+to first create a separate folder and specify this folder in the hidden
+``prefix`` argument.
 
 .. code-block:: bash
 
@@ -286,21 +292,27 @@ to first create a separate folder and specify this folder in the hidden ``prefix
   End time (CTA MET in seconds) [0.0]
   Output event list or observation definition file [selected_events.fits] selected_obs.xml 
   
-For IACT analysis, it is recommended to use the hidden parameter ``usethres="DEFAULT"``. This instructs :ref:`ctselect`
-to extract the safe energy range from the instrument response functions and apply them to the data. This safe energy range
-is thus superior to the energy limit passed via the user parameters. In addition, to analyse the complete field of view,
-the parameter ``usepnt=yes`` uses, for each observation, the pointing position as centre for the selection radius.
-The radius parameter is dependent on the intrument, for an instrument with a 5 degree field of view, a radius of 2.5 degrees
+For IACT analysis, it is recommended to use the hidden parameter
+``usethres="DEFAULT"``. This instructs :ref:`ctselect` to extract the safe
+energy range from the instrument response functions and apply them to the
+data. This safe energy range is thus superior to the energy limit passed via
+the user parameters. In addition, to analyse the complete field of view, the
+parameter ``usepnt=yes`` uses, for each observation, the pointing position as
+centre for the selection radius. The radius parameter is dependent on the
+intrument, for an instrument with a 5° field of view, a radius of 2.5°
 seems reasonable. The time selection is not applied in the above example; 
-specifying 0 as start and end time skips the time selection.
-For time-resolved analysis, it is important to know the MET time that is required to extract.
-The result of the selection step is written into the observation XML file ``selected_obs.xml``, which now contains references
-to the new selected event FITS files.
+specifying 0 as start and end time skips the time selection. For time-resolved
+analysis, it is important to know the MET time that is required to extract.
+The result of the selection step is written into the observation XML file
+``selected_obs.xml``, which now contains references to the new selected event
+FITS files.
+
 
 Unbinned analysis
 -----------------
-Once the data is selected, the easiest way to analyse is an unbinned analysis. Note that the input model XML
-file must now contain the background models and source components to describe the field of view.
+Once the data is selected, the easiest way to analyse is an unbinned analysis.
+Note that the input model definition XML file must now contain the background
+models and source components to describe the field of view.
 
 .. code-block:: bash
 
@@ -309,20 +321,26 @@ file must now contain the background models and source components to describe th
   Source model [$CTOOLS/share/models/crab.xml] crab_models.xml
   Source model output file [crab_results.xml]
   
-The result of the fit was stored in ``crab_results.xml``. Note that fitted parameters, ``Prefactors`` in particular,
-typically use MeV as energy unit. To monitor the progress of the fit on the screen, one can simply run with the option ``debug=yes``.
-Alternatively, the logfile ``ctlike.log`` can be inspected after the fit. 
+The result of the fit was stored in ``crab_results.xml``. Note that fitted
+parameters, ``Prefactors`` in particular, typically use MeV as energy unit.
+To monitor the progress of the fit on the screen, one can simply run with the
+option ``debug=yes``. Alternatively, the logfile ``ctlike.log`` can be inspected
+after the fit.
 
-On default, energy dispersion is not considered in the fit. To switch on the usage of the energy migration matrix,
-the hidden parameter ``edisp=yes`` can be provided. Note that this will cause a significant reduction of the computing
-speed.
+On default, energy dispersion is not considered in the fit. To switch on the
+usage of the energy migration matrix, the hidden parameter ``edisp=yes`` can
+be provided. Note that this will cause a significant reduction of the
+computing speed.
 
-Stacked (binned) analysis
--------------------------
-The stacked analysis mode is using a binned analysis where all observations are included and stacked into one event cube.
-This analysis mode is much faster than unbinned analysis when having a large dataset (e.g. > 100 hours).
-For this type of binned analysis, some intermediate data products have to be produced. The products are a binned data cube,
-an exposure cube, a PSF cube, and a background cube. 
+
+Stacked analysis
+----------------
+In a stacked analysis the events of all observations are stacked into a single
+counts cube. This analysis mode is much faster than unbinned analysis when
+having a large dataset (e.g. > 100 hours). For this type of analysis, some
+intermediate data products have to be produced. The products are a binned counts
+cube, an exposure cube, a point spead function cube, optionally an energy
+dispersion cube, and a background cube.
 
 Bin events
 ^^^^^^^^^^
@@ -344,23 +362,25 @@ Bin events
   Number of energy bins [20]
   Output counts cube [cntcube.fits]
 
-Note that bins only get filled if the bin of the cube is fully contained in the energy range and RoI of a considered observation.
-It is therefore useful to provide the energy range given by :ref:`csiactobs` above. This ensures a maximum agreement between
-observations and binning and reduces the loss of data.
 
 Create exposure cube
 ^^^^^^^^^^^^^^^^^^^^
-After binning the events into a three-dimensional cube, an exposure cube has to be computed.
-The exposure is defined as the effective area times the dead-time corrected observation time.
-Each observation from the input container gets stacked in the resulting cube. The exposure is stored
-in units of :math:`cm^2 s`. The exposure cube does not have to contain the same binning as the event cube
-but for simplicity, the event cube can be passed to adopt the binning parameters. Note, however, that the
-exposure cube is defined in true sky coordinates and energy while the counts cube is defined in reconstructed
-sky coordinates and energy. Consequently, the sky area and energy range covered by the exposure cube should be
-slightly larger than that of the counts cube to accommodate for spill over of events due to the point spread function
-and energy dispersion. By computing the exposure cube on the same grid as the counts cube, the spill over of events
-from sources at the edge of cube will not be handled correctly. In the example below, however, no source at the edge of the
-field of view is present. Therefore, for simplicity, the count cube is used as input cube to extract the binning.
+After binning the events into a three-dimensional cube, an exposure cube has to
+be computed. The exposure is defined as the effective area times the dead-time
+corrected observation time. Each observation from the input container gets
+stacked in the resulting cube. The exposure is stored in units of :math:`cm^2 s`.
+The exposure cube does not have to contain the same binning as the event cube
+but for simplicity, the event cube can be passed to adopt the binning
+parameters. Note, however, that the exposure cube is defined in true sky
+coordinates and energy while the counts cube is defined in reconstructed sky
+coordinates and energy. Consequently, the sky area and energy range covered by
+the exposure cube should be slightly larger than that of the counts cube to
+accommodate for spill over of events due to the point spread function and energy
+dispersion. By computing the exposure cube on the same grid as the counts cube,
+the spill over of events from sources at the edge of cube will not be handled
+correctly. In the example below, however, no source at the edge of the field of
+view is present. Therefore, for simplicity, the count cube is used as input cube
+to extract the binning.
 
 This task of computing the exposure cube is is performed by :ref:`ctexpcube`. 
 
@@ -371,7 +391,8 @@ This task of computing the exposure cube is is performed by :ref:`ctexpcube`.
   Input counts cube file to extract exposure cube definition [NONE] cntcube.fits
   Output exposure cube file [expcube.fits]
   
-Alternatively, the exposure cube can be created with different binning than the event cube:
+Alternatively, the exposure cube can be created with different binning than the
+counts cube:
 
 .. code-block:: bash
 
@@ -390,15 +411,18 @@ Alternatively, the exposure cube can be created with different binning than the 
   Number of energy bins [20] 30
   Output exposure cube file [expcube.fits] 
 
-Create PSF cube
-^^^^^^^^^^^^^^^
-As a next step for the binned analysis, a cube containing the point spread function (PSF) must be computed.
-Since the PSF cannot be stored by one single parameter, the PSF cube computed by :ref:`ctpsfcube` has a fourth dimension.
-In each bin of the cube, the PSF is stored as a function of offset from source. The granularity of the
-PSF histogram is determined by the hidden parameter ``anumbins`` (default: 200). Therefore, when passing
-the event cube to adopt the sky binning for the PSF cube, the resulting FITS file can become quite large due to
-the fourth dimension. Usually in IACT analysis, the PSF doesn't change too dramatically across the field of view.
-Therefore the user can think about reducing the spatial binning of the PSF cube:
+Create point spread function cube
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+As a next step for the stacked analysis, a cube containing the point spread
+function (PSF) must be computed. Since the PSF cannot be stored by one single
+parameter, the PSF cube computed by :ref:`ctpsfcube` has a fourth dimension.
+In each bin of the cube, the PSF is stored as a function of offset from source.
+The granularity of the PSF histogram is determined by the hidden parameter
+``anumbins`` (default: 200). Therefore, when passing the event cube to adopt
+the sky binning for the PSF cube, the resulting FITS file can become quite large
+due to the fourth dimension. Usually in IACT analysis, the PSF doesn't change
+too dramatically across the field of view. Therefore the user can think about
+reducing the spatial binning of the PSF cube:
 
 .. code-block:: bash
 
@@ -417,8 +441,8 @@ Therefore the user can think about reducing the spatial binning of the PSF cube:
   Number of energy bins [20] 
   Output PSF cube file [psfcube.fits]
   
-Depending on the required PSF precision, one could reduce the number of offset bins via the hidden parameter
-``anumbins``:
+Depending on the required PSF precision, one could reduce the number of offset
+bins via the hidden parameter ``anumbins``:
 
 .. code-block:: bash
 
@@ -426,13 +450,16 @@ Depending on the required PSF precision, one could reduce the number of offset b
 
 Create energy dispersion cube (optional)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In case energy dispersion wants to be used in the analysis, the tool :ref:`ctedispcube` computes the energy
-migration response for the given observations. Analogous to the PSF cube, the Edisp cube is stored in
-a four-dimensional map. In each bin of the cube, the migration value ``E_reco/E_true`` is stored. The granularity
-of the migration histogram can be steered via the hidden parameter ``migrabins`` (default: 100). In addition, the
-maximum migration value can be set via the hidden parameter ``migramax`` (default: 2.0). Similar to the PSF cube,
-the edispcube FITS file can become quite large. Therefore, since the energy dispersion shouldn't vary too much across
-the sky region, one could reduce the spatial binning:
+In case energy dispersion should be considered used in the analysis, the tool
+:ref:`ctedispcube` computes the energy migration response for the given
+observations. Analoguous to the PSF cube, the energy dispersion cube is stored
+in a four-dimensional map. In each bin of the cube, the migration value
+``E_reco/E_true`` is stored. The granularity of the migration histogram can be
+steered via the hidden parameter ``migrabins`` (default: 100). In addition, the
+maximum migration value can be set via the hidden parameter ``migramax``
+(default: 2.0). Similar to the PSF cube, the energy dispersion cube FITS file
+can become quite large. Therefore, since the energy dispersion shouldn't vary
+too much across the sky region, one could reduce the spatial binning:
 
 .. code-block:: bash
 
@@ -453,9 +480,11 @@ the sky region, one could reduce the spatial binning:
 
 Create background cube
 ^^^^^^^^^^^^^^^^^^^^^^
-Last but not least, for a binned IACT analysis a cube containing the background rate in sky coordinates and
-reconstructed energy has to be computed. This task is performed by :ref:`ctbkgcube`. The binning here can also differ
-from the event cube. For simplicity, however, the example below uses the event cube to adopt the binning.
+Last but not least, for a stacked IACT analysis a cube containing the background
+rate in sky coordinates and reconstructed energy has to be computed. This task
+is performed by :ref:`ctbkgcube`. The binning here can also differ from the counts
+cube. For simplicity, however, the example below uses the counts cube to adopt
+the binning.
 
 .. code-block:: bash
 
@@ -466,11 +495,14 @@ from the event cube. For simplicity, however, the example below uses the event c
   Output background cube file [bkgcube.fits] 
   Output model XML file [NONE] binned_models.xml
 
-Note that this tool also requires the parameters of an input and output model. In the model XML file that came out of
-:ref:`csiactobs`, one background model per observation is included. This models get merged and averaged in the background
-sky cube. In the output model the background models per obseervation will be removed. Instead, a global background model
-for the newly created background cube is included. Sky models present in the input model XML file will also be included in the 
-new XML file, which subsequently can be used for binned :ref:`ctlike`.
+Note that this tool also requires the parameters of an input and output model.
+In the model XML file that came out of :ref:`csiactobs`, one background model
+per observation is included. This models get merged and averaged in the background
+sky cube. In the output model the background models per obseervation will be
+removed. Instead, a global background model for the newly created background
+cube is included. Sky models present in the input model XML file will also be
+included in the new XML file, which subsequently can be used for stacked
+:ref:`ctlike`.
 
 Example for stacked model XML file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -500,12 +532,13 @@ The output model of :ref:`ctbkgcube` looks the following:
 	  </source>
 	</source_library>
 	
-The background model with ``type=CTACubeBackground`` is used to scale the background cube stored in the FITS file
-created by :ref:`ctbkgcube`.
+The background model with ``type=CTACubeBackground`` is used to scale the
+background cube stored in the FITS file created by :ref:`ctbkgcube`.
 
 Run ctlike
 ^^^^^^^^^^
-Having all the intermediate data products ready, a binned analysis can be conducted using :ref:`ctlike`.
+Having all the intermediate data products ready, a stacked analysis can be
+conducted using :ref:`ctlike`.
 
 .. code-block:: bash
 
@@ -517,12 +550,15 @@ Having all the intermediate data products ready, a binned analysis can be conduc
   Input model XML file [binned_models.xml]
   Output model XML file [binned_results.xml]
 	
-Note that when passing an event cube to :ref:`ctlike`, the tool behaves differently than in unbinned mode.
-It queries directly for the additional ingredients for the binned analysis. It is important to pass the background model
-generated by :ref:`ctbkgcube` here to ensure the proper modelling of the background in the fit.
+Note that when passing an counts cube to :ref:`ctlike`, the tool behaves
+differently than in unbinned mode. It queries directly for the additional
+ingredients for the stacked analysis. It is important to pass the background
+model generated by :ref:`ctbkgcube` here to ensure the proper modelling of
+the background in the fit.
 
-Running :ref:`ctlike` with energy dispersion, the hidden parameter ``edisp=yes`` needs to be specified. The tool
-will then additionally query for the energy dispersion cube described above:
+To consider also the energy dispersion, you have to execute the :ref:`ctlike`
+tool with the hidden parameter ``edisp=yes``. The tool will then also query for
+the energy dispersion cube:
 
 .. code-block:: bash
   
@@ -534,6 +570,3 @@ will then additionally query for the energy dispersion cube described above:
   Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits 
   Input model XML file [binned_models.xml]
   Output model XML file [binned_results.xml] 
-
-
-
