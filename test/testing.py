@@ -78,7 +78,6 @@ class test(gammalib.GPythonTestSuite):
             rc = os.system(cmd+' >/dev/null 2>&1')
         except:
             rc = -1
-            pass
 
         # Return return code
         return rc

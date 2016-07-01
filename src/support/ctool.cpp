@@ -985,6 +985,10 @@ void ctool::set_obs_response(GCTAObservation* obs)
             // Get filenames
             GFilename expcube((*this)["expcube"].filename());
             GFilename psfcube((*this)["psfcube"].filename());
+            GFilename edispcube;
+            if (query_edisp) {
+                edispcube = (*this)["edispcube"].filename();
+            }
             GFilename bkgcube((*this)["bkgcube"].filename());
 
             // Extract stacked response information if available
@@ -1003,9 +1007,6 @@ void ctool::set_obs_response(GCTAObservation* obs)
                 // If querying of energy dispersion cube is requested then
                 // query it now
                 if (query_edisp) {
-
-                    // Get filename
-                    GFilename edispcube((*this)["edispcube"].filename());
 
                     // If filename is valid then use energy dispersion ...
                     if ((gammalib::toupper(edispcube.url()) != "NONE") &&
