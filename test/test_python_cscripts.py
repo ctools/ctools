@@ -37,6 +37,7 @@ import test_csroot2caldb
 import test_cssens
 import test_csspec
 import test_cstsdist
+import test_cstsmapsplit
 import test_cstsmapmerge
 import test_csworkflow
 import test_csiactcopy
@@ -111,6 +112,7 @@ def test(installed=False, debug=False):
     suite_cssens       = test_cssens.Test()
     suite_csspec       = test_csspec.Test()
     suite_cstsdist     = test_cstsdist.Test()
+    suite_cstsmapsplit = test_cstsmapsplit.Test()
     suite_cstsmapmerge = test_cstsmapmerge.Test()
     suite_csworkflow   = test_csworkflow.Test()
 
@@ -128,6 +130,7 @@ def test(installed=False, debug=False):
     suite_cssens.set()
     suite_csspec.set()
     suite_cstsdist.set()
+    suite_cstsmapsplit.set()
     suite_cstsmapmerge.set()
     suite_csworkflow.set()
 
@@ -145,6 +148,7 @@ def test(installed=False, debug=False):
     suites.append(suite_cssens)
     suites.append(suite_csspec)
     suites.append(suite_cstsdist)
+    suites.append(suite_cstsmapsplit)
     suites.append(suite_cstsmapmerge)
     suites.append(suite_csworkflow)
 
