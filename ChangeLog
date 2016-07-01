@@ -1,8 +1,9 @@
-2016-06-25  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-07-01  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Add cstsmapsplit script (#1797)
         Add unit tests for all example scripts
         Handle zero parameter errors in ctulimit (#1795)
         Compute counts cube weights in ctbin (#1789)

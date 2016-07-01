@@ -16,8 +16,8 @@ pythonscripts = __init__.py \
                 cssens.py \
                 csspec.py \
                 cstsdist.py \
-                cstsmapsplit.py \
                 cstsmapmerge.py \
+                cstsmapsplit.py \
                 csworkflow.py \
                 csfindobs.py \
                 csiactcopy.py \
@@ -39,8 +39,8 @@ parfiles = cscaldb.par \
            cssens.par \
            csspec.par \
            cstsdist.par \
-           cstsmapsplit.par \
            cstsmapmerge.par \
+           cstsmapsplit.par \
            csworkflow.par \
            csfindobs.par \
            csiactcopy.par \
@@ -62,8 +62,8 @@ linkscripts = cscaldb \
               cssens \
               csspec \
               cstsdist \
-              cstsmapsplit \
               cstsmapmerge \
+              cstsmapsplit \
               csworkflow \
               csfindobs \
               csiactcopy \
@@ -87,8 +87,8 @@ testscripts = tests/__init__.py \
               ../test/test_cssens.py \
               ../test/test_csspec.py \
               ../test/test_cstsdist.py \
-              ../test/test_cstsmapsplit.py \
               ../test/test_cstsmapmerge.py \
+              ../test/test_cstsmapsplit.py \
               ../test/test_csworkflow.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \

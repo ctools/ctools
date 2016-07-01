@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.1.0
 
-25 June 2016
+1 July 2016
 
 
 Introduction
@@ -218,6 +218,9 @@ sampling than the spatial sampling in the ROOT file.
 
 Add csobsdef.pntdef() method to set directly a pointing definition from a
 gammalib.GCsv object (#1771).
+
+Add cstsmapsplit script that generates the command sequence for splitting the
+computation of a Test Statistic map into computations of sub maps (#1797).
 
 Unit tests have been added for all cscripts.
 
