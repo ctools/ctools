@@ -81,7 +81,7 @@ class Test(test):
                        ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
 
         # Check if execution of wrong command fails
-        self.test_assert(self._execute('command that does not exist') != 0,
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
              'Self test of test script')
 
         # Check if execution was successful
