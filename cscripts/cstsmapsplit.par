@@ -18,7 +18,7 @@
 # General parameters
 #===================
 inobs,         f, a, events.fits,,, "Input event list, counts cube or observation definition XML file"
-inmodel,       f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
+inmodel,       f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
 srcname,       s, a, Crab,,, "Test source name"
 expcube,       f, a, NONE,,, "Input exposure cube file (only needed for stacked analysis)"
 psfcube,       f, a, NONE,,, "Input PSF cube file (only needed for stacked analysis)"
@@ -30,7 +30,7 @@ edisp,         b, h, no,,, "Apply energy dispersion?"
 outmap,        f, a, tsmap.fits,,, "Output Test Statistic map file"
 bins_per_job,  i, a, 5,,, "Number of TS map bins per running job"
 compute_null,  b, a, yes,,,"Compute null hypothesis first?"
-outfile,       f, a, commands.txt,,, "ASCII file containing all commands"
+outfile,       f, a, commands.dat,,, "ASCII file containing all commands"
 
 #
 # Spatial binning parameters
@@ -51,5 +51,5 @@ publish, b, h, no,,, "Publish Test Statistic map on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
-mode,    s, h, "ql",,, "Mode of automatic parameters"
+mode,    s, h, ql,,, "Mode of automatic parameters"
 logfile, f, h, cstsmapsplit.log,,, "Log filename"
