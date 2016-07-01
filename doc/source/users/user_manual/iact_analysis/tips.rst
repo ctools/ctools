@@ -13,7 +13,7 @@ Create a skymap of counts
 The tool :ref:`ctskymap` allows to create a single map of counts contained inside an observation container.
 In contrast to :ref:`ctbin`, ctskymap takes into account all events that fall into the skymap energy range and spatial range.
 Since :ref:`ctbin` is intended for binned/stacked analysis, it respects energy thresholds, RoI selections etc.
-Accordingly, :ref:`ctskymap` should be used for a simple visualisation of the counts.
+Accordingly, :ref:`ctskymap` could be used for a simple visualisation of the counts.
 
 
 .. code-block:: bash
@@ -30,6 +30,15 @@ Accordingly, :ref:`ctskymap` should be used for a simple visualisation of the co
 	Size of the X axis in pixels [200] 
 	Size of the Y axis in pixels [200] 
 	Output skymap file [skymap.fits] 
+	
+Alternatively, one could use count cube and collapse the maps into one single image via Python:
+
+.. code-block:: python
+ 
+   import gammalib
+   map = gammalib.GSkyMap("myCountCube.fits") # Loads the count cube
+   map.stack_maps() # Stack energy slices
+   map.save("myCountMap.fits") # Save to file
 	
 Create region file of pointings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -77,6 +86,12 @@ to access information in python:
   info.ebounds()  # gammalib.GEbounds object of energy ranges
   info.gti()      # gammalib.GGti object containing good time intervals 
   
+There is also an example script to plot several information about an observation container which might be useful
+for a quick visualisation of the observations inside a container:
+
+.. code-block:: bash
+  
+  $ python $CTOOLS/examples/show_obs.py selected_obs.xml
 
 Visualise models
 ----------------
@@ -185,7 +200,7 @@ Not all issues can be tackled. Nevertheless, here is a list of actions that have
 
 * Consider switching to binned analysis if the observation time exceeds 50-100 hours.
 * Diffuse and extended sources in the RoI are computational expensive. However, in unbinned analysis they impact the speed much more.
-* Usage of energy dispersion in unbinned analysis could also cause a long fit. Try switching it off if speed is important.
+* Usage of energy dispersion could also cause a long fit. Try switching it off if speed is important. Keep in mind this will have an effect on the results.
 * Switch to a machine that supports OpenMP. This allows to parallelise the fit onto several cores.
 
 Compute excess maps

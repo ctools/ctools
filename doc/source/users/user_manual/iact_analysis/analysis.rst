@@ -3,83 +3,97 @@
 Analysing IACT data
 ===================
 
-In order to analyse data from current IACTs, the data have to be retrieved. Information how
-to copy IACT data to a local machine can be found here: :ref:`sec_copy`
+In order to analyse data from current IACTs, you first have to retrieve the
+data. Information on how to do that can be found in the section :ref:`sec_copy`.
 
 Check available FITS production
 -------------------------------
-Before starting an analysis, it is important to know what kind of data need to be analysed.
-In the current scheme of `storing IACT data <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/index.html>`_,
-every FITS data set is represented with a unique name, e.g. ``"hess-fits-pa-release-1.0-Prod26-MppStd"``. This string
-has to be passed to some set of ctools to find and use the data for analysis.
+Before you start an analysis, it is important that you know what kind of data
+need to be analysed. In the current scheme of
+`storing IACT data <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/index.html>`_,
+every FITS data set is represented by a unique name, e.g.
+``"hess-fits-pa-release-1.0-Prod26-MppStd"``.
+You have to pass this string to some set of scripts to find and use the data
+for analysis.
 
-To check the available names of FITS data sets, it is recommended to run :ref:`csiactdata`.
+To check the available names of FITS data sets, you should run the
+:ref:`csiactdata` script:
 
 .. code-block:: bash
 
   $ csiactdata
   Path were data is located [] /path/to/fits/data/
   
-This will list names of available FITS data sets on the screen. In the 
-following it is assumed the user has selected a data set called ``fits-data-name``.
-The query for the path where the data is located can be
-omitted by setting the environment variable ``VHEFITS`` to this locations. This might be convenient
-since some other tools also query for the same parameter and can use ``VHEFITS`` instead.
+This script will list the names of available FITS data sets into the console.
+In the following it is assumed that you have selected a data set named
+``fits-data-name``.
+You can omit the query for the path where the data is located by setting the
+environment variable ``VHEFITS`` to this location. Also other scripts will
+benefit from having this environment variable set, and this avoids that you
+have to type in the path name every time you use one of these scripts.
+
 
 Find observations
 -----------------
-To start an analysis, it is required to assemble a list of observations that should be used. For this purpose,
-:ref:`csfindobs` searches for observations according to user criteria.
 
-Search for sky pointings
-^^^^^^^^^^^^^^^^^^^^^^^^
-The most common search for observations is by pointing position in the sky.
+Now that you know which data are available you have to assemble a list of
+observations (a.k.a. runs) that you want to use in an analysis. You will
+use the :ref:`csfindobs` for that task, which allows you to select the
+observations according to a number of user criteria.
+
+
+Select observations according to pointing direction
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The most common search for observations is by pointing direction on the sky,
+and you do this by simply invoking the :ref:`csfindobs` script:
 
 .. code-block:: bash
 
   $ csfindobs
   Name of FITS production (Run csiactdata to view your options) [fits-data-name] 
-  Right ascension [83.6331]
-  Declination [22.01] 
-  Search radius [2.5]
-  Runlist outfile [runlist.lis]
-  
-  
-Specifying additional search criteria
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The search for observations can be further constrained arbitrarily. For this purpose,
-:ref:`csfindobs` contains a hidden parameter ``expression``. It is possible to use any
-FITS selection expression that is `supported by cfitsio <http://www.isdc.unige.ch/integral/download/osa/doc/10.1/osa_um_intro/node38.html>`_.
-Available properties (i.e. column names) for selection, can be found 
-`here <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/obs_index/index.html>`_
-or by simply browsing the observation index file with a FITS viewer.
+  Right ascension of selection region centre (deg) [83.63]
+  Declination of selection region centre (deg) [22.01]
+  Search radius of selection region (deg) [2.5]
+  Output runlist file [runlist.lis]
 
-Example:
+The script will create an ASCII file named ``runlist.lis`` that contains the
+identifiers for all observations with pointing directions located within 2.5°
+around the position of the Crab nebula.
+
+
+Select observations using additional criteria
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You may add further selection criteria using the hidden ``expression`` parameter.
+You may use any FITS selection expression that is
+`supported by the cfitsio row filtering specification <https://heasarc.gsfc.nasa.gov/docs/software/fitsio/c/c_user/node97.html>`_.
+Column names that can be used in the expression can be found
+`here <http://gamma-astro-data-formats.readthedocs.org/en/latest/data_storage/obs_index/index.html>`_
+or by simply browsing the observation index file with a FITS viewer. For example
 
 .. code-block:: bash
 
   $ csfindobs expression="ZEN_PNT<30&&LIVETIME>1800"
-  ...
-  
-This command selects all observations that have a zenith angle less than 
-30 degrees and a livetime larger than 1800 seconds (i.e. 30 minutes).
+
+will select all observations that have a zenith angle less than 30° and a
+livetime larger than 1800 seconds.
 
 
-Omitting the pointing selection
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can also omit the pointing selection, for example in case where you 
-don't know the sky coordinates of your object of interest. In that case, you 
-may directly use the object name in the expression and pass ``NONE`` as
-coordinate to :ref:`csfindobs`:
+Select observations independent of pointing direction
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can also omit the pointing selection, for example in case that you do not
+know the sky coordinates of your object of interest. In that case, you may
+directly use the object name in the expression and pass ``NONE`` as coordinate
+to :ref:`csfindobs`:
 
 .. code-block:: bash
 
   $ csfindobs expression="OBJECT=='Crab Nebula'"
   Name of FITS production (Run csiactdata to view your options) [fits-data-name] 
-  Right ascension [NONE]
-  Runlist outfile [runlist.lis]
-
-This will omit the selection of pointing positions.
+  Right ascension of selection region centre [NONE]
+  Output runlist file [runlist.lis]
 
 .. note::
 
@@ -88,50 +102,79 @@ This will omit the selection of pointing positions.
    ``min_qual``. For example, ``min_qual=1`` selects all data with a 
    looser quality criteria.
 
+
 Create an observation list
 --------------------------
-The runlist ASCII file containing a list of selected observation IDs must now be converted to an
-observation definition XML file. This file contains information about the location of the files that are required
-for the analysis. The purpose of the tool :ref:`csiactobs` is to do this conversion.
+
+As next step, you must convert the runlist ASCII file into an observation
+definition XML file. The observation definition XML file will contain the
+file names of all files that are needed for the analysis. You do this
+conversion with the :ref:`csiactobs` script:
 
 .. code-block:: bash
 
   $ csiactobs
-  Data storage name (Run csiactdata to view your options) [] fits-data-name
-  Runlist file [runlist.lis]
+  Data storage name [] fits-data-name
+  Input runlist file [runlist.lis]
   Number of free parameters per background model [1] 
-  Output model XML file [bgmodels.xml] 
-  Observation XML outfile [obs.xml]
+  Output model definition XML file [bgmodels.xml]
+  Output observation definition XML file [obs.xml]
 
-This tools has now performed various tasks:
+The :ref:`csiactobs` script will create two output files: the observations
+definition XML file ``obs.xml`` and an output model definition XML file
+``bgmodels.xml``. To generate ``obs.xml``, :ref:`csiactobs` has used the
+IACT data storage and extracted the relevant file names. ``bgmodels.xml`` is
+a file that is used for background modeling, where each observation will have
+its own independent background model. In the example above, you have set the
+number of free parameters per background model to one, hence the normalisation
+of the background model for each observation will be a free parameter that is
+later adjusted by the maximum likelihood fit.
 
-* Use the IACT data storage to convert the observation list ``runlist.lis`` into an observation definition XML file ``obs.xml``.
-* Create a model XML file that contains the background models. In ctools, each observation has its own independent background model. The number of free parameters per model was set to 1, i.e. the normalisation of the background is left free for each observation. The models were saved in ``bgmodels.xml``.
-* The tool uses an internal hierarchy for assigning the background models. The hidden parameter ``bkg_mod_hiera`` (default=irf|aeff|gauss) steers the order how background models should be created. In case the IRF background model is not available, the script automatically falls back to the background model from effective area (GCTAModelAeffBackground). 
-* There are some further hidden parameters to steer the start parameters for the Aeff and Gaussian background model. Have a look at :ref:`csiactobs` to view a full list of parameters.
-* In ``csiactobs.log`` (or on screen if ``debug=yes``), the script logs the complete energy range of the observation container. These values might be important for later usage (e.g. in binned analysis).
+There are some further hidden parameters to steer the start parameters for the
+effective area and the Gaussian background models. You may have a look at
+:ref:`csiactobs` to see the full list of available parameters.
 
-In case a sky model is already prepared, it is possible to also provide the hidden parameter ``inmodel``. The output
-model XML file will then contain both, the background model and the input sky model:
+You may also note that the :ref:`csiactobs` script has created a ``csiactobs.log``
+file that logs the complete energy range of the observations that have been
+selected. These values may be important for later, in particular if you
+intend to do a binned or stacked analysis.
+
+In case that you have already a model definition XML file that describes a model
+of the celestial source distribution (a.k.a. a sky model), you may provide this
+sky model to :ref:`csiactobs` using the hidden ``inmodel`` parameter. The
+output model definition XML file will then contain the sky model and the
+background model, and you can use the model directly in a maximum likelihood
+fit.
 
 .. code-block:: bash
 
   $ csiactobs inmodel="mymodel.xml"
   
-Alternatively, models can be merged at any times using the simple tool :ref:`csmodelmerge`:
+Alternatively, you can merged models using the :ref:`csmodelmerge` script:
 
 .. code-block:: bash
 
   $ csmodelmerge
-  Input model XML files [bgmodels.xml crab.xml]
-  Output model file [crab_models.xml]
-  
-Note that the number of files to merge is not limited to two. Detailled options how the input model XML file can
-be passed is given on the reference page of :ref:`csmodelmerge`. It is also important to know that each model in the container
-must have a unique name. This implies, for instance, merging the same XML model twice will result in an exception.
+  Input model definition XML files [mymodel.xml bgmodels.xml]
+  Output model definition XML file [combined_model.xml]
 
-A list of available sky models can be found `here <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_.
-Of particular help to create sky models for your dataset is the section about :ref:`modelling CTA data <models>`.
+.. note::
+
+   The number of files that can be merged with :ref:`csmodelmerge` is not
+   limited to two. The list of input file names may be either separated by
+   whitespace or semi-colons, can be specified using wildcards, or can be given
+   in an ASCII file (see :ref:`csmodelmerge`).
+
+.. warning::
+
+   Each model component in the input model definition XML files that are provided
+   to :ref:`csmodelmerge` must have a different and unique name. Merging for
+   example the same XML model twice will raise an exception.
+
+A list of available sky models can be found
+`here <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_.
+If you are not familiar with creating sky models you should read the section
+about :ref:`modelling CTA data <models>`.
 
 
 Example XML files
@@ -381,6 +424,33 @@ Depending on the required PSF precision, one could reduce the number of offset b
 
   $ ctpsfcube anumbins=100
 
+Create energy dispersion cube (optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In case energy dispersion wants to be used in the analysis, the tool :ref:`ctedispcube` computes the energy
+migration response for the given observations. Analogous to the PSF cube, the Edisp cube is stored in
+a four-dimensional map. In each bin of the cube, the migration value ``E_reco/E_true`` is stored. The granularity
+of the migration histogram can be steered via the hidden parameter ``migrabins`` (default: 100). In addition, the
+maximum migration value can be set via the hidden parameter ``migramax`` (default: 2.0). Similar to the PSF cube,
+the edispcube FITS file can become quite large. Therefore, since the energy dispersion shouldn't vary too much across
+the sky region, one could reduce the spatial binning:
+
+.. code-block:: bash
+
+  $ ctedispcube
+  Input event list or observation definition XML file [NONE] selected_obs.xml 
+  Input counts cube file to extract energy dispersion cube definition [NONE] 
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
+  Image scale (in degrees/pixel) [1.0] 0.2
+  Size of the X axis in pixels [10] 20
+  Size of the Y axis in pixels [10] 20
+  Lower energy limit (TeV) [0.1] 0.5
+  Upper energy limit (TeV) [100.0] 50
+  Number of energy bins [20] 
+  Output energy dispersion cube file [edispcube.fits]
+
 Create background cube
 ^^^^^^^^^^^^^^^^^^^^^^
 Last but not least, for a binned IACT analysis a cube containing the background rate in sky coordinates and
@@ -451,6 +521,19 @@ Note that when passing an event cube to :ref:`ctlike`, the tool behaves differen
 It queries directly for the additional ingredients for the binned analysis. It is important to pass the background model
 generated by :ref:`ctbkgcube` here to ensure the proper modelling of the background in the fit.
 
+Running :ref:`ctlike` with energy dispersion, the hidden parameter ``edisp=yes`` needs to be specified. The tool
+will then additionally query for the energy dispersion cube described above:
+
+.. code-block:: bash
+  
+  $ ctlike debug=yes
+  Input event list, counts cube or observation definition XML file [events.fits] cntcube.fits 
+  Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits 
+  Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits 
+  Input energy dispersion cube file (only needed for stacked analysis) [NONE] edispcube.fits 
+  Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits 
+  Input model XML file [binned_models.xml]
+  Output model XML file [binned_results.xml] 
 
 
 
