@@ -28,7 +28,7 @@ caldb,         s, a, prod2,,, "Calibration database"
 irf,           s, a, South_0.5h,,, "Instrument response function"
 edisp,         b, h, no,,, "Apply energy dispersion?"
 outmap,        f, a, tsmap.fits,,, "Output Test Statistic map file"
-bins_per_job,  i, a, 5,,, "Number of TS map bins per running job"
+bins_per_job,  i, a, 5,,, "Number of TS map bins per task"
 compute_null,  b, a, yes,,,"Compute null hypothesis first?"
 outfile,       f, a, commands.dat,,, "ASCII file containing all commands"
 
