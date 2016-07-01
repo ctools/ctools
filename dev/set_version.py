@@ -151,6 +151,7 @@ def set_versions(version, current):
     # List of all relevant files, including their access paths from the
     # source directory
     filenames = ['configure.ac',
+                 'ctools.pc.in',
                  'README.md',
                  'sonar-project.properties',
                  'doc/Doxyfile',
