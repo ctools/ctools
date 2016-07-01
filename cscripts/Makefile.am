@@ -16,13 +16,13 @@ pythonscripts = __init__.py \
                 cssens.py \
                 csspec.py \
                 cstsdist.py \
+                cstsmapsplit.py \
                 cstsmapmerge.py \
                 csworkflow.py \
                 csfindobs.py \
                 csiactcopy.py \
                 csiactdata.py \
                 csiactobs.py \
-                cstssplit.py \
                 obsutils.py
 
 # Parfiles to be distributed in $(prefix)/syspfiles
@@ -39,12 +39,12 @@ parfiles = cscaldb.par \
            cssens.par \
            csspec.par \
            cstsdist.par \
+           cstsmapsplit.par \
            cstsmapmerge.par \
            csworkflow.par \
            csfindobs.par \
            csiactcopy.par \
            csiactdata.par \
-           cstssplit.par \
            csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
@@ -62,12 +62,12 @@ linkscripts = cscaldb \
               cssens \
               csspec \
               cstsdist \
+              cstsmapsplit \
               cstsmapmerge \
               csworkflow \
               csfindobs \
               csiactcopy \
               csiactdata \
-              cstssplit \
               csiactobs
 
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
@@ -86,12 +86,12 @@ testscripts = tests/__init__.py \
               ../test/test_cssens.py \
               ../test/test_csspec.py \
               ../test/test_cstsdist.py \
+              ../test/test_cstsmapsplit.py \
               ../test/test_cstsmapmerge.py \
               ../test/test_csworkflow.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \
               ../test/test_csiactdata.py \
-              ../test/test_cstssplit.py \
               ../test/test_csiactobs.py
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data

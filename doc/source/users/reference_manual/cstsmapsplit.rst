@@ -1,21 +1,20 @@
-.. _cstssplit:
+.. _cstsmapsplit:
 
-cstssplit
-=======
+cstsmapsplit
+============
 
-Generate commands to split TS map computation
+Generate commands to split the Test Statistic map computation
 
 
 Synopsis
 --------
 
-This tool allows to generate a command sequence in order to compute a 
-Test Statistic (TS) map using e.g. several machines. The command sequence
-is stored in an ASCII file. Each line contains an individual command.
-Each command will call the tool :ref:`cttsmap` with the appropriate parameters.
-To split the computation, each TS map that is computed has a suffix to the filename
-according to the number of the command. The resulting individual TS maps can then be
-merged via :ref:`cstsmapmerge`.
+This script generates a sequence of commands to split the Test Statistic (TS)
+map computation into a distinct number of :ref:`cttsmap` computations. The
+sequence of commands is written into an ASCII file, where each line in the
+file corresponds to the command for an individual :ref:`cttsmap` run. Each TS
+map computed in that way will be suffixed with the command number, and the
+map can be combined into a single TS map using the :ref:`cstsmapmerge` script.
 
 
 General parameters
@@ -50,7 +49,18 @@ General parameters
 
 ``outmap [file]``
     Output Test Statistic map file.
- 	 	 
+
+``bins_per_job [integer]``
+    Number of bins of the TS map that should be computed within one command
+
+``compute_null [boolean]``
+    Pre-computes the null hypothesis globally and passes the value to the
+    individual commands.  If the parameter is set to ``no``, the null
+    hypothesis will be computed in each run of :ref:`cttsmap` individually.
+    
+``outfile [file]``
+	Output ASCII file name where the commands are written to.
+
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for map centre instead of xref/yref parameters?
  	 	 
@@ -75,16 +85,7 @@ General parameters
 ``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
     Projection method.
 
-``bins_per_job [integer]``
-    Number of bins of the TS map that should be computed within one command
 
-``compute_null [boolean]``
-    Pre-computes the null hypothesis globally and passes the value to the individual commands
-    If 'false', the null hypothesis will be computed in each run of :ref:`cttsmap` individually.
-    
-``outfile [file]``
-	Output ASCII file name where the commands are written to.
- 	 	 
 
 Standard parameters
 -------------------
@@ -108,12 +109,13 @@ Standard parameters
     Specifies whether an existing output TS map file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
-    Enables debug mode. In debug mode the executable will dump any log file output to the console.
+    Enables debug mode. In debug mode the executable will dump any log file
+    output to the console.
  	 	 
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = cttsmap.log) [string]``
+``(logfile = cstsmapsplit.log) [string]``
     Name of log file.
 
 
@@ -122,5 +124,4 @@ Related tools or scripts
 
 :ref:`cttsmap`
 :ref:`cstsmapmerge`
-
 

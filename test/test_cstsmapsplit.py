@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cstssplit script.
+# This scripts performs unit tests for the cstsmapsplit script.
 #
 # Copyright (C) 2016 Michael Mayer
 #
@@ -28,7 +28,7 @@ import cscripts
 # =============================== #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for cstssplit script.
+    Test class for cstssplit script
 
     This test class makes unit tests for the csstsplit script by using it
     from the command line and from Python.
@@ -37,7 +37,7 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
@@ -48,46 +48,46 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name('cstssplit')
+        self.name('cstsmapsplit')
 
         # Append tests
-        self.append(self._test_cmd, "Test cstssplit on command line")
-        #self.append(self._test_python, "Test cstssplit from Python")
+        self.append(self._test_cmd, 'Test cstsmapsplit on command line')
+        #self.append(self._test_python, 'Test cstsmapsplit from Python')
 
         # Return
         return
 
-    # Test cstssplit on command line
+    # Test cstsmapsplit on command line
     def _test_cmd(self):
         """
-        Test cstssplit on the command line.
+        Test cstsmapsplit on the command line.
         """
         # Kluge to set the command (installed version has no README file)
         if os.path.isfile("README.md"):
-            cstssplit = "../cscripts/cstssplit.py"
+            cstsmapsplit = "../cscripts/cstsmapsplit.py"
         else:
-            cstssplit = "cstssplit"
+            cstsmapsplit = "cstsmapsplit"
 
-        # Setup cstssplit command
-        cmd = cstssplit+' inobs="selected_events.fits"'+ \
-                        ' inmodel="data/crab.xml"'+ \
-                        ' srcname="Crab"'+ \
-                        ' caldb="irf"'+ \
-                        ' irf="cta_dummy_irf"'+ \
-                        ' outmap="tsmap.fits"'+ \
-                        ' nxpix=5'+ \
-                        ' nypix=5'+ \
-                        ' binsz=0.05'+ \
-                        ' coordsys="CEL"'+ \
-                        ' xref=83.63'+ \
-                        ' yref=22.01'+ \
-                        ' proj="CAR"'+ \
-                        ' compute_null=yes'+ \
-                        ' bins_per_job=5'+ \
-                        ' outfile="tsmap_cmds1.txt"'
+        # Setup cstsmapsplit command
+        cmd = cstsmapsplit+' inobs="selected_events.fits"'+ \
+                           ' inmodel="data/crab.xml"'+ \
+                           ' srcname="Crab"'+ \
+                           ' caldb="prod2"'+ \
+                           ' irf="South_0.5h"'+ \
+                           ' outmap="tsmap.fits"'+ \
+                           ' nxpix=5'+ \
+                           ' nypix=5'+ \
+                           ' binsz=0.05'+ \
+                           ' coordsys="CEL"'+ \
+                           ' xref=83.63'+ \
+                           ' yref=22.01'+ \
+                           ' proj="CAR"'+ \
+                           ' compute_null=yes'+ \
+                           ' bins_per_job=5'+ \
+                           ' outfile="tsmap_cmds1.txt"'
 
 
         # Execute cstssplit, make sure we catch any exception
@@ -103,23 +103,23 @@ class Test(gammalib.GPythonTestSuite):
         # Check observation definition XML file
         self._check_cmdfile('tsmap_cmds1.txt')
 
-        # Setup cstssplit command
-        cmd = cstssplit+' inobs="selected_events.fits"'+ \
-                        ' inmodel="data/crab.xml"'+ \
-                        ' srcname="Does_not_exist"'+ \
-                        ' caldb="irf"'+ \
-                        ' irf="cta_dummy_irf"'+ \
-                        ' outmap="tsmap.fits"'+ \
-                        ' nxpix=5'+ \
-                        ' nypix=5'+ \
-                        ' binsz=0.05'+ \
-                        ' coordsys="CEL"'+ \
-                        ' xref=83.63'+ \
-                        ' yref=22.01'+ \
-                        ' proj="CAR"'+ \
-                        ' compute_null=yes'+ \
-                        ' bins_per_job=5'+ \
-                        ' outfile="tsmap_cmds2.txt"'
+        # Setup cstsmapsplit command
+        cmd = cstsmapsplit+' inobs="selected_events.fits"'+ \
+                           ' inmodel="data/crab.xml"'+ \
+                           ' srcname="Does_not_exist"'+ \
+                           ' caldb="prod2"'+ \
+                           ' irf="South_0.5h"'+ \
+                           ' outmap="tsmap.fits"'+ \
+                           ' nxpix=5'+ \
+                           ' nypix=5'+ \
+                           ' binsz=0.05'+ \
+                           ' coordsys="CEL"'+ \
+                           ' xref=83.63'+ \
+                           ' yref=22.01'+ \
+                           ' proj="CAR"'+ \
+                           ' compute_null=yes'+ \
+                           ' bins_per_job=5'+ \
+                           ' outfile="tsmap_cmds2.txt"'
                         
 
         # Execute cstssplit, make sure we catch any exception
@@ -135,31 +135,30 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
-    # Test cstssplit from Python
+    # Test cstsmapsplit from Python
     def _test_python(self):
         """
-        Test cstssplit from Python.
+        Test cstsmapsplit from Python.
         """
-        # Set-up cstssplit
-        tssplit = cscripts.cstssplit()
-        tssplit['inobs'] = 'obs_selected.xml'
-        tssplit['inmodel'] = 'data/crab.xml'
-        tssplit['xref']   = 83.6331
-        tssplit['yref']  = 22.01
-        tssplit['coordsys']   = 'CEL'
-        tssplit['proj'] = 'CAR'
-        tssplit['binsz']  = 0.05
-        tssplit['nxpix']  = 5
-        tssplit['nypix']  = 5
-        tssplit['compute_null']  = False
-        tssplit['bins_per_job']  = 5
-        tssplit['outfile']  = 'tsmap_cmd_py1.txt'
-
+        # Set-up cstsmapsplit
+        tsmapsplit = cscripts.cstsmapsplit()
+        tsmapsplit['inobs']        = 'obs_selected.xml'
+        tsmapsplit['inmodel']      = 'data/crab.xml'
+        tsmapsplit['xref']         = 83.6331
+        tsmapsplit['yref']         = 22.01
+        tsmapsplit['coordsys']     = 'CEL'
+        tsmapsplit['proj']         = 'CAR'
+        tsmapsplit['binsz']        = 0.05
+        tsmapsplit['nxpix']        = 5
+        tsmapsplit['nypix']        = 5
+        tsmapsplit['compute_null'] = False
+        tsmapsplit['bins_per_job'] = 5
+        tsmapsplit['outfile']      = 'tsmap_cmd_py1.txt'
 
         # Run cstssplit script and save run list
-        tssplit.logFileOpen()   # Make sure we get a log file
-        tssplit.run()
-        tssplit.save()
+        tsmapsplit.logFileOpen()   # Make sure we get a log file
+        tsmapsplit.run()
+        tsmapsplit.save()
 
         # Check observation definition XML file
         self._check_cmdfile('tsmap_cmd_py1.txt')
@@ -177,8 +176,7 @@ class Test(gammalib.GPythonTestSuite):
         fname = gammalib.GFilename(filename)
         
         # Check if execution was successful
-        self.test_assert(fname.exists(),
-                          "Output of cstssplit exists")   
+        self.test_assert(fname.exists(), 'Check of output filename exists')
         
         # Return
         return

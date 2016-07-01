@@ -38,9 +38,9 @@ __all__ = [
     "cssens",
     "csspec",
     "cstsdist",
+    "cstsmapsplit",
     "cstsmapmerge",
     "csworkflow",
-    "cstssplit",
     "obsutils"
 ]
 if cur_version > req_version:
@@ -64,9 +64,9 @@ from cscripts.csroot2caldb import csroot2caldb
 from cscripts.cssens       import cssens
 from cscripts.csspec       import csspec
 from cscripts.cstsdist     import cstsdist
+from cscripts.cstsmapsplit import cstsmapsplit
 from cscripts.cstsmapmerge import cstsmapmerge
 from cscripts.csworkflow   import csworkflow
-from cscripts.cstssplit    import cstssplit
 from cscripts              import obsutils
 if cur_version > req_version:
     from cscripts.csfindobs  import csfindobs

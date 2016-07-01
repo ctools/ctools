@@ -49,9 +49,9 @@ cscripts
    csresmap --- Generates residual map <csresmap>
    cssens --- Computes CTA sensitivity <cssens>
    csspec --- Computes spectral points <csspec>
-   cstsdist --- Generates TS distribution <cstsdist>
-   cstssplit --- Creates commands to slice the ts map computations <cstssplit>
-   cstsmapmerge --- Merges slices from ts map computations <cstsmapmerge>
+   cstsdist --- Generates Test Statistic distribution <cstsdist>
+   cstsmapsplit --- Creates commands to split the Test Statistic map computations <cstsmapsplit>
+   cstsmapmerge --- Merges slices from Test Statistic map computations <cstsmapmerge>
    
  
 

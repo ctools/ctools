@@ -25,10 +25,10 @@ import gammalib
 import ctools
 
 
-# ============== #
-# cstssplit class #
-# ============== #
-class cstssplit(ctools.cscript):
+# ================== #
+# cstsmapsplit class #
+# ================== #
+class cstsmapsplit(ctools.cscript):
     """
     Generates commands to split TS map computation
     
@@ -42,18 +42,20 @@ class cstssplit(ctools.cscript):
     # Consructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
 
-        # Set name
-        self._name    = 'cstssplit'
+        # Set name and version
+        self._name    = 'cstsmapsplit'
         self._version = '1.1.0'
-        self._outmap = gammalib.GFilename()
+
+        # Set data members
+        self._outmap       = gammalib.GFilename()
         self._bins_per_job = 0
         self._compute_null = False
-        self._outfile = gammalib.GFilename()
-        self._map = gammalib.GSkyMap()
-        self._cmd = []
+        self._outfile      = gammalib.GFilename()
+        self._map          = gammalib.GSkyMap()
+        self._cmd          = []
         
         # Initialise observation container from constructor arguments.
         self._obs, argv = self._set_input_obs(argv)
@@ -69,7 +71,7 @@ class cstssplit(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile and setup the observation.
+        Get parameters from parfile and setup the observation
         """
          
         # If there are no observations in container then get some ...
@@ -103,7 +105,9 @@ class cstssplit(ctools.cscript):
         """
         Compute null hypothesis
         
-        Returns:
+        Returns
+        -------
+        logl : float
             Log-likelihood of null hypothesis
         """
         
@@ -134,7 +138,7 @@ class cstssplit(ctools.cscript):
     
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         
         # Switch screen logging on in debug mode
@@ -238,9 +242,10 @@ class cstssplit(ctools.cscript):
             if binmax > nbins:
                 binmax = nbins           
                 
-            # Complete command by binning parameters
-            sliced_command = base_command + ' binmin='+str(binmin)+' binmax='+str(binmax)
-            sliced_command += ' outmap='+outmap + ' logfile='+outmap.replace('.fits','.log')
+            # Setup sliced command
+            sliced_command = '%s binmin=%s binmax=%s outmap=%s logfile=%s' % \
+                             (base_command, str(binmin), str(binmax),
+                              outmap, outmap.replace('.fits','.log'))
             
             # Append command to list of commands
             self._cmd.append(sliced_command)
@@ -260,7 +265,7 @@ class cstssplit(ctools.cscript):
     
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         
         # Run the script
@@ -290,18 +295,15 @@ class cstssplit(ctools.cscript):
         
         # Return
         return
+
+
 # ======================== #
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Generates splitted TS map commands
-    """
     
     # Create instance of application
-    app = cstssplit(sys.argv)
+    app = cstsmapsplit(sys.argv)
     
     # Execute application
     app.execute()
-    
-#  
