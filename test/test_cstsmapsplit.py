@@ -69,7 +69,7 @@ class Test(test):
         cstsmapsplit = self._script('cstsmapsplit')
 
         # Setup cstsmapsplit command
-        cmd = cstsmapsplit+' inobs="selected_events.fits"'+ \
+        cmd = cstsmapsplit+' inobs="data/crab_events.fits"'+ \
                            ' inmodel="data/crab.xml"'+ \
                            ' srcname="Crab"'+ \
                            ' caldb="prod2"'+ \
@@ -99,7 +99,7 @@ class Test(test):
         self._check_cmdfile('cstsmapsplit_cmd1.dat')
 
         # Setup cstsmapsplit command
-        cmd = cstsmapsplit+' inobs="selected_events.fits"'+ \
+        cmd = cstsmapsplit+' inobs="data/crab_events.fits"'+ \
                            ' inmodel="data/crab.xml"'+ \
                            ' srcname="Does_not_exist"'+ \
                            ' caldb="prod2"'+ \
@@ -131,7 +131,7 @@ class Test(test):
         """
         # Set-up cstsmapsplit
         tsmapsplit = cscripts.cstsmapsplit()
-        tsmapsplit['inobs']        = 'selected_events.fits'
+        tsmapsplit['inobs']        = 'data/crab_events.fits'
         tsmapsplit['inmodel']      = 'data/crab.xml'
         tsmapsplit['srcname']      = 'Crab'
         tsmapsplit['caldb']        = 'prod2'
