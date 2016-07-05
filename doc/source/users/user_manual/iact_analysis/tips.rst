@@ -292,6 +292,35 @@ Each command could run on a different machine.
   The output file name of individual jobs should be different. Otherwise files could overwrite each other. The naming of the individual slices
   is up to the user.
   
+There is a tool :ref:`cstsmapsplit` that will take of this bookkeeping. It creates an ASCII file containing all the commands
+according to the user input. The following example will create split the computation of a TS map into 2000 separate task.
+Each task will only compute 5 bins on its own. This is very useful if the observation container is large or the fit simply
+takes a long time.
+
+.. code-block:: bash
+
+  $ cstsmapsplit
+  Input event list, counts cube or observation definition XML file [selected_obs.xml]
+  Input model definition XML file [$CTOOLS/share/models/crab.xml]
+  First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 
+  Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 
+  Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR] 
+  Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] 
+  Image scale (in degrees/pixel) [0.02]
+  Size of the X axis in pixels [100]
+  Size of the Y axis in pixels [100]
+  Test source name [Crab] 
+  Output Test Statistic map file [tsmap.fits] 
+  Number of TS map bins per task [5] 
+  Compute null hypothesis first? [yes] 
+  ASCII file containing all commands [commands.dat] 
+  
+.. note::
+  
+  One can decide if we want to compute the null hypothesis first. This way, a parameter optimisation will be performed without
+  the test source. The obtained likelihood value will then be passed to each individual task of :ref:`cttsmap`. 
+  If ``compute_null=no``, each task has to compute the null hypothesis itself.
+  
 Merge sliced TS maps
 ^^^^^^^^^^^^^^^^^^^^
 The tool :ref:`cstsmapmerge` is intended to take care of merging the files that were produced while splitting the TS map computation.
