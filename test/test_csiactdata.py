@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set data members
+        self._datapath = self._datadir + '/iactdata'
+
         # Return
         return
 
@@ -69,7 +72,7 @@ class Test(test):
         csiactdata = self._script('csiactdata')
 
         # Setup csiactdata command
-        cmd = csiactdata+' datapath="iactdata"'+ \
+        cmd = csiactdata+' datapath="'+self._datapath+'"'+ \
                          ' logfile="csiactdata_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -98,7 +101,7 @@ class Test(test):
         """
         # Set-up csiactdata
         iactdata = cscripts.csiactdata()
-        iactdata['datapath'] = 'iactdata'
+        iactdata['datapath'] = self._datapath
         iactdata['logfile']  = 'csiactdata_py1.log'
         iactdata['chatter']  = 2
 

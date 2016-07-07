@@ -42,6 +42,13 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._inobs     = self._datadir + '/crab_cntmap_small.fits'
+        self._expcube   = self._datadir + '/crab_expcube.fits'
+        self._psfcube   = self._datadir + '/crab_psfcube.fits'
+        self._edispcube = self._datadir + '/crab_edispcube.fits'
+        self._bkgcube   = self._datadir + '/crab_bkgcube.fits'
+
         # Return
         return
 
@@ -69,9 +76,10 @@ class Test(test):
         csspec = self._script('csspec')
 
         # Setup csspec command
-        cmd = csspec+' inobs="data/crab_events.fits"'+ \
-                     ' inmodel="data/crab.xml"'+ \
-                     ' srcname="Crab" caldb="prod2" irf="South_0.5h"' + \
+        cmd = csspec+' inobs="'+self._events+'"'+ \
+                     ' inmodel="'+self._model+'"'+ \
+                     ' srcname="Crab"'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
                      ' outfile="csspec_cmd1.fits"'+ \
                      ' logfile="csspec_cmd1.log" chatter=1'
@@ -89,8 +97,9 @@ class Test(test):
 
         # Setup csspec command
         cmd = csspec+' inobs="input_file_that_does_not_exist.fits"'+ \
-                     ' inmodel="data/crab.xml"'+ \
-                     ' srcname="Crab" caldb="prod2" irf="South_0.5h"' + \
+                     ' inmodel="'+self._model+'"'+ \
+                     ' srcname="Crab"'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
                      ' outfile="csspec_cmd2.fits"'+ \
                      ' logfile="csspec_cmd2.log" chatter=1'
@@ -109,11 +118,11 @@ class Test(test):
         """
         # Set-up unbinned csspec
         spec = cscripts.csspec()
-        spec['inobs']    = 'data/crab_events.fits'
-        spec['inmodel']  = 'data/crab.xml'
+        spec['inobs']    = self._events
+        spec['inmodel']  = self._model
         spec['srcname']  = 'Crab'
-        spec['caldb']    = 'prod2'
-        spec['irf']      = 'South_0.5h'
+        spec['caldb']    = self._caldb
+        spec['irf']      = self._irf
         spec['outfile']  = 'csspec_py1.fits'
         spec['ebinalg']  = 'LOG'
         spec['enumbins'] = 5
@@ -132,12 +141,12 @@ class Test(test):
 
         # Set-up binned csspec
         spec = cscripts.csspec()
-        spec['inobs']     = 'data/crab_cntmap_small.fits'
-        spec['expcube']   = 'data/crab_expcube.fits'
-        spec['psfcube']   = 'data/crab_psfcube.fits'
-        spec['edispcube'] = 'data/crab_edispcube.fits'
-        spec['bkgcube']   = 'data/crab_bkgcube.fits'
-        spec['inmodel']   = 'data/crab.xml'
+        spec['inobs']     = self._inobs
+        spec['expcube']   = self._expcube
+        spec['psfcube']   = self._psfcube
+        spec['edispcube'] = self._edispcube
+        spec['bkgcube']   = self._bkgcube
+        spec['inmodel']   = self._model
         spec['srcname']   = 'Crab'
         spec['outfile']   = 'csspec_py2.fits'
         spec['ebinalg']   = 'LOG'
@@ -168,8 +177,10 @@ class Test(test):
         spectrum = fits['SPECTRUM']
 
         # Check dimensions
-        self.test_value(spectrum.nrows(), bins, 'Check for %d rows in spectrum' % bins)
-        self.test_value(spectrum.ncols(), 8, 'Check for 8 columns in spectrum')
+        self.test_value(spectrum.nrows(), bins,
+             'Check for %d rows in spectrum' % bins)
+        self.test_value(spectrum.ncols(), 8,
+             'Check for 8 columns in spectrum')
 
         # Return
         return

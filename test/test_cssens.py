@@ -69,8 +69,9 @@ class Test(test):
         cssens = self._script('cssens')
 
         # Setup cssens command
-        cmd = cssens+' inmodel="data/crab.xml"'+ \
-                     ' srcname="Crab" caldb="prod2" irf="South_0.5h"' + \
+        cmd = cssens+' inmodel="'+self._model+'"'+ \
+                     ' srcname="Crab"'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' duration=1800.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
                      ' outfile="cssens_cmd1.dat"'+ \
                      ' logfile="cssens_cmd1.log" chatter=1'
@@ -88,7 +89,8 @@ class Test(test):
 
         # Setup cssens command
         cmd = cssens+' inmodel="model_that_does_not_exist.xml"'+ \
-                     ' srcname="Crab" caldb="prod2" irf="South_0.5h"' + \
+                     ' srcname="Crab"'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' duration=1800.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
                      ' outfile="cssens_cmd2.dat"'+ \
                      ' logfile="cssens_cmd2.log" chatter=2'
@@ -108,10 +110,10 @@ class Test(test):
         # Set-up cssens
         sens = cscripts.cssens()
         sens['inobs']    = 'NONE'
-        sens['inmodel']  = 'data/crab.xml'
+        sens['inmodel']  = self._model
         sens['srcname']  = 'Crab'
-        sens['caldb']    = 'prod2'
-        sens['irf']      = 'South_0.5h'
+        sens['caldb']    = self._caldb
+        sens['irf']      = self._irf
         sens['outfile']  = 'cssens_py1.dat'
         sens['duration'] = 1800.0
         sens['rad']      = 3.0
@@ -141,8 +143,10 @@ class Test(test):
         results = gammalib.GCsv(filename, ',')
 
         # Check dimensions
-        self.test_value(results.nrows(), 2, 'Check for 2 rows in sensitivity file')
-        self.test_value(results.ncols(), 7, 'Check for 7 columns in sensitivity file')
+        self.test_value(results.nrows(), 2,
+             'Check for 2 rows in sensitivity file')
+        self.test_value(results.ncols(), 7,
+             'Check for 7 columns in sensitivity file')
 
         # Return
         return

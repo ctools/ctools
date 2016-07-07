@@ -29,96 +29,140 @@
 # Works only if Python is available
 if WITH_PYTHON
 
+# Set wrapper directory depending on the whether the wrappers were actually
+# shipped with the distribution of whether the wrappers have to be build
+# using swig
+if BUILD_WRAPPERS
+  wrapperdir = $(builddir)
+else
+  wrapperdir = $(srcdir)
+endif
+
 # Test scripts to be distributed in $(pyexecdir)/ctools/tests
 testscripts = ctools/tests/__init__.py \
-              ../test/testing.py \
-              ../test/test_python_ctools.py \
-              ../test/test_ctobssim.py \
-              ../test/test_ctselect.py \
-              ../test/test_ctbin.py \
-              ../test/test_ctlike.py \
-              ../test/test_cttsmap.py \
-              ../test/test_ctmodel.py \
-              ../test/test_ctskymap.py \
-              ../test/test_ctexpcube.py \
-              ../test/test_ctpsfcube.py \
-              ../test/test_ctedispcube.py \
-              ../test/test_ctbkgcube.py \
-              ../test/test_ctmapcube.py \
-              ../test/test_ctcubemask.py \
-              ../test/test_ctbutterfly.py \
-              ../test/test_ctulimit.py \
-              ../test/test_cterror.py \
-              ../test/test_pipelines.py
-testdata    = ../test/data/crab.xml \
-              ../test/data/crab_events.fits.gz \
-              ../test/data/crab_cntmap.fits.gz \
-              ../test/data/exclusion.reg
-testirf     = ../test/irf/cta_dummy_irf.dat
+              $(top_srcdir)/test/testing.py \
+              $(top_srcdir)/test/test_python_ctools.py \
+              $(top_srcdir)/test/test_ctobssim.py \
+              $(top_srcdir)/test/test_ctselect.py \
+              $(top_srcdir)/test/test_ctbin.py \
+              $(top_srcdir)/test/test_ctlike.py \
+              $(top_srcdir)/test/test_cttsmap.py \
+              $(top_srcdir)/test/test_ctmodel.py \
+              $(top_srcdir)/test/test_ctskymap.py \
+              $(top_srcdir)/test/test_ctexpcube.py \
+              $(top_srcdir)/test/test_ctpsfcube.py \
+              $(top_srcdir)/test/test_ctedispcube.py \
+              $(top_srcdir)/test/test_ctbkgcube.py \
+              $(top_srcdir)/test/test_ctmapcube.py \
+              $(top_srcdir)/test/test_ctcubemask.py \
+              $(top_srcdir)/test/test_ctbutterfly.py \
+              $(top_srcdir)/test/test_ctulimit.py \
+              $(top_srcdir)/test/test_cterror.py \
+              $(top_srcdir)/test/test_pipelines.py
 
-# Distribute scripts
-EXTRA_DIST       = $(testscripts) $(testdata) $(testirf)
+# Test data to be distributed in $(pyexecdir)/ctools/tests/data
+testdata = $(top_srcdir)/test/data/crab.xml \
+           $(top_srcdir)/test/data/crab_events.fits.gz \
+           $(top_srcdir)/test/data/crab_cntmap.fits.gz \
+           $(top_srcdir)/test/data/exclusion.reg
+
+# Install test scripts and test data. Note that we don't need to prepend
+# $(DESTDIR) here (not fully clear why, but that's the way it is)
+
 testscriptsdir   = $(pyexecdir)/ctools/tests
 testscripts_DATA = $(testscripts)
 testdatadir      = $(pyexecdir)/ctools/tests/data
 testdata_DATA    = $(testdata)
-testirfdir       = $(pyexecdir)/ctools/tests/irf
-testirf_DATA     = $(testirf)
 
-# Set SWIG interface filename
-SWIG_INTERFACE = ctools/tools.i
+# If building of Python wrappers was requested then add them to the build
+# source
+if BUILD_WRAPPERS
+
+# Set SWIG compile command
+SWIGCOMPILE = $(SWIG) -c++ -python -Wall \
+              -I$(DESTDIR)$(prefix)/share/gammalib/swig \
+              -I$(GAMMALIB)/share/gammalib/swig \
+              -I$(top_srcdir)/pyext
+
+# Sources that are required for the build. All targets in the list will be
+# built before anything. These are honored by 'make all', 'make check' and
+# 'make install'. We use this here to make sure that all these targets are
+# build by swig before we start compiling the Python modules.
+BUILT_SOURCES = $(wrapperdir)/ctools/tools_wrap.cpp \
+                $(wrapperdir)/ctools/tools.py
+
+# Add the wrappers to the files that will be deleted in a 'make clean'
+CLEAN_FILES = $(BUILT_SOURCES)
+
+# Rule to build SWIG wrappers
+swig: $(BUILT_SOURCES)
+
+# Rule for building Python wrappers using SWIG.
+ctools/tools.py: ctools/tools_wrap.cpp
+ctools/tools_wrap.cpp: ctools/tools.i
+	if $(SWIGCOMPILE) -MMD -MF "tools.Tpi" -o ctools/tools_wrap.cpp $<; \
+	then mv -f "tools.Tpi" "tools.Pi"; else rm -f "tools.Tpi"; exit 1; fi
+
+# ... otherwise, if building of Python wrappers has not been required then
+# they are located in the source directory and we don't have to build them
+# using swig
+else
+CLEAN_FILES =
+BUILT_SOURCES =
+endif # BUILD_WRAPPERS
+
+# Extra files to be distributed in the tar file
+EXTRA_DIST = ctools/tests \
+             $(wrapperdir)/ctools/tools_wrap.cpp \
+             $(wrapperdir)/ctools/tools.py \
+             $(testscripts) \
+             $(testdata) \
+             $(testirf)
 
 # Dependencies. Obtain the list of dependencies by executing ls.
 DEPFILES = $(shell ls *.Pi 2> /dev/null)
 include $(DEPFILES)
 
-# Define the targets that should be built before anything else.
-# These are honored by 'make all', 'make check' and 'make install'.
-if HAVE_SWIG
-  BUILT_SOURCES = ctools/tools_wrap.cpp ctools/tools.py
-endif
-
-# Set files to be removed in clean. We remove only the SWIG interface files
-# if SWIG is available to rebuild them. 
-if HAVE_SWIG
-  CLEAN_FILES = $(BUILT_SOURCES)
-endif
-CLEANFILES = $(CLEAN_FILES) $(DEPFILES)
-
-# Set SWIG compile command
-SWIGCOMPILE = $(SWIG) -c++ -python -Wall -I$(prefix)/share/gammalib/swig -I$(GAMMALIB)/share/gammalib/swig
-
+# Things we want to do when 'make' is invoked.
 all-local: build
 
-# We build the python extension twice since the install step needs the result
-# in a specific directory and the test make check has no access to the name
-# of this specific directory. So we build one instance for checking, the other
-# for installation. If we could get the name built by distutils we could avoid
-# this.
-build: ctools/tools_wrap.cpp ctools/tools.py
+# Build the ctools extension module
+build: $(BUILT_SOURCES)
 	$(PYTHON) setup.py build
 if IS_ELCAPITAN
 	-for f in build/ctools/ctools/_*.so; do \
 		echo "Post process module "$$f; \
 		install_name_tool -change $(libdir)/libctools.1.dylib @rpath/libctools.1.dylib $$f; \
-		install_name_tool -change $(libdir)/libgamma.1.dylib @rpath/libgamma.1.dylib $$f; \
+		install_name_tool -change $(libdir)/libgamma.2.dylib @rpath/libgamma.2.dylib $$f; \
 		install_name_tool -add_rpath $(libdir) $$f; \
-		install_name_tool -add_rpath $(abs_top_srcdir)/src/.libs $$f; \
+		install_name_tool -add_rpath $(abs_top_builddir)/src/.libs $$f; \
 	done
 endif
 
+# Install the ctools Python module
 install-exec-local:
-	$(PYTHON) setup.py install --prefix=$(prefix)
+	$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix)
 
+# Uninstall the ctools Python module
+uninstall-local:
+	rm -rf $(DESTDIR)$(pyexecdir)/ctools/*.py
+	rm -rf $(DESTDIR)$(pyexecdir)/ctools/*.pyc
+	rm -rf $(DESTDIR)$(pyexecdir)/ctools/*.so
+	rm -rf $(DESTDIR)$(pyexecdir)/ctools/__pycache__
+	rm -rf $(DESTDIR)$(pyexecdir)/ctools/tests/*.pyc
+	rm -rf $(DESTDIR)$(pyexecdir)/ctools/tests/__pycache__
+	rm -rf $(DESTDIR)$(pyexecdir)/ctools-@VERSION@*.egg-info
+
+# Set files to be removed in 'make clean'
+CLEANFILES = $(CLEAN_FILES) $(DEPFILES)
+
+# Files to be removed in build directory
 clean-local:
-	rm -rf build _tools.so
-
-# Rule for building Python wrappers using SWIG.
-if HAVE_SWIG
-ctools/tools.py: ctools/tools_wrap.cpp
-ctools/tools_wrap.cpp: $(SWIG_INTERFACE)
-	if $(SWIGCOMPILE) -MMD -MF "tools.Tpi" -o ctools/tools_wrap.cpp $<; \
-	then mv -f "tools.Tpi" "tools.Pi"; else rm -f "tools.Tpi"; exit 1; fi
-endif # HAVE_SWIG
+	rm -rf build
+	rm -rf $(builddir)/ctools/*.py
+	rm -rf $(builddir)/ctools/*.pyc
+	rm -rf $(builddir)/ctools/*_wrap.cpp
+	rm -rf $(builddir)/ctools/_tools.so
+	rm -rf $(builddir)/ctools/__pycache__
 
 endif # WITH_PYTHON

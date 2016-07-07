@@ -69,10 +69,10 @@ class Test(test):
         csresmap = self._script('csresmap')
 
         # Setup csresmap command
-        cmd = csresmap+' inobs="data/crab_events.fits"'+ \
+        cmd = csresmap+' inobs="'+self._events+'"'+ \
                        ' outmap="csresmap_cmd1.fits"'+ \
-                       ' inmodel="data/crab.xml"'+ \
-                       ' caldb="prod2" irf="South_0.5h"' + \
+                       ' inmodel="'+self._model+'"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' emin=0.1 emax=100.0 enumbins=20'+ \
                        ' nxpix=50 nypix=50 binsz=0.02'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -93,8 +93,8 @@ class Test(test):
         # Setup csresmap command
         cmd = csresmap+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' outmap="csresmap_cmd1.fits"'+ \
-                       ' inmodel="data/crab.xml"'+ \
-                       ' caldb="prod2" irf="South_0.5h"' + \
+                       ' inmodel="'+self._model+'"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' emin=0.1 emax=100.0 enumbins=20'+ \
                        ' nxpix=50 nypix=50 binsz=0.02'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -115,11 +115,11 @@ class Test(test):
         """
         # Set-up csresmap for event list
         resmap = cscripts.csresmap()
-        resmap['inobs']     = 'data/crab_events.fits'
+        resmap['inobs']     = self._events
         resmap['outmap']    = 'csresmap_py1.fits'
-        resmap['inmodel']   = 'data/crab.xml'
-        resmap['caldb']     = 'prod2'
-        resmap['irf']       = 'South_0.5h'
+        resmap['inmodel']   = self._model
+        resmap['caldb']     = self._caldb
+        resmap['irf']       = self._irf
         resmap['emin']      = 0.1
         resmap['emax']      = 100.0
         resmap['enumbins']  = 20
@@ -144,15 +144,15 @@ class Test(test):
 
         # Set-up csresmap for counts cube
         resmap = cscripts.csresmap()
-        resmap['inobs']     = 'data/crab_cntmap.fits'
+        resmap['inobs']     = self._cntcube
         resmap['modcube']   = 'NONE'
         resmap['expcube']   = 'NONE'
         resmap['psfcube']   = 'NONE'
         resmap['edispcube'] = 'NONE'
         resmap['bkgcube']   = 'NONE'
-        resmap['caldb']     = 'prod2'
-        resmap['irf']       = 'South_0.5h'
-        resmap['inmodel']   = 'data/crab.xml'
+        resmap['caldb']     = self._caldb
+        resmap['irf']       = self._irf
+        resmap['inmodel']   = self._model
         resmap['outmap']    = 'csresmap_py2.fits'
         resmap['algorithm'] = 'SUBDIV'
         resmap['logfile']   = 'csresmap_py2.log'

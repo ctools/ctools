@@ -2,9 +2,9 @@
 <workflow>
     <actor name="input">
         <output>
-            <parameter name="inmodel" value="data/crab.xml" />
-            <parameter name="caldb"   value="irf" />
-            <parameter name="irf"     value="cta_dummy_irf" />
+            <parameter name="inmodel" value="$(TEST_DATA)/crab.xml" />
+            <parameter name="caldb"   value="prod2" />
+            <parameter name="irf"     value="South_0.5h" />
             <parameter name="edisp"   value="no" />
             <parameter name="deadc"   value="0.95" />
             <parameter name="ra"      value="83.63" />

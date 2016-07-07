@@ -22,24 +22,19 @@ import sys
 import time
 import cscripts
 
-# Optionally import processing module
-try:
-    import processing
-    has_processing = True
-except:
-    has_processing = False
-
 
 # ====================== #
 # Create TS distribution #
 # ====================== #
-def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
-                          enumbins=0, log=False):
+def create_ts(datadir, loge, emin, emax, ntrials=100, duration=180000.0,
+              enumbins=0, log=False):
     """
     Create TS distribution.
 
     Parameters
     ----------
+    datadir : str
+        Data directory
     loge : float
         Logarithm of mean energy (TeV)
     emin : float
@@ -60,7 +55,7 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
 
     # Setup cstsdist tool
     tsdist = cscripts.cstsdist()
-    tsdist['inmodel']  = 'data/crab.xml'
+    tsdist['inmodel']  = datadir+'/crab.xml'
     tsdist['srcname']  = 'Crab'
     tsdist['outfile']  = outfile
     tsdist['ntrials']  = ntrials
@@ -104,12 +99,14 @@ if __name__ == '__main__':
     enumbins    = 0
     duration    = 180000.0
     max_threads = 1
+    datadir     = 'data'
 
     # Parameter dictionnary
     pars = [{'option': '-n', 'value': ntrials},
             {'option': '-e', 'value': enumbins},
             {'option': '-d', 'value': duration},
-            {'option': '-m', 'value': max_threads}]
+            {'option': '-m', 'value': max_threads},
+            {'option': '-p', 'value': datadir}]
 
     # Gather parameters from command line
     i = 1
@@ -137,6 +134,7 @@ if __name__ == '__main__':
     enumbins    = pars[1]['value']
     duration    = pars[2]['value']
     max_threads = pars[3]['value']
+    datadir     = pars[4]['value']
 
     # Loop over energy bands. The energy bands are those that are also
     # used for sensitivity computation.
@@ -152,33 +150,6 @@ if __name__ == '__main__':
         else:
             loge = 'p'+str(abs(loge))
 
-        # If processing support is available then start max_threads processes
-        # in parallel
-        if has_processing:
-
-            # Wait until one thread has finished
-            while len(processing.activeChildren()) >= max_threads:
-                time.sleep(10)
-
-            # Set arguments
-            args   = (loge, emin, emax)
-            kwargs = {'ntrials': ntrials, 'enumbins': enumbins,
-                      'duration': duration}
-
-            # Generate pull distribution
-            p = processing.Process(target=create_ts, args=args, kwargs=kwargs)
-            p.start()
-            print('Process emin=%.4f emax=%.4f started.' % (emin, emax))
-
-            # Wait a short time to allow process to start
-            time.sleep(1)
-
-        # ... otherwise simply start a single process
-        else:
-            create_ts(loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
-                      duration=duration)
-
-    # If processing support is available then wait until all threads finished
-    if has_processing:
-        while len(processing.activeChildren()) > 0:
-            time.sleep(10)
+        # Create TS
+        create_ts(datadir, loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
+                  duration=duration)

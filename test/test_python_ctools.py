@@ -54,6 +54,10 @@ def test(installed=False):
     installed : bool, optional
         Flag indicating whether the script has been installed or not
     """
+    # Set environment variables first
+    if installed:
+        os.environ['TEST_DATA'] = 'data'
+
     # Allocate test suite container
     suites = gammalib.GTestSuites('ctools unit testing')
 
@@ -130,7 +134,10 @@ def test(installed=False):
 
         # Copy over test data and irf
         os.system('cp -r %s %s' % (dirname+'/data', 'data'))
-        os.system('cp -r %s %s' % (dirname+'/irf',  'irf'))
+
+    # ... otherwise set the calibration database
+    else:
+        os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
 
     # Set PFILES environment variable
     try:
@@ -141,9 +148,11 @@ def test(installed=False):
 
     # Copy over pfiles
     if not installed:
-        os.system('cp -r ../src/*/*.par pfiles/')
+        os.system('cp -r %s/src/*/*.par pfiles/' % (os.environ['TEST_SRCDIR']))
+        os.system('chmod u+w pfiles/*')
     else:
         os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
+        os.system('chmod u+w pfiles/*')
 
     # Run test suite
     success = suites.run()

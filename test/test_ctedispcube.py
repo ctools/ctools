@@ -65,10 +65,10 @@ class Test(test):
         ctedispcube = self._tool('ctedispcube')
 
         # Setup ctedispcube command
-        cmd = ctedispcube+' inobs="data/crab_events.fits"'+ \
+        cmd = ctedispcube+' inobs="'+self._events+'"'+ \
                           ' incube="NONE"'+ \
                           ' outcube="ctedispcube_cmd1.fits"'+ \
-                          ' caldb="prod2" irf="South_0.5h"'+ \
+                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                           ' nxpix=10 nypix=10 binsz=0.4'+ \
                           ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -90,7 +90,7 @@ class Test(test):
         cmd = ctedispcube+' inobs="events_that_do_not_exist.fits"'+ \
                           ' incube="NONE"'+ \
                           ' outcube="ctedispcube_cmd2.fits"'+ \
-                          ' caldb="prod2" irf="South_0.5h"'+ \
+                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                           ' nxpix=10 nypix=10 binsz=0.4'+ \
                           ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -111,11 +111,11 @@ class Test(test):
         """
         # Set-up ctedispcube
         edispcube = ctools.ctedispcube()
-        edispcube['inobs']     = 'data/crab_events.fits'
+        edispcube['inobs']     = self._events
         edispcube['incube']    = 'NONE'
         edispcube['outcube']   = 'ctedispcube_py1.fits'
-        edispcube['caldb']     = 'prod2'
-        edispcube['irf']       = 'South_0.5h'
+        edispcube['caldb']     = self._caldb
+        edispcube['irf']       = self._irf
         edispcube['ebinalg']   = 'LOG'
         edispcube['emin']      = 0.1
         edispcube['emax']      = 100

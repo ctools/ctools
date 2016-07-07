@@ -65,12 +65,12 @@ class Test(test):
         ctbkgcube = self._tool('ctbkgcube')
 
         # Setup ctbkgcube command
-        cmd = ctbkgcube+' inobs="data/crab_events.fits"'+ \
-                        ' inmodel="data/crab.xml"'+ \
+        cmd = ctbkgcube+' inobs="'+self._events+'"'+ \
+                        ' inmodel="'+self._model+'"'+ \
                         ' incube="NONE"'+ \
                         ' outcube="ctbkgcube_cmd1.fits"'+ \
                         ' outmodel="ctbkgcube_cmd1.xml"'+ \
-                        ' caldb="prod2" irf="South_0.5h"'+ \
+                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                         ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                         ' nxpix=10 nypix=10 binsz=0.4'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -89,11 +89,11 @@ class Test(test):
 
         # Setup ctbkgcube command
         cmd = ctbkgcube+' inobs="event_file_that_does_not_exist.fits"'+ \
-                        ' inmodel="data/crab.xml"'+ \
+                        ' inmodel="'+self._model+'"'+ \
                         ' incube="NONE"'+ \
                         ' outcube="ctbkgcube_cmd2.fits"'+ \
                         ' outmodel="ctbkgcube_cmd2.xml"'+ \
-                        ' caldb="prod2" irf="South_0.5h"'+ \
+                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                         ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                         ' nxpix=10 nypix=10 binsz=0.4'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -113,13 +113,13 @@ class Test(test):
         """
         # Set-up ctbkgcube
         bkgcube = ctools.ctbkgcube()
-        bkgcube['inobs']    = 'data/crab_events.fits'
-        bkgcube['inmodel']  = 'data/crab.xml'
+        bkgcube['inobs']    = self._events
+        bkgcube['inmodel']  = self._model
         bkgcube['incube']   = 'NONE'
         bkgcube['outcube']  = 'ctbkgcube_py1.fits'
         bkgcube['outmodel'] = 'ctbkgcube_py1.xml'
-        bkgcube['caldb']    = 'prod2'
-        bkgcube['irf']      = 'South_0.5h'
+        bkgcube['caldb']    = self._caldb
+        bkgcube['irf']      = self._irf
         bkgcube['ebinalg']  = 'LOG'
         bkgcube['emin']     = 0.1
         bkgcube['emax']     = 100

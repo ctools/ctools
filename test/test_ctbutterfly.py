@@ -28,12 +28,12 @@ from testing import test
 # =============================== #
 class Test(test):
     """
-    Test class for ctbutterfly tool.
+    Test class for ctbutterfly tool
     """
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         test.__init__(self)
@@ -44,7 +44,7 @@ class Test(test):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('ctbutterfly')
@@ -59,16 +59,16 @@ class Test(test):
     # Test ctbutterfly on command line
     def _test_cmd(self):
         """
-        Test ctbutterfly on the command line.
+        Test ctbutterfly on the command line
         """
         # Set tool name
         ctbutterfly = self._tool('ctbutterfly')
 
         # Setup ctbutterfly command
-        cmd = ctbutterfly+' inobs="data/crab_events.fits"'+\
-                          ' outfile="ctbutterfly_cmd1.txt"'+ \
-                          ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                          ' caldb="prod2" irf="South_0.5h"'+ \
+        cmd = ctbutterfly+' inobs="'+self._events+'"'+\
+                          ' outfile="ctbutterfly_cmd1.dat"'+ \
+                          ' inmodel="'+self._model +'" srcname="Crab"'+ \
+                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' emin=0.1 emax=100.0'+ \
                           ' logfile="ctbutterfly_cmd1.log" chatter=1'
 
@@ -81,13 +81,13 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('ctbutterfly_cmd1.txt')
+        self._check_result_file('ctbutterfly_cmd1.dat')
 
         # Setup ctbutterfly command
         cmd = ctbutterfly+' inobs="event_file_that_does_not_exist.fits"'+\
-                          ' outfile="ctbutterfly_cmd2.txt"'+ \
-                          ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                          ' caldb="prod2" irf="South_0.5h"'+ \
+                          ' outfile="ctbutterfly_cmd2.dat"'+ \
+                          ' inmodel="'+self._model +'" srcname="Crab"'+ \
+                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' emin=0.1 emax=100.0'+ \
                           ' logfile="ctbutterfly_cmd2.log" chatter=1'
 
@@ -105,14 +105,14 @@ class Test(test):
         """
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
-        butterfly['inobs']   = 'data/crab_events.fits'
-        butterfly['inmodel'] = 'data/crab.xml'
+        butterfly['inobs']   = self._events
+        butterfly['inmodel'] = self._model
         butterfly['srcname'] = 'Crab'
-        butterfly['caldb']   = 'prod2'
-        butterfly['irf']     = 'South_0.5h'
+        butterfly['caldb']   = self._caldb
+        butterfly['irf']     = self._irf
         butterfly['emin']    = 0.1
         butterfly['emax']    = 100.0
-        butterfly['outfile'] = 'ctbutterfly_py1.txt'
+        butterfly['outfile'] = 'ctbutterfly_py1.dat'
         butterfly['logfile'] = 'ctbutterfly_py1.log'
         butterfly['chatter'] = 2
 
@@ -122,7 +122,7 @@ class Test(test):
         butterfly.save()
 
         # Check result file
-        self._check_result_file('ctbutterfly_py1.txt')
+        self._check_result_file('ctbutterfly_py1.dat')
 
         # Return
         return
@@ -136,8 +136,10 @@ class Test(test):
         results = gammalib.GCsv(filename)
 
         # Check dimensions
-        self.test_value(results.nrows(), 100, 'Check for 100 rows in butterfly file')
-        self.test_value(results.ncols(), 4, 'Check for 4 columns in butterfly file')
+        self.test_value(results.nrows(), 100,
+             'Check for 100 rows in butterfly file')
+        self.test_value(results.ncols(), 4,
+             'Check for 4 columns in butterfly file')
 
         # Return
         return

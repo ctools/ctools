@@ -65,9 +65,9 @@ class Test(test):
         ctlike = self._tool('ctlike')
 
         # Setup ctlike command
-        cmd = ctlike+' inobs="data/crab_events.fits"'+ \
-                     ' inmodel="data/crab.xml"'+ \
-                     ' caldb="prod2" irf="South_0.5h"'+ \
+        cmd = ctlike+' inobs="'+self._events+'"'+ \
+                     ' inmodel="'+self._model+'"'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' outmodel="ctlike_cmd1.xml"'+ \
                      ' logfile="ctlike_cmd1.log" chatter=1'
 
@@ -84,8 +84,8 @@ class Test(test):
 
         # Setup ctlike command
         cmd = ctlike+' inobs="event_file_that_does_not_exist.fits"'+ \
-                     ' inmodel="data/crab.xml"'+ \
-                     ' caldb="prod2" irf="South_0.5h"'+ \
+                     ' inmodel="'+self._model+'"'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' outmodel="ctlike_cmd2.xml"'+ \
                      ' logfile="ctlike_cmd2.log" chatter=1'
 
@@ -103,10 +103,10 @@ class Test(test):
         """
         # Set-up ctlike
         like = ctools.ctlike()
-        like['inobs']    = 'data/crab_events.fits'
-        like['inmodel']  = 'data/crab.xml'
-        like['caldb']    = 'prod2'
-        like['irf']      = 'South_0.5h'
+        like['inobs']    = self._events
+        like['inmodel']  = self._model
+        like['caldb']    = self._caldb
+        like['irf']      = self._irf
         like['outmodel'] = 'ctlike_py1.xml'
         like['logfile']  = 'ctlike_py1.log'
         like['chatter']  = 2

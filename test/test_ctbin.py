@@ -42,9 +42,6 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
-        # Set members
-        self._events_name = 'data/crab_events.fits'
-
         # Return
         return
 
@@ -72,7 +69,7 @@ class Test(test):
         ctbin = self._tool('ctbin')
 
         # Setup ctbin command
-        cmd = ctbin+' inobs="'+self._events_name+'"'+ \
+        cmd = ctbin+' inobs="'+self._events+'"'+ \
                     ' outcube="cntmap_cmd1.fits"'+\
                     ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"'+ \
                     ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
@@ -111,7 +108,7 @@ class Test(test):
         """
         # Set-up ctbin
         bin = ctools.ctbin()
-        bin['inobs']    = self._events_name
+        bin['inobs']    = self._events
         bin['outcube']  = 'cntmap.fits'
         bin['ebinalg']  = 'LOG'
         bin['emin']     = 0.1
@@ -157,7 +154,7 @@ class Test(test):
         self._check_cube(evt, 5542)
 
         # Prepare observation container for stacked analysis
-        cta = gammalib.GCTAObservation(self._events_name)
+        cta = gammalib.GCTAObservation(self._events)
         obs = gammalib.GObservations()
         cta.id('0001')
         obs.append(cta)

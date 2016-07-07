@@ -38,6 +38,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._exclusion = self._datadir + '/exclusion.reg'
+
         # Return
         return
 
@@ -65,8 +68,8 @@ class Test(test):
         ctcubemask = self._tool('ctcubemask')
 
         # Setup ctcubemask command
-        cmd = ctcubemask+' inobs="data/crab_cntmap.fits"'+ \
-                         ' regfile="data/exclusion.reg"'+ \
+        cmd = ctcubemask+' inobs="'+self._cntcube+'"'+ \
+                         ' regfile="'+self._exclusion+'"'+ \
                          ' outcube="ctcubemask_cmd1.fits"'+ \
                          ' ra=83.63 dec=22.01 rad=2.0'+ \
                          ' emin=0.1 emax=100.0'+ \
@@ -85,7 +88,7 @@ class Test(test):
 
         # Setup ctcubemask command
         cmd = ctcubemask+' inobs="counts_cube_that_does_not_exist.fits"'+ \
-                         ' regfile="data/exclusion.reg"'+ \
+                         ' regfile="'+self._exclusion+'"'+ \
                          ' outcube="ctcubemask_cmd2.fits"'+ \
                          ' ra=83.63 dec=22.01 rad=2.0'+ \
                          ' emin=0.1 emax=100.0'+ \
@@ -105,8 +108,8 @@ class Test(test):
         """
         # Set-up ctcubemask
         mask = ctools.ctcubemask()
-        mask['inobs']   = 'data/crab_cntmap.fits'
-        mask['regfile'] = 'data/exclusion.reg'
+        mask['inobs']   = self._cntcube
+        mask['regfile'] = self._exclusion
         mask['outcube'] = 'ctcubemask_py1.fits'
         mask['ra']      = 83.63
         mask['dec']     = 22.01

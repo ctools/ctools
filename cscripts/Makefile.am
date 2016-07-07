@@ -1,51 +1,70 @@
-## Process this file with automake to produce Makefile.in
+#############################################################################
+# Makefile for cscripts scripts                                             #
+# ------------------------------------------------------------------------- #
+# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  This program is free software: you can redistribute it and/or modify     #
+#  it under the terms of the GNU General Public License as published by     #
+#  the Free Software Foundation, either version 3 of the License, or        #
+#  (at your option) any later version.                                      #
+#                                                                           #
+#  This program is distributed in the hope that it will be useful,          #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+#  GNU General Public License for more details.                             #
+#                                                                           #
+#  You should have received a copy of the GNU General Public License        #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
+#                                                                           #
+#############################################################################
 
 # Scripts to be distributed in $(pyexecdir)/cscripts
-pythonscripts = __init__.py \
-                cscaldb.py \
-                csinfo.py \
-                cslightcrv.py \
-                csmodelinfo.py \
-                csmodelmerge.py \
-                csobs2caldb.py \
-                csobsdef.py \
-                csobsinfo.py \
-                cspull.py \
-                csresmap.py \
-                csroot2caldb.py  \
-                cssens.py \
-                csspec.py \
-                cstsdist.py \
-                cstsmapmerge.py \
-                cstsmapsplit.py \
-                csworkflow.py \
-                csfindobs.py \
-                csiactcopy.py \
-                csiactdata.py \
-                csiactobs.py \
-                obsutils.py
+pythonscripts = $(builddir)/__init__.py \
+                $(srcdir)/cscaldb.py \
+                $(srcdir)/csinfo.py \
+                $(srcdir)/cslightcrv.py \
+                $(srcdir)/csmodelinfo.py \
+                $(srcdir)/csmodelmerge.py \
+                $(srcdir)/csobs2caldb.py \
+                $(srcdir)/csobsdef.py \
+                $(srcdir)/csobsinfo.py \
+                $(srcdir)/cspull.py \
+                $(srcdir)/csresmap.py \
+                $(srcdir)/csroot2caldb.py  \
+                $(srcdir)/cssens.py \
+                $(srcdir)/csspec.py \
+                $(srcdir)/cstsdist.py \
+                $(srcdir)/cstsmapmerge.py \
+                $(srcdir)/cstsmapsplit.py \
+                $(srcdir)/csworkflow.py \
+                $(srcdir)/csfindobs.py \
+                $(srcdir)/csiactcopy.py \
+                $(srcdir)/csiactdata.py \
+                $(srcdir)/csiactobs.py \
+                $(srcdir)/obsutils.py
 
 # Parfiles to be distributed in $(prefix)/syspfiles
-parfiles = cscaldb.par \
-           cslightcrv.par \
-           csmodelinfo.par \
-           csmodelmerge.par \
-           csobs2caldb.par \
-           csobsdef.par \
-           csobsinfo.par \
-           cspull.par \
-           csresmap.par \
-           csroot2caldb.par \
-           cssens.par \
-           csspec.par \
-           cstsdist.par \
-           cstsmapmerge.par \
-           cstsmapsplit.par \
-           csworkflow.par \
-           csfindobs.par \
-           csiactcopy.par \
-           csiactdata.par \
-           csiactobs.par
+parfiles = $(srcdir)/cscaldb.par \
+           $(srcdir)/cslightcrv.par \
+           $(srcdir)/csmodelinfo.par \
+           $(srcdir)/csmodelmerge.par \
+           $(srcdir)/csobs2caldb.par \
+           $(srcdir)/csobsdef.par \
+           $(srcdir)/csobsinfo.par \
+           $(srcdir)/cspull.par \
+           $(srcdir)/csresmap.par \
+           $(srcdir)/csroot2caldb.par \
+           $(srcdir)/cssens.par \
+           $(srcdir)/csspec.par \
+           $(srcdir)/cstsdist.par \
+           $(srcdir)/cstsmapmerge.par \
+           $(srcdir)/cstsmapsplit.par \
+           $(srcdir)/csworkflow.par \
+           $(srcdir)/csfindobs.par \
+           $(srcdir)/csiactcopy.par \
+           $(srcdir)/csiactdata.par \
+           $(srcdir)/csiactobs.par
 
 # Scripts for which symbolic links will be created in bindir
 linkscripts = cscaldb \
@@ -71,64 +90,70 @@ linkscripts = cscaldb \
               csiactobs
 
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
-testscripts = tests/__init__.py \
-              ../test/testing.py \
-              ../test/test_python_cscripts.py \
-              ../test/test_cscaldb.py \
-              ../test/test_csmodelinfo.py \
-              ../test/test_csmodelmerge.py \
-              ../test/test_csobs2caldb.py \
-              ../test/test_csobsdef.py \
-              ../test/test_csobsinfo.py \
-              ../test/test_cslightcrv.py \
-              ../test/test_cspull.py \
-              ../test/test_csresmap.py \
-              ../test/test_csroot2caldb.py \
-              ../test/test_cssens.py \
-              ../test/test_csspec.py \
-              ../test/test_cstsdist.py \
-              ../test/test_cstsmapmerge.py \
-              ../test/test_cstsmapsplit.py \
-              ../test/test_csworkflow.py \
-              ../test/test_csfindobs.py \
-              ../test/test_csiactcopy.py \
-              ../test/test_csiactdata.py \
-              ../test/test_csiactobs.py
+testscripts = $(srcdir)/tests/__init__.py \
+              $(top_srcdir)/test/testing.py \
+              $(top_srcdir)/test/test_python_cscripts.py \
+              $(top_srcdir)/test/test_cscaldb.py \
+              $(top_srcdir)/test/test_csmodelinfo.py \
+              $(top_srcdir)/test/test_csmodelmerge.py \
+              $(top_srcdir)/test/test_csobs2caldb.py \
+              $(top_srcdir)/test/test_csobsdef.py \
+              $(top_srcdir)/test/test_csobsinfo.py \
+              $(top_srcdir)/test/test_cslightcrv.py \
+              $(top_srcdir)/test/test_cspull.py \
+              $(top_srcdir)/test/test_csresmap.py \
+              $(top_srcdir)/test/test_csroot2caldb.py \
+              $(top_srcdir)/test/test_cssens.py \
+              $(top_srcdir)/test/test_csspec.py \
+              $(top_srcdir)/test/test_cstsdist.py \
+              $(top_srcdir)/test/test_cstsmapmerge.py \
+              $(top_srcdir)/test/test_cstsmapsplit.py \
+              $(top_srcdir)/test/test_csworkflow.py \
+              $(top_srcdir)/test/test_csfindobs.py \
+              $(top_srcdir)/test/test_csiactcopy.py \
+              $(top_srcdir)/test/test_csiactdata.py \
+              $(top_srcdir)/test/test_csiactobs.py
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data
-testdata    = ../test/data/crab.xml \
-              ../test/data/obs_unbinned.xml \
-              ../test/data/obs_stacked.xml \
-              ../test/data/crab_events.fits.gz \
-              ../test/data/crab_cntmap.fits.gz \
-              ../test/data/crab_cntmap_small.fits.gz \
-              ../test/data/crab_expcube.fits.gz \
-              ../test/data/crab_psfcube.fits.gz \
-              ../test/data/crab_edispcube.fits.gz \
-              ../test/data/crab_bkgcube.fits.gz \
-              ../test/data/tsmap_0.fits \
-              ../test/data/tsmap_1.fits \
-              ../test/data/exclusion.reg \
-              ../test/data/pntdef.dat \
-              ../test/data/models.txt \
-              ../test/data/tsmaps.txt \
-              ../test/data/model_cube_background.xml \
-              ../test/data/model_cube_background2.xml \
-              ../test/data/crab_bkgcube.xml \
-              ../test/data/irf.root \
-              ../test/data/workflow.xml
+testdata = $(top_srcdir)/test/data/crab.xml \
+           $(top_srcdir)/test/data/obs_unbinned.xml \
+           $(top_srcdir)/test/data/obs_stacked.xml \
+           $(top_srcdir)/test/data/crab_events.fits.gz \
+           $(top_srcdir)/test/data/crab_cntmap.fits.gz \
+           $(top_srcdir)/test/data/crab_cntmap_small.fits.gz \
+           $(top_srcdir)/test/data/crab_expcube.fits.gz \
+           $(top_srcdir)/test/data/crab_psfcube.fits.gz \
+           $(top_srcdir)/test/data/crab_edispcube.fits.gz \
+           $(top_srcdir)/test/data/crab_bkgcube.fits.gz \
+           $(top_srcdir)/test/data/tsmap_0.fits \
+           $(top_srcdir)/test/data/tsmap_1.fits \
+           $(top_srcdir)/test/data/exclusion.reg \
+           $(top_srcdir)/test/data/pntdef.dat \
+           $(top_srcdir)/test/data/models.txt \
+           $(top_srcdir)/test/data/tsmaps.txt \
+           $(top_srcdir)/test/data/model_cube_background.xml \
+           $(top_srcdir)/test/data/model_cube_background2.xml \
+           $(top_srcdir)/test/data/crab_bkgcube.xml \
+           $(top_srcdir)/test/data/irf.root \
+           $(top_srcdir)/test/data/irf_file.fits.gz \
+           $(top_srcdir)/test/data/workflow.xml \
+           $(top_srcdir)/test/data/butterfly.txt \
+           $(top_srcdir)/test/data/pha.fits \
+           $(top_srcdir)/test/data/pull.dat \
+           $(top_srcdir)/test/data/sensitivity.dat \
+           $(top_srcdir)/test/data/spectrum.fits \
+           $(top_srcdir)/test/data/ts.dat
 
-# Test data to be distributed in $(pyexecdir)/cscripts/tests/iactdata
-testiactdata = ../test/iactdata/hdu-index.fits.gz \
-               ../test/iactdata/master.json \
-               ../test/iactdata/obs-index.fits.gz
+# Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
+testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \
+               $(top_srcdir)/test/data/iactdata/master.json \
+               $(top_srcdir)/test/data/iactdata/obs-index.fits.gz \
+               $(top_srcdir)/test/data/iactdata/irf_file.fits.gz \
+               $(top_srcdir)/test/data/iactdata/events.fits.gz
 
-# Test IRFs to be distributed in $(pyexecdir)/cscripts/tests/irf
-testirf      = ../test/irf/irf_file.fits.gz \
-               ../test/irf/cta_dummy_irf.dat
-
-# Distribute scripts and parfiles
-EXTRA_DIST         = $(binscripts) $(pythonscripts)
+# Install scripts, parfiles, test scripts and test data. Note that we don't
+# need to prepend $(DESTDIR) here (not fully clear why, but that's the way
+# it is)
 binscriptsdir      = $(bindir)
 binscripts_DATA    = $(binscripts)
 pythonscriptsdir   = $(pyexecdir)/cscripts
@@ -139,12 +164,14 @@ testscriptsdir     = $(pyexecdir)/cscripts/tests
 testscripts_DATA   = $(testscripts)
 testdatadir        = $(pyexecdir)/cscripts/tests/data
 testdata_DATA      = $(testdata)
-testiactdatadir    = $(pyexecdir)/cscripts/tests/iactdata
+testiactdatadir    = $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata_DATA  = $(testiactdata)
-testirfdir         = $(pyexecdir)/cscripts/tests/irf
-testirf_DATA       = $(testirf)
 
-# Add hook rule to create symbolic links for cscripts
+# Files to be distributed in the tar file
+EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
+             $(testscripts) $(testdata) $(testiactdata)
+
+# Add install hook rule to create symbolic links for cscripts
 install-data-hook:
 	@binlist='$(binscripts)';\
 	for p in $$binlist; do \
@@ -156,4 +183,17 @@ install-data-hook:
       ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
 	  chmod +x "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py"; \
 	done
-    
+
+# Files to be removed in build directory
+clean-local:
+	rm -rf $(builddir)/cs*.py
+	rm -rf $(builddir)/obsutils.py
+	rm -rf $(builddir)/*.pyc
+	rm -rf $(builddir)/*.par
+
+# Uninstall the cscripts Python module
+uninstall-local:
+	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/*.pyc
+	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/__pycache__
+	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/*.pyc
+	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/__pycache__

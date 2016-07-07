@@ -24,15 +24,25 @@ import glob
 import os
 import sys
 
+# Define package name
+pkg_name = 'ctools'
+
 # Detect execution mode
 is_build = True
 if (len(sys.argv) >= 2):
     if (sys.argv[1] == 'install'):
         is_build = False
 if is_build:
-    sys.stdout.write("Python extension module building:\n")
+    print('Python extension module building:')
 else:
-    sys.stdout.write("Python extension module installation:\n")
+    print('Python extension module installation:')
+
+# Set prefix
+prefix = '@prefix@'
+if (len(sys.argv) >= 3):
+    if (sys.argv[2].find('--prefix') != -1):
+        start  = sys.argv[2].find('=') + 1
+        prefix = sys.argv[2][start:]
 
 # Darwin MacPorts kluge: Remove -L/opt/local/lib path from LDSHARED as this
 # overrides the GammaLib settings. Otherwise, MacPorts libraries would be
@@ -52,33 +62,33 @@ if sys.platform.lower().startswith("darwin"):
         else:
             ldshared_rm += option + ' '
     if (len(ldshared_rm) > 0):
-        sys.stdout.write("Removed following option(s) from LDSHARED: "+ldshared_rm+"\n")
+        print('Removed following option(s) from LDSHARED: %s' % (ldshared_rm))
     
     # Set LDSHARED
     cvars['LDSHARED'] = ldshared_new
 
 # Set default include directories and data files
-include_dirs         = ['@prefix@/include/gammalib']
+include_dirs         = [prefix+'/include/gammalib']
 install_files        = glob.glob('@top_srcdir@/pyext/*.i')
 library_dirs         = ['../src/.libs']
 runtime_library_dirs = ['../src/.libs']
 libraries            = ['ctools','gamma']
 
 # Add install directory to runtime library path
-if os.path.exists('@prefix@/lib'):
-    library_dirs.append('@prefix@/lib')
-    runtime_library_dirs.append('@prefix@/lib')
+if os.path.exists(prefix+'/lib'):
+    library_dirs.append(prefix+'/lib')
+    runtime_library_dirs.append(prefix+'/lib')
 
 # Add application include files. The method we use here is not very
 # intelligent as it simple will add all names that start with 'ct'
 # in the src directory. Once we added the ctools script we had to
 # add an explicit filter to avoid appending those.
-dirs = glob.glob('../src/ct*')
+dirs = glob.glob('@top_srcdir@/src/ct*')
 for dir in dirs:
     if len(dir) > 0 and 'ctools' not in dir:
         path = os.path.abspath(dir)
         include_dirs.append(path)
-include_dirs.append(os.path.abspath('../src/support'))
+include_dirs.append(os.path.abspath('@top_srcdir@/src/support'))
 
 # Add extra libraries
 extra_libs = ('@PYTHON_EXTRA_LIBS@').split(',')
@@ -104,7 +114,7 @@ for extra_include_dir in extra_include_dirs:
             include_dirs.append(dir)
 
 # Set data files to install.
-data_files=[('@prefix@/share/ctools/swig', install_files)]
+data_files=[(prefix+'/share/ctools/swig', install_files)]
 
 # Optionally enable OpenMP
 if '@OPENMP_TRUE@' != '#':
@@ -123,6 +133,24 @@ if len('@COVERAGE_CXXFLAGS@') > 0:
 if '@IS_ELCAPITAN_TRUE@' != '#':
     extra_link_args.append('-headerpad_max_install_names')
 
+# If this is a build then we may need to copy over a bunch of files
+if is_build:
+
+    # In case that wrappers were not built then copy the module wrapper files
+    # from the source to the build directory
+    if '@BUILD_WRAPPERS_FALSE@' != '#':
+        py_file  = pkg_name+'/tools.py'
+        cpp_file = pkg_name+'/tools_wrap.cpp'
+        os.system('cp %s %s' % ('@srcdir@/'+cpp_file, '@builddir@/'+cpp_file))
+        os.system('cp %s %s' % ('@srcdir@/'+py_file,  '@builddir@/'+py_file))
+
+    # In case that the build directory is different from the source directory
+    # then copy all cscripts and parfiles from the source directory to the
+    # build directory
+    if '@top_srcdir@' != '@top_builddir@':
+        os.system('cp %s/cscripts/*.py  %s/cscripts' % ('@top_srcdir@', '@top_builddir@'))
+        os.system('cp %s/cscripts/*.par %s/cscripts' % ('@top_srcdir@', '@top_builddir@'))
+
 # Setup
 setup(name='@PACKAGE_NAME@',
       version='@PACKAGE_VERSION@',
@@ -130,7 +158,6 @@ setup(name='@PACKAGE_NAME@',
       author='Juergen Knoedlseder',
       author_email='@PACKAGE_BUGREPORT@',
       url='http://cta.irap.omp.eu/ctools/',
-      py_modules=['ctools.tools'],
       ext_modules=[Extension('ctools._tools', ['ctools/tools_wrap.cpp'],
                              include_dirs=include_dirs,
                              library_dirs=library_dirs,
@@ -138,10 +165,11 @@ setup(name='@PACKAGE_NAME@',
                              runtime_library_dirs=runtime_library_dirs,
                              extra_compile_args=extra_compile_args,
                              extra_link_args=extra_link_args)],
+      py_modules=['ctools.tools'],
       data_files=data_files,
       license="GNU GPL v3",
       long_description="CTA science analysis tools",
-      platforms=["Linux", "Solaris", "Mac OS-X", "Unix", "BSD"],
+      platforms=['Linux', 'Solaris', 'Mac OS-X', 'Unix', 'BSD'],
       )
 
 # Post-processing. A symbolic link is created to the directory containing the
@@ -151,12 +179,12 @@ if is_build:
     try:
         os.chdir('build')
         os.remove('ctools')
-        sys.stdout.write("Removed symbolic link build/ctools.\n")
+        print('Removed symbolic link build/ctools.')
     except:
         pass
     try:
         path = glob.glob('lib.*')
         os.symlink(path[0], 'ctools')
-        sys.stdout.write("Created symbolic link build/ctools.\n")
+        print('Created symbolic link build/ctools.')
     except:
-        sys.stdout.write("WARNING: Failed to create symbolic link build/ctools.\n")
+        print('WARNING: Failed to create symbolic link build/ctools.')

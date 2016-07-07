@@ -74,13 +74,16 @@ def test(installed=False, debug=False):
         dirname = os.path.dirname(testdir)
 
         # Copy over test data and irf
-        os.system('cp -r %s %s' % (dirname+'/data',     'data'))
-        os.system('cp -r %s %s' % (dirname+'/iactdata', 'iactdata'))
-        os.system('cp -r %s %s' % (dirname+'/irf',      'irf'))
+        os.system('cp -r %s %s' % (dirname+'/data', 'data'))
 
-    # ... otherwise set the calibration database
+        # Set test data environment variable
+        os.environ['TEST_DATA'] = 'data'
+
+    # ... otherwise set the calibration database to the one shipped with the
+    # package; we don't need to set the 'TEST_DATA', this is done by the
+    # test environment
     else:
-        os.environ['CALDB'] = '../caldb'
+        os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
 
     # Set PFILES environment variable
     try:
@@ -91,9 +94,11 @@ def test(installed=False, debug=False):
 
     # Copy over pfiles
     if not installed:
-        os.system('cp -r ../cscripts/*.par pfiles/')
+        os.system('cp -r %s/cscripts/*.par pfiles/'% (os.environ['TEST_SRCDIR']))
+        os.system('chmod u+w pfiles/*')
     else:
         os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
+        os.system('chmod u+w pfiles/*')
 
     # Allocate test suite container
     suites = gammalib.GTestSuites('cscripts unit testing')

@@ -69,8 +69,9 @@ class Test(test):
         cstsdist = self._script('cstsdist')
 
         # Setup cstsdist command
-        cmd = cstsdist+' inmodel="data/crab.xml"'+ \
-                       ' srcname="Crab" caldb="prod2" irf="South_0.5h"' + \
+        cmd = cstsdist+' inmodel="'+self._model+'"'+ \
+                       ' srcname="Crab"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' ntrials=1 ra=83.63 dec=22.01 emin=0.1 emax=100.0'+ \
                        ' enumbins=0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
                        ' binsz=0.05'+ \
@@ -90,7 +91,8 @@ class Test(test):
 
         # Setup cstsdist command
         cmd = cstsdist+' inmodel="model_that_does_not_exist.xml"'+ \
-                       ' srcname="Crab" caldb="prod2" irf="South_0.5h"' + \
+                       ' srcname="Crab"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' ntrials=1 ra=83.63 dec=22.01 emin=0.1 emax=100.0'+ \
                        ' enumbins=0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
                        ' binsz=0.05'+ \
@@ -111,10 +113,10 @@ class Test(test):
         """
         # Set-up cstsdist
         tsdist = cscripts.cstsdist()
-        tsdist['inmodel']  = 'data/crab.xml'
+        tsdist['inmodel']  = self._model
         tsdist['srcname']  = 'Crab'
-        tsdist['caldb']    = 'prod2'
-        tsdist['irf']      = 'South_0.5h'
+        tsdist['caldb']    = self._caldb
+        tsdist['irf']      = self._irf
         tsdist['outfile']  = 'cstsdist_py1.dat'
         tsdist['ntrials']  = 1
         tsdist['ra']       = 83.63

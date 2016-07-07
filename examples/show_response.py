@@ -339,13 +339,13 @@ if __name__ == '__main__':
 
     # Set response dictionary
     rsps = [
-            {'dbname':  'irf',
-             'rspname': 'cta_dummy_irf.dat',
-             'name':    'Prod1 (Array E, MPIK)',
+            {'dbname':  'prod2',
+             'rspname': 'South_0.5h',
+             'name':    'Prod2 (30 min)',
              'color':   'b'},
-            {'dbname':  'irf',
-             'rspname': 'irf_file.fits',
-             'name':    'Prod2 (Aar, IFAE)',
+            {'dbname':  'prod2',
+             'rspname': 'South_50h',
+             'name':    'Prod2 (50 h)',
              'color':   'r'}
             ]
 

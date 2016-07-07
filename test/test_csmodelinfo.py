@@ -37,13 +37,10 @@ class Test(test):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         test.__init__(self)
-
-        # Set members
-        self._model_name = "data/crab.xml"
 
         # Return
         return
@@ -72,7 +69,7 @@ class Test(test):
         csmodelinfo = self._script('csmodelinfo')
 
         # Setup csmodelinfo command
-        cmd = csmodelinfo+' inmodel="'+self._model_name+'"'+ \
+        cmd = csmodelinfo+' inmodel="'+self._model+'"'+ \
                           ' ds9file="model_cmd1.reg"'+ \
                           ' logfile="csmodelinfo_cmd1.log" chatter=1'
 
@@ -106,7 +103,7 @@ class Test(test):
         """
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo['inmodel']  = self._model_name
+        modelinfo['inmodel']  = self._model
         modelinfo['ds9file']  = 'csmodelinfo_py1.reg'
         modelinfo['logfile']  = 'csmodelinfo_py1.log'
         modelinfo['chatter']  = 2
@@ -121,7 +118,7 @@ class Test(test):
 
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo['inmodel']  = self._model_name
+        modelinfo['inmodel']  = self._model
         modelinfo['ds9file']  = 'csmodelinfo_py2.reg'
         modelinfo['logfile']  = 'csmodelinfo_py2.log'
         modelinfo['chatter']  = 3

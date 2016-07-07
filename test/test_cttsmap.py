@@ -33,7 +33,7 @@ class Test(test):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         test.__init__(self)
@@ -65,9 +65,9 @@ class Test(test):
         cttsmap = self._tool('cttsmap')
 
         # Setup cttsmap command
-        cmd = cttsmap+' inobs="data/crab_events.fits"'+ \
-                      ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                      ' caldb="prod2" irf="South_0.5h"'+ \
+        cmd = cttsmap+' inobs="'+self._events+'"'+ \
+                      ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' outmap="cttsmap_cmd1.fits"'+ \
                       ' nxpix=5 nypix=5 binsz=0.02'+ \
                       ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -86,8 +86,8 @@ class Test(test):
 
         # Setup cttsmap command
         cmd = cttsmap+' inobs="event_file_that_does_not_exist.fits"'+ \
-                      ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                      ' caldb="prod2" irf="South_0.5h"'+ \
+                      ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' outmap="cttsmap_cmd2.fits"'+ \
                       ' nxpix=5 nypix=5 binsz=0.02'+ \
                       ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -107,11 +107,11 @@ class Test(test):
         """
         # Set-up cttsmap
         tsmap = ctools.cttsmap()
-        tsmap['inobs']    = 'data/crab_events.fits'
-        tsmap['inmodel']  = 'data/crab.xml'
+        tsmap['inobs']    = self._events
+        tsmap['inmodel']  = self._model
         tsmap['srcname']  = 'Crab'
-        tsmap['caldb']    = 'prod2'
-        tsmap['irf']      = 'South_0.5h'
+        tsmap['caldb']    = self._caldb
+        tsmap['irf']      = self._irf
         tsmap['outmap']   = 'cttsmap_py1.fits'
         tsmap['nxpix']    = 5
         tsmap['nypix']    = 5

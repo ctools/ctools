@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set data members
+        self._datapath = self._datadir + '/iactdata'
+
         # Return
         return
 
@@ -69,7 +72,7 @@ class Test(test):
         csiactobs = self._script('csiactobs')
 
         # Setup csiactobs command
-        cmd = csiactobs+' datapath="iactdata"'+ \
+        cmd = csiactobs+' datapath="'+self._datapath+'"'+ \
                         ' prodname="unit-test"'+ \
                         ' infile="runlist_cmd1.dat"'+ \
                         ' bkgpars=1'+\
@@ -114,7 +117,7 @@ class Test(test):
         """
         # Set-up csiactobs
         iactobs = cscripts.csiactobs()
-        iactobs['datapath'] = 'iactdata'
+        iactobs['datapath'] = self._datapath
         iactobs['prodname'] = 'unit-test'
         iactobs['infile']   = 'runlist_py1.dat'
         iactobs['bkgpars']  = 1
@@ -151,7 +154,7 @@ class Test(test):
         # Check number of observations
         self.test_value(obs.size(), 1,
                         'Check for single observation in XML file')
-        self.test_assert(obs[0].eventfile().file() == 'crab_events.fits.gz',
+        self.test_assert(obs[0].eventfile().file() == 'events.fits.gz',
                          'Check event file name')
         self.test_assert(obs[0].eventfile().extname() == 'EVENTS',
                          'Check event extension name')

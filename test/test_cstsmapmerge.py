@@ -42,6 +42,12 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._map0    = self._datadir + '/tsmap_0.fits'
+        self._map1    = self._datadir + '/tsmap_1.fits'
+        self._mapstar = self._datadir + '/tsmap_*.fits'
+        self._mapat   = '@' + self._datadir + '/tsmaps.txt'
+
         # Return
         return
 
@@ -69,7 +75,7 @@ class Test(test):
         cstsmapmerge = self._script('cstsmapmerge')
 
         # Setup cstsmapmerge command
-        cmd = cstsmapmerge+' inmaps="data/tsmap_0.fits;data/tsmap_1.fits"'+ \
+        cmd = cstsmapmerge+' inmaps="'+self._map0+';'+self._map1+'"'+ \
                            ' outmap="cstsmapmerge_cmd1.fits"'+ \
                            ' logfile="cstsmapmerge_cmd1.log" chatter=1'
 
@@ -103,7 +109,7 @@ class Test(test):
         """
         # Set-up semi-colon separated cstsmapmerge
         merge = cscripts.cstsmapmerge()
-        merge['inmaps']  = 'data/tsmap_0.fits;data/tsmap_1.fits'
+        merge['inmaps']  = self._map0+';'+self._map1
         merge['outmap']  = 'cstsmapmerge_py1.fits'
         merge['logfile'] = 'cstsmapmerge_py1.log'
         merge['chatter'] = 2
@@ -118,7 +124,7 @@ class Test(test):
 
         # Set-up space-separated cstsmapmerge
         merge = cscripts.cstsmapmerge()
-        merge['inmaps']  = 'data/tsmap_0.fits data/tsmap_1.fits'
+        merge['inmaps']  = self._map0+' '+self._map1
         merge['outmap']  = 'cstsmapmerge_py2.fits'
         merge['logfile'] = 'cstsmapmerge_py2.log'
         merge['chatter'] = 3
@@ -131,7 +137,7 @@ class Test(test):
 
         # Set-up wildcard string cstsmapmerge
         merge = cscripts.cstsmapmerge()
-        merge['inmaps']  = 'data/tsmap_*.fits'
+        merge['inmaps']  = self._mapstar
         merge['outmap']  = 'cstsmapmerge_py3.fits'
         merge['logfile'] = 'cstsmapmerge_py3.log'
         merge['chatter'] = 4
@@ -144,7 +150,7 @@ class Test(test):
 
         # Set-up ASCII file cstsmapmerge
         merge = cscripts.cstsmapmerge()
-        merge['inmaps']  = '@data/tsmaps.txt'
+        merge['inmaps']  = self._mapat
         merge['outmap']  = 'cstsmapmerge_py4.fits'
         merge['logfile'] = 'cstsmapmerge_py4.log'
         merge['chatter'] = 4

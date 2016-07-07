@@ -22,4 +22,4 @@
 #
 # Run the Python test
 # ===================
-@PYTHON_COVERAGE@./test_python_cscripts.py
+@PYTHON_COVERAGE@@srcdir@/test_python_cscripts.py

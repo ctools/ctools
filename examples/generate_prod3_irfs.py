@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import sys
 import gammalib
 import cscripts
 
@@ -25,7 +26,7 @@ import cscripts
 # ======================= #
 # Set Prod3 DESY database #
 # ======================= #
-def set_prod3_desy():
+def set_prod3_desy(datadir):
     """
     Set Prod3 DESY database
 
@@ -33,11 +34,19 @@ def set_prod3_desy():
     the db list a number of calibrations can be defined for which IRFs
     should be generated. All calibrations will be added to the calibration
     database.
+
+    Parameters
+    ----------
+    datadir : str
+        Data directory
+
+    Returns
+    -------
+    db : list of dict
+        Database
     """
     # Set database attributes
-    #path       = '/project-data/cta/performance/prod3'
-    #file       = 'DESY.d20160304.V5.ID0NIM2.prod3-paranalp05-NN.S.3HB1-ND-3.180000s.root'
-    path       = 'data'
+    path       = datadir
     file       = 'irf.root'
     psftype    = 'Gauss'
     oversample = 3
@@ -62,8 +71,14 @@ def set_prod3_desy():
 # ======================== #
 if __name__ == '__main__':
 
+    # Get optional argument
+    if len(sys.argv) == 2:
+        datadir = sys.argv[1]
+    else:
+        datadir = 'data'
+
     # Get database
-    entries = set_prod3_desy()
+    entries = set_prod3_desy(datadir)
 
     # Loop over entries
     for entry in entries:

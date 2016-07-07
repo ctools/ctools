@@ -68,11 +68,23 @@ class cstsmapmerge(ctools.cscript):
         """
         # Get input maps string
         inmaps = self['inmaps'].string()
-        
-        # Handle ascii files
+
+        # Handle ASCII files. If the file names given in the ASCII are
+        # relative filenames it is assumed that the filename is given
+        # relative to the location of the file.
         if '@' == inmaps[0]:
-            self._files = open(inmaps.replace('@','')).read().splitlines()
-            
+            filename    = inmaps.replace('@','')
+            self._files = open(filename).read().splitlines()
+            dirname     = os.path.dirname(filename)
+            files       = []
+            for f in self._files:
+                if f[0] != '/':
+                    fname = dirname + '/' + f
+                else:
+                    fname = f
+                files.append(fname)
+            self._files = files
+        
         # Handle wild card strings
         elif '*' in inmaps:
             self._files = glob.glob(inmaps)

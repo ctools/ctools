@@ -40,6 +40,9 @@ class Test(gammalib.GPythonTestSuite):
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
 
+        # Set test data directory
+        self._datadir = os.environ['TEST_DATA']
+
         # Return
         return
 
@@ -58,7 +61,7 @@ class Test(gammalib.GPythonTestSuite):
             String with name to be used for logging
         """
         # Setup command
-        cmd = '@PYTHON_COVERAGE@../examples/' + name + '.py'
+        cmd = '@PYTHON_COVERAGE@@top_srcdir@/examples/' + name + '.py'
         if len(args) > 0:
             cmd += ' ' + args
 
@@ -89,26 +92,46 @@ class Test(gammalib.GPythonTestSuite):
         self.name('examples')
 
         # Append tests
-        self.append(self.test_generate_prod3_irfs, 'Test generate_prod3_irfs.py')
-        self.append(self.test_make_pointings, 'Test make_pointings.py')
-        self.append(self.test_make_spectrum, 'Test make_spectrum.py')
-        self.append(self.test_make_ts_distributions, 'Test make_ts_distributions.py')
-        self.append(self.test_pipeline_binned_disk, 'Test pipeline_binned_disk.py')
-        self.append(self.test_pipeline_binned_mem, 'Test pipeline_binned_mem.py')
-        self.append(self.test_pipeline_stacked_disk, 'Test pipeline_stacked_disk.py')
-        self.append(self.test_pipeline_stacked_mem, 'Test pipeline_stacked_mem.py')
-        self.append(self.test_pipeline_unbinned_disk, 'Test pipeline_unbinned_disk.py')
-        self.append(self.test_pipeline_unbinned_mem, 'Test pipeline_unbinned_mem.py')
-        self.append(self.test_show_butterfly, 'Test show_butterfly.py')
-        self.append(self.test_show_model, 'Test show_model.py')
-        self.append(self.test_show_pha, 'Test show_pha.py')
-        self.append(self.test_show_pull_evolution, 'Test show_pull_evolution.py')
-        self.append(self.test_show_pull_histogram, 'Test show_pull_histogram.py')
-        self.append(self.test_show_response, 'Test test_show_response.py')
-        self.append(self.test_show_sensitivity, 'Test test_show_sensitivity.py')
-        self.append(self.test_show_spectrum, 'Test test_show_spectrum.py')
-        self.append(self.test_show_ts_distribution, 'Test show_ts_distribution.py')
-        self.append(self.test_show_obs, 'Test show_obs.py')
+        self.append(self.test_generate_prod3_irfs,
+                    'Test generate_prod3_irfs.py')
+        self.append(self.test_make_pointings,
+                    'Test make_pointings.py')
+        self.append(self.test_make_spectrum,
+                    'Test make_spectrum.py')
+        self.append(self.test_make_ts_distributions,
+                    'Test make_ts_distributions.py')
+        self.append(self.test_pipeline_binned_disk,
+                    'Test pipeline_binned_disk.py')
+        self.append(self.test_pipeline_binned_mem,
+                    'Test pipeline_binned_mem.py')
+        self.append(self.test_pipeline_stacked_disk,
+                    'Test pipeline_stacked_disk.py')
+        self.append(self.test_pipeline_stacked_mem,
+                    'Test pipeline_stacked_mem.py')
+        self.append(self.test_pipeline_unbinned_disk,
+                    'Test pipeline_unbinned_disk.py')
+        self.append(self.test_pipeline_unbinned_mem,
+                    'Test pipeline_unbinned_mem.py')
+        self.append(self.test_show_butterfly,
+                    'Test show_butterfly.py')
+        self.append(self.test_show_model,
+                    'Test show_model.py')
+        self.append(self.test_show_pha,
+                    'Test show_pha.py')
+        self.append(self.test_show_pull_evolution,
+                    'Test show_pull_evolution.py')
+        self.append(self.test_show_pull_histogram,
+                    'Test show_pull_histogram.py')
+        self.append(self.test_show_response,
+                    'Test test_show_response.py')
+        self.append(self.test_show_sensitivity,
+                    'Test test_show_sensitivity.py')
+        self.append(self.test_show_spectrum,
+                    'Test test_show_spectrum.py')
+        self.append(self.test_show_ts_distribution,
+                    'Test show_ts_distribution.py')
+        self.append(self.test_show_obs,
+                    'Test show_obs.py')
 
         # Return
         return
@@ -138,7 +161,8 @@ class Test(gammalib.GPythonTestSuite):
         Test generate_prod3_irfs
         """
         # Execute script
-        self._execute_python('generate_prod3_irfs')
+        self._execute_python('generate_prod3_irfs',
+                             args=self._datadir)
 
         # Return
         return
@@ -149,7 +173,8 @@ class Test(gammalib.GPythonTestSuite):
         Test make_spectrum
         """
         # Execute script
-        self._execute_python('make_spectrum', args='eps')
+        self._execute_python('make_spectrum',
+                             args=self._datadir+' eps')
 
         # Return
         return
@@ -160,7 +185,8 @@ class Test(gammalib.GPythonTestSuite):
         Test make_ts_distributions
         """
         # Execute script
-        self._execute_python('make_ts_distributions', args='-n 2 -e 0 -d 1800')
+        self._execute_python('make_ts_distributions',
+                             args='-n 2 -e 0 -d 1800 -p '+self._datadir)
 
         # Return
         return
@@ -171,7 +197,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_binned_disk
         """
         # Execute script
-        self._execute_python('pipeline_binned_disk')
+        self._execute_python('pipeline_binned_disk', args=self._datadir)
 
         # Return
         return
@@ -182,7 +208,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_binned_mem
         """
         # Execute script
-        self._execute_python('pipeline_binned_mem')
+        self._execute_python('pipeline_binned_mem', args=self._datadir)
 
         # Return
         return
@@ -193,7 +219,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_stacked_disk
         """
         # Execute script
-        self._execute_python('pipeline_stacked_disk')
+        self._execute_python('pipeline_stacked_disk', args=self._datadir)
 
         # Return
         return
@@ -204,7 +230,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_stacked_mem
         """
         # Execute script
-        self._execute_python('pipeline_stacked_mem')
+        self._execute_python('pipeline_stacked_mem', args=self._datadir)
 
         # Return
         return
@@ -215,7 +241,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_unbinned_disk
         """
         # Execute script
-        self._execute_python('pipeline_unbinned_disk')
+        self._execute_python('pipeline_unbinned_disk', args=self._datadir)
 
         # Return
         return
@@ -226,7 +252,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_unbinned_mem
         """
         # Execute script
-        self._execute_python('pipeline_unbinned_mem')
+        self._execute_python('pipeline_unbinned_mem', args=self._datadir)
 
         # Return
         return
@@ -238,7 +264,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_butterfly',
-                             args='data/butterfly.txt '
+                             args=self._datadir+'/butterfly.txt '
                                   'example_show_butterfly.eps')
 
         # Return
@@ -251,7 +277,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_model',
-                             args='data/crab.xml Crab example_show_model.eps')
+                             args=self._datadir+'/crab.xml '
+                                  'Crab example_show_model.eps')
 
         # Return
         return
@@ -263,7 +290,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_pha',
-                             args='data/pha.fits example_show_pha.eps')
+                             args=self._datadir+'/pha.fits '
+                                  'example_show_pha.eps')
 
         # Return
         return
@@ -275,7 +303,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_pull_evolution',
-                             args='data/pull.dat Pull_Crab_Prefactor '
+                             args=self._datadir+'/pull.dat '
+                                  'Pull_Crab_Prefactor '
                                   'example_show_pull_evolution.eps')
 
         # Return
@@ -288,7 +317,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_pull_histogram',
-                             args='data/pull.dat Pull_Crab_Prefactor 50 '
+                             args=self._datadir+'/pull.dat '
+                                  'Pull_Crab_Prefactor 50 '
                                   'example_show_pull_histogram.eps')
 
         # Return
@@ -312,7 +342,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_sensitivity',
-                             args='data/sensitivity.dat '
+                             args=self._datadir+'/sensitivity.dat '
                                   'example_show_sensitivity.eps')
 
         # Return
@@ -325,7 +355,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_spectrum',
-                             args='data/spectrum.fits '
+                             args=self._datadir+'/spectrum.fits '
                                   'example_show_spectrum.eps')
 
         # Return
@@ -338,7 +368,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_ts_distribution',
-                             args='data/ts.dat -n 100 '
+                             args=self._datadir+'/ts.dat -n 100 '
                                   '-f example_show_ts_distribution.eps')
 
         # Return
@@ -351,7 +381,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('show_obs',
-                             args='obs_selected.xml example_show_obs.eps')
+                             args=self._datadir+'/obs_unbinned.xml '
+                                  'example_show_obs.eps')
 
         # Return
         return
@@ -363,7 +394,7 @@ class Test(gammalib.GPythonTestSuite):
 if __name__ == '__main__':
 
     # Set calibration database
-    os.environ['CALDB'] = '../caldb'
+    os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
 
     # Set PFILES environment variable
     try:
@@ -373,8 +404,8 @@ if __name__ == '__main__':
     os.environ['PFILES'] = 'pfiles'
 
     # Copy over pfiles
-    os.system('cp -r ../src/*/*.par pfiles/')
-    os.system('cp -r ../cscripts/*.par pfiles/')
+    os.system('cp -r %s/src/*/*.par pfiles/' % (os.environ['TEST_SRCDIR']))
+    os.system('cp -r %s/cscripts/*.par pfiles/' % (os.environ['TEST_SRCDIR']))
 
     # Allocate test suites
     suites = gammalib.GTestSuites('Examples testing')

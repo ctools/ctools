@@ -46,17 +46,17 @@ class csobs2caldb(ctools.cscript):
         Constructor.
         """
         # Set name and version
-        self._name    = "csobs2caldb"
-        self._version = "1.1.0"
+        self._name    = 'csobs2caldb'
+        self._version = '1.1.0'
 
         # Initialise members
         self._observation = gammalib.GCTAObservation()
-        self._mission     = "cta"
-        self._caldb       = "cta"
-        self._outfile     = gammalib.GFilename("irf_file.fits")
-        self._base_dir    = ""
-        self._cal_dir     = ""
-        self._rsp_dir     = ""
+        self._mission     = 'cta'
+        self._caldb       = 'cta'
+        self._outfile     = gammalib.GFilename('irf_file.fits')
+        self._base_dir    = ''
+        self._cal_dir     = ''
+        self._rsp_dir     = ''
         self._caldb_inx   = gammalib.GFits()
         self._irf_fits    = gammalib.GFits()
 
@@ -73,7 +73,7 @@ class csobs2caldb(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile.
+        Get parameters from parfile
 
         Raises:
             ValueError, IndexError, & RuntimeError.
@@ -81,7 +81,7 @@ class csobs2caldb(ctools.cscript):
         # Load observation container from "inobs" parameter in case that
         # the observation container is still empty.
         if self._obs.is_empty():
-            self._obs = gammalib.GObservations(self["inobs"].filename())
+            self._obs = gammalib.GObservations(self['inobs'].filename())
 
         # Raise an exception if the observation container is empty
         if self._obs.is_empty():
@@ -89,7 +89,7 @@ class csobs2caldb(ctools.cscript):
                              'parameter "inobs".')
         
         # Get index of observation to be used
-        index = self["index"].integer()
+        index = self['index'].integer()
 
         # Raise an exception if the index is not valid
         if index < 0 or index >= self._obs.size():
@@ -100,37 +100,37 @@ class csobs2caldb(ctools.cscript):
         self._observation = self._obs[index]
 
         # Make sure we have a CTA observation
-        if not self._observation.classname() == "GCTAObservation":
+        if not self._observation.classname() == 'GCTAObservation':
             raise RuntimeError('Input observation not of type '
                                '"GCTAObservation".')
         
         # Make sure we have an IRF response associated with the CTA
         # observation
-        if not self._observation.response().classname() == "GCTAResponseIrf":
+        if not self._observation.response().classname() == 'GCTAResponseIrf':
             raise RuntimeError('Response of input observation not of '
                                'type "GCTAResponseIrf".')
         
         # Get calibration database name. If the "caldb" parameter is "NONE"
         # or empty then use the instrument name from the observation as
         # calibration database name.
-        self._caldb = self["caldb"].string()
-        if (self._caldb == "NONE" or len(self._caldb) == 0): 
+        self._caldb = self['caldb'].string()
+        if (self._caldb == 'NONE' or len(self._caldb) == 0):
             self._caldb = self._observation.instrument().lower()
 
         # Get instrument response function file name
-        self._outfile = self["outfile"].filename()
+        self._outfile = self['outfile'].filename()
 
         # Make sure that remaining user parameters are queried now. We
         # do not store the actual parameter values as we do not want
         # too many instance attributes with enhances the maintenance
         # costs.
-        self["irf"].string()
-        self["rootdir"].string()
+        self['irf'].string()
+        self['rootdir'].string()
 
         # Write input parameters and header into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
