@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # =============================== #
 # Test class for csiactobs script #
 # =============================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csiactobs script.
+    Test class for csiactobs script
 
     This test class makes unit tests for the csiactobs script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,14 +48,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("csiactobs")
+        self.name('csiactobs')
 
         # Append tests
-        self.append(self._test_cmd, "Test csiactobs on command line")
-        self.append(self._test_python, "Test csiactobs from Python")
+        self.append(self._test_cmd, 'Test csiactobs on command line')
+        self.append(self._test_python, 'Test csiactobs from Python')
 
         # Return
         return
@@ -63,13 +63,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test csiactobs on command line
     def _test_cmd(self):
         """
-        Test csiactobs on the command line.
+        Test csiactobs on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            csiactobs = "../cscripts/csiactobs.py"
-        else:
-            csiactobs = "csiactobs"
+        # Set script name
+        csiactobs = self._script('csiactobs')
 
         # Setup csiactobs command
         cmd = csiactobs+' datapath="iactdata"'+ \
@@ -80,21 +77,19 @@ class Test(gammalib.GPythonTestSuite):
                         ' outmodel="bgd_iactobs_cmd1.xml"'+ \
                         ' logfile="csiactobs_cmd1.log" chatter=1'
 
-        # Execute csiactobs, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful csiactobs execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check observation definition XML file
-        self._check_obsdef("obs_iactobs_cmd1.xml")
+        self._check_obsdef('obs_iactobs_cmd1.xml')
 
         # Check model definition XML file
-        self._check_moddef("bgd_iactobs_cmd1.xml")
+        self._check_moddef('bgd_iactobs_cmd1.xml')
 
         # Setup csiactobs command
         cmd = csiactobs+' datapath="data_path_that_does_not_exist"'+ \
@@ -105,15 +100,9 @@ class Test(gammalib.GPythonTestSuite):
                         ' outmodel="bgd_iactobs_cmd2.xml"'+ \
                         ' logfile="csiactobs_cmd2.log" chatter=1'
 
-        # Execute csiactobs, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of csiactobs execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -121,18 +110,18 @@ class Test(gammalib.GPythonTestSuite):
     # Test csiactobs from Python
     def _test_python(self):
         """
-        Test csiactobs from Python.
+        Test csiactobs from Python
         """
         # Set-up csiactobs
         iactobs = cscripts.csiactobs()
-        iactobs["datapath"] = "iactdata"
-        iactobs["prodname"] = "unit-test"
-        iactobs["infile"]   = "runlist_py1.dat"
-        iactobs["bkgpars"]  = 1
-        iactobs["outobs"]   = "obs_iactobs_py1.xml"
-        iactobs["outmodel"] = "bgd_iactobs_py1.xml"
-        iactobs["logfile"]  = "csiactobs_py1.log"
-        iactobs["chatter"]  = 2
+        iactobs['datapath'] = 'iactdata'
+        iactobs['prodname'] = 'unit-test'
+        iactobs['infile']   = 'runlist_py1.dat'
+        iactobs['bkgpars']  = 1
+        iactobs['outobs']   = 'obs_iactobs_py1.xml'
+        iactobs['outmodel'] = 'bgd_iactobs_py1.xml'
+        iactobs['logfile']  = 'csiactobs_py1.log'
+        iactobs['chatter']  = 2
 
         # Run csiactobs script and save run list
         iactobs.logFileOpen()   # Make sure we get a log file
@@ -140,10 +129,10 @@ class Test(gammalib.GPythonTestSuite):
         iactobs.save()
 
         # Check observation definition XML file
-        self._check_obsdef("obs_iactobs_py1.xml")
+        self._check_obsdef('obs_iactobs_py1.xml')
         
         # Check model definition XML file
-        self._check_moddef("bgd_iactobs_py1.xml")
+        self._check_moddef('bgd_iactobs_py1.xml')
 
         # Return
         return
@@ -151,7 +140,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check observation definition XML file
     def _check_obsdef(self, filename):
         """
-        Check observation definition XML file.
+        Check observation definition XML file
         """
         # Load observation definition XML file
         obs = gammalib.GObservations(filename)
@@ -197,7 +186,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check model XML file
     def _check_moddef(self, filename):
         """
-        Check model definition XML file.
+        Check model definition XML file
         """
         # Load model definition XML file
         models = gammalib.GModels(filename)

@@ -21,14 +21,15 @@
 import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ================================== #
 # Test class for csroot2caldb script #
 # ================================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csroot2caldb script.
+    Test class for csroot2caldb script
 
     This test class makes unit tests for the cslightcrv script by using it
     from the command line and from Python.
@@ -40,10 +41,10 @@ class Test(gammalib.GPythonTestSuite):
         Constructor.
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Clean calibration database
-        os.system("rm -rf csroot2caldb_* >/dev/null 2>&1")
+        os.system('rm -rf csroot2caldb_* >/dev/null 2>&1')
 
         # Return
         return
@@ -51,14 +52,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("csroot2caldb")
+        self.name('csroot2caldb')
 
         # Append tests
-        self.append(self._test_cmd, "Test csroot2caldb on command line")
-        self.append(self._test_python, "Test csroot2caldb from Python")
+        self.append(self._test_cmd, 'Test csroot2caldb on command line')
+        self.append(self._test_python, 'Test csroot2caldb from Python')
 
         # Return
         return
@@ -66,13 +67,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test csroot2caldb on command line
     def _test_cmd(self):
         """
-        Test csroot2caldb on the command line.
+        Test csroot2caldb on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            csroot2caldb = "../cscripts/csroot2caldb.py"
-        else:
-            csroot2caldb = "csroot2caldb"
+        # Set script name
+        csroot2caldb = self._script('csroot2caldb')
 
         # Setup csroot2caldb command
         cmd = csroot2caldb+' infile="data/irf.root"'+ \
@@ -81,15 +79,13 @@ class Test(gammalib.GPythonTestSuite):
                            ' analysis=DESY'+ \
                            ' logfile="csroot2caldb_cmd1.log" chatter=1'
 
-        # Execute csroot2caldb, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful csroot2caldb execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Return
         return
@@ -97,18 +93,18 @@ class Test(gammalib.GPythonTestSuite):
     # Test csroot2caldb from Python
     def _test_python(self):
         """
-        Test csroot2caldb from Python.
+        Test csroot2caldb from Python
         """
         # Set-up csroot2caldb
         caldb = cscripts.csroot2caldb()
-        caldb["infile"]   = "data/irf.root"
-        caldb["outdir"]   = "csroot2caldb_py1"
-        caldb["inst"]     = "prod3"
-        caldb["id"]       = "South_50h"
-        caldb["version"]  = "prod3"
-        caldb["analysis"] = "DESY"
-        caldb["logfile"]  = "csroot2caldb_py1.log"
-        caldb["chatter"]  = 2
+        caldb['infile']   = 'data/irf.root'
+        caldb['outdir']   = 'csroot2caldb_py1'
+        caldb['inst']     = 'prod3'
+        caldb['id']       = 'South_50h'
+        caldb['version']  = 'prod3'
+        caldb['analysis'] = 'DESY'
+        caldb['logfile']  = 'csroot2caldb_py1.log'
+        caldb['chatter']  = 2
 
         # Run script
         caldb.logFileOpen()   # Make sure we get a log file

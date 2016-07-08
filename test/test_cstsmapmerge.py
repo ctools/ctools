@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ================================== #
 # Test class for cstsmapmerge script #
 # ================================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for cstsmapmerge script.
+    Test class for cstsmapmerge script
 
     This test class makes unit tests for the cstsmapmerge script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,7 +48,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('cstsmapmerge')
@@ -63,28 +63,23 @@ class Test(gammalib.GPythonTestSuite):
     # Test cstsmapmerge on command line
     def _test_cmd(self):
         """
-        Test cstsmapmerge on the command line.
+        Test cstsmapmerge on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
-            cstsmapmerge = '../cscripts/cstsmapmerge.py'
-        else:
-            cstsmapmerge = 'cstsmapmerge'
+        # Set script name
+        cstsmapmerge = self._script('cstsmapmerge')
 
         # Setup cstsmapmerge command
         cmd = cstsmapmerge+' inmaps="data/tsmap_0.fits;data/tsmap_1.fits"'+ \
                            ' outmap="cstsmapmerge_cmd1.fits"'+ \
                            ' logfile="cstsmapmerge_cmd1.log" chatter=1'
 
-        # Execute cstsmapmerge, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful cstsmapmerge execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('cstsmapmerge_cmd1.fits')
@@ -94,15 +89,9 @@ class Test(gammalib.GPythonTestSuite):
                            ' outmap="cstsmapmerge_cmd2.fits"'+ \
                            ' logfile="cstsmapmerge_cmd2.log" chatter=2'
 
-        # Execute cstsmapmerge, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of cstsmapmerge execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -110,7 +99,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test cstsmapmerge from Python
     def _test_python(self):
         """
-        Test cstsmapmerge from Python.
+        Test cstsmapmerge from Python
         """
         # Set-up semi-colon separated cstsmapmerge
         merge = cscripts.cstsmapmerge()
@@ -172,7 +161,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Open result file
         fits = gammalib.GFits(filename)

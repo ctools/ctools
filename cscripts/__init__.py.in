@@ -39,6 +39,7 @@ __all__ = [
     "csspec",
     "cstsdist",
     "cstsmapmerge",
+    "cstsmapsplit",
     "csworkflow",
     "obsutils"
 ]
@@ -64,6 +65,7 @@ from cscripts.cssens       import cssens
 from cscripts.csspec       import csspec
 from cscripts.cstsdist     import cstsdist
 from cscripts.cstsmapmerge import cstsmapmerge
+from cscripts.cstsmapsplit import cstsmapsplit
 from cscripts.csworkflow   import csworkflow
 from cscripts              import obsutils
 if cur_version > req_version:

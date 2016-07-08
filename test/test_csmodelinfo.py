@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ================================= #
 # Test class for csmodelinfo script #
 # ================================= #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csmodelinfo script.
+    Test class for csmodelinfo script
 
     This test class makes unit tests for the csmodelinfo script by using it
     from the command line and from Python.
@@ -40,7 +40,7 @@ class Test(gammalib.GPythonTestSuite):
         Constructor.
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Set members
         self._model_name = "data/crab.xml"
@@ -54,11 +54,11 @@ class Test(gammalib.GPythonTestSuite):
         Set all test functions.
         """
         # Set test name
-        self.name("csmodelinfo")
+        self.name('csmodelinfo')
 
         # Append tests
-        self.append(self._test_cmd, "Test csmodelinfo on command line")
-        self.append(self._test_python, "Test csmodelinfo from Python")
+        self.append(self._test_cmd, 'Test csmodelinfo on command line')
+        self.append(self._test_python, 'Test csmodelinfo from Python')
 
         # Return
         return
@@ -66,46 +66,35 @@ class Test(gammalib.GPythonTestSuite):
     # Test csmodelinfo on command line
     def _test_cmd(self):
         """
-        Test csmodelinfo on the command line.
+        Test csmodelinfo on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            csmodelinfo = "../cscripts/csmodelinfo.py"
-        else:
-            csmodelinfo = "csmodelinfo"
+        # Set script name
+        csmodelinfo = self._script('csmodelinfo')
 
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="'+self._model_name+'"'+ \
                           ' ds9file="model_cmd1.reg"'+ \
                           ' logfile="csmodelinfo_cmd1.log" chatter=1'
 
-        # Execute csmodelinfo, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful csmodelinfo execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check region file
-        self._check_ds9_file("model_cmd1.reg")
+        self._check_ds9_file('model_cmd1.reg')
 
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="model_that_does_not_exist.xml"'+ \
                           ' ds9file="model_cmd2.reg"'+ \
                           ' logfile="csmodelinfo_cmd2.log"'
 
-        # Execute csmodelinfo, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of csmodelinfo execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -113,14 +102,14 @@ class Test(gammalib.GPythonTestSuite):
     # Test csmodelinfo from Python
     def _test_python(self):
         """
-        Test csmodelinfo from Python.
+        Test csmodelinfo from Python
         """
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo["inmodel"]  = self._model_name
-        modelinfo["ds9file"]  = "csmodelinfo_py1.reg"
-        modelinfo["logfile"]  = "csmodelinfo_py1.log"
-        modelinfo["chatter"]  = 2
+        modelinfo['inmodel']  = self._model_name
+        modelinfo['ds9file']  = 'csmodelinfo_py1.reg'
+        modelinfo['logfile']  = 'csmodelinfo_py1.log'
+        modelinfo['chatter']  = 2
 
         # Run csmodelinfo script and save DS9 file
         modelinfo.logFileOpen()   # Make sure we get a log file
@@ -128,20 +117,20 @@ class Test(gammalib.GPythonTestSuite):
         modelinfo.save()
 
         # Check region file
-        self._check_ds9_file("csmodelinfo_py1.reg")
+        self._check_ds9_file('csmodelinfo_py1.reg')
 
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo["inmodel"]  = self._model_name
-        modelinfo["ds9file"]  = "csmodelinfo_py2.reg"
-        modelinfo["logfile"]  = "csmodelinfo_py2.log"
-        modelinfo["chatter"]  = 3
+        modelinfo['inmodel']  = self._model_name
+        modelinfo['ds9file']  = 'csmodelinfo_py2.reg'
+        modelinfo['logfile']  = 'csmodelinfo_py2.log'
+        modelinfo['chatter']  = 3
 
         # Execute csmodelinfo script
         modelinfo.execute()
 
         # Check region file
-        self._check_ds9_file("csmodelinfo_py2.reg")
+        self._check_ds9_file('csmodelinfo_py2.reg')
 
         # Return
         return
@@ -149,10 +138,10 @@ class Test(gammalib.GPythonTestSuite):
     # Check region file
     def _check_ds9_file(self, filename):
         """
-        Check region file.
+        Check region file
         """
         # Open file   
-        f = open(filename,"r")
+        f = open(filename,'r')
 
         # Expect "fk5" in first line
         line = f.readline().strip('\n')

@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # =============================== #
 # Test class for csobsinfo script #
 # =============================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csobsinfo script.
+    Test class for csobsinfo script
 
     This test class makes unit tests for the csobsinfo script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,14 +48,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("csobsinfo")
+        self.name('csobsinfo')
 
         # Append tests
-        self.append(self._test_cmd, "Test csobsinfo on command line")
-        self.append(self._test_python, "Test csobsinfo from Python")
+        self.append(self._test_cmd, 'Test csobsinfo on command line')
+        self.append(self._test_python, 'Test csobsinfo from Python')
 
         # Return
         return
@@ -63,13 +63,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test csobsinfo on command line
     def _test_cmd(self):
         """
-        Test csobsinfo on the command line.
+        Test csobsinfo on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            csobsinfo = "../cscripts/csobsinfo.py"
-        else:
-            csobsinfo = "csobsinfo"
+        # Set script name
+        csobsinfo = self._script('csobsinfo')
 
         # Setup csobsinfo command
         cmd = csobsinfo+' inobs="data/obs_unbinned.xml"'+ \
@@ -77,18 +74,16 @@ class Test(gammalib.GPythonTestSuite):
                         ' offset=yes ra=83.63 dec=22.01'+ \
                         ' logfile="csobsinfo_cmd1.log" chatter=1'
 
-        # Execute csobsinfo, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful csobsinfo execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check DS9 file
-        self._check_ds9_file("csobsinfo_cmd1.reg")
+        self._check_ds9_file('csobsinfo_cmd1.reg')
 
         # Setup csobsinfo command
         cmd = csobsinfo+' inobs="obs_definition_that_does_not_exist.xml"'+ \
@@ -96,15 +91,9 @@ class Test(gammalib.GPythonTestSuite):
                         ' offset=yes ra=83.63 dec=22.01'+ \
                         ' logfile="csobsinfo_cmd2.log"'
 
-        # Execute csobsinfo, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of csobsinfo execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -112,17 +101,17 @@ class Test(gammalib.GPythonTestSuite):
     # Test csobsinfo from Python
     def _test_python(self):
         """
-        Test csobsinfo from Python.
+        Test csobsinfo from Python
         """
         # Set-up csobsinfo
         obsinfo = cscripts.csobsinfo()
-        obsinfo["inobs"]   = "data/obs_unbinned.xml"
-        obsinfo["ds9file"] = "csobsinfo_py1.reg"
-        obsinfo["offset"]  = True
-        obsinfo["ra"]      = 83.63
-        obsinfo["dec"]     = 22.01
-        obsinfo["logfile"] = "csobsinfo_py1.log"
-        obsinfo["chatter"] = 2
+        obsinfo['inobs']   = 'data/obs_unbinned.xml'
+        obsinfo['ds9file'] = 'csobsinfo_py1.reg'
+        obsinfo['offset']  = True
+        obsinfo['ra']      = 83.63
+        obsinfo['dec']     = 22.01
+        obsinfo['logfile'] = 'csobsinfo_py1.log'
+        obsinfo['chatter'] = 2
 
         # Run csobsinfo script and save XML file
         obsinfo.logFileOpen()   # Make sure we get a log file
@@ -130,23 +119,23 @@ class Test(gammalib.GPythonTestSuite):
         obsinfo.save()
 
         # Check DS9 file
-        self._check_ds9_file("csobsinfo_py1.reg")
+        self._check_ds9_file('csobsinfo_py1.reg')
 
         # Set-up csobsinfo
         obsinfo = cscripts.csobsinfo()
-        obsinfo["inobs"]   = "data/obs_unbinned.xml"
-        obsinfo["ds9file"] = "csobsinfo_py2.reg"
-        obsinfo["offset"]  = True
-        obsinfo["ra"]      = 83.63
-        obsinfo["dec"]     = 22.01
-        obsinfo["logfile"] = "csobsinfo_py2.log"
-        obsinfo["chatter"] = 3
+        obsinfo['inobs']   = 'data/obs_unbinned.xml'
+        obsinfo['ds9file'] = 'csobsinfo_py2.reg'
+        obsinfo['offset']  = True
+        obsinfo['ra']      = 83.63
+        obsinfo['dec']     = 22.01
+        obsinfo['logfile'] = 'csobsinfo_py2.log'
+        obsinfo['chatter'] = 3
 
         # Execute csobsinfo script
         obsinfo.execute()
 
         # Check DS9 file
-        self._check_ds9_file("csobsinfo_py2.reg")
+        self._check_ds9_file('csobsinfo_py2.reg')
 
         # Return
         return
@@ -154,10 +143,10 @@ class Test(gammalib.GPythonTestSuite):
     # Check DS9 file
     def _check_ds9_file(self, filename):
         """
-        Check DS9 file.
+        Check DS9 file
         """
         # Open file   
-        f = open(filename,"r")
+        f = open(filename,'r')
 
         # Expect "fk5" in first line
         line = f.readline().strip('\n')

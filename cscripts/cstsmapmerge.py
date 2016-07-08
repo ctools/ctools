@@ -18,11 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
 import glob
 import os
+import gammalib
+import ctools
 
 
 # ================== #

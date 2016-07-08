@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
+from testing import test
 
 
 # ============================= #
 # Test class for ctmapcube tool #
 # ============================= #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for ctmapcube tool.
+    Test class for ctmapcube tool
 
     This test class makes unit tests for the ctmapcube tool by using it from
     the command line and from Python.
@@ -37,13 +37,13 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Set members
-        self._model_name = "data/crab.xml"
+        self._model_name = 'data/crab.xml'
 
         # Return
         return
@@ -51,14 +51,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("ctmapcube")
+        self.name('ctmapcube')
 
         # Append tests
-        self.append(self._test_cmd, "Test ctmapcube on command line")
-        self.append(self._test_python, "Test ctmapcube from Python")
+        self.append(self._test_cmd, 'Test ctmapcube on command line')
+        self.append(self._test_python, 'Test ctmapcube from Python')
 
         # Return
         return
@@ -66,13 +66,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctmapcube on command line
     def _test_cmd(self):
         """
-        Test ctmapcube on the command line.
+        Test ctmapcube on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            ctmapcube = "../src/ctmapcube/ctmapcube"
-        else:
-            ctmapcube = "ctmapcube"
+        # Set tool name
+        ctmapcube = self._tool('ctmapcube')
 
         # Setup ctmapcube command
         cmd = ctmapcube+' inmodel="'+self._model_name+'"'+ \
@@ -82,19 +79,16 @@ class Test(gammalib.GPythonTestSuite):
                         ' xref=83.63 yref=22.01 proj=CAR'+ \
                         ' logfile="ctmapcube_cmd1.log" chatter=1'
 
-        # Execute ctmapcube, make sure we catch any exception
-        try:
-            #rc = os.system(cmd)
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful ctmapcube execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check map cube
-        self._check_cube("ctmapcube_cmd1.fits")
+        self._check_cube('ctmapcube_cmd1.fits')
 
         # Setup ctmapcube command
         cmd = ctmapcube+' inmodel="events_that_do_not_exist.fits"'+ \
@@ -104,16 +98,9 @@ class Test(gammalib.GPythonTestSuite):
                         ' xref=83.63 yref=22.01 proj=CAR'+ \
                         ' logfile="ctmapcube_cmd2.log"'
 
-        # Execute ctmapcube, make sure we catch any exception
-        try:
-            #rc = os.system(cmd)
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of ctmapcube execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -121,25 +108,25 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctmapcube from Python
     def _test_python(self):
         """
-        Test ctmapcube from Python.
+        Test ctmapcube from Python
         """
         # Set-up ctmapcube
         mapcube = ctools.ctmapcube()
-        mapcube["inmodel"]  = self._model_name
-        mapcube["outcube"]  = "ctmapcube_py1.fits"
-        mapcube["ebinalg"]  = "LOG"
-        mapcube["emin"]     = 0.1
-        mapcube["emax"]     = 100.0
-        mapcube["enumbins"] = 20
-        mapcube["nxpix"]    = 200
-        mapcube["nypix"]    = 200
-        mapcube["binsz"]    = 0.02
-        mapcube["coordsys"] = "CEL"
-        mapcube["proj"]     = "CAR"
-        mapcube["xref"]     = 83.63
-        mapcube["yref"]     = 22.01
-        mapcube["logfile"]  = "ctmapcube_py1.log"
-        mapcube["chatter"]  = 2
+        mapcube['inmodel']  = self._model_name
+        mapcube['outcube']  = 'ctmapcube_py1.fits'
+        mapcube['ebinalg']  = 'LOG'
+        mapcube['emin']     = 0.1
+        mapcube['emax']     = 100.0
+        mapcube['enumbins'] = 20
+        mapcube['nxpix']    = 200
+        mapcube['nypix']    = 200
+        mapcube['binsz']    = 0.02
+        mapcube['coordsys'] = 'CEL'
+        mapcube['proj']     = 'CAR'
+        mapcube['xref']     = 83.63
+        mapcube['yref']     = 22.01
+        mapcube['logfile']  = 'ctmapcube_py1.log'
+        mapcube['chatter']  = 2
 
         # Run ctmapcube tool
         mapcube.logFileOpen()   # Make sure we get a log file
@@ -149,7 +136,7 @@ class Test(gammalib.GPythonTestSuite):
         mapcube.save()
 
         # Check map cube
-        self._check_cube("ctmapcube_py1.fits")
+        self._check_cube('ctmapcube_py1.fits')
 
         # Return
         return
@@ -157,22 +144,23 @@ class Test(gammalib.GPythonTestSuite):
     # Check map cube
     def _check_cube(self, filename):
         """
-        Check content of map cube."
+        Check content of map cube
 
-        Args:
-            filename: Map cube file name.
+        Parameters
+        ----------
+        filename : str
+            Map cube file name.
         """
         # Load map cube
         cube = gammalib.GModelSpatialDiffuseCube(filename)
-        #print(cube)
 
         # Test map cube
         #self.test_value(cube.maps(), 20, "20 maps")
         #self.test_value(cube.pixels(), 40000, "40000 map pixels")
         # The map cube is not loaded by default !!!! We should add the method so that
         # the attributes are known !!!!
-        self.test_value(cube.maps(), 0, "20 maps")
-        self.test_value(cube.pixels(), 0, "40000 map pixels")
+        self.test_value(cube.maps(), 0, '20 maps')
+        self.test_value(cube.pixels(), 0, '40000 map pixels')
 
         # Return
         return

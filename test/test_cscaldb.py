@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ============================= #
 # Test class for cscaldb script #
 # ============================= #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for cscaldb script.
+    Test class for cscaldb script
 
     This test class makes unit tests for the cslightcrv script by using it
     from the command line and from Python.
@@ -40,7 +40,7 @@ class Test(gammalib.GPythonTestSuite):
         Constructor.
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -65,24 +65,19 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test cscaldb on the command line.
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
-            cscaldb = '../cscripts/cscaldb.py'
-        else:
-            cscaldb = 'cscaldb'
+        # Set script name
+        cscaldb = self._script('cscaldb')
 
         # Setup cscaldb command
         cmd = cscaldb+' logfile="cscaldb_cmd1.log" chatter=1'
 
-        # Execute cscaldb, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful cscaldb execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Return
         return
@@ -94,8 +89,8 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Set-up cscaldb
         caldb = cscripts.cscaldb()
-        caldb['logfile']  = 'cscaldb_py1.log'
-        caldb['chatter']  = 2
+        caldb['logfile'] = 'cscaldb_py1.log'
+        caldb['chatter'] = 2
 
         # Run script
         caldb.logFileOpen()   # Make sure we get a log file

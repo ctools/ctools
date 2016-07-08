@@ -38,6 +38,7 @@ import test_cssens
 import test_csspec
 import test_cstsdist
 import test_cstsmapmerge
+import test_cstsmapsplit
 import test_csworkflow
 import test_csiactcopy
 import test_csiactdata
@@ -112,6 +113,7 @@ def test(installed=False, debug=False):
     suite_csspec       = test_csspec.Test()
     suite_cstsdist     = test_cstsdist.Test()
     suite_cstsmapmerge = test_cstsmapmerge.Test()
+    suite_cstsmapsplit = test_cstsmapsplit.Test()
     suite_csworkflow   = test_csworkflow.Test()
 
     # Setup unit tests
@@ -129,6 +131,7 @@ def test(installed=False, debug=False):
     suite_csspec.set()
     suite_cstsdist.set()
     suite_cstsmapmerge.set()
+    suite_cstsmapsplit.set()
     suite_csworkflow.set()
 
     # Append tests to container
@@ -146,6 +149,7 @@ def test(installed=False, debug=False):
     suites.append(suite_csspec)
     suites.append(suite_cstsdist)
     suites.append(suite_cstsmapmerge)
+    suites.append(suite_cstsmapsplit)
     suites.append(suite_csworkflow)
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
@@ -187,6 +191,10 @@ def test(installed=False, debug=False):
         rc = 0
     else:
         rc = 1
+
+    # Remove temporary direction
+    if installed:
+        os.system('rm -rf %s' % (path))
 
     # Exit with return code
     sys.exit(rc)

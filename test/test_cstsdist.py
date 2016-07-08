@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ============================== #
 # Test class for cstsdist script #
 # ============================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for cstsdist script.
+    Test class for cstsdist script
 
     This test class makes unit tests for the cstsdist script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,7 +48,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('cstsdist')
@@ -63,13 +63,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test cstsdist on command line
     def _test_cmd(self):
         """
-        Test cstsdist on the command line.
+        Test cstsdist on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
-            cstsdist = '../cscripts/cstsdist.py'
-        else:
-            cstsdist = 'cstsdist'
+        # Set script name
+        cstsdist = self._script('cstsdist')
 
         # Setup cstsdist command
         cmd = cstsdist+' inmodel="data/crab.xml"'+ \
@@ -80,15 +77,13 @@ class Test(gammalib.GPythonTestSuite):
                        ' outfile="cstsdist_cmd1.dat"'+ \
                        ' logfile="cstsdist_cmd1.log" chatter=1'
 
-        # Execute cstsdist, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful cstsdist execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('cstsdist_cmd1.dat')
@@ -102,15 +97,9 @@ class Test(gammalib.GPythonTestSuite):
                        ' outfile="cstsdist_cmd2.dat"'+ \
                        ' logfile="cstsdist_cmd2.log" chatter=2'
 
-        # Execute cstsdist, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of cstsdist execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -118,7 +107,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test cstsdist from Python
     def _test_python(self):
         """
-        Test cstsdist from Python.
+        Test cstsdist from Python
         """
         # Set-up cstsdist
         tsdist = cscripts.cstsdist()
@@ -154,7 +143,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Open result file as CSV file
         results = gammalib.GCsv(filename, ',')

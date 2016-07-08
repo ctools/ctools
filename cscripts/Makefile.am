@@ -17,6 +17,7 @@ pythonscripts = __init__.py \
                 csspec.py \
                 cstsdist.py \
                 cstsmapmerge.py \
+                cstsmapsplit.py \
                 csworkflow.py \
                 csfindobs.py \
                 csiactcopy.py \
@@ -39,6 +40,7 @@ parfiles = cscaldb.par \
            csspec.par \
            cstsdist.par \
            cstsmapmerge.par \
+           cstsmapsplit.par \
            csworkflow.par \
            csfindobs.par \
            csiactcopy.par \
@@ -61,6 +63,7 @@ linkscripts = cscaldb \
               csspec \
               cstsdist \
               cstsmapmerge \
+              cstsmapsplit \
               csworkflow \
               csfindobs \
               csiactcopy \
@@ -69,6 +72,7 @@ linkscripts = cscaldb \
 
 # Test scripts to be distributed in $(pyexecdir)/cscripts/tests
 testscripts = tests/__init__.py \
+              ../test/testing.py \
               ../test/test_python_cscripts.py \
               ../test/test_cscaldb.py \
               ../test/test_csmodelinfo.py \
@@ -84,6 +88,7 @@ testscripts = tests/__init__.py \
               ../test/test_csspec.py \
               ../test/test_cstsdist.py \
               ../test/test_cstsmapmerge.py \
+              ../test/test_cstsmapsplit.py \
               ../test/test_csworkflow.py \
               ../test/test_csfindobs.py \
               ../test/test_csiactcopy.py \

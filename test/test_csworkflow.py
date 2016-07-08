@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ================================ #
 # Test class for csworkflow script #
 # ================================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csworkflow script.
+    Test class for csworkflow script
 
     This test class makes unit tests for the cslightcrv script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,7 +48,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('csworkflow')
@@ -62,12 +62,11 @@ class Test(gammalib.GPythonTestSuite):
 
     # Test csworkflow on command line
     def _test_cmd(self):
-
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
-            csworkflow = '../cscripts/csworkflow.py'
-        else:
-            csworkflow = 'csworkflow'
+        """
+        Test csworkflow on the command line
+        """
+        # Set script name
+        csworkflow = self._script('csworkflow')
 
         # Remove result file
         gammalib.GFilename('wf_crab_results.xml').remove()
@@ -76,16 +75,13 @@ class Test(gammalib.GPythonTestSuite):
         cmd = csworkflow+' inflow="data/workflow.xml"'+ \
                          ' logfile="csworkflow_cmd1.log" chatter=1'
 
-        # Execute csworkflow, make sure we catch any exception
-        try:
-            rc = os.system(cmd)
-            #rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful csworkflow execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check fit result
         self._check_fit_result('wf_crab_results.xml')
@@ -95,7 +91,9 @@ class Test(gammalib.GPythonTestSuite):
 
     # Test csworkflow from Python
     def _test_python(self):
-
+        """
+        Test csworkflow from Python
+        """
         # Remove result file
         gammalib.GFilename('wf_crab_results.xml').remove()
 
@@ -132,7 +130,9 @@ class Test(gammalib.GPythonTestSuite):
 
     # Check fit result XML values
     def _check_fit_result(self, filename):
-
+        """
+        Check result file
+        """
         # Load fit results
         models = gammalib.GModels(filename)
 

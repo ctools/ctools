@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
+from testing import test
 
 
 # =========================== #
 # Test class for cterror tool #
 # =========================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for cterror tool.
+    Test class for cterror tool
     """
     # Constructor
     def __init__(self):
@@ -36,14 +36,14 @@ class Test(gammalib.GPythonTestSuite):
         Constructor.
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Set members
-        self.events_name = "data/crab_events.fits"
-        self.model_name  = "data/crab.xml"
-        self.result_name = "cterror_result.xml"
-        self.caldb       = "irf"
-        self.irf         = "cta_dummy_irf"
+        self.events_name = 'data/crab_events.fits'
+        self.model_name  = 'data/crab.xml'
+        self.result_name = 'cterror_result.xml'
+        self.caldb       = 'irf'
+        self.irf         = 'cta_dummy_irf'
 
         # Return
         return
@@ -51,7 +51,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('cterror')
@@ -66,13 +66,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test cterror on command line
     def _test_cmd(self):
         """
-        Test cterror on the command line.
+        Test cterror on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
-            cterror = '../src/cterror/cterror'
-        else:
-            cterror = 'cterror'
+        # Set tool name
+        cterror = self._tool('cterror')
 
         # Setup cterror command
         cmd = cterror+' inobs="data/crab_events.fits"'+ \
@@ -81,15 +78,13 @@ class Test(gammalib.GPythonTestSuite):
                       ' outmodel="cterror_cmd1.xml"'+ \
                       ' logfile="cterror_cmd1.log" chatter=1'
 
-        # Execute cterror, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful cterror execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check result file
         self._check_result_file('cterror_cmd1.xml')
@@ -101,15 +96,9 @@ class Test(gammalib.GPythonTestSuite):
                       ' outmodel="cterror_cmd2.xml"'+ \
                       ' logfile="cterror_cmd2.log" chatter=1'
 
-        # Execute cterror, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of cterror execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -117,7 +106,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test cterror from Python
     def _test_python(self):
         """
-        Test cterror from Python.
+        Test cterror from Python
         """
         # Set-up cterror
         error = ctools.cterror()
@@ -144,7 +133,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check result file
     def _check_result_file(self, filename):
         """
-        Check result file.
+        Check result file
         """
         # Open result file
         result = gammalib.GModels(filename)

@@ -18,18 +18,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
 from cscripts import obsutils
+from testing import test
 
 
 # ============================ #
 # Test class for ctobssim tool #
 # ============================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for ctobssim tools.
+    Test class for ctobssim tools
     
     This test class makes unit tests for the ctobssim tool by using it from
     the command line and from Python.
@@ -38,15 +38,15 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Set members
-        self._model_name = "data/crab.xml"
-        self._caldb      = "irf"
-        self._irf        = "cta_dummy_irf"
+        self._model_name = 'data/crab.xml'
+        self._caldb      = 'irf'
+        self._irf        = 'cta_dummy_irf'
 
         # Return
         return
@@ -54,14 +54,14 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("ctobssim")
+        self.name('ctobssim')
 
         # Append tests
-        self.append(self._test_ctobssim_cmd, "Test ctobssim on command line")
-        self.append(self._test_ctobssim_python, "Test ctobssim from Python")
+        self.append(self._test_ctobssim_cmd, 'Test ctobssim on command line')
+        self.append(self._test_ctobssim_python, 'Test ctobssim from Python')
 
         # Return
         return
@@ -69,13 +69,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctobssim on command line
     def _test_ctobssim_cmd(self):
         """
-        Test ctobssim on the command line.
+        Test ctobssim on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile("README"):
-            ctobssim = "../src/ctobssim/ctobssim"
-        else:
-            ctobssim = "ctobssim"
+        # Set tool name
+        ctobssim = self._tool('ctobssim')
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="data/crab.xml" outevents="events.fits"'+ \
@@ -83,18 +80,16 @@ class Test(gammalib.GPythonTestSuite):
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
                        ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
 
-        # Execute ctobssim, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         "Successful ctobssim execution on command line")
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Load counts cube and check content.
-        evt = gammalib.GCTAEventList("events.fits")
+        evt = gammalib.GCTAEventList('events.fits')
         self._test_list(evt, 4119)
 
         # Setup ctobssim command
@@ -104,15 +99,9 @@ class Test(gammalib.GPythonTestSuite):
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
                        ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
 
-        # Execute ctobssim, make sure we catch any exception
-        try:
-            rc = os.system(cmd+" >/dev/null 2>&1")
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         "Failure of ctobssim execution on command line")
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -120,21 +109,21 @@ class Test(gammalib.GPythonTestSuite):
     # Test ctobssim from Python
     def _test_ctobssim_python(self):
         """
-        Test ctobssim from Python.
+        Test ctobssim from Python
         """
         # Set-up ctobssim
         sim = ctools.ctobssim()
-        sim["inmodel"]   = self._model_name
-        sim["outevents"] = "events.fits"
-        sim["caldb"]     = self._caldb
-        sim["irf"]       = self._irf
-        sim["ra"]        = 83.63
-        sim["dec"]       = 22.01
-        sim["rad"]       = 10.0
-        sim["tmin"]      = 0.0
-        sim["tmax"]      = 1800.0
-        sim["emin"]      = 0.1
-        sim["emax"]      = 100.0
+        sim['inmodel']   = self._model_name
+        sim['outevents'] = 'events.fits'
+        sim['caldb']     = self._caldb
+        sim['irf']       = self._irf
+        sim['ra']        = 83.63
+        sim['dec']       = 22.01
+        sim['rad']       = 10.0
+        sim['tmin']      = 0.0
+        sim['tmax']      = 1800.0
+        sim['emin']      = 0.1
+        sim['emax']      = 100.0
 
         # Run tool
         sim.run()
@@ -147,7 +136,7 @@ class Test(gammalib.GPythonTestSuite):
         sim.save()
 
         # Load counts cube and check content.
-        evt = gammalib.GCTAEventList("events.fits")
+        evt = gammalib.GCTAEventList('events.fits')
         self._test_list(evt, 4119)
 
         # Set-up observation container
@@ -159,8 +148,8 @@ class Test(gammalib.GPythonTestSuite):
 
         # Set-up ctobssim from observation container
         sim = ctools.ctobssim(obs)
-        sim["outevents"] = "sim_events.xml"
-        sim["inmodel"]   = self._model_name
+        sim['outevents'] = 'sim_events.xml'
+        sim['inmodel']   = self._model_name
 
         # Run tool
         sim.run()
@@ -176,7 +165,7 @@ class Test(gammalib.GPythonTestSuite):
         sim.save()
 
         # Load events
-        obs = gammalib.GObservations("sim_events.xml")
+        obs = gammalib.GObservations('sim_events.xml')
 
         # Retrieve observation and check content
         self._test_list(obs[0].events(), 4063)
@@ -186,20 +175,20 @@ class Test(gammalib.GPythonTestSuite):
 
         # Set-up ctobssim with invalid event file
         sim = ctools.ctobssim()
-        sim["inmodel"]   = "model_file_that_does_not_exist.xml"
-        sim["outevents"] = "events.fits"
-        sim["caldb"]     = self._caldb
-        sim["irf"]       = self._irf
-        sim["ra"]        = 83.63
-        sim["dec"]       = 22.01
-        sim["rad"]       = 10.0
-        sim["tmin"]      = 0.0
-        sim["tmax"]      = 1800.0
-        sim["emin"]      = 0.1
-        sim["emax"]      = 100.0
+        sim['inmodel']   = 'model_file_that_does_not_exist.xml'
+        sim['outevents'] = 'events.fits'
+        sim['caldb']     = self._caldb
+        sim['irf']       = self._irf
+        sim['ra']        = 83.63
+        sim['dec']       = 22.01
+        sim['rad']       = 10.0
+        sim['tmin']      = 0.0
+        sim['tmax']      = 1800.0
+        sim['emin']      = 0.1
+        sim['emax']      = 100.0
 
         # Run ctbin tool
-        self.test_try("Run ctobssim with invalid model file")
+        self.test_try('Run ctobssim with invalid model file')
         try:
             sim.run()
             self.test_try_failure()
@@ -213,31 +202,33 @@ class Test(gammalib.GPythonTestSuite):
     def _test_observation(self, ctobssim, nobs=1,
                           pnts=[{'ra': 83.63, 'dec': 22.01}]):
         """
-        Test content of an observation.
+        Test content of an observation
         
-        Args:
-            ctobssim: ctobssim instance
-
-        Kwargs:
-            nobs:     Number of observations
-            pnts:     List of pointing dictionaries
+        Parameters
+        ----------
+        ctobssim : `~ctools.ctobssim`
+            ctobssim instance
+        nobs : int
+            Number of observations
+        pnts : list of dict
+            List of pointing dictionaries
         """
         # Test observation container
         self.test_value(ctobssim.obs().size(), nobs,
-             "There is one observation")
+             'There is one observation')
         for i in range(ctobssim.obs().size()):
             obs = gammalib.GCTAObservation(ctobssim.obs()[i])
             pnt = obs.pointing()
-            self.test_assert(obs.instrument() == "CTA",
-                 "Observation is CTA observation")
+            self.test_assert(obs.instrument() == 'CTA',
+                 'Observation is CTA observation')
             self.test_value(obs.ontime(), 1800.0, 1.0e-6,
-                 "Ontime is 1800 sec")
+                 'Ontime is 1800 sec')
             self.test_value(obs.livetime(), 1710.0, 1.0e-6,
-                 "Livetime is 1710 sec")
+                 'Livetime is 1710 sec')
             self.test_value(pnt.dir().ra_deg(), pnts[i]['ra'], 1.0e-6,
-                 "Pointing Right Ascension is "+str(pnts[i]['ra'])+" deg")
+                 'Pointing Right Ascension is '+str(pnts[i]['ra'])+' deg')
             self.test_value(pnt.dir().dec_deg(), pnts[i]['dec'], 1.0e-6,
-                 "Pointing Declination is "+str(pnts[i]['dec'])+" deg")
+                 'Pointing Declination is '+str(pnts[i]['dec'])+' deg')
 
         # Return
         return
@@ -245,15 +236,18 @@ class Test(gammalib.GPythonTestSuite):
     # Check event list
     def _test_list(self, list, nevents):
         """
-        Test content of event list."
+        Test content of event list
         
-        Args:
-            list:    Event list
-            nevents: Expected number of events.
+        Parameters
+        ----------
+        list : `~gammalib.GCTAEventList`
+            Event list
+        nevents : int
+            Expected number of events
         """
         # Test event list
-        self.test_value(list.size(), nevents, str(nevents)+" elements")
-        self.test_value(list.number(), nevents, str(nevents)+" events")
+        self.test_value(list.size(), nevents, str(nevents)+' elements')
+        self.test_value(list.number(), nevents, str(nevents)+' events')
 
         # Return
         return

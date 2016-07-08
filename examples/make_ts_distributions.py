@@ -1,18 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script generates TS distributions for the standard energy bands that
-# are also used for sensitivity computation. The script makes use of the
-# "processing" Python module, if available, that can be used for parallel
-# computing on multiple cores/CPUs.
+# Generate TS distributions as function of energy for an OFF observation
 #
-# This script provides an illustration of how a ctools or cscript can be
-# used from within Python. It further illustrates the possibility of
-# parallel computing using the "processing" Python module.
-#
-# Required 3rd party modules:
-# - processing (optional)
-#
-# Copyright (C) 2011-2015 Jurgen Knodlseder
+# Copyright (C) 2011-2016 Jurgen Knodlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,15 +20,14 @@
 # ==========================================================================
 import sys
 import time
-from cscripts import cstsdist
+import cscripts
 
-# Try importing processing module
-has_processing = False
+# Optionally import processing module
 try:
     import processing
     has_processing = True
 except:
-    pass
+    has_processing = False
 
 
 # ====================== #
@@ -49,35 +38,44 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
     """
     Create TS distribution.
 
-    Parameters:
-     loge - Logarithm of mean energy in TeV
-     emin - Minimum energy (TeV)
-     emax - Maximum energy (TeV)
-    Keywords:
-     log  - Create log file(s)
+    Parameters
+    ----------
+    loge : float
+        Logarithm of mean energy (TeV)
+    emin : float
+        Minimum energy (TeV)
+    emax : float
+        Maximum energy (TeV)
+    ntrials : int, optional
+        Number of MC samples
+    durations : float, optional
+        Observation duration (s)
+    enumbins : int, optional
+        Number of energy bins
+    log : bool, optional
+        Create log file(s)
     """
     # Generate output filename
-    outfile = "ts_"+str(loge)+".dat"
+    outfile = 'ts_'+str(loge)+'.dat'
 
     # Setup cstsdist tool
-    tsdist = cstsdist()
-    tsdist["inmodel"]  = "$CTOOLS/share/models/crab.xml"
-    tsdist["srcname"]  = "Crab"
-    tsdist["outfile"]  = outfile
-    tsdist["ntrials"]  = ntrials
-    tsdist["caldb"]    = "prod2"
-    tsdist["irf"]      = "South_50h"
-    tsdist["ra"]       = 83.63
-    tsdist["dec"]      = 22.01
-    tsdist["emin"]     = emin
-    tsdist["emax"]     = emax
-    tsdist["enumbins"] = enumbins
-    tsdist["tmin"]     = 0
-    tsdist["tmax"]     = duration
-    tsdist["rad"]      = 5.0
-    tsdist["npix"]     = 200
-    tsdist["binsz"]    = 0.05
-    #tsdist["debug"].boolean(True)
+    tsdist = cscripts.cstsdist()
+    tsdist['inmodel']  = 'data/crab.xml'
+    tsdist['srcname']  = 'Crab'
+    tsdist['outfile']  = outfile
+    tsdist['ntrials']  = ntrials
+    tsdist['caldb']    = 'prod2'
+    tsdist['irf']      = 'South_50h'
+    tsdist['ra']       = 83.63
+    tsdist['dec']      = 22.01
+    tsdist['emin']     = emin
+    tsdist['emax']     = emax
+    tsdist['enumbins'] = enumbins
+    tsdist['tmin']     = 0
+    tsdist['tmax']     = duration
+    tsdist['rad']      = 5.0
+    tsdist['npix']     = 200
+    tsdist['binsz']    = 0.05
 
     # Optionally open the log file
     if log:
@@ -94,11 +92,9 @@ def create_ts(loge, emin, emax, ntrials=100, duration=180000.0,
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Create TS distribution in a number of energy bands.
-    """
+
     # Get input arguments
-    usage = "make_ts_distributions [-n ntrials] [-e enumbins] [-m max_threads]"
+    usage = 'make_ts_distributions.py [-n ntrials] [-e enumbins] [-m max_threads]'
     if len(sys.argv) < 1:
         print(usage)
         sys.exit()
@@ -113,7 +109,7 @@ if __name__ == '__main__':
     pars = [{'option': '-n', 'value': ntrials},
             {'option': '-e', 'value': enumbins},
             {'option': '-d', 'value': duration},
-                    {'option': '-m', 'value': max_threads}]
+            {'option': '-m', 'value': max_threads}]
 
     # Gather parameters from command line
     i = 1
@@ -123,7 +119,7 @@ if __name__ == '__main__':
         for par in pars:
             if sys.argv[i] == par['option']:
                 if len(sys.argv) > i+1:
-                    i      += 1
+                    i += 1
                     try:
                         par['value'] = int(sys.argv[i])
                     except:
@@ -152,11 +148,12 @@ if __name__ == '__main__':
         emin  = pow(10.0, loge-0.1)
         emax  = pow(10.0, loge+0.1)
         if loge < 0:
-            loge = "m"+str(abs(loge))
+            loge = 'm'+str(abs(loge))
         else:
-            loge = "p"+str(abs(loge))
+            loge = 'p'+str(abs(loge))
 
-        # Processing support?
+        # If processing support is available then start max_threads processes
+        # in parallel
         if has_processing:
 
             # Wait until one thread has finished
@@ -171,19 +168,17 @@ if __name__ == '__main__':
             # Generate pull distribution
             p = processing.Process(target=create_ts, args=args, kwargs=kwargs)
             p.start()
-            print("Process emin=%.4f emax=%.4f started." % (emin, emax))
+            print('Process emin=%.4f emax=%.4f started.' % (emin, emax))
 
             # Wait a short time to allow process to start
             time.sleep(1)
 
-        # ... no
+        # ... otherwise simply start a single process
         else:
             create_ts(loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
-          duration=duration)
+                      duration=duration)
 
-    # Processing support
+    # If processing support is available then wait until all threads finished
     if has_processing:
-
-        # Wait until all threads finished
         while len(processing.activeChildren()) > 0:
             time.sleep(10)

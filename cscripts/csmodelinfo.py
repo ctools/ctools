@@ -18,9 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import sys
 import gammalib
 import ctools
-import sys
 
 
 # ================= #
@@ -430,16 +430,17 @@ class csmodelinfo(ctools.cscript):
         """ 
         Save models to ds9 region file if required
         """
-        # Write header
-        if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save models in DS9 file")
 
         # Get output filename in case it was not read ahead
         self._ds9file = self["ds9file"].filename()
 
         # Check if DS9 file is valid
         if self._ds9file != "NONE":      
+            
+            # Write header
+            if self._logTerse():
+                self._log("\n")
+                self._log.header1("Save models in DS9 file")
             
             # Log filename
             if self._logTerse():

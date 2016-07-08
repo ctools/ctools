@@ -31,6 +31,7 @@ if WITH_PYTHON
 
 # Test scripts to be distributed in $(pyexecdir)/ctools/tests
 testscripts = ctools/tests/__init__.py \
+              ../test/testing.py \
               ../test/test_python_ctools.py \
               ../test/test_ctobssim.py \
               ../test/test_ctselect.py \
@@ -48,7 +49,6 @@ testscripts = ctools/tests/__init__.py \
               ../test/test_ctbutterfly.py \
               ../test/test_ctulimit.py \
               ../test/test_cterror.py \
-              ../test/test_cscaldb.py \
               ../test/test_pipelines.py
 testdata    = ../test/data/crab.xml \
               ../test/data/crab_events.fits.gz \

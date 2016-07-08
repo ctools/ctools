@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import cscripts
+from testing import test
 
 
 # ============================== #
 # Test class for csobsdef script #
 # ============================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for csobsdef script.
+    Test class for csobsdef script
 
     This test class makes unit tests for the csobsdef script by using it
     from the command line and from Python.
@@ -37,10 +37,10 @@ class Test(gammalib.GPythonTestSuite):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
+        test.__init__(self)
 
         # Return
         return
@@ -48,7 +48,7 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('csobsdef')
@@ -63,13 +63,10 @@ class Test(gammalib.GPythonTestSuite):
     # Test csobsdef on command line
     def _test_cmd(self):
         """
-        Test csobsdef on the command line.
+        Test csobsdef on the command line
         """
-        # Kluge to set the command (installed version has no README file)
-        if os.path.isfile('README'):
-            csobsdef = '../cscripts/csobsdef.py'
-        else:
-            csobsdef = 'csobsdef'
+        # Set script name
+        csobsdef = self._script('csobsdef')
 
         # Setup csobsdef command
         cmd = csobsdef+' inpnt="data/pntdef.dat"'+ \
@@ -78,15 +75,13 @@ class Test(gammalib.GPythonTestSuite):
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
                        ' logfile="csobsdef_cmd1.log" chatter=1'
 
-        # Execute csobsdef, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(rc == 0,
-                         'Successful csobsdef execution on command line')
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Check observation definition file
         self._check_obsdef_file('csobsdef_cmd1.xml')
@@ -98,15 +93,9 @@ class Test(gammalib.GPythonTestSuite):
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
                        ' logfile="csobsdef_cmd2.log"'
 
-        # Execute csobsdef, make sure we catch any exception
-        try:
-            rc = os.system(cmd+' >/dev/null 2>&1')
-        except:
-            pass
-
         # Check if execution failed
-        self.test_assert(rc != 0,
-                         'Failure of csobsdef execution on command line')
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
 
         # Return
         return
@@ -114,7 +103,7 @@ class Test(gammalib.GPythonTestSuite):
     # Test csobsdef from Python
     def _test_python(self):
         """
-        Test csobsdef from Python.
+        Test csobsdef from Python
         """
         # Set-up csobsdef
         obsdef = cscripts.csobsdef()
@@ -184,7 +173,7 @@ class Test(gammalib.GPythonTestSuite):
     # Check observation definition file
     def _check_obsdef_file(self, filename):
         """
-        Check observation definition file.
+        Check observation definition file
         """
         # Load observation definition file
         obs = gammalib.GObservations(filename)

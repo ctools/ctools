@@ -21,9 +21,9 @@
 import os
 import sys
 import math
+from datetime import datetime
 import gammalib
 import ctools
-from datetime import datetime
 
 # Optional ROOT import
 try:
