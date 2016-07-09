@@ -131,16 +131,23 @@ build: $(BUILT_SOURCES)
 	$(PYTHON) setup.py build
 if IS_ELCAPITAN
 	-for f in build/ctools/ctools/_*.so; do \
-		echo "Post process module "$$f; \
-		install_name_tool -change $(libdir)/libctools.1.dylib @rpath/libctools.1.dylib $$f; \
-		install_name_tool -change $(libdir)/libgamma.2.dylib @rpath/libgamma.2.dylib $$f; \
-		install_name_tool -add_rpath $(libdir) $$f; \
+		echo "Build post process Python module "$$f; \
+		libgamma=`otool -L $$f | grep -o libgamma.*.dylib`; \
+		libctools=`otool -L $$f | grep -o libctools.*.dylib`; \
+		install_name_tool -change $(libdir)/$$libctools @rpath/$$libctools $$f; \
+		install_name_tool -change $(libdir)/$$libgamma @rpath/$$libgamma $$f; \
 		install_name_tool -add_rpath $(abs_top_builddir)/src/.libs $$f; \
 	done
 endif
 
 # Install the ctools Python module
 install-exec-local:
+if IS_ELCAPITAN
+	-for f in build/ctools/ctools/_*.so; do \
+		echo "Install pre process Python module "$$f; \
+		install_name_tool -rpath $(abs_top_builddir)/src/.libs $(libdir) $$f; \
+	done
+endif
 	$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix)
 
 # Uninstall the ctools Python module
