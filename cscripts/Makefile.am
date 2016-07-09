@@ -186,10 +186,12 @@ install-data-hook:
 
 # Files to be removed in build directory
 clean-local:
-	rm -rf $(builddir)/cs*.py
-	rm -rf $(builddir)/obsutils.py
+	@if @srcdir@ != @builddir@; then \
+		rm -rf $(builddir)/cs*.py; \
+		rm -rf $(builddir)/obsutils.py; \
+		rm -rf $(builddir)/*.par; \
+	fi; \
 	rm -rf $(builddir)/*.pyc
-	rm -rf $(builddir)/*.par
 
 # Uninstall the cscripts Python module
 uninstall-local:
