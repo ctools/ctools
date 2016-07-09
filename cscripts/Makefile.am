@@ -186,7 +186,7 @@ install-data-hook:
 
 # Files to be removed in build directory
 clean-local:
-	@if @srcdir@ != @builddir@; then \
+	@if test '@srcdir@' != '@builddir@'; then \
 		rm -rf $(builddir)/cs*.py; \
 		rm -rf $(builddir)/obsutils.py; \
 		rm -rf $(builddir)/*.par; \
