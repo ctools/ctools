@@ -137,6 +137,7 @@ if IS_ELCAPITAN
 		install_name_tool -change $(libdir)/$$libctools @rpath/$$libctools $$f; \
 		install_name_tool -change $(libdir)/$$libgamma @rpath/$$libgamma $$f; \
 		install_name_tool -add_rpath $(abs_top_builddir)/src/.libs $$f; \
+		install_name_tool -add_rpath ${GAMMALIB}/lib $$f; \
 	done
 endif
 
