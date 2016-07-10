@@ -698,7 +698,7 @@ class csiactcopy(ctools.cscript):
         # before writing the file. This is needed as the original master file
         # may be read-only, and the shutil.copy2 function copies over the
         # access permissions.
-        os.chmod(localmaster, 0644)
+        os.chmod(localmaster, 420)
         f = open(localmaster, 'w')
         data['datasets'] = newconfigs
         json.dump(data, f, indent=2)
