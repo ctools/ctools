@@ -38,10 +38,13 @@ class Test(test):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         test.__init__(self)
+
+        # Set members
+        self._infile = self._datadir + '/irf.root'
 
         # Clean calibration database
         os.system('rm -rf csroot2caldb_* >/dev/null 2>&1')
@@ -73,7 +76,7 @@ class Test(test):
         csroot2caldb = self._script('csroot2caldb')
 
         # Setup csroot2caldb command
-        cmd = csroot2caldb+' infile="data/irf.root"'+ \
+        cmd = csroot2caldb+' infile="'+self._infile+'"'+ \
                            ' outdir="csroot2caldb_cmd1"'+ \
                            ' inst=prod3 id=South_50h version=prod3'+ \
                            ' analysis=DESY'+ \
@@ -97,7 +100,7 @@ class Test(test):
         """
         # Set-up csroot2caldb
         caldb = cscripts.csroot2caldb()
-        caldb['infile']   = 'data/irf.root'
+        caldb['infile']   = self._infile
         caldb['outdir']   = 'csroot2caldb_py1'
         caldb['inst']     = 'prod3'
         caldb['id']       = 'South_50h'

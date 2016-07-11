@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set data members
+        self._remote = self._datadir + '/iactdata/master.json'
+
         # Return
         return
 
@@ -69,7 +72,7 @@ class Test(test):
         csiactcopy = self._script('csiactcopy')
 
         # Setup csiactcopy command
-        cmd = csiactcopy+' remote_master="iactdata/master.json"'+ \
+        cmd = csiactcopy+' remote_master="'+self._remote+'"'+ \
                          ' prodname="unit-test"'+ \
                          ' outpath="iactdata_cmd1"'+ \
                          ' logfile="csiactcopy_cmd1.log" chatter=1'
@@ -105,7 +108,7 @@ class Test(test):
         """
         # Set-up csiactcopy
         findobs = cscripts.csiactcopy()
-        findobs['remote_master'] = 'iactdata/master.json'
+        findobs['remote_master'] = self._remote
         findobs['prodname']      = 'unit-test'
         findobs['outpath']       = 'iactdata_py1'
         findobs['logfile']       = 'csiactcopy_py1.log'
@@ -134,17 +137,17 @@ class Test(test):
 
         # Check for existence of files
         self.test_assert(hdu_index_name.exists(),
-                         'Check is file "hdu-index.fits" exists.')
+                         'Check if file "hdu-index.fits" exists.')
         self.test_assert(obs_index_name.exists(),
-                         'Check is file "obs-index.fits" exists.')
+                         'Check if file "obs-index.fits" exists.')
         self.test_assert(master_name.exists(),
-                         'Check is file "master.json" exists.')
+                         'Check if file "master.json" exists.')
 
         # Check if index files are FITS file
         self.test_assert(hdu_index_name.is_fits(),
-                         'Check is file "hdu-index.fits" is FITS file.')
+                         'Check if file "hdu-index.fits" is FITS file.')
         self.test_assert(obs_index_name.is_fits(),
-                         'Check is file "obs-index.fits" is FITS file.')
+                         'Check if file "obs-index.fits" is FITS file.')
         
         # Return
         return

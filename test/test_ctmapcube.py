@@ -42,9 +42,6 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
-        # Set members
-        self._model_name = 'data/crab.xml'
-
         # Return
         return
 
@@ -72,7 +69,7 @@ class Test(test):
         ctmapcube = self._tool('ctmapcube')
 
         # Setup ctmapcube command
-        cmd = ctmapcube+' inmodel="'+self._model_name+'"'+ \
+        cmd = ctmapcube+' inmodel="'+self._model+'"'+ \
                         ' outcube="ctmapcube_cmd1.fits"'+\
                         ' emin=0.1 emax=100.0 enumbins=20 ebinalg=LOG'+ \
                         ' nxpix=200 nypix=200 binsz=0.02 coordsys=CEL'+ \
@@ -112,7 +109,7 @@ class Test(test):
         """
         # Set-up ctmapcube
         mapcube = ctools.ctmapcube()
-        mapcube['inmodel']  = self._model_name
+        mapcube['inmodel']  = self._model
         mapcube['outcube']  = 'ctmapcube_py1.fits'
         mapcube['ebinalg']  = 'LOG'
         mapcube['emin']     = 0.1

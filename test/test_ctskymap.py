@@ -65,7 +65,7 @@ class Test(test):
         ctskymap = self._tool('ctskymap')
 
         # Setup ctskymap command
-        cmd = ctskymap+' inobs="data/crab_events.fits"'+\
+        cmd = ctskymap+' inobs="'+self._events+'"'+\
                        ' outmap="ctskymap_cmd1.fits"'+ \
                        ' emin=0.1 emax=100.0 nxpix=200 nypix=200'+ \
                        ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
@@ -105,7 +105,7 @@ class Test(test):
         """
         # Set-up ctskymap
         skymap = ctools.ctskymap()
-        skymap['inobs']    = 'data/crab_events.fits'
+        skymap['inobs']    = self._events
         skymap['outmap']   = 'ctskymap_py1.fits'
         skymap['emin']     = 0.1
         skymap['emax']     = 100

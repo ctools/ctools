@@ -68,8 +68,8 @@ class Test(test):
         cmd = ctmodel+' incube="NONE" inobs="NONE" expcube="NONE"'+\
                       ' psfcube="NONE" bkgcube="NONE"'+ \
                       ' outcube="ctmodel_cmd1.fits"'+ \
-                      ' inmodel="data/crab.xml"'+ \
-                      ' caldb="prod2" irf="South_0.5h"'+ \
+                      ' inmodel="'+self._model+'"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
                       ' emin=0.1 emax=100.0 enumbins=20 nxpix=200 nypix=200'+ \
                       ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
@@ -92,7 +92,7 @@ class Test(test):
                       ' psfcube="NONE" bkgcube="NONE"'+ \
                       ' outcube="ctmodel_cmd2.fits"'+ \
                       ' inmodel="model_that_does_not_exist.xml"'+ \
-                      ' caldb="prod2" irf="South_0.5h"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
                       ' emin=0.1 emax=100.0 enumbins=20 nxpix=200 nypix=200'+ \
                       ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
@@ -115,13 +115,13 @@ class Test(test):
         model = ctools.ctmodel()
         model['incube']   = 'NONE'
         model['outcube']  = 'ctmodel_py1.fits'
-        model['inmodel']  = 'data/crab.xml'
+        model['inmodel']  = self._model
         model['inobs']    = 'NONE'
         model['expcube']  = 'NONE'
         model['psfcube']  = 'NONE'
         model['bkgcube']  = 'NONE'
-        model['caldb']    = 'prod2'
-        model['irf']      = 'South_0.5h'
+        model['caldb']    = self._caldb
+        model['irf']      = self._irf
         model['rad']      = 5
         model['ra']       = 83.63
         model['dec']      = 22.01

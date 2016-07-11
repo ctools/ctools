@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 
@@ -27,15 +28,23 @@ import ctools
 # ============================ #
 class Test(gammalib.GPythonTestSuite):
     """
-    Test class for pipelines.
+    Test class for pipelines
     """
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
+
+        # Set test data directory
+        self._datadir = os.environ['TEST_DATA']
+
+        # Set some standard test data
+        self._model   = self._datadir + '/crab.xml'
+        self._caldb   = 'prod2'
+        self._irf     = 'South_0.5h'
 
         # Return
         return
@@ -43,14 +52,16 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("pipelines")
+        self.name('pipelines')
 
         # Append tests
-        self.append(self.test_unbinned_fits, "Test unbinned pipeline with FITS file saving")
-        self.append(self.test_unbinned_mem, "Test unbinned in-memory pipeline")
+        self.append(self.test_unbinned_fits,
+                    'Test unbinned pipeline with FITS file saving')
+        self.append(self.test_unbinned_mem,
+                    'Test unbinned in-memory pipeline')
 
         # Return
         return
@@ -58,15 +69,15 @@ class Test(gammalib.GPythonTestSuite):
     # Test unbinned pipeline with FITS file saving
     def test_unbinned_fits(self):
         """
-        Test unbinned pipeline with FITS file saving.
+        Test unbinned pipeline with FITS file saving
         """
         # Set script parameters
-        model_name           = "data/crab.xml"
-        events_name          = "events.fits"
-        selected_events_name = "selected_events.fits"
-        result_name          = "results.xml"
-        caldb                = "irf"
-        irf                  = "cta_dummy_irf"
+        model_name           = self._model
+        events_name          = 'events.fits'
+        selected_events_name = 'selected_events.fits'
+        result_name          = 'results.xml'
+        caldb                = self._caldb
+        irf                  = self._irf
         ra                   =   83.63
         dec                  =   22.01
         rad_sim              =   10.0
@@ -78,116 +89,90 @@ class Test(gammalib.GPythonTestSuite):
 
         # Simulate events
         sim = ctools.ctobssim()
-        sim["inmodel"]   = model_name
-        sim["outevents"] = events_name
-        sim["caldb"]     = caldb
-        sim["irf"]       = irf
-        sim["ra"]        = ra
-        sim["dec"]       = dec
-        sim["rad"]       = rad_sim
-        sim["tmin"]      = tstart
-        sim["tmax"]      = tstop
-        sim["emin"]      = emin
-        sim["emax"]      = emax
-        self.test_try("Execute ctobssim")
-        try:
-            sim.execute()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctobssim.")
+        sim['inmodel']   = model_name
+        sim['outevents'] = events_name
+        sim['caldb']     = caldb
+        sim['irf']       = irf
+        sim['ra']        = ra
+        sim['dec']       = dec
+        sim['rad']       = rad_sim
+        sim['tmin']      = tstart
+        sim['tmax']      = tstop
+        sim['emin']      = emin
+        sim['emax']      = emax
+        sim.execute()
 
         # Select events
         select = ctools.ctselect()
-        select["inobs"]  = events_name
-        select["outobs"] = selected_events_name
-        select["ra"]     = ra
-        select["dec"]    = dec
-        select["rad"]    = rad_select
-        select["tmin"]   = tstart
-        select["tmax"]   = tstop
-        select["emin"]   = emin
-        select["emax"]   = emax
-        self.test_try("Execute ctselect")
-        try:
-            select.execute()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctselect.")
+        select['inobs']  = events_name
+        select['outobs'] = selected_events_name
+        select['ra']     = ra
+        select['dec']    = dec
+        select['rad']    = rad_select
+        select['tmin']   = tstart
+        select['tmax']   = tstop
+        select['emin']   = emin
+        select['emax']   = emax
+        select.execute()
 
         # Perform maximum likelihood fitting
         like = ctools.ctlike()
-        like["inobs"]    = selected_events_name
-        like["inmodel"]  = model_name
-        like["outmodel"] = result_name
-        like["caldb"]    = caldb
-        like["irf"]      = irf
-        self.test_try("Execute ctlike")
-        try:
-            like.execute()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctlike.")
+        like['inobs']    = selected_events_name
+        like['inmodel']  = model_name
+        like['outmodel'] = result_name
+        like['caldb']    = caldb
+        like['irf']      = irf
+        like.execute()
 
+        # Return
+        return
 
     # Test unbinned in-memory pipeline
     def test_unbinned_mem(self):
         """
-        Test unbinned in-memory pipeline.
+        Test unbinned in-memory pipeline
         """
         # Set script parameters
-        model_name           = "data/crab.xml"
-        caldb                = "irf"
-        irf                  = "cta_dummy_irf"
-        ra                   =   83.63
-        dec                  =   22.01
-        rad_sim              =   10.0
-        tstart               =    0.0
-        tstop                = 1800.0
-        emin                 =    0.1
-        emax                 =  100.0
-        rad_select           =    3.0
+        model_name = self._model
+        caldb      = self._caldb
+        irf        = self._irf
+        ra         =   83.63
+        dec        =   22.01
+        rad_sim    =   10.0
+        tstart     =    0.0
+        tstop      = 1800.0
+        emin       =    0.1
+        emax       =  100.0
+        rad_select =    3.0
 
         # Simulate events
         sim = ctools.ctobssim()
-        sim["inmodel"] = model_name
-        sim["caldb"]   = caldb
-        sim["irf"]     = irf
-        sim["ra"]      = ra
-        sim["dec"]     = dec
-        sim["rad"]     = rad_sim
-        sim["tmin"]    = tstart
-        sim["tmax"]    = tstop
-        sim["emin"]    = emin
-        sim["emax"]    = emax
-        self.test_try("Run ctobssim")
-        try:
-            sim.run()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctobssim.")
+        sim['inmodel'] = model_name
+        sim['caldb']   = caldb
+        sim['irf']     = irf
+        sim['ra']      = ra
+        sim['dec']     = dec
+        sim['rad']     = rad_sim
+        sim['tmin']    = tstart
+        sim['tmax']    = tstop
+        sim['emin']    = emin
+        sim['emax']    = emax
+        sim.run()
 
         # Select events
         select = ctools.ctselect(sim.obs())
-        select["ra"]   = ra
-        select["dec"]  = dec
-        select["rad"]  = rad_select
-        select["tmin"] = tstart
-        select["tmax"] = tstop
-        select["emin"] = emin
-        select["emax"] = emax
+        select['ra']   = ra
+        select['dec']  = dec
+        select['rad']  = rad_select
+        select['tmin'] = tstart
+        select['tmax'] = tstop
+        select['emin'] = emin
+        select['emax'] = emax
         select.run()
-        self.test_try("Run ctselect")
-        try:
-            select.run()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctselect.")
 
         # Perform maximum likelihood fitting
         like = ctools.ctlike(select.obs())
-        self.test_try("Run ctlike")
-        try:
-            like.run()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctlike.")
+        like.run()
+
+        # Return
+        return

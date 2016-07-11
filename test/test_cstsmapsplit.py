@@ -69,11 +69,11 @@ class Test(test):
         cstsmapsplit = self._script('cstsmapsplit')
 
         # Setup cstsmapsplit command
-        cmd = cstsmapsplit+' inobs="data/crab_events.fits"'+ \
-                           ' inmodel="data/crab.xml"'+ \
+        cmd = cstsmapsplit+' inobs="'+self._events+'"'+ \
+                           ' inmodel="'+self._model+'"'+ \
                            ' srcname="Crab"'+ \
-                           ' caldb="prod2"'+ \
-                           ' irf="South_0.5h"'+ \
+                           ' caldb="'+self._caldb+'"'+ \
+                           ' irf="'+self._irf+'"'+ \
                            ' outmap="tsmap.fits"'+ \
                            ' nxpix=5'+ \
                            ' nypix=5'+ \
@@ -99,11 +99,11 @@ class Test(test):
         self._check_cmdfile('cstsmapsplit_cmd1.dat')
 
         # Setup cstsmapsplit command
-        cmd = cstsmapsplit+' inobs="data/crab_events.fits"'+ \
-                           ' inmodel="data/crab.xml"'+ \
+        cmd = cstsmapsplit+' inobs="'+self._events+'"'+ \
+                           ' inmodel="'+self._model+'"'+ \
                            ' srcname="Does_not_exist"'+ \
-                           ' caldb="prod2"'+ \
-                           ' irf="South_0.5h"'+ \
+                           ' caldb="'+self._caldb+'"'+ \
+                           ' irf="'+self._irf+'"'+ \
                            ' outmap="tsmap.fits"'+ \
                            ' nxpix=5'+ \
                            ' nypix=5'+ \
@@ -131,11 +131,11 @@ class Test(test):
         """
         # Set-up cstsmapsplit
         tsmapsplit = cscripts.cstsmapsplit()
-        tsmapsplit['inobs']        = 'data/crab_events.fits'
-        tsmapsplit['inmodel']      = 'data/crab.xml'
+        tsmapsplit['inobs']        = self._events
+        tsmapsplit['inmodel']      = self._model
         tsmapsplit['srcname']      = 'Crab'
-        tsmapsplit['caldb']        = 'prod2'
-        tsmapsplit['irf']          = 'South_0.5h'
+        tsmapsplit['caldb']        = self._caldb
+        tsmapsplit['irf']          = self._irf
         tsmapsplit['outmap']       = 'tsmap.fits'
         tsmapsplit['bins_per_job'] = 5
         tsmapsplit['compute_null'] = False

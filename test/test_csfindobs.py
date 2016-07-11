@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set data members
+        self._datapath = self._datadir + '/iactdata'
+
         # Return
         return
 
@@ -69,7 +72,7 @@ class Test(test):
         csfindobs = self._script('csfindobs')
 
         # Setup csfindobs command
-        cmd = csfindobs+' datapath="iactdata/"'+ \
+        cmd = csfindobs+' datapath="'+self._datapath+'"'+ \
                         ' prodname="unit-test"'+ \
                         ' ra=83.63 dec=22.01 rad=1.0'+ \
                         ' outfile="runlist_cmd1.dat"'+ \
@@ -107,7 +110,7 @@ class Test(test):
         """
         # Set-up csfindobs
         findobs = cscripts.csfindobs()
-        findobs['datapath'] = 'iactdata/'
+        findobs['datapath'] = self._datapath
         findobs['prodname'] = 'unit-test'
         findobs['outfile']  = 'runlist_py1.dat'
         findobs['ra']       = 83.63

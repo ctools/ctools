@@ -1,6 +1,5 @@
 #############################################################################
-# Configuration for ctools - a set of tools for science analysis of CTA     #
-#                            data                                           #
+# Configuration for ctools - tools for science analysis of CTA data         #
 # ------------------------------------------------------------------------- #
 # Copyright (C) 2011-2016 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
@@ -34,7 +33,7 @@ AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies foreign])
 AM_INIT_AUTOMAKE([gnu -Wno-portability foreign])
-#AM_INIT_AUTOMAKE([gnu -Wno-portability serial-tests foreign])
+#AM_INIT_AUTOMAKE([gnu -Wno-portability foreign serial-tests])
 AC_CONFIG_HEADER([config.h])
 
 
@@ -609,8 +608,9 @@ AC_C_INLINE
 # Python binding requires Python and either the files tools_wrap.cpp and    #
 # tools.py or swig to create these files.  The following conditionals are   #
 # set:                                                                      #
-# WITH_PYTHON - Python bindings will be built                               #
-# HAVE_SWIG   - swig is available                                           #
+# WITH_PYTHON   - Python bindings will be built                             #
+# HAVE_SWIG     - swig is available                                         #
+# HAVE_WRAPPERS - wrappers are available                                    #
 #############################################################################
 # Initialise flags
 enable_python="no"
@@ -618,6 +618,7 @@ has_python="no"
 has_python_h="no"
 has_swig="no"
 has_wrappers="no"
+build_wrappers="no"
 
 # Python binding enabled?
 AC_ARG_ENABLE([python-binding],
@@ -734,10 +735,16 @@ else
  
   # Do we have wrappers (tools_wrap.cpp and tools.py)?
   has_wrappers="yes"
-  AC_CHECK_FILES([pyext/ctools/tools_wrap.cpp pyext/ctools/tools.py],,
+  AC_CHECK_FILES([$srcdir/pyext/ctools/tools_wrap.cpp
+                  $srcdir/pyext/ctools/tools.py],,
                  [has_wrappers="no"])
   if test "x$has_wrappers" = "xno"; then
     AC_MSG_WARN([Python wrapper missing. Requires swig for wrapper generation.])
+  fi
+
+  # Don't we have wrappers but we have swig
+  if [test "x$has_wrappers" = "xno" -a "x$has_swig" = "xyes"]; then
+    build_wrappers="yes"
   fi
 
   # Signal if Python is enabled
@@ -748,8 +755,10 @@ else
   fi
 
 fi
-AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
 AM_CONDITIONAL(WITH_PYTHON, test "x$enable_python" = "xyes")
+AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
+AM_CONDITIONAL(HAVE_WRAPPERS, test "x$has_wrappers" = "xyes")
+AM_CONDITIONAL(BUILD_WRAPPERS, test "x$build_wrappers" = "xyes")
 
 # Set Python environment
 if test "x$enable_python" = "xyes"; then
@@ -1022,7 +1031,6 @@ AC_CONFIG_FILES([Makefile
                  src/support/Makefile
                  src/ctools-setup
                  test/Makefile
-                 test/test_cscripts.sh
                  test/test_python_ctools.sh
                  test/test_python_cscripts.sh
                  test/test_examples.py
@@ -1036,8 +1044,7 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  ctools.pc
                  testconf.sh],
-                [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;
-                 if test -f test/test_python_ctools.sh; then chmod +x test/test_python_ctools.sh; fi;
+                [if test -f test/test_python_ctools.sh; then chmod +x test/test_python_ctools.sh; fi;
                  if test -f test/test_python_cscripts.sh; then chmod +x test/test_python_cscripts.sh; fi;
                  if test -f test/test_examples.py; then chmod +x test/test_examples.py; fi;
                  if test -f testconf.sh; then chmod +x testconf.sh; fi])

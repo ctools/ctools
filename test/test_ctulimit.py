@@ -65,9 +65,9 @@ class Test(test):
         ctulimit = self._tool('ctulimit')
 
         # Setup ctulimit command
-        cmd = ctulimit+' inobs="data/crab_events.fits"'+ \
-                       ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                       ' caldb="prod2" irf="South_0.5h"'+ \
+        cmd = ctulimit+' inobs="'+self._events+'"'+ \
+                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' logfile="ctulimit_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -83,8 +83,8 @@ class Test(test):
 
         # Setup ctulimit command
         cmd = ctulimit+' inobs="event_file_that_does_not_exist.fits"'+ \
-                       ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                       ' caldb="prod2" irf="South_0.5h"'+ \
+                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' logfile="ctulimit_cmd2.log" chatter=1'
 
         # Check if execution failed
@@ -101,11 +101,11 @@ class Test(test):
         """
         # Set-up ctulimit
         ulimit = ctools.ctulimit()
-        ulimit['inobs']   = 'data/crab_events.fits'
-        ulimit['inmodel'] = 'data/crab.xml'
+        ulimit['inobs']   = self._events
+        ulimit['inmodel'] = self._model
         ulimit['srcname'] = 'Crab'
-        ulimit['caldb']   = 'prod2'
-        ulimit['irf']     = 'South_0.5h'
+        ulimit['caldb']   = self._caldb
+        ulimit['irf']     = self._irf
         ulimit['logfile'] = 'ctulimit_py1.log'
         ulimit['chatter'] = 2
 

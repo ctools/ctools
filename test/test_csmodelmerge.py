@@ -42,6 +42,12 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._model1  = self._datadir + '/crab.xml'
+        self._model2  = self._datadir + '/model_cube_background.xml'
+        self._model3  = self._datadir + '/model_cube_background*.xml'
+        self._model4  = '@' + self._datadir + '/models.txt'
+
         # Return
         return
 
@@ -69,8 +75,8 @@ class Test(test):
         csmodelmerge = self._script('csmodelmerge')
 
         # Setup csmodelmerge command
-        cmd = csmodelmerge+' inmodels="data/crab.xml data/model_cube_background.xml"'+ \
-                           ' outmodel="mergedmodel_cmd1.xml"'+ \
+        cmd = csmodelmerge+' inmodels="'+self._model1+' '+self._model2+'"'+ \
+                           ' outmodel="csmodelmerge_cmd1.xml"'+ \
                            ' logfile="csmodelmerge_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -82,11 +88,11 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check model file
-        self._check_model_file('mergedmodel_cmd1.xml', 3)
+        self._check_model_file('csmodelmerge_cmd1.xml', 3)
 
         # Setup csmodelmerge command
         cmd = csmodelmerge+' inmodels="model_that_does_not_exist.xml"'+ \
-                           ' outmodel="mergedmodel_cmd2.xml"'+ \
+                           ' outmodel="csmodelmerge_cmd2.xml"'+ \
                            ' logfile="csmodelmerge_cmd2.log"'
 
         # Check if execution failed
@@ -103,8 +109,8 @@ class Test(test):
         """
         # Set-up csmodelmerge for space-separated input
         modelmerge = cscripts.csmodelmerge()
-        modelmerge['inmodels'] = 'data/crab.xml data/model_cube_background.xml'
-        modelmerge['outmodel'] = 'mergedmodel_py1.xml'
+        modelmerge['inmodels'] = self._model1+' '+self._model2
+        modelmerge['outmodel'] = 'csmodelmerge_py1.xml'
         modelmerge['logfile']  = 'csmodelmerge_py1.log'
         modelmerge['chatter']  = 2
 
@@ -114,12 +120,12 @@ class Test(test):
         modelmerge.save()
 
         # Check model file
-        self._check_model_file('mergedmodel_py1.xml', 3)
+        self._check_model_file('csmodelmerge_py1.xml', 3)
 
         # Set-up csmodelmerge for semi-colon separated input
         modelmerge = cscripts.csmodelmerge()
-        modelmerge['inmodels'] = 'data/crab.xml;data/model_cube_background.xml'
-        modelmerge['outmodel'] = 'mergedmodel_py2.xml'
+        modelmerge['inmodels'] = self._model1+';'+self._model2
+        modelmerge['outmodel'] = 'csmodelmerge_py2.xml'
         modelmerge['logfile']  = 'csmodelmerge_py2.log'
         modelmerge['chatter']  = 3
 
@@ -127,12 +133,12 @@ class Test(test):
         modelmerge.execute()
 
         # Check model file
-        self._check_model_file('mergedmodel_py2.xml', 3)
+        self._check_model_file('csmodelmerge_py2.xml', 3)
 
         # Set-up csmodelmerge for wildcard input
         modelmerge = cscripts.csmodelmerge()
-        modelmerge['inmodels'] = 'data/model_cube_background*.xml'
-        modelmerge['outmodel'] = 'mergedmodel_py3.xml'
+        modelmerge['inmodels'] = self._model3
+        modelmerge['outmodel'] = 'csmodelmerge_py3.xml'
         modelmerge['logfile']  = 'csmodelmerge_py3.log'
         modelmerge['chatter']  = 4
 
@@ -140,12 +146,12 @@ class Test(test):
         modelmerge.execute()
 
         # Check model file
-        self._check_model_file('mergedmodel_py3.xml', 2)
+        self._check_model_file('csmodelmerge_py3.xml', 2)
 
         # Set-up csmodelmerge for ASCII file
         modelmerge = cscripts.csmodelmerge()
-        modelmerge['inmodels'] = '@data/models.txt'
-        modelmerge['outmodel'] = 'mergedmodel_py4.xml'
+        modelmerge['inmodels'] = self._model4
+        modelmerge['outmodel'] = 'csmodelmerge_py4.xml'
         modelmerge['logfile']  = 'csmodelmerge_py4.log'
         modelmerge['chatter']  = 4
 
@@ -153,7 +159,7 @@ class Test(test):
         modelmerge.execute()
 
         # Check model file
-        self._check_model_file('mergedmodel_py4.xml', 2)
+        self._check_model_file('csmodelmerge_py4.xml', 2)
 
         # Return
         return

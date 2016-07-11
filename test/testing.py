@@ -37,6 +37,17 @@ class test(gammalib.GPythonTestSuite):
         # Call base class constructor
         gammalib.GPythonTestSuite.__init__(self)
 
+        # Set test data directory
+        self._datadir = os.environ['TEST_DATA']
+
+        # Set some standard test data (additional test data will be set in
+        # the derived classes as needed)
+        self._events  = self._datadir + '/crab_events.fits'
+        self._cntcube = self._datadir + '/crab_cntmap.fits'
+        self._model   = self._datadir + '/crab.xml'
+        self._caldb   = 'prod2'
+        self._irf     = 'South_0.5h'
+
         # Return
         return
 
@@ -45,9 +56,11 @@ class test(gammalib.GPythonTestSuite):
         """
         Set script name
         """
-        # Kluge to set the command. The installed version has no README.md file
-        if os.path.isfile('README.md'):
-            script = '../cscripts/'+name+'.py'
+        # Set script name dependent on whether the software is installed or
+        # not. If the software is not installed the 'TEST_BUILDDIR' environment
+        # variable will exist
+        if 'TEST_BUILDDIR' in os.environ:
+            script = os.environ['TEST_BUILDDIR'] + '/cscripts/'+name+'.py'
         else:
             script = name
 
@@ -59,9 +72,11 @@ class test(gammalib.GPythonTestSuite):
         """
         Set tool name
         """
-        # Kluge to set the command. The installed version has no README.md file
-        if os.path.isfile('README.md'):
-            tool = '../src/'+name+'/'+name
+        # Set tool name dependent on whether the software is installed or
+        # not. If the software is not installed the 'TEST_BUILDDIR' environment
+        # variable will exist
+        if 'TEST_BUILDDIR' in os.environ:
+            tool = os.environ['TEST_BUILDDIR'] + '/src/'+name+'/'+name
         else:
             tool = name
 

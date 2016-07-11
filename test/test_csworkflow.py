@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._workflow = self._datadir + '/workflow.xml'
+
         # Return
         return
 
@@ -72,7 +75,7 @@ class Test(test):
         gammalib.GFilename('wf_crab_results.xml').remove()
 
         # Setup csworkflow command
-        cmd = csworkflow+' inflow="data/workflow.xml"'+ \
+        cmd = csworkflow+' inflow="'+self._workflow+'"'+ \
                          ' logfile="csworkflow_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -99,7 +102,7 @@ class Test(test):
 
         # Set-up csworkflow
         workflow = cscripts.csworkflow()
-        workflow['inflow']  = 'data/workflow.xml'
+        workflow['inflow']  = self._workflow
         workflow['logfile'] = 'csworkflow_py1.log'
         workflow['chatter'] = 2
 
@@ -115,7 +118,7 @@ class Test(test):
 
         # Set-up csworkflow
         workflow = cscripts.csworkflow()
-        workflow['inflow']  = 'data/workflow.xml'
+        workflow['inflow']  = self._workflow
         workflow['logfile'] = 'csworkflow_py2.log'
         workflow['chatter'] = 3
 
@@ -140,13 +143,13 @@ class Test(test):
         self.test_value(models['Crab'][2].value(),
                         5.71055e-16, 1.0e-5, 'Crab prefactor')
         self.test_value(models['Crab'][3].value(),
-                        -2.50996, 1.0e-5, 'Crab index')
+                        -2.47559, 1.0e-5, 'Crab index')
         self.test_value(models['Background'][0].value(),
-                        2.98499, 1.0e-5, 'Background model sigma')
+                        3.00491, 1.0e-5, 'Background model sigma')
         self.test_value(models['Background'][1].value(),
                         6.27131e-05, 1.0e-5, 'Background model prefactor')
         self.test_value(models['Background'][2].value(),
-                        -1.85037, 1.0e-5, 'Background model index')
+                        -1.83164, 1.0e-5, 'Background model index')
 
         # Return
         return

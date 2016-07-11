@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import sys
 import glob
 import gammalib
@@ -64,10 +65,22 @@ class csmodelmerge(ctools.cscript):
         # Get input models string
         inmodels = self['inmodels'].string()
         
-        # Handle ascii files
+        # Handle ASCII files. If the file names given in the ASCII are
+        # relative filenames it is assumed that the filename is given
+        # relative to the location of the file.
         if '@' == inmodels[0]:
-            self._files = open(inmodels.replace('@','')).read().splitlines()
-            
+            filename    = inmodels.replace('@','')
+            self._files = open(filename).read().splitlines()
+            dirname     = os.path.dirname(filename)
+            files       = []
+            for f in self._files:
+                if f[0] != '/':
+                    fname = dirname + '/' + f
+                else:
+                    fname = f
+                files.append(fname)
+            self._files = files
+    
         # Handle wild card strings
         elif '*' in inmodels:
             self._files = glob.glob(inmodels)
@@ -124,10 +137,10 @@ class csmodelmerge(ctools.cscript):
         self._models = gammalib.GModels()
         
         # Loop over model files
-        for file_ in self._files:
+        for f in self._files:
 
             # Construct container from XML file
-            models = gammalib.GModels(file_)
+            models = gammalib.GModels(f)
             
             # Log number of models to add
             if self._logTerse():
@@ -139,7 +152,7 @@ class csmodelmerge(ctools.cscript):
                 else:
                     self._log(gammalib.parformat('Add %d models from file' %
                                                  nmodels))
-                self._log(file_)
+                self._log(f)
                 self._log('\n')
             
             # Extend model container by adding all models in the model file

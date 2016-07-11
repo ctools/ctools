@@ -42,10 +42,6 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
-        # Set members
-        self._events_name = 'data/crab_events.fits'
-        self._model_name  = 'data/crab.xml'
-
         # Return
         return
 
@@ -73,9 +69,9 @@ class Test(test):
         cslightcrv = self._script('cslightcrv')
 
         # Setup cslightcrv command
-        cmd = cslightcrv+' inobs="'+self._events_name+'"'+ \
-                         ' inmodel="'+self._model_name+'"'+ \
-                         ' srcname="Crab" caldb="prod2" irf="South_0.5h"'+ \
+        cmd = cslightcrv+' inobs="'+self._events+'"'+ \
+                         ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg="LIN" tmin=51544.50 tmax=51544.53'+ \
                          ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
@@ -94,8 +90,8 @@ class Test(test):
 
         # Setup cslightcrv command
         cmd = cslightcrv+' inobs="events_that_do_not_exist.fits"'+ \
-                         ' inmodel="'+self._model_name+'"'+ \
-                         ' srcname="Crab" caldb="prod2" irf="South_0.5h"'+ \
+                         ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg="LIN" tmin=51544.50 tmax=51544.53'+ \
                          ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
@@ -115,11 +111,11 @@ class Test(test):
         """
         # Set-up unbinned cslightcrv
         lcrv = cscripts.cslightcrv()
-        lcrv['inobs']    = self._events_name
-        lcrv['inmodel']  = self._model_name
+        lcrv['inobs']    = self._events
+        lcrv['inmodel']  = self._model
         lcrv['srcname']  = 'Crab'
-        lcrv['caldb']    = 'prod2'
-        lcrv['irf']      = 'South_0.5h'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
         lcrv['tmin']     = 51544.50
         lcrv['tmax']     = 51544.53
@@ -152,11 +148,11 @@ class Test(test):
 
         # Set-up unbinned cslightcrv
         lcrv = cscripts.cslightcrv()
-        lcrv['inobs']    = self._events_name
-        lcrv['inmodel']  = self._model_name
+        lcrv['inobs']    = self._events
+        lcrv['inmodel']  = self._model
         lcrv['srcname']  = 'Crab'
-        lcrv['caldb']    = 'prod2'
-        lcrv['irf']      = 'South_0.5h'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'FILE'
         lcrv['tbinfile'] = 'cslightcrv_py2.dat'
         lcrv['enumbins'] = 0
@@ -176,17 +172,17 @@ class Test(test):
         # Now we setup an observation container on input. We attached the
         # model to the observation container so that cslightcrv should
         # no longer query for the parameter.
-        cta = gammalib.GCTAObservation(self._events_name)
+        cta = gammalib.GCTAObservation(self._events)
         obs = gammalib.GObservations()
         obs.append(cta)
-        obs.models(self._model_name)
+        obs.models(self._model)
 
         # Set-up unbinned cslightcrv from observation container. Now use
         # the GTI algorithm so that we test all timing algorithms.
         lcrv = cscripts.cslightcrv(obs)
         lcrv['srcname']  = 'Crab'
-        lcrv['caldb']    = 'prod2'
-        lcrv['irf']      = 'South_0.5h'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'GTI'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
@@ -203,11 +199,11 @@ class Test(test):
 
         # Finally we set-up a binned cslightcrv
         lcrv = cscripts.cslightcrv()
-        lcrv['inobs']    = self._events_name
-        lcrv['inmodel']  = self._model_name
+        lcrv['inobs']    = self._events
+        lcrv['inmodel']  = self._model
         lcrv['srcname']  = 'Crab'
-        lcrv['caldb']    = 'prod2'
-        lcrv['irf']      = 'South_0.5h'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
         lcrv['tmin']     = 51544.50
         lcrv['tmax']     = 51544.53

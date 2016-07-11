@@ -1,2 +1,2 @@
-data/model_cube_background.xml
-data/model_cube_background2.xml
+model_cube_background.xml
+model_cube_background2.xml

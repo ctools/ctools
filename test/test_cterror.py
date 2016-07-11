@@ -38,13 +38,6 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
-        # Set members
-        self.events_name = 'data/crab_events.fits'
-        self.model_name  = 'data/crab.xml'
-        self.result_name = 'cterror_result.xml'
-        self.caldb       = 'irf'
-        self.irf         = 'cta_dummy_irf'
-
         # Return
         return
 
@@ -72,9 +65,9 @@ class Test(test):
         cterror = self._tool('cterror')
 
         # Setup cterror command
-        cmd = cterror+' inobs="data/crab_events.fits"'+ \
-                      ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                      ' caldb="prod2" irf="South_0.5h"'+ \
+        cmd = cterror+' inobs="'+self._events+'"'+ \
+                      ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' outmodel="cterror_cmd1.xml"'+ \
                       ' logfile="cterror_cmd1.log" chatter=1'
 
@@ -91,8 +84,8 @@ class Test(test):
 
         # Setup cterror command
         cmd = cterror+' inobs="event_file_that_does_not_exist.fits"'+ \
-                      ' inmodel="data/crab.xml" srcname="Crab"'+ \
-                      ' caldb="prod2" irf="South_0.5h"'+ \
+                      ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' outmodel="cterror_cmd2.xml"'+ \
                       ' logfile="cterror_cmd2.log" chatter=1'
 
@@ -110,12 +103,12 @@ class Test(test):
         """
         # Set-up cterror
         error = ctools.cterror()
-        error['inobs']    = 'data/crab_events.fits'
-        error['inmodel']  = 'data/crab.xml'
+        error['inobs']    = self._events
+        error['inmodel']  = self._model
         error['outmodel'] = 'cterror_py1.xml'
         error['srcname']  = 'Crab'
-        error['caldb']    = 'prod2'
-        error['irf']      = 'South_0.5h'
+        error['caldb']    = self._caldb
+        error['irf']      = self._irf
         error['logfile']  = 'cterror_py1.log'
         error['chatter']  = 2
 

@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import sys
 import os
+import sys
 import json
 import shutil
 import gammalib
@@ -694,7 +694,11 @@ class csiactcopy(ctools.cscript):
                 self._log('Adding "'+str(newdict['name'])+'"')
                 self._log('\n')
         
-        # Write new json master file
+        # Write new json master file. Make sure that we have write permission
+        # before writing the file. This is needed as the original master file
+        # may be read-only, and the shutil.copy2 function copies over the
+        # access permissions.
+        os.chmod(localmaster, 420)
         f = open(localmaster, 'w')
         data['datasets'] = newconfigs
         json.dump(data, f, indent=2)

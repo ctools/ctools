@@ -65,7 +65,7 @@ class Test(test):
         ctselect = self._tool('ctselect')
 
         # Setup ctselect command
-        cmd = ctselect+' inobs="data/crab_events.fits"'+ \
+        cmd = ctselect+' inobs="'+self._events+'"'+ \
                        ' outobs="ctselect_cmd1.fits"'+ \
                        ' ra=83.63 dec=22.01 rad=3.0'+ \
                        ' tmin=0.0 tmax=1800.0'+ \
@@ -105,7 +105,7 @@ class Test(test):
         """
         # Set-up ctselect
         select = ctools.ctselect()
-        select['inobs']   = 'data/crab_events.fits'
+        select['inobs']   = self._events
         select['outobs']  = 'ctselect_py1.fits'
         select['ra']      = 83.63
         select['dec']     = 22.01

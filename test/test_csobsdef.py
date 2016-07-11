@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._pntdef = self._datadir + '/pntdef.dat'
+
         # Return
         return
 
@@ -69,9 +72,9 @@ class Test(test):
         csobsdef = self._script('csobsdef')
 
         # Setup csobsdef command
-        cmd = csobsdef+' inpnt="data/pntdef.dat"'+ \
+        cmd = csobsdef+' inpnt="'+self._pntdef+'"'+ \
                        ' outobs="csobsdef_cmd1.xml"'+ \
-                       ' caldb="prod2" irf="South_0.5h"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
                        ' logfile="csobsdef_cmd1.log" chatter=1'
 
@@ -89,7 +92,7 @@ class Test(test):
         # Setup csobsdef command
         cmd = csobsdef+' inpnt="obs_definition_that_does_not_exist.dat"'+ \
                        ' outobs="csobsdef_cmd1.xml"'+ \
-                       ' caldb="prod2" irf="South_0.5h"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
                        ' logfile="csobsdef_cmd2.log"'
 
@@ -107,10 +110,10 @@ class Test(test):
         """
         # Set-up csobsdef
         obsdef = cscripts.csobsdef()
-        obsdef['inpnt']    = 'data/pntdef.dat'
+        obsdef['inpnt']    = self._pntdef
         obsdef['outobs']   = 'csobsdef_py1.xml'
-        obsdef['caldb']    = 'prod2'
-        obsdef['irf']      = 'South_0.5h'
+        obsdef['caldb']    = self._caldb
+        obsdef['irf']      = self._irf
         obsdef['emin']     = 0.1
         obsdef['emax']     = 100.0
         obsdef['duration'] = 1800.0
@@ -128,10 +131,10 @@ class Test(test):
 
         # Set-up csobsdef
         obsdef = cscripts.csobsdef()
-        obsdef['inpnt']    = 'data/pntdef.dat'
+        obsdef['inpnt']    = self._pntdef
         obsdef['outobs']   = 'csobsdef_py2.xml'
-        obsdef['caldb']    = 'prod2'
-        obsdef['irf']      = 'South_0.5h'
+        obsdef['caldb']    = self._caldb
+        obsdef['irf']      = self._irf
         obsdef['emin']     = 0.1
         obsdef['emax']     = 100.0
         obsdef['duration'] = 1800.0
@@ -146,14 +149,14 @@ class Test(test):
         self._check_obsdef_file('csobsdef_py2.xml')
 
         # Load CSV table
-        csv = gammalib.GCsv('data/pntdef.dat', ',')
+        csv = gammalib.GCsv(self._pntdef, ',')
  
         # Set-up csobsdef
         obsdef = cscripts.csobsdef()
         obsdef.pntdef(csv)
         obsdef['outobs']   = 'csobsdef_py3.xml'
-        obsdef['caldb']    = 'prod2'
-        obsdef['irf']      = 'South_0.5h'
+        obsdef['caldb']    = self._caldb
+        obsdef['irf']      = self._irf
         obsdef['emin']     = 0.1
         obsdef['emax']     = 100.0
         obsdef['duration'] = 1800.0

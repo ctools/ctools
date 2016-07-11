@@ -33,17 +33,17 @@ except:
 # =============== #
 # Make a spectrum #
 # =============== #
-def make_spectrum():
+def make_spectrum(datadir):
     """
     Simulate events and generate a source spectrum
 
     Returns
     -------
-    spectrum : `~gammalib.GFits`
-        Spectrum FITS file
+    datadir : str
+        Data directory
     """
     # Set script parameters
-    model_name  = 'data/crab.xml'
+    model_name  = datadir+'/crab.xml'
     caldb       = 'prod2'
     irf         = 'South_0.5h'
     ra          =   83.63
@@ -183,15 +183,18 @@ def plot_spectrum(spectrum, file=False):
 # ======================== #
 if __name__ == '__main__':
 
-    # Initialise option
-    file = False
-
-    # Get any command line arguments
-    if (len(sys.argv) > 1):
+    # Get optional arguments
+    if len(sys.argv) >= 2:
+        datadir = sys.argv[1]
+    else:
+        datadir = 'data'
+    if len(sys.argv) >= 3:
         file = True
+    else:
+        file = False
 
     # Generate spectrum
-    spectrum = make_spectrum()
+    spectrum = make_spectrum(datadir)
 
     # If matplotlib is installed then plot spectrum
     if has_matplotlib:

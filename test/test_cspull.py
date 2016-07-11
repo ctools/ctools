@@ -42,6 +42,10 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._inobs         = self._datadir + '/obs_stacked.xml'
+        self._stacked_model = self._datadir + '/crab_bkgcube.xml'
+
         # Return
         return
 
@@ -69,9 +73,10 @@ class Test(test):
         cspull = self._script('cspull')
 
         # Setup cspull command
-        cmd = cspull+' inmodel="data/crab.xml"'+ \
+        cmd = cspull+' inmodel="'+self._model+'"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
-                     ' ntrials=3 caldb="prod2" irf="South_0.5h"'+ \
+                     ' ntrials=3'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
                      ' enumbins=0 tmax=1800.0 deadc=0.95 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
@@ -91,7 +96,8 @@ class Test(test):
         # Setup cspull command
         cmd = cspull+' inmodel="model_that_does_not_exist.xml"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
-                     ' ntrials=3 caldb="prod2" irf="South_0.5h"'+ \
+                     ' ntrials=3'+ \
+                     ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
                      ' enumbins=0 tmax=1800.0 deadc=0.95 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
@@ -111,11 +117,11 @@ class Test(test):
         """
         # Set-up unbinned cspull
         pull = cscripts.cspull()
-        pull['inmodel']  = 'data/crab.xml'
+        pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py1.dat'
         pull['ntrials']  = 3
-        pull['caldb']    = 'prod2'
-        pull['irf']      = 'South_0.5h'
+        pull['caldb']    = self._caldb
+        pull['irf']      = self._irf
         pull['ra']       = 83.6331
         pull['dec']      = 22.0145
         pull['emin']     = 0.1
@@ -137,11 +143,11 @@ class Test(test):
 
         # Set-up binned cspull
         pull = cscripts.cspull()
-        pull['inmodel']  = 'data/crab.xml'
+        pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py2.dat'
         pull['ntrials']  = 3
-        pull['caldb']    = 'prod2'
-        pull['irf']      = 'South_0.5h'
+        pull['caldb']    = self._caldb
+        pull['irf']      = self._irf
         pull['ra']       = 83.6331
         pull['dec']      = 22.0145
         pull['emin']     = 0.1
@@ -165,12 +171,12 @@ class Test(test):
 
         # Set-up cspull from event list
         pull = cscripts.cspull()
-        pull['inobs']    = 'data/crab_events.fits'
-        pull['inmodel']  = 'data/crab.xml'
+        pull['inobs']    = self._events
+        pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py3.dat'
         pull['ntrials']  = 3
-        pull['caldb']    = 'prod2'
-        pull['irf']      = 'South_0.5h'
+        pull['caldb']    = self._caldb
+        pull['irf']      = self._irf
         pull['enumbins'] = 0
         pull['logfile']  = 'cspull_py3.log'
         pull['chatter']  = 4
@@ -182,17 +188,17 @@ class Test(test):
         self._check_pull_file('cspull_py3.dat')
 
         # Build observation container with unbinned observation
-        cta = gammalib.GCTAObservation('data/crab_events.fits')
+        cta = gammalib.GCTAObservation(self._events)
         obs = gammalib.GObservations()
         obs.append(cta)
 
         # Set-up cspull from observation container with unbinned observation
         pull = cscripts.cspull(obs)
-        pull['inmodel']  = 'data/crab.xml'
+        pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py4.dat'
         pull['ntrials']  = 3
-        pull['caldb']    = 'prod2'
-        pull['irf']      = 'South_0.5h'
+        pull['caldb']    = self._caldb
+        pull['irf']      = self._irf
         pull['enumbins'] = 0
         pull['logfile']  = 'cspull_py4.log'
         pull['chatter']  = 4
@@ -205,12 +211,12 @@ class Test(test):
 
         # Set-up stacked cspull
         pull = cscripts.cspull()
-        pull['inobs']    = 'data/obs_stacked.xml'
-        pull['inmodel']  = 'data/crab_bkgcube.xml'
+        pull['inobs']    = self._inobs
+        pull['inmodel']  = self._stacked_model
         pull['outfile']  = 'cspull_py5.dat'
         pull['ntrials']  = 3
-        pull['caldb']    = 'prod2'
-        pull['irf']      = 'South_0.5h'
+        pull['caldb']    = self._caldb
+        pull['irf']      = self._irf
         pull['enumbins'] = 0
         pull['logfile']  = 'cspull_py5.log'
         pull['chatter']  = 4

@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set members
+        self._inobs = self._datadir + '/obs_unbinned.xml'
+
         # Return
         return
 
@@ -69,7 +72,7 @@ class Test(test):
         csobsinfo = self._script('csobsinfo')
 
         # Setup csobsinfo command
-        cmd = csobsinfo+' inobs="data/obs_unbinned.xml"'+ \
+        cmd = csobsinfo+' inobs="'+self._inobs+'"'+ \
                         ' ds9file="csobsinfo_cmd1.reg"'+ \
                         ' offset=yes ra=83.63 dec=22.01'+ \
                         ' logfile="csobsinfo_cmd1.log" chatter=1'
@@ -105,7 +108,7 @@ class Test(test):
         """
         # Set-up csobsinfo
         obsinfo = cscripts.csobsinfo()
-        obsinfo['inobs']   = 'data/obs_unbinned.xml'
+        obsinfo['inobs']   = self._inobs
         obsinfo['ds9file'] = 'csobsinfo_py1.reg'
         obsinfo['offset']  = True
         obsinfo['ra']      = 83.63
@@ -123,7 +126,7 @@ class Test(test):
 
         # Set-up csobsinfo
         obsinfo = cscripts.csobsinfo()
-        obsinfo['inobs']   = 'data/obs_unbinned.xml'
+        obsinfo['inobs']   = self._inobs
         obsinfo['ds9file'] = 'csobsinfo_py2.reg'
         obsinfo['offset']  = True
         obsinfo['ra']      = 83.63

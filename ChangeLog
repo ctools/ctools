@@ -1,4 +1,4 @@
-2016-07-01  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-07-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
@@ -24,6 +24,7 @@
         Add documentation for IACT analysis (#1646)
         ctselect allows usage of non-default events and GTI extensions (#1598)
         Add csworkflow workflow manager script (#1508)
+        Support out of source builds (#1484)
 
 
 2016-01-27  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>

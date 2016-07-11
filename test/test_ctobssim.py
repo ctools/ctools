@@ -43,11 +43,6 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
-        # Set members
-        self._model_name = 'data/crab.xml'
-        self._caldb      = 'irf'
-        self._irf        = 'cta_dummy_irf'
-
         # Return
         return
 
@@ -75,8 +70,9 @@ class Test(test):
         ctobssim = self._tool('ctobssim')
 
         # Setup ctobssim command
-        cmd = ctobssim+' inmodel="data/crab.xml" outevents="events.fits"'+ \
-                       ' caldb="irf" irf="cta_dummy_irf" '+ \
+        cmd = ctobssim+' inmodel="'+self._model+'" '+ \
+                       ' outevents="events.fits"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
                        ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
 
@@ -90,12 +86,12 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('events.fits')
-        self._test_list(evt, 4119)
+        self._test_list(evt, 6881)
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
                        ' outevents="events.fits"'+ \
-                       ' caldb="irf" irf="cta_dummy_irf" '+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
                        ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
 
@@ -113,7 +109,7 @@ class Test(test):
         """
         # Set-up ctobssim
         sim = ctools.ctobssim()
-        sim['inmodel']   = self._model_name
+        sim['inmodel']   = self._model
         sim['outevents'] = 'events.fits'
         sim['caldb']     = self._caldb
         sim['irf']       = self._irf
@@ -130,14 +126,14 @@ class Test(test):
 
         # Check content of observation
         self._test_observation(sim)
-        self._test_list(sim.obs()[0].events(), 4119)
+        self._test_list(sim.obs()[0].events(), 6881)
 
         # Save events
         sim.save()
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('events.fits')
-        self._test_list(evt, 4119)
+        self._test_list(evt, 6881)
 
         # Set-up observation container
         pnts = [{'ra': 83.63, 'dec': 21.01},
@@ -149,17 +145,17 @@ class Test(test):
         # Set-up ctobssim from observation container
         sim = ctools.ctobssim(obs)
         sim['outevents'] = 'sim_events.xml'
-        sim['inmodel']   = self._model_name
+        sim['inmodel']   = self._model
 
         # Run tool
         sim.run()
 
         # Retrieve observation and check content
         self._test_observation(sim, nobs=4, pnts=pnts)
-        self._test_list(sim.obs()[0].events(), 4063)
-        self._test_list(sim.obs()[1].events(), 4059)
-        self._test_list(sim.obs()[2].events(), 4010)
-        self._test_list(sim.obs()[3].events(), 4138)
+        self._test_list(sim.obs()[0].events(), 6003)
+        self._test_list(sim.obs()[1].events(), 6084)
+        self._test_list(sim.obs()[2].events(), 5955)
+        self._test_list(sim.obs()[3].events(), 6030)
 
         # Save events
         sim.save()
@@ -168,10 +164,10 @@ class Test(test):
         obs = gammalib.GObservations('sim_events.xml')
 
         # Retrieve observation and check content
-        self._test_list(obs[0].events(), 4063)
-        self._test_list(obs[1].events(), 4059)
-        self._test_list(obs[2].events(), 4010)
-        self._test_list(obs[3].events(), 4138)
+        self._test_list(obs[0].events(), 6003)
+        self._test_list(obs[1].events(), 6084)
+        self._test_list(obs[2].events(), 5955)
+        self._test_list(obs[3].events(), 6030)
 
         # Set-up ctobssim with invalid event file
         sim = ctools.ctobssim()

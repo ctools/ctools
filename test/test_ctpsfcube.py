@@ -65,10 +65,10 @@ class Test(test):
         ctpsfcube = self._tool('ctpsfcube')
 
         # Setup ctpsfcube command
-        cmd = ctpsfcube+' inobs="data/crab_events.fits"'+ \
+        cmd = ctpsfcube+' inobs="'+self._events+'"'+ \
                         ' incube="NONE"'+ \
                         ' outcube="ctpsfcube_cmd1.fits"'+ \
-                        ' caldb="prod2" irf="South_0.5h"'+ \
+                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                         ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                         ' nxpix=200 nypix=200 binsz=0.02'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -90,7 +90,7 @@ class Test(test):
         cmd = ctpsfcube+' inobs="event_file_that_does_not_exist.fits"'+ \
                         ' incube="NONE"'+ \
                         ' outcube="ctpsfcube_cmd2.fits"'+ \
-                        ' caldb="prod2" irf="South_0.5h"'+ \
+                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                         ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                         ' nxpix=200 nypix=200 binsz=0.02'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -111,11 +111,11 @@ class Test(test):
         """
         # Set-up ctpsfcube
         psfcube = ctools.ctpsfcube()
-        psfcube['inobs']    = 'data/crab_events.fits'
+        psfcube['inobs']    = self._events
         psfcube['incube']   = 'NONE'
         psfcube['outcube']  = 'ctpsfcube_py1.fits'
-        psfcube['caldb']    = 'prod2'
-        psfcube['irf']      = 'South_0.5h'
+        psfcube['caldb']    = self._caldb
+        psfcube['irf']      = self._irf
         psfcube['ebinalg']  = 'LOG'
         psfcube['emin']     = 0.1
         psfcube['emax']     = 100

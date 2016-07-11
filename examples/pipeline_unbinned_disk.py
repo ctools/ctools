@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import sys
 import gammalib
 import ctools
 from cscripts import obsutils
@@ -192,11 +193,17 @@ if __name__ == '__main__':
     print('*      CTA unbinned analysis pipeline      *')
     print('********************************************')
 
+    # Get optional arguments
+    if len(sys.argv) == 2:
+        datadir = sys.argv[1]
+    else:
+        datadir = 'data'
+
     # Setup observations
     obs = setup_observations()
 
     # Setup model
-    obs = setup_model(obs)
+    obs = setup_model(obs, model=datadir+'/crab.xml')
 
     # Run analysis pipeline
-    run_pipeline(obs)
+    run_pipeline(obs, model=datadir+'/crab.xml')

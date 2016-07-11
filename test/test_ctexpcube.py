@@ -65,10 +65,10 @@ class Test(test):
         ctexpcube = self._tool('ctexpcube')
 
         # Setup ctexpcube command
-        cmd = ctexpcube+' inobs="data/crab_events.fits"'+ \
+        cmd = ctexpcube+' inobs="'+self._events+'"'+ \
                         ' incube="NONE"'+ \
                         ' outcube="ctexpcube_cmd1.fits"'+ \
-                        ' caldb="prod2" irf="South_0.5h"'+ \
+                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                         ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                         ' nxpix=200 nypix=200 binsz=0.02'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -89,7 +89,7 @@ class Test(test):
         cmd = ctexpcube+' inobs="event_file_that_does_not_exist.fits"'+ \
                         ' incube="NONE"'+ \
                         ' outcube="ctexpcube_cmd2.fits"'+ \
-                        ' caldb="prod2" irf="South_0.5h"'+ \
+                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                         ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                         ' nxpix=200 nypix=200 binsz=0.02'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
@@ -109,11 +109,11 @@ class Test(test):
         """
         # Set-up ctexpcube
         expcube = ctools.ctexpcube()
-        expcube['inobs']    = 'data/crab_events.fits'
+        expcube['inobs']    = self._events
         expcube['incube']   = 'NONE'
         expcube['outcube']  = 'ctexpcube_py1.fits'
-        expcube['caldb']    = 'prod2'
-        expcube['irf']      = 'South_0.5h'
+        expcube['caldb']    = self._caldb
+        expcube['irf']      = self._irf
         expcube['ebinalg']  = 'LOG'
         expcube['emin']     = 0.1
         expcube['emax']     = 100
