@@ -197,7 +197,7 @@ clean-local:
 		rm -rf $(builddir)/cs*.py; \
 		rm -rf $(builddir)/obsutils.py; \
 		rm -rf $(builddir)/*.par; \
-	fi; \
+	fi
 	rm -rf $(builddir)/*.pyc
 	rm -rf $(builddir)/cscripts/__pycache__
 
