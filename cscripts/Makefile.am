@@ -179,9 +179,9 @@ install-data-hook:
 	done
 	@linklist='$(linkscripts)';\
 	for p in $$linklist; do \
-      rm -rf "$(DESTDIR)$(bindir)/$$p"; \
-      ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
-	  chmod +x "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py"; \
+		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
+		ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
+		chmod +x "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py"; \
 	done
 
 # Uninstall hook rule to remove the symbolic links for cscripts
