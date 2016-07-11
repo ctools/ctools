@@ -196,6 +196,10 @@ clean-local:
 # Uninstall the cscripts Python module
 uninstall-local:
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/*.pyc
+	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/*.pyc
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/__pycache__
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/*.pyc
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/__pycache__
+	for p in $$linklist; do \
+        rm -rf "$(DESTDIR)$(bindir)/$$p"; \
+	done
