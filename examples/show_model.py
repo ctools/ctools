@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import math
 import gammalib
 try:
     import matplotlib.pyplot as plt
@@ -72,13 +71,6 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
             min = value
         x.append(energy.TeV())
         y.append(value)
-
-    # Set minimum and maximum
-    #max = math.pow(10.0, math.log10(max)+1)
-    #if min < 0.0001*max:
-    #    min = 0.0001*max
-    #min = math.pow(10.0, math.log10(min)-1)
-
 
     # Show spectrum
     plt.figure()

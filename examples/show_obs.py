@@ -20,7 +20,6 @@
 # ==========================================================================
 import sys
 import gammalib
-import ctools
 import cscripts
 try:
     import matplotlib.pyplot as plt
