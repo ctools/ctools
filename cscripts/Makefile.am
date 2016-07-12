@@ -199,7 +199,7 @@ clean-local:
 		rm -rf $(builddir)/*.par; \
 	fi
 	rm -rf $(builddir)/*.pyc
-    rm -rf $(builddir)/cscripts/__pycache__/*.pyc
+	rm -rf $(builddir)/cscripts/__pycache__/*.pyc
 	rm -rf $(builddir)/cscripts/__pycache__
 
 # Uninstall the cscripts Python module
