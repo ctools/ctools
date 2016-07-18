@@ -234,6 +234,9 @@ class sciver(gammalib.GPythonTestSuite):
         # Set test name
         self.name('Science Verification')
 
+        # Append background model test
+        self.append(self.bgd, 'Test background model')
+
         # Append spectral tests
         self.append(self.spec_plaw, 'Test power law model')
         self.append(self.spec_plaw_edisp, 'Test power law model with energy dispersion')
@@ -262,7 +265,8 @@ class sciver(gammalib.GPythonTestSuite):
         return
 
     # Generate and analyse pull distributions
-    def pull(self, model, trials=100, ra=83.63, dec=22.01, rad=5.0,
+    def pull(self, model, trials=100, duration=1800.0,
+             ra=83.63, dec=22.01, rad=5.0,
              edisp=False, debug=False):
         """
         Generate and analyse pull distributions
@@ -273,6 +277,8 @@ class sciver(gammalib.GPythonTestSuite):
             Model XML filename (without .xml extension)
         trials : int, optional
             Number of trials
+        duration : float, optional
+            Observation duration (sec)
         ra : float, optional
             Right Ascension of pointing (deg)
         dec : float, optional
@@ -286,6 +292,7 @@ class sciver(gammalib.GPythonTestSuite):
         """
         # Generate pull distribution
         outfile = generate_pull_distribution(model, trials=trials,
+                                             duration=duration,
                                              ra=ra, dec=dec, rad=rad,
                                              edisp=edisp, debug=debug)
 
@@ -308,16 +315,34 @@ class sciver(gammalib.GPythonTestSuite):
         # Test mean
         mean  = self.results[name]['mean']
         valid = (mean >= -0.40) and (mean <= +0.40)
-        text  = 'Mean %.5f of %s should be within [-0.4,0.4] range' % (mean, name)
+        text  = 'Mean %.5f of %s should be within [-0.4,0.4] range' % \
+                (mean, name)
         self.test_assert(valid, text)
 
         # Test standard deviation
         std   = self.results[name]['std']
         valid = (std >= 0.80) and (std <= 1.20)
-        text  = 'Standard deviation %.5f of %s should be within [0.8,1.2] range' % (std, name)
+        text  = 'Standard deviation %.5f of %s should be within [0.8,1.2]' \
+                ' range' % (std, name)
         self.test_assert(valid, text)
 
         # Return
+        return
+
+    # Test background model
+    def bgd(self):
+        """
+        Test background model
+
+        The standard background model is tested for an observation duration
+        of 50 hours to verify the numerical accuracy of the background model
+        at sufficiently good precision. Most analysis relies on the numerical
+        accuracy of the background model, hence it's important to assure that
+        the model is indeed accurate.
+        """
+        self.pull('data/sciver/bgd', duration=180000.0)
+        self.test('Pull_Background_Prefactor')
+        self.test('Pull_Background_Index')
         return
 
     # Test power law model
