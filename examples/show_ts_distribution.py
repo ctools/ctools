@@ -23,7 +23,6 @@ import csv
 import math
 try:
     import matplotlib.pyplot as plt
-    import matplotlib.mlab as mlab
     plt.figure()
     plt.close()
 except:

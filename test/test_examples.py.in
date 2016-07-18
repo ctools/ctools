@@ -123,13 +123,13 @@ class Test(gammalib.GPythonTestSuite):
         self.append(self.test_show_pull_histogram,
                     'Test show_pull_histogram.py')
         self.append(self.test_show_response,
-                    'Test test_show_response.py')
+                    'Test show_response.py')
         self.append(self.test_show_sensitivity,
-                    'Test test_show_sensitivity.py')
+                    'Test show_sensitivity.py')
         self.append(self.test_show_spectrum,
-                    'Test test_show_spectrum.py')
+                    'Test show_spectrum.py')
         self.append(self.test_show_ts_distribution,
-                    'Test show_ts_distribution.py')
+                    'Test ts_distribution.py')
         self.append(self.test_show_obs,
                     'Test show_obs.py')
 

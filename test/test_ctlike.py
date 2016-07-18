@@ -119,6 +119,14 @@ class Test(test):
         # Check result file
         self._check_result_file('ctlike_py1.xml')
 
+        # Retrieve observation container, save and check model file
+        obs = like.obs()
+        obs.models().save('ctlike_py2.xml')
+        self._check_result_file('ctlike_py2.xml')
+
+        # Retrieve optimizer
+        opt = like.opt()
+
         # Return
         return
 

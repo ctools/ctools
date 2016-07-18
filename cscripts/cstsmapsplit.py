@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import os
 import math
 import gammalib
 import ctools
@@ -56,6 +55,7 @@ class cstsmapsplit(ctools.cscript):
         self._outfile      = gammalib.GFilename()
         self._map          = gammalib.GSkyMap()
         self._cmd          = []
+        self._srcname      = ''
         
         # Initialise observation container from constructor arguments.
         self._obs, argv = self._set_input_obs(argv)
@@ -83,9 +83,9 @@ class cstsmapsplit(ctools.cscript):
             self._obs.models(self['inmodel'].filename())
         
         # Get TS map paramters
-        self._map      = self._create_map(self._obs)        
-        self._srcname  = self['srcname'].string()      
-        self._outmap   = self['outmap'].filename()
+        self._map     = self._create_map(self._obs)
+        self._srcname = self['srcname'].string()
+        self._outmap  = self['outmap'].filename()
         
         # Get additional parameters
         self._bins_per_job = self['bins_per_job'].integer()

@@ -179,9 +179,16 @@ install-data-hook:
 	done
 	@linklist='$(linkscripts)';\
 	for p in $$linklist; do \
-      rm -rf "$(DESTDIR)$(bindir)/$$p"; \
-      ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
-	  chmod +x "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py"; \
+		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
+		ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
+		chmod +x "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py"; \
+	done
+
+# Uninstall hook rule to remove the symbolic links for cscripts
+uninstall-hook:
+	@linklist='$(linkscripts)';\
+	for p in $$linklist; do \
+		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
 # Files to be removed in build directory
@@ -190,8 +197,9 @@ clean-local:
 		rm -rf $(builddir)/cs*.py; \
 		rm -rf $(builddir)/obsutils.py; \
 		rm -rf $(builddir)/*.par; \
-	fi; \
+	fi
 	rm -rf $(builddir)/*.pyc
+	rm -rf $(builddir)/__pycache__
 
 # Uninstall the cscripts Python module
 uninstall-local:
@@ -200,6 +208,3 @@ uninstall-local:
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/__pycache__
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/*.pyc
 	rm -rf $(DESTDIR)$(pyexecdir)/cscripts/tests/__pycache__
-	for p in $$linklist; do \
-        rm -rf "$(DESTDIR)$(bindir)/$$p"; \
-	done
