@@ -7,7 +7,7 @@
       <parameter name="LowerLimit" scale="1.0"  value="100.0"    min="10.0"  max="1000000.0" free="0"/>
       <parameter name="UpperLimit" scale="1.0"  value="500000.0" min="10.0"  max="1000000.0" free="0"/>
     </spectrum>
-    <spatialModel type="SkyDirFunction">
+    <spatialModel type="PointSource">
       <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
       <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
     </spatialModel>
