@@ -233,13 +233,13 @@ class csiactobs(ctools.cscript):
         # Handle constant spectral model 
         if index == 0.0 and self._bkgpars <= 1:
             spec = gammalib.GModelSpectralConst()
-            spec['Value'].min(prefactor / self._bkg_range_factor)
-            spec['Value'].max(prefactor * self._bkg_range_factor)
-            spec['Value'].value(prefactor)
+            spec['Normalization'].min(prefactor / self._bkg_range_factor)
+            spec['Normalization'].max(prefactor * self._bkg_range_factor)
+            spec['Normalization'].value(prefactor)
             if self._bkgpars == 0:
-                spec['Value'].fix()
+                spec['Normalization'].fix()
             else:
-                spec['Value'].free()
+                spec['Normalization'].free()
                 
         else:
                 

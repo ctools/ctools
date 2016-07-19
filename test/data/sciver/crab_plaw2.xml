@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 <source_library title="source library">
   <source name="Crab" type="PointSource">
-    <spectrum type="PowerLaw2">
-      <parameter name="Integral"   scale="1e-5" value="1.617"      min="1e-07" max="1000.0"    free="1"/>
+    <spectrum type="PowerLawPhotonFlux">
+      <parameter name="PhotonFlux" scale="1e-5" value="1.617"      min="1e-07" max="1000.0"    free="1"/>
       <parameter name="Index"      scale="-1.0" value="2.48"     min="-5.0"  max="+5.0"      free="1"/>
       <parameter name="LowerLimit" scale="1.0"  value="100.0"    min="10.0"  max="1000000.0" free="0"/>
       <parameter name="UpperLimit" scale="1.0"  value="500000.0" min="10.0"  max="1000000.0" free="0"/>
@@ -14,9 +14,9 @@
   </source>
   <source name="Background" type="CTAIrfBackground" instrument="CTA">
     <spectrum type="PowerLaw">
-      <parameter name="Prefactor" scale="1.0" value="1.0" min="1e-3" max="1e3"    free="1"/>
-      <parameter name="Index"     scale="1.0" value="0.0" min="-5.0" max="+5.0"   free="1"/>
-      <parameter name="Scale"     scale="1e6" value="1.0" min="0.01" max="1000.0" free="0"/>
+      <parameter name="Prefactor"   scale="1.0" value="1.0" min="1e-3" max="1e3"    free="1"/>
+      <parameter name="Index"       scale="1.0" value="0.0" min="-5.0" max="+5.0"   free="1"/>
+      <parameter name="PivotEnergy" scale="1e6" value="1.0" min="0.01" max="1000.0" free="0"/>
     </spectrum>
   </source>
 </source_library>
