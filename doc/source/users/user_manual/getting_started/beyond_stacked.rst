@@ -145,7 +145,7 @@ modelling works:
       <spectrum type="PowerLaw">
         <parameter name="Prefactor" value="5.7" error="0" scale="1e-16" min="1e-07" max="1000" free="1" />
         <parameter name="Index" value="2.48" error="0" scale="-1" min="0" max="5" free="1" />
-        <parameter name="Scale" value="0.3" scale="1e+06" min="0.01" max="1000" free="0" />
+        <parameter name="PivotEnergy" value="0.3" scale="1e+06" min="0.01" max="1000" free="0" />
       </spectrum>
       <spatialModel type="SkyDirFunction">
         <parameter name="RA" value="83.6331" scale="1" min="-360" max="360" free="0" />
@@ -156,7 +156,7 @@ modelling works:
       <spectrum type="PowerLaw">
         <parameter name="Prefactor" value="1" error="0" scale="1" min="0" free="1" />
         <parameter name="Index" value="0" error="0" scale="1" min="-10" max="10" free="1" />
-        <parameter name="Scale" value="1" scale="1e+06" free="0" />
+        <parameter name="PivotEnergy" value="1" scale="1e+06" free="0" />
       </spectrum>
     </source>
   </source_library>
@@ -256,7 +256,7 @@ below.
   2016-06-29T19:54:17:  Instrument scale factors ..: unity
   2016-06-29T19:54:17:  Observation identifiers ...: all
   2016-06-29T19:54:17:  Model type ................: PointSource
-  2016-06-29T19:54:17:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2016-06-29T19:54:17:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
   2016-06-29T19:54:17:  Number of parameters ......: 6
   2016-06-29T19:54:17:  Number of spatial par's ...: 2
   2016-06-29T19:54:17:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)

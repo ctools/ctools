@@ -175,7 +175,7 @@ the same events for both analyses.
   2016-06-29T16:24:45:  Instrument scale factors ..: unity
   2016-06-29T16:24:45:  Observation identifiers ...: all
   2016-06-29T16:24:45:  Model type ................: PointSource
-  2016-06-29T16:24:45:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2016-06-29T16:24:45:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
   2016-06-29T16:24:45:  Number of parameters ......: 6
   2016-06-29T16:24:45:  Number of spatial par's ...: 2
   2016-06-29T16:24:45:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)

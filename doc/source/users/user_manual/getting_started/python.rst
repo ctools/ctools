@@ -170,7 +170,7 @@ member of the observation container:
     Instrument scale factors ..: unity
     Observation identifiers ...: all
     Model type ................: PointSource
-    Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+    Model components ..........: "PointSource" * "PowerLaw" * "Constant"
     Number of parameters ......: 6
     Number of spatial par's ...: 2
      RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)

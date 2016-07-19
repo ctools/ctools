@@ -102,7 +102,7 @@ Below you see the output from the ``ctlike.log`` file.
   2016-06-29T20:33:50:  Instrument scale factors ..: unity
   2016-06-29T20:33:50:  Observation identifiers ...: all
   2016-06-29T20:33:50:  Model type ................: PointSource
-  2016-06-29T20:33:50:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2016-06-29T20:33:50:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
   2016-06-29T20:33:50:  Number of parameters ......: 6
   2016-06-29T20:33:50:  Number of spatial par's ...: 2
   2016-06-29T20:33:50:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)

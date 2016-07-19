@@ -26,13 +26,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
-import cscripts
 import os
 import csv
 import math
 import sys
+import gammalib
+import ctools
+import cscripts
 
 
 # ========================== #
@@ -375,7 +375,7 @@ class sciver(gammalib.GPythonTestSuite):
         Test power law 2 model
         """
         self.pull('data/sciver/crab_plaw2')
-        self.test('Pull_Crab_Integral')
+        self.test('Pull_Crab_PhotonFlux')
         self.test('Pull_Crab_Index')
         self.test('Pull_Background_Prefactor')
         self.test('Pull_Background_Index')

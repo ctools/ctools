@@ -264,20 +264,20 @@ excess map. In the section about :ref:`high level analysis tools <sec_high_level
 the usage of :ref:`cttsmap` was demonstrated. This tool can also be used to
 generate flux maps. For this, the user has to incorporate a test source in the
 XML model file. This source should consist of a spectral component using a
-PowerLaw2 model:
+``PowerLawPhotonFlux`` model:
 
 .. code-block:: xml
 
 	<source name="TestSource" type="PointSource">
-	 <spectrum type="PowerLaw2">
-	  <parameter scale="1e-07" name="Integral"   min="1e-07" max="1000.0"    value="1.0" free="1"/>
+	 <spectrum type="PowerLawPhotonFlux">
+	  <parameter scale="1e-07" name="PhotonFlux" min="1e-07" max="1000.0"    value="1.0" free="1"/>
 	  <parameter scale="1.0"   name="Index"      min="-5.0"  max="+5.0"      value="-2.0" free="1"/>
 	  <parameter scale="1.0"   name="LowerLimit" min="10.0"  max="1000000.0" value="100.0" free="0"/>
 	  <parameter scale="1.0"   name="UpperLimit" min="10.0"  max="1000000.0" value="500000.0" free="0"/>
 	 </spectrum>
-	 <spatialModel type="SkyDirFunction">
-	  <parameter free="0" max="360" min="-360" name="RA" scale="1" value="83.6331" />
-	  <parameter free="0" max="90" min="-90" name="DEC" scale="1" value="22.0145" />
+	 <spatialModel type="PointSource">
+	  <parameter free="0" max="360" min="-360" name="RA"  scale="1" value="83.6331" />
+	  <parameter free="0" max="90"  min="-90"  name="DEC" scale="1" value="22.0145" />
 	 </spatialModel>
 	</source>
 

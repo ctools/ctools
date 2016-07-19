@@ -20,7 +20,8 @@ also be specified as arguments separated by a whitespace to the ctool:
 
 .. code-block:: bash
 
-  $ ctobssim ra=83.63 dec=22.01 rad=5.0 tmin=0 tmax=1800 emin=0.1 emax=100.0 caldb=prod2 irf=South_50h inmodel=$CTOOLS/share/models/crab.xml outevents=events.fits
+  $ ctobssim ra=83.63 dec=22.01 rad=5.0 tmin=0 tmax=1800 emin=0.1 emax=100.0 caldb=prod2 irf=South_0.5h \
+             inmodel=$CTOOLS/share/models/crab.xml outevents=events.fits
 
 If you need help about the usage of a ctool or a cscript, type the name of 
 the ctool or cscript followed by the ``--help`` option:
