@@ -186,9 +186,6 @@ class cspull(ctools.cscript):
         expcube['chatter']  = self._chatter
         expcube['debug']    = self._logDebug()
         expcube.run()
-        # JK: Debug
-        expcube['outcube'] = 'expcube.fits'
-        expcube.save()
 
         # Notify exposure computation
         if self._logTerse():
@@ -210,9 +207,6 @@ class cspull(ctools.cscript):
         psfcube['chatter']  = self._chatter
         psfcube['debug']    = self._logDebug()
         psfcube.run()
-        # JK: Debug
-        psfcube['outcube'] = 'psfcube.fits'
-        psfcube.save()
 
         # Notify Psf computation
         if self._logTerse():
@@ -259,10 +253,6 @@ class cspull(ctools.cscript):
         bkgcube['chatter']  = self._chatter
         bkgcube['debug']    = self._logDebug()
         bkgcube.run()
-        # JK: Debug
-        bkgcube['outcube']  = 'bkgcube.fits'
-        bkgcube['outmodel'] = 'cube_model.xml'
-        bkgcube.save()
 
         # Notify background cube computation
         if self._logTerse():
@@ -354,8 +344,6 @@ class cspull(ctools.cscript):
                 obs[0].response(self._exposure, self._psfcube,
                                 self._bckcube)
             obs.models(self._stackmodels)
-        # JK: Test
-        obs[0].save('stacked_cube.fits', True)
 
         # Determine number of events in simulation
         nevents = 0.0
@@ -476,7 +464,6 @@ class cspull(ctools.cscript):
             self._log('\n')
 
         # Signal if stacked analysis is requested
-        #stacked = self._obs.size() > 1 and self._enumbins > 0
         stacked = self._enumbins > 0
 
         # If several observations and binned: prepare stacked irfs
