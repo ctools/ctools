@@ -220,12 +220,7 @@ void ctexpcube::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
+        log.header1(gammalib::number("Observation",m_obs.size()));
         log << m_obs << std::endl;
     }
 
