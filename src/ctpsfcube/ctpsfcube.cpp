@@ -270,8 +270,8 @@ void ctpsfcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save PSF cube into file \""+m_outcube+"\".";
-            log << std::endl;
+            log << gammalib::parformat("PSF cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save PSF cube

@@ -297,8 +297,8 @@ void ctexpcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save exposure cube into file \""+m_outcube+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Exposure cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save exposure cube
@@ -332,7 +332,8 @@ void ctexpcube::publish(const std::string& name)
 
     // Log filename
     if (logTerse()) {
-        log << "Publish \""+user_name+"\" exposure cube." << std::endl;
+        log << gammalib::parformat("Publish exposure cube");
+        log << user_name << std::endl;
     }
 
     // Publish exposure cube

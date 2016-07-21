@@ -322,7 +322,8 @@ void ctskymap::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save sky map into file \""+m_outmap+"\"." << std::endl;
+            log << gammalib::parformat("Sky map file");
+            log << m_outmap.url() << std::endl;
         }
 
         // Create empty FITS file
@@ -362,7 +363,8 @@ void ctskymap::publish(const std::string& name)
 
     // Log filename
     if (logTerse()) {
-        log << "Publish \""+user_name+"\" sky map." << std::endl;
+        log << gammalib::parformat("Publish sky map");
+        log << user_name << std::endl;
     }
 
     // Publish sky map

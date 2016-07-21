@@ -356,8 +356,8 @@ void ctmodel::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save model cube into file \""+m_outcube+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Model cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save model cube into FITS file
@@ -391,7 +391,8 @@ void ctmodel::publish(const std::string& name)
 
     // Log filename
     if (logTerse()) {
-        log << "Publish \""+user_name+"\" model cube." << std::endl;
+        log << gammalib::parformat("Publish model cube");
+        log << user_name << std::endl;
     }
 
     // Publish model cube

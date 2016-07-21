@@ -401,8 +401,8 @@ void ctbkgcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save background cube into file \""+m_outcube+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Background cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save background cube
@@ -416,8 +416,8 @@ void ctbkgcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save model into file \""+m_outmodel.url()+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Model definition file");
+            log << m_outmodel.url() << std::endl;
         }
 
         // Save output model for stacked analyses
@@ -451,7 +451,8 @@ void ctbkgcube::publish(const std::string& name)
 
     // Log filename
     if (logTerse()) {
-        log << "Publish \""+user_name+"\" background cube." << std::endl;
+        log << gammalib::parformat("Publish background cube");
+        log << user_name << std::endl;
     }
 
     // Publish exposure cube

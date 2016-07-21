@@ -399,7 +399,8 @@ void cttsmap::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save TS map into file \""+m_outmap+"\"." << std::endl;
+            log << gammalib::parformat("TS map file");
+            log << m_outmap.url() << std::endl;
         }
 
         // Create fits file
@@ -453,7 +454,8 @@ void cttsmap::publish(const std::string& name)
 
     // Log filename
     if (logTerse()) {
-        log << "Publish \""+user_name+"\" TS map." << std::endl;
+        log << gammalib::parformat("Publish TS map");
+        log << user_name << std::endl;
     }
 
     // Publish TS map

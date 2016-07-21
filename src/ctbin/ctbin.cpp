@@ -619,7 +619,6 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
         // Log cube
         if (logExplicit()) {
-            log.header1("Counts cube");
             log << m_counts << std::endl;
         }
 

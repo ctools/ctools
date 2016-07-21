@@ -746,8 +746,8 @@ void ctcubemask::save_fits(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save counts cube into file \""+m_outcube+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Counts cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save event list
@@ -802,8 +802,8 @@ void ctcubemask::save_xml(void)
 
             // Log filename
             if (logTerse()) {
-                log << "Save counts cube into file \""+outfile+"\".";
-                log << std::endl;
+                log << gammalib::parformat("Counts cube file");
+                log << outfile << std::endl;
             }
 
             // Save event list

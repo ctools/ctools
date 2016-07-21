@@ -73,7 +73,8 @@ class Test(test):
                     ' outcube="cntmap_cmd1.fits"'+\
                     ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"'+ \
                     ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
-                    ' xref=83.63 yref=22.01 proj="CAR"'
+                    ' xref=83.63 yref=22.01 proj="CAR"'+ \
+                    ' logfile="ctbin_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -92,7 +93,8 @@ class Test(test):
                     ' outcube="cntmap_cmd2.fits"'+\
                     ' emin=0.1 emax=100.0 enumbins=20 ebinalg="LOG"'+ \
                     ' nxpix=200 nypix=200 binsz=0.02 coordsys="CEL"'+ \
-                    ' xref=83.63 yref=22.01 proj="CAR"'
+                    ' xref=83.63 yref=22.01 proj="CAR"'+ \
+                    ' logfile="ctbin_cmd1.log" chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -121,8 +123,11 @@ class Test(test):
         bin['proj']     = 'CAR'
         bin['xref']     = 83.63
         bin['yref']     = 22.01
+        bin['logfile']  = 'ctbin_py1.log'
+        bin['chatter']  = 2
 
         # Run ctbin tool
+        bin.logFileOpen()   # Make sure we get a log file
         bin.run()
 
         # Check content of observation and cube
@@ -137,6 +142,8 @@ class Test(test):
         self._check_cube(cpy_bin.cube(), 5542)
 
         # Run copy of ctbin tool again
+        cpy_bin['logfile'] = 'ctbin_py2.log'
+        cpy_bin['chatter'] = 3
         cpy_bin.run()
 
         # Check content of observation and cube. We expect now an empty
@@ -177,8 +184,11 @@ class Test(test):
         bin['proj']     = 'CAR'
         bin['xref']     = 83.63
         bin['yref']     = 22.01
+        bin['logfile']  = 'ctbin_py3.log'
+        bin['chatter']  = 4
 
         # Run ctbin tool
+        bin.logFileOpen()   # Make sure we get a log file
         bin.run()
 
         # Check content of observation and cube (need multiplier=3 since
@@ -200,6 +210,8 @@ class Test(test):
         bin['proj']     = 'CAR'
         bin['xref']     = 83.63
         bin['yref']     = 22.01
+        bin['logfile']  = 'ctbin_py4.log'
+        bin['chatter']  = 4
 
         # Execute ctbin tool
         bin.execute()

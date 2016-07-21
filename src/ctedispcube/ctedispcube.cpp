@@ -286,8 +286,8 @@ void ctedispcube::save(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save energy dispersion cube into file \""+m_outcube+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Energy dispersion cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save energy dispersion cube

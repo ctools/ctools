@@ -1266,8 +1266,8 @@ void ctselect::save_fits(void)
 
             // Log filename
             if (logTerse()) {
-                log << "Save event list into file \""+outfile+"\".";
-                log << std::endl;
+                log << gammalib::parformat("Event list file");
+                log << outfile << std::endl;
             }
 
             // Save event list
@@ -1335,8 +1335,8 @@ void ctselect::save_xml(void)
 
         // Log filename
         if (logTerse()) {
-            log << "Save event list into file \""+outfile+"\".";
-            log << std::endl;
+            log << gammalib::parformat("Event list file");
+            log << outfile << std::endl;
         }
 
         // Store output file name in observation
