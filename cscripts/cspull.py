@@ -320,10 +320,19 @@ class cspull(ctools.cscript):
         if self._logNormal():
             self._log.header2('Trial '+str(seed-self._seed+1))
 
+        # If we have a binned obeservation then specify the lower and
+        # upper energy limit
+        if self._enumbins > 0:
+            emin = self['emin'].real()
+            emax = self['emax'].real()
+        else:
+            emin = None
+            emax = None
+
         # Simulate events
         obs = obsutils.sim(self._obs,
-                           emin=self['emin'].real(),
-                           emax=self['emax'].real(),
+                           emin=emin,
+                           emax=emax,
                            nbins=self._enumbins,
                            seed=seed,
                            binsz=self._binsz,
