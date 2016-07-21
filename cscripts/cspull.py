@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import csv
+import math
 import gammalib
 import ctools
 from cscripts import obsutils
@@ -163,6 +164,12 @@ class cspull(ctools.cscript):
             self._log('\n')
             self._log.header1('Compute stacked response')
 
+        # Set number of energy bins to at least 30 per energy decade
+        enumbins = int((math.log10(self['emax'].real()) -
+                        math.log10(self['emin'].real())) * 30.0)
+        if self._enumbins > enumbins:
+            enumbins = self._enumbins
+
         # Get stacked exposure
         expcube = ctools.ctexpcube(self._obs)
         expcube['incube']   = 'NONE'
@@ -171,7 +178,7 @@ class cspull(ctools.cscript):
         expcube['binsz']    = self._binsz
         expcube['nxpix']    = self._npix
         expcube['nypix']    = self._npix
-        expcube['enumbins'] = self._enumbins
+        expcube['enumbins'] = enumbins
         expcube['emin']     = self['emin'].real()
         expcube['emax']     = self['emax'].real()
         expcube['coordsys'] = self._coordsys
@@ -195,7 +202,7 @@ class cspull(ctools.cscript):
         psfcube['binsz']    = self._binsz*10.0
         psfcube['nxpix']    = self._npix/10
         psfcube['nypix']    = self._npix/10
-        psfcube['enumbins'] = self._enumbins
+        psfcube['enumbins'] = enumbins
         psfcube['emin']     = self['emin'].real()
         psfcube['emax']     = self['emax'].real()
         psfcube['coordsys'] = self._coordsys
@@ -220,7 +227,7 @@ class cspull(ctools.cscript):
             edispcube['binsz']    = self._binsz*10.0
             edispcube['nxpix']    = self._npix/10
             edispcube['nypix']    = self._npix/10
-            edispcube['enumbins'] = self._enumbins
+            edispcube['enumbins'] = enumbins
             edispcube['emin']     = self['emin'].real()
             edispcube['emax']     = self['emax'].real()
             edispcube['coordsys'] = self._coordsys
@@ -244,7 +251,7 @@ class cspull(ctools.cscript):
         bkgcube['binsz']    = self._binsz
         bkgcube['nxpix']    = self._npix
         bkgcube['nypix']    = self._npix
-        bkgcube['enumbins'] = self._enumbins
+        bkgcube['enumbins'] = enumbins
         bkgcube['emin']     = self['emin'].real()
         bkgcube['emax']     = self['emax'].real()
         bkgcube['coordsys'] = self._coordsys

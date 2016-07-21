@@ -29,13 +29,12 @@ rather coarse spatial binning to keep the file size manageable (with a typical
 value of ``binsz=1.0``).
 
 ctedispcube generates an energy dispersion cube FITS file comprising three
-extensions. The primary extension contains a 3-dimensional image that contains
-the energy disperison values. The energy and fraction dimensions of the enrgy 
-dispersion cube are folded into the 3rd dimension of the FITS image. The next 
-extension named ``ENERGIES`` contains a binary table that defines the energy 
-values of the energy dispersion cube. The last extension named ``MIGRAS``
-contains a binary table that defines the migration values of the cube which
-is the ratio between reconstructed and true photon energy.
+extensions. The primary extension contains a 4-dimensional image that contains
+the energy disperison values. The next extension named ``ENERGIES`` contains
+a binary table that defines the energies of the energy dispersion cube. The
+last extension named ``MIGRAS`` contains a binary table that defines the
+migration values of the cube which is the ratio between reconstructed and true
+photon energy.
 
 
 General parameters
@@ -71,6 +70,9 @@ General parameters
 ``ebinfile [file]``
     Name of the file containing the energy bin definition.
  	 	 
+``(addbounds = yes) [boolean]``
+    Add energies to the energy dispersion cube at the observation energy boundaries?
+
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?
  	 	 

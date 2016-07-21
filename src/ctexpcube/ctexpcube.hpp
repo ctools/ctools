@@ -68,10 +68,13 @@ protected:
     void copy_members(const ctexpcube& app);
     void free_members(void);
     void get_parameters(void);
+    void init_cube(void);
 
     // User parameters
-    GFilename m_outcube;     //!< Output exposure cube file
-    bool      m_publish;     //!< Publish exposure cube?
+    GFilename m_outcube;            //!< Output exposure cube file
+    bool      m_addbounds;          //!< Add energies at boundaries?
+    bool      m_publish;            //!< Publish exposure cube?
+    GChatter  m_chatter;            //!< Chattiness
 
     // Protected members
     GObservations    m_obs;         //!< Observation container

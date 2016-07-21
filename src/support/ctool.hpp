@@ -92,6 +92,9 @@ protected:
     GSkyDir         get_mean_pointing(const GObservations& obs);
     size_t          get_current_rss(void);
     std::string     get_obs_header(const GObservation* obs);
+    GEnergies       insert_energy_boundaries(const GEnergies&       energies,
+                                             const GCTAObservation& obs,
+                                             GLog* log = NULL) const;
 
     // Protected members
     bool            m_read_ahead; //!< Read ahead output parameters

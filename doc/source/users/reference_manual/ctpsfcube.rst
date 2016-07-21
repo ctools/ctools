@@ -29,13 +29,11 @@ recommended to use a rather coarse spatial binning to keep the file size
 manageable (with a typical value of ``binsz=1.0``).
 
 ctpsfcube generates a point spread function cube FITS file comprising three
-extensions. The primary extension contains a 3-dimensional image that contains
-the point spread function values. The energy and offset angle dimensions 
-of the point spread function cube are folded into the 3rd dimension of the 
-FITS image. The next extension named ``EBOUNDS`` contains a binary table
-that defines the energy boundaries of the exposure cube. The last extension
-named ``DELTAS`` contains a binary table that defines the offset angles 
-between true and measured arrival direction of the photon.
+extensions. The primary extension contains a 4-dimensional image that contains
+the point spread function values. The next extension named ``ENERGIES`` contains
+a binary table that defines the energies of the point spread function cube.
+The last extension named ``DELTAS`` contains a binary table that defines the
+offset angles between true and measured arrival direction of the photon.
 
 
 General parameters
@@ -71,6 +69,9 @@ General parameters
 ``ebinfile [file]``
     Name of the file containing the energy bin definition.
  	 	 
+``(addbounds = yes) [boolean]``
+    Add energies to the point spread function cube at the observation energy boundaries?
+
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?
  	 	 
