@@ -170,6 +170,16 @@ class cspull(ctools.cscript):
         if self._enumbins > enumbins:
             enumbins = self._enumbins
 
+        # Compute spatial binning for point spread function and
+        # energy dispersion cubes
+        binsz = 10.0 * self['binsz'].real()
+        nxpix = self['nxpix'].integer() // 10  # Make sure result is int
+        nypix = self['nypix'].integer() // 10  # Make sure result is int
+        if nxpix < 2:
+            nxpix = 2
+        if nypix < 2:
+            nypix = 2
+
         # Get stacked exposure
         expcube = ctools.ctexpcube(self._obs)
         expcube['incube']   = 'NONE'
@@ -196,9 +206,9 @@ class cspull(ctools.cscript):
         psfcube['incube']   = 'NONE'
         psfcube['usepnt']   = True
         psfcube['ebinalg']  = 'LOG'
-        psfcube['binsz']    = self._binsz*10.0
-        psfcube['nxpix']    = self._npix/10
-        psfcube['nypix']    = self._npix/10
+        psfcube['binsz']    = binsz
+        psfcube['nxpix']    = nxpix
+        psfcube['nypix']    = nypix
         psfcube['enumbins'] = enumbins
         psfcube['emin']     = self['emin'].real()
         psfcube['emax']     = self['emax'].real()
@@ -218,9 +228,9 @@ class cspull(ctools.cscript):
             edispcube['incube']   = 'NONE'
             edispcube['usepnt']   = True
             edispcube['ebinalg']  = 'LOG'
-            edispcube['binsz']    = self._binsz*10.0
-            edispcube['nxpix']    = self._npix/10
-            edispcube['nypix']    = self._npix/10
+            edispcube['binsz']    = binsz
+            edispcube['nxpix']    = nxpix
+            edispcube['nypix']    = nypix
             edispcube['enumbins'] = enumbins
             edispcube['emin']     = self['emin'].real()
             edispcube['emax']     = self['emax'].real()
@@ -473,7 +483,7 @@ class cspull(ctools.cscript):
             self._log('\n')
 
         # Signal if stacked analysis is requested
-        stacked = self._enumbins > 0
+        stacked = self._obs.size() > 1 and self._enumbins > 0
 
         # If several observations and binned: prepare stacked irfs
         if stacked:
