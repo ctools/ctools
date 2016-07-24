@@ -424,7 +424,7 @@ class sciver(gammalib.GPythonTestSuite):
         self.pull('data/sciver/crab_eplaw')
         self.test('Pull_Crab_Prefactor')
         self.test('Pull_Crab_Index')
-        self.test('Pull_Crab_Cutoff')
+        self.test('Pull_Crab_CutoffEnergy')
         self.test('Pull_Background_Prefactor')
         self.test('Pull_Background_Index')
         return
@@ -438,7 +438,7 @@ class sciver(gammalib.GPythonTestSuite):
         self.test('Pull_Crab_Prefactor')
         self.test('Pull_Crab_Index1')
         self.test('Pull_Crab_Index2')
-        self.test('Pull_Crab_Cutoff')
+        self.test('Pull_Crab_CutoffEnergy')
         self.test('Pull_Background_Prefactor')
         self.test('Pull_Background_Index')
         return

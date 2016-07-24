@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<observation_list title="observation list">
+  <observation name="Crab" id="000001" instrument="CTA">
+    <parameter name="Pointing" ra="83.6331" dec="21.0145" />
+    <parameter name="EnergyBoundaries" emin="50000" emax="1e+08" />
+    <parameter name="GoodTimeIntervals" tmin="0" tmax="1800" />
+    <parameter name="TimeReference" mjdrefi="51544" mjdreff="0.5" timeunit="s" timesys="TT" timeref="LOCAL" />
+    <parameter name="RegionOfInterest" ra="83.6331" dec="21.0145" rad="1.5" />
+    <parameter name="Deadtime" deadc="0.95" />
+    <parameter name="Calibration" database="prod2" response="South_0.5h" />
+  </observation>
+  <observation name="Crab" id="000002" instrument="CTA">
+    <parameter name="Pointing" ra="83.6331" dec="23.0145" />
+    <parameter name="EnergyBoundaries" emin="70000" emax="1e+08" />
+    <parameter name="GoodTimeIntervals" tmin="1800" tmax="3600" />
+    <parameter name="TimeReference" mjdrefi="51544" mjdreff="0.5" timeunit="s" timesys="TT" timeref="LOCAL" />
+    <parameter name="RegionOfInterest" ra="83.6331" dec="23.0145" rad="1.5" />
+    <parameter name="Deadtime" deadc="0.95" />
+    <parameter name="Calibration" database="prod2" response="South_0.5h" />
+  </observation>
+</observation_list>
