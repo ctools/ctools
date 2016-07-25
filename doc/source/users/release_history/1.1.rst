@@ -1,0 +1,76 @@
+.. _1.1:
+
+ctools 1.1 release (24 July 2016)
+=================================
+
+Overview
+--------
+
+ctools 1.1 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* Complete IACT analysis scripts and documentation
+* The ``csworkflow`` workflow manager
+* Publication of sky maps over Virtual Observatory Hub
+
+Bug fixes
+---------
+
+* [`1819 <https://cta-redmine.irap.omp.eu/issues/1819>`_] -
+  Fix stacked analysis bias
+* [`1795 <https://cta-redmine.irap.omp.eu/issues/1795>`_] -
+  Handle zero parameter errors in ``ctulimit``
+
+Improvements
+------------
+
+* [`1821 <https://cta-redmine.irap.omp.eu/issues/1821>`_] -
+  Adapt to new spectral model names
+* [`1818 <https://cta-redmine.irap.omp.eu/issues/1818>`_] -
+  Adapt to new spatial model names
+* [`1815 <https://cta-redmine.irap.omp.eu/issues/1815>`_] -
+  Add background model science verification
+* Add unit tests for all example scripts
+* [`1789 <https://cta-redmine.irap.omp.eu/issues/1789>`_] -
+  Compute counts cube weights in ``ctbin``
+* [`1788 <https://cta-redmine.irap.omp.eu/issues/1788>`_] -
+  Adapt to new stacked cube interface
+* Add ctools and cscripts unit tests
+* Add ``bgdoversample`` and ``bgdinfill`` parameters to csroot2caldb
+* [`1755 <https://cta-redmine.irap.omp.eu/issues/1755>`_] -
+  Add ``seed`` parameter to cspull
+* [`1715 <https://cta-redmine.irap.omp.eu/issues/1715>`_] -
+  Test and import IACT scripts only for Python 2.6+
+* [`1714 <https://cta-redmine.irap.omp.eu/issues/1714>`_] -
+  Adapt to revise GTime operators
+* [`1710 <https://cta-redmine.irap.omp.eu/issues/1710>`_] -
+  Add ``publish()`` methods to tools producing images
+* [`1700 <https://cta-redmine.irap.omp.eu/issues/1700>`_] -
+  Read ahead output filename in ``cterror``
+* [`1673 <https://cta-redmine.irap.omp.eu/issues/1673>`_] -
+  Subdivide simulation energy range in ``ctobssim``
+* [`1663 <https://cta-redmine.irap.omp.eu/issues/1663>`_] -
+  Delete existing events before simulation in ``ctobssim``
+* [`1598 <https://cta-redmine.irap.omp.eu/issues/1598>`_] -
+  ``ctselect`` allows usage of non-default events and GTI extensions
+* [`1484 <https://cta-redmine.irap.omp.eu/issues/1484>`_] -
+  Support out of source builds
+
+New features
+------------
+
+* [`1797 <https://cta-redmine.irap.omp.eu/issues/1797>`_] -
+  Add ``cstsmapsplit`` script
+* [`1771 <https://cta-redmine.irap.omp.eu/issues/1771>`_] -
+  Add ``csobsdef.pntdef()`` method
+* [`1760 <https://cta-redmine.irap.omp.eu/issues/1760>`_] -
+  Add ``ctmapcube`` tool
+* [`1724 <https://cta-redmine.irap.omp.eu/issues/1724>`_] -
+  Add ``ctedispcube`` tool
+* [`1661 <https://cta-redmine.irap.omp.eu/issues/1661>`_] -
+  Add ``csiactcopy`` script
+* [`1646 <https://cta-redmine.irap.omp.eu/issues/1646>`_] -
+  Add documentation for IACT analysis
+* [`1508 <https://cta-redmine.irap.omp.eu/issues/1508>`_] -
+  Add ``csworkflow`` workflow manager script
