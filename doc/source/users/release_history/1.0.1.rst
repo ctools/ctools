@@ -1,0 +1,17 @@
+.. _1.0.1:
+
+ctools 1.0.1 release (27 January 2016)
+======================================
+
+Overview
+--------
+
+ctools 1.0.1 is a bug fix for ctools release 1.0.
+
+The following bugs have been fixed:
+
+* [`1609 <https://cta-redmine.irap.omp.eu/issues/1609>`_] -
+  Re-enable ctmodel computation for stacked analysis
+* [`1607 <https://cta-redmine.irap.omp.eu/issues/1607>`_] -
+  Solve compatibility issues with Anaconda on Mac OS X
+* Change diffuse map for science verification

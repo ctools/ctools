@@ -90,14 +90,15 @@ protected:
     void                free_members(void);
     void                get_parameters(void);
     void                fill_cube(GCTAObservation* obs);
+    void                set_weights(GCTAObservation* obs);
     void                obs_cube(void);
-    GSkyMap             set_roi_weights(const GCTARoi& roi) const;
-    std::vector<double> set_energy_weights(const GEbounds& ebounds) const;
+    std::vector<bool>   cube_layer_usage(const GEbounds& ebounds) const;
 
     // User parameters
     GFilename     m_outcube;    //!< Output counts map file name
     bool          m_usepnt;     //!< Use pointing instead of xref/yref parameters
     bool          m_publish;    //!< Publish counts cube?
+    GChatter      m_chatter;    //!< Chattiness
 
     // Protected members
     GObservations m_obs;        //!< Observation container

@@ -68,9 +68,9 @@ The source and background model is defined by the XML file
   <source_library title="source library">
     <source name="Crab" type="PointSource">
       <spectrum type="PowerLaw">
-         <parameter name="Prefactor" scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-         <parameter name="Index"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="Scale"     scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
+         <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
       </spectrum>
       <spatialModel type="SkyDirFunction">
         <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
@@ -78,12 +78,12 @@ The source and background model is defined by the XML file
       </spatialModel>
     </source>
     <source name="CTABackgroundModel" type="CTAIrfBackground" instrument="CTA">
-      <spectrum type="PowerLaw">  
-        <parameter name="Prefactor" scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="1"/>  
-        <parameter name="Index"     scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>  
-        <parameter name="Scale"     scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>  
+      <spectrum type="PowerLaw">
+        <parameter name="Prefactor"   scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="1"/>
+        <parameter name="Index"       scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>
+        <parameter name="PivotEnergy" scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
       </spectrum>
-    </source>     
+    </source>
   </source_library>
 
 The model consists of a source library that contains two components:
@@ -103,8 +103,8 @@ maximum (``max``) value, and a parameter may be free (``free="1"``) or fixed
 relevant here for the simulations, but they will be important for the model 
 fitting later.
 
-The spectral intensity I(E) (in units of photons/cm2/s/MeV) of the power
-law is given by 
+The spectral intensity I(E) (in units of photons/cm2/s/MeV) of the power law is
+given by
 
 .. math::
     \frac{dN}{dE} = N_0 \left( \frac{E}{E_0} \right)^{\gamma}
@@ -113,7 +113,7 @@ where the parameters in the XML definition have the following mappings:
 
 * :math:`N_0` = ``Prefactor``
 * :math:`\gamma` = ``Index``
-* :math:`E_0` = ``Scale``
+* :math:`E_0` = ``PivotEnergy``
 
 .. warning::
 

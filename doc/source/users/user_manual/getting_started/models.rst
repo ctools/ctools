@@ -67,11 +67,11 @@ function that is tabulated in an ASCII file.
   <source_library title="source library">
     <source name="Crab" type="PointSource">
       <spectrum type="PowerLaw">
-         <parameter name="Prefactor" scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-         <parameter name="Index"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="Scale"     scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
+         <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
       </spectrum>
-      <spatialModel type="SkyDirFunction">
+      <spatialModel type="PointSource">
         <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
         <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
       </spatialModel>
@@ -118,16 +118,14 @@ term will be appended to each ``<parameter>`` tag.
    parameters so that the effective parameters to be optimised (the ``value`` terms) 
    are all of about unity.
 
-.. warning::
+.. note::
 
-   The syntax of the model definition XML file has been adopted from the 
-   syntax used by the Fermi/LAT ScienceTools.
-   This should allow for exchange of model definition files between ctools 
-   and the Fermi/LAT ScienceTools.
-   Note, however, that ctools implements a number of extensions with 
-   respect to the Fermi/LAT ScienceTools syntax, hence eventually minor 
-   manual adjustments may be needed to use ctools XML files for 
-   Fermi/LAT analyses.
+   The syntax of the model definition XML file has been inspired from the
+   syntax used by the Fermi/LAT ScienceTools, but for reasons of clarity and
+   homogenity of the various model and parameter names we have made some
+   modifications.
+   Nevertheless, the exact format used by the Fermi/LAT ScienceTools is also
+   supported.
 
 
 .. _sec_spatial_models:
@@ -144,7 +142,7 @@ Point source
   .. code-block:: xml
 
     <source name="Crab" type="PointSource">
-      <spatialModel type="SkyDirFunction">
+      <spatialModel type="PointSource">
         <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
         <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
       </spatialModel>
@@ -153,6 +151,11 @@ Point source
       </spectrum>
     </source>
 
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the model type
+    ``PointSource`` can be replaced by ``SkyDirFunction``.
+
 
 Radial source
 ^^^^^^^^^^^^^
@@ -160,7 +163,7 @@ Radial source
   .. code-block:: xml
 
     <source name="Crab" type="ExtendedSource">
-      <spatialModel type="DiskFunction">
+      <spatialModel type="RadialDisk">
         <parameter name="RA"     scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
         <parameter name="DEC"    scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
         <parameter name="Radius" scale="1.0" value="0.20"    min="0.01" max="10"  free="1"/>
@@ -173,7 +176,7 @@ Radial source
   .. code-block:: xml
 
     <source name="Crab" type="ExtendedSource">
-      <spatialModel type="GaussFunction">
+      <spatialModel type="RadialGaussian">
         <parameter name="RA"    scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
         <parameter name="DEC"   scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
         <parameter name="Sigma" scale="1.0" value="0.20"    min="0.01" max="10"  free="1"/>
@@ -186,7 +189,7 @@ Radial source
   .. code-block:: xml
 
     <source name="Crab" type="ExtendedSource">
-      <spatialModel type="ShellFunction">
+      <spatialModel type="RadialShell">
         <parameter name="RA"     scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
         <parameter name="DEC"    scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
         <parameter name="Radius" scale="1.0" value="0.30"    min="0.01" max="10"  free="1"/>
@@ -219,7 +222,7 @@ Elliptical source
   .. code-block:: xml
 
     <source name="Crab" type="ExtendedSource">
-      <spatialModel type="EllipticalGauss">
+      <spatialModel type="EllipticalGaussian">
         <parameter name="RA"          scale="1.0" value="83.6331" min="-360"  max="360" free="1"/>
         <parameter name="DEC"         scale="1.0" value="22.0145" min="-90"   max="90"  free="1"/>
         <parameter name="PA"          scale="1.0" value="45.0"    min="-360"  max="360" free="1"/>
@@ -238,7 +241,7 @@ Diffuse source
   .. code-block:: xml
 
     <source name="Crab" type="DiffuseSource">
-      <spatialModel type="ConstantValue">
+      <spatialModel type="DiffuseIsotropic">
          <parameter name="Value" scale="1" value="1" min="1"  max="1" free="0"/>
       </spatialModel>
       <spectrum type="...">
@@ -246,27 +249,44 @@ Diffuse source
       </spectrum>
     </source>
 
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the model type
+    ``DiffuseIsotropic`` can be replaced by ``ConstantValue``.
+
   .. code-block:: xml
 
     <source name="Crab" type="DiffuseSource">
-      <spatialModel type="SpatialMap" file="map.fits">
-         <parameter name="Prefactor" scale="1" value="1" min="0.001" max="1000.0" free="0"/>
+      <spatialModel type="DiffuseMap" file="map.fits">
+         <parameter name="Normalization" scale="1" value="1" min="0.001" max="1000.0" free="0"/>
       </spatialModel>
       <spectrum type="...">
         ...
       </spectrum>
     </source>
 
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the model type
+    ``DiffuseMap`` can be replaced by ``SpatialMap`` and the parameter
+    ``Normalization`` can be replaced by ``Prefactor``.
+
   .. code-block:: xml
 
     <source name="Crab" type="DiffuseSource">
-      <spatialModel type="MapCubeFunction" file="map_cube.fits">
+      <spatialModel type="DiffuseMapCube" file="map_cube.fits">
         <parameter name="Normalization" scale="1" value="1" min="0.001" max="1000.0" free="0"/>
       </spatialModel>
       <spectrum type="...">
         ...
       </spectrum>
     </source>
+
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the model type
+    ``DiffuseMapCube`` can be replaced by ``MapCubeFunction`` and the parameter
+    ``Normalization`` can be replaced by ``Value``.
 
 
 CTA radial background
@@ -351,17 +371,15 @@ in ctools.
 
 .. warning::
 
-   The units of the spectral model depend on the spatial model component.
-   Units quoted below apply to spatial models for a source component.
    Source intensities are generally given in units of
    :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}`.
 
    Exceptions to this rule exist for the following spatial models:
 
-   - ``ConstantValue``: intensity units are given per steradian, e.g.
+   - ``DiffuseIsotropic``: intensity units are given per steradian, e.g.
      :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}\,{\rm sr}^{-1}`
 
-   - ``MapCubeFunction``: intensities are unitless, the spectral model 
+   - ``DiffuseMapCube``: intensities are unitless, the spectral model
      presents a relative scaling of the diffuse model
 
    If spectral models are used for a background model component, intensity 
@@ -383,11 +401,11 @@ Constant
 
   .. code-block:: xml
 
-   <spectrum type="ConstantValue">
+   <spectrum type="Constant">
      <parameter name="Normalization" scale="1e-16" value="5.7" min="1e-07" max="1000.0" free="1"/>
    </spectrum>
 
-  The ``ConstantValue`` model component implements the constant function
+  This spectral model component implements the constant function
 
   .. math::
     \frac{dN}{dE} = N_0
@@ -395,8 +413,13 @@ Constant
   where
 
   * :math:`N_0` = ``Normalization``
-    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1})`
 
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the model type
+    ``Constant`` can be replaced by ``ConstantValue`` and the parameter
+    ``Normalization`` by ``Value``.
 
 
 Power law
@@ -405,12 +428,12 @@ Power law
   .. code-block:: xml
 
    <spectrum type="PowerLaw">
-     <parameter name="Prefactor" scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-     <parameter name="Index"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-     <parameter name="Scale"     scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
+     <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+     <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+     <parameter name="PivotEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
    </spectrum>
 
-  The ``PowerLaw`` model component implements the power law function
+  This spectral model component implements the power law function
 
   .. math::
     \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
@@ -418,28 +441,33 @@ Power law
   where
 
   * :math:`k_0` = ``Prefactor``
-    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1})`
   * :math:`\gamma` = ``Index``
-  * :math:`E_0` = ``Scale``
-    :math:`[{\rm MeV}]`
+  * :math:`E_0` = ``PivotEnergy``
+    :math:`({\rm MeV})`
 
   .. warning::
 
-    The ``Scale`` parameter is not intended to be fitted.
+    The ``PivotEnergy`` parameter is not intended to be fitted.
 
-  An alternative power law function that uses the integral flux as parameter
-  rather than the Prefactor is specified by
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the parameter
+    ``PivotEnergy`` can be replaced by ``Scale``.
+
+  An alternative power law function that uses the integral photon flux as
+  parameter rather than the Prefactor is specified by
 
   .. code-block:: xml
 
-   <spectrum type="PowerLaw2">
-     <parameter scale="1e-07" name="Integral"   min="1e-07" max="1000.0"    value="1.0" free="1"/>
+   <spectrum type="PowerLaw">
+     <parameter scale="1e-07" name="PhotonFlux" min="1e-07" max="1000.0"    value="1.0" free="1"/>
      <parameter scale="1.0"   name="Index"      min="-5.0"  max="+5.0"      value="-2.0" free="1"/>
      <parameter scale="1.0"   name="LowerLimit" min="10.0"  max="1000000.0" value="100.0" free="0"/>
      <parameter scale="1.0"   name="UpperLimit" min="10.0"  max="1000000.0" value="500000.0" free="0"/>
    </spectrum>
 
-  The ``PowerLaw2`` model component implements the power law function
+  This spectral model component implements the power law function
 
   .. math::
     \frac{dN}{dE} = \frac{N(\gamma+1)E^{\gamma}}
@@ -447,21 +475,27 @@ Power law
 
   where
 
-  * :math:`N` = ``Integral``
-    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}]`
+  * :math:`N` = ``PhotonFlux``
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1})`
   * :math:`\gamma` = ``Index``
   * :math:`E_{\rm min}` = ``LowerLimit``
-    :math:`[{\rm MeV}]`
+    :math:`({\rm MeV})`
   * :math:`E_{\rm max}` = ``UpperLimit``
-    :math:`[{\rm MeV}]`
+    :math:`({\rm MeV})`
 
   .. warning::
 
-    The ``LowerLimit`` and ``UpperLimit`` parameters are always treated as fixed and,
-    the flux given by the ``Integral`` parameter is computed over the 
+    The ``LowerLimit`` and ``UpperLimit`` parameters are always treated as fixed
+    and the flux given by the ``PhotonFlux`` parameter is computed over the
     range set by these two parameters.
     Use of this model allows the errors on the integral flux to be evaluated directly
     by :ref:`ctlike`.
+
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the model type
+    ``PowerLaw`` can be replaced by ``PowerLaw2`` and the parameter
+    ``PhotonFlux`` by ``Integral``.
 
 
 Exponentially cut-off power law
@@ -469,33 +503,91 @@ Exponentially cut-off power law
 
   .. code-block:: xml
 
-   <spectrum type="ExpCutoff">
-     <parameter name="Prefactor" scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-     <parameter name="Index"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-     <parameter name="Cutoff"    scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
-     <parameter name="Scale"     scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
+   <spectrum type="ExponentialCutoffPowerLaw">
+     <parameter name="Prefactor"    scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+     <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+     <parameter name="CutoffEnergy" scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
+     <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
    </spectrum>
 
-  The ``ExpCutoff`` model component implements the exponentially cut-off power law function
+  This spectral model component implements the exponentially cut-off power law
+  function
 
   .. math::
     \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
-                    \exp \left( \frac{-E}{\tt E_{\rm cut}} \right)
+                    \exp \left( \frac{-E}{E_{\rm cut}} \right)
 
   where
 
   * :math:`k_0` = ``Prefactor``
-    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1})`
   * :math:`\gamma` = ``Index``
-  * :math:`E_0` = ``Scale``
-    :math:`[{\rm MeV}]`
-  * :math:`E_{\rm cut}` = ``Cutoff``
-    :math:`[{\rm MeV}]`
+  * :math:`E_0` = ``PivotEnergy``
+    :math:`({\rm MeV})`
+  * :math:`E_{\rm cut}` = ``CutoffEnergy``
+    :math:`({\rm MeV})`
 
   .. warning::
 
-    The ``Scale`` parameter is not intended to be fitted.
+    The ``PivotEnergy`` parameter is not intended to be fitted.
 
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the model type
+    ``ExponentialCutoffPowerLaw`` can be replaced by ``ExpCutoff`` and
+    the parameters ``CutoffEnergy`` by ``Cutoff`` and ``PivotEnergy``
+    by ``Scale``.
+
+
+Super exponentially cut-off power law
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  .. code-block:: xml
+
+   <spectrum type="SuperExponentialCutoffPowerLaw">
+    <parameter name="Prefactor"    scale="1e-16" value="1.0" min="1e-07" max="1000.0" free="1"/>
+    <parameter name="Index1"       scale="-1"    value="2.0" min="0.0"   max="+5.0"   free="1"/>
+    <parameter name="CutoffEnergy" scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="1"/>
+    <parameter name="Index2"       scale="1.0"   value="1.5" min="0.1"   max="5.0"    free="1"/>
+    <parameter name="PivotEnergy"  scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="0"/>
+   </spectrum>
+
+  This spectral model component implements the super exponentially cut-off power
+  law function
+
+  .. math::
+    \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
+                    \exp \left( 
+                      -\left( \frac{E}{E_{\rm cut}} \right)^{\alpha}
+                    \right)
+
+  where
+
+  * :math:`k_0` = ``Prefactor``
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1})`
+  * :math:`\gamma` = ``Index1``
+  * :math:`\alpha` = ``Index2``
+  * :math:`E_0` = ``PivotEnergy``
+    :math:`({\rm MeV})`
+  * :math:`E_{\rm cut}` = ``CutoffEnergy``
+    :math:`({\rm MeV})`
+
+  .. warning::
+
+    The ``PivotEnergy`` parameter is not intended to be fitted.
+
+  An alternative XML format is supported for compatibility with the Fermi/LAT
+  XML format:
+
+  .. code-block:: xml
+
+   <spectrum type="PLSuperExpCutoff">
+    <parameter name="Prefactor"   scale="1e-16" value="1.0" min="1e-07" max="1000.0" free="1"/>
+    <parameter name="Index1"      scale="-1"    value="2.0" min="0.0"   max="+5.0"   free="1"/>
+    <parameter name="Cutoff"      scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="1"/>
+    <parameter name="Index2"      scale="1.0"   value="1.5" min="0.1"   max="5.0"    free="1"/>
+    <parameter name="Scale"       scale="1e6"   value="1.0" min="0.01"  max="1000.0" free="0"/>
+   </spectrum>
 
 
 Broken power law
@@ -504,13 +596,13 @@ Broken power law
   .. code-block:: xml
 
    <spectrum type="BrokenPowerLaw">
-     <parameter name="Prefactor"  scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
-     <parameter name="Index1"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-     <parameter name="BreakValue" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="1"/>
-     <parameter name="Index2"     scale="-1"    value="2.70" min="0.01"  max="1000.0" free="1"/>
+     <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+     <parameter name="Index1"      scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+     <parameter name="BreakEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="1"/>
+     <parameter name="Index2"      scale="-1"    value="2.70" min="0.01"  max="1000.0" free="1"/>
    </spectrum>
 
-  The ``BrokenPowerLaw`` model component implements the broken power law function
+  This spectral model component implements the broken power law function
 
   .. math::
 
@@ -524,17 +616,22 @@ Broken power law
   where
 
   * :math:`k_0` = ``Prefactor``
-    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1})`
   * :math:`\gamma_1` = ``Index1``
   * :math:`\gamma_2` = ``Index2``
-  * :math:`E_b` = ``BreakValue``
-    :math:`[{\rm MeV}]`
+  * :math:`E_b` = ``BreakEnergy``
+    :math:`({\rm MeV})`
 
   .. warning::
 
-    Note that the ``BreakValue`` parameter may be poorly constrained if 
+    Note that the ``BreakEnergy`` parameter may be poorly constrained if
     there is no clear spectral cut-off in the spectrum.
     This model may lead to complications in the maximum likelihood fitting.
+
+  .. note::
+
+    For compatibility with the Fermi/LAT ScienceTools the parameters
+    ``BreakEnergy`` can be replaced by ``BreakValue``.
 
 
 Log parabola
@@ -543,13 +640,13 @@ Log parabola
   .. code-block:: xml
 
    <spectrum type="LogParabola">
-     <parameter name="Prefactor" scale="1e-17" value="5.878"   min="1e-07" max="1000.0" free="1"/>
-     <parameter name="Index"     scale="-1"    value="2.32473" min="0.0"   max="+5.0"   free="1"/>
-     <parameter name="Curvature" scale="-1"    value="0.074"   min="-5.0"  max="+5.0"   free="1"/>
-     <parameter name="Scale"     scale="1e6"   value="1.0"     min="0.01"  max="1000.0" free="0"/>
+     <parameter name="Prefactor"   scale="1e-17" value="5.878"   min="1e-07" max="1000.0" free="1"/>
+     <parameter name="Index"       scale="-1"    value="2.32473" min="0.0"   max="+5.0"   free="1"/>
+     <parameter name="Curvature"   scale="-1"    value="0.074"   min="-5.0"  max="+5.0"   free="1"/>
+     <parameter name="PivotEnergy" scale="1e6"   value="1.0"     min="0.01"  max="1000.0" free="0"/>
    </spectrum>
 
-  The ``LogParabola`` model component implements the log parabola function
+  This spectral model component implements the log parabola function
 
   .. math::
     \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma+\eta \ln(E/E_0)}
@@ -557,25 +654,26 @@ Log parabola
   where
 
   * :math:`k_0` = ``Prefactor``
-    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1})`
   * :math:`\gamma` = ``Index``
   * :math:`\eta` = ``Curvature``
-  * :math:`E_0` = ``Scale``
-    :math:`[{\rm MeV}]`
+  * :math:`E_0` = ``PivotEnergy``
+    :math:`({\rm MeV})`
 
   .. warning::
 
-    The ``Scale`` parameter is not intended to be fitted.
+    The ``PivotEnergy`` parameter is not intended to be fitted.
 
-  An alternative XML format is supported for compatibility with the Fermi/LAT XML format:
+  An alternative XML format is supported for compatibility with the Fermi/LAT
+  XML format:
 
   .. code-block:: xml
 
    <spectrum type="LogParabola">
-     <parameter name="Prefactor" scale="1e-17" value="5.878"   min="1e-07" max="1000.0" free="1"/>
-     <parameter name="alpha"     scale="1"     value="2.32473" min="0.0"   max="+5.0"   free="1"/>
-     <parameter name="beta"      scale="1"     value="0.074"   min="-5.0"  max="+5.0"   free="1"/>
-     <parameter name="Scale"     scale="1e6"   value="1.0"     min="0.01"  max="1000.0" free="0"/>
+     <parameter name="norm"  scale="1e-17" value="5.878"   min="1e-07" max="1000.0" free="1"/>
+     <parameter name="alpha" scale="1"     value="2.32473" min="0.0"   max="+5.0"   free="1"/>
+     <parameter name="beta"  scale="1"     value="0.074"   min="-5.0"  max="+5.0"   free="1"/>
+     <parameter name="Eb"    scale="1e6"   value="1.0"     min="0.01"  max="1000.0" free="0"/>
    </spectrum>
 
   where
@@ -595,7 +693,7 @@ Gaussian
      <parameter name="Sigma"         scale="1e6"   value="1.0"  min="0.01"  max="100.0"  free="1"/>
    </spectrum>
 
-  The ``Gaussian`` model component implements the gaussian function
+  This spectral model component implements the gaussian function
 
   .. math::
     \frac{dN}{dE} = \frac{N_0}{\sqrt{2\pi}\sigma}
@@ -604,11 +702,11 @@ Gaussian
   where
 
   * :math:`N_0` = ``Normalization``
-    :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}]`
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1})`
   * :math:`\bar{E}` = ``Mean``
-    :math:`[{\rm MeV}]`
+    :math:`({\rm MeV})`
   * :math:`\sigma` = ``Sigma``
-    :math:`[{\rm MeV}]`
+    :math:`({\rm MeV})`
 
 
 File function
@@ -620,14 +718,14 @@ File function
      <parameter scale="1.0" name="Normalization" min="0.0" max="1000.0" value="1.0" free="1"/>
    </spectrum>
 
-  The ``FileFunction`` model component implements an arbitrary function 
+  This spectral model component implements an arbitrary function
   that is defined by intensity values at specific energies.
   The energy and intensity values are defined using an ASCII file with
   columns of energy and differential flux values.
   Energies are given in units of
-  :math:`[{\rm MeV}]`,
+  :math:`{\rm MeV}`,
   intensities are given in units of
-  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`.
+  :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}`.
   The only parameter is a multiplicative normalization:
 
   .. math::
@@ -639,9 +737,10 @@ File function
 
   .. warning::
 
-    If the file name is given as relative path, the path is relative to the
-    working directory where the ctool has been launched.
-    Alternatively, an absolute path may be specified.
+    If the file name is given without a path it is expected that the file
+    resides in the same directory than the XML file.
+    If the file resides in a different directory, an absolute path name should
+    be specified.
     Any environment variable present in the path name will be expanded.
 
 
@@ -661,13 +760,13 @@ Node function
      </node>
    </spectrum>
 
-  The ``NodeFunction`` model component implements a generalised broken 
+  This spectral model component implements a generalised broken 
   power law which is defined by a set of energy and intensity values
   (the so called nodes) that are piecewise connected by power laws.
   Energies are given in units of
-  :math:`[{\rm MeV}]`,
+  :math:`{\rm MeV}`,
   intensities are given in units of
-  :math:`[{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}]`.
+  :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}`.
 
   .. warning::
 

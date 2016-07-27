@@ -69,12 +69,15 @@ protected:
     void copy_members(const ctbkgcube& app);
     void free_members(void);
     void get_parameters(void);
-    void fill_cube(GCTAObservation* obs);
+    void init_cube(void);
+    //void fill_cube(GCTAObservation* obs);
 
     // User parameters
     GFilename          m_outcube;     //!< Filename of output cube
     GFilename          m_outmodel;    //!< Filename of output XML model
+    bool               m_addbounds;   //!< Add energies at boundaries?
     bool               m_publish;     //!< Publish background cube?
+    GChatter           m_chatter;     //!< Chattiness
 
     // Protected members
     GObservations      m_obs;         //!< Observation container

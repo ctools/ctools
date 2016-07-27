@@ -13,7 +13,7 @@ bugs.
 Releases
 --------
 
-The latest ctools release is ``ctools-1.1.0`` (1 July 2016).
+The latest ctools release is ``ctools-1.1.0`` (24 July 2016).
 
 Below a table of ctools releases. Please note that at this stage of the
 project there is a strict link between the ctools and gammalib versions.

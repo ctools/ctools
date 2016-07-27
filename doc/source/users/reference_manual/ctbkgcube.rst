@@ -25,10 +25,14 @@ cube as ``incube`` parameter. This will instruct ctbkgcube to extract the
 background cube definition (such as sky coordinates and projection, number 
 of pixels, pixel scale, energy binning) from the counts cube.
 
+Note that there should at least be 25 bins per energy decade in the background
+cube to assure that the energy dependence of the background rate is sufficiently
+well sampled (in particular at low energies).
+
 ctbkgcube generates a background cube FITS file comprising two extensions.
 The primary extension contains a 3-dimensional image that contains the 
-background cube values. The next extension named ``EBOUNDS`` contains a
-binary table that defines the energy boundaries of the background cube.
+background cube values. The next extension named ``ENERGIES`` contains a
+binary table that defines the energies of the background cube.
 
 ctbkgcube generates also an output model XML file that can serve as input 
 for a maximum likelihood analysis. The output model XML file is a copy of
@@ -82,7 +86,10 @@ General parameters
  	 	 
 ``ebinfile [file]``
     Name of the file containing the energy bin definition.
- 	 	 
+
+``(addbounds = yes) [boolean]``
+    Add energies to the background cube at the observation energy boundaries?
+
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?
  	 	 

@@ -229,31 +229,31 @@ Model definition XML file
 	<source_library title="source library">
 	  <source name="bkg_11111" type="CTAIrfBackground" instrument="HESS" id="11111">
 	    <spectrum type="ConstantValue">
-	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	      <parameter name="Normalization" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
 	    </spectrum>
 	  </source>
 	  <source name="bkg_11112" type="CTAIrfBackground" instrument="HESS" id="11112">
 	    <spectrum type="ConstantValue">
-	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	      <parameter name="Normalization" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
 	    </spectrum>
 	  </source>
 	  <source name="bkg_11113" type="CTAIrfBackground" instrument="HESS" id="11113">
 	    <spectrum type="ConstantValue">
-	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	      <parameter name="Normalization" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
 	    </spectrum>
 	  </source>
 	  <source name="bkg_11114" type="CTAIrfBackground" instrument="HESS" id="11114">
 	    <spectrum type="ConstantValue">
-	      <parameter name="Value" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	      <parameter name="Normalization" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
 	    </spectrum>
 	  </source>
 	    <source name="Crab" type="PointSource">
 	    <spectrum type="PowerLaw">
-	       <parameter name="Prefactor" scale="1e-17" value="3.0"  min="1e-07" max="1000.0" free="1"/>
-	       <parameter name="Index"     scale="-1"    value="2.5" min="0.0"   max="+5.0"   free="1"/>
-	       <parameter name="Scale"     scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="0"/>
+	       <parameter name="Prefactor"   scale="1e-17" value="3.0"  min="1e-07" max="1000.0" free="1"/>
+	       <parameter name="Index"       scale="-1"    value="2.5" min="0.0"   max="+5.0"   free="1"/>
+	       <parameter name="PivotEnergy" scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="0"/>
 	    </spectrum>
-	    <spatialModel type="SkyDirFunction">
+	    <spatialModel type="PointSource">
 	      <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
 	      <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
 	    </spatialModel>
@@ -514,18 +514,18 @@ The output model of :ref:`ctbkgcube` looks the following:
 	<source_library title="source library">
 	  <source name="BackgroundModel" type="CTACubeBackground" instrument="CTA,HESS,MAGIC,VERITAS">
 	    <spectrum type="PowerLaw">
-	      <parameter name="Prefactor" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
-	      <parameter name="Index" value="0" error="0" scale="1" min="-5" max="5" free="1" />
-	      <parameter name="Scale" value="1" scale="1e+06" free="0" />
+	      <parameter name="Prefactor"   value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+	      <parameter name="Index"       value="0" error="0" scale="1" min="-5" max="5" free="1" />
+	      <parameter name="PivotEnergy" value="1" scale="1e+06" free="0" />
 	    </spectrum>
 	  </source>
 	  <source name="Crab" type="PointSource">
 	    <spectrum type="PowerLaw">
-	       <parameter name="Prefactor" scale="1e-17" value="3.0"  min="1e-07" max="1000.0" free="1"/>
-	       <parameter name="Index"     scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-	       <parameter name="Scale"     scale="1e6"   value="1."  min="0.01"  max="1000.0" free="0"/>
+	       <parameter name="Prefactor"   scale="1e-17" value="3.0"  min="1e-07" max="1000.0" free="1"/>
+	       <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+	       <parameter name="PivotEnergy" scale="1e6"   value="1."  min="0.01"  max="1000.0" free="0"/>
 	    </spectrum>
-	    <spatialModel type="SkyDirFunction">
+	    <spatialModel type="PointSource">
 	      <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
 	      <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
 	    </spatialModel>

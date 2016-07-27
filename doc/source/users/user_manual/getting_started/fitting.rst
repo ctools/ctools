@@ -42,7 +42,7 @@ Below we show the XML result file that has been produced by the run:
       <spectrum type="PowerLaw">
         <parameter name="Prefactor" value="5.79064" error="0.101828" scale="1e-16" min="1e-07" max="1000" free="1" />
         <parameter name="Index" value="2.47177" error="0.0154935" scale="-1" min="0" max="5" free="1" />
-        <parameter name="Scale" value="0.3" scale="1e+06" min="0.01" max="1000" free="0" />
+        <parameter name="PivotEnergy" value="0.3" scale="1e+06" min="0.01" max="1000" free="0" />
       </spectrum>
       <spatialModel type="SkyDirFunction">
         <parameter name="RA" value="83.6331" scale="1" min="-360" max="360" free="0" />
@@ -53,7 +53,7 @@ Below we show the XML result file that has been produced by the run:
       <spectrum type="PowerLaw">
         <parameter name="Prefactor" value="1.01642" error="0.0162226" scale="1" min="0.001" max="1000" free="1" />
         <parameter name="Index" value="0.00462945" error="0.00964737" scale="1" min="-5" max="5" free="1" />
-        <parameter name="Scale" value="1" scale="1e+06" min="0.01" max="1000" free="0" />
+        <parameter name="PivotEnergy" value="1" scale="1e+06" min="0.01" max="1000" free="0" />
       </spectrum>
     </source>
   </source_library>
@@ -112,7 +112,7 @@ this run:
   2016-06-29T16:11:08:  Instrument scale factors ..: unity
   2016-06-29T16:11:08:  Observation identifiers ...: all
   2016-06-29T16:11:08:  Model type ................: PointSource
-  2016-06-29T16:11:08:  Model components ..........: "SkyDirFunction" * "PowerLaw" * "Constant"
+  2016-06-29T16:11:08:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
   2016-06-29T16:11:08:  Number of parameters ......: 6
   2016-06-29T16:11:08:  Number of spatial par's ...: 2
   2016-06-29T16:11:08:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)

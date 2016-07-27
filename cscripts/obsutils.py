@@ -24,45 +24,57 @@ import ctools
 # ===================== #
 # Simulate observations #
 # ===================== #
-def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
-        binsz=0.05, npix=200, proj="TAN", coord="GAL"):
+def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
+        emin=None, emax=None, nbins=0,
+        binsz=0.05, npix=200, proj='TAN', coord='GAL'):
     """
-    Simulate events for all observations in the container.
+    Simulate events for all observations in the container
 
-    Args:
-        obs: Observation container without events
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container without events
+    log : bool, optional
+        Create log file(s)
+    debug : bool, optional
+        Create console dump?
+    chatter : int, optional
+        Chatter level
+    edisp : bool, optional
+        Apply energy dispersion?
+    seed : int, integer
+        Seed value for simulations
+    emin : float, optional
+        Minimum energy of counts cube for binned (TeV)
+    emax : float, optional
+        Maximum energy of counts cube for binned (TeV)
+    nbins : int, optional
+        Number of energy bins (0=unbinned)
+    binsz : float, optional
+        Pixel size for binned simulation (deg/pixel)
+    npix : int, optional
+        Number of pixels in X and Y for binned simulation
+    proj : str, optional
+        Projection for binned simulation
+    coord : str, optional
+        Coordinate system for binned simulation
 
-    Kwargs:
-        log:     Create log file(s)
-        debug:   Create console dump?
-        chatter: Chatter level
-        edisp:   Apply energy dispersion?
-        seed:    Seed value for simulations (default: 0)
-        nbins:   Number of energy bins (default: 0=unbinned)
-        binsz:   Pixel size for binned simulation (deg/pixel)
-        npix:    Number of pixels in X and Y for binned simulation
-        proj:    Projection for binned simulation
-        coord:   Coordinate system for binned simulation
-
-    Returns:
-        Observation container, filled with simulated events.
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container filled with simulated events
     """
 
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
-    sim["seed"]  = seed
-    sim["edisp"] = edisp
+    sim['seed']    = seed
+    sim['edisp']   = edisp
+    sim['chatter'] = chatter
+    sim['debug']   = debug
 
     # Optionally open the log file
     if log:
         sim.logFileOpen()
-
-    # Optionally switch-on debugging model
-    if debug:
-        sim["debug"] = True
-
-    # Set chatter level
-    sim["chatter"] = chatter
 
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
@@ -73,44 +85,41 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0, nbins=0,
     # Binned option?
     if nbins > 0:
 
-        # Determine common energy boundaries for observations
-        emin = None
-        emax = None
-        for run in sim.obs():
-            run_emin = run.events().ebounds().emin().TeV()
-            run_emax = run.events().ebounds().emax().TeV()
-            if emin == None:
-                emin = run_emin
-            elif run_emin > emin:
-                emin = run_emin
-            if emax == None:
-                emax = run_emax
-            elif run_emax > emax:
-                emax = run_emax
+        # If energy boundaries are not given then determine common energy
+        # boundaries for all observations
+        if emin == None or emax == None:
+            emin = None
+            emax = None
+            for run in sim.obs():
+                run_emin = run.events().ebounds().emin().TeV()
+                run_emax = run.events().ebounds().emax().TeV()
+                if emin == None:
+                    emin = run_emin
+                elif run_emin > emin:
+                    emin = run_emin
+                if emax == None:
+                    emax = run_emax
+                elif run_emax > emax:
+                    emax = run_emax
 
         # Allocate ctbin application and set parameters
         bin = ctools.ctbin(sim.obs())
-        bin["ebinalg"]  = "LOG"
-        bin["emin"]     = emin
-        bin["emax"]     = emax
-        bin["enumbins"] = nbins
-        bin["usepnt"]   = True # Use pointing for map centre
-        bin["nxpix"]    = npix
-        bin["nypix"]    = npix
-        bin["binsz"]    = binsz
-        bin["coordsys"] = coord
-        bin["proj"]     = proj
+        bin['ebinalg']  = 'LOG'
+        bin['emin']     = emin
+        bin['emax']     = emax
+        bin['enumbins'] = nbins
+        bin['usepnt']   = True # Use pointing for map centre
+        bin['nxpix']    = npix
+        bin['nypix']    = npix
+        bin['binsz']    = binsz
+        bin['coordsys'] = coord
+        bin['proj']     = proj
+        bin['chatter']  = chatter
+        bin['debug']    = debug
 
         # Optionally open the log file
         if log:
             bin.logFileOpen()
-
-        # Optionally switch-on debugging model
-        if debug:
-            bin["debug"] = True
-
-        # Set chatter level
-        bin["chatter"] = chatter
 
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps

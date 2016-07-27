@@ -230,13 +230,8 @@ void ctlike::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
+        log.header1(gammalib::number("Observation",m_obs.size()));
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Optimize model parameters using LM optimizer
@@ -311,7 +306,7 @@ void ctlike::run(void)
     if (logTerse()) {
         log << std::endl;
         log.header1("Maximum likelihood optimisation results");
-        log << *m_opt << std::endl;
+        log << m_opt->print(m_chatter) << std::endl;
         log << gammalib::parformat("Maximum log likelihood");
         log << gammalib::str(m_logL,3) << std::endl;
         log << gammalib::parformat("Observed events  (Nobs)");
@@ -321,7 +316,7 @@ void ctlike::run(void)
         log << " (Nobs - Npred = ";
         log << gammalib::str(num_events-npred);
         log << ")" << std::endl;
-        log << m_obs.models() << std::endl;
+        log << m_obs.models().print(m_chatter) << std::endl;
     }
 
     // Restore energy dispersion flag for all CTA observations
@@ -430,6 +425,7 @@ void ctlike::get_parameters(void)
     m_refit           = (*this)["refit"].boolean();
     m_apply_edisp     = (*this)["edisp"].boolean();
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
+    m_chatter         = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -592,6 +588,7 @@ void ctlike::init_members(void)
     m_opt             = NULL;
     m_apply_edisp     = false;
     m_fix_spat_for_ts = false;
+    m_chatter         = static_cast<GChatter>(2);
 
     // Set logger properties
     log.date(true);
@@ -628,6 +625,7 @@ void ctlike::copy_members(const ctlike& app)
     m_opt             = app.m_opt->clone();
     m_apply_edisp     = app.m_apply_edisp;
     m_fix_spat_for_ts = app.m_fix_spat_for_ts;
+    m_chatter         = app.m_chatter;
 
     // Return
     return;

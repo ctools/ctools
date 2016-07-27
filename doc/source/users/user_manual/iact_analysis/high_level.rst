@@ -3,7 +3,8 @@
 High level analysis tools for IACT data
 =======================================
 
-This section describes and explains how to create high level output. The following tools are explained:
+This section describes and explains how to create high level output. The
+following scripts and tools are explained:
 
 * :ref:`csobsinfo` (inspect and observation XML files)
 * :ref:`csmodelinfo` (inspect model XML files)
@@ -16,9 +17,10 @@ This section describes and explains how to create high level output. The followi
 
 Inspecting observation definition files
 ---------------------------------------
-After having created an observation definition file, the user might want to know a summary of its content.
-Important quantities usually are the number of observations, the total livetime, or the mean zenith angle.
-For this purpose, :ref:`csobsinfo` inspects an observation XML container for its content.
+After having created an observation definition file, the user might want to
+know a summary of its content. Important quantities usually are the number of
+observations, the total livetime, or the mean zenith angle. For this purpose,
+:ref:`csobsinfo` inspects an observation XML container for its content.
 
 .. code-block:: bash
 

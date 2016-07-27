@@ -77,6 +77,7 @@ protected:
     GFilename     m_outmodel;        //!< Source model output XML file name
     bool          m_apply_edisp;     //!< Apply energy dispersion?
     bool          m_fix_spat_for_ts; //!< Fix spatial parameters for TS computation?
+    GChatter      m_chatter;         //!< Chattiness
 
     // Members
     GObservations m_obs;        //!< Observations

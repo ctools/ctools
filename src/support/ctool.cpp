@@ -1303,6 +1303,81 @@ std::string ctool::get_obs_header(const GObservation* obs)
 
 
 /***********************************************************************//**
+ * @brief Insert observation energy boundaries into list of energies
+ *
+ * @param[in] energies Energies.
+ * @param[in] obs Observation container.
+ * @return Energies.
+ ***************************************************************************/
+GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
+                                          const GCTAObservation& obs,
+                                          GLog*                  log) const
+{
+    // Create copy of input energies
+    GEnergies engs = energies;
+
+    // Get the energy boundaries of the event list
+    GEbounds ebounds = obs.ebounds();
+
+    // Loop over all boundary energies
+    for (int iebin = 0; iebin <= ebounds.size(); ++iebin) {
+
+        // Get boundary energy
+        GEnergy energy;
+        if (iebin < ebounds.size()) {
+            energy = ebounds.emin(iebin);
+        }
+        else {
+            energy = ebounds.emax();
+        }
+
+        // Get index before which the energy should be appended
+        bool insert = true;
+        int  index  = -1;
+        for (int k = 0; k < engs.size(); ++k) {
+        
+            // If energy exists already then skip the boundary and examine the
+            // next one. We consider here 1 MeV as being sufficiently close.
+            if (std::abs(engs[k].MeV()-energy.MeV()) < 1.0) {
+                insert = false;
+                break;
+            }
+        
+            // If energy is above the boundary energy we found the index
+            if (engs[k] > energy) {
+                index = k;
+                break;
+            }
+
+        } // endfor: search index for insertion
+
+        // Insert energy if requested
+        if (insert) {
+
+            // Insert or append energy
+            if (index != -1) {
+                engs.insert(index, energy);
+            }
+            else {
+                engs.append(energy);
+            }
+
+            // Log energy insertion
+            if (log != NULL) {
+                *log << gammalib::parformat("Insert energy");
+                *log << energy.print() << std::endl;
+            }
+
+        } // endif: energy insertion requested
+
+    } // endfor: looped over all energy boundaries
+
+    // Return energies
+    return engs;
+}
+
+
+/***********************************************************************//**
  * @brief Dumps help text in the console
  ***************************************************************************/
 void ctool::provide_help(void) const

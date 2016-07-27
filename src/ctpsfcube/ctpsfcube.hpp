@@ -67,9 +67,12 @@ protected:
     void copy_members(const ctpsfcube& app);
     void free_members(void);
     void get_parameters(void);
+    void init_cube(void);
 
     // User parameters
-    GFilename     m_outcube;     //!< Output PSF cube file name
+    GFilename m_outcube;         //!< Output PSF cube file name
+    bool      m_addbounds;       //!< Add energies at boundaries?
+    GChatter  m_chatter;         //!< Chattiness
 
     // Protected members
     GObservations m_obs;         //!< Observation container

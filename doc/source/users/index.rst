@@ -10,4 +10,5 @@ User Documentation
    reference_manual/index
    faq
    issues
+   release_history/index
    help

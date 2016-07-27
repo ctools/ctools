@@ -1,8 +1,11 @@
-2016-07-09  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-07-24  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
 
         * Version 1.1.0 released
         ========================
 
+        Adapt to new spatial (#1818) and spectral model names (#1821)
+        Fix stacked analysis bias (#1819)
+        Add background model science verification (#1815)
         Add cstsmapsplit script (#1797)
         Add unit tests for all example scripts
         Handle zero parameter errors in ctulimit (#1795)

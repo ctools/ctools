@@ -20,7 +20,7 @@ that has been used in the generation of the counts cube using :doc:`ctbin`.
 
 The binning of an exposure cube does not need to correspond to the binning
 of a counts cube, as exposure values will in any case be determined by linear
-interpolation. For the user's convenience, howver, the counts cube can be
+interpolation. For the user's convenience, however, the counts cube can be
 specified as ``incube`` parameter which will instruct ctexpcube to extract
 the exposure cube definition (such as sky coordinates and projection, number
 of pixels, pixel scale, energy binning) from the counts cube. Note, however,
@@ -32,13 +32,16 @@ due to the point spread function and energy dispersion. By computing the
 exposure cube on the same grid as the counts cube, the spill over of events
 from sources at the edge of cube will not be handled correctly.
 
+Note that there should at least be 25 bins per energy decade in the exposure
+cube to assure that the energy dependence of the exposure is sufficiently
+well sampled (in particular at low energies).
+
 ctexpcube generates an exposure cube FITS file comprising three extensions.
 The primary extension contains a 3-dimensional image that contains the 
-exposure values. The next extension named ``EBOUNDS`` contains a binary table
-that defines the energy boundaries of the exposure cube. The last extension
-named ``GTI`` contains a binary table that provides the Good Time Intervals
-of all observations that have been used for the computation of the exposure
-cube.
+exposure values. The next extension named ``ENERGIES`` contains a binary table
+that defines the energies of the exposure cube. The last extension named ``GTI``
+contains a binary table that provides the Good Time Intervals of all
+observations that have been used for the computation of the exposure cube.
 
 
 General parameters
@@ -73,7 +76,10 @@ General parameters
  	 	 
 ``ebinfile [file]``
     Name of the file containing the energy bin definition.
- 	 	 
+
+``(addbounds = yes) [boolean]``
+    Add energies to the exposure cube at the observation energy boundaries?
+
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for cube centre instead of xref/yref parameters?
  	 	 

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.1.0
 
-9 July 2016
+24 July 2016
 
 
 Introduction
@@ -94,11 +94,10 @@ Observatory interoperable tools (e.g. Aladin).
 
 The tool now computes the counts cube weights according to the overlaps
 between the Region of Interests and energy boundaries with the counts
-cube bins. This allows in particular for a proper handling of different
-energy thresholds between observations that will be stacked into a single
-cube. Also different Region of Interests are now properly handled, and
-there is no longer an issue with counts cubes that are larger than the
-Region of Interest of the event list (#1789).
+cube bins (#1789). Initially an implementation was done taking into account
+the partial overlaps between counts cube bins and the data space selection,
+but this led to a bias that was inherent to the method (#1819). It was
+therefore decided to move back to the original scheme.
 
 
 ctlike - Maximum likelihood fitting
@@ -138,10 +137,16 @@ Virtual Observatory interoperable tools (e.g. Aladin).
 
 Remove "edisp" parameter as this is parameter is not needed (#1724).
 
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
+
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
 Remove "edisp" parameter as this is parameter is not needed (#1724).
+
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
 
 
 ctedispcube - CTA energy dispersion cube generation
@@ -151,11 +156,17 @@ energy dispersion cube holds the migration matrix as function of sky
 direction, true photon energy and the migration value which is the ratio
 of reconstructed over true energy (#1724).
 
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
+
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
 Add publish() method to publish the background cube via a SAMP Hub to
 Virtual Observatory interoperable tools (e.g. Aladin).
+
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
 
 
 ctmapcube - CTA map cube generation

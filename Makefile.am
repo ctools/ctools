@@ -169,18 +169,18 @@ sphinx-install:
 doc: doxygen sphinx
 
 # Non-Automake subdirectories to distribute
-DISTDIRS = doc/html doc/html/images
-dist-hook:
-	( \
-	  builddir=`pwd` ; \
-	  cd $(srcdir) && \
-	  ( \
-	    for dir in $(DISTDIRS) ; do \
-	      find $$dir -depth -print | egrep -v '(~$$)|(/CVS)|(/\.#)|(/\.deps)' \
-		| cpio -pdum $$builddir/$(distdir) 2> /dev/null ; \
-	    done \
-	  ) \
-	)
+#DISTDIRS = doc/html doc/html/images
+#dist-hook:
+#	( \
+#	  builddir=`pwd` ; \
+#	  cd $(srcdir) && \
+#	  ( \
+#	    for dir in $(DISTDIRS) ; do \
+#	      find $$dir -depth -print | egrep -v '(~$$)|(/CVS)|(/\.#)|(/\.deps)' \
+#		| cpio -pdum $$builddir/$(distdir) 2> /dev/null ; \
+#	    done \
+#	  ) \
+#	)
 
 # Add Doxygen rules
 if DX_COND_doc
@@ -312,16 +312,11 @@ DX_CLEANFILES = \
 
 endif #DX_COND_doc
 
-#
-# Additional install rules
-#
-
 # Install HTML files
-#HTMLDIRS = html
-HTMLDIRS =
+HTMLDIRS = html
 HTML_INSTALL_DATA_TARGETS = install-data-html
 install-data-html:
-	$(mkinstalldirs) $(DESTDIR)$(docdir)
+	$(mkinstalldirs) $(DESTDIR)$(docdir)/html/doxygen
 	@for dir in $(HTMLDIRS) ; do \
 	  $(mkinstalldirs) $(DESTDIR)$(docdir)/$$dir && \
 	  for file in $(srcdir)/doc/$$dir/*.* ; do \
@@ -333,6 +328,7 @@ install-data-html:
 # Uninstall HTML files
 HTML_UNINSTALL_DATA_TARGETS = uninstall-data-html
 uninstall-data-html:
+	rm -f $(DESTDIR)$(docdir)/html/doxygen
 	for dir in $(HTMLDIRS) ; do \
 	  rm -f -r $(DESTDIR)$(docdir)/$$dir ; \
 	done

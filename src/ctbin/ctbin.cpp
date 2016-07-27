@@ -33,8 +33,9 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
 #define G_GET_PARAMETERS                            "ctbin::get_parameters()"
+#define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
+#define G_SET_WEIGHTS                  "ctbin::set_weights(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -229,7 +230,7 @@ void ctbin::run(void)
     if (logTerse()) {
         log << std::endl;
         log.header1(gammalib::number("Observation", m_obs.size()));
-        log << m_obs << std::endl;
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Write header
@@ -272,19 +273,13 @@ void ctbin::run(void)
         // Fill the cube
         fill_cube(obs);
 
+        // Set the counts cube weights
+        set_weights(obs);
+
         // Dispose events to free memory
         obs->dispose_events();
 
     } // endfor: looped over observations
-
-    // Normalize weights counts map
-    if (m_livetime > 0.0) {
-        for (int iebin = 0; iebin < m_weights.nmaps(); ++iebin) {
-            for (int index = 0; index < m_weights.npix(); ++index) {
-                m_weights(index, iebin) /= m_livetime;
-            }
-        }
-    }
 
     // Set a single cube in the observation container
     obs_cube();
@@ -293,7 +288,7 @@ void ctbin::run(void)
     if (logTerse()) {
         log << std::endl;
         log.header1(gammalib::number("Binned observation", m_obs.size()));
-        log << m_obs << std::endl;
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Optionally publish counts cube
@@ -397,6 +392,7 @@ void ctbin::init_members(void)
     m_outcube.clear();
     m_usepnt  = false;
     m_publish = false;
+    m_chatter = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_obs.clear();
@@ -423,15 +419,16 @@ void ctbin::copy_members(const ctbin& app)
     m_outcube = app.m_outcube;
     m_usepnt  = app.m_usepnt;
     m_publish = app.m_publish;
+    m_chatter = app.m_chatter;
 
     // Copy protected members
-    m_obs      = app.m_obs;
-    m_counts   = app.m_counts;
-    m_weights  = app.m_weights;
-    m_ebounds  = app.m_ebounds;
-    m_gti      = app.m_gti;
-    m_ontime   = app.m_ontime;
-    m_livetime = app.m_livetime;
+    m_obs       = app.m_obs;
+    m_counts    = app.m_counts;
+    m_weights   = app.m_weights;
+    m_ebounds   = app.m_ebounds;
+    m_gti       = app.m_gti;
+    m_ontime    = app.m_ontime;
+    m_livetime  = app.m_livetime;
 
     // Return
     return;
@@ -484,10 +481,11 @@ void ctbin::get_parameters(void)
     m_weights = m_counts;
 
     // Get energy boundaries
-    m_ebounds  = cube.ebounds();
+    m_ebounds = cube.ebounds();
 
     // Get remaining parameters
     m_publish = (*this)["publish"].boolean();
+    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -523,8 +521,8 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then throw an exception.
-        const GCTAEventList* events =
-              dynamic_cast<const GCTAEventList*>(obs->events());
+        const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+                                      (obs->events());
         if (events == NULL) {
             std::string msg = "CTA Observation does not contain an event "
                               "list. An event list is needed to fill the "
@@ -544,6 +542,9 @@ void ctbin::fill_cube(GCTAObservation* obs)
             throw GException::invalid_value(G_FILL_CUBE, msg);
         }
 
+        // Get counts cube usage flags
+        std::vector<bool> usage = cube_layer_usage(events->ebounds());
+
         // Initialise binning statistics
         int num_outside_roi  = 0;
         int num_outside_map  = 0;
@@ -561,24 +562,27 @@ void ctbin::fill_cube(GCTAObservation* obs)
             GSkyDir      dir   = inst->dir();
             GSkyPixel    pixel = m_counts.dir2pix(dir);
 
-            // Skip if pixel is outside RoI
+            // Skip event if corresponding counts cube pixel is outside RoI
             if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
                 num_outside_roi++;
                 continue;
             }
 
-            // Skip if pixel is out of map range
+            // Skip event if corresponding counts cube pixel is outside the
+            // counts cube map range
             if (pixel.x() < -0.5 || pixel.x() > (m_counts.nx()-0.5) ||
                 pixel.y() < -0.5 || pixel.y() > (m_counts.ny()-0.5)) {
                 num_outside_map++;
                 continue;
             }
 
-            // Determine energy bin
+            // Determine counts cube energy bin
             int iebin = m_ebounds.index(event->energy());
 
-            // Skip if energy bin is outside counts cube boundaries
-            if (iebin == -1) {
+            // Skip event if the corresponding counts cube energy bin is not
+            // fully contained in the event list energy range. This avoids
+            // having partially filled bins.
+            if (!usage[iebin]) {
                 num_outside_ebds++;
                 continue;
             }
@@ -587,21 +591,10 @@ void ctbin::fill_cube(GCTAObservation* obs)
             m_counts(pixel, iebin) += 1.0;
             num_in_map++;
 
+            // Signal that bin was filled
+            m_weights(pixel, iebin) = 1.0;
+
         } // endfor: looped over all events
-
-        // Get RoI and energy weights
-        GSkyMap             roi_weights    = set_roi_weights(roi);
-        std::vector<double> energy_weights = set_energy_weights(events->ebounds());
-
-        // Add weights multiplied by livetime to weight map. The map is later
-        // divided by the cumulative livetime in run().
-        for (int iebin = 0; iebin < energy_weights.size(); ++iebin) {
-            for (int index = 0; index < roi_weights.npix(); ++index) {
-                m_weights(index, iebin) += roi_weights(index) *
-                                           energy_weights[iebin] *
-                                           obs->livetime();
-            }
-        }
 
         // Append GTIs
         m_gti.extend(events->gti());
@@ -626,9 +619,82 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
         // Log cube
         if (logExplicit()) {
-            log.header1("Counts cube");
             log << m_counts << std::endl;
         }
+
+    } // endif: observation was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set counts cube weights for a given observation
+ *
+ * @param[in] obs CTA observation.
+ *
+ * @exception GException::invalid_value
+ *            No event list or valid RoI found in observation.
+ *
+ * Sets the counts cube weights for all bins that are considered for the
+ * specific observation to unity.
+ ***************************************************************************/
+void ctbin::set_weights(GCTAObservation* obs)
+{
+    // Continue only if observation pointer is valid
+    if (obs != NULL) {
+
+        // Make sure that the observation holds a CTA event list. If this
+        // is not the case then throw an exception.
+        const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+                                      (obs->events());
+        if (events == NULL) {
+            std::string msg = "CTA Observation does not contain an event "
+                              "list. An event list is needed to fill the "
+                              "counts cube.";
+            throw GException::invalid_value(G_SET_WEIGHTS, msg);
+        }
+
+        // Get the RoI
+        const GCTARoi& roi = events->roi();
+
+        // Check for RoI sanity
+        if (!roi.is_valid()) {
+            std::string msg = "No valid RoI found in input observation "
+                              "\""+obs->name()+"\". Run ctselect to specify "
+                              "an RoI for this observation before running "
+                              "ctbin.";
+            throw GException::invalid_value(G_SET_WEIGHTS, msg);
+        }
+
+        // Get counts cube usage flags
+        std::vector<bool> usage = cube_layer_usage(events->ebounds());
+
+        // Loop over all pixels in counts cube
+        for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
+
+            // Get pixel sky direction
+            GSkyDir dir = m_counts.inx2dir(pixel);
+
+            // Skip pixel if it is outside the RoI
+            if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+                continue;
+            }
+
+            // Loop over all energy layers of counts cube
+            for (int iebin = 0; iebin < m_ebounds.size(); ++iebin){
+
+                // Skip energy layer if the usage flag is false
+                if (!usage[iebin]) {
+                    continue;
+                }
+                // Signal that bin was filled
+                m_weights(pixel, iebin) = 1.0;
+
+            } // endfor: looped over energy layers of counts cube
+
+        } // endfor: looped over pixels of counts cube
 
     } // endif: observation was valid
 
@@ -761,163 +827,42 @@ void ctbin::obs_cube(void)
 }
 
 
-/***********************************************************************//**
- * @brief Set RoI weights.
- *
- * @param[in] roi Region of Interest.
- * @return Sky map with Region of Interest weights.
- *
- * Computes a sky map of Region of Interest (RoI) weights. All pixels of the
- * sky map that are fully comprised within the RoI will be set to unity.
- * Pixels that are only partly comprised will be devided into a 10x10 subgrid,
- * and a weight corresponding to the fraction of subgrid points that are
- * fully comprised within the RoI will be assigned to the sky map pixel.
- * The precision of the weights is about 1%.
- ***************************************************************************/
-GSkyMap ctbin::set_roi_weights(const GCTARoi& roi) const
-{
-    // Set number of points in subgrid
-    const int n_subgrid = 10;
-
-    // Initialise ROI weight sky map with zero weights
-    GSkyMap weights(m_counts.extract(0));
-    weights = 0.0;
-
-    // Compute save RoI radius. All pixels with bin centre within that radius
-    // will be set to unity. In case that the counts cube is not a WCS map
-    // no pixels will be considered within the safe radius.
-    double      margin(roi.radius());
-    const GWcs* wcs(dynamic_cast<const GWcs*>(m_counts.projection()));
-    if (wcs != NULL) {
-        double dx = wcs->cdelt(0);
-        double dy = wcs->cdelt(1);
-        margin    = (dx > dy) ? dx : dy;
-    }
-    double safe_radius = roi.radius() - margin;
-
-    // Loop over all sky map pixels
-    for (int i = 0; i < weights.npix(); ++i) {
-
-        // Get pixel sky direction
-        GSkyDir dir(weights.inx2dir(i));
-
-        // If pixel is within the safe radius then set the pixel weight to
-        // unity ...
-        if (roi.centre().dir().dist_deg(dir) <= safe_radius) {
-            weights(i) = 1.0;
-        }
-
-        // ... otherwise define a subgrid a check all positions within that
-        // subgrid that fall within the RoI. This is an approximation that
-        // determines the weight of the pixels
-        else {
-
-            // Set pixel centre
-            GSkyPixel centre(weights.inx2pix(i));
-
-            // Compute subgrid pixel step size
-            double step = 1.0 / double(n_subgrid-1);
-
-            // Compute sky direction weight
-            double weight = 1.0 / (double(n_subgrid) * double(n_subgrid));
-
-            // Loop over X subgrid
-            for (int ix = 0; ix < n_subgrid; ++ix) {
-
-                // Compute X pixel value
-                double x = ix * step - 0.5;
-
-                // Loop over Y subgrid
-                for (int iy = 0; iy < n_subgrid; ++iy) {
-
-                    // Compute Y pixel value
-                    double y = iy * step - 0.5;
-
-                    // Set pixel value
-                    GSkyPixel pixel(centre.x()+x, centre.y()+y);
-                    
-                    // Get pixel sky direction
-                    GSkyDir dir(weights.pix2dir(pixel));
-
-                    // If sky direction is within the RoI then add the direction
-                    // to the weight for this pixel
-                    if (roi.centre().dir().dist_deg(dir) <= roi.radius()) {
-                        weights(i) += weight;
-                    }
-
-                } // endfor: loop over Y subgrid
-
-            } // endfor: loop over X subgrid
-
-        } // endelse: pixel was outside safe radius
-
-    } // endfor: looped over all pixel sky maps
-
-    // Return
-    return weights;
-}
 
 
 /***********************************************************************//**
- * @brief Set energy weights.
+ * @brief Determine the counts cube layer usage.
  *
- * @param[in] ebounds Energy boundaries.
- * @return Vector of energy boundary weights.
+ * @param[in] ebounds Energy boundaries of the event list.
+ * @return Vector of usage flags.
  *
- * Computes a vector of energy boundary weights from the overlap of the
- * event list energy boundaries with the counts cube boundaries. It is
- * assumed that within a bin the events are distributed according to a power
- * law with spectral index of -2, and the weights are computed according
- * to the fraction of this power law that is comprised within a counts cube
- * bin.
- *
- * This method properly handles event lists with multiple energy boundaries.
+ * Determines a vector of counts cube layer usage flags that signal whether
+ * an event should actually be filled in the counts cube or not. This makes
+ * sure that no partially filled bins will exist in the counts cube.
  ***************************************************************************/
-std::vector<double> ctbin::set_energy_weights(const GEbounds& ebounds) const
+std::vector<bool> ctbin::cube_layer_usage(const GEbounds& ebounds) const
 {
-    // Initialise energy boundary weights with zero weights
-    std::vector<double> weights(m_ebounds.size(), 0.0);
+    // Set energy margin
+    const GEnergy energy_margin(0.01, "GeV");
 
-    // Loop over all energy bins of counts cube
-    for (int i = 0; i < m_ebounds.size(); ++i) {
+    // Initialise usage vector
+    std::vector<bool> usage(m_ebounds.size(), true);
 
-        // Get energy boundaries of counts cube bin
-        GEnergy emin(m_ebounds.emin(i));
-        GEnergy emax(m_ebounds.emax(i));
+    // Loop over all energy bins of the cube
+    for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
 
-        // Loop over all energy boundaries of the event list and add the
-        // coverage fraction to the weights
-        for (int k = 0; k < ebounds.size(); ++k) {
+        // If the counts cube energy bin is fully contained within the
+        // energy boundaries of the event list the signal usage of this
+        // counts cube bin. Partially overlapping energy bins are signaled
+        // for non-usage, which avoids having partially filled bins in the
+        // counts cube. Some margin is applied that effectively reduces the
+        // width of the counts cube energy bin. This should cope with any
+        // rounding errors that come from reading and writing the energy
+        // boundary information to a FITS file.
+        usage[iebin] = ebounds.contains(m_ebounds.emin(iebin) + energy_margin,
+                                        m_ebounds.emax(iebin) - energy_margin);
 
-            // If there is no overlap then check next boundary
-            if ((ebounds.emax(k) <= emin) || (ebounds.emin(k) >= emax)) {
-                continue;
-            }
+    } // endfor: looped over all energy bins
 
-            // Get minimum and maximum energy of overlap region
-            GEnergy elow  = (ebounds.emin(k) > emin) ? ebounds.emin(k) : emin;
-            GEnergy ehigh = (ebounds.emax(k) < emax) ? ebounds.emax(k) : emax;
-
-            // Compute overlap weight
-            #if defined(G_PLAW_WEIGHTS)
-            double w_overlap = gammalib::plaw_photon_flux(elow.TeV(),
-                                                          ehigh.TeV(),
-                                                          1.0, -2.0);
-            double w_full    = gammalib::plaw_photon_flux(emin.TeV(),
-                                                          emax.TeV(),
-                                                          1.0, -2.0);
-            double weight = w_overlap / w_full;
-            #else
-            double weight = (ehigh - elow) / (emax - emin);
-            #endif
-
-            // Add overlap weight
-            weights[i] += weight;
-
-        } // endfor: looped over all energy boundaries of the event list
-
-    } // endfor: looped over all energy boundaries of the counts cube
-
-    // Return
-    return weights;
+    // Return usage
+    return usage;
 }
