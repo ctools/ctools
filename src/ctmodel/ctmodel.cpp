@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -303,8 +303,7 @@ void ctmodel::run(void)
         fill_cube(obs);
 
         // Dispose events to free memory if event file exists on disk
-        if (obs->eventfile().length() > 0 &&
-            gammalib::file_exists(obs->eventfile())) {
+        if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
             obs->dispose_events();
         }
 
@@ -323,6 +322,11 @@ void ctmodel::run(void)
         if (obs != NULL) {
             obs->response()->apply_edisp(save_edisp[i]);
         }
+    }
+
+    // Optionally publish model cube
+    if (m_publish) {
+        publish();
     }
 
     // Return
@@ -344,21 +348,55 @@ void ctmodel::save(void)
         log.header1("Save cube");
     }
 
-    // Make sure we have the FITS filename
+    // Get model cube filename
     m_outcube = (*this)["outcube"].filename();
 
     // Save only if filename is non-empty
-    if (m_outcube.length() > 0) {
+    if (!m_outcube.is_empty()) {
 
-        // Dump filename
+        // Log filename
         if (logTerse()) {
-            log << "Save \""+m_outcube+"\"" << std::endl;
+            log << gammalib::parformat("Model cube file");
+            log << m_outcube.url() << std::endl;
         }
 
         // Save model cube into FITS file
         m_cube.save(m_outcube, clobber());
 
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish model cube
+ *
+ * @param[in] name Model cube name.
+ ***************************************************************************/
+void ctmodel::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish model cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTMODEL_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << gammalib::parformat("Publish model cube");
+        log << user_name << std::endl;
+    }
+
+    // Publish model cube
+    m_cube.counts().publish(user_name);
 
     // Return
     return;
@@ -404,6 +442,7 @@ void ctmodel::init_members(void)
     // Initialise members
     m_outcube.clear();
     m_apply_edisp = false;
+    m_publish     = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -428,6 +467,7 @@ void ctmodel::copy_members(const ctmodel& app)
     // Copy attributes
     m_outcube     = app.m_outcube;
     m_apply_edisp = app.m_apply_edisp;
+    m_publish     = app.m_publish;
 
     // Copy protected members
     m_obs         = app.m_obs;
@@ -551,6 +591,9 @@ void ctmodel::get_parameters(void)
 
     } // endif: we had no cube yet
 
+    // Get remaining parameters
+    m_publish = (*this)["publish"].boolean();
+
     // Read optionally output cube filenames
     if (read_ahead()) {
         m_outcube = (*this)["outcube"].filename();
@@ -673,7 +716,7 @@ void ctmodel::get_obs(void)
 
         // If file is a FITS file then create an empty CTA observation
         // and load file into observation
-        if (gammalib::is_fits(filename)) {
+        if (GFilename(filename).is_fits()) {
 
             // Allocate empty CTA observation
             GCTAObservation cta;

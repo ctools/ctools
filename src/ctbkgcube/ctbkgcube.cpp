@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -217,23 +217,46 @@ void ctbkgcube::run(void)
         log << std::endl;
     }
 
+    // Warn if there are not enough energy bins
+    int    n          = m_background.energies().size();
+    double logEmin    = std::log10(m_background.energies()[0].TeV());
+    double logEmax    = std::log10(m_background.energies()[n-1].TeV());
+    int    nrequired  = int((logEmax - logEmin) * 25.0);
+    if ((n < nrequired) && logTerse()) {
+        log << std::endl;
+        log << "WARNING: ";
+        log << "Only " << n-1 << " energy bins have been requested. This may be "
+               "too few energy bins.";
+        log << std::endl << "         ";
+        log << "At least 25 bins per decade in energy are recommended, which "
+               "in your case";
+        log << std::endl << "         ";
+        log << "would be " << nrequired-1 << " bins. Consider increasing the "
+               "number of energy bins.";
+        log << std::endl;
+    }
+
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Initialise background cube");
+    }
+
+    // Initialise exposure cube
+    init_cube();
+
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
+        log.header1(gammalib::number("Observation",m_obs.size()));
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Log input model
     if (logTerse()) {
         log << std::endl;
         log.header1("Input model");
-        log << m_obs.models() << std::endl;
+        log << m_obs.models().print(m_chatter) << std::endl;
     }
 
     // Write header
@@ -330,6 +353,11 @@ void ctbkgcube::run(void)
     // Append model to output container
     m_outmdl.append(model);
 
+    // Log background cube
+    if (logTerse()) {
+        log << m_background.print(m_chatter) << std::endl;
+    }
+
     // Log output model
     if (logTerse()) {
         log << std::endl;
@@ -340,6 +368,11 @@ void ctbkgcube::run(void)
     // Recover original models
     m_obs.models(models_orig);
 
+    // Optionally publish background cube
+    if (m_publish) {
+        publish();
+    }
+
     // Return
     return;
 }
@@ -348,7 +381,8 @@ void ctbkgcube::run(void)
 /***********************************************************************//**
  * @brief Save background cube
  *
- * Save the background cube into the file specified by the outfile parameter.
+ * Save the background cube into a FITS file and the output model into an
+ * XML file.
  ***************************************************************************/
 void ctbkgcube::save(void)
 {
@@ -358,20 +392,71 @@ void ctbkgcube::save(void)
         log.header1("Save background cube");
     }
 
-    // Get output filenames
-    std::string outfile  = (*this)["outcube"].filename();
-    std::string outmodel = (*this)["outmodel"].filename();
+    // Get background cube and model file names
+    m_outcube  = (*this)["outcube"].filename();
+    m_outmodel = (*this)["outmodel"].filename();
 
-    // Save background cube
-    m_background.save(outfile, clobber());
+    // Save only if filename is non-empty
+    if (!m_outcube.is_empty()) {
+
+        // Log filename
+        if (logTerse()) {
+            log << gammalib::parformat("Background cube file");
+            log << m_outcube.url() << std::endl;
+        }
+
+        // Save background cube
+        m_background.save(m_outcube, clobber());
+    
+    }
 
     // Write output models if filename is valid
-    if ((outmodel.length() > 0) && (gammalib::tolower(outmodel) != "none")) {
+    if ((!m_outmodel.is_empty()) &&
+        (gammalib::tolower(m_outmodel.url()) != "none")) {
 
-        // Save output model for binned analyses
-        m_outmdl.save(outmodel);
+        // Log filename
+        if (logTerse()) {
+            log << gammalib::parformat("Model definition file");
+            log << m_outmodel.url() << std::endl;
+        }
+
+        // Save output model for stacked analyses
+        m_outmdl.save(m_outmodel.url());
 
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish background cube
+ *
+ * @param[in] name Background cube name.
+ ***************************************************************************/
+void ctbkgcube::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish background cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTBKGCUBE_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << gammalib::parformat("Publish background cube");
+        log << user_name << std::endl;
+    }
+
+    // Publish exposure cube
+    m_background.cube().publish(user_name);
 
     // Return
     return;
@@ -389,9 +474,14 @@ void ctbkgcube::save(void)
  ***************************************************************************/
 void ctbkgcube::init_members(void)
 {
-    // Initialise members
+    // Initialise user parameters
     m_outcube.clear();
     m_outmodel.clear();
+    m_addbounds = true;
+    m_publish   = false;
+    m_chatter   = static_cast<GChatter>(2);
+
+    // Initialise protected members
     m_obs.clear();
     m_background.clear();
     m_bkgmdl.clear();
@@ -409,9 +499,14 @@ void ctbkgcube::init_members(void)
  ***************************************************************************/
 void ctbkgcube::copy_members(const ctbkgcube& app)
 {
-    // Copy members
-    m_outmodel   = app.m_outmodel;
-    m_outcube    = app.m_outcube;
+    // Copy user parameters
+    m_outmodel  = app.m_outmodel;
+    m_outcube   = app.m_outcube;
+    m_addbounds = app.m_addbounds;
+    m_publish   = app.m_publish;
+    m_chatter   = app.m_chatter;
+
+    // Copy protected members
     m_obs        = app.m_obs;
     m_background = app.m_background;
     m_bkgmdl     = app.m_bkgmdl;
@@ -499,6 +594,11 @@ void ctbkgcube::get_parameters(void)
         m_obs.models(models);
     }
 
+    // Get remaining parameters
+    m_addbounds = (*this)["addbounds"].boolean();
+    m_publish   = (*this)["publish"].boolean();
+    m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
+
     // Read output filenames (if needed)
     if (read_ahead()) {
         m_outcube  = (*this)["outcube"].filename();
@@ -508,3 +608,70 @@ void ctbkgcube::get_parameters(void)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Initialise background cube
+ *
+ * Initialise the background cube.
+ ***************************************************************************/
+void ctbkgcube::init_cube(void)
+{
+    // Extract exposure cube definition
+    const GWcs* proj   = static_cast<const GWcs*>(m_background.cube().projection());
+    std::string wcs    = m_background.cube().projection()->code();
+    std::string coords = m_background.cube().projection()->coordsys();
+    double      x      = proj->crval(0);
+    double      y      = proj->crval(1);
+    double      dx     = proj->cdelt(0);
+    double      dy     = proj->cdelt(1);
+    int         nx     = m_background.cube().nx();
+    int         ny     = m_background.cube().ny();
+
+    // Extract energies
+    GEnergies energies = m_background.energies();
+
+    // If requested, insert energies at all event list energy boundaries
+    if (m_addbounds) {
+
+        // Set logger
+        GLog* logger = NULL;
+        if (logTerse()) {
+            logger = &log;
+        }
+    
+        // Loop over all observations
+        for (int i = 0; i < m_obs.size(); ++i) {
+    
+            // Get observation and continue only if it is a CTA observation
+            const GCTAObservation* cta = dynamic_cast<const GCTAObservation*>
+                                         (m_obs[i]);
+
+            // Skip observation if it's not a CTA observation
+            if (cta == NULL) {
+                continue;
+            }
+
+            // Skip observation if it does not contain an event list
+            if (cta->eventtype() != "EventList") {
+                continue;
+            }
+
+            // Insert energy boundaries
+            energies = insert_energy_boundaries(energies, *cta, logger);
+
+        } // endfor: looped over all observations
+
+       } // endif: energy bin insertion requested
+
+    // Setup background cube
+    m_background = GCTACubeBackground(wcs, coords, x, y, dx, dy, nx, ny, energies);
+
+    // Log background cube
+    if (logTerse()) {
+        log << m_background.print(m_chatter) << std::endl;
+    }
+
+    // Return
+    return;
+};

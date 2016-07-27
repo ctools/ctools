@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -72,6 +72,7 @@ protected:
     const bool&           read_ahead(void) const;
     const GTimeReference& time_reference(void) const;
     GObservations         get_observations(const bool& get_response = true);
+    void                  setup_observations(GObservations& obs);
 
     // Protected methods that create objects from user parameters
     GEbounds        create_ebounds(void);
@@ -90,15 +91,21 @@ protected:
     void            set_obs_bounds(GObservations& obs);
     GSkyDir         get_mean_pointing(const GObservations& obs);
     size_t          get_current_rss(void);
+    std::string     get_obs_header(const GObservation* obs);
+    GEnergies       insert_energy_boundaries(const GEnergies&       energies,
+                                             const GCTAObservation& obs,
+                                             GLog* log = NULL) const;
+
+    // Protected members
+    bool            m_read_ahead; //!< Read ahead output parameters
 
 protected:
     // Protected methods
-    void           provide_help(void) const;
+    void            provide_help(void) const;
     
     // Protected members
-    bool           m_read_ahead; //!< Read ahead parameters
-    bool           m_use_xml;    //!< Use XML file instead of FITS file for observations
-    GTimeReference m_cta_ref;    //!< CTA time reference
+    bool            m_use_xml;  //!< Use XML file instead of FITS file for observations
+    GTimeReference  m_cta_ref;  //!< CTA time reference
 };
 
 

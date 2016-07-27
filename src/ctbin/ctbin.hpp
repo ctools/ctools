@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -28,13 +28,14 @@
 #define CTBIN_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <vector>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "1.0.0"
+#define CTBIN_VERSION "1.1.0"
 
 
 /***********************************************************************//**
@@ -78,25 +79,31 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
+    void                 publish(const std::string& name = "");
     const GObservations& obs(void) const;
     GCTAEventCube        cube(void) const;
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctbin& app);
-    void free_members(void);
-    void get_parameters(void);
-    void fill_cube(GCTAObservation* obs);
-    void obs_cube(void);
+    void                init_members(void);
+    void                copy_members(const ctbin& app);
+    void                free_members(void);
+    void                get_parameters(void);
+    void                fill_cube(GCTAObservation* obs);
+    void                set_weights(GCTAObservation* obs);
+    void                obs_cube(void);
+    std::vector<bool>   cube_layer_usage(const GEbounds& ebounds) const;
 
     // User parameters
-    std::string   m_outcube;    //!< Output counts map file
+    GFilename     m_outcube;    //!< Output counts map file name
     bool          m_usepnt;     //!< Use pointing instead of xref/yref parameters
+    bool          m_publish;    //!< Publish counts cube?
+    GChatter      m_chatter;    //!< Chattiness
 
     // Protected members
     GObservations m_obs;        //!< Observation container
-    GSkyMap       m_cube;       //!< Event cube
+    GSkyMap       m_counts;     //!< Event cube counts
+    GSkyMap       m_weights;    //!< Event cube weights
     GEbounds      m_ebounds;    //!< Energy boundaries
     GGti          m_gti;        //!< Good time intervals
     double        m_ontime;     //!< Total ontime
@@ -126,7 +133,7 @@ inline
 GCTAEventCube ctbin::cube(void) const
 {
     // Build event cube
-    GCTAEventCube cube(m_cube, m_ebounds, m_gti);
+    GCTAEventCube cube(m_counts, m_weights, m_ebounds, m_gti);
     
     // Return cube
     return cube;

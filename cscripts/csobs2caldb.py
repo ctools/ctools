@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Generation of an caldb entry from general IACT observation.
+# Creates a calibration database entry for an IACT observation.
 #
-# Copyright (C) 2015 Michael Mayer
+# Copyright (C) 2015-2016 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import gammalib
-import ctools
 import sys
 import os
 import datetime
+import gammalib
+import ctools
 
 
 # ================= #
@@ -30,166 +30,214 @@ import datetime
 # ================= #
 class csobs2caldb(ctools.cscript):
     """
-    This class implements the creation of a caldb entry for a particular
-    observation, which might be helpful for running simulations for current
-    IACTs. It takes an observation definition file as input and uses the
-    first observation to create a caldb entry which can be used for
-    simulations and sensitivity studies later on.
+    Creates a calibration database entry for an IACT observation.
+    
+    The creation of a calibration database entry is useful for performing
+    simulations for current Imaging Air Cherenkov Telescopes (IACTs).
+    The class takes an observation definition XML file as input and uses
+    one observation to create a calibration database entry. By default
+    the first observation will be used, but the user can specify the
+    index of any observation using the hidden "index" parameter.
     """
+    
+    # Constructor
     def __init__(self, *argv):
         """
         Constructor.
         """
-        # Set name
-        self.name    = "csobs2caldb"
-        self.version = "1.1.0"
+        # Set name and version
+        self._name    = 'csobs2caldb'
+        self._version = '1.1.0'
 
-        # Make sure that parfile exists
-        file = self.parfile()
+        # Initialise members
+        self._observation = gammalib.GCTAObservation()
+        self._mission     = 'cta'
+        self._caldb       = 'cta'
+        self._outfile     = gammalib.GFilename('irf_file.fits')
+        self._base_dir    = ''
+        self._cal_dir     = ''
+        self._rsp_dir     = ''
+        self._caldb_inx   = gammalib.GFits()
+        self._irf_fits    = gammalib.GFits()
 
-        # Initialise application
-        if len(argv) == 0:
-            ctools.cscript.__init__(self, self.name, self.version)
-        elif len(argv) == 1:
-            ctools.cscript.__init__(self, self.name, self.version, *argv)
-        else:
-            raise TypeError("Invalid number of arguments given.")
-
-        # Set logger properties
-        self.log_header()
-        self.log.date(True)
-
-        # Return
-        return
-
-    def __del__(self):
-        """
-        Destructor.
-        """
-        # Return
-        return
-
-    def parfile(self):
-        """
-        Check if parfile exists. If parfile does not exist then create a
-        default parfile. This kluge avoids shipping the cscript with a
-        parfile.
-        """
-
-        # Set parfile name
-        parfile = self.name+".par"
-
-        try:
-            pars = gammalib.GApplicationPars(parfile)
-        except:
-            # Signal that parfile was not found
-            print("Parfile \""+parfile+"\" not found. Create default parfile.")
-
-            # Create default parfile
-            pars = gammalib.GApplicationPars()
-            pars.append(gammalib.GApplicationPar("inobs","f","a","obs.xml","","","Input observation definition file"))
-            pars.append(gammalib.GApplicationPar("rspname","s","a","NONE","","","Response output name (e.g. Zenith50)"))            
-            pars.append(gammalib.GApplicationPar("outirfs","f","h","irf_file.fits","","","Output IRF file name"))            
-            pars.append(gammalib.GApplicationPar("index","i","h","0","","","Index of observation to be used from XML file"))            
-            pars.append_standard()
-            pars.append(gammalib.GApplicationPar("logfile","f","h","csobs2caldb.log","","","Log filename"))
-            pars.save(parfile)
-
-        # Return
-        return
-
-    def get_parameters(self):
-        """
-        Get parameters from parfile and setup the observation.
-        """
-        # Get parameters     
-        self.inobs = self["inobs"].filename()
-        self.obs   = gammalib.GObservations(self.inobs)
+        # Initialise observation container from constructor arguments.
+        self._obs, argv = self._set_input_obs(argv)
         
-        # Get index of observation to be used (0=default)
-        inx = self["index"].integer()
+        # Initialise script by calling the appropriate class constructor.
+        self._init_cscript(argv)
+
+        # Return
+        return
+
+
+    # Private methods
+    def _get_parameters(self):
+        """
+        Get parameters from parfile
+
+        Raises:
+            ValueError, IndexError, & RuntimeError.
+        """
+        # Load observation container from "inobs" parameter in case that
+        # the observation container is still empty.
+        if self._obs.is_empty():
+            self._obs = gammalib.GObservations(self['inobs'].filename())
+
+        # Raise an exception if the observation container is empty
+        if self._obs.is_empty():
+            raise ValueError('No or empty observation provided for '
+                             'parameter "inobs".')
+        
+        # Get index of observation to be used
+        index = self['index'].integer()
+
+        # Raise an exception if the index is not valid
+        if index < 0 or index >= self._obs.size():
+            raise IndexError('Parameter "index=%d" outside the validity '
+                             'range [0,%d].' % (index, self._obs.size()))
         
         # Get observation
-        self.observation = self.obs[inx]
-        
-        # Set instrument mission to cta
-        # This is to be compliant with standard gammalib caldb
-        self.m_mission = "CTA"
-        
-        # Get instrument name
-        self.m_instrument = self.observation.instrument()
-        
-        # Get config and file name
-        self.m_rspname = self["rspname"].string()
-        self.m_outfile = self["outirfs"].filename()
-        
-        # Make sure we have a cta observation
-        if not self.observation.classname() == "GCTAObservation":
-            raise gammalib.Exception.runtime_error("Input observation not of type \"GCTAObservation\"")
-        
-        # Make sure we have an irf response
-        if not self.observation.response().classname() == "GCTAResponseIrf":
-            raise gammalib.Exception.runtime_error("Response of input observation not of type \"GCTAResponseIrf\"")
+        self._observation = self._obs[index]
 
-        # Get other parameters
-        self.m_clobber = self["clobber"].boolean()
+        # Make sure we have a CTA observation
+        if not self._observation.classname() == 'GCTAObservation':
+            raise RuntimeError('Input observation not of type '
+                               '"GCTAObservation".')
+        
+        # Make sure we have an IRF response associated with the CTA
+        # observation
+        if not self._observation.response().classname() == 'GCTAResponseIrf':
+            raise RuntimeError('Response of input observation not of '
+                               'type "GCTAResponseIrf".')
+        
+        # Get calibration database name. If the "caldb" parameter is "NONE"
+        # or empty then use the instrument name from the observation as
+        # calibration database name.
+        self._caldb = self['caldb'].string()
+        if (self._caldb == 'NONE' or len(self._caldb) == 0):
+            self._caldb = self._observation.instrument().lower()
+
+        # Get instrument response function file name
+        self._outfile = self['outfile'].filename()
+
+        # Make sure that remaining user parameters are queried now. We
+        # do not store the actual parameter values as we do not want
+        # too many instance attributes with enhances the maintenance
+        # costs.
+        self['irf'].string()
+        self['rootdir'].string()
+
+        # Write input parameters and header into logger
+        if self._logTerse():
+            self._log_parameters()
+            self._log('\n')
 
         # Return
         return
 
-    def make_irf_file(self):
+    def _make_irf_file(self):
+        """
+        Creates an IRF FITS file.
+        """
+        # Write header into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header2("Creating IRF file")
+
+        # Get response for the observation
+        rsp = self._observation.response()
         
-        # retrieve response component
-        rsp = self.observation.response()
-        
-        # Initialise FITS file
-        fits = gammalib.GFits()
-        
-        # Create GFilename instances
-        fname_aeff  = gammalib.GFilename(rsp.aeff().filename())
-        fname_psf   = gammalib.GFilename(rsp.psf().filename())
-        fname_edisp = gammalib.GFilename(rsp.edisp().filename())
-        fname_bkg   = gammalib.GFilename(rsp.background().filename())
+        # Extract response file names
+        fname_aeff  = rsp.aeff().filename()
+        fname_psf   = rsp.psf().filename()
+        fname_edisp = rsp.edisp().filename()
+        fname_bkg   = rsp.background().filename()
+
+        # Log filenames
+        if self._logNormal():
+            self._log.header3("IRF input files")
+            self._log(gammalib.parformat("Effective area"))
+            self._log(fname_aeff.url())
+            self._log("\n")
+            self._log(gammalib.parformat("Point spread function"))
+            self._log(fname_psf.url())
+            self._log("\n")
+            self._log(gammalib.parformat("Energy dispersion"))
+            self._log(fname_edisp.url())
+            self._log("\n")
+            self._log(gammalib.parformat("Background rate"))
+            self._log(fname_bkg.url())
+            self._log("\n")
     
         # Open FITS files of response components
-        fits_aeff  = gammalib.GFits(fname_aeff.filename())
-        fits_psf   = gammalib.GFits(fname_psf.filename())
-        fits_edisp = gammalib.GFits(fname_edisp.filename())
-        fits_bkg   = gammalib.GFits(fname_bkg.filename())
+        fits_aeff  = gammalib.GFits(fname_aeff)
+        fits_psf   = gammalib.GFits(fname_psf)
+        fits_edisp = gammalib.GFits(fname_edisp)
+        fits_bkg   = gammalib.GFits(fname_bkg)
+
+        # Get extension names
+        ext_aeff  = fname_aeff.extname("EFFECTIVE AREA")
+        ext_psf   = fname_psf.extname("POINT SPREAD FUNCTION")
+        ext_edisp = fname_edisp.extname("ENERGY DISPERSION")
+        ext_bkg   = fname_bkg.extname("BACKGROUND")
         
-        # Bundle IRFs into one file
-        fits.append(fits_aeff[fname_aeff.extname("EFFECTIVE AREA")])
-        fits.append(fits_psf[fname_psf.extname("POINT SPREAD FUNCTION")])
-        fits.append(fits_edisp[fname_edisp.extname("ENERGY DISPERSION")])
-        fits.append(fits_bkg[fname_bkg.extname("BACKGROUND")])
+        # Create empty FITS file
+        fits = gammalib.GFits()
+        
+        # Append IRF component to FITS file
+        fits.append(fits_aeff[ext_aeff])
+        fits.append(fits_psf[ext_psf])
+        fits.append(fits_edisp[ext_edisp])
+        fits.append(fits_bkg[ext_bkg])
+
+        # Log resulting FITS file
+        if self._logNormal():
+            self._log(str(fits))
+            self._log("\n")
+        if self._logExplicit():
+            self._log(str(fits[ext_aeff].header()))
+            self._log("\n")
+            self._log(str(fits[ext_psf].header()))
+            self._log("\n")
+            self._log(str(fits[ext_edisp].header()))
+            self._log("\n")
+            self._log(str(fits[ext_bkg].header()))
+            self._log("\n")
         
         # Return fits file
         return fits
 
-    def make_caldb_index(self):
-        
+    def _make_caldb_index(self):
+        """
+        Creates an IRF index FITS file.
+        """
+        # Write header into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header2("Creating database index file")
+
         # Open calibration database index
-        indx_file = self.base_dir+"/caldb.indx"
+        indx_file = self._base_dir+"/caldb.indx"
         
-        # Check if indx file exists (create if not existent)
-        if os.path.isfile(indx_file):
-            cif = gammalib.GFits(indx_file)
-        else:
-            cif = gammalib.GFits(indx_file, True)
+        # Open index file (or create one if it does not exist)
+        cif = gammalib.GFits(indx_file, True)
         
         # Retrieve "CIF" table
         if cif.contains("CIF"):
             table = cif.table("CIF")
+
+        # ... or create binary table if no "CIF" table exists yet
         else:       
-            # Create binary table if not available
+
+            # Create empty binary table
             bintable = gammalib.GFitsBinTable()
             bintable.extname("CIF")
             bintable.card("CIFVERSN", "1992a", "Version of CIF format")     
-            cif.append(bintable)
+
+            # Append table to FITS file and recover a reference to the
+            # appended table
+            table = cif.append(bintable)
             
-            table = cif.table("CIF")
-            
-            # Copied from cta_root2caldb.py
             # Attach columns. Reference: CAL/GEN/92-008
             table.append(gammalib.GFitsTableStringCol("TELESCOP", 0, 10))
             table.append(gammalib.GFitsTableStringCol("INSTRUME", 0, 10))
@@ -215,7 +263,7 @@ class csobs2caldb(ctools.cscript):
         row_index = -1
         for caldir in table["CAL_DIR"]:
             row_index += 1
-            if caldir == self.cal_dir:
+            if caldir == self._cal_dir:
                 has_config = True
                 break
          
@@ -238,8 +286,8 @@ class csobs2caldb(ctools.cscript):
             today, time = now.split()
             
             # Set element
-            table["TELESCOP"][row] = self.m_mission
-            table["INSTRUME"][row] = self.m_instrument
+            table["TELESCOP"][row] = self._mission
+            table["INSTRUME"][row] = self._caldb
             table["DETNAM"][row]   = "NONE"
             table["FILTER"][row]   = "NONE"
             table["CAL_DEV"][row]  = "ONLINE"
@@ -249,115 +297,146 @@ class csobs2caldb(ctools.cscript):
             table["CAL_VST"][row]  = time.split(".")[0]
             table["REF_TIME"][row] = 51544.0
             table["CAL_QUAL"][row] = 0
-            table["CAL_CBD"][row]  = "NAME("+self.m_rspname+")"
+            table["CAL_CBD"][row]  = "NAME("+self["irf"].string()+")"
             table["CAL_DATE"][row] = today.replace("-","/")[2:]
-            table["CAL_DIR"][row]  = self.cal_dir
-            table["CAL_FILE"][row] = self.m_outfile
+            table["CAL_DIR"][row]  = self._cal_dir
+            table["CAL_FILE"][row] = self._outfile
 
         # Add effective area information
         row = row_index-4
-        table["CAL_CNAM"][row]  = "EFF_AREA"
-        table["CAL_DESC"][row]  = self.m_instrument+" effective area"
+        table["CAL_CNAM"][row] = "EFF_AREA"
+        table["CAL_DESC"][row] = self._caldb+" effective area"
 
         # Add point spread function information
         row = row_index-3
-        table["CAL_CNAM"][row]  = "RPSF"
-        table["CAL_DESC"][row]  = self.m_instrument+" point spread function"
+        table["CAL_CNAM"][row] = "RPSF"
+        table["CAL_DESC"][row] = self._caldb+" point spread function"
         
         # Add energy dispersion information
         row = row_index-2
-        table["CAL_CNAM"][row]  = "EDISP"
-        table["CAL_DESC"][row]  = self.m_instrument+" energy dispersion"
+        table["CAL_CNAM"][row] = "EDISP"
+        table["CAL_DESC"][row] = self._caldb+" energy dispersion"
 
         # Add background information
         row = row_index-1
-        table["CAL_CNAM"][row]  = "BGD"
-        table["CAL_DESC"][row]  = self.m_instrument+" background"
+        table["CAL_CNAM"][row] = "BGD"
+        table["CAL_DESC"][row] = self._caldb+" background"
+
+        # Log resulting FITS table and header
+        if self._logNormal():
+            self._log(str(table))
+            self._log("\n")
+        if self._logExplicit():
+            self._log(str(table.header()))
+            self._log("\n")
         
         # Return CIF FITS file
         return cif
         
-    def make_dirs(self):
+    def _make_dirs(self):
+        """
+        Make CALDB directories.
+        """
+        # Write header into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header2("Creating directory structure")
 
-        # Create gammalib Caldb        
-        caldb = gammalib.GCaldb()
+        # Create calibration database        
+        caldb = gammalib.GCaldb(self["rootdir"].string())
         
         # Set calibration directory 
-        self.cal_dir  = "data"
-        self.cal_dir += "/"+self.m_mission.lower()
-        self.cal_dir += "/"+self.m_instrument.lower()
-        self.cal_dir += "/bcf/"+self.m_rspname
+        self._cal_dir  = "data"
+        self._cal_dir += "/"+self._mission.lower()
+        self._cal_dir += "/"+self._caldb.lower()
+        self._cal_dir += "/bcf/"+self["irf"].string()
         
         # Set absolute path
-        self.base_dir = caldb.rootdir() +"/data"
-        self.base_dir += "/"+self.m_mission.lower()
-        self.base_dir += "/"+self.m_instrument.lower()
+        self._base_dir = caldb.rootdir() +"/data"
+        self._base_dir += "/"+self._mission.lower()
+        self._base_dir += "/"+self._caldb.lower()
         
         # Set directory for irf file
-        self.rsp_dir = caldb.rootdir() + "/" + self.cal_dir
+        self._rsp_dir = caldb.rootdir() + "/" + self._cal_dir
+
+        # Log resulting FITS table
+        if self._logNormal():
+            self._log(gammalib.parformat("Calibration directory"))
+            self._log(self._cal_dir)
+            self._log("\n")
+            self._log(gammalib.parformat("Base directory"))
+            self._log(self._base_dir)
+            self._log("\n")
+            if not os.path.isdir(self._rsp_dir):
+                self._log(gammalib.parformat("IRF directory"))
+            else:
+                self._log(gammalib.parformat("IRF directory (existing)"))
+            self._log(self._rsp_dir)
+            self._log("\n")
         
-        # Create directories and log information
-        if not os.path.isdir(self.rsp_dir):
-            if self.logExplicit():
-                self.log(gammalib.parformat("Directory"))
-                self.log(self.rsp_dir)
-                self.log("\n")
-            os.makedirs(self.rsp_dir)
-        else:
-            if self.logExplicit():
-                self.log(gammalib.parformat("Directory (existing)"))
-                self.log(self.rsp_dir)
-                self.log("\n")
+        # Create IRF directory is it does not yet exist
+        if not os.path.isdir(self._rsp_dir):
+            os.makedirs(self._rsp_dir)
 
         # Return
         return
 
+
+    # Public methods
     def run(self):
         """
         Run the script.
         """
         # Switch screen logging on in debug mode
-        if self.logDebug():
-            self.log.cout(True)
+        if self._logDebug():
+            self._log.cout(True)
 
         # Get parameters
-        self.get_parameters()
+        self._get_parameters()
         
-        # Write input parameters into logger
-        if self.logTerse():
-            self.log_parameters()
-            self.log("\n\n")
-            self.log.header1("Creating directory structure")
+        # Write input parameters and header into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Creating CALDB entry")
         
         # Create directory structure
-        self.make_dirs()
-
-        # Logging
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Updating calibration database")
+        self._make_dirs()
          
         # Create/update calibration database   
-        self.caldb_inx = self.make_caldb_index()
+        self._caldb_inx = self._make_caldb_index()
         
-        # Logging
-        if self.logTerse():
-            self.log("\n")
-            self.log.header1("Creating response file")
-            
-        # Create IRF file
-        self.irf_fits = self.make_irf_file()
+        # Create response file
+        self._irf_fits = self._make_irf_file()
                 
         # Return
         return
 
     def save(self):
+        """
+        Save calibration database FITS file.
+        """
+        # Write header into logger
+        if self._logTerse():
+            self._log("\n")
+            self._log.header1("Save calibration database")
+
+        # Set response filename
+        filename = self._rsp_dir + "/" + self._outfile
+        
+        # Write filenames into logger
+        if self._logNormal():
+            self._log(gammalib.parformat("CALDB index file"))
+            self._log(self._caldb_inx.filename().url())
+            self._log("\n")
+            self._log(gammalib.parformat("Response file"))
+            self._log(filename)
+            self._log("\n")
 
         # Save caldb index file
-        self.caldb_inx.save(self.m_clobber)
+        self._caldb_inx.save(self._clobber())
 
         # Save response file
-        self.irf_fits.saveto(self.rsp_dir + "/" + self.m_outfile, self.m_clobber)
+        self._irf_fits.saveto(filename, self._clobber())
         
         # Return
         return
@@ -366,6 +445,9 @@ class csobs2caldb(ctools.cscript):
         """
         Execute the script.
         """
+        # Open logfile
+        self.logFileOpen()
+
         # Run the script
         self.run()
 
@@ -380,14 +462,9 @@ class csobs2caldb(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Generates caldb entry.
-    """
+
     # Create instance of application
     app = csobs2caldb(sys.argv)
     
-    # Open logfile
-    app.logFileOpen()
-
     # Execute application
     app.execute()

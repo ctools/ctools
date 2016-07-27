@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 ctexpcube - Exposure cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -217,28 +217,39 @@ void ctexpcube::run(void)
         log << std::endl;
     }
 
-    // Set energy dispersion flag for all CTA observations and save old
-    // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
+    // Warn if there are not enough energy bins
+    int    n          = m_expcube.energies().size();
+    double logEmin    = std::log10(m_expcube.energies()[0].TeV());
+    double logEmax    = std::log10(m_expcube.energies()[n-1].TeV());
+    int    nrequired  = int((logEmax - logEmin) * 25.0);
+    if ((n < nrequired) && logTerse()) {
+        log << std::endl;
+        log << "WARNING: ";
+        log << "Only " << n-1 << " energy bins have been requested. This may be "
+               "too few energy bins.";
+        log << std::endl << "         ";
+        log << "At least 25 bins per decade in energy are recommended, which "
+               "in your case";
+        log << std::endl << "         ";
+        log << "would be " << nrequired-1 << " bins. Consider increasing the "
+               "number of energy bins.";
+        log << std::endl;
     }
+
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Initialise exposure cube");
+    }
+
+    // Initialise exposure cube
+    init_cube();
 
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
+        log.header1(gammalib::number("Observation",m_obs.size()));
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Write header
@@ -247,15 +258,17 @@ void ctexpcube::run(void)
         log.header1("Generate exposure cube");
     }
 
-    // Fill exposure
+    // Fill exposure cube
     m_expcube.fill(m_obs, &log);
 
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
+    // Log exposure cube
+    if (logTerse()) {
+        log << m_expcube.print(m_chatter) << std::endl;
+    }
+
+    // Optionally publish exposure cube
+    if (m_publish) {
+        publish();
     }
 
     // Return
@@ -265,6 +278,8 @@ void ctexpcube::run(void)
 
 /***********************************************************************//**
  * @brief Save exposure cube
+ *
+ * Saves the exposure cube into a FITS file.
  ***************************************************************************/
 void ctexpcube::save(void)
 {
@@ -274,11 +289,55 @@ void ctexpcube::save(void)
         log.header1("Save exposure cube");
     }
 
-    // Get output filename
+    // Get exposure cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save exposure cube
-    m_expcube.save(m_outcube, clobber());
+    // Save only if filename is non-empty
+    if (!m_outcube.is_empty()) {
+
+        // Log filename
+        if (logTerse()) {
+            log << gammalib::parformat("Exposure cube file");
+            log << m_outcube.url() << std::endl;
+        }
+
+        // Save exposure cube
+        m_expcube.save(m_outcube, clobber());
+
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish exposure cube
+ *
+ * @param[in] name Exposure cube name.
+ ***************************************************************************/
+void ctexpcube::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish exposure cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTEXPCUBE_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << gammalib::parformat("Publish exposure cube");
+        log << user_name << std::endl;
+    }
+
+    // Publish exposure cube
+    m_expcube.cube().publish(user_name);
 
     // Return
     return;
@@ -296,9 +355,11 @@ void ctexpcube::save(void)
  ***************************************************************************/
 void ctexpcube::init_members(void)
 {
-    // Initialise members
+    // Initialise user parameters
     m_outcube.clear();
-    m_apply_edisp = false;
+    m_addbounds = true;
+    m_publish   = false;
+    m_chatter   = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_obs.clear();
@@ -316,9 +377,11 @@ void ctexpcube::init_members(void)
  ***************************************************************************/
 void ctexpcube::copy_members(const ctexpcube& app)
 {
-    // Copy attributes
-    m_outcube     = app.m_outcube;
-    m_apply_edisp = app.m_apply_edisp;
+    // Copy user parameters
+    m_outcube   = app.m_outcube;
+    m_addbounds = app.m_addbounds;
+    m_publish   = app.m_publish;
+    m_chatter   = app.m_chatter;
 
     // Copy protected members
     m_obs     = app.m_obs;
@@ -362,9 +425,6 @@ void ctexpcube::get_parameters(void)
 
     } // endif: there was no observation in the container
 
-    // Read energy dispersion flag
-    m_apply_edisp = (*this)["edisp"].boolean();
-
     // Get the incube filename
     std::string incube = (*this)["incube"].filename();
 
@@ -390,6 +450,11 @@ void ctexpcube::get_parameters(void)
 
     } // endelse: cube loaded from file
 
+    // Get remaining parameters
+    m_addbounds = (*this)["addbounds"].boolean();
+    m_publish   = (*this)["publish"].boolean();
+    m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
+
     // Read output filename (if needed)
     if (read_ahead()) {
         m_outcube = (*this)["outcube"].filename();
@@ -398,3 +463,70 @@ void ctexpcube::get_parameters(void)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Initialise exposure cube
+ *
+ * Initialise the exposure cube.
+ ***************************************************************************/
+void ctexpcube::init_cube(void)
+{
+    // Extract exposure cube definition
+    const GWcs* proj   = static_cast<const GWcs*>(m_expcube.cube().projection());
+    std::string wcs    = m_expcube.cube().projection()->code();
+    std::string coords = m_expcube.cube().projection()->coordsys();
+    double      x      = proj->crval(0);
+    double      y      = proj->crval(1);
+    double      dx     = proj->cdelt(0);
+    double      dy     = proj->cdelt(1);
+    int         nx     = m_expcube.cube().nx();
+    int         ny     = m_expcube.cube().ny();
+
+    // Extract energies
+    GEnergies energies = m_expcube.energies();
+
+    // If requested, insert energies at all event list energy boundaries
+    if (m_addbounds) {
+
+        // Set logger
+        GLog* logger = NULL;
+        if (logTerse()) {
+            logger = &log;
+        }
+    
+        // Loop over all observations
+        for (int i = 0; i < m_obs.size(); ++i) {
+    
+            // Get observation and continue only if it is a CTA observation
+            const GCTAObservation* cta = dynamic_cast<const GCTAObservation*>
+                                         (m_obs[i]);
+
+            // Skip observation if it's not a CTA observation
+            if (cta == NULL) {
+                continue;
+            }
+
+            // Skip observation if it does not contain an event list
+            if (cta->eventtype() != "EventList") {
+                continue;
+            }
+
+            // Insert energy boundaries
+            energies = insert_energy_boundaries(energies, *cta, logger);
+
+        } // endfor: looped over all observations
+
+       } // endif: energy bin insertion requested
+
+    // Setup exposure cube
+    m_expcube = GCTACubeExposure(wcs, coords, x, y, dx, dy, nx, ny, energies);
+
+    // Log exposure cube
+    if (logTerse()) {
+        log << m_expcube.print(m_chatter) << std::endl;
+    }
+
+    // Return
+    return;
+};

@@ -1,0 +1,54 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csiactobs.par                                                 #
+#  Version:   1.1.0                                                         #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
+#                                                                           #
+#  Purpose:   Parameter file for the csiactobs script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+datapath,    s, a, $VHEFITS,,, "Path were data is located"
+prodname,    s, a, fits-prod-name,,, "Data storage name"
+infile,      f, a, runlist.lis,,, "Input runlist file"   
+inmodel,     f, h, NONE,,, "Input model definition XML file (optional)"
+master_indx, s, h, master.json,,, "Input master index file"
+outobs,      f, a, obs.xml,,, "Output observation definition XML file"
+outmodel,    f, a, bgmodels.xml,,, "Output model definition XML file"
+
+#
+# Script parameters
+#==================
+bkgpars,          i, a, 1,,, "Number of free parameters per background model"
+bkg_scale,        b, h, yes,,, "Apply background scaling factor from observation index file if available?"
+ev_hiera,         s, h, events,,, "Hierarchy of event formats"
+aeff_hiera,       s, h, aeff_2d,,, "Hierarchy of effective area formats"
+psf_hiera,        s, h, psf_king|psf_3gauss,,, "Hierarchy of psf formats"
+edisp_hiera,      s, h, edisp_2d,,, "Hierarchy of energy dispersion formats"
+bkg_hiera,        s, h, bkg_3d,,, "Hierarchy of background formats"
+bkg_mod_hiera,    s, h, irf|aeff|gauss,,, "Hierarchy of background models"
+bkg_gauss_norm,   r, h, 1e-8,,, "Input normalisation for Gaussian background"
+bkg_gauss_index,  r, h, -2.0,,, "Input spectral index for Gaussian background"
+bkg_gauss_sigma,  r, h, 2.5,,, "Input sigma for Gaussian background"
+bkg_aeff_norm,    r, h, 1e-14,,, "Input normalisation for effective area background"
+bkg_aeff_index,   r, h, -2.0,,, "Input spectral index for effective area background"
+bkg_range_factor, r, h, 100.0,,, "Factor to determine range of background normalisation"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csiactobs.log,,, "Log filename"
+

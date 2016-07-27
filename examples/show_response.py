@@ -1,12 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script displays one or several CTA response functions.
+# Shows one or several CTA response functions.
 #
-# Required 3rd party modules:
-# - matplotlib
-# - numpy
-#
-# Copyright (C) 2014-2015 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +21,13 @@
 import sys
 import math
 import gammalib
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.close()
+except:
+    print('This script needs the "matplotlib" module')
+    sys.exit()
 
 
 # ================================== #
@@ -35,11 +37,19 @@ def sigma_lima(Non, Noff, alpha=0.2):
     """
     Compute Eq. (17) of Li & Ma (1983).
 
-    Parameters:
-     Non   - Number of on counts
-     Noff  - Number of off counts
-    Keywords:
-     alpha - Ratio of on-to-off exposure
+    Parameters
+    ----------
+    Non : float
+        Number of On counts
+    Noff : float
+        Number of Off counts
+    alpha : float, optional
+        Ratio of on-to-off exposure
+
+    Returns
+    -------
+    sigma : float
+        Detection significance in Gaussian sigma
     """
     # Compute sensitivity
     alpha1 = alpha + 1.0
@@ -61,11 +71,19 @@ def Non_lima(sigma, Noff, alpha=0.2):
     """
     Solve Eq. (17) of Li & Ma (1983) for Non
 
-    Parameters:
-     sigma - Required significance
-     Noff  - Number of off counts
-    Keywords:
-     alpha - Ratio of on-to-off exposure
+    Parameters
+    ----------
+    sigma : float
+        Required detection significance in Gaussian sigma
+    Noff : float
+        Number of Off counts
+    alpha : float, optional
+        Ratio of on-to-off exposure
+
+    Returns
+    -------
+    Non : float
+        Number of On counts
     """
     # Set initial guess for Non
     S   = 25.0
@@ -89,9 +107,18 @@ def Non_lima(sigma, Noff, alpha=0.2):
 # ======================= #
 # Show one effective area #
 # ======================= #
-def show_one_effective_area(rsp, name, color="r"):
+def show_one_effective_area(rsp, name, color='r'):
     """
-    Show one effective area.
+    Show one effective area
+
+    Parameters
+    ----------
+    rsp : `~gammalib.GCTAResponse`
+        Response function
+    name : str
+        Name of the response function
+    color : str, optional
+        Color for plot
     """
     # Set to figure 1
     plt.figure(1)
@@ -111,11 +138,11 @@ def show_one_effective_area(rsp, name, color="r"):
     plt.loglog(E, aeff, color+'o')
 
     # Set axes
-    plt.xlabel("Energy [TeV]")
-    plt.ylabel("Effective area [cm2]")
+    plt.xlabel('Energy (TeV)')
+    plt.ylabel(r'Effective area (cm$^{2}$)')
 
     # Set legend
-    plt.legend(loc="lower right")
+    plt.legend(loc='lower right')
 
     # Return
     return
@@ -124,9 +151,18 @@ def show_one_effective_area(rsp, name, color="r"):
 # ======================== #
 # Show one background rate #
 # ======================== #
-def show_one_background_rate(rsp, name, color="r"):
+def show_one_background_rate(rsp, name, color='r'):
     """
-    Show one background rate.
+    Show one background rate
+
+    Parameters
+    ----------
+    rsp : `~gammalib.GCTAResponse`
+        Response function
+    name : str
+        Name of the response function
+    color : str, optional
+        Color for plot
     """
     # Set to figure 2
     plt.figure(2)
@@ -148,11 +184,11 @@ def show_one_background_rate(rsp, name, color="r"):
     plt.loglog(E, bgrate, color+'o')
 
     # Set axes
-    plt.xlabel("Energy [TeV]")
-    plt.ylabel("Background rate [events/s/MeV/sr]")
+    plt.xlabel('Energy (TeV)')
+    plt.ylabel(r'Background rate (counts s$^{-1}$ MeV$^{-1}$ sr$^{-1}$)')
 
     # Set legend
-    plt.legend(loc="lower left")
+    plt.legend(loc='lower left')
 
     # Return
     return
@@ -161,9 +197,25 @@ def show_one_background_rate(rsp, name, color="r"):
 # ==================== #
 # Show one sensitivity #
 # ==================== #
-def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sigma=5.0):
+def show_one_sensitivity(rsp, name, color='r', duration=180000.0, alpha=0.2,
+                         sigma=5.0):
     """
-    Show one sensitivity.
+    Show one sensitivity
+
+    Parameters
+    ----------
+    rsp : `~gammalib.GCTAResponse`
+        Response function
+    name : str
+        Name of the response function
+    color : str, optional
+        Color for plot
+    duration : float, optional
+        Duration of observation (s)
+    alpha : float, optional
+        Ratio of on-to-off exposure
+    sigma : float, optional
+        Required detection significance in Gaussian sigma
     """
     # Set constants
     r68_to_sigma = 0.6624305
@@ -194,9 +246,9 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
                 src_counts = 0.05*bgd_counts
             if src_counts < 10:
                 src_counts = 10.0
-            emin    = gammalib.GEnergy(math.pow(10.0, logE[i]-0.1), "TeV")
-            emax    = gammalib.GEnergy(math.pow(10.0, logE[i]+0.1), "TeV")
-            epivot  = gammalib.GEnergy(math.pow(10.0, logE[i]), "TeV")
+            emin    = gammalib.GEnergy(math.pow(10.0, logE[i]-0.1), 'TeV')
+            emax    = gammalib.GEnergy(math.pow(10.0, logE[i]+0.1), 'TeV')
+            epivot  = gammalib.GEnergy(math.pow(10.0, logE[i]), 'TeV')
             plaw    = gammalib.GModelSpectralPlaw(1.0e-6, -2.6, epivot)
             conv    = TeV2erg*E[i]*E[i]/plaw.flux(emin, emax)
             flux[i] = conv * src_counts / (duration * aeff*0.68)
@@ -206,11 +258,11 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
     plt.loglog(E, flux, color+'o')
 
     # Set axes
-    plt.xlabel("Energy [TeV]")
-    plt.ylabel("Sensitivity [erg/cm2/s]")
+    plt.xlabel('Energy (TeV)')
+    plt.ylabel(r'Sensitivity (erg cm$^{-2}$ s$^{-1}$)')
 
     # Set legend
-    plt.legend(loc="upper right")
+    plt.legend(loc='upper right')
 
     # Return
     return
@@ -219,9 +271,22 @@ def show_one_sensitivity(rsp, name, color="r", duration=180000.0, alpha=0.2, sig
 # ==================== #
 # Show one sensitivity #
 # ==================== #
-def show_one_response(rspname, dbname, name, rootdir=None, color="r"):
+def show_one_response(rspname, dbname, name, rootdir=None, color='r'):
     """
     Show one response.
+
+    Parameters
+    ----------
+    rspname : str
+        Response name
+    dbname : str
+        Database name
+    name : str
+        Name of the response function
+    rootdir : str, optional
+        Response root directory
+    color : str, optional
+        Color for plot
     """
     # Set-up calibration database
     caldb = gammalib.GCaldb()
@@ -230,7 +295,7 @@ def show_one_response(rspname, dbname, name, rootdir=None, color="r"):
     if gammalib.dir_exists(dbname):
         caldb.rootdir(dbname)
     else:
-        caldb.open("cta", dbname)
+        caldb.open('cta', dbname)
 
     # Load response function
     rsp = gammalib.GCTAResponseIrf(rspname, caldb)
@@ -252,31 +317,36 @@ def show_one_response(rspname, dbname, name, rootdir=None, color="r"):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    Display response information.
-    """
+
+    # Print usage information
+    usage = 'Usage: show_response.py [file]'
+    if len(sys.argv) < 1:
+        print(usage)
+        sys.exit()
+
+    # Check if plotting in file is requested
+    plotfile = ''
+    if len(sys.argv) == 2:
+        plotfile = sys.argv[1]
+
     # Create figures
     plt.figure(1)
-    plt.title("Effective area")
+    plt.title('Effective area')
     plt.figure(2)
-    plt.title("Background rate")
+    plt.title('Background rate')
     plt.figure(3)
-    plt.title("Sensitivity")
+    plt.title('Sensitivity')
 
     # Set response dictionary
     rsps = [
-            {'dbname':  "dummy",
-             'rspname': "cta_dummy_irf",
-             'name':    "Prod1 (Array E, MPIK)",
-             'color':   "b"},
-            {'dbname':  "e",
-             'rspname': "IFAE20120510_50h",
-             'name':    "Prod1 (Array E, IFAE)",
-             'color':   "g"},
-            {'dbname':  "aar",
-             'rspname': "DESY20140105_50h",
-             'name':    "Prod2 (Aar, DESY)",
-             'color':   "r"}
+            {'dbname':  'prod2',
+             'rspname': 'South_0.5h',
+             'name':    'Prod2 (30 min)',
+             'color':   'b'},
+            {'dbname':  'prod2',
+             'rspname': 'South_50h',
+             'name':    'Prod2 (50 h)',
+             'color':   'r'}
             ]
 
     # Loop over all responses
@@ -295,5 +365,8 @@ if __name__ == '__main__':
         # Show response
         show_one_response(rspname, dbname, name, rootdir=rootdir, color=color)
 
-    # Show plot
-    plt.show()
+    # Show figure
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
+    else:
+        plt.show()

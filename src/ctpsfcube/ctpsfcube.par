@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctpsfcube.par                                                 #
-#  Version:   1.0.0                                                         #
+#  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -21,17 +21,17 @@ inobs,    f, a, "NONE",,, "Input event list or observation definition XML file"
 incube,   f, a, "NONE",,, "Input counts cube file to extract PSF cube definition"
 caldb,    s, a, "prod2",,, "Calibration database"
 irf,      s, a, "South_0.5h",,, "Instrument response function"
-edisp,    b, h, no,,, "Apply energy dispersion?"
 outcube,  f, a, "psfcube.fits",,, "Output PSF cube file"
 
 #
 # Energy binning parameters
 #==========================
-ebinalg,  s, h, "LOG", FILE|LIN|LOG,, "Algorithm for defining energy bins"
-emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
-emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
-enumbins, i, a, 20,,, "Number of energy bins"
-ebinfile, f, h, "NONE",,, "Name of the file containing the energy bin definition"
+ebinalg,   s, h, "LOG", FILE|LIN|LOG,, "Algorithm for defining energy bins"
+emin,      r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins,  i, a, 20,,, "Number of energy bins"
+ebinfile,  f, h, "NONE",,, "Name of the file containing the energy bin definition"
+addbounds, b, h, yes,,, "Add energies at observation energy boundaries?"
 
 #
 # Spatial binning parameters

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -216,28 +216,20 @@ void ctpsfcube::run(void)
         log << std::endl;
     }
 
-    // Set energy dispersion flag for all CTA observations and save old
-    // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Initialise PSF cube");
     }
+
+    // Initialise exposure cube
+    init_cube();
 
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
+        log.header1(gammalib::number("Observation",m_obs.size()));
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Write header
@@ -246,15 +238,12 @@ void ctpsfcube::run(void)
         log.header1("Generate PSF cube");
     }
 
-    // Fill PSF 
+    // Fill PSF cube
     m_psfcube.fill(m_obs, &log);
 
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
+    // Log PSF cube
+    if (logTerse()) {
+        log << m_psfcube.print(m_chatter) << std::endl;
     }
 
     // Return
@@ -276,8 +265,19 @@ void ctpsfcube::save(void)
     // Get output filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save PSF cube
-    m_psfcube.save(m_outcube, clobber());
+    // Save only if filename is non-empty
+    if (!m_outcube.is_empty()) {
+
+        // Log filename
+        if (logTerse()) {
+            log << gammalib::parformat("PSF cube file");
+            log << m_outcube.url() << std::endl;
+        }
+
+        // Save PSF cube
+        m_psfcube.save(m_outcube, clobber());
+
+    }
 
     // Return
     return;
@@ -295,9 +295,10 @@ void ctpsfcube::save(void)
  ***************************************************************************/
 void ctpsfcube::init_members(void)
 {
-    // Initialise members
+    // Initialise user parameters
     m_outcube.clear();
-    m_apply_edisp = false;
+    m_addbounds = true;
+    m_chatter   = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_obs.clear();
@@ -315,13 +316,14 @@ void ctpsfcube::init_members(void)
  ***************************************************************************/
 void ctpsfcube::copy_members(const ctpsfcube& app)
 {
-    // Copy attributes
-    m_outcube     = app.m_outcube;
-    m_apply_edisp = app.m_apply_edisp;
+    // Copy user parameters
+    m_outcube   = app.m_outcube;
+    m_addbounds = app.m_addbounds;
+    m_chatter   = app.m_chatter;
 
     // Copy protected members
-    m_obs        = app.m_obs;
-    m_psfcube    = app.m_psfcube;
+    m_obs     = app.m_obs;
+    m_psfcube = app.m_psfcube;
 
     // Return
     return;
@@ -390,8 +392,9 @@ void ctpsfcube::get_parameters(void)
 
     } // endelse: cube loaded from file
 
-    // Read energy dispersion flag
-    m_apply_edisp = (*this)["edisp"].boolean();
+    // Get remaining parameters
+    m_addbounds = (*this)["addbounds"].boolean();
+    m_chatter   = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Read output filename (if needed)
     if (read_ahead()) {
@@ -401,3 +404,73 @@ void ctpsfcube::get_parameters(void)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Initialise PSF cube
+ *
+ * Initialise the PSF cube.
+ ***************************************************************************/
+void ctpsfcube::init_cube(void)
+{
+    // Extract exposure cube definition
+    const GWcs* proj   = static_cast<const GWcs*>(m_psfcube.cube().projection());
+    std::string wcs    = m_psfcube.cube().projection()->code();
+    std::string coords = m_psfcube.cube().projection()->coordsys();
+    double      x      = proj->crval(0);
+    double      y      = proj->crval(1);
+    double      dx     = proj->cdelt(0);
+    double      dy     = proj->cdelt(1);
+    int         nx     = m_psfcube.cube().nx();
+    int         ny     = m_psfcube.cube().ny();
+    double      dmax   = (*this)["amax"].real();
+    int         ndbins = (*this)["anumbins"].integer();
+
+    // Extract energies
+    GEnergies energies = m_psfcube.energies();
+
+    // If requested, insert energies at all event list energy boundaries
+    if (m_addbounds) {
+
+        // Set logger
+        GLog* logger = NULL;
+        if (logTerse()) {
+            logger = &log;
+        }
+    
+        // Loop over all observations
+        for (int i = 0; i < m_obs.size(); ++i) {
+    
+            // Get observation and continue only if it is a CTA observation
+            const GCTAObservation* cta = dynamic_cast<const GCTAObservation*>
+                                         (m_obs[i]);
+
+            // Skip observation if it's not a CTA observation
+            if (cta == NULL) {
+                continue;
+            }
+
+            // Skip observation if it does not contain an event list
+            if (cta->eventtype() != "EventList") {
+                continue;
+            }
+
+            // Insert energy boundaries
+            energies = insert_energy_boundaries(energies, *cta, logger);
+
+        } // endfor: looped over all observations
+
+       } // endif: energy bin insertion requested
+
+    // Setup PSF cube
+    m_psfcube = GCTACubePsf(wcs, coords, x, y, dx, dy, nx, ny, energies,
+                            dmax, ndbins);
+
+    // Log PSF cube
+    if (logTerse()) {
+        log << m_psfcube.print(m_chatter) << std::endl;
+    }
+
+    // Return
+    return;
+};

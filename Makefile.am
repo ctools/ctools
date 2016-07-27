@@ -1,4 +1,23 @@
-## Process this file with automake to produce Makefile.in
+#############################################################################
+# Makefile for ctools package                                               #
+# ------------------------------------------------------------------------- #
+# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  This program is free software: you can redistribute it and/or modify     #
+#  it under the terms of the GNU General Public License as published by     #
+#  the Free Software Foundation, either version 3 of the License, or        #
+#  (at your option) any later version.                                      #
+#                                                                           #
+#  This program is distributed in the hope that it will be useful,          #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+#  GNU General Public License for more details.                             #
+#                                                                           #
+#  You should have received a copy of the GNU General Public License        #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
+#                                                                           #
+#############################################################################
 
 # Include M4 macros
 ACLOCAL_AMFLAGS = -I m4
@@ -22,8 +41,12 @@ doc_DATA = \
 	   COPYING \
 	   INSTALL \
 	   NEWS \
-	   README
+	   README.md
 docdir = ${datadir}/doc/${PACKAGE}
+
+# Extra files to be distributed in the tar file
+EXTRA_DIST = README.md \
+             doc/Doxyfile doc/source
 
 #install-data-local: $(HTML_INSTALL_DATA_TARGETS)
 #uninstall-local: $(HTML_UNINSTALL_DATA_TARGETS)
@@ -66,7 +89,7 @@ dynamic-analysis: coverage valgrind
 # Add cppcheck rule
 cppcheck:
 	@if type cppcheck >/dev/null 2>&1; then \
-		cppcheck -v --enable=all --xml \
+		cppcheck -v --enable=all --xml --xml-version=2 \
 		src 2> cppcheck-result.xml; \
 	else \
 		echo "cppcheck not found in PATH."; \
@@ -76,7 +99,7 @@ cppcheck:
 sloccount:
 	@if type sloccount >/dev/null 2>&1; then \
 		sloccount --duplicates --wide --details \
-		src test > sloccount.sc; \
+		cscripts src test > sloccount.sc; \
 	else \
 		echo "sloccount not found in PATH."; \
 	fi
@@ -85,7 +108,7 @@ sloccount:
 cppncss:
 	@if type cppncss >/dev/null 2>&1; then \
 		cppncss -r -v -x -k -f=cppncss-raw-report.xml \
-		src inst/*/src; \
+		src; \
 	else \
 		echo "cppncss not found in PATH."; \
 	fi
@@ -93,9 +116,15 @@ cppncss:
 # Add coverage rule
 coverage:
 	@if type gcovr >/dev/null 2>&1; then \
-		gcovr -r . -x -o gcovr-reports-data.xml; \
+		gcovr -r . -x --exclude-unreachable-branches -o coverage-report-cxx.xml; \
 	else \
 		echo "gcovr script not found in PATH."; \
+	fi; \
+	if type coverage >/dev/null 2>&1; then \
+	    export COVERAGE_FILE=test/.coverage; \
+		coverage xml --omit=**/gammalib/**,/usr/** -o coverage-report-python.xml; \
+	else \
+		echo "coverage script not found in PATH."; \
 	fi
 
 # Add Valgrind rule
@@ -140,18 +169,18 @@ sphinx-install:
 doc: doxygen sphinx
 
 # Non-Automake subdirectories to distribute
-DISTDIRS = doc/html doc/html/images
-dist-hook:
-	( \
-	  builddir=`pwd` ; \
-	  cd $(srcdir) && \
-	  ( \
-	    for dir in $(DISTDIRS) ; do \
-	      find $$dir -depth -print | egrep -v '(~$$)|(/CVS)|(/\.#)|(/\.deps)' \
-		| cpio -pdum $$builddir/$(distdir) 2> /dev/null ; \
-	    done \
-	  ) \
-	)
+#DISTDIRS = doc/html doc/html/images
+#dist-hook:
+#	( \
+#	  builddir=`pwd` ; \
+#	  cd $(srcdir) && \
+#	  ( \
+#	    for dir in $(DISTDIRS) ; do \
+#	      find $$dir -depth -print | egrep -v '(~$$)|(/CVS)|(/\.#)|(/\.deps)' \
+#		| cpio -pdum $$builddir/$(distdir) 2> /dev/null ; \
+#	    done \
+#	  ) \
+#	)
 
 # Add Doxygen rules
 if DX_COND_doc
@@ -283,16 +312,11 @@ DX_CLEANFILES = \
 
 endif #DX_COND_doc
 
-#
-# Additional install rules
-#
-
 # Install HTML files
-#HTMLDIRS = html
-HTMLDIRS =
+HTMLDIRS = html
 HTML_INSTALL_DATA_TARGETS = install-data-html
 install-data-html:
-	$(mkinstalldirs) $(DESTDIR)$(docdir)
+	$(mkinstalldirs) $(DESTDIR)$(docdir)/html/doxygen
 	@for dir in $(HTMLDIRS) ; do \
 	  $(mkinstalldirs) $(DESTDIR)$(docdir)/$$dir && \
 	  for file in $(srcdir)/doc/$$dir/*.* ; do \
@@ -304,6 +328,7 @@ install-data-html:
 # Uninstall HTML files
 HTML_UNINSTALL_DATA_TARGETS = uninstall-data-html
 uninstall-data-html:
+	rm -f $(DESTDIR)$(docdir)/html/doxygen
 	for dir in $(HTMLDIRS) ; do \
 	  rm -f -r $(DESTDIR)$(docdir)/$$dir ; \
 	done

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,15 +33,16 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
 #define G_GET_PARAMETERS                            "ctbin::get_parameters()"
+#define G_FILL_CUBE                      "ctbin::fill_cube(GCTAObservation*)"
+#define G_SET_WEIGHTS                  "ctbin::set_weights(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
+#define G_PLAW_WEIGHTS      //!< Use power law in energy weight computation
 
 /* __ Constants __________________________________________________________ */
-const GEnergy g_energy_margin(1.0e-12, "TeV");
 
 
 /*==========================================================================
@@ -52,6 +53,8 @@ const GEnergy g_energy_margin(1.0e-12, "TeV");
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty ctbin tool.
  ***************************************************************************/
 ctbin::ctbin(void) : ctool(CTBIN_NAME, CTBIN_VERSION)
 {
@@ -68,8 +71,7 @@ ctbin::ctbin(void) : ctool(CTBIN_NAME, CTBIN_VERSION)
  *
  * param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs ctbin tool from an observation container.
  ***************************************************************************/
 ctbin::ctbin(const GObservations& obs) : ctool(CTBIN_NAME, CTBIN_VERSION)
 {
@@ -90,6 +92,9 @@ ctbin::ctbin(const GObservations& obs) : ctool(CTBIN_NAME, CTBIN_VERSION)
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs ctbin tool using command line arguments for user parameter
+ * setting.
  ***************************************************************************/
 ctbin::ctbin(int argc, char *argv[]) : 
        ctool(CTBIN_NAME, CTBIN_VERSION, argc, argv)
@@ -106,6 +111,8 @@ ctbin::ctbin(int argc, char *argv[]) :
  * @brief Copy constructor
  *
  * @param[in] app Application.
+ *
+ * Constructs ctbin tool from another ctbin instance.
  ***************************************************************************/
 ctbin::ctbin(const ctbin& app) : ctool(app)
 {
@@ -122,6 +129,8 @@ ctbin::ctbin(const ctbin& app) : ctool(app)
 
 /***********************************************************************//**
  * @brief Destructor
+ *
+ * Destructs ctbin tool.
  ***************************************************************************/
 ctbin::~ctbin(void)
 {
@@ -142,7 +151,10 @@ ctbin::~ctbin(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Application.
+ * @param[in] app ctbin tool.
+ * @return ctbin tool.
+ *
+ * Assigns ctbin tool.
  ***************************************************************************/
 ctbin& ctbin::operator=(const ctbin& app)
 {
@@ -175,7 +187,9 @@ ctbin& ctbin::operator=(const ctbin& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear ctbin tool
+ *
+ * Clears ctbin tool.
  ***************************************************************************/
 void ctbin::clear(void)
 {
@@ -195,12 +209,12 @@ void ctbin::clear(void)
 
 
 /***********************************************************************//**
- * @brief Bin the event data
+ * @brief Run the ctbin tool
  *
- * This method loops over all observations found in the observation conatiner
- * and bins all events from the event list(s) into counts map(s). Note that
- * each event list is binned in a separate counts map, hence no summing of
- * events is done.
+ * Gets the user parameters and loops over all CTA observations in the
+ * observation container to bin the events into a single counts cube. All
+ * observations in the observation container that do not contain CTA event
+ * lists will be skipped.
  ***************************************************************************/
 void ctbin::run(void)
 {
@@ -212,33 +226,17 @@ void ctbin::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
+        log.header1(gammalib::number("Observation", m_obs.size()));
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Bin observations");
-        }
-        else {
-            log.header1("Bin observation");
-        }
+        log.header1(gammalib::number("Bin observation", m_obs.size()));
     }
 
     // Loop over all observations in the container
@@ -246,14 +244,7 @@ void ctbin::run(void)
 
         // Write header for observation
         if (logTerse()) {
-            std::string header = m_obs[i]->instrument() + " observation";
-            if (m_obs[i]->name().length() > 1) {
-                header += " \"" + m_obs[i]->name() + "\"";
-            }
-            if (m_obs[i]->id().length() > 1) {
-                header += " (id=" + m_obs[i]->id() +")";
-            }
-            log.header3(header);
+            log.header3(get_obs_header(m_obs[i]));
         }
 
         // Get CTA observation
@@ -282,6 +273,9 @@ void ctbin::run(void)
         // Fill the cube
         fill_cube(obs);
 
+        // Set the counts cube weights
+        set_weights(obs);
+
         // Dispose events to free memory
         obs->dispose_events();
 
@@ -293,13 +287,13 @@ void ctbin::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Binned observations");
-        }
-        else {
-            log.header1("Binned observation");
-        }
-        log << m_obs << std::endl;
+        log.header1(gammalib::number("Binned observation", m_obs.size()));
+        log << m_obs.print(m_chatter) << std::endl;
+    }
+
+    // Optionally publish counts cube
+    if (m_publish) {
+        publish();
     }
 
     // Return
@@ -310,26 +304,21 @@ void ctbin::run(void)
 /***********************************************************************//**
  * @brief Save counts cube
  *
- * This method saves the counts cube into a FITS file.
+ * Saves the counts cube into a FITS file.
  ***************************************************************************/
 void ctbin::save(void)
 {
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Save observations");
-        }
-        else {
-            log.header1("Save observation");
-        }
+        log.header1("Save counts cube");
     }
 
-    // Get output filename
+    // Get counts cube filename
     m_outcube = (*this)["outcube"].filename();
 
     // Save only if filename is non-empty
-    if (m_outcube.length() > 0) {
+    if (!m_outcube.is_empty()) {
 
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
@@ -337,9 +326,10 @@ void ctbin::save(void)
         // Save only if observation is valid
         if (obs != NULL) {
         
-            // Dump filename
+            // Log filename
             if (logTerse()) {
-                log << "Save \""+m_outcube+"\"" << std::endl;
+                log << gammalib::parformat("Counts cube file");
+                log << m_outcube.url() << std::endl;
             }
             
             // Save cube
@@ -348,6 +338,39 @@ void ctbin::save(void)
         } // endif: observation was valid
 
     } // endif: outcube file was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish counts cube
+ *
+ * @param[in] name Counts cube name.
+ ***************************************************************************/
+void ctbin::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish counts cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTBIN_NAME;
+    }
+
+    // Log filename
+    if (logTerse()) {
+        log << gammalib::parformat("Counts cube name");
+        log << user_name << std::endl;
+    }
+
+    // Publish counts cube
+    m_counts.publish(user_name);
 
     // Return
     return;
@@ -367,11 +390,14 @@ void ctbin::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
-    m_usepnt = false;
+    m_usepnt  = false;
+    m_publish = false;
+    m_chatter = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_obs.clear();
-    m_cube.clear();
+    m_counts.clear();
+    m_weights.clear();
     m_ebounds.clear();
     m_gti.clear();
     m_ontime   = 0.0;
@@ -392,14 +418,17 @@ void ctbin::copy_members(const ctbin& app)
     // Copy attributes
     m_outcube = app.m_outcube;
     m_usepnt  = app.m_usepnt;
+    m_publish = app.m_publish;
+    m_chatter = app.m_chatter;
 
     // Copy protected members
-    m_obs      = app.m_obs;
-    m_cube     = app.m_cube;
-    m_ebounds  = app.m_ebounds;
-    m_gti      = app.m_gti;
-    m_ontime   = app.m_ontime;
-    m_livetime = app.m_livetime;
+    m_obs       = app.m_obs;
+    m_counts    = app.m_counts;
+    m_weights   = app.m_weights;
+    m_ebounds   = app.m_ebounds;
+    m_gti       = app.m_gti;
+    m_ontime    = app.m_ontime;
+    m_livetime  = app.m_livetime;
 
     // Return
     return;
@@ -445,17 +474,29 @@ void ctbin::get_parameters(void)
     // Create an event cube based on task parameters
     GCTAEventCube cube = create_cube(m_obs);
 
-    // Get the skymap from the cube and initialise all pixels to zero
-    m_cube = cube.map();
-    m_cube = 0.0;
+    // Get the skymap from the cube and initialise all counts cube bins and
+    // weights to zero
+    m_counts  = cube.counts();
+    m_counts  = 0.0;
+    m_weights = m_counts;
 
     // Get energy boundaries
-    m_ebounds  = cube.ebounds();
+    m_ebounds = cube.ebounds();
+
+    // Get remaining parameters
+    m_publish = (*this)["publish"].boolean();
+    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
         m_outcube = (*this)["outcube"].filename();
+    }
+
+    // Write parameters into logger
+    if (logTerse()) {
+        log_parameters();
+        log << std::endl;
     }
 
     // Return
@@ -469,7 +510,7 @@ void ctbin::get_parameters(void)
  * @param[in] obs CTA observation.
  *
  * @exception GException::invalid_value
- *            No event list found in observation.
+ *            No event list or valid RoI found in observation.
  *
  * Fills the events from an event list in the counts cube setup by init_cube.
  ***************************************************************************/
@@ -480,28 +521,29 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
         // Make sure that the observation holds a CTA event list. If this
         // is not the case then throw an exception.
-        const GCTAEventList* events = dynamic_cast<const GCTAEventList*>(obs->events());
+        const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+                                      (obs->events());
         if (events == NULL) {
             std::string msg = "CTA Observation does not contain an event "
-                              "list. Event list information is needed to "
-                              "fill the counts map.";
+                              "list. An event list is needed to fill the "
+                              "counts cube.";
             throw GException::invalid_value(G_FILL_CUBE, msg);
         }
 
         // Get the RoI
         const GCTARoi& roi = events->roi();
 
-        // Get the ebounds
-        const GEbounds& obs_ebounds = events->ebounds();
-
         // Check for RoI sanity
         if (!roi.is_valid()) {
-            std::string msg = "No RoI information found in input observation "
+            std::string msg = "No valid RoI found in input observation "
                               "\""+obs->name()+"\". Run ctselect to specify "
                               "an RoI for this observation before running "
                               "ctbin.";
             throw GException::invalid_value(G_FILL_CUBE, msg);
         }
+
+        // Get counts cube usage flags
+        std::vector<bool> usage = cube_layer_usage(events->ebounds());
 
         // Initialise binning statistics
         int num_outside_roi  = 0;
@@ -509,7 +551,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
         int num_outside_ebds = 0;
         int num_in_map       = 0;
 
-        // Fill sky map
+        // Fill counts sky map
         for (int i = 0; i < events->size(); ++i) {
 
             // Get event
@@ -518,33 +560,39 @@ void ctbin::fill_cube(GCTAObservation* obs)
             // Determine sky pixel
             GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
             GSkyDir      dir   = inst->dir();
-            GSkyPixel    pixel = m_cube.dir2pix(dir);
+            GSkyPixel    pixel = m_counts.dir2pix(dir);
 
-            // Skip if pixel is outside RoI
+            // Skip event if corresponding counts cube pixel is outside RoI
             if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
                 num_outside_roi++;
                 continue;
             }
 
-            // Skip if pixel is out of range
-            if (pixel.x() < -0.5 || pixel.x() > (m_cube.nx()-0.5) ||
-                pixel.y() < -0.5 || pixel.y() > (m_cube.ny()-0.5)) {
+            // Skip event if corresponding counts cube pixel is outside the
+            // counts cube map range
+            if (pixel.x() < -0.5 || pixel.x() > (m_counts.nx()-0.5) ||
+                pixel.y() < -0.5 || pixel.y() > (m_counts.ny()-0.5)) {
                 num_outside_map++;
                 continue;
             }
 
-            // Determine energy bin. Skip if we are outside the energy range
-            int index = m_ebounds.index(event->energy());
-            if (index == -1 ||
-                !obs_ebounds.contains(m_ebounds.emin(index)+g_energy_margin,
-                                      m_ebounds.emax(index)-g_energy_margin)) {
+            // Determine counts cube energy bin
+            int iebin = m_ebounds.index(event->energy());
+
+            // Skip event if the corresponding counts cube energy bin is not
+            // fully contained in the event list energy range. This avoids
+            // having partially filled bins.
+            if (!usage[iebin]) {
                 num_outside_ebds++;
                 continue;
             }
 
             // Fill event in skymap
-            m_cube(pixel, index) += 1.0;
+            m_counts(pixel, iebin) += 1.0;
             num_in_map++;
+
+            // Signal that bin was filled
+            m_weights(pixel, iebin) = 1.0;
 
         } // endfor: looped over all events
 
@@ -571,9 +619,82 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
         // Log cube
         if (logExplicit()) {
-            log.header1("Counts cube");
-            log << m_cube << std::endl;
+            log << m_counts << std::endl;
         }
+
+    } // endif: observation was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set counts cube weights for a given observation
+ *
+ * @param[in] obs CTA observation.
+ *
+ * @exception GException::invalid_value
+ *            No event list or valid RoI found in observation.
+ *
+ * Sets the counts cube weights for all bins that are considered for the
+ * specific observation to unity.
+ ***************************************************************************/
+void ctbin::set_weights(GCTAObservation* obs)
+{
+    // Continue only if observation pointer is valid
+    if (obs != NULL) {
+
+        // Make sure that the observation holds a CTA event list. If this
+        // is not the case then throw an exception.
+        const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+                                      (obs->events());
+        if (events == NULL) {
+            std::string msg = "CTA Observation does not contain an event "
+                              "list. An event list is needed to fill the "
+                              "counts cube.";
+            throw GException::invalid_value(G_SET_WEIGHTS, msg);
+        }
+
+        // Get the RoI
+        const GCTARoi& roi = events->roi();
+
+        // Check for RoI sanity
+        if (!roi.is_valid()) {
+            std::string msg = "No valid RoI found in input observation "
+                              "\""+obs->name()+"\". Run ctselect to specify "
+                              "an RoI for this observation before running "
+                              "ctbin.";
+            throw GException::invalid_value(G_SET_WEIGHTS, msg);
+        }
+
+        // Get counts cube usage flags
+        std::vector<bool> usage = cube_layer_usage(events->ebounds());
+
+        // Loop over all pixels in counts cube
+        for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
+
+            // Get pixel sky direction
+            GSkyDir dir = m_counts.inx2dir(pixel);
+
+            // Skip pixel if it is outside the RoI
+            if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+                continue;
+            }
+
+            // Loop over all energy layers of counts cube
+            for (int iebin = 0; iebin < m_ebounds.size(); ++iebin){
+
+                // Skip energy layer if the usage flag is false
+                if (!usage[iebin]) {
+                    continue;
+                }
+                // Signal that bin was filled
+                m_weights(pixel, iebin) = 1.0;
+
+            } // endfor: looped over energy layers of counts cube
+
+        } // endfor: looped over pixels of counts cube
 
     } // endif: observation was valid
 
@@ -586,10 +707,12 @@ void ctbin::fill_cube(GCTAObservation* obs)
  * @brief Create output observation container.
  *
  * Creates an output observation container that combines all input CTA
- * observation into a single cube-style observation. All non CTA observations
- * present in the observation container are kept. The method furthermore
- * conserves any response information in case that a single CTA observation
- * is provided. This supports the original binned analysis.
+ * observation into a single stacked observation. All non-CTA observations
+ * and all binned CTA observations that were present in the observation
+ * container are append to the observation container so that they can
+ * be used by other tools. The method furthermore conserves any response
+ * information in case that a single CTA observation is provided to support
+ * binned analysis.
  ***************************************************************************/
 void ctbin::obs_cube(void)
 {
@@ -603,26 +726,37 @@ void ctbin::obs_cube(void)
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
         if (obs != NULL) {
 
-            // Only change the event type if we had an unbinned observation
+            // Change the event type if we had an unbinned observation
             if (obs->eventtype() == "EventList") {
 
+                // Assign cube to the observation
                 obs->events(this->cube());
-                obs->eventfile("");
-             } // endif: observation was unbinned
-            else { // input observation was binned and skipped
 
-                // Create new and empty cube
-                GCTAEventCube cube = GCTAEventCube(m_cube, m_ebounds, obs->gti());
-
-                // Assign empty cube to have a new binned observation
-                obs->events(cube);
             }
+
+            // ... otherwise the input observation was binned and hence
+            // skipped. In that case we simply append an empty counts
+            // cube
+            else {
+
+                // Create empty counts cube
+                GCTAEventCube cube(m_counts, m_weights, m_ebounds, obs->gti());
+
+                // Assign empty cube to observation
+                obs->events(cube);
+
+            }
+
+            // Reset file name
+            obs->eventfile("");
 
         } // endif: obervation was valid
 
     } // endif: we only had one observation in the container
 
-    // ... otherwise put a single CTA observation in container
+    // ... otherwise put a single CTA observation in container and
+    // append all observations that have not been used in the binning
+    // to the container
     else {
 
         // Allocate observation container
@@ -634,10 +768,25 @@ void ctbin::obs_cube(void)
         // Attach event cube to CTA observation
         obs.events(this->cube());
 
-        // Set map centre as pointing
-        GSkyPixel    pixel(0.5*double(m_cube.nx()), 0.5*double(m_cube.ny()));
-        GSkyDir      centre = m_cube.pix2dir(pixel);
-        GCTAPointing pointing(centre);
+        // Compute average pointing direction for all CTA event lists
+        double ra     = 0.0;
+        double dec    = 0.0;
+        double number = 0.0;
+        for (int i = 0; i < m_obs.size(); ++i) {
+            GCTAObservation* cta = dynamic_cast<GCTAObservation*>(m_obs[i]);
+            if ((cta != NULL) && (cta->eventtype() == "EventList")) {
+                ra     += cta->pointing().dir().ra();
+                dec    += cta->pointing().dir().dec();
+                number += 1.0;
+            }
+        }
+        if (number > 0.0) {
+            ra  /= number;
+            dec /= number;
+        }
+        GSkyDir dir;
+        dir.radec(ra, dec);
+        GCTAPointing pointing(dir);
 
         // Compute deadtime correction
         double deadc = (m_ontime > 0.0) ? m_livetime / m_ontime : 0.0;
@@ -645,8 +794,8 @@ void ctbin::obs_cube(void)
         // Set CTA observation attributes
         obs.pointing(pointing);
         obs.obs_id(0);
-        obs.ra_obj(centre.ra_deg());   //!< Dummy
-        obs.dec_obj(centre.dec_deg()); //!< Dummy
+        obs.ra_obj(dir.ra_deg());   //!< Dummy
+        obs.dec_obj(dir.dec_deg()); //!< Dummy
         obs.ontime(m_ontime);
         obs.livetime(m_livetime);
         obs.deadc(deadc);
@@ -663,6 +812,9 @@ void ctbin::obs_cube(void)
             if (obs == NULL) {
                 container.append(*m_obs[i]);
             }
+            else if (obs->eventtype() != "EventList") {
+                container.append(*m_obs[i]);
+            }
         }
 
         // Set observation container
@@ -672,4 +824,45 @@ void ctbin::obs_cube(void)
 
     // Return
     return;
+}
+
+
+
+
+/***********************************************************************//**
+ * @brief Determine the counts cube layer usage.
+ *
+ * @param[in] ebounds Energy boundaries of the event list.
+ * @return Vector of usage flags.
+ *
+ * Determines a vector of counts cube layer usage flags that signal whether
+ * an event should actually be filled in the counts cube or not. This makes
+ * sure that no partially filled bins will exist in the counts cube.
+ ***************************************************************************/
+std::vector<bool> ctbin::cube_layer_usage(const GEbounds& ebounds) const
+{
+    // Set energy margin
+    const GEnergy energy_margin(0.01, "GeV");
+
+    // Initialise usage vector
+    std::vector<bool> usage(m_ebounds.size(), true);
+
+    // Loop over all energy bins of the cube
+    for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
+
+        // If the counts cube energy bin is fully contained within the
+        // energy boundaries of the event list the signal usage of this
+        // counts cube bin. Partially overlapping energy bins are signaled
+        // for non-usage, which avoids having partially filled bins in the
+        // counts cube. Some margin is applied that effectively reduces the
+        // width of the counts cube energy bin. This should cope with any
+        // rounding errors that come from reading and writing the energy
+        // boundary information to a FITS file.
+        usage[iebin] = ebounds.contains(m_ebounds.emin(iebin) + energy_margin,
+                                        m_ebounds.emax(iebin) - energy_margin);
+
+    } // endfor: looped over all energy bins
+
+    // Return usage
+    return usage;
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<observation_list title="observation list">
+  <observation name="Crab" id="00001" instrument="CTA">
+    <parameter name="CountsCube"   file="crab_cntmap.fits"/>
+    <parameter name="ExposureCube" file="crab_expcube.fits"/>
+    <parameter name="PsfCube"      file="crab_psfcube.fits"/>
+    <parameter name="BkgCube"      file="crab_bkgcube.fits"/>
+  </observation>
+</observation_list>

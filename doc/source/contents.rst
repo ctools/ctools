@@ -1,19 +1,10 @@
-.. ctools documentation master file, created by
-   sphinx-quickstart on Sat Apr 13 16:41:07 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Documentation
 =============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    about
    download
-   user_manual/index
-   reference_manual/index
-   faq
-   issues
-   develop
-   help
+   users/index
+   develop/index

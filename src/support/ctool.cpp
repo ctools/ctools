@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -49,8 +49,10 @@
 
 
 /* __ Method name definitions ____________________________________________ */
+#define G_SETUP_OBSERVATION       "ctool::setup_observations(GObservations&)"
 #define G_GET_MEAN_POINTING        "ctool::get_mean_pointing(GObservations&)"
 #define G_CREATE_EBOUNDS                            "ctool::create_ebounds()"
+#define G_SET_OBS_RESPONSE        "ctool::set_obs_response(GCTAObservation*)"
 #define G_PROVIDE_HELP                                "ctool::provide_help()"
 
 /* __ Debug definitions __________________________________________________ */
@@ -327,7 +329,7 @@ GObservations ctool::get_observations(const bool& get_response)
 
         // If file is a FITS file then create an empty CTA observation
         // and load file into observation
-        if (gammalib::is_fits(filename)) {
+        if (GFilename(filename).is_fits()) {
 
             // Allocate empty CTA observation
             GCTAObservation cta_obs;
@@ -378,7 +380,98 @@ GObservations ctool::get_observations(const bool& get_response)
 
     // Return observation container
     return obs;
+}
 
+
+/***********************************************************************//**
+ * @brief Setup observation container
+ *
+ * @param[in] obs Observation container
+ *
+ * @exception GException::invalid_value
+ *            Invalid "inobs" parameter encountered.
+ *
+ * Setup an observation container by appending all required information that
+ * is missing using user parameters.
+ *
+ * If the observation container @p obs is empty, the method will extract the
+ * filename from the "inobs" parameter, and if the filename is neither empty
+ * nor "NONE", will load the observation container from the specified file.
+ * If the file is a FITS file, and dependent on the information that is found
+ * in the FITS file, the method will append a single CTA observation to the
+ * observation container, containing either an event list or a counts cube.
+ * Otherwise, the method assumes that the file is an observation definition
+ * XML file and will load that file into the observation container.
+ *
+ * If the filename is empty or "NONE", the method will throw an exception.
+ *
+ * The method will then setup the response for all CTA observations in the
+ * container (see the set_response() method for more information).
+ * 
+ * The method will furthermore setup the observation boundaries for all CTA
+ * observations in the container that contain event lists (see the
+ * set_obs_bounds() method for more information).
+ ***************************************************************************/
+void ctool::setup_observations(GObservations& obs)
+{
+    // Load observations if there are none in the container
+    if (obs.size() == 0) {
+
+        // Get the filename from the "inobs" parameter
+        GFilename filename((*this)["inobs"].filename());
+        
+        // Load observation container from file if the filename is neither
+        // "NONE" nor empty ...
+        if ((gammalib::toupper(filename.url()) != "NONE") &&
+            !filename.is_empty()) {
+
+            // If file does not exist then throw an exceptions
+            if (!filename.exists()) {
+                std::string msg = "The \"inobs\" parameter \""+filename+
+                                  "\" specifies a file that does not "
+                                  "exist. Please specify  a valid event "
+                                  "list, counts cube or  observation "
+                                  "definition XML file.";
+                throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
+            }
+
+            // If the file is a FITS file then load it into a CTA
+            // observation and append that observation to the container ...
+            else if (filename.is_fits()) {
+                GCTAObservation cta(filename);
+                obs.append(cta);
+            }
+
+            // ... otherwise it is assumed that the file is an observation
+            // definition XML file and the file is loaded into the
+            // observation container
+            else {
+                obs.load(filename);
+            }
+
+        }
+
+        // ... otherwise, if the filename is "NONE" or empty then throw
+        // an exception.
+        else {
+            std::string msg = "The \"inobs\" parameter \""+filename+
+                              "\" is not a valid filename. Please specify "
+                              "a valid event list, counts cube or "
+                              "observation definition XML file.";
+            throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
+        }
+
+    } // endif: there were no observations in the container
+
+    // Setup the response for all CTA observations in the observation
+    // container
+    set_response(obs);
+
+    // Setup boundaries for all CTA observations containing event lists
+    set_obs_bounds(obs);
+
+    // Return
+    return;
 }
 
 
@@ -595,15 +688,16 @@ GCTAEventCube ctool::create_cube(const GObservations& obs)
  * method furthermore sets the ontime, livetime and deadtime correction
  * factor.
  *
- * The following parameters are read:
- *      ra - Right Ascension of pointing and RoI centre (deg)
- *      dec - Declination of pointing and RoI centre (deg)
- *      rad - Radius of RoI (deg)
- *      deadc - Deadtime correction factor
- *      tmin - Start time
- *      tmax - Stop time
- *      emin - Minimum energy (TeV)
- *      emax - Maximum energy (TeV)
+ * The following parameters are read
+ *
+ *      ra:    Right Ascension of pointing and RoI centre (deg)
+ *      dec:   Declination of pointing and RoI centre (deg)
+ *      rad:   Radius of RoI (deg)
+ *      deadc: Deadtime correction factor
+ *      tmin:  Start time
+ *      tmax:  Stop time
+ *      emin:  Minimum energy (TeV)
+ *      emax:  Maximum energy (TeV)
  ***************************************************************************/
 GCTAObservation ctool::create_cta_obs(void)
 {
@@ -705,10 +799,10 @@ void ctool::require_inobs(const std::string& method)
 void ctool::require_inobs_nolist(const std::string& method)
 {
     // Get inobs filename
-    std::string filename = (*this)["inobs"].filename();
+    GFilename filename = (*this)["inobs"].filename();
 
     // Continue only if we have a FITS file
-    if (gammalib::is_fits(filename)) {
+    if (filename.is_fits()) {
 
         // Signal no list
         bool is_list = false;
@@ -757,10 +851,10 @@ void ctool::require_inobs_nolist(const std::string& method)
 void ctool::require_inobs_nocube(const std::string& method)
 {
     // Get inobs filename
-    std::string filename = (*this)["inobs"].filename();
+    GFilename filename = (*this)["inobs"].filename();
 
     // Continue only if we have a FITS file
-    if (gammalib::is_fits(filename)) {
+    if (filename.is_fits()) {
 
         // Signal no cube
         bool is_cube = false;
@@ -804,12 +898,9 @@ void ctool::require_inobs_nocube(const std::string& method)
  *
  * @param[in,out] obs Observation container
  *
- * Set the response for a CTA observations in the container that so far have
- * no response using the "caldb" and "irf" task parameters.
- *
- * The following parameters are read:
- *      caldb - Calibration database
- *      irf - Instrument response function
+ * Set the response for all CTA observations in the container that so far
+ * have no response information available. See the set_obs_response()
+ * method for more information about the user parameters that are read.
  ***************************************************************************/
 void ctool::set_response(GObservations& obs)
 {
@@ -841,58 +932,129 @@ void ctool::set_response(GObservations& obs)
  *
  * @param[in,out] obs CTA observation
  *
- * Set the response for a CTA observation. If the CTA observation contains
- * a counts cube the method first attempts to set the response information
- * using the @a expcube and @a psfcube user parameters. If this is not
- * successful (for example because the parameters do not exist or their
- * value is NONE or blank), the method will set the response information
- * from the @a caldb and @a irf user parameters.
+ * @exception GException::invalid_value
+ *            Energy dispersion requested but not energy dispersion cube given
  *
- * The following parameters are read:
- *      expcube - Exposure cube file (optional)
- *      psfcube - PSF cube file (optional)
- *      caldb - Calibration database (optional)
- *      irf - Instrument response function (optional)
+ * Set the response for one CTA observation. If the CTA observation contains
+ * a counts cube the method first attempts to set the response information
+ * using the following user parameters
+ *
+ *      expcube:   Exposure cube file
+ *      psfcube:   Point spread function cube file
+ *      edispcube: Energy dispersion cube file (optional)
+ *      bkgcube:   Background cube file
+ *
+ * If none of the @p expcube, @p psfcube and @p bkgcube parameters is
+ * "NONE" or empty, the method will allocate a stacked response for the
+ * observation. In case that an energy dispersion cube is provided using
+ * the @p edispcube parameter, this energy dispersion cube is also loaded
+ * and attached to the stacked response function.
+ *
+ * In case that any of the @p expcube, @p psfcube and @p bkgcube parameters
+ * is "NONE" or empty, the method will assume that a IRF response should
+ * be used, and will attempty to set the response information using the
+ * following user parameters
+ *
+ *      caldb:     Calibration database
+ *      irf:       Instrument response function
+ *
  ***************************************************************************/
 void ctool::set_obs_response(GCTAObservation* obs)
 {
     // Initialise response flag
     bool has_response = false;
 
-    // If the observation contains a counts cube, then first check whether
-    // the expcube and psfcube parameters exist and are not NONE
+    // If the observation contains a counts cube, then check whether
+    // response information for a stacked analysis is provided, and if so,
+    // set that response information for the CTA observation
     if (dynamic_cast<const GCTAEventCube*>(obs->events()) != NULL) {
-        if (has_par("expcube") && has_par("psfcube") && has_par("bkgcube")) {
+
+        // Check if response cube parameters are provided. We need all four
+        // response cube parameters.
+        if (has_par("expcube") && has_par("psfcube") &&
+            has_par("bkgcube") && has_par("edispcube")) {
+
+            // Check if we need to query the energy dispersion cube. We do
+            // not need to query the cube is an "edisp" parameter exists and
+            // if this parameter is set to "no".
+            bool query_edisp = true;
+            if (has_par("edisp")) {
+                query_edisp = (*this)["edisp"].boolean();
+            }
 
             // Get filenames
-            std::string expcube = (*this)["expcube"].filename();
-            std::string psfcube = (*this)["psfcube"].filename();
-            std::string bkgcube = (*this)["bkgcube"].filename();
+            GFilename expcube((*this)["expcube"].filename());
+            GFilename psfcube((*this)["psfcube"].filename());
+            GFilename edispcube;
+            if (query_edisp) {
+                edispcube = (*this)["edispcube"].filename();
+            }
+            GFilename bkgcube((*this)["bkgcube"].filename());
 
-            // Extract response information if available
-            if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
-                (gammalib::strip_whitespace(expcube) != "") &&
-                (gammalib::strip_whitespace(psfcube) != "") &&
-                (gammalib::strip_whitespace(bkgcube) != "")) {
+            // Extract stacked response information if available
+            if ((gammalib::toupper(expcube.url()) != "NONE") &&
+                (gammalib::toupper(psfcube.url()) != "NONE") &&
+                (gammalib::toupper(bkgcube.url()) != "NONE") &&
+                !expcube.is_empty() &&
+                !psfcube.is_empty() &&
+                !bkgcube.is_empty()) {
 
-                // Get exposure, PSF and background cubes
+                // Load exposure, PSF and background cubes
                 GCTACubeExposure   exposure(expcube);
                 GCTACubePsf        psf(psfcube);
                 GCTACubeBackground background(bkgcube);
 
-                // Set reponse
-                obs->response(exposure, psf, background);
+                // If querying of energy dispersion cube is requested then
+                // query it now
+                if (query_edisp) {
 
-                // Signal response availability
+                    // If filename is valid then use energy dispersion ...
+                    if ((gammalib::toupper(edispcube.url()) != "NONE") &&
+                        !edispcube.is_empty()) {
+
+                        // Load energy dispersion cube
+                        GCTACubeEdisp edisp(edispcube);
+
+                        // Set response with all four cubes
+                        obs->response(exposure, psf, edisp, background);
+
+                    } // endif: energy dispersion cube was provided
+
+                    // ... otherwise work without energy dispersion
+                    else {
+
+                        // If energy dispersion was requested but no cube
+                        // was provided then throw an exception
+                        if (has_par("edisp") && (*this)["edisp"].boolean()) {
+                            std::string msg = "Energy dispersion requested but "
+                                              "no energy dispersion cube was "
+                                              "specified.";
+                            throw GException::invalid_value(G_SET_OBS_RESPONSE,
+                                                            msg);
+                        }
+
+                        // Set response without energy dispersion
+                        obs->response(exposure, psf, background);
+                        
+                    } // endelse: no energy dispersion was available
+
+                } // endif: energy dispersion needed
+
+                // ... otherwise work without energy dispersion
+                else {
+                    obs->response(exposure, psf, background);
+                }
+
+                // Signal that response is available
                 has_response = true;
 
             } // endif: filenames were available
 
-        } // endif: expcube and psfcube parameters exist
+        } // endif: expcube, psfcube and bkdcube parameters valid
     } // endif: observation contains a counts cube
 
-    // If we have not yet response information then get it now
-    // from the caldb and irf parameters
+    // If we have not yet response information then get it now from the
+    // caldb and irf user parameters
     if (!has_response) {
 
         // Load response information
@@ -904,8 +1066,9 @@ void ctool::set_obs_response(GCTAObservation* obs)
         // to the observation definition XML file, in case an observation
         // definition XML file is written.
         std::string parameter = "parameter name=\"Calibration\""
-                                         " database=\""+database+"\""
-                                         " response=\""+irf+"\"";
+                                " database=\""+database+"\""
+                                " response=\""+irf+"\"";
+
         GXmlElement xml;
         xml.append(parameter);
 
@@ -915,22 +1078,6 @@ void ctool::set_obs_response(GCTAObservation* obs)
         // Attach response to observation
         obs->response(response);
         
-        // Set calibration database. If "database" is a valid directory then use
-        // this as the pathname to the calibration database. Otherwise, interpret
-        // "database" as the instrument name, the mission being "cta"
-        /*
-        GCaldb caldb;
-        if (gammalib::dir_exists(database)) {
-            caldb.rootdir(database);
-        }
-        else {
-            caldb.open("cta", database);
-        }
-        */
-
-        // Set reponse
-        //obs->response(irf, caldb);
-
         // Signal response availability
         has_response = true;
 
@@ -942,60 +1089,72 @@ void ctool::set_obs_response(GCTAObservation* obs)
 
 
 /***********************************************************************//**
- * @brief Set observation boundaries
+ * @brief Set observation boundaries for all CTA observations
  *
  * @param[in,out] obs Observation container
+ *
+ * Sets the observation boundaries for all CTA observations in the container
+ * that contain event lists. If the energy boundaries of an event list are
+ * empty, the method gets the 
+ *
+ *      emin:   Minimum energy (TeV)
+ *      emax:   Maximum energy (TeV)
+ *
+ * user parameters and sets a single energy boundary element @p [emin,emax].
+ *
+ * If the RoI radius of the event list is invalid, the method gets the
+ *
+ *      rad:    Region of Interest radius (deg)
+ *
+ * user parameter to set the radius of the RoI, and uses the CTA pointing
+ * direction to set the centre of the RoI.
  ***************************************************************************/
 void ctool::set_obs_bounds(GObservations& obs)
 {
-    // Setup response for all observations
+    // Loop over all observations in the container
     for (int i = 0; i < obs.size(); ++i) {
 
-        // Is this observation a CTA observation?
+        // Get pointer to CTA observation
         GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
 
-        // Continue only if observation is CTA and has events
-        if ((cta != NULL) && (cta->has_events())) {
+        // Fall through if observation is not a CTA observation or if it
+        // does not contain events
+        if ((cta == NULL) || (!cta->has_events())) {
+            continue;
+        }
 
-            // Get pointer on event list
-            GCTAEventList* list = const_cast<GCTAEventList*>(dynamic_cast<const GCTAEventList*>(cta->events()));
+        // Get pointer on CTA event list
+        GCTAEventList* list = const_cast<GCTAEventList*>
+                       (dynamic_cast<const GCTAEventList*>(cta->events()));
 
-            // Continue only if it's valid
-            if (list != NULL) {
+        // Fall through if CTA observation does not contain an event list
+        if (list == NULL) {
+            continue;
+        }
 
-                // If there are no energy boundaries then read the user
-                // parameters and add them
-                if (list->ebounds().is_empty()) {
+        // If there are no energy boundaries then read the "emin" and "emax"
+        // user parameters and add them
+        if (list->ebounds().is_empty()) {
+            if (has_par("emin") && has_par("emax")) {
+                double emin((*this)["emin"].real());
+                double emax((*this)["emax"].real());
+                GEbounds ebounds(GEnergy(emin, "TeV"),
+                                 GEnergy(emax, "TeV"));
+                list->ebounds(ebounds);
+            }
+        }
 
-                    // If there are "emin" and "emax" parameters then use them
-                    if (has_par("emin") && has_par("emax")) {
-                        double emin = (*this)["emin"].real();
-                        double emax = (*this)["emax"].real();
-                        GEbounds ebounds(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
-                        list->ebounds(ebounds);
-                    }
-                    
-                }
-
-                // If there is no ROI then read the user parameters and add
-                // them
-                if (list->roi().radius() == 0) {
-                    
-                    // If there is a "rad" parameter then use it
-                    if (has_par("rad")) {
-                        double rad = (*this)["rad"].real();
-                        GCTARoi roi(GCTAInstDir(cta->pointing().dir()), rad);
-                        list->roi(roi);
-                    }
-
-                }
-
-            } // endif: list was valid
-
-        } // endif: observation was CTA
+        // If there is no RoI then read the "rad" user parameters and use
+        // the pointing direction to set the RoI
+        if (list->roi().radius() == 0) {
+            if (has_par("rad")) {
+                double rad = (*this)["rad"].real();
+                GCTARoi roi(GCTAInstDir(cta->pointing().dir()), rad);
+                list->roi(roi);
+            }
+        }
         
     } // endfor: looped over observations
-
 
     // Return
     return;
@@ -1111,6 +1270,114 @@ size_t ctool::get_current_rss(void)
 
 
 /***********************************************************************//**
+ * @brief Return observation header string
+ *
+ * @param[in] obs Pointer to observation.
+ * @return String containing observation information.
+ *
+ * Returns a string that contains observation information, including the
+ * instrument name, the observation name, and the observation ID. The format
+ * of the string is
+ *
+ *      XXX observation "name" (id=YYYYY)
+ *
+ ***************************************************************************/
+std::string ctool::get_obs_header(const GObservation* obs)
+{
+    // Initialise header string
+    std::string header = obs->instrument() + " observation";
+
+    // If observation name is not empty then add name
+    if (!obs->name().empty()) {
+        header += " \"" + obs->name() + "\"";
+    }
+
+    // If observation ID is not empty then add ID
+    if (!obs->id().empty()) {
+        header += " (id=" + obs->id() +")";
+    }
+
+    // Return header
+    return header;
+}
+
+
+/***********************************************************************//**
+ * @brief Insert observation energy boundaries into list of energies
+ *
+ * @param[in] energies Energies.
+ * @param[in] obs Observation container.
+ * @return Energies.
+ ***************************************************************************/
+GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
+                                          const GCTAObservation& obs,
+                                          GLog*                  log) const
+{
+    // Create copy of input energies
+    GEnergies engs = energies;
+
+    // Get the energy boundaries of the event list
+    GEbounds ebounds = obs.ebounds();
+
+    // Loop over all boundary energies
+    for (int iebin = 0; iebin <= ebounds.size(); ++iebin) {
+
+        // Get boundary energy
+        GEnergy energy;
+        if (iebin < ebounds.size()) {
+            energy = ebounds.emin(iebin);
+        }
+        else {
+            energy = ebounds.emax();
+        }
+
+        // Get index before which the energy should be appended
+        bool insert = true;
+        int  index  = -1;
+        for (int k = 0; k < engs.size(); ++k) {
+        
+            // If energy exists already then skip the boundary and examine the
+            // next one. We consider here 1 MeV as being sufficiently close.
+            if (std::abs(engs[k].MeV()-energy.MeV()) < 1.0) {
+                insert = false;
+                break;
+            }
+        
+            // If energy is above the boundary energy we found the index
+            if (engs[k] > energy) {
+                index = k;
+                break;
+            }
+
+        } // endfor: search index for insertion
+
+        // Insert energy if requested
+        if (insert) {
+
+            // Insert or append energy
+            if (index != -1) {
+                engs.insert(index, energy);
+            }
+            else {
+                engs.append(energy);
+            }
+
+            // Log energy insertion
+            if (log != NULL) {
+                *log << gammalib::parformat("Insert energy");
+                *log << energy.print() << std::endl;
+            }
+
+        } // endif: energy insertion requested
+
+    } // endfor: looped over all energy boundaries
+
+    // Return energies
+    return engs;
+}
+
+
+/***********************************************************************//**
  * @brief Dumps help text in the console
  ***************************************************************************/
 void ctool::provide_help(void) const
@@ -1126,7 +1393,7 @@ void ctool::provide_help(void) const
     char* ptr = std::getenv("CTOOLS");
     if (ptr == NULL) {
         std::string msg = "CTOOLS environment variable not set, cannot "
-                          "display help file. Please define CTOOLS "
+                          "display help file. Please set the CTOOLS "
                           "environment variable.";
         throw GException::invalid_value(G_PROVIDE_HELP, msg);
     }

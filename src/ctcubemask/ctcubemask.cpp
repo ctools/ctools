@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2015 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -282,6 +282,11 @@ void ctcubemask::run(void)
         log << m_obs << std::endl;
     }
 
+    // Optionally publish counts cube
+    if (m_publish) {
+        publish();
+    }
+
     // Return
     return;
 }
@@ -312,21 +317,75 @@ void ctcubemask::save(void)
     if (logTerse()) {
         log << std::endl;
         if (m_obs.size() > 1) {
-            log.header1("Save observations");
+            log.header1("Save counts cubes");
         }
         else {
-            log.header1("Save observation");
+            log.header1("Save counts cube");
         }
     }
 
+    // Get counts cube filename
+    m_outcube = (*this)["outcube"].filename();
+
     // Case A: Save event file(s) and XML metadata information
     if (m_use_xml) {
+
+        // Get prefix
+        m_prefix = (*this)["prefix"].string();
+
+        // Save XML
         save_xml();
     }
 
     // Case B: Save event file as FITS file
     else {
         save_fits();
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish counts cube
+ *
+ * @param[in] name Counts cube name.
+ *
+ * Publishes the first counts cube in the observation container on the VO
+ * Hub.
+ ***************************************************************************/
+void ctcubemask::publish(const std::string& name)
+{
+    // Write header
+    if (logTerse()) {
+        log << std::endl;
+        log.header1("Publish counts cube");
+    }
+
+    // Set default name is user name is empty
+    std::string user_name(name);
+    if (user_name.empty()) {
+        user_name = CTCUBEMASK_NAME;
+    }
+
+    // Get first CTA observation from observation container
+    GCTAObservation* obs  = dynamic_cast<GCTAObservation*>(m_obs[0]);
+    if (obs != NULL) {
+
+        // Get counts cube
+        GCTAEventCube* cube = dynamic_cast<GCTAEventCube*>(obs->events());
+        if (cube != NULL) {
+
+            // Log filename
+            if (logTerse()) {
+                log << "Publish \""+user_name+"\" counts cube." << std::endl;
+            }
+
+            // Publish counts cube
+            cube->counts().publish(user_name);
+
+        }
     }
 
     // Return
@@ -402,10 +461,14 @@ void ctcubemask::get_parameters(void)
         m_select_energy = false;
     }
 
+    // Get remaining parameters
+    m_publish = (*this)["publish"].boolean();
+
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
         m_outcube = (*this)["outcube"].filename();
+        m_prefix  = (*this)["prefix"].string();
     }
 
     // Return
@@ -429,7 +492,7 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
     if (cube != NULL) {
 
         // Extract event cube and energy boundaries
-        GSkyMap         map     = cube->map();
+        GSkyMap         map     = cube->counts();
         const GEbounds& ebounds = cube->ebounds();
 
         // If no energy selection is required set energy boundaries to cube boundaries
@@ -562,7 +625,7 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Put back map into the event cube
-        cube->map(map);
+        cube->counts(map);
 
     } // endif: observation contained an event cube
 
@@ -586,12 +649,13 @@ void ctcubemask::init_members(void)
 	m_regfile.clear();
     m_outcube.clear();
 	m_prefix.clear();
-    m_usepnt = false;
-    m_ra     = 0.0;
-    m_dec    = 0.0;
-    m_rad    = 0.0;
-    m_emin   = 0.0;
-    m_emax   = 0.0;
+    m_usepnt  = false;
+    m_ra      = 0.0;
+    m_dec     = 0.0;
+    m_rad     = 0.0;
+    m_emin    = 0.0;
+    m_emax    = 0.0;
+    m_publish = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -621,6 +685,7 @@ void ctcubemask::copy_members(const ctcubemask& app)
     m_rad     = app.m_rad;
     m_emin    = app.m_emin;
     m_emax    = app.m_emax;
+    m_publish = app.m_publish;
 
     // Copy protected members
     m_obs           = app.m_obs;
@@ -640,38 +705,6 @@ void ctcubemask::free_members(void)
 {
     // Return
     return;
-}
-
-
-/***********************************************************************//**
- * @brief Check input filename
- *
- * @param[in] filename File name.
- *
- * This method checks if the input FITS file is correct.
- ***************************************************************************/
-std::string ctcubemask::check_infile(const std::string& filename) const
-{
-    // Initialise message string
-    std::string message = "";
-
-    // Open FITS file
-    GFits file(filename);
-
-    // Check for IMAGE HDU
-    GFitsImage* image = NULL;
-    try {
-
-        // Get pointer to FITS image
-        image = file.image("IMAGE");
-    }
-    catch (GException::fits_hdu_not_found& e) {
-        message = "No \"IMAGE\" extension found in input file \""
-                + m_outcube + "\".";
-    }
-
-    // Return
-    return message;
 }
 
 
@@ -698,21 +731,29 @@ std::string ctcubemask::set_outfile_name(const std::string& filename) const
 
 
 /***********************************************************************//**
- * @brief Save counts map in FITS format.
+ * @brief Save counts cube in FITS format.
  *
- * Save the counts map as a FITS file. The filename of the FITS file is
+ * Save the counts cube as a FITS file. The filename of the FITS file is
  * specified by the m_outfile member.
  ***************************************************************************/
 void ctcubemask::save_fits(void)
 {
-    // Get output filename
-    m_outcube = (*this)["outcube"].filename();
+    // Save only if filename is non-empty
+    if (!m_outcube.is_empty()) {
 
-    // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+        // Get CTA observation from observation container
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
-    // Save event list
-    save_counts_map(obs, m_outcube);
+        // Log filename
+        if (logTerse()) {
+            log << gammalib::parformat("Counts cube file");
+            log << m_outcube.url() << std::endl;
+        }
+
+        // Save event list
+        save_counts_map(obs, m_outcube);
+        
+    }
 
     // Return
     return;
@@ -732,12 +773,8 @@ void ctcubemask::save_fits(void)
  ***************************************************************************/
 void ctcubemask::save_xml(void)
 {
-    // Get output filename and prefix
-    m_outcube = (*this)["m_outcube"].filename();
-    m_prefix  = (*this)["prefix"].string();
-
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outcube.substr(m_outcube.length()-4,4));
+    std::string suffix = gammalib::tolower(m_outcube.url().substr(m_outcube.length()-4,4));
     if (suffix != ".xml") {
         log << "*** WARNING: Name of observation definition output file \""+
                m_outcube+"\"" << std::endl;
@@ -762,6 +799,12 @@ void ctcubemask::save_xml(void)
 
             // Store output file name in observation
             obs->eventfile(outfile);
+
+            // Log filename
+            if (logTerse()) {
+                log << gammalib::parformat("Counts cube file");
+                log << outfile << std::endl;
+            }
 
             // Save event list
             save_counts_map(obs, outfile);

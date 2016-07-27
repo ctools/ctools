@@ -1,0 +1,31 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csiactdata.par                                                #
+#  Version:   1.1.0                                                         #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
+#                                                                           #
+#  Purpose:   Parameter file for the csiactdata script                      #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+datapath,    s, a, $VHEFITS,,, "Path were data is located"
+master_indx, s, h, master.json,,, "Name of master index file"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csiactdata.log,,, "Log filename"
+

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctbutterfly tool.
 #
-# Copyright (C) 2014 Michal Mayer
+# Copyright (C) 2014-2016 Michal Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,28 +20,23 @@
 # ==========================================================================
 import gammalib
 import ctools
+from testing import test
 
 
 # =============================== #
 # Test class for ctbutterfly tool #
 # =============================== #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for ctbutterfly tool.
+    Test class for ctbutterfly tool
     """
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
-
-        # Set members
-        self.events_name = "data/crab_events.fits"
-        self.model_name  = "data/crab.xml"
-        self.caldb       = "irf"
-        self.irf         = "cta_dummy_irf"
+        test.__init__(self)
 
         # Return
         return
@@ -49,48 +44,102 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("ctbutterfly")
+        self.name('ctbutterfly')
 
         # Append tests
-        self.append(self.test_functional, "Test ctbutterfly functionality")
+        self.append(self._test_cmd, 'Test ctbutterfly on command line')
+        self.append(self._test_python, 'Test ctbutterfly from Python')
 
         # Return
         return
 
-    # Test ctbutterfly functionnality
-    def test_functional(self):
+    # Test ctbutterfly on command line
+    def _test_cmd(self):
         """
-        Test ctbutterfly functionnality.
+        Test ctbutterfly on the command line
+        """
+        # Set tool name
+        ctbutterfly = self._tool('ctbutterfly')
+
+        # Setup ctbutterfly command
+        cmd = ctbutterfly+' inobs="'+self._events+'"'+\
+                          ' outfile="ctbutterfly_cmd1.dat"'+ \
+                          ' inmodel="'+self._model +'" srcname="Crab"'+ \
+                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
+                          ' emin=0.1 emax=100.0'+ \
+                          ' logfile="ctbutterfly_cmd1.log" chatter=1'
+
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
+
+        # Check if execution was successful
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
+
+        # Check result file
+        self._check_result_file('ctbutterfly_cmd1.dat')
+
+        # Setup ctbutterfly command
+        cmd = ctbutterfly+' inobs="event_file_that_does_not_exist.fits"'+\
+                          ' outfile="ctbutterfly_cmd2.dat"'+ \
+                          ' inmodel="'+self._model +'" srcname="Crab"'+ \
+                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
+                          ' emin=0.1 emax=100.0'+ \
+                          ' logfile="ctbutterfly_cmd2.log" chatter=1'
+
+        # Check if execution failed
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
+
+        # Return
+        return
+
+    # Test ctbutterfly from Python
+    def _test_python(self):
+        """
+        Test ctbutterfly from Python
         """
         # Set-up ctbutterfly
         butterfly = ctools.ctbutterfly()
-        butterfly["inobs"]   = self.events_name
-        butterfly["inmodel"] = self.model_name
-        butterfly["srcname"] = "Crab"
-        butterfly["caldb"]   = self.caldb
-        butterfly["irf"]     = self.irf
-        butterfly["emin"]    = 0.1
-        butterfly["emax"]    = 100
-        butterfly["outfile"] = "butterfly.txt"
+        butterfly['inobs']   = self._events
+        butterfly['inmodel'] = self._model
+        butterfly['srcname'] = 'Crab'
+        butterfly['caldb']   = self._caldb
+        butterfly['irf']     = self._irf
+        butterfly['emin']    = 0.1
+        butterfly['emax']    = 100.0
+        butterfly['outfile'] = 'ctbutterfly_py1.dat'
+        butterfly['logfile'] = 'ctbutterfly_py1.log'
+        butterfly['chatter'] = 2
 
-        # Run tool
-        self.test_try("Run ctbutterfly")
-        try:
-            butterfly.run()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in butterfly.")
+        # Run ctbutterfly tool
+        butterfly.logFileOpen()   # Make sure we get a log file
+        butterfly.run()
+        butterfly.save()
 
-        # Save results
-        self.test_try("Save results")
-        try:
-            butterfly.save()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in saving results.")
+        # Check result file
+        self._check_result_file('ctbutterfly_py1.dat')
+
+        # Return
+        return
+
+    # Check result file
+    def _check_result_file(self, filename):
+        """
+        Check result file
+        """
+        # Open result file as CSV file
+        results = gammalib.GCsv(filename)
+
+        # Check dimensions
+        self.test_value(results.nrows(), 100,
+             'Check for 100 rows in butterfly file')
+        self.test_value(results.ncols(), 4,
+             'Check for 4 columns in butterfly file')
 
         # Return
         return

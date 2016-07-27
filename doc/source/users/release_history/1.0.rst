@@ -1,0 +1,45 @@
+.. _1.0:
+
+ctools 1.0 release (18 December 2015)
+=====================================
+
+Overview
+--------
+
+ctools 1.0 is the first stable release of ctools.
+
+In particular, this release provides:
+
+* Support scripts for IACT analysis
+* Compliance to GammaLib 1.0 interface
+
+Bug fixes
+---------
+
+* [`1563 <https://cta-redmine.irap.omp.eu/issues/1563>`_] -
+  Resolve Python test problem on El Capitan
+
+Improvements
+------------
+
+* Update end-user documentation
+* [`1608 <https://cta-redmine.irap.omp.eu/issues/1608>`_] -
+  Rename ``cshessobs`` to ``csiactobs``
+* [`1605 <https://cta-redmine.irap.omp.eu/issues/1605>`_] -
+  Ignore errors in El Capitan post processing
+* [`1604 <https://cta-redmine.irap.omp.eu/issues/1604>`_] -
+  Change ``GException`` to RuntimeError in cscripts
+* [`1603 <https://cta-redmine.irap.omp.eu/issues/1603>`_] -
+  Adapt to GammaLib interface changes
+
+New features
+------------
+
+* [`1608 <https://cta-redmine.irap.omp.eu/issues/1608>`_] -
+  Add ``csiactdata`` script
+* [`1579 <https://cta-redmine.irap.omp.eu/issues/1579>`_] -
+  Add ``csobs2caldb`` script
+* [`1578 <https://cta-redmine.irap.omp.eu/issues/1578>`_] -
+  Add ``csobsinfo``, ``csmodelinfo``, ``csmodelmerge``, ``cstsmapmerge``
+* [`1566 <https://cta-redmine.irap.omp.eu/issues/1566>`_] -
+  Implement handling of stacked data in ``csspec``

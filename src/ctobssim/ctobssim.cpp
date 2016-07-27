@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -29,6 +29,7 @@
 #include <config.h>
 #endif
 #include <cstdio>
+#include <typeinfo> 
 #include "ctobssim.hpp"
 #include "GTools.hpp"
 
@@ -36,6 +37,12 @@
 #define G_GET_PARAMETERS                         "ctobssim::get_parameters()"
 #define G_SIMULATE_SOURCE      "ctobssim::simulate_source(GCTAObservation*, "\
                                                     "GModels&, GRan&, GLog*)"
+#define G_SIMULATE_INTERVAL    "ctobssim::simulate_interval(GCTAObservation*"\
+                       ", GCTAEventList*, GCTAResponseIrf*, GModels&, GTime&"\
+                           ", GTime&, GEnergy&, GEnergy&, GEnergy&, GEnergy&"\
+                          ", GSkyDir&, double&, double&, GRan&, GLog*, int&)"
+#define G_GET_AREA      "ctobssim::get_area(GCTAObservation* obs, GEnergy&, "\
+                                                                  "GEnergy&)"
 
 /* __ Constants __________________________________________________________ */
 const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
@@ -53,6 +60,8 @@ const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty ctobssim tool.
  ***************************************************************************/
 ctobssim::ctobssim(void) : ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
@@ -69,7 +78,7 @@ ctobssim::ctobssim(void) : ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
  *
  * @param[in] obs Observation container.
  *
- * Constructs application by initialising from an observation container.
+ * Constructs ctobssim tool from an observation container.
  ***************************************************************************/
 ctobssim::ctobssim(const GObservations& obs) :
           ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
@@ -91,7 +100,8 @@ ctobssim::ctobssim(const GObservations& obs) :
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  *
- * Constructs application using command line arguments for parameter setting.
+ * Constructs ctobssim tool using command line arguments for user parameter
+ * setting.
  ***************************************************************************/
 ctobssim::ctobssim(int argc, char *argv[]) :
           ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
@@ -108,6 +118,8 @@ ctobssim::ctobssim(int argc, char *argv[]) :
  * @brief Copy constructor
  *
  * @param[in] app Application.
+ *
+ * Constructs ctobssim tool from another ctobssim instance.
  ***************************************************************************/
 ctobssim::ctobssim(const ctobssim& app) : ctool(app)
 {
@@ -124,6 +136,8 @@ ctobssim::ctobssim(const ctobssim& app) : ctool(app)
 
 /***********************************************************************//**
  * @brief Destructor
+ *
+ * Destructs ctobssim tool.
  ***************************************************************************/
 ctobssim::~ctobssim(void)
 {
@@ -144,8 +158,10 @@ ctobssim::~ctobssim(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Application.
- * @return Application.
+ * @param[in] app ctobssim tool.
+ * @return ctobssim tool.
+ *
+ * Assigns ctobssim tool.
  ***************************************************************************/
 ctobssim& ctobssim::operator=(const ctobssim& app)
 {
@@ -178,7 +194,9 @@ ctobssim& ctobssim::operator=(const ctobssim& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear application
+ * @brief Clear ctobssim tool
+ *
+ * Clears ctobssim tool.
  ***************************************************************************/
 void ctobssim::clear(void)
 {
@@ -198,10 +216,10 @@ void ctobssim::clear(void)
 
 
 /***********************************************************************//**
- * @brief Simulate event data
+ * @brief Run the ctobssim tool.
  *
- * This method runs the simulation. Results are not saved by this method.
- * Invoke "save" to save the results.
+ * Gets the user parameters, loops over all CTA observations in the
+ * observation container, and simulate events for each observation. 
  ***************************************************************************/
 void ctobssim::run(void)
 {
@@ -279,24 +297,14 @@ void ctobssim::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
+        log.header1(gammalib::number("Observation", m_obs.size()));
         log << m_obs << std::endl;
     }
 
     // Write header
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Simulate observations");
-        }
-        else {
-            log.header1("Simulate observation");
-        }
+        log.header1(gammalib::number("Simulate observation", m_obs.size()));
     }
 
     // From here on the code can be parallelized if OpenMP support
@@ -327,14 +335,7 @@ void ctobssim::run(void)
 
             // Write header for observation
             if (logTerse()) {
-                std::string header = m_obs[i]->instrument() + " observation";
-                if (m_obs[i]->name().length() > 1) {
-                    header += " \"" + m_obs[i]->name() + "\"";
-                }
-                if (m_obs[i]->id().length() > 1) {
-                    header += " (id=" + m_obs[i]->id() +")";
-                }
-                wrklog.header3(header);
+                wrklog.header3(get_obs_header(m_obs[i]));
             }
 
             // Get pointer on CTA observation
@@ -360,6 +361,13 @@ void ctobssim::run(void)
                 continue;
             }
 
+            // Remove now all events from the event list but keep the
+            // event list information such as ROI, Good Time Intervals,
+            // energy boundaries. This will also keep additional columns
+            // in an event list file.
+            GCTAEventList* events = static_cast<GCTAEventList*>(obs->events());
+            events->remove(0, events->size());
+
             // Work on a clone of the CTA observation. This makes sure that
             // any memory allocated for computing (for example a response
             // cache) is properly de-allocated on exit of this run
@@ -375,7 +383,7 @@ void ctobssim::run(void)
             simulate_background(&obs_clone, models, m_rans[i], &wrklog);
 
             // Dump simulation results
-            if (logNormal()) {
+            if (logTerse()) {
                 wrklog << gammalib::parformat("MC events");
                 wrklog << obs_clone.events()->size() - events_before;
                 wrklog << " (all models)";
@@ -405,9 +413,10 @@ void ctobssim::run(void)
 
                 // Save observation into FITS file. This is a critical zone
                 // to avoid multiple threads writing simultaneously
-                #pragma omp critical
+                #pragma omp critical(ctobssim_run)
                 {
-                    obs_clone.save(outfile, clobber());
+                    //obs_clone.save(outfile, clobber());
+                    obs->save(outfile, clobber());
                 }
 
                 // Dispose events
@@ -504,6 +513,7 @@ void ctobssim::init_members(void)
     m_outevents.clear();
     m_prefix.clear();
     m_seed        = 1;
+    m_eslices     = 10;
     m_apply_edisp = false;
     m_max_rate    = 1.0e6;
 
@@ -513,8 +523,7 @@ void ctobssim::init_members(void)
     m_save_and_dispose = false;
 
     // Set fixed parameters
-    m_area        = 19634954.0 * 1.0e4; //!< pi*(2500^2) m^2
-    m_max_photons = 1000000;            //!< Maximum number of photons / time slice
+    m_max_photons = 1000000;  //!< Maximum number of photons / time slice
 
     // Initialise first event identifier
     m_event_id = 1;
@@ -535,11 +544,11 @@ void ctobssim::copy_members(const ctobssim& app)
     m_outevents   = app.m_outevents;
     m_prefix      = app.m_prefix;
     m_seed        = app.m_seed;
+    m_eslices     = app.m_eslices;
     m_apply_edisp = app.m_apply_edisp;
     m_max_rate    = app.m_max_rate;
 
     // Copy protected members
-    m_area             = app.m_area;
     m_max_photons      = app.m_max_photons;
     m_rans             = app.m_rans;
     m_obs              = app.m_obs;
@@ -600,6 +609,7 @@ void ctobssim::get_parameters(void)
 
     // Get other parameters
     m_seed        = (*this)["seed"].integer();
+    m_eslices     = (*this)["eslices"].integer();
     m_apply_edisp = (*this)["edisp"].boolean();
     m_max_rate    = (*this)["maxrate"].real();
 
@@ -665,17 +675,29 @@ void ctobssim::get_parameters(void)
  *
  * @param[in] obs Pointer on CTA observation.
  * @param[in] models Model list.
- * @param[in] ran Random number generator.
+ * @param[in,out] ran Random number generator.
  * @param[in] wrklog Pointer to logger.
  *
- * Simulate source events from a photon list for a given CTA observation.
- * The events are stored in as event list in the observation.
+ * Simulate source events from a photon list for a given CTA observation and
+ * all source models. The events are stored in form of an event list in the
+ * observation.
  *
- * This method does nothing if the observation pointer is NULL. It also
- * verifies if the observation has a valid pointing and response.
+ * The method will loop over all Good Time Intervals (GTI) to perform the
+ * simulations. Within a given GTI the requested energy range is split into
+ * a number of energy slices so that the simulation area can be adapted to
+ * the effective area of the instrument (this avoids simulating a large
+ * number of sources photons at low energies while accepting only few of
+ * them do to the small effective area). In case that the flux of a source
+ * is large, the simulation may be done within time slices so that the
+ * memory requirements won't get too large.
+ *
+ * This method does nothing if the observation pointer is NULL. It verifies
+ * if the observation has a CTA IRF response.
  ***************************************************************************/
-void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
-                               GRan& ran, GLog* wrklog)
+void ctobssim::simulate_source(GCTAObservation* obs,
+                               const GModels&   models,
+                               GRan&            ran,
+                               GLog*            wrklog)
 {
     // Continue only if observation pointer is valid
     if (obs != NULL) {
@@ -685,35 +707,42 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
             wrklog = &log;
         }
 
+        // Get pointer on event list
+        GCTAEventList* events = static_cast<GCTAEventList*>(obs->events());
+
         // Get CTA response
         const GCTAResponseIrf* rsp =
-            dynamic_cast<const GCTAResponseIrf*>(obs->response());
+              dynamic_cast<const GCTAResponseIrf*>(obs->response());
         if (rsp == NULL) {
-            std::string msg = "Response is not an IRF response.\n" +
-                              obs->response()->print();
+            std::string cls = std::string(typeid(obs->response()).name());
+            std::string msg = "Response of type \""+cls+"\" is not a CTA "
+                              "IRF response. Please make sure that a CTA "
+                              "IRF response  is contained in the CTA "
+                              "observation.";
             throw GException::invalid_value(G_SIMULATE_SOURCE, msg);
         }
 
-        // Get pointer on event list (circumvent const correctness)
-        GCTAEventList* events =
-            static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-
-        // Extract simulation region.
+        // Extract simulation region from event list ROI
         GSkyDir dir = events->roi().centre().dir();
         double  rad = events->roi().radius() + g_roi_margin;
 
-        // Dump simulation cone information
-        if (logNormal()) {
-            *wrklog << gammalib::parformat("Simulation area");
-            *wrklog << m_area << " cm2" << std::endl;
+        // Determine energy boundaries for simulation
+        GEbounds ebounds = get_ebounds(events->ebounds());
+
+        // Log simulation cone information
+        if (logTerse()) {
             *wrklog << gammalib::parformat("Simulation cone");
             *wrklog << "RA=" << dir.ra_deg() << " deg";
             *wrklog << ", Dec=" << dir.dec_deg() << " deg";
-            *wrklog << ", r=" << rad << " deg" << std::endl;
+            *wrklog << ", radius=" << rad << " deg" << std::endl;
         }
 
         // Initialise indentation for logging
         int indent = 0;
+
+        // Initialise photon and event counters
+        std::vector<int> nphotons(models.size(),0);
+        std::vector<int> nevents(models.size(),0);
 
         // Loop over all Good Time Intervals
         for (int it = 0; it < events->gti().size(); ++it) {
@@ -722,7 +751,8 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
             GTime tmin = events->gti().tstart(it);
             GTime tmax = events->gti().tstop(it);
 
-            // Dump time interval
+            // Log time interval. Increment indentation if there are
+            // several Good Time Intervals.
             if (logNormal()) {
                 if (events->gti().size() > 1) {
                     indent++;
@@ -736,225 +766,67 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
             }
 
             // Loop over all energy boundaries
-            for (int ie = 0; ie <  events->ebounds().size(); ++ie) {
+            for (int ie = 0; ie <  ebounds.size(); ++ie) {
 
-                // Extract energy boundaries
-                GEnergy emin = events->ebounds().emin(ie);
-                GEnergy emax = events->ebounds().emax(ie);
+                // Set reconstructed energy interval
+                GEnergy ereco_min = ebounds.emin(ie);
+                GEnergy ereco_max = ebounds.emax(ie);
 
-                // Set true photon energy limits for simulation. If observation
-                // has energy dispersion then add margin
-                GEnergy e_true_min = emin;
-                GEnergy e_true_max = emax;
+                // Set true photon energy limits for simulation. If the
+                // observation has energy dispersion then add a margin.
+                GEnergy etrue_min = ereco_min;
+                GEnergy etrue_max = ereco_max;
                 if (rsp->use_edisp()) {
-                    e_true_min = rsp->ebounds(e_true_min).emin();
-                    e_true_max = rsp->ebounds(e_true_max).emax();
+                    etrue_min = rsp->ebounds(etrue_min).emin();
+                    etrue_max = rsp->ebounds(etrue_max).emax();
                 }
 
-                // Dump energy range
+                // Determine simulation area
+                double area = get_area(obs, ereco_min, ereco_max);
+
+                // Log energy range and simulation area
                 if (logNormal()) {
-                    if (events->ebounds().size() > 1) {
+                    *wrklog << gammalib::parformat("Photon energy range", indent);
+                    *wrklog << etrue_min << " - " << etrue_max << std::endl;
+                    *wrklog << gammalib::parformat("Event energy range", indent);
+                    *wrklog << ereco_min << " - " << ereco_max << std::endl;
+                }
+
+                // Increment indentation if there are several energy
+                // boundaries
+                if (logNormal()) {
+                    if (ebounds.size() > 1) {
                         indent++;
                         wrklog->indent(indent);
                     }
-                    *wrklog << gammalib::parformat("Photon energy range", indent);
-                    *wrklog << e_true_min << " - " << e_true_max << std::endl;
-                    *wrklog << gammalib::parformat("Event energy range", indent);
-                    *wrklog << emin << " - " << emax << std::endl;
                 }
 
-                // Loop over all sky models
-                for (int i = 0; i < models.size(); ++i) {
+                // Log simulation area
+                if (logNormal()) {
+                    *wrklog << gammalib::parformat("Simulation area", indent);
+                    *wrklog << area << " cm2" << std::endl;
+                }
 
-                    // Get sky model (NULL if not a sky model)
-                    const GModelSky* model =
-                          dynamic_cast<const GModelSky*>(models[i]);
+                // Save state of event counter before doing the simulation
+                int nevents_before = events->size();
 
-                    // If we have a sky model that applies to the present
-                    // observation then simulate events
-                    if (model != NULL &&
-                        model->is_valid(obs->instrument(), obs->id())) {
+                // Simulate events for this time and energy interval
+                simulate_interval(obs, rsp, events, models, tmin, tmax,
+                                  etrue_min, etrue_max, ereco_min, ereco_max,
+                                  dir, rad, area,
+                                  ran, wrklog, indent, nphotons, nevents);
 
-                        // Determine duration of a time slice by limiting the
-                        // number of simulated photons to m_max_photons.
-                        // The photon rate is estimated from the model flux
-                        // and used to set the duration of the time slice.
-                        double flux     = get_model_flux(model, emin, emax,
-                                                         dir, rad,
-                                                         indent, wrklog);
-                        double rate     = flux * m_area;
-                        double duration = 1800.0;  // default: 1800 sec
-                        if (rate > 0.0) {
-                            duration = m_max_photons / rate;
-                            if (duration < 1.0) {  // not <1 sec
-                                duration = 1.0;
-                            }
-                            else if (duration > 180000.0) { // not >50 hr
-                                duration = 180000.0;
-                            }
-                        }
-                        GTime tslice(duration, "sec");
-
-                        // Skip model if photon rate is 0
-                        if (rate <= 0.0) {
-                            continue;
-                        }
-
-                        // Dump photon rate
-                        if (logNormal()) {
-                            *wrklog << gammalib::parformat("Photon rate", indent);
-                            *wrklog << rate << " photons/s";
-                            if (model->name().length() > 0) {
-                                *wrklog << " [" << model->name() << "]";
-                            }
-                            *wrklog << std::endl;
-                        }
-
-                        // If photon rate exceeds the maximum photon rate
-                        // then throw an exception
-                        if (rate > m_max_rate) {
-                            std::string modnam = (model->name().length() > 0) ?
-                                                 model->name() : "Unknown";
-                            std::string msg    = "Photon rate "+
-                                                 gammalib::str(rate)+
-                                                 " photons/s for model \""+
-                                                 modnam+"\" exceeds maximum"
-                                                 " allowed photon rate of "+
-                                                 gammalib::str(m_max_rate)+
-                                                 " photons/s. Please check"
-                                                 " the model parameters for"
-                                                 " model \""+modnam+"\" or"
-                                                 " increase the value of the"
-                                                 " hidden \"maxrate\""
-                                                 " parameter.";
-                            throw GException::invalid_value(G_SIMULATE_SOURCE, msg);
-                        }
-
-                        // To reduce memory requirements we split long time
-                        // intervals into several slices.
-                        GTime tstart = tmin;
-                        GTime tstop  = tstart + tslice;
-
-                        // Initialise cumulative photon counters
-                        int nphotons = 0;
-
-                        // Loop over time slices
-                        while (tstart < tmax) {
-
-                            // Make sure that tstop <= tmax
-                            if (tstop > tmax) {
-                                tstop = tmax;
-                            }
-
-                            // Dump time slice
-                            if (logExplicit()) {
-                                if (tmax - tmin > tslice) {
-                                    indent++;
-                                    wrklog->indent(indent);
-                                }
-                                *wrklog << gammalib::parformat("Time slice", indent);
-                                *wrklog << tstart.convert(m_cta_ref);
-                                *wrklog << " - ";
-                                *wrklog << tstop.convert(m_cta_ref);
-                                *wrklog << " s";
-                                if (model->name().length() > 0) {
-                                    *wrklog << " [" << model->name() << "]";
-                                }
-                                *wrklog << std::endl;
-                            }
-
-                            // Get photons
-                            GPhotons photons = model->mc(m_area, dir, rad,
-                                                         e_true_min, e_true_max,
-                                                         tstart, tstop, ran);
-
-                            // Dump number of simulated photons
-                            if (logExplicit()) {
-                                *wrklog << gammalib::parformat("MC source photons/slice", indent);
-                                *wrklog << photons.size();
-                                if (model->name().length() > 0) {
-                                    *wrklog << " [" << model->name() << "]";
-                                }
-                                *wrklog << std::endl;
-                            }
-
-                            // Simulate events from photons
-                            for (int i = 0; i < photons.size(); ++i) {
-
-                                // Increment photon counter
-                                nphotons++;
-
-                                // Simulate event. Note that this method
-                                // includes the deadtime correction.
-                                GCTAEventAtom* event = rsp->mc(m_area,
-                                                               photons[i],
-                                                               *obs,
-                                                               ran);
-
-                                if (event != NULL) {
-
-                                    // Use event only if it falls within ROI
-                                    // energy boundary and time slice
-                                    if (events->roi().contains(*event) &&
-                                        event->energy() >= emin &&
-                                        event->energy() <= emax &&
-                                        event->time() >= tstart &&
-                                        event->time() <= tstop) {
-                                        event->event_id(m_event_id);
-                                        events->append(*event);
-                                        m_event_id++;
-                                    }
-                                    delete event;
-                                }
-
-                            } // endfor: looped over events
-
-                            // Go to next time slice
-                            tstart = tstop;
-                            tstop  = tstart + tslice;
-
-                            // Reset indentation
-                            if (logExplicit()) {
-                                if (tmax - tmin > tslice) {
-                                    indent--;
-                                    wrklog->indent(indent);
-                                }
-                            }
-
-                        } // endwhile: looped over time slices
-
-                        // Dump simulation results
-                        if (logNormal()) {
-                            *wrklog << gammalib::parformat("MC source photons", indent);
-                            *wrklog << nphotons;
-                            if (model->name().length() > 0) {
-                                *wrklog << " [" << model->name() << "]";
-                            }
-                            *wrklog << std::endl;
-                            *wrklog << gammalib::parformat("MC source events", indent);
-                            *wrklog << events->size();
-                            if (model->name().length() > 0) {
-                                *wrklog << " [" << model->name() << "]";
-                            }
-                            *wrklog << std::endl;
-
-                        }
-                        
-                    } // endif: model was a sky model
-
-                } // endfor: looped over models
-
-                // Dump simulation results
+                // Log simulation results
                 if (logNormal()) {
                     *wrklog << gammalib::parformat("MC source events", indent);
-                    *wrklog << events->size();
+                    *wrklog << events->size() - nevents_before;
                     *wrklog << " (all source models)";
                     *wrklog << std::endl;
                 }
 
-                // Reset indentation
+                // Reset indentation if there were several energy boundaries
                 if (logNormal()) {
-                    if (events->ebounds().size() > 1) {
+                    if (ebounds.size() > 1) {
                         indent--;
                         wrklog->indent(indent);
 
@@ -963,7 +835,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
 
             } // endfor: looped over all energy boundaries
 
-            // Reset indentation
+            // Reset indentation if there were several Good Time Intervals
             if (logNormal()) {
                 if (events->gti().size() > 1) {
                     indent--;
@@ -976,10 +848,372 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
         // Reset indentation
         wrklog->indent(0);
 
+        // Log simulation summary
+        if (logTerse()) {
+            for (int i = 0; i < models.size(); ++i) {
+                const GModelSky* model = dynamic_cast<const GModelSky*>(models[i]);
+                if (model == NULL) {
+                    continue;
+                }
+                if (!model->is_valid(obs->instrument(), obs->id())) {
+                    continue;
+                }
+                *wrklog << gammalib::parformat("MC source photons");
+                *wrklog << nphotons[i];
+                if (model->name().length() > 0) {
+                    *wrklog << " [" << model->name() << "]";
+                }
+                *wrklog << std::endl;
+                *wrklog << gammalib::parformat("MC source events");
+                *wrklog << nevents[i];
+                if (model->name().length() > 0) {
+                    *wrklog << " [" << model->name() << "]";
+                }
+                *wrklog << std::endl;
+            }
+        }
+
     } // endif: observation pointer was valid
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Simulate source events for a time and energy interval
+ *
+ * @param[in] obs Pointer on CTA observation.
+ * @param[in] rsp Pointer on CTA IRF response.
+ * @param[in,out] events Pointer on CTA event list.
+ * @param[in] models Model list.
+ * @param[in] tmin Start time.
+ * @param[in] tmax Stop time.
+ * @param[in] etrue_min Minimum true energy.
+ * @param[in] etrue_max Maximum true energy.
+ * @param[in] ereco_min Minimum reconstructed energy.
+ * @param[in] ereco_max Maximum reconstructed energy.
+ * @param[in] dir Simulation cone centre.
+ * @param[in] rad Simulation cone radius (degrees).
+ * @param[in] area Simulation area (cm^2).
+ * @param[in,out] ran Random number generator.
+ * @param[in] wrklog Pointer to logger.
+ * @param[in,out] indent Logger indent.
+ * @param[in,out] nphotons Number of photons for all models.
+ * @param[in,out] nevents Number of events for all models.
+ *
+ * Simulate source events for a time and energy interval.
+ ***************************************************************************/
+void ctobssim::simulate_interval(GCTAObservation*       obs,
+                                 const GCTAResponseIrf* rsp,
+                                 GCTAEventList*         events,
+                                 const GModels&         models,
+                                 const GTime&           tmin,
+                                 const GTime&           tmax,
+                                 const GEnergy&         etrue_min,
+                                 const GEnergy&         etrue_max,
+                                 const GEnergy&         ereco_min,
+                                 const GEnergy&         ereco_max,
+                                 const GSkyDir&         dir,
+                                 const double&          rad,
+                                 const double&          area,
+                                 GRan&                  ran,
+                                 GLog*                  wrklog,
+                                 int&                   indent,
+                                 std::vector<int>&      nphotons,
+                                 std::vector<int>&      nevents)
+{
+    // Loop over all models
+    for (int i = 0; i < models.size(); ++i) {
+
+        // Get sky model (NULL if not a sky model)
+        const GModelSky* model = dynamic_cast<const GModelSky*>(models[i]);
+
+        // If the model is not a sky model then skip the model
+        if (model == NULL) {
+            continue;
+        }
+
+        // If the model does not apply to the instrument and observation
+        // identifier then skip the model
+        if (!model->is_valid(obs->instrument(), obs->id())) {
+            continue;
+        }
+
+        // Determine duration of a time slice by limiting the number of
+        // simulated photons to m_max_photons. The photon rate is estimated
+        // from the model flux and used to set the duration of the time
+        // slice.
+        double flux     = get_model_flux(model, etrue_min, etrue_max, dir, rad,
+                                         indent, wrklog);
+        double rate     = flux * area;
+        double duration = 1800.0;           // default: 1800 sec
+        if (rate > 0.0) {
+            duration = m_max_photons / rate;
+            if (duration < 1.0) {           // not <1 sec
+                duration = 1.0;
+            }
+            else if (duration > 180000.0) { // not >50 hr
+                duration = 180000.0;
+            }
+        }
+
+        // Skip model if photon rate is 0
+        if (rate <= 0.0) {
+            continue;
+        }
+
+        // Log photon rate
+        if (logNormal()) {
+            *wrklog << gammalib::parformat("Photon rate", indent);
+            *wrklog << rate << " photons/s";
+            if (model->name().length() > 0) {
+                *wrklog << " [" << model->name() << "]";
+            }
+            *wrklog << std::endl;
+        }
+
+        // If photon rate exceeds the maximum photon rate that is allowed
+        // then throw an exception
+        if (rate > m_max_rate) {
+            std::string mod = (model->name().length() > 0) ?
+                               model->name() : "Unknown";
+            std::string msg = "Photon rate "+gammalib::str(rate)+
+                              " photons/s for model \""+mod+"\" exceeds "
+                              "maximum allowed photon rate of "+
+                              gammalib::str(m_max_rate)+" photons/s. "
+                              "Please check the parameters of model "
+                              "\""+mod+"\" or increase the value of the "
+                              "\"maxrate\" parameter.";
+            throw GException::invalid_value(G_SIMULATE_INTERVAL, msg);
+        }
+
+        // To reduce memory requirements we split long time intervals into
+        // several time slices
+        GTime tstart = tmin;
+        GTime tstop  = tstart + duration;
+
+        // Save state of photon and event counters before doing the
+        // simulation
+        int nphotons_before = nphotons[i];
+        int nevents_before  = nevents[i];
+
+        // Loop over time slices
+        while (tstart < tmax) {
+
+            // Make sure that tstop <= tmax
+            if (tstop > tmax) {
+                tstop = tmax;
+            }
+
+            // Log time slice
+            if (logExplicit()) {
+                if (tmax - tmin > duration) {
+                    indent++;
+                    wrklog->indent(indent);
+                }
+                *wrklog << gammalib::parformat("Time slice", indent);
+                *wrklog << tstart.convert(m_cta_ref) << " - ";
+                *wrklog << tstop.convert(m_cta_ref) << " s";
+                if (model->name().length() > 0) {
+                    *wrklog << " [" << model->name() << "]";
+                }
+                *wrklog << std::endl;
+            }
+
+            // Simulate time slice
+            simulate_time_slice(obs, rsp, events, model, tstart, tstop,
+                                etrue_min, etrue_max, ereco_min, ereco_max,
+                                dir, rad, area,
+                                ran, wrklog, indent,
+                                nphotons[i], nevents[i]);
+
+            // Go to next time slice
+            tstart = tstop;
+            tstop  = tstart + duration;
+
+            // Reset indentation
+            if (logExplicit()) {
+                if (tmax - tmin > duration) {
+                    indent--;
+                    wrklog->indent(indent);
+                }
+            }
+
+        } // endwhile: looped over time slices
+
+        // Log simulation results
+        if (logNormal()) {
+            *wrklog << gammalib::parformat("MC source photons", indent);
+            *wrklog << nphotons[i] - nphotons_before;
+            if (model->name().length() > 0) {
+                *wrklog << " [" << model->name() << "]";
+            }
+            *wrklog << std::endl;
+            *wrklog << gammalib::parformat("MC source events", indent);
+            *wrklog << nevents[i] - nevents_before;
+            if (model->name().length() > 0) {
+                *wrklog << " [" << model->name() << "]";
+            }
+            *wrklog << std::endl;
+
+        }
+            
+    } // endfor: looped over models
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Simulate source events for a time slice
+ *
+ * @param[in] obs Pointer on CTA observation.
+ * @param[in,out] events Pointer on CTA event list.
+ * @param[in] models Model list.
+ * @param[in] tmin Start time.
+ * @param[in] tmax Stop time.
+ * @param[in] etrue_min Minimum true energy.
+ * @param[in] etrue_max Maximum true energy.
+ * @param[in] ereco_min Minimum reconstructed energy.
+ * @param[in] ereco_max Maximum reconstructed energy.
+ * @param[in] dir Simulation cone centre.
+ * @param[in] rad Simulation cone radius (degrees).
+ * @param[in] area Simulation area (cm^2).
+ * @param[in,out] ran Random number generator.
+ * @param[in] wrklog Pointer to logger.
+ * @param[in,out] indent Logger indent.
+ * @param[in,out] nphotons Number of photons.
+ * @param[in,out] nevents Number of events.
+ *
+ * Simulate source events for a time slice.
+ ***************************************************************************/
+void ctobssim::simulate_time_slice(GCTAObservation*       obs,
+                                   const GCTAResponseIrf* rsp,
+                                   GCTAEventList*         events,
+                                   const GModelSky*       model,
+                                   const GTime&           tstart,
+                                   const GTime&           tstop,
+                                   const GEnergy&         etrue_min,
+                                   const GEnergy&         etrue_max,
+                                   const GEnergy&         ereco_min,
+                                   const GEnergy&         ereco_max,
+                                   const GSkyDir&         dir,
+                                   const double&          rad,
+                                   const double&          area,
+                                   GRan&                  ran,
+                                   GLog*                  wrklog,
+                                   int&                   indent,
+                                   int&                   nphotons,
+                                   int&                   nevents)
+{
+    // Get photons
+    GPhotons photons = model->mc(area, dir, rad, etrue_min, etrue_max,
+                                 tstart, tstop, ran);
+
+    // Dump number of simulated photons
+    if (logExplicit()) {
+        *wrklog << gammalib::parformat("MC source photons/slice", indent);
+        *wrklog << photons.size();
+        if (model->name().length() > 0) {
+            *wrklog << " [" << model->name() << "]";
+        }
+        *wrklog << std::endl;
+    }
+
+    // Simulate events from photons
+    for (int i = 0; i < photons.size(); ++i) {
+
+        // Increment photon counter
+        nphotons++;
+
+        // Simulate event. Note that this method includes the deadtime
+        // correction.
+        GCTAEventAtom* event = rsp->mc(area, photons[i], *obs, ran);
+
+        // Use event only if it exists and if it falls within ROI, the
+        // reconstructed energy interval and the time slice
+        if (event != NULL) {
+            if (events->roi().contains(*event) &&
+                event->energy() >= ereco_min &&
+                event->energy() <= ereco_max &&
+                event->time() >= tstart &&
+                event->time() <= tstop) {
+                event->event_id(m_event_id);
+                events->append(*event);
+                m_event_id++;
+                nevents++;
+            }
+            delete event;
+        }
+
+    } // endfor: looped over events
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get energy boundaries
+ *
+ * @param[in] ebounds Energy boundaries of events.
+ * @return Energy boundaries for simulation.
+ *
+ * Get the energy boundaries for the source simulation.
+ *
+ * @todo Need to take care of the (rare) case that there are distinct
+ *       energy boundaries in the event list. In that case we need to
+ *       create mixed energy boundaries.
+ ***************************************************************************/
+GEbounds ctobssim::get_ebounds(const GEbounds& ebounds) const
+{
+    // Set energy bins
+    GEbounds ebins(m_eslices, ebounds.emin(), ebounds.emax());
+ 
+    // Return energy bins
+    return (ebins);
+}
+
+
+/***********************************************************************//**
+ * @brief Get simulation area (cm^2)
+ *
+ * @param[in] obs Pointer on CTA observation.
+ * @param[in] emin Minimum energy.
+ * @param[in] emax Maximum energy.
+ * @return Simulation area (cm^2).
+ *
+ * Get the simulation area for an energy interval in units of cm^2.
+ ***************************************************************************/
+double ctobssim::get_area(GCTAObservation* obs,
+                          const GEnergy&   emin,
+                          const GEnergy&   emax) const
+{
+    // Get CTA response
+    const GCTAResponseIrf* rsp =
+                      dynamic_cast<const GCTAResponseIrf*>(obs->response());
+    if (rsp == NULL) {
+        std::string cls = std::string(typeid(rsp).name());
+        std::string msg = "Response of type \""+cls+"\" is not a CTA IRF "
+                          "response. Please make sure that a CTA IRF "
+                          "response  is contained in the CTA observation.";
+        throw GException::invalid_value(G_GET_AREA, msg);
+    }
+
+    // Compute effective area at minimum and maximum energy
+    double area_emin = rsp->aeff()->max(emin.log10TeV(), 0.0, 0.0);
+    double area_emax = rsp->aeff()->max(emax.log10TeV(), 0.0, 0.0);
+
+    // Use maximum of both
+    double area = (area_emin > area_emax) ? area_emin : area_emax;
+
+    // Multiply by security factor
+    area *= 2.0;
+
+    // Return simulation area
+    return area;
 }
 
 
@@ -992,7 +1226,7 @@ void ctobssim::simulate_source(GCTAObservation* obs, const GModels& models,
  * @param[in] centre Centre of region for photon rate determination.
  * @param[in] radius Radius of region for photon rate determination (degrees).
  * @param[in] indent Indent for logging.
- * @param[in,out] wrklog Pointer to logger (default: NULL).
+ * @param[in,out] wrklog Pointer to logger.
  * @return Model flux (photons/cm2/sec).
  ***************************************************************************/
 double ctobssim::get_model_flux(const GModelSky* model,
@@ -1224,6 +1458,12 @@ void ctobssim::save_fits(void)
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
+        // Log filename
+        if (logTerse()) {
+            log << gammalib::parformat("Event list file");
+            log << m_outevents << std::endl;
+        }
+
         // Save observation into FITS file
         obs->save(m_outevents, clobber());
 
@@ -1248,7 +1488,7 @@ void ctobssim::save_xml(void)
 {
     // Get output filename and prefix
     m_outevents = (*this)["outevents"].filename();
-    m_prefix  = (*this)["prefix"].string();
+    m_prefix    = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
     std::string suffix = gammalib::tolower(m_outevents.substr(m_outevents.length()-4,4));
@@ -1278,10 +1518,17 @@ void ctobssim::save_xml(void)
                 if (obs->events()->size() != 0) {
 
                     // Set event output file name
-                    std::string outfile = m_prefix + gammalib::str(i) + ".fits";
+                    std::string outfile = m_prefix + gammalib::str(i) +
+                                          ".fits";
 
                     // Store output file name in observation
                     obs->eventfile(outfile);
+
+                    // Log filename
+                    if (logTerse()) {
+                        log << gammalib::parformat("Event list file");
+                        log << outfile << std::endl;
+                    }
 
                     // Save observation into FITS file
                     obs->save(outfile, clobber());

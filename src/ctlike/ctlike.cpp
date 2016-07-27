@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2015 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -230,13 +230,8 @@ void ctlike::run(void)
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
+        log.header1(gammalib::number("Observation",m_obs.size()));
+        log << m_obs.print(m_chatter) << std::endl;
     }
 
     // Optimize model parameters using LM optimizer
@@ -311,7 +306,7 @@ void ctlike::run(void)
     if (logTerse()) {
         log << std::endl;
         log.header1("Maximum likelihood optimisation results");
-        log << *m_opt << std::endl;
+        log << m_opt->print(m_chatter) << std::endl;
         log << gammalib::parformat("Maximum log likelihood");
         log << gammalib::str(m_logL,3) << std::endl;
         log << gammalib::parformat("Observed events  (Nobs)");
@@ -321,7 +316,7 @@ void ctlike::run(void)
         log << " (Nobs - Npred = ";
         log << gammalib::str(num_events-npred);
         log << ")" << std::endl;
-        log << m_obs.models() << std::endl;
+        log << m_obs.models().print(m_chatter) << std::endl;
     }
 
     // Restore energy dispersion flag for all CTA observations
@@ -353,9 +348,19 @@ void ctlike::save(void)
     // Get output filename
     m_outmodel = (*this)["outmodel"].filename();
 
-    // Write results out as XML model
-    if (gammalib::toupper(m_outmodel) != "NONE") {
+    // Save only if filename is non-empty
+    if (!m_outmodel.is_empty() &&
+        gammalib::toupper(m_outmodel.url()) != "NONE") {
+
+        // Log filename
+        if (logTerse()) {
+            log << "Save fitted parameters into file \""+m_outmodel+"\".";
+            log << std::endl;
+        }
+
+        // Write results out as XML model
         m_obs.models().save(m_outmodel);
+
     }
 
     // Return
@@ -420,6 +425,7 @@ void ctlike::get_parameters(void)
     m_refit           = (*this)["refit"].boolean();
     m_apply_edisp     = (*this)["edisp"].boolean();
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
+    m_chatter         = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -441,7 +447,9 @@ void ctlike::get_parameters(void)
 
 
 /***********************************************************************//**
- * @brief Optimize model parameters using Levenberg-Marquardt method
+ * @brief Optimise model parameters
+ *
+ * Optimise model parameters using a maximum likelihood fit.
  ***************************************************************************/
 void ctlike::optimize_lm(void)
 {
@@ -518,8 +526,10 @@ void ctlike::optimize_lm(void)
 
 
 /***********************************************************************//**
- * @brief Re-optimize model parameters using Levenberg-Marquardt method
- *        for TS computation
+ * @brief Re-optimise model parameters for TS computation
+ *
+ * Re-optimise the model parameters using a maximum likelihood fit for
+ * computation of the Test Statistic value for a given source.
  ***************************************************************************/
 double ctlike::reoptimize_lm(void)
 {
@@ -530,23 +540,26 @@ double ctlike::reoptimize_lm(void)
         log.indent(1);
     }
 
+    // Create a clone of the optimizer for the re-optimisation
+    GOptimizer* opt = m_opt->clone();
+
     // Perform LM optimization
-    m_obs.optimize(*m_opt);
+    m_obs.optimize(*opt);
 
     // Optionally refit
     if (m_refit) {
-        m_obs.optimize(*m_opt);
+        m_obs.optimize(*opt);
     }
 
     // Store maximum log likelihood value
-    double logL = -(m_opt->value());
+    double logL = -(opt->value());
 
     // Write optimization results
     log.indent(0);
     if (logTerse()) {
         log << std::endl;
         log.header1("Maximum likelihood re-optimisation results");
-        log << *m_opt << std::endl;
+        log << *opt << std::endl;
     }
 
     // Return
@@ -575,6 +588,7 @@ void ctlike::init_members(void)
     m_opt             = NULL;
     m_apply_edisp     = false;
     m_fix_spat_for_ts = false;
+    m_chatter         = static_cast<GChatter>(2);
 
     // Set logger properties
     log.date(true);
@@ -611,6 +625,7 @@ void ctlike::copy_members(const ctlike& app)
     m_opt             = app.m_opt->clone();
     m_apply_edisp     = app.m_apply_edisp;
     m_fix_spat_for_ts = app.m_fix_spat_for_ts;
+    m_chatter         = app.m_chatter;
 
     // Return
     return;

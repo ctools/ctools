@@ -1,7 +1,7 @@
 /***************************************************************************
  *                           ctools - SWIG file                            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -54,7 +54,9 @@
 %include "ctskymap.i"
 %include "ctexpcube.i"
 %include "ctpsfcube.i"
+%include "ctedispcube.i"
 %include "ctbkgcube.i"
+%include "ctmapcube.i"
 %include "ctcubemask.i"
 %include "cttsmap.i"
 %include "ctbutterfly.i"
@@ -64,6 +66,6 @@
 /* __ Test function ______________________________________________________ */
 %pythoncode %{
 def test():
-    from ctools.tests import test_python
-    test_python.test(installed=True)
+    from ctools.tests import test_python_ctools
+    test_python_ctools.test(installed=True)
 %}

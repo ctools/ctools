@@ -1,124 +1,251 @@
-New Features and Important Changes in ctools 1.0.1
+New Features and Important Changes in ctools 1.1.0
 
-Author(s) : Juergen Knoedlseder
-
-27 January 2016
+24 July 2016
 
 
-1. Introduction
----------------
-This document briefly summarizes executable by executable the most important
-changes made since the last release of ctools.
+Introduction
+------------
+This document briefly summarizes the changes that have been made in this
+ctools release with respect to the precedent release.
 
 
-2. Configuration
------------------
-If ctools is compiled on Mavericks (Mac OS X 10.9) or newer but Python has been
-compiled for an earlier deployment target, a compatibility issue arises due to the
-way how class names are mangled by the compiler. This is now automatically detected
-and fixed, which should solve some compatibility issues that have been encountered
-by user using the Anaconda package on Mac OS X.
+Configuration
+-------------
+The package now supports out of source builds (#1484).
 
 
-3. Python interface
--------------------
-None
-
-
-4. Support model
+Python interface
 ----------------
-None
+The IACT scripts csfindobs, csiactcopy, csiactdata, and csiactobs are only
+imported into the cscripts module and tested if the Python version is 2.6 or
+newer. These scripts make use of the json Python module that is only became
+available from Python 2.6 on.
 
 
-5. ctobssim - CTA observation simulation
-----------------------------------------
-None
+Support model
+-------------
+The "edispcube" parameter is expected in any tool that supports stacked
+analysis. If the parameter is not "NONE" or empty, the ctool::set_obs_response()
+method will load the energy dispersion cube and use it in the response
+definition of the first observations (#1724).
+
+A new method setup_observations() has been added that sets up an observation
+container by appending all required information that is missing using the
+user parameters.
 
 
-6. ctselect - CTA event selection
----------------------------------
-None
+ctobssim - CTA observation simulation
+-------------------------------------
+The simulation energy range is subdivided internally to avoid having a too
+large difference between simulation area and effective area. Before, there
+was a simulation area of 19634954 m^2 that was applied to all energies, which
+led to the simulation of a huge number of low energy photons that were thrown
+away later due to the small effective area. Now, the energy range is subdivided
+(controlled using the "eslices" parameter), and for each energy range, the
+simulation area is computed from the maximum effective area in that energy
+range multiplied by a security factor of 2. This leads to a much more efficient
+simulation of low-energy events (#1673).
+
+Any existing events in an event list are now removed before starting the
+simulation to enable providing an existing event file on input from which
+only the observation attributes are extracted (for example GTI, ROI, energy
+range, etc.) while the measured events are replaced by the simulated ones
+(#1663).
 
 
-7. ctbin - CTA event binning
-----------------------------
-None
-
-
-8. ctlike - Maximum likelihood fitting
---------------------------------------
-None
-
-
-9. cttsmap - Generation of Test Statistics map
-----------------------------------------------
-None
-
-
-10. ctskymap - CTA sky mapping
+ctselect - CTA event selection
 ------------------------------
-None
+The tool now allows the usage of non-default extension names for the event
+and Good Time Intervals. If the events are not located in the "EVENTS"
+extension, the extension name can be provided by appending the extension
+name to the input file name using the syntax
+
+    <filename>[<event extension name>]
+
+where <filename> needs to be replaced by the name of the FITS file and
+<event extension name> by the name of the FITS extension. ctselect also
+extracts the name of the Good Time Intervals extension from the data sub-
+space keywords provided in the header of the event file.
+
+The user has now also the possibility to specify other extension names for
+the events and the Good Time intervals upon writing of the selected output
+file. The format of the "outobs" parameter for this is
+
+    <filename>[<event extension name;GTI extension name>]
+
+If only an event extension name is provided using
+
+    <filename>[<event extension name>]
+
+the original extension name will be kept for the GTIs. Changing only the
+GTI extension name can be achieved using
+
+    <filename>[;GTI extension name>]
+
+The ctselect tool now can also write the output into the same file that
+was input, replacing the initial event (and eventually also Good Time
+Intervals) extensions.
 
 
-11. ctmodel - CTA counts cube modelling
----------------------------------------
-The get_obs() method, that has been accidently removed, has been put back
-which allows computation of a model cube for a stacked analysis. Another
-bug was corrected that led to the generation of model cubes with a single
-pixel, related to an internal change of the logic in how input information
-was handled. This fixes issue #1609.
+ctbin - CTA event binning
+-------------------------
+Add publish() method to publish the counts cube via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
+
+The tool now computes the counts cube weights according to the overlaps
+between the Region of Interests and energy boundaries with the counts
+cube bins (#1789). Initially an implementation was done taking into account
+the partial overlaps between counts cube bins and the data space selection,
+but this led to a bias that was inherent to the method (#1819). It was
+therefore decided to move back to the original scheme.
 
 
-12. ctexpcube - CTA exposure cube generation
---------------------------------------------
-None
-
-
-13. ctpsfcube - CTA point spread function cube generation
----------------------------------------------------------
-None
-
-
-14. ctbkgcube - CTA background cube generation
-----------------------------------------------
-None
-
-
-15. ctcubemask - CTA cube filtering
+ctlike - Maximum likelihood fitting
 -----------------------------------
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
+
+
+cttsmap - Generation of Test Statistic map
+------------------------------------------
+Add publish() method to publish the Test Statistic map via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
+
+Add "edispcube" parameter to support energy dispersion for stacked analysis 
+(#1724).
+
+
+ctskymap - CTA sky mapping
+--------------------------
+Add publish() method to publish the sky map via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
+
+
+ctmodel - CTA counts cube modelling
+-----------------------------------
+Add publish() method to publish the model cube via a SAMP Hub to Virtual
+Observatory interoperable tools (e.g. Aladin).
+
+Add "edispcube" parameter to support energy dispersion for stacked analysis 
+(#1724).
+
+
+ctexpcube - CTA exposure cube generation
+----------------------------------------
+Add publish() method to publish the exposure cube via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
+
+Remove "edisp" parameter as this is parameter is not needed (#1724).
+
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
+
+
+ctpsfcube - CTA point spread function cube generation
+-----------------------------------------------------
+Remove "edisp" parameter as this is parameter is not needed (#1724).
+
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
+
+
+ctedispcube - CTA energy dispersion cube generation
+---------------------------------------------------
+This tool generates an energy dispersion cube for a stacked analysis. The
+energy dispersion cube holds the migration matrix as function of sky
+direction, true photon energy and the migration value which is the ratio
+of reconstructed over true energy (#1724).
+
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
+
+
+ctbkgcube - CTA background cube generation
+------------------------------------------
+Add publish() method to publish the background cube via a SAMP Hub to
+Virtual Observatory interoperable tools (e.g. Aladin).
+
+Added hidden "addbounds" parameter to insert energy layers for each
+energy boundary of the input observation (#1819).
+
+
+ctmapcube - CTA map cube generation
+-----------------------------------
+This tools generates a map cube from a model definition XML file. In that
+way an arbitrary source model can be fed as diffuse map cube into an
+analysis. This speeds up considerably the analysis in case that many
+(extended) sources should be kept fixed (#1760)
+
+
+ctcubemask - CTA cube filtering
+-------------------------------
+Add publish() method to publish the masked counts cube via a SAMP Hub
+to Virtual Observatory interoperable tools (e.g. Aladin).
+
+
+ctbutterfly - Generate butterfly diagrams
+-----------------------------------------
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
+
+
+ctulimit - Compute upper limit
+------------------------------
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
+
+In case that the parameter error is zero, the parameter value is taken as
+parameter error to define the bracketing parameter values (#1795).
+
+
+cterror - Likelihood profile error computation
+----------------------------------------------
+The output filename is now read ahead in case that the tool is executed
+(#1700).
+
+Add "edispcube" parameter to support energy dispersion for stacked analysis
+(#1724).
+
+
+cscripts
+--------
+Add the csiactcopy script that copies IACT data from a remote machine to
+the user's machine (#1661).
+
+Add csresmap::publish() method to publish the residual map via a SAMP Hub
+to Virtual Observatory interoperable tools (e.g. Aladin).
+
+Add "edispcube" parameter to cslightcrv, csresmap, and csspec scripts to
+support energy dispersion for stacked analysis (#1724).
+
+Add csworkflow script that executes an arbitrary analysis workflow (#1508).
+
+Transformed cta_root2caldb into csroot2caldb script. The parameters
+"bgdoversample" and "bgdinfill" have been added to the parameter file to
+provide more control over the background template generation. The background
+template is now generated using linear interpolation, and the
+"bgdoversample" allows to generate the background template at a finer
+sampling than the spatial sampling in the ROOT file.
+
+Add csobsdef.pntdef() method to set directly a pointing definition from a
+gammalib.GCsv object (#1771).
+
+Add cstsmapsplit script that generates the command sequence for splitting the
+computation of a Test Statistic map into computations of sub maps (#1797).
+
+Unit tests have been added for all cscripts.
+
+
+Examples
+--------
 None
 
 
-16. ctbutterfly - Generate butterfly diagrams
----------------------------------------------
+caldb
+-----
 None
 
 
-17. ctulimit - Compute upper limit
-----------------------------------
-None
-
-
-18. cterror - Likelihood profile error computation
---------------------------------------------------
-None
-
-
-19. cscripts
-------------
-None
-
-
-20. Examples
-------------
-None
-
-
-21. caldb
----------
-None
-
-
-22. models
-----------
+models
+------
 None

@@ -1,0 +1,37 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csobsinfo.par                                                 #
+#  Version:   1.1.0                                                         #
+#                                                                           #
+#  Author:    Michael Mayer                                                 #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
+#                                                                           #
+#  Purpose:   Parameter file for the csobsinfo script                       #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,   f, a, obs.xml,,, "Input event list, counts cube, or observation definition XML file"
+ds9file, f, h, NONE,,, "Output DS9 region file containing pointings"
+
+#
+# Script parameters
+#==================
+offset, b, h, no,,, "Compute offset from target to pointing positions?"
+ra,     r, a, 0.0,,, "Target Right Ascension (deg)"
+dec,    r, a, 0.0,,, "Target Declination (deg)")
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csobsinfo.log,,, "Log filename"

@@ -1,15 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script illustrates how to perform a binned CTA analysis based on
-# simulated CTA data. You may use and adapt this script to implement your
-# own pipeline.
+# Perform binned analysis of simulated CTA data.
 #
-# Usage:
-#   ./pipeline_binned_disk.py
-#
-# ==========================================================================
-#
-# Copyright (C) 2015 Juergen Knoedlseder
+# Copyright (C) 2015-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import sys
 import gammalib
 import ctools
 from cscripts import obsutils
@@ -33,25 +27,41 @@ from cscripts import obsutils
 # ================== #
 # Setup observations #
 # ================== #
-def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
-                       emin=0.1, emax=100.0, rad=5.0, duration=1800.0,
-                       deadc=0.95,
-                       caldb="prod2", irf="South_50h"):
+def setup_observations(pattern='four', ra=83.63, dec=22.01, offset=1.5,
+                       emin=0.1, emax=100.0, rad=5.0, duration=180.0,
+                       deadc=0.95, caldb='prod2', irf='South_0.5h'):
     """
-    Returns an observation container.
+    Returns an observation container
 
-    Keywords:
-     pattern   - Pointing pattern, either "single" or "four"
-     ra        - RA of pattern centre [deg] (default: 83.6331)
-     dec       - DEC of pattern centre [deg] (default: 22.0145)
-     offset    - Offset between observations of pattern [deg] (default: 1.5)
-     emin      - Minimum energy [TeV] (default: 0.1)
-     emax      - Maximum energy [TeV] (default: 100.0)
-     rad       - ROI radius used for analysis [deg] (default: 5.0)
-     duration  - Duration of one CTA observation [seconds] (default: 1800.0)
-     deadc     - Deadtime correction factor (default: 0.95)
-     caldb     - Calibration database path (default: "dummy")
-     irf       - Instrument response function (default: cta_dummy_irf)
+    Parameters
+    ----------
+    pattern : str, optional
+        Pointing pattern, either 'single' or 'four'
+    ra : float, optional
+        Right Ascension of pattern centre (deg)
+    dec : float, optional
+        Declination of pattern centre (deg)
+    offset : float, optional
+        Offset between observations of pattern (deg)
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    rad : float, optional
+        ROI radius used for analysis (deg)
+    duration : float, optional
+        Duration of one CTA observation (s)
+    deadc : float, optional
+        Deadtime correction factor
+    caldb : str, optional
+        Calibration database path
+    irf : str, optional
+        Instrument response function
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container
     """
     # Set list of observations
     obs_def_list = obsutils.set_obs_patterns(pattern,
@@ -75,12 +85,21 @@ def setup_observations(pattern="four", ra=83.63, dec=22.01, offset=1.5,
 # =========== #
 # Setup model #
 # =========== #
-def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
+def setup_model(obs, model='data/crab.xml'):
     """
-    Setup model for analysis.
+    Setup model for analysis
 
-    Keywords:
-     model - Model Xml file
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    model : str, optional
+        Model definition XML file
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container
     """
     # Append model from file to observation container
     obs.models(gammalib.GModels(model))
@@ -94,56 +113,71 @@ def setup_model(obs, model="${CTOOLS}/share/models/crab.xml"):
 # ================================ #
 def run_pipeline(obs, emin=0.1, emax=100.0,
                  enumbins=20, nxpix=200, nypix=200, binsz=0.02,
-                 coordsys="CEL", proj="CAR",
-                 model="${CTOOLS}/share/models/crab.xml",
-                 caldb="prod2", irf="South_50h",
+                 coordsys='CEL', proj='CAR',
+                 model='data/crab.xml',
+                 caldb='prod2', irf='South_0.5h',
                  debug=False):
     """
-    Simulation and binned analysis pipeline.
+    Simulation and binned analysis pipeline
 
-    Keywords:
-     emin     - Minimum energy of cube [TeV] (default: 0.1)
-     emax     - Maximum energy of cube [TeV] (default: 100.0)
-     enumbins - Number of energy bins in cube (default: 20)
-     nxpix    - Number of RA pixels in cube (default: 200)
-     nypix    - Number of DEC pixels in cube (default: 200)
-     binsz    - Spatial cube bin size [deg] (default: 0.02)
-     coordsys - Cube coordinate system (CEL or GAL)
-     proj     - Cube World Coordinate System (WCS) projection
-     model    - Model Xml file
-     caldb    - Calibration database path (default: "dummy")
-     irf      - Instrument response function (default: cta_dummy_irf)
-     debug    - Enable debugging (default: False)
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    enumbins : int, optional
+        Number of energy bins
+    nxpix : int, optional
+        Number of pixels in X axis
+    nypix : int, optional
+        Number of pixels in Y axis
+    binsz : float, optional
+        Pixel size (deg)
+    coordsys : str, optional
+        Coordinate system
+    proj : str, optional
+        Coordinate projection
+    model : str, optional
+        Model definition XML file
+    caldb : str, optional
+        Calibration database path
+    irf : str, optional
+        Instrument response function
+    debug : bool, optional
+        Debug function
     """
     # Simulate events
     sim = ctools.ctobssim(obs)
-    sim["debug"] = debug
-    sim["outevents"] = "obs.xml"
+    sim['debug']     = debug
+    sim['outevents'] = 'obs.xml'
     sim.execute()
 
     # Bin events by looping over all observations in the container
-    sim_obs = gammalib.GObservations("obs.xml")
+    sim_obs = gammalib.GObservations('obs.xml')
     obs     = gammalib.GObservations()
     for run in sim_obs:
 
         # Get event filename and set counts cube filename
-        eventfile = run.eventfile()
-        cubefile  = "cube_"+eventfile
+        eventfile = run.eventfile().url()
+        cubefile  = 'cube_'+eventfile
 
         # Bin events for that observation
         bin = ctools.ctbin()
-        bin["inobs"]    = eventfile
-        bin["outcube"]  = cubefile
-        bin["ebinalg"]  = "LOG"
-        bin["emin"]     = emin
-        bin["emax"]     = emax
-        bin["enumbins"] = enumbins
-        bin["nxpix"]    = nxpix
-        bin["nypix"]    = nypix
-        bin["binsz"]    = binsz
-        bin["coordsys"] = coordsys
-        bin["usepnt"]   = True
-        bin["proj"]     = proj
+        bin['inobs']    = eventfile
+        bin['outcube']  = cubefile
+        bin['ebinalg']  = 'LOG'
+        bin['emin']     = emin
+        bin['emax']     = emax
+        bin['enumbins'] = enumbins
+        bin['nxpix']    = nxpix
+        bin['nypix']    = nypix
+        bin['binsz']    = binsz
+        bin['coordsys'] = coordsys
+        bin['usepnt']   = True
+        bin['proj']     = proj
         bin.execute()
 
         # Set observation ID
@@ -156,19 +190,19 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
     # Save XML file
     xml = gammalib.GXml()
     obs.write(xml)
-    xml.save("obs_cube.xml")
+    xml.save('obs_cube.xml')
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike()
-    like["inobs"]    = "obs_cube.xml"
-    like["inmodel"]  = model
-    like["outmodel"] = "fit_results.xml"
-    like["expcube"]  = "NONE"
-    like["psfcube"]  = "NONE"
-    like["bkgcube"]  = "NONE"
-    like["caldb"]    = caldb
-    like["irf"]      = irf
-    like["debug"]    = True # Switch this always on for results in console
+    like['inobs']    = 'obs_cube.xml'
+    like['inmodel']  = model
+    like['outmodel'] = 'fit_results.xml'
+    like['expcube']  = 'NONE'
+    like['psfcube']  = 'NONE'
+    like['bkgcube']  = 'NONE'
+    like['caldb']    = caldb
+    like['irf']      = irf
+    like['debug']    = True # Switch this always on for results in console
     like.execute()
 
     # Return
@@ -179,18 +213,23 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
-    """
-    """
+
     # Dump header
-    print("********************************************")
-    print("*       CTA binned analysis pipeline       *")
-    print("********************************************")
+    print('********************************************')
+    print('*       CTA binned analysis pipeline       *')
+    print('********************************************')
+
+    # Get optional arguments
+    if len(sys.argv) == 2:
+        datadir = sys.argv[1]
+    else:
+        datadir = 'data'
 
     # Setup observations
     obs = setup_observations()
 
     # Setup model
-    obs = setup_model(obs)
+    obs = setup_model(obs, model=datadir+'/crab.xml')
 
     # Run analysis pipeline
-    run_pipeline(obs)
+    run_pipeline(obs, model=datadir+'/crab.xml')

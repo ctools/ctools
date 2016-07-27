@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctselect tool.
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,25 +20,23 @@
 # ==========================================================================
 import gammalib
 import ctools
+from testing import test
 
 
 # ============================ #
 # Test class for ctselect tool #
 # ============================ #
-class Test(gammalib.GPythonTestSuite):
+class Test(test):
     """
-    Test class for ctselect tool.
+    Test class for ctselect tool
     """
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
-        gammalib.GPythonTestSuite.__init__(self)
-
-        # Set members
-        self.events_name = "data/crab_events.fits"
+        test.__init__(self)
 
         # Return
         return
@@ -46,49 +44,106 @@ class Test(gammalib.GPythonTestSuite):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
-        self.name("ctselect")
+        self.name('ctselect')
 
         # Append tests
-        self.append(self.test_functional, "Test ctselect functionality")
+        self.append(self._test_cmd, 'Test ctselect on command line')
+        self.append(self._test_python, 'Test ctselect from Python')
 
         # Return
         return
 
-    # Test ctselect functionnality
-    def test_functional(self):
+    # Test ctselect on command line
+    def _test_cmd(self):
         """
-        Test ctselect functionnality.
+        Test ctselect on the command line
+        """
+        # Set tool name
+        ctselect = self._tool('ctselect')
+
+        # Setup ctselect command
+        cmd = ctselect+' inobs="'+self._events+'"'+ \
+                       ' outobs="ctselect_cmd1.fits"'+ \
+                       ' ra=83.63 dec=22.01 rad=3.0'+ \
+                       ' tmin=0.0 tmax=1800.0'+ \
+                       ' emin=0.1 emax=100.0'+ \
+                       ' logfile="ctselect_cmd1.log" chatter=1'
+
+        # Check if execution of wrong command fails
+        self.test_assert(self._execute('command_that_does_not_exist') != 0,
+             'Self test of test script')
+
+        # Check if execution was successful
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
+
+        # Check result file
+        self._check_result_file('ctselect_cmd1.fits')
+
+        # Setup ctselect command
+        cmd = ctselect+' inobs="event_file_that_does_not_exist.fits"'+ \
+                       ' outobs="ctselect_cmd2.fits"'+ \
+                       ' ra=83.63 dec=22.01 rad=3.0'+ \
+                       ' tmin=0.0 tmax=1800.0'+ \
+                       ' emin=0.1 emax=100.0'+ \
+                       ' logfile="ctselect_cmd2.log" chatter=1'
+
+        # Check if execution failed
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input file when executed from command line')
+
+        # Return
+        return
+
+    # Test ctselect from Python
+    def _test_python(self):
+        """
+        Test ctselect from Python
         """
         # Set-up ctselect
         select = ctools.ctselect()
-        select["inobs"]  = self.events_name
-        select["outobs"] = "selected_events.fits"
-        select["ra"]     = 83.63
-        select["dec"]    = 22.01
-        select["rad"]    = 3
-        select["tmin"]   = 0
-        select["tmax"]   = 1800
-        select["emin"]   = 0.1
-        select["emax"]   = 100
+        select['inobs']   = self._events
+        select['outobs']  = 'ctselect_py1.fits'
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 3
+        select['tmin']    = 0
+        select['tmax']    = 1800
+        select['emin']    = 0.1
+        select['emax']    = 100
+        select['logfile'] = 'ctselect_py1.log'
+        select['chatter'] = 2
 
-        # Run tool
-        self.test_try("Run ctselect")
-        try:
-            select.run()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in ctselect.")
+        # Run ctselect tool
+        select.logFileOpen()   # Make sure we get a log file
+        select.run()
+        select.save()
 
-        # Save events
-        self.test_try("Save events")
-        try:
-            select.save()
-            self.test_try_success()
-        except:
-            self.test_try_failure("Exception occured in saving events.")
+        # Check result file
+        self._check_result_file('ctselect_py1.fits')
+
+        # Return
+        return
+
+    # Check result file
+    def _check_result_file(self, filename):
+        """
+        Check result file
+        """
+        # Open result file
+        result = gammalib.GCTAEventList(filename)
+
+        # Check file
+        self.test_value(result.size(), 6127, 'Check for 6127 events')
+        self.test_value(result.roi().centre().dir().ra_deg(), 83.63, 1.0e-6,
+                        'Check for ROI Right Ascension')
+        self.test_value(result.roi().centre().dir().dec_deg(), 22.01, 1.0e-6,
+                        'Check for ROI Declination')
+        self.test_value(result.roi().radius(), 3.0, 1.0e-6,
+                        'Check for ROI Radius')
 
         # Return
         return

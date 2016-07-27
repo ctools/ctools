@@ -1,6 +1,5 @@
 #############################################################################
-# Configuration for ctools - a set of tools for science analysis of CTA     #
-#                            data                                           #
+# Configuration for ctools - tools for science analysis of CTA data         #
 # ------------------------------------------------------------------------- #
 # Copyright (C) 2011-2016 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
@@ -29,12 +28,12 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [1.0.1], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [1.1.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
-#AM_INIT_AUTOMAKE([gnu no-dependencies])
-AM_INIT_AUTOMAKE([gnu -Wno-portability])
-#AM_INIT_AUTOMAKE([gnu -Wno-portability serial-tests])
+#AM_INIT_AUTOMAKE([gnu no-dependencies foreign])
+AM_INIT_AUTOMAKE([gnu -Wno-portability foreign])
+#AM_INIT_AUTOMAKE([gnu -Wno-portability foreign serial-tests])
 AC_CONFIG_HEADER([config.h])
 
 
@@ -55,7 +54,7 @@ AC_CONFIG_HEADER([config.h])
 # 5. If any interfaces have been removed or changed since the last public   #
 #    release, then set age to 0.                                            #
 #############################################################################
-CTOOLS_LT_VERSION="1:1:0"
+CTOOLS_LT_VERSION="2:0:0"
 AC_SUBST(CTOOLS_LT_VERSION)
 
 
@@ -84,6 +83,22 @@ AC_PROG_MAKE_SET
 # Determine the build and host system type                                  #
 #############################################################################
 AC_CANONICAL_HOST
+
+
+#############################################################################
+# Check for --enable-coverage option
+#############################################################################
+AC_MSG_CHECKING(whether to build ctools for code coverage measure)
+AC_ARG_ENABLE([coverage],
+              AS_HELP_STRING([--enable-coverage],
+                             [turn on code coverage measure [default=no]]),
+              [enable_coverage="$enableval"],
+              [enable_coverage="no"])
+if test "x$enable_coverage" = "xyes"; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
 
 
 #############################################################################
@@ -140,10 +155,22 @@ else
 fi
 AM_CONDITIONAL(IS_ELCAPITAN, test "x$osx_el_capitan" = "xyes")
 
+# If coverage is selected then save current C++ options
+if test "x$enable_coverage" = "xyes"; then
+  SAVED_CXXFLAGS=$CXXFLAGS
+  SAVED_CFLAGS=$CFLAGS
+fi
+
 # Our language is C++
 AC_LANG(C++)
 AC_PROG_CXX($cxx_list)
 AC_PROG_CC($cc_list)
+
+# If coverage is selected then restore former C++ options
+if test "x$enable_coverage" = "xyes"; then
+  CXXFLAGS=$SAVED_CXXFLAGS
+  CFLAGS=$SAVED_CFLAGS
+fi
 
 
 #############################################################################
@@ -581,8 +608,9 @@ AC_C_INLINE
 # Python binding requires Python and either the files tools_wrap.cpp and    #
 # tools.py or swig to create these files.  The following conditionals are   #
 # set:                                                                      #
-# WITH_PYTHON - Python bindings will be built                               #
-# HAVE_SWIG   - swig is available                                           #
+# WITH_PYTHON   - Python bindings will be built                             #
+# HAVE_SWIG     - swig is available                                         #
+# HAVE_WRAPPERS - wrappers are available                                    #
 #############################################################################
 # Initialise flags
 enable_python="no"
@@ -590,6 +618,7 @@ has_python="no"
 has_python_h="no"
 has_swig="no"
 has_wrappers="no"
+build_wrappers="no"
 
 # Python binding enabled?
 AC_ARG_ENABLE([python-binding],
@@ -603,9 +632,9 @@ if test "x$ac_enable_python_binding" = "xno"; then
 else
 
   # Do we have Python and Python.h?
-  AM_PATH_PYTHON([2.2],
+  AM_PATH_PYTHON([2.3],
                  [has_python="yes"],
-                 [AC_MSG_WARN([Python >= 2.2 not found. Python >= 2.2 is required to build python binding. Python can be obtained from http://www.python.org])])
+                 [AC_MSG_WARN([Python >= 2.3 not found. Python >= 2.3 is required to build python binding. Python can be obtained from http://www.python.org])])
 
   # It would really be weired if Python has not been found, as barely every system has Python. Maybe
   # it was not found because the autoconf is so old, and in an early version of the AM_PATH_PYTHON
@@ -624,14 +653,14 @@ else
 
     # Set opening and closing symbols to make setup.py compatible for versions 2 and 3
     if test ${PYTHON_VERSION} '<' 3; then
-      PYTHON_OPEN=" "
-      PYTHON_CLOSE=""
+      PYTHON_RELATIVE_IMPORT=""
+      PYTHON_FROM_DOT_=""
     else
-      PYTHON_OPEN="("
-      PYTHON_CLOSE=")"
+      PYTHON_RELATIVE_IMPORT="."
+      PYTHON_FROM_DOT_="from . "
     fi
-    AC_SUBST(PYTHON_OPEN)  
-    AC_SUBST(PYTHON_CLOSE)
+    AC_SUBST(PYTHON_RELATIVE_IMPORT)  
+    AC_SUBST(PYTHON_FROM_DOT_)  
 
     # Do we have distutils?
     AC_MSG_CHECKING([for the distutils Python package])
@@ -706,10 +735,16 @@ else
  
   # Do we have wrappers (tools_wrap.cpp and tools.py)?
   has_wrappers="yes"
-  AC_CHECK_FILES([pyext/ctools/tools_wrap.cpp pyext/ctools/tools.py],,
+  AC_CHECK_FILES([$srcdir/pyext/ctools/tools_wrap.cpp
+                  $srcdir/pyext/ctools/tools.py],,
                  [has_wrappers="no"])
   if test "x$has_wrappers" = "xno"; then
     AC_MSG_WARN([Python wrapper missing. Requires swig for wrapper generation.])
+  fi
+
+  # Don't we have wrappers but we have swig
+  if [test "x$has_wrappers" = "xno" -a "x$has_swig" = "xyes"]; then
+    build_wrappers="yes"
   fi
 
   # Signal if Python is enabled
@@ -720,8 +755,10 @@ else
   fi
 
 fi
-AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
 AM_CONDITIONAL(WITH_PYTHON, test "x$enable_python" = "xyes")
+AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
+AM_CONDITIONAL(HAVE_WRAPPERS, test "x$has_wrappers" = "xyes")
+AM_CONDITIONAL(BUILD_WRAPPERS, test "x$build_wrappers" = "xyes")
 
 # Set Python environment
 if test "x$enable_python" = "xyes"; then
@@ -751,6 +788,29 @@ else
     AC_MSG_WARN([swig can be obtained from http://www.swig.org/])
   fi
 fi
+
+
+#############################################################################
+# Checks for coverage option                                                #
+#############################################################################
+# Initialise Python coverage with empty string
+PYTHON_COVERAGE=
+COVERAGE_CXXFLAGS=
+
+# If coverage option has been selected then set some variables
+if test "x$enable_coverage" = "xyes"; then
+  CXXFLAGS="--coverage $CXXFLAGS"
+  COVERAGE_CXXFLAGS="--coverage"
+  LDFLAGS="--coverage $LDFLAGS"
+  if test "x$has_python" = "xyes"; then
+    PYTHON_COVERAGE="coverage run --branch --append "
+  fi
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+AC_SUBST(PYTHON_COVERAGE)
+AC_SUBST(COVERAGE_CXXFLAGS)
 
 
 #############################################################################
@@ -911,7 +971,7 @@ OPENMP_LIB_LDFLAGS=
 #fi
 AC_SUBST(OPENMP_LIB_LDFLAGS)
 
-# Signal if ctools cannot be compiled as gammalibe requires OpenMP but ctools
+# Signal if ctools cannot be compiled as gammalib requires OpenMP but ctools
 # cannot be compiled with OpenMP
 if test "x$enable_openmp" = "xno" && test "x$gammalib_with_openmp" = "xyes"; then
   AC_MSG_ERROR([The GammaLib library has been built with openMP support but OpenMP is not available on this system. Please install OpenMP or re-build GammaLib without OpenMP support.])
@@ -960,7 +1020,9 @@ AC_CONFIG_FILES([Makefile
                  src/ctselect/Makefile
                  src/ctexpcube/Makefile
                  src/ctpsfcube/Makefile
+                 src/ctedispcube/Makefile
                  src/ctbkgcube/Makefile
+                 src/ctmapcube/Makefile
                  src/ctcubemask/Makefile
                  src/cttsmap/Makefile
                  src/ctbutterfly/Makefile
@@ -969,7 +1031,9 @@ AC_CONFIG_FILES([Makefile
                  src/support/Makefile
                  src/ctools-setup
                  test/Makefile
-                 test/test_cscripts.sh
+                 test/test_python_ctools.sh
+                 test/test_python_cscripts.sh
+                 test/test_examples.py
                  pyext/Makefile
                  pyext/setup.py
                  pyext/ctools/__init__.py
@@ -980,7 +1044,9 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  ctools.pc
                  testconf.sh],
-                [if test -f test/test_cscripts.sh; then chmod +x test/test_cscripts.sh; fi;
+                [if test -f test/test_python_ctools.sh; then chmod +x test/test_python_ctools.sh; fi;
+                 if test -f test/test_python_cscripts.sh; then chmod +x test/test_python_cscripts.sh; fi;
+                 if test -f test/test_examples.py; then chmod +x test/test_examples.py; fi;
                  if test -f testconf.sh; then chmod +x testconf.sh; fi])
 AC_OUTPUT
 
