@@ -60,7 +60,8 @@ class test(gammalib.GPythonTestSuite):
         # not. If the software is not installed the 'TEST_BUILDDIR' environment
         # variable will exist
         if 'TEST_BUILDDIR' in os.environ:
-            script = os.environ['TEST_BUILDDIR'] + '/cscripts/'+name+'.py'
+            script = '@PYTHON_COVERAGE@' + os.environ['TEST_BUILDDIR'] + \
+                     '/cscripts/'+name+'.py'
         else:
             script = name
 
