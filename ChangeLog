@@ -1,8 +1,9 @@
-2016-07-28
+2016-07-29
 
         * Version 1.2.0 released
         ========================
 
+        Fix lacking coverage measure for cscripts execution (#1827)
         Set "addbounds" parameters by default to "no" (#1819)
 
 

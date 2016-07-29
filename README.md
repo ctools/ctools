@@ -1,6 +1,6 @@
 ctools information
 ==================
-* Version:             1.2.0.dev1 (28 July 2016)
+* Version:             1.2.0.dev1 (29 July 2016)
 * Author:              Juergen Knoedlseder (jurgen.knodlseder@irap.omp.eu)
 * GammaLib dependency: 1.2.0.dev1
 
