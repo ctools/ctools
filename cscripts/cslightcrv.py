@@ -68,7 +68,7 @@ class cslightcrv(ctools.cscript):
         """
         # Set name
         self._name    = 'cslightcrv'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise some members
         self._srcname = ''

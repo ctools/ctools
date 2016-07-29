@@ -121,7 +121,7 @@ class Test(test):
         sens['emax']     = 10.0
         sens['bins']     = 1
         sens['logfile']  = 'cssens_py1.log'
-        sens['chatter']  = 2
+        sens['chatter']  = 4
 
         # Run cssens script
         sens.logFileOpen()   # Make sure we get a log file

@@ -31,7 +31,7 @@ from cscripts import obsutils
 # ============ #
 class cssens(ctools.cscript):
     """
-    Computes the CTA sensitivity.
+    Computes the CTA sensitivity
 
     This class computes the CTA sensitivity for a number of energy bins using
     ctlike. Spectra are fitted in narrow energy bins to simulated data,
@@ -47,14 +47,14 @@ class cssens(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name    = "cssens"
-        self._version = "1.1.0"
+        self._name    = 'cssens'
+        self._version = '1.2.0'
 
         # Initialise class members
         self._obs         = gammalib.GObservations()
         self._ebounds     = gammalib.GEbounds()
         self._obs_ebounds = []
-        self._srcname     = ""
+        self._srcname     = ''
         self._outfile     = gammalib.GFilename()
         self._ra          = None
         self._dec         = None
@@ -65,7 +65,7 @@ class cssens(ctools.cscript):
         self._enumbins    = 0
         self._npix        = 200
         self._binsz       = 0.05
-        self._type        = "Differential"
+        self._type        = 'Differential'
         self._ts_thres    = 25.0
         self._max_iter    = 50
         self._num_avg     = 3
@@ -83,7 +83,7 @@ class cssens(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get user parameters from parfile.
+        Get user parameters from parfile
         """
         # Set observation if not done before
         if self._obs == None or self._obs.size() == 0:
@@ -91,74 +91,80 @@ class cssens(ctools.cscript):
 
         # Set models if we have none
         if self._obs.models().size() == 0:
-            self._obs.models(self["inmodel"].filename())
+            self._obs.models(self['inmodel'].filename())
 
         # Get source name
-        self._srcname = self["srcname"].string()
+        self._srcname = self['srcname'].string()
 
         # Read further parameters
-        self._outfile = self["outfile"].filename()
-        self._emin    = self["emin"].real()
-        self._emax    = self["emax"].real()
-        self._bins    = self["bins"].integer()
+        self._outfile = self['outfile'].filename()
+        self._emin    = self['emin'].real()
+        self._emax    = self['emax'].real()
+        self._bins    = self['bins'].integer()
 
         # Read parameters for binned if requested
-        self._enumbins = self["enumbins"].integer()
+        self._enumbins = self['enumbins'].integer()
         if not self._enumbins == 0:
-            self._npix  = self["npix"].integer()
-            self._binsz = self["binsz"].real()
+            self._npix  = self['npix'].integer()
+            self._binsz = self['binsz'].real()
 
         # Read remaining parameters
-        self._edisp    = self["edisp"].boolean()
-        self._ts_thres = self["sigma"].real()*self["sigma"].real()
-        self._max_iter = self["max_iter"].integer()
-        self._num_avg  = self["num_avg"].integer()
-        self._type     = self["type"].string()
+        self._edisp    = self['edisp'].boolean()
+        self._ts_thres = self['sigma'].real() * self['sigma'].real()
+        self._max_iter = self['max_iter'].integer()
+        self._num_avg  = self['num_avg'].integer()
+        self._type     = self['type'].string()
 
         # Set some fixed parameters
-        self._debug = self["debug"].boolean() # Debugging in client tools
+        self._debug = self['debug'].boolean() # Debugging in client tools
 
         # Derive some parameters
         self._ebounds = gammalib.GEbounds(self._bins,
-                                          gammalib.GEnergy(self._emin, "TeV"),
-                                          gammalib.GEnergy(self._emax, "TeV"))
+                                          gammalib.GEnergy(self._emin, 'TeV'),
+                                          gammalib.GEnergy(self._emax, 'TeV'))
 
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
 
     def _set_obs(self, lpnt=0.0, bpnt=0.0, emin=0.1, emax=100.0):
         """
-        Set an observation container.
+        Set an observation container
 
-        Kwargs:
-            lpnt: Galactic longitude of pointing [deg] (default: 0.0)
-            bpnt: Galactic latitude of pointing [deg] (default: 0.0)
-            emin: Minimum energy [TeV] (default: 0.1)
-            emax: Maximum energy [TeV] (default: 100.0)
+        Parameters
+        ----------
+        lpnt : float, optional
+            Galactic longitude of pointing (deg)
+        bpnt : float, optional
+            Galactic latitude of pointing (deg)
+        emin : float, optional
+            Minimum energy (TeV)
+        emax : float, optional
+            Maximum energy (TeV)
 
-        Returns:
-            Observation container.
+        Returns
+        -------
+        obs : `~gammalib.GObservations`
+            Observation container
         """
-        # If an observation was provided on input then load it from XML
-        # file
-        filename = self["inobs"].filename()
-        if filename != "NONE" and filename != "":
+        # If an observation was provided on input then load it from XML file
+        filename = self['inobs'].filename()
+        if filename != 'NONE' and filename != '':
             obs = self._get_observations()
 
         # ... otherwise allocate a single observation
         else:
 
             # Read relevant user parameters
-            caldb    = self["caldb"].string()
-            irf      = self["irf"].string()
-            deadc    = self["deadc"].real()
-            duration = self["duration"].real()
-            rad      = self["rad"].real()
+            caldb    = self['caldb'].string()
+            irf      = self['irf'].string()
+            deadc    = self['deadc'].real()
+            duration = self['duration'].real()
+            rad      = self['rad'].real()
 
             # Allocate observation container
             obs = gammalib.GObservations()
@@ -176,7 +182,7 @@ class cssens(ctools.cscript):
             obs.append(run)
 
             # Set source position
-            offset    = self["offset"].real()
+            offset    = self['offset'].real()
             pntdir.lb_deg(lpnt, bpnt+offset)
             self._ra  = pntdir.ra_deg()
             self._dec = pntdir.dec_deg()
@@ -186,14 +192,19 @@ class cssens(ctools.cscript):
 
     def _set_models(self, fitspat=False, fitspec=False):
         """
-        Set full model and background model.
+        Set full model and background model
 
-        Kwargs:
-            fitspat: Fit spatial parameter (default: False).
-            fitspec: Fit spectral parameters (default: False).
+        Parameters
+        ----------
+        fitspat : bool, optional
+            Fit spatial parameter?
+        fitspec : bool, optional
+            Fit spectral parameters?
 
-        Returns:
-            Tuple containing full model and background model.
+        Returns
+        -------
+        full_model, bkg_model : `~gammalib.GModels`
+            Full model and background model containers
         """
         # Retrieve full model from observation container
         full_model = self._obs.models().copy()
@@ -201,54 +212,40 @@ class cssens(ctools.cscript):
         # Get source model
         model = full_model[self._srcname]
 
-        # Check that model has a Prefactor
-        if not model.has_par("Prefactor"):
-            msg = "Model \""+self._srcname+"\" has no parameter "+\
-                  "\"Prefactor\". Only spectral models with a "+\
-                  "\"Prefactor\" parameter are supported."
+        # If source model has no "Prefactor" parameter then raise an exception
+        if not model.has_par('Prefactor'):
+            msg = ('Model "%s" has no parameter "Prefactor". Only spectral '
+                   'models with a "Prefactor" parameter are supported.' %
+                   self._srcname)
             raise RuntimeError(msg)
 
         # Set source position
         if self._ra != None and self._dec != None:
-            if model.has_par("RA") and model.has_par("DEC"):
-                model["RA"].value(self._ra)
-                model["DEC"].value(self._dec)
+            if model.has_par('RA') and model.has_par('DEC'):
+                model['RA'].value(self._ra)
+                model['DEC'].value(self._dec)
+
+        # Set possible spatial and spectral parameters
+        spatial  = ['RA', 'DEC', 'Sigma', 'Radius', 'Width', 'PA',
+                    'MinorRadius', 'MajorRadius']
+        spectral = ['Index', 'Index1', 'Index2', 'BreakEnergy', 'CutoffEnergy',
+                    'InverseCutoffEnergy']
 
         # Fit or fix spatial parameters
-        if fitspat:
-            if model.has_par("RA"):
-                model["RA"].free()
-            if model.has_par("DEC"):
-                model["DEC"].free()
-            if model.has_par("Sigma"):
-                model["Sigma"].free()
-            if model.has_par("Radius"):
-                model["Radius"].free()
-            if model.has_par("Width"):
-                model["Width"].free()
-        else:
-            if model.has_par("RA"):
-                model["RA"].fix()
-            if model.has_par("DEC"):
-                model["DEC"].fix()
-            if model.has_par("Sigma"):
-                model["Sigma"].fix()
-            if model.has_par("Radius"):
-                model["Radius"].fix()
-            if model.has_par("Width"):
-                model["Width"].fix()
+        for par in spatial:
+            if model.has_par(par):
+                if fitspat:
+                    model[par].free()
+                else:
+                    model[par].fix()
 
         # Fit or fix spectral parameters
-        if fitspec:
-            if model.has_par("Index"):
-                model["Index"].free()
-            if model.has_par("Cutoff"):
-                model["Cutoff"].free()
-        else:
-            if model.has_par("Index"):
-                model["Index"].fix()
-            if model.has_par("Cutoff"):
-                model["Cutoff"].fix()
+        for par in spectral:
+            if model.has_par(par):
+                if fitspec:
+                    model[par].free()
+                else:
+                    model[par].fix()
 
         # Create background model
         bkg_model = full_model.copy()
@@ -259,14 +256,14 @@ class cssens(ctools.cscript):
 
     def _set_obs_ebounds(self, emin, emax):
         """
-        Set energy boundaries for observation container.
+        Set energy boundaries for all observations in container
 
-        Sets the energy boundaries for all observations in the observation
-        container.
-
-        Args:
-            emin: Minimum energy
-            emax: Maximum energy
+        Parameters
+        ----------
+        emin : `~gammalib.GEnergy`
+            Minimum energy
+        emax : `~gammalib.GEnergy`
+            Maximum energy
         """
         # Loop over all observations in container
         for obs in self._obs:
@@ -274,38 +271,34 @@ class cssens(ctools.cscript):
             # Get observation energy boundaries
             obs_ebounds = obs.events().ebounds()
             
-            # Get minimum and maximum energy
+            # Get minimum and maximum energy of the observation
             obs_emin = obs_ebounds.emin()
             obs_emax = obs_ebounds.emax()
             
-            # Case A: bin fully contained in observation ebounds
+            # If [emin,emax] is fully contained in the observation energy range
+            # the use [emin,emax] as energy boundaries
             if obs_emin <= emin and obs_emax >= emax:
                 ebounds = gammalib.GEbounds(emin, emax)
             
-            # Case B: bin fully outside of obs ebounds
+            # ... otherwise, if [emin,emax] is completely outside the
+            # observation energy range then set the energy boundaries to the
+            # zero-width interval [0,0]
             elif emax < obs_emin or emin > obs_emax:
-                
-                # Set zero range (inspired by ctselect)
-                e0 = gammalib.GEnergy(0.0, "TeV")
+                e0      = gammalib.GEnergy(0.0, 'TeV')
                 ebounds = gammalib.GEbounds(e0, e0)
             
-            # Case C:  bin partly overlapping with observation ebounds
+            # ... otherwise, if [emin,emax] overlaps partially with the
+            # observation energy range then set the energy boundaries to the
+            # overlapping part
             else:
+                # Set overlapping energy range
+                set_emin = max(emin, obs_emin)
+                set_emax = min(emax, obs_emax)
                 
-                # Set energy range as obs ebounds were fully contained inside energy bin
-                set_emin = emin
-                set_emax = emax
-                
-                # Adjust energy bin to respect observation energy boundary
-                if emin < obs_emin: 
-                    set_emin = obs_emin
-                if emax > obs_emax:
-                    set_emax = obs_emax
-                
-                #Set energy boundaries   
+                # Set energy boundaries
                 ebounds = gammalib.GEbounds(set_emin, set_emax)
             
-            # Set energy boundaries
+            # Set the energy boundaries as the boundaries of the observation
             obs.events().ebounds(ebounds)
 
         # Return
@@ -313,36 +306,48 @@ class cssens(ctools.cscript):
 
     def _get_crab_flux(self, emin, emax):
         """
-        Return Crab photon flux in a given energy interval.
+        Return Crab photon flux in a given energy interval
 
-        Args:
-            emin: Minimum energy
-            emax: Maximum energy
+        Parameters
+        ----------
+        emin : `~gammalib.GEnergy`
+            Minimum energy
+        emax : `~gammalib.GEnergy`
+            Maximum energy
 
-        Returns:
-            Crab photon flux in specified energy interval.
+        Returns
+        -------
+        flux : float
+            Crab photon flux in specified energy interval (ph/cm2/s)
         """
         # Set Crab TeV spectral model based on a power law
         crab = gammalib.GModelSpectralPlaw(5.7e-16, -2.48,
-                                           gammalib.GEnergy(0.3, "TeV"))
+                                           gammalib.GEnergy(0.3, 'TeV'))
 
-        # Determine flux
+        # Determine photon flux
         flux = crab.flux(emin, emax)
 
-        # Return flux
+        # Return photon flux
         return flux
 
     def _get_sensitivity(self, emin, emax, bkg_model, full_model):
         """
         Determine sensitivity for given observations.
 
-        Args:
-            emin:       Minimum energy for fitting and flux computation
-            emax:       Maximum energy for fitting and flux computation
-            bkg_model:  Background model
-            full_model: Source model
+        Parameters
+        ----------
+        emin : `~gammalib.GEnergy`
+            Minimum energy for fitting and flux computation
+        emax : `~gammalib.GEnergy`
+            Maximum energy for fitting and flux computation
+        bkg_model : `~gammalib.GModels`
+            Background model
+        full_model : `~gammalib.GModels`
+            Source plus background model
 
-        Returns:
+        Returns
+        -------
+        result : dict
             Result dictionary
         """
         # Set TeV->erg conversion factor
@@ -364,17 +369,17 @@ class cssens(ctools.cscript):
 
         # Write header
         if self._logTerse():
-            self._log("\n")
-            self._log.header2("Energies: "+str(emin)+" - "+str(emax))
-            self._log.parformat("Crab flux")
+            self._log('\n')
+            self._log.header2('Energies: '+str(emin)+' - '+str(emax))
+            self._log.parformat('Crab flux')
             self._log(crab_flux)
-            self._log(" ph/cm2/s\n")
-            self._log.parformat("Source model flux")
+            self._log(' ph/cm2/s\n')
+            self._log.parformat('Source model flux')
             self._log(src_flux)
-            self._log(" ph/cm2/s\n")
-            self._log.parformat("Crab unit factor")
+            self._log(' ph/cm2/s\n')
+            self._log.parformat('Crab unit factor')
             self._log(crab_unit)
-            self._log("\n")
+            self._log('\n')
 
         # Initialise loop
         crab_flux_value   = []
@@ -392,7 +397,7 @@ class cssens(ctools.cscript):
 
             # Write header
             if self._logExplicit():
-                self._log.header2("Iteration "+str(iterations))
+                self._log.header2('Iteration '+str(iterations))
 
             # Set source model. crab_prefactor is the Prefactor that
             # corresponds to 1 Crab
@@ -416,10 +421,10 @@ class cssens(ctools.cscript):
 
             # Write simulation results
             if self._logExplicit():
-                self._log.header3("Simulation")
-                self._log.parformat("Number of simulated events")
+                self._log.header3('Simulation')
+                self._log.parformat('Number of simulated events')
                 self._log(nevents)
-                self._log("\n")
+                self._log('\n')
 
             # Fit background only
             sim.models(bkg_model)
@@ -434,25 +439,25 @@ class cssens(ctools.cscript):
 
             # Write background fit results
             if self._logExplicit():
-                self._log.header3("Background model fit")
-                self._log.parformat("log likelihood")
+                self._log.header3('Background model fit')
+                self._log.parformat('log likelihood')
                 self._log(LogL_bgm)
-                self._log("\n")
-                self._log.parformat("Number of predicted events")
+                self._log('\n')
+                self._log.parformat('Number of predicted events')
                 self._log(npred_bgm)
-                self._log("\n")
-                self._log.parformat("Fit quality")
+                self._log('\n')
+                self._log.parformat('Fit quality')
                 self._log(quality_bgm)
-                self._log("\n")
+                self._log('\n')
 
             # Write model fit results
             if self._logExplicit():
                 for model in result_bgm:
-                    self._log.parformat("Model")
+                    self._log.parformat('Model')
                     self._log(model.name())
-                    self._log("\n")
+                    self._log('\n')
                     for par in model:
-                        self._log(str(par)+"\n")
+                        self._log(str(par)+'\n')
 
             # Fit background and test source
             sim.models(src_model)
@@ -468,31 +473,31 @@ class cssens(ctools.cscript):
 
             # Write background and test source fit results
             if self._logExplicit():
-                self._log.header3("Background and test source model fit")
-                self._log.parformat("Test statistics")
+                self._log.header3('Background and test source model fit')
+                self._log.parformat('Test statistics')
                 self._log(ts)
-                self._log("\n")
-                self._log.parformat("log likelihood")
+                self._log('\n')
+                self._log.parformat('log likelihood')
                 self._log(LogL_all)
-                self._log("\n")
-                self._log.parformat("Number of predicted events")
+                self._log('\n')
+                self._log.parformat('Number of predicted events')
                 self._log(npred_all)
-                self._log("\n")
-                self._log.parformat("Fit quality")
+                self._log('\n')
+                self._log.parformat('Fit quality')
                 self._log(quality_all)
-                self._log("\n")
+                self._log('\n')
                 #
                 for model in result_all:
-                    self._log.parformat("Model")
+                    self._log.parformat('Model')
                     self._log(model.name())
-                    self._log("\n")
+                    self._log('\n')
                     for par in model:
-                        self._log(str(par)+"\n")
+                        self._log(str(par)+'\n')
 
             # Start over if TS was non-positive
             if ts <= 0.0:
                 if self._logExplicit():
-                    self._log("Non positive TS. Start over.\n")
+                    self._log('Non positive TS. Start over.\n')
                 continue
 
             # Get fitted Crab, photon and energy fluxes
@@ -504,7 +509,7 @@ class cssens(ctools.cscript):
             energy_flux   = result_all[self._srcname].spectral().eflux(emin, emax)
 
             # Compute differential sensitivity in unit erg/cm2/s
-            energy      = gammalib.GEnergy(e_mean, "TeV")
+            energy      = gammalib.GEnergy(e_mean, 'TeV')
             time        = gammalib.GTime()
             sensitivity = result_all[self._srcname].spectral().eval(energy, time) * \
                           e_mean*erg_mean * 1.0e6
@@ -526,40 +531,40 @@ class cssens(ctools.cscript):
 
             # Write background and test source fit results
             if self._logExplicit():
-                self._log.parformat("Photon flux")
+                self._log.parformat('Photon flux')
                 self._log(photon_flux)
-                self._log(" ph/cm2/s\n")
-                self._log.parformat("Energy flux")
+                self._log(' ph/cm2/s\n')
+                self._log.parformat('Energy flux')
                 self._log(energy_flux)
-                self._log(" erg/cm2/s\n")
-                self._log.parformat("Crab flux")
+                self._log(' erg/cm2/s\n')
+                self._log.parformat('Crab flux')
                 self._log(crab_flux*1000.0)
-                self._log(" mCrab\n")
-                self._log.parformat("Differential sensitivity")
+                self._log(' mCrab\n')
+                self._log.parformat('Differential sensitivity')
                 self._log(sensitivity)
-                self._log(" erg/cm2/s\n")
+                self._log(' erg/cm2/s\n')
                 for model in result_all:
-                    self._log.parformat("Model")
+                    self._log.parformat('Model')
                     self._log(model.name())
-                    self._log("\n")
+                    self._log('\n')
                     for par in model:
-                        self._log(str(par)+"\n")
+                        self._log(str(par)+'\n')
             elif self._logTerse():
-                self._log.parformat("Iteration "+str(iterations))
-                self._log("TS=")
+                self._log.parformat('Iteration '+str(iterations))
+                self._log('TS=')
                 self._log(ts)
-                self._log(" ")
-                self._log("corr=")
+                self._log(' ')
+                self._log('corr=')
                 self._log(correct)
-                self._log("  ")
+                self._log('  ')
                 self._log(photon_flux)
-                self._log(" ph/cm2/s = ")
+                self._log(' ph/cm2/s = ')
                 self._log(energy_flux)
-                self._log(" erg/cm2/s = ")
+                self._log(' erg/cm2/s = ')
                 self._log(crab_flux*1000.0)
-                self._log(" mCrab = ")
+                self._log(' mCrab = ')
                 self._log(sensitivity)
-                self._log(" erg/cm2/s\n")
+                self._log(' erg/cm2/s\n')
 
             # Compute sliding average of extrapolated fitted prefactor,
             # photon and energy flux. This damps out fluctuations and
@@ -593,11 +598,11 @@ class cssens(ctools.cscript):
                     if ratio   >= 0.99 and ratio   <= 1.01 and \
                        correct >= 0.9  and correct <= 1.1:
                         if self._logTerse():
-                            self._log(" Converged ("+str(ratio)+")\n")
+                            self._log(' Converged ('+str(ratio)+')\n')
                         break
                 else:
                     if self._logTerse():
-                        self._log(" Flux is zero.\n")
+                        self._log(' Flux is zero.\n')
                     break
 
             # Use average for next iteration
@@ -606,57 +611,57 @@ class cssens(ctools.cscript):
             # Exit loop if number of trials exhausted
             if (iterations >= self._max_iter):
                 if self._logTerse():
-                    self._log(" Test ended after "+str(self._max_iter)+
-                              " iterations.\n")
+                    self._log(' Test ended after '+str(self._max_iter)+
+                              ' iterations.\n')
                 break
 
         # Write fit results
         if self._logTerse():
-            self._log.header3("Fit results")
-            self._log.parformat("Test statistics")
+            self._log.header3('Fit results')
+            self._log.parformat('Test statistics')
             self._log(ts)
-            self._log("\n")
-            self._log.parformat("Photon flux")
+            self._log('\n')
+            self._log.parformat('Photon flux')
             self._log(photon_flux)
-            self._log(" ph/cm2/s\n")
-            self._log.parformat("Energy flux")
+            self._log(' ph/cm2/s\n')
+            self._log.parformat('Energy flux')
             self._log(energy_flux)
-            self._log(" erg/cm2/s\n")
-            self._log.parformat("Crab flux")
+            self._log(' erg/cm2/s\n')
+            self._log.parformat('Crab flux')
             self._log(crab_flux*1000.0)
-            self._log(" mCrab\n")
-            self._log.parformat("Differential sensitivity")
+            self._log(' mCrab\n')
+            self._log.parformat('Differential sensitivity')
             self._log(sensitivity)
-            self._log(" erg/cm2/s\n")
-            self._log.parformat("Number of simulated events")
+            self._log(' erg/cm2/s\n')
+            self._log.parformat('Number of simulated events')
             self._log(nevents)
-            self._log("\n")
-            self._log.header3("Background and test source model fitting")
-            self._log.parformat("log likelihood")
+            self._log('\n')
+            self._log.header3('Background and test source model fitting')
+            self._log.parformat('log likelihood')
             self._log(LogL_all)
-            self._log("\n")
-            self._log.parformat("Number of predicted events")
+            self._log('\n')
+            self._log.parformat('Number of predicted events')
             self._log(npred_all)
-            self._log("\n")
+            self._log('\n')
             for model in result_all:
-                self._log.parformat("Model")
+                self._log.parformat('Model')
                 self._log(model.name())
-                self._log("\n")
+                self._log('\n')
                 for par in model:
-                    self._log(str(par)+"\n")
-            self._log.header3("Background model fit")
-            self._log.parformat("log likelihood")
+                    self._log(str(par)+'\n')
+            self._log.header3('Background model fit')
+            self._log.parformat('log likelihood')
             self._log(LogL_bgm)
-            self._log("\n")
-            self._log.parformat("Number of predicted events")
+            self._log('\n')
+            self._log.parformat('Number of predicted events')
             self._log(npred_bgm)
-            self._log("\n")
+            self._log('\n')
             for model in result_bgm:
-                self._log.parformat("Model")
+                self._log.parformat('Model')
                 self._log(model.name())
-                self._log("\n")
+                self._log('\n')
                 for par in model:
-                    self._log(str(par)+"\n")
+                    self._log(str(par)+'\n')
 
         # Restore energy boundaries of observation container
         for i, obs in enumerate(self._obs):
@@ -675,7 +680,7 @@ class cssens(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -698,42 +703,40 @@ class cssens(ctools.cscript):
 
         # Write models into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Models")
-            self._log.header2("Background model")
+            self._log('\n')
+            self._log.header1('Models')
+            self._log.header2('Background model')
             self._log(str(bkg_model))
-            self._log("\n\n")
-            self._log.header2("Full model")
+            self._log('\n\n')
+            self._log.header2('Full model')
             self._log(str(full_model))
-            self._log("\n")
+            self._log('\n')
 
         # Write header
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Sensitivity determination")
-            self._log.parformat("Type")
+            self._log('\n')
+            self._log.header1('Sensitivity determination')
+            self._log.parformat('Type')
             self._log(self._type)
-            self._log("\n")
+            self._log('\n')
 
         # Loop over energy bins
         for ieng in range(self._ebounds.size()):
 
             # Set energies
-            if self._type == "Differential":
+            if self._type == 'Differential':
                 emin  = self._ebounds.emin(ieng)
                 emax  = self._ebounds.emax(ieng)
-            elif self._type == "Integral":
+            elif self._type == 'Integral':
                 emin  = self._ebounds.emin(ieng)
                 emax  = self._ebounds.emax()
             else:
-                msg = "Invalid sensitivity type \""+self._type+"\" "+\
-                      "encountered. Either specify \"Differential\" or "+\
-                      "\"Integral\"."
+                msg = ('Invalid sensitivity type "%s" encountered. Either '
+                       'specify "Differential" or "Integral".' % self._type)
                 raise RuntimeError(msg)
 
             # Determine sensitivity
-            result = self._get_sensitivity(emin, emax,
-                                           bkg_model, full_model)
+            result = self._get_sensitivity(emin, emax, bkg_model, full_model)
 
             # Write results
             if ieng == 0:
@@ -759,7 +762,7 @@ class cssens(ctools.cscript):
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

@@ -40,7 +40,7 @@ class csfindobs(ctools.cscript):
         """
         # Set name
         self._name         = 'csfindobs'
-        self._version      = '1.1.0'
+        self._version      = '1.2.0'
         self._datapath     = os.getenv('VHEFITS','')
         self._prodname     = ''
         self._select_radec = True
