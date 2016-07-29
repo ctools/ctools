@@ -51,7 +51,7 @@ class Test(test):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('csfindobs')
@@ -66,7 +66,7 @@ class Test(test):
     # Test csfindobs on command line
     def _test_cmd(self):
         """
-        Test csfindobs on the command line.
+        Test csfindobs on the command line
         """
         # Set script name
         csfindobs = self._script('csfindobs')
@@ -106,45 +106,97 @@ class Test(test):
     # Test csfindobs from Python
     def _test_python(self):
         """
-        Test csfindobs from Python.
+        Test csfindobs from Python
         """
         # Set-up csfindobs
         findobs = cscripts.csfindobs()
         findobs['datapath'] = self._datapath
         findobs['prodname'] = 'unit-test'
-        findobs['outfile']  = 'runlist_py1.dat'
         findobs['ra']       = 83.63
         findobs['dec']      = 22.01
         findobs['rad']      = 1.0
+        findobs['outfile']  = 'runlist_py1.dat'
         findobs['logfile']  = 'csfindobs_py1.log'
         findobs['chatter']  = 2
 
-        # Run csfindobs script and save run list
+        # Run csfindobs script
         findobs.logFileOpen()   # Make sure we get a log file
         findobs.run()
+
+        # Check list of runs
+        runs = findobs.runs()
+        self.test_value(len(runs), 1,
+                        'Check for number of runs in runlist')
+        self.test_value(str(runs[0]), '0',
+                        'Check run ID in runlist')
+
+        # Save run list
         findobs.save()
 
         # Check run list
         self._check_runlist('runlist_py1.dat')
 
+        # Set-up csfindobs for undefined spatial parameters
+        findobs = cscripts.csfindobs()
+        findobs['datapath'] = self._datapath
+        findobs['prodname'] = 'unit-test'
+        findobs['ra']       = 'UNDEFINED'
+        findobs['dec']      = 'UNDEFINED'
+        findobs['rad']      = 'UNDEFINED'
+        findobs['outfile']  = 'runlist_py2.dat'
+        findobs['logfile']  = 'csfindobs_py2.log'
+        findobs['chatter']  = 3
+
+        # Run csfindobs script and save run list
+        findobs.execute()
+
+        # Check run list
+        self._check_runlist('runlist_py2.dat')
+
+        # Set-up csfindobs for user expression
+        findobs = cscripts.csfindobs()
+        findobs['datapath']   = self._datapath
+        findobs['prodname']   = 'unit-test'
+        findobs['ra']         = 83.63
+        findobs['dec']        = 22.01
+        findobs['rad']        = 0.0
+        findobs['expression'] = 'ONTIME<10.0'
+        findobs['outfile']    = 'runlist_py3.dat'
+        findobs['logfile']    = 'csfindobs_py3.log'
+        findobs['chatter']    = 4
+
+        # Run csfindobs script and save run list
+        findobs.execute()
+
+        # Check run list
+        self._check_runlist('runlist_py3.dat', runs=0)
+
         # Return
         return
 
     # Check run list result file
-    def _check_runlist(self, filename):
+    def _check_runlist(self, filename, runs=1):
         """
-        Check run list file.
+        Check run list file
+
+        Parameters
+        ----------
+        filename : str
+            Run list file name
+        runs : int, optional
+            Expected number of runs in runlist file
         """
         # Open run list file as CSV file
         runlist = gammalib.GCsv(filename)
 
         # Check dimensions
-        self.test_value(runlist.ncols(), 1,
-                        'Check for single column in runlist file')
-        self.test_value(runlist.nrows(), 1,
-                        'Check for single row in runlist file')
-        self.test_assert(runlist[0,0] == '0',
-                         'Check for value "0" in runlist file')
+        self.test_value(runlist.nrows(), runs,
+                        'Check for number of runs in runlist file')
+        if runs > 0:
+            self.test_value(runlist.ncols(), 1,
+                            'Check for single column in runlist file')
+            self.test_value(runlist[0,0], '0',
+                            'Check for run ID in runlist file')
         
         # Return
         return
