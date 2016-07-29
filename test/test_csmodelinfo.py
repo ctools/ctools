@@ -42,6 +42,10 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set test data
+        self._models_spat = self._datadir + '/models_spatial.xml'
+        self._models_spec = self._datadir + '/models_spectral.xml'
+
         # Return
         return
 
@@ -69,7 +73,7 @@ class Test(test):
         csmodelinfo = self._script('csmodelinfo')
 
         # Setup csmodelinfo command
-        cmd = csmodelinfo+' inmodel="'+self._model+'"'+ \
+        cmd = csmodelinfo+' inmodel="'+self._models_spec+'"'+ \
                           ' ds9file="model_cmd1.reg"'+ \
                           ' logfile="csmodelinfo_cmd1.log" chatter=1'
 
@@ -103,7 +107,7 @@ class Test(test):
         """
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo['inmodel']  = self._model
+        modelinfo['inmodel']  = self._models_spat
         modelinfo['ds9file']  = 'csmodelinfo_py1.reg'
         modelinfo['logfile']  = 'csmodelinfo_py1.log'
         modelinfo['chatter']  = 2
@@ -118,7 +122,7 @@ class Test(test):
 
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo['inmodel']  = self._model
+        modelinfo['inmodel']  = self._models_spec
         modelinfo['ds9file']  = 'csmodelinfo_py2.reg'
         modelinfo['logfile']  = 'csmodelinfo_py2.log'
         modelinfo['chatter']  = 3
