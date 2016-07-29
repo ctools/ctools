@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctpsfcube.par                                                 #
-#  Version:   1.1.0                                                         #
+#  Version:   1.2.0                                                         #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -31,7 +31,7 @@ emin,      r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
 enumbins,  i, a, 20,,, "Number of energy bins"
 ebinfile,  f, h, "NONE",,, "Name of the file containing the energy bin definition"
-addbounds, b, h, yes,,, "Add energies at observation energy boundaries?"
+addbounds, b, h, no,,, "Add energies at observation energy boundaries?"
 
 #
 # Spatial binning parameters

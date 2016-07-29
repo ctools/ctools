@@ -1,4 +1,12 @@
-2016-07-24  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-07-28
+
+        * Version 1.2.0 released
+        ========================
+
+        Set "addbounds" parameters by default to "no" (#1819)
+
+
+2016-07-24
 
         * Version 1.1.0 released
         ========================
@@ -30,7 +38,7 @@
         Support out of source builds (#1484)
 
 
-2016-01-27  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2016-01-27
 
         * Bug fix version 1.0.1 released
         ================================
@@ -40,7 +48,7 @@
         Change diffuse map for science verification
 
 
-2015-12-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-12-18
 
         * Version 1.0.0 released
         ========================
@@ -56,7 +64,7 @@
         Resolve Python test problem on El Capitan (#1563)
 
 
-2015-10-31  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-10-31
 
         * Version 0.10.0 released
         =========================
@@ -75,7 +83,7 @@
         Move cscripts into the ctools Python module (#1470)
 
 
-2015-05-22  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-05-22
 
         * Version 0.9.0 released
         ========================
@@ -94,7 +102,7 @@
         Correct sensitivity computation in cssens
 
 
-2015-01-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2015-01-08
 
         * Bug fix version 0.8.1 released
         ================================
@@ -102,7 +110,7 @@
         Include Python wrappers in source code distribution
 
 
-2014-11-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-11-08
 
         * Version 0.8.0 released
         ========================
@@ -129,7 +137,7 @@
         Enhance documentation
 
 
-2014-02-20  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-02-20
 
         * Bug fix Version 0.7.2 released
         ================================
@@ -138,7 +146,7 @@
         Properly close temporary file in ctselect (#1149)
 
 
-2014-02-05  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-02-05
         
         * Bug fix Version 0.7.1 released
         ================================
@@ -149,7 +157,7 @@
         Use reworked GCaldb for calibration data access (#1116)
 
 
-2014-01-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2014-01-18
 
         * Version 0.7.0 released
         ========================
@@ -164,7 +172,7 @@
         Update parameter files if necessary
 
 
-2012-12-21  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+2012-12-21
 
         * Version 0.6.0 released
         ========================
@@ -174,14 +182,16 @@
         Adapt to GammaLib-00-07-00 interface
         Correct ctobssim usage of seed value
 
-2012-10-11  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+2012-10-11
 
         * Bug fix version 0.5.2 released
         ================================
 
         Correct gcc 4.2.x OpenMP dlopen() test
 
-2012-09-18  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+2012-09-18
 
         * Bug fix version 0.5.1 released
         ================================
@@ -193,7 +203,8 @@
         Improve Python bindings configuration
         Add TEST_ENV_DIR to load library path
 
-2012-09-14  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+2012-09-14
 
         * Version 0.5.0 released
         ========================
@@ -202,7 +213,8 @@
         Improve logging information for ctlike
         Add OpenPM support
 
-2012-03-08  Juergen Knoedlseder  <jurgen.knodlseder@irap.omp.eu>
+
+2012-03-08
 
         * Version 0.4.0 released
         ========================
@@ -219,7 +231,7 @@
         Improve building of Python bindings
 
 
-2011-10-06  Juergen Knoedlseder  <knodlseder@cesr.fr>
+2011-10-06
 
         * Version 0.3.0 released
         ========================
@@ -227,7 +239,7 @@
         Renamed to ctools
 
 
-2011-10-03  Juergen Knoedlseder  <knodlseder@cesr.fr>
+2011-10-03
 
         * Version 0.2.5 released
         ========================
@@ -237,7 +249,8 @@
         Add examples directory
         Add scripts directory
 
-2011-07-20  Juergen Knoedlseder  <knodlseder@cesr.fr>
+
+2011-07-20
 
         * Version 0.2.4 released
         ========================
@@ -245,14 +258,16 @@
         Improve configure script
         Add scripts for ctatools environment setting
 
-2011-07-09  Juergen Knoedlseder  <knodlseder@cesr.fr>
+
+2011-07-09
 
         * Version 0.2.3 released
         ========================
 
         Improve configure script
 
-2011-02-24  Juergen Knoedlseder  <knodlseder@cesr.fr>
+
+2011-02-24
 
         * Version 0.2.1 released
         ========================
@@ -260,7 +275,8 @@
         Correct test environment
         Adjust Python wrapper compile option on Darwin
 
-2011-02-21  Juergen Knoedlseder  <knodlseder@cesr.fr>
+
+2011-02-21
 
         * Version 0.2.0 released
         ========================
@@ -269,7 +285,8 @@
         Add unit test (make check)
         Add html documentation
 
-2011-02-02  Juergen Knoedlseder  <knodlseder@cesr.fr>
+
+2011-02-02
 
         * Version 0.1.0 released
         ========================

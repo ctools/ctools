@@ -87,7 +87,7 @@ General parameters
 ``ebinfile [file]``
     Name of the file containing the energy bin definition.
 
-``(addbounds = yes) [boolean]``
+``(addbounds = no) [boolean]``
     Add energies to the background cube at the observation energy boundaries?
 
 ``(usepnt = no) [boolean]``
