@@ -36,25 +36,19 @@ class cspull(ctools.cscript):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Set name
         self._name    = 'cspull'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise some members
         self._edisp       = False
-        self._exposure    = None
-        self._psfcube     = None
-        self._bckcube     = None
-        self._edispcube   = None
-        self._stackmodels = None
         self._coordsys    = 'CEL'
         self._proj        = 'TAN'
         self._log_clients = False  # Static parameter
         self._offset      = 0.0
         self._ntrials     = 0
-        self._outfile     = gammalib.GFilename()
         self._npix        = 0
         self._binsz       = 0.0
         self._pattern     = 'single'
@@ -62,11 +56,10 @@ class cspull(ctools.cscript):
         self._seed        = 1
         self._chatter     = 2
 
-        # Initialise observation container from constructor arguments.
+        # Initialise observation container from constructor arguments
         self._obs, argv = self._set_input_obs(argv)
 
-        # Initialise application by calling the appropriate class
-        # constructor.
+        # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
         # Return
@@ -108,7 +101,6 @@ class cspull(ctools.cscript):
             self._obs.models(self['inmodel'].filename())
 
         # Read other parameters    
-        self._outfile = self['outfile'].filename()
         self._ntrials = self['ntrials'].integer()
         self._edisp   = self['edisp'].boolean()
         self._offset  = self['offset'].real()
@@ -116,6 +108,7 @@ class cspull(ctools.cscript):
         self._chatter = self['chatter'].integer()
 
         # Query some parameters
+        self['outfile'].filename()
         self['profile'].boolean()
 
         #  Write input parameters into logger
@@ -135,6 +128,9 @@ class cspull(ctools.cscript):
         obs : `~gammalib.GObservations`
             Observation container.
         """
+        # Set duration
+        duration = self['tmax'].real() - self['tmin'].real()
+
         # Setup observation definition list
         obsdeflist = obsutils.set_obs_patterns(self._pattern,
                                                ra=self['ra'].real(),
@@ -144,7 +140,7 @@ class cspull(ctools.cscript):
         # Create list of observations
         obs = obsutils.set_obs_list(obsdeflist,
                                     tstart=self['tmin'].real(),
-                                    duration=self['tmax'].real()-self['tmin'].real(),
+                                    duration=duration,
                                     deadc=self['deadc'].real(),
                                     emin=self['emin'].real(),
                                     emax=self['emax'].real(),
@@ -154,128 +150,6 @@ class cspull(ctools.cscript):
 
         # Return observation container
         return obs
-
-    def _set_stacked_irf(self):
-        """
-        Prepare stacked IRFs for stacked analysis
-        """
-        # Write header into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Compute stacked response')
-
-        # Set number of energy bins to at least 30 per energy decade
-        enumbins = int((math.log10(self['emax'].real()) -
-                        math.log10(self['emin'].real())) * 30.0)
-        if self._enumbins > enumbins:
-            enumbins = self._enumbins
-
-        # Compute spatial binning for point spread function and
-        # energy dispersion cubes
-        binsz = 10.0 * self['binsz'].real()
-        nxpix = self['npix'].integer() // 10  # Make sure result is int
-        nypix = self['npix'].integer() // 10  # Make sure result is int
-        if nxpix < 2:
-            nxpix = 2
-        if nypix < 2:
-            nypix = 2
-
-        # Get stacked exposure
-        expcube = ctools.ctexpcube(self._obs)
-        expcube['incube']   = 'NONE'
-        expcube['usepnt']   = True
-        expcube['ebinalg']  = 'LOG'
-        expcube['binsz']    = self._binsz
-        expcube['nxpix']    = self._npix
-        expcube['nypix']    = self._npix
-        expcube['enumbins'] = enumbins
-        expcube['emin']     = self['emin'].real()
-        expcube['emax']     = self['emax'].real()
-        expcube['coordsys'] = self._coordsys
-        expcube['proj']     = self._proj
-        expcube['chatter']  = self._chatter
-        expcube['debug']    = self._logDebug()
-        expcube.run()
-
-        # Notify exposure computation
-        if self._logTerse():
-            self._log('Computed exposure cube\n')
-
-        # Get stacked Psf
-        psfcube = ctools.ctpsfcube(self._obs)
-        psfcube['incube']   = 'NONE'
-        psfcube['usepnt']   = True
-        psfcube['ebinalg']  = 'LOG'
-        psfcube['binsz']    = binsz
-        psfcube['nxpix']    = nxpix
-        psfcube['nypix']    = nypix
-        psfcube['enumbins'] = enumbins
-        psfcube['emin']     = self['emin'].real()
-        psfcube['emax']     = self['emax'].real()
-        psfcube['coordsys'] = self._coordsys
-        psfcube['proj']     = self._proj
-        psfcube['chatter']  = self._chatter
-        psfcube['debug']    = self._logDebug()
-        psfcube.run()
-
-        # Notify Psf computation
-        if self._logTerse():
-            self._log('Computed point spread function cube\n')
-
-        # Optionally get stacked Edisp
-        if self._edisp:
-            edispcube = ctools.ctedispcube(self._obs)
-            edispcube['incube']   = 'NONE'
-            edispcube['usepnt']   = True
-            edispcube['ebinalg']  = 'LOG'
-            edispcube['binsz']    = binsz
-            edispcube['nxpix']    = nxpix
-            edispcube['nypix']    = nypix
-            edispcube['enumbins'] = enumbins
-            edispcube['emin']     = self['emin'].real()
-            edispcube['emax']     = self['emax'].real()
-            edispcube['coordsys'] = self._coordsys
-            edispcube['proj']     = self._proj
-            edispcube['chatter']  = self._chatter
-            edispcube['debug']    = self._logDebug()
-            edispcube.run()
-
-            # Store result
-            self._edispcube = edispcube.edispcube().copy()
-            
-            # Logging
-            if self._logTerse():
-                self._log('Computed energy dispersion cube\n')
-
-        # Get stacked background
-        bkgcube = ctools.ctbkgcube(self._obs)
-        bkgcube['incube']   = 'NONE'
-        bkgcube['usepnt']   = True
-        bkgcube['ebinalg']  = 'LOG'
-        bkgcube['binsz']    = self._binsz
-        bkgcube['nxpix']    = self._npix
-        bkgcube['nypix']    = self._npix
-        bkgcube['enumbins'] = enumbins
-        bkgcube['emin']     = self['emin'].real()
-        bkgcube['emax']     = self['emax'].real()
-        bkgcube['coordsys'] = self._coordsys
-        bkgcube['proj']     = self._proj
-        bkgcube['chatter']  = self._chatter
-        bkgcube['debug']    = self._logDebug()
-        bkgcube.run()
-
-        # Notify background cube computation
-        if self._logTerse():
-            self._log('Computed background cube\n')
-
-        # Store results
-        self._exposure    = expcube.expcube().copy()
-        self._psfcube     = psfcube.psfcube().copy()
-        self._bckcube     = bkgcube.bkgcube().copy()
-        self._stackmodels = bkgcube.models().copy()
-
-        # Return
-        return
 
     def _obs_string(self, obs):
         """
@@ -310,7 +184,7 @@ class cspull(ctools.cscript):
         # Return summary string
         return text
 
-    def _trial(self, seed, stacked):
+    def _trial(self, seed):
         """
         Compute the pull for a single trial
 
@@ -318,8 +192,6 @@ class cspull(ctools.cscript):
         ----------
         seed : int
             Random number generator seed
-        stacked : bool
-            Use stacked analysis
 
         Returns
         -------
@@ -353,16 +225,6 @@ class cspull(ctools.cscript):
                            log=self._log_clients,
                            debug=self._logDebug(),
                            chatter=self._chatter)
-
-        # Set response for a stacked observation
-        if stacked:
-            if self._edisp:
-                obs[0].response(self._exposure,  self._psfcube,
-                                self._edispcube, self._bckcube)
-            else:
-                obs[0].response(self._exposure, self._psfcube,
-                                self._bckcube)
-            obs.models(self._stackmodels)
 
         # Determine number of events in simulation
         nevents = 0.0
@@ -427,10 +289,10 @@ class cspull(ctools.cscript):
                     # Set parameter name
                     name = model_name+'_'+par.name()
 
-                    # Append parameter, Pull_parameter and Unc_parameter
+                    # Append parameter, Pull_parameter and e_parameter
                     colnames.append(name)
                     colnames.append('Pull_'+name)
-                    colnames.append('Unc_'+name)
+                    colnames.append('e_'+name)
 
                     # Compute pull
                     fitted_value = par.value()
@@ -444,7 +306,7 @@ class cspull(ctools.cscript):
                     # Store results
                     values[name] = fitted_value
                     values['Pull_'+name] = pull
-                    values['Unc_'+name]  = error
+                    values['e_'+name]    = error
 
                     # Write result
                     if self._logNormal():
@@ -481,13 +343,10 @@ class cspull(ctools.cscript):
             self._log.header1(gammalib.number('Observation',len(self._obs)))
             self._log(str(self._obs))
             self._log('\n')
-
-        # Signal if stacked analysis is requested
-        stacked = self._obs.size() > 1 and self._enumbins > 0
-
-        # If several observations and binned: prepare stacked irfs
-        if stacked:
-            self._set_stacked_irf()
+        if self._logExplicit():
+            for obs in self._obs:
+                self._log(str(obs))
+                self._log('\n')
 
         # Write header
         if self._logTerse():
@@ -498,18 +357,21 @@ class cspull(ctools.cscript):
         for seed in range(self._ntrials):
 
             # Make a trial and add initial seed
-            result = self._trial(seed + self._seed, stacked)
+            result = self._trial(seed + self._seed)
+
+            # Set output filename
+            outfile = self['outfile'].filename().url()
 
             # Write out result immediately
             if seed == 0:
-                f      = open(self._outfile.url(), 'w')
+                f      = open(outfile, 'w')
                 writer = csv.DictWriter(f, result['colnames'])
                 headers = {}
                 for n in result['colnames']:
                     headers[n] = n
                 writer.writerow(headers)
             else:
-                f = open(self._outfile.url(), 'a')
+                f = open(outfile, 'a')
             writer = csv.DictWriter(f, result['colnames'])
             writer.writerow(result['values'])
             f.close()

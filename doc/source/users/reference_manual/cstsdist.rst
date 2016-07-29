@@ -75,6 +75,12 @@ General parameters
 ``dec [real]``
     Declination of CTA pointing (J2000, in degrees).
 
+``coordsys <CEL|GAL> [string]``
+    Coordinate system (CEL - celestial, GAL - galactic).
+ 	 	 
+``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+    Projection method.
+
 ``emin [real]``
     Lower energy limit (in TeV).
  	 	 

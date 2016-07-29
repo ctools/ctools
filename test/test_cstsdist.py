@@ -76,7 +76,7 @@ class Test(test):
                        ' enumbins=0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
                        ' binsz=0.05'+ \
                        ' outfile="cstsdist_cmd1.dat"'+ \
-                       ' logfile="cstsdist_cmd1.log" chatter=1'
+                       ' logfile="cstsdist_cmd1.log" chatter=2'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -117,7 +117,6 @@ class Test(test):
         tsdist['srcname']  = 'Crab'
         tsdist['caldb']    = self._caldb
         tsdist['irf']      = self._irf
-        tsdist['outfile']  = 'cstsdist_py1.dat'
         tsdist['ntrials']  = 1
         tsdist['ra']       = 83.63
         tsdist['dec']      = 22.01
@@ -126,10 +125,9 @@ class Test(test):
         tsdist['enumbins'] = 0
         tsdist['tmax']     = 1800.0
         tsdist['rad']      = 5.0
-        tsdist['npix']     = 200
-        tsdist['binsz']    = 0.05
+        tsdist['outfile']  = 'cstsdist_py1.dat'
         tsdist['logfile']  = 'cstsdist_py1.log'
-        tsdist['chatter']  = 2
+        tsdist['chatter']  = 3
 
         # Run cstsdist script
         tsdist.logFileOpen()   # Make sure we get a log file
@@ -139,20 +137,56 @@ class Test(test):
         # Check pull distribution file
         self._check_result_file('cstsdist_py1.dat')
 
+        # Set-up binned cstsdist in four observation wobble mode
+        tsdist = cscripts.cstsdist()
+        tsdist['inmodel']  = self._model
+        tsdist['srcname']  = 'Crab'
+        tsdist['caldb']    = self._caldb
+        tsdist['irf']      = self._irf
+        tsdist['ntrials']  = 1
+        tsdist['ra']       = 83.63
+        tsdist['dec']      = 22.01
+        tsdist['coordsys'] = 'CEL'
+        tsdist['proj']     = 'TAN'
+        tsdist['emin']     = 0.1
+        tsdist['emax']     = 100.0
+        tsdist['enumbins'] = 10
+        tsdist['tmax']     = 1800.0
+        tsdist['rad']      = 5.0
+        tsdist['npix']     = 50
+        tsdist['binsz']    = 0.1
+        tsdist['pattern']  = 'four'
+        tsdist['outfile']  = 'cstsdist_py2.dat'
+        tsdist['logfile']  = 'cstsdist_py2.log'
+        tsdist['chatter']  = 4
+
+        # Execute cstsdist script
+        tsdist.execute()
+
+        # Check pull distribution file
+        self._check_result_file('cstsdist_py2.dat', ncols=9)
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, ncols=11):
         """
         Check result file
+
+        Parameters
+        ----------
+        filename : str
+            Name of result file
+        ncols : int, optional
+            Required number of columns
         """
         # Open result file as CSV file
         results = gammalib.GCsv(filename, ',')
 
         # Check dimensions
-        self.test_value(results.nrows(), 2, 'Check for 2 rows in TS file')
-        self.test_value(results.ncols(), 14, 'Check for 14 columns in TS file')
+        self.test_value(results.nrows(), 2,     'Check rows in TS file')
+        self.test_value(results.ncols(), ncols, 'Check columns in TS file')
 
         # Return
         return

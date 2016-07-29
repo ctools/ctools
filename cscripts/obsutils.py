@@ -1,5 +1,5 @@
 # ==========================================================================
-# CTA observation handling support functions.
+# CTA observation handling support functions
 #
 # Copyright (C) 2011-2016 Juergen Knoedlseder
 #
@@ -30,6 +30,14 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
     """
     Simulate events for all observations in the container
 
+    Simulate events for all observations using ctobssim. If the number of
+    energy bins is positive, the events are then binned in a counts cube
+    using ctbin. If multiple observations are simulated, the counts cube is
+    a stacked cube and the corresponding response cubes are computed using
+    ctexpcube, ctpsfcube, ctbkgcube and optionally ctedispcube. The response
+    cubes are attached to the first observation in the container, which
+    normally is the observation with the counts cube.
+
     Parameters
     ----------
     obs : `~gammalib.GObservations`
@@ -42,7 +50,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Chatter level
     edisp : bool, optional
         Apply energy dispersion?
-    seed : int, integer
+    seed : int, optional
         Seed value for simulations
     emin : float, optional
         Minimum energy of counts cube for binned (TeV)
@@ -64,7 +72,6 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
     obs : `~gammalib.GObservations`
         Observation container filled with simulated events
     """
-
     # Allocate ctobssim application and set parameters
     sim = ctools.ctobssim(obs)
     sim['seed']    = seed
@@ -125,6 +132,48 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         # the container and bin the events in counts maps
         bin.run()
 
+        # If we have multiple input observations then create stacked response
+        # cubes and append them to the observation
+        if len(sim.obs()) > 1:
+
+            # First get the cube. We need this because ctbin builds a cube on
+            # the fly. We should avoid this and make the cube part of ctbin
+            cube = bin.cube()
+
+            # Get xref, yref, coordsys and proj from counts cube
+            _xref     = cube.counts().projection().crval(0)
+            _yref     = cube.counts().projection().crval(1)
+            _coordsys = cube.counts().projection().coordsys()
+            _proj     = cube.counts().projection().code()
+
+            # Kluge: map "EQU" to "CEL" coordinate system (not sure why the
+            # GSkyProjection::coordsys returns "EQU" instead of "CEL"
+            if _coordsys == 'EQU':
+                _coordsys = 'CEL'
+
+            # Get stacked response
+            response = get_stacked_response(sim.obs(), _xref, _yref,
+                                            binsz=binsz, nxpix=npix, nypix=npix,
+                                            emin=emin, emax=emax, enumbins=nbins,
+                                            edisp=edisp,
+                                            coordsys=_coordsys, proj=_proj,
+                                            log=log, debug=debug,
+                                            chatter=chatter)
+        
+            # Set stacked response
+            if edisp:
+                bin.obs()[0].response(response['expcube'],
+                                      response['psfcube'],
+                                      response['edispcube'],
+                                      response['bkgcube'])
+            else:
+                bin.obs()[0].response(response['expcube'],
+                                      response['psfcube'],
+                                      response['bkgcube'])
+
+            # Set new models
+            bin.obs().models(response['models'])
+
         # Make a deep copy of the observation that will be returned
         # (the ctbin object will go out of scope one the function is
         # left)
@@ -149,32 +198,35 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 # ================ #
 def fit(obs, log=False, debug=False, chatter=2, edisp=False):
     """
-    Perform maximum likelihood fitting of observations in the container.
+    Perform maximum likelihood fitting of observations in the container
 
-    Parameters:
-     obs   - Observation container
-    Keywords:
-     log     - Create log file(s)
-     debug   - Create screen dump
-     chatter - Chatter level
-     edisp   - Apply energy dispersion?
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    log : bool, optional
+        Create log file(s)
+    debug : bool, optional
+        Create console dump?
+    chatter : int, optional
+        Chatter level
+    edisp : bool, optional
+        Apply energy dispersion?
+
+    Returns
+    -------
+    like : `~ctools.ctlike`
+        ctlike application
     """
-    # Allocate ctlike application
+    # Allocate ctlike application and set parameters
     like = ctools.ctlike(obs)
+    like['debug']   = debug
+    like['chatter'] = chatter
+    like['edisp']   = edisp
 
     # Optionally open the log file
     if log:
         like.logFileOpen()
-
-    # Optionally switch-on debugging model
-    if debug:
-        like["debug"] = True
-
-    # Set chatter level
-    like["chatter"] = chatter
-
-    # Optionally apply energy dispersion
-    like["edisp"] = edisp
 
     # Run ctlike application.
     like.run()
@@ -188,33 +240,35 @@ def fit(obs, log=False, debug=False, chatter=2, edisp=False):
 # ============================================================== #
 def cterror(obs, srcname, log=False, debug=False, chatter=2):
     """
-    Perform maximum likelihood fitting of observations in the container.
+    Fit observations and determine errors using likelihood profile
 
-    Parameters:
-     obs     - Observation container
-     srcname - Source name
-    Keywords:
-     log     - Create log file(s)
-     debug   - Create screen dump
-     chatter - Chatter level
-     edisp   - Apply energy dispersion?
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    srcname : str
+        Source name
+    log : bool, optional
+        Create log file(s)
+    debug : bool, optional
+        Create console dump?
+    chatter : int, optional
+        Chatter level
+
+    Returns
+    -------
+    error : `~ctools.cterror`
+        cterror application
     """
-    # Allocate cterror application
+    # Allocate cterror application and set parameters
     error = ctools.cterror(obs)
-
-    # Set cterror parameters
-    error["srcname"] = srcname
+    error['srcname'] = srcname
+    error['debug']   = debug
+    error['chatter'] = chatter
 
     # Optionally open the log file
     if log:
         error.logFileOpen()
-
-    # Optionally switch-on debugging model
-    if debug:
-        error["debug"] = True
-
-    # Set chatter level
-    error["chatter"] = chatter
 
     # Run cterror application.
     error.run()
@@ -226,24 +280,39 @@ def cterror(obs, srcname, log=False, debug=False, chatter=2):
 # ================= #
 # Create counts map #
 # ================= #
-def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
+def cntmap(obs, proj='TAN', coord='GAL', xval=0.0, yval=0.0, \
            binsz=0.05, nxpix=200, nypix=200, \
-           outname="cntmap.fits"):
+           outname='cntmap.fits'):
     """
-    Creates a counts map by combining the events of all observations.
-    The counts map will be a summed map over all energies.
+    Creates a counts map by combining the events of all observations
 
-    Parameters:
-     obs     - Observation container
-    Keywords:
-     proj    - Projection type (e.g. TAN, CAR, STG, ...) (default: TAN)
-     coord   - Coordinate type (GAL, CEL) (default: GAL)
-     xval    - Reference longitude value [deg] (default: 0.0)
-     yval    - Reference latitude value [deg] (default: 0.0)
-     binsz   - Pixel size [deg/pixel] (default: 0.05)
-     nxpix   - Number of pixels in X direction (default: 200)
-     nypix   - Number of pixels in Y direction (default: 200)
-     outname - Counts map FITS filename (default: cntmap.fits)
+    The counts map will be a summed map over all energies
+
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container without events
+    proj : str, optional
+        Projection for binned simulation
+    coord : str, optional
+        Coordinate system for binned simulation
+    xval : float, optional
+        Counts map centre of X direction (deg)
+    yval : float, optional
+        Counts map centre of Y direction (deg)
+    binsz : float, optional
+        Pixel size for binned simulation (deg/pixel)
+    nxpix : int, optional
+        Number of pixels in X direction
+    nypix : int, optional
+        Number of pixels in Y direction
+    outname : str, optional
+        Counts map file name
+
+    Returns
+    -------
+    map : `~gammalib.GSkyMap`
+        Counts map
     """
     # Allocate counts map
     map = gammalib.GSkyMap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
@@ -276,26 +345,42 @@ def cntmap(obs, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
 # ================ #
 # Create model map #
 # ================ #
-def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
+def modmap(obs, eref=0.1, proj='TAN', coord='GAL', xval=0.0, yval=0.0, \
            binsz=0.05, nxpix=200, nypix=200, \
-           outname="modmap.fits"):
+           outname='modmap.fits'):
     """
-    Make model map for a given reference energy by combining all observations.
+    Make model map for a given reference energy by combining all observations
+
     The model map will be evaluated for a given reference energy 'eref' and will
     be given in units of [counts/(sr MeV s)].
 
-    Parameters:
-     obs     - Observation container
-    Keywords:
-     eref    - Reference energy for which model is created [TeV] (default: 0.1)
-     proj    - Projection type (e.g. TAN, CAR, STG, ...) (default: TAN)
-     coord   - Coordinate type (GAL, CEL) (default: GAL)
-     xval    - Reference longitude value [deg] (default: 0.0)
-     yval    - Reference latitude value [deg] (default: 0.0)
-     binsz   - Pixel size [deg/pixel] (default: 0.05)
-     nxpix   - Number of pixels in X direction (default: 200)
-     nypix   - Number of pixels in Y direction (default: 200)
-     outname - Model map FITS filename (default: modmap.fits)
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container without events
+    eref : float, optional
+        Reference energy for which model is created (TeV)
+    proj : str, optional
+        Projection for binned simulation
+    coord : str, optional
+        Coordinate system for binned simulation
+    xval : float, optional
+        Counts map centre of X direction (deg)
+    yval : float, optional
+        Counts map centre of Y direction (deg)
+    binsz : float, optional
+        Pixel size for binned simulation (deg/pixel)
+    nxpix : int, optional
+        Number of pixels in X direction
+    nypix : int, optional
+        Number of pixels in Y direction
+    outname : str, optional
+        Model map file name
+
+    Returns
+    -------
+    map : `~gammalib.GSkyMap`
+        Model map
     """
     # Allocate model map
     map = gammalib.GSkyMap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
@@ -338,53 +423,46 @@ def modmap(obs, eref=0.1, proj="TAN", coord="GAL", xval=0.0, yval=0.0, \
     return map
 
 
-# ===================================== #
-# Set one CTA observation (old version) #
-# ===================================== #
-def set(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
-        emin=0.1, emax=100.0, rad=5.0, \
-        irf="South_50h", caldb="prod2"):
-    """
-    Obsolete function, use set_obs instead.
-    """
-    # Print warning
-    print("Warning: obsutils.set is obsolete, use obsutils.set_obs instead.")
-
-    # Call new function
-    obs_cta = set_obs(pntdir, tstart=tstart, duration=duration, deadc=deadc, \
-                      emin=emin, emax=emax, rad=rad, \
-                      irf=irf, caldb=caldb)
-
-    # Return CTA observation
-    return obs_cta
-
-
 # ======================= #
 # Set one CTA observation #
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf="South_50h", caldb="prod2", id="000000"):
+            irf='South_50h', caldb='prod2', id='000000'):
     """
-    Set a single CTA observation.
+    Set a single CTA observation
     
     The function sets a single CTA observation containing an empty CTA
     event list. By looping over this function you can add CTA observations
     to the observation container.
 
-    Args:
-        pntdir: Pointing direction [GSkyDir]
+    Parameters
+    ----------
+    pntdir : `~gammalib.GSkyDir`
+        Pointing direction
+    tstart : float, optional
+        Start time (seconds)
+    duration : float, optional
+        Duration of observation (seconds)
+    deadc : float, optional
+        Deadtime correction factor
+    emin : float, optional
+        Minimum event energy (TeV)
+    emax : float, optional
+        Maximum event energy (TeV)
+    rad : float, optional
+        ROI radius used for analysis (deg)
+    irf : str, optional
+        Instrument response function
+    caldb : str, optional
+        Calibration database path
+    id : str, optional
+        Observation identifier
 
-    Kwargs:
-        tstart:   Start time (seconds) (default: 0.0)
-        duration: Duration of observation (seconds) (default: 1800.0)
-        deadc:    Deadtime correction factor (default: 0.95)
-        emin:     Minimum event energy (TeV) (default: 0.1)
-        emax:     Maximum event energy (TeV) (default: 100.0)
-        rad:      ROI radius used for analysis (deg) (default: 5.0)
-        irf:      Instrument response function (default: "South_50h")
-        caldb:    Calibration database path (default: "prod2")
-        id:       Run identifier (default: "000000")
+    Returns
+    -------
+    obs : `~gammalib.GCTAObservation`
+        CTA observation
     """
     # Allocate CTA observation
     obs_cta = gammalib.GCTAObservation()
@@ -394,7 +472,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     if (gammalib.dir_exists(caldb)):
         db.rootdir(caldb)
     else:
-        db.open("cta", caldb)
+        db.open('cta', caldb)
 
     # Set pointing direction
     pnt = gammalib.GCTAPointing()
@@ -413,8 +491,8 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     gti.append(gammalib.GTime(tstart), gammalib.GTime(tstart+duration))
 
     # Set energy boundaries
-    ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, "TeV"),
-                                gammalib.GEnergy(emax, "TeV"))
+    ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, 'TeV'),
+                                gammalib.GEnergy(emax, 'TeV'))
 
     # Allocate event list
     events = gammalib.GCTAEventList()
@@ -440,10 +518,11 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # Set list of CTA observations #
 # ============================ #
 def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
-        emin=0.1, emax=100.0, rad=5.0, \
-        irf="South_50h", caldb="prod2"):
+                 emin=0.1, emax=100.0, rad=5.0, \
+                 irf='South_50h', caldb='prod2'):
     """
-    Returns an observation container filled with a list of CTA observations.
+    Returns an observation container filled with a list of CTA observations
+
     The list is defined by the obsdeflist parameter which is a dictionnary
     containing the mandatory keywords 'ra' and 'dec' that specify the
     pointing direction for a given observation. Optional keyword give control
@@ -451,27 +530,31 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
     energy range, etc. If an optional keyword is not specified, the function
     keyword is used instead.
 
-    Parameters:
-     obsdeflist - Observation definition list [{'ra': x.xx, 'dec': x.xx}]
-                  The directory can take the following optional keywords:
-                  - duration: Duration of CTA observation [seconds]
-                  - deadc: Deadtime correction factor
-                  - emin: Minimum event energy [TeV]
-                  - emax: Maximum event energy [TeV]
-                  - rad: ROI radius used for analysis [deg]
-                  - irf: Instrument response function
-                  - caldb: Calibration database path
-                  Optional keywords overwrite keywords specified in the
-                  function call.
-    Keywords:
-     tstart     - Start time [seconds] (default: 0.0)
-     duration   - Duration of one CTA observation [seconds] (default: 1800.0)
-     deadc      - Deadtime correction factor (default: 0.95)
-     emin       - Minimum event energy [TeV] (default: 0.1)
-     emax       - Maximum event energy [TeV] (default: 100.0)
-     rad        - ROI radius used for analysis [deg] (default: 5.0)
-     irf        - Instrument response function (default: cta_dummy_irf)
-     caldb      - Calibration database path (default: "dummy")
+    Parameters
+    ----------
+    obsdeflist : list of dict
+        Observation definition list
+    tstart : float, optional
+        Start time (seconds)
+    duration : float, optional
+        Duration of observation (seconds)
+    deadc : float, optional
+        Deadtime correction factor
+    emin : float, optional
+        Minimum event energy (TeV)
+    emax : float, optional
+        Maximum event energy (TeV)
+    rad : float, optional
+        ROI radius used for analysis (deg)
+    irf : str, optional
+        Instrument response function
+    caldb : str, optional
+        Calibration database path
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container filled with CTA observation
     """
     # Initialise empty observation container
     obs = gammalib.GObservations()
@@ -530,7 +613,7 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
             obs_irf = irf
 
         # Generate identifier string
-        id = "%6.6d" % obs_id
+        id = '%6.6d' % obs_id
 
         # Set CTA observation
         obs_cta = set_obs(pntdir, tstart=obs_start, duration=obs_duration, \
@@ -553,26 +636,38 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ============================ #
 def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
     """
-    Sets a number of standard patterns.
+    Sets a number of standard patterns
+    
+    Parameters
+    ----------
+    pattern : str
+        Observation pattern ("single", "four")
+    ra : float, optional
+        Right Ascension of pattern centre (deg)
+    dec : float, optional
+        Declination of pattern centre (deg)
+    offset : float, optional
+        Offset from pattern centre (deg)
 
-    Parameters:
-     pattern - Observation pattern. Possible options are:
-               - "single": single pointing
-               - "four": four pointings 'offset' around pattern centre
-
-    Keywords:
-     ra      - Right Ascension of pattern centre [deg] (default: 83.6331)
-     dec     - Declination of pattern centre [deg] (default: 22.0145)
-     offset  - Offset from pattern centre [deg] (default: 1.5)
+    Returns
+    -------
+    obsdeflist : list
+        Observation definition list
     """
     # Initialise observation definition list
     obsdeflist = []
 
-    # Add patterns
-    if pattern == "single":
+    # If the pattern is a single observation then append the Right Ascension
+    # and Declination to the observation definition list
+    if pattern == 'single':
         obsdef = {'ra': ra, 'dec': dec}
         obsdeflist.append(obsdef)
-    elif pattern == "four":
+
+    # ... otherwise, if the pattern is four observations then append four
+    # observations offset by a certain amount from the pattern centre to the
+    # observation definition list
+    elif pattern == 'four':
+
         # Set pattern centre
         centre = gammalib.GSkyDir()
         centre.radec_deg(ra, dec)
@@ -582,8 +677,232 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
             pntdir = centre.copy()
             pntdir.rotate_deg(phi, offset)
             obsdeflist.append({'ra': pntdir.ra_deg(), 'dec': pntdir.dec_deg()})
+
+    # ... otherwise we have an unknown pattern
     else:
-        print("Warning: Observation pattern '"+str(pattern)+"' not recognized.")
+        print('Warning: Observation pattern "'+str(pattern)+'" not recognized.')
 
     # Return observation definition list
     return obsdeflist
+
+
+# ======================== #
+# Set model for TS fitting #
+# ======================== #
+def set_ts_model(models, srcname, ra=None, dec=None, fitspat=False, fitspec=False):
+        """
+        Set model for TS fitting
+
+        Parameters
+        ----------
+        models : `~gammalib.GModels`
+            Input model container
+        srcname : str
+            Test source name
+        ra : float, optional
+            Right Ascension of test source (deg)
+        dec : float, optional
+            Declination of test source (deg)
+        fitspat : bool, optional
+            Fit spatial parameter?
+        fitspec : bool, optional
+            Fit spectral parameters?
+
+        Returns
+        -------
+        model : `~gammalib.GModels`
+            Model container for TS fitting
+        """
+        # Create a clone of the input model
+        outmodels = models.copy()
+
+        # Disable TS computation for all model components (will enable the
+        # test source later)
+        for model in outmodels:
+            model.tscalc(False)
+
+        # Get source model and enable TS computation
+        model = outmodels[srcname]
+        model.tscalc(True)
+
+        # If source model has no "Prefactor" parameter then raise an exception
+        if not model.has_par('Prefactor'):
+            msg = ('Model "%s" has no parameter "Prefactor". Only spectral '
+                   'models with a "Prefactor" parameter are supported.' %
+                   srcname)
+            raise RuntimeError(msg)
+
+        # Set position of test source
+        if ra != None and dec != None:
+            if model.has_par('RA') and model.has_par('DEC'):
+                model['RA'].value(ra)
+                model['DEC'].value(dec)
+
+        # Set possible spatial and spectral parameters
+        spatial  = ['RA', 'DEC', 'Sigma', 'Radius', 'Width', 'PA',
+                    'MinorRadius', 'MajorRadius']
+        spectral = ['Index', 'Index1', 'Index2', 'BreakEnergy', 'CutoffEnergy',
+                    'InverseCutoffEnergy']
+
+        # Fit or fix spatial parameters
+        for par in spatial:
+            if model.has_par(par):
+                if fitspat:
+                    model[par].free()
+                else:
+                    model[par].fix()
+
+        # Fit or fix spectral parameters
+        for par in spectral:
+            if model.has_par(par):
+                if fitspec:
+                    model[par].free()
+                else:
+                    model[par].fix()
+
+        # Return model container
+        return outmodels
+
+
+# ==================== #
+# Get stacked response #
+# ==================== #
+def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
+                         emin=0.1, emax=100.0, enumbins=20, edisp=False,
+                         coordsys='GAL', proj='TAN',
+                         log=False, debug=False, chatter=2):
+    """
+    Get stacked response cubes
+
+    Parameters
+    ----------
+    obs : `~gammalib.GObservations`
+        Observation container
+    xref : float
+        Right Ascension or Galactic longitude of response centre (deg)
+    yref : float
+        Declination or Galactic latitude of response centre (deg)
+    binsz : float, optional
+        Pixel size (deg/pixel)
+    nxpix : int, optional
+        Number of pixels in X direction
+    nypix : int, optional
+        Number of pixels in Y direction
+    emin : float, optional
+        Minimum energy (TeV)
+    emax : float, optional
+        Maximum energy (TeV)
+    enumbins : int, optional
+        Number of energy bins
+    edisp : bool, optional
+        Apply energy dispersion?
+    coordsys : str, optional
+        Coordinate system
+    proj : str, optional
+        Projection
+    log : bool, optional
+        Create log file(s)
+    debug : bool, optional
+        Create console dump?
+    chatter : int, optional
+        Chatter level
+
+    Returns
+    -------
+    result : dict
+        Dictionary of response cubes
+    """
+    # Compute spatial binning for point spread function and
+    # energy dispersion cubes
+    psf_binsz = 10.0 * binsz
+    psf_nxpix = min(nxpix // 10, 2)  # Make sure result is int
+    psf_nypix = min(nypix // 10, 2)  # Make sure result is int
+
+    # Create exposure cube
+    expcube = ctools.ctexpcube(obs)
+    expcube['incube']   = 'NONE'
+    expcube['usepnt']   = False
+    expcube['ebinalg']  = 'LOG'
+    expcube['xref']     = xref
+    expcube['yref']     = yref
+    expcube['binsz']    = binsz
+    expcube['nxpix']    = nxpix
+    expcube['nypix']    = nypix
+    expcube['enumbins'] = enumbins
+    expcube['emin']     = emin
+    expcube['emax']     = emax
+    expcube['coordsys'] = coordsys
+    expcube['proj']     = proj
+    if log:
+        expcube.logFileOpen()
+    expcube.run()
+
+    # Create point spread function cube
+    psfcube = ctools.ctpsfcube(obs)
+    psfcube['incube']   = 'NONE'
+    psfcube['usepnt']   = False
+    psfcube['ebinalg']  = 'LOG'
+    psfcube['xref']     = xref
+    psfcube['yref']     = yref
+    psfcube['binsz']    = psf_binsz
+    psfcube['nxpix']    = psf_nxpix
+    psfcube['nypix']    = psf_nypix
+    psfcube['enumbins'] = enumbins
+    psfcube['emin']     = emin
+    psfcube['emax']     = emax
+    psfcube['coordsys'] = coordsys
+    psfcube['proj']     = proj
+    if log:
+        psfcube.logFileOpen()
+    psfcube.run()
+
+    # Create background cube
+    bkgcube = ctools.ctbkgcube(obs)
+    bkgcube['incube']   = 'NONE'
+    bkgcube['usepnt']   = False
+    bkgcube['ebinalg']  = 'LOG'
+    bkgcube['xref']     = xref
+    bkgcube['yref']     = yref
+    bkgcube['binsz']    = binsz
+    bkgcube['nxpix']    = nxpix
+    bkgcube['nypix']    = nypix
+    bkgcube['enumbins'] = enumbins
+    bkgcube['emin']     = emin
+    bkgcube['emax']     = emax
+    bkgcube['coordsys'] = coordsys
+    bkgcube['proj']     = proj
+    if log:
+        bkgcube.logFileOpen()
+    bkgcube.run()
+
+    # If energy dispersion is requested then create energy dispersion cube
+    if edisp:
+        edispcube = ctools.ctedispcube(obs)
+        edispcube['incube']   = 'NONE'
+        edispcube['usepnt']   = False
+        edispcube['ebinalg']  = 'LOG'
+        edispcube['xref']     = xref
+        edispcube['yref']     = yref
+        edispcube['binsz']    = psf_binsz
+        edispcube['nxpix']    = psf_nxpix
+        edispcube['nypix']    = psf_nypix
+        edispcube['enumbins'] = enumbins
+        edispcube['emin']     = emin
+        edispcube['emax']     = emax
+        edispcube['coordsys'] = coordsys
+        edispcube['proj']     = proj
+        if log:
+            edispcube.logFileOpen()
+        edispcube.run()
+
+    # Build response dictionary
+    response = {}
+    response['expcube'] = expcube.expcube().copy()
+    response['psfcube'] = psfcube.psfcube().copy()
+    response['bkgcube'] = bkgcube.bkgcube().copy()
+    response['models']  = bkgcube.models().copy()
+    if edisp:
+        response['edispcube'] = edispcube.expcube().copy()
+
+    # Return response cubes
+    return response
