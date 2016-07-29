@@ -85,6 +85,7 @@ test/*.eps
 test/*.jpg
 test/test_cscripts.sh
 test/test_examples.py
+test/testing.py
 test/reports/*.xml
 test/butterfly.txt
 test/.coverage

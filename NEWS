@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-28 July 2016
+29 July 2016
 
 
 Introduction
@@ -11,7 +11,8 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+The testing.py script has been modified so that cscripts that are executed
+from the command line are included in the coverage reports (#1827).
 
 
 Python interface

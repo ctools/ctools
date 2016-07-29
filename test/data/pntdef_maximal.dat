@@ -1,0 +1,4 @@
+name,id,lon,lat,duration,emin,emax,rad,deadc,caldb,irf
+Crab,0001,184.58,-5.78,1800.0,0.1,100.0,5.0,0.95,Prod2,South_50h
+Crab,0002,184.58,-4.78,1800.0,0.1,100.0,5.0,0.95,Prod2,South_50h
+Crab,0003,184.58,-6.78,1800.0,0.1,100.0,5.0,0.95,Prod2,South_50h

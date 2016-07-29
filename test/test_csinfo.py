@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cscaldb script.
+# This scripts performs unit tests for the csinfo script.
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -23,12 +23,12 @@ import cscripts
 from testing import test
 
 
-# ============================= #
-# Test class for cscaldb script #
-# ============================= #
+# ============================ #
+# Test class for csinfo script #
+# ============================ #
 class Test(test):
     """
-    Test class for cscaldb script
+    Test class for csinfo script
     """
 
     # Constructor
@@ -48,50 +48,49 @@ class Test(test):
         Set all test functions.
         """
         # Set test name
-        self.name('cscaldb')
+        self.name('csinfo')
 
         # Append tests
-        self.append(self._test_cmd, 'Test cscaldb on command line')
-        self.append(self._test_python, 'Test cscaldb from Python')
+        self.append(self._test_cmd, 'Test csinfo on command line')
 
         # Return
         return
 
-    # Test cscaldb on command line
+    # Test csinfo on command line
     def _test_cmd(self):
         """
-        Test cscaldb on the command line.
+        Test csinfo on the command line.
         """
         # Set script name
-        cscaldb = self._script('cscaldb')
+        csinfo = self._script('csinfo')
 
-        # Setup cscaldb command
-        cmd = cscaldb+' logfile="cscaldb_cmd1.log" chatter=1'
+        # Setup csinfo command
+        cmd = csinfo
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
              'Self test of test script')
 
-        # Check if execution was successful
+        # Execute script without arguments
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
 
-        # Return
-        return
+        # Execute script with "list" argument
+        self.test_assert(self._execute(cmd+' list') == 0,
+             'Check successful execution with "list" argument from command line')
 
-    # Test cscaldb from Python
-    def _test_python(self):
-        """
-        Test cscaldb from Python.
-        """
-        # Set-up cscaldb
-        caldb = cscripts.cscaldb()
-        caldb['logfile'] = 'cscaldb_py1.log'
-        caldb['chatter'] = 2
+        # Execute script with "check" argument
+        self.test_assert(self._execute(cmd+' check') == 0,
+             'Check successful execution with "check" argument from command line')
 
-        # Run script
-        caldb.logFileOpen()   # Make sure we get a log file
-        caldb.run()
+        # Execute script with "info" argument
+        self.test_assert(self._execute(cmd+' info') == 0,
+             'Check successful execution with "info" argument from command line')
+
+        # Execute script with invalid argument
+        self.test_assert(self._execute(cmd+' not_a_valid_argument') != 0,
+             'Check unsuccessful execution with unsupported argument from '
+             'command line')
 
         # Return
         return

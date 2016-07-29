@@ -1034,6 +1034,7 @@ AC_CONFIG_FILES([Makefile
                  test/test_python_ctools.sh
                  test/test_python_cscripts.sh
                  test/test_examples.py
+                 test/testing.py
                  pyext/Makefile
                  pyext/setup.py
                  pyext/ctools/__init__.py

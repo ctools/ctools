@@ -129,7 +129,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/tsmap_0.fits \
            $(top_srcdir)/test/data/tsmap_1.fits \
            $(top_srcdir)/test/data/exclusion.reg \
-           $(top_srcdir)/test/data/pntdef.dat \
+           $(top_srcdir)/test/data/pntdef_minimal.dat \
+           $(top_srcdir)/test/data/pntdef_maximal.dat \
            $(top_srcdir)/test/data/models.txt \
            $(top_srcdir)/test/data/tsmaps.txt \
            $(top_srcdir)/test/data/model_cube_background.xml \
@@ -143,7 +144,12 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/pull.dat \
            $(top_srcdir)/test/data/sensitivity.dat \
            $(top_srcdir)/test/data/spectrum.fits \
-           $(top_srcdir)/test/data/ts.dat
+           $(top_srcdir)/test/data/ts.dat \
+           $(top_srcdir)/test/data/models_spatial.xml \
+           $(top_srcdir)/test/data/models_spectral.xml \
+           $(top_srcdir)/test/data/model_filefunction.txt \
+           $(top_srcdir)/test/data/model_map.fits.gz \
+           $(top_srcdir)/test/data/model_mapcube.fits.gz
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \

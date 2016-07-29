@@ -43,7 +43,8 @@ class Test(test):
         test.__init__(self)
 
         # Set members
-        self._pntdef = self._datadir + '/pntdef.dat'
+        self._pntdef_min = self._datadir + '/pntdef_minimal.dat'
+        self._pntdef_max = self._datadir + '/pntdef_maximal.dat'
 
         # Return
         return
@@ -72,7 +73,7 @@ class Test(test):
         csobsdef = self._script('csobsdef')
 
         # Setup csobsdef command
-        cmd = csobsdef+' inpnt="'+self._pntdef+'"'+ \
+        cmd = csobsdef+' inpnt="'+self._pntdef_min+'"'+ \
                        ' outobs="csobsdef_cmd1.xml"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
@@ -108,9 +109,9 @@ class Test(test):
         """
         Test csobsdef from Python
         """
-        # Set-up csobsdef
+        # Set-up csobsdef with minimal pointing definition file
         obsdef = cscripts.csobsdef()
-        obsdef['inpnt']    = self._pntdef
+        obsdef['inpnt']    = self._pntdef_min
         obsdef['outobs']   = 'csobsdef_py1.xml'
         obsdef['caldb']    = self._caldb
         obsdef['irf']      = self._irf
@@ -129,16 +130,10 @@ class Test(test):
         # Check model file
         self._check_obsdef_file('csobsdef_py1.xml')
 
-        # Set-up csobsdef
+        # Set-up csobsdef with maximal pointing definition file
         obsdef = cscripts.csobsdef()
-        obsdef['inpnt']    = self._pntdef
+        obsdef['inpnt']    = self._pntdef_max
         obsdef['outobs']   = 'csobsdef_py2.xml'
-        obsdef['caldb']    = self._caldb
-        obsdef['irf']      = self._irf
-        obsdef['emin']     = 0.1
-        obsdef['emax']     = 100.0
-        obsdef['duration'] = 1800.0
-        obsdef['rad']      = 5.0
         obsdef['logfile']  = 'csobsdef_py2.log'
         obsdef['chatter']  = 3
 
@@ -149,7 +144,7 @@ class Test(test):
         self._check_obsdef_file('csobsdef_py2.xml')
 
         # Load CSV table
-        csv = gammalib.GCsv(self._pntdef, ',')
+        csv = gammalib.GCsv(self._pntdef_min, ',')
  
         # Set-up csobsdef
         obsdef = cscripts.csobsdef()
@@ -190,15 +185,15 @@ class Test(test):
             self.test_value(o.instrument(), 'CTA',
                             'Check for "CTA" instrument')
             self.test_value(o.ontime(), 1800.0, 1.0e-6,
-                            'Check for ontime of 1800 sec')
+                            'Check for ontime')
             self.test_value(o.deadc(), 0.95, 1.0e-6,
-                            'Check for deadtime correction of 0.95')
+                            'Check for deadtime correction')
             self.test_value(o.events().ebounds().emin().TeV(), 0.1, 1.0e-6,
-                            'Check for minimum energy of 0.1 TeV')
+                            'Check for minimum energy')
             self.test_value(o.events().ebounds().emax().TeV(), 100.0, 1.0e-6,
-                            'Check for maximum energy of 100 TeV')
+                            'Check for maximum energy')
             self.test_value(o.roi().radius(), 5.0, 1.0e-6,
-                            'Check for ROI radois of 5 deg')
+                            'Check for ROI radius')
 
         # Return
         return

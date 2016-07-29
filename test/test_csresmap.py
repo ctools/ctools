@@ -76,7 +76,7 @@ class Test(test):
                        ' emin=0.1 emax=100.0 enumbins=20'+ \
                        ' nxpix=50 nypix=50 binsz=0.02'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
-                       ' algorithm="SUBDIV"'+ \
+                       ' algorithm="SUBDIVSQRT"'+ \
                        ' logfile="csresmap_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -98,7 +98,7 @@ class Test(test):
                        ' emin=0.1 emax=100.0 enumbins=20'+ \
                        ' nxpix=50 nypix=50 binsz=0.02'+ \
                        ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
-                       ' algorithm="SUBDIV"'+ \
+                       ' algorithm="SUBDIVSQRT"'+ \
                        ' logfile="csresmap_cmd2.log" chatter=2'
 
         # Check if execution failed
@@ -130,7 +130,7 @@ class Test(test):
         resmap['proj']      = 'CAR'
         resmap['xref']      = 83.63
         resmap['yref']      = 22.01
-        resmap['algorithm'] = 'SUBDIV'
+        resmap['algorithm'] = 'SUB'
         resmap['logfile']   = 'csresmap_py1.log'
         resmap['chatter']   = 2
 
@@ -157,6 +157,7 @@ class Test(test):
         resmap['algorithm'] = 'SUBDIV'
         resmap['logfile']   = 'csresmap_py2.log'
         resmap['chatter']   = 3
+        resmap['publish']   = True
 
         # Run csresmap script
         resmap.execute()
