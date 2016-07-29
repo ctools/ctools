@@ -141,6 +141,7 @@ def csinfo_setup_check():
     ctools_environ   = False
     gammalib_python  = False
     ctools_python    = False
+    cscripts_python  = False
 
     # Print header
     print('\nGammalib / ctools setup check:\n')
@@ -185,6 +186,16 @@ def csinfo_setup_check():
         all_ok        = False
         ctools_python = True
 
+    # Check if cscripts Python module import works
+    log('   cscripts Python import .......... ', end='')
+    try:
+        import cscripts
+        print('ok')
+    except:
+        print('NOT OK')
+        all_ok          = False
+        cscripts_python = True
+
     # Signal if everything is okay, or notify about the problems that have
     # been encountered
     if all_ok:
@@ -195,7 +206,7 @@ def csinfo_setup_check():
             print('      - Have you set the GAMMALIB environment variable?')
         if ctools_environ:
             print('      - Have you set the CTOOLS environment variable?')
-        if gammalib_python or ctools_python:
+        if gammalib_python or ctools_python or cscripts_python:
             print('      - Did you source gammalib-init.sh?')
             print('      - Did you source ctools-init.sh ?')
             print('      - Are you using the correct Python ?')
@@ -233,6 +244,15 @@ def csinfo_setup_info():
         ctools_path    = 'Not found'
         ctools_version = 'Unknown'
 
+    # Try importing cscripts, and flag if this was unsuccessful
+    try:
+        import cscripts
+        cscripts_path    = cscripts.__path__[0]
+        cscripts_version = cscripts.__version__
+    except ImportError:
+        cscripts_path    = 'Not found'
+        cscripts_version = 'Unknown'
+
     # Get GAMMALIB and CTOOLS environment variables
     gammalib_env = os.environ.get('GAMMALIB', 'Not found')
     ctools_env   = os.environ.get('CTOOLS', 'Not found')
@@ -241,13 +261,15 @@ def csinfo_setup_info():
     print('\nGammalib / ctools setup info:\n')
 
     # Print package versions
-    print('   Gammalib version ................. {0}'.format(gammalib_version))
-    print('   ctools   version ................. {0}'.format(ctools_version))
+    print('   Gammalib  version ................ {0}'.format(gammalib_version))
+    print('   ctools    version ................ {0}'.format(ctools_version))
+    print('   cscripts  version ................ {0}'.format(cscripts_version))
     print('   $GAMMALIB environment variable ... {0}'.format(gammalib_env))
     print('   $CTOOLS   environment variable ... {0}'.format(ctools_env))
     print('   Python executable ................ {0}'.format(sys.executable))
-    print('   gammalib  Python package ......... {0}'.format(gammalib_path))
-    print('   ctools    Python package  ........ {0}'.format(ctools_path))
+    print('   gammalib  Python module .......... {0}'.format(gammalib_path))
+    print('   ctools    Python module .......... {0}'.format(ctools_path))
+    print('   cscripts  Python module .......... {0}'.format(cscripts_path))
     print('   GAMMALIB  CFLAGS ................. {0}'.format(get_pkg_config_info('cflags', 'gammalib')))
     print('   CTOOLS    CFLAGS ................. {0}'.format(get_pkg_config_info('cflags', 'ctools')))
     print('   GAMMALIB  LIBS   ................. {0}'.format(get_pkg_config_info('libs', 'gammalib')))
