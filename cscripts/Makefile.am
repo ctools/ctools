@@ -129,7 +129,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/tsmap_0.fits \
            $(top_srcdir)/test/data/tsmap_1.fits \
            $(top_srcdir)/test/data/exclusion.reg \
-           $(top_srcdir)/test/data/pntdef.dat \
+           $(top_srcdir)/test/data/pntdef_minimal.dat \
+           $(top_srcdir)/test/data/pntdef_maximal.dat \
            $(top_srcdir)/test/data/models.txt \
            $(top_srcdir)/test/data/tsmaps.txt \
            $(top_srcdir)/test/data/model_cube_background.xml \
