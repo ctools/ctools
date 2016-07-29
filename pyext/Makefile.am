@@ -64,12 +64,7 @@ testscripts = ctools/tests/__init__.py \
 testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_events.fits.gz \
            $(top_srcdir)/test/data/crab_cntmap.fits.gz \
-           $(top_srcdir)/test/data/exclusion.reg \
-           $(top_srcdir)/test/data/models_spatial.xml \
-           $(top_srcdir)/test/data/models_spectral.xml \
-           $(top_srcdir)/test/data/model_filefunction.txt \
-           $(top_srcdir)/test/data/model_map.fits.gz \
-           $(top_srcdir)/test/data/model_mapcube.fits.gz
+           $(top_srcdir)/test/data/exclusion.reg
 
 # Install test scripts and test data. Note that we don't need to prepend
 # $(DESTDIR) here (not fully clear why, but that's the way it is)
