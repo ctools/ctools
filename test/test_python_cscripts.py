@@ -25,6 +25,7 @@ import cscripts
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_cscaldb
 import test_csfindobs
+import test_csinfo
 import test_cslightcrv
 import test_csmodelinfo
 import test_csmodelmerge
@@ -105,6 +106,7 @@ def test(installed=False, debug=False):
 
     # Allocate test suites
     suite_cscaldb      = test_cscaldb.Test()
+    suite_csinfo       = test_csinfo.Test()
     suite_cslightcrv   = test_cslightcrv.Test()
     suite_csmodelinfo  = test_csmodelinfo.Test()
     suite_csmodelmerge = test_csmodelmerge.Test()
@@ -123,6 +125,7 @@ def test(installed=False, debug=False):
 
     # Setup unit tests
     suite_cscaldb.set()
+    suite_csinfo.set()
     suite_cslightcrv.set()
     suite_csmodelinfo.set()
     suite_csmodelmerge.set()
@@ -141,6 +144,7 @@ def test(installed=False, debug=False):
 
     # Append tests to container
     suites.append(suite_cscaldb)
+    suites.append(suite_csinfo)
     suites.append(suite_cslightcrv)
     suites.append(suite_csmodelinfo)
     suites.append(suite_csmodelmerge)
