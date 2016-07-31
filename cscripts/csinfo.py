@@ -261,19 +261,19 @@ def csinfo_setup_info():
     print('\nGammalib / ctools setup info:\n')
 
     # Print package versions
-    print('   Gammalib  version ................ {0}'.format(gammalib_version))
-    print('   ctools    version ................ {0}'.format(ctools_version))
-    print('   cscripts  version ................ {0}'.format(cscripts_version))
-    print('   $GAMMALIB environment variable ... {0}'.format(gammalib_env))
-    print('   $CTOOLS   environment variable ... {0}'.format(ctools_env))
-    print('   Python executable ................ {0}'.format(sys.executable))
-    print('   gammalib  Python module .......... {0}'.format(gammalib_path))
-    print('   ctools    Python module .......... {0}'.format(ctools_path))
-    print('   cscripts  Python module .......... {0}'.format(cscripts_path))
-    print('   GAMMALIB  CFLAGS ................. {0}'.format(get_pkg_config_info('cflags', 'gammalib')))
-    print('   CTOOLS    CFLAGS ................. {0}'.format(get_pkg_config_info('cflags', 'ctools')))
-    print('   GAMMALIB  LIBS   ................. {0}'.format(get_pkg_config_info('libs', 'gammalib')))
-    print('   CTOOLS    LIBS   ................. {0}'.format(get_pkg_config_info('libs', 'ctools')))
+    print('   Gammalib  version ................ %s' % gammalib_version)
+    print('   ctools    version ................ %s' % ctools_version)
+    print('   cscripts  version ................ %s' % cscripts_version)
+    print('   $GAMMALIB environment variable ... %s' % gammalib_env)
+    print('   $CTOOLS   environment variable ... %s' % ctools_env)
+    print('   Python executable ................ %s' % sys.executable)
+    print('   gammalib  Python module .......... %s' % gammalib_path)
+    print('   ctools    Python module .......... %s' % ctools_path)
+    print('   cscripts  Python module .......... %s' % cscripts_path)
+    print('   GAMMALIB  CFLAGS ................. %s' % get_pkg_config_info('cflags', 'gammalib'))
+    print('   CTOOLS    CFLAGS ................. %s' % get_pkg_config_info('cflags', 'ctools'))
+    print('   GAMMALIB  LIBS   ................. %s' % get_pkg_config_info('libs', 'gammalib'))
+    print('   CTOOLS    LIBS   ................. %s' % get_pkg_config_info('libs', 'ctools'))
     print('')
 
     # Return
@@ -300,7 +300,7 @@ def get_pkg_config_info(info, library):
         Information string, 'Not available' if pkg-config is not installed
     """
     # Set pkg-config command
-    cmd = 'pkg-config --{0} {1}'.format(info, library)
+    cmd = 'pkg-config --%s %s' % (info, library)
 
     # Execute command
     out = get_command_output(cmd)
@@ -355,7 +355,7 @@ def csinfo(argv):
     elif cmd == 'info':
         csinfo_setup_info()
     else:
-        print('\nERROR: invalid command: `{0}`'.format(cmd))
+        print('\nERROR: invalid command: "%s"' % cmd)
         csinfo_print_help()
         sys.exit(-1)
 
