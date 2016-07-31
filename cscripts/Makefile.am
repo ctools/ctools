@@ -44,6 +44,7 @@ pythonscripts = $(builddir)/__init__.py \
                 $(srcdir)/csiactobs.py \
                 $(srcdir)/obsutils.py \
                 $(srcdir)/modutils.py \
+                $(srcdir)/calutils.py \
                 $(srcdir)/ioutils.py
 
 # Parfiles to be distributed in $(prefix)/syspfiles
@@ -206,6 +207,7 @@ clean-local:
 		rm -rf $(builddir)/cs*.py; \
 		rm -rf $(builddir)/obsutils.py; \
 		rm -rf $(builddir)/modutils.py; \
+		rm -rf $(builddir)/calutils.py; \
 		rm -rf $(builddir)/ioutils.py; \
 		rm -rf $(builddir)/*.par; \
 	fi

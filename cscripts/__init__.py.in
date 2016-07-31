@@ -43,6 +43,7 @@ __all__ = [
     "csworkflow",
     "obsutils",
     "modutils",
+    "calutils",
     "ioutils"
 ]
 if cur_version > req_version:
@@ -71,6 +72,7 @@ from cscripts.cstsmapsplit import cstsmapsplit
 from cscripts.csworkflow   import csworkflow
 from cscripts              import obsutils
 from cscripts              import modutils
+from cscripts              import calutils
 from cscripts              import ioutils
 if cur_version > req_version:
     from cscripts.csfindobs  import csfindobs
