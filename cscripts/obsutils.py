@@ -198,7 +198,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 # ======================= #
 def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
             emin=0.1, emax=100.0, rad=5.0, \
-            irf='South_50h', caldb='prod2', id='000000'):
+            irf='South_50h', caldb='prod2', obsid='000000'):
     """
     Set a single CTA observation
     
@@ -211,9 +211,9 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     pntdir : `~gammalib.GSkyDir`
         Pointing direction
     tstart : float, optional
-        Start time (seconds)
+        Start time (s)
     duration : float, optional
-        Duration of observation (seconds)
+        Duration of observation (s)
     deadc : float, optional
         Deadtime correction factor
     emin : float, optional
@@ -226,7 +226,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         Instrument response function
     caldb : str, optional
         Calibration database path
-    id : str, optional
+    obsid : str, optional
         Observation identifier
 
     Returns
@@ -278,7 +278,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     obs_cta.ontime(duration)
     obs_cta.livetime(duration*deadc)
     obs_cta.deadc(deadc)
-    obs_cta.id(id)
+    obs_cta.id(obsid)
 
     # Return CTA observation
     return obs_cta
@@ -305,9 +305,9 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
     obsdeflist : list of dict
         Observation definition list
     tstart : float, optional
-        Start time (seconds)
+        Start time (s)
     duration : float, optional
-        Duration of observation (seconds)
+        Duration of observation (s)
     deadc : float, optional
         Deadtime correction factor
     emin : float, optional
@@ -340,61 +340,26 @@ def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
         pntdir = gammalib.GSkyDir()
         pntdir.radec_deg(obsdef['ra'], obsdef['dec'])
 
-        # Set duration (use default if not found in definition list)
-        if 'duration' in obsdef:
-            obs_duration = obsdef['duration']
-        else:
-            obs_duration = duration
-
-        # Set emin (use default if not found in definition list)
-        if 'emin' in obsdef:
-            obs_emin = obsdef['emin']
-        else:
-            obs_emin = emin
-
-        # Set emax (use default if not found in definition list)
-        if 'emax' in obsdef:
-            obs_emax = obsdef['emax']
-        else:
-            obs_emax = emax
-
-        # Set radius (use default if not found in definition list)
-        if 'rad' in obsdef:
-            obs_rad = obsdef['rad']
-        else:
-            obs_rad = rad
-
-        # Set deadc (use default if not found in definition list)
-        if 'deadc' in obsdef:
-            obs_deadc = obsdef['deadc']
-        else:
-            obs_deadc = deadc
-
-        # Set caldb (use default if not found in definition list)
-        if 'caldb' in obsdef:
-            obs_caldb = obsdef['caldb']
-        else:
-            obs_caldb = caldb
-
-        # Set irf (use default if not found in definition list)
-        if 'irf' in obsdef:
-            obs_irf = obsdef['irf']
-        else:
-            obs_irf = irf
-
         # Generate identifier string
-        id = '%6.6d' % obs_id
+        obsid = '%6.6d' % obs_id
 
-        # Set CTA observation
-        obs_cta = set_obs(pntdir, tstart=obs_start, duration=obs_duration, \
-                          deadc=obs_deadc, emin=obs_emin, emax=obs_emax, \
-                          rad=obs_rad, irf=obs_irf, caldb=obs_caldb, id=id)
+        # Set one CTA observation
+        obs_cta = set_obs(pntdir,
+                          tstart=obs_start,
+                          duration=obsdef.setdefault('duration', duration),
+                          deadc=obsdef.setdefault('deadc', deadc),
+                          emin=obsdef.setdefault('emin', emin),
+                          emax=obsdef.setdefault('emax', emax),
+                          rad=obsdef.setdefault('rad', rad),
+                          irf=obsdef.setdefault('irf', irf),
+                          caldb=obsdef.setdefault('caldb', caldb),
+                          obsid=obsid)
 
         # Append to container
         obs.append(obs_cta)
 
         # Update start time and identifier
-        obs_start += obs_duration
+        obs_start += duration
         obs_id    += 1
 
     # Return observation container
@@ -473,9 +438,9 @@ def set_observations(ra, dec, rad, tstart, duration, emin, emax, irf, caldb,
     rad : float
         ROI radius used for analysis (deg)
     tstart : float
-        Start time of observation (seconds)
+        Start time of observation (s)
     duration : float
-        Duration of each observation (seconds)
+        Duration of each observation (s)
     emin : float, optional
         Minimum event energy (TeV)
     emax : float, optional
