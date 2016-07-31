@@ -19,10 +19,11 @@
 #
 # ==========================================================================
 import sys
-import csv
 import gammalib
 import ctools
 from cscripts import obsutils
+from cscripts import modutils
+from cscripts import ioutils
 
 
 # ============== #
@@ -68,7 +69,18 @@ class cstsdist(ctools.cscript):
             # Check for requested pattern and use above observation parameters
             # to set wobble pattern
             if self['pattern'].string() == 'four':
-                self._obs = self._set_obs()
+                self._obs = obsutils.set_observations(self['ra'].real(),
+                                                      self['dec'].real(),
+                                                      self['rad'].real(),
+                                                      self['tmin'].real(),
+                                                      self['tmax'].real(),
+                                                      self['emin'].real(),
+                                                      self['emax'].real(),
+                                                      self['irf'].string(),
+                                                      self['caldb'].string(),
+                                                      deadc=self['deadc'].real(),
+                                                      pattern=self['pattern'].string(),
+                                                      offset=self['offset'].real())
 
         # Get source name
         self._srcname = self['srcname'].string()
@@ -97,38 +109,6 @@ class cstsdist(ctools.cscript):
 
         # Return
         return
-
-    def _set_obs(self):
-        """
-        Set an observation container
-
-        Returns
-        -------
-        obs : `~gammalib.GObservations`
-            Observation container
-        """
-        # Set duration
-        duration = self['tmax'].real() - self['tmin'].real()
-
-        # Setup observation definition list
-        obsdeflist = obsutils.set_obs_patterns(self['pattern'].string(),
-                                               ra     = self['ra'].real(),
-                                               dec    = self['dec'].real(),
-                                               offset = self['offset'].real())
-
-        # Create list of observations
-        obs = obsutils.set_obs_list(obsdeflist,
-                                    tstart   = self['tmin'].real(),
-                                    duration = duration,
-                                    deadc    = self['deadc'].real(),
-                                    emin     = self['emin'].real(),
-                                    emax     = self['emax'].real(),
-                                    rad      = self['rad'].real(),
-                                    irf      = self['irf'].string(),
-                                    caldb    = self['caldb'].string())
-
-        # Return observation container
-        return obs
 
     def _trial(self, seed):
         """
@@ -276,8 +256,8 @@ class cstsdist(ctools.cscript):
         # Get parameters
         self._get_parameters()
 
-        # Set models for this observation
-        self.models(obsutils.set_ts_model(self._obs.models(), self._srcname))
+        # Set test source model for this observation
+        self.models(modutils.test_source(self._obs.models(), self._srcname))
 
         # Write models into logger
         if self._logTerse():
@@ -308,22 +288,9 @@ class cstsdist(ctools.cscript):
             # Make a trial
             result = self._trial(seed)
 
-            # Set output filename
-            outfile = self['outfile'].filename().url()
-
-            # Write out result immediately
-            if seed == 0:
-                f      = open(outfile, 'w')
-                writer = csv.DictWriter(f, result['colnames'])
-                headers = {}
-                for n in result['colnames']:
-                    headers[n] = n
-                writer.writerow(headers)
-            else:
-                f = open(outfile, 'a')
-            writer = csv.DictWriter(f, result['colnames'])
-            writer.writerow(result['values'])
-            f.close()
+            # Write out trial result
+            ioutils.write_csv_row(self['outfile'].filename().url(), seed,
+                                  result['colnames'], result['values'])
 
         # Return
         return

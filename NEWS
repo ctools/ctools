@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-29 July 2016
+31 July 2016
 
 
 Introduction
@@ -105,9 +105,11 @@ cterror - Likelihood profile error computation
 None
 
 
-scripts
--------
-None
+cscripts
+--------
+Added the support modules "modutils" and "ioutils" to the cscripts module
+and removed the obsolete function "cntmap()" and "modmap()" from the
+"obsutils" module (#1830).
 
 
 Examples

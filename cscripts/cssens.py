@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This script computes the CTA sensitivity.
+# Computes the array sensitivity using a test source
 #
 # Copyright (C) 2011-2016 Juergen Knoedlseder
 #
@@ -24,6 +24,8 @@ import math
 import gammalib
 import ctools
 from cscripts import obsutils
+from cscripts import modutils
+from cscripts import ioutils
 
 
 # ============ #
@@ -190,70 +192,6 @@ class cssens(ctools.cscript):
         # Return observation container
         return obs
 
-    def _set_models(self, fitspat=False, fitspec=False):
-        """
-        Set full model and background model
-
-        Parameters
-        ----------
-        fitspat : bool, optional
-            Fit spatial parameter?
-        fitspec : bool, optional
-            Fit spectral parameters?
-
-        Returns
-        -------
-        full_model, bkg_model : `~gammalib.GModels`
-            Full model and background model containers
-        """
-        # Retrieve full model from observation container
-        full_model = self._obs.models().copy()
-
-        # Get source model
-        model = full_model[self._srcname]
-
-        # If source model has no "Prefactor" parameter then raise an exception
-        if not model.has_par('Prefactor'):
-            msg = ('Model "%s" has no parameter "Prefactor". Only spectral '
-                   'models with a "Prefactor" parameter are supported.' %
-                   self._srcname)
-            raise RuntimeError(msg)
-
-        # Set source position
-        if self._ra != None and self._dec != None:
-            if model.has_par('RA') and model.has_par('DEC'):
-                model['RA'].value(self._ra)
-                model['DEC'].value(self._dec)
-
-        # Set possible spatial and spectral parameters
-        spatial  = ['RA', 'DEC', 'Sigma', 'Radius', 'Width', 'PA',
-                    'MinorRadius', 'MajorRadius']
-        spectral = ['Index', 'Index1', 'Index2', 'BreakEnergy', 'CutoffEnergy',
-                    'InverseCutoffEnergy']
-
-        # Fit or fix spatial parameters
-        for par in spatial:
-            if model.has_par(par):
-                if fitspat:
-                    model[par].free()
-                else:
-                    model[par].fix()
-
-        # Fit or fix spectral parameters
-        for par in spectral:
-            if model.has_par(par):
-                if fitspec:
-                    model[par].free()
-                else:
-                    model[par].fix()
-
-        # Create background model
-        bkg_model = full_model.copy()
-        bkg_model.remove(self._srcname)
-
-        # Return models
-        return full_model, bkg_model
-
     def _set_obs_ebounds(self, emin, emax):
         """
         Set energy boundaries for all observations in container
@@ -330,9 +268,9 @@ class cssens(ctools.cscript):
         # Return photon flux
         return flux
 
-    def _get_sensitivity(self, emin, emax, bkg_model, full_model):
+    def _get_sensitivity(self, emin, emax, test_model):
         """
-        Determine sensitivity for given observations.
+        Determine sensitivity for given observations
 
         Parameters
         ----------
@@ -340,10 +278,8 @@ class cssens(ctools.cscript):
             Minimum energy for fitting and flux computation
         emax : `~gammalib.GEnergy`
             Maximum energy for fitting and flux computation
-        bkg_model : `~gammalib.GModels`
-            Background model
-        full_model : `~gammalib.GModels`
-            Source plus background model
+        test_model : `~gammalib.GModels`
+            Test source model
 
         Returns
         -------
@@ -364,7 +300,7 @@ class cssens(ctools.cscript):
         # Compute Crab unit (this is the factor with which the Prefactor needs
         # to be multiplied to get 1 Crab
         crab_flux = self._get_crab_flux(emin, emax)
-        src_flux  = full_model[self._srcname].spectral().flux(emin, emax)
+        src_flux  = test_model[self._srcname].spectral().flux(emin, emax)
         crab_unit = crab_flux/src_flux
 
         # Write header
@@ -399,14 +335,14 @@ class cssens(ctools.cscript):
             if self._logExplicit():
                 self._log.header2('Iteration '+str(iterations))
 
-            # Set source model. crab_prefactor is the Prefactor that
+            # Set test source model. crab_prefactor is the Prefactor that
             # corresponds to 1 Crab
-            src_model      = full_model.copy()
-            crab_prefactor = src_model[self._srcname]['Prefactor'].value() * \
+            models         = test_model.copy()
+            crab_prefactor = models[self._srcname]['Prefactor'].value() * \
                              crab_unit
-            src_model[self._srcname]['Prefactor'].value(crab_prefactor * \
-                             test_crab_flux)
-            self._obs.models(src_model)
+            models[self._srcname]['Prefactor'].value(crab_prefactor * \
+                                                     test_crab_flux)
+            self._obs.models(models)
 
             # Simulate events
             sim = obsutils.sim(self._obs, nbins=self._enumbins, seed=iterations,
@@ -426,68 +362,35 @@ class cssens(ctools.cscript):
                 self._log(nevents)
                 self._log('\n')
 
-            # Fit background only
-            sim.models(bkg_model)
-            like       = obsutils.fit(sim, log=self._log_clients,
-                                      debug=self._debug, edisp=self._edisp)
-            result_bgm = like.obs().models().copy()
-            LogL_bgm   = like.opt().value()
-            npred_bgm  = like.obs().npred()
+            # Fit test source
+            fit = obsutils.fit(sim, log=self._log_clients, debug=self._debug,
+                               edisp=self._edisp)
+
+            # Get model fitting results
+            logL   = fit.opt().value()
+            npred  = fit.obs().npred()
+            models = fit.obs().models()
+            ts     = models[self._srcname].ts()
 
             # Assess quality based on a comparison between Npred and Nevents
-            quality_bgm = npred_bgm-nevents
+            quality = npred - nevents
 
-            # Write background fit results
+            # Write test source fit results
             if self._logExplicit():
-                self._log.header3('Background model fit')
-                self._log.parformat('log likelihood')
-                self._log(LogL_bgm)
-                self._log('\n')
-                self._log.parformat('Number of predicted events')
-                self._log(npred_bgm)
-                self._log('\n')
-                self._log.parformat('Fit quality')
-                self._log(quality_bgm)
-                self._log('\n')
-
-            # Write model fit results
-            if self._logExplicit():
-                for model in result_bgm:
-                    self._log.parformat('Model')
-                    self._log(model.name())
-                    self._log('\n')
-                    for par in model:
-                        self._log(str(par)+'\n')
-
-            # Fit background and test source
-            sim.models(src_model)
-            like       = obsutils.fit(sim, log=self._log_clients,
-                                      debug=self._debug, edisp=self._edisp)
-            result_all = like.obs().models().copy()
-            LogL_all   = like.opt().value()
-            npred_all  = like.obs().npred()
-            ts         = 2.0*(LogL_bgm-LogL_all)
-
-            # Assess quality based on a comparison between Npred and Nevents
-            quality_all = npred_all-nevents
-
-            # Write background and test source fit results
-            if self._logExplicit():
-                self._log.header3('Background and test source model fit')
+                self._log.header3('Test source model fit')
                 self._log.parformat('Test statistics')
                 self._log(ts)
                 self._log('\n')
                 self._log.parformat('log likelihood')
-                self._log(LogL_all)
+                self._log(logL)
                 self._log('\n')
                 self._log.parformat('Number of predicted events')
-                self._log(npred_all)
+                self._log(npred)
                 self._log('\n')
                 self._log.parformat('Fit quality')
-                self._log(quality_all)
+                self._log(quality)
                 self._log('\n')
-                #
-                for model in result_all:
+                for model in models:
                     self._log.parformat('Model')
                     self._log(model.name())
                     self._log('\n')
@@ -501,17 +404,14 @@ class cssens(ctools.cscript):
                 continue
 
             # Get fitted Crab, photon and energy fluxes
-            crab_flux     = result_all[self._srcname]['Prefactor'].value() / \
-                            crab_prefactor
-            #crab_flux_err = result_all[self._srcname]['Prefactor'].error() / \
-            #                crab_prefactor
-            photon_flux   = result_all[self._srcname].spectral().flux(emin, emax)
-            energy_flux   = result_all[self._srcname].spectral().eflux(emin, emax)
+            crab_flux   = models[self._srcname]['Prefactor'].value() / \
+                          crab_prefactor
+            photon_flux = models[self._srcname].spectral().flux(emin, emax)
+            energy_flux = models[self._srcname].spectral().eflux(emin, emax)
 
             # Compute differential sensitivity in unit erg/cm2/s
             energy      = gammalib.GEnergy(e_mean, 'TeV')
-            time        = gammalib.GTime()
-            sensitivity = result_all[self._srcname].spectral().eval(energy, time) * \
+            sensitivity = models[self._srcname].spectral().eval(energy) * \
                           e_mean*erg_mean * 1.0e6
 
             # Compute flux correction factor based on average TS
@@ -543,7 +443,7 @@ class cssens(ctools.cscript):
                 self._log.parformat('Differential sensitivity')
                 self._log(sensitivity)
                 self._log(' erg/cm2/s\n')
-                for model in result_all:
+                for model in models:
                     self._log.parformat('Model')
                     self._log(model.name())
                     self._log('\n')
@@ -636,27 +536,14 @@ class cssens(ctools.cscript):
             self._log.parformat('Number of simulated events')
             self._log(nevents)
             self._log('\n')
-            self._log.header3('Background and test source model fitting')
+            self._log.header3('Test source model fitting')
             self._log.parformat('log likelihood')
-            self._log(LogL_all)
+            self._log(logL)
             self._log('\n')
             self._log.parformat('Number of predicted events')
-            self._log(npred_all)
+            self._log(npred)
             self._log('\n')
-            for model in result_all:
-                self._log.parformat('Model')
-                self._log(model.name())
-                self._log('\n')
-                for par in model:
-                    self._log(str(par)+'\n')
-            self._log.header3('Background model fit')
-            self._log.parformat('log likelihood')
-            self._log(LogL_bgm)
-            self._log('\n')
-            self._log.parformat('Number of predicted events')
-            self._log(npred_bgm)
-            self._log('\n')
-            for model in result_bgm:
+            for model in models:
                 self._log.parformat('Model')
                 self._log(model.name())
                 self._log('\n')
@@ -698,18 +585,14 @@ class cssens(ctools.cscript):
                     'energy_flux', 'sensitivity']
         results  = []
 
-        # Initialise models
-        full_model, bkg_model = self._set_models()
+        # Set test source model for this observation
+        models = modutils.test_source(self._obs.models(), self._srcname)
 
         # Write models into logger
         if self._logTerse():
             self._log('\n')
             self._log.header1('Models')
-            self._log.header2('Background model')
-            self._log(str(bkg_model))
-            self._log('\n\n')
-            self._log.header2('Full model')
-            self._log(str(full_model))
+            self._log(str(models))
             self._log('\n')
 
         # Write header
@@ -736,23 +619,10 @@ class cssens(ctools.cscript):
                 raise RuntimeError(msg)
 
             # Determine sensitivity
-            result = self._get_sensitivity(emin, emax, bkg_model, full_model)
+            result = self._get_sensitivity(emin, emax, models)
 
-            # Write results
-            if ieng == 0:
-                f      = open(self._outfile.url(), 'w')
-                writer = csv.DictWriter(f, colnames)
-                headers = {}
-                for n in colnames:
-                    headers[n] = n
-                writer.writerow(headers)
-                writer.writerow(result)
-                f.close()
-            else:
-                f      = open(self._outfile.url(), 'a')
-                writer = csv.DictWriter(f, colnames)
-                writer.writerow(result)
-                f.close()
+            # Write out trial result
+            ioutils.write_csv_row(self._outfile.url(), ieng, colnames, result)
 
             # Append results
             results.append(result)

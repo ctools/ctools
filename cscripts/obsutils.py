@@ -1,5 +1,5 @@
 # ==========================================================================
-# CTA observation handling support functions
+# Utility functions for observation handling
 #
 # Copyright (C) 2011-2016 Juergen Knoedlseder
 #
@@ -277,152 +277,6 @@ def cterror(obs, srcname, log=False, debug=False, chatter=2):
     return error
 
 
-# ================= #
-# Create counts map #
-# ================= #
-def cntmap(obs, proj='TAN', coord='GAL', xval=0.0, yval=0.0, \
-           binsz=0.05, nxpix=200, nypix=200, \
-           outname='cntmap.fits'):
-    """
-    Creates a counts map by combining the events of all observations
-
-    The counts map will be a summed map over all energies
-
-    Parameters
-    ----------
-    obs : `~gammalib.GObservations`
-        Observation container without events
-    proj : str, optional
-        Projection for binned simulation
-    coord : str, optional
-        Coordinate system for binned simulation
-    xval : float, optional
-        Counts map centre of X direction (deg)
-    yval : float, optional
-        Counts map centre of Y direction (deg)
-    binsz : float, optional
-        Pixel size for binned simulation (deg/pixel)
-    nxpix : int, optional
-        Number of pixels in X direction
-    nypix : int, optional
-        Number of pixels in Y direction
-    outname : str, optional
-        Counts map file name
-
-    Returns
-    -------
-    map : `~gammalib.GSkyMap`
-        Counts map
-    """
-    # Allocate counts map
-    map = gammalib.GSkyMap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
-
-    # Set maximum pixel number
-    maxpixel = nxpix * nypix
-
-    # Fill all observations
-    for run in obs:
-
-        # Loop over all events
-        for event in run.events():
-
-            # Determine sky pixel
-            skydir = event.dir().dir()
-            pixel  = map.dir2inx(skydir)
-
-            # Set pixel
-            if pixel < maxpixel:
-                map[pixel] += event.counts()
-
-    # Save sky map. The clobber flag is set to True, so any existing FITS
-    # file will be overwritten.
-    map.save(outname, True)
-
-    # Return counts map
-    return map
-
-
-# ================ #
-# Create model map #
-# ================ #
-def modmap(obs, eref=0.1, proj='TAN', coord='GAL', xval=0.0, yval=0.0, \
-           binsz=0.05, nxpix=200, nypix=200, \
-           outname='modmap.fits'):
-    """
-    Make model map for a given reference energy by combining all observations
-
-    The model map will be evaluated for a given reference energy 'eref' and will
-    be given in units of [counts/(sr MeV s)].
-
-    Parameters
-    ----------
-    obs : `~gammalib.GObservations`
-        Observation container without events
-    eref : float, optional
-        Reference energy for which model is created (TeV)
-    proj : str, optional
-        Projection for binned simulation
-    coord : str, optional
-        Coordinate system for binned simulation
-    xval : float, optional
-        Counts map centre of X direction (deg)
-    yval : float, optional
-        Counts map centre of Y direction (deg)
-    binsz : float, optional
-        Pixel size for binned simulation (deg/pixel)
-    nxpix : int, optional
-        Number of pixels in X direction
-    nypix : int, optional
-        Number of pixels in Y direction
-    outname : str, optional
-        Model map file name
-
-    Returns
-    -------
-    map : `~gammalib.GSkyMap`
-        Model map
-    """
-    # Allocate model map
-    map = gammalib.GSkyMap(proj, coord, xval, yval, -binsz, binsz, nxpix, nypix, 1)
-
-    # Set reference energy, time and direction. The time is not initialised and is
-    # in fact not used (as the IRF is assumed to be time independent for now).
-    # The sky direction is set later using the pixel values.
-    energy  = gammalib.GEnergy()
-    time    = gammalib.GTime()
-    instdir = gammalib.GCTAInstDir()
-    energy.TeV(eref)
-
-    # Loop over all map pixels
-    for pixel in range(map.npix()):
-
-        # Get sky direction
-        skydir = map.inx2dir(pixel)
-        instdir.dir(skydir)
-
-        # Create event atom for map pixel
-        atom = gammalib.GCTAEventAtom()
-        atom.dir(instdir)
-        atom.energy(energy)
-        atom.time(time)
-
-        # Initialise model value
-        value = 0.0
-
-        # Loop over all observations
-        for run in obs:
-            value += obs.models().eval(atom, run)
-
-        # Set map value
-        map[pixel] = value
-
-    # Save sky map
-    map.save(outname, True)
-
-    # Return model map
-    return map
-
-
 # ======================= #
 # Set one CTA observation #
 # ======================= #
@@ -686,82 +540,56 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
     return obsdeflist
 
 
-# ======================== #
-# Set model for TS fitting #
-# ======================== #
-def set_ts_model(models, srcname, ra=None, dec=None, fitspat=False, fitspec=False):
+# ====================================================== #
+# Set observation container filled with CTA observations #
+# ====================================================== #
+def set_observations(ra, dec, rad, tstart, duration, emin, emax, irf, caldb,
+                     deadc=0.95, pattern='single', offset=1.5):
     """
-    Set model for TS fitting
-
+    Set an observation container filled with CTA observations
+    
     Parameters
     ----------
-    models : `~gammalib.GModels`
-        Input model container
-    srcname : str
-        Test source name
-    ra : float, optional
-        Right Ascension of test source (deg)
-    dec : float, optional
-        Declination of test source (deg)
-    fitspat : bool, optional
-        Fit spatial parameter?
-    fitspec : bool, optional
-        Fit spectral parameters?
+    ra : float
+        Right Ascension of pattern centre (deg)
+    dec : float
+        Declination of pattern centre (deg)
+    rad : float
+        ROI radius used for analysis (deg)
+    tstart : float
+        Start time of observation (seconds)
+    duration : float
+        Duration of each observation (seconds)
+    emin : float, optional
+        Minimum event energy (TeV)
+    emax : float, optional
+        Maximum event energy (TeV)
+    irf : str
+        Instrument response function
+    caldb : str
+        Calibration database path
+    deadc : float, optional
+        Deadtime correction factor
+    pattern : str, optional
+        Observation pattern ("single", "four")
+    offset : float, optional
+        Offset from pattern centre (deg)
 
     Returns
     -------
-    model : `~gammalib.GModels`
-        Model container for TS fitting
+    obs : `~gammalib.GObservations()
+        Observation container
     """
-    # Create a clone of the input model
-    outmodels = models.copy()
+    # Setup observation definition list
+    obsdeflist = set_obs_patterns(pattern, offset=offset, ra=ra, dec=dec)
 
-    # Disable TS computation for all model components (will enable the
-    # test source later)
-    for model in outmodels:
-        model.tscalc(False)
+    # Create list of observations
+    obs = set_obs_list(obsdeflist, tstart=tstart, duration=duration,
+                       emin=emin, emax=emax, rad=rad, irf=irf, caldb=caldb,
+                       deadc=deadc)
 
-    # Get source model and enable TS computation
-    model = outmodels[srcname]
-    model.tscalc(True)
-
-    # If source model has no "Prefactor" parameter then raise an exception
-    if not model.has_par('Prefactor'):
-        msg = ('Model "%s" has no parameter "Prefactor". Only spectral '
-               'models with a "Prefactor" parameter are supported.' %
-               srcname)
-        raise RuntimeError(msg)
-
-    # Set position of test source
-    if ra != None and dec != None:
-        if model.has_par('RA') and model.has_par('DEC'):
-            model['RA'].value(ra)
-            model['DEC'].value(dec)
-
-    # Set possible spatial and spectral parameters
-    spatial  = ['RA', 'DEC', 'Sigma', 'Radius', 'Width', 'PA',
-                'MinorRadius', 'MajorRadius']
-    spectral = ['Index', 'Index1', 'Index2', 'BreakEnergy', 'CutoffEnergy',
-                'InverseCutoffEnergy']
-
-    # Fit or fix spatial parameters
-    for par in spatial:
-        if model.has_par(par):
-            if fitspat:
-                model[par].free()
-            else:
-                model[par].fix()
-
-    # Fit or fix spectral parameters
-    for par in spectral:
-        if model.has_par(par):
-            if fitspec:
-                model[par].free()
-            else:
-                model[par].fix()
-
-    # Return model container
-    return outmodels
+    # Return observation container
+    return obs
 
 
 # ==================== #
@@ -833,6 +661,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     expcube['emax']     = emax
     expcube['coordsys'] = coordsys
     expcube['proj']     = proj
+    expcube['debug']    = debug
+    expcube['chatter']  = chatter
     if log:
         expcube.logFileOpen()
     expcube.run()
@@ -852,6 +682,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     psfcube['emax']     = emax
     psfcube['coordsys'] = coordsys
     psfcube['proj']     = proj
+    psfcube['debug']    = debug
+    psfcube['chatter']  = chatter
     if log:
         psfcube.logFileOpen()
     psfcube.run()
@@ -871,6 +703,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     bkgcube['emax']     = emax
     bkgcube['coordsys'] = coordsys
     bkgcube['proj']     = proj
+    bkgcube['debug']    = debug
+    bkgcube['chatter']  = chatter
     if log:
         bkgcube.logFileOpen()
     bkgcube.run()
@@ -891,6 +725,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
         edispcube['emax']     = emax
         edispcube['coordsys'] = coordsys
         edispcube['proj']     = proj
+        edispcube['debug']    = debug
+        edispcube['chatter']  = chatter
         if log:
             edispcube.logFileOpen()
         edispcube.run()

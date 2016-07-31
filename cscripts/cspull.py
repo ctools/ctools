@@ -19,11 +19,11 @@
 #
 # ==========================================================================
 import sys
-import csv
 import math
 import gammalib
 import ctools
 from cscripts import obsutils
+from cscripts import ioutils
 
 
 # ============ #
@@ -79,7 +79,18 @@ class cspull(ctools.cscript):
             # observation parameters to set wobble pattern
             self._pattern = self['pattern'].string()
             if self._pattern == 'four':
-                self._obs = self._set_obs()
+                self._obs = obsutils.set_observations(self['ra'].real(),
+                                                      self['dec'].real(),
+                                                      self['rad'].real(),
+                                                      self['tmin'].real(),
+                                                      self['tmax'].real(),
+                                                      self['emin'].real(),
+                                                      self['emax'].real(),
+                                                      self['irf'].string(),
+                                                      self['caldb'].string(),
+                                                      deadc=self['deadc'].real(),
+                                                      pattern=self['pattern'].string(),
+                                                      offset=self['offset'].real())
 
         # ... otherwise add response information and energy boundaries
         # in case they are missing.
@@ -118,38 +129,6 @@ class cspull(ctools.cscript):
 
         # Return
         return
-
-    def _set_obs(self):
-        """
-        Set CTA observation(s)
-
-        Returns
-        -------
-        obs : `~gammalib.GObservations`
-            Observation container.
-        """
-        # Set duration
-        duration = self['tmax'].real() - self['tmin'].real()
-
-        # Setup observation definition list
-        obsdeflist = obsutils.set_obs_patterns(self._pattern,
-                                               ra=self['ra'].real(),
-                                               dec=self['dec'].real(),
-                                               offset=self['offset'].real())
-
-        # Create list of observations
-        obs = obsutils.set_obs_list(obsdeflist,
-                                    tstart=self['tmin'].real(),
-                                    duration=duration,
-                                    deadc=self['deadc'].real(),
-                                    emin=self['emin'].real(),
-                                    emax=self['emax'].real(),
-                                    rad=self['rad'].real(),
-                                    irf=self['irf'].string(),
-                                    caldb=self['caldb'].string())
-
-        # Return observation container
-        return obs
 
     def _obs_string(self, obs):
         """
@@ -359,22 +338,9 @@ class cspull(ctools.cscript):
             # Make a trial and add initial seed
             result = self._trial(seed + self._seed)
 
-            # Set output filename
-            outfile = self['outfile'].filename().url()
-
-            # Write out result immediately
-            if seed == 0:
-                f      = open(outfile, 'w')
-                writer = csv.DictWriter(f, result['colnames'])
-                headers = {}
-                for n in result['colnames']:
-                    headers[n] = n
-                writer.writerow(headers)
-            else:
-                f = open(outfile, 'a')
-            writer = csv.DictWriter(f, result['colnames'])
-            writer.writerow(result['values'])
-            f.close()
+            # Write out trial result
+            ioutils.write_csv_row(self['outfile'].filename().url(), seed,
+                                  result['colnames'], result['values'])
 
         # Return
         return
