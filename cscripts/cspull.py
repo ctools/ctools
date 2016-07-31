@@ -228,17 +228,19 @@ class cspull(ctools.cscript):
         # Fit model
         if self['profile'].boolean():
             models = self._obs.models()
-            for i in range(models.size()):
-                model_name = models[i].name()
-                like       = obsutils.cterror(self._obs, model_name,
-                                              log=self._log_clients,
-                                              debug=self._logDebug(),
-                                              chatter=self._chatter)
+            for model in models:
+                like = ctools.cterror(obs)
+                like['srcname'] = model.name()
+                like['edisp']   = edisp=self._edisp
+                like['debug']   = self._logDebug()
+                like['chatter'] = self._chatter
+                like.run()
         else:
-            like = obsutils.fit(obs, edisp=self._edisp,
-                                log=self._log_clients,
-                                debug=self._logDebug(),
-                                chatter=self._chatter)
+            like = ctools.ctlike(obs)
+            like['edisp']   = edisp=self._edisp
+            like['debug']   = self._logDebug()
+            like['chatter'] = self._chatter
+            like.run()
 
         # Store results
         logL   = like.opt().value()

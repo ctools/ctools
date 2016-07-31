@@ -193,90 +193,6 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
     return obs
 
 
-# ================ #
-# Fit observations #
-# ================ #
-def fit(obs, log=False, debug=False, chatter=2, edisp=False):
-    """
-    Perform maximum likelihood fitting of observations in the container
-
-    Parameters
-    ----------
-    obs : `~gammalib.GObservations`
-        Observation container
-    log : bool, optional
-        Create log file(s)
-    debug : bool, optional
-        Create console dump?
-    chatter : int, optional
-        Chatter level
-    edisp : bool, optional
-        Apply energy dispersion?
-
-    Returns
-    -------
-    like : `~ctools.ctlike`
-        ctlike application
-    """
-    # Allocate ctlike application and set parameters
-    like = ctools.ctlike(obs)
-    like['debug']   = debug
-    like['chatter'] = chatter
-    like['edisp']   = edisp
-
-    # Optionally open the log file
-    if log:
-        like.logFileOpen()
-
-    # Run ctlike application.
-    like.run()
-
-    # Return observations
-    return like
-
-
-# ============================================================== #
-# Fit observations and determine errors using likelihood profile #
-# ============================================================== #
-def cterror(obs, srcname, log=False, debug=False, chatter=2):
-    """
-    Fit observations and determine errors using likelihood profile
-
-    Parameters
-    ----------
-    obs : `~gammalib.GObservations`
-        Observation container
-    srcname : str
-        Source name
-    log : bool, optional
-        Create log file(s)
-    debug : bool, optional
-        Create console dump?
-    chatter : int, optional
-        Chatter level
-
-    Returns
-    -------
-    error : `~ctools.cterror`
-        cterror application
-    """
-    # Allocate cterror application and set parameters
-    error = ctools.cterror(obs)
-    error['srcname'] = srcname
-    error['debug']   = debug
-    error['chatter'] = chatter
-
-    # Optionally open the log file
-    if log:
-        error.logFileOpen()
-
-    # Run cterror application.
-    error.run()
-
-    # Return observations
-    return error
-
-
 # ======================= #
 # Set one CTA observation #
 # ======================= #
@@ -640,8 +556,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     result : dict
         Dictionary of response cubes
     """
-    # Compute spatial binning for point spread function and
-    # energy dispersion cubes
+    # Compute spatial binning for point spread function and energy dispersion
+    # cubes
     psf_binsz = 10.0 * binsz
     psf_nxpix = min(nxpix // 10, 2)  # Make sure result is int
     psf_nypix = min(nypix // 10, 2)  # Make sure result is int

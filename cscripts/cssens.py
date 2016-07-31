@@ -72,7 +72,6 @@ class cssens(ctools.cscript):
         self._max_iter    = 50
         self._num_avg     = 3
         self._log_clients = False
-        self._debug       = False
         
         # Initialise application by calling the appropriate class
         # constructor.
@@ -117,8 +116,8 @@ class cssens(ctools.cscript):
         self._num_avg  = self['num_avg'].integer()
         self._type     = self['type'].string()
 
-        # Set some fixed parameters
-        self._debug = self['debug'].boolean() # Debugging in client tools
+        # Query remaining parameters
+        self['debug'].boolean()
 
         # Derive some parameters
         self._ebounds = gammalib.GEbounds(self._bins,
@@ -347,7 +346,8 @@ class cssens(ctools.cscript):
             # Simulate events
             sim = obsutils.sim(self._obs, nbins=self._enumbins, seed=iterations,
                                binsz=self._binsz, npix=self._npix,
-                               log=self._log_clients, debug=self._debug,
+                               log=self._log_clients,
+                               debug=self['debug'].boolean(),
                                edisp=self._edisp)
 
             # Determine number of events in simulation
@@ -363,8 +363,11 @@ class cssens(ctools.cscript):
                 self._log('\n')
 
             # Fit test source
-            fit = obsutils.fit(sim, log=self._log_clients, debug=self._debug,
-                               edisp=self._edisp)
+            fit = ctools.ctlike(sim)
+            fit['edisp']   = edisp=self._edisp
+            fit['debug']   = self['debug'].boolean()
+            fit['chatter'] = self['chatter'].integer()
+            fit.run()
 
             # Get model fitting results
             logL   = fit.opt().value()

@@ -108,8 +108,8 @@ None
 cscripts
 --------
 Added the support modules "modutils" and "ioutils" to the cscripts module
-and removed the obsolete function "cntmap()" and "modmap()" from the
-"obsutils" module (#1830).
+and removed the obsolete functions fit(), cterror(), cntmap() and modmap()
+from the "obsutils" module (#1830).
 
 
 Examples

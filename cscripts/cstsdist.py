@@ -165,8 +165,10 @@ class cstsdist(ctools.cscript):
             self._log('\n')
 
         # Fit model
-        fit = obsutils.fit(sim, log   = self._log_clients,
-                                debug = self['debug'].boolean())
+        fit = ctools.ctlike(sim)
+        fit['debug']   = self['debug'].boolean()
+        fit['chatter'] = self['chatter'].integer()
+        fit.run()
 
         # Get model fitting results
         logL   = fit.opt().value()
