@@ -373,7 +373,17 @@ class cssens(ctools.cscript):
             logL   = fit.opt().value()
             npred  = fit.obs().npred()
             models = fit.obs().models()
-            ts     = models[self._srcname].ts()
+            source = models[self._srcname]
+            ts     = source.ts()
+
+            # Get fitted Crab, photon and energy fluxes
+            crab_flux   = source['Prefactor'].value() / crab_prefactor
+            photon_flux = source.spectral().flux(emin, emax)
+            energy_flux = source.spectral().eflux(emin, emax)
+
+            # Compute differential sensitivity in unit erg/cm2/s
+            energy      = gammalib.GEnergy(e_mean, 'TeV')
+            sensitivity = source.spectral().eval(energy) * e_mean*erg_mean * 1.0e6
 
             # Assess quality based on a comparison between Npred and Nevents
             quality = npred - nevents
@@ -400,27 +410,30 @@ class cssens(ctools.cscript):
                     for par in model:
                         self._log(str(par)+'\n')
 
-            # Start over if TS was non-positive
+            # If TS was non-positive then increase the test flux and start
+            # over
             if ts <= 0.0:
+
+                # If the number of iterations was exceeded then stop
+                if (iterations >= self._max_iter):
+                    if self._logTerse():
+                        self._log(' Test ended after %d iterations.\n' %
+                                  self._max_iter)
+                    break
+
+                # Increase test flux by a factor of 2
+                test_crab_flux = test_crab_flux * 2.0
+
+                # Signal start we start over
                 if self._logExplicit():
-                    self._log('Non positive TS. Start over.\n')
+                    self._log('Non positive TS, increase test flux and start '
+                              'over.\n')
+
+                # ... and start over
                 continue
 
-            # Get fitted Crab, photon and energy fluxes
-            crab_flux   = models[self._srcname]['Prefactor'].value() / \
-                          crab_prefactor
-            photon_flux = models[self._srcname].spectral().flux(emin, emax)
-            energy_flux = models[self._srcname].spectral().eflux(emin, emax)
-
-            # Compute differential sensitivity in unit erg/cm2/s
-            energy      = gammalib.GEnergy(e_mean, 'TeV')
-            sensitivity = models[self._srcname].spectral().eval(energy) * \
-                          e_mean*erg_mean * 1.0e6
-
             # Compute flux correction factor based on average TS
-            correct = 1.0
-            if ts > 0:
-                correct = math.sqrt(self._ts_thres/ts)
+            correct = math.sqrt(self._ts_thres/ts)
 
             # Compute extrapolated fluxes
             crab_flux   = correct * crab_flux
@@ -432,7 +445,7 @@ class cssens(ctools.cscript):
             energy_flux_value.append(energy_flux)
             sensitivity_value.append(sensitivity)
 
-            # Write background and test source fit results
+            # Write fit results
             if self._logExplicit():
                 self._log.parformat('Photon flux')
                 self._log(photon_flux)
@@ -453,7 +466,7 @@ class cssens(ctools.cscript):
                     for par in model:
                         self._log(str(par)+'\n')
             elif self._logTerse():
-                self._log.parformat('Iteration '+str(iterations))
+                self._log.parformat('Iteration %d' % iterations)
                 self._log('TS=')
                 self._log(ts)
                 self._log(' ')
@@ -589,7 +602,19 @@ class cssens(ctools.cscript):
         results  = []
 
         # Set test source model for this observation
-        models = modutils.test_source(self._obs.models(), self._srcname)
+        models = modutils.test_source(self._obs.models(), self._srcname,
+                                      ra=self._ra, dec=self._dec)
+
+        # Write observations into logger
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1(gammalib.number('Observation',len(self._obs)))
+            self._log(str(self._obs))
+            self._log('\n')
+        if self._logExplicit():
+            for obs in self._obs:
+                self._log(str(obs))
+                self._log('\n')
 
         # Write models into logger
         if self._logTerse():

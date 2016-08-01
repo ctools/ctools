@@ -71,8 +71,8 @@ class Test(test):
         # Setup ctmapcube command
         cmd = ctmapcube+' inmodel="'+self._model+'"'+ \
                         ' outcube="ctmapcube_cmd1.fits"'+\
-                        ' emin=0.1 emax=100.0 enumbins=20 ebinalg=LOG'+ \
-                        ' nxpix=200 nypix=200 binsz=0.02 coordsys=CEL'+ \
+                        ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
+                        ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
                         ' xref=83.63 yref=22.01 proj=CAR'+ \
                         ' logfile="ctmapcube_cmd1.log" chatter=1'
 
@@ -90,8 +90,8 @@ class Test(test):
         # Setup ctmapcube command
         cmd = ctmapcube+' inmodel="events_that_do_not_exist.fits"'+ \
                         ' outcube="ctmapcube_cmd2.fits"'+\
-                        ' emin=0.1 emax=100.0 enumbins=20 ebinalg=LOG'+ \
-                        ' nxpix=200 nypix=200 binsz=0.02 coordsys=CEL'+ \
+                        ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
+                        ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
                         ' xref=83.63 yref=22.01 proj=CAR'+ \
                         ' logfile="ctmapcube_cmd2.log"'
 
@@ -114,10 +114,10 @@ class Test(test):
         mapcube['ebinalg']  = 'LOG'
         mapcube['emin']     = 0.1
         mapcube['emax']     = 100.0
-        mapcube['enumbins'] = 20
-        mapcube['nxpix']    = 200
-        mapcube['nypix']    = 200
-        mapcube['binsz']    = 0.02
+        mapcube['enumbins'] = 10
+        mapcube['nxpix']    = 100
+        mapcube['nypix']    = 100
+        mapcube['binsz']    = 0.04
         mapcube['coordsys'] = 'CEL'
         mapcube['proj']     = 'CAR'
         mapcube['xref']     = 83.63
@@ -152,12 +152,12 @@ class Test(test):
         cube = gammalib.GModelSpatialDiffuseCube(filename)
 
         # Test map cube
-        #self.test_value(cube.maps(), 20, "20 maps")
-        #self.test_value(cube.pixels(), 40000, "40000 map pixels")
+        #self.test_value(cube.maps(), 10, "10 maps")
+        #self.test_value(cube.pixels(), 10000, "10000 map pixels")
         # The map cube is not loaded by default !!!! We should add the method so that
         # the attributes are known !!!!
-        self.test_value(cube.maps(), 0, '20 maps')
-        self.test_value(cube.pixels(), 0, '40000 map pixels')
+        self.test_value(cube.maps(), 0, '10 maps')
+        self.test_value(cube.pixels(), 0, '10000 map pixels')
 
         # Return
         return

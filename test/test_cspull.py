@@ -146,7 +146,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py2.dat'
-        pull['ntrials']  = 2
+        pull['ntrials']  = 1
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
         pull['ra']       = 83.6331
@@ -157,8 +157,8 @@ class Test(test):
         pull['tmax']     = 100.0
         pull['deadc']    = 0.95
         pull['rad']      = 5.0
-        pull['npix']     = 100
-        pull['binsz']    = 0.02
+        pull['npix']     = 20
+        pull['binsz']    = 0.2
         pull['coordsys'] = 'CEL'
         pull['proj']     = 'TAN'
         pull['logfile']  = 'cspull_py2.log'
@@ -168,14 +168,14 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py2.dat')
+        self._check_pull_file('cspull_py2.dat', rows=2)
 
         # Set-up cspull from event list
         pull = cscripts.cspull()
         pull['inobs']    = self._events
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py3.dat'
-        pull['ntrials']  = 2
+        pull['ntrials']  = 1
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
         pull['enumbins'] = 0
@@ -186,7 +186,7 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py3.dat')
+        self._check_pull_file('cspull_py3.dat', rows=2)
 
         # Build observation container with unbinned observation
         cta = gammalib.GCTAObservation(self._events)
@@ -197,7 +197,7 @@ class Test(test):
         pull = cscripts.cspull(obs)
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py4.dat'
-        pull['ntrials']  = 2
+        pull['ntrials']  = 1
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
         pull['enumbins'] = 0
@@ -208,7 +208,7 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py4.dat')
+        self._check_pull_file('cspull_py4.dat', rows=2)
 
         # Set-up stacked cspull with one observation where response cubes
         # are specified in the input observation
@@ -216,7 +216,7 @@ class Test(test):
         pull['inobs']    = self._inobs
         pull['inmodel']  = self._stacked_model
         pull['outfile']  = 'cspull_py5.dat'
-        pull['ntrials']  = 2
+        pull['ntrials']  = 1
         pull['enumbins'] = 0
         pull['logfile']  = 'cspull_py5.log'
         pull['chatter']  = 4
@@ -225,7 +225,7 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py5.dat')
+        self._check_pull_file('cspull_py5.dat', rows=2)
 
         # Set-up stacked cspull with two observations from which response
         # cubes will be computed internally. The IRFs are also specified
@@ -235,7 +235,7 @@ class Test(test):
         pull['inobs']    = self._inobs_two
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py6.dat'
-        pull['ntrials']  = 2
+        pull['ntrials']  = 1
         pull['emin']     = 0.02
         pull['emax']     = 100.0
         pull['enumbins'] = 10
@@ -250,13 +250,13 @@ class Test(test):
         pull.execute()
 
         # Check pull distribution file
-        self._check_pull_file('cspull_py6.dat')
+        self._check_pull_file('cspull_py6.dat', rows=2)
 
         # Return
         return
 
     # Check pull file
-    def _check_pull_file(self, filename):
+    def _check_pull_file(self, filename, rows=3):
         """
         Check pull file
         """
@@ -264,8 +264,8 @@ class Test(test):
         pulls = gammalib.GCsv(filename)
 
         # Check dimensions
-        self.test_value(pulls.nrows(), 3,
-                        'Check for 3 rows in pull file')
+        self.test_value(pulls.nrows(), rows,
+                        'Check for number of rows in pull file')
 
         # Return
         return

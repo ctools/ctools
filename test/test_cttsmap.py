@@ -69,7 +69,7 @@ class Test(test):
                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' outmap="cttsmap_cmd1.fits"'+ \
-                      ' nxpix=5 nypix=5 binsz=0.02'+ \
+                      ' nxpix=3 nypix=3 binsz=0.02'+ \
                       ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                       ' logfile="cttsmap_cmd1.log" chatter=1'
 
@@ -89,7 +89,7 @@ class Test(test):
                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' outmap="cttsmap_cmd2.fits"'+ \
-                      ' nxpix=5 nypix=5 binsz=0.02'+ \
+                      ' nxpix=3 nypix=3 binsz=0.02'+ \
                       ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                       ' logfile="cttsmap_cmd2.log" chatter=2'
 
@@ -113,8 +113,8 @@ class Test(test):
         tsmap['caldb']    = self._caldb
         tsmap['irf']      = self._irf
         tsmap['outmap']   = 'cttsmap_py1.fits'
-        tsmap['nxpix']    = 5
-        tsmap['nypix']    = 5
+        tsmap['nxpix']    = 3
+        tsmap['nypix']    = 3
         tsmap['binsz']    = 0.02
         tsmap['coordsys'] = 'CEL'
         tsmap['proj']     = 'CAR'
@@ -149,14 +149,14 @@ class Test(test):
 
         # Check dimensions
         self.test_value(ts.naxis(), 2, 'Check for 2 dimensions')
-        self.test_value(ts.naxes(0), 5, 'Check for 5 pixels in X')
-        self.test_value(ts.naxes(1), 5, 'Check for 5 pixels in Y')
+        self.test_value(ts.naxes(0), 3, 'Check for 3 pixels in X')
+        self.test_value(ts.naxes(1), 3, 'Check for 3 pixels in Y')
         self.test_value(prefactor.naxis(), 2, 'Check for 2 dimensions')
-        self.test_value(prefactor.naxes(0), 5, 'Check for 5 pixels in X')
-        self.test_value(prefactor.naxes(1), 5, 'Check for 5 pixels in Y')
+        self.test_value(prefactor.naxes(0), 3, 'Check for 3 pixels in X')
+        self.test_value(prefactor.naxes(1), 3, 'Check for 3 pixels in Y')
         self.test_value(index.naxis(), 2, 'Check for 2 dimensions')
-        self.test_value(index.naxes(0), 5, 'Check for 5 pixels in X')
-        self.test_value(index.naxes(1), 5, 'Check for 5 pixels in Y')
+        self.test_value(index.naxes(0), 3, 'Check for 3 pixels in X')
+        self.test_value(index.naxes(1), 3, 'Check for 3 pixels in Y')
 
         # Return
         return
