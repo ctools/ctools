@@ -25,9 +25,9 @@ try:
     import matplotlib.pyplot as plt
     plt.figure()
     plt.close()
-    has_matplotlib = True
 except:
-    has_matplotlib = False
+    print('This script needs the "matplotlib" module')
+    sys.exit()
 
 
 # =============== #
@@ -94,7 +94,7 @@ def make_spectrum(datadir):
 # ============= #
 # Plot spectrum #
 # ============= #
-def plot_spectrum(spectrum, file=False):
+def plot_spectrum(spectrum, plotfile):
     """
     Plot spectrum
 
@@ -102,8 +102,8 @@ def plot_spectrum(spectrum, file=False):
     ----------
     spectrum : `~gammalib.GFits`
         Spectrum FITS file
-    file : bool, optional
-        Plot into a file
+    plotfile : str
+        Plot filename
     """
     # Extract columns from spectrum file
     table    = spectrum.table(1)
@@ -169,8 +169,8 @@ def plot_spectrum(spectrum, file=False):
     plt.ylabel(r'E$^{2}$dN/dE (erg cm$^{-2}$ s$^{-1}$)')
 
     # Show spectrum or save it into file
-    if file:
-        plt.savefig('example_spectrum.eps')
+    if len(plotfile) > 0:
+        plt.savefig(plotfile)
     else:
         plt.show()
 
@@ -183,19 +183,22 @@ def plot_spectrum(spectrum, file=False):
 # ======================== #
 if __name__ == '__main__':
 
-    # Get optional arguments
-    if len(sys.argv) >= 2:
-        datadir = sys.argv[1]
-    else:
-        datadir = 'data'
-    if len(sys.argv) >= 3:
-        file = True
-    else:
-        file = False
+    # Set usage string
+    usage = 'make_spectrum.py [-d datadir] [-p plotfile]'
+
+    # Set default options
+    options = [{'option': '-d', 'value': 'data'},
+               {'option': '-p', 'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    datadir  = options[0]['value']
+    plotfile = options[1]['value']
 
     # Generate spectrum
     spectrum = make_spectrum(datadir)
 
-    # If matplotlib is installed then plot spectrum
-    if has_matplotlib:
-        plot_spectrum(spectrum, file=file)
+    # Plot spectrum
+    plot_spectrum(spectrum, plotfile)

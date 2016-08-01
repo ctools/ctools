@@ -21,6 +21,7 @@
 import sys
 import math
 import gammalib
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -313,22 +314,18 @@ def show_one_response(rspname, dbname, name, rootdir=None, color='r'):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
+# ==================== #
+# Show one sensitivity #
+# ==================== #
+def show_response(plotfile):
+    """
+    Show response
 
-    # Print usage information
-    usage = 'Usage: show_response.py [file]'
-    if len(sys.argv) < 1:
-        print(usage)
-        sys.exit()
-
-    # Check if plotting in file is requested
-    plotfile = ''
-    if len(sys.argv) == 2:
-        plotfile = sys.argv[1]
-
+    Parameters
+    ----------
+    plotfile : str
+        Plot filename
+    """
     # Create figures
     plt.figure(1)
     plt.title('Effective area')
@@ -338,16 +335,14 @@ if __name__ == '__main__':
     plt.title('Sensitivity')
 
     # Set response dictionary
-    rsps = [
-            {'dbname':  'prod2',
+    rsps = [{'dbname':  'prod2',
              'rspname': 'South_0.5h',
              'name':    'Prod2 (30 min)',
              'color':   'b'},
             {'dbname':  'prod2',
              'rspname': 'South_50h',
              'name':    'Prod2 (50 h)',
-             'color':   'r'}
-            ]
+             'color':   'r'}]
 
     # Loop over all responses
     for rsp in rsps:
@@ -357,10 +352,7 @@ if __name__ == '__main__':
         rspname = rsp['rspname']
         color   = rsp['color']
         name    = rsp['name']
-        if rsp.has_key('rootdir'):
-            rootdir = rsp['rootdir']
-        else:
-            rootdir = None
+        rootdir = rsp.setdefault('rootdir', None)
 
         # Show response
         show_one_response(rspname, dbname, name, rootdir=rootdir, color=color)
@@ -370,3 +362,27 @@ if __name__ == '__main__':
         plt.savefig(plotfile)
     else:
         plt.show()
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Set usage string
+    usage = 'show_response.py [-p plotfile]'
+
+    # Set default options
+    options = [{'option': '-p', 'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    plotfile = options[0]['value']
+
+    # Show response
+    show_response(plotfile)

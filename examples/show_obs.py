@@ -33,7 +33,7 @@ except:
 # ==================== #
 # Run csobsinfo script #
 # ==================== #
-def run_csobsinfo(filename, ra=None, dec=None, debug=True):
+def run_csobsinfo(filename, ra, dec, debug=True):
     """
     Run csobsinfo script
 
@@ -41,9 +41,9 @@ def run_csobsinfo(filename, ra=None, dec=None, debug=True):
     ----------
     filename : str
         File name of observation definition XML file
-    ra : float, optional
+    ra : str
         Target Right Ascension (deg)
-    dec : float, optional
+    dec : str
         Target declination of pointing (deg)
     debug : bool, optional
         Switch on debugging in csobsinfo run
@@ -62,9 +62,9 @@ def run_csobsinfo(filename, ra=None, dec=None, debug=True):
     info['debug'] = debug
 
     # Set offset
-    if ra != None and dec != None:
-        info['ra']     = ra
-        info['dec']    = dec
+    if ra != '' and dec != '':
+        info['ra']     = float(ra)
+        info['dec']    = float(dec)
         info['offset'] = True
     else:
         info['offset'] = False
@@ -79,7 +79,7 @@ def run_csobsinfo(filename, ra=None, dec=None, debug=True):
 # ================ #
 # Plot information #
 # ================ #
-def plot_information(info, plotfile=''):
+def plot_information(info, plotfile):
     """
     Plot information
 
@@ -87,7 +87,7 @@ def plot_information(info, plotfile=''):
     ----------
     info : `~cscripts.csobsinfo`
         csobsinfo instance
-    plotfile : str, optional
+    plotfile : str
         Plot filename
     """
     # Retrieve observation info
@@ -178,22 +178,24 @@ def plot_information(info, plotfile=''):
 # ======================== #
 if __name__ == '__main__':
 
-    # Print usage message if wrong number of arguments is provided
-    if len(sys.argv) < 2:
-        sys.exit('Usage: inspect_obs.py inobs.xml [ra] [dec] [file]')
+    # Set usage string
+    usage = 'show_model.py [-ra ra] [-dec dec] [-p plotfile] file'
 
-    # Extract optional parameters
-    plotfile = ''
-    ra       = None
-    dec      = None
-    if len(sys.argv) == 3:
-        plotfile = sys.argv[2]
-    elif len(sys.argv) == 4:
-        ra  = float(sys.argv[2])
-        dec = float(sys.argv[3])
+    # Set default options
+    options = [{'option': '-ra',  'value': ''},
+               {'option': '-dec', 'value': ''},
+               {'option': '-p',   'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    ra       = options[0]['value']
+    dec      = options[1]['value']
+    plotfile = options[2]['value']
 
     # Run csobsinfo
-    info = run_csobsinfo(sys.argv[1], ra=ra, dec=dec)
+    info = run_csobsinfo(args[0], ra, dec)
 
     # Plot information
-    plot_information(info, plotfile=plotfile)
+    plot_information(info, plotfile)

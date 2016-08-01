@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Show a spectrum in PHA format.
+# Show a spectrum in PHA format
 #
 # Copyright (C) 2013-2016 Juergen Knoedlseder
 #
@@ -21,6 +21,7 @@
 import sys
 import math
 import gammalib
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -33,7 +34,7 @@ except:
 # ================= #
 # Show PHA spectrum #
 # ================= #
-def show_pha(pha, plotfile=''):
+def show_pha(pha, plotfile):
     """
     Show PHA spectrum
 
@@ -41,7 +42,7 @@ def show_pha(pha, plotfile=''):
     ----------
     spectrum : `~gammalib.GPha`
         PHA file
-    plotfile : str, optional
+    plotfile : str
         Plot file name
     """
     # Create figure
@@ -94,22 +95,20 @@ def show_pha(pha, plotfile=''):
 # ======================== #
 if __name__ == '__main__':
 
-    # Print usage information
-    usage = 'Usage: show_pha.py filename [file]'
-    if len(sys.argv) < 2:
-        print(usage)
-        sys.exit()
+    # Set usage string
+    usage = 'show_pha.py [-p plotfile] file'
 
-    # Check if plotting in file is requested
-    plotfile = ''
-    if len(sys.argv) == 3:
-        plotfile = sys.argv[2]
+    # Set default options
+    options = [{'option': '-p', 'value': ''}]
 
-    # Extract parameters
-    filename = sys.argv[1]
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    plotfile = options[0]['value']
 
     # Load PHA spectrum
-    pha = gammalib.GPha(filename)
+    pha = gammalib.GPha(args[0])
 
     # Show PHA spectrum
-    show_pha(pha, plotfile=plotfile)
+    show_pha(pha, plotfile)

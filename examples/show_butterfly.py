@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import gammalib
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -29,23 +30,22 @@ except:
     sys.exit()
 
 
-# ============ #
-# Script entry #
-# ============ #    
-if __name__ == '__main__':
+# ============== #
+# Plot butterfly #
+# ============== #
+def plot_butterfly(filename, plotfile):
+    """
+    Plot butterfly diagram
 
-    # Check for given butterfly file
-    if len(sys.argv) < 2:
-        sys.exit('Usage: show_butterfly.py butterfly.txt [file]')
-
-    # Check if plotting in file is requested
-    plotfile = ''
-    if len(sys.argv) == 3:
-        plotfile = sys.argv[2]
-
-    # Read given butterfly file    
-    filename = sys.argv[1]
-    csv      = gammalib.GCsv(filename)
+    Parameters
+    ----------
+    filename : str
+        Butterfly CSV file
+    plotfile : str
+        Plot filename
+    """
+    # Read butterfly file
+    csv = gammalib.GCsv(filename)
 
     # Initialise arrays to be filled
     butterfly_x = []
@@ -65,15 +65,13 @@ if __name__ == '__main__':
         line_x.append(csv.real(row,0))
         line_y.append(csv.real(row,1))
 
-    # Loop over the rows backwards to compute the lower edge
-    # of the confidence band    
+    # Loop over the rows backwards to compute the lower edge of the
+    # confidence band
     for row in range(nrows):
         index = nrows - 1 - row
         butterfly_x.append(csv.real(index,0))
-        low_error = csv.real(index,3)
-        if low_error < 1e-26:
-            low_error = 1e-26
-        butterfly_y.append(low_error)   
+        low_error = max(csv.real(index,3), 1e-26)
+        butterfly_y.append(low_error)
     
     # Plot the butterfly and spectral line       
     plt.figure()
@@ -90,3 +88,27 @@ if __name__ == '__main__':
         plt.savefig(plotfile)
     else:
         plt.show()
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Set usage string
+    usage = 'show_butterfly.py [-p plotfile] file'
+
+    # Set default options
+    options = [{'option': '-p', 'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    plotfile = options[0]['value']
+
+    # Plot butterfly diagram
+    plot_butterfly(args[0], plotfile)

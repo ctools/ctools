@@ -21,6 +21,7 @@
 import sys
 import math
 import gammalib
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -96,7 +97,7 @@ def read_sensitivity(filename):
 # ===================== #
 # Show sensitivity data #
 # ===================== #
-def show_sensitivity(sensitivity, filename, plotfile=''):
+def show_sensitivity(sensitivity, filename, plotfile):
     """
     Plot sensitivity data
 
@@ -106,7 +107,7 @@ def show_sensitivity(sensitivity, filename, plotfile=''):
         Dictionary with sensitivity information
     filename : str
         Name of CSV file
-    plotfile : str, optional
+    plotfile : str
         Plot file name
     """
     # Build title
@@ -145,23 +146,24 @@ def show_sensitivity(sensitivity, filename, plotfile=''):
 # ======================== #
 if __name__ == '__main__':
 
-    # Print usage information
-    usage = 'Usage: show_sensitivity.py [filename] [file]'
-    if len(sys.argv) < 1:
-        print(usage)
-        sys.exit()
+    # Set usage string
+    usage = 'show_sensitivity.py [-p plotfile] [file]'
 
-    # Extract parameters
-    if len(sys.argv) == 1:
-        filename = 'sensitivity.dat'
+    # Set default options
+    options = [{'option': '-p', 'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    plotfile = options[0]['value']
+    if len(args) > 0:
+        filename = args[0]
     else:
-        filename = sys.argv[1]
-    plotfile = ''
-    if len(sys.argv) == 3:
-        plotfile = sys.argv[2]
+        filename = 'sensitivity.dat'
 
     # Read sensitivity data
     sensitivity = read_sensitivity(filename)
 
     # Show sensitivity data
-    show_sensitivity(sensitivity, filename, plotfile=plotfile)
+    show_sensitivity(sensitivity, filename, plotfile)

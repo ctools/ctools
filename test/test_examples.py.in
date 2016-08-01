@@ -161,8 +161,7 @@ class Test(gammalib.GPythonTestSuite):
         Test generate_prod3_irfs
         """
         # Execute script
-        self._execute_python('generate_prod3_irfs',
-                             args=self._datadir)
+        self._execute_python('generate_prod3_irfs', args=self._datadir)
 
         # Return
         return
@@ -172,9 +171,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test make_spectrum
         """
+        # Set arguments
+        args = '-d %s -p example_spectrum.eps' % self._datadir
+
         # Execute script
-        self._execute_python('make_spectrum',
-                             args=self._datadir+' eps')
+        self._execute_python('make_spectrum', args=args)
 
         # Return
         return
@@ -184,9 +185,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test make_ts_distributions
         """
+        # Set arguments
+        args = '-n 2 -e 0 -t 1800 -d %s' % self._datadir
+
         # Execute script
-        self._execute_python('make_ts_distributions',
-                             args='-n 2 -e 0 -t 1800 -d '+self._datadir)
+        self._execute_python('make_ts_distributions', args=args)
 
         # Return
         return
@@ -262,10 +265,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_butterfly
         """
+        # Set arguments
+        args = '-p example_show_butterfly.eps %s/butterfly.txt' % self._datadir
+
         # Execute script
-        self._execute_python('show_butterfly',
-                             args=self._datadir+'/butterfly.txt '
-                                  'example_show_butterfly.eps')
+        self._execute_python('show_butterfly', args=args)
 
         # Return
         return
@@ -275,10 +279,17 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_model
         """
+        # Set arguments
+        args = '-n Crab -p example_show_model1.eps %s/crab.xml' % self._datadir
+
         # Execute script
-        self._execute_python('show_model',
-                             args=self._datadir+'/crab.xml '
-                                  'Crab example_show_model.eps')
+        self._execute_python('show_model', args=args)
+
+        # Set new arguments
+        args = '-p example_show_model2.eps %s/crab.xml' % self._datadir
+
+        # Execute script
+        self._execute_python('show_model', args=args)
 
         # Return
         return
@@ -288,10 +299,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_pha
         """
+        # Set arguments
+        args = '-p example_show_pha.eps %s/pha.fits' % self._datadir
+
         # Execute script
-        self._execute_python('show_pha',
-                             args=self._datadir+'/pha.fits '
-                                  'example_show_pha.eps')
+        self._execute_python('show_pha', args=args)
 
         # Return
         return
@@ -301,11 +313,12 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_pull_evolution
         """
+        # Set arguments
+        args = ('-p example_show_pull_evolution.eps %s/pull.dat '
+                'Pull_Crab_Prefactor' % self._datadir)
+
         # Execute script
-        self._execute_python('show_pull_evolution',
-                             args=self._datadir+'/pull.dat '
-                                  'Pull_Crab_Prefactor '
-                                  'example_show_pull_evolution.eps')
+        self._execute_python('show_pull_evolution', args=args)
 
         # Return
         return
@@ -315,11 +328,19 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_pull_histogram
         """
+        # Set arguments
+        args = ('-p example_show_pull_histogram1.eps %s/pull.dat '
+                'Pull_Crab_Prefactor' % self._datadir)
+
         # Execute script
-        self._execute_python('show_pull_histogram',
-                             args=self._datadir+'/pull.dat '
-                                  'Pull_Crab_Prefactor 50 '
-                                  'example_show_pull_histogram.eps')
+        self._execute_python('show_pull_histogram', args=args)
+
+        # Set arguments
+        args = ('-n 20 -p example_show_pull_histogram2.eps %s/pull.dat '
+                'Pull_Crab_Prefactor' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_pull_histogram', args=args)
 
         # Return
         return
@@ -329,8 +350,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_response
         """
+        # Set arguments
+        args = '-p example_show_response.eps'
+
         # Execute script
-        self._execute_python('show_response', args='example_show_response.eps')
+        self._execute_python('show_response', args=args)
 
         # Return
         return
@@ -340,10 +364,12 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_sensitivity
         """
+        # Set arguments
+        args = ('-p example_show_sensitivity.eps %s/sensitivity.dat' %
+                self._datadir)
+
         # Execute script
-        self._execute_python('show_sensitivity',
-                             args=self._datadir+'/sensitivity.dat '
-                                  'example_show_sensitivity.eps')
+        self._execute_python('show_sensitivity', args=args)
 
         # Return
         return
@@ -353,10 +379,11 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_spectrum
         """
+        # Set arguments
+        args = '-p example_show_spectrum.eps %s/spectrum.fits' % self._datadir
+
         # Execute script
-        self._execute_python('show_spectrum',
-                             args=self._datadir+'/spectrum.fits '
-                                  'example_show_spectrum.eps')
+        self._execute_python('show_spectrum', args=args)
 
         # Return
         return
@@ -366,10 +393,19 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_ts_distribution
         """
+        # Set arguments
+        args = ('-n 100 -p example_show_ts_distribution1.eps %s/ts.dat' %
+                self._datadir)
+
         # Execute script
-        self._execute_python('show_ts_distribution',
-                             args=self._datadir+'/ts.dat -n 100 '
-                                  '-f example_show_ts_distribution.eps')
+        self._execute_python('show_ts_distribution', args=args)
+
+        # Set arguments
+        args = ('-n 100 -t cdf -p example_show_ts_distribution2.eps %s/ts.dat' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_ts_distribution', args=args)
 
         # Return
         return
@@ -379,10 +415,18 @@ class Test(gammalib.GPythonTestSuite):
         """
         Test show_obs
         """
+        # Set arguments
+        args = '-p example_show_obs1.eps %s/obs_unbinned.xml' % self._datadir
+
         # Execute script
-        self._execute_python('show_obs',
-                             args=self._datadir+'/obs_unbinned.xml '
-                                  'example_show_obs.eps')
+        self._execute_python('show_obs', args=args)
+
+        # Set arguments
+        args = ('-ra 83.63 -dec 22.01 -p example_show_obs2.eps '
+                '%s/obs_unbinned.xml' % self._datadir)
+
+        # Execute script
+        self._execute_python('show_obs', args=args)
 
         # Return
         return

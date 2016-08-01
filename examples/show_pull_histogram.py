@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import csv
+import cscripts
 try:
     import matplotlib.pyplot as plt
     import matplotlib.mlab as mlab
@@ -84,29 +85,24 @@ def read_pull(filename, parname):
     return a
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
+# =================== #
+# Plot pull histogram #
+# =================== #
+def plot_pull_histogram(filename, parname, nbins, plotfile):
+    """
+    Plot pull histogram
 
-    # Print usage information
-    usage = 'Usage: show_pull_histogram.py filename parname [bins] [file]'
-    if len(sys.argv) < 3:
-        print(usage)
-        sys.exit()
-
-    # Extract parameters
-    filename = sys.argv[1]
-    parname  = sys.argv[2]
-    if len(sys.argv) > 3:
-        nbins = int(sys.argv[3])
-    else:
-        nbins = 50
-    if len(sys.argv) == 5:
-        plotfile = sys.argv[4]
-    else:
-        plotfile = ''
-
+    Parameters
+    ----------
+    filename : str
+        Pull filename
+    parname : str
+        Parameter name
+    nbins : int
+        Number of hisogram bins
+    plotfile : str
+        Plot filename
+    """
     # Read values from CSV file
     values = read_pull(filename, parname)
 
@@ -132,3 +128,29 @@ if __name__ == '__main__':
         plt.savefig(plotfile)
     else:
         plt.show()
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Set usage string
+    usage = 'show_pull_histogram.py [-n bins] [-p plotfile] file parameter'
+
+    # Set default options
+    options = [{'option': '-n', 'value': '50'},
+               {'option': '-p', 'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    nbins    = int(options[0]['value'])
+    plotfile = options[1]['value']
+
+    # Plot pull histogram
+    plot_pull_histogram(args[0], args[1], nbins, plotfile)

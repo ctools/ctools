@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import gammalib
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -32,7 +33,7 @@ except:
 # ============= #
 # Show spectrum #
 # ============= #
-def show_spectrum(filename, plotfile=''):
+def show_spectrum(filename, plotfile):
     """
     Plot sensitivity data
 
@@ -40,7 +41,7 @@ def show_spectrum(filename, plotfile=''):
     ----------
     filename : str
         Name of spectrum FITS file
-    plotfile : str, optional
+    plotfile : str
         Plot file name
     """
     # Read spectrum file    
@@ -116,17 +117,17 @@ def show_spectrum(filename, plotfile=''):
 # ======================== #
 if __name__ == '__main__':
 
-    # Print usage information
-    usage = 'Usage: show_spectrum.py filename [file]'
-    if len(sys.argv) < 2:
-        print(usage)
-        sys.exit()
+    # Set usage string
+    usage = 'show_spectrum.py [-p plotfile] [file]'
 
-    # Extract parameters
-    filename = sys.argv[1]
-    plotfile = ''
-    if len(sys.argv) == 3:
-        plotfile = sys.argv[2]
+    # Set default options
+    options = [{'option': '-p', 'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    plotfile = options[0]['value']
 
     # Show spectrum
-    show_spectrum(filename, plotfile=plotfile)
+    show_spectrum(args[0], plotfile)

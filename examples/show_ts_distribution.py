@@ -21,6 +21,7 @@
 import sys
 import csv
 import math
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -130,7 +131,7 @@ def erf(x):
 # =============================== #
 # Display cumulative distribution #
 # =============================== #
-def dist_cdf(values, nbins, title, expect='', plotfile=''):
+def dist_cdf(values, nbins, title, plotfile, expect=''):
     """
     Display cumulative TS distribution and overplots expectation
 
@@ -142,8 +143,10 @@ def dist_cdf(values, nbins, title, expect='', plotfile=''):
         Number of bins
     title : str
         Plot title
-    plotfile : str, optional
+    plotfile : str
         Plot file name
+    expect : str, optional
+        If 'show', show expectation
     """
     # Set range and adapt number of bins. We make sure that we have a
     # histogram bin centred on 0 that will capture the TS=0 part.
@@ -205,7 +208,7 @@ def dist_cdf(values, nbins, title, expect='', plotfile=''):
 # ======================================== #
 # Display probability density distribution #
 # ======================================== #
-def dist_pdf(values, nbins, title, expect='', plotfile=''):
+def dist_pdf(values, nbins, title, plotfile, expect=''):
     """
     Display probability density TS distribution and overplots expectation
 
@@ -217,8 +220,10 @@ def dist_pdf(values, nbins, title, expect='', plotfile=''):
         Number of bins
     title : str
         Plot title
-    plotfile : str, optional
+    plotfile : str
         Plot file name
+    expect : str, optional
+        If 'show', show expectation
     """
     # Set range and adapt number of bins. We make sure that we have a
     # histogram bin centred on 0 that will capture the TS=0 part.
@@ -279,59 +284,35 @@ def dist_pdf(values, nbins, title, expect='', plotfile=''):
 # ======================== #
 if __name__ == '__main__':
 
-    # Print usage information
-    usage = 'Usage: show_ts_distribution.py filename' \
-            ' [-n bins] [-c column] [-t title] [-p plot] [-f file]'
-    if len(sys.argv) < 2:
-        print(usage)
-        sys.exit()
+    # Set usage string
+    usage = ('show_ts_distribution.py [-n bins] [-c column] [-title title] '
+             '[-e expect] [-t type] [-p plotfile] file')
 
-    # Extract parameters
-    filename = sys.argv[1]
+    # Set default options
+    options = [{'option': '-n', 'value': 30},
+               {'option': '-c', 'value': 'TS'},
+               {'option': '-title', 'value': 'TS distribution'},
+               {'option': '-e', 'value': ''},
+               {'option': '-t', 'value': 'pdf'},
+               {'option': '-p', 'value': ''}]
 
-    # Parameter dictionnary
-    pars = [{'option': '-n', 'value': 30},
-            {'option': '-c', 'value': 'TS'},
-            {'option': '-t', 'value': 'TS distribution'},
-            {'option': '-p', 'value': 'pdf'},
-            {'option': '-e', 'value': ''},
-            {'option': '-f', 'value': ''}]
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
 
-    # Gather parameters from command line
-    i = 2
-    while i < len(sys.argv):
-
-        # Search for options
-        for par in pars:
-            if sys.argv[i] == par['option']:
-                if len(sys.argv) > i+1:
-                    i      += 1
-                    try:
-                        par['value'] = sys.argv[i]
-                    except:
-                        print(usage)
-                        sys.exit()
-                else:
-                    print(usage)
-                    sys.exit()
-
-        # Next item
-        i += 1
-
-    # Recover parameters
-    nbins    = int(pars[0]['value'])
-    tsname   = pars[1]['value']
-    title    = pars[2]['value']
-    plot     = pars[3]['value']
-    expect   = pars[4]['value']
-    plotfile = pars[5]['value']
+    # Extract script parameters from options
+    nbins    = int(options[0]['value'])
+    tsname   = options[1]['value']
+    title    = options[2]['value']
+    expect   = options[3]['value']
+    disttype = options[4]['value']
+    plotfile = options[5]['value']
 
     # Read values from CSV file
-    values = read_ts(filename, tsname=tsname)
+    values = read_ts(args[0], tsname=tsname)
     print('%d values read.' % len(values))
 
     # Show histogram
-    if plot == 'pdf':
-        dist_pdf(values, nbins, title, expect=expect, plotfile=plotfile)
+    if disttype == 'pdf':
+        dist_pdf(values, nbins, title, plotfile, expect=expect)
     else:
-        dist_cdf(values, nbins, title, expect=expect, plotfile=plotfile)
+        dist_cdf(values, nbins, title, plotfile, expect=expect)

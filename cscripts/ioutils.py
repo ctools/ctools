@@ -90,7 +90,7 @@ def get_args_options(options, usage):
     # If there are no command line arguments then show usage string and
     # exit
     if len(sys.argv) < 1:
-        print(usage)
+        print('Usage: %s' % usage)
         sys.exit()
 
     # First possible option is element 1
@@ -116,13 +116,13 @@ def get_args_options(options, usage):
                     try:
                         option['value'] = str(sys.argv[i])
                     except:
-                        print(usage)
+                        print('Usage: %s' % usage)
                         sys.exit()
 
                 # ... there is no following parameter, hence write out usage
                 # and quite
                 else:
-                    print(usage)
+                    print('Usage: %s' % usage)
                     sys.exit()
 
                 # We can break now as every option should only occur once

@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import csv
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -83,26 +84,22 @@ def read_pull(filename, parname):
     return a
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
+# =================== #
+# Plot pull evolution #
+# =================== #
+def plot_pull_evolution(filename, parname, plotfile):
+    """
+    Plot pull evolution
 
-    # Print usage information
-    usage = 'Usage: show_pull_evolution.py filename parname [file]'
-    if len(sys.argv) < 3:
-        print(usage)
-        sys.exit()
-
-    # Check if plotting in file is requested
-    plotfile = ''
-    if len(sys.argv) == 4:
-        plotfile = sys.argv[3]
-
-    # Extract parameters
-    filename = sys.argv[1]
-    parname  = sys.argv[2]
-
+    Parameters
+    ----------
+    filename : str
+        Pull filename
+    parname : str
+        Parameter name
+    plotfile : str
+        Plot filename
+    """
     # Read values from CSV file
     values = read_pull(filename, parname)
 
@@ -134,3 +131,27 @@ if __name__ == '__main__':
         plt.savefig(plotfile)
     else:
         plt.show()
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Set usage string
+    usage = 'show_pull_evolution.py [-p plotfile] file parameter'
+
+    # Set default options
+    options = [{'option': '-p',   'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    plotfile = options[0]['value']
+
+    # Plot pull evolution
+    plot_pull_evolution(args[0], args[1], plotfile)

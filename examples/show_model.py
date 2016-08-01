@@ -20,6 +20,7 @@
 # ==========================================================================
 import sys
 import gammalib
+import cscripts
 try:
     import matplotlib.pyplot as plt
     plt.figure()
@@ -32,7 +33,7 @@ except:
 # ======================= #
 # Plot spectral component #
 # ======================= #    
-def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
+def plot_spectrum(model, plotfile, emin=0.01, emax=100.0, enumbins=100):
     """
     Plot spectral model component
 
@@ -40,14 +41,14 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
     ----------
     model : `~gammalib.GModel`
         Model
+    plotfile : str
+        Name of plot file
     emin : float, optional
         Minimum energy (TeV)
     emax : float, optional
         Maximum energy (TeV)
     enumbins : integer, optional
         Number of energy bins
-    plotfile : str, optional
-        Name of plot file
     """
     # Get spectral component
     spectrum = model.spectral()
@@ -57,18 +58,12 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
     e_max   = gammalib.GEnergy(emax, 'TeV')
     ebounds = gammalib.GEbounds(enumbins, e_min, e_max)
 
-    # Setup model plot
+    # Setup lists of x and y values
     x   = []
     y   = []
-    min = 1.0e30
-    max = 0.0
     for i in range(enumbins):
         energy = ebounds.elogmean(i)
         value  = spectrum.eval(energy)
-        if value > max:
-            max = value
-        if value < min:
-            min = value
         x.append(energy.TeV())
         y.append(value)
 
@@ -80,7 +75,6 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
     plt.loglog(x, y, color='red')
     plt.xlabel('Energy (TeV)')
     plt.ylabel(r'dN/dE (ph s$^{-1}$ cm$^{-2}$ MeV$^{-1}$)')
-    #plt.ylim([min,max])
 
     # Show spectrum or save it into file
     if len(plotfile) > 0:
@@ -92,31 +86,32 @@ def plot_spectrum(model, emin=0.01, emax=100.0, enumbins=100, plotfile=''):
     return
 
 
-# ============= #
-# Script entry  #
-# ============= #    
+# ======================== #
+# Main routine entry point #
+# ======================== #
 if __name__ == '__main__':
 
-    # Check for model filename
-    if len(sys.argv) < 2:
-        sys.exit('Usage: show_model.py model.xml [name] [file]')
+    # Set usage string
+    usage = 'show_model.py [-n name] [-p plotfile] file'
 
-    # Get optional model index
-    if len(sys.argv) >= 3:
-        name = sys.argv[2]
-    else:
+    # Set default options
+    options = [{'option': '-n', 'value': ''},
+               {'option': '-p', 'value': ''}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    name     = options[0]['value']
+    plotfile = options[1]['value']
+    if len(name) == 0:
         name = 0
-    if len(sys.argv) == 4:
-        plotfile = sys.argv[3]
-    else:
-        plotfile = ''
 
     # Read models XML file
-    filename = sys.argv[1]
-    models   = gammalib.GModels(filename)
+    models = gammalib.GModels(args[0])
 
     # Extract relevant model
     model = models[name]
 
     # Plot spectrum
-    plot_spectrum(model, plotfile=plotfile)
+    plot_spectrum(model, plotfile)
