@@ -41,7 +41,10 @@ __all__ = [
     "cstsmapmerge",
     "cstsmapsplit",
     "csworkflow",
-    "obsutils"
+    "obsutils",
+    "modutils",
+    "calutils",
+    "ioutils"
 ]
 if cur_version > req_version:
     __all__.extend(["csfindobs",
@@ -68,6 +71,9 @@ from cscripts.cstsmapmerge import cstsmapmerge
 from cscripts.cstsmapsplit import cstsmapsplit
 from cscripts.csworkflow   import csworkflow
 from cscripts              import obsutils
+from cscripts              import modutils
+from cscripts              import calutils
+from cscripts              import ioutils
 if cur_version > req_version:
     from cscripts.csfindobs  import csfindobs
     from cscripts.csiactcopy import csiactcopy

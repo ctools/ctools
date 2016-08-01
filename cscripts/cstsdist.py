@@ -19,10 +19,11 @@
 #
 # ==========================================================================
 import sys
-import csv
 import gammalib
 import ctools
 from cscripts import obsutils
+from cscripts import modutils
+from cscripts import ioutils
 
 
 # ============== #
@@ -30,13 +31,7 @@ from cscripts import obsutils
 # ============== #
 class cstsdist(ctools.cscript):
     """
-    Generates Test Statistic distribution for a model.
-    
-    
-    This class implements the TS distribution generation script. It derives
-    from the ctools.cscript class which provides support for parameter
-    files, command line arguments, and logging. In that way the Python
-    script behaves just as a regular ctool.
+    Generates Test Statistic distribution for a model
     """
 
     # Constructor
@@ -45,24 +40,17 @@ class cstsdist(ctools.cscript):
         Constructor.
         """
         # Set name
-        self._name    = "cstsdist"
-        self._version = "1.1.0"
+        self._name    = 'cstsdist'
+        self._version = '1.2.0'
 
         # Initialise some members
-        self._obs         = gammalib.GObservations()
-        self._pattern     = "single"
-        self._srcname     = ""
-        self._enumbins    = 0
-        self._npix        = 0
-        self._binsz       = 0.0
-        self._outfile     = gammalib.GFilename("ts.dat")
-        self._ntrials     = 10
-        self._edisp       = False
-        self._debug       = False
-        self._log_clients = False        
+        self._srcname     = ''
+        self._log_clients = False
 
-        # Initialise application by calling the appropriate class
-        # constructor.
+        # Initialise observation container from constructor arguments
+        self._obs, argv = self._set_input_obs(argv)
+
+        # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
         # Return
@@ -74,165 +62,95 @@ class cstsdist(ctools.cscript):
         """
         Get parameters from parfile and setup the observation.
         """
-
         # Set observation if not done before
         if self._obs == None or self._obs.size() == 0:
             self._obs = self._get_observations()
 
-            # Check for requested pattern and use above
-            # observation parameters to set wobble pattern
-            self._pattern = self["pattern"].string()
-            if self._pattern == "four":
-                self._obs = self._set_obs()
+            # Check for requested pattern and use above observation parameters
+            # to set wobble pattern
+            if self['pattern'].string() == 'four':
+                self._obs = obsutils.set_observations(self['ra'].real(),
+                                                      self['dec'].real(),
+                                                      self['rad'].real(),
+                                                      self['tmin'].real(),
+                                                      self['tmax'].real(),
+                                                      self['emin'].real(),
+                                                      self['emax'].real(),
+                                                      self['irf'].string(),
+                                                      self['caldb'].string(),
+                                                      deadc=self['deadc'].real(),
+                                                      pattern=self['pattern'].string(),
+                                                      offset=self['offset'].real())
 
         # Get source name
-        self._srcname = self["srcname"].string()
+        self._srcname = self['srcname'].string()
 
-        # Get number of energy bins
-        self._enumbins = self["enumbins"].integer()
-
-        # Read parameters for binned if requested
-        if not self._enumbins == 0:
-            self._npix  = self["npix"].integer()
-            self._binsz = self["binsz"].real()
+        # Query parameters for binned if requested
+        if self['enumbins'].integer() != 0:
+            self['npix'].integer()
+            self['binsz'].real()
+            self['coordsys'].string()
+            self['proj'].string()
 
         # Set models if we have none
         if self._obs.models().size() == 0:
-            self._obs.models(self["inmodel"].filename())
+            self._obs.models(self['inmodel'].filename())
 
-        # Get other parameters
-        self._outfile = self["outfile"].filename()
-        self._ntrials = self["ntrials"].integer()
-        self._edisp   = self["edisp"].boolean()
-        self._debug   = self["debug"].boolean()
+        # Query parameters
+        self['edisp'].boolean()
+        self['ntrials'].integer()
+        self['outfile'].filename()
+        self['debug'].boolean()
 
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
 
-    def _set_obs(self):
+    def _trial(self, seed):
         """
-        Set an observation container.
+        Create the TS for a single trial
 
-        Returns:
-            Observation container.
-        """
+        Parameters
+        ----------
+        seed : int
+            Random number generator seed
 
-        # Setup observation definition list
-        obsdeflist = obsutils.set_obs_patterns(self._pattern,
-                                               ra=self["ra"].real(),
-                                               dec=self["dec"].real(),
-                                               offset=self["offset"].real())
-
-        # Create list of observations
-        obs = obsutils.set_obs_list(obsdeflist,
-                                    tstart=self["tmin"].real(),
-                                    duration=self["tmax"].real()-self["tmin"].real(),
-                                    deadc=self["deadc"].real(),
-                                    emin=self["emin"].real(),
-                                    emax=self["emax"].real(),
-                                    rad=self["rad"].real(),
-                                    irf=self["irf"].string(),
-                                    caldb=self["caldb"].string())
-
-        # Return observation container
-        return obs
-
-    def _set_models(self, fitspat=False, fitspec=False):
-        """
-        Set full model and background model.
-
-        Kwargs:
-            fitspat: Fit spatial parameter (default: False).
-            fitspec: Fit spectral parameters (default: False).
-
-        Returns:
-            Tuple containing full model and background model.
-        """
-        # Retrieve full model from observation container
-        full_model = self._obs.models().copy()
-
-        # Get source model
-        model = full_model[self._srcname]
-
-        # Check that model has a Prefactor
-        if not model.has_par("Prefactor"):
-            msg = "Model \""+self._srcname+"\" has no parameter "+\
-                  "\"Prefactor\". Only spectral models with a "+\
-                  "\"Prefactor\" parameter are supported."
-            raise RuntimeError(msg)
-
-        # Fit or fix spatial parameters
-        if fitspat:
-            if model.has_par("RA"):
-                model["RA"].free()
-            if model.has_par("DEC"):
-                model["DEC"].free()
-            if model.has_par("Sigma"):
-                model["Sigma"].free()
-            if model.has_par("Radius"):
-                model["Radius"].free()
-            if model.has_par("Width"):
-                model["Width"].free()
-        else:
-            if model.has_par("RA"):
-                model["RA"].fix()
-            if model.has_par("DEC"):
-                model["DEC"].fix()
-            if model.has_par("Sigma"):
-                model["Sigma"].fix()
-            if model.has_par("Radius"):
-                model["Radius"].fix()
-            if model.has_par("Width"):
-                model["Width"].fix()
-
-        # Fit or fix spectral parameters
-        if fitspec:
-            if model.has_par("Index"):
-                model["Index"].free()
-            if model.has_par("Cutoff"):
-                model["Cutoff"].free()
-        else:
-            if model.has_par("Index"):
-                model["Index"].fix()
-            if model.has_par("Cutoff"):
-                model["Cutoff"].fix()
-
-        # Create background model
-        bkg_model = full_model.copy()
-        bkg_model.remove(self._srcname)
-
-        # Return models
-        return full_model, bkg_model
-
-    def _trial(self, seed, full_model, bkg_model):
-        """
-        Create the TS for a single trial.
-
-        Args:
-            seed:       Random number generator seed
-            full_model: Full model
-            bkg_model:  Background model
-
-        Returns:
+        Returns
+        -------
+        result : dict
             Result dictionary
         """
         # Write header
         if self._logExplicit():
-            self._log.header2("Trial "+str(seed+1))
+            self._log.header2('Trial '+str(seed+1))
+
+        # Set default binned parameters
+        coordsys = 'CEL'
+        proj     = 'TAN'
+        npix     = 0
+        binsz    = 0.0
+
+        # If binned analysis is requested the read the binned parameters
+        if self['enumbins'].integer() != 0:
+            npix     = self['npix'].integer()
+            binsz    = self['binsz'].real()
+            coordsys = self['coordsys'].string()
+            proj     = self['proj'].string()
 
         # Simulate events
         sim = obsutils.sim(self._obs,
-                           nbins=self._enumbins,
-                           seed=seed,
-                           binsz=self._binsz,
-                           npix=self._npix,
-                           log=self._log_clients,
-                           debug=self._debug)
+                           nbins = self['enumbins'].integer(),
+                           seed  = seed,
+                           proj  = proj,
+                           coord = coordsys,
+                           binsz = binsz,
+                           npix  = npix,
+                           log   = self._log_clients,
+                           debug = self['debug'].boolean())
 
         # Determine number of events in simulation
         nevents = 0.0
@@ -241,110 +159,72 @@ class cstsdist(ctools.cscript):
 
         # Write simulation results
         if self._logExplicit():
-            self._log.header3("Simulation")
-            self._log.parformat("Number of simulated events")
+            self._log.header3('Simulation')
+            self._log.parformat('Number of simulated events')
             self._log(nevents)
-            self._log("\n")
+            self._log('\n')
 
-        # Fit background only
-        sim.models(bkg_model)
-        like_bgm   = obsutils.fit(sim,
-                                  log=self._log_clients,
-                                  debug=self._debug)
-        result_bgm = like_bgm.obs().models().copy()
-        LogL_bgm   = like_bgm.opt().value()
-        npred_bgm  = like_bgm.obs().npred()
+        # Fit model
+        fit = ctools.ctlike(sim)
+        fit['debug']   = self['debug'].boolean()
+        fit['chatter'] = self['chatter'].integer()
+        fit.run()
 
-        # Write background fit results
+        # Get model fitting results
+        logL   = fit.opt().value()
+        npred  = fit.obs().npred()
+        models = fit.obs().models()
+        model  = models[self._srcname]
+        ts     = model.ts()
+
+        # Write fit results, either explicit or normal
         if self._logExplicit():
-            self._log.header3("Background model fit")
-            self._log.parformat("log likelihood")
-            self._log(LogL_bgm)
-            self._log("\n")
-            self._log.parformat("Number of predicted events")
-            self._log(npred_bgm)
-            self._log("\n")
-            for model in result_bgm:
-                self._log.parformat("Model")
-                self._log(model.name())
-                self._log("\n")
-                for par in model:
-                    self._log(str(par)+"\n")
-
-        # Fit background and test source
-        sim.models(full_model)
-        like_all   = obsutils.fit(sim,
-                                  log=self._log_clients,
-                                  debug=self._debug)
-        result_all = like_all.obs().models().copy()
-        LogL_all   = like_all.opt().value()
-        npred_all  = like_all.obs().npred()
-        ts         = 2.0*(LogL_bgm-LogL_all)
-
-        # Write background and test source fit results
-        if self._logExplicit():
-            self._log.header3("Background and test source model fit")
-            self._log.parformat("Test statistics")
+            self._log.header3('Test source model fit')
+            self._log.parformat('Test statistics')
             self._log(ts)
-            self._log("\n")
-            self._log.parformat("log likelihood")
-            self._log(LogL_all)
-            self._log("\n")
-            self._log.parformat("Number of predicted events")
-            self._log(npred_all)
-            self._log("\n")
-            for model in result_all:
-                self._log.parformat("Model")
+            self._log('\n')
+            self._log.parformat('log likelihood')
+            self._log(logL)
+            self._log('\n')
+            self._log.parformat('Number of predicted events')
+            self._log(npred)
+            self._log('\n')
+            for model in models:
+                self._log.parformat('Model')
                 self._log(model.name())
-                self._log("\n")
+                self._log('\n')
                 for par in model:
-                    self._log(str(par)+"\n")
-
-        # Write result
-        elif self._logTerse():
-            self._log.parformat("Trial "+str(seed))
-            self._log("TS=")
+                    self._log(str(par)+'\n')
+        elif self._logNormal():
+            self._log.parformat('Trial '+str(seed))
+            self._log('TS=')
             self._log(ts)
-            self._log("  Prefactor=")
-            self._log(result_all[self._srcname]["Prefactor"].value())
-            self._log("+/-")
-            self._log(result_all[self._srcname]["Prefactor"].error())
-            self._log("\n")
+            self._log('  Prefactor=')
+            self._log(model['Prefactor'].value())
+            self._log('+/-')
+            self._log(model['Prefactor'].error())
+            self._log('\n')
 
         # Initialise results
         colnames = []
         values   = {}
 
         # Set TS value
-        colnames.append("TS")
-        values["TS"] = ts
-
-        # Set logL for background fit
-        colnames.append("LogL_bgm")
-        values["LogL_bgm"] = LogL_bgm
-
-        # Set logL for full fit
-        colnames.append("LogL_all")
-        values["LogL_all"] = LogL_all
+        colnames.append('TS')
+        values['TS'] = ts
 
         # Set Nevents
-        colnames.append("Nevents")
-        values["Nevents"] = nevents
+        colnames.append('Nevents')
+        values['Nevents'] = nevents
 
-        # Set Npred for background fit
-        colnames.append("Npred_bkg")
-        values["Npred_bkg"] = npred_bgm
-
-        # Set Npred for full fit
-        colnames.append("Npred_all")
-        values["Npred_all"] = npred_all
+        # Set Npred
+        colnames.append('Npred')
+        values['Npred'] = npred
 
         # Gather free full fit parameters
-        for i in range(result_all.size()):
-            model      = result_all[i]
+        for model in models:
             model_name = model.name()
-            for k in range(model.size()):
-                par = model[k]
+            for par in model:
                 if par.is_free():
 
                     # Set parameter name
@@ -355,7 +235,7 @@ class cstsdist(ctools.cscript):
                     values[name] = par.value()
 
                     # Append error
-                    name = "Unc_"+name
+                    name = 'e_'+name
                     colnames.append(name)
                     values[name] = par.error()
 
@@ -369,7 +249,7 @@ class cstsdist(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -378,75 +258,63 @@ class cstsdist(ctools.cscript):
         # Get parameters
         self._get_parameters()
 
-        # Initialise models
-        full_model, bkg_model = self._set_models()
+        # Set test source model for this observation
+        self.models(modutils.test_source(self._obs.models(), self._srcname))
 
         # Write models into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Models")
-            self._log.header2("Background model")
-            self._log(str(bkg_model))
-            self._log("\n\n")
-            self._log.header2("Full model")
-            self._log(str(full_model))
-            self._log("\n")
+            self._log('\n')
+            self._log.header1('Models')
+            self._log(str(self._obs.models()))
+            self._log('\n')
 
         # Write observation into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Observation")
+            self._log('\n')
+            self._log.header1(gammalib.number('Observation',len(self._obs)))
             self._log(str(self._obs))
-            self._log("\n")
-
-        # Write models into logger
-        if self._logTerse():
-            self._log("\n")
-            self._log.header1("Test model")
-            self._log(str(full_model))
-            self._log("\n")
+            self._log('\n')
+        if self._logExplicit():
+            for obs in self._obs:
+                self._log(str(obs))
+                self._log('\n')
 
         # Write header
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Generate TS distribution")
+            self._log('\n')
+            self._log.header1('Generate TS distribution')
 
         # Loop over trials
-        for seed in range(self._ntrials):
+        for seed in range(self['ntrials'].integer()):
 
             # Make a trial
-            result = self._trial(seed, full_model, bkg_model)
+            result = self._trial(seed)
 
-            # Write out result immediately
-            if seed == 0:
-                f      = open(self._outfile.url(), 'w')
-                writer = csv.DictWriter(f, result['colnames'])
-                headers = {}
-                for n in result['colnames']:
-                    headers[n] = n
-                writer.writerow(headers)
-            else:
-                f = open(self._outfile.url(), 'a')
-            writer = csv.DictWriter(f, result['colnames'])
-            writer.writerow(result['values'])
-            f.close()
+            # Write out trial result
+            ioutils.write_csv_row(self['outfile'].filename().url(), seed,
+                                  result['colnames'], result['values'])
 
         # Return
         return
 
     def models(self, models):
         """
-        Set model.
+        Set model
+
+        Parameters
+        ----------
+        models : `~gammalib.GModels`
+            Model container
         """
         # Copy models
-        self._obs.models(models.copy())
+        self._obs.models(models)
 
         # Return
         return
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

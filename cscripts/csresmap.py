@@ -38,7 +38,7 @@ class csresmap(ctools.cscript):
         """
         # Set name
         self._name    = 'csresmap'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise class members
         self._resmap       = None

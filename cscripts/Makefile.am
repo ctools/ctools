@@ -42,7 +42,10 @@ pythonscripts = $(builddir)/__init__.py \
                 $(srcdir)/csiactcopy.py \
                 $(srcdir)/csiactdata.py \
                 $(srcdir)/csiactobs.py \
-                $(srcdir)/obsutils.py
+                $(srcdir)/obsutils.py \
+                $(srcdir)/modutils.py \
+                $(srcdir)/calutils.py \
+                $(srcdir)/ioutils.py
 
 # Parfiles to be distributed in $(prefix)/syspfiles
 parfiles = $(srcdir)/cscaldb.par \
@@ -203,6 +206,9 @@ clean-local:
 	@if test '@srcdir@' != '@builddir@'; then \
 		rm -rf $(builddir)/cs*.py; \
 		rm -rf $(builddir)/obsutils.py; \
+		rm -rf $(builddir)/modutils.py; \
+		rm -rf $(builddir)/calutils.py; \
+		rm -rf $(builddir)/ioutils.py; \
 		rm -rf $(builddir)/*.par; \
 	fi
 	rm -rf $(builddir)/*.pyc

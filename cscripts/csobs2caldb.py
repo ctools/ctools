@@ -23,6 +23,7 @@ import os
 import datetime
 import gammalib
 import ctools
+from cscripts import calutils
 
 
 # ================= #
@@ -43,11 +44,11 @@ class csobs2caldb(ctools.cscript):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Set name and version
         self._name    = 'csobs2caldb'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise members
         self._observation = gammalib.GCTAObservation()
@@ -137,7 +138,7 @@ class csobs2caldb(ctools.cscript):
 
     def _make_irf_file(self):
         """
-        Creates an IRF FITS file.
+        Creates an IRF FITS file
         """
         # Write header into logger
         if self._logTerse():
@@ -209,59 +210,33 @@ class csobs2caldb(ctools.cscript):
 
     def _make_caldb_index(self):
         """
-        Creates an IRF index FITS file.
+        Creates an IRF index FITS file
         """
         # Write header into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header2("Creating database index file")
+            self._log('\n')
+            self._log.header2('Creating database index file')
 
         # Open calibration database index
-        indx_file = self._base_dir+"/caldb.indx"
+        indx_file = self._base_dir + '/caldb.indx'
         
         # Open index file (or create one if it does not exist)
         cif = gammalib.GFits(indx_file, True)
         
         # Retrieve "CIF" table
-        if cif.contains("CIF"):
-            table = cif.table("CIF")
+        if cif.contains('CIF'):
+            table = cif.table('CIF')
 
-        # ... or create binary table if no "CIF" table exists yet
+        # ... or create binary table if no "CIF" table exists yet, append
+        # binary table to CIF file and return a reference to the appended
+        # table to work with
         else:       
-
-            # Create empty binary table
-            bintable = gammalib.GFitsBinTable()
-            bintable.extname("CIF")
-            bintable.card("CIFVERSN", "1992a", "Version of CIF format")     
-
-            # Append table to FITS file and recover a reference to the
-            # appended table
-            table = cif.append(bintable)
-            
-            # Attach columns. Reference: CAL/GEN/92-008
-            table.append(gammalib.GFitsTableStringCol("TELESCOP", 0, 10))
-            table.append(gammalib.GFitsTableStringCol("INSTRUME", 0, 10))
-            table.append(gammalib.GFitsTableStringCol("DETNAM", 0, 20))
-            table.append(gammalib.GFitsTableStringCol("FILTER", 0, 10))
-            table.append(gammalib.GFitsTableStringCol("CAL_DEV", 0, 20))
-            table.append(gammalib.GFitsTableStringCol("CAL_DIR", 0, 70))
-            table.append(gammalib.GFitsTableStringCol("CAL_FILE", 0, 40))
-            table.append(gammalib.GFitsTableStringCol("CAL_CLAS", 0, 3))
-            table.append(gammalib.GFitsTableStringCol("CAL_DTYP", 0, 4))
-            table.append(gammalib.GFitsTableStringCol("CAL_CNAM", 0, 20))
-            table.append(gammalib.GFitsTableStringCol("CAL_CBD", 0, 70, 9))
-            table.append(gammalib.GFitsTableShortCol("CAL_XNO", 0))
-            table.append(gammalib.GFitsTableStringCol("CAL_VSD", 0, 10))
-            table.append(gammalib.GFitsTableStringCol("CAL_VST", 0, 8))
-            table.append(gammalib.GFitsTableDoubleCol("REF_TIME", 0))
-            table.append(gammalib.GFitsTableShortCol("CAL_QUAL", 0))
-            table.append(gammalib.GFitsTableStringCol("CAL_DATE", 0, 8))
-            table.append(gammalib.GFitsTableStringCol("CAL_DESC", 0, 70))
+            table = cif.append(calutils.create_cif_table())
 
         # Check if output config already exist
         has_config = False
         row_index = -1
-        for caldir in table["CAL_DIR"]:
+        for caldir in table['CAL_DIR']:
             row_index += 1
             if caldir == self._cal_dir:
                 has_config = True
@@ -286,56 +261,56 @@ class csobs2caldb(ctools.cscript):
             today, time = now.split()
             
             # Set element
-            table["TELESCOP"][row] = self._mission
-            table["INSTRUME"][row] = self._caldb
-            table["DETNAM"][row]   = "NONE"
-            table["FILTER"][row]   = "NONE"
-            table["CAL_DEV"][row]  = "ONLINE"
-            table["CAL_CLAS"][row] = "BCF"
-            table["CAL_DTYP"][row] = "DATA"
-            table["CAL_VSD"][row]  = today
-            table["CAL_VST"][row]  = time.split(".")[0]
-            table["REF_TIME"][row] = 51544.0
-            table["CAL_QUAL"][row] = 0
-            table["CAL_CBD"][row]  = "NAME("+self["irf"].string()+")"
-            table["CAL_DATE"][row] = today.replace("-","/")[2:]
-            table["CAL_DIR"][row]  = self._cal_dir
-            table["CAL_FILE"][row] = self._outfile
+            table['TELESCOP'][row] = self._mission
+            table['INSTRUME'][row] = self._caldb
+            table['DETNAM'][row]   = 'NONE'
+            table['FILTER'][row]   = 'NONE'
+            table['CAL_DEV'][row]  = 'ONLINE'
+            table['CAL_CLAS'][row] = 'BCF'
+            table['CAL_DTYP'][row] = 'DATA'
+            table['CAL_VSD'][row]  = today
+            table['CAL_VST'][row]  = time.split('.')[0]
+            table['REF_TIME'][row] = 51544.0
+            table['CAL_QUAL'][row] = 0
+            table['CAL_CBD'][row]  = 'NAME('+self['irf'].string()+')'
+            table['CAL_DATE'][row] = today.replace('-','/')[2:]
+            table['CAL_DIR'][row]  = self._cal_dir
+            table['CAL_FILE'][row] = self._outfile
 
         # Add effective area information
         row = row_index-4
-        table["CAL_CNAM"][row] = "EFF_AREA"
-        table["CAL_DESC"][row] = self._caldb+" effective area"
+        table['CAL_CNAM'][row] = 'EFF_AREA'
+        table['CAL_DESC'][row] = self._caldb+' effective area'
 
         # Add point spread function information
         row = row_index-3
-        table["CAL_CNAM"][row] = "RPSF"
-        table["CAL_DESC"][row] = self._caldb+" point spread function"
+        table['CAL_CNAM'][row] = 'RPSF'
+        table['CAL_DESC'][row] = self._caldb+' point spread function'
         
         # Add energy dispersion information
         row = row_index-2
-        table["CAL_CNAM"][row] = "EDISP"
-        table["CAL_DESC"][row] = self._caldb+" energy dispersion"
+        table['CAL_CNAM'][row] = 'EDISP'
+        table['CAL_DESC'][row] = self._caldb+' energy dispersion'
 
         # Add background information
         row = row_index-1
-        table["CAL_CNAM"][row] = "BGD"
-        table["CAL_DESC"][row] = self._caldb+" background"
+        table['CAL_CNAM'][row] = 'BGD'
+        table['CAL_DESC'][row] = self._caldb+' background'
 
         # Log resulting FITS table and header
         if self._logNormal():
             self._log(str(table))
-            self._log("\n")
+            self._log('\n')
         if self._logExplicit():
             self._log(str(table.header()))
-            self._log("\n")
+            self._log('\n')
         
         # Return CIF FITS file
         return cif
         
     def _make_dirs(self):
         """
-        Make CALDB directories.
+        Make CALDB directories
         """
         # Write header into logger
         if self._logTerse():
@@ -385,7 +360,7 @@ class csobs2caldb(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -396,8 +371,8 @@ class csobs2caldb(ctools.cscript):
         
         # Write input parameters and header into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Creating CALDB entry")
+            self._log('\n')
+            self._log.header1('Creating CALDB entry')
         
         # Create directory structure
         self._make_dirs()
@@ -413,24 +388,24 @@ class csobs2caldb(ctools.cscript):
 
     def save(self):
         """
-        Save calibration database FITS file.
+        Save calibration database FITS file
         """
         # Write header into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save calibration database")
+            self._log('\n')
+            self._log.header1('Save calibration database')
 
         # Set response filename
-        filename = self._rsp_dir + "/" + self._outfile
+        filename = self._rsp_dir + '/' + self._outfile
         
         # Write filenames into logger
         if self._logNormal():
-            self._log(gammalib.parformat("CALDB index file"))
+            self._log(gammalib.parformat('CALDB index file'))
             self._log(self._caldb_inx.filename().url())
-            self._log("\n")
-            self._log(gammalib.parformat("Response file"))
+            self._log('\n')
+            self._log(gammalib.parformat('Response file'))
             self._log(filename)
-            self._log("\n")
+            self._log('\n')
 
         # Save caldb index file
         self._caldb_inx.save(self._clobber())
@@ -443,7 +418,7 @@ class csobs2caldb(ctools.cscript):
         
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()
