@@ -186,7 +186,7 @@ class Test(gammalib.GPythonTestSuite):
         Test make_ts_distributions
         """
         # Set arguments
-        args = '-n 2 -e 0 -t 1800 -d %s' % self._datadir
+        args = '-n 1 -e 0 -t 100 -d %s' % self._datadir
 
         # Execute script
         self._execute_python('make_ts_distributions', args=args)

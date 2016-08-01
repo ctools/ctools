@@ -178,4 +178,4 @@ if __name__ == '__main__':
     obs.models(gammalib.GModels(datadir+'/crab.xml'))
 
     # Run analysis pipeline
-    run_pipeline(obs)
+    run_pipeline(obs, enumbins=10, nxpix=40, nypix=40, binsz=0.1)
