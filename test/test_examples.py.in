@@ -186,7 +186,7 @@ class Test(gammalib.GPythonTestSuite):
         """
         # Execute script
         self._execute_python('make_ts_distributions',
-                             args='-n 2 -e 0 -d 1800 -p '+self._datadir)
+                             args='-n 2 -e 0 -t 1800 -d '+self._datadir)
 
         # Return
         return
@@ -197,7 +197,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_binned_disk
         """
         # Execute script
-        self._execute_python('pipeline_binned_disk', args=self._datadir)
+        self._execute_python('pipeline_binned_disk', args='-d '+self._datadir)
 
         # Return
         return
@@ -208,7 +208,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_binned_mem
         """
         # Execute script
-        self._execute_python('pipeline_binned_mem', args=self._datadir)
+        self._execute_python('pipeline_binned_mem', args='-d '+self._datadir)
 
         # Return
         return
@@ -219,7 +219,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_stacked_disk
         """
         # Execute script
-        self._execute_python('pipeline_stacked_disk', args=self._datadir)
+        self._execute_python('pipeline_stacked_disk', args='-d '+self._datadir)
 
         # Return
         return
@@ -230,7 +230,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_stacked_mem
         """
         # Execute script
-        self._execute_python('pipeline_stacked_mem', args=self._datadir)
+        self._execute_python('pipeline_stacked_mem', args='-d '+self._datadir)
 
         # Return
         return
@@ -241,7 +241,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_unbinned_disk
         """
         # Execute script
-        self._execute_python('pipeline_unbinned_disk', args=self._datadir)
+        self._execute_python('pipeline_unbinned_disk', args='-d '+self._datadir)
 
         # Return
         return
@@ -252,7 +252,7 @@ class Test(gammalib.GPythonTestSuite):
         Test pipeline_unbinned_mem
         """
         # Execute script
-        self._execute_python('pipeline_unbinned_mem', args=self._datadir)
+        self._execute_python('pipeline_unbinned_mem', args='-d '+self._datadir)
 
         # Return
         return

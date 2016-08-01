@@ -89,17 +89,17 @@ if __name__ == '__main__':
 
     # Set usage string
     usage = 'make_ts_distributions.py [-n ntrials] [-e enumbins]'\
-            ' [-d duration] [-m max_threads] [-p datadir]'
+            ' [-t duration] [-m max_threads] [-d datadir]'
 
     # Set default options
     options = [{'option': '-n', 'value': '100'},
                {'option': '-e', 'value': '0'},
-               {'option': '-d', 'value': '180000.0'},
+               {'option': '-t', 'value': '180000.0'},
                {'option': '-m', 'value': '1'},
-               {'option': '-p', 'value': 'data'}]
+               {'option': '-d', 'value': 'data'}]
 
-    # Get options from command line arguments
-    options = cscripts.ioutils.get_arg_options(options, usage)
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
 
     # Extract script parameters from options
     ntrials     = int(options[0]['value'])

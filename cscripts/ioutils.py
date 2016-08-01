@@ -65,12 +65,12 @@ def write_csv_row(outfile, row, colnames, colvalues):
     return
 
 
-# ============================== #
-# Get options from argument list #
-# ============================== #
-def get_arg_options(options, usage):
+# ============================================ #
+# Get arguments and options from argument list #
+# ============================================ #
+def get_args_options(options, usage):
     """
-    Get options from argument list
+    Get arguments and options from argument list
 
     Parameters
     ----------
@@ -81,9 +81,12 @@ def get_arg_options(options, usage):
 
     Returns
     -------
-    options : list of dict
-        Update list of options
+    args, options : tuple of list and list of dict
+        Arguments and updated list of options
     """
+    # Initialise list of arguments
+    args = []
+
     # If there are no command line arguments then show usage string and
     # exit
     if len(sys.argv) < 1:
@@ -96,13 +99,18 @@ def get_arg_options(options, usage):
     # Loop over all arguments
     while i < len(sys.argv):
 
+        # Initialise that no option was found
+        option_found = False
+
         # Search for options
         for option in options:
+
+            # Do we have an option
             if sys.argv[i] == option['option']:
 
                 # If an option has been found then check if there is a
                 # following parameter and extract that parameter as a
-                # string
+                # string. Quit in case that an exception occurs.
                 if len(sys.argv) > i+1:
                     i += 1
                     try:
@@ -110,12 +118,23 @@ def get_arg_options(options, usage):
                     except:
                         print(usage)
                         sys.exit()
+
+                # ... there is no following parameter, hence write out usage
+                # and quite
                 else:
                     print(usage)
                     sys.exit()
 
+                # We can break now as every option should only occur once
+                option_found = True
+                break
+
+        # If no option was found then add the argument to list of arguments
+        if not option_found:
+            args.append(sys.argv[i])
+
         # Next item
         i += 1
 
-    # Return options
-    return options
+    # Return arguments and options
+    return args, options

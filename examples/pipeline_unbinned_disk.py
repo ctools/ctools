@@ -18,94 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import sys
 import gammalib
 import ctools
-from cscripts import obsutils
-
-
-# ================== #
-# Setup observations #
-# ================== #
-def setup_observations(pattern='four', ra=83.63, dec=22.01, offset=1.5,
-                       emin=0.1, emax=100.0, rad=5.0, duration=180.0,
-                       deadc=0.95, caldb='prod2', irf='South_0.5h'):
-    """
-    Returns an observation container
-
-    Parameters
-    ----------
-    pattern : str, optional
-        Pointing pattern, either 'single' or 'four'
-    ra : float, optional
-        Right Ascension of pattern centre (deg)
-    dec : float, optional
-        Declination of pattern centre (deg)
-    offset : float, optional
-        Offset between observations of pattern (deg)
-    emin : float, optional
-        Minimum energy (TeV)
-    emax : float, optional
-        Maximum energy (TeV)
-    rad : float, optional
-        ROI radius used for analysis (deg)
-    duration : float, optional
-        Duration of one CTA observation (s)
-    deadc : float, optional
-        Deadtime correction factor
-    caldb : str, optional
-        Calibration database path
-    irf : str, optional
-        Instrument response function
-
-    Returns
-    -------
-    obs : `~gammalib.GObservations`
-        Observation container
-    """
-    # Set list of observations
-    obs_def_list = obsutils.set_obs_patterns(pattern,
-                                             ra=ra,
-                                             dec=dec,
-                                             offset=offset)
-
-    # Get observation container
-    obs = obsutils.set_obs_list(obs_def_list,
-                                duration=duration,
-                                emin=emin,
-                                emax=emax,
-                                rad=rad,
-                                caldb=caldb,
-                                irf=irf)
-
-    # Return observation container
-    return obs
-
-
-# =========== #
-# Setup model #
-# =========== #
-def setup_model(obs, model='data/crab.xml'):
-    """
-    Setup model for analysis
-
-    Parameters
-    ----------
-    obs : `~gammalib.GObservations`
-        Observation container
-    model : str, optional
-        Model definition XML file
-
-    Returns
-    -------
-    obs : `~gammalib.GObservations`
-        Observation container
-    """
-    # Append model from file to observation container
-    obs.models(gammalib.GModels(model))
-
-    # Return observation container
-    return obs
+import cscripts
 
 
 # ================================ #
@@ -193,17 +108,25 @@ if __name__ == '__main__':
     print('*      CTA unbinned analysis pipeline      *')
     print('********************************************')
 
-    # Get optional arguments
-    if len(sys.argv) == 2:
-        datadir = sys.argv[1]
-    else:
-        datadir = 'data'
+    # Set usage string
+    usage = 'pipeline_unbinned_disk.py [-d datadir]'
+
+    # Set default options
+    options = [{'option': '-d', 'value': 'data'}]
+
+    # Get arguments and options from command line arguments
+    args, options = cscripts.ioutils.get_args_options(options, usage)
+
+    # Extract script parameters from options
+    datadir = options[0]['value']
 
     # Setup observations
-    obs = setup_observations()
+    obs = cscripts.obsutils.set_observations(83.63, 22.01, 5.0, 0.0, 180.0,
+                                             0.1, 100.0, 'South_0.5h', 'prod2',
+                                             pattern='four', offset=1.5)
 
     # Setup model
-    obs = setup_model(obs, model=datadir+'/crab.xml')
+    obs.models(gammalib.GModels(datadir+'/crab.xml'))
 
     # Run analysis pipeline
     run_pipeline(obs, model=datadir+'/crab.xml')
