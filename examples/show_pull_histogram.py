@@ -36,55 +36,6 @@ except:
     sys.exit()
 
 
-# ====================== #
-# Read pull distribution #
-# ====================== #
-def read_pull(filename, parname):
-    """
-    Read pull distribution
-    
-    Parameters
-    ----------
-    filename : str
-        Pull distribution ASCII file
-    parname : str
-        Parameter
-    """
-    # Initialise list
-    values = []
-
-    # Open reader
-    reader = csv.reader(open(filename, 'r'), delimiter=',')
-
-    # Read rows
-    first = True
-    index = -1
-    for row in reader:
-
-        # Get column index if first row
-        if first:
-            try:
-                index = row.index(parname)
-            except:
-                print('ERROR: Parameter "'+parname+'" not found in list:')
-                for p in row:
-                    print('       "'+p+'"')
-                raise NameError(parname)
-
-        # Handle data rows
-        else:
-            values.append(float(row[index]))
-
-        # Flag that first row has been passed
-        first = False
-
-    # Create numpy array
-    a = np.array(values)
-
-    # Return array
-    return a
-
-
 # =================== #
 # Plot pull histogram #
 # =================== #
@@ -104,7 +55,7 @@ def plot_pull_histogram(filename, parname, nbins, plotfile):
         Plot filename
     """
     # Read values from CSV file
-    values = read_pull(filename, parname)
+    values = np.array(cscripts.ioutils.read_pull_values(filename, parname))
 
     # Create histogram
     n, bins, patches = plt.hist(values, nbins, range=[-4.0,4.0],
@@ -112,15 +63,12 @@ def plot_pull_histogram(filename, parname, nbins, plotfile):
 
     # Create expected distribution
     y = mlab.normpdf(bins, 0.0, 1.0)
-    l = plt.plot(bins, y, 'r-', linewidth=2)
-
-    # Set parname for plotting
-    name = parname
+    plt.plot(bins, y, 'r-', linewidth=2)
 
     # Set plot
-    plt.xlabel('Pull ('+name+')')
+    plt.xlabel('Pull ('+parname+')')
     plt.ylabel('Arbitrary units')
-    plt.title(name)
+    plt.title(parname)
     plt.grid(True)
 
     # Show figure

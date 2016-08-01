@@ -65,6 +65,61 @@ def write_csv_row(outfile, row, colnames, colvalues):
     return
 
 
+# ================ #
+# Read pull values #
+# ================ #
+def read_pull_values(filename, parname):
+    """
+    Read pull values from pull distribution ASCII file
+    
+    Parameters
+    ----------
+    filename : str
+        Pull distribution ASCII file
+    parname : str
+        Parameter
+
+    Returns
+    -------
+    values : list of float
+        List of pull values
+
+    Raises
+    ------
+    NameError
+    """
+    # Initialise list of values
+    values = []
+
+    # Open reader
+    reader = csv.reader(open(filename, 'r'), delimiter=',')
+
+    # Read rows
+    first = True
+    index = -1
+    for row in reader:
+
+        # Get column index if first row
+        if first:
+            try:
+                index = row.index(parname)
+            except:
+                print('ERROR: Parameter "'+parname+'" not found in list:')
+                for p in row:
+                    print('       "'+p+'"')
+                raise NameError(parname)
+
+        # Handle data rows
+        else:
+            values.append(float(row[index]))
+
+        # Flag that first row has been passed
+        first = False
+
+    # Return values
+    return values
+
+
 # ============================================ #
 # Get arguments and options from argument list #
 # ============================================ #
