@@ -76,10 +76,10 @@ class Test(test):
         # Setup cspull command
         cmd = cspull+' inmodel="'+self._model+'"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
-                     ' ntrials=3'+ \
+                     ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
-                     ' enumbins=0 tmax=1800.0 deadc=0.95 rad=5.0'+ \
+                     ' enumbins=0 tmax=100.0 deadc=0.95 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd1.log" chatter=1'
 
@@ -97,10 +97,10 @@ class Test(test):
         # Setup cspull command
         cmd = cspull+' inmodel="model_that_does_not_exist.xml"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
-                     ' ntrials=3'+ \
+                     ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
-                     ' enumbins=0 tmax=1800.0 deadc=0.95 rad=5.0'+ \
+                     ' enumbins=0 tmax=100.0 deadc=0.95 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd2.log"'
 
@@ -120,7 +120,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py1.dat'
-        pull['ntrials']  = 3
+        pull['ntrials']  = 2
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
         pull['ra']       = 83.6331
@@ -128,7 +128,7 @@ class Test(test):
         pull['emin']     = 0.1
         pull['emax']     = 100.0
         pull['enumbins'] = 0
-        pull['tmax']     = 1800.0
+        pull['tmax']     = 100.0
         pull['deadc']    = 0.95
         pull['rad']      = 5.0
         pull['logfile']  = 'cspull_py1.log'
@@ -146,7 +146,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py2.dat'
-        pull['ntrials']  = 3
+        pull['ntrials']  = 2
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
         pull['ra']       = 83.6331
@@ -154,7 +154,7 @@ class Test(test):
         pull['emin']     = 0.1
         pull['emax']     = 100.0
         pull['enumbins'] = 10
-        pull['tmax']     = 1800.0
+        pull['tmax']     = 100.0
         pull['deadc']    = 0.95
         pull['rad']      = 5.0
         pull['npix']     = 100
@@ -175,7 +175,7 @@ class Test(test):
         pull['inobs']    = self._events
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py3.dat'
-        pull['ntrials']  = 3
+        pull['ntrials']  = 2
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
         pull['enumbins'] = 0
@@ -197,7 +197,7 @@ class Test(test):
         pull = cscripts.cspull(obs)
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py4.dat'
-        pull['ntrials']  = 3
+        pull['ntrials']  = 2
         pull['caldb']    = self._caldb
         pull['irf']      = self._irf
         pull['enumbins'] = 0
@@ -216,7 +216,7 @@ class Test(test):
         pull['inobs']    = self._inobs
         pull['inmodel']  = self._stacked_model
         pull['outfile']  = 'cspull_py5.dat'
-        pull['ntrials']  = 3
+        pull['ntrials']  = 2
         pull['enumbins'] = 0
         pull['logfile']  = 'cspull_py5.log'
         pull['chatter']  = 4
@@ -235,7 +235,7 @@ class Test(test):
         pull['inobs']    = self._inobs_two
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py6.dat'
-        pull['ntrials']  = 3
+        pull['ntrials']  = 2
         pull['emin']     = 0.02
         pull['emax']     = 100.0
         pull['enumbins'] = 10
@@ -264,8 +264,8 @@ class Test(test):
         pulls = gammalib.GCsv(filename)
 
         # Check dimensions
-        self.test_value(pulls.nrows(), 4,
-                        'Check for 4 rows in pull file')
+        self.test_value(pulls.nrows(), 3,
+                        'Check for 3 rows in pull file')
 
         # Return
         return

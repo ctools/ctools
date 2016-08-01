@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cssens script.
+# This scripts performs unit tests for the cssens script
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -72,7 +72,7 @@ class Test(test):
         cmd = cssens+' inmodel="'+self._model+'"'+ \
                      ' srcname="Crab"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                     ' duration=1800.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
+                     ' duration=500.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
                      ' outfile="cssens_cmd1.dat"'+ \
                      ' logfile="cssens_cmd1.log" chatter=1'
 
@@ -91,7 +91,7 @@ class Test(test):
         cmd = cssens+' inmodel="model_that_does_not_exist.xml"'+ \
                      ' srcname="Crab"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                     ' duration=1800.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
+                     ' duration=500.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
                      ' outfile="cssens_cmd2.dat"'+ \
                      ' logfile="cssens_cmd2.log" chatter=2'
 
@@ -115,7 +115,7 @@ class Test(test):
         sens['caldb']    = self._caldb
         sens['irf']      = self._irf
         sens['outfile']  = 'cssens_py1.dat'
-        sens['duration'] = 1800.0
+        sens['duration'] = 500.0
         sens['rad']      = 3.0
         sens['emin']     = 1.0
         sens['emax']     = 10.0
@@ -144,9 +144,9 @@ class Test(test):
 
         # Check dimensions
         self.test_value(results.nrows(), 2,
-             'Check for 2 rows in sensitivity file')
+             'Check number of rows in sensitivity file')
         self.test_value(results.ncols(), 7,
-             'Check for 7 columns in sensitivity file')
+             'Check number of columns in sensitivity file')
 
         # Return
         return
