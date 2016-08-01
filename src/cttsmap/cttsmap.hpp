@@ -89,6 +89,7 @@ protected:
     GFilename                m_outmap;      //!< Output TS map file name
     bool                     m_apply_edisp; //!< Apply energy dispersion?
     bool                     m_publish;     //!< Publish TS map?
+    bool                     m_errors;      //!< Compute and store parameter errors?
 
     // Parameters to control speed and job splitting
     int                      m_binmin;      //!< Map bin number from which computation should start
@@ -98,7 +99,8 @@ protected:
     // Protected members
     GObservations            m_obs;         //!< Observation container
     GSkyMap                  m_tsmap;       //!< TS map
-    GSkyMap                  m_statusmap;   //!< Map of computed bins
+    GSkyMap                  m_statusmap;   //!< Map of optimizer fit status
+    GSkyMap                  m_progressmap; //!< Map of computed bins
     std::vector<std::string> m_mapnames;    //!< Names of free parameters
     std::vector<GSkyMap>     m_maps;        //!< Sky maps for each free parameter
     GModel*                  m_testsource;  //!< Pointer to test source for TS computation
