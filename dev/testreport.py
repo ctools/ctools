@@ -123,6 +123,10 @@ def report_one_test_suite(xml):
     name     = xml.attribute('name')
     errors   = int(xml.attribute('errors'))
     failures = int(xml.attribute('failures'))
+    time     = float(xml.attribute('time'))
+
+    # Optionally show time
+    #print('%.4f s spent in module "%s"' % (time, name))
 
     # If there are errors or failures then print them
     if errors > 0 or failures > 0:
