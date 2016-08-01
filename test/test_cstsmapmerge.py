@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cstsmapmerge script.
+# This scripts performs unit tests for the cstsmapmerge script
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -119,7 +119,7 @@ class Test(test):
         merge.run()
         merge.save()
 
-        # Check pull distribution file
+        # Check merged TS map
         self._check_result_file('cstsmapmerge_py1.fits')
 
         # Set-up space-separated cstsmapmerge
@@ -132,7 +132,7 @@ class Test(test):
         # Run cstsmapmerge script
         merge.execute()
 
-        # Check pull distribution file
+        # Check merged TS map
         self._check_result_file('cstsmapmerge_py2.fits')
 
         # Set-up wildcard string cstsmapmerge
@@ -145,7 +145,7 @@ class Test(test):
         # Run cstsmapmerge script
         merge.execute()
 
-        # Check pull distribution file
+        # Check merged TS map
         self._check_result_file('cstsmapmerge_py3.fits')
 
         # Set-up ASCII file cstsmapmerge
@@ -158,8 +158,21 @@ class Test(test):
         # Run cstsmapmerge script
         merge.execute()
 
-        # Check pull distribution file
+        # Check merged TS map
         self._check_result_file('cstsmapmerge_py4.fits')
+
+        # Set-up space-separated cstsmapmerge with invalid files
+        merge = cscripts.cstsmapmerge()
+        merge['inmaps']  = self._events+' '+self._model
+        merge['outmap']  = 'cstsmapmerge_py5.fits'
+        merge['logfile'] = 'cstsmapmerge_py5.log'
+        merge['chatter'] = 4
+
+        # Run cstsmapmerge script
+        merge.execute()
+
+        # Check merged TS map
+        #self._check_result_file('cstsmapmerge_py5.fits')
 
         # Return
         return

@@ -30,17 +30,17 @@ import ctools
 # ================== #
 class cstsmapmerge(ctools.cscript):
     """
-    Merge Test Statistic maps.
+    Merge Test Statistic maps
     """
 
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Set name
         self._name    = 'cstsmapmerge'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise class members
         self._files        = None
@@ -64,7 +64,7 @@ class cstsmapmerge(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile.
+        Get parameters from parfile
         """
         # Get input maps string
         inmaps = self['inmaps'].string()
@@ -128,7 +128,12 @@ class cstsmapmerge(ctools.cscript):
  
     def _init_ts_map(self, fitsfile):
         """
-        Initialise Test Statistic map.
+        Initialise Test Statistic map
+
+        Parameters
+        ----------
+        fitsfile : str
+            FITS file to be merged
         """
         # Set filename
         self._in_filename = fitsfile
@@ -140,7 +145,7 @@ class cstsmapmerge(ctools.cscript):
         self._tsmap     = gammalib.GSkyMap()
         self._tsmap.read(fits[0])
         self._statusmap = gammalib.GSkyMap()
-        self._statusmap.read(fits["STATUS MAP"])
+        self._statusmap.read(fits['STATUS MAP'])
         
         # Get other maps 
         self._maps     = []
@@ -150,7 +155,7 @@ class cstsmapmerge(ctools.cscript):
         for hdu in fits:
             
             # Leave out primary and status extension
-            if hdu.extname() != "IMAGE" and hdu.extname() != "STATUS MAP":
+            if hdu.extname() != 'IMAGE' and hdu.extname() != 'STATUS MAP':
                 
                 # Add present maps
                 skymap = gammalib.GSkyMap()
@@ -166,10 +171,12 @@ class cstsmapmerge(ctools.cscript):
 
     def _merge_ts_map(self, fitsfile):
         """
-        Merge TS map from FITS file into output TS map.
+        Merge TS map from FITS file into output TS map
 
-        Args:
-            fitsfile: FITS file to be merged.
+        Parameters
+        ----------
+        fitsfile : str
+            FITS file to be merged
         """
         # Open FITS file
         fits = gammalib.GFits(fitsfile)
@@ -178,7 +185,7 @@ class cstsmapmerge(ctools.cscript):
         add_tsmap     = gammalib.GSkyMap()
         add_tsmap.read(fits[0])
         add_statusmap = gammalib.GSkyMap()
-        add_statusmap.read(fits["STATUS MAP"])
+        add_statusmap.read(fits['STATUS MAP'])
         
         # Get other maps 
         add_maps = []
@@ -187,7 +194,7 @@ class cstsmapmerge(ctools.cscript):
         for hdu in fits:
             
             # Leave out primary and status extension
-            if hdu.extname() != "IMAGE" and hdu.extname() != "STATUS MAP":
+            if hdu.extname() != 'IMAGE' and hdu.extname() != 'STATUS MAP':
                 
                 # Add present maps
                 skymap = gammalib.GSkyMap()
@@ -199,9 +206,9 @@ class cstsmapmerge(ctools.cscript):
         
         # Compare size of maps
         if not len(add_maps) == len(self._maps):
-            msg = "Cannot merge map \""+fitsfile+"\" into map \""+\
-                  self._in_filename+"\" since the number of parameters "\
-                  "between both maps is different."
+            msg = ('Cannot merge map "%s" into map "%s" since the number of '
+                   'parameters between both maps is different.' %
+                   (fitsfile, self._in_filename))
             raise RuntimeError(msg) 
 
         # Loop over bins    
@@ -212,10 +219,10 @@ class cstsmapmerge(ctools.cscript):
                 
                 # Raise exception if this bin has already been computed
                 if self._statusmap[i] > 0.5 and not self._overwrite:
-                    msg = "Attempt to merge bin which apparently has "+\
-                          "already been merged. File \""+fitsfile+"\" "+\
-                          "contains already merged bins. Set hidden "+\
-                          "parameter \"overwrite=yes\" to avoid this error."
+                    msg = ('Attempt to merge bin which apparently has already '
+                           'been merged. File "%s" contains already merged '
+                           'bins. Set hidden parameter "overwrite=yes" to '
+                           'avoid this error.' % fitsfile)
                     raise RuntimeError(msg)
                 
                 # Copy TS values
@@ -233,16 +240,20 @@ class cstsmapmerge(ctools.cscript):
 
     def _get_number_of_ts_pixels(self, fitsfile):
         """
-        Return number of pixels with TS values.
+        Return number of pixels with TS values
 
-        Args:
-            fitsfile: FITS file to be merged.
+        Parameters
+        ----------
+        fitsfile : str
+            FITS file to be merged
 
-        Returns:
-            Number of pixels for which TS has been computed.
+        Returns
+        -------
+        counts : int
+            Number of pixels for which TS has been computed
         """
         # Get status map for this file
-        status = gammalib.GSkyMap(fitsfile+"[STATUS MAP]")
+        status = gammalib.GSkyMap(fitsfile+'[STATUS MAP]')
 
         # Count number of pixels with TS status set
         count = 0
@@ -257,7 +268,7 @@ class cstsmapmerge(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -268,11 +279,11 @@ class cstsmapmerge(ctools.cscript):
         
         # Write header into logger
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Merge TS maps")
+            self._log('\n')
+            self._log.header1('Merge TS maps')
         
         # Initialise file to start with
-        file0              = ""
+        file0              = ''
         self._merged_files = []
         
         # Test files for the entry status map. Use the first one to appear
@@ -282,41 +293,40 @@ class cstsmapmerge(ctools.cscript):
             # Skip file if it's not a FITS file
             if not gammalib.GFilename(fitsfile).is_fits():
                 if self._logExplicit():
-                    self._log(gammalib.parformat("Skip file"))
+                    self._log(gammalib.parformat('Skip file'))
                     self._log(fitsfile)
-                    self._log(" (not a FITS file)\n")
+                    self._log(' (not a FITS file)\n')
                 continue
 
             # Open FITS file
             fits = gammalib.GFits(fitsfile)
 
             # If file contains a status map then use it
-            if fits.contains("STATUS MAP"):
+            if fits.contains('STATUS MAP'):
                 fits.close()
                 file0 = fitsfile
                 if self._logTerse():
-                    self._log(gammalib.parformat("Initial TS map file"))
+                    self._log(gammalib.parformat('Initial TS map file'))
                     self._log(fitsfile)
                     count = self._get_number_of_ts_pixels(fitsfile)
-                    self._log(" (%d TS pixels computed)" % count)
-                    self._log("\n")
+                    self._log(' (%d TS pixels computed)' % count)
+                    self._log('\n')
                 break
 
             # ... otherwise signal that file is useless
             else:
                 fits.close()
                 if self._logExplicit():
-                    self._log(gammalib.parformat("Skip file"))
+                    self._log(gammalib.parformat('Skip file'))
                     self._log(fitsfile)
-                    self._log(" (no \"STATUS MAP\" extension)\n")
+                    self._log(' (no "STATUS MAP" extension)\n')
                 continue
 
         # Signal if no suitable file was found
-        if file0 == "":
+        if file0 == '':
             if self._logTerse():
-                self._log("None of the provided files seems to be a sliced "
-                          "TS map file (none has a \"STATUS MAP\" "
-                          "extension).\n") 
+                self._log('None of the provided files seems to be a sliced '
+                          'TS map file (none has a "STATUS MAP" extension).\n')
         
         # ... otherwise merge files
         else:
@@ -339,21 +349,21 @@ class cstsmapmerge(ctools.cscript):
                 # Skip if file is not FITS
                 if not gammalib.GFilename(fitsfile).is_fits():
                     if self._logExplicit():
-                        self._log(gammalib.parformat("Skip file"))
+                        self._log(gammalib.parformat('Skip file'))
                         self._log(fitsfile)
-                        self._log(" (not a FITS file)\n")
+                        self._log(' (not a FITS file)\n')
                     continue   
 
                 # Open FITS file
                 fits = gammalib.GFits(fitsfile)
                 
                 # Skip if file does not contain status map
-                if not fits.contains("STATUS MAP"):
+                if not fits.contains('STATUS MAP'):
                     fits.close()
                     if self._logExplicit():
-                        self._log(gammalib.parformat("Skip file"))
+                        self._log(gammalib.parformat('Skip file'))
                         self._log(fitsfile)
-                        self._log(" (no \"STATUS MAP\" extension)\n")
+                        self._log(' (no "STATUS MAP" extension)\n')
                     continue
 
                 # Close FITS file
@@ -361,11 +371,11 @@ class cstsmapmerge(ctools.cscript):
                 
                 # Logging
                 if self._logTerse():
-                    self._log(gammalib.parformat("Merge TS map file"))
+                    self._log(gammalib.parformat('Merge TS map file'))
                     self._log(fitsfile)
                     count = self._get_number_of_ts_pixels(fitsfile)
-                    self._log(" (%d TS pixels computed)" % count)
-                    self._log("\n")
+                    self._log(' (%d TS pixels computed)' % count)
+                    self._log('\n')
                     
                 # Merge TS map
                 self._merge_ts_map(fitsfile)
@@ -378,21 +388,21 @@ class cstsmapmerge(ctools.cscript):
 
     def save(self):
         """ 
-        Save TS map and remove slices if requested.
+        Save TS map and remove slices if requested
         """
         # Write header
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save TS map")
+            self._log('\n')
+            self._log.header1('Save TS map')
 
         # Get output filename in case it was not read ahead
-        outmap = self["outmap"].filename()
+        outmap = self['outmap'].filename()
 
         # Log filename
         if self._logTerse():
-            self._log(gammalib.parformat("TS map file"))
+            self._log(gammalib.parformat('TS map file'))
             self._log(outmap.url())
-            self._log("\n")
+            self._log('\n')
         
         # Create FITS file
         fits = gammalib.GFits()
@@ -418,7 +428,7 @@ class cstsmapmerge(ctools.cscript):
         # Write status map if we are not done yet
         if not done:
             self._statusmap.write(fits)
-            fits[fits.size()-1].extname("STATUS MAP")
+            fits[fits.size()-1].extname('STATUS MAP')
         
         # Save FITS file
         fits.saveto(outmap, self._clobber())
@@ -428,16 +438,16 @@ class cstsmapmerge(ctools.cscript):
             for filename in self._merged_files:
                 os.remove(filename)
                 if self._logTerse():
-                    self._log(gammalib.parformat("Deleted input file"))
+                    self._log(gammalib.parformat('Deleted input file'))
                     self._log(filename)
-                    self._log("\n")
+                    self._log('\n')
         
         # Return
         return
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()
