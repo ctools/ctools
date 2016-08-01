@@ -87,53 +87,26 @@ def create_ts(datadir, loge, emin, emax, ntrials=100, duration=180000.0,
 # ======================== #
 if __name__ == '__main__':
 
-    # Get input arguments
-    usage = 'make_ts_distributions.py [-n ntrials] [-e enumbins] [-m max_threads]'
-    if len(sys.argv) < 1:
-        print(usage)
-        sys.exit()
+    # Set usage string
+    usage = 'make_ts_distributions.py [-n ntrials] [-e enumbins]'\
+            ' [-d duration] [-m max_threads] [-p datadir]'
 
-    # Set default parameters
-    ntrials     = 100
-    enumbins    = 0
-    duration    = 180000.0
-    max_threads = 1
-    datadir     = 'data'
+    # Set default options
+    options = [{'option': '-n', 'value': '100'},
+               {'option': '-e', 'value': '0'},
+               {'option': '-d', 'value': '180000.0'},
+               {'option': '-m', 'value': '1'},
+               {'option': '-p', 'value': 'data'}]
 
-    # Parameter dictionnary
-    pars = [{'option': '-n', 'value': ntrials},
-            {'option': '-e', 'value': enumbins},
-            {'option': '-d', 'value': duration},
-            {'option': '-m', 'value': max_threads},
-            {'option': '-p', 'value': datadir}]
+    # Get options from command line arguments
+    options = cscripts.ioutils.get_arg_options(options, usage)
 
-    # Gather parameters from command line
-    i = 1
-    while i < len(sys.argv):
-
-        # Search for options
-        for par in pars:
-            if sys.argv[i] == par['option']:
-                if len(sys.argv) > i+1:
-                    i += 1
-                    try:
-                        par['value'] = int(sys.argv[i])
-                    except:
-                        print(usage)
-                        sys.exit()
-                else:
-                    print(usage)
-                    sys.exit()
-
-        # Next item
-        i += 1
-
-    # Recover parameters
-    ntrials     = pars[0]['value']
-    enumbins    = pars[1]['value']
-    duration    = pars[2]['value']
-    max_threads = pars[3]['value']
-    datadir     = pars[4]['value']
+    # Extract script parameters from options
+    ntrials     = int(options[0]['value'])
+    enumbins    = int(options[1]['value'])
+    duration    = float(options[2]['value'])
+    max_threads = int(options[3]['value'])
+    datadir     = options[4]['value']
 
     # Loop over energy bands. The energy bands are those that are also
     # used for sensitivity computation.

@@ -56,7 +56,7 @@ def get_positions(xmin, xmax, ymin, ymax, step):
     # Initialise positions
     positions = []
 
-    # Determine ystep and number of rows
+    # Determine ystep and number of pointing rows
     ystep   = step * math.sqrt(0.75)
     ny      = int((ymax-ymin)/ystep+1.5)
     rescale = (ymax-ymin)/(ystep*(ny-1))
@@ -67,13 +67,16 @@ def get_positions(xmin, xmax, ymin, ymax, step):
     y = ymin
     for row in range(ny):
 
-        # Determine xstep and number of pointings in row
-        xstep = step / math.cos(gammalib.deg2rad * y)
-        nx    = int((xmax-xmin)/xstep+1.5)
+        # Determine xstep and number of pointings in row. The xstep increases
+        # with the cosine of the latitude so that the distance of the step
+        # is invariant of latitude.
+        xstep   = step / math.cos(gammalib.deg2rad * y)
+        nx      = int((xmax-xmin)/xstep+1.5)
         rescale = (xmax-xmin)/(xstep*(nx-1))
         xstep  *= rescale
 
-        # Set x offset
+        # Set x offset. For every second row the x position is displace by
+        # half a step size.
         if row % 2 == 0:
             x = xmin
         else:
@@ -151,7 +154,9 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
         # Optionally add-in site dependent IRF
         if site != None:
 
-            # Handle automatic site switching
+            # If automatic site switching is requested then set the North
+            # IRF for declinations greater or equal than "autodec" and the
+            # South IRF for declination smaller than "autodec".
             if site == 'Automatic':
                 pos = gammalib.GSkyDir()
                 pos.lb_deg(pnt['x'], pnt['y'])
@@ -160,10 +165,13 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
                     obs_site = 'North'
                 else:
                     obs_site = 'South'
+
+            # ... otherwise use the specified site, North or South
             else:
                 obs_site = site
 
-            # Set site IRF
+            # Set site dependent Prod2 50 hour IRF and add up exposure for
+            # a given site
             caldb = 'prod2'
             if obs_site == 'North':
                 if lst:

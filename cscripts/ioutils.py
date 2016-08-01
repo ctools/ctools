@@ -18,6 +18,7 @@
 #
 # ==========================================================================
 import csv
+import sys
 import gammalib
 import ctools
 
@@ -62,3 +63,59 @@ def write_csv_row(outfile, row, colnames, colvalues):
 
     # Return
     return
+
+
+# ============================== #
+# Get options from argument list #
+# ============================== #
+def get_arg_options(options, usage):
+    """
+    Get options from argument list
+
+    Parameters
+    ----------
+    options : list of dict
+        List of possible options and default values
+    usage : str
+        Usage string to be shown in case of a problem
+
+    Returns
+    -------
+    options : list of dict
+        Update list of options
+    """
+    # If there are no command line arguments then show usage string and
+    # exit
+    if len(sys.argv) < 1:
+        print(usage)
+        sys.exit()
+
+    # First possible option is element 1
+    i = 1
+
+    # Loop over all arguments
+    while i < len(sys.argv):
+
+        # Search for options
+        for option in options:
+            if sys.argv[i] == option['option']:
+
+                # If an option has been found then check if there is a
+                # following parameter and extract that parameter as a
+                # string
+                if len(sys.argv) > i+1:
+                    i += 1
+                    try:
+                        option['value'] = str(sys.argv[i])
+                    except:
+                        print(usage)
+                        sys.exit()
+                else:
+                    print(usage)
+                    sys.exit()
+
+        # Next item
+        i += 1
+
+    # Return options
+    return options

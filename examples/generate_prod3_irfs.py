@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Generates Prod3 IRFs from ROOT performance files.
+# Generates Prod3 IRFs from ROOT performance files
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -30,7 +30,7 @@ def set_prod3_desy(datadir):
     Set Prod3 DESY database
 
     This function sets the calibration database. By adding dictionaries to
-    the db list a number of calibrations can be defined for which IRFs
+    the "db" list a number of calibrations can be defined for which IRFs
     should be generated. All calibrations will be added to the calibration
     database.
 
@@ -44,22 +44,10 @@ def set_prod3_desy(datadir):
     db : list of dict
         Database
     """
-    # Set database attributes
-    path       = datadir
-    file       = 'irf.root'
-    psftype    = 'Gauss'
-    oversample = 3
-    #norm1d     = True   # Will normalise the on-axis 2D IRFs on the 1D IRFs
-    norm1d     = False
-    bgdinfill  = False
-    bgdethres  = 10.0
-
     # Set database content
-    db = [{'inst': 'prod3', 'id': 'South_50h', 'psftype': psftype,
-           'oversample': oversample, 'norm1d': norm1d,
-           'bgdinfill': bgdinfill, 'bgdethres': bgdethres,
-           'path': path, 'file': file}
-         ]
+    db = [{'inst': 'prod3', 'id': 'South_50h', 'analysis': 'DESY',
+           'oversample': 3, 'norm1d': False, 'bgdinfill': False,
+           'bgdethres': 10.0, 'path': datadir, 'file': 'irf.root'}]
 
     # Return database
     return db
@@ -82,36 +70,6 @@ if __name__ == '__main__':
     # Loop over entries
     for entry in entries:
 
-        # Set optional attributes
-        if 'rebin' in entry:
-            rebin = entry['rebin']
-        else:
-            rebin = False
-        if 'eascale' in entry:
-            eascale = entry['eascale']
-        else:
-            eascale = 1.0
-        if 'bgdscale' in entry:
-            bgdscale = entry['bgdscale']
-        else:
-            bgdscale = 1.0
-        if 'bgdethres' in entry:
-            bgdethres = entry['bgdethres']
-        else:
-            bgdethres = 1000.0
-        if 'bgdinfill' in entry:
-            bgdinfill = entry['bgdinfill']
-        else:
-            bgdinfill = False
-        if 'oversample' in entry:
-            oversample = entry['oversample']
-        else:
-            oversample = 1
-        if 'norm1d' in entry:
-            norm1d = entry['norm1d']
-        else:
-            norm1d = False
-
         # Set filename
         filename = entry['path']+'/'+entry['file']
 
@@ -122,15 +80,15 @@ if __name__ == '__main__':
         caldb['inst']          = entry['inst']
         caldb['id']            = entry['id']
         caldb['version']       = entry['inst']
-        caldb['analysis']      = 'DESY'
-        caldb['psftype']       = entry['psftype']
-        caldb['norm1d']        = norm1d
-        caldb['rebin']         = rebin
-        caldb['eascale']       = eascale
-        caldb['bgdscale']      = bgdscale
-        caldb['bgdoversample'] = oversample
-        caldb['bgdethres']     = bgdethres
-        caldb['bgdinfill']     = bgdinfill
+        caldb['analysis']      = entry.setdefault('analysis', 'DESY')
+        caldb['psftype']       = entry.setdefault('psftype', 'Gauss')
+        caldb['norm1d']        = entry.setdefault('norm1d', False)
+        caldb['rebin']         = entry.setdefault('rebin', False)
+        caldb['eascale']       = entry.setdefault('eascale', 1.0)
+        caldb['bgdscale']      = entry.setdefault('bgdscale', 1.0)
+        caldb['bgdoversample'] = entry.setdefault('oversample', 1)
+        caldb['bgdethres']     = entry.setdefault('bgdethres', 1000.0)
+        caldb['bgdinfill']     = entry.setdefault('bgdinfill', False)
         caldb['logfile']       = 'generate_prod3_irfs.log'
 
         # Add CALDB entry

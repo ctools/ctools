@@ -31,9 +31,9 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
     Simulate events for all observations in the container
 
     Simulate events for all observations using ctobssim. If the number of
-    energy bins is positive, the events are then binned in a counts cube
-    using ctbin. If multiple observations are simulated, the counts cube is
-    a stacked cube and the corresponding response cubes are computed using
+    energy bins is positive, the events are binned into a counts cube using
+    ctbin. If multiple observations are simulated, the counts cube is a
+    stacked cube and the corresponding response cubes are computed using
     ctexpcube, ctpsfcube, ctbkgcube and optionally ctedispcube. The response
     cubes are attached to the first observation in the container, which
     normally is the observation with the counts cube.
@@ -203,8 +203,8 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
     Set a single CTA observation
     
     The function sets a single CTA observation containing an empty CTA
-    event list. By looping over this function you can add CTA observations
-    to the observation container.
+    event list. By looping over this function CTA observations can be
+    added to the observation container.
 
     Parameters
     ----------
@@ -235,19 +235,19 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
         CTA observation
     """
     # Allocate CTA observation
-    obs_cta = gammalib.GCTAObservation()
+    obs = gammalib.GCTAObservation()
 
-    # Set calibration database
+    # Set CTA calibration database
     db = gammalib.GCaldb()
     if (gammalib.dir_exists(caldb)):
         db.rootdir(caldb)
     else:
         db.open('cta', caldb)
 
-    # Set pointing direction
+    # Set pointing direction for CTA observation
     pnt = gammalib.GCTAPointing()
     pnt.dir(pntdir)
-    obs_cta.pointing(pnt)
+    obs.pointing(pnt)
 
     # Set ROI
     roi     = gammalib.GCTARoi()
@@ -266,22 +266,26 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 
     # Allocate event list
     events = gammalib.GCTAEventList()
+
+    # Set ROI, GTI and energy boundaries for event list
     events.roi(roi)
     events.gti(gti)
     events.ebounds(ebounds)
-    obs_cta.events(events)
 
-    # Set instrument response
-    obs_cta.response(irf, db)
+    # Set the event list as the events for CTA observation
+    obs.events(events)
 
-    # Set ontime, livetime, and deadtime correction factor
-    obs_cta.ontime(duration)
-    obs_cta.livetime(duration*deadc)
-    obs_cta.deadc(deadc)
-    obs_cta.id(obsid)
+    # Set instrument response for CTA observation
+    obs.response(irf, db)
+
+    # Set ontime, livetime, and deadtime correction factor for CTA observation
+    obs.ontime(duration)
+    obs.livetime(duration*deadc)
+    obs.deadc(deadc)
+    obs.id(obsid)
 
     # Return CTA observation
-    return obs_cta
+    return obs
 
 
 # ============================ #
