@@ -51,14 +51,6 @@ class csroot2caldb(ctools.cscript):
         self._name    = 'csroot2caldb'
         self._version = '1.2.0'
 
-        # Initialise file members
-        self._cif     = None
-        self._ea      = None
-        self._psf     = None
-        self._edisp   = None
-        self._bgd     = None
-        self._hdu_cif = None
-
         # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
@@ -240,18 +232,18 @@ class csroot2caldb(ctools.cscript):
         ----------
         irf : dict
             IRF metadata dictionary
-        dir : dir
+        dir : dict
             Directory structure dictionary
         """
         # Open calibration database index
-        self._cif = gammalib.GFits(dir['BASE_PATH']+'/caldb.indx', True)
+        dir['CIF'] = gammalib.GFits(dir['BASE_PATH']+'/caldb.indx', True)
 
         # If file has no CIF extension than create it now
         try:
-            self._hdu_cif = self._cif.table('CIF')
+            dir['HDU_CIF'] = dir['CIF'].table('CIF')
         except:
-            self._cif.append(calutils.create_cif_table())
-            self._hdu_cif = self._cif.table('CIF')
+            dir['CIF'].append(calutils.create_cif_table())
+            dir['HDU_CIF'] = dir['CIF'].table('CIF')
 
         # Set IRF component filenames
         ea_filename    = dir['EA_PATH']+'/'+dir['EA_FILE']
@@ -261,25 +253,29 @@ class csroot2caldb(ctools.cscript):
 
         # Open IRF component files
         if self['split'].boolean():
-            self._ea    = gammalib.GFits(ea_filename, True)
-            self._psf   = gammalib.GFits(psf_filename, True)
-            self._edisp = gammalib.GFits(edisp_filename, True)
-            self._bgd   = gammalib.GFits(bgd_filename, True)
+            dir['EA_FITS']    = gammalib.GFits(ea_filename, True)
+            dir['PSF_FITS']   = gammalib.GFits(psf_filename, True)
+            dir['EDISP_FITS'] = gammalib.GFits(edisp_filename, True)
+            dir['BGD_FITS']   = gammalib.GFits(bgd_filename, True)
         else:
-            self._ea   = gammalib.GFits(ea_filename, True)
-            self._psf   = self._ea
-            self._edisp = self._ea
-            self._bgd   = self._ea
+            dir['EA_FITS']    = gammalib.GFits(ea_filename, True)
+            dir['PSF_FITS']   = dir['EA_FITS']
+            dir['EDISP_FITS'] = dir['EA_FITS']
+            dir['BGD_FITS']   = dir['EA_FITS']
 
         # Open HDUs
-        self._hdu_ea    = self._open_hdu(self._ea, "EFFECTIVE AREA",
-                                         irf['EA_NAME'], irf['EA_DOC'], irf)
-        self._hdu_psf   = self._open_hdu(self._psf, "POINT SPREAD FUNCTION",
-                                         irf['PSF_NAME'], irf['PSF_DOC'], irf)
-        self._hdu_edisp = self._open_hdu(self._edisp, "ENERGY DISPERSION",
-                                         irf['EDISP_NAME'], irf['EDISP_DOC'], irf)
-        self._hdu_bgd   = self._open_hdu(self._bgd, "BACKGROUND",
-                                         irf['BGD_NAME'], irf['BGD_DOC'], irf)
+        dir['HDU_EA']    = self._open_hdu(dir['EA_FITS'], "EFFECTIVE AREA",
+                                          irf['EA_NAME'], irf['EA_DOC'],
+                                          irf)
+        dir['HDU_PSF']   = self._open_hdu(dir['PSF_FITS'], "POINT SPREAD FUNCTION",
+                                          irf['PSF_NAME'], irf['PSF_DOC'],
+                                          irf)
+        dir['HDU_EDISP'] = self._open_hdu(dir['EDISP_FITS'], "ENERGY DISPERSION",
+                                          irf['EDISP_NAME'], irf['EDISP_DOC'],
+                                          irf)
+        dir['HDU_BGD']   = self._open_hdu(dir['BGD_FITS'], "BACKGROUND",
+                                          irf['BGD_NAME'], irf['BGD_DOC'],
+                                          irf)
 
         # Return
         return
@@ -301,21 +297,21 @@ class csroot2caldb(ctools.cscript):
         self._add_cif_info(irf, dir)
 
         # Save and close CIF
-        self._cif.save(True)
-        self._cif.close()
+        dir['CIF'].save(True)
+        dir['CIF'].close()
 
         # Close all IRF components. If the files have been split all components
         # need to be closed, otherwise only the effective area component needs
         # to be closed as representative for all components.
-        self._ea.save(True)
-        self._ea.close()
+        dir['EA_FITS'].save(True)
+        dir['EA_FITS'].close()
         if self['split'].boolean():
-            self._psf.save(True)
-            self._edisp.save(True)
-            self._bgd.save(True)
-            self._psf.close()
-            self._edisp.close()
-            self._bgd.close()
+            dir['PSF_FITS'].save(True)
+            dir['EDISP_FITS'].save(True)
+            dir['BGD_FITS'].save(True)
+            dir['PSF_FITS'].close()
+            dir['EDISP_FITS'].close()
+            dir['BGD_FITS'].close()
  
         # Return
         return
@@ -412,10 +408,10 @@ class csroot2caldb(ctools.cscript):
         names = ['EA', 'PSF', 'EDISP', 'BGD']
 
         # Initialise CIF row index
-        row = self._hdu_cif.nrows()
+        row = dir['HDU_CIF'].nrows()
 
         # Append rows for all components to CIF extension
-        self._hdu_cif.append_rows(len(names))
+        dir['HDU_CIF'].append_rows(len(names))
 
         # Add information for all components
         for name in names:
@@ -428,30 +424,30 @@ class csroot2caldb(ctools.cscript):
             key_bounds = '%s_BOUNDS' % name
 
             # Set generic information
-            self._hdu_cif['TELESCOP'][row] = irf['CAL_TEL']
-            self._hdu_cif['INSTRUME'][row] = irf['CAL_INST']
-            self._hdu_cif['DETNAM'][row]   = irf['CAL_DET']
-            self._hdu_cif['FILTER'][row]   = irf['CAL_FLT']
-            self._hdu_cif['CAL_DEV'][row]  = 'ONLINE'
-            self._hdu_cif['CAL_CLAS'][row] = irf['CAL_CLASS']
-            self._hdu_cif['CAL_DTYP'][row] = irf['CAL_TYPE']
-            self._hdu_cif['CAL_VSD'][row]  = irf['VAL_DATE']
-            self._hdu_cif['CAL_VST'][row]  = irf['VAL_TIME']
-            self._hdu_cif['REF_TIME'][row] = irf['REF_TIME']
-            self._hdu_cif['CAL_QUAL'][row] = irf['CAL_QUAL']
-            self._hdu_cif['CAL_DATE'][row] = irf['CAL_DATE']
+            dir['HDU_CIF']['TELESCOP'][row] = irf['CAL_TEL']
+            dir['HDU_CIF']['INSTRUME'][row] = irf['CAL_INST']
+            dir['HDU_CIF']['DETNAM'][row]   = irf['CAL_DET']
+            dir['HDU_CIF']['FILTER'][row]   = irf['CAL_FLT']
+            dir['HDU_CIF']['CAL_DEV'][row]  = 'ONLINE'
+            dir['HDU_CIF']['CAL_CLAS'][row] = irf['CAL_CLASS']
+            dir['HDU_CIF']['CAL_DTYP'][row] = irf['CAL_TYPE']
+            dir['HDU_CIF']['CAL_VSD'][row]  = irf['VAL_DATE']
+            dir['HDU_CIF']['CAL_VST'][row]  = irf['VAL_TIME']
+            dir['HDU_CIF']['REF_TIME'][row] = irf['REF_TIME']
+            dir['HDU_CIF']['CAL_QUAL'][row] = irf['CAL_QUAL']
+            dir['HDU_CIF']['CAL_DATE'][row] = irf['CAL_DATE']
 
             # Set component specific information
-            self._hdu_cif['CAL_DIR'][row]   = dir[key_dir]
-            self._hdu_cif['CAL_FILE'][row]  = dir[key_file]
-            self._hdu_cif['CAL_CNAM'][row]  = irf[key_name]
-            self._hdu_cif['CAL_DESC'][row]  = irf[key_desc]
-            self._hdu_cif['CAL_XNO'][row]   = 1
+            dir['HDU_CIF']['CAL_DIR'][row]   = dir[key_dir]
+            dir['HDU_CIF']['CAL_FILE'][row]  = dir[key_file]
+            dir['HDU_CIF']['CAL_CNAM'][row]  = irf[key_name]
+            dir['HDU_CIF']['CAL_DESC'][row]  = irf[key_desc]
+            dir['HDU_CIF']['CAL_XNO'][row]   = 1
             for i in range(9):
                 if i >= len(irf[key_bounds]):
-                    self._hdu_cif['CAL_CBD'][row,i] = 'NONE'
+                    dir['HDU_CIF']['CAL_CBD'][row,i] = 'NONE'
                 else:
-                    self._hdu_cif['CAL_CBD'][row,i] = irf[key_bounds][i]
+                    dir['HDU_CIF']['CAL_CBD'][row,i] = irf[key_bounds][i]
 
             # Increment row index
             row += 1
@@ -474,7 +470,7 @@ class csroot2caldb(ctools.cscript):
         desc : str
             Calibration description
         irf : dict
-            IRF dictionary
+            IRF metadata dictionary
         """
         # Set standard CIF keywords
         hdu.card('CSYSNAME', 'XMA_POL', '')
@@ -503,34 +499,36 @@ class csroot2caldb(ctools.cscript):
 
 
     # ROOT specific private members
-    def _root2caldb(self, irf):
+    def _root2caldb(self, irf, dir):
         """
         Translate ROOT to CALDB information
 
         Parameters
         ----------
         irf : dict
-            IRF dictionary
+            IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Open ROOT performance file
         file = TFile(self['infile'].filename().url())
 
         # Create effective area
-        self._root2ea(file, irf)
+        self._root2ea(file, irf, dir)
 
         # Create point spread function
-        self._root2psf(file, irf)
+        self._root2psf(file, irf, dir)
 
         # Create energy dispersion
-        self._root2edisp(file, irf)
+        self._root2edisp(file, irf, dir)
 
         # Create background
-        self._root2bgd(file, irf)
+        self._root2bgd(file, irf, dir)
 
         # Return
         return
 
-    def _root2ea(self, file, irf):
+    def _root2ea(self, file, irf, dir):
         """
         Translate ROOT to CALDB effective area extension
         
@@ -544,6 +542,8 @@ class csroot2caldb(ctools.cscript):
             ROOT file
         irf : dict
             IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Write header
         if self._logTerse():
@@ -594,24 +594,24 @@ class csroot2caldb(ctools.cscript):
                     ereco.SetBinContent(ieng+1,ioff+1,value)
 
         # Set boundaries (use Ereco boundaries)
-        bounds = self._make_2D(ereco, self._hdu_ea, None, 'm2')
+        bounds = self._make_2D(ereco, dir['HDU_EA'], None, 'm2')
         for b in bounds:
             irf['EA_BOUNDS'].append(b)
 
         # Write boundary keywords
-        self._set_cif_keywords(self._hdu_ea, irf['EA_NAME'],
+        self._set_cif_keywords(dir['HDU_EA'], irf['EA_NAME'],
                                irf['EA_BOUNDS'], irf['EA_DESC'], irf)
 
         # Create "EFFAREA" data column
-        self._make_2D(etrue, self._hdu_ea, 'EFFAREA', 'm2')
+        self._make_2D(etrue, dir['HDU_EA'], 'EFFAREA', 'm2')
 
         # Create "EFFAREA_RECO" data column
-        self._make_2D(ereco, self._hdu_ea, 'EFFAREA_RECO', 'm2')
+        self._make_2D(ereco, dir['HDU_EA'], 'EFFAREA_RECO', 'm2')
 
         # Return
         return
 
-    def _root2psf(self, file, irf):
+    def _root2psf(self, file, irf, dir):
         """
         Translate ROOT to CALDB point spread function extension
         
@@ -621,6 +621,8 @@ class csroot2caldb(ctools.cscript):
             ROOT file
         irf : dict
             IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Write header
         if self._logTerse():
@@ -629,16 +631,16 @@ class csroot2caldb(ctools.cscript):
 
         # King profile PSF
         if self['psftype'].string() == 'King':
-            self._root2psf_king(file, irf)
+            self._root2psf_king(file, irf, dir)
 
         # ... otherwise use Gaussian profile PSF
         else:
-            self._root2psf_gauss(file, irf)
+            self._root2psf_gauss(file, irf, dir)
 
         # Return
         return
 
-    def _root2psf_gauss(self, file, irf):
+    def _root2psf_gauss(self, file, irf, dir):
         """
         Translate ROOT to CALDB point spread function extension
         
@@ -656,6 +658,8 @@ class csroot2caldb(ctools.cscript):
             ROOT file
         irf : dict
             IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Get relevant ROOT histograms
         r68 = file.Get('AngRes_offaxis')
@@ -689,37 +693,37 @@ class csroot2caldb(ctools.cscript):
                 zero.SetBinContent(ieng+1,ioff+1,0.0)
 
         # Set boundaries
-        bounds = self._make_2D(r68, self._hdu_psf, None, 'deg')
+        bounds = self._make_2D(r68, dir['HDU_PSF'], None, 'deg')
         for b in bounds:
             irf['PSF_BOUNDS'].append(b)
         irf['PSF_BOUNDS'].append('PSF(GAUSS)')
 
         # Write boundary keywords
-        self._set_cif_keywords(self._hdu_psf, irf['PSF_NAME'],
+        self._set_cif_keywords(dir['HDU_PSF'], irf['PSF_NAME'],
                                irf['PSF_BOUNDS'], irf['PSF_DESC'], irf)
 
         # Create "SCALE" data column
-        self._make_2D(scale, self._hdu_psf, 'SCALE', '')
+        self._make_2D(scale, dir['HDU_PSF'], 'SCALE', '')
 
         # Create "SIGMA_1" data column
-        self._make_2D(r68, self._hdu_psf, 'SIGMA_1', 'deg')
+        self._make_2D(r68, dir['HDU_PSF'], 'SIGMA_1', 'deg')
 
         # Create "AMPL_2" data column
-        self._make_2D(zero, self._hdu_psf, 'AMPL_2', '')
+        self._make_2D(zero, dir['HDU_PSF'], 'AMPL_2', '')
 
         # Create "SIGMA_2" data column
-        self._make_2D(zero, self._hdu_psf, 'SIGMA_2', 'deg')
+        self._make_2D(zero, dir['HDU_PSF'], 'SIGMA_2', 'deg')
 
         # Create "AMPL_3" data column
-        self._make_2D(zero, self._hdu_psf, 'AMPL_3', '')
+        self._make_2D(zero, dir['HDU_PSF'], 'AMPL_3', '')
 
         # Create "SIGMA_3" data column
-        self._make_2D(zero, self._hdu_psf, 'SIGMA_3', 'deg')
+        self._make_2D(zero, dir['HDU_PSF'], 'SIGMA_3', 'deg')
 
         # Return
         return
 
-    def _root2psf_king(self, file, irf):
+    def _root2psf_king(self, file, irf, dir):
         """
         Translate ROOT to CALDB point spread function extension
         
@@ -733,6 +737,8 @@ class csroot2caldb(ctools.cscript):
             ROOT file
         irf : dict
             IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Get relevant ROOT histograms
         r68 = file.Get('AngRes_offaxis')
@@ -828,25 +834,25 @@ class csroot2caldb(ctools.cscript):
                 sigma2D.SetBinContent(ieng+1,ioff+1,sigma)
 
         # Set boundaries
-        bounds = self._make_2D(r68, self._hdu_psf, None, 'deg')
+        bounds = self._make_2D(r68, dir['HDU_PSF'], None, 'deg')
         for b in bounds:
             irf['PSF_BOUNDS'].append(b)
         irf['PSF_BOUNDS'].append('PSF(KING)')
 
         # Write boundary keywords
-        self._set_cif_keywords(self._hdu_psf, irf['PSF_NAME'],
+        self._set_cif_keywords(dir['HDU_PSF'], irf['PSF_NAME'],
                                irf['PSF_BOUNDS'], irf['PSF_DESC'], irf)
 
         # Create "GAMMA" data column
-        self._make_2D(gamma2D, self._hdu_psf, 'GAMMA', '')
+        self._make_2D(gamma2D, dir['HDU_PSF'], 'GAMMA', '')
 
         # Create "SIGMA" data column
-        self._make_2D(sigma2D, self._hdu_psf, 'SIGMA', 'deg')
+        self._make_2D(sigma2D, dir['HDU_PSF'], 'SIGMA', 'deg')
 
         # Return
         return
 
-    def _root2edisp(self, file, irf):
+    def _root2edisp(self, file, irf, dir):
         """
         Translate ROOT to CALDB energy dispersion extension
         
@@ -859,6 +865,8 @@ class csroot2caldb(ctools.cscript):
             ROOT file
         irf : dict
             IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Write header
         if self._logTerse():
@@ -869,21 +877,21 @@ class csroot2caldb(ctools.cscript):
         matrix = file.Get('EestOverEtrue_offaxis')
 
         # Set boundaries
-        bounds = self._make_3D_migra(matrix, self._hdu_edisp, None, '')
+        bounds = self._make_3D_migra(matrix, dir['HDU_EDISP'], None, '')
         for b in bounds:
             irf['EDISP_BOUNDS'].append(b)
 
         # Write boundary keywords
-        self._set_cif_keywords(self._hdu_edisp, irf['EDISP_NAME'],
+        self._set_cif_keywords(dir['HDU_EDISP'], irf['EDISP_NAME'],
                                irf['EDISP_BOUNDS'], irf['EDISP_DESC'], irf)
 
         # Create "MATRIX" data column
-        self._make_3D_migra(matrix, self._hdu_edisp, 'MATRIX', '')
+        self._make_3D_migra(matrix, dir['HDU_EDISP'], 'MATRIX', '')
 
         # Return
         return
 
-    def _root2bgd(self, file, irf):
+    def _root2bgd(self, file, irf, dir):
         """
         Translate ROOT to CALDB background extension.
         
@@ -896,6 +904,8 @@ class csroot2caldb(ctools.cscript):
             ROOT file
         irf : dict
             IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Write header
         if self._logTerse():
@@ -920,16 +930,16 @@ class csroot2caldb(ctools.cscript):
             self._renorm_onaxis(array, array_1D)
 
         # Set boundaries
-        bounds = self._make_3D(array, self._hdu_bgd, None, 'deg')
+        bounds = self._make_3D(array, dir['HDU_BGD'], None, 'deg')
         for b in bounds:
             irf['BGD_BOUNDS'].append(b)
 
         # Write boundary keywords
-        self._set_cif_keywords(self._hdu_bgd, irf['BGD_NAME'],
+        self._set_cif_keywords(dir['HDU_BGD'], irf['BGD_NAME'],
                                irf['BGD_BOUNDS'], irf['BGD_DESC'], irf)
 
         # Create "BGD" data column
-        self._make_3D(array, self._hdu_bgd, 'BGD', '1/s/MeV/sr')
+        self._make_3D(array, dir['HDU_BGD'], 'BGD', '1/s/MeV/sr')
 
         # Return
         return
@@ -1547,7 +1557,7 @@ class csroot2caldb(ctools.cscript):
 
         # Translate ROOT to CALDB information
         if _has_root:
-            self._root2caldb(irf)
+            self._root2caldb(irf, dir)
 
         # Close calibration files
         self._close(irf, dir)

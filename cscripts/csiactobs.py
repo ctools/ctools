@@ -53,15 +53,12 @@ class csiactobs(ctools.cscript):
         self._obs              = gammalib.GObservations()
         self._ebounds          = gammalib.GEbounds()
         self._datapath         = os.getenv('VHEFITS','')
-        self._inmodels         = gammalib.GModels()
         self._prodname         = ''
         self._xml              = gammalib.GXml()
         self._models           = gammalib.GModels()
         self._runlist          = []
         self._runlistfile      = gammalib.GFilename()
         self._bkgpars          = 0
-        #self._outmodel         = gammalib.GFilename()
-        #self._outobs           = gammalib.GFilename()
         self._master_indx      = ''
         self._use_bkg_scale    = False
         self._ev_hiera         = ['']
@@ -97,10 +94,9 @@ class csiactobs(ctools.cscript):
         if self._datapath == '':
             self._datapath = self['datapath'].string()
         
-        # Check for input models
-        if not self['inmodel'].filename() == 'NONE':
-            self._inmodels = gammalib.GModels(self['inmodel'].filename())
-               
+        # Query input parameters
+        self['inmodel'].filename()
+
         # Expand environment
         self._datapath = gammalib.expand_env(self._datapath)
         
@@ -246,7 +242,6 @@ class csiactobs(ctools.cscript):
         spec : `~gammalib.GModelSpectral()`
             Spectral model for the background shape     
         """
-        
         # Handle constant spectral model 
         if index == 0.0 and self._bkgpars <= 1:
             spec = gammalib.GModelSpectralConst()
@@ -346,8 +341,7 @@ class csiactobs(ctools.cscript):
         model : `~gammalib.GModelData()`
             Background model for IACT observation
         """
-              
-        # handle IrfBackground
+        # Handle IrfBackground
         if bkgtype == 'irf':
             
             # Set parameters to have a constant spectral model
@@ -400,11 +394,63 @@ class csiactobs(ctools.cscript):
         # Return model
         return model
 
+    def _append_inmodels(self):
+        """
+        Append input models
+        """
+        # If there are models provided by "inmodels" then append them now to
+        # the model container
+        filename = self['inmodel'].filename().url()
+        if filename != '' and filename != 'NONE':
+
+            # Write header
+            if self._logTerse():
+                self._log('\n')
+                self._log.header1('Append input models')
+                self._log_value('Input model file', filename)
+
+            # Load input models
+            models = gammalib.GModels(filename)
+
+            # Loop over input models and append them to the model container
+            for model in models:
+                self._models.append(model)
+                if self._logTerse():
+                    self._log_value('Append model', '"'+model.name()+'"')
+
+        # Return
+        return
+
+    def _write_summary(self):
+        """
+        Write observation summary
+        """
+        # Write observation summary
+        if self._logTerse():
+        
+            # Log header
+            self._log('\n')
+            self._log.header1('Observation summary')
+
+            # Set energy range dependent on whether boundaries exist or
+            # not
+            if self._ebounds.size() > 0:
+                erange = '%s - %s' % (str(self._ebounds.emin()),
+                                      str(self._ebounds.emax()))
+            else:
+                erange = 'not available'
+            
+            # Log energy range
+            self._log_value('Energy range', erange)
+
+        # Return
+        return
+
 
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -416,7 +462,7 @@ class csiactobs(ctools.cscript):
         # Clear models
         self._models.clear()
 
-        # Clear xml file and append an observation list
+        # Clear XML file and append an observation list
         self._xml.clear()
         self._xml.append(gammalib.GXmlElement('observation_list title="observation list"'))
         lib = self._xml.element('observation_list', 0)
@@ -467,7 +513,8 @@ class csiactobs(ctools.cscript):
             # Check if psf file is available
             if not gammalib.GFilename(eventfile).is_fits():
                 
-                # Print warning that observation will be skipped since no events are present
+                # Print warning that observation will be skipped since no
+                # events are present
                 if self._logTerse():
                     self._log('Skipping observation '+str(obs_id)+
                               ': eventfile "'+eventfile+'" not found\n')
@@ -633,22 +680,6 @@ class csiactobs(ctools.cscript):
                                                       run_emin.TeV(),
                                                       run_emax.TeV()))
 
-            # Logging
-            if self._logTerse():
-                self._log('Adding observation '+str(obs_id)+
-                          ' ("'+object_name+'")\n')
-
-            # log more details
-            if self._logExplicit():
-                self._log(' Event file: '+eventfile+'\n')
-                self._log(' Effective area: '+aefffile+'\n')
-                self._log(' Point spread function: '+psffile+'\n')
-                self._log(' Energy dispersion: '+edispfile+'\n')
-                self._log(' Background file: '+bkgfile+'\n')  
-                if self._use_bkg_scale:
-                    self._log(' Background scale: '+str(bkg_scale)+'\n')  
-                self._log('\n')
-
             # Append observation to XML and set attributes
             obs = lib.append('observation')
             obs.attribute('name', object_name)
@@ -675,51 +706,38 @@ class csiactobs(ctools.cscript):
             bck = gammalib.GXmlElement('parameter name="Background"')
             bck.attribute('file',bkgfile)
 
-            # assign events and IRFs to observation
+            # Assign events and IRFs to observation
             obs.append(ev)
             obs.append(aeff)
             obs.append(psf)
             obs.append(edisp)
             obs.append(bck)
-            
-        # Continue only if there are observations available
-        if lib.size():
-            
-            # Log header of energy range
-            if self._logTerse():
-                self._log('\n')
-                self._log.header3('Energy range of obervation list')
-            
-            # Logging if energy range is available
-            if self._ebounds.size() > 0:
-                               
-                # Write energy range into log file    
-                self._log(str(self._ebounds.emin())+' - '+str(self._ebounds.emax()))
-                self._log('\n')
-                
-            else:
-               
-                # Write 'not available' into log file    
-                self._log('not available')
-                self._log('\n')
-        
-        else:
-            # Print warning if no observation could be be used from runlist
-            self._log.header2('WARNING: No observation from given runlist available')
 
-        # Append models provided by 'inmodels' if necessary
-        if self._inmodels.size() > 0:
-            
-            # Logging
+            # Log the observation ID and object name that has been appended
             if self._logTerse():
-                self._log('\n')
-                self._log.header1('Appending models')
+                self._log_value('Append observation', '%s ("%s")' %
+                                (obs_id, object_name))
 
-            # Loop over input models    
-            for model in self._inmodels:
-                if self._logTerse():
-                    self._log.header3('Adding model "'+model.name()+'"')
-                self._models.append(model)
+            # Log the file names of the event and response files
+            if self._logExplicit():
+                self._log_value(' Event file', eventfile)
+                self._log_value(' Effective area file', aefffile)
+                self._log_value(' Point spread function file', psffile)
+                self._log_value(' Energy dispersion file', edispfile)
+                self._log_value(' Background file', bkgfile)
+                if self._use_bkg_scale:
+                    self._log_value(' Background scale', bkg_scale)
+
+        # Append models provided by "inmodel" to the model container
+        self._append_inmodels()
+
+        # Write observation summary
+        self._write_summary()
+
+        # Write warning in no observation could be used from runlist
+        if lib.size() == 0:
+            self._log('WARNING: No observation was appended from specified '
+                      'runlist')
 
         # Return
         return       
