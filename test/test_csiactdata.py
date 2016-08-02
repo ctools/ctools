@@ -116,5 +116,21 @@ class Test(test):
         self.test_assert(len(names) > 0,
              'Check successful execution from Python')
 
+        # Set-up csiactdata
+        iactdata = cscripts.csiactdata()
+        iactdata['datapath'] = self._datapath
+        iactdata['logfile']  = 'csiactdata_py2.log'
+        iactdata['chatter']  = 4
+
+        # Run csiactdata script and save run list
+        iactdata.execute()
+        
+        # Get available configs
+        names = iactdata.names()
+        
+        # Check if there is at least one config available
+        self.test_assert(len(names) > 0,
+             'Check successful execution from Python')
+
         # Return
         return
