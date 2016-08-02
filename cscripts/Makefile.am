@@ -152,7 +152,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/models_spectral.xml \
            $(top_srcdir)/test/data/model_filefunction.txt \
            $(top_srcdir)/test/data/model_map.fits.gz \
-           $(top_srcdir)/test/data/model_mapcube.fits.gz
+           $(top_srcdir)/test/data/model_mapcube.fits.gz \
+           $(top_srcdir)/test/data/iact_runlist.dat
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \

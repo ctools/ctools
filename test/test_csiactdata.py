@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the csiactdata script.
+# This scripts performs unit tests for the csiactdata script
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -108,6 +108,13 @@ class Test(test):
         # Run csiactdata script and save run list
         iactdata.logFileOpen()   # Make sure we get a log file
         iactdata.run()
+        
+        # Get available configs
+        names = iactdata.names()
+        
+        # Check if there is at least one config available
+        self.test_assert(len(names) > 0,
+             'Check successful execution from Python')
 
         # Return
         return

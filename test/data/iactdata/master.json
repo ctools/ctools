@@ -3,7 +3,14 @@
         {
             "name": "unit-test",
 	    "obsindx": "obs-index.fits.gz",
-            "hduindx": "hdu-index.fits.gz"
+            "hduindx": "hdu-index.fits.gz",
+	    "comment": "this is a comment"
+        },
+	{
+            "name": "unit-test-that-doesnt-exist",
+	    "obsindx": "badfile.fits.gz",
+            "hduindx": "unavailable_file.fits.gz",
+	    "comment": "this is a comment"
         }
     ]
 }

@@ -95,6 +95,12 @@ class csiactdata(ctools.cscript):
     def _log_configuration(self, config):
         """
         Log configuration
+        
+        Parameters
+        ----------
+        config : dict
+            Dictionary containing data configuration
+
         """
         # Log only if the level is at least "Terse"
         if self._logTerse():
@@ -107,6 +113,8 @@ class csiactdata(ctools.cscript):
             
             # Print additional information
             for key in config:
+                
+                # Skip keys that were treated above
                 if key in ['name','hduindx','obsindx']:
                     continue
                 self._log_value(key, config[key])

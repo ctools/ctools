@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the csiactobs script.
+# This scripts performs unit tests for the csiactobs script
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -44,6 +44,7 @@ class Test(test):
 
         # Set data members
         self._datapath = self._datadir + '/iactdata'
+        self._runlist  = self._datadir + '/iact_runlist.dat'
 
         # Return
         return
@@ -74,10 +75,10 @@ class Test(test):
         # Setup csiactobs command
         cmd = csiactobs+' datapath="'+self._datapath+'"'+ \
                         ' prodname="unit-test"'+ \
-                        ' infile="runlist_cmd1.dat"'+ \
+                        ' infile="'+self._runlist+'"'+ \
                         ' bkgpars=1'+\
-                        ' outobs="obs_iactobs_cmd1.xml"'+ \
-                        ' outmodel="bgd_iactobs_cmd1.xml"'+ \
+                        ' outobs="csiactobs_obs_cmd1.xml"'+ \
+                        ' outmodel="csiactobs_bgd_cmd1.xml"'+ \
                         ' logfile="csiactobs_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -89,23 +90,36 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check observation definition XML file
-        self._check_obsdef('obs_iactobs_cmd1.xml')
+        self._check_obsdef('csiactobs_obs_cmd1.xml')
 
         # Check model definition XML file
-        self._check_moddef('bgd_iactobs_cmd1.xml')
+        self._check_moddef('csiactobs_bgd_cmd1.xml')
 
         # Setup csiactobs command
         cmd = csiactobs+' datapath="data_path_that_does_not_exist"'+ \
                         ' prodname="unit-test"'+ \
-                        ' infile="runlist_cmd1.dat"'+ \
+                        ' infile="'+self._runlist+'"'+ \
                         ' bkgpars=1'+\
-                        ' outobs="obs_iactobs_cmd2.xml"'+ \
-                        ' outmodel="bgd_iactobs_cmd2.xml"'+ \
+                        ' outobs="csiactobs_obs_cmd2.xml"'+ \
+                        ' outmodel="csiactobs_bgd_cmd2.xml"'+ \
                         ' logfile="csiactobs_cmd2.log" chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
-             'Check invalid input file when executed from command line')
+             'Check invalid input datapath when executed from command line')
+        
+        # Setup csiactobs command
+        cmd = csiactobs+' datapath="'+self._datapath+'"'+ \
+                        ' prodname="unit-test-doesnt-exist"'+ \
+                        ' infile="'+self._runlist+'"'+ \
+                        ' bkgpars=1'+\
+                        ' outobs="csiactobs_obs_cmd3.xml"'+ \
+                        ' outmodel="csiactobs_bgd_cmd3.xml"'+ \
+                        ' logfile="csiactobs_cmd3.log" chatter=1'       
+
+        # Check if execution failed
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input prodname when executed from command line')
 
         # Return
         return
@@ -119,10 +133,10 @@ class Test(test):
         iactobs = cscripts.csiactobs()
         iactobs['datapath'] = self._datapath
         iactobs['prodname'] = 'unit-test'
-        iactobs['infile']   = 'runlist_py1.dat'
+        iactobs['infile']   = self._runlist
         iactobs['bkgpars']  = 1
-        iactobs['outobs']   = 'obs_iactobs_py1.xml'
-        iactobs['outmodel'] = 'bgd_iactobs_py1.xml'
+        iactobs['outobs']   = 'csiactobs_obs_py1.xml'
+        iactobs['outmodel'] = 'csiactobs_bgd_py1.xml'
         iactobs['logfile']  = 'csiactobs_py1.log'
         iactobs['chatter']  = 2
 
@@ -132,10 +146,88 @@ class Test(test):
         iactobs.save()
 
         # Check observation definition XML file
-        self._check_obsdef('obs_iactobs_py1.xml')
+        self._check_obsdef('csiactobs_obs_py1.xml')
         
         # Check model definition XML file
-        self._check_moddef('bgd_iactobs_py1.xml')
+        self._check_moddef('csiactobs_bgd_py1.xml')
+        
+        # Create test runlist
+        runlist = ['0']
+           
+        # Set-up csiactobs using a runlist with 2 background parameters
+        iactobs = cscripts.csiactobs()
+        iactobs['datapath'] = self._datapath
+        iactobs['prodname'] = 'unit-test'
+        iactobs['bkgpars']  = 2
+        iactobs['outobs']   = 'csiactobs_obs_py2.xml'
+        iactobs['outmodel'] = 'csiactobs_bgd_py2.xml'
+        iactobs['logfile']  = 'csiactobs_py2.log'
+        iactobs['chatter']  = 3
+        iactobs.runlist(runlist)
+   
+        # Run csiactobs script and save run list
+        iactobs.logFileOpen()   # Make sure we get a log file
+        iactobs.run()
+        iactobs.save()
+           
+        # Test return functions
+        self.test_value(iactobs.obs().size(), 1,
+                        'Check number of observations in container')
+        self.test_value(iactobs.ebounds().size(), 0,
+                        'Check number of energy boundaries')
+   
+        # Check observation definition XML file
+        self._check_obsdef('csiactobs_obs_py2.xml')
+           
+        # Check model definition XML file
+        self._check_moddef('csiactobs_bgd_py2.xml')
+           
+        # Set-up csiactobs with a large number of free parameters and "aeff"
+        # background
+        iactobs = cscripts.csiactobs()
+        iactobs['datapath']      = self._datapath
+        iactobs['prodname']      = 'unit-test'
+        iactobs['infile']        = self._runlist
+        iactobs['bkgpars']       = 8
+        iactobs['bkg_mod_hiera'] = 'aeff'
+        iactobs['outobs']        = 'csiactobs_obs_py3.xml'
+        iactobs['outmodel']      = 'csiactobs_bgd_py3.xml'
+        iactobs['logfile']       = 'csiactobs_py3.log'
+        iactobs['chatter']       = 4
+    
+        # Execute csiactobs script
+        iactobs.execute()
+        
+        # Check observation definition XML file
+        self._check_obsdef('csiactobs_obs_py3.xml')
+            
+        # Check model definition XML file
+        self._check_moddef('csiactobs_bgd_py3.xml')
+            
+        # Set-up csiactobs with a "gauss" background and "inmodel" parameter
+        iactobs = cscripts.csiactobs()
+        iactobs['datapath']      = self._datapath
+        iactobs['inmodel']       = self._model
+        iactobs['prodname']      = 'unit-test'
+        iactobs['infile']        = self._runlist
+        iactobs['bkgpars']       = 1
+        iactobs['bkg_mod_hiera'] = 'gauss'
+        iactobs['outobs']        = 'NONE'
+        iactobs['outmodel']      = 'NONE'
+        iactobs['logfile']       = 'csiactobs_py4.log'
+        iactobs['chatter']       = 4
+   
+        # Run csiactobs script
+        iactobs.logFileOpen()   # Make sure we get a log file
+        iactobs.run()
+        
+        # Check number of observations
+        self.test_value(iactobs.obs().size(), 1,
+                        'Check number of observations in container')
+
+        # Check number of models
+        self.test_value(iactobs.obs().models().size(), 3,
+                        'Check number of models in container')
 
         # Return
         return
@@ -154,34 +246,26 @@ class Test(test):
         # Check number of observations
         self.test_value(obs.size(), 1,
                         'Check for single observation in XML file')
-        self.test_assert(obs[0].eventfile().file() == 'events.fits.gz',
-                         'Check event file name')
-        self.test_assert(obs[0].eventfile().extname() == 'EVENTS',
-                         'Check event extension name')
-        self.test_assert(rsp.aeff().filename().file() ==
-                         'irf_file.fits.gz',
-                         'Check effective area name')
-        self.test_assert(rsp.aeff().filename().extname() ==
-                         'EFFECTIVE AREA',
-                         'Check effective area extension name')
-        self.test_assert(rsp.psf().filename().file() ==
-                         'irf_file.fits.gz',
-                         'Check point spread function name')
-        self.test_assert(rsp.psf().filename().extname() ==
-                         'POINT SPREAD FUNCTION',
-                         'Check point spread function extension name')
-        self.test_assert(rsp.edisp().filename().file() ==
-                         'irf_file.fits.gz',
-                         'Check energy dispersion name')
-        self.test_assert(rsp.edisp().filename().extname() ==
-                         'ENERGY DISPERSION',
-                         'Check energy dispersion extension name')
-        self.test_assert(rsp.background().filename().file() ==
-                         'irf_file.fits.gz',
-                         'Check background name')
-        self.test_assert(rsp.background().filename().extname() ==
-                         'BACKGROUND',
-                         'Check background extension name')
+        self.test_value(obs[0].eventfile().file(), 'events.fits.gz',
+                        'Check event file name')
+        self.test_value(obs[0].eventfile().extname(), 'EVENTS',
+                        'Check event extension name')
+        self.test_value(rsp.aeff().filename().file(), 'irf_file.fits.gz',
+                        'Check effective area file name')
+        self.test_value(rsp.aeff().filename().extname(), 'EFFECTIVE AREA',
+                        'Check effective area extension name')
+        self.test_value(rsp.psf().filename().file(), 'irf_file.fits.gz',
+                        'Check point spread function file name')
+        self.test_value(rsp.psf().filename().extname(), 'POINT SPREAD FUNCTION',
+                        'Check point spread function extension name')
+        self.test_value(rsp.edisp().filename().file(), 'irf_file.fits.gz',
+                        'Check energy dispersion file name')
+        self.test_value(rsp.edisp().filename().extname(), 'ENERGY DISPERSION',
+                        'Check energy dispersion extension name')
+        self.test_value(rsp.background().filename().file(), 'irf_file.fits.gz',
+                        'Check background file name')
+        self.test_value(rsp.background().filename().extname(), 'BACKGROUND',
+                        'Check background extension name')
         
         # Return
         return

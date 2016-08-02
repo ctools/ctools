@@ -91,7 +91,18 @@ class csiactcopy(ctools.cscript):
     def _copy(self, source, clobber):     
         """
         Copy file to outpath
+        
+        Parameters
+        ----------
+        source : string
+            Path of file to be copied
+
+        Returns
+        -------
+        filesize : float
+            Size of the file that was copied
         """
+        
         # Get file destination
         destination = os.path.join(self._outpath,
                                    os.path.relpath(source, self._remote_base))
@@ -147,10 +158,21 @@ class csiactcopy(ctools.cscript):
     def _merge(self, localfits, remotefits, hduname, clobber):
         """
         Merge remote and local fits files
-        
         If the local fits file is not present, a new one is created.
+        
+        Parameters
+        ----------
+        localfits : string
+            Path of local index FITS file         
+        remotefits : string
+            Path of remote index FITS file         
+        hduname : string
+            Name of HDU extension to be merged       
+        clobber : bool
+            Flag if remote content should overwrite local content        
         """    
-        # ...
+        
+        # Logging
         if self._logTerse():
             self._log_value('Local file', localfits)
             self._log_value('Remote file', remotefits)
@@ -214,7 +236,7 @@ class csiactcopy(ctools.cscript):
                 tmp_hdu = remote[hduname]
                 
                 # Get old size of remote HDU
-                size = remote_hdu.size()
+                size = remote_hdu.nrows()
                 
                 # Extend remote HDU
                 remote_hdu.append_rows(tmp_hdu.nrows())
@@ -229,8 +251,8 @@ class csiactcopy(ctools.cscript):
         robs_col   = remote_hdu['OBS_ID']
         for obs_id in robs_col:
             remote_obs.append(obs_id)
-
-        # Dump the number of remote and local entries
+        
+        # Log entries of index files   
         if self._logTerse():
             self._log_value('Remote entries', len(remote_obs))
             self._log_value('Local entries', len(local_obs))
@@ -250,12 +272,18 @@ class csiactcopy(ctools.cscript):
                     
                     # Remove local obs_id entries
                     table_has_obsid = True
+                    
+                    # Loop over obs ids and overwrite with remote content
                     while table_has_obsid:
+                        
+                        # First remove old rows
                         for i in range(local_hdu.nrows()):
                             if remote_obs_id == local_hdu['OBS_ID'][i]:
                                 local_hdu.remove_rows(i,1)
                                 removed_rows += 1
                                 break
+                        
+                        # Replace with remote content
                         table_has_obsid = False
                         for i in range(local_hdu.nrows()):
                             if remote_obs_id == local_hdu['OBS_ID'][i]:
@@ -290,8 +318,8 @@ class csiactcopy(ctools.cscript):
         
         # Add remote HDUs
         local_hdu.insert_rows(old_local_rows, remote_hdu.nrows())
-
-        # Dump ...
+        
+        # Log actions
         if self._logTerse():
             if clobber:
                 what = 'Removed local rows'
@@ -344,6 +372,8 @@ class csiactcopy(ctools.cscript):
         # Check if runlist file is available
         if self._runlist.exists():
             runfile = open(self._runlist.url())
+            
+            # Read runlist
             for line in runfile.readlines():
                 if len(line) == 0:
                     continue
@@ -351,6 +381,8 @@ class csiactcopy(ctools.cscript):
                     continue
                 if len(line.split()) > 0:
                     self._runs.append(int(line.split()[0]))
+            
+            # Close runlist file
             runfile.close()   
             
             # Logging
@@ -428,8 +460,8 @@ class csiactcopy(ctools.cscript):
                 # Initialise flag if SIZE column is present
                 has_size = table.contains('SIZE')
                 
+                # Initialise file size
                 if has_size:
-                    # Initialise file size
                     cp_size = 0
                 
                 # Initialise remote observation IDs
@@ -439,6 +471,8 @@ class csiactcopy(ctools.cscript):
                 
                 # Log runs that are not available remotely
                 for run in self._runs:
+                    
+                    # Check for run not in remote data store
                     if not run in remote_ids:  
                         if self._logNormal():
                             self._log('Skip observation '+str(run)+': ')
@@ -529,16 +563,22 @@ class csiactcopy(ctools.cscript):
             self._log('\n')
             self._log.header1('Copying files')
         
-        # intialise counter
+        # Intialise counter
         k = 0
     
-        # initialise values for logging
+        # Initialise values for logging
         last_fraction      =  0.0
         fraction_increment = 20.0
+        
+        # Use 10% step increase
         if self._logNormal():
             fraction_increment = 10.0
+            
+        # Use 5% step increase
         if self._logTerse():
             fraction_increment = 5.0
+        
+        # Use 2% step increase
         if self._logExplicit():
             fraction_increment = 2.0
         
@@ -552,6 +592,8 @@ class csiactcopy(ctools.cscript):
             # Log progress
             fraction = float(k) / float(len(files)) * 100.0
             while fraction > last_fraction:
+                
+                # Print status of copying procedure
                 if self._logNormal() and not self._logVerbose():
                     self._log_value('Status', '%d %%' % int(last_fraction))
                 last_fraction += fraction_increment
@@ -565,7 +607,7 @@ class csiactcopy(ctools.cscript):
                 total_size += filesize
                 n_copied   += 1
             
-            # Increment counter
+            # Increment file counter
             k += 1
         
         # Logging
@@ -573,14 +615,17 @@ class csiactcopy(ctools.cscript):
             self._log.parformat('Status')
             self._log('Finished')
             self._log('\n')
+        
+        # Logging about index files
         if self._logTerse():
             self._log('\n')
             self._log.header1('Updating index files')
         
-        # Build local index file names
+        # Build local hdu index file name
         local_hdu = os.path.join(self._outpath,
                                  os.path.relpath(remote_hdu,
                                                  self._remote_base))
+        # Build local obs index file name
         local_obs = os.path.join(self._outpath,
                                  os.path.relpath(remote_obs,
                                                  self._remote_base))
@@ -596,6 +641,7 @@ class csiactcopy(ctools.cscript):
             # Merge remote index files with local files
             self._merge(local_hdu, remote_hdu, 'HDU_INDEX', self._clobber())
             
+            # Logging
             if self._logTerse():
                 self._log('\n')
                 self._log.header3('OBS index')
@@ -607,7 +653,8 @@ class csiactcopy(ctools.cscript):
             # If all files were copied, just copy index files too
             self._copy(remote_hdu, self._clobber())
             self._copy(remote_obs, self._clobber())
-  
+        
+        # Logging
         if self._logTerse():
             self._log('\n')
             self._log.header3('Master index file')
