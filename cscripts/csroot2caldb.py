@@ -39,7 +39,7 @@ except:
 # ================== #
 class csroot2caldb(ctools.cscript):
     """
-    Generates IRFs in CALDB from a ROOT offaxis performance file.
+    Generates IRFs in CALDB from a ROOT offaxis performance file
     """
 
     # Constructor
@@ -51,9 +51,8 @@ class csroot2caldb(ctools.cscript):
         self._name    = 'csroot2caldb'
         self._version = '1.2.0'
 
-        # Initialise some members
+        # Initialise file members
         self._cif     = None
-        self._irf     = None
         self._ea      = None
         self._psf     = None
         self._edisp   = None
@@ -80,6 +79,7 @@ class csroot2caldb(ctools.cscript):
         self['analysis'].string()
         self['version'].string()
         self['psftype'].string()
+        self['split'].boolean()
         self['norm1d'].boolean()
         self['rebin'].boolean()
         self['eascale'].real()
@@ -90,64 +90,66 @@ class csroot2caldb(ctools.cscript):
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
 
         # Return
         return
 
-    def _initialise(self):
-
-        # Set CALDB information
-        self._cal_tel      = "CTA"
-        self._cal_inst     = self["inst"].string().upper()
-        self._cal_obsid    = self["id"].string()
-        self._cal_det      = "NONE"
-        self._cal_flt      = "NONE"
-        self._cal_class    = "BCF"
-        self._cal_type     = "DATA"
-        self._cal_qual     = 0            # 0=good, 1=bad, 2=dubious, ...
-        self._cal_date     = "14/01/30"
-        self._val_date     = "2014-01-30"
-        self._val_time     = "00:00:00"
-        self._ref_time     = 51544.0
-        self._cal_name     = "NAME("+self["id"].string()+")"
-        self._cal_version  = "VERSION("+self["version"].string()+")"
-        self._cal_cut      = "CLASS(BEST)"
-        self._cal_analysis = "ANALYSIS("+self["analysis"].string()+")"
-        #
-        self._ea_name      = "EFF_AREA"
-        self._ea_doc       = "CAL/GEN/92-019"
-        self._ea_bounds    = [self._cal_name, self._cal_version,
-                              self._cal_cut, self._cal_analysis]
-        self._ea_desc      = "CTA effective area"
-        #
-        self._psf_name     = "RPSF"
-        self._psf_doc      = "CAL/GEN/92-020"
-        self._psf_bounds   = [self._cal_name, self._cal_version,
-                              self._cal_cut, self._cal_analysis]
-        self._psf_desc     = "CTA point spread function"
-        #
-        self._edisp_name   = "EDISP"
-        self._edisp_doc    = "???"
-        self._edisp_bounds = [self._cal_name, self._cal_version,
-                              self._cal_cut, self._cal_analysis]
-        self._edisp_desc   = "CTA energy dispersion"
-        #
-        self._bgd_name     = "BGD"
-        self._bgd_doc      = "???"
-        self._bgd_bounds   = [self._cal_name, self._cal_version,
-                              self._cal_cut, self._cal_analysis]
-        self._bgd_desc     = "CTA background"
-
-        # Create directory structure
-        self._make_dirs()
-
-        # Return
-        return
-
-    def _make_dirs(self):
+    def _init_metadata(self):
         """
-        Generate CALDB directory structure for one observation identifier.
+        Initialise dictionary containing the IRF metadata
+
+        Returns
+        -------
+        irf : dict
+            IRF metadata dictionary
+        """
+        # Initialise IRF metadata dictionary
+        irf = {}
+
+        # Set calibration information
+        cal_name     = 'NAME('+self['id'].string()+')'
+        cal_version  = 'VERSION('+self['version'].string()+')'
+        cal_cut      = 'CLASS(BEST)'
+        cal_analysis = 'ANALYSIS('+self['analysis'].string()+')'
+
+        # Set IRF information
+        irf['CAL_TEL']      = 'CTA'
+        irf['CAL_INST']     = self['inst'].string().upper()
+        irf['CAL_OBSID']    = self['id'].string()
+        irf['CAL_DET']      = 'NONE'
+        irf['CAL_FLT']      = 'NONE'
+        irf['CAL_CLASS']    = 'BCF'
+        irf['CAL_TYPE']     = 'DATA'
+        irf['CAL_QUAL']     = 0            # 0=good, 1=bad, 2=dubious, ...
+        irf['CAL_DATE']     = '14/01/30'
+        irf['VAL_DATE']     = '2014-01-30'
+        irf['VAL_TIME']     = '00:00:00'
+        irf['REF_TIME']     = 51544.0
+        irf['EA_NAME']      = 'EFF_AREA'
+        irf['EA_DOC']       = 'CAL/GEN/92-019'
+        irf['EA_BOUNDS']    = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['EA_DESC']      = 'CTA effective area'
+        irf['PSF_NAME']     = 'RPSF'
+        irf['PSF_DOC']      = 'CAL/GEN/92-020'
+        irf['PSF_BOUNDS']   = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['PSF_DESC']     = 'CTA point spread function'
+        irf['EDISP_NAME']   = 'EDISP'
+        irf['EDISP_DOC']    = '???'
+        irf['EDISP_BOUNDS'] = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['EDISP_DESC']   = 'CTA energy dispersion'
+        irf['BGD_NAME']     = 'BGD'
+        irf['BGD_DOC']      = '???'
+        irf['BGD_BOUNDS']   = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['BGD_DESC']     = 'CTA background'
+
+        # Return metadata
+        return irf
+
+    def _make_dirs(self, version, irf):
+        """
+        Generate CALDB directory structure for one observation identifier
+        
         The structure is given by
 
             data/<tel>/<inst>/bcf/<obsid>
@@ -155,172 +157,193 @@ class csroot2caldb(ctools.cscript):
         where <tel> is "cta" and <inst> is the instrument specified in the
         CALDB constructor (the instrument may be used for different array
         configurations).
+
+        Parameters
+        ----------
+        version : str
+            Version string
+        irf : dict
+            IRF metadata dictionary
+
+        Returns
+        -------
+        dir : dict
+            Directory structure information
         """
+        # Initialise directory structure dictionary
+        dir = {}
+
         # Set base directory
-        base_dir  = "data"
-        base_dir += "/"+self._cal_tel.lower()
-        base_dir += "/"+self._cal_inst.lower()
+        base_dir  = 'data'
+        base_dir += '/'+irf['CAL_TEL'].lower()
+        base_dir += '/'+irf['CAL_INST'].lower()
 
         # Set directory names
-        obs_dir         = base_dir+"/bcf/"+self._cal_obsid
-        self._ea_dir    = obs_dir
-        self._psf_dir   = obs_dir
-        self._edisp_dir = obs_dir
-        self._bgd_dir   = obs_dir
+        obs_dir          = base_dir+'/bcf/'+irf['CAL_OBSID']
+        dir['EA_DIR']    = obs_dir
+        dir['PSF_DIR']   = obs_dir
+        dir['EDISP_DIR'] = obs_dir
+        dir['BGD_DIR']   = obs_dir
 
-        # Optionally prefix path
-        outdir = self["outdir"].string()
+        # Set path to response components. If the "outdir" parameter is set
+        # then prefix the value to the path of the response components
+        outdir = self['outdir'].string()
         if len(outdir) > 0:
-            self._base_path  = outdir+"/"+base_dir
-            self._ea_path    = outdir+"/"+self._ea_dir
-            self._psf_path   = outdir+"/"+self._psf_dir
-            self._edisp_path = outdir+"/"+self._edisp_dir
-            self._bgd_path   = outdir+"/"+self._bgd_dir
+            dir['BASE_PATH']  = outdir+'/'+base_dir
+            dir['EA_PATH']    = outdir+'/'+dir['EA_DIR']
+            dir['PSF_PATH']   = outdir+'/'+dir['PSF_DIR']
+            dir['EDISP_PATH'] = outdir+'/'+dir['EDISP_DIR']
+            dir['BGD_PATH']   = outdir+'/'+dir['BGD_DIR']
         else:
-            self._base_path  = base_dir
-            self._ea_path    = self._ea_dir
-            self._psf_path   = self._psf_dir
-            self._edisp_path = self._edisp_dir
-            self._bgd_path   = self._bgd_dir
+            dir['BASE_PATH']  = base_dir
+            dir['EA_PATH']    = dir['EA_DIR']
+            dir['PSF_PATH']   = dir['PSF_DIR']
+            dir['EDISP_PATH'] = dir['EDISP_DIR']
+            dir['BGD_PATH']   = dir['BGD_DIR']
+
+        # Set IRF component file names. If the "split" parameter is "yes" then
+        # split the IRF components over several files.
+        if self['split'].boolean():
+            dir['EA_FILE']    = 'ea_'+version+'.fits'
+            dir['PSF_FILE']   = 'psf_'+version+'.fits'
+            dir['EDISP_FILE'] = 'edisp_'+version+'.fits'
+            dir['BGD_FILE']   = 'bgd_'+version+'.fits'
+        else:
+            dir['EA_FILE']    = 'irf_'+version+'.fits'
+            dir['PSF_FILE']   = 'irf_'+version+'.fits'
+            dir['EDISP_FILE'] = 'irf_'+version+'.fits'
+            dir['BGD_FILE']   = 'irf_'+version+'.fits'
 
         # Create directory structure
-        if not os.path.isdir(self._ea_path):
-            os.makedirs(self._ea_path)
-        if not os.path.isdir(self._psf_path):
-            os.makedirs(self._psf_path)
-        if not os.path.isdir(self._edisp_path):
-            os.makedirs(self._edisp_path)
-        if not os.path.isdir(self._bgd_path):
-            os.makedirs(self._bgd_path)
+        if not os.path.isdir(dir['EA_PATH']):
+            os.makedirs(dir['EA_PATH'])
+        if not os.path.isdir(dir['PSF_PATH']):
+            os.makedirs(dir['PSF_PATH'])
+        if not os.path.isdir(dir['EDISP_PATH']):
+            os.makedirs(dir['EDISP_PATH'])
+        if not os.path.isdir(dir['BGD_PATH']):
+            os.makedirs(dir['BGD_PATH'])
 
-        # Return
-        return
+        # Return dir
+        return dir
 
-    def _open(self, version, split=False, clobber=True):
+    def _open(self, irf, dir):
         """
-        Open existing or create new calibration. The actual version will put
-        all calibrations in the same file, although each part of the response
-        function will have its own logical name. We can thus easily modify
-        the script to put each calibration information in a separate file.
+        Open existing or create new calibration
+        
+        The actual version will put all calibrations in the same file, although
+        each part of the response function will have its own logical name. We
+        can thus easily modify the script to put each calibration information
+        in a separate file
 
-        Parameters:
-         version - Filename version
-        Keywords:
-         split   - Split IRF over several files?
-         clobber - Overwrite existing files?
+        Parameters
+        ----------
+        irf : dict
+            IRF metadata dictionary
+        dir : dir
+            Directory structure dictionary
         """
-        # Set calibrate file names
-        if split:
-            self._ea_file    = "ea_"+version+".fits"
-            self._psf_file   = "psf_"+version+".fits"
-            self._edisp_file = "edisp_"+version+".fits"
-            self._bgd_file   = "bgd_"+version+".fits"
-        else:
-            self._ea_file    = "irf_"+version+".fits"
-            self._psf_file   = "irf_"+version+".fits"
-            self._edisp_file = "irf_"+version+".fits"
-            self._bgd_file   = "irf_"+version+".fits"
-
         # Open calibration database index
-        self._cif = gammalib.GFits(self._base_path+"/caldb.indx", True)
+        self._cif = gammalib.GFits(dir['BASE_PATH']+'/caldb.indx', True)
 
         # If file has no CIF extension than create it now
         try:
-            self._hdu_cif = self._cif.table("CIF")
+            self._hdu_cif = self._cif.table('CIF')
         except:
-            self._create_cif()
-            self._hdu_cif = self._cif.table("CIF")
+            self._cif.append(calutils.create_cif_table())
+            self._hdu_cif = self._cif.table('CIF')
 
-        # Set filenames
-        ea_filename    = self._ea_path+"/"+self._ea_file
-        psf_filename   = self._psf_path+"/"+self._psf_file
-        edisp_filename = self._edisp_path+"/"+self._edisp_file
-        bgd_filename   = self._bgd_path+"/"+self._bgd_file
+        # Set IRF component filenames
+        ea_filename    = dir['EA_PATH']+'/'+dir['EA_FILE']
+        psf_filename   = dir['PSF_PATH']+'/'+dir['PSF_FILE']
+        edisp_filename = dir['EDISP_PATH']+'/'+dir['EDISP_FILE']
+        bgd_filename   = dir['BGD_PATH']+'/'+dir['BGD_FILE']
 
-        # Open files
-        if split:
+        # Open IRF component files
+        if self['split'].boolean():
             self._ea    = gammalib.GFits(ea_filename, True)
             self._psf   = gammalib.GFits(psf_filename, True)
             self._edisp = gammalib.GFits(edisp_filename, True)
             self._bgd   = gammalib.GFits(bgd_filename, True)
         else:
-            self._irf   = gammalib.GFits(ea_filename, True)
-            self._ea    = self._irf
-            self._psf   = self._irf
-            self._edisp = self._irf
-            self._bgd   = self._irf
+            self._ea   = gammalib.GFits(ea_filename, True)
+            self._psf   = self._ea
+            self._edisp = self._ea
+            self._bgd   = self._ea
 
         # Open HDUs
         self._hdu_ea    = self._open_hdu(self._ea, "EFFECTIVE AREA",
-                                         self._ea_name, self._ea_doc)
+                                         irf['EA_NAME'], irf['EA_DOC'], irf)
         self._hdu_psf   = self._open_hdu(self._psf, "POINT SPREAD FUNCTION",
-                                         self._psf_name, self._psf_doc)
+                                         irf['PSF_NAME'], irf['PSF_DOC'], irf)
         self._hdu_edisp = self._open_hdu(self._edisp, "ENERGY DISPERSION",
-                                         self._edisp_name, self._edisp_doc)
+                                         irf['EDISP_NAME'], irf['EDISP_DOC'], irf)
         self._hdu_bgd   = self._open_hdu(self._bgd, "BACKGROUND",
-                                         self._bgd_name, self._bgd_doc)
+                                         irf['BGD_NAME'], irf['BGD_DOC'], irf)
 
         # Return
         return
 
-    def _close(self):
+    def _close(self, irf, dir):
         """
-        Close calibration FITS files.
+        Close calibration FITS files
+
+        Parameters
+        ----------
+        irf : dict
+            IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
         # Add information to CIF. We do this now as before we did not
-        # necessarily have all the information at hand (in particular
-        # about the boundaries)
-        self._add_cif_info()
+        # necessarily have all the information at hand (in particular about
+        # the boundaries)
+        self._add_cif_info(irf, dir)
 
-        # Close CIF
-        self._close_file(self._cif)
+        # Save and close CIF
+        self._cif.save(True)
+        self._cif.close()
 
-        # If IRF file exists then close it now. All file pointers will
-        # be set to None
-        if self._irf != None:
-            self._close_file(self._irf)
-            self._ea    = None
-            self._psf   = None
-            self._edisp = None
-            self._bgd   = None
-
-        # ... otherwise we have split files, so we have to close them all
-        else:
-            self._close_file(self._ea)
-            self._close_file(self._psf)
-            self._close_file(self._edisp)
-            self._close_file(self._bgd)
-
+        # Close all IRF components. If the files have been split all components
+        # need to be closed, otherwise only the effective area component needs
+        # to be closed as representative for all components.
+        self._ea.save(True)
+        self._ea.close()
+        if self['split'].boolean():
+            self._psf.save(True)
+            self._edisp.save(True)
+            self._bgd.save(True)
+            self._psf.close()
+            self._edisp.close()
+            self._bgd.close()
+ 
         # Return
         return
 
-    def _close_file(self, file):
-        """
-        Close one file.
-        """
-        # If file is open then close it
-        if file != None:
-            file.save(True)
-            file.close()
-            file = None
-
-        # Return
-        return
-
-    def _open_hdu(self, fits, extname, name, doc):
+    def _open_hdu(self, fits, extname, name, doc, irf):
         """
         Open HDU
         
-        If HDU does not exist then create one.
+        Opens a FITS binary table with given "extname". If HDU does not exist
+        in the FITS file it will be created and appended to the FITS file.
 
-        Parameters:
-            fits:    FITS file
-            extname: Extension name
-            name:    Name string
-            doc:     Document string
+        Parameters
+        ----------
+        fits : `~gammalib.GFits`
+            FITS file
+        extname : str
+            Extension name
+        name : str
+            Name string
+        doc : str
+            Document string
+        irf : dict
+            IRF metadata dictionary
 
-        Returns:
-            FITS table
+        Returns
+        -------
+        table : `~gammalib.GFitsBinTable`
+            FITS binary table
         """
         # Create table if it does not yet exist
         if not fits.contains(extname):
@@ -332,7 +355,7 @@ class csroot2caldb(ctools.cscript):
             table.extname(extname)
 
             # Set OGIP keywords
-            self._set_ogip_keywords(table, doc, ["RESPONSE", name])
+            self._set_ogip_keywords(table, doc, ['RESPONSE', name], irf)
 
             # Append table to FITS file
             fits.append(table)
@@ -340,650 +363,593 @@ class csroot2caldb(ctools.cscript):
         # Return FITS table
         return fits.table(extname)
 
-    def _set_ogip_keywords(self, hdu, hdudoc, hduclas):
+    def _set_ogip_keywords(self, hdu, hdudoc, hduclas, irf):
         """
-        Set standard OGIP keywords for extension.
+        Set standard OGIP keywords for extension
 
-        Parameters:
-            hdu:     Header Data Unit.
-            hdudoc:  Documentation reference string
-            hduclas: Array of HDUCLAS fields
+        Parameters
+        ----------
+        hdu : `~gammalig.GFitsHDU`
+            Header Data Unit
+        hdudoc : str
+            Documentation reference string
+        hduclas : list of str
+            List of HDUCLAS fields
+        irf : dict
+            IRF dictonary
         """
         # Set UTC date of file creation
         utc = datetime.utcnow().isoformat()[:19]
 
         # Set keywords
-        hdu.card("ORIGIN", "IRAP", "Name of organization making this file")
-        hdu.card("DATE", utc, "File creation date (YYYY-MM-DDThh:mm:ss UTC)")
-        hdu.card("TELESCOP", self._cal_tel, "Name of telescope")
-        hdu.card("INSTRUME", self._cal_inst, "Name of instrument")
-        hdu.card("DETNAM", self._cal_det, "Name of detector")
-        hdu.card("HDUCLASS", "OGIP", "HDU class")
-        hdu.card("HDUDOC", hdudoc, "HDU documentation")
+        hdu.card('ORIGIN', 'IRAP', 'Name of organization making this file')
+        hdu.card('DATE', utc, 'File creation date (YYYY-MM-DDThh:mm:ss UTC)')
+        hdu.card('TELESCOP', irf['CAL_TEL'], 'Name of telescope')
+        hdu.card('INSTRUME', irf['CAL_INST'], 'Name of instrument')
+        hdu.card('DETNAM', irf['CAL_DET'], 'Name of detector')
+        hdu.card('HDUCLASS', 'OGIP', 'HDU class')
+        hdu.card('HDUDOC', hdudoc, 'HDU documentation')
         for i, item in enumerate(hduclas):
-            key = "HDUCLAS%d" % (i+1)
-            hdu.card(key, item, "HDU class")
-        hdu.card("HDUVERS", "1.0.0", "HDU version")
+            key = 'HDUCLAS%d' % (i+1)
+            hdu.card(key, item, 'HDU class')
+        hdu.card('HDUVERS', '1.0.0', 'HDU version')
 
         # Return
         return
 
-    def _create_cif(self):
+    def _add_cif_info(self, irf, dir):
         """
-        Create Calibration Index File (CIF) extension in CIF FITS file.
+        Add information to CIF extension
 
-        Parameters:
-         None
-        Keywords:
-         None
+        Parameters
+        ----------
+        irf : dict
+            IRF metadata dictionary
+        dir : dict
+            Directory structure dictionary
         """
-        # Attach table to FITS file. Note that at this moment the FITS table
-        # gets connected to the FITS file. Yet since nothing was yet written
-        # to the FITS file, we cannot read anything from it.
-        self._cif.append(calutils.create_cif_table())
+        # Set list of IRF component names
+        names = ['EA', 'PSF', 'EDISP', 'BGD']
+
+        # Initialise CIF row index
+        row = self._hdu_cif.nrows()
+
+        # Append rows for all components to CIF extension
+        self._hdu_cif.append_rows(len(names))
+
+        # Add information for all components
+        for name in names:
+
+            # Set dictionary keys for this component
+            key_dir    = '%s_DIR' % name
+            key_file   = '%s_FILE' % name
+            key_name   = '%s_NAME' % name
+            key_desc   = '%s_DESC' % name
+            key_bounds = '%s_BOUNDS' % name
+
+            # Set generic information
+            self._hdu_cif['TELESCOP'][row] = irf['CAL_TEL']
+            self._hdu_cif['INSTRUME'][row] = irf['CAL_INST']
+            self._hdu_cif['DETNAM'][row]   = irf['CAL_DET']
+            self._hdu_cif['FILTER'][row]   = irf['CAL_FLT']
+            self._hdu_cif['CAL_DEV'][row]  = 'ONLINE'
+            self._hdu_cif['CAL_CLAS'][row] = irf['CAL_CLASS']
+            self._hdu_cif['CAL_DTYP'][row] = irf['CAL_TYPE']
+            self._hdu_cif['CAL_VSD'][row]  = irf['VAL_DATE']
+            self._hdu_cif['CAL_VST'][row]  = irf['VAL_TIME']
+            self._hdu_cif['REF_TIME'][row] = irf['REF_TIME']
+            self._hdu_cif['CAL_QUAL'][row] = irf['CAL_QUAL']
+            self._hdu_cif['CAL_DATE'][row] = irf['CAL_DATE']
+
+            # Set component specific information
+            self._hdu_cif['CAL_DIR'][row]   = dir[key_dir]
+            self._hdu_cif['CAL_FILE'][row]  = dir[key_file]
+            self._hdu_cif['CAL_CNAM'][row]  = irf[key_name]
+            self._hdu_cif['CAL_DESC'][row]  = irf[key_desc]
+            self._hdu_cif['CAL_XNO'][row]   = 1
+            for i in range(9):
+                if i >= len(irf[key_bounds]):
+                    self._hdu_cif['CAL_CBD'][row,i] = 'NONE'
+                else:
+                    self._hdu_cif['CAL_CBD'][row,i] = irf[key_bounds][i]
+
+            # Increment row index
+            row += 1
 
         # Return
         return
 
-    def _add_cif_info(self):
+    def _set_cif_keywords(self, hdu, name, bounds, desc, irf):
         """
-        Add information to CIF extension.
-        """
-        # Append 4 rows to CIF extension
-        self._hdu_cif.append_rows(4)
+        Set standard CIF keywords for extension
 
-        # Add generic information for these 4 rows
-        for i in range(4):
-
-            # Set row number
-            row = i + self._hdu_cif.nrows() - 4
-
-            # Set element
-            self._hdu_cif["TELESCOP"][row] = self._cal_tel
-            self._hdu_cif["INSTRUME"][row] = self._cal_inst
-            self._hdu_cif["DETNAM"][row]   = self._cal_det
-            self._hdu_cif["FILTER"][row]   = self._cal_flt
-            self._hdu_cif["CAL_DEV"][row]  = "ONLINE"
-            self._hdu_cif["CAL_CLAS"][row] = self._cal_class
-            self._hdu_cif["CAL_DTYP"][row] = self._cal_type
-            self._hdu_cif["CAL_VSD"][row]  = self._val_date
-            self._hdu_cif["CAL_VST"][row]  = self._val_time
-            self._hdu_cif["REF_TIME"][row] = self._ref_time
-            self._hdu_cif["CAL_QUAL"][row] = self._cal_qual
-            self._hdu_cif["CAL_DATE"][row] = self._cal_date
-
-        # Add effective area information
-        row = self._hdu_cif.nrows() - 4
-        self._hdu_cif["CAL_DIR"][row]   = self._ea_dir
-        self._hdu_cif["CAL_FILE"][row]  = self._ea_file
-        self._hdu_cif["CAL_CNAM"][row]  = self._ea_name
-        self._hdu_cif["CAL_DESC"][row]  = self._ea_desc
-        self._hdu_cif["CAL_XNO"][row]   = 1
-        for n in range(9):
-            if n >= len(self._ea_bounds):
-                self._hdu_cif["CAL_CBD"][row, n] = "NONE"
-            else:
-                self._hdu_cif["CAL_CBD"][row, n] = self._ea_bounds[n]
-
-        # Add point spread function information
-        row = self._hdu_cif.nrows() - 3
-        self._hdu_cif["CAL_DIR"][row]   = self._psf_dir
-        self._hdu_cif["CAL_FILE"][row]  = self._psf_file
-        self._hdu_cif["CAL_CNAM"][row]  = self._psf_name
-        self._hdu_cif["CAL_DESC"][row]  = self._psf_desc
-        self._hdu_cif["CAL_XNO"][row]   = 1
-        for n in range(9):
-            if n >= len(self._psf_bounds):
-                self._hdu_cif["CAL_CBD"][row, n] = "NONE"
-            else:
-                self._hdu_cif["CAL_CBD"][row, n] = self._psf_bounds[n]
-
-        # Add energy dispersion information
-        row = self._hdu_cif.nrows() - 2
-        self._hdu_cif["CAL_DIR"][row]   = self._edisp_dir
-        self._hdu_cif["CAL_FILE"][row]  = self._edisp_file
-        self._hdu_cif["CAL_CNAM"][row]  = self._edisp_name
-        self._hdu_cif["CAL_DESC"][row]  = self._edisp_desc
-        self._hdu_cif["CAL_XNO"][row]   = 1
-        for n in range(9):
-            if n >= len(self._edisp_bounds):
-                self._hdu_cif["CAL_CBD"][row, n] = "NONE"
-            else:
-                self._hdu_cif["CAL_CBD"][row, n] = self._edisp_bounds[n]
-
-        # Add background information
-        row = self._hdu_cif.nrows() - 1
-        self._hdu_cif["CAL_DIR"][row]   = self._bgd_dir
-        self._hdu_cif["CAL_FILE"][row]  = self._bgd_file
-        self._hdu_cif["CAL_CNAM"][row]  = self._bgd_name
-        self._hdu_cif["CAL_DESC"][row]  = self._bgd_desc
-        self._hdu_cif["CAL_XNO"][row]   = 1
-        for n in range(9):
-            if n >= len(self._bgd_bounds):
-                self._hdu_cif["CAL_CBD"][row, n] = "NONE"
-            else:
-                self._hdu_cif["CAL_CBD"][row, n] = self._bgd_bounds[n]
-
-        # Return
-        return
-
-    def _set_cif_keywords(self, hdu, name, bounds, desc):
-        """
-        Set standard CIF keywords for extension.
+        Parameters
+        ----------
+        hdu : `~gammalib.GFitsHDU`
+            FITS HDU
+        name : str
+            Calibration name
+        bounds : list of str
+            Calibration boundaries
+        desc : str
+            Calibration description
+        irf : dict
+            IRF dictionary
         """
         # Set standard CIF keywords
-        hdu.card("CSYSNAME", "XMA_POL", "")
-        hdu.card("CCLS0001", self._cal_class, "Calibration class")
-        hdu.card("CDTP0001", self._cal_type, "Calibration type")
-        hdu.card("CCNM0001", name, "Calibration name")
+        hdu.card('CSYSNAME', 'XMA_POL', '')
+        hdu.card('CCLS0001', irf['CAL_CLASS'], 'Calibration class')
+        hdu.card('CDTP0001', irf['CAL_TYPE'], 'Calibration type')
+        hdu.card('CCNM0001', name, 'Calibration name')
 
         # Set boundary keywords
-        for n in range(9):
-            keyname = "CBD%d0001" % (n+1)
-            if n >= len(bounds):
-                value = "NONE"
+        for i in range(9):
+            keyname = 'CBD%d0001' % (i+1)
+            if i >= len(bounds):
+                value = 'NONE'
             else:
-                value = bounds[n]
-            hdu.card(keyname, value, "Calibration boundary")
+                value = bounds[i]
+            hdu.card(keyname, value, 'Calibration boundary')
 
         # Set validity keywords
-        hdu.card("CVSD0001", self._val_date, "Calibration validity start date (UTC)")
-        hdu.card("CVST0001", self._val_time, "Calibration validity start time (UTC)")
-        hdu.card("CDEC0001", desc, "Calibration description")
+        hdu.card('CVSD0001', irf['VAL_DATE'],
+                 'Calibration validity start date (UTC)')
+        hdu.card('CVST0001', irf['VAL_TIME'],
+                 'Calibration validity start time (UTC)')
+        hdu.card('CDEC0001', desc, 'Calibration description')
 
         # Return
         return
 
 
     # ROOT specific private members
-    def _root2caldb(self):
+    def _root2caldb(self, irf):
         """
-        Translate ROOT to CALDB information.
+        Translate ROOT to CALDB information
 
-        Parameters:
-         filename - ROOT 2D performance filename.
+        Parameters
+        ----------
+        irf : dict
+            IRF dictionary
         """
         # Open ROOT performance file
-        file = TFile(self["infile"].filename().url())
+        file = TFile(self['infile'].filename().url())
 
         # Create effective area
-        self._root2ea(file, rebin=self["rebin"].boolean(),
-                            eascale=self["eascale"].real())
+        self._root2ea(file, irf)
 
         # Create point spread function
-        self._root2psf(file, self["psftype"].string())
+        self._root2psf(file, irf)
 
         # Create energy dispersion
-        self._root2edisp(file)
+        self._root2edisp(file, irf)
 
         # Create background
-        #self._root2bgd(file)
-        self._root2bgd3D(file)
+        self._root2bgd(file, irf)
 
         # Return
         return
 
-    def _root2ea(self, file, rebin=False, eascale=1.0):
+    def _root2ea(self, file, irf):
         """
-        Translate ROOT to CALDB effective area extension. The following ROOT
-        histograms are used:
-
-        EffectiveAreaEtrue_offaxis -> EFFAREA
-        EffectiveArea_offaxis      -> EFFAREA_RECO
-
-        Parameters:
-            file: ROOT file.
-
-        Keywords:
-            rebin:   Rebin Etrue histogram (useful for Prod1 IFAE runs)
-            eascale: Effective area scaling factor
-        """
-        # Continue only if effective area HDU has been opened
-        if self._hdu_ea != None:
-
-            # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Generate effective area extension')
-
-            # Get User parameters
-            norm1d = self['norm1d'].boolean()
-
-            # Allocate ROOT 2D arrays
-            etrue = TH2F()
-            ereco = TH2F()
-            file.GetObject('EffectiveAreaEtrue_offaxis', etrue)
-            file.GetObject('EffectiveArea_offaxis',      ereco)
-
-            # Normalize 2D histogram on on-axis 1D histogram
-            if norm1d:
-                etrue_1D = TH1F()
-                ereco_1D = TH1F()
-                file.GetObject('EffectiveAreaEtrue', etrue_1D)
-                file.GetObject('EffectiveArea',      ereco_1D)
-                self._renorm_onaxis(etrue, etrue_1D)
-                self._renorm_onaxis(ereco, ereco_1D)
-
-            # Rebin etrue histogram
-            if rebin:
-                etrue.RebinX(10)
-                neng    = etrue.GetXaxis().GetNbins()
-                noffset = etrue.GetYaxis().GetNbins()
-                for ioff in range(noffset):
-                    for ieng in range(neng):
-                        value = etrue.GetBinContent(ieng+1,ioff+1) / 10.0
-                        etrue.SetBinContent(ieng+1,ioff+1,value)
-
-            # Scale histograms (if needed)
-            if eascale != 1.0:
-                neng    = etrue.GetXaxis().GetNbins()
-                noffset = etrue.GetYaxis().GetNbins()
-                for ioff in range(noffset):
-                    for ieng in range(neng):
-                        value = etrue.GetBinContent(ieng+1,ioff+1) * eascale
-                        etrue.SetBinContent(ieng+1,ioff+1,value)
-                neng    = ereco.GetXaxis().GetNbins()
-                noffset = ereco.GetYaxis().GetNbins()
-                for ioff in range(noffset):
-                    for ieng in range(neng):
-                        value = ereco.GetBinContent(ieng+1,ioff+1) * eascale
-                        ereco.SetBinContent(ieng+1,ioff+1,value)
-
-            # Write boundaries (use Ereco boundaries)
-            bounds = self._make_2D(ereco, self._hdu_ea, None, "m2")
-            for b in bounds:
-                self._ea_bounds.append(b)
-            self._set_cif_keywords(self._hdu_ea, self._ea_name, \
-                                   self._ea_bounds, self._ea_desc)
-
-            # EFFAREA
-            self._make_2D(etrue, self._hdu_ea, "EFFAREA", "m2")
-
-            # EFFAREA_RECO
-            self._make_2D(ereco, self._hdu_ea, "EFFAREA_RECO", "m2")
-
-        # Return
-        return
-
-    def _root2psf(self, file, psftype):
-        """
-        Translate ROOT to CALDB point spread function extension.
-        Parameters:
-         file    - ROOT file.
-         psftype - PSF type (Gauss, King)
-        Keywords:
-         None
-        """
-        # Continue only if point spread function HDU has been opened
-        if self._hdu_psf != None:
-
-            # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Generate point spread function extension')
-
-            # King profile PSF
-            if psftype == 'King':
-                self._root2psf_king(file)
-            else:
-                self._root2psf_gauss(file)
-
-        # Return
-        return
-
-    def _root2psf_gauss(self, file):
-        """
-        Translate ROOT to CALDB point spread function extension. The following
-        ROOT histograms are used:
-
-        1/(2*pi*SIGMA_1) -> SCALE
-        AngRes_offaxis -> SIGMA_1 (scaling: 1/0.8)
-        0.0 -> AMPL_2
-        0.0 -> SIGMA_2
-        0.0 -> AMPL_3
-        0.0 -> SIGMA_3
-
-        Parameters:
-         file - ROOT file.
-        Keywords:
-         None
-        """
-        # Continue only if point spread function HDU has been opened
-        if self._hdu_psf != None:
-
-            # Allocate ROOT 2D array
-            r68  = TH2F()
-
-            # Read 68% containment histogram
-            file.GetObject("AngRes_offaxis", r68)
-            neng    = r68.GetXaxis().GetNbins()
-            noffset = r68.GetYaxis().GetNbins()
-
-            # Converts 68% -> 1 sigma
-            r68_to_sigma = 0.6624305
-            for ioff in range(noffset):
-                for ieng in range(neng):
-                    sigma = r68.GetBinContent(ieng+1,ioff+1) * r68_to_sigma
-                    r68.SetBinContent(ieng+1,ioff+1,sigma)
-
-            # Compute scale histogram
-            scale = r68.Clone()
-            for ioff in range(noffset):
-                for ieng in range(neng):
-                    integral = 2.0 * math.pi * r68.GetBinContent(ieng+1,ioff+1)
-                    if integral > 0.0:
-                        value = 1.0 / integral
-                    else:
-                        value = 0.0
-                    scale.SetBinContent(ieng+1,ioff+1,value)
-
-            # Set zero histogram
-            zero = r68.Clone()
-            for ioff in range(noffset):
-                for ieng in range(neng):
-                    zero.SetBinContent(ieng+1,ioff+1,0.0)
-
-            # Set boundaries
-            bounds = self._make_2D(r68, self._hdu_psf, None, "deg")
-            for b in bounds:
-                self._psf_bounds.append(b)
-            self._psf_bounds.append("PSF(GAUSS)")
-            self._set_cif_keywords(self._hdu_psf, self._psf_name, \
-                                   self._psf_bounds, self._psf_desc)
-
-            # SCALE
-            self._make_2D(scale, self._hdu_psf, "SCALE", "")
-
-            # SIGMA_1
-            self._make_2D(r68, self._hdu_psf, "SIGMA_1", "deg")
-
-            # AMPL_2
-            self._make_2D(zero, self._hdu_psf, "AMPL_2", "")
-
-            # SIGMA_2
-            self._make_2D(zero, self._hdu_psf, "SIGMA_2", "deg")
-
-            # AMPL_3
-            self._make_2D(zero, self._hdu_psf, "AMPL_3", "")
-
-            # SIGMA_3
-            self._make_2D(zero, self._hdu_psf, "SIGMA_3", "deg")
-
-        # Return
-        return
-
-    def _root2psf_king(self, file):
-        """
-        Translate ROOT to CALDB point spread function extension. The following
-        ROOT histograms are used:
-
-        AngRes_offaxis
-        AngRes80_offaxis
-
-        Parameters:
-         file - ROOT file.
-        Keywords:
-         None
-        """
-        # Continue only if point spread function HDU has been opened
-        if self._hdu_psf != None:
-
-            # Allocate ROOT 2D arrays
-            r68  = TH2F()
-            r80  = TH2F()
-
-            # Read 68% and 80% containment histograms
-            file.GetObject("AngRes_offaxis", r68)
-            file.GetObject("AngRes80_offaxis", r80)
-            neng    = r68.GetXaxis().GetNbins()
-            noffset = r68.GetYaxis().GetNbins()
-
-            # Initialise parameter maps by cloning the r68 2D map
-            gamma2D = r68.Clone()
-            sigma2D = r68.Clone()
-
-            # Compute gamma and sigma values
-            for ioff in range(noffset):
-
-                # Initialise last results
-                last_gamma = 0.0
-                last_sigma = 0.0
-
-                for ieng in range(neng):
-
-                    # Extract radii
-                    r_68 = r68.GetBinContent(ieng+1,ioff+1)
-                    r_80 = r80.GetBinContent(ieng+1,ioff+1)
-
-                    # Initialise results
-                    gamma = 0.0
-                    sigma = 0.0
-
-                    # Continue only if both radii are positive
-                    if r_68 > 0 and r_80 > 0:
-
-                        # Derive constants for equation to solve
-                        a = 1.0 - 0.68
-                        b = 1.0 - 0.80
-                        c = r_68*r_68/(r_80*r_80)
-
-                        # Solve equation (a^x-1)/(b^x-1)=c for x using secant
-                        # method. Stop when we are better than 1e-6.
-                        x1   = -0.5
-                        x2   = -1.0
-                        f1   = (math.pow(a,x1) - 1.0)/(math.pow(b,x1) - 1.0) - c
-                        f2   = (math.pow(a,x2) - 1.0)/(math.pow(b,x2) - 1.0) - c
-                        iter = 0
-                        while True:
-                            x     = x1 - f1 * (x1-x2)/(f1-f2)
-                            f     = (math.pow(a,x) - 1.0)/(math.pow(b,x) - 1.0) - c
-                            iter += 1
-                            if abs(f) < 1.0e-6:
-                                break
-                            else:
-                                f2 = f1
-                                x2 = x1
-                                f1 = f
-                                x1 = x
-
-                        # Compute gamma.
-                        if x < 0.0:
-                            gamma = 1.0 - 1.0/x
-                        else:
-                            gamma = 1.0
-
-                        # Compute sigma
-                        denominator = 2.0 * gamma * (math.pow(a, x) - 1.0)
-                        if denominator > 0.0:
-                            sigma = r_68 * math.sqrt(1.0/denominator)
-                        else:
-                            denominator = 2.0 * gamma * (math.pow(b, x) - 1.0)
-                            if denominator > 0.0:
-                                sigma = r_80 * math.sqrt(1.0/denominator)
-                            else:
-                                gamma = 0.0
-                                sigma = 0.0
-
-                        # Handle special case that no results were found.
-                        # This takes care of pixels that are ill defined
-                        # in the MC file.
-                        if gamma == 0.0 and sigma == 0.0:
-                            gamma = last_gamma
-                            sigma = last_sigma
-
-                        # Store surrent result as last result
-                        last_gamma = gamma
-                        last_sigma = sigma
-
-                        # Show results on console
-                        #print(ioff,ieng,gamma,sigma,x,f,iter)
-
-                    # Set bin contents
-                    gamma2D.SetBinContent(ieng+1,ioff+1,gamma)
-                    sigma2D.SetBinContent(ieng+1,ioff+1,sigma)
-
-            # Set boundaries
-            bounds = self._make_2D(r68, self._hdu_psf, None, "deg")
-            for b in bounds:
-                self._psf_bounds.append(b)
-            self._psf_bounds.append("PSF(KING)")
-            self._set_cif_keywords(self._hdu_psf, self._psf_name, \
-                                   self._psf_bounds, self._psf_desc)
-
-            # GAMMA
-            self._make_2D(gamma2D, self._hdu_psf, "GAMMA", "")
-
-            # SIGMA
-            self._make_2D(sigma2D, self._hdu_psf, "SIGMA", "deg")
-
-        # Return
-        return
-
-    def _root2edisp(self, file):
-        """
-        Translate ROOT to CALDB energy dispersion extension. The following ROOT
-        histograms are used:
-
-        EestOverEtrue_offaxis  -> MATRIX
-
-        Parameters:
-         file - ROOT file.
-        Keywords:
-         None
-        """
-        # Continue only if energy dispersion HDU has been opened
-        if self._hdu_edisp != None:
-
-            # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Generate energy dispersion extension')
-
-            # Allocate ROOT 3D array
-            matrix  = TH3F()
-            file.GetObject('EestOverEtrue_offaxis', matrix)
-
-            # Set boundaries
-            bounds = self._make_3D_migra(matrix, self._hdu_edisp, None, '')
-            for b in bounds:
-                self._edisp_bounds.append(b)
-            self._set_cif_keywords(self._hdu_edisp, self._edisp_name, \
-                                   self._edisp_bounds, self._edisp_desc)
-
-            # MATRIX
-            self._make_3D_migra(matrix, self._hdu_edisp, 'MATRIX', '')
-
-        # Return
-        return
-
-    def _root2bgd(self, file):
-        """
-        Translate ROOT to CALDB background extension. The following ROOT
-        histograms are used:
-
-        BGRatePerSqDeg_offaxis -> BGD
-        BGRatePerSqDeg_offaxis -> BGD_RECO
-
-        Parameters:
-         file - ROOT file.
-        Keywords:
-         None
-        """
-        # Continue only if background HDU has been opened
-        if self._hdu_bgd != None:
-
-            # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Generate 2D background extension')
-
-            # Allocate ROOT 2D array
-            array = TH2F()
-            file.GetObject('BGRatePerSqDeg_offaxis', array)
-
-            # Set boundaries
-            bounds = self._make_2D(array, self._hdu_bgd, None, 'deg')
-            for b in bounds:
-                self._bgd_bounds.append(b)
-            self._set_cif_keywords(self._hdu_bgd, self._bgd_name, \
-                                   self._bgd_bounds, self._bgd_desc)
-
-            # BGD
-            self._make_2D(array, self._hdu_bgd, 'BGD', '')
-
-            # BGD_RECO
-            self._make_2D(array, self._hdu_bgd, 'BGD_RECO', '')
-
-        # Return
-        return
-
-    def _root2bgd3D(self, file):
-        """
-        Translate ROOT to CALDB background extension.
+        Translate ROOT to CALDB effective area extension
         
         The following ROOT histograms are used:
-        BGRatePerSqDeg_offaxis -> BGD
+        - EffectiveAreaEtrue_offaxis -> EFFAREA
+        - EffectiveArea_offaxis      -> EFFAREA_RECO
 
         Parameters
         ----------
         file : `~ROOT.TFile`
-            ROOT file.
+            ROOT file
+        irf : dict
+            IRF metadata dictionary
         """
-        # Continue only if background HDU has been opened
-        if self._hdu_bgd != None:
+        # Write header
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1('Generate effective area extension')
 
-            # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Generate 3D background extension')
+        # Get relevant ROOT histograms
+        etrue = file.Get('EffectiveAreaEtrue_offaxis')
+        ereco = file.Get('EffectiveArea_offaxis')
 
-            # Get User parameters
-            norm1d    = self['norm1d'].boolean()
-            bgdethres = self['bgdethres'].real()
-            bgdinfill = self['bgdinfill'].boolean()
+        # If requested then normalize the 2D histogram on the on-axis 1D
+        # histogram. This assures that the 2D histogram has the same on-axis
+        # effective area dependence as the 1D histogram.
+        if self['norm1d'].boolean():
+            etrue_1D = file.Get('EffectiveAreaEtrue')
+            ereco_1D = file.Get('EffectiveArea')
+            self._renorm_onaxis(etrue, etrue_1D)
+            self._renorm_onaxis(ereco, ereco_1D)
 
-            # Allocate ROOT 2D array
-            array = TH2F()
-            file.GetObject('BGRatePerSqDeg_offaxis', array)
+        # If requested then rebin the effective area Etrue histogram. This
+        # increases the number of bins by a factor 10.
+        if self['rebin'].boolean():
+            etrue.RebinX(10)
+            neng    = etrue.GetXaxis().GetNbins()
+            noffset = etrue.GetYaxis().GetNbins()
+            for ioff in range(noffset):
+                for ieng in range(neng):
+                    value = etrue.GetBinContent(ieng+1,ioff+1) / 10.0
+                    etrue.SetBinContent(ieng+1,ioff+1,value)
 
-            # Replace 2D histogram values by power law extrapolation
-            self._plaw_replace(array, bgdethres)
+        # Get effective area multiplicator. This allows renormalising the
+        # effective area.
+        eascale = self['eascale'].real()
 
-            # Optionally fill in empty values in 2D histogram
-            if bgdinfill:
-                self._infill_bgd(array)
+        # If renormalisation has been requested then do it now
+        if eascale != 1.0:
+            neng    = etrue.GetXaxis().GetNbins()
+            noffset = etrue.GetYaxis().GetNbins()
+            for ioff in range(noffset):
+                for ieng in range(neng):
+                    value = etrue.GetBinContent(ieng+1,ioff+1) * eascale
+                    etrue.SetBinContent(ieng+1,ioff+1,value)
+            neng    = ereco.GetXaxis().GetNbins()
+            noffset = ereco.GetYaxis().GetNbins()
+            for ioff in range(noffset):
+                for ieng in range(neng):
+                    value = ereco.GetBinContent(ieng+1,ioff+1) * eascale
+                    ereco.SetBinContent(ieng+1,ioff+1,value)
 
-            # Optionally normalize 2D histogram on on-axis 1D histogram
-            if norm1d:
-                array_1D = TH1F()
-                file.GetObject('BGRatePerSqDeg', array_1D)
-                self._renorm_onaxis(array, array_1D)
+        # Set boundaries (use Ereco boundaries)
+        bounds = self._make_2D(ereco, self._hdu_ea, None, 'm2')
+        for b in bounds:
+            irf['EA_BOUNDS'].append(b)
 
-            # Set boundaries
-            bounds = self._make_3D(array, self._hdu_bgd, None, 'deg')
-            for b in bounds:
-                self._bgd_bounds.append(b)
-            self._set_cif_keywords(self._hdu_bgd, self._bgd_name,
-                                   self._bgd_bounds, self._bgd_desc)
+        # Write boundary keywords
+        self._set_cif_keywords(self._hdu_ea, irf['EA_NAME'],
+                               irf['EA_BOUNDS'], irf['EA_DESC'], irf)
 
-            # BGD (reconstructed energy)
-            self._make_3D(array, self._hdu_bgd, 'BGD', '1/s/MeV/sr')
+        # Create "EFFAREA" data column
+        self._make_2D(etrue, self._hdu_ea, 'EFFAREA', 'm2')
+
+        # Create "EFFAREA_RECO" data column
+        self._make_2D(ereco, self._hdu_ea, 'EFFAREA_RECO', 'm2')
+
+        # Return
+        return
+
+    def _root2psf(self, file, irf):
+        """
+        Translate ROOT to CALDB point spread function extension
+        
+        Parameters
+        ----------
+        file : `~ROOT.TFile`
+            ROOT file
+        irf : dict
+            IRF metadata dictionary
+        """
+        # Write header
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1('Generate point spread function extension')
+
+        # King profile PSF
+        if self['psftype'].string() == 'King':
+            self._root2psf_king(file, irf)
+
+        # ... otherwise use Gaussian profile PSF
+        else:
+            self._root2psf_gauss(file, irf)
+
+        # Return
+        return
+
+    def _root2psf_gauss(self, file, irf):
+        """
+        Translate ROOT to CALDB point spread function extension
+        
+        The following ROOT histograms are used:
+        - 1/(2*pi*SIGMA_1) -> SCALE
+        - AngRes_offaxis -> SIGMA_1 (scaling: 1/0.8)
+        - 0.0 -> AMPL_2
+        - 0.0 -> SIGMA_2
+        - 0.0 -> AMPL_3
+        - 0.0 -> SIGMA_3
+
+        Parameters
+        ----------
+        file : `~ROOT.TFile`
+            ROOT file
+        irf : dict
+            IRF metadata dictionary
+        """
+        # Get relevant ROOT histograms
+        r68 = file.Get('AngRes_offaxis')
+
+        # Extract number of bins in histogram
+        neng    = r68.GetXaxis().GetNbins()
+        noffset = r68.GetYaxis().GetNbins()
+
+        # Converts 68% -> 1 sigma
+        r68_to_sigma = 0.6624305
+        for ioff in range(noffset):
+            for ieng in range(neng):
+                sigma = r68.GetBinContent(ieng+1,ioff+1) * r68_to_sigma
+                r68.SetBinContent(ieng+1,ioff+1,sigma)
+
+        # Compute scale histogram
+        scale = r68.Clone()
+        for ioff in range(noffset):
+            for ieng in range(neng):
+                integral = 2.0 * math.pi * r68.GetBinContent(ieng+1,ioff+1)
+                if integral > 0.0:
+                    value = 1.0 / integral
+                else:
+                    value = 0.0
+                scale.SetBinContent(ieng+1,ioff+1,value)
+
+        # Set zero histogram
+        zero = r68.Clone()
+        for ioff in range(noffset):
+            for ieng in range(neng):
+                zero.SetBinContent(ieng+1,ioff+1,0.0)
+
+        # Set boundaries
+        bounds = self._make_2D(r68, self._hdu_psf, None, 'deg')
+        for b in bounds:
+            irf['PSF_BOUNDS'].append(b)
+        irf['PSF_BOUNDS'].append('PSF(GAUSS)')
+
+        # Write boundary keywords
+        self._set_cif_keywords(self._hdu_psf, irf['PSF_NAME'],
+                               irf['PSF_BOUNDS'], irf['PSF_DESC'], irf)
+
+        # Create "SCALE" data column
+        self._make_2D(scale, self._hdu_psf, 'SCALE', '')
+
+        # Create "SIGMA_1" data column
+        self._make_2D(r68, self._hdu_psf, 'SIGMA_1', 'deg')
+
+        # Create "AMPL_2" data column
+        self._make_2D(zero, self._hdu_psf, 'AMPL_2', '')
+
+        # Create "SIGMA_2" data column
+        self._make_2D(zero, self._hdu_psf, 'SIGMA_2', 'deg')
+
+        # Create "AMPL_3" data column
+        self._make_2D(zero, self._hdu_psf, 'AMPL_3', '')
+
+        # Create "SIGMA_3" data column
+        self._make_2D(zero, self._hdu_psf, 'SIGMA_3', 'deg')
+
+        # Return
+        return
+
+    def _root2psf_king(self, file, irf):
+        """
+        Translate ROOT to CALDB point spread function extension
+        
+        The following ROOT histograms are used:
+        - AngRes_offaxis
+        - AngRes80_offaxis
+
+        Parameters
+        ----------
+        file : `~ROOT.TFile`
+            ROOT file
+        irf : dict
+            IRF metadata dictionary
+        """
+        # Get relevant ROOT histograms
+        r68 = file.Get('AngRes_offaxis')
+        r80 = file.Get('AngRes80_offaxis')
+
+        # Extract number of bins in histogram
+        neng    = r68.GetXaxis().GetNbins()
+        noffset = r68.GetYaxis().GetNbins()
+
+        # Initialise parameter maps by cloning the r68 2D map
+        gamma2D = r68.Clone()
+        sigma2D = r68.Clone()
+
+        # Compute gamma and sigma values
+        for ioff in range(noffset):
+
+            # Initialise last results
+            last_gamma = 0.0
+            last_sigma = 0.0
+
+            # Loop over all energies
+            for ieng in range(neng):
+
+                # Extract radii
+                r_68 = r68.GetBinContent(ieng+1,ioff+1)
+                r_80 = r80.GetBinContent(ieng+1,ioff+1)
+
+                # Initialise results
+                gamma = 0.0
+                sigma = 0.0
+
+                # Continue only if both radii are positive
+                if r_68 > 0 and r_80 > 0:
+
+                    # Derive constants for equation to solve
+                    a = 1.0 - 0.68
+                    b = 1.0 - 0.80
+                    c = r_68*r_68/(r_80*r_80)
+
+                    # Solve equation (a^x-1)/(b^x-1)=c for x using secant
+                    # method. Stop when we are better than 1e-6.
+                    x1   = -0.5
+                    x2   = -1.0
+                    f1   = (math.pow(a,x1) - 1.0)/(math.pow(b,x1) - 1.0) - c
+                    f2   = (math.pow(a,x2) - 1.0)/(math.pow(b,x2) - 1.0) - c
+                    iter = 0
+                    while True:
+                        x     = x1 - f1 * (x1-x2)/(f1-f2)
+                        f     = (math.pow(a,x) - 1.0)/(math.pow(b,x) - 1.0) - c
+                        iter += 1
+                        if abs(f) < 1.0e-6:
+                            break
+                        else:
+                            f2 = f1
+                            x2 = x1
+                            f1 = f
+                            x1 = x
+
+                    # Compute gamma.
+                    if x < 0.0:
+                        gamma = 1.0 - 1.0/x
+                    else:
+                        gamma = 1.0
+
+                    # Compute sigma
+                    denominator = 2.0 * gamma * (math.pow(a, x) - 1.0)
+                    if denominator > 0.0:
+                        sigma = r_68 * math.sqrt(1.0/denominator)
+                    else:
+                        denominator = 2.0 * gamma * (math.pow(b, x) - 1.0)
+                        if denominator > 0.0:
+                            sigma = r_80 * math.sqrt(1.0/denominator)
+                        else:
+                            gamma = 0.0
+                            sigma = 0.0
+
+                    # Handle special case that no results were found.
+                    # This takes care of pixels that are ill defined
+                    # in the MC file.
+                    if gamma == 0.0 and sigma == 0.0:
+                        gamma = last_gamma
+                        sigma = last_sigma
+
+                    # Store surrent result as last result
+                    last_gamma = gamma
+                    last_sigma = sigma
+
+                    # Show results on console
+                    #print(ioff,ieng,gamma,sigma,x,f,iter)
+
+                # Set bin contents
+                gamma2D.SetBinContent(ieng+1,ioff+1,gamma)
+                sigma2D.SetBinContent(ieng+1,ioff+1,sigma)
+
+        # Set boundaries
+        bounds = self._make_2D(r68, self._hdu_psf, None, 'deg')
+        for b in bounds:
+            irf['PSF_BOUNDS'].append(b)
+        irf['PSF_BOUNDS'].append('PSF(KING)')
+
+        # Write boundary keywords
+        self._set_cif_keywords(self._hdu_psf, irf['PSF_NAME'],
+                               irf['PSF_BOUNDS'], irf['PSF_DESC'], irf)
+
+        # Create "GAMMA" data column
+        self._make_2D(gamma2D, self._hdu_psf, 'GAMMA', '')
+
+        # Create "SIGMA" data column
+        self._make_2D(sigma2D, self._hdu_psf, 'SIGMA', 'deg')
+
+        # Return
+        return
+
+    def _root2edisp(self, file, irf):
+        """
+        Translate ROOT to CALDB energy dispersion extension
+        
+        The following ROOT histograms are used:
+        - EestOverEtrue_offaxis  -> MATRIX
+
+        Parameters
+        ----------
+        file : `~ROOT.TFile`
+            ROOT file
+        irf : dict
+            IRF metadata dictionary
+        """
+        # Write header
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1('Generate energy dispersion extension')
+
+        # Get relevant ROOT histograms
+        matrix = file.Get('EestOverEtrue_offaxis')
+
+        # Set boundaries
+        bounds = self._make_3D_migra(matrix, self._hdu_edisp, None, '')
+        for b in bounds:
+            irf['EDISP_BOUNDS'].append(b)
+
+        # Write boundary keywords
+        self._set_cif_keywords(self._hdu_edisp, irf['EDISP_NAME'],
+                               irf['EDISP_BOUNDS'], irf['EDISP_DESC'], irf)
+
+        # Create "MATRIX" data column
+        self._make_3D_migra(matrix, self._hdu_edisp, 'MATRIX', '')
+
+        # Return
+        return
+
+    def _root2bgd(self, file, irf):
+        """
+        Translate ROOT to CALDB background extension.
+        
+        The following ROOT histograms are used:
+        - BGRatePerSqDeg_offaxis -> BGD
+
+        Parameters
+        ----------
+        file : `~ROOT.TFile`
+            ROOT file
+        irf : dict
+            IRF metadata dictionary
+        """
+        # Write header
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1('Generate 3D background extension')
+
+        # Get relevant ROOT histograms
+        array = file.Get('BGRatePerSqDeg_offaxis')
+
+        # Replace 2D histogram values by power law extrapolation
+        self._plaw_replace(array, self['bgdethres'].real())
+
+        # If requested then fill-in empty values in 2D histogram
+        if self['bgdinfill'].boolean():
+            self._infill_bgd(array)
+
+        # If requested then normalize the 2D histogram on the on-axis 1D
+        # histogram. This assures that the 2D histogram has the same on-axis
+        # effective area dependence as the 1D histogram.
+        if self['norm1d'].boolean():
+            array_1D = file.Get('BGRatePerSqDeg')
+            self._renorm_onaxis(array, array_1D)
+
+        # Set boundaries
+        bounds = self._make_3D(array, self._hdu_bgd, None, 'deg')
+        for b in bounds:
+            irf['BGD_BOUNDS'].append(b)
+
+        # Write boundary keywords
+        self._set_cif_keywords(self._hdu_bgd, irf['BGD_NAME'],
+                               irf['BGD_BOUNDS'], irf['BGD_DESC'], irf)
+
+        # Create "BGD" data column
+        self._make_3D(array, self._hdu_bgd, 'BGD', '1/s/MeV/sr')
 
         # Return
         return
 
     def _append_column(self, hdu, name, unit, axis, log=False):
         """
-        Append column to HDU.
+        Append column to HDU
         
-        Parameters:
-            hdu: HDU
-            name: Column name
-            unit: Column unit
-            axis: ROOT histogram axis
-        
-        Keywords:
-            log:  Logarithmic axis
+        Parameters
+        ----------
+        hdu : `~gammalib.GFitsHDU`
+            FITS HDU
+        name : str
+            Column name
+        unit : str
+            Column unit
+        axis : `~ROOT.TAxis`
+            ROOT histogram axis
+        log : bool, optional
+            Axis is logarithmic
         """
         # Continue only if columns does not yet exist
         if not hdu.contains(name):
@@ -1024,9 +990,9 @@ class csroot2caldb(ctools.cscript):
         Parameters
         ----------
         hist2D : `~ROOT.TH2F`
-            ROOT 2D histogram.
+            ROOT 2D histogram
         hist1D : `~ROOT.TH1F`
-            ROOT 1D histogram.
+            ROOT 1D histogram
         """
         # Get 2D dimensions
         neng    = hist2D.GetXaxis().GetNbins()
@@ -1101,9 +1067,9 @@ class csroot2caldb(ctools.cscript):
         Parameters
         ----------
         hist2D : `~ROOT.TH2F`
-            ROOT 2D histogram.
+            ROOT 2D histogram
         ethres : float
-            Energy threshold.
+            Energy threshold
         """
         # Extract energy and offset angle vectors
         energies = hist2D.GetXaxis()
@@ -1260,7 +1226,7 @@ class csroot2caldb(ctools.cscript):
         Parameters
         ----------
         hist2D : `~ROOT.TH2F`
-            ROOT 2D histogram.
+            ROOT 2D histogram
         """
         # Extract energy and offset angle vectors
         energies = hist2D.GetXaxis()
@@ -1316,19 +1282,24 @@ class csroot2caldb(ctools.cscript):
 
     def _make_2D(self, array, hdu, name, unit, scale=1.0):
         """
-        Make 2D matrix as function of energy and offset angle from a
-        ROOT 2D histogram. If the HDU has already the energy and
-        offset angle columns, this method will simply add another data
-        column.
-        If name==None, the method will not append any data column.
+        Make 2D data column as function of energy and offset angle
+        
+        If the HDU has already the energy and offset angle columns, this method
+        will simply add another data column. If name==None, the method will not
+        append any data column.
 
-        Parameters:
-         array - ROOT 2D histogram.
-         hdu   - FITS HDU.
-         name  - Data column name.
-         unit  - Data unit.
-        Keywords:
-         scale - Scaling factor for histogram values.
+        Parameters
+        ----------
+        array : `~ROOT.TH2F`
+            ROOT 2D histogram
+        hdu : `~gammalib.GFitsHDU`
+            FITS HDU
+        name : str
+            Data column name
+        unit : str
+            Data unit
+        scale : float, optional
+            Scaling factor for histogram values
         """
         # Extract energy and offset angle vectors
         energies = array.GetXaxis()
@@ -1337,10 +1308,10 @@ class csroot2caldb(ctools.cscript):
         noffset  = offsets.GetNbins()
 
         # Append axis columns to HDU
-        self._append_column(hdu, "ENERG_LO", "TeV", energies, log=True)
-        self._append_column(hdu, "ENERG_HI", "TeV", energies, log=True)
-        self._append_column(hdu, "THETA_LO", "deg", offsets)
-        self._append_column(hdu, "THETA_HI", "deg", offsets)
+        self._append_column(hdu, 'ENERG_LO', 'TeV', energies, log=True)
+        self._append_column(hdu, 'ENERG_HI', 'TeV', energies, log=True)
+        self._append_column(hdu, 'THETA_LO', 'deg', offsets)
+        self._append_column(hdu, 'THETA_HI', 'deg', offsets)
 
         # Append array column
         if name != None and not hdu.contains(name):
@@ -1354,13 +1325,13 @@ class csroot2caldb(ctools.cscript):
                     hdu[name][0,index] = value * scale
 
         # Collect boundary information
-        bd_eng = "ENERG(%.4f-%.2f)TeV" % \
+        bd_eng = 'ENERG(%.4f-%.2f)TeV' % \
                  (pow(10.0, energies.GetBinLowEdge(1)), \
                   pow(10.0, energies.GetBinUpEdge(neng)))
-        bd_off = "THETA(%.2f-%.2f)deg" % \
+        bd_off = 'THETA(%.2f-%.2f)deg' % \
                  (offsets.GetBinLowEdge(1), \
                   offsets.GetBinUpEdge(noffset))
-        bd_phi = "PHI(0-360)deg"
+        bd_phi = 'PHI(0-360)deg'
         bounds = [bd_eng, bd_off, bd_phi]
 
         # Return boundary information
@@ -1368,23 +1339,22 @@ class csroot2caldb(ctools.cscript):
 
     def _make_3D(self, array, hdu, name, unit):
         """
-        Generate background 3D cube
+        Make 3D data column as function of DETX, DETY and energy
         
-        Generates 3D cube as function of DETX, DETY and energy from a
-        ROOT 2D histogram. If the HDU has already the energy and
-        offset angle columns, this method will simply add another data
-        column. If name==None, the method will not append any data column.
+        If the HDU has already the energy and offset angle columns, this method
+        will simply add another data column. If name==None, the method will not
+        append any data column.
 
         Parameters
         ----------
         array : `~ROOT.TH2F`
-            ROOT 2D histogram.
+            ROOT 2D histogram
         hdu : `~gammalib.GFitsHDU`
-            FITS HDU.
+            FITS HDU
         name : str
-            Data column name.
+            Data column name
         unit : str
-            Data unit.
+            Data unit
         """
         # Get User parameters
         scale      = self['bgdscale'].real()
@@ -1468,21 +1438,6 @@ class csroot2caldb(ctools.cscript):
                             value = binsq / deg2sr / (ewidth[ieng])
                             hdu[name][0,index] = value * scale
 
-        # Debugging
-        if False:
-            for ieng in range(neng):
-                sum = 0.0
-                for ioff in range(noffset):
-                    index = ieng + ioff * neng
-                    binsq = array.GetBinContent(ieng+1,ioff+1)
-                    value = binsq / deg2sr / ewidth[ieng]
-                    sum  += value
-                    if ioff == 0:
-                        peak = value
-                        peaksq = binsq
-                print(pow(10.0, energies.GetBinLowEdge(ieng+1))+
-                      pow(10.0, energies.GetBinUpEdge(ieng+1)), sum, peak, peaksq)
-
         # Collect boundary information
         bd_detx = 'DETX(%.2f-%.2f)deg' % (-det_max, det_max)
         bd_dety = 'DETY(%.2f-%.2f)deg' % (-det_max, det_max)
@@ -1496,18 +1451,24 @@ class csroot2caldb(ctools.cscript):
 
     def _make_3D_migra(self, array, hdu, name, unit, scale=1.0):
         """
-        Make 3D cube as function of ETRUE, MIGRA and THETA form ROOT 3D
-        histogram. If the HDU has already the columns, this method will
-        simply add another data column.
-        If name==None, the method will not append any data column.
+        Make 3D data column as function of ETRUE, MIGRA and THETA
+        
+        If the HDU has already the energy and offset angle columns, this method
+        will simply add another data column. If name==None, the method will not
+        append any data column.
 
-        Parameters:
-         array - ROOT 3D histogram.
-         hdu   - FITS HDU.
-         name  - Data column name.
-         unit  - Data unit.
-        Keywords:
-         scale - Scaling factor for histogram values.
+        Parameters
+        ----------
+        array : `~ROOT.TH3F`
+            ROOT 2D histogram
+        hdu : `~gammalib.GFitsHDU`
+            FITS HDU
+        name : str
+            Data column name
+        unit : str
+            Data unit
+        scale : float, optional
+            Scaling factor for histogram values
         """
         # Extract Etrue, Eobs/Etrue and offset angle vectors
         etrue    = array.GetXaxis()
@@ -1522,12 +1483,12 @@ class csroot2caldb(ctools.cscript):
                           pow(10.0, etrue.GetBinLowEdge(ieng+1)+6.0))
 
         # Append axis columns to HDU
-        self._append_column(hdu, "ETRUE_LO", "TeV", etrue, log=True)
-        self._append_column(hdu, "ETRUE_HI", "TeV", etrue, log=True)
-        self._append_column(hdu, "MIGRA_LO", "", migra)
-        self._append_column(hdu, "MIGRA_HI", "", migra)
-        self._append_column(hdu, "THETA_LO", "deg", offsets)
-        self._append_column(hdu, "THETA_HI", "deg", offsets)
+        self._append_column(hdu, 'ETRUE_LO', 'TeV', etrue, log=True)
+        self._append_column(hdu, 'ETRUE_HI', 'TeV', etrue, log=True)
+        self._append_column(hdu, 'MIGRA_LO', '', migra)
+        self._append_column(hdu, 'MIGRA_HI', '', migra)
+        self._append_column(hdu, 'THETA_LO', 'deg', offsets)
+        self._append_column(hdu, 'THETA_HI', 'deg', offsets)
 
         # Append migration matrix to HDU
         if name != None and not hdu.contains(name):
@@ -1542,16 +1503,16 @@ class csroot2caldb(ctools.cscript):
                         hdu[name][0,index] = value * scale
 
         # Collect boundary information
-        bd_eng   = "ETRUE(%.4f-%.2f)TeV" % \
+        bd_eng   = 'ETRUE(%.4f-%.2f)TeV' % \
                    (pow(10.0, etrue.GetBinLowEdge(1)),
                     pow(10.0, etrue.GetBinUpEdge(netrue)))
-        bd_migra = "MIGRA(%.3f-%.3f)" % \
+        bd_migra = 'MIGRA(%.3f-%.3f)' % \
                    (migra.GetBinLowEdge(1),
                     migra.GetBinUpEdge(nmigra))
-        bd_off   = "THETA(%.2f-%.2f)deg" % \
+        bd_off   = 'THETA(%.2f-%.2f)deg' % \
                    (offsets.GetBinLowEdge(1),
                     offsets.GetBinUpEdge(noffset))
-        bd_phi   = "PHI(0-360)deg"
+        bd_phi   = 'PHI(0-360)deg'
         bounds   = [bd_eng, bd_migra, bd_off, bd_phi]
 
         # Return boundary information
@@ -1561,7 +1522,7 @@ class csroot2caldb(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Warn if ROOT module is missing
         if not _has_root:
@@ -1575,25 +1536,28 @@ class csroot2caldb(ctools.cscript):
         # Get parameters
         self._get_parameters()
 
-        # Initialise IRF
-        self._initialise()
+        # Initialise IRF metadata
+        irf = self._init_metadata()
 
-        # Open calibration file
-        self._open("file")
+        # Create directory structure
+        dir = self._make_dirs('file', irf)
+
+        # Open calibration files
+        self._open(irf, dir)
 
         # Translate ROOT to CALDB information
         if _has_root:
-            self._root2caldb()
+            self._root2caldb(irf)
 
-        # Close calibration file
-        self._close()
+        # Close calibration files
+        self._close(irf, dir)
 
         # Return
         return
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

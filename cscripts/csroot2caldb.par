@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      csroot2caldb.par                                              #
-#  Version:   1.0.0                                                         #
+#  Version:   1.2.0                                                         #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -24,6 +24,7 @@ id,            s, a, South_50h,,, "Instrument Response Function identifier"
 version,       s, a, prod3,,, "Instrument Response Function version"
 analysis,      s, a, DESY,,, "Instrument Response Function analysis"
 psftype,       s, h, Gauss,Gauss|King,, "Point spread function type"
+split,         b, h, no,,, "Split IRF components into different files"
 norm1d,        b, h, no,,, "Normalize on 1D histograms"
 rebin,         b, h, no,,, "Rebin"
 eascale,       r, h, 1.0,,, "Scaling factor for effective areas"
