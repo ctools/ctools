@@ -80,7 +80,7 @@ class Test(test):
                            ' outdir="csroot2caldb_cmd1"'+ \
                            ' inst=prod3 id=South_50h version=prod3'+ \
                            ' analysis=DESY'+ \
-                           ' logfile="csroot2caldb_cmd1.log" chatter=1'
+                           ' logfile="csroot2caldb_cmd1.log" chatter=2'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -98,16 +98,25 @@ class Test(test):
         """
         Test csroot2caldb from Python
         """
-        # Set-up csroot2caldb
+        # Set-up csroot2caldb with a maximum of parameters so that the
+        # corresponding code gets tests
         caldb = cscripts.csroot2caldb()
-        caldb['infile']   = self._infile
-        caldb['outdir']   = 'csroot2caldb_py1'
-        caldb['inst']     = 'prod3'
-        caldb['id']       = 'South_50h'
-        caldb['version']  = 'prod3'
-        caldb['analysis'] = 'DESY'
-        caldb['logfile']  = 'csroot2caldb_py1.log'
-        caldb['chatter']  = 2
+        caldb['infile']        = self._infile
+        caldb['outdir']        = 'csroot2caldb_py1'
+        caldb['inst']          = 'prod3'
+        caldb['id']            = 'South_50h'
+        caldb['version']       = 'prod3'
+        caldb['analysis']      = 'DESY'
+        caldb['psftype']       = 'King'
+        caldb['norm1d']        = True
+        caldb['rebin']         = True
+        caldb['eascale']       = 1.1
+        caldb['bgdscale']      = 0.9
+        caldb['bgdoversample'] = 3
+        caldb['bgdethres']     = 10.0
+        caldb['bgdinfill']     = True
+        caldb['logfile']       = 'csroot2caldb_py1.log'
+        caldb['chatter']       = 4
 
         # Run script
         caldb.logFileOpen()   # Make sure we get a log file
