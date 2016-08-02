@@ -107,7 +107,7 @@ class Test(test):
         """
         Test cssens from Python
         """
-        # Set-up cssens
+        # Set-up cssens for differential sensitivity computation
         sens = cscripts.cssens()
         sens['inobs']    = 'NONE'
         sens['inmodel']  = self._model
@@ -130,6 +130,29 @@ class Test(test):
 
         # Check pull distribution file
         self._check_result_file('cssens_py1.dat')
+
+        # Set-up cssens for integral sensitivity computation
+        sens = cscripts.cssens()
+        sens['inobs']    = 'NONE'
+        sens['inmodel']  = self._model
+        sens['srcname']  = 'Crab'
+        sens['caldb']    = self._caldb
+        sens['irf']      = self._irf
+        sens['outfile']  = 'cssens_py2.dat'
+        sens['duration'] = 1800.0
+        sens['rad']      = 3.0
+        sens['emin']     = 1.0
+        sens['emax']     = 10.0
+        sens['bins']     = 1
+        sens['type']     = 'Integral'
+        sens['logfile']  = 'cssens_py2.log'
+        sens['chatter']  = 4
+
+        # Execute cssens script
+        sens.execute()
+
+        # Check pull distribution file
+        self._check_result_file('cssens_py2.dat')
 
         # Return
         return
