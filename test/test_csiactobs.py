@@ -77,7 +77,7 @@ class Test(test):
                         ' infile="runlist_cmd1.dat"'+ \
                         ' bkgpars=1'+\
                         ' outobs="obs_iactobs_cmd1.xml"'+ \
-                        ' outmodel="bgd_iactobs_cmd1.xml"'+ \
+                        ' outmodel="bkg_iactobs_cmd1.xml"'+ \
                         ' logfile="csiactobs_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -92,7 +92,7 @@ class Test(test):
         self._check_obsdef('obs_iactobs_cmd1.xml')
 
         # Check model definition XML file
-        self._check_moddef('bgd_iactobs_cmd1.xml')
+        self._check_moddef('bkg_iactobs_cmd1.xml')
 
         # Setup csiactobs command
         cmd = csiactobs+' datapath="data_path_that_does_not_exist"'+ \
@@ -100,12 +100,25 @@ class Test(test):
                         ' infile="runlist_cmd1.dat"'+ \
                         ' bkgpars=1'+\
                         ' outobs="obs_iactobs_cmd2.xml"'+ \
-                        ' outmodel="bgd_iactobs_cmd2.xml"'+ \
+                        ' outmodel="bkg_iactobs_cmd2.xml"'+ \
                         ' logfile="csiactobs_cmd2.log" chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
-             'Check invalid input file when executed from command line')
+             'Check invalid input datapath when executed from command line')
+        
+        # Setup csiactobs command
+        cmd = csiactobs+' datapath="'+self._datapath+'"'+ \
+                        ' prodname="unit-test-doesnt-exist"'+ \
+                        ' infile="runlist_cmd1.dat"'+ \
+                        ' bkgpars=1'+\
+                        ' outobs="obs_iactobs_cmd3.xml"'+ \
+                        ' outmodel="bkg_iactobs_cmd3.xml"'+ \
+                        ' logfile="csiactobs_cmd3.log" chatter=1'       
+
+        # Check if execution failed
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid input prodname when executed from command line')
 
         # Return
         return
@@ -122,7 +135,7 @@ class Test(test):
         iactobs['infile']   = 'runlist_py1.dat'
         iactobs['bkgpars']  = 1
         iactobs['outobs']   = 'obs_iactobs_py1.xml'
-        iactobs['outmodel'] = 'bgd_iactobs_py1.xml'
+        iactobs['outmodel'] = 'bkg_iactobs_py1.xml'
         iactobs['logfile']  = 'csiactobs_py1.log'
         iactobs['chatter']  = 2
 
@@ -135,7 +148,93 @@ class Test(test):
         self._check_obsdef('obs_iactobs_py1.xml')
         
         # Check model definition XML file
-        self._check_moddef('bgd_iactobs_py1.xml')
+        self._check_moddef('bkg_iactobs_py1.xml')
+        
+        # Create test runlist
+        runlist = ['0']
+           
+        # Set-up csiactobs - part 2 (set runlist via function, 2 background pars)
+        iactobs = cscripts.csiactobs()
+        iactobs['datapath'] = self._datapath
+        iactobs['prodname'] = 'unit-test'
+        iactobs['bkgpars']  = 2
+        iactobs['outobs']   = 'obs_iactobs_py2.xml'
+        iactobs['outmodel'] = 'bkg_iactobs_py2.xml'
+        iactobs['logfile']  = 'csiactobs_py2.log'
+        iactobs['chatter']  = 3
+        iactobs.runlist(runlist)
+   
+        # Run csiactobs script and save run list
+        iactobs.logFileOpen()   # Make sure we get a log file
+        iactobs.run()
+        iactobs.save()
+           
+        # Test return functions
+        obs     = iactobs.obs()
+        ebounds = iactobs.ebounds() 
+           
+        self.test_assert(obs.size() == 1,
+                         'Check output observation container')
+        self.test_assert(ebounds.size() == 0,
+                         'Check output energy boundaries container')
+   
+        # Check observation definition XML file
+        self._check_obsdef('obs_iactobs_py2.xml')
+           
+        # Check model definition XML file
+        self._check_moddef('bkg_iactobs_py2.xml')
+           
+        # Set-up csiactobs - part 3 (use a large number of free parameters, aeff background)
+        iactobs = cscripts.csiactobs()
+        iactobs['datapath']      = self._datapath
+        iactobs['prodname']      = 'unit-test'
+        iactobs['infile']        = 'runlist_py1.dat'
+        iactobs['bkgpars']       = 8
+        iactobs['bkg_mod_hiera'] = 'aeff'
+        iactobs['outobs']        = 'obs_iactobs_py3.xml'
+        iactobs['outmodel']      = 'bkg_iactobs_py3.xml'
+        iactobs['logfile']       = 'csiactobs_py3.log'
+        iactobs['chatter']       = 4
+    
+        # Run csiactobs script and save run list
+        iactobs.logFileOpen()   # Make sure we get a log file
+        iactobs.run()   
+        iactobs.save()
+        
+        # Check observation definition XML file
+        self._check_obsdef('obs_iactobs_py3.xml')
+            
+        # Check model definition XML file
+        self._check_moddef('bkg_iactobs_py3.xml')
+            
+        # Set-up csiactobs - part 4 (use a Gauss background and inmodel parameter)
+        iactobs = cscripts.csiactobs()
+        iactobs['datapath']      = self._datapath
+        iactobs['inmodel']       = 'results.xml'
+        iactobs['prodname']      = 'unit-test'
+        iactobs['infile']        = 'runlist_py1.dat'
+        iactobs['bkgpars']       = 1
+        iactobs['bkg_mod_hiera'] = 'gauss'
+        iactobs['outobs']        = 'NONE'
+        iactobs['outmodel']      = 'NONE'
+        iactobs['logfile']       = 'csiactobs_py4.log'
+        iactobs['chatter']       = 2
+   
+        # Run csiactobs script
+        iactobs.logFileOpen()   # Make sure we get a log file
+        iactobs.run()
+        
+        # Get observations and models
+        observations      = iactobs.obs()
+        models            = observations.models()
+         
+        # Check number of models
+        self.test_assert(models.size() == 3,
+                       'Check for three models in container')
+
+        # Check number of observations
+        self.test_assert(observations.size() == 1,
+                       'Check for one observation in container')
 
         # Return
         return

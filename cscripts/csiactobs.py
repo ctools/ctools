@@ -174,27 +174,45 @@ class csiactobs(ctools.cscript):
 
         # Get HDUs
         for config in configs:
+            
+            # Check if prodname is present
             if self._prodname == config['name']:
                 self._hdu_index = str(os.path.join(self._datapath, config['hduindx']))
                 self._obs_index = str(os.path.join(self._datapath, config['obsindx']))
+                
+                # Leave loop if index file names were found
                 break
 
-        # Check HDUs
+        # Check index files
         if self._hdu_index == '' or self._obs_index == '':
             raise RuntimeError('*** ERROR: FITS data store "'+self._prodname+'" not available. Run csiactdata to get a list of available storage names')
+        
+        # Check HDU names
         filename = gammalib.GFilename(self._hdu_index+'[HDU_INDEX]')
         if not filename.is_fits():
             raise RuntimeError('*** ERROR: HDU index file "'+self._hdu_index+'[HDU_INDEX]" for FITS data store "'+self._prodname+'" not available. Check your master index file or run csiactdata to get a list of available storage names.')
 
         # Check for existence of 'BKG_SCALE' in the observation index file if required
         if self._use_bkg_scale:
+            
+            # Create filename
             filename = gammalib.GFilename(self._obs_index+'[OBS_INDEX]')
+            
+            # Check if it is a FITS file
             if filename.is_fits():
+                
+                # Open FITS file
                 fits = gammalib.GFits(self._obs_index)
+                
+                # Check if column "BKG_SCALE" is found and signal its possible usage
                 if not fits['OBS_INDEX'].contains('BKG_SCALE'):
                     self._use_bkg_scale = False
+                    
+                # Close FITS file
                 fits.close()
+                
             else:
+                # Signal that there is no background scale
                 self._use_bkg_scale = False
         
         # Create base data directory from hdu index file location
@@ -212,6 +230,11 @@ class csiactobs(ctools.cscript):
     def runlist(self, runlist):
         """
         Set observation list
+        
+        Parameters
+        ----------
+        runlist : list
+            List of observation IDs
         """
         
         # Check if convertable to a python list
@@ -228,14 +251,37 @@ class csiactobs(ctools.cscript):
         # Return
         return
     
-    def _background_spectrum(self, run, prefactor, index, emin = 0.01, emax = 100.0):
+    def _background_spectrum(self, prefactor, index, emin = 0.01, emax = 100.0):
+        """
+        Create a background spectrum model dependent on user parameters
+        
+        Parameters
+        ----------
+        prefactor : float
+            Prefactor parameter of spectral model
+        index : float
+            Index parameter of spectral model
+        emin : float
+            Minimum energy (in case a spectral node function is required)
+        emax : float
+            Maximum energy (in case a spectral node function is required)
+        
+        Returns
+        -------
+        spec : `~gammalib.GModelSpectral()`
+            Spectral model for the background shape     
+        """
         
         # Handle constant spectral model 
         if index == 0.0 and self._bkgpars <= 1:
             spec = gammalib.GModelSpectralConst()
+            
+            # Set parameter range
             spec['Normalization'].min(prefactor / self._bkg_range_factor)
             spec['Normalization'].max(prefactor * self._bkg_range_factor)
             spec['Normalization'].value(prefactor)
+            
+            # Freeze or release normalisation parameter
             if self._bkgpars == 0:
                 spec['Normalization'].fix()
             else:
@@ -245,8 +291,10 @@ class csiactobs(ctools.cscript):
                 
             # Create power law model 
             if self._bkgpars <= 2:
-                e    = gammalib.GEnergy(1.0,'TeV')
-                spec = gammalib.GModelSpectralPlaw(prefactor, index, e)  
+                
+                # Set Power Law model with arbitrary pivot energy
+                pivot = gammalib.GEnergy(1.0,'TeV')
+                spec  = gammalib.GModelSpectralPlaw(prefactor, index, pivot)  
                  
                 # Set parameter ranges
                 spec[0].min(prefactor / self._bkg_range_factor)
@@ -269,19 +317,31 @@ class csiactobs(ctools.cscript):
             else:
                 
                 # Create reference powerlaw
-                plaw = gammalib.GModelSpectralPlaw(prefactor, index, gammalib.GEnergy(1.0,'TeV')) 
+                pivot = gammalib.GEnergy(1.0,'TeV')
+                plaw = gammalib.GModelSpectralPlaw(prefactor, index, pivot) 
                 
                 # Create spectral model and energy values
                 spec = gammalib.GModelSpectralNodes()
+                
+                # Create logarithmic energy nodes
                 bounds = gammalib.GEbounds(self._bkgpars,gammalib.GEnergy(emin,'TeV'),gammalib.GEnergy(emax,'TeV'), True)
+                
+                # Loop over bounds and set intensity value
                 for i in range(bounds.size()):     
                     energy = bounds.elogmean(i)
-                    value = plaw.eval(energy, gammalib.GTime())
+                    value = plaw.eval(energy)
+                    
+                    # Append energy, value - tuple to node function
                     spec.append(energy, value)
+                
+                # Loop over parameters
                 for par in spec:
                     
+                    # Fix energy nodes
                     if 'Energy' in par.name():
                         par.fix()
+                    
+                    # Release intensity nodes
                     elif 'Intensity' in par.name():   
                         value = par.value() 
                         par.scale(value)    
@@ -292,13 +352,36 @@ class csiactobs(ctools.cscript):
         return spec
 
     def _iact_background(self, telescope, obs_id, bkg_scale, bkgtype, emin=0.01, emax=100):
+        """
+        Create an IACT background model
         
+        Parameters
+        ----------
+        telescope : string
+            Name of telescope
+        obs_id : string
+            Observation ID
+        bkg_scale : float
+            Background scaling factor
+        bkgtype : string
+            Type of background (irf,aeff, or gauss)
+        
+        Returns
+        -------
+        model : `~gammalib.GModelData()`
+            Background model for IACT observation
+        """
+              
         # handle IrfBackground
         if bkgtype == 'irf':
+            
+            # Set parameters to have a constant spectral model
             prefactor  = 1.0
             index      = 0.0
             prefactor *= bkg_scale
-            spec       = self._background_spectrum(obs_id, prefactor, index, emin, emax)
+            
+            # Create background spectrum
+            spec       = self._background_spectrum(prefactor, index, emin, emax)
             
             # Create background model instance
             bck = gammalib.GCTAModelIrfBackground(spec)
@@ -306,7 +389,7 @@ class csiactobs(ctools.cscript):
         # Set AeffBackground   
         elif bkgtype == 'aeff':
             prefactor = bkg_scale * self._bkg_aeff_norm
-            spec      = self._background_spectrum(obs_id, prefactor, self._bkg_aeff_index, emin, emax)
+            spec      = self._background_spectrum(prefactor, self._bkg_aeff_index, emin, emax)
                 
             # Create background model instance
             bck = gammalib.GCTAModelAeffBackground(spec)
@@ -314,12 +397,14 @@ class csiactobs(ctools.cscript):
         # Set Gaussian Background
         elif bkgtype == 'gauss':
             prefactor = bkg_scale * self._bkg_gauss_norm
-            spec      = self._background_spectrum(obs_id, prefactor, self._bkg_gauss_index, emin, emax)
+            
+            # Create background spectrum
+            spec      = self._background_spectrum(prefactor, self._bkg_gauss_index, emin, emax)
             radial    = gammalib.GCTAModelRadialGauss(self._bkg_gauss_sigma)
             bck       = gammalib.GCTAModelRadialAcceptance(radial, spec)
         
         else:
-            msg = 'Background type "'+self._bkgtype+'" unsupported'
+            msg = 'Background type "'+bkgtype+'" unsupported'
             raise RuntimeError(msg)
         
         # Copy model
@@ -383,6 +468,7 @@ class csiactobs(ctools.cscript):
             eventfile = aefffile = psffile = edispfile = bkgfile = ''
             eventhdu  = aeffhdu  = ''
             
+            # Initialise types and formats
             types = []
             formats = []
             for i in range(hduindx_hdu.nrows()):  
@@ -402,7 +488,11 @@ class csiactobs(ctools.cscript):
                                           hduindx_hdu['FILE_NAME'][index])
                 eventhdu   = hduindx_hdu['HDU_NAME'][index]
                 eventfile += '['+eventhdu+']'
+            
+            # Check if psf file is available
             if not gammalib.GFilename(eventfile).is_fits():
+                
+                # Print warning that observation will be skipped since no events are present
                 if self._logTerse():
                     self._log('Skipping observation '+str(obs_id)+
                               ': eventfile "'+eventfile+'" not found\n')
@@ -421,7 +511,11 @@ class csiactobs(ctools.cscript):
                                          hduindx_hdu['FILE_NAME'][index])
                 aeffhdu   = hduindx_hdu['HDU_NAME'][index]
                 aefffile += '['+aeffhdu+']'
+            
+            # Check if psf file is available
             if not gammalib.GFilename(aefffile).is_fits():
+                
+                # Print warning that observation will be skipped since no effective area is present
                 if self._logTerse():
                     self._log('Skipping observation '+str(obs_id)+
                               ': effective area "'+aefffile+'" not found\n')
@@ -439,7 +533,11 @@ class csiactobs(ctools.cscript):
                                         hduindx_hdu['FILE_DIR'][index],
                                         hduindx_hdu['FILE_NAME'][index])
                 psffile += '['+hduindx_hdu['HDU_NAME'][index]+']'
+            
+            # Check if psf file is available
             if not gammalib.GFilename(psffile).is_fits():
+                
+                # Print warning that observation will be skipped since no PSF is present
                 if self._logTerse():
                     self._log('Skipping observation '+str(obs_id)+
                               ': point spread function "'+psffile+
@@ -458,7 +556,11 @@ class csiactobs(ctools.cscript):
                                           hduindx_hdu['FILE_DIR'][index],
                                           hduindx_hdu['FILE_NAME'][index])
                 edispfile += '['+hduindx_hdu['HDU_NAME'][index]+']'
+            
+            # Check if edisp file is available
             if not gammalib.GFilename(edispfile).is_fits():
+                
+                # Print warning that edisp cannot be used for this observation
                 if self._logTerse():
                     self._log('Warning: observation '+str(obs_id)+
                               ' has no energy dispersion "'+edispfile+
@@ -480,17 +582,22 @@ class csiactobs(ctools.cscript):
                 bkgfile += '['+hduindx_hdu['HDU_NAME'][index]+']'
             if 'irf' in bkg_mod_hierarchy and not gammalib.GFilename(bkgfile).is_fits():
                 bkg_mod_hierarchy.remove('irf')
+                
+                # Throw warning if IRF background cannot be used
                 if self._logTerse():
                     self._log('Warning: observation '+str(obs_id)+
                               ' has no background information (file="'+
                               bkgfile+'"). IRF background cannot be used\n')
                     bkgfile = ''       
                     if len(bkg_mod_hierarchy) == 0:
+                        
+                        # Skip observation if no background can be used
                         if self._logTerse():
                             self._log('Skipping observation '+str(obs_id)+
                                       ': No background can be used\n')
                         continue
                     else:
+                        # Log if we fall back to next background approach
                         if self._logTerse():
                             self._log('Observation '+str(obs_id)+
                                       ': Falling back to background "'+
@@ -499,15 +606,21 @@ class csiactobs(ctools.cscript):
             # Close hdu index file
             hduindx.close()
 
-            # Handle background scale information if available
+            # Initialise background scale
             bkg_scale = 1.0
+            
+            # Check if background scale should be used
             if self._use_bkg_scale:
+                
+                # Read background scale from fits file
                 obsindx   = gammalib.GFits(self._obs_index+'[OBS_INDEX]'+obs_selection)
                 bkg_scale = obsindx['OBS_INDEX']['BKG_SCALE'][0]
                 obsindx.close()
             
-            # Open fits file to determine the observation name
+            # Open event FITS file
             fits        = gammalib.GFits(eventfile)
+            
+            # Get object and telescope strings from event hdu
             events      = fits[eventhdu]
             object_name = events.string('OBJECT')
             telescope   = events.string('TELESCOP')
@@ -550,6 +663,7 @@ class csiactobs(ctools.cscript):
                 self._log('Adding observation '+str(obs_id)+
                           ' ("'+object_name+'")\n')
 
+            # log more details
             if self._logExplicit():
                 self._log(' Event file: '+eventfile+'\n')
                 self._log(' Effective area: '+aefffile+'\n')
@@ -615,10 +729,13 @@ class csiactobs(ctools.cscript):
                 self._log('\n')
         
         else:
+            # Print warning if no observation could be be used from runlist
             self._log.header2('WARNING: No observation from given runlist available')
 
         # Append models provided by 'inmodels' if necessary
-        if not self._inmodels == None:
+        if self._inmodels.size() > 0:
+            
+            # Logging
             if self._logTerse():
                 self._log('\n')
                 self._log.header1('Appending models')
