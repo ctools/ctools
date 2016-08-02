@@ -26,12 +26,12 @@ try:
     import matplotlib.mlab as mlab
     plt.figure()
     plt.close()
-except:
+except ImportError:
     print('This script needs the "matplotlib" module')
     sys.exit()
 try:
     import numpy as np
-except:
+except ImportError:
     print('This script needs the "numpy" module')
     sys.exit()
 

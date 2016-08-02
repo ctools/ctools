@@ -26,7 +26,7 @@ try:
     import matplotlib.pyplot as plt
     plt.figure()
     plt.close()
-except:
+except ImportError:
     print('This script needs the "matplotlib" module')
     sys.exit()
 
