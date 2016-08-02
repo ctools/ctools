@@ -47,9 +47,10 @@ class csiactobs(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csiactobs'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise some members
+        self._obs              = gammalib.GObservations()
         self._ebounds          = gammalib.GEbounds()
         self._datapath         = os.getenv('VHEFITS','')
         self._inmodels         = gammalib.GModels()
@@ -59,8 +60,8 @@ class csiactobs(ctools.cscript):
         self._runlist          = []
         self._runlistfile      = gammalib.GFilename()
         self._bkgpars          = 0
-        self._outmodel         = gammalib.GFilename()
-        self._outobs           = gammalib.GFilename()
+        #self._outmodel         = gammalib.GFilename()
+        #self._outobs           = gammalib.GFilename()
         self._master_indx      = ''
         self._use_bkg_scale    = False
         self._ev_hiera         = ['']
@@ -80,8 +81,7 @@ class csiactobs(ctools.cscript):
         self._subdir           = ''
         self._debug            = False
 
-        # Initialise application by calling the appropriate class
-        # constructor.
+        # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
         # Return
@@ -91,7 +91,7 @@ class csiactobs(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile and setup the observation.
+        Get parameters from parfile and setup the observation
         """
         # Set data path
         if self._datapath == '':
@@ -105,7 +105,7 @@ class csiactobs(ctools.cscript):
         self._datapath = gammalib.expand_env(self._datapath)
         
         # Read FITS production
-        self._prodname    = self['prodname'].string()
+        self._prodname = self['prodname'].string()
         
         # Read runlist file if list not already filled
         if len(self._runlist) == 0:
@@ -125,13 +125,12 @@ class csiactobs(ctools.cscript):
             runfile.close()
         
         # Read number of background parameters
-        self._bkgpars     = self['bkgpars'].integer()
-          
-        # Output model file
-        self._outmodel = self['outmodel'].filename()
-        
-        # Observation outfile
-        self._outobs = self['outobs'].filename()
+        self._bkgpars = self['bkgpars'].integer()
+
+        # Query ahead output parameters
+        if self._read_ahead():
+            self['outmodel'].filename()
+            self['outobs'].filename()
         
         # Master index file name
         self._master_indx = self['master_indx'].string()
@@ -224,30 +223,6 @@ class csiactobs(ctools.cscript):
             self._log_parameters()
             self._log('\n')
 
-        # Return
-        return
-    
-    def runlist(self, runlist):
-        """
-        Set observation list
-        
-        Parameters
-        ----------
-        runlist : list
-            List of observation IDs
-        """
-        
-        # Check if convertable to a python list
-        try:
-            
-            # Store a copy of input argument
-            self._runlist = list(runlist)
-            
-        except:
-            
-            # raise error if wrong type detected
-            raise RuntimeError('Argument of csiactobs.runlist() must be of type "list"')
-        
         # Return
         return
     
@@ -767,16 +742,63 @@ class csiactobs(ctools.cscript):
 
     def save(self):
         """
-        Save model definition XML file
+        Save observation definition and model definition XML file
         """
-        # Save observation XML file
-        self._xml.save(self._outobs)
+        # Write header
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1('Save XML files')
+
+        # Get filenames
+        outobs   = self['outobs'].filename()
+        outmodel = self['outmodel'].filename()
+
+        # Log file name
+        if self._logTerse():
+            self._log(gammalib.parformat('Obs. definition XML file'))
+            self._log(outobs.url())
+            self._log('\n')
+
+        # Save observation definition XML file
+        self._xml.save(outobs.url())
+
+        # Log file name
+        if self._logTerse():
+            self._log(gammalib.parformat('Model definiton XML file'))
+            self._log(outmodel.url())
+            self._log('\n')
 
         # Save model XML file
-        self._models.save(self._outmodel)
+        self._models.save(outmodel.url())
 
         # Return
         return       
+
+    def runlist(self, runlist):
+        """
+        Set runlist
+        
+        Parameters
+        ----------
+        runlist : list
+            List of observation IDs
+
+        Raises
+        ------
+        RuntimeError
+            Input runlist is not a Python list
+        """
+        # If the runlist is convertable to a Python list then store the
+        # runlist in the class
+        try:
+            self._runlist = list(runlist)
+
+        # ... otherwise raise an exception
+        except:
+            raise RuntimeError('Argument is not a Python list')
+        
+        # Return
+        return
 
     def ebounds(self):
         """
@@ -787,20 +809,20 @@ class csiactobs(ctools.cscript):
     
     def obs(self):
         """
-        Returns GObservations object
+        Return observations container
         """   
-        # Initialise observations
-        obs = gammalib.GObservations()
+        # Clear observations
+        self._obs.clear()
         
         # Read observations if XML is filled
         if self._xml.size():   
-            obs.read(self._xml)
+            self._obs.read(self._xml)
                 
         # Assign models
-        obs.models(self._models)
+        self._obs.models(self._models)
         
         # Return observations
-        return obs
+        return self._obs
 
 
 # ======================== #

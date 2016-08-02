@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the csiactdata script.
+# This scripts performs unit tests for the csiactdata script
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
