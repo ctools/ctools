@@ -93,11 +93,13 @@ def plot_butterfly(filename, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ====================== #
+# Show butterfly diagram #
+# ====================== #
+def show_butterfly():
+    """
+    Show butterfly diagram
+    """
     # Set usage string
     usage = 'show_butterfly.py [-p plotfile] file'
 
@@ -112,3 +114,15 @@ if __name__ == '__main__':
 
     # Plot butterfly diagram
     plot_butterfly(args[0], plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show butterfly diagram
+    show_butterfly()

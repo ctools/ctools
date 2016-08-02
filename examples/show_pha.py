@@ -32,11 +32,11 @@ except (ImportError, RuntimeError):
 
 
 # ================= #
-# Show PHA spectrum #
+# Plot PHA spectrum #
 # ================= #
-def show_pha(pha, plotfile):
+def plot_pha(pha, plotfile):
     """
-    Show PHA spectrum
+    Plot PHA spectrum
 
     Parameters
     ----------
@@ -90,11 +90,13 @@ def show_pha(pha, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ================= #
+# Show PHA spectrum #
+# ================= #
+def show_pha():
+    """
+    Show PHA spectrum
+    """
     # Set usage string
     usage = 'show_pha.py [-p plotfile] file'
 
@@ -110,5 +112,17 @@ if __name__ == '__main__':
     # Load PHA spectrum
     pha = gammalib.GPha(args[0])
 
+    # Plot PHA spectrum
+    plot_pha(pha, plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
     # Show PHA spectrum
-    show_pha(pha, plotfile)
+    show_pha()

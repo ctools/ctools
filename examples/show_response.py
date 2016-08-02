@@ -317,7 +317,7 @@ def show_one_response(rspname, dbname, name, rootdir=None, color='r'):
 # ==================== #
 # Show one sensitivity #
 # ==================== #
-def show_response(plotfile):
+def plot_response(plotfile):
     """
     Show response
 
@@ -367,11 +367,13 @@ def show_response(plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ============= #
+# Show response #
+# ============= #
+def show_response():
+    """
+    Show response
+    """
     # Set usage string
     usage = 'show_response.py [-p plotfile]'
 
@@ -385,4 +387,16 @@ if __name__ == '__main__':
     plotfile = options[0]['value']
 
     # Show response
-    show_response(plotfile)
+    plot_response(plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show response
+    show_response()

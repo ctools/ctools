@@ -147,16 +147,13 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
-    # Dump header
-    print('********************************************')
-    print('*      CTA stacked analysis pipeline       *')
-    print('********************************************')
-
+# ============================== #
+# Run stacked in-memory pipeline #
+# ============================== #
+def pipeline_stacked_mem():
+    """
+    Run stacked in-memory pipeline
+    """
     # Set usage string
     usage = 'pipeline_stacked_mem.py [-d datadir]'
 
@@ -179,3 +176,15 @@ if __name__ == '__main__':
 
     # Run analysis pipeline
     run_pipeline(obs, enumbins=10, nxpix=40, nypix=40, binsz=0.1)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Run stacked in-memory pipeline
+    pipeline_stacked_mem()

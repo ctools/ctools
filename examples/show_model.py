@@ -86,11 +86,13 @@ def plot_spectrum(model, plotfile, emin=0.01, emax=100.0, enumbins=100):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# =================== #
+# Show model spectrum #
+# =================== #
+def show_model():
+    """
+    Show model spectrum
+    """
     # Set usage string
     usage = 'show_model.py [-n name] [-p plotfile] file'
 
@@ -115,3 +117,15 @@ if __name__ == '__main__':
 
     # Plot spectrum
     plot_spectrum(model, plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show model spectrum
+    show_model()

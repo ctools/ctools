@@ -95,16 +95,13 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
-    # Dump header
-    print('********************************************')
-    print('*       CTA binned analysis pipeline       *')
-    print('********************************************')
-
+# ============================= #
+# Run binned in-memory pipeline #
+# ============================= #
+def pipeline_binned_mem():
+    """
+    Run binned in-memory pipeline
+    """
     # Set usage string
     usage = 'pipeline_binned_mem.py [-d datadir]'
 
@@ -127,3 +124,15 @@ if __name__ == '__main__':
 
     # Run analysis pipeline
     run_pipeline(obs, enumbins=10, nxpix=40, nypix=40, binsz=0.1)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Run binned in-memory pipeline
+    pipeline_binned_mem()

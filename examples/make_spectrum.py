@@ -25,15 +25,15 @@ try:
     import matplotlib.pyplot as plt
     plt.figure()
     plt.close()
-except:
+except (ImportError, RuntimeError):
     print('This script needs the "matplotlib" module')
     sys.exit()
 
 
 # =============== #
-# Make a spectrum #
+# Create spectrum #
 # =============== #
-def make_spectrum(datadir):
+def create_spectrum(datadir):
     """
     Simulate events and generate a source spectrum
 
@@ -178,11 +178,13 @@ def plot_spectrum(spectrum, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ============= #
+# Make spectrum #
+# ============= #
+def make_spectrum():
+    """
+    Make spectrum
+    """
     # Set usage string
     usage = 'make_spectrum.py [-d datadir] [-p plotfile]'
 
@@ -198,7 +200,18 @@ if __name__ == '__main__':
     plotfile = options[1]['value']
 
     # Generate spectrum
-    spectrum = make_spectrum(datadir)
+    spectrum = create_spectrum(datadir)
 
     # Plot spectrum
     plot_spectrum(spectrum, plotfile)
+
+    # Return
+    return
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Make spectrum
+    make_spectrum()

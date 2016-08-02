@@ -98,16 +98,13 @@ def run_pipeline(obs, ra=83.63, dec=22.01, rad=3.0,
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
-    # Dump header
-    print('********************************************')
-    print('*      CTA unbinned analysis pipeline      *')
-    print('********************************************')
-
+# ======================================================= #
+# Run unbinned pipeline with intermediate results on disk #
+# ======================================================= #
+def pipeline_unbinned_disk():
+    """
+    Run unbinned pipeline with intermediate results on disk
+    """
     # Set usage string
     usage = 'pipeline_unbinned_disk.py [-d datadir]'
 
@@ -130,3 +127,15 @@ if __name__ == '__main__':
 
     # Run analysis pipeline
     run_pipeline(obs, model=datadir+'/crab.xml')
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Run unbinned pipeline with intermediate results on disk
+    pipeline_unbinned_disk()

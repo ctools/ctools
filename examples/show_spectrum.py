@@ -31,9 +31,9 @@ except (ImportError, RuntimeError):
 
 
 # ============= #
-# Show spectrum #
+# Plot spectrum #
 # ============= #
-def show_spectrum(filename, plotfile):
+def plot_spectrum(filename, plotfile):
     """
     Plot sensitivity data
 
@@ -112,11 +112,13 @@ def show_spectrum(filename, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ============= #
+# Show spectrum #
+# ============= #
+def show_spectrum():
+    """
+    Show spectrum
+    """
     # Set usage string
     usage = 'show_spectrum.py [-p plotfile] [file]'
 
@@ -130,4 +132,16 @@ if __name__ == '__main__':
     plotfile = options[0]['value']
 
     # Show spectrum
-    show_spectrum(args[0], plotfile)
+    plot_spectrum(args[0], plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show spectrum
+    show_spectrum()

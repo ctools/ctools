@@ -279,11 +279,13 @@ def dist_pdf(values, nbins, title, plotfile, expect=''):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ==================== #
+# Show TS distribution #
+# ==================== #
+def show_ts_distribution():
+    """
+    Show TS distribution
+    """
     # Set usage string
     usage = ('show_ts_distribution.py [-n bins] [-c column] [-title title] '
              '[-e expect] [-t type] [-p plotfile] file')
@@ -316,3 +318,15 @@ if __name__ == '__main__':
         dist_pdf(values, nbins, title, plotfile, expect=expect)
     else:
         dist_cdf(values, nbins, title, plotfile, expect=expect)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show TS distribution
+    show_ts_distribution()

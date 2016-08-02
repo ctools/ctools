@@ -174,16 +174,13 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
-    # Dump header
-    print('********************************************')
-    print('*      CTA stacked analysis pipeline       *')
-    print('********************************************')
-
+# ====================================================== #
+# Run stacked pipeline with intermediate results on disk #
+# ====================================================== #
+def pipeline_stacked_disk():
+    """
+    Run stacked pipeline with intermediate results on disk
+    """
     # Set usage string
     usage = 'pipeline_stacked_disk.py [-d datadir]'
 
@@ -207,3 +204,15 @@ if __name__ == '__main__':
     # Run analysis pipeline
     run_pipeline(obs, model=datadir+'/crab.xml', enumbins=10, nxpix=40,
                  nypix=40, binsz=0.1)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Run stacked pipeline with intermediate results on disk
+    pipeline_stacked_disk()

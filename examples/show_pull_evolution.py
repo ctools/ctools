@@ -87,11 +87,13 @@ def plot_pull_evolution(filename, parname, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# =================== #
+# Show pull evolution #
+# =================== #
+def show_pull_evolution():
+    """
+    Show pull evolution
+    """
     # Set usage string
     usage = 'show_pull_evolution.py [-p plotfile] file parameter'
 
@@ -106,3 +108,15 @@ if __name__ == '__main__':
 
     # Plot pull evolution
     plot_pull_evolution(args[0], args[1], plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show pull evolution
+    show_pull_evolution()

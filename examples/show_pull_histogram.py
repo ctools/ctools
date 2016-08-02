@@ -81,11 +81,13 @@ def plot_pull_histogram(filename, parname, nbins, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# =================== #
+# Show pull histogram #
+# =================== #
+def show_pull_histogram():
+    """
+    Show pull histogram
+    """
     # Set usage string
     usage = 'show_pull_histogram.py [-n bins] [-p plotfile] file parameter'
 
@@ -102,3 +104,15 @@ if __name__ == '__main__':
 
     # Plot pull histogram
     plot_pull_histogram(args[0], args[1], nbins, plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show pull histogram
+    show_pull_histogram()

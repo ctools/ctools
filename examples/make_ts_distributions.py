@@ -82,11 +82,13 @@ def create_ts(datadir, loge, emin, emax, ntrials=100, duration=180000.0,
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ==================== #
+# Make TS distribution #
+# ==================== #
+def make_ts_distribution():
+    """
+    Make TS distribution
+    """
     # Set usage string
     usage = 'make_ts_distributions.py [-n ntrials] [-e enumbins]'\
             ' [-t duration] [-m max_threads] [-d datadir]'
@@ -125,3 +127,15 @@ if __name__ == '__main__':
         # Create TS
         create_ts(datadir, loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
                   duration=duration)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Make TS distribution
+    make_ts_distribution()

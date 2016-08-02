@@ -437,11 +437,13 @@ def write_obsdef(filename, obsdef):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ============== #
+# Make pointings #
+# ============== #
+def make_pointings():
+    """
+    Make pointings
+    """
     # Initialise flags
     need_help = False
 
@@ -491,3 +493,15 @@ if __name__ == '__main__':
     # Invalid pattern
     else:
         print('Unknown option "' + obsname + '"')
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Make pointings
+    make_pointings()

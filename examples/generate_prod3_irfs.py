@@ -53,11 +53,13 @@ def set_prod3_desy(datadir):
     return db
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# =================== #
+# Generate Prod3 IRFs #
+# =================== #
+def generate_prod3_irfs():
+    """
+    Generate Prod3 IRFs
+    """
     # Get optional argument
     if len(sys.argv) == 2:
         datadir = sys.argv[1]
@@ -93,3 +95,15 @@ if __name__ == '__main__':
 
         # Add CALDB entry
         caldb.execute()
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Generate Prod3 IRFs
+    generate_prod3_irfs()

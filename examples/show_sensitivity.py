@@ -95,9 +95,9 @@ def read_sensitivity(filename):
 
 
 # ===================== #
-# Show sensitivity data #
+# Plot sensitivity data #
 # ===================== #
-def show_sensitivity(sensitivity, filename, plotfile):
+def plot_sensitivity(sensitivity, filename, plotfile):
     """
     Plot sensitivity data
 
@@ -141,11 +141,13 @@ def show_sensitivity(sensitivity, filename, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ================ #
+# Show sensitivity #
+# ================ #
+def show_sensitivity():
+    """
+    Show sensitivity
+    """
     # Set usage string
     usage = 'show_sensitivity.py [-p plotfile] [file]'
 
@@ -165,5 +167,17 @@ if __name__ == '__main__':
     # Read sensitivity data
     sensitivity = read_sensitivity(filename)
 
-    # Show sensitivity data
-    show_sensitivity(sensitivity, filename, plotfile)
+    # Plot sensitivity data
+    plot_sensitivity(sensitivity, filename, plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show sensitivity
+    show_sensitivity()

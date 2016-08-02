@@ -79,7 +79,7 @@ def run_csobsinfo(filename, ra, dec, debug=True):
 # ================ #
 # Plot information #
 # ================ #
-def plot_information(info, plotfile):
+def plot_information(info, ra, dec, plotfile):
     """
     Plot information
 
@@ -87,6 +87,10 @@ def plot_information(info, plotfile):
     ----------
     info : `~cscripts.csobsinfo`
         csobsinfo instance
+    ra : float
+        Right Ascension (deg)
+    dec : float
+        Declination (deg)
     plotfile : str
         Plot filename
     """
@@ -173,13 +177,15 @@ def plot_information(info, plotfile):
     return
 
 
-# ======================== #
-# Main routine entry point #
-# ======================== #
-if __name__ == '__main__':
-
+# ================ #
+# Show observation #
+# ================ #
+def show_obs():
+    """
+    Show observation
+    """
     # Set usage string
-    usage = 'show_model.py [-ra ra] [-dec dec] [-p plotfile] file'
+    usage = 'show_obs.py [-ra ra] [-dec dec] [-p plotfile] file'
 
     # Set default options
     options = [{'option': '-ra',  'value': ''},
@@ -198,4 +204,16 @@ if __name__ == '__main__':
     info = run_csobsinfo(args[0], ra, dec)
 
     # Plot information
-    plot_information(info, plotfile)
+    plot_information(info, ra, dec, plotfile)
+
+    # Return
+    return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+
+    # Show observation
+    show_obs()
