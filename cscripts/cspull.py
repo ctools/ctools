@@ -214,16 +214,12 @@ class cspull(ctools.cscript):
         if self._logNormal():
             self._log.header3('Simulation')
             for run in self._obs:
-                self._log.parformat('Input observation %s' % (run.id()))
-                self._log(self._obs_string(run))
-                self._log('\n')
+                self._log_value('Input observation %s' % run.id(),
+                                self._obs_string(run))
             for run in obs:
-                self._log.parformat('Output observation %s' % (run.id()))
-                self._log(self._obs_string(run))
-                self._log('\n')
-            self._log.parformat('Number of simulated events')
-            self._log(nevents)
-            self._log('\n')
+                self._log_value('Output observation %s' % run.id(),
+                                self._obs_string(run))
+            self._log_value('Number of simulated events', nevents)
 
         # Fit model
         if self['profile'].boolean():
@@ -291,13 +287,8 @@ class cspull(ctools.cscript):
 
                     # Write result
                     if self._logNormal():
-                        self._log.parformat(name)
-                        self._log(pull)
-                        self._log(' (')
-                        self._log(fitted_value)
-                        self._log(' +/- ')
-                        self._log(error)
-                        self._log(')\n')
+                        value = '%.4f (%e +/- %e)' % (pull, fitted_value, error)
+                        self._log_value(name, value)
 
         # Bundle together results
         result = {'colnames': colnames, 'values': values}

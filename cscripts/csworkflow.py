@@ -53,7 +53,7 @@ class csworkflow(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csworkflow'
-        self._version = '1.0.0'
+        self._version = '1.2.0'
 
         # Set members
         self._workflow = gammalib.GXml()
@@ -168,12 +168,9 @@ class csworkflow(ctools.cscript):
 
             # Log information about actors
             if self._logNormal():
-                self._log.parformat('Actor "'+name+'"')
-                self._log(tool)
-                self._log('\n')
+                self._log_value('Actor "%s"' % name, tool)
                 if num_inputs == 0:
-                    self._log.parformat('  Predecessor')
-                    self._log('none\n')
+                    self._log_value('  Predecessor', 'none')
                 else:
                     if num_inputs == 1:
                         self._log.parformat('  Predecessor')
@@ -203,16 +200,15 @@ class csworkflow(ctools.cscript):
 
                     # Log execution start
                     if self._logNormal():
-                        self._log.parformat('Execute actor')
-                        self._log('"'+actor['name']+'"\n')
+                        self._log_value('Execute actor', '"%s"' % actor['name'])
 
                     # Execute actor
                     self._execute_actor(actor)
 
                     # Log execution finish
                     if self._logNormal():
-                        self._log.parformat('Finished actor execution')
-                        self._log('"'+actor['name']+'"\n')
+                        self._log_value('Finished actor execution',
+                                        '"%s"' % actor['name'])
 
                     # Set actor status to finished
                     actor['status'] = 'finished'
@@ -247,21 +243,15 @@ class csworkflow(ctools.cscript):
         if self._logNormal():
             pars = actor['input_parameters']
             for par in pars:
-                self._log.parformat('  Input parameter')
-                self._log(par['name'])
-                self._log('=')
-                self._log(self._get_parameter_value(par))
-                self._log('\n')
+                self._log_value('  Input parameter', '%s=%s' %
+                                (par['name'], self._get_parameter_value(par)))
 
         # Log output parameters
         if self._logNormal():
             pars = actor['output_parameters']
             for par in pars:
-                self._log.parformat('  Output parameter')
-                self._log(par['name'])
-                self._log('=')
-                self._log(self._get_parameter_value(par))
-                self._log('\n')
+                self._log_value('  Output parameter', '%s=%s' %
+                                (par['name'], self._get_parameter_value(par)))
 
         # Set actor tool
         if 'tool' in actor:
@@ -342,7 +332,7 @@ class csworkflow(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -368,7 +358,7 @@ class csworkflow(ctools.cscript):
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

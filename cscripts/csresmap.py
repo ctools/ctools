@@ -290,9 +290,7 @@ class csresmap(ctools.cscript):
 
             # Log file name
             if self._logTerse():
-                self._log(gammalib.parformat('Residual map file'))
-                self._log(outmap.url())
-                self._log('\n')
+                self._log_value('Residual map file', outmap.url())
 
             # Save residual map
             self._resmap.save(outmap, self['clobber'].boolean())
@@ -325,9 +323,7 @@ class csresmap(ctools.cscript):
 
             # Log map name
             if self._logTerse():
-                self._log(gammalib.parformat('Residual map name'))
-                self._log(user_name)
-                self._log('\n')
+                self._log_value('Residual map name', user_name)
 
             # Publish map
             self._resmap.publish(user_name)

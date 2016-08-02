@@ -214,17 +214,13 @@ class csspec(ctools.cscript):
             self._log.header1("Spectral binning")
             if self._binned_mode:
                 cube_ebounds = self._obs[0].events().ebounds()
-                self._log.parformat("Counts cube energy range")
-                self._log(str(cube_ebounds.emin()))
-                self._log(" - ")
-                self._log(str(cube_ebounds.emax()))
-                self._log("\n")
+                value = '%s - %s' % (str(cube_ebounds.emin()),
+                                     str(cube_ebounds.emax()))
+                self._log_value('Counts cube energy range', value)
             for i in range(self._ebounds.size()):
-                self._log.parformat("Bin "+str(i+1))
-                self._log(str(self._ebounds.emin(i)))
-                self._log(" - ")
-                self._log(str(self._ebounds.emax(i)))
-                self._log("\n")
+                value = '%s - %s' % (str(self._ebounds.emin(i)),
+                                     str(self._ebounds.emax(i)))
+                self._log_value('Bin %d' % (i+1), value)
 
         # Write observation into logger
         if self._logTerse():

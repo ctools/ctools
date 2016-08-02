@@ -43,7 +43,7 @@ class csmodelmerge(ctools.cscript):
         """
         # Set name
         self._name    = 'csmodelmerge'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise class members
         self._files      = None
@@ -146,23 +146,19 @@ class csmodelmerge(ctools.cscript):
             if self._logTerse():
                 nmodels = models.size()
                 if nmodels == 0:
-                    self._log(gammalib.parformat('Add no model from file'))
+                    name = 'Add no model from file'
                 elif nmodels == 1:
-                    self._log(gammalib.parformat('Add 1 model from file'))
+                    name = 'Add 1 model from file'
                 else:
-                    self._log(gammalib.parformat('Add %d models from file' %
-                                                 nmodels))
-                self._log(f)
-                self._log('\n')
+                    name = 'Add %d models from file' % nmodels
+                self._log_value(name, f)
             
             # Extend model container by adding all models in the model file
             self._models.extend(models)
                 
         # Log total number of models
         if self._logTerse():
-            self._log(gammalib.parformat('Models after merging'))
-            self._log(self._models.size())
-            self._log('\n')
+            self._log_value('Models after merging', self._models.size())
 
         # Return
         return
@@ -189,9 +185,7 @@ class csmodelmerge(ctools.cscript):
             
             # Log filename
             if self._logTerse():
-                self._log(gammalib.parformat('Model definition XML file'))
-                self._log(outmodel.url())
-                self._log('\n')
+                self._log_value('Model definition XML file', outmodel.url())
     
             # Save models
             self._models.save(outmodel)

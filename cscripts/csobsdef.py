@@ -75,7 +75,7 @@ class csobsdef(ctools.cscript):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
 
         Parameters
         ----------
@@ -85,7 +85,7 @@ class csobsdef(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csobsdef'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise class members
         self._obs    = gammalib.GObservations()
@@ -103,7 +103,7 @@ class csobsdef(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile.
+        Get parameters from parfile
         """
         # Query input filename if necessary
         if self._pntdef.size() == 0:
@@ -123,7 +123,7 @@ class csobsdef(ctools.cscript):
 
     def _set_response(self, obs, caldb, irf):
         """
-        Set response for an observation.
+        Set response for an observation
         
         The method creates an XML element so that that the response XML
         writer will write the database and response name into the
@@ -151,7 +151,7 @@ class csobsdef(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
 
         Raises
         ------
@@ -315,9 +315,9 @@ class csobsdef(ctools.cscript):
                 self._log(str(obs))
                 self._log('\n')
             elif self._logTerse():
-                self._log(gammalib.parformat(obs.instrument()+' observation'))
-                self._log('Name="'+obs.name()+'" ')
-                self._log('ID="'+obs.id()+'"\n')
+                name  = obs.instrument()+' observation'
+                value = 'Name="%s" ID="%s"' % (obs.name(), obs.id())
+                self._log_value(name, value)
 
             # Append observation
             self._obs.append(obs)
@@ -342,9 +342,7 @@ class csobsdef(ctools.cscript):
 
             # Log filename
             if self._logTerse():
-                self._log(gammalib.parformat('Observation XML file'))
-                self._log(outobs.url())
-                self._log('\n')
+                self._log_value('Observation XML file', outobs.url())
 
             # Save observation definition XML file
             self._obs.save(outobs)
@@ -354,7 +352,7 @@ class csobsdef(ctools.cscript):
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()
@@ -373,7 +371,7 @@ class csobsdef(ctools.cscript):
 
     def pntdef(self, csv):
         """
-        Set pointing definition from a CSV table.
+        Set pointing definition from a CSV table
 
         Parameters
         ----------

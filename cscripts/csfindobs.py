@@ -225,15 +225,12 @@ class csfindobs(ctools.cscript):
 
         # Write the number of observations into the logger
         if self._logTerse():
-            self._log(gammalib.parformat('Observations'))
-            self._log(len(self._runs))
-            self._log('\n')
+            self._log_value('Observations', len(self._runs))
 
         # Write the observation identifiers into the logger
         if self._logNormal() and len(self._runs) > 0:
             for i, run in enumerate(self._runs):
-                self._log(gammalib.parformat('Observation %d' % (i+1)))
-                self._log(str(run)+'\n')
+                self._log_value('Observation %d' % (i+1), run)
 
         # Close FITS file
         fits.close()

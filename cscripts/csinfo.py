@@ -21,8 +21,9 @@
 import sys
 import os
 
-# Copied and edited a bit from the `doc/source/users/reference_manual/index.rst`
-# file. The list there and here needs to be manually updated and kept in sync.
+# List of available ctools. The list was copied from
+# `doc/source/users/reference_manual/index.rst`
+# and needs to be manually updated and kept in sync
 CTOOL_LIST = """
    ctbin         Generates counts cube
    ctbkgcube     Generates background cube
@@ -41,6 +42,10 @@ CTOOL_LIST = """
    cttsmap       Generates Test Statistics map
    ctulimit      Calculates upper limit
 """
+
+# List of available cscripts. The list was copied from
+# `doc/source/users/reference_manual/index.rst`
+# and needs to be manually updated and kept in sync
 CSCRIPT_LIST = """
    cscaldb       Lists available instrument response functions
    cslightcrv    Computes lightcurve
@@ -57,6 +62,7 @@ CSCRIPT_LIST = """
    cstsmapsplit  Creates commands to split the Test Statistic map computations
    cstsmapmerge  Merges slices from Test Statistic map computations\n
    csobs2caldb   Creates a caldb entry from an input observation
+   csroot2caldb  Creates a caldb entry from a ROOT performance file
    csiactdata    Shows information about IACT data available on the user machine
    csiactobs     Generates observation definition file for IACT data from observation IDs
    csfindobs     Generates a list of IACT observation IDs
@@ -92,23 +98,6 @@ def get_command_output(cmd):
     return getoutput(cmd)
 
 
-# ===================================== #
-# Workaround for print without linefeed #
-# ===================================== #
-def log(text, end='\n'):
-    """
-    Print text to console
-
-    Workaround to have an `end=''` option on old Pythons:
-    http://stackoverflow.com/a/493399/498873
-    """
-    # Print without linefeed
-    sys.stdout.write(text + end)
-
-    # Return
-    return
-
-
 # ====================== #
 # Print list information #
 # ====================== #
@@ -135,66 +124,61 @@ def csinfo_setup_check():
     """
     Print check information
     """
-    # Initialise success flags
-    all_ok           = True
-    gammalib_environ = False
-    ctools_environ   = False
-    gammalib_python  = False
-    ctools_python    = False
-    cscripts_python  = False
-
     # Print header
     print('\nGammalib / ctools setup check:\n')
 
-    # Check if GAMMALIB is set
-    log('   GAMMALIB environment variable ... ', end='')
-    try:
-        gammalib_env = os.environ['GAMMALIB']
+    # Check if the "GAMMALIB" environment variable is set
+    sys.stdout.write('   GAMMALIB environment variable ... ')
+    if 'GAMMALIB' in os.environ:
         print('ok')
-    except KeyError:
-        print('NOT OK')
-        all_ok           = False
         gammalib_environ = True
+    else:
+        print('NOT OK')
+        gammalib_environ = False
 
-    # Check if CTOOLS is set
-    log('   CTOOLS   environment variable ... ', end='')
-    try:
-        ctools_env = os.environ['CTOOLS']
+    # Check if the "CTOOLS" environment variable is set
+    sys.stdout.write('   CTOOLS   environment variable ... ')
+    if 'CTOOLS' in os.environ:
         print('ok')
-    except KeyError:
-        print('NOT_OK')
-        all_ok         = False
         ctools_environ = True
+    else:
+        print('NOT OK')
+        ctools_environ = False
+
 
     # Check if gammalib Python module import works
-    log('   gammalib Python import .......... ', end='')
+    sys.stdout.write('   gammalib Python import .......... ')
     try:
         import gammalib
         print('ok')
+        gammalib_python = True
     except:
         print('NOT OK')
-        all_ok          = False
-        gammalib_python = True
+        gammalib_python = False
 
     # Check if ctools Python module import works
-    log('   ctools   Python import .......... ', end='')
+    sys.stdout.write('   ctools   Python import .......... ')
     try:
         import ctools
         print('ok')
+        ctools_python = True
     except:
         print('NOT OK')
-        all_ok        = False
-        ctools_python = True
+        ctools_python = False
 
     # Check if cscripts Python module import works
-    log('   cscripts Python import .......... ', end='')
+    sys.stdout.write('   cscripts Python import .......... ')
     try:
         import cscripts
         print('ok')
+        cscripts_python = True
     except:
         print('NOT OK')
-        all_ok          = False
-        cscripts_python = True
+        cscripts_python = False
+
+    # Set flag that everything is okay
+    all_ok = gammalib_environ and ctools_environ and gammalib_python and \
+             ctools_python and cscripts_python
 
     # Signal if everything is okay, or notify about the problems that have
     # been encountered
@@ -202,11 +186,11 @@ def csinfo_setup_check():
         print('\n   ===> Your Gammalib / ctools setup is OK.')
     else:
         print('\n   ===> WARNING: Your Gammalib / ctools setup is NOT OK!\n')
-        if gammalib_environ:
+        if not gammalib_environ:
             print('      - Have you set the GAMMALIB environment variable?')
-        if ctools_environ:
+        if not ctools_environ:
             print('      - Have you set the CTOOLS environment variable?')
-        if gammalib_python or ctools_python or cscripts_python:
+        if not gammalib_python or not ctools_python or not cscripts_python:
             print('      - Did you source gammalib-init.sh?')
             print('      - Did you source ctools-init.sh ?')
             print('      - Are you using the correct Python ?')
@@ -257,10 +241,8 @@ def csinfo_setup_info():
     gammalib_env = os.environ.get('GAMMALIB', 'Not found')
     ctools_env   = os.environ.get('CTOOLS', 'Not found')
 
-    # Print header
+    # Print setup information
     print('\nGammalib / ctools setup info:\n')
-
-    # Print package versions
     print('   Gammalib  version ................ %s' % gammalib_version)
     print('   ctools    version ................ %s' % ctools_version)
     print('   cscripts  version ................ %s' % cscripts_version)
@@ -306,7 +288,7 @@ def get_pkg_config_info(info, library):
     out = get_command_output(cmd)
 
     # If the command returns 'was not found' then pkg-config is not
-    # avaailable
+    # available
     if 'not found' in out:
         out = 'Not available'
 
@@ -340,8 +322,8 @@ def csinfo(argv):
     """
     Print information about Gammalib and ctools to the console
     """
-    # If there are no command line arguments then print help and exit
-    # with success
+    # If there are no command line arguments then print help and exit with
+    # success
     if len(argv) <= 1:
         csinfo_print_help()
         sys.exit(0)

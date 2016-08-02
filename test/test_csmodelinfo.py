@@ -74,7 +74,7 @@ class Test(test):
 
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="'+self._models_spec+'"'+ \
-                          ' ds9file="model_cmd1.reg"'+ \
+                          ' ds9file="csmodelinfo_cmd1.reg"'+ \
                           ' logfile="csmodelinfo_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -86,11 +86,11 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check region file
-        self._check_ds9_file('model_cmd1.reg')
+        self._check_ds9_file('csmodelinfo_cmd1.reg')
 
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="model_that_does_not_exist.xml"'+ \
-                          ' ds9file="model_cmd2.reg"'+ \
+                          ' ds9file="csmodelinfo_cmd2.reg"'+ \
                           ' logfile="csmodelinfo_cmd2.log"'
 
         # Check if execution failed

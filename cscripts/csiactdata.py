@@ -96,26 +96,20 @@ class csiactdata(ctools.cscript):
         """
         Log configuration
         """
-        # Log information
+        # Log only if the level is at least "Terse"
         if self._logTerse():
+
+            # Log configuration information
             self._log.header3(str(config['name']))
-            self._log.parformat('Name')
-            self._log(str(config['name']))
-            self._log('\n')
-            self._log.parformat('Observation index')
-            self._log(str(config['obsindx']))
-            self._log('\n')
-            self._log.parformat('HDU index')
-            self._log(str(config['hduindx']))
-            self._log('\n')
-                
+            self._log_value('Name', config['name'])
+            self._log_value('Observation index', config['obsindx'])
+            self._log_value('HDU index', config['hduindx'])
+            
             # Print additional information
             for key in config:
                 if key in ['name','hduindx','obsindx']:
                     continue
-                self._log.parformat(str(key))
-                self._log(str(config[key]))
-                self._log('\n')
+                self._log_value(key, config[key])
 
         # Return
         return

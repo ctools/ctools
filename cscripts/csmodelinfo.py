@@ -28,7 +28,7 @@ import ctools
 # ================= #
 class csmodelinfo(ctools.cscript):
     """
-    Shows the content of a model container.
+    Shows the content of a model container
 
     The script is useful to show, e.g., the number of sources in a model
     container, the background models, free and fixed parameters etc.
@@ -39,29 +39,16 @@ class csmodelinfo(ctools.cscript):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Set name
-        self._name    = "csmodelinfo"
-        self._version = "1.1.0"
+        self._name    = 'csmodelinfo'
+        self._version = '1.2.0'
 
         # Initialise class members
-        self._models        = gammalib.GModels()
-        self._ds9file       = gammalib.GFilename("NONE")
-        self._pnt_type      = ""
-        self._pnt_mark_size = 12
-        self._show_labels   = True
-        self._width         = 2
-        self._fontfamily    = "helvetica"
-        self._fontsize      = 12
-        self._fontweight    = "normal"
-        self._fontslant     = "roman"
-        self._show_ext_type = True
-        self._free_color    = "green"
-        self._fixed_color   = "magenta"
+        self._models = gammalib.GModels()
 
-        # Initialise application by calling the appropriate class
-        # constructor.
+        # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
         # Return
@@ -71,57 +58,83 @@ class csmodelinfo(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile and setup the observation.
+        Get parameters from parfile and setup the observation
         """
         # Get models
-        self._models = gammalib.GModels(self["inmodel"].filename())
+        self._models = gammalib.GModels(self['inmodel'].filename())
         
-        # Get hidden parameters for region file
-        self._pnt_type      = self["pnt_type"].string()
-        self._pnt_mark_size = self["pnt_mark_size"].integer()
-        self._show_labels   = self["show_labels"].boolean()
-        self._width         = self["width"].integer()
-        self._fontfamily    = self["fontfamily"].string()
-        self._fontsize      = self["fontsize"].integer()
-        self._fontweight    = self["fontweight"].string()
-        self._fontslant     = self["fontslant"].string()
-        self._show_ext_type = self["show_ext_type"].boolean()
-        self._free_color    = self["free_color"].string()
-        self._fixed_color   = self["fixed_color"].string()
+        # Query hidden parameters for region file
+        self['pnt_type'].string()
+        self['pnt_mark_size'].integer()
+        self['show_labels'].boolean()
+        self['width'].integer()
+        self['fontfamily'].string()
+        self['fontsize'].integer()
+        self['fontweight'].string()
+        self['fontslant'].string()
+        self['show_ext_type'].boolean()
+        self['free_color'].string()
+        self['fixed_color'].string()
 
-        # Read ahead DS9 filename
+        # Query ahead DS9 filename
         if self._read_ahead():
-            self._ds9file = self["ds9file"].filename()
+            self["ds9file"].filename()
 
         # Write input parameters into logger
         if self._logTerse():
             self._log_parameters()
-            self._log("\n")
+            self._log('\n')
         
         # Return
         return
 
-    def _model2ds9string(self, model):
+    def _ds9attributes(self, model):
         """
-        Converts model into a DS9 region string.
+        Returns attributes for DS9 string
+        Parameters
+        ----------
+        model : `~gammalib.GModel`
+            Model
 
-        Args:
-            model: Model.
-
-        Returns:
-            DS9 region string.
+        Returns
+        -------
+        attributes : str
+            DS9 attribute string
         """
-        # Initialise DS9 region string
-        ds9string = ""
-
-        # Determine region color. The color will change between a model
-        # where all parameters are fixed and a model with at least one
-        # free parameter.
-        color = self._fixed_color
+        # Determine region color. A model where all parameters are fixed will
+        # get the color defined by "fixed_color", a model with at least one
+        # free parameter will get the color defined by "free_color".
+        color = self['fixed_color'].string()
         for par in model:
             if par.is_free():
-                color = self._free_color
+                color = self['free_color'].string()
                 break
+
+        # Set DS9 attributes
+        attributes = (' color=%s width=%d font=%s %d %s %s' %
+                      (color, self['width'].integer(),
+                       self['fontfamily'].string(), self['fontsize'].integer(),
+                       self['fontweight'].string(), self['fontslant'].string()))
+
+        # Return attributes
+        return attributes
+
+    def _model2ds9string(self, model):
+        """
+        Converts model into a DS9 region string
+
+        Parameters
+        ----------
+        model : `~gammalib.GModel`
+            Model
+
+        Returns
+        -------
+        ds9string : str
+            DS9 region string
+        """
+        # Initialise DS9 region string
+        ds9string = ''
 
         # Retrieve model sky direction. The model is skipped in case that
         # it does not provide a sky direction.
@@ -129,8 +142,9 @@ class csmodelinfo(ctools.cscript):
         try:
             modelpos = model.spatial().dir()
         except AttributeError:            
-            self._log("Skip source \""+model.name()+"\" since no "
-                      "sky direction is associated with that model.\n")
+            msg = ('Skip model "%s" since it has no sky direction.\n' %
+                   model.name())
+            self._log(msg)
             is_valid = False
 
         # Continue only if sky direction was found
@@ -141,16 +155,16 @@ class csmodelinfo(ctools.cscript):
             modelname = model.name()
 
             # Handle point source
-            if modeltype == "PointSource":
+            if modeltype == 'PointSource':
 
-                # Append point to DS9 string
-                ds9string += "point("
-                ds9string += str(modelpos.ra_deg()) 
-                ds9string += ","
-                ds9string += str(modelpos.dec_deg())
-                ds9string += ") # "
-                ds9string += "point="+self._pnt_type+" "
-                ds9string += str(self._pnt_mark_size)+" "
+                # Append point with Right Ascension and Declination to the DS9
+                # string. The type of the point is specified by the "pnt_type"
+                # parameter, the size of the point by the "pnt_mark_size"
+                # parameter
+                ds9string += ('point(%.6f,%.6f) # point=%s %d' %
+                              (modelpos.ra_deg(), modelpos.dec_deg(),
+                               self['pnt_type'].string(),
+                               self['pnt_mark_size'].integer()))
 
             # Handle extended sources    
             elif modeltype == "ExtendedSource":
@@ -160,89 +174,74 @@ class csmodelinfo(ctools.cscript):
                 classname = spatial.classname()
 
                 # Handle radial sources
-                if "Radial" in classname:  
+                if 'Radial' in classname:
 
                     # Retrieve short name of model class (e.g. "Gauss"
                     # or "Disk)
-                    shorttype = classname.split("Radial")[-1]
+                    shorttype = classname.split('Radial')[-1]
 
                     # Handle Disk and Shell model
-                    if (classname == "GModelSpatialRadialDisk" or
-                        classname == "GModelSpatialRadialShell"):
+                    if (classname == 'GModelSpatialRadialDisk' or
+                        classname == 'GModelSpatialRadialShell'):
                         size = spatial.radius()
 
                     # Handle Gauss Model
-                    elif classname == "GModelSpatialRadialGauss":
+                    elif classname == 'GModelSpatialRadialGauss':
                         size = spatial.sigma()
 
                     # Skip if source is unknown
                     else:
-                        self._log("Skip source \""+model.name()+"\""
-                                  " since the radial model \""+classname+
-                                  "\" is unkown.\n")
+                        msg = ('Skip model "%s" since the radial model "%s" '
+                               'is unknown.\n' % (model.name(), classname))
+                        self._log(msg)
                         is_valid = False
 
                     # Append circle to DS9 string
                     if is_valid:
-                        ds9string += "circle("
-                        ds9string += str(modelpos.ra_deg()) 
-                        ds9string += ","
-                        ds9string += str(modelpos.dec_deg())
-                        ds9string += ","
-                        ds9string += str(size*3600.)+"\") # "
-                
+                        ds9string += ('circle(%.6f,%.6f,%.6f) #' %
+                                      (modelpos.ra_deg(), modelpos.dec_deg(),
+                                       size*3600.0))
+            
                 # Handle elliptical sources 
-                elif "Elliptical" in classname:
+                elif 'Elliptical' in classname:
 
                     # Retrieve short name and source size
-                    shorttype = classname.split("Elliptical")[-1]
+                    shorttype = classname.split('Elliptical')[-1]
                     size1     = spatial.semimajor()
                     size2     = spatial.semiminor()
                     angle     = spatial.posangle()
 
                     # Append ellipse to DS9 string
-                    ds9string += "ellipse("
-                    ds9string += str(modelpos.ra_deg()) 
-                    ds9string += ","
-                    ds9string += str(modelpos.dec_deg())
-                    ds9string += ","
-                    ds9string += str(size1*3600.)+"\""
-                    ds9string += ","
-                    ds9string += str(size2*3600.)+"\""
-                    ds9string += ","
-                    ds9string += str(angle+90.0)+") # "   
+                    ds9string += ('ellipse(%.6f,%.6f,%.6f,%.6f,%.6f) #' %
+                                  (modelpos.ra_deg(), modelpos.dec_deg(),
+                                   size1*3600.0, size2*3600.0, angle+90.0))
                 
                 # Skip if source is neither radial nor elliptical      
                 else:
-                    self._log("Skip source \""+model.name()+"\" "
-                              "since the model \""+classname+"\" is "
-                              "neither a point source, a radial source, "
-                              "nor a elliptical source.\n")
+                    msg = ('Skip model "%s" since the model "%s" is neither '
+                           'a point source, a radial source, nor an elliptical '
+                           'source.\n' % (model.name(), classname))
+                    self._log(msg)
                     is_valid = False
                 
                 # Add short model type to modelname
-                if self._show_ext_type:
-                    modelname +=" ("+shorttype+")"
+                if self['show_ext_type'].boolean():
+                    modelname +=' ('+shorttype+')'
     
             # Add DS9 attributes
             if is_valid:
-                ds9string += "color="+color+" "
-                ds9string += "width="+str(self._width)+" "
-                ds9string += "font=\""+self._fontfamily+" "
-                ds9string += str(self._fontsize)+" "
-                ds9string += self._fontweight+" "
-                ds9string += self._fontslant+"\""
-                if self._show_labels:
-                    ds9string += " text={"+modelname+"}"
+                ds9string += self._ds9attributes(model)
+                if self['show_labels'].boolean():
+                    ds9string += ' text={'+modelname+'}'
         
         # Return string
         return ds9string 
-        
+
 
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -253,11 +252,11 @@ class csmodelinfo(ctools.cscript):
         
         # Optionally log models
         if self._logVerbose():
-            self._log("\n")
-            self._log.header1("Models")
-            self._log("\n")
+            self._log('\n')
+            self._log.header1('Models')
+            self._log('\n')
             self._log(str(self._models))
-            self._log("\n")
+            self._log('\n')
         
         # Initialise output values 
         types           = {}
@@ -295,7 +294,7 @@ class csmodelinfo(ctools.cscript):
                 ts[model.name()] = model.ts()
                 
             # Skymodel?
-            skymodel = (model.classname() == "GModelSky")
+            skymodel = (model.classname() == 'GModelSky')
             if skymodel:
                 free_src_pars[model.name()] = []                
             
@@ -340,140 +339,110 @@ class csmodelinfo(ctools.cscript):
         if self._logTerse():
         
             # Log summary
-            self._log("\n")
-            self._log.header1("Summary")
+            self._log('\n')
+            self._log.header1('Summary')
         
             # Log instruments
-            self._log.header3("Instrument specific models")
+            self._log.header3('Instrument specific models')
             for inst, n_inst in instruments.items():
-                if inst == "":
-                    inst = "All"
-                self._log.parformat(inst)
-                self._log(str(n_inst))
-                self._log("\n")
+                if inst == '':
+                    inst = 'All'
+                self._log_value(inst, n_inst)
         
             # Log model types
-            self._log.header3("Model types")
+            self._log.header3('Model types')
             for modeltype, n_types in types.items():
-                self._log.parformat(modeltype)
-                self._log(str(n_types))
-                self._log("\n")
+                self._log_value(modeltype, n_types)
         
             # Log model parameter information
-            self._log("\n")
-            self._log.header1("Parameter information")
-            self._log.parformat("All parameters")
-            self._log(str(n_par_total))
-            self._log("\n")
-            self._log.parformat("Fixed parameters")
-            self._log(str(n_par_fixed))
-            self._log("\n")
-            self._log.parformat("Free parameters (total)")
-            self._log(str(n_par_free))
-            self._log("\n")
-            self._log.parformat("Free background parameters")
-            self._log(str(n_par_free_bkg))
-            self._log("\n")
-            self._log.parformat("Free source parameters")
-            self._log(str(n_par_free_src))
-            self._log("\n")
+            self._log('\n')
+            self._log.header1('Parameter information')
+            self._log_value('All parameters', n_par_total)
+            self._log_value('Fixed parameters', n_par_fixed)
+            self._log_value('Free parameters (total)', n_par_free)
+            self._log_value('Free background parameters', n_par_free_bkg)
+            self._log_value('Free source parameters', n_par_free_src)
             if n_par_free_spec > 0:
-                self._log.parformat("Free spectral parameters")
-                self._log(str(n_par_free_spec))
-                self._log("\n")
+                self._log_value('Free spectral parameters', n_par_free_spec)
             if n_par_free_spat > 0:
-                self._log.parformat("Free spatial parameters")
-                self._log(str(n_par_free_spat))
-                self._log("\n")
+                self._log_value('Free spatial parameters', n_par_free_spat)
             if n_par_free_temp > 0:
-                self._log.parformat("Free temporal parameters")
-                self._log(str(n_par_free_temp))
-                self._log("\n")
-            self._log.parformat("Parameters at limit")
-            self._log(str(n_par_at_limit))
-            self._log("\n")
+                self._log_value('Free temporal parameters', n_par_free_temp)
+            self._log_value('Parameters at limit', n_par_at_limit)
         
             # Log parameters at limit (if any)
             if n_par_at_limit > 0:
-                self._log.header3("Parameters at limit")
+                self._log.header3('Parameters at limit')
                 for source, parameter in pars_at_limit.items():   
                     if len(parameter):  
                         for par in parameter:
-                            self._log.parformat(source)
-                            self._log(par)
-                            self._log("\n")
+                            self._log_value(source, par)
         
             # Optionally log free parameters
             if self._logExplicit() and len(free_src_pars):
-                self._log("\n")
-                self._log.header2("Free source parameters")
+                self._log('\n')
+                self._log.header2('Free source parameters')
                 for source, parameter in free_src_pars.items():   
                     if len(parameter): 
                         self._log.header3(source)
                         for par in parameter:
                             self._log(str(par))
-                            self._log("\n")
-                        self._log("\n")            
+                            self._log('\n')
+                        self._log('\n')
         
             # Log TS values if available
             if len(ts):       
-                self._log.header3("Test statistics")
-                for source,tsvalue in ts.items():     
-                    self._log.parformat(source)
-                    self._log("%.2f"%tsvalue)
-                    self._log("\n")     
+                self._log.header3('Test statistics')
+                for source, tsvalue in ts.items():
+                    self._log_value(source, tsvalue)
                 
         # Return
         return
 
     def save(self):
         """ 
-        Save models to ds9 region file if required
+        Save models to ds9 region file
         """
-
-        # Get output filename in case it was not read ahead
-        self._ds9file = self["ds9file"].filename()
+        # Get output filename
+        ds9file = self['ds9file'].filename()
 
         # Check if DS9 file is valid
-        if self._ds9file != "NONE":      
+        if ds9file != '' and ds9file != 'NONE':
             
             # Write header
             if self._logTerse():
-                self._log("\n")
-                self._log.header1("Save models in DS9 file")
+                self._log('\n')
+                self._log.header1('Save models in DS9 file')
             
             # Log filename
             if self._logTerse():
-                self._log(gammalib.parformat("DS9 filename"))
-                self._log(self._ds9file.url())
-                self._log("\n")
+                self._log_value('DS9 filename', ds9file.url())
             
             # Open file   
-            f = open(self._ds9file.url(),"w")
+            f = open(ds9file.url(), 'w')
             
             # Write coordinate system
-            f.write("fk5\n")
+            f.write('fk5\n')
              
             # Loop over models
             for model in self._models:
                 
                 # Continue only if point source or extended source model
-                if (model.type() == "PointSource" or
-                    model.type() == "ExtendedSource"):   
+                if (model.type() == 'PointSource' or
+                    model.type() == 'ExtendedSource'):
                     line = self._model2ds9string(model)
                     if len(line):
-                        f.write(line+"\n") 
+                        f.write(line+'\n')
                 
                 # Logging for diffuse components    
-                elif model.type() == "DiffuseSource":
-                    self._log("Skipping diffuse model \""+model.name()+
-                              "\"\n")
+                elif model.type() == 'DiffuseSource':
+                    self._log('Skipping diffuse model "'+model.name()+'".\n')
                     
                 # Logging for background components 
                 else:
                     if self._logExplicit():
-                        self._log("Skipping background model \""+
-                                  model.name()+"\"\n")   
+                        self._log('Skipping background model "'+model.name()+
+                                  '".\n')
                                       
             # Close file
             f.close()
@@ -483,7 +452,7 @@ class csmodelinfo(ctools.cscript):
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

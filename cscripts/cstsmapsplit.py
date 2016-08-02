@@ -46,7 +46,7 @@ class cstsmapsplit(ctools.cscript):
 
         # Set name and version
         self._name    = 'cstsmapsplit'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Set data members
         self._outmap       = gammalib.GFilename()
@@ -99,8 +99,7 @@ class cstsmapsplit(ctools.cscript):
         
         # Return
         return
- 
-    
+
     def _compute_null_hypothesis(self):
         """
         Compute null hypothesis
@@ -136,11 +135,11 @@ class cstsmapsplit(ctools.cscript):
         return -(opt.value())
     
     
+    # Public methods
     def run(self):
         """
         Run the script
         """
-        
         # Switch screen logging on in debug mode
         if self._logDebug():
             self._log.cout(True)
@@ -172,13 +171,9 @@ class cstsmapsplit(ctools.cscript):
             
             # Write likelihood into logger
             if self._logTerse():
-                self._log(gammalib.parformat('Source removed'))
-                self._log(self._srcname)
-                self._log('\n')
-                self._log(gammalib.parformat('Log-likelihood'))
-                self._log(repr(logL0))
-                self._log('\n')
-        
+                self._log_value('Source removed', self._srcname)
+                self._log_value('Log-likelihood', repr(logL0))
+    
         # Get parameters of TS map ctool
         pars = gammalib.GApplicationPars('cttsmap.par')
         
@@ -196,9 +191,7 @@ class cstsmapsplit(ctools.cscript):
         if self._logTerse():
             self._log('\n')
             self._log.header1('Create commands')
-            self._log(gammalib.parformat('Number of cttsmap calls'))
-            self._log(str(njobs))
-            self._log('\n')
+            self._log_value('Number of cttsmap calls', njobs)
         
         # Loop over TS map parameters
         for par in pars:
@@ -262,12 +255,10 @@ class cstsmapsplit(ctools.cscript):
         # Return
         return
     
-    
     def execute(self):
         """
         Execute the script
         """
-        
         # Run the script
         self.run()
         
@@ -277,12 +268,10 @@ class cstsmapsplit(ctools.cscript):
         # Return
         return
 
-    
     def save(self):
         """
         Save commands to ASCII file
         """
-        
         # Open file
         f = open(self._outfile.url(), 'w')
         

@@ -306,15 +306,9 @@ class cssens(ctools.cscript):
         if self._logTerse():
             self._log('\n')
             self._log.header2('Energies: '+str(emin)+' - '+str(emax))
-            self._log.parformat('Crab flux')
-            self._log(crab_flux)
-            self._log(' ph/cm2/s\n')
-            self._log.parformat('Source model flux')
-            self._log(src_flux)
-            self._log(' ph/cm2/s\n')
-            self._log.parformat('Crab unit factor')
-            self._log(crab_unit)
-            self._log('\n')
+            self._log_value('Crab flux', str(crab_flux)+' ph/cm2/s')
+            self._log_value('Source model flux', str(src_flux)+' ph/cm2/s')
+            self._log_value('Crab unit factor', crab_unit)
 
         # Initialise loop
         crab_flux_value   = []
@@ -358,9 +352,7 @@ class cssens(ctools.cscript):
             # Write simulation results
             if self._logExplicit():
                 self._log.header3('Simulation')
-                self._log.parformat('Number of simulated events')
-                self._log(nevents)
-                self._log('\n')
+                self._log_value('Number of simulated events', nevents)
 
             # Fit test source
             fit = ctools.ctlike(sim)
@@ -391,22 +383,12 @@ class cssens(ctools.cscript):
             # Write test source fit results
             if self._logExplicit():
                 self._log.header3('Test source model fit')
-                self._log.parformat('Test statistics')
-                self._log(ts)
-                self._log('\n')
-                self._log.parformat('log likelihood')
-                self._log(logL)
-                self._log('\n')
-                self._log.parformat('Number of predicted events')
-                self._log(npred)
-                self._log('\n')
-                self._log.parformat('Fit quality')
-                self._log(quality)
-                self._log('\n')
+                self._log_value('Test statistics', ts)
+                self._log_value('log likelihood', logL)
+                self._log_value('Number of predicted events', quality)
+                self._log_value('Fit quality', npred)
                 for model in models:
-                    self._log.parformat('Model')
-                    self._log(model.name())
-                    self._log('\n')
+                    self._log_value('Model', model.name())
                     for par in model:
                         self._log(str(par)+'\n')
 
@@ -447,40 +429,21 @@ class cssens(ctools.cscript):
 
             # Write fit results
             if self._logExplicit():
-                self._log.parformat('Photon flux')
-                self._log(photon_flux)
-                self._log(' ph/cm2/s\n')
-                self._log.parformat('Energy flux')
-                self._log(energy_flux)
-                self._log(' erg/cm2/s\n')
-                self._log.parformat('Crab flux')
-                self._log(crab_flux*1000.0)
-                self._log(' mCrab\n')
-                self._log.parformat('Differential sensitivity')
-                self._log(sensitivity)
-                self._log(' erg/cm2/s\n')
+                self._log_value('Photon flux', str(photon_flux)+' ph/cm2/s')
+                self._log_value('Energy flux', str(energy_flux)+' erg/cm2/s')
+                self._log_value('Crab flux', str(crab_flux*1000.0)+' mCrab')
+                self._log_value('Differential sensitivity', str(sensitivity)+
+                                ' erg/cm2/s')
                 for model in models:
-                    self._log.parformat('Model')
-                    self._log(model.name())
-                    self._log('\n')
+                    self._log_value('Model', model.name())
                     for par in model:
                         self._log(str(par)+'\n')
             elif self._logTerse():
-                self._log.parformat('Iteration %d' % iterations)
-                self._log('TS=')
-                self._log(ts)
-                self._log(' ')
-                self._log('corr=')
-                self._log(correct)
-                self._log('  ')
-                self._log(photon_flux)
-                self._log(' ph/cm2/s = ')
-                self._log(energy_flux)
-                self._log(' erg/cm2/s = ')
-                self._log(crab_flux*1000.0)
-                self._log(' mCrab = ')
-                self._log(sensitivity)
-                self._log(' erg/cm2/s\n')
+                name  = 'Iteration %d' % iterations
+                value = ('TS=%.4f corr=%e  %e ph/cm2/s = %e erg/cm2/s = %.2f '
+                         'mCrab = %e erg/cm2/s' % (ts, correct, photon_flux,
+                         energy_flux, crab_flux*1000.0, sensitivity))
+                self._log_value(name, value)
 
             # Compute sliding average of extrapolated fitted prefactor,
             # photon and energy flux. This damps out fluctuations and
@@ -534,35 +497,17 @@ class cssens(ctools.cscript):
         # Write fit results
         if self._logTerse():
             self._log.header3('Fit results')
-            self._log.parformat('Test statistics')
-            self._log(ts)
-            self._log('\n')
-            self._log.parformat('Photon flux')
-            self._log(photon_flux)
-            self._log(' ph/cm2/s\n')
-            self._log.parformat('Energy flux')
-            self._log(energy_flux)
-            self._log(' erg/cm2/s\n')
-            self._log.parformat('Crab flux')
-            self._log(crab_flux*1000.0)
-            self._log(' mCrab\n')
-            self._log.parformat('Differential sensitivity')
-            self._log(sensitivity)
-            self._log(' erg/cm2/s\n')
-            self._log.parformat('Number of simulated events')
-            self._log(nevents)
-            self._log('\n')
+            self._log_value('Test statistics', ts)
+            self._log_value('Photon flux', str(photon_flux)+' ph/cm2/s')
+            self._log_value('Energy flux', str(energy_flux)+' erg/cm2/s')
+            self._log_value('Crab flux', str(crab_flux*1000.0)+' mCrab')
+            self._log_value('Differential sensitivity', str(sensitivity)+' erg/cm2/s')
+            self._log_value('Number of simulated events', nevents)
             self._log.header3('Test source model fitting')
-            self._log.parformat('log likelihood')
-            self._log(logL)
-            self._log('\n')
-            self._log.parformat('Number of predicted events')
-            self._log(npred)
-            self._log('\n')
+            self._log_value('log likelihood', logL)
+            self._log_value('Number of predicted events', npred)
             for model in models:
-                self._log.parformat('Model')
-                self._log(model.name())
-                self._log('\n')
+                self._log_value('Model', model.name())
                 for par in model:
                     self._log(str(par)+'\n')
 

@@ -183,17 +183,23 @@ def _set_input_obs(self, argv):
     return (obs, argv)
 cscript._set_input_obs = _set_input_obs 
 
-# Initialise application by calling the appropriate class constructor.
+# Initialise application by calling the appropriate class constructor
 def _init_cscript(self, argv):
     if len(argv) == 0:
         cscript.__init__(self, self._name, self._version)
     elif len(argv) == 1:
         cscript.__init__(self, self._name, self._version, *argv)
     else:
-        raise TypeError("Invalid number of arguments given.")
+        raise TypeError('Invalid number of arguments given.')
     # Set logger properties
     self._log_header()
     self._log.date(True)
 cscript._init_cscript = _init_cscript
 
+# Log the value of a parameter
+def _log_value(self, name, value):
+    self._log.parformat(name)
+    self._log(str(value))
+    self._log('\n')
+cscript._log_value = _log_value
 %}

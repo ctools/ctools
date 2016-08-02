@@ -38,7 +38,7 @@ class csobsinfo(ctools.cscript):
         """
         # Set name
         self._name    = 'csobsinfo'
-        self._version = '1.1.0'
+        self._version = '1.2.0'
 
         # Initialise class members
         self._obj_dir        = None
@@ -181,20 +181,14 @@ class csobsinfo(ctools.cscript):
                 n_eventbins  += obs.events().size()
                 n_obs_binned += 1
                 if self._logTerse():
-                    self._log.parformat('Binned')
-                    self._log('yes\n')
-                    self._log.parformat('Number of bins')
-                    self._log(str(obs.events().size()))
-                    self._log('\n')
+                    self._log_value('Binned', 'yes')
+                    self._log_value('Number of bins', obs.events().size())
             else:
                 n_events       +=  obs.events().size()
                 n_obs_unbinned += 1
                 if self._logTerse():
-                    self._log.parformat('Binned')
-                    self._log('no\n')
-                    self._log.parformat('Number of events')
-                    self._log(str(obs.events().size()))
-                    self._log('\n')
+                    self._log_value('Binned', 'no')
+                    self._log_value('Number of events', obs.events().size())
 
             # Retrieve zenith and azimuth and store for later use
             zenith  = obs.pointing().zenith()
@@ -232,39 +226,19 @@ class csobsinfo(ctools.cscript):
                     self._log(str(obs_gti.tstop().mjd()))
                 self._log('\n')
                 
-                # Log ontime
-                self._log.parformat('Ontime')
-                self._log(str(obs.ontime()))
-                self._log(' s\n')
-                
-                # Log livetime
-                self._log.parformat('Livetime')
-                self._log(str(obs.livetime()))
-                self._log(' s\n')
-                
-                # Log dead time fraction
-                self._log.parformat('Deadtime fraction (%)')
-                self._log('%.3f' % (deadfrac))
-                self._log('\n')
-                
-                # Log pointing direction
-                self._log.parformat('Pointing')
-                self._log(str(pnt_dir))
-                self._log('\n')
-                
+                # Log observation information
+                self._log_value('Ontime', '%.3f s' % obs.ontime())
+                self._log_value('Livetime', '%.3f s' % obs.livetime())
+                self._log_value('Deadtime fraction', '%.3f %%' % deadfrac)
+                self._log_value('Pointing', pnt_dir)
+
                 # Optionally log offset with respect to target direction
                 if self._compute_offset:
-                    self._log.parformat('Offset from target')
-                    self._log('%.2f' % (offset))
-                    self._log(' deg\n')
-                    
-                # Log Zenith and Azimuth if required
-                self._log.parformat('Zenith angle')
-                self._log('%.2f' % (zenith))
-                self._log(' deg\n')
-                self._log.parformat('Azimuth angle')
-                self._log('%.2f' % (azimuth))
-                self._log(' deg\n')
+                    self._log_value('Offset from target', '%.2f deg' % offset)
+
+                # Log Zenith and Azimuth angles
+                self._log_value('Zenith angle', '%.2f deg' % zenith)
+                self._log_value('Azimuth angle', '%.2f deg' % azimuth)
                     
         # Log summary
         if self._logTerse():
@@ -275,36 +249,26 @@ class csobsinfo(ctools.cscript):
         
             # Log general summary
             self._log.header3('Observations')
-            self._log.parformat('Unbinned observations')
-            self._log(str(n_obs_unbinned))
-            self._log('\n')
-            self._log.parformat('Binned observations')
-            self._log(str(n_obs_binned))
-            self._log('\n')
+            self._log_value('Unbinned observations', n_obs_unbinned)
+            self._log_value('Binned observations', n_obs_binned)
+            self._log_value('Binned observations', n_obs_binned)
             self._log.header3('Events')
-            self._log.parformat('Number of events')
-            self._log(str(n_events))
-            self._log('\n')
-            self._log.parformat('Number of bins')
-            self._log(str(n_eventbins))
-            self._log('\n')
+            self._log_value('Number of events', n_events)
+            self._log_value('Number of bins', n_eventbins)
         
             # Log pointing summary
             self._log.header3('Pointings')
         
             # Log mean offset if possible
             if self._compute_offset:
-                self._log.parformat('Mean offset angle')
-                self._log('%.2f' % (sum(self._offsets)/len(self._offsets)))
-                self._log(' deg\n')
+                self._log_value('Mean offset angle', '%.2f deg' %
+                                (sum(self._offsets)/len(self._offsets)))
         
             # Log mean azimuth and zenith angle
-            self._log.parformat('Mean zenith angle')
-            self._log('%.2f' % (sum(self._zeniths)/len(self._zeniths)))
-            self._log(' deg\n')
-            self._log.parformat('Mean azimuth angle')
-            self._log('%.2f' % (sum(self._azimuths)/len(self._azimuths)))
-            self._log(' deg\n')
+            self._log_value('Mean zenith angle', '%.2f deg' %
+                            (sum(self._zeniths)/len(self._zeniths)))
+            self._log_value('Mean azimuth angle', '%.2f deg' %
+                            (sum(self._azimuths)/len(self._azimuths)))
         
             # Optionally log names of observations. Note that the set class
             # is used to extract all different observation names from the
@@ -313,44 +277,34 @@ class csobsinfo(ctools.cscript):
             if self._logExplicit() and sys.version_info >= (2,4):
                 obs_set = set(obs_names)
                 for name in obs_set:
-                    self._log.parformat('"'+name+'"')
-                    self._log(str(obs_names.count(name)))
-                    self._log('\n')
+                    self._log_value('"'+name+'"', obs_names.count(name))
                 self._log('\n')
-            
+
+            # Get energy boundary information
+            if self._ebounds.size() == 0:
+                min_value = 'undefined'
+                max_value = 'undefined'
+            else:
+                min_value = str(self._ebounds.emin())
+                max_value = str(self._ebounds.emax())
+
             # Log energy range
             self._log.header3('Energy range')
-            self._log.parformat('Minimum energy')
-            if self._ebounds.size() == 0:
-                self._log('undefined')
-            else:
-                self._log(str(self._ebounds.emin()))
-            self._log('\n')
-            self._log.parformat('Maximum energy')
-            if self._ebounds.size() == 0:
-                self._log('undefined')
-            else:
-                self._log(str(self._ebounds.emax()))
-            self._log('\n')
-        
+            self._log_value('Minimum energy', min_value)
+            self._log_value('Maximum energy', max_value)
+
             # Log time range
             self._log.header3('Time range')
-            self._log.parformat('Start (MJD)')
-            self._log(str(self._gti.tstart().mjd()))
-            self._log('\n')
-            self._log.parformat('Stop (MJD)')
-            self._log(str(self._gti.tstop().mjd()))
-            self._log('\n')
-        
-            # Log ontime and livetime in different units      
-            self._log.parformat('Total ontime')
-            self._log('%.2f s = %.2f min = %.2f h' %
-                      (ontime, ontime/60., ontime/3600.))
-            self._log('\n')
-            self._log.parformat('Total livetime')
-            self._log('%.2f s = %.2f min = %.2f h' %
-                      (livetime, livetime/60.0, livetime/3600.))
-            self._log('\n')
+            self._log_value('Start (MJD)', self._gti.tstart().mjd())
+            self._log_value('Stop (MJD)',  self._gti.tstop().mjd())
+
+            # Log ontime and livetime in different units
+            on_time   = '%.2f s = %.2f min = %.2f h' % \
+                        (ontime, ontime/60., ontime/3600.)
+            live_time = '%.2f s = %.2f min = %.2f h' % \
+                        (livetime, livetime/60., livetime/3600.)
+            self._log_value('Total ontime', on_time)
+            self._log_value('Total livetime', live_time)
                 
         # Return
         return
@@ -377,9 +331,7 @@ class csobsinfo(ctools.cscript):
 
             # Log filename
             if self._logTerse():
-                self._log(gammalib.parformat('DS9 filename'))
-                self._log(ds9file.url())
-                self._log('\n')
+                self._log_value('DS9 filename', ds9file.url())
             
             # Open file   
             f = open(ds9file.url(),'w')
@@ -436,7 +388,7 @@ class csobsinfo(ctools.cscript):
             
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

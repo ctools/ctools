@@ -156,19 +156,11 @@ class csobs2caldb(ctools.cscript):
 
         # Log filenames
         if self._logNormal():
-            self._log.header3("IRF input files")
-            self._log(gammalib.parformat("Effective area"))
-            self._log(fname_aeff.url())
-            self._log("\n")
-            self._log(gammalib.parformat("Point spread function"))
-            self._log(fname_psf.url())
-            self._log("\n")
-            self._log(gammalib.parformat("Energy dispersion"))
-            self._log(fname_edisp.url())
-            self._log("\n")
-            self._log(gammalib.parformat("Background rate"))
-            self._log(fname_bkg.url())
-            self._log("\n")
+            self._log.header3('IRF input files')
+            self._log_value('Effective area', fname_aeff.url())
+            self._log_value('Point spread function', fname_psf.url())
+            self._log_value('Energy dispersion', fname_edisp.url())
+            self._log_value('Background rate', fname_bkg.url())
     
         # Open FITS files of response components
         fits_aeff  = gammalib.GFits(fname_aeff)
@@ -336,18 +328,13 @@ class csobs2caldb(ctools.cscript):
 
         # Log resulting FITS table
         if self._logNormal():
-            self._log(gammalib.parformat("Calibration directory"))
-            self._log(self._cal_dir)
-            self._log("\n")
-            self._log(gammalib.parformat("Base directory"))
-            self._log(self._base_dir)
-            self._log("\n")
+            self._log_value('Calibration directory', self._cal_dir)
+            self._log_value('Base directory', self._base_dir)
             if not os.path.isdir(self._rsp_dir):
-                self._log(gammalib.parformat("IRF directory"))
+                name = 'IRF directory'
             else:
-                self._log(gammalib.parformat("IRF directory (existing)"))
-            self._log(self._rsp_dir)
-            self._log("\n")
+                name = 'IRF directory (existing)'
+            self._log_value(name, self._rsp_dir)
         
         # Create IRF directory is it does not yet exist
         if not os.path.isdir(self._rsp_dir):
@@ -400,12 +387,8 @@ class csobs2caldb(ctools.cscript):
         
         # Write filenames into logger
         if self._logNormal():
-            self._log(gammalib.parformat('CALDB index file'))
-            self._log(self._caldb_inx.filename().url())
-            self._log('\n')
-            self._log(gammalib.parformat('Response file'))
-            self._log(filename)
-            self._log('\n')
+            self._log_value('CALDB index file', self._caldb_inx.filename().url())
+            self._log_value('Response file', filename)
 
         # Save caldb index file
         self._caldb_inx.save(self._clobber())

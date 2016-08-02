@@ -101,20 +101,12 @@ class csiactcopy(ctools.cscript):
         
         # Logging
         if self._logVerbose():
-            self._log('\n')  
+            self._log('\n')
             self._log.header3('Copy file')
-            self._log.parformat('Source')
-            self._log(str(source))
-            self._log('\n')
-            self._log.parformat('Destination')
-            self._log(str(destination))
-            self._log('\n')  
-            self._log.parformat('Already exists')
-            self._log(str(os.path.isfile(destination)))
-            self._log('\n')
-            self._log.parformat('Overwrite')
-            self._log(str(clobber))
-            self._log('\n')
+            self._log_value('Source', source)
+            self._log_value('Destination', destination)
+            self._log_value('Already exists', str(os.path.isfile(destination)))
+            self._log_value('Overwrite', clobber)
             self._log.parformat('Copying')
         
         # Flag if file destination is already available
@@ -158,24 +150,17 @@ class csiactcopy(ctools.cscript):
         
         If the local fits file is not present, a new one is created.
         """    
-        
+        # ...
         if self._logTerse():
-            self._log.parformat('Local file')
-            self._log(str(localfits))
-            self._log('\n')
-            self._log.parformat('Remote file')
-            self._log(str(remotefits))
-            self._log('\n')
-            self._log.parformat('HDU name')
-            self._log(str(hduname))
-            self._log('\n')
-            self._log.parformat('Conflict preference')
+            self._log_value('Local file', localfits)
+            self._log_value('Remote file', remotefits)
+            self._log_value('HDU name', hduname)
             if clobber:
-                self._log('Remote')
+                preference = 'Remote'
             else:
-                self._log('Local')
-            self._log('\n')
-        
+                preference = 'Local'
+            self._log_value('Conflict preference', preference)
+    
         # Check if local fits file is available
         if os.path.isfile(localfits):    
             local = gammalib.GFits(str(localfits))
@@ -244,15 +229,12 @@ class csiactcopy(ctools.cscript):
         robs_col   = remote_hdu['OBS_ID']
         for obs_id in robs_col:
             remote_obs.append(obs_id)
-            
+
+        # Dump the number of remote and local entries
         if self._logTerse():
-            self._log.parformat('Remote entries')
-            self._log(str(len(remote_obs)))
-            self._log('\n')
-            self._log.parformat('Local entries')
-            self._log(str(len(local_obs)))
-            self._log('\n')
-        
+            self._log_value('Remote entries', len(remote_obs))
+            self._log_value('Local entries', len(local_obs))
+
         # initialise counter for logging
         removed_rows = 0
         
@@ -306,16 +288,16 @@ class csiactcopy(ctools.cscript):
         # Store number of local rows
         old_local_rows = local_hdu.nrows()
         
-        # Add rmeote HDUs
+        # Add remote HDUs
         local_hdu.insert_rows(old_local_rows, remote_hdu.nrows())
-        
+
+        # Dump ...
         if self._logTerse():
             if clobber:
-                self._log.parformat('Removed local rows')
+                what = 'Removed local rows'
             else:
-                self._log.parformat('Skipped remote rows')
-            self._log(str(removed_rows))
-            self._log('\n')
+                what = 'Skipped remote rows'
+            self._log_value(what, removed_rows)
 
         # Loop over columns 
         for i in range(local_hdu.ncols()):
@@ -338,7 +320,7 @@ class csiactcopy(ctools.cscript):
     # Public methods
     def run(self):
         """
-        Run the script.
+        Run the script
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -373,9 +355,7 @@ class csiactcopy(ctools.cscript):
             
             # Logging
             if self._logTerse():
-                self._log.parformat('Number of observations')
-                self._log(str(len(self._runs)))
-                self._log('\n')
+                self._log_value('Number of observations', len(self._runs))
         
         # Copy all data if runlist file is 'NONE'
         elif self._runlist == 'NONE':
@@ -438,13 +418,9 @@ class csiactcopy(ctools.cscript):
                 # Log information
                 if self._logTerse():
                     self._log.header3('Remote config "'+self._prodname+'"')
-                    self._log.parformat('HDU index')
-                    self._log(str(remote_hdu))
-                    self._log('\n')
-                    self._log.parformat('Observation index')
-                    self._log(str(remote_obs))
-                    self._log('\n')
-                    
+                    self._log_value('HDU index', remote_hdu)
+                    self._log_value('Observation index', remote_obs)
+                
                 # Open remote HDU index file
                 fits = gammalib.GFits(str(remote_hdu))
                 table = fits['HDU_INDEX']
@@ -519,19 +495,16 @@ class csiactcopy(ctools.cscript):
                 if self._logTerse():
                     self._log('\n')
                     self._log.header2('File information')
-                    self._log.parformat('Number of files')
-                    self._log(str(len(files)))
-                    self._log('\n')
+                    self._log_value('Number of files', len(files))
                     if has_size:
-                        self._log.parformat('Size')
-                        self._log('%.2f'%(float(cp_size)*1e-6)+' MB')
-                        self._log('\n')
+                        size = float(cp_size) * 1.0e-6
+                        self._log_value('Size', '%.2f MB' % size)
                 if self._logVerbose():
                     self._log('\n')
                     self._log.header3('File names')
                     for filename in files:
                         self._log(str(filename)+'\n')
-                
+
                 # Close HDU index file
                 fits.close()
                 
@@ -569,7 +542,7 @@ class csiactcopy(ctools.cscript):
         if self._logExplicit():
             fraction_increment = 2.0
         
-        # initialise logging properties
+        # Initialise logging properties
         n_copied   = 0
         total_size = 0.0
         
@@ -580,14 +553,14 @@ class csiactcopy(ctools.cscript):
             fraction = float(k) / float(len(files)) * 100.0
             while fraction > last_fraction:
                 if self._logNormal() and not self._logVerbose():
-                    self._log.parformat('Status')
-                    self._log(str(int(last_fraction))+'%')
-                    self._log('\n')
+                    self._log_value('Status', '%d %%' % int(last_fraction))
                 last_fraction += fraction_increment
             
             # Copy file
             filesize = self._copy(filename, self._clobber())
-            
+
+            # If the filesize is positive then increment the number of copied
+            # files and add the size to the total copied filesize
             if filesize > 0.0:
                 total_size += filesize
                 n_copied   += 1
@@ -708,31 +681,23 @@ class csiactcopy(ctools.cscript):
         if self._logNormal():
             self._log('\n')
             self._log.header1('Summary')
-            self._log.parformat('Data files found')
-            self._log(str(len(files)))
-            self._log('\n')
-            self._log.parformat('Data files copied')
-            self._log(str(n_copied))
-            self._log('\n')
-            self._log.parformat('Size')
-            self._log('%.2f'%(float(total_size)*1e-6)+' MB')
-            self._log('\n')
-            self._log.parformat('Local configs')
-            self._log(str(len(newconfigs)))
-            self._log('\n')
+            self._log_value('Data files found', len(files))
+            self._log_value('Data files copied', n_copied)
+            self._log_value('Size', '%.2f MB' % (float(total_size)*1.0e-6))
+            self._log_value('Local configs', len(newconfigs))
             if self._logTerse():
                 self._log('\n')
                 self._log.header3('Content of master index')
                 for config in newconfigs:
                     self._log(str(config['name']))
                     self._log('\n')
-        
+
         # Return
         return       
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()

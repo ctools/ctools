@@ -160,9 +160,7 @@ class cstsdist(ctools.cscript):
         # Write simulation results
         if self._logExplicit():
             self._log.header3('Simulation')
-            self._log.parformat('Number of simulated events')
-            self._log(nevents)
-            self._log('\n')
+            self._log_value('Number of simulated events', nevents)
 
         # Fit model
         fit = ctools.ctlike(sim)
@@ -180,30 +178,18 @@ class cstsdist(ctools.cscript):
         # Write fit results, either explicit or normal
         if self._logExplicit():
             self._log.header3('Test source model fit')
-            self._log.parformat('Test statistics')
-            self._log(ts)
-            self._log('\n')
-            self._log.parformat('log likelihood')
-            self._log(logL)
-            self._log('\n')
-            self._log.parformat('Number of predicted events')
-            self._log(npred)
-            self._log('\n')
+            self._log_value('Test statistics', ts)
+            self._log_value('log likelihood', logL)
+            self._log_value('Number of predicted events', npred)
             for model in models:
-                self._log.parformat('Model')
-                self._log(model.name())
-                self._log('\n')
+                self._log_value('Model', model.name())
                 for par in model:
                     self._log(str(par)+'\n')
         elif self._logNormal():
-            self._log.parformat('Trial '+str(seed))
-            self._log('TS=')
-            self._log(ts)
-            self._log('  Prefactor=')
-            self._log(model['Prefactor'].value())
-            self._log('+/-')
-            self._log(model['Prefactor'].error())
-            self._log('\n')
+            name  = 'Trial %d' % seed
+            value = 'TS=%.3f  Prefactor=%e +/- %e' % \
+                    (ts, model['Prefactor'].value(), model['Prefactor'].error())
+            self._log_value(name, value)
 
         # Initialise results
         colnames = []
