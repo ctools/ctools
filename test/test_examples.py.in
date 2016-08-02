@@ -300,7 +300,13 @@ class Test(gammalib.GPythonTestSuite):
         Test show_pha
         """
         # Set arguments
-        args = '-p example_show_pha.eps %s/pha.fits' % self._datadir
+        args = '-p example_show_pha1.eps %s/pha.fits' % self._datadir
+
+        # Execute script
+        self._execute_python('show_pha', args=args)
+
+        # Set arguments
+        args = '-p example_show_pha2.eps %s/pha_channels.fits' % self._datadir
 
         # Execute script
         self._execute_python('show_pha', args=args)

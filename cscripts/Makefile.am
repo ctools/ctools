@@ -144,6 +144,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/workflow.xml \
            $(top_srcdir)/test/data/butterfly.txt \
            $(top_srcdir)/test/data/pha.fits \
+           $(top_srcdir)/test/data/pha_channels.fits \
            $(top_srcdir)/test/data/pull.dat \
            $(top_srcdir)/test/data/sensitivity.dat \
            $(top_srcdir)/test/data/spectrum.fits \
