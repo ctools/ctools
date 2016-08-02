@@ -28,7 +28,7 @@ import ctools
 # ============== #
 class csobsdef(ctools.cscript):
     """
-    Creates an observation definition file from a pointing list.
+    Creates an observation definition file from a pointing list
     
     The pointing list is a comma-separated value ASCII file with header
     keywords in the first row followed by a list of pointings (one
@@ -92,8 +92,7 @@ class csobsdef(ctools.cscript):
         self._pntdef = gammalib.GCsv()
         self._tmin   = 0.0
 
-        # Initialise application by calling the appropriate class
-        # constructor.
+        # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
         # Return
@@ -128,6 +127,20 @@ class csobsdef(ctools.cscript):
         The method creates an XML element so that that the response XML
         writer will write the database and response name into the
         observation definition file.
+
+        Parameters
+        ----------
+        obs : `~gammalib.GCTAObservation`
+            CTA observation
+        caldb : str
+            Calibration database
+        irf : str
+            Instrument response function
+
+        Returns
+        obs : `~gammalib.GCTAObservation`
+            CTA observation with response attached
+        -------
         """
         # Create XML element
         xml = gammalib.GXmlElement()
@@ -156,7 +169,7 @@ class csobsdef(ctools.cscript):
         Raises
         ------
         RuntimeError
-            Invalid pointing definition file format.
+            Invalid pointing definition file format
         """
         # Switch screen logging on in debug mode
         if self._logDebug():
@@ -170,21 +183,25 @@ class csobsdef(ctools.cscript):
             self._log('\n')
             self._log.header1('Creating observation definition XML file')
 
-        # Load pointing definition file if it is not already set
+        # Load pointing definition file if it is not already set. Extract
+        # the number of columns and pointings
         if self._pntdef.size() == 0:
             self._pntdef = gammalib.GCsv(self['inpnt'].filename(), ',')
         ncols = self._pntdef.ncols()
         npnt  = self._pntdef.nrows()-1
 
-        # Throw an exception is there is no header information
+        # Raise an exception if there is no header information
         if self._pntdef.nrows() < 1:
             raise RuntimeError('No header found in pointing definition file.')
 
         # Clear observation container
         self._obs.clear()
+
+        # Initialise observation identifier counter
         identifier = 1
 
-        # Extract header from pointing definition file
+        # Extract header columns from pointing definition file and put them
+        # into a list
         header = []
         for col in range(ncols):
             header.append(self._pntdef[0,col])
@@ -192,28 +209,31 @@ class csobsdef(ctools.cscript):
         # Loop over all pointings
         for pnt in range(npnt):
 
-            # Set row index
+            # Set pointing definition CSV file row index
             row = pnt + 1
 
-            # Create CTA observation
+            # Create empty CTA observation
             obs = gammalib.GCTAObservation()
 
-            # Set observation name
+            # Set observation name. If no observation name was given then
+            # use "None".
             if 'name' in header:
                 name = self._pntdef[row, header.index('name')]
             else:
                 name = 'None'
             obs.name(name)
 
-            # Set identifier
+            # Set observation identifier. If no observation identified was
+            # given the use the internal counter.
             if 'id' in header:
-                id_ = self._pntdef[row, header.index('id')]
+                obsid = self._pntdef[row, header.index('id')]
             else:
-                id_ = '%6.6d' % identifier
+                obsid = '%6.6d' % identifier
                 identifier += 1
-            obs.id(id_)
+            obs.id(obsid)
 
-            # Set pointing
+            # Set pointing. Either use "ra" and "dec" or "lon" and "lat".
+            # If none of these pairs are given then raise an exception.
             if 'ra' in header and 'dec' in header:
                 ra     = float(self._pntdef[row, header.index('ra')])
                 dec    = float(self._pntdef[row, header.index('dec')])
@@ -229,7 +249,8 @@ class csobsdef(ctools.cscript):
                                    'found in pointing definition file.')
             obs.pointing(gammalib.GCTAPointing(pntdir))
 
-            # Set response function
+            # Set response function. If no "caldb" or "irf" information is
+            # provided then use the user parameter values.
             if 'caldb' in header:
                 caldb = self._pntdef[row, header.index('caldb')]
             else:
@@ -241,14 +262,16 @@ class csobsdef(ctools.cscript):
             if caldb != '' and irf != '':
                 obs = self._set_response(obs, caldb, irf)
 
-            # Set deadtime correction factor
+            # Set deadtime correction factor. If no information is provided
+            # then use the user parameter value "deadc".
             if 'deadc' in header:
                 deadc = float(self._pntdef[row, header.index('deadc')])
             else:
                 deadc = self['deadc'].real()
             obs.deadc(deadc)
 
-            # Set Good Time Interval
+            # Set Good Time Interval. If no information is provided then use
+            # the user parameter value "duration".
             if 'duration' in header:
                 duration = float(self._pntdef[row, header.index('duration')])
             else:
@@ -263,7 +286,9 @@ class csobsdef(ctools.cscript):
             obs.ontime(gti.ontime())
             obs.livetime(gti.ontime()*deadc)
 
-            # Set Energy Boundaries
+            # Set Energy Boundaries. If no "emin" or "emax" information is
+            # provided then use the user parameter values in case they are
+            # valid.
             has_emin = False
             has_emax = False
             if 'emin' in header:
@@ -285,7 +310,8 @@ class csobsdef(ctools.cscript):
                 ebounds = gammalib.GEbounds(gammalib.GEnergy(emin, 'TeV'),
                                             gammalib.GEnergy(emax, 'TeV'))
 
-            # Set ROI
+            # Set ROI. If no ROI radius is provided then use the user
+            # parameters "rad".
             has_roi = False
             if 'rad' in header:
                 rad     = float(self._pntdef[row, header.index('rad')])
@@ -298,17 +324,17 @@ class csobsdef(ctools.cscript):
                 roi = gammalib.GCTARoi(gammalib.GCTAInstDir(pntdir), rad)
 
             # Create an empty event list
-            list_ = gammalib.GCTAEventList()
-            list_.gti(gti)
+            event_list = gammalib.GCTAEventList()
+            event_list.gti(gti)
 
-            # Set optional information
+            # If available, set the energy boundaries and the ROI
             if has_ebounds:
-                list_.ebounds(ebounds)
+                event_list.ebounds(ebounds)
             if has_roi:
-                list_.roi(roi)
+                event_list.roi(roi)
 
             # Attach event list to CTA observation
-            obs.events(list_)
+            obs.events(event_list)
 
             # Write observation into logger
             if self._logExplicit():

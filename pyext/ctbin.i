@@ -49,7 +49,7 @@ public:
     void                 save(void);
     void                 publish(const std::string& name = "");
     const GObservations& obs(void) const;
-    GCTAEventCube        cube(void) const;
+    const GCTAEventCube& cube(void) const;
 };
 
 

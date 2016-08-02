@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Print info about Gammalib / ctools to the console.
+# Print info about Gammalib / ctools to the console
 #
 # Copyright (C) 2015-2016 Christoph Deil
 #
@@ -87,8 +87,8 @@ def get_command_output(cmd):
     output : str
         Command output
     """
-    # Try to import getoutput from subprocess, alternatively get it from
-    # commands
+    # Try to import getoutput from the "subprocess" module, alternatively get
+    # it from the "commands" module
     try:
         from subprocess import getoutput
     except ImportError:
@@ -287,8 +287,7 @@ def get_pkg_config_info(info, library):
     # Execute command
     out = get_command_output(cmd)
 
-    # If the command returns 'was not found' then pkg-config is not
-    # available
+    # If the command returns "not found" then pkg-config is not available
     if 'not found' in out:
         out = 'Not available'
 
@@ -322,8 +321,8 @@ def csinfo(argv):
     """
     Print information about Gammalib and ctools to the console
     """
-    # If there are no command line arguments then print help and exit with
-    # success
+    # If there are no command line arguments then print help text and exit
+    # with success
     if len(argv) <= 1:
         csinfo_print_help()
         sys.exit(0)

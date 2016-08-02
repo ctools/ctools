@@ -81,7 +81,7 @@ public:
     void                 save(void);
     void                 publish(const std::string& name = "");
     const GObservations& obs(void) const;
-    GCTAEventCube        cube(void) const;
+    const GCTAEventCube& cube(void) const;
 
 protected:
     // Protected methods
@@ -95,25 +95,28 @@ protected:
     std::vector<bool>   cube_layer_usage(const GEbounds& ebounds) const;
 
     // User parameters
-    GFilename     m_outcube;    //!< Output counts map file name
-    bool          m_usepnt;     //!< Use pointing instead of xref/yref parameters
-    bool          m_publish;    //!< Publish counts cube?
-    GChatter      m_chatter;    //!< Chattiness
+    GFilename     m_outcube;  //!< Output counts map file name
+    bool          m_usepnt;   //!< Use pointing instead of xref/yref parameters
+    bool          m_publish;  //!< Publish counts cube?
+    GChatter      m_chatter;  //!< Chattiness
 
     // Protected members
-    GObservations m_obs;        //!< Observation container
-    GSkyMap       m_counts;     //!< Event cube counts
-    GSkyMap       m_weights;    //!< Event cube weights
-    GEbounds      m_ebounds;    //!< Energy boundaries
-    GGti          m_gti;        //!< Good time intervals
-    double        m_ontime;     //!< Total ontime
-    double        m_livetime;   //!< Total livetime
+    GObservations m_obs;      //!< Observation container
+    GSkyMap       m_counts;   //!< Event cube counts
+    GSkyMap       m_weights;  //!< Event cube weights
+    GEbounds      m_ebounds;  //!< Energy boundaries
+    GGti          m_gti;      //!< Good time intervals
+    GCTAEventCube m_cube;     //!< Events cube (for cube() method)
+    double        m_ontime;   //!< Total ontime
+    double        m_livetime; //!< Total livetime
 };
 
 /***********************************************************************//**
  * @brief Return observation container
  *
  * @return Reference to observation container
+ *
+ * Returns a reference to an observation container.
  ***************************************************************************/
 inline
 const GObservations& ctbin::obs(void) const
@@ -125,18 +128,14 @@ const GObservations& ctbin::obs(void) const
 /***********************************************************************//**
  * @brief Return event cube
  *
- * @return Event cube
+ * @return Reference to event cube
  *
- * Returns a event cube built from the ctbin member information.
+ * Returns a reference to the event cube.
  ***************************************************************************/
 inline
-GCTAEventCube ctbin::cube(void) const
+const GCTAEventCube& ctbin::cube(void) const
 {
-    // Build event cube
-    GCTAEventCube cube(m_counts, m_weights, m_ebounds, m_gti);
-    
-    // Return cube
-    return cube;
+    return m_cube;
 }
 
 #endif /* CTBIN_HPP */

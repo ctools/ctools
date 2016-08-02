@@ -136,15 +136,11 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         # cubes and append them to the observation
         if len(sim.obs()) > 1:
 
-            # First get the cube. We need this because ctbin builds a cube on
-            # the fly. We should avoid this and make the cube part of ctbin
-            cube = bin.cube()
-
             # Get xref, yref, coordsys and proj from counts cube
-            _xref     = cube.counts().projection().crval(0)
-            _yref     = cube.counts().projection().crval(1)
-            _coordsys = cube.counts().projection().coordsys()
-            _proj     = cube.counts().projection().code()
+            _xref     = bin.cube().counts().projection().crval(0)
+            _yref     = bin.cube().counts().projection().crval(1)
+            _coordsys = bin.cube().counts().projection().coordsys()
+            _proj     = bin.cube().counts().projection().code()
 
             # Kluge: map "EQU" to "CEL" coordinate system (not sure why the
             # GSkyProjection::coordsys returns "EQU" instead of "CEL"

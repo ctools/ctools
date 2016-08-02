@@ -281,6 +281,10 @@ void ctbin::run(void)
 
     } // endfor: looped over observations
 
+    // Build event cube (needs to come before obs_cube() since this method
+    // relies on correct setting of m_cube)
+    m_cube = GCTAEventCube(m_counts, m_weights, m_ebounds, m_gti);
+
     // Set a single cube in the observation container
     obs_cube();
 
@@ -400,6 +404,7 @@ void ctbin::init_members(void)
     m_weights.clear();
     m_ebounds.clear();
     m_gti.clear();
+    m_cube.clear();
     m_ontime   = 0.0;
     m_livetime = 0.0;
 
@@ -427,6 +432,7 @@ void ctbin::copy_members(const ctbin& app)
     m_weights   = app.m_weights;
     m_ebounds   = app.m_ebounds;
     m_gti       = app.m_gti;
+    m_cube      = app.m_cube;
     m_ontime    = app.m_ontime;
     m_livetime  = app.m_livetime;
 
