@@ -147,6 +147,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/pha_channels.fits \
            $(top_srcdir)/test/data/pull.dat \
            $(top_srcdir)/test/data/sensitivity.dat \
+           $(top_srcdir)/test/data/sensitivity_integral.dat \
            $(top_srcdir)/test/data/spectrum.fits \
            $(top_srcdir)/test/data/ts.dat \
            $(top_srcdir)/test/data/models_spatial.xml \
