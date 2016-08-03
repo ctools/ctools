@@ -178,15 +178,15 @@ class csobsinfo(ctools.cscript):
             if obs.eventtype() == 'CountsCube':
                 n_eventbins  += obs.events().size()
                 n_obs_binned += 1
-                if self._logTerse():
-                    self._log_value('Binned', 'yes')
-                    self._log_value('Number of bins', obs.events().size())
+                is_binned     = 'yes'
+                is_what       = 'Number of bins'
             else:
                 n_events       +=  obs.events().size()
                 n_obs_unbinned += 1
-                if self._logTerse():
-                    self._log_value('Binned', 'no')
-                    self._log_value('Number of events', obs.events().size())
+                is_binned     = 'no'
+                is_what       = 'Number of events'
+            self._log_value(gammalib.TERSE, 'Binned', is_binned)
+            self._log_value(gammalib.TERSE, is_what, obs.events().size())
 
             # Retrieve zenith and azimuth and store for later use
             zenith  = obs.pointing().zenith()
@@ -224,86 +224,100 @@ class csobsinfo(ctools.cscript):
                     self._log(str(obs_gti.tstop().mjd()))
                 self._log('\n')
                 
-                # Log observation information
-                self._log_value('Ontime', '%.3f s' % obs.ontime())
-                self._log_value('Livetime', '%.3f s' % obs.livetime())
-                self._log_value('Deadtime fraction', '%.3f %%' % deadfrac)
-                self._log_value('Pointing', pnt_dir)
+            # Log observation information
+            self._log_value(gammalib.TERSE, 'Ontime', '%.3f s' %
+                            obs.ontime())
+            self._log_value(gammalib.TERSE, 'Livetime', '%.3f s' %
+                            obs.livetime())
+            self._log_value(gammalib.TERSE, 'Deadtime fraction', '%.3f %%' %
+                            deadfrac)
+            self._log_value(gammalib.TERSE, 'Pointing', pnt_dir)
 
-                # Optionally log offset with respect to target direction
-                if self._compute_offset:
-                    self._log_value('Offset from target', '%.2f deg' % offset)
-
-                # Log Zenith and Azimuth angles
-                self._log_value('Zenith angle', '%.2f deg' % zenith)
-                self._log_value('Azimuth angle', '%.2f deg' % azimuth)
-                    
-        # Log summary
-        if self._logTerse():
-
-            # Write header
-            self._log('\n')
-            self._log.header1('Summary')
-        
-            # Log general summary
-            self._log.header3('Observations')
-            self._log_value('Unbinned observations', n_obs_unbinned)
-            self._log_value('Binned observations', n_obs_binned)
-            self._log_value('Binned observations', n_obs_binned)
-            self._log.header3('Events')
-            self._log_value('Number of events', n_events)
-            self._log_value('Number of bins', n_eventbins)
-        
-            # Log pointing summary
-            self._log.header3('Pointings')
-        
-            # Log mean offset if possible
+            # Optionally log offset with respect to target direction
             if self._compute_offset:
-                self._log_value('Mean offset angle', '%.2f deg' %
-                                (sum(self._offsets)/len(self._offsets)))
+                self._log_value(gammalib.TERSE,
+                                'Offset from target', '%.2f deg' % offset)
+
+            # Log Zenith and Azimuth angles
+            self._log_value(gammalib.TERSE, 'Zenith angle', '%.2f deg' %
+                            zenith)
+            self._log_value(gammalib.TERSE, 'Azimuth angle', '%.2f deg' %
+                            azimuth)
+                    
+        # Write summary header
+        self._log_string(gammalib.TERSE, '\n')
+        self._log_header1(gammalib.TERSE, 'Summary')
+
+        # Log general summary
+        self._log_header3(gammalib.TERSE, 'Observations')
+        self._log_value(gammalib.TERSE, 'Unbinned observations', n_obs_unbinned)
+        self._log_value(gammalib.TERSE, 'Binned observations', n_obs_binned)
+        self._log_value(gammalib.TERSE, 'Binned observations', n_obs_binned)
+        self._log_header3(gammalib.TERSE, 'Events')
+        self._log_value(gammalib.TERSE, 'Number of events', n_events)
+        self._log_value(gammalib.TERSE, 'Number of bins', n_eventbins)
+
+
+        # Compute mean offset, azimuth and zenith angle
+        if len(self._offsets) > 0:
+            mean_offset = sum(self._offsets) / len(self._offsets)
+        else:
+            mean_offset = 'Unknown'
+        if len(self._zeniths) > 0:
+            mean_zenith = sum(self._zeniths) / len(self._zeniths)
+        else:
+            mean_zenith = 'Unknown'
+        if len(self._azimuths) > 0:
+            mean_azimuth = sum(self._azimuths) / len(self._azimuths)
+        else:
+            mean_azimuth = 'Unknown'
         
-            # Log mean azimuth and zenith angle
-            self._log_value('Mean zenith angle', '%.2f deg' %
-                            (sum(self._zeniths)/len(self._zeniths)))
-            self._log_value('Mean azimuth angle', '%.2f deg' %
-                            (sum(self._azimuths)/len(self._azimuths)))
-        
-            # Optionally log names of observations. Note that the set class
-            # is used to extract all different observation names from the
-            # list of observation names, and the set class is only available
-            # from Python 2.4 on.
-            if self._logExplicit() and sys.version_info >= (2,4):
-                obs_set = set(obs_names)
-                for name in obs_set:
-                    self._log_value('"'+name+'"', obs_names.count(name))
-                self._log('\n')
+        # Log mean offset, azimuth and zenith angle
+        self._log_header3(gammalib.TERSE, 'Pointings')
+        self._log_value(gammalib.TERSE, 'Mean offset angle', '%.2f deg' %
+                        mean_offset)
+        self._log_value(gammalib.TERSE, 'Mean zenith angle', '%.2f deg' %
+                        mean_zenith)
+        self._log_value(gammalib.TERSE, 'Mean azimuth angle', '%.2f deg' %
+                        mean_azimuth)
 
-            # Get energy boundary information
-            if self._ebounds.size() == 0:
-                min_value = 'undefined'
-                max_value = 'undefined'
-            else:
-                min_value = str(self._ebounds.emin())
-                max_value = str(self._ebounds.emax())
+        # Optionally log names of observations. Note that the set class is
+        # used to extract all different observation names from the list of
+        # observation names, and the set class is only available from
+        # Python 2.4 on.
+        if sys.version_info >= (2,4):
+            obs_set = set(obs_names)
+            for name in obs_set:
+                self._log_value(gammalib.EXPLICIT,'"'+name+'"',
+                                obs_names.count(name))
+            self._log('\n')
 
-            # Log energy range
-            self._log.header3('Energy range')
-            self._log_value('Minimum energy', min_value)
-            self._log_value('Maximum energy', max_value)
+        # Get energy boundary information
+        if self._ebounds.size() == 0:
+            min_value = 'undefined'
+            max_value = 'undefined'
+        else:
+            min_value = str(self._ebounds.emin())
+            max_value = str(self._ebounds.emax())
 
-            # Log time range
-            self._log.header3('Time range')
-            self._log_value('Start (MJD)', self._gti.tstart().mjd())
-            self._log_value('Stop (MJD)',  self._gti.tstop().mjd())
+        # Log energy range
+        self._log_header3(gammalib.TERSE, 'Energy range')
+        self._log_value(gammalib.TERSE, 'Minimum energy', min_value)
+        self._log_value(gammalib.TERSE, 'Maximum energy', max_value)
 
-            # Log ontime and livetime in different units
-            on_time   = '%.2f s = %.2f min = %.2f h' % \
-                        (ontime, ontime/60., ontime/3600.)
-            live_time = '%.2f s = %.2f min = %.2f h' % \
-                        (livetime, livetime/60., livetime/3600.)
-            self._log_value('Total ontime', on_time)
-            self._log_value('Total livetime', live_time)
-                
+        # Log time range
+        self._log_header3(gammalib.TERSE, 'Time range')
+        self._log_value(gammalib.TERSE, 'Start (MJD)', self._gti.tstart().mjd())
+        self._log_value(gammalib.TERSE, 'Stop (MJD)',  self._gti.tstop().mjd())
+
+        # Log ontime and livetime in different units
+        on_time   = '%.2f s = %.2f min = %.2f h' % \
+                    (ontime, ontime/60., ontime/3600.)
+        live_time = '%.2f s = %.2f min = %.2f h' % \
+                    (livetime, livetime/60., livetime/3600.)
+        self._log_value(gammalib.TERSE, 'Total ontime', on_time)
+        self._log_value(gammalib.TERSE, 'Total livetime', live_time)
+                 
         # Return
         return
 
@@ -323,13 +337,10 @@ class csobsinfo(ctools.cscript):
         if ds9file.url() != 'NONE':
             
             # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Save pointings in DS9 file')
+            self._log_header1(gammalib.TERSE, 'Save pointings in DS9 file')
 
             # Log filename
-            if self._logTerse():
-                self._log_value('DS9 filename', ds9file.url())
+            self._log_value(gammalib.TERSE, 'DS9 filename', ds9file.url())
             
             # Open file   
             f = open(ds9file.url(),'w')

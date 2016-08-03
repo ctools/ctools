@@ -290,9 +290,8 @@ class cstsmapmerge(ctools.cscript):
 
             # Skip file if it's not a FITS file
             if not gammalib.GFilename(fitsfile).is_fits():
-                if self._logExplicit():
-                    self._log_value('Skip file',
-                                    '%s (not a FITS file)' % fitsfile)
+                self._log_value(gammalib.EXPLICIT, 'Skip file',
+                                '%s (not a FITS file)' % fitsfile)
                 continue
 
             # Open FITS file
@@ -313,9 +312,8 @@ class cstsmapmerge(ctools.cscript):
             # ... otherwise signal that file is useless
             else:
                 fits.close()
-                if self._logExplicit():
-                     self._log_value('Skip file',
-                                    '%s (no "STATUS MAP" extension)' % fitsfile)
+                self._log_value(gammalib.EXPLICIT, 'Skip file',
+                                '%s (no "STATUS MAP" extension)' % fitsfile)
                 continue
 
         # Signal if no suitable file was found
@@ -344,9 +342,8 @@ class cstsmapmerge(ctools.cscript):
                 
                 # Skip if file is not FITS
                 if not gammalib.GFilename(fitsfile).is_fits():
-                    if self._logExplicit():
-                        self._log_value('Skip file',
-                                        '%s (not a FITS file)' % fitsfile)
+                    self._log_value(gammalib.EXPLICIT, 'Skip file',
+                                    '%s (not a FITS file)' % fitsfile)
                     continue
 
                 # Open FITS file
@@ -355,10 +352,8 @@ class cstsmapmerge(ctools.cscript):
                 # Skip if file does not contain status map
                 if not fits.contains('STATUS MAP'):
                     fits.close()
-                    if self._logExplicit():
-                        self._log_value('Skip file',
-                                        '%s (no "STATUS MAP" extension)' %
-                                        fitsfile)
+                    self._log_value(gammalib.EXPLICIT, 'Skip file',
+                                    '%s (no "STATUS MAP" extension)' % fitsfile)
                     continue
 
                 # Close FITS file
@@ -386,16 +381,13 @@ class cstsmapmerge(ctools.cscript):
         Save TS map and remove slices if requested
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save TS map')
+        self._log_header1(gammalib.TERSE, 'Save TS map')
 
         # Get output filename in case it was not read ahead
         outmap = self['outmap'].filename()
 
         # Log filename
-        if self._logTerse():
-            self._log_value('TS map file', outmap.url())
+        self._log_value(gammalib.TERSE, 'TS map file', outmap.url())
         
         # Create FITS file
         fits = gammalib.GFits()
@@ -430,8 +422,7 @@ class cstsmapmerge(ctools.cscript):
         if self._delete:
             for filename in self._merged_files:
                 os.remove(filename)
-                if self._logTerse():
-                    self._log_value('Deleted input file', filename)
+                self._log_value(gammalib.TERSE, 'Deleted input file', filename)
         
         # Return
         return

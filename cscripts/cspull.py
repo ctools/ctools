@@ -209,15 +209,14 @@ class cspull(ctools.cscript):
             nevents += run.events().number()
 
         # Write simulation results
-        if self._logNormal():
-            self._log.header3('Simulation')
-            for run in self._obs:
-                self._log_value('Input observation %s' % run.id(),
-                                self._obs_string(run))
-            for run in obs:
-                self._log_value('Output observation %s' % run.id(),
-                                self._obs_string(run))
-            self._log_value('Number of simulated events', nevents)
+        self._log_header3(gammalib.NORMAL, 'Simulation')
+        for run in self._obs:
+            self._log_value(gammalib.NORMAL, 'Input observation %s' % run.id(),
+                            self._obs_string(run))
+        for run in obs:
+            self._log_value(gammalib.NORMAL, 'Output observation %s' % run.id(),
+                            self._obs_string(run))
+        self._log_value(gammalib.NORMAL, 'Number of simulated events', nevents)
 
         # Fit model
         if self['profile'].boolean():
@@ -284,9 +283,8 @@ class cspull(ctools.cscript):
                     values['e_'+name]    = error
 
                     # Write result
-                    if self._logNormal():
-                        value = '%.4f (%e +/- %e)' % (pull, fitted_value, error)
-                        self._log_value(name, value)
+                    value = '%.4f (%e +/- %e)' % (pull, fitted_value, error)
+                    self._log_value(gammalib.NORMAL, name, value)
 
         # Bundle together results
         result = {'colnames': colnames, 'values': values}

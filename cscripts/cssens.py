@@ -301,12 +301,11 @@ class cssens(ctools.cscript):
         crab_unit = crab_flux/src_flux
 
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header2('Energies: '+str(emin)+' - '+str(emax))
-            self._log_value('Crab flux', str(crab_flux)+' ph/cm2/s')
-            self._log_value('Source model flux', str(src_flux)+' ph/cm2/s')
-            self._log_value('Crab unit factor', crab_unit)
+        self._log_header2(gammalib.TERSE, 'Energies: '+str(emin)+' - '+str(emax))
+        self._log_value(gammalib.TERSE, 'Crab flux', str(crab_flux)+' ph/cm2/s')
+        self._log_value(gammalib.TERSE, 'Source model flux', str(src_flux)+
+                        ' ph/cm2/s')
+        self._log_value(gammalib.TERSE, 'Crab unit factor', crab_unit)
 
         # Initialise loop
         crab_flux_value   = []
@@ -348,9 +347,9 @@ class cssens(ctools.cscript):
                 nevents += run.events().number()
 
             # Write simulation results
-            if self._logExplicit():
-                self._log.header3('Simulation')
-                self._log_value('Number of simulated events', nevents)
+            self._log_header3(gammalib.EXPLICIT, 'Simulation')
+            self._log_value(gammalib.EXPLICIT, 'Number of simulated events',
+                            nevents)
 
             # Fit test source
             fit = ctools.ctlike(sim)
@@ -379,16 +378,16 @@ class cssens(ctools.cscript):
             quality = npred - nevents
 
             # Write test source fit results
-            if self._logExplicit():
-                self._log.header3('Test source model fit')
-                self._log_value('Test statistics', ts)
-                self._log_value('log likelihood', logL)
-                self._log_value('Number of predicted events', quality)
-                self._log_value('Fit quality', npred)
-                for model in models:
-                    self._log_value('Model', model.name())
-                    for par in model:
-                        self._log(str(par)+'\n')
+            self._log_header3(gammalib.EXPLICIT, 'Test source model fit')
+            self._log_value(gammalib.EXPLICIT, 'Test statistics', ts)
+            self._log_value(gammalib.EXPLICIT, 'log likelihood', logL)
+            self._log_value(gammalib.EXPLICIT, 'Number of predicted events',
+                                               quality)
+            self._log_value(gammalib.EXPLICIT, 'Fit quality', npred)
+            for model in models:
+                self._log_value(gammalib.EXPLICIT, 'Model', model.name())
+                for par in model:
+                    self._log(str(par)+'\n')
 
             # If TS was non-positive then increase the test flux and start
             # over
@@ -427,13 +426,16 @@ class cssens(ctools.cscript):
 
             # Write fit results
             if self._logExplicit():
-                self._log_value('Photon flux', str(photon_flux)+' ph/cm2/s')
-                self._log_value('Energy flux', str(energy_flux)+' erg/cm2/s')
-                self._log_value('Crab flux', str(crab_flux*1000.0)+' mCrab')
-                self._log_value('Differential sensitivity', str(sensitivity)+
-                                ' erg/cm2/s')
+                self._log_value(gammalib.EXPLICIT, 'Photon flux',
+                                str(photon_flux)+' ph/cm2/s')
+                self._log_value(gammalib.EXPLICIT, 'Energy flux',
+                                str(energy_flux)+' erg/cm2/s')
+                self._log_value(gammalib.EXPLICIT, 'Crab flux',
+                                str(crab_flux*1000.0)+' mCrab')
+                self._log_value(gammalib.EXPLICIT, 'Differential sensitivity',
+                                str(sensitivity)+' erg/cm2/s')
                 for model in models:
-                    self._log_value('Model', model.name())
+                    self._log_value(gammalib.EXPLICIT, 'Model', model.name())
                     for par in model:
                         self._log(str(par)+'\n')
             elif self._logTerse():
@@ -441,7 +443,7 @@ class cssens(ctools.cscript):
                 value = ('TS=%.4f corr=%e  %e ph/cm2/s = %e erg/cm2/s = %.2f '
                          'mCrab = %e erg/cm2/s' % (ts, correct, photon_flux,
                          energy_flux, crab_flux*1000.0, sensitivity))
-                self._log_value(name, value)
+                self._log_value(gammalib.TERSE, name, value)
 
             # Compute sliding average of extrapolated fitted prefactor,
             # photon and energy flux. This damps out fluctuations and
@@ -493,21 +495,24 @@ class cssens(ctools.cscript):
                 break
 
         # Write fit results
-        if self._logTerse():
-            self._log.header3('Fit results')
-            self._log_value('Test statistics', ts)
-            self._log_value('Photon flux', str(photon_flux)+' ph/cm2/s')
-            self._log_value('Energy flux', str(energy_flux)+' erg/cm2/s')
-            self._log_value('Crab flux', str(crab_flux*1000.0)+' mCrab')
-            self._log_value('Differential sensitivity', str(sensitivity)+' erg/cm2/s')
-            self._log_value('Number of simulated events', nevents)
-            self._log.header3('Test source model fitting')
-            self._log_value('log likelihood', logL)
-            self._log_value('Number of predicted events', npred)
-            for model in models:
-                self._log_value('Model', model.name())
-                for par in model:
-                    self._log(str(par)+'\n')
+        self._log_header3(gammalib.TERSE, 'Fit results')
+        self._log_value(gammalib.TERSE, 'Test statistics', ts)
+        self._log_value(gammalib.TERSE, 'Photon flux',
+                        str(photon_flux)+' ph/cm2/s')
+        self._log_value(gammalib.TERSE, 'Energy flux',
+                        str(energy_flux)+' erg/cm2/s')
+        self._log_value(gammalib.TERSE, 'Crab flux',
+                        str(crab_flux*1000.0)+' mCrab')
+        self._log_value(gammalib.TERSE, 'Differential sensitivity',
+                        str(sensitivity)+' erg/cm2/s')
+        self._log_value(gammalib.TERSE, 'Number of simulated events', nevents)
+        self._log_header3(gammalib.TERSE, 'Test source model fitting')
+        self._log_value(gammalib.TERSE, 'log likelihood', logL)
+        self._log_value(gammalib.TERSE, 'Number of predicted events', npred)
+        for model in models:
+            self._log_value(gammalib.TERSE, 'Model', model.name())
+            for par in model:
+                self._log_string(gammalib.TERSE, str(par)+'\n')
 
         # Restore energy boundaries of observation container
         for i, obs in enumerate(self._obs):

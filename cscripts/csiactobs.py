@@ -401,11 +401,9 @@ class csiactobs(ctools.cscript):
         filename = self['inmodel'].filename().url()
         if filename != '' and filename != 'NONE':
 
-            # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Append input models')
-                self._log_value('Input model file', filename)
+            # Log header and input model file
+            self._log_header1(gammalib.TERSE, 'Append input models')
+            self._log_value(gammalib.NORMAL, 'Input model file', filename)
 
             # Load input models
             models = gammalib.GModels(filename)
@@ -413,8 +411,8 @@ class csiactobs(ctools.cscript):
             # Loop over input models and append them to the model container
             for model in models:
                 self._models.append(model)
-                if self._logTerse():
-                    self._log_value('Append model', '"'+model.name()+'"')
+                self._log_value(gammalib.NORMAL, 'Append model',
+                                                 '"'+model.name()+'"')
 
         # Return
         return
@@ -423,23 +421,19 @@ class csiactobs(ctools.cscript):
         """
         Write observation summary
         """
-        # Write observation summary
-        if self._logTerse():
-        
-            # Log header
-            self._log('\n')
-            self._log.header1('Observation summary')
+        # Log header
+        self._log_header1(gammalib.TERSE, 'Observation summary')
 
-            # Set energy range dependent on whether boundaries exist or
-            # not
-            if self._ebounds.size() > 0:
-                erange = '%s - %s' % (str(self._ebounds.emin()),
-                                      str(self._ebounds.emax()))
-            else:
-                erange = 'not available'
-            
-            # Log energy range
-            self._log_value('Energy range', erange)
+        # Set energy range dependent on whether boundaries exist or
+        # not
+        if self._ebounds.size() > 0:
+            erange = '%s - %s' % (str(self._ebounds.emin()),
+                                  str(self._ebounds.emax()))
+        else:
+            erange = 'not available'
+        
+        # Log energy range
+        self._log_value(gammalib.NORMAL, 'Energy range', erange)
 
         # Return
         return
@@ -712,19 +706,17 @@ class csiactobs(ctools.cscript):
             obs.append(bck)
 
             # Log the observation ID and object name that has been appended
-            if self._logTerse():
-                self._log_value('Append observation', '%s ("%s")' %
-                                (obs_id, object_name))
+            self._log_value(gammalib.TERSE, 'Append observation', '%s ("%s")' %
+                                            (obs_id, object_name))
 
             # Log the file names of the event and response files
-            if self._logExplicit():
-                self._log_value(' Event file', eventfile)
-                self._log_value(' Effective area file', aefffile)
-                self._log_value(' Point spread function file', psffile)
-                self._log_value(' Energy dispersion file', edispfile)
-                self._log_value(' Background file', bkgfile)
-                if self._use_bkg_scale:
-                    self._log_value(' Background scale', bkg_scale)
+            self._log_value(gammalib.EXPLICIT, ' Event file', eventfile)
+            self._log_value(gammalib.EXPLICIT, ' Effective area file', aefffile)
+            self._log_value(gammalib.EXPLICIT, ' Point spread function file', psffile)
+            self._log_value(gammalib.EXPLICIT, ' Energy dispersion file', edispfile)
+            self._log_value(gammalib.EXPLICIT, ' Background file', bkgfile)
+            if self._use_bkg_scale:
+                self._log_value(gammalib.EXPLICIT, ' Background scale', bkg_scale)
 
         # Append models provided by "inmodel" to the model container
         self._append_inmodels()

@@ -165,20 +165,22 @@ class csworkflow(ctools.cscript):
             self._actors.append(entry)
 
             # Log information about actors
-            if self._logNormal():
-                self._log_value('Actor "%s"' % name, tool)
-                if num_inputs == 0:
-                    self._log_value('  Predecessor', 'none')
-                else:
-                    if num_inputs == 1:
-                        self._log.parformat('  Predecessor')
-                    else:
-                        self._log.parformat('  Predecessors')
-                    for k in range(num_inputs):
-                        if k > 0:
-                            self._log(', ')
-                        self._log('"'+input_actors[k]+'"')
-                    self._log('\n')
+            self._log_value(gammalib.NORMAL, 'Actor "%s"' % name, tool)
+
+            # Compute list of predecessors
+            if num_inputs == 0:
+                predecessors = 'none'
+            else:
+                predecessors = ''
+                for k in range(num_inputs):
+                    if k > 0:
+                        predecessors += ', '
+                    predecessors += '"'+input_actors[k]+'"'
+ 
+            # Log predecessors
+            self._log_value(gammalib.NORMAL,
+                            gammalib.number('  Predecessor', num_inputs),
+                            predecessors)
 
         # Return
         return
@@ -197,16 +199,15 @@ class csworkflow(ctools.cscript):
                 if actor['status'] == 'ready':
 
                     # Log execution start
-                    if self._logNormal():
-                        self._log_value('Execute actor', '"%s"' % actor['name'])
+                    self._log_value(gammalib.NORMAL, 'Execute actor',
+                                    '"%s"' % actor['name'])
 
                     # Execute actor
                     self._execute_actor(actor)
 
                     # Log execution finish
-                    if self._logNormal():
-                        self._log_value('Finished actor execution',
-                                        '"%s"' % actor['name'])
+                    self._log_value(gammalib.NORMAL, 'Finished actor execution',
+                                    '"%s"' % actor['name'])
 
                     # Set actor status to finished
                     actor['status'] = 'finished'
@@ -238,18 +239,16 @@ class csworkflow(ctools.cscript):
     def _execute_actor(self, actor):
 
         # Log input parameters
-        if self._logNormal():
-            pars = actor['input_parameters']
-            for par in pars:
-                self._log_value('  Input parameter', '%s=%s' %
-                                (par['name'], self._get_parameter_value(par)))
+        pars = actor['input_parameters']
+        for par in pars:
+            self._log_value(gammalib.NORMAL, '  Input parameter', '%s=%s' %
+                            (par['name'], self._get_parameter_value(par)))
 
         # Log output parameters
-        if self._logNormal():
-            pars = actor['output_parameters']
-            for par in pars:
-                self._log_value('  Output parameter', '%s=%s' %
-                                (par['name'], self._get_parameter_value(par)))
+        pars = actor['output_parameters']
+        for par in pars:
+            self._log_value(gammalib.NORMAL, '  Output parameter', '%s=%s' %
+                            (par['name'], self._get_parameter_value(par)))
 
         # Set actor tool
         if 'tool' in actor:

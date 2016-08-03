@@ -168,9 +168,8 @@ class cstsmapsplit(ctools.cscript):
             logL0 = self._compute_null_hypothesis()
             
             # Write likelihood into logger
-            if self._logTerse():
-                self._log_value('Source removed', self._srcname)
-                self._log_value('Log-likelihood', repr(logL0))
+            self._log_value(gammalib.TERSE, 'Source removed', self._srcname)
+            self._log_value(gammalib.TERSE, 'Log-likelihood', repr(logL0))
     
         # Get parameters of TS map ctool
         pars = gammalib.GApplicationPars('cttsmap.par')
@@ -186,10 +185,8 @@ class cstsmapsplit(ctools.cscript):
         base_command = 'cttsmap'
         
         # Write information into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Create commands')
-            self._log_value('Number of cttsmap calls', njobs)
+        self._log_header1(gammalib.TERSE, 'Create commands')
+        self._log_value(gammalib.TERSE, 'Number of cttsmap calls', njobs)
         
         # Loop over TS map parameters
         for par in pars:

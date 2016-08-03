@@ -107,32 +107,25 @@ class csiactcopy(ctools.cscript):
             
         # Initialise return value
         filesize = 0.0
-        
-        # Logging
-        if self._logVerbose():
-            self._log('\n')
-            self._log.header3('Copy file')
-            self._log_value('Source', source)
-            self._log_value('Destination', destination)
-            self._log_value('Already exists', str(os.path.isfile(destination)))
-            self._log_value('Overwrite', clobber)
-            self._log.parformat('Copying')
-        
+
         # Flag if file destination is already available
         is_file = os.path.isfile(destination)
-                
+        
+        # Logging
+        self._log_header3(gammalib.VERBOSE, 'Copy file')
+        self._log_value(gammalib.VERBOSE, 'Source', source)
+        self._log_value(gammalib.VERBOSE, 'Destination', destination)
+        self._log_value(gammalib.VERBOSE, 'Already exists', is_file)
+        self._log_value(gammalib.VERBOSE, 'Overwrite', clobber)
+        
         # check if file could be skipped because clobber=no
         if is_file and clobber == False:
-            if self._logVerbose():
-                self._log('Skip (clobber=no)')
-                self._log('\n')
+            self._log_value(gammalib.VERBOSE, 'Copying', 'Skip (clobber=no)')
         
         # check if file could be skipped because it is the same file
         elif is_file and os.path.samefile(destination, source):
-            if self._logVerbose():
-                self._log('Skip (same file)')
-                self._log('\n')
-            
+            self._log_value(gammalib.VERBOSE, 'Copying', 'Skip (same file)')
+        
         else:  
             # Create directory if not existent
             dest_dir = os.path.dirname(destination)
@@ -146,10 +139,8 @@ class csiactcopy(ctools.cscript):
             filesize = os.stat(destination).st_size
             
             # Logging
-            if self._logVerbose():
-                self._log('Done!')
-                self._log('\n')
-                   
+            self._log_value(gammalib.VERBOSE, 'Copying', 'Done!')
+                
         # Return 
         return filesize
 
@@ -171,15 +162,14 @@ class csiactcopy(ctools.cscript):
         """    
         
         # Logging
-        if self._logTerse():
-            self._log_value('Local file', localfits)
-            self._log_value('Remote file', remotefits)
-            self._log_value('HDU name', hduname)
-            if clobber:
-                preference = 'Remote'
-            else:
-                preference = 'Local'
-            self._log_value('Conflict preference', preference)
+        self._log_value(gammalib.TERSE, 'Local file', localfits)
+        self._log_value(gammalib.TERSE, 'Remote file', remotefits)
+        self._log_value(gammalib.TERSE, 'HDU name', hduname)
+        if clobber:
+            preference = 'Remote'
+        else:
+            preference = 'Local'
+        self._log_value(gammalib.TERSE, 'Conflict preference', preference)
     
         # Check if local fits file is available
         if os.path.isfile(localfits):    
@@ -251,9 +241,8 @@ class csiactcopy(ctools.cscript):
             remote_obs.append(obs_id)
         
         # Log entries of index files   
-        if self._logTerse():
-            self._log_value('Remote entries', len(remote_obs))
-            self._log_value('Local entries', len(local_obs))
+        self._log_value(gammalib.TERSE, 'Remote entries', len(remote_obs))
+        self._log_value(gammalib.TERSE, 'Local entries', len(local_obs))
 
         # initialise counter for logging
         removed_rows = 0
@@ -318,12 +307,11 @@ class csiactcopy(ctools.cscript):
         local_hdu.insert_rows(old_local_rows, remote_hdu.nrows())
         
         # Log actions
-        if self._logTerse():
-            if clobber:
-                what = 'Removed local rows'
-            else:
-                what = 'Skipped remote rows'
-            self._log_value(what, removed_rows)
+        if clobber:
+            what = 'Removed local rows'
+        else:
+            what = 'Skipped remote rows'
+        self._log_value(gammalib.TERSE, what, removed_rows)
 
         # Loop over columns 
         for i in range(local_hdu.ncols()):
@@ -384,8 +372,8 @@ class csiactcopy(ctools.cscript):
             runfile.close()   
             
             # Logging
-            if self._logTerse():
-                self._log_value('Number of observations', len(self._runs))
+            self._log_value(gammalib.TERSE, 'Number of observations',
+                            len(self._runs))
         
         # Copy all data if runlist file is 'NONE'
         elif self._runlist == 'NONE':
@@ -446,10 +434,10 @@ class csiactcopy(ctools.cscript):
                 remote_obs = os.path.join(self._remote_base, config['obsindx'])
                 
                 # Log information
-                if self._logTerse():
-                    self._log.header3('Remote config "'+self._prodname+'"')
-                    self._log_value('HDU index', remote_hdu)
-                    self._log_value('Observation index', remote_obs)
+                self._log_header3(gammalib.TERSE, 'Remote config "'+
+                                  self._prodname+'"')
+                self._log_value(gammalib.TERSE, 'HDU index', remote_hdu)
+                self._log_value(gammalib.TERSE, 'Observation index', remote_obs)
                 
                 # Open remote HDU index file
                 fits = gammalib.GFits(str(remote_hdu))
@@ -524,29 +512,22 @@ class csiactcopy(ctools.cscript):
                             cp_size += table['SIZE'][row]
                             
                 # Log file information
-                if self._logTerse():
-                    self._log('\n')
-                    self._log.header2('File information')
-                    self._log_value('Number of files', len(files))
-                    if has_size:
-                        size = float(cp_size) * 1.0e-6
-                        self._log_value('Size', '%.2f MB' % size)
-                if self._logVerbose():
-                    self._log('\n')
-                    self._log.header3('File names')
-                    for filename in files:
-                        self._log(str(filename)+'\n')
+                self._log_header2(gammalib.TERSE, 'File information')
+                self._log_value(gammalib.TERSE, 'Number of files', len(files))
+                if has_size:
+                    size = float(cp_size) * 1.0e-6
+                    self._log_value(gammalib.TERSE, 'Size', '%.2f MB' % size)
+                self._log_header3(gammalib.VERBOSE, 'File names')
+                for filename in files:
+                    self._log_string(gammalib.VERBOSE, str(filename)+'\n')
 
                 # Close HDU index file
                 fits.close()
                 
             # If prodname is not found just log that we skip the config
             else:
-                if self._logExplicit():
-                    self._log('\n')
-                    self._log.header3('Skipping config "'+
-                                      str(config['name'])+'"')
-                    self._log('\n')
+                self._log_header3(gammalib.EXPLICIT, 'Skipping config "'+
+                                  str(config['name'])+'"')
         
         # Raise Exception if prodname was not found
         if not has_prod: 
@@ -556,10 +537,8 @@ class csiactcopy(ctools.cscript):
                 msg += ' - '+config['name']+'\n'
             raise RuntimeError(msg)
 
-        # Logging
-        if self._logNormal():
-            self._log('\n')
-            self._log.header1('Copying files')
+        # Write header
+        self._log_header1(gammalib.NORMAL, 'Copying files')
         
         # Intialise counter
         k = 0
@@ -592,8 +571,8 @@ class csiactcopy(ctools.cscript):
             while fraction > last_fraction:
                 
                 # Print status of copying procedure
-                if self._logNormal() and not self._logVerbose():
-                    self._log_value('Status', '%d %%' % int(last_fraction))
+                self._log_value(gammalib.NORMAL, 'Status', '%d %%' %
+                                int(last_fraction))
                 last_fraction += fraction_increment
             
             # Copy file
@@ -632,17 +611,13 @@ class csiactcopy(ctools.cscript):
         if len(self._runs):
             
             # Logging            
-            if self._logTerse():
-                self._log('\n')
-                self._log.header3('HDU index')
+            self._log_header3(gammalib.TERSE, 'HDU index')
                 
             # Merge remote index files with local files
             self._merge(local_hdu, remote_hdu, 'HDU_INDEX', self._clobber())
             
             # Logging
-            if self._logTerse():
-                self._log('\n')
-                self._log.header3('OBS index')
+            self._log_header3(gammalib.TERSE, 'OBS index')
                 
             # Merge remote index files with local files
             self._merge(local_obs, remote_obs, 'OBS_INDEX', self._clobber())
@@ -653,9 +628,7 @@ class csiactcopy(ctools.cscript):
             self._copy(remote_obs, self._clobber())
         
         # Logging
-        if self._logTerse():
-            self._log('\n')
-            self._log.header3('Master index file')
+        self._log_header3(gammalib.TERSE, 'Master index file')
         
         # Adding prodname to local master
         localmaster = os.path.join(self._outpath, 'master.json')
@@ -722,20 +695,18 @@ class csiactcopy(ctools.cscript):
         json.dump(data, f, indent=2)
         f.close()
 
+        # Compute total size in MB
+        size_MB = float(total_size) * 1.0e-6
+
         # Log summary
-        if self._logNormal():
-            self._log('\n')
-            self._log.header1('Summary')
-            self._log_value('Data files found', len(files))
-            self._log_value('Data files copied', n_copied)
-            self._log_value('Size', '%.2f MB' % (float(total_size)*1.0e-6))
-            self._log_value('Local configs', len(newconfigs))
-            if self._logTerse():
-                self._log('\n')
-                self._log.header3('Content of master index')
-                for config in newconfigs:
-                    self._log(str(config['name']))
-                    self._log('\n')
+        self._log_header1(gammalib.NORMAL, 'Summary')
+        self._log_value(gammalib.NORMAL, 'Data files found', len(files))
+        self._log_value(gammalib.NORMAL, 'Data files copied', n_copied)
+        self._log_value(gammalib.NORMAL, 'Size', '%.2f MB' % size_MB)
+        self._log_value(gammalib.NORMAL, 'Local configs', len(newconfigs))
+        self._log_header3(gammalib.TERSE, 'Content of master index')
+        for config in newconfigs:
+            self._log_string(gammalib.TERSE, str(config['name'])+'\n')
 
         # Return
         return       

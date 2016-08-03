@@ -177,9 +177,8 @@ class csobsdef(ctools.cscript):
         self._get_parameters()
 
         # Write header into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Creating observation definition XML file')
+        self._log_header1(gammalib.TERSE,
+                          'Creating observation definition XML file')
 
         # Load pointing definition file if it is not already set. Extract
         # the number of columns and pointings
@@ -335,13 +334,10 @@ class csobsdef(ctools.cscript):
             obs.events(event_list)
 
             # Write observation into logger
-            if self._logExplicit():
-                self._log(str(obs))
-                self._log('\n')
-            elif self._logTerse():
-                name  = obs.instrument()+' observation'
-                value = 'Name="%s" ID="%s"' % (obs.name(), obs.id())
-                self._log_value(name, value)
+            name  = obs.instrument()+' observation'
+            value = 'Name="%s" ID="%s"' % (obs.name(), obs.id())
+            self._log_value(gammalib.TERSE, name, value)
+            self._log_string(gammalib.EXPLICIT, str(obs)+'\n')
 
             # Append observation
             self._obs.append(obs)
@@ -354,9 +350,7 @@ class csobsdef(ctools.cscript):
         Save observation definition XML file.
         """
         # Write header and filename into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save observation definition XML file')
+        self._log_header1(gammalib.TERSE, 'Save observation definition XML file')
 
         # Get output filename in case it was not read ahead
         outobs = self['outobs'].filename()
@@ -365,8 +359,7 @@ class csobsdef(ctools.cscript):
         if outobs.url() != 'NONE':
 
             # Log filename
-            if self._logTerse():
-                self._log_value('Observation XML file', outobs.url())
+            self._log_value(gammalib.NORMAL, 'Observation XML file', outobs.url())
 
             # Save observation definition XML file
             self._obs.save(outobs)

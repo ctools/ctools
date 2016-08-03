@@ -276,9 +276,7 @@ class csresmap(ctools.cscript):
         Save residual map
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save residual map')
+        self._log_header1(gammalib.TERSE, 'Save residual map')
 
         # Get outmap parameter
         outmap = self['outmap'].filename()
@@ -287,8 +285,7 @@ class csresmap(ctools.cscript):
         if self._resmap != None:
 
             # Log file name
-            if self._logTerse():
-                self._log_value('Residual map file', outmap.url())
+            self._log_value(gammalib.TERSE, 'Residual map file', outmap.url())
 
             # Save residual map
             self._resmap.save(outmap, self['clobber'].boolean())
@@ -306,9 +303,7 @@ class csresmap(ctools.cscript):
             Name of residual map
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Publish residual map')
+        self._log_header1(gammalib.TERSE, 'Publish residual map')
 
         # Continue only if residual map is valid
         if self._resmap != None:
@@ -320,8 +315,7 @@ class csresmap(ctools.cscript):
                 user_name = name
 
             # Log map name
-            if self._logTerse():
-                self._log_value('Residual map name', user_name)
+            self._log_value(gammalib.TERSE, 'Residual map name', user_name)
 
             # Publish map
             self._resmap.publish(user_name)

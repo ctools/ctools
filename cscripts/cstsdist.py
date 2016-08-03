@@ -156,9 +156,8 @@ class cstsdist(ctools.cscript):
             nevents += run.events().number()
 
         # Write simulation results
-        if self._logExplicit():
-            self._log.header3('Simulation')
-            self._log_value('Number of simulated events', nevents)
+        self._log_header3(gammalib.EXPLICIT, 'Simulation')
+        self._log_value(gammalib.EXPLICIT, 'Number of simulated events', nevents)
 
         # Fit model
         fit = ctools.ctlike(sim)
@@ -175,19 +174,19 @@ class cstsdist(ctools.cscript):
 
         # Write fit results, either explicit or normal
         if self._logExplicit():
-            self._log.header3('Test source model fit')
-            self._log_value('Test statistics', ts)
-            self._log_value('log likelihood', logL)
-            self._log_value('Number of predicted events', npred)
+            self._log_header3(gammalib.EXPLICIT, 'Test source model fit')
+            self._log_value(gammalib.EXPLICIT, 'Test statistics', ts)
+            self._log_value(gammalib.EXPLICIT, 'log likelihood', logL)
+            self._log_value(gammalib.EXPLICIT, 'Number of predicted events', npred)
             for model in models:
-                self._log_value('Model', model.name())
+                self._log_value(gammalib.EXPLICIT, 'Model', model.name())
                 for par in model:
-                    self._log(str(par)+'\n')
+                    self._log_string(gammalib.EXPLICIT, str(par)+'\n')
         elif self._logNormal():
             name  = 'Trial %d' % seed
             value = 'TS=%.3f  Prefactor=%e +/- %e' % \
                     (ts, model['Prefactor'].value(), model['Prefactor'].error())
-            self._log_value(name, value)
+            self._log_value(gammalib.TERSE, name, value)
 
         # Initialise results
         colnames = []

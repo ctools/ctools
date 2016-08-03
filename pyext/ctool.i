@@ -195,11 +195,4 @@ def _init_cscript(self, argv):
     self._log_header()
     self._log.date(True)
 cscript._init_cscript = _init_cscript
-
-# Log the value of a parameter
-def _log_value(self, name, value):
-    self._log.parformat(str(name))
-    self._log(str(value))
-    self._log('\n')
-cscript._log_value = _log_value
 %}

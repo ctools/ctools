@@ -153,12 +153,11 @@ class csobs2caldb(ctools.cscript):
         fname_bkg   = rsp.background().filename()
 
         # Log filenames
-        if self._logNormal():
-            self._log.header3('IRF input files')
-            self._log_value('Effective area', fname_aeff.url())
-            self._log_value('Point spread function', fname_psf.url())
-            self._log_value('Energy dispersion', fname_edisp.url())
-            self._log_value('Background rate', fname_bkg.url())
+        self._log_header3(gammalib.NORMAL, 'IRF input files')
+        self._log_value(gammalib.NORMAL, 'Effective area', fname_aeff.url())
+        self._log_value(gammalib.NORMAL, 'Point spread function', fname_psf.url())
+        self._log_value(gammalib.NORMAL, 'Energy dispersion', fname_edisp.url())
+        self._log_value(gammalib.NORMAL, 'Background rate', fname_bkg.url())
     
         # Open FITS files of response components
         fits_aeff  = gammalib.GFits(fname_aeff)
@@ -325,14 +324,13 @@ class csobs2caldb(ctools.cscript):
         self._rsp_dir = caldb.rootdir() + "/" + self._cal_dir
 
         # Log resulting FITS table
-        if self._logNormal():
-            self._log_value('Calibration directory', self._cal_dir)
-            self._log_value('Base directory', self._base_dir)
-            if not os.path.isdir(self._rsp_dir):
-                name = 'IRF directory'
-            else:
-                name = 'IRF directory (existing)'
-            self._log_value(name, self._rsp_dir)
+        self._log_value(gammalib.NORMAL, 'Calibration directory', self._cal_dir)
+        self._log_value(gammalib.NORMAL, 'Base directory', self._base_dir)
+        if not os.path.isdir(self._rsp_dir):
+            name = 'IRF directory'
+        else:
+            name = 'IRF directory (existing)'
+        self._log_value(gammalib.NORMAL, name, self._rsp_dir)
         
         # Create IRF directory is it does not yet exist
         if not os.path.isdir(self._rsp_dir):
@@ -376,17 +374,15 @@ class csobs2caldb(ctools.cscript):
         Save calibration database FITS file
         """
         # Write header into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save calibration database')
+        self._log_header1(gammalib.TERSE, 'Save calibration database')
 
         # Set response filename
         filename = self._rsp_dir + '/' + self._outfile
         
         # Write filenames into logger
-        if self._logNormal():
-            self._log_value('CALDB index file', self._caldb_inx.filename().url())
-            self._log_value('Response file', filename)
+        self._log_value(gammalib.NORMAL, 'CALDB index file',
+                        self._caldb_inx.filename().url())
+        self._log_value(gammalib.NORMAL, 'Response file', filename)
 
         # Save caldb index file
         self._caldb_inx.save(self._clobber())

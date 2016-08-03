@@ -174,9 +174,7 @@ class csfindobs(ctools.cscript):
         self._get_parameters()
 
         # Write header into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Find observations')
+        self._log_header1(gammalib.TERSE, 'Find observations')
         
         # Initialise run list
         self._runs = []
@@ -204,9 +202,7 @@ class csfindobs(ctools.cscript):
             expr += '&&' + expression   
 
         # Write the expression into the logger
-        if self._logNormal():
-            self._log(gammalib.parformat('Expression'))
-            self._log(expr+'\n')
+        self._log_value(gammalib.NORMAL, 'Expression', expr)
 
         # Set filename including the selection expression
         filename = self._obs_index+'[OBS_INDEX]['+expr+']'
@@ -222,13 +218,12 @@ class csfindobs(ctools.cscript):
                 self._runs.append(obs_index['OBS_ID'][i])
 
         # Write the number of observations into the logger
-        if self._logTerse():
-            self._log_value('Observations', len(self._runs))
+        self._log_value(gammalib.TERSE, 'Observations', len(self._runs))
 
         # Write the observation identifiers into the logger
-        if self._logNormal() and len(self._runs) > 0:
+        if len(self._runs) > 0:
             for i, run in enumerate(self._runs):
-                self._log_value('Observation %d' % (i+1), run)
+                self._log_value(gammalib.NORMAL, 'Observation %d' % (i+1), run)
 
         # Close FITS file
         fits.close()
@@ -260,9 +255,7 @@ class csfindobs(ctools.cscript):
         Save runlist
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save runlist')
+        self._log_header1(gammalib.TERSE, 'Save runlist')
 
         # Get filename
         outfile = self['outfile'].filename()
@@ -270,18 +263,15 @@ class csfindobs(ctools.cscript):
         # If the runlist file exists but the clobber flag is not set then signal
         # that runlist file exists already
         if outfile.exists() and not self._clobber():
-            if self._logTerse():
-                self._log('File "'+outfile+'" exists already, runlist not ')
-                self._log('saved. Set clobber=yes to overwrite the file.\n')
+            msg = ('File "'+outfile+'" exists already, runlist not saved. '
+                   'Set clobber=yes to overwrite the file.\n')
+            self._log_string(gammalib.TERSE, msg)
 
         # ... otherwise save the runlist into a file
         else:
 
             # Log file name
-            if self._logTerse():
-                self._log(gammalib.parformat('Runlist file'))
-                self._log(outfile.url())
-                self._log('\n')
+            self._log_value(gammalib.NORMAL, 'Runlist file', outfile.url())
 
             # Write all runs to file
             f = open(outfile.url(),'w')

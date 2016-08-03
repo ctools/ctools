@@ -98,24 +98,20 @@ class csiactdata(ctools.cscript):
         ----------
         config : dict
             Dictionary containing data configuration
-
         """
-        # Log only if the level is at least "Terse"
-        if self._logTerse():
-
-            # Log configuration information
-            self._log.header3(str(config['name']))
-            self._log_value('Name', config['name'])
-            self._log_value('Observation index', config['obsindx'])
-            self._log_value('HDU index', config['hduindx'])
+        # Log configuration information
+        self._log_header3(gammalib.TERSE, str(config['name']))
+        self._log_value(gammalib.TERSE, 'Name', config['name'])
+        self._log_value(gammalib.TERSE, 'Observation index', config['obsindx'])
+        self._log_value(gammalib.TERSE, 'HDU index', config['hduindx'])
             
-            # Print additional information
-            for key in config:
+        # Print additional information
+        for key in config:
                 
-                # Skip keys that were treated above
-                if key in ['name','hduindx','obsindx']:
-                    continue
-                self._log_value(key, config[key])
+            # Skip keys that were treated above
+            if key in ['name','hduindx','obsindx']:
+                continue
+            self._log_value(gammalib.TERSE, key, config[key])
 
         # Return
         return

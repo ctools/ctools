@@ -337,62 +337,57 @@ class csmodelinfo(ctools.cscript):
         if self._logTerse():
         
             # Log summary
-            self._log('\n')
-            self._log.header1('Summary')
+            self._log_header1(gammalib.TERSE, 'Summary')
         
             # Log instruments
             self._log.header3('Instrument specific models')
             for inst, n_inst in instruments.items():
                 if inst == '':
                     inst = 'All'
-                self._log_value(inst, n_inst)
+                self._log_value(gammalib.TERSE, inst, n_inst)
         
             # Log model types
-            self._log.header3('Model types')
+            self._log_header3(gammalib.TERSE, 'Model types')
             for modeltype, n_types in types.items():
-                self._log_value(modeltype, n_types)
+                self._log_value(gammalib.TERSE, modeltype, n_types)
         
             # Log model parameter information
-            self._log('\n')
-            self._log.header1('Parameter information')
-            self._log_value('All parameters', n_par_total)
-            self._log_value('Fixed parameters', n_par_fixed)
-            self._log_value('Free parameters (total)', n_par_free)
-            self._log_value('Free background parameters', n_par_free_bkg)
-            self._log_value('Free source parameters', n_par_free_src)
+            self._log_header1(gammalib.TERSE,'Parameter information')
+            self._log_value(gammalib.TERSE,'All parameters', n_par_total)
+            self._log_value(gammalib.TERSE,'Fixed parameters', n_par_fixed)
+            self._log_value(gammalib.TERSE,'Free parameters (total)', n_par_free)
+            self._log_value(gammalib.TERSE,'Free background parameters', n_par_free_bkg)
+            self._log_value(gammalib.TERSE,'Free source parameters', n_par_free_src)
             if n_par_free_spec > 0:
-                self._log_value('Free spectral parameters', n_par_free_spec)
+                self._log_value(gammalib.TERSE,'Free spectral parameters', n_par_free_spec)
             if n_par_free_spat > 0:
-                self._log_value('Free spatial parameters', n_par_free_spat)
+                self._log_value(gammalib.TERSE,'Free spatial parameters', n_par_free_spat)
             if n_par_free_temp > 0:
-                self._log_value('Free temporal parameters', n_par_free_temp)
-            self._log_value('Parameters at limit', n_par_at_limit)
+                self._log_value(gammalib.TERSE,'Free temporal parameters', n_par_free_temp)
+            self._log_value(gammalib.TERSE,'Parameters at limit', n_par_at_limit)
         
             # Log parameters at limit (if any)
             if n_par_at_limit > 0:
-                self._log.header3('Parameters at limit')
+                self._log_header3(gammalib.TERSE, 'Parameters at limit')
                 for source, parameter in pars_at_limit.items():   
                     if len(parameter):  
                         for par in parameter:
                             self._log_value(source, par)
         
             # Optionally log free parameters
-            if self._logExplicit() and len(free_src_pars):
-                self._log('\n')
-                self._log.header2('Free source parameters')
+            if len(free_src_pars):
+                self._log_header2(gammalib.EXPLICIT, 'Free source parameters')
                 for source, parameter in free_src_pars.items():   
                     if len(parameter): 
                         self._log.header3(source)
                         for par in parameter:
-                            self._log(str(par))
-                            self._log('\n')
-                        self._log('\n')
+                            self._log_string(gammalib.EXPLICIT, str(par)+'\n')
         
             # Log TS values if available
             if len(ts):       
-                self._log.header3('Test statistics')
+                self._log_header3(gammalib.TERSE, 'Test statistics')
                 for source, tsvalue in ts.items():
-                    self._log_value(source, tsvalue)
+                    self._log_value(gammalib.TERSE, source, tsvalue)
                 
         # Return
         return
@@ -408,13 +403,10 @@ class csmodelinfo(ctools.cscript):
         if ds9file != '' and ds9file != 'NONE':
             
             # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Save models in DS9 file')
+            self._log_header1(gammalib.TERSE, 'Save models in DS9 file')
             
             # Log filename
-            if self._logTerse():
-                self._log_value('DS9 filename', ds9file.url())
+            self._log_value(gammalib.NORMAL, 'DS9 filename', ds9file.url())
             
             # Open file   
             f = open(ds9file.url(), 'w')

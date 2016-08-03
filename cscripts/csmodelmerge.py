@@ -141,22 +141,21 @@ class csmodelmerge(ctools.cscript):
             models = gammalib.GModels(f)
             
             # Log number of models to add
-            if self._logTerse():
-                nmodels = models.size()
-                if nmodels == 0:
-                    name = 'Add no model from file'
-                elif nmodels == 1:
-                    name = 'Add 1 model from file'
-                else:
-                    name = 'Add %d models from file' % nmodels
-                self._log_value(name, f)
+            nmodels = models.size()
+            if nmodels == 0:
+                name = 'Add no model from file'
+            elif nmodels == 1:
+                name = 'Add 1 model from file'
+            else:
+                name = 'Add %d models from file' % nmodels
+            self._log_value(gammalib.TERSE, name, f)
             
             # Extend model container by adding all models in the model file
             self._models.extend(models)
                 
         # Log total number of models
-        if self._logTerse():
-            self._log_value('Models after merging', self._models.size())
+        self._log_value(gammalib.TERSE, 'Models after merging',
+                                        self._models.size())
 
         # Return
         return
@@ -166,24 +165,22 @@ class csmodelmerge(ctools.cscript):
         Save model definition XML file
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save models')
+        self._log_header1(gammalib.TERSE, 'Save models')
 
         # Get output filename in case it was not read ahead
         outmodel = self['outmodel'].filename()
         
         # If file exists and clobber flag is false then raise an exception
         if outmodel.exists() and not self._clobber:
-            msg = 'Cannot save ""+outmodel.url()+"": File already exists. '\
-                  'Use parameter clobber=yes to allow overwriting of files.'
+            msg = ('Cannot save "'+outmodel.url()+'": File already exists. '
+                   'Use parameter clobber=yes to allow overwriting of files.')
             raise RuntimeError(msg)
         
         else:
             
             # Log filename
-            if self._logTerse():
-                self._log_value('Model definition XML file', outmodel.url())
+            self._log_value(gammalib.NORMAL, 'Model definition XML file',
+                                             outmodel.url())
     
             # Save models
             self._models.save(outmodel)

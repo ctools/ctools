@@ -558,9 +558,8 @@ class cslightcrv(ctools.cscript):
             if like.obs().logL() == 0.0:
 
                 # Signal skipping of bin
-                if self._logTerse():
-                    self._log_value('Warning', 'No event in this time bin, '
-                                    'skip bin.')
+                self._log_value(gammalib.TERSE, 'Warning',
+                                'No event in this time bin, skip bin.')
 
                 # Set all results to 0
                 for par in pars:
@@ -594,19 +593,19 @@ class cslightcrv(ctools.cscript):
             results.append(result)
 
             # Log results for this time bin
-            if self._logNormal():
-                self._log.header3('Results')
-                pars = self._get_free_par_names()
-                for par in pars:
-                    value = source.spectral()[par].value()
-                    error = source.spectral()[par].error()
-                    unit  = source.spectral()[par].unit()
-                    self._log_value(par, str(value)+' +/- '+str(error)+' '+unit)
-                if result['ulimit'] > 0.0:
-                    self._log_value('Upper flux limit', str(result['ulimit'])+
-                                                        ' ph/cm2/s')
-                if self['calc_ts'].boolean():
-                    self._log_value('Test Statistic', result['ts'])
+            self._log.header3('Results')
+            pars = self._get_free_par_names()
+            for par in pars:
+                value = source.spectral()[par].value()
+                error = source.spectral()[par].error()
+                unit  = source.spectral()[par].unit()
+                self._log_value(gammalib.NORMAL, par,
+                                str(value)+' +/- '+str(error)+' '+unit)
+            if result['ulimit'] > 0.0:
+                self._log_value(gammalib.NORMAL, 'Upper flux limit',
+                                str(result['ulimit'])+' ph/cm2/s')
+            if self['calc_ts'].boolean():
+                self._log_value(gammalib.NORMAL, 'Test Statistic', result['ts'])
 
         # Create FITS table from results
         table = self._create_fits_table(results)
@@ -642,9 +641,7 @@ class cslightcrv(ctools.cscript):
         Save light curve
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save light curve')
+        self._log_header1(gammalib.TERSE, 'Save light curve')
 
         # Get light curve filename
         outfile = self['outfile'].filename()
@@ -653,8 +650,7 @@ class cslightcrv(ctools.cscript):
         if self._fits != None:
 
             # Log file name
-            if self._logTerse():
-                self._log_value('Light curve file', outfile.url())
+            self._log_value(gammalib.NORMAL, 'Light curve file', outfile.url())
 
             # Save spectrum
             self._fits.saveto(outfile, self._clobber())
