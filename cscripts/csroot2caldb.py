@@ -237,11 +237,9 @@ class csroot2caldb(ctools.cscript):
         ds['CIF'] = gammalib.GFits(ds['BASE_PATH']+'/caldb.indx', True)
 
         # If file has no CIF extension than create it now
-        try:
-            ds['HDU_CIF'] = ds['CIF'].table('CIF')
-        except:
+        if not ds['CIF'].contains('CIF'):
             ds['CIF'].append(calutils.create_cif_table())
-            ds['HDU_CIF'] = ds['CIF'].table('CIF')
+        ds['HDU_CIF'] = ds['CIF'].table('CIF')
 
         # Set IRF component filenames
         ea_filename    = ds['EA_PATH']+'/'+ds['EA_FILE']
@@ -509,24 +507,24 @@ class csroot2caldb(ctools.cscript):
             Directory structure dictionary
         """
         # Open ROOT performance file
-        file = TFile(self['infile'].filename().url())
+        tfile = TFile(self['infile'].filename().url())
 
         # Create effective area
-        self._root2ea(file, irf, ds)
+        self._root2ea(tfile, irf, ds)
 
         # Create point spread function
-        self._root2psf(file, irf, ds)
+        self._root2psf(tfile, irf, ds)
 
         # Create energy dispersion
-        self._root2edisp(file, irf, ds)
+        self._root2edisp(tfile, irf, ds)
 
         # Create background
-        self._root2bgd(file, irf, ds)
+        self._root2bgd(tfile, irf, ds)
 
         # Return
         return
 
-    def _root2ea(self, file, irf, ds):
+    def _root2ea(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB effective area extension
         
@@ -536,7 +534,7 @@ class csroot2caldb(ctools.cscript):
 
         Parameters
         ----------
-        file : `~ROOT.TFile`
+        tfile : `~ROOT.TFile`
             ROOT file
         irf : dict
             IRF metadata dictionary
@@ -549,15 +547,15 @@ class csroot2caldb(ctools.cscript):
             self._log.header1('Generate effective area extension')
 
         # Get relevant ROOT histograms
-        etrue = file.Get('EffectiveAreaEtrue_offaxis')
-        ereco = file.Get('EffectiveArea_offaxis')
+        etrue = tfile.Get('EffectiveAreaEtrue_offaxis')
+        ereco = tfile.Get('EffectiveArea_offaxis')
 
         # If requested then normalize the 2D histogram on the on-axis 1D
         # histogram. This assures that the 2D histogram has the same on-axis
         # effective area dependence as the 1D histogram.
         if self['norm1d'].boolean():
-            etrue_1D = file.Get('EffectiveAreaEtrue')
-            ereco_1D = file.Get('EffectiveArea')
+            etrue_1D = tfile.Get('EffectiveAreaEtrue')
+            ereco_1D = tfile.Get('EffectiveArea')
             self._renorm_onaxis(etrue, etrue_1D)
             self._renorm_onaxis(ereco, ereco_1D)
 
@@ -609,13 +607,13 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
-    def _root2psf(self, file, irf, ds):
+    def _root2psf(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB point spread function extension
         
         Parameters
         ----------
-        file : `~ROOT.TFile`
+        tfile : `~ROOT.TFile`
             ROOT file
         irf : dict
             IRF metadata dictionary
@@ -629,16 +627,16 @@ class csroot2caldb(ctools.cscript):
 
         # King profile PSF
         if self['psftype'].string() == 'King':
-            self._root2psf_king(file, irf, ds)
+            self._root2psf_king(tfile, irf, ds)
 
         # ... otherwise use Gaussian profile PSF
         else:
-            self._root2psf_gauss(file, irf, ds)
+            self._root2psf_gauss(tfile, irf, ds)
 
         # Return
         return
 
-    def _root2psf_gauss(self, file, irf, ds):
+    def _root2psf_gauss(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB point spread function extension
         
@@ -652,7 +650,7 @@ class csroot2caldb(ctools.cscript):
 
         Parameters
         ----------
-        file : `~ROOT.TFile`
+        tfile : `~ROOT.TFile`
             ROOT file
         irf : dict
             IRF metadata dictionary
@@ -660,7 +658,7 @@ class csroot2caldb(ctools.cscript):
             Directory structure dictionary
         """
         # Get relevant ROOT histograms
-        r68 = file.Get('AngRes_offaxis')
+        r68 = tfile.Get('AngRes_offaxis')
 
         # Extract number of bins in histogram
         neng    = r68.GetXaxis().GetNbins()
@@ -721,7 +719,7 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
-    def _root2psf_king(self, file, irf, ds):
+    def _root2psf_king(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB point spread function extension
         
@@ -731,7 +729,7 @@ class csroot2caldb(ctools.cscript):
 
         Parameters
         ----------
-        file : `~ROOT.TFile`
+        tfile : `~ROOT.TFile`
             ROOT file
         irf : dict
             IRF metadata dictionary
@@ -739,8 +737,8 @@ class csroot2caldb(ctools.cscript):
             Directory structure dictionary
         """
         # Get relevant ROOT histograms
-        r68 = file.Get('AngRes_offaxis')
-        r80 = file.Get('AngRes80_offaxis')
+        r68 = tfile.Get('AngRes_offaxis')
+        r80 = tfile.Get('AngRes80_offaxis')
 
         # Extract number of bins in histogram
         neng    = r68.GetXaxis().GetNbins()
@@ -845,7 +843,7 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
-    def _root2edisp(self, file, irf, ds):
+    def _root2edisp(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB energy dispersion extension
         
@@ -854,7 +852,7 @@ class csroot2caldb(ctools.cscript):
 
         Parameters
         ----------
-        file : `~ROOT.TFile`
+        tfile : `~ROOT.TFile`
             ROOT file
         irf : dict
             IRF metadata dictionary
@@ -867,7 +865,7 @@ class csroot2caldb(ctools.cscript):
             self._log.header1('Generate energy dispersion extension')
 
         # Get relevant ROOT histograms
-        matrix = file.Get('EestOverEtrue_offaxis')
+        matrix = tfile.Get('EestOverEtrue_offaxis')
 
         # Set boundaries
         bounds = self._make_3D_migra(matrix, ds['HDU_EDISP'], None, '')
@@ -884,7 +882,7 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
-    def _root2bgd(self, file, irf, ds):
+    def _root2bgd(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB background extension.
         
@@ -893,7 +891,7 @@ class csroot2caldb(ctools.cscript):
 
         Parameters
         ----------
-        file : `~ROOT.TFile`
+        tfile : `~ROOT.TFile`
             ROOT file
         irf : dict
             IRF metadata dictionary
@@ -906,7 +904,7 @@ class csroot2caldb(ctools.cscript):
             self._log.header1('Generate 3D background extension')
 
         # Get relevant ROOT histograms
-        array = file.Get('BGRatePerSqDeg_offaxis')
+        array = tfile.Get('BGRatePerSqDeg_offaxis')
 
         # Replace 2D histogram values by power law extrapolation
         self._plaw_replace(array, self['bgdethres'].real())
@@ -919,7 +917,7 @@ class csroot2caldb(ctools.cscript):
         # histogram. This assures that the 2D histogram has the same on-axis
         # effective area dependence as the 1D histogram.
         if self['norm1d'].boolean():
-            array_1D = file.Get('BGRatePerSqDeg')
+            array_1D = tfile.Get('BGRatePerSqDeg')
             self._renorm_onaxis(array, array_1D)
 
         # Set boundaries
