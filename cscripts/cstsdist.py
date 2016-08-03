@@ -102,10 +102,8 @@ class cstsdist(ctools.cscript):
         self['outfile'].filename()
         self['debug'].boolean()
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
 
         # Return
         return

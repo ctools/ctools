@@ -85,6 +85,11 @@ protected:
     void            require_inobs_nolist(const std::string& method);
     void            require_inobs_nocube(const std::string& method);
 
+    // Protected methods for logging
+    void log_observations(const GChatter&      chatter,
+                          const GObservations& obs,
+                          const std::string&   what = "Observation");
+
     // Protected support methods
     void            set_response(GObservations& obs);
     void            set_obs_response(GCTAObservation* obs);

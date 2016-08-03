@@ -215,12 +215,6 @@ void ctskymap::run(void)
     // Get parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -413,6 +407,9 @@ void ctskymap::get_parameters(void)
     if (read_ahead()) {
         m_outmap  = (*this)["outmap"].filename();
     }
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

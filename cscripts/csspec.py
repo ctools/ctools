@@ -122,10 +122,8 @@ class csspec(ctools.cscript):
         if self._read_ahead():
             self["outfile"].filename()
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log("\n")
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
 
         # Return
         return

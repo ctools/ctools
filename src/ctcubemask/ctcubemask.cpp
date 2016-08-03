@@ -212,12 +212,6 @@ void ctcubemask::run(void)
     // Get parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -470,6 +464,9 @@ void ctcubemask::get_parameters(void)
         m_outcube = (*this)["outcube"].filename();
         m_prefix  = (*this)["prefix"].string();
     }
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

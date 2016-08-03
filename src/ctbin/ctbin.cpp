@@ -226,47 +226,34 @@ void ctbin::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Observation", m_obs.size()));
-        log << m_obs.print(m_chatter) << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs);
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Bin observation", m_obs.size()));
-    }
+    log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Write header for observation
-        if (logTerse()) {
-            log.header3(get_obs_header(m_obs[i]));
-        }
+        log_header3(NORMAL, get_obs_header(m_obs[i]));
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Skip observation if it's not CTA
         if (obs == NULL) {
-            if (logTerse()) {
-                log << " Skipping ";
-                log << m_obs[i]->instrument();
-                log << " observation" << std::endl;
-            }
+            std::string msg = " Skipping "+m_obs[i]->instrument()+
+                              " observation\n";
+            log_string(NORMAL, msg);
             continue;
         }
 
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
-            if (logTerse()) {
-                log << " Skipping binned ";
-                log << obs->instrument();
-                log << " observation" << std::endl;
-            }
+            std::string msg = " Skipping binned "+m_obs[i]->instrument()+
+                              " observation\n";
+            log_string(NORMAL, msg);
             continue;
         }
 
@@ -288,12 +275,8 @@ void ctbin::run(void)
     // Set a single cube in the observation container
     obs_cube();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Binned observation", m_obs.size()));
-        log << m_obs.print(m_chatter) << std::endl;
-    }
+    // Write resulting observation container into logger
+    log_observations(NORMAL, m_obs, "Binned observation");
 
     // Optionally publish counts cube
     if (m_publish) {
@@ -313,10 +296,7 @@ void ctbin::run(void)
 void ctbin::save(void)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save counts cube");
-    }
+    log_header1(TERSE, "Save counts cube");
 
     // Get counts cube filename
     m_outcube = (*this)["outcube"].filename();
@@ -330,11 +310,8 @@ void ctbin::save(void)
         // Save only if observation is valid
         if (obs != NULL) {
         
-            // Log filename
-            if (logTerse()) {
-                log << gammalib::parformat("Counts cube file");
-                log << m_outcube.url() << std::endl;
-            }
+            // Log counts cube file name
+            log_value(NORMAL, "Counts cube file", m_outcube.url());
             
             // Save cube
             obs->save(m_outcube, clobber());
@@ -356,10 +333,7 @@ void ctbin::save(void)
 void ctbin::publish(const std::string& name)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish counts cube");
-    }
+    log_header1(TERSE, "Publish counts cube");
 
     // Set default name is user name is empty
     std::string user_name(name);
@@ -367,11 +341,8 @@ void ctbin::publish(const std::string& name)
         user_name = CTBIN_NAME;
     }
 
-    // Log filename
-    if (logTerse()) {
-        log << gammalib::parformat("Counts cube name");
-        log << user_name << std::endl;
-    }
+    // Log counts cube name
+    log_value(NORMAL, "Counts cube name", user_name);
 
     // Publish counts cube
     m_counts.publish(user_name);
@@ -500,10 +471,7 @@ void ctbin::get_parameters(void)
     }
 
     // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
+    log_parameters(TERSE);
 
     // Return
     return;
@@ -610,23 +578,14 @@ void ctbin::fill_cube(GCTAObservation* obs)
         m_livetime += obs->livetime();
 
         // Log filling results
-        if (logTerse()) {
-            log << gammalib::parformat("Events in list");
-            log << obs->events()->size() << std::endl;
-            log << gammalib::parformat("Events in cube");
-            log << num_in_map << std::endl;
-            log << gammalib::parformat("Event bins outside RoI");
-            log << num_outside_roi << std::endl;
-            log << gammalib::parformat("Events outside cube area");
-            log << num_outside_map << std::endl;
-            log << gammalib::parformat("Events outside energy bins");
-            log << num_outside_ebds << std::endl;
-        }
+        log_value(TERSE, "Events in list", obs->events()->size());
+        log_value(TERSE, "Events in cube", num_in_map);
+        log_value(TERSE, "Event bins outside RoI", num_outside_roi);
+        log_value(TERSE, "Events outside cube area", num_outside_map);
+        log_value(TERSE, "Events outside energy bins", num_outside_ebds);
 
         // Log cube
-        if (logExplicit()) {
-            log << m_counts << std::endl;
-        }
+        log_string(EXPLICIT, m_counts.print());
 
     } // endif: observation was valid
 

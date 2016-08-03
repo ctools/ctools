@@ -225,12 +225,6 @@ void ctulimit::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Set energy dispersion flag for all CTA observations and save old
     // values in save_edisp vector
     std::vector<bool> save_edisp;
@@ -581,6 +575,9 @@ void ctulimit::get_parameters(void)
     // Read precision
     m_tol      = (*this)["tol"].real();
     m_max_iter = (*this)["max_iter"].integer();
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

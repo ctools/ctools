@@ -894,6 +894,40 @@ void ctool::require_inobs_nocube(const std::string& method)
 
 
 /***********************************************************************//**
+ * @brief Log observation container
+ *
+ * @param[in] chatter Minimum required chattiness
+ * @param[in] obs Observation container
+ * @param[in] what String specifying the container content
+ *
+ * Log observations if chattiness is at least @p chatter.
+ ***************************************************************************/
+void ctool::log_observations(const GChatter&      chatter,
+                             const GObservations& obs,
+                             const std::string&   what)
+{
+    // Get chattiness of ctool
+    GChatter chattiness = static_cast<GChatter>((*this)["chatter"].integer());
+
+    // Only write message if chattiness is at least equal to the minimum
+    // required chattiness
+    if (chattiness >= chatter) {
+
+        // Log observation header
+        log << std::endl;
+        log.header1(gammalib::number(what, obs.size()));
+
+        // Log observation content dependent on chattiness
+        log << obs.print(chattiness) << std::endl;
+
+    } // endif: Chattiness satisfied minimum required level
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Set response for all CTA observations in container
  *
  * @param[in,out] obs Observation container

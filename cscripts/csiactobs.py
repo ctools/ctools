@@ -214,10 +214,8 @@ class csiactobs(ctools.cscript):
         self._subdir  = os.path.dirname(self._hdu_index)  
         self._debug   = False # Debugging in client tools
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
 
         # Return
         return

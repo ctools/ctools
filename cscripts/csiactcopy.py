@@ -80,11 +80,9 @@ class csiactcopy(ctools.cscript):
         self._outpath  = gammalib.expand_env(self['outpath'].string())
         self._runlist  = self['runlist'].filename()            
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
-                
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
+        
         # Return
         return
 

@@ -124,10 +124,8 @@ class cssens(ctools.cscript):
                                           gammalib.GEnergy(self._emin, 'TeV'),
                                           gammalib.GEnergy(self._emax, 'TeV'))
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
 
         # Return
         return

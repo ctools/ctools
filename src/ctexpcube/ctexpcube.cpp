@@ -211,12 +211,6 @@ void ctexpcube::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Warn if there are not enough energy bins
     int    n          = m_expcube.energies().size();
     double logEmin    = std::log10(m_expcube.energies()[0].TeV());
@@ -459,6 +453,9 @@ void ctexpcube::get_parameters(void)
     if (read_ahead()) {
         m_outcube = (*this)["outcube"].filename();
     }
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

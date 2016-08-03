@@ -380,10 +380,7 @@ void ctmapcube::get_parameters(void)
     m_cube = GModelSpatialDiffuseCube(cube, energies);
 
     // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
+    log_parameters(TERSE);
 
     // Return
     return;

@@ -76,9 +76,7 @@ class csworkflow(ctools.cscript):
         self._workflow = gammalib.GXml(xmlfile.url())
 
         #  Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
+        self._log_parameters(gammalib.TERSE)
 
         # Return
         return

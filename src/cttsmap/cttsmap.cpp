@@ -209,12 +209,6 @@ void cttsmap::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Set energy dispersion flag for all CTA observations and save old
     // values in save_edisp vector
     std::vector<bool> save_edisp;
@@ -629,6 +623,9 @@ void cttsmap::get_parameters(void)
     if (read_ahead()) {
         m_outmap = (*this)["outmap"].filename();
     }
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

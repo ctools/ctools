@@ -210,12 +210,6 @@ void ctpsfcube::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Write header
     if (logTerse()) {
         log << std::endl;
@@ -400,6 +394,9 @@ void ctpsfcube::get_parameters(void)
     if (read_ahead()) {
         m_outcube = (*this)["outcube"].filename();
     }
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

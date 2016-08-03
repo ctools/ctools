@@ -154,10 +154,8 @@ class csfindobs(ctools.cscript):
                    (self._obs_index, self._prodname))
             raise RuntimeError(msg)
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
 
         # Return
         return

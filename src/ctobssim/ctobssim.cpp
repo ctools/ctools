@@ -231,12 +231,6 @@ void ctobssim::run(void)
     // Get parameters
     get_parameters();
 
-    // Write input parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Special mode: if read ahead is specified we know that we called
     // the execute() method, hence files are saved immediately and event
     // lists are disposed afterwards.
@@ -664,6 +658,9 @@ void ctobssim::get_parameters(void)
         m_rans.push_back(GRan(new_seed));
 
     } // endfor: looped over observations
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

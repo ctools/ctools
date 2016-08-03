@@ -211,12 +211,6 @@ void ctmodel::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Set energy dispersion flag for all CTA observations and save old
     // values in save_edisp vector
     std::vector<bool> save_edisp;
@@ -617,6 +611,9 @@ void ctmodel::get_parameters(void)
         m_obs[0]->events(m_cube);
 
     } // endif: cube was scheduled for appending
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

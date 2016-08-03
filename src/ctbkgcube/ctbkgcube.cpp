@@ -211,12 +211,6 @@ void ctbkgcube::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Warn if there are not enough energy bins
     int    n          = m_background.energies().size();
     double logEmin    = std::log10(m_background.energies()[0].TeV());
@@ -604,6 +598,9 @@ void ctbkgcube::get_parameters(void)
         m_outcube  = (*this)["outcube"].filename();
         m_outmodel = (*this)["outmodel"].filename();
     }
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

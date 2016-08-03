@@ -128,10 +128,8 @@ class csobs2caldb(ctools.cscript):
         self['irf'].string()
         self['rootdir'].string()
 
-        # Write input parameters and header into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
 
         # Return
         return

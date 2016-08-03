@@ -209,12 +209,6 @@ void ctlike::run(void)
     // Get parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Set energy dispersion flag for all CTA observations and save old
     // values in save_edisp vector
     std::vector<bool> save_edisp;
@@ -440,6 +434,9 @@ void ctlike::get_parameters(void)
     else {
         static_cast<GOptimizerLM*>(m_opt)->logger(NULL);
     }
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;

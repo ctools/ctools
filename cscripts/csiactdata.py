@@ -83,10 +83,8 @@ class csiactdata(ctools.cscript):
                                '"master_indx" to specifiy a different '+
                                'filename.')
 
-        # Write input parameters into logger
-        if self._logTerse():
-            self._log_parameters()
-            self._log('\n')
+        #  Write input parameters into logger
+        self._log_parameters(gammalib.TERSE)
         
         # Return
         return

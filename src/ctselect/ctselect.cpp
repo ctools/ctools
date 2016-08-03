@@ -218,12 +218,6 @@ void ctselect::run(void)
     // Get parameters
     get_parameters();
 
-    // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
-
     // Write observation(s) into logger
     if (logTerse()) {
         log << std::endl;
@@ -622,6 +616,9 @@ void ctselect::get_parameters(void)
     // time (in seconds)
     m_timemin.set(m_tmin, m_cta_ref);
     m_timemax.set(m_tmax, m_cta_ref);
+
+    // Write parameters into logger
+    log_parameters(TERSE);
 
     // Return
     return;
