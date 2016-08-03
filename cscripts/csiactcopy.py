@@ -377,9 +377,7 @@ class csiactcopy(ctools.cscript):
         
         # Copy all data if runlist file is 'NONE'
         elif self._runlist == 'NONE':
-            if self._logTerse():
-                self._log('Copy all available data')
-                self._log('\n')
+            self._log_string(gammalib.TERSE, 'Copy all available data')
         
         # Raise exception if file not valid
         else:

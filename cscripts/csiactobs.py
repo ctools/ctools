@@ -438,6 +438,94 @@ class csiactobs(ctools.cscript):
         # Return
         return
 
+    def _get_filename(self, hdu, hierarchy, formats): 
+        """
+        Retrieves a filename from a hdu index
+        
+        Parameters
+        ----------
+        hdu : `gammalib.GFitsTable`
+            HDU FITS table
+        hierarchy : list of strings
+            List of strings containing the hierarchy how to look for files
+        formats : list of strings
+            File formats available for this observation
+        
+        Returns
+        -------
+        filename : string
+            Filename of requested file
+        """
+        
+        # Initialise filename
+        filename = ''
+        
+        # Handle hierarchies
+        index = -1
+        
+        # Loop over possible formats
+        for version in hierarchy:
+            
+            # Count number of same available  versions
+            n = formats.count(version) 
+            
+            # Leave loop and store index of first occurence
+            if n > 0:
+                index = formats.index(version)
+                break
+        
+        # Build filename from information stored in hduindx_hdu
+        if index >= 0:
+            filename  = os.path.join(self._subdir,
+                                      hdu['FILE_DIR'][index],
+                                      hdu['FILE_NAME'][index])
+            filehdu   = hdu['HDU_NAME'][index]
+            filename += '['+filehdu+']'
+
+        # Return filename
+        return filename
+    
+    
+    def _is_present(self, filename, obs_id, filetype):
+        """
+        Checks if a filename is present
+        
+        Parameters
+        ----------
+        filename : string
+            Filename
+        obs_id : int
+            Observation ID
+        filetype : string
+            Type of file
+        
+        Returns
+        -------
+        present : bool
+            Flag signaling if file is present
+        """
+                
+        # Initialise return value
+        present = True
+        
+        # Create filename instance
+        fname = gammalib.GFilename(filename)
+        
+        # Check if file is empty
+        if fname.is_empty():
+            self._log_string(gammalib.TERSE, 'Skipping observation '+str(obs_id)+
+                          ': No '+filetype+' found\n')
+            present = False
+        
+        # Check if file exists
+        elif not fname.exists():
+            self._log_string(gammalib.TERSE, 'Skipping observation '+str(obs_id)+
+                          ': '+filetype+' "'+filename+'" does not exist\n')
+            present = False
+        
+        # Return boolean
+        return present    
+
 
     # Public methods
     def run(self):
@@ -477,149 +565,77 @@ class csiactobs(ctools.cscript):
             hduindx     = gammalib.GFits(self._hdu_index+'[HDU_INDEX]'+obs_selection)
             hduindx_hdu = hduindx['HDU_INDEX']
             
-            # Initialise files and hdu names
-            eventfile = aefffile = psffile = edispfile = bkgfile = ''
-            eventhdu  = aeffhdu  = ''
-            
             # Initialise types and formats
-            types = []
             formats = []
             for i in range(hduindx_hdu.nrows()):  
-                types.append(hduindx_hdu['HDU_TYPE'][i])
                 formats.append(hduindx_hdu['HDU_CLASS'][i])
             
-            # Handle events
-            index = -1
-            for version in self._ev_hiera:
-                n = formats.count(version) 
-                if n > 0:
-                    index = formats.index(version)
-                    break
-            if index >= 0:
-                eventfile  = os.path.join(self._subdir,
-                                          hduindx_hdu['FILE_DIR'][index],
-                                          hduindx_hdu['FILE_NAME'][index])
-                eventhdu   = hduindx_hdu['HDU_NAME'][index]
-                eventfile += '['+eventhdu+']'
+            # Retrieve filenames            
+            eventfile = self._get_filename(hduindx_hdu, self._ev_hiera, formats)
+            aefffile  = self._get_filename(hduindx_hdu, self._aeff_hiera, formats)
+            psffile   = self._get_filename(hduindx_hdu, self._psf_hiera, formats)
+            edispfile = self._get_filename(hduindx_hdu, self._edisp_hiera, formats)
+            bkgfile   = self._get_filename(hduindx_hdu, self._bkg_hiera, formats)
             
-            # Check if psf file is available
-            if not gammalib.GFilename(eventfile).is_fits():
-                
-                # Print warning that observation will be skipped since no
-                # events are present
-                if self._logTerse():
-                    self._log('Skipping observation '+str(obs_id)+
-                              ': eventfile "'+eventfile+'" not found\n')
+            # Check for presence of required event file
+            if not self._is_present(eventfile, obs_id, "event file"):
                 continue
             
-            # Handle Aeff
-            index = -1
-            for version in self._aeff_hiera:
-                n = formats.count(version) 
-                if n > 0:
-                    index = formats.index(version)
-                    break
-            if index >= 0:
-                aefffile  = os.path.join(self._subdir,
-                                         hduindx_hdu['FILE_DIR'][index],
-                                         hduindx_hdu['FILE_NAME'][index])
-                aeffhdu   = hduindx_hdu['HDU_NAME'][index]
-                aefffile += '['+aeffhdu+']'
-            
-            # Check if psf file is available
-            if not gammalib.GFilename(aefffile).is_fits():
-                
-                # Print warning that observation will be skipped since no effective area is present
-                if self._logTerse():
-                    self._log('Skipping observation '+str(obs_id)+
-                              ': effective area "'+aefffile+'" not found\n')
+            # Check for presence of required effective area file
+            if not self._is_present(aefffile, obs_id, "effective area file"):
                 continue
-                                
-            # Handle psf
-            index = -1
-            for version in self._psf_hiera:
-                n = formats.count(version) 
-                if n > 0:
-                    index = formats.index(version)
-                    break
-            if index >= 0:
-                psffile  = os.path.join(self._subdir,
-                                        hduindx_hdu['FILE_DIR'][index],
-                                        hduindx_hdu['FILE_NAME'][index])
-                psffile += '['+hduindx_hdu['HDU_NAME'][index]+']'
             
-            # Check if psf file is available
-            if not gammalib.GFilename(psffile).is_fits():
-                
-                # Print warning that observation will be skipped since no PSF is present
-                if self._logTerse():
-                    self._log('Skipping observation '+str(obs_id)+
-                              ': point spread function "'+psffile+
-                              '" not found\n')
+            # Check for presence of required psf file
+            if not self._is_present(psffile, obs_id, "PSF file"):
                 continue
-                
-            # Handle edisp
-            index = -1
-            for version in self._edisp_hiera:
-                n = formats.count(version) 
-                if n > 0:
-                    index = formats.index(version)
-                    break
-            if index >= 0:
-                edispfile  = os.path.join(self._subdir,
-                                          hduindx_hdu['FILE_DIR'][index],
-                                          hduindx_hdu['FILE_NAME'][index])
-                edispfile += '['+hduindx_hdu['HDU_NAME'][index]+']'
             
-            # Check if edisp file is available
-            if not gammalib.GFilename(edispfile).is_fits():
+            # Check for optional energy dispersion file
+            if not gammalib.GFilename(edispfile).exists():
                 
                 # Print warning that edisp cannot be used for this observation
-                if self._logTerse():
-                    self._log('Warning: observation '+str(obs_id)+
-                              ' has no energy dispersion "'+edispfile+
-                              '" information\n')
-                    edispfile = ''
+                self._log_string(gammalib.TERSE, 'Warning: observation '+str(obs_id)+
+                              ' has no energy dispersion information\n')
                 
-            # Handle background
-            index = -1
-            bkg_mod_hierarchy = list(self._bkg_mod_hiera)
-            for version in self._bkg_hiera:
-                n = formats.count(version) 
-                if n > 0:
-                    index = formats.index(version)
-                    break
-            if index >= 0:
-                bkgfile  = os.path.join(self._subdir,
-                                        hduindx_hdu['FILE_DIR'][index],
-                                        hduindx_hdu['FILE_NAME'][index])
-                bkgfile += '['+hduindx_hdu['HDU_NAME'][index]+']'
-            if 'irf' in bkg_mod_hierarchy and not gammalib.GFilename(bkgfile).is_fits():
-                bkg_mod_hierarchy.remove('irf')
+                # Set energy dispersion file as empty
+                edispfile = ''
+            
+            # Create a copy of background model hierarchy for this run
+            run_bkg_mod_hierarchy = list(self._bkg_mod_hiera)
+            
+            # Check if background file is available
+            # Remove IRF background from hierarchy if file doesnt exist
+            if not gammalib.GFilename(bkgfile).exists():
                 
-                # Throw warning if IRF background cannot be used
-                if self._logTerse():
-                    self._log('Warning: observation '+str(obs_id)+
-                              ' has no background information (file="'+
-                              bkgfile+'"). IRF background cannot be used\n')
-                    bkgfile = ''       
-                    if len(bkg_mod_hierarchy) == 0:
-                        
-                        # Skip observation if no background can be used
-                        if self._logTerse():
-                            self._log('Skipping observation '+str(obs_id)+
-                                      ': No background can be used\n')
-                        continue
-                    else:
-                        # Log if we fall back to next background approach
-                        if self._logTerse():
-                            self._log('Observation '+str(obs_id)+
-                                      ': Falling back to background "'+
-                                      bkg_mod_hierarchy[0]+'"\n')
+                # Set background file as empty
+                bkgfile = ''
+                
+                # Check for IRF background in background model hierarchy
+                if 'irf' in run_bkg_mod_hierarchy:
+                    
+                    # Remove IRF background if file doesnt exist
+                    run_bkg_mod_hierarchy.remove('irf')
+                
+                    # Print warning that edisp cannot be used for this observation
+                    self._log_string(gammalib.TERSE, 'Warning: observation '+str(obs_id)+
+                                  ' has no background information (IRF background cannot be used)\n')
+                
+                # Check if background model hierarchy is empty
+                if len(run_bkg_mod_hierarchy) == 0:
+                    
+                    # Skip observation if no background can be used
+                    self._log_string(gammalib.TERSE, 'Skipping observation '+str(obs_id)+
+                                  ': No background can be used\n')
+                    continue
+                
+                else:
+                    # Log if we fall back to next background approach
+                    self._log_string(gammalib.TERSE, 'Observation '+str(obs_id)+
+                                  ': Falling back to background "'+
+                                  run_bkg_mod_hierarchy[0]+'"\n')
 
             # Close hdu index file
             hduindx.close()
-
+            
             # Initialise background scale
             bkg_scale = 1.0
             
@@ -635,7 +651,7 @@ class csiactobs(ctools.cscript):
             fits        = gammalib.GFits(eventfile)
             
             # Get object and telescope strings from event hdu
-            events      = fits[eventhdu]
+            events      = fits[gammalib.GFilename(eventfile).extname()]
             object_name = events.string('OBJECT')
             telescope   = events.string('TELESCOP')
 
@@ -644,7 +660,7 @@ class csiactobs(ctools.cscript):
             
             # Open effective area file to look for threshold
             aeff_fits  = gammalib.GFits(aefffile)
-            aeff_table = aeff_fits[aeffhdu]
+            aeff_table = aeff_fits[gammalib.GFilename(aefffile).extname()]
             
             # Set energy range from header keyword if present
             if aeff_table.has_card('LO_THRES') and aeff_table.has_card('HI_THRES'):
@@ -668,7 +684,7 @@ class csiactobs(ctools.cscript):
             self._models.append(self._iact_background(telescope,
                                                       obs_id,
                                                       bkg_scale,
-                                                      bkg_mod_hierarchy[0],
+                                                      run_bkg_mod_hierarchy[0],
                                                       run_emin.TeV(),
                                                       run_emax.TeV()))
 
@@ -684,19 +700,19 @@ class csiactobs(ctools.cscript):
 
             # Append effective area
             aeff = gammalib.GXmlElement('parameter name="EffectiveArea"')
-            aeff.attribute('file',aefffile)
+            aeff.attribute('file', aefffile)
 
             # Append PSF
             psf = gammalib.GXmlElement('parameter name="PointSpreadFunction"')
-            psf.attribute('file',psffile)
+            psf.attribute('file', psffile)
 
             # Append energy dispersion
             edisp = gammalib.GXmlElement('parameter name="EnergyDispersion"')
-            edisp.attribute('file',edispfile)
+            edisp.attribute('file', edispfile)
 
             # Append background
             bck = gammalib.GXmlElement('parameter name="Background"')
-            bck.attribute('file',bkgfile)
+            bck.attribute('file', bkgfile)
 
             # Assign events and IRFs to observation
             obs.append(ev)
@@ -726,8 +742,8 @@ class csiactobs(ctools.cscript):
 
         # Write warning in no observation could be used from runlist
         if lib.size() == 0:
-            self._log('WARNING: No observation was appended from specified '
-                      'runlist')
+            self._log_string(gammalib.TERSE, 'WARNING: No observation was appended from specified '
+                      'runlist\n')
 
         # Return
         return       

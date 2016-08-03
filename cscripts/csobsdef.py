@@ -386,6 +386,19 @@ class csobsdef(ctools.cscript):
         # Return
         return
 
+    def obs(self):
+        """
+        Returns observation container
+        -----
+        Returns
+        obs : `~gammalib.GObservations`
+            Observation container
+        """
+        
+        # Return container
+        return self._obs
+
+    
     def pntdef(self, csv):
         """
         Set pointing definition from a CSV table

@@ -1,16 +1,14 @@
 {
-    "datasets": [
-        {
-            "name": "unit-test",
-	    "obsindx": "obs-index.fits.gz",
-            "hduindx": "hdu-index.fits.gz",
-	    "comment": "this is a comment"
-        },
-	{
-            "name": "unit-test-that-doesnt-exist",
-	    "obsindx": "badfile.fits.gz",
-            "hduindx": "unavailable_file.fits.gz",
-	    "comment": "this is a comment"
-        }
-    ]
+  "datasets": [
+    {
+      "name": "unit-test", 
+      "hduindx": "hdu-index.fits.gz", 
+      "obsindx": "obs-index.fits.gz", 
+      "Total observations": 9, 
+      "Total time": "0.07 hours", 
+      "Total events": 533, 
+      "Disk usage": "0.43 MB", 
+      "Date created": "2016-08-03"
+    }
+  ]
 }

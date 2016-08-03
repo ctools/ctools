@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import cscripts
 from testing import test
@@ -43,7 +44,9 @@ class Test(test):
         test.__init__(self)
 
         # Set data members
-        self._remote = self._datadir + '/iactdata/master.json'
+        self._remote    = self._datadir + '/iactdata/master.json'
+        self._runlist1  = self._datadir + '/iact_runlist_1.dat'
+        self._runlist2  = self._datadir + '/iact_runlist_2.dat'
 
         # Return
         return
@@ -107,20 +110,115 @@ class Test(test):
         Test csiactcopy from Python
         """
         # Set-up csiactcopy
-        findobs = cscripts.csiactcopy()
-        findobs['remote_master'] = self._remote
-        findobs['prodname']      = 'unit-test'
-        findobs['outpath']       = 'iactdata_py1'
-        findobs['logfile']       = 'csiactcopy_py1.log'
-        findobs['chatter']       = 2
+        iactcopy = cscripts.csiactcopy()
+        iactcopy['remote_master'] = self._remote
+        iactcopy['prodname']      = 'unit-test'
+        iactcopy['outpath']       = 'iactdata_py1'
+        iactcopy['logfile']       = 'csiactcopy_py1.log'
+        iactcopy['chatter']       = 4
 
         # Run csiactcopy script and save run list
-        findobs.logFileOpen()   # Make sure we get a log file
-        findobs.run()
-        findobs.save()
+        iactcopy.logFileOpen()   # Make sure we get a log file
+        iactcopy.run()
+        iactcopy.save()
+        
+        # Check IACT data store
+        self._check_copy('iactdata_py1')
+        self._check_n_obs('iactdata_py1', 9)
+        
+        # Set-up csiactcopy
+        iactcopy = cscripts.csiactcopy()
+        iactcopy['remote_master'] = self._remote
+        iactcopy['prodname']      = 'unit-test'
+        iactcopy['outpath']       = 'iactdata_py1'
+        iactcopy['logfile']       = 'csiactcopy_py2.log'
+        iactcopy['chatter']       = 4
+        iactcopy['clobber']       = True
 
+        # Run csiactcopy script and save run list
+        iactcopy.logFileOpen()   # Make sure we get a log file
+        iactcopy.run()
+        iactcopy.save()
+        
         # Check copy
         self._check_copy('iactdata_py1')
+        self._check_n_obs('iactdata_py1', 9)
+        
+        # Set-up csiactcopy
+        iactcopy = cscripts.csiactcopy()
+        iactcopy['remote_master'] = self._remote
+        iactcopy['prodname']      = 'unit-test'
+        iactcopy['outpath']       = 'iactdata_py1'
+        iactcopy['logfile']       = 'csiactcopy_py3.log'
+        iactcopy['chatter']       = 4
+        iactcopy['clobber']       = False
+
+        # Run csiactcopy script and save run list
+        iactcopy.logFileOpen()   # Make sure we get a log file
+        iactcopy.run()
+        iactcopy.save()
+        
+        # Check copy
+        self._check_copy('iactdata_py1')
+        self._check_n_obs('iactdata_py1', 9)
+        
+        if os.path.isdir('iactdata_py2'):
+            os.system("rm -r iactdata_py2")
+        
+        # Set-up csiactcopy
+        iactcopy = cscripts.csiactcopy()
+        iactcopy['runlist']       = self._runlist1
+        iactcopy['remote_master'] = self._remote
+        iactcopy['prodname']      = 'unit-test'
+        iactcopy['outpath']       = 'iactdata_py2'
+        iactcopy['logfile']       = 'csiactcopy_py4.log'
+        iactcopy['chatter']       = 3       
+
+        # Run csiactcopy script and save run list
+        iactcopy.logFileOpen()   # Make sure we get a log file
+        iactcopy.run()
+        iactcopy.save()
+
+        # Check copy
+        self._check_copy('iactdata_py2')
+        self._check_n_obs('iactdata_py2', 5)
+
+        # Set-up csiactcopy
+        iactcopy = cscripts.csiactcopy()
+        iactcopy['runlist']       = self._runlist2
+        iactcopy['remote_master'] = self._remote
+        iactcopy['prodname']      = 'unit-test'
+        iactcopy['outpath']       = 'iactdata_py2'
+        iactcopy['logfile']       = 'csiactcopy_py5.log'
+        iactcopy['chatter']       = 3
+        
+        # Run csiactcopy script and save run list
+        iactcopy.logFileOpen()   # Make sure we get a log file
+        iactcopy.run()
+        iactcopy.save()
+
+        # Check copy
+        self._check_copy('iactdata_py2')
+        self._check_n_obs('iactdata_py2', 9)
+        
+        # Set-up csiactcopy
+        iactcopy = cscripts.csiactcopy()
+        iactcopy['runlist']       = self._runlist2
+        iactcopy['remote_master'] = self._remote
+        iactcopy['prodname']      = 'unit-test'
+        iactcopy['outpath']       = 'iactdata_py2'
+        iactcopy['logfile']       = 'csiactcopy_py6.log'
+        iactcopy['chatter']       = 3
+        iactcopy['clobber']       = True
+        
+        # Run csiactcopy script and save run list
+        iactcopy.logFileOpen()   # Make sure we get a log file
+        iactcopy.run()
+        iactcopy.save()
+
+        # Check copy
+        self._check_copy('iactdata_py2')
+        self._check_n_obs('iactdata_py2',9)
 
         # Return
         return
@@ -149,5 +247,29 @@ class Test(test):
         self.test_assert(obs_index_name.is_fits(),
                          'Check if file "obs-index.fits" is FITS file.')
         
+        # Return
+        return
+
+    # Check copy
+    def _check_n_obs(self, pathname, n_expected):
+        """
+        Check number of available observations.
+        """
+        # Set file name
+        obs_index_name = gammalib.GFilename(pathname+'/obs-index.fits[OBS_INDEX]')
+        
+        # Open index file
+        fits = gammalib.GFits(obs_index_name)
+        
+        # Get number of observations
+        n_obs = fits[obs_index_name.extname()].nrows()
+        
+        # Close FITS file
+        fits.close()
+
+        # Check for existence of observations
+        self.test_assert(n_obs == n_expected,
+                         'Check for '+str(n_expected)+' observations.')
+                
         # Return
         return
