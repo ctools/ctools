@@ -371,7 +371,14 @@ class Test(gammalib.GPythonTestSuite):
         Test show_sensitivity
         """
         # Set arguments
-        args = ('-p example_show_sensitivity.eps %s/sensitivity.dat' %
+        args = ('-p example_show_sensitivity1.eps %s/sensitivity.dat' %
+                self._datadir)
+
+        # Execute script
+        self._execute_python('show_sensitivity', args=args)
+
+        # Set arguments
+        args = ('-p example_show_sensitivity2.eps %s/sensitivity_integral.dat' %
                 self._datadir)
 
         # Execute script
