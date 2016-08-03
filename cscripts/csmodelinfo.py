@@ -372,7 +372,7 @@ class csmodelinfo(ctools.cscript):
                 for source, parameter in pars_at_limit.items():   
                     if len(parameter):  
                         for par in parameter:
-                            self._log_value(source, par)
+                            self._log_value(gammalib.TERSE, source, par)
         
             # Optionally log free parameters
             if len(free_src_pars):
