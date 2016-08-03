@@ -212,7 +212,6 @@ class Test(test):
         bin['xref']     = 83.63
         bin['yref']     = 22.01
         bin['publish']  = True
-        bin['debug']    = True
         bin['logfile']  = 'ctbin_py3.log'
         bin['chatter']  = 4
 
