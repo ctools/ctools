@@ -212,18 +212,11 @@ void ctcubemask::run(void)
     // Get parameters
     get_parameters();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Observations");
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Apply mask");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Apply mask");
 
     // Initialise counters
     int n_observations = 0;
@@ -240,15 +233,8 @@ void ctcubemask::run(void)
         // Continue only if observation is a CTA observation
         if (obs != NULL) {
 
-            // Write header for observation
-            if (logTerse()) {
-                if (obs->name().length() > 1) {
-                    log.header3("Observation "+obs->name());
-                }
-                else {
-                    log.header3("Observation");
-                }
-            }
+            // Write header for the current observation
+            log_header3(TERSE, get_obs_header(obs));
 
             // Increment counter
             n_observations++;
@@ -269,12 +255,8 @@ void ctcubemask::run(void)
         m_use_xml = true;
     }
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Observations after event bin masking");
-        log << m_obs << std::endl;
-    }
+    // Write resulting observation container into logger
+    log_observations(NORMAL, m_obs, "Observations after event bin masking");
 
     // Optionally publish counts cube
     if (m_publish) {
@@ -307,16 +289,8 @@ void ctcubemask::run(void)
  ***************************************************************************/
 void ctcubemask::save(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Save counts cubes");
-        }
-        else {
-            log.header1("Save counts cube");
-        }
-    }
+    // Write header into logger
+    log_header1(TERSE, gammalib::number("Save counts cube", m_obs.size()));
 
     // Get counts cube filename
     m_outcube = (*this)["outcube"].filename();
@@ -351,11 +325,8 @@ void ctcubemask::save(void)
  ***************************************************************************/
 void ctcubemask::publish(const std::string& name)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish counts cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Publish counts cube");
 
     // Set default name is user name is empty
     std::string user_name(name);
@@ -371,10 +342,8 @@ void ctcubemask::publish(const std::string& name)
         GCTAEventCube* cube = dynamic_cast<GCTAEventCube*>(obs->events());
         if (cube != NULL) {
 
-            // Log filename
-            if (logTerse()) {
-                log << "Publish \""+user_name+"\" counts cube." << std::endl;
-            }
+            // Log counts cube name
+            log_value(NORMAL, "Counts cube name", user_name);
 
             // Publish counts cube
             cube->counts().publish(user_name);
@@ -382,6 +351,80 @@ void ctcubemask::publish(const std::string& name)
         }
     }
 
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctcubemask::init_members(void)
+{
+    // Initialise parameters
+	m_regfile.clear();
+    m_outcube.clear();
+	m_prefix.clear();
+    m_usepnt  = false;
+    m_ra      = 0.0;
+    m_dec     = 0.0;
+    m_rad     = 0.0;
+    m_emin    = 0.0;
+    m_emax    = 0.0;
+    m_publish = false;
+
+    // Initialise protected members
+    m_obs.clear();
+    m_infiles.clear();
+    m_select_energy = true;
+    m_select_roi    = true;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctcubemask::copy_members(const ctcubemask& app)
+{
+    // Copy parameters
+	m_regfile = app.m_regfile;
+    m_outcube = app.m_outcube;
+	m_prefix  = app.m_prefix;
+    m_usepnt  = app.m_usepnt;
+    m_ra      = app.m_ra;
+    m_dec     = app.m_dec;
+    m_rad     = app.m_rad;
+    m_emin    = app.m_emin;
+    m_emax    = app.m_emax;
+    m_publish = app.m_publish;
+
+    // Copy protected members
+    m_obs           = app.m_obs;
+    m_infiles       = app.m_infiles;
+    m_select_energy = app.m_select_energy;
+    m_select_roi    = app.m_select_roi;
+    
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctcubemask::free_members(void)
+{
     // Return
     return;
 }
@@ -485,7 +528,8 @@ void ctcubemask::get_parameters(void)
 void ctcubemask::apply_mask(GCTAObservation* obs)
 {
     // Get pointer to CTA event cube. Continue only if we have a cube
-    GCTAEventCube* cube = dynamic_cast<GCTAEventCube*>(const_cast<GEvents*>(obs->events()));
+    GCTAEventCube* cube = dynamic_cast<GCTAEventCube*>
+                                      (const_cast<GEvents*>(obs->events()));
     if (cube != NULL) {
 
         // Extract event cube and energy boundaries
@@ -545,14 +589,11 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         }
 
         // Log selected energy band
-        if (logTerse()) {
-            log << gammalib::parformat("Selected energy band");
-            log << ebounds.emin(e_idx1).TeV() << " - ";
-            log << ebounds.emax(e_idx2).TeV() << " TeV";
-            log << std::endl;
-        }
+        log_value(NORMAL, "Selected energy band",
+                          gammalib::str(ebounds.emin(e_idx1).TeV())+" - "+
+                          gammalib::str(ebounds.emax(e_idx2).TeV())+" TeV");
 
-        // Set all pixels inside selected energy bands but outside ROI
+        // Set all pixels inside selected energy bands but outside RoI
         // to -1.0 if requested
         if (m_select_roi) {
             GSkyRegionCircle roi(m_ra, m_dec, m_rad);
@@ -565,15 +606,13 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
                 }
             }
 
-            // Log selected energy band
-            if (logTerse()) {
-                log << gammalib::parformat("Selected ROI");
-                log << "RA=" << m_ra << " deg, ";
-                log << "DEC=" << m_dec << " deg, ";
-                log << "Radius=" << m_rad << " deg";
-                log << std::endl;
-            }
-        }
+            // Log selected RoI
+            log_value(NORMAL, "Selected RoI",
+                              "RA="+gammalib::str(m_ra)+" deg, "+
+                              "DEC="+gammalib::str(m_dec)+" deg, "+
+                              "Radius="+gammalib::str(m_rad)+" deg");
+
+        } // endif: applied RoI selection
 
         // Set all pixels inside selected energy bands and inside exclusion
         // regions to -1.0
@@ -587,20 +626,15 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
                     }
                 }
             }
-            if (logTerse()) {
-                log << gammalib::parformat("Exclusion regions");
-                log << std::endl;
-                log.indent(1);
-                log << regions.print();
-                log << std::endl;
-                log.indent(0);
+
+            // Log exclusion regions
+            for (int i = 0; i < regions.size(); ++i) {
+                log_value(NORMAL, "Exclusion region "+gammalib::str(i+1),
+                                  region_string(*(regions[i])));
             }
         }
         else {
-            if (logTerse()) {
-                log << gammalib::parformat("Exclusion regions");
-                log << "None" << std::endl;
-            }
+            log_value(NORMAL, "Exclusion regions", "None");
         }
 
         // Determine number of events after masking
@@ -613,13 +647,9 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
             }
         }
 
-        // Dump number of events before and after masking
-        if (logTerse()) {
-            log << gammalib::parformat("Events before masking");
-            log << sum_before << std::endl;
-            log << gammalib::parformat("Events after masking");
-            log << sum_after << std::endl;
-        }
+        // Write number of events before and after masking into logger
+        log_value(NORMAL, "Events before masking", sum_before);
+        log_value(NORMAL, "Events after masking", sum_after);
 
         // Put back map into the event cube
         cube->counts(map);
@@ -631,77 +661,31 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
 }
 
 
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
 /***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctcubemask::init_members(void)
-{
-    // Initialise parameters
-	m_regfile.clear();
-    m_outcube.clear();
-	m_prefix.clear();
-    m_usepnt  = false;
-    m_ra      = 0.0;
-    m_dec     = 0.0;
-    m_rad     = 0.0;
-    m_emin    = 0.0;
-    m_emax    = 0.0;
-    m_publish = false;
-
-    // Initialise protected members
-    m_obs.clear();
-    m_infiles.clear();
-    m_select_energy = true;
-    m_select_roi    = true;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
+ * @brief Return region string
  *
- * @param[in] app Application.
+ * @param[in] region Sky region.
+ *
+ * Returns a formatted region string for logging.
  ***************************************************************************/
-void ctcubemask::copy_members(const ctcubemask& app)
+std::string ctcubemask::region_string(const GSkyRegion& region) const
 {
-    // Copy parameters
-	m_regfile = app.m_regfile;
-    m_outcube = app.m_outcube;
-	m_prefix  = app.m_prefix;
-    m_usepnt  = app.m_usepnt;
-    m_ra      = app.m_ra;
-    m_dec     = app.m_dec;
-    m_rad     = app.m_rad;
-    m_emin    = app.m_emin;
-    m_emax    = app.m_emax;
-    m_publish = app.m_publish;
+    // Initialise region string
+    std::string rstring;
 
-    // Copy protected members
-    m_obs           = app.m_obs;
-    m_infiles       = app.m_infiles;
-    m_select_energy = app.m_select_energy;
-    m_select_roi    = app.m_select_roi;
-    
-    // Return
-    return;
-}
+    // Get pointer to circle
+    const GSkyRegionCircle* circle = dynamic_cast<const GSkyRegionCircle*>(&region);
 
+    // If the sky region is a circle then append Right Ascenscion, Declination
+    // and Radius to the region string
+    if (circle != NULL) {
+        rstring.append("RA="+gammalib::str(circle->centre().ra_deg())+" deg, "+
+                       "DEC="+gammalib::str(circle->centre().dec_deg())+" deg, "+
+                       "Radius="+gammalib::str(circle->radius())+" deg");
+    }
 
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctcubemask::free_members(void)
-{
-    // Return
-    return;
+    // Return region string
+    return rstring;
 }
 
 
@@ -741,11 +725,8 @@ void ctcubemask::save_fits(void)
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Counts cube file");
-            log << m_outcube.url() << std::endl;
-        }
+        // Log counts cube file name
+        log_value(NORMAL, "Counts cube file", m_outcube.url());
 
         // Save event list
         save_counts_map(obs, m_outcube);
@@ -771,15 +752,16 @@ void ctcubemask::save_fits(void)
 void ctcubemask::save_xml(void)
 {
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outcube.url().substr(m_outcube.length()-4,4));
+    std::string suffix = gammalib::tolower(m_outcube.url().substr(
+                                                    m_outcube.length()-4,4));
     if (suffix != ".xml") {
-        log << "*** WARNING: Name of observation definition output file \""+
-               m_outcube+"\"" << std::endl;
-        log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
-        log << "*** WARNING: This is not an error, but might be misleading."
-               " It is recommended" << std::endl;
-        log << "*** WARNING: to use the suffix \".xml\" for observation"
-               " definition files." << std::endl;
+        std::string msg = "\nWARNING: Name of observation definition output "
+                          "file \""+m_outcube+"\" does not terminate with\n"
+                          "         \".xml\". This is not an error, but may "
+                          "be misleading. It is recommended to use the\n"
+                          "         suffix \".xml\" for observation definition "
+                          "files.";
+        log_string(TERSE, msg);
     }
 
     // Loop over all observation in the container
@@ -797,11 +779,8 @@ void ctcubemask::save_xml(void)
             // Store output file name in observation
             obs->eventfile(outfile);
 
-            // Log filename
-            if (logTerse()) {
-                log << gammalib::parformat("Counts cube file");
-                log << outfile << std::endl;
-            }
+            // Log counts cube file name
+            log_value(NORMAL, "Counts cube file", outfile);
 
             // Save event list
             save_counts_map(obs, outfile);

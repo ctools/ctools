@@ -96,6 +96,7 @@ protected:
     bool        m_fit;          //!< Do fit?
     GEbounds    m_ebounds;      //!< Energy binning definition
     GFilename   m_outfile;      //!< Output ASCII file name
+    GChatter    m_chatter;      //!< Chattiness
 
     // Protected members
     GOptimizerLM        m_opt;             //!< Optimizer

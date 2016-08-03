@@ -40,7 +40,6 @@
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
-#define G_PLAW_WEIGHTS      //!< Use power law in energy weight computation
 
 /* __ Constants __________________________________________________________ */
 
@@ -227,16 +226,16 @@ void ctbin::run(void)
     get_parameters();
 
     // Write input observation container into logger
-    log_observations(NORMAL, m_obs);
+    log_observations(NORMAL, m_obs, "Input observation");
 
-    // Write header
+    // Write header into logger
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
     // Loop over all observations in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
-        // Write header for observation
-        log_header3(NORMAL, get_obs_header(m_obs[i]));
+        // Write header for the current observation
+        log_header3(TERSE, get_obs_header(m_obs[i]));
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
@@ -244,7 +243,7 @@ void ctbin::run(void)
         // Skip observation if it's not CTA
         if (obs == NULL) {
             std::string msg = " Skipping "+m_obs[i]->instrument()+
-                              " observation\n";
+                              " observation";
             log_string(NORMAL, msg);
             continue;
         }
@@ -252,7 +251,7 @@ void ctbin::run(void)
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
             std::string msg = " Skipping binned "+m_obs[i]->instrument()+
-                              " observation\n";
+                              " observation";
             log_string(NORMAL, msg);
             continue;
         }
@@ -332,7 +331,7 @@ void ctbin::save(void)
  ***************************************************************************/
 void ctbin::publish(const std::string& name)
 {
-    // Write header
+    // Write header into logger
     log_header1(TERSE, "Publish counts cube");
 
     // Set default name is user name is empty
@@ -486,108 +485,97 @@ void ctbin::get_parameters(void)
  * @exception GException::invalid_value
  *            No event list or valid RoI found in observation.
  *
- * Fills the events from an event list in the counts cube setup by init_cube.
+ * Fills the events from an event list into the counts cube.
  ***************************************************************************/
 void ctbin::fill_cube(GCTAObservation* obs)
 {
-    // Continue only if observation pointer is valid
-    if (obs != NULL) {
+    // Make sure that the observation holds a CTA event list. If this
+    // is not the case then throw an exception.
+    const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+                                  (obs->events());
+    if (events == NULL) {
+        std::string msg = "CTA Observation does not contain an event "
+                          "list. An event list is needed to fill the "
+                          "counts cube.";
+        throw GException::invalid_value(G_FILL_CUBE, msg);
+    }
 
-        // Make sure that the observation holds a CTA event list. If this
-        // is not the case then throw an exception.
-        const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
-                                      (obs->events());
-        if (events == NULL) {
-            std::string msg = "CTA Observation does not contain an event "
-                              "list. An event list is needed to fill the "
-                              "counts cube.";
-            throw GException::invalid_value(G_FILL_CUBE, msg);
+    // Get the RoI
+    const GCTARoi& roi = events->roi();
+
+    // Check for RoI sanity
+    if (!roi.is_valid()) {
+        std::string msg = "No valid RoI found in input observation "
+                          "\""+obs->name()+"\". Run ctselect to specify "
+                          "an RoI for this observation before running "
+                          "ctbin.";
+        throw GException::invalid_value(G_FILL_CUBE, msg);
+    }
+
+    // Get counts cube usage flags
+    std::vector<bool> usage = cube_layer_usage(events->ebounds());
+
+    // Initialise binning statistics
+    int num_outside_roi  = 0;
+    int num_outside_map  = 0;
+    int num_outside_ebds = 0;
+    int num_in_map       = 0;
+
+    // Fill counts sky map
+    for (int i = 0; i < events->size(); ++i) {
+
+        // Get event
+        const GCTAEventAtom* event = (*events)[i];
+
+        // Determine sky pixel
+        GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
+        GSkyDir      dir   = inst->dir();
+        GSkyPixel    pixel = m_counts.dir2pix(dir);
+
+        // Skip event if corresponding counts cube pixel is outside RoI
+        if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+            num_outside_roi++;
+            continue;
         }
 
-        // Get the RoI
-        const GCTARoi& roi = events->roi();
-
-        // Check for RoI sanity
-        if (!roi.is_valid()) {
-            std::string msg = "No valid RoI found in input observation "
-                              "\""+obs->name()+"\". Run ctselect to specify "
-                              "an RoI for this observation before running "
-                              "ctbin.";
-            throw GException::invalid_value(G_FILL_CUBE, msg);
+        // Skip event if corresponding counts cube pixel is outside the
+        // counts cube map range
+        if (pixel.x() < -0.5 || pixel.x() > (m_counts.nx()-0.5) ||
+            pixel.y() < -0.5 || pixel.y() > (m_counts.ny()-0.5)) {
+            num_outside_map++;
+            continue;
         }
 
-        // Get counts cube usage flags
-        std::vector<bool> usage = cube_layer_usage(events->ebounds());
+        // Determine counts cube energy bin
+        int iebin = m_ebounds.index(event->energy());
 
-        // Initialise binning statistics
-        int num_outside_roi  = 0;
-        int num_outside_map  = 0;
-        int num_outside_ebds = 0;
-        int num_in_map       = 0;
+        // Skip event if the corresponding counts cube energy bin is not
+        // fully contained in the event list energy range. This avoids
+        // having partially filled bins.
+        if (!usage[iebin]) {
+            num_outside_ebds++;
+            continue;
+        }
 
-        // Fill counts sky map
-        for (int i = 0; i < events->size(); ++i) {
+        // Fill event in skymap
+        m_counts(pixel, iebin) += 1.0;
+        num_in_map++;
 
-            // Get event
-            const GCTAEventAtom* event = (*events)[i];
+    } // endfor: looped over all events
 
-            // Determine sky pixel
-            GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
-            GSkyDir      dir   = inst->dir();
-            GSkyPixel    pixel = m_counts.dir2pix(dir);
+    // Append GTIs
+    m_gti.extend(events->gti());
 
-            // Skip event if corresponding counts cube pixel is outside RoI
-            if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
-                num_outside_roi++;
-                continue;
-            }
+    // Update ontime and livetime
+    m_ontime   += obs->ontime();
+    m_livetime += obs->livetime();
 
-            // Skip event if corresponding counts cube pixel is outside the
-            // counts cube map range
-            if (pixel.x() < -0.5 || pixel.x() > (m_counts.nx()-0.5) ||
-                pixel.y() < -0.5 || pixel.y() > (m_counts.ny()-0.5)) {
-                num_outside_map++;
-                continue;
-            }
-
-            // Determine counts cube energy bin
-            int iebin = m_ebounds.index(event->energy());
-
-            // Skip event if the corresponding counts cube energy bin is not
-            // fully contained in the event list energy range. This avoids
-            // having partially filled bins.
-            if (!usage[iebin]) {
-                num_outside_ebds++;
-                continue;
-            }
-
-            // Fill event in skymap
-            m_counts(pixel, iebin) += 1.0;
-            num_in_map++;
-
-            // Signal that bin was filled
-            m_weights(pixel, iebin) = 1.0;
-
-        } // endfor: looped over all events
-
-        // Append GTIs
-        m_gti.extend(events->gti());
-
-        // Update ontime and livetime
-        m_ontime   += obs->ontime();
-        m_livetime += obs->livetime();
-
-        // Log filling results
-        log_value(TERSE, "Events in list", obs->events()->size());
-        log_value(TERSE, "Events in cube", num_in_map);
-        log_value(TERSE, "Event bins outside RoI", num_outside_roi);
-        log_value(TERSE, "Events outside cube area", num_outside_map);
-        log_value(TERSE, "Events outside energy bins", num_outside_ebds);
-
-        // Log cube
-        log_string(EXPLICIT, m_counts.print());
-
-    } // endif: observation was valid
+    // Log filling results
+    log_value(NORMAL, "Events in list", obs->events()->size());
+    log_value(NORMAL, "Events in cube", num_in_map);
+    log_value(NORMAL, "Event bins outside RoI", num_outside_roi);
+    log_value(NORMAL, "Events outside cube area", num_outside_map);
+    log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
 
     // Return
     return;
@@ -607,61 +595,56 @@ void ctbin::fill_cube(GCTAObservation* obs)
  ***************************************************************************/
 void ctbin::set_weights(GCTAObservation* obs)
 {
-    // Continue only if observation pointer is valid
-    if (obs != NULL) {
+    // Make sure that the observation holds a CTA event list. If this
+    // is not the case then throw an exception.
+    const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
+                                  (obs->events());
+    if (events == NULL) {
+        std::string msg = "CTA Observation does not contain an event "
+                          "list. An event list is needed to fill the "
+                          "counts cube.";
+        throw GException::invalid_value(G_SET_WEIGHTS, msg);
+    }
 
-        // Make sure that the observation holds a CTA event list. If this
-        // is not the case then throw an exception.
-        const GCTAEventList* events = dynamic_cast<const GCTAEventList*>
-                                      (obs->events());
-        if (events == NULL) {
-            std::string msg = "CTA Observation does not contain an event "
-                              "list. An event list is needed to fill the "
-                              "counts cube.";
-            throw GException::invalid_value(G_SET_WEIGHTS, msg);
+    // Get the RoI
+    const GCTARoi& roi = events->roi();
+
+    // Check for RoI sanity
+    if (!roi.is_valid()) {
+        std::string msg = "No valid RoI found in input observation "
+                          "\""+obs->name()+"\". Run ctselect to specify "
+                          "an RoI for this observation before running "
+                          "ctbin.";
+        throw GException::invalid_value(G_SET_WEIGHTS, msg);
+    }
+
+    // Get counts cube usage flags
+    std::vector<bool> usage = cube_layer_usage(events->ebounds());
+
+    // Loop over all pixels in counts cube
+    for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
+
+        // Get pixel sky direction
+        GSkyDir dir = m_counts.inx2dir(pixel);
+
+        // Skip pixel if it is outside the RoI
+        if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+            continue;
         }
 
-        // Get the RoI
-        const GCTARoi& roi = events->roi();
+        // Loop over all energy layers of counts cube
+        for (int iebin = 0; iebin < m_ebounds.size(); ++iebin){
 
-        // Check for RoI sanity
-        if (!roi.is_valid()) {
-            std::string msg = "No valid RoI found in input observation "
-                              "\""+obs->name()+"\". Run ctselect to specify "
-                              "an RoI for this observation before running "
-                              "ctbin.";
-            throw GException::invalid_value(G_SET_WEIGHTS, msg);
-        }
-
-        // Get counts cube usage flags
-        std::vector<bool> usage = cube_layer_usage(events->ebounds());
-
-        // Loop over all pixels in counts cube
-        for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
-
-            // Get pixel sky direction
-            GSkyDir dir = m_counts.inx2dir(pixel);
-
-            // Skip pixel if it is outside the RoI
-            if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+            // Skip energy layer if the usage flag is false
+            if (!usage[iebin]) {
                 continue;
             }
+            // Signal that bin was filled
+            m_weights(pixel, iebin) = 1.0;
 
-            // Loop over all energy layers of counts cube
-            for (int iebin = 0; iebin < m_ebounds.size(); ++iebin){
+        } // endfor: looped over energy layers of counts cube
 
-                // Skip energy layer if the usage flag is false
-                if (!usage[iebin]) {
-                    continue;
-                }
-                // Signal that bin was filled
-                m_weights(pixel, iebin) = 1.0;
-
-            } // endfor: looped over energy layers of counts cube
-
-        } // endfor: looped over pixels of counts cube
-
-    } // endif: observation was valid
+    } // endfor: looped over pixels of counts cube
 
     // Return
     return;
@@ -790,8 +773,6 @@ void ctbin::obs_cube(void)
     // Return
     return;
 }
-
-
 
 
 /***********************************************************************//**

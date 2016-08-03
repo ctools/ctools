@@ -110,12 +110,12 @@ class Test(test):
         mask = ctools.ctcubemask()
         mask['inobs']   = self._cntcube
         mask['regfile'] = self._exclusion
-        mask['outcube'] = 'ctcubemask_py1.fits'
         mask['ra']      = 83.63
         mask['dec']     = 22.01
         mask['rad']     = 2.0
         mask['emin']    = 0.1
         mask['emax']    = 100.0
+        mask['outcube'] = 'ctcubemask_py1.fits'
         mask['logfile'] = 'ctcubemask_py1.log'
         mask['chatter'] = 2
 
@@ -127,11 +127,31 @@ class Test(test):
         # Check result file
         self._check_result_file('ctcubemask_py1.fits')
 
+        # Set-up ctcubemask without exclusion regions
+        mask = ctools.ctcubemask()
+        mask['inobs']   = self._cntcube
+        mask['regfile'] = 'NONE'
+        mask['ra']      = 83.63
+        mask['dec']     = 22.01
+        mask['rad']     = 3.0
+        mask['emin']    = 0.1
+        mask['emax']    = 100.0
+        mask['outcube'] = 'ctcubemask_py2.fits'
+        mask['logfile'] = 'ctcubemask_py2.log'
+        mask['chatter'] = 3
+
+        # Execute ctcubemask tool
+        mask.logFileOpen()   # Make sure we get a log file
+        mask.execute()
+
+        # Check result file
+        self._check_result_file('ctcubemask_py2.fits', events=5542)
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, events=4921):
         """
         Check result file
         """
@@ -139,8 +159,8 @@ class Test(test):
         cube = gammalib.GCTAEventCube(filename)
 
         # Check counts cube
-        self.test_value(cube.size(), 800000, 'Check for 800000 cube bins')
-        self.test_value(cube.number(), 4921, 'Check for 4921 events')
+        self.test_value(cube.size(), 800000, 'Check for number of cube bins')
+        self.test_value(cube.number(), events, 'Check for number of events')
 
         # Return
         return

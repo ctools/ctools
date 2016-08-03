@@ -95,6 +95,12 @@ public:
     %rename(_require_inobs)        require_inobs(const std::string& method);
     %rename(_require_inobs_nolist) require_inobs_nolist(const std::string& method);
     %rename(_require_inobs_nocube) require_inobs_nocube(const std::string& method);
+    %rename(_log_observations)     log_observations(const GChatter&      chatter,
+                                                    const GObservations& obs,
+                                                    const std::string&   what);
+    %rename(_log_models)           log_models(const GChatter&    chatter,
+                                              const GModels&     models,
+                                              const std::string& what);
     %rename(_set_response)         set_response(GObservations& obs);
     %rename(_set_obs_response)     set_obs_response(GCTAObservation* obs);
     %rename(_set_obs_bounds)       set_obs_bounds(GObservations& obs);
@@ -118,6 +124,14 @@ public:
     void            require_inobs(const std::string& method);
     void            require_inobs_nolist(const std::string& method);
     void            require_inobs_nocube(const std::string& method);
+
+    // Protected methods for logging
+    void            log_observations(const GChatter&      chatter,
+                                     const GObservations& obs,
+                                     const std::string&   what = "Observation");
+    void            log_models(const GChatter&    chatter,
+                               const GModels&     models,
+                               const std::string& what = "Model");
 
     // Protected support methods
     void            set_response(GObservations& obs);

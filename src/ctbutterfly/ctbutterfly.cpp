@@ -223,26 +223,14 @@ void ctbutterfly::run(void)
         }
     }
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
     // If fit is selected then do maximum likelihood fit
     if (m_fit) {
 
-        // Write header
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Compute best-fit likelihood");
-        }
+        // Write header into logger
+        log_header1(TERSE, "Compute best-fit likelihood");
 
         // Optimize and compute errors
         m_obs.optimize(m_opt);
@@ -254,12 +242,10 @@ void ctbutterfly::run(void)
         GObservations::likelihood likelihood = m_obs.function();
         m_covariance = likelihood.curvature()->invert();
 
-        // Write optimised model and covariance matrix into logger
-        if (logTerse()) {
-            log << m_opt << std::endl;
-            log << m_obs.models() << std::endl;
-            log << m_covariance << std::endl;
-        }
+        // Write optimizer, optimised model and covariance matrix into logger
+        log_string(NORMAL, m_opt.print(m_chatter));
+        log_string(NORMAL, m_obs.models().print(m_chatter));
+        log_string(EXPLICIT, m_covariance.print(m_chatter));
 
     } // endif: fit selected
 
@@ -270,11 +256,8 @@ void ctbutterfly::run(void)
     // then compute now the covariance matrix
     if (!m_fit && m_covariance.size() == 0) {
 
-        // Write header
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Compute covariance matrix");
-        }
+        // Write header into logger
+        log_header1(TERSE, "Compute covariance matrix");
 
         // Evaluate curvature matrix at the actual parameters
         GOptimizerPars            pars       = models.pars();
@@ -286,18 +269,13 @@ void ctbutterfly::run(void)
         // to scale them before we can proceed.
         m_covariance = likelihood.curvature()->invert();
 
-        // Log covariance matrix
-        if (logTerse()) {
-            log << m_covariance << std::endl;
-        }
+        // Write covariance matrix into logger
+        log_string(EXPLICIT, m_covariance.print(m_chatter));
 
     } // endif: covariance computation needed
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Prepare butterfly computation");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Prepare butterfly computation");
 
     // Find parameter indices. We do this by the memory location of the
     // model parameters.
@@ -315,8 +293,6 @@ void ctbutterfly::run(void)
         }
     }
 
-    // Check indices
-
     // Store model values and scales
     double  prefactor_mean  = (*skymodel)["Prefactor"].value();
     double  index_mean      = (*skymodel)["Index"].value();
@@ -325,16 +301,12 @@ void ctbutterfly::run(void)
     double  index_scale     = (*skymodel)["Index"].scale();
     GEnergy pivot(pivot_mean, "MeV");
 
-    // Show parameter indices
-    if (logTerse()) {
-        log << gammalib::parformat("Prefactor");
-        log << prefactor_mean << " ph/cm2/s/MeV (";
-        log << inx_prefactor << ")" << std::endl;
-        log << gammalib::parformat("Index");
-        log << index_mean << " (" << inx_index << ")" << std::endl;
-        log << gammalib::parformat("Pivot energy");
-        log << pivot << std::endl;
-    }
+    // Write parameter indices into logger
+    log_value(NORMAL, "Prefactor", gammalib::str(prefactor_mean)+
+                      " ph/cm2/s/MeV ("+gammalib::str(inx_prefactor)+")");
+    log_value(NORMAL, "Index", gammalib::str(index_mean)+
+                      " ("+gammalib::str(inx_index)+")");
+    log_value(NORMAL, "Pivot energy", pivot.print());
 
     // Extract covariance elements
     double cov_pp = m_covariance(inx_prefactor,inx_prefactor);
@@ -353,35 +325,26 @@ void ctbutterfly::run(void)
     eigenvectors(cov_pp, cov_pg, cov_pg, cov_gg,
                  &lambda1, &lambda2, &vector1, &vector2);
 
-    // Show eigenvectors and eigenvalues
-    if (logTerse()) {
-        log << gammalib::parformat("Eigenvalue 1")  << lambda1 << std::endl;
-        log << gammalib::parformat("Eigenvalue 2")  << lambda2 << std::endl;
-        log << gammalib::parformat("Eigenvector 1") << vector1 << std::endl;
-        log << gammalib::parformat("Eigenvector 2") << vector2 << std::endl;
-    }
+    // Write eigenvectors and eigenvalues into logger
+    log_value(NORMAL, "Eigenvalue 1", lambda1);
+    log_value(NORMAL, "Eigenvalue 2", lambda2);
+    log_value(NORMAL, "Eigenvector 1", vector1.print());
+    log_value(NORMAL, "Eigenvector 2", vector2.print());
 
     // Confidence scaling
     double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
     double scale = (sigma*sigma);
 
-    // Show confidence stuff
-    if (logTerse()) {
-        log << gammalib::parformat("Confidence level");
-        log << m_confidence << std::endl;
-        log << gammalib::parformat("Corresponding scaling");
-        log << scale << std::endl;
-    }
+    // Write confidence level information into logger
+    log_value(NORMAL, "Confidence level", m_confidence);
+    log_value(NORMAL, "Corresponding scaling", scale);
 
     // Compute minor and major axes of error ellipse
     double major = scale*std::sqrt(lambda1);
     double minor = scale*std::sqrt(lambda2);
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate butterfly");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Generate butterfly");
 
     // Walk around the error ellipse
     int    nt = 360;
@@ -401,12 +364,10 @@ void ctbutterfly::run(void)
                             minor * sin_t * vector2[1]) * index_scale +
                            index_mean;
 
-        // Show prefactor and index
-        if (logTerse()) {
-            log << gammalib::parformat("Angle "+gammalib::str(t*gammalib::rad2deg));
-            log << prefactor << " ph/cm2/s/MeV; ";
-            log << index << std::endl;
-        }
+        // Write prefactor and index into logger
+        log_value(EXPLICIT, "Angle "+gammalib::str(t*gammalib::rad2deg),
+                  gammalib::str(prefactor)+" ph/cm2/s/MeV; "+
+                  gammalib::str(index));
 
         // Setup power law model
         GModelSpectralPlaw plaw(prefactor, index, pivot);
@@ -434,11 +395,8 @@ void ctbutterfly::run(void)
 
     } // endfor: looped over all angles
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Results");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Results");
 
     // Setup power law model
     GModelSpectralPlaw plaw(prefactor_mean, index_mean, pivot);
@@ -457,17 +415,11 @@ void ctbutterfly::run(void)
         m_energies.push_back(energy.MeV());
         m_intensities.push_back(intensity);
 
-        // Log information
-        if (logTerse()) {
-            log << gammalib::parformat("Intensity at "+energy.print());
-            log << intensity;
-            log << " (";
-            log << m_min_intensities[k];
-            log << ", ";
-            log << m_max_intensities[k];
-            log << ") ph/cm2/s/MeV";
-            log << std::endl;
-        }
+        // Write results into logger
+        log_value(NORMAL, "Intensity at "+energy.print(),
+                  gammalib::str(intensity)+" ("+
+                  gammalib::str(m_min_intensities[k])+", "+
+                  gammalib::str(m_max_intensities[k])+") ph/cm2/s/MeV");
 
     } // endfor
 
@@ -492,11 +444,8 @@ void ctbutterfly::run(void)
  ***************************************************************************/
 void ctbutterfly::save(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save Butterfly diagram");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Save Butterfly diagram");
 
     // Get output filename
     m_outfile = (*this)["outfile"].filename();
@@ -504,11 +453,8 @@ void ctbutterfly::save(void)
     // Save only if filename is non-empty
     if (!m_outfile.is_empty()) {
 
-        // Log filename
-        if (logTerse()) {
-            log << "Save butterfly diagram into file \""+m_outfile+"\".";
-            log << std::endl;
-        }
+        // Log butterfly diagram file name
+        log_value(NORMAL, "Butterfly file", m_outfile.url());
 
         // Create CSV table with 4 columns
         GCsv table(m_energies.size(), 4);
@@ -522,7 +468,7 @@ void ctbutterfly::save(void)
         }
 
         // Save CSV table
-        table.save(m_outfile, " ", clobber());
+        table.save(m_outfile.url(), " ", clobber());
 
     }
 
@@ -548,6 +494,7 @@ void ctbutterfly::init_members(void)
     m_max_iter    = 50;
     m_apply_edisp = false;
     m_fit         = false;
+    m_chatter     = static_cast<GChatter>(2);
     m_ebounds.clear();
     m_outfile.clear();
 
@@ -582,6 +529,7 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_max_iter    = app.m_max_iter;
     m_apply_edisp = app.m_apply_edisp;
     m_fit         = app.m_fit;
+    m_chatter     = app.m_chatter;
     m_ebounds     = app.m_ebounds;
     m_outfile     = app.m_outfile;
  
@@ -668,12 +616,11 @@ void ctbutterfly::get_parameters(void)
         // m_covariance.load(matrixfilename);
     }
 
-    // Read energy dispersion flag
+    // Get remaining parameters
     m_apply_edisp = (*this)["edisp"].boolean();
-
-    // Read other parameters
-    m_confidence = (*this)["confidence"].real();
-    m_fit        = (*this)["fit"].boolean();
+    m_confidence  = (*this)["confidence"].real();
+    m_fit         = (*this)["fit"].boolean();
+    m_chatter     = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file

@@ -928,6 +928,40 @@ void ctool::log_observations(const GChatter&      chatter,
 
 
 /***********************************************************************//**
+ * @brief Log model container
+ *
+ * @param[in] chatter Minimum required chattiness
+ * @param[in] models Model container
+ * @param[in] what String specifying the container content
+ *
+ * Log models if chattiness is at least @p chatter.
+ ***************************************************************************/
+void ctool::log_models(const GChatter&    chatter,
+                       const GModels&     models,
+                       const std::string& what)
+{
+    // Get chattiness of ctool
+    GChatter chattiness = static_cast<GChatter>((*this)["chatter"].integer());
+
+    // Only write message if chattiness is at least equal to the minimum
+    // required chattiness
+    if (chattiness >= chatter) {
+
+        // Log observation header
+        log << std::endl;
+        log.header1(gammalib::number(what, models.size()));
+
+        // Log observation content dependent on chattiness
+        log << models.print(chattiness) << std::endl;
+
+    } // endif: Chattiness satisfied minimum required level
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Set response for all CTA observations in container
  *
  * @param[in,out] obs Observation container

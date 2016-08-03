@@ -124,6 +124,27 @@ class Test(test):
         # Check result file
         self._check_result_file('ctbutterfly_py1.dat')
 
+        # Set-up ctbutterfly
+        butterfly = ctools.ctbutterfly()
+        butterfly['inobs']   = self._events
+        butterfly['inmodel'] = self._model
+        butterfly['srcname'] = 'Crab'
+        butterfly['caldb']   = self._caldb
+        butterfly['irf']     = self._irf
+        butterfly['emin']    = 0.1
+        butterfly['emax']    = 100.0
+        butterfly['fit']     = True
+        butterfly['outfile'] = 'ctbutterfly_py2.dat'
+        butterfly['logfile'] = 'ctbutterfly_py2.log'
+        butterfly['chatter'] = 3
+
+        # Run ctbutterfly tool
+        butterfly.logFileOpen()   # Make sure we get a log file
+        butterfly.execute()
+
+        # Check result file
+        self._check_result_file('ctbutterfly_py2.dat')
+
         # Return
         return
 

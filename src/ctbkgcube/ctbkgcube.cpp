@@ -216,48 +216,28 @@ void ctbkgcube::run(void)
     double logEmin    = std::log10(m_background.energies()[0].TeV());
     double logEmax    = std::log10(m_background.energies()[n-1].TeV());
     int    nrequired  = int((logEmax - logEmin) * 25.0);
-    if ((n < nrequired) && logTerse()) {
-        log << std::endl;
-        log << "WARNING: ";
-        log << "Only " << n-1 << " energy bins have been requested. This may be "
-               "too few energy bins.";
-        log << std::endl << "         ";
-        log << "At least 25 bins per decade in energy are recommended, which "
-               "in your case";
-        log << std::endl << "         ";
-        log << "would be " << nrequired-1 << " bins. Consider increasing the "
-               "number of energy bins.";
-        log << std::endl;
-    }
-
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Initialise background cube");
+    if (n < nrequired) {
+        std::string msg = "\nWARNING: Only "+gammalib::str(n-1)+" energy bins "
+                          "have been requested. This may be too few energy "
+                          "bins.\n         At least 25 bins per decade in "
+                          "energy are recommended, which in your case\n"
+                          "         would be "+gammalib::str(nrequired-1)+
+                          " bins. Consider increasing the number of energy "
+                          "bins.";
+        log_string(TERSE, msg);
     }
 
     // Initialise exposure cube
     init_cube();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Observation",m_obs.size()));
-        log << m_obs.print(m_chatter) << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
-    // Log input model
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Input model");
-        log << m_obs.models().print(m_chatter) << std::endl;
-    }
+    // Write input model container into logger
+    log_models(NORMAL, m_obs.models(), "Input model");
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Prepare model");
-    }
+    log_header1(TERSE, "Prepare model");
 
     // Copy models from observation container and reset output model
     // container
@@ -289,22 +269,11 @@ void ctbkgcube::run(void)
             } // endif: had a background model
         } // endif: had a CTA, HESS, MAGIC or VERITAS model
 
-        // Log results
-        if (logTerse()) {
-            if (remove) {
-                log << gammalib::parformat("Remove model");
-            }
-            else {
-                log << gammalib::parformat("Keep model");
-            }
-            log << m_bkgmdl[i]->name();
-            log << " ";
-            log << m_bkgmdl[i]->type();
-            log << "(";
-            log << m_bkgmdl[i]->instruments();
-            log << ")";
-            log << std::endl;
-        }
+        // Log model removal or keeping
+        std::string what  = (remove) ? "Remove model" : "Keep model";
+        std::string value = m_bkgmdl[i]->name()+" "+m_bkgmdl[i]->type()+"("+
+                            m_bkgmdl[i]->instruments()+")";
+        log_value(NORMAL, what, value);
 
         // If removal is requested, append model to output container and
         // remove it from the background model container ...
@@ -316,16 +285,16 @@ void ctbkgcube::run(void)
     } // endfor: looped over all background models
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate background cube");
-    }
+    log_header1(TERSE, "Generate background cube");
 
     // Assign background models to container
     m_obs.models(m_bkgmdl);
 
+    // Set pointer on logger depending on chattiness
+    GLog* logp = (logNormal()) ? &log : NULL;
+
     // Fill background cube from observations
-    m_background.fill(m_obs, &log);
+    m_background.fill(m_obs, logp);
 
     // Create a background model for the output background cube and append
     // that model to the input model in place of the original
@@ -347,17 +316,11 @@ void ctbkgcube::run(void)
     // Append model to output container
     m_outmdl.append(model);
 
-    // Log background cube
-    if (logTerse()) {
-        log << m_background.print(m_chatter) << std::endl;
-    }
+    // Write background cube into logger
+    log_string(NORMAL, m_background.print(m_chatter));
 
-    // Log output model
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Output model");
-        log << m_outmdl << std::endl;
-    }
+    // Write input model container into logger
+    log_models(NORMAL, m_outmdl, "Output model");
 
     // Recover original models
     m_obs.models(models_orig);
@@ -381,10 +344,7 @@ void ctbkgcube::run(void)
 void ctbkgcube::save(void)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save background cube");
-    }
+    log_header1(TERSE, "Save background cube");
 
     // Get background cube and model file names
     m_outcube  = (*this)["outcube"].filename();
@@ -393,11 +353,8 @@ void ctbkgcube::save(void)
     // Save only if filename is non-empty
     if (!m_outcube.is_empty()) {
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Background cube file");
-            log << m_outcube.url() << std::endl;
-        }
+        // Log background cube file name
+        log_value(NORMAL, "Background cube file", m_outcube.url());
 
         // Save background cube
         m_background.save(m_outcube, clobber());
@@ -408,11 +365,8 @@ void ctbkgcube::save(void)
     if ((!m_outmodel.is_empty()) &&
         (gammalib::tolower(m_outmodel.url()) != "none")) {
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Model definition file");
-            log << m_outmodel.url() << std::endl;
-        }
+        // Log model definition file name
+        log_value(NORMAL, "Model definition file", m_outmodel.url());
 
         // Save output model for stacked analyses
         m_outmdl.save(m_outmodel.url());
@@ -432,10 +386,7 @@ void ctbkgcube::save(void)
 void ctbkgcube::publish(const std::string& name)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish background cube");
-    }
+    log_header1(TERSE, "Publish background cube");
 
     // Set default name is user name is empty
     std::string user_name(name);
@@ -443,11 +394,8 @@ void ctbkgcube::publish(const std::string& name)
         user_name = CTBKGCUBE_NAME;
     }
 
-    // Log filename
-    if (logTerse()) {
-        log << gammalib::parformat("Publish background cube");
-        log << user_name << std::endl;
-    }
+    // Log background cube name
+    log_value(NORMAL, "Publish background cube", user_name);
 
     // Publish exposure cube
     m_background.cube().publish(user_name);
@@ -614,6 +562,9 @@ void ctbkgcube::get_parameters(void)
  ***************************************************************************/
 void ctbkgcube::init_cube(void)
 {
+    // Write header
+    log_header1(TERSE, "Initialise background cube");
+
     // Extract exposure cube definition
     const GWcs* proj   = static_cast<const GWcs*>(m_background.cube().projection());
     std::string wcs    = m_background.cube().projection()->code();
@@ -631,11 +582,8 @@ void ctbkgcube::init_cube(void)
     // If requested, insert energies at all event list energy boundaries
     if (m_addbounds) {
 
-        // Set logger
-        GLog* logger = NULL;
-        if (logTerse()) {
-            logger = &log;
-        }
+        // Set pointer on logger depending on chattiness
+        GLog* logp = (logNormal()) ? &log : NULL;
     
         // Loop over all observations
         for (int i = 0; i < m_obs.size(); ++i) {
@@ -655,7 +603,7 @@ void ctbkgcube::init_cube(void)
             }
 
             // Insert energy boundaries
-            energies = insert_energy_boundaries(energies, *cta, logger);
+            energies = insert_energy_boundaries(energies, *cta, logp);
 
         } // endfor: looped over all observations
 
@@ -664,10 +612,8 @@ void ctbkgcube::init_cube(void)
     // Setup background cube
     m_background = GCTACubeBackground(wcs, coords, x, y, dx, dy, nx, ny, energies);
 
-    // Log background cube
-    if (logTerse()) {
-        log << m_background.print(m_chatter) << std::endl;
-    }
+    // Write background cube into logger
+    log_string(NORMAL, m_background.print(m_chatter));
 
     // Return
     return;
