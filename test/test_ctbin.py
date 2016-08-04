@@ -152,9 +152,7 @@ class Test(test):
         bin['chatter']  = 2
 
         # Run ctbin tool
-        #bin.logFileOpen()   # Make sure we get a log file, but this leads
-                             # to a segmentation fault on Linux, e.g. CentOS 6.
-                             # see issue #1823 (need to fix that)
+        bin.logFileOpen()
         bin.run()
 
         # Check content of observation container and counts cube
