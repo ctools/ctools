@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -118,14 +119,22 @@ class Test(test):
         self.test_value(bin.cube().size(), 0,
              'Check that empty ctbin has an empty counts cube')
 
-        # Check that saving and publishing does nothing
-        bin['debug']   = True
+        # Check that saving does not nothing
+        bin['logfile'] = 'ctbin_py0.log'
         bin['outcube'] = 'ctbin_py0.fits'
-        #bin.save()          # Segfaults, see issue #1835
-        #bin.publish()       # Segfaults, see issue #1835
+        bin.logFileOpen()
+        bin.save()
+        self.test_assert(not os.path.isfile('ctbin_py0.fits'),
+             'Check that no counts cube has been created')
 
-        # Set ctbin parameters
-        bin = ctools.ctbin()
+        # Check that publishing does not lead to an exception or segfault
+        bin.publish()
+
+        # Check that clearing does not lead to an exception or segfault
+        bin.clear()
+
+        # Now set ctbin parameters
+        #bin = ctools.ctbin()
         bin['inobs']    = self._events
         bin['outcube']  = 'ctbin_py1.fits'
         bin['ebinalg']  = 'LOG'

@@ -276,7 +276,7 @@ void ctool::copy_members(const ctool& app)
 void ctool::free_members(void)
 {
     // Write separator into logger
-    log_string(TERSE, "\n");
+    log_string(TERSE, "");
 
     // Return
     return;

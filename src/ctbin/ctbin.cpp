@@ -304,8 +304,9 @@ void ctbin::save(void)
     // Get counts cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outcube.is_empty()) {
+    // Save only if filename is not empty and if there is at least one
+    // observation
+    if (!m_outcube.is_empty() && m_obs.size() > 0) {
 
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);

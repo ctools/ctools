@@ -42,6 +42,10 @@ ctbin - CTA event binning
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
 
+The save() method led to a segmentation violation in case it was applied on an
+empty ctbin instance, and specifically in case that the instance contains an
+empty observation container. This bug has been fixed (#1835).
+
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
