@@ -90,10 +90,10 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check observation definition XML file
-        self._check_obsdef('csiactobs_obs_cmd1.xml')
+        self._check_obsdef('csiactobs_obs_cmd1.xml', 6)
 
         # Check model definition XML file
-        self._check_moddef('csiactobs_bgd_cmd1.xml')
+        self._check_moddef('csiactobs_bgd_cmd1.xml', 6)
 
         # Setup csiactobs command
         cmd = csiactobs+' datapath="data_path_that_does_not_exist"'+ \
@@ -146,13 +146,13 @@ class Test(test):
         iactobs.save()
 
         # Check observation definition XML file
-        self._check_obsdef('csiactobs_obs_py1.xml')
+        self._check_obsdef('csiactobs_obs_py1.xml', 6)
         
         # Check model definition XML file
-        self._check_moddef('csiactobs_bgd_py1.xml')
+        self._check_moddef('csiactobs_bgd_py1.xml', 6)
         
         # Create test runlist
-        runlist = ['0']
+        runlist = ['15000','15001']
            
         # Set-up csiactobs using a runlist with 2 background parameters
         iactobs = cscripts.csiactobs()
@@ -171,16 +171,16 @@ class Test(test):
         iactobs.save()
            
         # Test return functions
-        self.test_value(iactobs.obs().size(), 1,
+        self.test_value(iactobs.obs().size(), 2,
                         'Check number of observations in container')
         self.test_value(iactobs.ebounds().size(), 0,
                         'Check number of energy boundaries')
    
         # Check observation definition XML file
-        self._check_obsdef('csiactobs_obs_py2.xml')
+        self._check_obsdef('csiactobs_obs_py2.xml',2)
            
         # Check model definition XML file
-        self._check_moddef('csiactobs_bgd_py2.xml')
+        self._check_moddef('csiactobs_bgd_py2.xml',2)
            
         # Set-up csiactobs with a large number of free parameters and "aeff"
         # background
@@ -199,10 +199,10 @@ class Test(test):
         iactobs.execute()
         
         # Check observation definition XML file
-        self._check_obsdef('csiactobs_obs_py3.xml')
+        self._check_obsdef('csiactobs_obs_py3.xml',6)
             
         # Check model definition XML file
-        self._check_moddef('csiactobs_bgd_py3.xml')
+        self._check_moddef('csiactobs_bgd_py3.xml',6)
             
         # Set-up csiactobs with a "gauss" background and "inmodel" parameter
         iactobs = cscripts.csiactobs()
@@ -222,56 +222,85 @@ class Test(test):
         iactobs.run()
         
         # Check number of observations
-        self.test_value(iactobs.obs().size(), 1,
+        self.test_value(iactobs.obs().size(), 6,
                         'Check number of observations in container')
 
         # Check number of models
-        self.test_value(iactobs.obs().models().size(), 3,
-                        'Check number of models in container')
+        self.test_value(iactobs.obs().models().size(), 8,
+                        'Check number of models in container')        
+        
+        # Set-up csiactobs with a "gauss" background and "inmodel" parameter
+        iactobs = cscripts.csiactobs()
+        iactobs['datapath']      = self._datapath
+        iactobs['inmodel']       = self._model
+        iactobs['prodname']      = 'unit-test'
+        iactobs['infile']        = self._runlist
+        iactobs['bkgpars']       = 1
+        iactobs['bkg_mod_hiera'] = 'irf'
+        iactobs['outobs']        = 'NONE'
+        iactobs['outmodel']      = 'NONE'
+        iactobs['logfile']       = 'csiactobs_py4.log'
+        iactobs['chatter']       = 4
+   
+        # Run csiactobs script
+        iactobs.logFileOpen()   # Make sure we get a log file
+        iactobs.run()
+        
+        # Check number of observations
+        self.test_value(iactobs.obs().size(), 5,
+                        'Check number of observations in container')
+
+        # Check number of models
+        self.test_value(iactobs.obs().models().size(), 7,
+                        'Check number of models in container')     
 
         # Return
         return
 
     # Check observation definition XML file
-    def _check_obsdef(self, filename):
+    def _check_obsdef(self, filename, obs_expected):
         """
         Check observation definition XML file
         """
         # Load observation definition XML file
         obs = gammalib.GObservations(filename)
 
-        # Get response
-        rsp = obs[0].response()
-
         # Check number of observations
-        self.test_value(obs.size(), 1,
-                        'Check for single observation in XML file')
-        self.test_value(obs[0].eventfile().file(), 'events.fits.gz',
-                        'Check event file name')
-        self.test_value(obs[0].eventfile().extname(), 'EVENTS',
-                        'Check event extension name')
-        self.test_value(rsp.aeff().filename().file(), 'irf_file.fits.gz',
-                        'Check effective area file name')
-        self.test_value(rsp.aeff().filename().extname(), 'EFFECTIVE AREA',
-                        'Check effective area extension name')
-        self.test_value(rsp.psf().filename().file(), 'irf_file.fits.gz',
-                        'Check point spread function file name')
-        self.test_value(rsp.psf().filename().extname(), 'POINT SPREAD FUNCTION',
-                        'Check point spread function extension name')
-        self.test_value(rsp.edisp().filename().file(), 'irf_file.fits.gz',
-                        'Check energy dispersion file name')
-        self.test_value(rsp.edisp().filename().extname(), 'ENERGY DISPERSION',
-                        'Check energy dispersion extension name')
-        self.test_value(rsp.background().filename().file(), 'irf_file.fits.gz',
-                        'Check background file name')
-        self.test_value(rsp.background().filename().extname(), 'BACKGROUND',
-                        'Check background extension name')
+        self.test_value(obs.size(), obs_expected,
+                        'Check for '+str(obs_expected)+' observations in XML file')
+        
+        if obs_expected > 0:
+            
+            # Get response
+            rsp = obs[0].response()
+            
+            # Test response
+            self.test_value(obs[0].eventfile().file(), 'events_0.fits.gz',
+                            'Check event file name')
+            self.test_value(obs[0].eventfile().extname(), 'EVENTS',
+                            'Check event extension name')
+            self.test_value(rsp.aeff().filename().file(), 'irf_file.fits.gz',
+                            'Check effective area file name')
+            self.test_value(rsp.aeff().filename().extname(), 'EFFECTIVE AREA',
+                            'Check effective area extension name')
+            self.test_value(rsp.psf().filename().file(), 'irf_file.fits.gz',
+                            'Check point spread function file name')
+            self.test_value(rsp.psf().filename().extname(), 'POINT SPREAD FUNCTION',
+                            'Check point spread function extension name')
+            self.test_value(rsp.edisp().filename().file(), 'irf_file.fits.gz',
+                            'Check energy dispersion file name')
+            self.test_value(rsp.edisp().filename().extname(), 'ENERGY DISPERSION',
+                            'Check energy dispersion extension name')
+            self.test_value(rsp.background().filename().file(), 'irf_file.fits.gz',
+                            'Check background file name')
+            self.test_value(rsp.background().filename().extname(), 'BACKGROUND',
+                            'Check background extension name')
         
         # Return
         return
 
     # Check model XML file
-    def _check_moddef(self, filename):
+    def _check_moddef(self, filename, models_expected):
         """
         Check model definition XML file
         """
@@ -279,8 +308,8 @@ class Test(test):
         models = gammalib.GModels(filename)
 
         # Check number of models
-        self.test_value(models.size(), 1,
-                        'Check for single model in XML file')
+        self.test_value(models.size(), models_expected,
+                        'Check for '+str(models_expected)+' models in XML file')
 
         # Return
         return

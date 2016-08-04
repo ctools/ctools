@@ -336,7 +336,7 @@ class csobsdef(ctools.cscript):
             # Write observation into logger
             name  = obs.instrument()+' observation'
             value = 'Name="%s" ID="%s"' % (obs.name(), obs.id())
-            self._log_value(gammalib.TERSE, name, value)
+            self._log_value(gammalib.NORMAL, name, value)
             self._log_string(gammalib.EXPLICIT, str(obs)+'\n')
 
             # Append observation
@@ -385,6 +385,17 @@ class csobsdef(ctools.cscript):
 
         # Return
         return
+
+    def obs(self):
+        """
+        Returns observation container
+        -----
+        Returns
+        obs : `~gammalib.GObservations`
+            Observation container
+        """
+        # Return container
+        return self._obs
 
     def pntdef(self, csv):
         """

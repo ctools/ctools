@@ -155,30 +155,44 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/model_filefunction.txt \
            $(top_srcdir)/test/data/model_map.fits.gz \
            $(top_srcdir)/test/data/model_mapcube.fits.gz \
-           $(top_srcdir)/test/data/iact_runlist.dat
+           $(top_srcdir)/test/data/iact_runlist.dat \
+           $(top_srcdir)/test/data/iact_runlist_1.dat \
+           $(top_srcdir)/test/data/iact_runlist_2.dat
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \
                $(top_srcdir)/test/data/iactdata/master.json \
-               $(top_srcdir)/test/data/iactdata/obs-index.fits.gz \
-               $(top_srcdir)/test/data/iactdata/irf_file.fits.gz \
-               $(top_srcdir)/test/data/iactdata/events.fits.gz
+               $(top_srcdir)/test/data/iactdata/obs-index.fits.gz
+
+# Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata/events
+testiactevents = $(top_srcdir)/test/data/iactdata/events/irf_file.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_0.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_1.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_2.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_3.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_4.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_5.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_6.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_7.fits.gz \
+                 $(top_srcdir)/test/data/iactdata/events/events_8.fits.gz
 
 # Install scripts, parfiles, test scripts and test data. Note that we don't
 # need to prepend $(DESTDIR) here (not fully clear why, but that's the way
 # it is)
-binscriptsdir      = $(bindir)
-binscripts_DATA    = $(binscripts)
-pythonscriptsdir   = $(pyexecdir)/cscripts
-pythonscripts_DATA = $(pythonscripts)
-pfilesdir          = $(prefix)/syspfiles
-pfiles_DATA        = $(parfiles)
-testscriptsdir     = $(pyexecdir)/cscripts/tests
-testscripts_DATA   = $(testscripts)
-testdatadir        = $(pyexecdir)/cscripts/tests/data
-testdata_DATA      = $(testdata)
-testiactdatadir    = $(pyexecdir)/cscripts/tests/data/iactdata
-testiactdata_DATA  = $(testiactdata)
+binscriptsdir       = $(bindir)
+binscripts_DATA     = $(binscripts)
+pythonscriptsdir    = $(pyexecdir)/cscripts
+pythonscripts_DATA  = $(pythonscripts)
+pfilesdir           = $(prefix)/syspfiles
+pfiles_DATA         = $(parfiles)
+testscriptsdir      = $(pyexecdir)/cscripts/tests
+testscripts_DATA    = $(testscripts)
+testdatadir         = $(pyexecdir)/cscripts/tests/data
+testdata_DATA       = $(testdata)
+testiactdatadir     = $(pyexecdir)/cscripts/tests/data/iactdata
+testiactdata_DATA   = $(testiactdata)
+testiacteventsdir   = $(pyexecdir)/cscripts/tests/data/iactdata/events
+testiactevents_DATA = $(testiactdata)
 
 # Files to be distributed in the tar file
 EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \

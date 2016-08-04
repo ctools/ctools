@@ -74,7 +74,7 @@ class Test(test):
         # Setup csfindobs command
         cmd = csfindobs+' datapath="'+self._datapath+'"'+ \
                         ' prodname="unit-test"'+ \
-                        ' ra=83.63 dec=22.01 rad=1.0'+ \
+                        ' ra=83.63 dec=22.01 rad=1.5'+ \
                         ' outfile="runlist_cmd1.dat"'+ \
                         ' logfile="csfindobs_cmd1.log" chatter=1'
 
@@ -87,12 +87,12 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check run list
-        self._check_runlist('runlist_cmd1.dat')
+        self._check_runlist('runlist_cmd1.dat',5)
 
         # Setup csfindobs command
         cmd = csfindobs+' datapath="path_that_does_not_exist"'+ \
                         ' prodname="unit-test"'+ \
-                        ' ra=83.63 dec=22.01 rad=1.0'+ \
+                        ' ra=83.63 dec=22.01 rad=1.5'+ \
                         ' outfile="runlist_cmd2.dat"'+ \
                         ' logfile="csfindobs_cmd2.log"'
 
@@ -114,10 +114,10 @@ class Test(test):
         findobs['prodname'] = 'unit-test'
         findobs['ra']       = 83.63
         findobs['dec']      = 22.01
-        findobs['rad']      = 1.0
+        findobs['rad']      = 1.5
         findobs['outfile']  = 'runlist_py1.dat'
         findobs['logfile']  = 'csfindobs_py1.log'
-        findobs['chatter']  = 2
+        findobs['chatter']  = 4
 
         # Run csfindobs script
         findobs.logFileOpen()   # Make sure we get a log file
@@ -125,16 +125,16 @@ class Test(test):
 
         # Check list of runs
         runs = findobs.runs()
-        self.test_value(len(runs), 1,
+        self.test_value(len(runs), 5,
                         'Check for number of runs in runlist')
-        self.test_value(str(runs[0]), '0',
+        self.test_value(str(runs[0]), '15000',
                         'Check run ID in runlist')
 
         # Save run list
         findobs.save()
 
         # Check run list
-        self._check_runlist('runlist_py1.dat')
+        self._check_runlist('runlist_py1.dat', runs=5)
 
         # Set-up csfindobs for undefined spatial parameters
         findobs = cscripts.csfindobs()
@@ -151,16 +151,16 @@ class Test(test):
         findobs.execute()
 
         # Check run list
-        self._check_runlist('runlist_py2.dat')
+        self._check_runlist('runlist_py2.dat', runs=9)
 
         # Set-up csfindobs for user expression
         findobs = cscripts.csfindobs()
         findobs['datapath']   = self._datapath
         findobs['prodname']   = 'unit-test'
-        findobs['ra']         = 83.63
-        findobs['dec']        = 22.01
-        findobs['rad']        = 0.0
-        findobs['expression'] = 'ONTIME<10.0'
+        findobs['ra']         = 329.71
+        findobs['dec']        = -30.2339
+        findobs['rad']        = 2.0
+        findobs['expression'] = 'ONTIME<5.0'
         findobs['outfile']    = 'runlist_py3.dat'
         findobs['logfile']    = 'csfindobs_py3.log'
         findobs['chatter']    = 4
@@ -195,7 +195,7 @@ class Test(test):
         if runs > 0:
             self.test_value(runlist.ncols(), 1,
                             'Check for single column in runlist file')
-            self.test_value(runlist[0,0], '0',
+            self.test_value(runlist[0,0], '15000',
                             'Check for run ID in runlist file')
         
         # Return
