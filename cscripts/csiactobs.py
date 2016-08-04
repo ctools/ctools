@@ -172,8 +172,10 @@ class csiactobs(ctools.cscript):
             
             # Check if prodname is present
             if self._prodname == config['name']:
-                self._hdu_index = str(os.path.join(self._datapath, config['hduindx']))
-                self._obs_index = str(os.path.join(self._datapath, config['obsindx']))
+                self._hdu_index = str(os.path.join(self._datapath,
+                                                   config['hduindx']))
+                self._obs_index = str(os.path.join(self._datapath,
+                                                   config['obsindx']))
                 
                 # Leave loop if index file names were found
                 break
@@ -292,7 +294,9 @@ class csiactobs(ctools.cscript):
                 spec = gammalib.GModelSpectralNodes()
                 
                 # Create logarithmic energy nodes
-                bounds = gammalib.GEbounds(self._bkgpars,gammalib.GEnergy(emin,'TeV'),gammalib.GEnergy(emax,'TeV'), True)
+                bounds = gammalib.GEbounds(self._bkgpars,
+                                           gammalib.GEnergy(emin,'TeV'),
+                                           gammalib.GEnergy(emax,'TeV'), True)
                 
                 # Loop over bounds and set intensity value
                 for i in range(bounds.size()):     
@@ -319,7 +323,8 @@ class csiactobs(ctools.cscript):
         # Return spectrum
         return spec
 
-    def _iact_background(self, telescope, obs_id, bkg_scale, bkgtype, emin=0.01, emax=100):
+    def _iact_background(self, telescope, obs_id, bkg_scale, bkgtype,
+                         emin=0.01, emax=100):
         """
         Create an IACT background model
         
@@ -348,27 +353,35 @@ class csiactobs(ctools.cscript):
             prefactor *= bkg_scale
             
             # Create background spectrum
-            spec       = self._background_spectrum(prefactor, index, emin, emax)
+            spec = self._background_spectrum(prefactor, index, emin, emax)
             
-            # Create background model instance
+            # Create background model
             bck = gammalib.GCTAModelIrfBackground(spec)
         
         # Set AeffBackground   
         elif bkgtype == 'aeff':
+
+            # Set background components
             prefactor = bkg_scale * self._bkg_aeff_norm
-            spec      = self._background_spectrum(prefactor, self._bkg_aeff_index, emin, emax)
+            spec      = self._background_spectrum(prefactor,
+                                                  self._bkg_aeff_index,
+                                                  emin, emax)
                 
-            # Create background model instance
+            # Create background model
             bck = gammalib.GCTAModelAeffBackground(spec)
             
         # Set Gaussian Background
         elif bkgtype == 'gauss':
+
+            # Set background components
             prefactor = bkg_scale * self._bkg_gauss_norm
-            
-            # Create background spectrum
-            spec      = self._background_spectrum(prefactor, self._bkg_gauss_index, emin, emax)
+            spec      = self._background_spectrum(prefactor,
+                                                  self._bkg_gauss_index,
+                                                  emin, emax)
             radial    = gammalib.GCTAModelRadialGauss(self._bkg_gauss_sigma)
-            bck       = gammalib.GCTAModelRadialAcceptance(radial, spec)
+
+            # Create background model
+            bck = gammalib.GCTAModelRadialAcceptance(radial, spec)
         
         else:
             msg = 'Background type "'+bkgtype+'" unsupported'
@@ -422,7 +435,7 @@ class csiactobs(ctools.cscript):
         Write observation summary
         """
         # Log header
-        self._log_header1(gammalib.TERSE, 'Observation summary')
+        self._log_header1(gammalib.NORMAL, 'Observation summary')
 
         # Set energy range dependent on whether boundaries exist or
         # not
@@ -444,16 +457,16 @@ class csiactobs(ctools.cscript):
         
         Parameters
         ----------
-        hdu : `gammalib.GFitsTable`
+        hdu : `~gammalib.GFitsTable`
             HDU FITS table
-        hierarchy : list of strings
+        hierarchy : list of str
             List of strings containing the hierarchy how to look for files
-        formats : list of strings
+        formats : list of str
             File formats available for this observation
         
         Returns
         -------
-        filename : string
+        filename : str
             Filename of requested file
         """
         
@@ -477,8 +490,8 @@ class csiactobs(ctools.cscript):
         # Build filename from information stored in hduindx_hdu
         if index >= 0:
             filename  = os.path.join(self._subdir,
-                                      hdu['FILE_DIR'][index],
-                                      hdu['FILE_NAME'][index])
+                                     hdu['FILE_DIR'][index],
+                                     hdu['FILE_NAME'][index])
             filehdu   = hdu['HDU_NAME'][index]
             filename += '['+filehdu+']'
 
@@ -492,17 +505,17 @@ class csiactobs(ctools.cscript):
         
         Parameters
         ----------
-        filename : string
+        filename : str
             Filename
         obs_id : int
             Observation ID
-        filetype : string
+        filetype : str
             Type of file
         
         Returns
         -------
         present : bool
-            Flag signaling if file is present
+            True if filename is present, False otherwise
         """
                 
         # Initialise return value
@@ -513,17 +526,18 @@ class csiactobs(ctools.cscript):
         
         # Check if file is empty
         if fname.is_empty():
-            self._log_string(gammalib.TERSE, 'Skipping observation '+str(obs_id)+
-                          ': No '+filetype+' found\n')
+            msg = 'Skipping observation "%s": No %s found' % (obs_id, filetype)
+            self._log_string(gammalib.NORMAL, msg)
             present = False
         
         # Check if file exists
         elif not fname.exists():
-            self._log_string(gammalib.TERSE, 'Skipping observation '+str(obs_id)+
-                          ': '+filetype+' "'+filename+'" does not exist\n')
+            msg = ('Skipping observation "%s": %s "%s" does not exist' %
+                   (obs_id, filetype, filename))
+            self._log_string(gammalib.NORMAL, msg)
             present = False
         
-        # Return boolean
+        # Return present flag
         return present    
 
 
@@ -548,9 +562,8 @@ class csiactobs(ctools.cscript):
         lib = self._xml.element('observation_list', 0)
 
         # Log output
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Looping over '+str(len(self._runlist))+' runs')
+        msg = 'Looping over %d runs' % len(self._runlist)
+        self._log_header1(gammalib.TERSE, msg)
 
         # Initialise energy range values for logging
         self._ebounds.clear()
@@ -562,7 +575,8 @@ class csiactobs(ctools.cscript):
             obs_selection = '[OBS_ID=='+str(obs_id)+']'
             
             # Open HDU index file
-            hduindx     = gammalib.GFits(self._hdu_index+'[HDU_INDEX]'+obs_selection)
+            hduindx     = gammalib.GFits(self._hdu_index+'[HDU_INDEX]'+
+                                         obs_selection)
             hduindx_hdu = hduindx['HDU_INDEX']
             
             # Initialise types and formats
@@ -593,8 +607,9 @@ class csiactobs(ctools.cscript):
             if not gammalib.GFilename(edispfile).exists():
                 
                 # Print warning that edisp cannot be used for this observation
-                self._log_string(gammalib.TERSE, 'Warning: observation '+str(obs_id)+
-                              ' has no energy dispersion information\n')
+                msg = ('Warning: observation "%s" has no energy dispersion '
+                       'information' % obs_id)
+                self._log_string(gammalib.NORMAL, msg)
                 
                 # Set energy dispersion file as empty
                 edispfile = ''
@@ -615,23 +630,27 @@ class csiactobs(ctools.cscript):
                     # Remove IRF background if file doesnt exist
                     run_bkg_mod_hierarchy.remove('irf')
                 
-                    # Print warning that edisp cannot be used for this observation
-                    self._log_string(gammalib.TERSE, 'Warning: observation '+str(obs_id)+
-                                  ' has no background information (IRF background cannot be used)\n')
+                    # Print warning that edisp cannot be used for this
+                    # observation
+                    msg = ('Warning: observation "%s" has no background '
+                           'information (IRF background cannot be used)' %
+                           obs_id)
+                    self._log_string(gammalib.NORMAL, msg)
                 
                 # Check if background model hierarchy is empty
                 if len(run_bkg_mod_hierarchy) == 0:
                     
                     # Skip observation if no background can be used
-                    self._log_string(gammalib.TERSE, 'Skipping observation '+str(obs_id)+
-                                  ': No background can be used\n')
+                    msg = ('Skipping observation "%s": No background can be '
+                           'used' % obs_id)
+                    self._log_string(gammalib.NORMAL, msg)
                     continue
                 
                 else:
                     # Log if we fall back to next background approach
-                    self._log_string(gammalib.TERSE, 'Observation '+str(obs_id)+
-                                  ': Falling back to background "'+
-                                  run_bkg_mod_hierarchy[0]+'"\n')
+                    msg = ('Observation "%s": Falling back to background "%s"' %
+                           (obs_id, run_bkg_mod_hierarchy[0]))
+                    self._log_string(gammalib.NORMAL, msg)
 
             # Close hdu index file
             hduindx.close()
@@ -643,7 +662,8 @@ class csiactobs(ctools.cscript):
             if self._use_bkg_scale:
                 
                 # Read background scale from fits file
-                obsindx   = gammalib.GFits(self._obs_index+'[OBS_INDEX]'+obs_selection)
+                obsindx   = gammalib.GFits(self._obs_index+'[OBS_INDEX]'+
+                                           obs_selection)
                 bkg_scale = obsindx['OBS_INDEX']['BKG_SCALE'][0]
                 obsindx.close()
             
@@ -722,17 +742,20 @@ class csiactobs(ctools.cscript):
             obs.append(bck)
 
             # Log the observation ID and object name that has been appended
-            self._log_value(gammalib.TERSE, 'Append observation', '%s ("%s")' %
-                                            (obs_id, object_name))
+            self._log_value(gammalib.NORMAL, 'Append observation', '%s ("%s")' %
+                            (obs_id, object_name))
 
             # Log the file names of the event and response files
             self._log_value(gammalib.EXPLICIT, ' Event file', eventfile)
             self._log_value(gammalib.EXPLICIT, ' Effective area file', aefffile)
-            self._log_value(gammalib.EXPLICIT, ' Point spread function file', psffile)
-            self._log_value(gammalib.EXPLICIT, ' Energy dispersion file', edispfile)
+            self._log_value(gammalib.EXPLICIT, ' Point spread function file',
+                            psffile)
+            self._log_value(gammalib.EXPLICIT, ' Energy dispersion file',
+                            edispfile)
             self._log_value(gammalib.EXPLICIT, ' Background file', bkgfile)
             if self._use_bkg_scale:
-                self._log_value(gammalib.EXPLICIT, ' Background scale', bkg_scale)
+                self._log_value(gammalib.EXPLICIT, ' Background scale',
+                                bkg_scale)
 
         # Append models provided by "inmodel" to the model container
         self._append_inmodels()
@@ -742,8 +765,8 @@ class csiactobs(ctools.cscript):
 
         # Write warning in no observation could be used from runlist
         if lib.size() == 0:
-            self._log_string(gammalib.TERSE, 'WARNING: No observation was appended from specified '
-                      'runlist\n')
+            self._log_string(gammalib.NORMAL, 'WARNING: No observation was '
+                             'appended from specified runlist')
 
         # Return
         return       
@@ -772,28 +795,22 @@ class csiactobs(ctools.cscript):
         Save observation definition and model definition XML file
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Save XML files')
+        self._log_header1(gammalib.TERSE, 'Save XML files')
 
         # Get filenames
         outobs   = self['outobs'].filename()
         outmodel = self['outmodel'].filename()
 
-        # Log file name
-        if self._logTerse():
-            self._log(gammalib.parformat('Obs. definition XML file'))
-            self._log(outobs.url())
-            self._log('\n')
+        # Log observation definition file name
+        self._log_value(gammalib.NORMAL, 'Obs. definition XML file',
+                        outobs.url())
 
         # Save observation definition XML file
         self._xml.save(outobs.url())
 
-        # Log file name
-        if self._logTerse():
-            self._log(gammalib.parformat('Model definiton XML file'))
-            self._log(outmodel.url())
-            self._log('\n')
+        # Log model definition file name
+        self._log_value(gammalib.NORMAL, 'Model definiton XML file',
+                        outmodel.url())
 
         # Save model XML file
         self._models.save(outmodel.url())
