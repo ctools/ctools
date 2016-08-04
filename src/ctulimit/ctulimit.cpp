@@ -237,17 +237,8 @@ void ctulimit::run(void)
         }
     }
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
     // Save original models
     GModels models_orig = m_obs.models();
@@ -260,27 +251,21 @@ void ctulimit::run(void)
     m_best_logL = m_obs.logL();
     if (m_best_logL == 0.0) {
 
-        // Write header
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Compute best-fit likelihood");
-        }
+        // Write header into logger
+        log_header1(TERSE, "Compute best-fit likelihood");
 
-         // Optimize and save best log-likelihood
-         m_obs.optimize(m_opt);
-         m_obs.errors(m_opt);
-         m_best_logL = m_obs.logL();
+        // Optimize and save best log-likelihood
+        m_obs.optimize(m_opt);
+        m_obs.errors(m_opt);
+        m_best_logL = m_obs.logL();
 
-         // Store optimizer for later recovery
-         best_opt = m_opt;
+        // Store optimizer for later recovery
+        best_opt = m_opt;
 
-         // Write optimised model into logger
-         if (logTerse()) {
-             log << m_opt << std::endl;
-             log << gammalib::parformat("Maximum log likelihood");
-             log << gammalib::str(m_best_logL,3) << std::endl;
-             log << m_obs.models() << std::endl;
-         }
+        // Write optimised model into logger
+        log_string(NORMAL, m_opt.print(m_chatter));
+        log_value(NORMAL,"Maximum log likelihood",gammalib::str(m_best_logL,3));
+        log_string(NORMAL, m_obs.models().print(m_chatter));
 
     } // endif: likelihood was zero
 
@@ -299,34 +284,22 @@ void ctulimit::run(void)
     double parmax = std::min(m_model_par->factor_max(),
                              value + m_sigma_max * error);
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Compute upper limit");
-        log << gammalib::parformat("Model name");
-        log << m_skymodel->name() << std::endl;
-        log << gammalib::parformat("Parameter name");
-        log << m_model_par->name() << std::endl;
-        log << gammalib::parformat("Confidence level");
-        log << m_confidence*100.0 << "%" << std::endl;
-        log << gammalib::parformat("Log-likelihood difference");
-        log << m_dlogL << std::endl;
-        log << gammalib::parformat("Initial parameter range");
-        log << "[";
-        log << parmin;
-        log << ", ";
-        log << parmax;
-        log << "]" << std::endl;
-    }
+    // Write header into logger
+    log_header1(TERSE, "Compute upper limit");
+
+    // Write some parameters into logger
+    log_value(NORMAL, "Model name", m_skymodel->name());
+    log_value(NORMAL, "Parameter name", m_model_par->name());
+    log_value(NORMAL, "Confidence level", gammalib::str(m_confidence*100.0)+"%");
+    log_value(NORMAL, "Log-likelihood difference", m_dlogL);
+    log_value(NORMAL, "Initial parameter range",
+              "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
 
     // Compute upper limit
     ulimit_bisection(parmin, parmax);
 
-    // Write final parameter range
-    if (logTerse()) {
-        log << gammalib::parformat("Final parameter");
-        log << m_model_par->value() << std::endl;
-    }
+    // Write final parameter into logger
+    log_value(NORMAL, "Final parameter", m_model_par->value());
 
     // Get reference energy for differential upper limit
     GEnergy eref = GEnergy(m_eref, "TeV");
@@ -340,28 +313,21 @@ void ctulimit::run(void)
     m_flux_ulimit  = m_skymodel->spectral()->flux(emin, emax);
     m_eflux_ulimit = m_skymodel->spectral()->eflux(emin, emax);
 
-    // Write results to logfile
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Upper limit results");
-        log << gammalib::parformat("Differential flux limit");
-        log << m_diff_ulimit;
-        log << " ph/cm2/s/MeV at ";
-        log << m_eref << " TeV";
-        log << std::endl;
-        log << gammalib::parformat("Integral flux limit");
-        log << m_flux_ulimit;
-        log << " ph/cm2/s within [";
-        log << m_emin << "-" << m_emax;
-        log << "] TeV";
-        log << std::endl;
-        log << gammalib::parformat("Energy flux limit");
-        log << m_eflux_ulimit;
-        log << " erg/cm2/s within [";
-        log << m_emin << "-" << m_emax;
-        log << "] TeV";
-        log << std::endl;
-    }
+    // Write header into logger
+    log_header1(TERSE, "Upper limit results");
+
+    // Write result into logger
+    log_value(TERSE, "Differential flux limit",
+              gammalib::str(m_diff_ulimit)+" ph/cm2/s/MeV at "+
+              gammalib::str(m_eref)+" TeV");
+    log_value(TERSE, "Integral flux limit",
+              gammalib::str(m_flux_ulimit)+" ph/cm2/s within ["+
+              gammalib::str(m_emin)+"-"+
+              gammalib::str(m_emax)+"] TeV");
+    log_value(TERSE, "Energy flux limit",
+              gammalib::str(m_eflux_ulimit)+" erg/cm2/s within ["+
+              gammalib::str(m_emin)+"-"+
+              gammalib::str(m_emax)+"] TeV");
 
     // Recover original models
     m_obs.models(models_orig);
@@ -392,27 +358,6 @@ void ctulimit::run(void)
  ***************************************************************************/
 void ctulimit::save(void)
 {
-    /*
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save upper limit");
-    }
-
-    // Get output filename
-    m_outfile = (*this)["outfile"].filename();
-
-    // Create CSV table with 3 columns
-    GCsv table(1, 3);
-
-    table.real(0, 0, m_diff_ulimit);
-    table.real(0, 1, m_flux_ulimit);
-    table.real(0, 2, m_eflux_ulimit);
-
-    // Save CSV table
-    table.save(m_outfile, " ", clobber());
-    */
-    
     // Return
     return;
 }
@@ -440,6 +385,7 @@ void ctulimit::init_members(void)
     m_tol         = 1.0e-6;
     m_max_iter    = 50;
     m_apply_edisp = false;
+    m_chatter     = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_obs.clear();
@@ -479,6 +425,7 @@ void ctulimit::copy_members(const ctulimit& app)
     m_tol         = app.m_tol;
     m_max_iter    = app.m_max_iter;
     m_apply_edisp = app.m_apply_edisp;
+    m_chatter     = app.m_chatter;
 
     // Copy protected members
     m_obs          = app.m_obs;
@@ -543,14 +490,9 @@ void ctulimit::get_parameters(void)
 
     } // endif: no models were associated with observations
 
-    // Get name of test source and check container for this name
+    // Get name of test source. The get_model_parameter() method will check
+    // where a source with the given name exists in the model container.
     m_srcname = (*this)["srcname"].string();
-    if (!m_obs.models().contains(m_srcname)) {
-        std::string msg = "Source \""+m_srcname+"\" not found in model "
-                          "container. Please add a source with that name "
-                          "or check for possible typos.";
-        throw GException::invalid_value(G_GET_PARAMETERS, msg);
-    }
 
     // Get relevant model and parameter for upper limit computation
     get_model_parameter();
@@ -576,6 +518,9 @@ void ctulimit::get_parameters(void)
     m_tol      = (*this)["tol"].real();
     m_max_iter = (*this)["max_iter"].integer();
 
+    // Get remaining parameters
+    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
+
     // Write parameters into logger
     log_parameters(TERSE);
 
@@ -588,59 +533,73 @@ void ctulimit::get_parameters(void)
  * @brief Get application parameters
  *
  * @exception GException::invalid_value
- *            Did not find a valid model parameter
+ *            Did not find a valid model or model parameter
  *
  * Extracts a pointer to the sky model (m_skymodel) and a pointer to the
- * relevant model parameter (m_model_par) from the model container.
+ * relevant model parameter (m_model_par) from the model container. If no
  ***************************************************************************/
 void ctulimit::get_model_parameter(void)
 {
-    // Continue only if source model exists
-    if (m_obs.models().contains(m_srcname)) {
+    // Define list of valid spectral model parameters, terminated with a
+    // NULL pointer to signal the end of the list
+    const char* pars[] = {"Normalization", "Value", "Prefactor",
+                          "Integral", "PhotonFlux", "EnergyFlux",
+                          NULL};
 
-        // Get relevant model and parameter for upper limit computation.
-        GModels& models = const_cast<GModels&>(m_obs.models());
-        m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
-        if (m_skymodel == NULL) {
-            std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
-                              "Please specify the name of a sky model for "
-                              "upper limit computation.";
-            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-        }
-        if (m_skymodel->spectral()->type() == "NodeFunction") {
-            std::string msg = "\"NodeFunction\" cannot be used as spectral "
-                              "model for an upper limit computation. "
-                              "Please specify another spectral model.";
-            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-        }
-        if (m_skymodel->spectral()->has_par("Normalization")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Normalization"));
-        }
-        else if (m_skymodel->spectral()->has_par("Prefactor")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Prefactor"));
-        }
-        else if (m_skymodel->spectral()->has_par("PhotonFlux")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("PhotonFlux"));
-        }
-        else if (m_skymodel->spectral()->has_par("EnergyFlux")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("EnergyFlux"));
-        }
-        else if (m_skymodel->spectral()->has_par("Integral")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Integral"));
-        }
-        else if (m_skymodel->spectral()->has_par("Value")) {
-            m_model_par = &(m_skymodel->spectral()->operator[]("Value"));
-        }
-        else {
-            std::string msg = "Require spectral parameter \"Normalization\", "
-                              "\"Prefactor\", \"PhotonFlux\", \"EnergyFlux\", "
-                              "\"Integral\" or \"Value\" for "
-                              "upper limit computation. The specified source "
-                              "\""+m_srcname+"\" does not have such a parameter.";
-            throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
-        }
+    // Initialises sky model and model parameters pointers
+    m_skymodel  = NULL;
+    m_model_par = NULL;
 
-    } // endif: source model existed
+    // If the model container does not container the specified source then
+    // throw an exception
+    if (!m_obs.models().contains(m_srcname)) {
+        std::string msg = "Source \""+m_srcname+"\" not found in model "
+                          "container. Please add a source with that name "
+                          "or check for possible typos.";
+        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+    }
+
+    // Get relevant sky model for upper limit computation. If the model is not
+    // a sky model or if the model has a "NodeFunction" as spectral component
+    // then throw an exception.
+    GModels& models = const_cast<GModels&>(m_obs.models());
+    m_skymodel      = dynamic_cast<GModelSky*>(models[m_srcname]);
+    if (m_skymodel == NULL) {
+        std::string msg = "Source \""+m_srcname+"\" is not a sky model. Please "
+                          "specify the name of a sky model for upper limit "
+                          "computation.";
+        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+    }
+    if (m_skymodel->spectral()->type() == "NodeFunction") {
+        std::string msg = "\"NodeFunction\" cannot be used as spectral model "
+                          "for an upper limit computation. Please specify "
+                          "another spectral model.";
+        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+    }
+
+    // Find appropriate model parameter and store its pointer in the
+    // m_model_par member
+    for (const char** par = pars; *par != NULL; ++par) {
+        if (m_skymodel->spectral()->has_par(*par)) {
+            m_model_par = &(m_skymodel->spectral()->operator[](*par));
+            break;
+        }
+    }
+
+    // If no model parameter was found then throw an exception
+    if (m_model_par == NULL) {
+        std::string msg = "Require one of the following spectral "
+                          "parameters for upper limit computation: ";
+        for (const char** par = pars; *par != NULL; ++par) {
+            if (par != pars) {
+                msg.append(", ");
+            }
+            msg.append("\""+std::string(*par)+"\"");
+        }
+        msg.append(". The specified source \""+m_srcname+"\" does not "
+                   "have such a parameter.");
+        throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
+    }
 
     // Return
     return;
@@ -668,14 +627,8 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
     while (true) {
 
         // Log information
-        if (logExplicit()) {
-            log << gammalib::parformat("Iteration "+gammalib::str(iter));
-            log << "[";
-            log << wrk_min;
-            log << ", ";
-            log << wrk_max;
-            log << "]" << std::endl;
-        }
+        log_value(EXPLICIT, "Iteration "+gammalib::str(iter),
+                  "["+gammalib::str(wrk_min)+", "+gammalib::str(wrk_max)+"]");
 
         // Throw exception if maximum iterations are reached
         if (iter > m_max_iter) {

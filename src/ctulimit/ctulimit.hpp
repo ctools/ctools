@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015 by Michael Mayer                                    *
+ *  copyright (C) 2015-2016 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTULIMIT_NAME    "ctulimit"
-#define CTULIMIT_VERSION "01-00-00"
+#define CTULIMIT_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -94,6 +94,7 @@ protected:
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
     bool          m_apply_edisp;  //!< Apply energy dispersion?
+    GChatter      m_chatter;      //!< Chattiness
 
     // Protected members
     GObservations m_obs;          //!< Observation container
