@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-31 July 2016
+4 August 2016
 
 
 Introduction
@@ -27,82 +27,106 @@ None
 
 ctobssim - CTA observation simulation
 -------------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctselect - CTA event selection
 ------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctbin - CTA event binning
 -------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctskymap - CTA sky mapping
 --------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctexpcube - CTA exposure cube generation
 ----------------------------------------
 Set hidden "addbounds" parameter by default to "no" (#1819).
 
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
+
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
 Set hidden "addbounds" parameter by default to "no" (#1819).
+
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctedispcube - CTA energy dispersion cube generation
 ---------------------------------------------------
 Set hidden "addbounds" parameter by default to "no" (#1819).
 
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
+
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
 Set hidden "addbounds" parameter by default to "no" (#1819).
 
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
+
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctcubemask - CTA cube filtering
 -------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 ctulimit - Compute upper limit
 ------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
-None
+The clear() method now calls GApplication::clear() to conserve the properties
+of the tool (#1835).
 
 
 cscripts

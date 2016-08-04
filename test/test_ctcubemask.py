@@ -139,6 +139,7 @@ class Test(test):
         mask['outcube'] = 'ctcubemask_py2.fits'
         mask['logfile'] = 'ctcubemask_py2.log'
         mask['chatter'] = 3
+        mask['publish'] = True
 
         # Execute ctcubemask tool
         mask.logFileOpen()   # Make sure we get a log file
@@ -146,6 +147,21 @@ class Test(test):
 
         # Check result file
         self._check_result_file('ctcubemask_py2.fits', events=5542)
+
+        # Copy ctcubemask tool and execute copy
+        cpy_mask = mask
+        cpy_mask['outcube'] = 'ctcubemask_py3.fits'
+        cpy_mask['logfile'] = 'ctcubemask_py3.log'
+        cpy_mask['chatter']  = 4
+        cpy_mask.execute()
+
+        # Check result file
+        self._check_result_file('ctcubemask_py3.fits', events=5542)
+
+        # Clear ctcubemask tool
+        mask.clear()
+
+        # TODO: Do some test after clearing
 
         # Return
         return

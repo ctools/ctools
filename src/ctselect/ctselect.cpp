@@ -179,19 +179,25 @@ ctselect& ctselect::operator=(const ctselect& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear ctselect tool
+ *
+ * Clears ctselect tool.
  ***************************************************************************/
 void ctselect::clear(void)
 {
     // Free members
     free_members();
     this->ctool::free_members();
-    this->GApplication::free_members();
+
+    // Clear base class (needed to conserve tool name and version)
+    this->GApplication::clear();
 
     // Initialise members
-    this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
+
+    // Write header into logger
+    log_header();
 
     // Return
     return;

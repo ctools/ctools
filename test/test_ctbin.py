@@ -179,14 +179,14 @@ class Test(test):
         self._check_cube(evt, 5542)
 
         # Now clear ctbin tool
-        #bin.clear()         # Segfaults, see issue #1835
+        bin.clear()
 
         # Check that cleared ctbin has an empty observation container and
         # counts cube
-        #self.test_value(bin.obs().size(), 0,
-        #     'Check that empty ctbin has an empty observation container')
-        #self.test_value(bin.cube().size(), 0,
-        #     'Check that empty ctbin has an empty counts cube')
+        self.test_value(bin.obs().size(), 0,
+             'Check that empty ctbin has an empty observation container')
+        self.test_value(bin.cube().size(), 0,
+             'Check that empty ctbin has an empty counts cube')
 
         # Prepare observation container for stacked analysis
         cta = gammalib.GCTAObservation(self._events)

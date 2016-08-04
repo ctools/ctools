@@ -138,12 +138,32 @@ class Test(test):
         butterfly['logfile'] = 'ctbutterfly_py2.log'
         butterfly['chatter'] = 3
 
-        # Run ctbutterfly tool
+        # Execute ctbutterfly tool
         butterfly.logFileOpen()   # Make sure we get a log file
         butterfly.execute()
 
         # Check result file
         self._check_result_file('ctbutterfly_py2.dat')
+
+        # Recover observation container
+        obs = butterfly.obs()
+
+        # TODO: Do someting test on observation container
+
+        # Copy ctbkgcube tool and execute copy
+        cpy_butterfly = butterfly
+        cpy_butterfly['outfile'] = 'ctbutterfly_py3.dat'
+        cpy_butterfly['logfile'] = 'ctbutterfly_py3.log'
+        cpy_butterfly['chatter'] = 4
+        cpy_butterfly.execute()
+
+        # Check result file
+        self._check_result_file('ctbutterfly_py3.dat')
+
+        # Clear ctbkgcube tool
+        butterfly.clear()
+
+        # TODO: Do some test after clearing
 
         # Return
         return

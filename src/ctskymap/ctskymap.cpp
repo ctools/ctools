@@ -175,19 +175,25 @@ ctskymap& ctskymap::operator=(const ctskymap& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear ctskymap tool
+ *
+ * Clears ctskymap tool.
  ***************************************************************************/
 void ctskymap::clear(void)
 {
     // Free members
     free_members();
     this->ctool::free_members();
-    this->GApplication::free_members();
+
+    // Clear base class (needed to conserve tool name and version)
+    this->GApplication::clear();
 
     // Initialise members
-    this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
+
+    // Write header into logger
+    log_header();
 
     // Return
     return;

@@ -116,8 +116,6 @@ class Test(test):
         bkgcube['inobs']    = self._events
         bkgcube['inmodel']  = self._model
         bkgcube['incube']   = 'NONE'
-        bkgcube['outcube']  = 'ctbkgcube_py1.fits'
-        bkgcube['outmodel'] = 'ctbkgcube_py1.xml'
         bkgcube['caldb']    = self._caldb
         bkgcube['irf']      = self._irf
         bkgcube['ebinalg']  = 'LOG'
@@ -131,6 +129,8 @@ class Test(test):
         bkgcube['proj']     = 'CAR'
         bkgcube['xref']     = 83.63
         bkgcube['yref']     = 22.01
+        bkgcube['outcube']  = 'ctbkgcube_py1.fits'
+        bkgcube['outmodel'] = 'ctbkgcube_py1.xml'
         bkgcube['logfile']  = 'ctbkgcube_py1.log'
         bkgcube['chatter']  = 2
 
@@ -141,6 +141,87 @@ class Test(test):
 
         # Check result file
         self._check_result_file('ctbkgcube_py1.fits')
+
+        # Set-up ctbkgcube from counts cube
+        bkgcube = ctools.ctbkgcube()
+        bkgcube['inobs']     = self._events
+        bkgcube['inmodel']   = self._model
+        bkgcube['incube']    = self._cntcube
+        bkgcube['caldb']     = self._caldb
+        bkgcube['irf']       = self._irf
+        bkgcube['outcube']   = 'ctbkgcube_py2.fits'
+        bkgcube['outmodel']  = 'ctbkgcube_py2.xml'
+        bkgcube['logfile']   = 'ctbkgcube_py2.log'
+        bkgcube['chatter']   = 3
+        bkgcube['publish']   = True
+        bkgcube['addbounds'] = True
+
+        # Execute ctbkgcube tool
+        bkgcube.logFileOpen()   # Make sure we get a log file
+        bkgcube.execute()
+
+        # Check result file
+        self._check_result_file('ctbkgcube_py2.fits')
+
+        # Copy ctbkgcube tool and execute copied tool
+        cpy_bkgcube = bkgcube
+        cpy_bkgcube['outcube']  = 'ctbkgcube_py3.fits'
+        cpy_bkgcube['outmodel'] = 'ctbkgcube_py3.xml'
+        cpy_bkgcube['logfile']  = 'ctbkgcube_py3.log'
+        cpy_bkgcube['chatter']  = 4
+        cpy_bkgcube.execute()
+
+        # Check result file
+        self._check_result_file('ctbkgcube_py3.fits')
+
+        # Clear ctbkgcube tool
+        bkgcube.clear()
+
+        # TODO: Do some test after clearing of ctbkgcube tool
+
+        # Prepare observation container
+        obs1 = gammalib.GCTAObservation(self._events)
+        obs2 = gammalib.GCTAObservation(self._cntcube)
+        obs3 = gammalib.GLATObservation()
+        obs1.id('0001')
+        obs2.id('0002')
+        obs3.id('0001')
+        obs3.events(gammalib.GLATEventList())
+        obs = gammalib.GObservations()
+        obs.append(obs1)
+        obs.append(obs2)
+        obs.append(obs3)
+        obs.models(gammalib.GModels(self._model))
+
+        # Set-up ctbkgcube from observation container
+        bkgcube = ctools.ctbkgcube(obs)
+        #bkgcube['inobs']    = self._events
+        #bkgcube['inmodel']  = self._model
+        bkgcube['incube']   = 'NONE'
+        bkgcube['caldb']    = self._caldb
+        bkgcube['irf']      = self._irf
+        bkgcube['ebinalg']  = 'LOG'
+        bkgcube['emin']     = 0.1
+        bkgcube['emax']     = 100
+        bkgcube['enumbins'] = 20
+        bkgcube['nxpix']    = 10
+        bkgcube['nypix']    = 10
+        bkgcube['binsz']    = 0.4
+        bkgcube['coordsys'] = 'CEL'
+        bkgcube['proj']     = 'CAR'
+        bkgcube['xref']     = 83.63
+        bkgcube['yref']     = 22.01
+        bkgcube['outcube']  = 'ctbkgcube_py4.fits'
+        bkgcube['outmodel'] = 'ctbkgcube_py4.xml'
+        bkgcube['logfile']  = 'ctbkgcube_py4.log'
+        bkgcube['chatter']  = 4
+
+        # Execute ctbkgcube tool
+        bkgcube.logFileOpen()   # Make sure we get a log file
+        bkgcube.execute()
+
+        # Check result file
+        self._check_result_file('ctbkgcube_py4.fits')
 
         # Return
         return

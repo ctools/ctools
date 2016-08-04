@@ -176,19 +176,25 @@ ctbutterfly& ctbutterfly::operator=(const ctbutterfly& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear instance
+ * @brief Clear ctbutterfly tool
+ *
+ * Clears ctbutterfly tool.
  ***************************************************************************/
 void ctbutterfly::clear(void)
 {
     // Free members
     free_members();
     this->ctool::free_members();
-    this->GApplication::free_members();
+
+    // Clear base class (needed to conserve tool name and version)
+    this->GApplication::clear();
 
     // Initialise members
-    this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
+
+    // Write header into logger
+    log_header();
 
     // Return
     return;
@@ -313,10 +319,6 @@ void ctbutterfly::run(void)
     double cov_pg = m_covariance(inx_prefactor,inx_index);
     double cov_gg = m_covariance(inx_index,inx_index);
 
-    // Initialise min and max intensities
-    m_min_intensities.assign(m_ebounds.size(), 1e30);
-    m_max_intensities.assign(m_ebounds.size(), 0.0);
-
     // Compute eigenvectors and eigenvalues
     double  lambda1;
     double  lambda2;
@@ -345,6 +347,12 @@ void ctbutterfly::run(void)
 
     // Write header into logger
     log_header1(TERSE, "Generate butterfly");
+
+    // Initialise result arrays
+    m_energies.assign(m_ebounds.size(), 0.0);
+    m_intensities.assign(m_ebounds.size(), 0.0);
+    m_min_intensities.assign(m_ebounds.size(), 1e30);
+    m_max_intensities.assign(m_ebounds.size(), 0.0);
 
     // Walk around the error ellipse
     int    nt = 360;
@@ -382,7 +390,7 @@ void ctbutterfly::run(void)
 
             // Evaluate power law
             double intensity = plaw.eval(energy, time);
-            
+
             // Get extremes
             if (intensity < m_min_intensities[k]) {
                 m_min_intensities[k] = intensity;
@@ -395,13 +403,10 @@ void ctbutterfly::run(void)
 
     } // endfor: looped over all angles
 
-    // Write header into logger
-    log_header1(TERSE, "Results");
-
-    // Setup power law model
+    // Setup power law model for mean prefactor and index
     GModelSpectralPlaw plaw(prefactor_mean, index_mean, pivot);
 
-    // Show results
+    // Compute energy and intensity vectors for mean power law
     for (int k = 0; k < m_ebounds.size(); ++k) {
 
         // Get the energy of current bin
@@ -412,16 +417,24 @@ void ctbutterfly::run(void)
         double intensity = plaw.eval(energy, time);
 
         // Store results
-        m_energies.push_back(energy.MeV());
-        m_intensities.push_back(intensity);
+        m_energies[k]    = energy.MeV();
+        m_intensities[k] = intensity;
+
+    } // endfor: looped over energies
+
+    // Write header into logger
+    log_header1(TERSE, "Results");
+
+    // Show results
+    for (int k = 0; k < m_ebounds.size(); ++k) {
 
         // Write results into logger
-        log_value(NORMAL, "Intensity at "+energy.print(),
-                  gammalib::str(intensity)+" ("+
+        log_value(NORMAL, "Intensity at "+gammalib::str(m_energies[k])+" MeV",
+                  gammalib::str(m_intensities[k])+" ("+
                   gammalib::str(m_min_intensities[k])+", "+
                   gammalib::str(m_max_intensities[k])+") ph/cm2/s/MeV");
 
-    } // endfor
+    } // endfor: looped over energies
 
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {
