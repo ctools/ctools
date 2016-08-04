@@ -192,7 +192,7 @@ testdata_DATA       = $(testdata)
 testiactdatadir     = $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata_DATA   = $(testiactdata)
 testiacteventsdir   = $(pyexecdir)/cscripts/tests/data/iactdata/events
-testiactevents_DATA = $(testiactdata)
+testiactevents_DATA = $(testiactevents)
 
 # Files to be distributed in the tar file
 EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
