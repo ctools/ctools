@@ -619,6 +619,12 @@ void ctulimit::get_model_parameter(void)
         else if (m_skymodel->spectral()->has_par("Prefactor")) {
             m_model_par = &(m_skymodel->spectral()->operator[]("Prefactor"));
         }
+        else if (m_skymodel->spectral()->has_par("PhotonFlux")) {
+            m_model_par = &(m_skymodel->spectral()->operator[]("PhotonFlux"));
+        }
+        else if (m_skymodel->spectral()->has_par("EnergyFlux")) {
+            m_model_par = &(m_skymodel->spectral()->operator[]("EnergyFlux"));
+        }
         else if (m_skymodel->spectral()->has_par("Integral")) {
             m_model_par = &(m_skymodel->spectral()->operator[]("Integral"));
         }
@@ -627,7 +633,8 @@ void ctulimit::get_model_parameter(void)
         }
         else {
             std::string msg = "Require spectral parameter \"Normalization\", "
-                              "\"Prefactor\", \"Integral\" or \"Value\" for "
+                              "\"Prefactor\", \"PhotonFlux\", \"EnergyFlux\", "
+                              "\"Integral\" or \"Value\" for "
                               "upper limit computation. The specified source "
                               "\""+m_srcname+"\" does not have such a parameter.";
             throw GException::invalid_value(G_GET_MODEL_PARAMETER, msg);
