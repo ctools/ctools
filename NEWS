@@ -126,6 +126,9 @@ ctulimit - Compute upper limit
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
 
+The tool now also supports spectral models with the new naming conventions, and
+in particular the "PhotonFlux" and "EnergyFlux" names (#1832).
+
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
