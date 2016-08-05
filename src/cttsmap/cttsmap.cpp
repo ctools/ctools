@@ -215,6 +215,12 @@ void cttsmap::run(void)
     // Get task parameters
     get_parameters();
 
+<<<<<<< HEAD
+=======
+    // Write parameters into logger
+    log_parameters(TERSE);
+
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
     // Set energy dispersion flag for all CTA observations and save old
     // values in save_edisp vector
     std::vector<bool> save_edisp;
@@ -315,6 +321,14 @@ void cttsmap::run(void)
     	// Optimize observation container
     	m_obs.optimize(*opt);
 
+    	// Compute errors if necessary
+    	if (m_errors) {
+    		m_obs.errors(*opt);
+    	}
+
+    	// Get status of optimization
+    	int status = opt->status();
+
     	// Retrieve the Likelihood value
     	double logL1 = -(opt->value());
 
@@ -326,6 +340,7 @@ void cttsmap::run(void)
     		log << " TS value ....: ";
             log << ts << std::endl;
     	}
+
         else if (logTerse()) {
     		log << "TS for bin number ";
             log << i;
@@ -345,12 +360,23 @@ void cttsmap::run(void)
     	// Extract fitted test source parameters
         if (m_testsource != NULL) {
             for (int j = 0; j < m_mapnames.size(); ++j) {
-                m_maps[j](i) = (*testsource)[m_mapnames[j]].value();
+
+            	// Set parameter value and error maps
+            	if (m_mapnames[j].substr(0,2) == "e_") {
+
+            		// Get Parameter name by removing the error prefix
+            		std::string parname = m_mapnames[j].substr(2, m_mapnames[j].size());
+            		m_maps[j](i) = (*testsource)[parname].error();
+
+            	}
+            	else {
+            		m_maps[j](i) = (*testsource)[m_mapnames[j]].value();
+            	}
             }
     	}
 
-    	// Set status of bin to true
-    	m_statusmap(i) = 1.0;
+        // Set Fit status of the bin
+        m_statusmap(i) = status;
 
     	// Remove model from container
     	models.remove(m_srcname);
@@ -417,11 +443,9 @@ void cttsmap::save(void)
             fits[i+1]->extname(m_mapnames[i]);
         }
 
-        // Add computation log if not all bins are computed
-        if (m_binmin != -1 || m_binmax != -1) {
-            m_statusmap.write(fits);
-            fits[m_mapnames.size()+1]->extname("STATUS MAP");
-        }
+        // Write Fit status map
+        m_statusmap.write(fits);
+        fits[fits.size()-1]->extname("FITSTATUS");
 
         // Save FITS file
         fits.saveto(m_outmap, clobber());
@@ -482,6 +506,7 @@ void cttsmap::init_members(void)
     m_outmap.clear();
     m_apply_edisp = false;
     m_publish     = false;
+    m_errors      = false;
 
     // Initialise protected members
     m_obs.clear();
@@ -511,16 +536,17 @@ void cttsmap::copy_members(const cttsmap& app)
     m_outmap      = app.m_outmap;
     m_apply_edisp = app.m_apply_edisp;
     m_publish     = app.m_publish;
+    m_errors      = app.m_errors;
 
     // Copy protected members
-    m_binmin    = app.m_binmin;
-    m_binmax    = app.m_binmax;
-    m_logL0     = app.m_logL0;
-    m_obs       = app.m_obs;
-    m_tsmap     = app.m_tsmap;
-    m_mapnames  = app.m_mapnames;
-    m_maps      = app.m_maps;
-    m_statusmap = app.m_statusmap;
+    m_binmin      = app.m_binmin;
+    m_binmax      = app.m_binmax;
+    m_logL0       = app.m_logL0;
+    m_obs         = app.m_obs;
+    m_tsmap       = app.m_tsmap;
+    m_mapnames    = app.m_mapnames;
+    m_maps        = app.m_maps;
+    m_statusmap   = app.m_statusmap;
 
     // Clone protected members
     m_testsource = (app.m_testsource != NULL) ? app.m_testsource->clone() : NULL;
@@ -612,6 +638,9 @@ void cttsmap::get_parameters(void)
     // Create sky map based on task parameters
     GSkyMap map = create_map(m_obs);
 
+    // Check if errors should be computed
+    m_errors  = (*this)["errors"].boolean();
+
     // Initialise maps from user parameters
     init_maps(map);
 
@@ -654,8 +683,12 @@ void cttsmap::init_maps(const GSkyMap& map)
     // Initialise map information
 	m_statusmap.clear();
 
-	// Create status map
+	// Create status map and progress map
 	m_statusmap = GSkyMap(map);
+
+	// Set status map to invalid value -1 to signal
+	// that bin wasn't computed yet
+	m_statusmap = -1.0;
 
 	// Initialise maps of free parameters
     if (m_testsource != NULL) {
@@ -674,6 +707,16 @@ void cttsmap::init_maps(const GSkyMap& map)
 
             // Store parameter name
             m_mapnames.push_back((*m_testsource)[i].name());
+
+            // Add parameter errors if requested
+            if (m_errors) {
+
+				// Add sky map for fit error of the free parameter
+				m_maps.push_back(map);
+
+				// Store name of parameter error
+				m_mapnames.push_back("e_" + (*m_testsource)[i].name());
+            }
         
         } // endfor: looped over all model parameters
 

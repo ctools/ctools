@@ -96,6 +96,20 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
+        
+        # Setup cttsmap command
+        cmd = cttsmap+' inobs="'+self._events+'"'+ \
+                      ' inmodel="'+self._model+'" srcname="Crab"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
+                      ' errors=yes'+ \
+                      ' outmap="cttsmap_cmd1.fits"'+ \
+                      ' nxpix=5 nypix=5 binsz=0.02'+ \
+                      ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
+                      ' logfile="cttsmap_cmd1.log" chatter=1'
+
+        # Check if execution was successful
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line')
 
         # Return
         return

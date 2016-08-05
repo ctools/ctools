@@ -46,7 +46,7 @@ class cstsmapmerge(ctools.cscript):
         self._files        = None
         self._in_filename  = ''
         self._tsmap        = gammalib.GSkyMap() # Empty sky map
-        self._statusmap    = gammalib.GSkyMap() # Empty sky map
+        self._statusmap  = gammalib.GSkyMap() # Empty sky map
         self._maps         = []
         self._mapnames     = []
         self._merged_files = []
@@ -118,7 +118,11 @@ class cstsmapmerge(ctools.cscript):
         if self._read_ahead():
             self['outmap'].filename()
         
+<<<<<<< HEAD
         #  Write input parameters into logger
+=======
+        # Write input parameters into logger
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
         self._log_parameters(gammalib.TERSE)
 
         # Return
@@ -153,7 +157,11 @@ class cstsmapmerge(ctools.cscript):
         for hdu in fits:
             
             # Leave out primary and status extension
+<<<<<<< HEAD
             if hdu.extname() != 'IMAGE' and hdu.extname() != 'STATUS MAP':
+=======
+            if hdu.extname() != "IMAGE" and hdu.extname() != 'STATUS MAP':
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                 
                 # Add present maps
                 skymap = gammalib.GSkyMap()
@@ -192,7 +200,11 @@ class cstsmapmerge(ctools.cscript):
         for hdu in fits:
             
             # Leave out primary and status extension
+<<<<<<< HEAD
             if hdu.extname() != 'IMAGE' and hdu.extname() != 'STATUS MAP':
+=======
+            if hdu.extname() != "IMAGE" and hdu.extname() != 'STATUS MAP':
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                 
                 # Add present maps
                 skymap = gammalib.GSkyMap()
@@ -213,14 +225,22 @@ class cstsmapmerge(ctools.cscript):
         for i in range(self._tsmap.npix()):
 
             # Consider only bins that have been computed
-            if add_statusmap[i] > 0.5:
+            if add_statusmap[i] > -0.5:
                 
                 # Raise exception if this bin has already been computed
+<<<<<<< HEAD
                 if self._statusmap[i] > 0.5 and not self._overwrite:
                     msg = ('Attempt to merge bin which apparently has already '
                            'been merged. File "%s" contains already merged '
                            'bins. Set hidden parameter "overwrite=yes" to '
                            'avoid this error.' % fitsfile)
+=======
+                if self._statusmap[i] > -0.5 and not self._overwrite:
+                    msg = "Attempt to merge bin which apparently has "+\
+                          "already been merged. File \""+fitsfile+"\" "+\
+                          "contains already merged bins. Set hidden "+\
+                          "parameter \"overwrite=yes\" to avoid this error."
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                     raise RuntimeError(msg)
                 
                 # Copy TS values
@@ -256,7 +276,7 @@ class cstsmapmerge(ctools.cscript):
         # Count number of pixels with TS status set
         count = 0
         for pix in status:
-            if pix > 0.5:
+            if pix > -0.5:
                 count += 1
 
         # Return number of pixels
@@ -290,8 +310,16 @@ class cstsmapmerge(ctools.cscript):
 
             # Skip file if it's not a FITS file
             if not gammalib.GFilename(fitsfile).is_fits():
+<<<<<<< HEAD
                 self._log_value(gammalib.EXPLICIT, 'Skip file',
                                 '%s (not a FITS file)' % fitsfile)
+=======
+                
+                # Log message
+                self._log_value(gammalib.EXPLICIT, "Skip file", fitsfile +" (not a FITS file)")
+
+                # Continue
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                 continue
 
             # Open FITS file
@@ -299,18 +327,35 @@ class cstsmapmerge(ctools.cscript):
 
             # If file contains a status map then use it
             if fits.contains('STATUS MAP'):
+<<<<<<< HEAD
+=======
+                
+                # Close FITS file
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                 fits.close()
+                
+                # Set filename to initial filename
                 file0 = fitsfile
+<<<<<<< HEAD
                 if self._logTerse():
                     self._log(gammalib.parformat('Initial TS map file'))
                     self._log(fitsfile)
                     count = self._get_number_of_ts_pixels(fitsfile)
                     self._log(' (%d TS pixels computed)' % count)
                     self._log('\n')
+=======
+                
+                # Log message
+                pix_info = " (%d TS pixels computed)" % self._get_number_of_ts_pixels(fitsfile)
+                self._log_value(gammalib.TERSE, "Initial TS map file", fitsfile + pix_info)
+                
+                # Leave loop
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                 break
 
             # ... otherwise signal that file is useless
             else:
+<<<<<<< HEAD
                 fits.close()
                 self._log_value(gammalib.EXPLICIT, 'Skip file',
                                 '%s (no "STATUS MAP" extension)' % fitsfile)
@@ -322,6 +367,24 @@ class cstsmapmerge(ctools.cscript):
                 self._log('None of the provided files seems to be a sliced '
                           'TS map file (none has a "STATUS MAP" extension).\n')
         
+=======
+                
+                # Close fits file
+                fits.close()  
+                
+                # Info message             
+                self._log_value(gammalib.EXPLICIT, "Skip file", fitsfile +" (no \"STATUS MAP\" extension)")
+                
+                # Continue
+                continue
+
+        # Signal if no suitable file was found
+        if file0 == "":
+            self._log_string(gammalib.TERSE, "None of the provided files seems to be a sliced "
+                          "TS map file (none has a \"STATUS MAP\" "
+                          "extension).\n")
+
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
         # ... otherwise merge files
         else:
             
@@ -342,9 +405,14 @@ class cstsmapmerge(ctools.cscript):
                 
                 # Skip if file is not FITS
                 if not gammalib.GFilename(fitsfile).is_fits():
+<<<<<<< HEAD
                     self._log_value(gammalib.EXPLICIT, 'Skip file',
                                     '%s (not a FITS file)' % fitsfile)
                     continue
+=======
+                    self._log_value(gammalib.EXPLICIT, "Skip file", fitsfile +" (not a FITS file)")
+                    continue   
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
 
                 # Open FITS file
                 fits = gammalib.GFits(fitsfile)
@@ -352,20 +420,29 @@ class cstsmapmerge(ctools.cscript):
                 # Skip if file does not contain status map
                 if not fits.contains('STATUS MAP'):
                     fits.close()
+<<<<<<< HEAD
                     self._log_value(gammalib.EXPLICIT, 'Skip file',
                                     '%s (no "STATUS MAP" extension)' % fitsfile)
+=======
+                    self._log_value(gammalib.EXPLICIT, "Skip file", fitsfile +" (no \"STATUS MAP\" extension)")
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                     continue
 
                 # Close FITS file
                 fits.close()
                 
                 # Logging
+<<<<<<< HEAD
                 if self._logTerse():
                     self._log(gammalib.parformat('Merge TS map file'))
                     self._log(fitsfile)
                     count = self._get_number_of_ts_pixels(fitsfile)
                     self._log(' (%d TS pixels computed)' % count)
                     self._log('\n')
+=======
+                pix_info = " (%d TS pixels computed)" % self._get_number_of_ts_pixels(fitsfile)
+                self._log_value(gammalib.TERSE, "Merge TS map file", fitsfile + pix_info)
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
                     
                 # Merge TS map
                 self._merge_ts_map(fitsfile)
@@ -380,6 +457,7 @@ class cstsmapmerge(ctools.cscript):
         """ 
         Save TS map and remove slices if requested
         """
+<<<<<<< HEAD
         # Write header
         self._log_header1(gammalib.TERSE, 'Save TS map')
 
@@ -388,6 +466,11 @@ class cstsmapmerge(ctools.cscript):
 
         # Log filename
         self._log_value(gammalib.TERSE, 'TS map file', outmap.url())
+=======
+
+        # Get output filename in case it was not read ahead
+        outmap = self["outmap"].filename()
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
         
         # Create FITS file
         fits = gammalib.GFits()
@@ -403,26 +486,67 @@ class cstsmapmerge(ctools.cscript):
         for i in range(len(self._mapnames)):   
             fits[i+1].extname(self._mapnames[i])
 
-        # Check if map is fully done
-        done = True
-        for pix in self._statusmap:
-            if pix < 0.5:
-                done = False
-                break
+        # Treat status map separately 
+        self._statusmap.write(fits)
+        fits[fits.size()-1].extname('STATUS MAP')
         
+        # Check if map is fully done
+        bins_merged = 0
+        for pix in self._statusmap:
+            if pix > -0.5:
+                bins_merged += 1
+
+        # Set boolean if map is fully done
+        done = (bins_merged == self._tsmaps.npix())
+        
+        # Log summary header
+        self._log_header2(gammalib.TERSE, "Merging Summary")
+                
         # Write status map if we are not done yet
         if not done:
+<<<<<<< HEAD
             self._statusmap.write(fits)
             fits[fits.size()-1].extname('STATUS MAP')
+=======
+            
+            # Log bins that were computed and those that were missing
+            self._log_value(gammalib.TERSE, "TS map bins", self._tsmap.npix())
+            self._log_value(gammalib.TERSE, "Bins computed and merged", bins_merged )
+            self._log_value(gammalib.TERSE, "Bins missing", self._tsmap.npix() - bins_merged)
+        
+        else:
+            
+            # Write success message
+            self._log_string(gammalib.TERSE, "TS map was fully computed and successfully merged") 
+        
+        # Write header
+        self._log_header1(gammalib.TERSE, "Save TS map")
+        
+        # Log filename
+        self._log_value(gammalib.TERSE, "TS map file", outmap.url())
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
         
         # Save FITS file
-        fits.saveto(outmap, self._clobber())
+        fits.saveto(outmap, self._clobber()) 
 
-        # Delete TS input maps if requested
-        if self._delete:
+        # Delete TS input maps if requested and map is fully done
+        if self._delete and done:
+            
+            # Log header
+            self._log_header2(gammalib.TERSE, "Delete slices TS map files")
+            
+            # Loop over sliced files
             for filename in self._merged_files:
+                
+                # Remove file
                 os.remove(filename)
+<<<<<<< HEAD
                 self._log_value(gammalib.TERSE, 'Deleted input file', filename)
+=======
+                
+                # Log message about file
+                self._log_value(gammalib.TERSE,"Deleted input file", filename)
+>>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
         
         # Return
         return
