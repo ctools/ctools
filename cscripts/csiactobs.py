@@ -43,7 +43,7 @@ class csiactobs(ctools.cscript):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Set name and version
         self._name    = 'csiactobs'
@@ -229,9 +229,9 @@ class csiactobs(ctools.cscript):
         Parameters
         ----------
         prefactor : float
-            Prefactor parameter of spectral model
+            Power law prefactor of spectral model
         index : float
-            Index parameter of spectral model
+            Power law index of spectral model
         emin : float
             Minimum energy (in case a spectral node function is required)
         emax : float
@@ -330,13 +330,13 @@ class csiactobs(ctools.cscript):
         
         Parameters
         ----------
-        telescope : string
+        telescope : str
             Name of telescope
-        obs_id : string
+        obs_id : str
             Observation ID
         bkg_scale : float
             Background scaling factor
-        bkgtype : string
+        bkgtype : str
             Type of background (irf,aeff, or gauss)
         
         Returns

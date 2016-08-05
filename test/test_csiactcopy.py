@@ -162,8 +162,9 @@ class Test(test):
         self._check_copy('iactdata_py1')
         self._check_n_obs('iactdata_py1', 9)
         
+        # Remove the copied IACT data store before continuing
         if os.path.isdir('iactdata_py2'):
-            os.system("rm -r iactdata_py2")
+            os.system('rm -r iactdata_py2')
         
         # Set-up csiactcopy
         iactcopy = cscripts.csiactcopy()
@@ -172,7 +173,7 @@ class Test(test):
         iactcopy['prodname']      = 'unit-test'
         iactcopy['outpath']       = 'iactdata_py2'
         iactcopy['logfile']       = 'csiactcopy_py4.log'
-        iactcopy['chatter']       = 3       
+        iactcopy['chatter']       = 3
 
         # Run csiactcopy script and save run list
         iactcopy.logFileOpen()   # Make sure we get a log file
@@ -223,10 +224,15 @@ class Test(test):
         # Return
         return
 
-    # Check copy
+    # Check copy of IACT data store
     def _check_copy(self, pathname):
         """
-        Check copy.
+        Check copy of IACT data store
+
+        Parameters
+        ----------
+        pathname : str
+            Path to copied IACT data store
         """
         # Set file names
         hdu_index_name = gammalib.GFilename(pathname+'/hdu-index.fits')
@@ -235,17 +241,17 @@ class Test(test):
 
         # Check for existence of files
         self.test_assert(hdu_index_name.exists(),
-                         'Check if file "hdu-index.fits" exists.')
+                         'Check if file "hdu-index.fits" exists')
         self.test_assert(obs_index_name.exists(),
-                         'Check if file "obs-index.fits" exists.')
+                         'Check if file "obs-index.fits" exists')
         self.test_assert(master_name.exists(),
-                         'Check if file "master.json" exists.')
+                         'Check if file "master.json" exists')
 
         # Check if index files are FITS file
         self.test_assert(hdu_index_name.is_fits(),
-                         'Check if file "hdu-index.fits" is FITS file.')
+                         'Check if file "hdu-index.fits" is FITS file')
         self.test_assert(obs_index_name.is_fits(),
-                         'Check if file "obs-index.fits" is FITS file.')
+                         'Check if file "obs-index.fits" is FITS file')
         
         # Return
         return
@@ -253,7 +259,14 @@ class Test(test):
     # Check copy
     def _check_n_obs(self, pathname, n_expected):
         """
-        Check number of available observations.
+        Check number of available observations
+
+        Parameters
+        ----------
+        pathname : str
+            Path to copied IACT data store
+        n_expected : int
+            Expected number of observation in IACT data store
         """
         # Set file name
         obs_index_name = gammalib.GFilename(pathname+'/obs-index.fits[OBS_INDEX]')
@@ -268,8 +281,7 @@ class Test(test):
         fits.close()
 
         # Check for existence of observations
-        self.test_assert(n_obs == n_expected,
-                         'Check for '+str(n_expected)+' observations.')
+        self.test_value(n_obs, n_expected, 'Check for number of observations')
                 
         # Return
         return
