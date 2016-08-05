@@ -345,7 +345,7 @@ void ctbin::publish(const std::string& name)
         user_name = CTBIN_NAME;
     }
 
-    // Log counts cube name
+    // Write counts cube name into logger
     log_value(NORMAL, "Counts cube name", user_name);
 
     // Publish counts cube

@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -85,7 +86,7 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check result file
-        self._check_result_file('ctbkgcube_cmd1.fits')
+        self._check_result_files('ctbkgcube_cmd1')
 
         # Setup ctbkgcube command
         cmd = ctbkgcube+' inobs="event_file_that_does_not_exist.fits"'+ \
@@ -111,8 +112,29 @@ class Test(test):
         """
         Test ctbkgcube from Python
         """
-        # Set-up ctbkgcube
+        # Allocate ctbkgcube
         bkgcube = ctools.ctbkgcube()
+
+        # Check that empty ctbkgcube tool holds a background cube that has
+        # no energy bins
+        self._check_cube(bkgcube.bkgcube(), nenergies=0)
+
+        # Check that saving does not nothing
+        bkgcube['outcube']  = 'ctbkgcube_py0.fits'
+        bkgcube['outmodel'] = 'ctbkgcube_py0.xml'
+        bkgcube['logfile']  = 'ctbkgcube_py0.log'
+        bkgcube.logFileOpen()
+        bkgcube.save()
+        self.test_assert(not os.path.isfile('ctbkgcube_py0.fits'),
+             'Check that no background cube has been created')
+
+        # Check model container
+        self._check_models(gammalib.GModels('ctbkgcube_py0.xml'), nmodels=0)
+
+        # Check that clearing does not lead to an exception or segfault
+        bkgcube.clear()
+
+        # Now set ctbkgcube parameters
         bkgcube['inobs']    = self._events
         bkgcube['inmodel']  = self._model
         bkgcube['incube']   = 'NONE'
@@ -120,7 +142,7 @@ class Test(test):
         bkgcube['irf']      = self._irf
         bkgcube['ebinalg']  = 'LOG'
         bkgcube['emin']     = 0.1
-        bkgcube['emax']     = 100
+        bkgcube['emax']     = 100.0
         bkgcube['enumbins'] = 20
         bkgcube['nxpix']    = 10
         bkgcube['nypix']    = 10
@@ -139,45 +161,43 @@ class Test(test):
         bkgcube.run()
         bkgcube.save()
 
-        # Check result file
-        self._check_result_file('ctbkgcube_py1.fits')
+        # Check result files
+        self._check_result_files('ctbkgcube_py1')
 
-        # Set-up ctbkgcube from counts cube
-        bkgcube = ctools.ctbkgcube()
-        bkgcube['inobs']     = self._events
-        bkgcube['inmodel']   = self._model
-        bkgcube['incube']    = self._cntcube
-        bkgcube['caldb']     = self._caldb
-        bkgcube['irf']       = self._irf
-        bkgcube['outcube']   = 'ctbkgcube_py2.fits'
-        bkgcube['outmodel']  = 'ctbkgcube_py2.xml'
-        bkgcube['logfile']   = 'ctbkgcube_py2.log'
-        bkgcube['chatter']   = 3
-        bkgcube['publish']   = True
-        bkgcube['addbounds'] = True
+        # Copy ctbkgcube tool
+        cpy_bkgcube = bkgcube.copy()
 
-        # Execute ctbkgcube tool
-        bkgcube.logFileOpen()   # Make sure we get a log file
-        bkgcube.execute()
+        # Check background cube and model container of ctbkgcube copy
+        self._check_cube(cpy_bkgcube.bkgcube())
+        self._check_models(cpy_bkgcube.models())
 
-        # Check result file
-        self._check_result_file('ctbkgcube_py2.fits')
-
-        # Copy ctbkgcube tool and execute copied tool
-        cpy_bkgcube = bkgcube
-        cpy_bkgcube['outcube']  = 'ctbkgcube_py3.fits'
-        cpy_bkgcube['outmodel'] = 'ctbkgcube_py3.xml'
-        cpy_bkgcube['logfile']  = 'ctbkgcube_py3.log'
-        cpy_bkgcube['chatter']  = 4
+        # Execute copy of ctbkgcube tool again, now with a higher chatter
+        # level than before. In addition, use counts cube to define the
+        # background cube
+        #cpy_bkgcube['inobs']     = self._events
+        #cpy_bkgcube['inmodel']   = self._model
+        cpy_bkgcube['incube']    = self._cntcube
+        #cpy_bkgcube['caldb']     = self._caldb
+        #cpy_bkgcube['irf']       = self._irf
+        cpy_bkgcube['outcube']   = 'ctbkgcube_py2.fits'
+        cpy_bkgcube['outmodel']  = 'ctbkgcube_py2.xml'
+        cpy_bkgcube['logfile']   = 'ctbkgcube_py2.log'
+        cpy_bkgcube['chatter']   = 3
+        cpy_bkgcube['publish']   = True
+        cpy_bkgcube['addbounds'] = True
+        cpy_bkgcube.logFileOpen()   # Make sure we get a log file
         cpy_bkgcube.execute()
 
-        # Check result file
-        self._check_result_file('ctbkgcube_py3.fits')
+        # Check result files
+        self._check_result_files('ctbkgcube_py2')
 
-        # Clear ctbkgcube tool
-        bkgcube.clear()
+        # Now clear copy of ctbkgcube tool
+        cpy_bkgcube.clear()
 
-        # TODO: Do some test after clearing of ctbkgcube tool
+        # Check that the cleared copy has also cleared the background cube
+        # and model container
+        self._check_cube(cpy_bkgcube.bkgcube(), nenergies=0)
+        self._check_models(cpy_bkgcube.models(), nmodels=0)
 
         # Prepare observation container
         obs1 = gammalib.GCTAObservation(self._events)
@@ -195,47 +215,94 @@ class Test(test):
 
         # Set-up ctbkgcube from observation container
         bkgcube = ctools.ctbkgcube(obs)
-        #bkgcube['inobs']    = self._events
-        #bkgcube['inmodel']  = self._model
-        bkgcube['incube']   = 'NONE'
-        bkgcube['caldb']    = self._caldb
-        bkgcube['irf']      = self._irf
-        bkgcube['ebinalg']  = 'LOG'
-        bkgcube['emin']     = 0.1
-        bkgcube['emax']     = 100
-        bkgcube['enumbins'] = 20
-        bkgcube['nxpix']    = 10
-        bkgcube['nypix']    = 10
-        bkgcube['binsz']    = 0.4
-        bkgcube['coordsys'] = 'CEL'
-        bkgcube['proj']     = 'CAR'
-        bkgcube['xref']     = 83.63
-        bkgcube['yref']     = 22.01
-        bkgcube['outcube']  = 'ctbkgcube_py4.fits'
-        bkgcube['outmodel'] = 'ctbkgcube_py4.xml'
-        bkgcube['logfile']  = 'ctbkgcube_py4.log'
-        bkgcube['chatter']  = 4
+        bkgcube['incube']    = 'NONE'
+        bkgcube['caldb']     = self._caldb
+        bkgcube['irf']       = self._irf
+        bkgcube['ebinalg']   = 'LOG'
+        bkgcube['emin']      = 0.2
+        bkgcube['emax']      = 150.0
+        bkgcube['enumbins']  = 20
+        bkgcube['nxpix']     = 10
+        bkgcube['nypix']     = 10
+        bkgcube['binsz']     = 0.4
+        bkgcube['coordsys']  = 'CEL'
+        bkgcube['proj']      = 'CAR'
+        bkgcube['xref']      = 83.63
+        bkgcube['yref']      = 22.01
+        bkgcube['outcube']   = 'ctbkgcube_py3.fits'
+        bkgcube['outmodel']  = 'ctbkgcube_py3.xml'
+        bkgcube['logfile']   = 'ctbkgcube_py3.log'
+        bkgcube['addbounds'] = True
+        bkgcube['chatter']   = 4
 
         # Execute ctbkgcube tool
         bkgcube.logFileOpen()   # Make sure we get a log file
         bkgcube.execute()
 
-        # Check result file
-        self._check_result_file('ctbkgcube_py4.fits')
+        # Check result files
+        self._check_result_files('ctbkgcube_py3', nenergies=23)
 
         # Return
         return
 
-    # Check result file
-    def _check_result_file(self, filename):
+    # Check result files
+    def _check_result_files(self, filename, nenergies=21, nmodels=2):
         """
         Check result file
+
+        Parameters
+        ----------
+        filename : str
+            Test file name without extension
+        nenergies : int, optional
+            Number of energy bins
         """
-        # Open result file
-        result = gammalib.GCTACubeBackground(filename)
+        # Open background cube
+        cube = gammalib.GCTACubeBackground(filename+'.fits')
 
+        # Open model definition file
+        models = gammalib.GModels(filename+'.xml')
+
+        # Check cube
+        self._check_cube(cube, nenergies=nenergies)
+
+        # Check models
+        self._check_models(models, nmodels=nmodels)
+
+        # Return
+        return
+
+    # Check background cube
+    def _check_cube(self, cube, nenergies=21):
+        """
+        Check background cube
+
+        Parameters
+        ----------
+        cube : `~gammalib.GCTACubeBackground`
+            Background cube
+        nenergies : int, optional
+            Number of energy bins
+        """
         # Check dimensions
-        self.test_value(len(result.energies()), 21, 'Check for 21 energy values')
+        self.test_value(len(cube.energies()), nenergies,
+             'Check number of energy maps')
 
+        # Return
+        return
+
+    # Check model container
+    def _check_models(self, models, nmodels=2):
+        """
+        Check model container
+
+        Parameters
+        ----------
+        models : `~gammalib.GModels`
+            Model container
+        """
+        # Check number of models
+        self.test_value(models.size(), nmodels, 'Check number of models')
+        
         # Return
         return

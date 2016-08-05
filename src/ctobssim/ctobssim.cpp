@@ -324,7 +324,7 @@ void ctobssim::run(void)
         wrklog.name(log.name());
 
         // Set a big value to avoid flushing
-        wrklog.max_size(10000000);
+        wrklog.buffer_size(10000000);
 
         // Loop over all observation in the container. If OpenMP support
         // is enabled, this loop will be parallelized.

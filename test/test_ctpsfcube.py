@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -109,8 +110,25 @@ class Test(test):
         """
         Test ctpsfcube from Python
         """
-        # Set-up ctpsfcube
+        # Allocate ctpsfcube
         psfcube = ctools.ctpsfcube()
+
+        # Check that empty ctpsfcube tool holds a PSF cube that has no energy
+        # bins
+        self._check_cube(psfcube.psfcube(), nenergies=0)
+
+        # Check that saving does not nothing
+        psfcube['outcube'] = 'ctpsfcube_py0.fits'
+        psfcube['logfile'] = 'ctpsfcube_py0.log'
+        psfcube.logFileOpen()
+        psfcube.save()
+        self.test_assert(not os.path.isfile('ctpsfcube_py0.fits'),
+             'Check that no PSF cube has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        psfcube.clear()
+
+        # Now set ctpsfcube parameters
         psfcube['inobs']    = self._events
         psfcube['incube']   = 'NONE'
         psfcube['outcube']  = 'ctpsfcube_py1.fits'
@@ -140,19 +158,71 @@ class Test(test):
         # Check result file
         self._check_result_file('ctpsfcube_py1.fits')
 
+        # Copy ctpsfcube tool
+        cpy_psfcube = psfcube.copy()
+
+        # Check PSF cube of ctpsfcube copy
+        self._check_cube(cpy_psfcube.psfcube())
+
+        # Execute copy of ctpsfcube tool again, now with a higher chatter
+        # level than before
+        cpy_psfcube['emin']      = 0.2
+        cpy_psfcube['emax']      = 150.0
+        cpy_psfcube['outcube']   = 'ctpsfcube_py2.fits'
+        cpy_psfcube['logfile']   = 'ctpsfcube_py2.log'
+        cpy_psfcube['addbounds'] = True
+        cpy_psfcube['chatter']   = 3
+        cpy_psfcube.logFileOpen()  # Needed to get a new log file
+        cpy_psfcube.execute()
+
+        # Check result file
+        self._check_result_file('ctpsfcube_py2.fits', nenergies=23)
+
+        # Now clear copy of ctpsfcube tool
+        cpy_psfcube.clear()
+
+        # Check that the cleared copy has also cleared the PSF cube
+        self._check_cube(cpy_psfcube.psfcube(), nenergies=0)
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nenergies=21):
         """
         Check result file
-        """
-        # Open result file
-        result = gammalib.GCTACubePsf(filename)
 
+        Parameters
+        ----------
+        filename : str
+            PSF cube file name
+        nenergies : int, optional
+            Number of energy bins
+        """
+        # Open PSF cube
+        cube = gammalib.GCTACubePsf(filename)
+
+        # Check cube
+        self._check_cube(cube, nenergies=nenergies)
+
+        # Return
+        return
+
+    # Check PSF cube
+    def _check_cube(self, cube, nenergies=21):
+        """
+        Check PSF cube
+
+        Parameters
+        ----------
+        cube : `~gammalib.GCTACubePsf`
+            PSF cube
+        nenergies : int, optional
+            Number of energy bins
+        """
         # Check dimensions
-        self.test_value(len(result.energies()), 21, 'Check for 21 energy values')
+        self.test_value(len(cube.energies()), nenergies,
+             'Check number of energy maps')
 
         # Return
         return

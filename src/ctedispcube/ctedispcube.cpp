@@ -227,35 +227,23 @@ void ctedispcube::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Initialise energy dispersion cube");
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
     // Initialise energy dispersion cube
     init_cube();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Observation",m_obs.size()));
-        log << m_obs.print(m_chatter) << std::endl;
-    }
+    // Write header into logger
+    log_header1(TERSE, "Generate energy dispersion cube");
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate energy dispersion cube");
-    }
+    // Set pointer to logger dependent on chattiness
+    GLog* logger = (logNormal()) ? &log : NULL;
 
     // Fill energy dispersion cube
-    m_edispcube.fill(m_obs, &log);
+    m_edispcube.fill(m_obs, logger);
 
-    // Log energy dispersion cube
-    if (logTerse()) {
-        log << m_edispcube.print(m_chatter) << std::endl;
-    }
+    // Write energy dispersion cube into logger
+    log_string(EXPLICIT, m_edispcube.print(m_chatter));
 
     // Return
     return;
@@ -270,28 +258,29 @@ void ctedispcube::run(void)
  ***************************************************************************/
 void ctedispcube::save(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save Edisp cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Save energy dispersion cube");
 
     // Get output filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outcube.is_empty()) {
+    // Determine whether the cube is empty
+    bool cube_is_empty = ((m_edispcube.cube().nx()    == 0) ||
+                          (m_edispcube.cube().ny()    == 0) ||
+                          (m_edispcube.cube().nmaps() == 0));
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Energy dispersion cube file");
-            log << m_outcube.url() << std::endl;
-        }
-
-        // Save energy dispersion cube
+    // Save energy dispersion cube if filename and the energy dispersion cube
+    // are not empty
+    if (!m_outcube.is_empty() && !cube_is_empty) {
         m_edispcube.save(m_outcube, clobber());
-
     }
+
+    // Write into logger what has been done
+    std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
+    if (cube_is_empty) {
+        fname.append(" (cube is empty, no file created)");
+    }
+    log_value(NORMAL, "Energy dispersion cube file", fname);
 
     // Return
     return;
@@ -430,6 +419,9 @@ void ctedispcube::get_parameters(void)
  ***************************************************************************/
 void ctedispcube::init_cube(void)
 {
+    // Write header into logger
+    log_header1(TERSE, "Initialise energy dispersion cube");
+
     // Extract energy dispersion definition
     const GWcs* proj   = static_cast<const GWcs*>(m_edispcube.cube().projection());
     std::string wcs    = m_edispcube.cube().projection()->code();
@@ -449,12 +441,6 @@ void ctedispcube::init_cube(void)
     // If requested, insert energies at all event list energy boundaries
     if (m_addbounds) {
 
-        // Set logger
-        GLog* logger = NULL;
-        if (logTerse()) {
-            logger = &log;
-        }
-    
         // Loop over all observations
         for (int i = 0; i < m_obs.size(); ++i) {
     
@@ -473,7 +459,7 @@ void ctedispcube::init_cube(void)
             }
 
             // Insert energy boundaries
-            energies = insert_energy_boundaries(energies, *cta, logger);
+            energies = insert_energy_boundaries(energies, *cta);
 
         } // endfor: looped over all observations
 
@@ -483,11 +469,9 @@ void ctedispcube::init_cube(void)
     m_edispcube = GCTACubeEdisp(wcs, coords, x, y, dx, dy, nx, ny, energies,
                                 mmax, nmbins);
 
-    // Log energy dispersion cube
-    if (logTerse()) {
-        log << m_edispcube.print(m_chatter) << std::endl;
-    }
+    // Write energy dispersion cube in logger
+    log_string(NORMAL, m_edispcube.print(m_chatter));
 
     // Return
     return;
-};
+}

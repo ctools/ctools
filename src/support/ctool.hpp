@@ -101,8 +101,10 @@ protected:
     size_t          get_current_rss(void);
     std::string     get_obs_header(const GObservation* obs);
     GEnergies       insert_energy_boundaries(const GEnergies&       energies,
-                                             const GCTAObservation& obs,
-                                             GLog* log = NULL) const;
+                                             const GCTAObservation& obs);
+
+    // Protected warning strings
+    std::string     warn_too_few_energies(const GEnergies& energies) const;
 
     // Protected members
     bool            m_read_ahead; //!< Read ahead output parameters

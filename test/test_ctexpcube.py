@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -107,16 +108,32 @@ class Test(test):
         """
         Test ctexpcube from Python
         """
-        # Set-up ctexpcube
+        # Allocate ctexpcube
         expcube = ctools.ctexpcube()
+
+        # Check that empty ctexpcube tool holds an exposure cube that has
+        # no energy bins
+        self._check_cube(expcube.expcube(), nenergies=0)
+
+        # Check that saving does not nothing
+        expcube['outcube'] = 'ctexpcube_py0.fits'
+        expcube['logfile'] = 'ctexpcube_py0.log'
+        expcube.logFileOpen()
+        expcube.save()
+        self.test_assert(not os.path.isfile('ctexpcube_py0.fits'),
+             'Check that no exposure cube has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        expcube.clear()
+
+        # Now set ctexpcube parameters
         expcube['inobs']    = self._events
         expcube['incube']   = 'NONE'
-        expcube['outcube']  = 'ctexpcube_py1.fits'
         expcube['caldb']    = self._caldb
         expcube['irf']      = self._irf
         expcube['ebinalg']  = 'LOG'
         expcube['emin']     = 0.1
-        expcube['emax']     = 100
+        expcube['emax']     = 100.0
         expcube['enumbins'] = 20
         expcube['nxpix']    = 200
         expcube['nypix']    = 200
@@ -126,6 +143,7 @@ class Test(test):
         expcube['xref']     = 83.63
         expcube['yref']     = 22.01
         expcube['logfile']  = 'ctexpcube_py1.log'
+        expcube['outcube']  = 'ctexpcube_py1.fits'
         expcube['chatter']  = 2
 
         # Run ctexpcube tool
@@ -136,19 +154,72 @@ class Test(test):
         # Check result file
         self._check_result_file('ctexpcube_py1.fits')
 
+        # Copy ctexpcube tool
+        cpy_expcube = expcube.copy()
+
+        # Check exposure cube of ctexpcube copy
+        self._check_cube(cpy_expcube.expcube())
+
+        # Execute copy of ctexpcube tool again, now with a higher chatter
+        # level than before
+        cpy_expcube['emin']      = 0.2
+        cpy_expcube['emax']      = 150.0
+        cpy_expcube['outcube']   = 'ctexpcube_py2.fits'
+        cpy_expcube['logfile']   = 'ctexpcube_py2.log'
+        cpy_expcube['publish']   = True
+        cpy_expcube['addbounds'] = True
+        cpy_expcube['chatter']   = 3
+        cpy_expcube.logFileOpen()  # Needed to get a new log file
+        cpy_expcube.execute()
+
+        # Check result file
+        self._check_result_file('ctexpcube_py2.fits', nenergies=23)
+
+        # Now clear copy of ctexpcube tool
+        cpy_expcube.clear()
+
+        # Check that the cleared copy has also cleared the exposure cube
+        self._check_cube(cpy_expcube.expcube(), nenergies=0)
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nenergies=21):
         """
         Check result file
-        """
-        # Open result file
-        result = gammalib.GCTACubeExposure(filename)
 
+        Parameters
+        ----------
+        filename : str
+            Exposure cube file name
+        nenergies : int, optional
+            Number of energy bins
+        """
+        # Open exposure cube
+        cube = gammalib.GCTACubeExposure(filename)
+
+        # Check cube
+        self._check_cube(cube, nenergies=nenergies)
+
+        # Return
+        return
+
+    # Check exposure cube
+    def _check_cube(self, cube, nenergies=21):
+        """
+        Check exposure cube
+
+        Parameters
+        ----------
+        cube : `~gammalib.GCTACubeExposure`
+            Exposure cube
+        nenergies : int, optional
+            Number of energy bins
+        """
         # Check dimensions
-        self.test_value(len(result.energies()), 21, 'Check for 21 energy values')
+        self.test_value(len(cube.energies()), nenergies,
+             'Check number of energy maps')
 
         # Return
         return

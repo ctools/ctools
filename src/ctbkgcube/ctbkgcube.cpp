@@ -218,29 +218,16 @@ void ctbkgcube::run(void)
     get_parameters();
 
     // Warn if there are not enough energy bins
-    int    n          = m_background.energies().size();
-    double logEmin    = std::log10(m_background.energies()[0].TeV());
-    double logEmax    = std::log10(m_background.energies()[n-1].TeV());
-    int    nrequired  = int((logEmax - logEmin) * 25.0);
-    if (n < nrequired) {
-        std::string msg = "\nWARNING: Only "+gammalib::str(n-1)+" energy bins "
-                          "have been requested. This may be too few energy "
-                          "bins.\n         At least 25 bins per decade in "
-                          "energy are recommended, which in your case\n"
-                          "         would be "+gammalib::str(nrequired-1)+
-                          " bins. Consider increasing the number of energy "
-                          "bins.";
-        log_string(TERSE, msg);
-    }
-
-    // Initialise exposure cube
-    init_cube();
+    log_string(TERSE, warn_too_few_energies(m_background.energies()));
 
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
     // Write input model container into logger
     log_models(NORMAL, m_obs.models(), "Input model");
+
+    // Initialise exposure cube
+    init_cube();
 
     // Write header
     log_header1(TERSE, "Prepare model");
@@ -296,11 +283,11 @@ void ctbkgcube::run(void)
     // Assign background models to container
     m_obs.models(m_bkgmdl);
 
-    // Set pointer on logger depending on chattiness
-    GLog* logp = (logNormal()) ? &log : NULL;
+    // Set pointer to logger dependent on chattiness
+    GLog* logger = (logNormal()) ? &log : NULL;
 
     // Fill background cube from observations
-    m_background.fill(m_obs, logp);
+    m_background.fill(m_obs, logger);
 
     // Create a background model for the output background cube and append
     // that model to the input model in place of the original
@@ -356,28 +343,33 @@ void ctbkgcube::save(void)
     m_outcube  = (*this)["outcube"].filename();
     m_outmodel = (*this)["outmodel"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outcube.is_empty()) {
+    // Determine whether the cube is empty
+    bool cube_is_empty = ((m_background.cube().nx()    == 0) ||
+                          (m_background.cube().ny()    == 0) ||
+                          (m_background.cube().nmaps() == 0));
 
-        // Log background cube file name
-        log_value(NORMAL, "Background cube file", m_outcube.url());
+    // Determine whether a model definition file should be written
+    bool write_moddef = ((!m_outmodel.is_empty()) &&
+                         (gammalib::tolower(m_outmodel.url()) != "none"));
 
-        // Save background cube
+    // Save background cube if filename and the background cube are not empty
+    if (!m_outcube.is_empty() && !cube_is_empty) {
         m_background.save(m_outcube, clobber());
-    
     }
 
-    // Write output models if filename is valid
-    if ((!m_outmodel.is_empty()) &&
-        (gammalib::tolower(m_outmodel.url()) != "none")) {
-
-        // Log model definition file name
-        log_value(NORMAL, "Model definition file", m_outmodel.url());
-
-        // Save output model for stacked analyses
+    // Save model definition file if requested
+    if (write_moddef) {
         m_outmdl.save(m_outmodel.url());
-
     }
+
+    // Write into logger what has been done
+    std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
+    std::string mname = (write_moddef) ? m_outmodel.url() : "NONE";
+    if (cube_is_empty) {
+        fname.append(" (cube is empty, no file created)");
+    }
+    log_value(NORMAL, "Background cube file", fname);
+    log_value(NORMAL, "Model definition file", mname);
 
     // Return
     return;
@@ -394,7 +386,7 @@ void ctbkgcube::publish(const std::string& name)
     // Write header
     log_header1(TERSE, "Publish background cube");
 
-    // Set default name is user name is empty
+    // Set default name if user name is empty
     std::string user_name(name);
     if (user_name.empty()) {
         user_name = CTBKGCUBE_NAME;
@@ -588,9 +580,6 @@ void ctbkgcube::init_cube(void)
     // If requested, insert energies at all event list energy boundaries
     if (m_addbounds) {
 
-        // Set pointer on logger depending on chattiness
-        GLog* logp = (logNormal()) ? &log : NULL;
-    
         // Loop over all observations
         for (int i = 0; i < m_obs.size(); ++i) {
     
@@ -609,7 +598,7 @@ void ctbkgcube::init_cube(void)
             }
 
             // Insert energy boundaries
-            energies = insert_energy_boundaries(energies, *cta, logp);
+            energies = insert_energy_boundaries(energies, *cta);
 
         } // endfor: looped over all observations
 
@@ -623,4 +612,4 @@ void ctbkgcube::init_cube(void)
 
     // Return
     return;
-};
+}

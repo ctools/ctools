@@ -84,29 +84,26 @@ public:
     virtual void execute(void);
 
     // Make methods private in Python by prepending an underscore
-    %rename(_read_ahead)           read_ahead() const;
-    %rename(_time_reference)       time_reference() const;
-    %rename(_get_observations)     get_observations(const bool& get_response = true);
-    %rename(_setup_observations)   setup_observations(GObservations& obs);
-    %rename(_create_ebounds)       create_ebounds();
-    %rename(_create_map)           create_map(const GObservations& obs);
-    %rename(_create_cube)          create_cube(const GObservations& obs);
-    %rename(_create_cta_obs)       create_cta_obs();
-    %rename(_require_inobs)        require_inobs(const std::string& method);
-    %rename(_require_inobs_nolist) require_inobs_nolist(const std::string& method);
-    %rename(_require_inobs_nocube) require_inobs_nocube(const std::string& method);
-    %rename(_log_observations)     log_observations(const GChatter&      chatter,
-                                                    const GObservations& obs,
-                                                    const std::string&   what);
-    %rename(_log_models)           log_models(const GChatter&    chatter,
-                                              const GModels&     models,
-                                              const std::string& what);
-    %rename(_set_response)         set_response(GObservations& obs);
-    %rename(_set_obs_response)     set_obs_response(GCTAObservation* obs);
-    %rename(_set_obs_bounds)       set_obs_bounds(GObservations& obs);
-    %rename(_get_mean_pointing)    get_mean_pointing(const GObservations& obs);
-    %rename(_get_current_rss)      get_current_rss();
-    %rename(_get_obs_header)       get_obs_header();
+    %rename(_read_ahead)            read_ahead;
+    %rename(_time_reference)        time_reference;
+    %rename(_get_observations)      get_observations;
+    %rename(_setup_observations)    setup_observations;
+    %rename(_create_ebounds)        create_ebounds;
+    %rename(_create_map)            create_map;
+    %rename(_create_cube)           create_cube;
+    %rename(_create_cta_obs)        create_cta_obs;
+    %rename(_require_inobs)         require_inobs;
+    %rename(_require_inobs_nolist)  require_inobs_nolist;
+    %rename(_require_inobs_nocube)  require_inobs_nocube;
+    %rename(_log_observations)      log_observations;
+    %rename(_log_models)            log_models;
+    %rename(_set_response)          set_response;
+    %rename(_set_obs_response)      set_obs_response;
+    %rename(_set_obs_bounds)        set_obs_bounds;
+    %rename(_get_mean_pointing)     get_mean_pointing;
+    %rename(_get_current_rss)       get_current_rss;
+    %rename(_get_obs_header)        get_obs_header;
+    %rename(_warn_too_few_energies) warn_too_few_energies;
 
     // Protected methods
     const bool&           read_ahead(void) const;
@@ -140,6 +137,10 @@ public:
     GSkyDir         get_mean_pointing(const GObservations& obs);
     size_t          get_current_rss(void);
     std::string     get_obs_header(const GObservation* obs);
+    GEnergies       insert_energy_boundaries(const GEnergies&       energies,
+                                             const GCTAObservation& obs);
+    // Protected warning strings
+    std::string     warn_too_few_energies(const GEnergies& energies) const;
 };
 
 

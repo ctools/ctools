@@ -68,14 +68,13 @@
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty ctools.
  ***************************************************************************/
 ctool::ctool(void) : GApplication()
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -87,15 +86,22 @@ ctool::ctool(void) : GApplication()
  *
  * @param[in] name Application name.
  * @param[in] version Application version.
+ *
+ * Constructs a ctool from the @p name and @p version. The constructor uses
+ * the equivalent GApplication constructor to set the parameter filename to
+ * "<name>.par" and the log filename to "<name>".log. The parameters will be
+ * loaded from the parameter file.
+ *
+ * No log file will be opened. To open the log file an explicit call to the
+ * logFileOpen() method is required.
+ *
+ * This constructor should be used for using a ctool from Python.
  ***************************************************************************/
 ctool::ctool(const std::string& name, const std::string& version) :
        GApplication(name, version)
 {
     // Initialise members
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -109,6 +115,16 @@ ctool::ctool(const std::string& name, const std::string& version) :
  * @param[in] version Application version.
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs a ctool from the @p name, @p version and command line
+ * arguments. The constructor uses the equivalent GApplication constructor
+ * to set the parameter filename to "<name>.par" and the log filename to
+ * "<name>".log. The parameters will be loaded from the parameter file.
+ * In addition, the constructor opens the log file.
+ *
+ * If the "--help" option is provided as command line argument a help text
+ * about the usage of the ctool will be shown in the console and the ctool
+ * will exit. No log file will be opened in that case.
  ***************************************************************************/
 ctool::ctool(const std::string& name, const std::string& version,
              int argc, char *argv[]) : 
@@ -123,8 +139,8 @@ ctool::ctool(const std::string& name, const std::string& version,
     // Initialise members
     init_members();
 
-    // Write header into logger
-    log_header();
+    // Open the log file
+    logFileOpen();
 
     // Return
     return;
@@ -135,6 +151,8 @@ ctool::ctool(const std::string& name, const std::string& version,
  * @brief Copy constructor
  *
  * @param[in] app Application.
+ *
+ * Construct a ctools from another ctool instance.
  ***************************************************************************/
 ctool::ctool(const ctool& app) : GApplication(app)
 {
@@ -172,6 +190,8 @@ ctool::~ctool(void)
  * @brief Assignment operator
  *
  * @param[in] app Application.
+ *
+ * Assigns one ctool to another.
  ***************************************************************************/
 ctool& ctool::operator=(const ctool& app)
 {
@@ -207,7 +227,8 @@ ctool& ctool::operator=(const ctool& app)
  * @brief Execute application
  *
  * This is the main execution method of a ctool. The method is invoked when
- * the executable is called from command line.
+ * the executable is called from the command line. It signals that output
+ * parameters should be read ahead, runs the tools, and saves the results.
  ***************************************************************************/
 void ctool::execute(void)
 {
@@ -275,9 +296,6 @@ void ctool::copy_members(const ctool& app)
  ***************************************************************************/
 void ctool::free_members(void)
 {
-    // Write separator into logger
-    log_string(TERSE, "");
-
     // Return
     return;
 }
@@ -1374,10 +1392,11 @@ std::string ctool::get_obs_header(const GObservation* obs)
  * @param[in] energies Energies.
  * @param[in] obs Observation container.
  * @return Energies.
+ *
+ * Inserts the energy boundaries of an observation in a list of @p energies.
  ***************************************************************************/
 GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
-                                          const GCTAObservation& obs,
-                                          GLog*                  log) const
+                                          const GCTAObservation& obs)
 {
     // Create copy of input energies
     GEnergies engs = energies;
@@ -1428,11 +1447,8 @@ GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
                 engs.append(energy);
             }
 
-            // Log energy insertion
-            if (log != NULL) {
-                *log << gammalib::parformat("Insert energy");
-                *log << energy.print() << std::endl;
-            }
+            // Log energy insertion. Circumvent const correctness
+            log_value(NORMAL, "Insert energy", energy.print());
 
         } // endif: energy insertion requested
 
@@ -1444,7 +1460,63 @@ GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
 
 
 /***********************************************************************//**
- * @brief Dumps help text in the console
+ * @brief Set warning string if there are too few energies
+ *
+ * @param[in] energies Energies.
+ * @return Warning string.
+ *
+ * Sets a warning string if there are too few @p energies in the container.
+ * For a binned or stacked analysis to be accurate, at least 25 bins per
+ * decade are required. If the provided number of energies is less than this
+ * number a warning string will be returned. Otherwise an empty string will
+ * be returned.
+ ***************************************************************************/
+std::string ctool::warn_too_few_energies(const GEnergies& energies) const
+{
+    // Initialise warning
+    std::string warning;
+
+    // Retrieve the number of energies
+    int n = energies.size();
+
+    // Compute the required number of energy bins
+    double logEmin   = std::log10(energies[0].TeV());
+    double logEmax   = std::log10(energies[n-1].TeV());
+    int    nrequired = int((logEmax - logEmin) * 25.0);
+    
+    // Warn if there are not enough energy bins
+    if (n < nrequired) {
+        warning.append("\nWARNING: Only "+gammalib::str(n-1)+" energy bins "
+                       "have been requested. This may be too few energy "
+                       "bins."
+                       "\n         At least 25 bins per decade in energy are "
+                       "recommended, which for the given"
+                       "\n         energy range would be "+
+                       gammalib::str(nrequired)+" bins. Consider increasing "
+                       "the number of energy bins.");
+    }
+
+    // Return warning
+    return warning;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                         Private methods for SWIG                        =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Dump help text in the console
+ *
+ * Dumps the help text for the ctool into the console. The help text is
+ * located in the folder
+ *
+ *      $CTOOLS//share/help/
+ *
+ * of the ctools installation and the help file has the name "<name>.txt",
+ * where <name> stands for the name of the ctool.
  ***************************************************************************/
 void ctool::provide_help(void) const
 {

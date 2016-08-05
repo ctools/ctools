@@ -216,35 +216,20 @@ void ctpsfcube::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Initialise PSF cube");
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
-    // Initialise exposure cube
+    // Initialise PSF cube
     init_cube();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Observation",m_obs.size()));
-        log << m_obs.print(m_chatter) << std::endl;
-    }
-
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate PSF cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Generate PSF cube");
 
     // Fill PSF cube
     m_psfcube.fill(m_obs, &log);
 
-    // Log PSF cube
-    if (logTerse()) {
-        log << m_psfcube.print(m_chatter) << std::endl;
-    }
+    // Write PSF cube into logger
+    log_string(EXPLICIT, m_psfcube.print(m_chatter));
 
     // Return
     return;
@@ -253,31 +238,34 @@ void ctpsfcube::run(void)
 
 /***********************************************************************//**
  * @brief Save PSF cube
+ *
+ * Saves the PSF cube into a FITS file. A file is only created if the
+ * "outcube" parameter is not empty and if a PSF cube has been computed.
  ***************************************************************************/
 void ctpsfcube::save(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save PSF cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Save PSF cube");
 
     // Get output filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outcube.is_empty()) {
+    // Determine whether the cube is empty
+    bool cube_is_empty = ((m_psfcube.cube().nx()    == 0) ||
+                          (m_psfcube.cube().ny()    == 0) ||
+                          (m_psfcube.cube().nmaps() == 0));
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("PSF cube file");
-            log << m_outcube.url() << std::endl;
-        }
-
-        // Save PSF cube
+    // Save PSF cube if filename and the PSF cube are not empty
+    if (!m_outcube.is_empty() && !cube_is_empty) {
         m_psfcube.save(m_outcube, clobber());
-
     }
+
+    // Write into logger what has been done
+    std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
+    if (cube_is_empty) {
+        fname.append(" (cube is empty, no file created)");
+    }
+    log_value(NORMAL, "PSF cube file", fname);
 
     // Return
     return;
@@ -381,7 +369,7 @@ void ctpsfcube::get_parameters(void)
 
     }
 
-    // ... otherwise setup the exposure cube from the counts map
+    // ... otherwise setup the PSF cube from the counts map
     else {
 
         // Load event cube from filename
@@ -416,7 +404,10 @@ void ctpsfcube::get_parameters(void)
  ***************************************************************************/
 void ctpsfcube::init_cube(void)
 {
-    // Extract exposure cube definition
+    // Write header into logger
+    log_header1(TERSE, "Initialise PSF cube");
+
+    // Extract PSF cube definition
     const GWcs* proj   = static_cast<const GWcs*>(m_psfcube.cube().projection());
     std::string wcs    = m_psfcube.cube().projection()->code();
     std::string coords = m_psfcube.cube().projection()->coordsys();
@@ -435,12 +426,6 @@ void ctpsfcube::init_cube(void)
     // If requested, insert energies at all event list energy boundaries
     if (m_addbounds) {
 
-        // Set logger
-        GLog* logger = NULL;
-        if (logTerse()) {
-            logger = &log;
-        }
-    
         // Loop over all observations
         for (int i = 0; i < m_obs.size(); ++i) {
     
@@ -459,7 +444,7 @@ void ctpsfcube::init_cube(void)
             }
 
             // Insert energy boundaries
-            energies = insert_energy_boundaries(energies, *cta, logger);
+            energies = insert_energy_boundaries(energies, *cta);
 
         } // endfor: looped over all observations
 
@@ -469,11 +454,9 @@ void ctpsfcube::init_cube(void)
     m_psfcube = GCTACubePsf(wcs, coords, x, y, dx, dy, nx, ny, energies,
                             dmax, ndbins);
 
-    // Log PSF cube
-    if (logTerse()) {
-        log << m_psfcube.print(m_chatter) << std::endl;
-    }
+    // Write PSF cube in logger
+    log_string(NORMAL, m_psfcube.print(m_chatter));
 
     // Return
     return;
-};
+}

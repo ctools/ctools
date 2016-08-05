@@ -218,53 +218,25 @@ void ctexpcube::run(void)
     get_parameters();
 
     // Warn if there are not enough energy bins
-    int    n          = m_expcube.energies().size();
-    double logEmin    = std::log10(m_expcube.energies()[0].TeV());
-    double logEmax    = std::log10(m_expcube.energies()[n-1].TeV());
-    int    nrequired  = int((logEmax - logEmin) * 25.0);
-    if ((n < nrequired) && logTerse()) {
-        log << std::endl;
-        log << "WARNING: ";
-        log << "Only " << n-1 << " energy bins have been requested. This may be "
-               "too few energy bins.";
-        log << std::endl << "         ";
-        log << "At least 25 bins per decade in energy are recommended, which "
-               "in your case";
-        log << std::endl << "         ";
-        log << "would be " << nrequired-1 << " bins. Consider increasing the "
-               "number of energy bins.";
-        log << std::endl;
-    }
+    log_string(TERSE, warn_too_few_energies(m_expcube.energies()));
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Initialise exposure cube");
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
     // Initialise exposure cube
     init_cube();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Observation",m_obs.size()));
-        log << m_obs.print(m_chatter) << std::endl;
-    }
+    // Write header into logger
+    log_header1(TERSE, "Generate exposure cube");
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate exposure cube");
-    }
+    // Set pointer to logger dependent on chattiness
+    GLog* logger = (logNormal()) ? &log : NULL;
 
     // Fill exposure cube
-    m_expcube.fill(m_obs, &log);
+    m_expcube.fill(m_obs, logger);
 
-    // Log exposure cube
-    if (logTerse()) {
-        log << m_expcube.print(m_chatter) << std::endl;
-    }
+    // Write exposure cube into logger
+    log_string(EXPLICIT, m_expcube.print(m_chatter));
 
     // Optionally publish exposure cube
     if (m_publish) {
@@ -283,28 +255,28 @@ void ctexpcube::run(void)
  ***************************************************************************/
 void ctexpcube::save(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save exposure cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Save exposure cube");
 
     // Get exposure cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outcube.is_empty()) {
+    // Determine whether the cube is empty
+    bool cube_is_empty = ((m_expcube.cube().nx()    == 0) ||
+                          (m_expcube.cube().ny()    == 0) ||
+                          (m_expcube.cube().nmaps() == 0));
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Exposure cube file");
-            log << m_outcube.url() << std::endl;
-        }
-
-        // Save exposure cube
+    // Save exposure cube if filename and the exposure cube are not empty
+    if (!m_outcube.is_empty() && !cube_is_empty) {
         m_expcube.save(m_outcube, clobber());
-
     }
+
+    // Write into logger what has been done
+    std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
+    if (cube_is_empty) {
+        fname.append(" (cube is empty, no file created)");
+    }
+    log_value(NORMAL, "Exposure cube file", fname);
 
     // Return
     return;
@@ -318,23 +290,17 @@ void ctexpcube::save(void)
  ***************************************************************************/
 void ctexpcube::publish(const std::string& name)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish exposure cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Publish exposure cube");
 
-    // Set default name is user name is empty
+    // Set default name if user name is empty
     std::string user_name(name);
     if (user_name.empty()) {
         user_name = CTEXPCUBE_NAME;
     }
 
-    // Log filename
-    if (logTerse()) {
-        log << gammalib::parformat("Publish exposure cube");
-        log << user_name << std::endl;
-    }
+    // Write exposure cube name into logger
+    log_value(NORMAL, "Counts cube name", user_name);
 
     // Publish exposure cube
     m_expcube.cube().publish(user_name);
@@ -475,6 +441,9 @@ void ctexpcube::get_parameters(void)
  ***************************************************************************/
 void ctexpcube::init_cube(void)
 {
+    // Write header into logger
+    log_header1(TERSE, "Initialise exposure cube");
+
     // Extract exposure cube definition
     const GWcs* proj   = static_cast<const GWcs*>(m_expcube.cube().projection());
     std::string wcs    = m_expcube.cube().projection()->code();
@@ -492,12 +461,6 @@ void ctexpcube::init_cube(void)
     // If requested, insert energies at all event list energy boundaries
     if (m_addbounds) {
 
-        // Set logger
-        GLog* logger = NULL;
-        if (logTerse()) {
-            logger = &log;
-        }
-    
         // Loop over all observations
         for (int i = 0; i < m_obs.size(); ++i) {
     
@@ -516,7 +479,7 @@ void ctexpcube::init_cube(void)
             }
 
             // Insert energy boundaries
-            energies = insert_energy_boundaries(energies, *cta, logger);
+            energies = insert_energy_boundaries(energies, *cta);
 
         } // endfor: looped over all observations
 
@@ -525,11 +488,9 @@ void ctexpcube::init_cube(void)
     // Setup exposure cube
     m_expcube = GCTACubeExposure(wcs, coords, x, y, dx, dy, nx, ny, energies);
 
-    // Log exposure cube
-    if (logTerse()) {
-        log << m_expcube.print(m_chatter) << std::endl;
-    }
+    // Write exposure cube in logger
+    log_string(NORMAL, m_expcube.print(m_chatter));
 
     // Return
     return;
-};
+}

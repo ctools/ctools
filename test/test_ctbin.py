@@ -134,7 +134,6 @@ class Test(test):
         bin.clear()
 
         # Now set ctbin parameters
-        #bin = ctools.ctbin()
         bin['inobs']    = self._events
         bin['outcube']  = 'ctbin_py1.fits'
         bin['ebinalg']  = 'LOG'
@@ -159,7 +158,7 @@ class Test(test):
         self._check_observation(bin, 5542)
         self._check_cube(bin.cube(), 5542)
 
-        # Test copy constructor
+        # Copy ctbin tool
         cpy_bin = bin.copy()
 
         # Check content of observation container and counts cube
