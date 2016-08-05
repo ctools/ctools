@@ -21,7 +21,10 @@ Gaussian sigma).
 
 cttsmap generates a FITS file comprising a sky map of TS values followed by 
 one extension per free parameter that contains sky maps of the fitted 
-parameter values.
+parameter values. To save computation time, the errors are not computed by
+default. Specifying the hidden parameter ``errors=yes`` will switch on the
+error computation. Accordingly, for each free parameter, the errors are also
+stored in a separate sky map.
 
 
 General parameters
@@ -56,6 +59,9 @@ General parameters
 
 ``outmap [file]``
     Output Test Statistic map file.
+    
+``(errors = no) [boolean]``
+    Compute and store parameter errors?
  	 	 
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for map centre instead of xref/yref parameters?

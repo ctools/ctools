@@ -173,25 +173,19 @@ cttsmap& cttsmap::operator=(const cttsmap& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear cttsmap tool
- *
- * Clears cttsmap tool.
+ * @brief Clear instance
  ***************************************************************************/
 void cttsmap::clear(void)
 {
     // Free members
     free_members();
     this->ctool::free_members();
-
-    // Clear base class (needed to conserve tool name and version)
-    this->GApplication::clear();
+    this->GApplication::free_members();
 
     // Initialise members
+    this->GApplication::init_members();
     this->ctool::init_members();
     init_members();
-
-    // Write header into logger
-    log_header();
 
     // Return
     return;
@@ -215,12 +209,9 @@ void cttsmap::run(void)
     // Get task parameters
     get_parameters();
 
-<<<<<<< HEAD
-=======
     // Write parameters into logger
     log_parameters(TERSE);
 
->>>>>>> b7dd76b35e6d2fd74ff010258ffa7606e072dbf5
     // Set energy dispersion flag for all CTA observations and save old
     // values in save_edisp vector
     std::vector<bool> save_edisp;
@@ -234,22 +225,16 @@ void cttsmap::run(void)
     }
 
     // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
+    if (m_obs.size() > 1) {
+    	log_header1(TERSE, "Observations");
     }
+    else {
+    	log_header1(TERSE, "Observation");
+    }
+    log_string(TERSE, m_obs.print());
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Initialise TS map");
-    }
+    log_header1(TERSE, "Initialise TS map");
 
 
     // Get bins to be computed
@@ -276,10 +261,7 @@ void cttsmap::run(void)
 	if (m_logL0 == 0.0) {
 
         // Write header
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Compute NULL Hypothesis for TS computation");
-        }
+		log_header1(TERSE, "Compute NULL Hypothesis for TS computation");
 
 		// Compute likelihood without the test source
 		m_obs.models(models);
@@ -289,10 +271,7 @@ void cttsmap::run(void)
 	}
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate TS map");
-    }
+    log_header1(TERSE, "Generate TS map");
 
     // Loop over grid positions
     for (int i = binmin; i < binmax; ++i) {
@@ -301,12 +280,9 @@ void cttsmap::run(void)
     	GSkyDir bincentre = m_tsmap.inx2dir(i);
 
     	// Header for verbose logging
-    	if (logExplicit()) {
-            std::string msg = "Computing TS for bin number "+gammalib::str(i)+
-                              " at "+bincentre.print();
-            log << std::endl;
-            log.header2(msg);
-    	}
+    	std::string msg = "Computing TS for bin number "+gammalib::str(i)+
+    	                              " at "+bincentre.print();
+    	log_header2(EXPLICIT, msg);
 
     	// Add test source at current bin position
         if (m_testsource != NULL) {
@@ -340,7 +316,6 @@ void cttsmap::run(void)
     		log << " TS value ....: ";
             log << ts << std::endl;
     	}
-
         else if (logTerse()) {
     		log << "TS for bin number ";
             log << i;
@@ -445,7 +420,7 @@ void cttsmap::save(void)
 
         // Write Fit status map
         m_statusmap.write(fits);
-        fits[fits.size()-1]->extname("FITSTATUS");
+        fits[fits.size()-1]->extname("STATUS MAP");
 
         // Save FITS file
         fits.saveto(m_outmap, clobber());
@@ -465,10 +440,7 @@ void cttsmap::save(void)
 void cttsmap::publish(const std::string& name)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish TS map");
-    }
+	log_header1(TERSE, "Publish TS map");
 
     // Set default name is user name is empty
     std::string user_name(name);
@@ -477,10 +449,7 @@ void cttsmap::publish(const std::string& name)
     }
 
     // Log filename
-    if (logTerse()) {
-        log << gammalib::parformat("Publish TS map");
-        log << user_name << std::endl;
-    }
+    log_value(TERSE, "Publish TS map", user_name);
 
     // Publish TS map
     m_tsmap.publish(user_name);
@@ -659,9 +628,6 @@ void cttsmap::get_parameters(void)
         m_outmap = (*this)["outmap"].filename();
     }
 
-    // Write parameters into logger
-    log_parameters(TERSE);
-
     // Return
     return;
 }
@@ -716,7 +682,8 @@ void cttsmap::init_maps(const GSkyMap& map)
 
 				// Store name of parameter error
 				m_mapnames.push_back("e_" + (*m_testsource)[i].name());
-            }
+
+            } // endif: error calculation was requested
         
         } // endfor: looped over all model parameters
 
