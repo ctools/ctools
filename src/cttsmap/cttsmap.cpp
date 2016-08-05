@@ -210,10 +210,7 @@ void cttsmap::run(void)
     get_parameters();
 
     // Write parameters into logger
-    if (logTerse()) {
-        log_parameters();
-        log << std::endl;
-    }
+    log_parameters(TERSE);
 
     // Set energy dispersion flag for all CTA observations and save old
     // values in save_edisp vector
@@ -372,9 +369,6 @@ void cttsmap::run(void)
         // Set Fit status of the bin
         m_statusmap(i) = status;
 
-    	// Add bin to progress map
-    	m_progressmap(i) = 1.0;
-
     	// Remove model from container
     	models.remove(m_srcname);
 
@@ -444,12 +438,6 @@ void cttsmap::save(void)
         m_statusmap.write(fits);
         fits[fits.size()-1]->extname("FITSTATUS");
 
-        // Add computation log if not all bins are computed
-        if (m_binmin != -1 || m_binmax != -1) {
-            m_progressmap.write(fits);
-            fits[m_mapnames.size()+1]->extname("PROGRESS MAP");
-        }
-
         // Save FITS file
         fits.saveto(m_outmap, clobber());
 
@@ -518,7 +506,6 @@ void cttsmap::init_members(void)
     m_logL0      = 0.0;
     m_tsmap.clear();
     m_statusmap.clear();
-    m_progressmap.clear();
     m_mapnames.clear();
     m_maps.clear();
     m_testsource = NULL;
@@ -551,7 +538,6 @@ void cttsmap::copy_members(const cttsmap& app)
     m_mapnames    = app.m_mapnames;
     m_maps        = app.m_maps;
     m_statusmap   = app.m_statusmap;
-    m_progressmap = app.m_progressmap;
 
     // Clone protected members
     m_testsource = (app.m_testsource != NULL) ? app.m_testsource->clone() : NULL;
@@ -684,11 +670,13 @@ void cttsmap::init_maps(const GSkyMap& map)
 
     // Initialise map information
 	m_statusmap.clear();
-	m_progressmap.clear();
 
 	// Create status map and progress map
-	m_statusmap   = GSkyMap(map);
-	m_progressmap = GSkyMap(map);
+	m_statusmap = GSkyMap(map);
+
+	// Set status map to invalid value -1 to signal
+	// that bin wasn't computed yet
+	m_statusmap = -1.0;
 
 	// Initialise maps of free parameters
     if (m_testsource != NULL) {

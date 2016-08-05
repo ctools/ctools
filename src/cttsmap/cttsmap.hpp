@@ -100,7 +100,6 @@ protected:
     GObservations            m_obs;         //!< Observation container
     GSkyMap                  m_tsmap;       //!< TS map
     GSkyMap                  m_statusmap;   //!< Map of optimizer fit status
-    GSkyMap                  m_progressmap; //!< Map of computed bins
     std::vector<std::string> m_mapnames;    //!< Names of free parameters
     std::vector<GSkyMap>     m_maps;        //!< Sky maps for each free parameter
     GModel*                  m_testsource;  //!< Pointer to test source for TS computation
