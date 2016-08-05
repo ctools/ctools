@@ -44,9 +44,9 @@ class Test(test):
         test.__init__(self)
 
         # Set data members
-        self._remote    = self._datadir + '/iactdata/master.json'
-        self._runlist1  = self._datadir + '/iact_runlist_1.dat'
-        self._runlist2  = self._datadir + '/iact_runlist_2.dat'
+        self._remote   = self._datadir + '/iactdata/master.json'
+        self._runlist1 = self._datadir + '/iact_runlist_1.dat'
+        self._runlist2 = self._datadir + '/iact_runlist_2.dat'
 
         # Return
         return
@@ -77,7 +77,7 @@ class Test(test):
         # Setup csiactcopy command
         cmd = csiactcopy+' remote_master="'+self._remote+'"'+ \
                          ' prodname="unit-test"'+ \
-                         ' outpath="iactdata_cmd1"'+ \
+                         ' outpath="csiactcopy_cmd1"'+ \
                          ' logfile="csiactcopy_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -89,12 +89,12 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check copy
-        self._check_copy('iactdata_cmd1')
+        self._check_copy('csiactcopy_cmd1')
 
         # Setup csiactcopy command
         cmd = csiactcopy+' remote_master="master_that_does_not_exist"'+ \
                          ' prodname="unit-test"'+ \
-                         ' outpath="iactdata_test"'+ \
+                         ' outpath="csiactcopy_cmd2"'+ \
                          ' logfile="csiactcopy_cmd2.log"'
 
         # Check if execution failed
@@ -113,9 +113,9 @@ class Test(test):
         iactcopy = cscripts.csiactcopy()
         iactcopy['remote_master'] = self._remote
         iactcopy['prodname']      = 'unit-test'
-        iactcopy['outpath']       = 'iactdata_py1'
+        iactcopy['outpath']       = 'csiactcopy_py1'
         iactcopy['logfile']       = 'csiactcopy_py1.log'
-        iactcopy['chatter']       = 4
+        iactcopy['chatter']       = 2
 
         # Run csiactcopy script and save run list
         iactcopy.logFileOpen()   # Make sure we get a log file
@@ -123,32 +123,34 @@ class Test(test):
         iactcopy.save()
         
         # Check IACT data store
-        self._check_copy('iactdata_py1')
-        self._check_n_obs('iactdata_py1', 9)
+        self._check_copy('csiactcopy_py1')
+        self._check_n_obs('csiactcopy_py1', 9)
         
-        # Set-up csiactcopy
+        # Set-up csiactcopy with clobber=True, should lead to skipping
+        # of files
         iactcopy = cscripts.csiactcopy()
         iactcopy['remote_master'] = self._remote
         iactcopy['prodname']      = 'unit-test'
-        iactcopy['outpath']       = 'iactdata_py1'
+        iactcopy['outpath']       = 'csiactcopy_py1'
         iactcopy['logfile']       = 'csiactcopy_py2.log'
-        iactcopy['chatter']       = 4
+        iactcopy['chatter']       = 3
         iactcopy['clobber']       = True
 
-        # Run csiactcopy script and save run list
+        # Execute csiactcopy script
         iactcopy.logFileOpen()   # Make sure we get a log file
-        iactcopy.run()
-        iactcopy.save()
+        iactcopy.execute()
         
         # Check copy
-        self._check_copy('iactdata_py1')
-        self._check_n_obs('iactdata_py1', 9)
+        self._check_copy('csiactcopy_py1')
+        self._check_n_obs('csiactcopy_py1', 9)
         
-        # Set-up csiactcopy
+        # Set-up csiactcopy with clobber=False, should also lead to skipping
+        # of files, but for the reason that it's not allowed to overwrite
+        # the file
         iactcopy = cscripts.csiactcopy()
         iactcopy['remote_master'] = self._remote
         iactcopy['prodname']      = 'unit-test'
-        iactcopy['outpath']       = 'iactdata_py1'
+        iactcopy['outpath']       = 'csiactcopy_py1'
         iactcopy['logfile']       = 'csiactcopy_py3.log'
         iactcopy['chatter']       = 4
         iactcopy['clobber']       = False
@@ -159,21 +161,21 @@ class Test(test):
         iactcopy.save()
         
         # Check copy
-        self._check_copy('iactdata_py1')
-        self._check_n_obs('iactdata_py1', 9)
+        self._check_copy('csiactcopy_py1')
+        self._check_n_obs('csiactcopy_py1', 9)
         
         # Remove the copied IACT data store before continuing
-        if os.path.isdir('iactdata_py2'):
-            os.system('rm -r iactdata_py2')
+        if os.path.isdir('csiactcopy_py2'):
+            os.system('rm -r csiactcopy_py2')
         
-        # Set-up csiactcopy
+        # Set-up csiactcopy using a run list with 5 runs
         iactcopy = cscripts.csiactcopy()
         iactcopy['runlist']       = self._runlist1
         iactcopy['remote_master'] = self._remote
         iactcopy['prodname']      = 'unit-test'
-        iactcopy['outpath']       = 'iactdata_py2'
+        iactcopy['outpath']       = 'csiactcopy_py2'
         iactcopy['logfile']       = 'csiactcopy_py4.log'
-        iactcopy['chatter']       = 3
+        iactcopy['chatter']       = 4
 
         # Run csiactcopy script and save run list
         iactcopy.logFileOpen()   # Make sure we get a log file
@@ -181,17 +183,18 @@ class Test(test):
         iactcopy.save()
 
         # Check copy
-        self._check_copy('iactdata_py2')
-        self._check_n_obs('iactdata_py2', 5)
+        self._check_copy('csiactcopy_py2')
+        self._check_n_obs('csiactcopy_py2', 5)
 
-        # Set-up csiactcopy
+        # Set-up csiactcopy using another run list with 4 runs. Should have
+        # 9 runs in total in the data store afterwards
         iactcopy = cscripts.csiactcopy()
         iactcopy['runlist']       = self._runlist2
         iactcopy['remote_master'] = self._remote
         iactcopy['prodname']      = 'unit-test'
-        iactcopy['outpath']       = 'iactdata_py2'
+        iactcopy['outpath']       = 'csiactcopy_py2'
         iactcopy['logfile']       = 'csiactcopy_py5.log'
-        iactcopy['chatter']       = 3
+        iactcopy['chatter']       = 4
         
         # Run csiactcopy script and save run list
         iactcopy.logFileOpen()   # Make sure we get a log file
@@ -199,17 +202,19 @@ class Test(test):
         iactcopy.save()
 
         # Check copy
-        self._check_copy('iactdata_py2')
-        self._check_n_obs('iactdata_py2', 9)
+        self._check_copy('csiactcopy_py2')
+        self._check_n_obs('csiactcopy_py2', 9)
         
-        # Set-up csiactcopy
+        # Set-up csiactcopy using the same run list with 4 runs again, should
+        # lead to skipping of files, and we should still have 9 runs at the
+        # end in the datastore.
         iactcopy = cscripts.csiactcopy()
         iactcopy['runlist']       = self._runlist2
         iactcopy['remote_master'] = self._remote
         iactcopy['prodname']      = 'unit-test'
-        iactcopy['outpath']       = 'iactdata_py2'
+        iactcopy['outpath']       = 'csiactcopy_py2'
         iactcopy['logfile']       = 'csiactcopy_py6.log'
-        iactcopy['chatter']       = 3
+        iactcopy['chatter']       = 4
         iactcopy['clobber']       = True
         
         # Run csiactcopy script and save run list
@@ -218,8 +223,8 @@ class Test(test):
         iactcopy.save()
 
         # Check copy
-        self._check_copy('iactdata_py2')
-        self._check_n_obs('iactdata_py2',9)
+        self._check_copy('csiactcopy_py2')
+        self._check_n_obs('csiactcopy_py2',9)
 
         # Return
         return
@@ -266,7 +271,7 @@ class Test(test):
         pathname : str
             Path to copied IACT data store
         n_expected : int
-            Expected number of observation in IACT data store
+            Expected number of observations in IACT data store
         """
         # Set file name
         obs_index_name = gammalib.GFilename(pathname+'/obs-index.fits[OBS_INDEX]')

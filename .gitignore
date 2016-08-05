@@ -74,7 +74,7 @@ test/pfiles/
 test/caldb/
 test/prod3
 test/csroot2caldb_*
-test/iactdata_*
+test/csiactcopy_*
 test/*.fits
 test/*.dat
 test/*.xml
