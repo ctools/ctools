@@ -1,8 +1,9 @@
-2016-08-04
+2016-08-06
 
         * Version 1.2.0 released
         ========================
 
+        Add ctool and cscript pars() methods (#1838)
         Fix ctbin::save() bug for empty observation container (#1835)
         Fix exception when calling ctools clear() methods (#1835)
         Add support for new spectral models in ctulimit (#1832)

@@ -181,7 +181,7 @@ public:
 }
 
 /***********************************************************************//**
- * @brief cscript base class Python extensions
+ * @brief ctool and cscript base class Python extensions
  ***************************************************************************/
 %pythoncode %{
 
@@ -210,4 +210,49 @@ def _init_cscript(self, argv):
     self._log_header()
     self._log.date(True)
 cscript._init_cscript = _init_cscript
+
+# Return or assigns user parameters in form of a dictionary
+#
+# This function either returns or assigns user parameters in form of a
+# dictionary. The assignment function takes a dictionary as argument and
+# the function then loops over all keys in that dictionary and assigns
+# the value to the parameter. For example
+#
+# >>> tool.pars({'ra': 83.63, 'dec': 22.01})
+#
+# is equivalent to
+#
+# >>> tool['ra'] = 83.63
+# >>> tool['dec'] = 22.01
+#
+# and assigns the 'ra' and 'dec' parameters of the tool. The return function
+# takes no argument and returns a dictionary with the parameter names as
+# keys and the current values as values. No parameter querying is performed.
+# For example
+#
+# >>> d = tool.pars()
+#
+# puts all parameters in the dictionary d.
+def _parameters(self, *args):
+    if len(args) == 0:
+        d = {}
+        for par in self._pars():
+            if par.type() == 'b':
+                v     = gammalib.tolower(par.current_value())
+                value = (v == "yes" or v == "y" or v == "true" or v == "t")
+                d[par.name()] = value
+            elif par.type() == 'i':
+                d[par.name()] = int(par.current_value())
+            elif par.type() == 'r':
+                d[par.name()] = float(par.current_value())
+            else:
+                d[par.name()] = str(par.current_value())
+        return d
+    elif len(args) == 1:
+        for key in args[0]:
+            self[key] = args[0][key]
+    else:
+        raise TypeError('pars() takes 0 or 1 arguments (%d given)' % len(args))
+ctool.pars = _parameters
+cscript.pars = _parameters
 %}

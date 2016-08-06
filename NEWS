@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-4 August 2016
+6 August 2016
 
 
 Introduction
@@ -17,7 +17,9 @@ from the command line are included in the coverage reports (#1827).
 
 Python interface
 ----------------
-None
+A pars() method has been added to the Python interface of all ctools and
+cscripts that allows assigning parameters from a dictionary or retrieving
+all parameters in a dictionary (#1838).
 
 
 Support model

@@ -235,6 +235,22 @@ class Test(test):
         evt = gammalib.GCTAEventCube('ctbin_py3.fits')
         self._check_cube(evt, 5542, multiplier=3)
 
+        # And finally go for a fully Pythonic version with all parameters
+        # being specified in a dictionary
+        dict = {'inobs': self._events, 'ebinalg': 'LOG', 'emin': 0.1,
+                'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
+                'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
+                'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py4.fits',
+                'logfile': 'ctbin_py4.log', 'chatter': 2}
+        bin = ctools.ctbin()
+        bin.pars(dict)
+        bin.logFileOpen()
+        bin.execute()
+
+        # Load counts cube and check content
+        evt = gammalib.GCTAEventCube('ctbin_py4.fits')
+        self._check_cube(evt, 5542)
+
         # Return
         return
 
