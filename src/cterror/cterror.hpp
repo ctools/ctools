@@ -35,7 +35,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTERROR_NAME    "cterror"
-#define CTERROR_VERSION "1.1.0"
+#define CTERROR_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -80,6 +80,7 @@ protected:
     int           m_max_iter;     //!< Maximum number of iterations
     double        m_value;        //!< Parameter value 
     bool          m_apply_edisp;  //!< Apply energy dispersion?
+    GChatter      m_chatter;      //!< Chattiness
 
     // Protected members
     GObservations m_obs;          //!< Observation container
@@ -87,7 +88,6 @@ protected:
     GModelPar*    m_model_par;    //!< Pointer to model parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
     GOptimizerLM  m_opt;          //!< Optimizer
-
 };
 
 

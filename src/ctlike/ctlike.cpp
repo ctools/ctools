@@ -215,24 +215,12 @@ void ctlike::run(void)
     // Get parameters
     get_parameters();
 
-    // Set energy dispersion flag for all CTA observations and save old
+    // Set energy dispersion flags of all CTA observations and save old
     // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
-    }
+    std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Observation",m_obs.size()));
-        log << m_obs.print(m_chatter) << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
     // Optimize model parameters using LM optimizer
     optimize_lm();
@@ -303,29 +291,16 @@ void ctlike::run(void)
     }
 
     // Write results into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Maximum likelihood optimisation results");
-        log << m_opt->print(m_chatter) << std::endl;
-        log << gammalib::parformat("Maximum log likelihood");
-        log << gammalib::str(m_logL,3) << std::endl;
-        log << gammalib::parformat("Observed events  (Nobs)");
-        log << gammalib::str(num_events, 3) << std::endl;
-        log << gammalib::parformat("Predicted events (Npred)");
-        log << gammalib::str(npred, 3);
-        log << " (Nobs - Npred = ";
-        log << gammalib::str(num_events-npred);
-        log << ")" << std::endl;
-        log << m_obs.models().print(m_chatter) << std::endl;
-    }
+    log_header1(NORMAL, "Maximum likelihood optimisation results");
+    log_string(NORMAL, m_opt->print(m_chatter));
+    log_value(NORMAL, "Maximum log likelihood", gammalib::str(m_logL,3));
+    log_value(NORMAL, "Observed events  (Nobs)", gammalib::str(num_events,3));
+    log_value(NORMAL, "Predicted events (Npred)", gammalib::str(npred,3)+
+              " (Nobs - Npred = "+gammalib::str(num_events-npred)+")");
+    log_string(NORMAL, m_obs.models().print(m_chatter));
 
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
-    }
+    // Restore energy dispersion flags of all CTA observations
+    restore_edisp(m_obs, save_edisp);
 
     // Return
     return;
@@ -340,10 +315,7 @@ void ctlike::run(void)
 void ctlike::save(void)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save results");
-    }
+    log_header1(TERSE, "Save results");
 
     // Get output filename
     m_outmodel = (*this)["outmodel"].filename();
@@ -353,14 +325,16 @@ void ctlike::save(void)
         gammalib::toupper(m_outmodel.url()) != "NONE") {
 
         // Log filename
-        if (logTerse()) {
-            log << "Save fitted parameters into file \""+m_outmodel+"\".";
-            log << std::endl;
-        }
+        log_value(NORMAL, "Model definition file", m_outmodel.url());
 
         // Write results out as XML model
         m_obs.models().save(m_outmodel);
 
+    }
+
+    // ... otherwise signal that file was not save
+    else {
+        log_value(NORMAL, "Model definition file", "NONE");
     }
 
     // Return
@@ -434,7 +408,7 @@ void ctlike::get_parameters(void)
     }
 
     // Set optimizer logger
-    if (logTerse()) {
+    if (logNormal()) {
         static_cast<GOptimizerLM*>(m_opt)->logger(&log);
     }
     else {
@@ -456,12 +430,9 @@ void ctlike::get_parameters(void)
  ***************************************************************************/
 void ctlike::optimize_lm(void)
 {
-    // Write Header for optimization and indent for optimizer logging
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Maximum likelihood optimisation");
-        log.indent(1);
-    }
+    // Write header
+    log_header1(TERSE, "Maximum likelihood optimisation");
+    log.indent(1);
 
     // Compute number of fitted parameters
     int nfit = 0;
@@ -476,14 +447,9 @@ void ctlike::optimize_lm(void)
 
     // Notify if all parameters are fixed
     if (nfit == 0) {
-        if (logTerse()) {
-            log << "WARNING: All model parameters are fixed!";
-            log << std::endl;
-            log << "         ctlike will proceed without fitting parameters.";
-            log << std::endl;
-            log << "         All curvature matrix elements will be zero.";
-            log << std::endl;
-        }
+        log_string(TERSE, "WARNING: All model parameters are fixed!");
+        log_string(TERSE, "         ctlike will proceed without fitting parameters.");
+        log_string(TERSE, "         All curvature matrix elements will be zero.");
     }
 
     // Perform LM optimization
@@ -494,11 +460,8 @@ void ctlike::optimize_lm(void)
 
         // Dump new header
         log.indent(0);
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Maximum likelihood re-optimisation");
-            log.indent(1);
-        }
+        log_header1(TERSE, "Maximum likelihood re-optimisation");
+        log.indent(1);
 
         // Optimise again
         m_obs.optimize(*m_opt);
@@ -506,13 +469,10 @@ void ctlike::optimize_lm(void)
     }
 
     // Optionally show curvature matrix
-    if (logNormal()) {
-        log << std::endl;
-        log.header1("Curvature matrix");
-        log.indent(1);
-        log << *(const_cast<GObservations::likelihood&>(m_obs.function()).curvature());
-        log << std::endl;
-    }
+    log_header1(EXPLICIT, "Curvature matrix");
+    log.indent(1);
+    log_string(EXPLICIT, (const_cast<GObservations::likelihood&>
+                                    (m_obs.function()).curvature())->print());
 
     // Compute errors
     m_obs.errors(*m_opt);
@@ -537,11 +497,8 @@ void ctlike::optimize_lm(void)
 double ctlike::reoptimize_lm(void)
 {
     // Write Header for optimization and indent for optimizer logging
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Maximum likelihood re-optimisation");
-        log.indent(1);
-    }
+    log_header1(TERSE, "Maximum likelihood re-optimisation");
+    log.indent(1);
 
     // Create a clone of the optimizer for the re-optimisation
     GOptimizer* opt = m_opt->clone();
@@ -559,11 +516,8 @@ double ctlike::reoptimize_lm(void)
 
     // Write optimization results
     log.indent(0);
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Maximum likelihood re-optimisation results");
-        log << *opt << std::endl;
-    }
+    log_header1(NORMAL, "Maximum likelihood re-optimisation results");
+    log_string(NORMAL, opt->print(m_chatter));
 
     // Return
     return (logL);

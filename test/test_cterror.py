@@ -101,14 +101,31 @@ class Test(test):
         """
         Test cterror from Python
         """
-        # Set-up cterror
+        # Allocate cterror
         error = ctools.cterror()
+
+        # Check that empty cterror tool holds an empty observation and
+        # optimizer
+        self._check_obs(error.obs(), nobs=0, nmodels=0)
+        self._check_opt(error.opt())
+
+        # Check that saving saves an empty model definition file
+        error['outmodel'] = 'cterror_py0.xml'
+        error['logfile']  = 'cterror_py0.log'
+        error.logFileOpen()
+        error.save()
+        self._check_result_file('cterror_py0.xml', nmodels=0)
+
+        # Check that clearing does not lead to an exception or segfault
+        error.clear()
+
+        # Now set cterror parameters
         error['inobs']    = self._events
         error['inmodel']  = self._model
-        error['outmodel'] = 'cterror_py1.xml'
         error['srcname']  = 'Crab'
         error['caldb']    = self._caldb
         error['irf']      = self._irf
+        error['outmodel'] = 'cterror_py1.xml'
         error['logfile']  = 'cterror_py1.log'
         error['chatter']  = 2
 
@@ -120,38 +137,130 @@ class Test(test):
         # Check result file
         self._check_result_file('cterror_py1.xml')
 
+        # Copy cterror tool
+        cpy_error = error.copy()
+
+        # Check observation and optimizer of copy
+        self._check_obs(cpy_error.obs())
+        self._check_opt(cpy_error.opt())
+
+        # Execute copy of cterror tool again, now with a higher chatter
+        # level than before
+        cpy_error['outmodel'] = 'cterror_py2.xml'
+        cpy_error['logfile']  = 'cterror_py2.log'
+        cpy_error['chatter']  = 3
+        cpy_error.logFileOpen()  # Needed to get a new log file
+        cpy_error.execute()
+
+        # Check result file
+        self._check_result_file('cterror_py2.xml')
+
+        # Now clear copy of cterror tool
+        cpy_error.clear()
+
+        # Check that the cleared copy has also cleared the observations
+        self._check_obs(cpy_error.obs(), nobs=0, nmodels=0)
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nmodels=2):
         """
         Check result file
-        """
-        # Open result file
-        result = gammalib.GModels(filename)
 
-        # Check results
-        self.test_value(result['Crab']['Prefactor'].value(), 1.58907e-16,
-                        1.0e-3, 'Check fitted Crab Prefactor')
-        self.test_value(result['Crab']['Prefactor'].error(), 0.0529105e-16,
-                        1.0e-3, 'Check Crab Prefactor error')
-        self.test_value(result['Crab']['Index'].value(), -2.43549,
-                        1.0e-3, 'Check fitted Crab Index')
-        self.test_value(result['Crab']['Index'].error(), 0.027804,
-                        1.0e-3, 'Check Crab Index error')
-        self.test_value(result['Background']['Prefactor'].value(), 61.6919e-6,
-                        1.0e-3, 'Check fitted background Prefactor')
-        self.test_value(result['Background']['Prefactor'].error(), 1.49438e-6,
-                        1.0e-3, 'Check background Prefactor error')
-        self.test_value(result['Background']['Index'].value(), -2.20535,
-                        1.0e-3, 'Check fitted background Index')
-        self.test_value(result['Background']['Index'].error(), 0.0113269,
-                        1.0e-3, 'Check background Index error')
-        self.test_value(result['Background']['Sigma'].value(), 3.04252,
-                        1.0e-3, 'Check fitted background Sigma')
-        self.test_value(result['Background']['Sigma'].error(), 0.0307008,
-                        1.0e-3, 'Check background Sigma error')
+        Parameters
+        ----------
+        filename : str
+            Model definition XML file
+        nmodels : int, optional
+            Expected number of models
+        """
+        # Open models from result file
+        models = gammalib.GModels(filename)
+
+        # Check models
+        self._check_models(models, nmodels=nmodels)
+
+        # Return
+        return
+
+    # Check observation and models
+    def _check_obs(self, obs, nobs=1, nmodels=2):
+        """
+        Check observation and models
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Models
+        nobs : int, optional
+            Expected number of observations
+        nmodels : int, optional
+            Expected number of models
+        """
+        # Check number of observations
+        self.test_value(obs.size(), nobs, 'Check number of observations')
+
+        # Check models
+        self._check_models(obs.models(), nmodels=nmodels)
+
+        # Return
+        return
+
+    # Check models
+    def _check_models(self, models, nmodels=2):
+        """
+        Check observation and models
+
+        Parameters
+        ----------
+        models : `~gammalib.GModels`
+            Models
+        nmodels : int, optional
+            Expected number of models
+        """
+        # Check number of models
+        self.test_value(models.size(), nmodels, 'Check number of models')
+
+        # If there are models in the container then check them
+        if nmodels > 0:
+            self.test_value(models['Crab']['Prefactor'].value(), 1.58907e-16,
+                            1.0e-3, 'Check fitted Crab Prefactor')
+            self.test_value(models['Crab']['Prefactor'].error(), 0.0529105e-16,
+                            1.0e-3, 'Check Crab Prefactor error')
+            self.test_value(models['Crab']['Index'].value(), -2.43549,
+                            1.0e-3, 'Check fitted Crab Index')
+            self.test_value(models['Crab']['Index'].error(), 0.027804,
+                            1.0e-3, 'Check Crab Index error')
+            self.test_value(models['Background']['Prefactor'].value(), 61.6919e-6,
+                            1.0e-3, 'Check fitted background Prefactor')
+            self.test_value(models['Background']['Prefactor'].error(), 1.49438e-6,
+                            1.0e-3, 'Check background Prefactor error')
+            self.test_value(models['Background']['Index'].value(), -2.20535,
+                            1.0e-3, 'Check fitted background Index')
+            self.test_value(models['Background']['Index'].error(), 0.0113269,
+                            1.0e-3, 'Check background Index error')
+            self.test_value(models['Background']['Sigma'].value(), 3.04252,
+                            1.0e-3, 'Check fitted background Sigma')
+            self.test_value(models['Background']['Sigma'].error(), 0.0307008,
+                            1.0e-3, 'Check background Sigma error')
+
+        # Return
+        return
+
+    # Check optimizer
+    def _check_opt(self, opt):
+        """
+        Check optimizer
+
+        Parameters
+        ----------
+        opt : `~gammalib.GOptimizerLM`
+            Optimizer
+        """
+        # Check optimizer
+        self.test_value(opt.status(), 0, 'Check optimizer status')
 
         # Return
         return

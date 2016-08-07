@@ -94,14 +94,17 @@ protected:
                                const std::string& what = "Model");
 
     // Protected support methods
-    void            set_response(GObservations& obs);
-    void            set_obs_response(GCTAObservation* obs);
-    void            set_obs_bounds(GObservations& obs);
-    GSkyDir         get_mean_pointing(const GObservations& obs);
-    size_t          get_current_rss(void);
-    std::string     get_obs_header(const GObservation* obs);
-    GEnergies       insert_energy_boundaries(const GEnergies&       energies,
-                                             const GCTAObservation& obs);
+    void              set_response(GObservations& obs);
+    std::vector<bool> set_edisp(GObservations& obs, const bool& edisp) const;
+    void              restore_edisp(GObservations& obs,
+                                    const std::vector<bool>& edisp) const;
+    void              set_obs_response(GCTAObservation* obs);
+    void              set_obs_bounds(GObservations& obs);
+    GSkyDir           get_mean_pointing(const GObservations& obs);
+    size_t            get_current_rss(void);
+    std::string       get_obs_header(const GObservation* obs);
+    GEnergies         insert_energy_boundaries(const GEnergies&       energies,
+                                               const GCTAObservation& obs);
 
     // Protected warning strings
     std::string     warn_too_few_energies(const GEnergies& energies) const;

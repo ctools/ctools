@@ -52,6 +52,8 @@
 #define G_SETUP_OBSERVATION       "ctool::setup_observations(GObservations&)"
 #define G_GET_MEAN_POINTING        "ctool::get_mean_pointing(GObservations&)"
 #define G_CREATE_EBOUNDS                            "ctool::create_ebounds()"
+#define G_RESTORE_EDISP               "ctool::restore_edisp(GObservations&, "\
+                                                        "std::vector<bool>&)"
 #define G_SET_OBS_RESPONSE        "ctool::set_obs_response(GCTAObservation*)"
 #define G_PROVIDE_HELP                                "ctool::provide_help()"
 
@@ -994,7 +996,7 @@ void ctool::set_response(GObservations& obs)
         // Is this observation a CTA observation?
         GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
 
-        // Yes ...
+        // Yes, the set the response if the observation does not yet have one
         if (cta != NULL) {
 
             // Set response if we don't have one
@@ -1005,6 +1007,87 @@ void ctool::set_response(GObservations& obs)
         } // endif: observation was a CTA observation
 
     } // endfor: looped over all observations
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set energy dispersion to CTA observations
+ *
+ * @param[in] obs Observation container.
+ * @param[in] edisp Requested energy dispersion flag.
+ * @return Vector of old energy dispersion flags.
+ *
+ * Applies energy dispersion to all CTA observations. The method returns a
+ * vector with the old energy dispersion flags.
+ ***************************************************************************/
+std::vector<bool> ctool::set_edisp(GObservations& obs, const bool& edisp) const
+{
+    // Allocate vector for energy dispersion flags of all observation in
+    // the container
+    std::vector<bool> old_edisp(obs.size(), false);
+
+    // Loop over all observations in observation container
+    for (int i = 0; i < obs.size(); ++i) {
+
+        // Is this observation a CTA observation?
+        GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
+
+        // Yes, then set the energy dispersion flag
+        if (cta != NULL) {
+        
+            // Save old energy dispersion flag
+            old_edisp[i] = cta->response()->apply_edisp();
+
+            // Set energy dispersion flag according to input parameter
+            cta->response()->apply_edisp(edisp);
+
+        } // endif: observation was CTA observation
+
+    } // endfor: loop over all observations in container
+
+    // Return old energy dispersion flags
+    return old_edisp;
+}
+
+
+/***********************************************************************//**
+ * @brief Restore energy dispersion flags of CTA observations
+ *
+ * @param[in] obs Observation container.
+ * @param[in] edisp Vector of energy dispersion flags.
+ *
+ * Restores energy dispersion flags that have previously been returned by
+ * the set_edisp() method. The number of observations between the calls
+ * of the set_edisp() and this method has to be the same.
+ ***************************************************************************/
+void ctool::restore_edisp(GObservations& obs, const std::vector<bool>& edisp) const
+{
+    // Check that energy dispersion flag vector has the same size as the
+    // observation container
+    if (edisp.size() != obs.size()) {
+        std::string msg = "Size of energy dispersion flag vector ("+
+                          gammalib::str(edisp.size())+" elements) is "
+                          "incompatible with number of observations in the "
+                          "observation container ("+gammalib::str(obs.size())+
+                          " observation).";
+        throw GException::invalid_value(G_RESTORE_EDISP, msg);
+    }
+
+    // Loop over all observations in observation container
+    for (int i = 0; i < obs.size(); ++i) {
+
+        // Is this observation a CTA observation?
+        GCTAObservation* cta = dynamic_cast<GCTAObservation*>(obs[i]);
+
+        // Yes, then restore the energy dispersion flag
+        if (cta != NULL) {
+            cta->response()->apply_edisp(edisp[i]);
+        }
+
+    } // endfor: loop over all observations in container
 
     // Return
     return;

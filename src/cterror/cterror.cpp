@@ -228,35 +228,15 @@ void cterror::run(void)
     // Get task parameters
     get_parameters();
 
-    // Set energy dispersion flag for all CTA observations and save old
+    // Set energy dispersion flags of all CTA observations and save old
     // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
-    }
+    std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Compute best-fit likelihood");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Compute best-fit likelihood");
 
     // Optimize and save best log-likelihood
     m_obs.optimize(m_opt);
@@ -266,13 +246,10 @@ void cterror::run(void)
     // Store optimizer for later recovery
     GOptimizerLM best_opt = m_opt;
 
-    // Write optimised model into logger
-    if (logTerse()) {
-        log << m_opt << std::endl;
-        log << gammalib::parformat("Maximum log likelihood");
-        log << gammalib::str(m_best_logL,3) << std::endl;
-        log << m_obs.models() << std::endl;
-    }
+    // Write optimisation results and models into logger
+    log_string(NORMAL, m_opt.print(m_chatter));
+    log_value(NORMAL, "Maximum log likelihood", gammalib::str(m_best_logL,3));
+    log_string(NORMAL, m_obs.models().print(m_chatter));
 
     // Continue only if source model exists
     if (m_obs.models().contains(m_srcname)) {
@@ -310,63 +287,39 @@ void cterror::run(void)
             double parmax = std::min(m_model_par->factor_max(),
                                      m_value + 10.0*m_model_par->factor_error());
 
-            // Write header
-            if (logTerse()) {
-                log << std::endl;
-                log.header1("Compute error for source \""+m_srcname+"\""
-                            " parameter \""+m_model_par->name()+"\"");
-                log << gammalib::parformat("Confidence level");
-                log << m_confidence*100.0 << "%" << std::endl;
-                log << gammalib::parformat("Log-likelihood difference");
-                log << m_dlogL << std::endl;
-                log << gammalib::parformat("Initial factor range");
-                log << "[";
-                log << parmin;
-                log << ", ";
-                log << parmax;
-                log << "]" << std::endl;
-            }
+            // Write header and initial parameters into logger
+            log_header1(TERSE, "Compute error for source \""+m_srcname+"\""
+                               " parameter \""+m_model_par->name()+"\"");
+            log_value(NORMAL, "Confidence level",
+                      gammalib::str(m_confidence*100.0)+" %");
+            log_value(NORMAL, "Log-likelihood difference", m_dlogL);
+            log_value(NORMAL, "Initial factor range",
+                      "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
 
-            // Compute lower boundary
+            // Compute lower and upper boundaries
             double value_lo = error_bisection(parmin, m_value);
-
-            // Write lower parameter value
-            if (logTerse()) {
-                log << gammalib::parformat("Lower parameter factor");
-                log << value_lo << std::endl;
-            }
-
-            // Compute upper boundary
             double value_hi = error_bisection(m_value, parmax);
 
-            // Write upper parameter value
-            if (logTerse()) {
-                log << gammalib::parformat("Upper parameter factor");
-                log << value_hi << std::endl;
-            }
-
             // Compute errors
-            double error     = 0.5 * (value_hi - value_lo);
-            double error_neg = m_value  - value_lo;
-            double error_pos = value_hi - m_value;
-            //double error_max = std::max(value_hi-m_value, m_value-value_lo);
-            //double error_min = std::min(value_hi-m_value, m_value-value_lo);
+            double error           = 0.5 * (value_hi - value_lo);
+            double error_neg       = m_value  - value_lo;
+            double error_pos       = value_hi - m_value;
+            double error_value     = std::abs(error*m_model_par->scale());
+            double error_value_neg = std::abs(error_neg*m_model_par->scale());
+            double error_value_pos = std::abs(error_pos*m_model_par->scale());
 
-            // Write errors
-            if (logTerse()) {
-                log << gammalib::parformat("Error from curvature");
-                log << m_model_par->error();
-                log << " " << m_model_par->unit() << std::endl;
-                log << gammalib::parformat("Error from profile");
-                log << std::abs(error*m_model_par->scale());
-                log << " " << m_model_par->unit() << std::endl;
-                log << gammalib::parformat("Negative profile error");
-                log << std::abs(error_neg*m_model_par->scale());
-                log << " " << m_model_par->unit() << std::endl;
-                log << gammalib::parformat("Positive profile error");
-                log << std::abs(error_pos*m_model_par->scale());
-                log << " " << m_model_par->unit() << std::endl;
-            }
+            // Write results into logger
+            std::string unit = " " + m_model_par->unit();
+            log_value(NORMAL, "Lower parameter factor", value_lo);
+            log_value(NORMAL, "Upper parameter factor", value_hi);
+            log_value(NORMAL, "Error from curvature",
+                      gammalib::str(m_model_par->error()) + unit);
+            log_value(NORMAL, "Error from profile",
+                      gammalib::str(error_value) + unit);
+            log_value(NORMAL, "Negative profile error",
+                      gammalib::str(error_value_neg) + unit);
+            log_value(NORMAL, "Positive profile error",
+                      gammalib::str(error_value_pos) + unit);
 
             // Save error result
             model->at(i).factor_error(error);
@@ -381,13 +334,8 @@ void cterror::run(void)
     // Recover optimizer
     m_opt = best_opt;
 
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
-    }
+    // Restore energy dispersion flags of all CTA observations
+    restore_edisp(m_obs, save_edisp);
 
     // Return
     return;
@@ -402,27 +350,26 @@ void cterror::run(void)
 void cterror::save(void)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save results");
-    }
+    log_header1(TERSE, "Save results");
 
     // Get output filename
     m_outmodel = (*this)["outmodel"].filename();
 
-    // Save only if filename is non-empty
+    // Save only if filename is not empty and not "NONE"
     if (!m_outmodel.is_empty() &&
         gammalib::toupper(m_outmodel.url()) != "NONE") {
 
         // Log filename
-        if (logTerse()) {
-            log << "Save errors into file \""+m_outmodel+"\".";
-            log << std::endl;
-        }
+        log_value(NORMAL, "Model definition file", m_outmodel.url());
 
         // Write results out as XML model
-        m_obs.models().save(m_outmodel);
+        m_obs.models().save(m_outmodel.url());
 
+    }
+
+    // ... otherwise signal that file was not save
+    else {
+        log_value(NORMAL, "Model definition file", "NONE");
     }
 
     // Return
@@ -448,6 +395,7 @@ void cterror::init_members(void)
     m_tol        = 1.0e-3;
     m_max_iter   = 50;
     m_value      = 0.0;
+    m_chatter    = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_obs.clear();
@@ -480,6 +428,7 @@ void cterror::copy_members(const cterror& app)
     m_tol         = app.m_tol;
     m_max_iter    = app.m_max_iter;
     m_apply_edisp = app.m_apply_edisp;
+    m_chatter     = app.m_chatter;
 
     // Copy protected members
     m_obs       = app.m_obs;
@@ -559,6 +508,7 @@ void cterror::get_parameters(void)
     // Read other parameters
     m_tol      = (*this)["tol"].real();
     m_max_iter = (*this)["max_iter"].integer();
+    m_chatter  = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Read ahead parameters that are only needed when the tool gets
     // executed
@@ -606,9 +556,7 @@ double cterror::error_bisection(const double& min, const double& max)
                                   "consider setting the minimum parameter "
                                   "value to a lower value, and re-run "
                                   "cterror.";
-                if (logTerse()) {
-                    log << msg;
-                }
+                log_string(TERSE, msg);
                 break;
             }
             else if (m_model_par->factor_max() - wrk_max < m_tol) {
@@ -618,9 +566,7 @@ double cterror::error_bisection(const double& min, const double& max)
                                   "consider setting the maximum parameter "
                                   "value to a higher value, and re-run "
                                   "cterror.";
-                if (logTerse()) {
-                    log << msg;
-                }
+                log_string(TERSE, msg);
                 break;
             }
             else {
@@ -639,17 +585,9 @@ double cterror::error_bisection(const double& min, const double& max)
         // Calculate function value
         double eval_mid = evaluate(mid);
 
-        // Log interval
-        if (logExplicit()) {
-            log << gammalib::parformat("  Iteration "+gammalib::str(iter));
-            log << "[";
-            log << wrk_min;
-            log << ", ";
-            log << wrk_max;
-            log << "] ";
-            log << eval_mid;
-            log << std::endl;
-        }
+        // Write interval into logger
+        log_value(EXPLICIT, "  Iteration "+gammalib::str(iter),
+                  "["+gammalib::str(wrk_min)+", "+gammalib::str(wrk_max)+"]");
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
