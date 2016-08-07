@@ -211,14 +211,12 @@ def _init_cscript(self, argv):
     self._log.date(True)
 cscript._init_cscript = _init_cscript
 
-# Return or assigns user parameters in form of a dictionary
-#
 # This function either returns or assigns user parameters in form of a
 # dictionary. The assignment function takes a dictionary as argument and
 # the function then loops over all keys in that dictionary and assigns
 # the value to the parameter. For example
 #
-# >>> tool.pars({'ra': 83.63, 'dec': 22.01})
+# >>> tool.pardict({'ra': 83.63, 'dec': 22.01})
 #
 # is equivalent to
 #
@@ -230,10 +228,10 @@ cscript._init_cscript = _init_cscript
 # keys and the current values as values. No parameter querying is performed.
 # For example
 #
-# >>> d = tool.pars()
+# >>> d = tool.pardict()
 #
 # puts all parameters in the dictionary d.
-def _parameters(self, *args):
+def _pardict(self, *args):
     if len(args) == 0:
         d = {}
         for par in self._pars():
@@ -252,7 +250,7 @@ def _parameters(self, *args):
         for key in args[0]:
             self[key] = args[0][key]
     else:
-        raise TypeError('pars() takes 0 or 1 arguments (%d given)' % len(args))
-ctool.pars = _parameters
-cscript.pars = _parameters
+        raise TypeError('pardict() takes 0 or 1 arguments (%d given)' % len(args))
+ctool.pardict = _pardict
+cscript.pardict = _pardict
 %}

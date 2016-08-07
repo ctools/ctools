@@ -237,13 +237,13 @@ class Test(test):
 
         # And finally go for a fully Pythonic version with all parameters
         # being specified in a dictionary
-        dict = {'inobs': self._events, 'ebinalg': 'LOG', 'emin': 0.1,
+        pars = {'inobs': self._events, 'ebinalg': 'LOG', 'emin': 0.1,
                 'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
                 'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
                 'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py4.fits',
                 'logfile': 'ctbin_py4.log', 'chatter': 2}
         bin = ctools.ctbin()
-        bin.pars(dict)
+        bin.pardict(pars)
         bin.logFileOpen()
         bin.execute()
 
