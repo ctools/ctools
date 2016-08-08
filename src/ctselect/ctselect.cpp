@@ -224,18 +224,11 @@ void ctselect::run(void)
     // Get parameters
     get_parameters();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Observations before selection");
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Event selection");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Event selection");
 
     // Initialise counters
     int n_observations = 0;
@@ -243,17 +236,8 @@ void ctselect::run(void)
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
-        // Write header for observation
-        if (logTerse()) {
-            std::string header = m_obs[i]->instrument() + " observation";
-            if (m_obs[i]->name().length() > 1) {
-                header += " \"" + m_obs[i]->name() + "\"";
-            }
-            if (m_obs[i]->id().length() > 1) {
-                header += " (id=" + m_obs[i]->id() +")";
-            }
-            log.header3(header);
-        }
+        // Write header for the current observation
+        log_header3(TERSE, get_obs_header(m_obs[i]));
 
         // Initialise event input and output filenames and the event
         // and GTI extension names
@@ -266,21 +250,17 @@ void ctselect::run(void)
 
         // Skip observation if it's not CTA
         if (obs == NULL) {
-            if (logTerse()) {
-                log << " Skipping ";
-                log << m_obs[i]->instrument();
-                log << " observation" << std::endl;
-            }
+            std::string msg = " Skipping "+m_obs[i]->instrument()+
+                              " observation";
+            log_string(NORMAL, msg);
             continue;
         }
 
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
-            if (logTerse()) {
-                log << " Skipping binned ";
-                log << obs->instrument();
-                log << " observation" << std::endl;
-            }
+            std::string msg = " Skipping binned "+m_obs[i]->instrument()+
+                              " observation";
+            log_string(NORMAL, msg);
             continue;
         }
 
@@ -297,23 +277,15 @@ void ctselect::run(void)
         }
         m_gtiname[i] = get_gtiname(fname.url(), m_evtname[i]);
 
-        // Log input file information
-        if (logTerse()) {
-            log << gammalib::parformat("Input filename");
-            log << m_infiles[i] << std::endl;
-            log << gammalib::parformat("Event extension name");
-            log << m_evtname[i] << std::endl;
-            log << gammalib::parformat("GTI extension name");
-            log << m_gtiname[i] << std::endl;
-        }
+        // Write input file information into logger
+        log_value(NORMAL, "Input filename", m_infiles[i]);
+        log_value(NORMAL, "Event extension name", m_evtname[i]);
+        log_value(NORMAL, "GTI extension name", m_gtiname[i]);
 
         // Fall through in case that the event file is empty
         if (obs->events()->size() == 0) {
-            if (logTerse()) {
-                log << " Warning: No events in event file \"";
-                log << m_infiles[i] << "\". Event selection skipped.";
-                log << std::endl;
-            }
+            log_string(NORMAL, " Warning: No events in event file \""+
+                       m_infiles[i]+"\". Event selection skipped.");
             continue;
         }
 
@@ -377,11 +349,7 @@ void ctselect::run(void)
     }
 
     // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Observations after selection");
-        log << m_obs << std::endl;
-    }
+    log_observations(NORMAL, m_obs, "Output observation");
 
     // Return
     return;
@@ -409,16 +377,8 @@ void ctselect::run(void)
  ***************************************************************************/
 void ctselect::save(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Save event lists");
-        }
-        else {
-            log.header1("Save event list");
-        }
-    }
+    // Write header into logger
+    log_header1(TERSE, gammalib::number("Save event list", m_obs.size()));
 
     // Case A: Save event file(s) and XML metadata information
     if (m_use_xml) {
@@ -459,6 +419,7 @@ void ctselect::init_members(void)
     m_emax   = 0.0;
     m_expr.clear();
     m_usethres.clear();
+    m_chatter = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_obs.clear();
@@ -496,6 +457,7 @@ void ctselect::copy_members(const ctselect& app)
     m_emax     = app.m_emax;
     m_expr     = app.m_expr;
     m_usethres = app.m_usethres;
+    m_chatter  = app.m_chatter;
 
     // Copy protected members
     m_obs           = app.m_obs;
@@ -610,6 +572,7 @@ void ctselect::get_parameters(void)
     // Get other User parameters
     m_expr     = (*this)["expr"].string();
     m_usethres = (*this)["usethres"].string();
+    m_chatter  = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -726,10 +689,8 @@ void ctselect::select_events(GCTAObservation*   obs,
         sprintf(cmin, "%.8f", tmin);
         sprintf(cmax, "%.8f", tmax);
         selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
-        if (logTerse()) {
-            log << gammalib::parformat("Time range");
-            log << tmin << " - " << tmax << " s" << std::endl;
-        }
+        log_value(NORMAL, "Time range",
+                  gammalib::str(tmin)+" - "+gammalib::str(tmax)+" s");
 
     } // endif: made time selection
 
@@ -742,7 +703,7 @@ void ctselect::select_events(GCTAObservation*   obs,
         }
 
         // Log the requested energy selection
-        if (logTerse()) {
+        if (logNormal()) {
             log << gammalib::parformat("Selected energy range");
             if (emin > 0.0 && emax > 0.0) {
                 if (emin >= emax) {
@@ -804,23 +765,20 @@ void ctselect::select_events(GCTAObservation*   obs,
         }
 
         // Log the requested ROI
-        if (logTerse()) {
-            log << gammalib::parformat("Requested ROI");
-            log << "Centre(RA,DEC)=(" << ra << ", " << dec << ") deg, ";
-            log << "Radius=" << m_rad << " deg" << std::endl;
-        }
+        log_value(NORMAL, "Requested RoI",
+                  "Centre(RA,DEC)=("+gammalib::str(ra)+", "+
+                  gammalib::str(dec)+") deg, Radius="+gammalib::str(m_rad)+
+                  " deg");
 
         // If we have already an ROI then make sure that the selected
         // ROI overlaps with the existing ROI
         double roi_radius = list->roi().radius();
         if (roi_radius > 0.0) {
             GSkyDir roi_centre = list->roi().centre().dir();
-            if (logTerse()) {
-                log << gammalib::parformat("ROI of data");
-                log << "Centre(RA,DEC)=(" << roi_centre.ra_deg() << ", ";
-                log << roi_centre.dec_deg() << ") deg, ";
-                log << "Radius=" << roi_radius << " deg" << std::endl;
-            }
+            log_value(NORMAL, "RoI of data",
+                      "Centre(RA,DEC)=("+gammalib::str(roi_centre.ra_deg())+
+                      ", "+gammalib::str(roi_centre.dec_deg())+") deg, Radius="+
+                      gammalib::str(roi_radius)+" deg");
             GSkyDir centre;
             centre.radec_deg(ra, dec);
             double distance = centre.dist_deg(roi_centre);
@@ -830,8 +788,8 @@ void ctselect::select_events(GCTAObservation*   obs,
         }
 
         // Log the selected ROI
-        if (logTerse()) {
-            log << gammalib::parformat("Selected ROI");
+        if (logNormal()) {
+            log << gammalib::parformat("Selected RoI");
             if (rad <= 0.0) {
                 log << "None. There is no overlap between existing ";
                 log << "and requested ROI." << std::endl;
@@ -869,10 +827,7 @@ void ctselect::select_events(GCTAObservation*   obs,
     } // endif: made expression selection
 
     // Dump cfitsio selection string
-    if (logTerse()) {
-        log << gammalib::parformat("cfitsio selection");
-        log << selection << std::endl;
-    }
+    log_value(NORMAL, "cfitsio selection", selection);
 
     // Build input filename including selection expression
     std::string expression = filename;
@@ -881,20 +836,14 @@ void ctselect::select_events(GCTAObservation*   obs,
     }
 
     // Dump FITS filename including selection expression
-    if (logTerse()) {
-        log << gammalib::parformat("FITS filename");
-        log << expression << std::endl;
-    }
+    log_value(NORMAL, "FITS filename", expression);
 
     // Open FITS file
     GFits file(expression);
 
     // Log selected FITS file
-    if (logExplicit()) {
-        log << std::endl;
-        log.header1("FITS file content after selection");
-        log << file << std::endl;
-    }
+    log_header1(EXPLICIT, "FITS file content after selection");
+    log_string(EXPLICIT, file.print(m_chatter));
 
     // Check if we have an events HDU
     if (!file.contains(evtname)) {
@@ -1022,7 +971,8 @@ GEbounds ctselect::set_ebounds(GCTAObservation* obs, const GEbounds& ebounds) co
 
         // Get CTA IRF respsonse pointer and throw exception if we don't
         //  find IRF
-        const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+        const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>
+                                                             (obs->response());
         if (rsp == NULL) {
             std::string msg = "No IRF response attached to given observation.";
             throw GException::invalid_value(G_SET_EBOUNDS, msg);
@@ -1268,10 +1218,7 @@ void ctselect::save_fits(void)
             }
 
             // Log filename
-            if (logTerse()) {
-                log << gammalib::parformat("Event list file");
-                log << outfile << std::endl;
-            }
+            log_value(NORMAL, "Event list file", outfile);
 
             // Save event list
             save_event_list(obs, m_infiles[0], m_evtname[0], m_gtiname[0],
@@ -1300,19 +1247,10 @@ void ctselect::save_xml(void)
 {
     // Get output filename and prefix
     m_outobs = (*this)["outobs"].filename();
-    m_prefix  = (*this)["prefix"].string();
+    m_prefix = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outobs.substr(m_outobs.length()-4,4));
-    if (suffix != ".xml") {
-        log << "*** WARNING: Name of observation definition output file \""+
-               m_outobs+"\"" << std::endl;
-        log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
-        log << "*** WARNING: This is not an error, but might be misleading."
-               " It is recommended" << std::endl;
-        log << "*** WARNING: to use the suffix \".xml\" for observation"
-               " definition files." << std::endl;
-    }
+    log_string(TERSE, warn_xml_suffix(m_outobs));
 
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -1337,10 +1275,7 @@ void ctselect::save_xml(void)
         outfile += "["+m_evtname[i]+"]";
 
         // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Event list file");
-            log << outfile << std::endl;
-        }
+        log_value(NORMAL, "Event list file", outfile);
 
         // Store output file name in observation
         obs->eventfile(outfile);
@@ -1351,10 +1286,8 @@ void ctselect::save_xml(void)
 
     } // endfor: looped over observations
 
-    // Dump filename
-    if (logTerse()) {
-        log << "Save \""+m_outobs+"\"" << std::endl;
-    }
+    // Write observation definition XML file name into logger
+    log_value(NORMAL, "Obs. definition file", m_outobs);
 
     // Save observations in XML file
     m_obs.save(m_outobs);
@@ -1421,7 +1354,8 @@ void ctselect::save_event_list(const GCTAObservation* obs,
             std::string outevt = evtname;
             std::string outgti = gtiname;
             if (outname.has_extname()) {
-                std::vector<std::string> extnames = gammalib::split(outname.extname(), ";");
+                std::vector<std::string> extnames =
+                           gammalib::split(outname.extname(), ";");
                 if (extnames.size() > 0) {
                     std::string extname = gammalib::strip_whitespace(extnames[0]);
                     if (!extname.empty()) {

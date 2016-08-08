@@ -85,14 +85,13 @@ public:
 
 protected:
     // Protected methods
-    void                init_members(void);
-    void                copy_members(const ctbin& app);
-    void                free_members(void);
-    void                get_parameters(void);
-    void                fill_cube(GCTAObservation* obs);
-    void                set_weights(GCTAObservation* obs);
-    void                obs_cube(void);
-    std::vector<bool>   cube_layer_usage(const GEbounds& ebounds) const;
+    void init_members(void);
+    void copy_members(const ctbin& app);
+    void free_members(void);
+    void get_parameters(void);
+    void fill_cube(GCTAObservation* obs);
+    void set_weights(GCTAObservation* obs);
+    void obs_cube(void);
 
     // User parameters
     GFilename     m_outcube;  //!< Output counts map file name

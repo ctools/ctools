@@ -254,7 +254,7 @@ void ctbin::run(void)
 
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
-            std::string msg = " Skipping binned "+m_obs[i]->instrument()+
+            std::string msg = " Skipping binned "+obs->instrument()+
                               " observation";
             log_string(NORMAL, msg);
             continue;
@@ -518,7 +518,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
     }
 
     // Get counts cube usage flags
-    std::vector<bool> usage = cube_layer_usage(events->ebounds());
+    std::vector<bool> usage = cube_layer_usage(m_ebounds, events->ebounds());
 
     // Initialise binning statistics
     int num_outside_roi  = 0;
@@ -624,7 +624,7 @@ void ctbin::set_weights(GCTAObservation* obs)
     }
 
     // Get counts cube usage flags
-    std::vector<bool> usage = cube_layer_usage(events->ebounds());
+    std::vector<bool> usage = cube_layer_usage(m_ebounds, events->ebounds());
 
     // Loop over all pixels in counts cube
     for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
@@ -777,43 +777,4 @@ void ctbin::obs_cube(void)
 
     // Return
     return;
-}
-
-
-/***********************************************************************//**
- * @brief Determine the counts cube layer usage.
- *
- * @param[in] ebounds Energy boundaries of the event list.
- * @return Vector of usage flags.
- *
- * Determines a vector of counts cube layer usage flags that signal whether
- * an event should actually be filled in the counts cube or not. This makes
- * sure that no partially filled bins will exist in the counts cube.
- ***************************************************************************/
-std::vector<bool> ctbin::cube_layer_usage(const GEbounds& ebounds) const
-{
-    // Set energy margin
-    const GEnergy energy_margin(0.01, "GeV");
-
-    // Initialise usage vector
-    std::vector<bool> usage(m_ebounds.size(), true);
-
-    // Loop over all energy bins of the cube
-    for (int iebin = 0; iebin < m_ebounds.size(); ++iebin) {
-
-        // If the counts cube energy bin is fully contained within the
-        // energy boundaries of the event list the signal usage of this
-        // counts cube bin. Partially overlapping energy bins are signaled
-        // for non-usage, which avoids having partially filled bins in the
-        // counts cube. Some margin is applied that effectively reduces the
-        // width of the counts cube energy bin. This should cope with any
-        // rounding errors that come from reading and writing the energy
-        // boundary information to a FITS file.
-        usage[iebin] = ebounds.contains(m_ebounds.emin(iebin) + energy_margin,
-                                        m_ebounds.emax(iebin) - energy_margin);
-
-    } // endfor: looped over all energy bins
-
-    // Return usage
-    return usage;
 }

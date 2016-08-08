@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSKYMAP_NAME    "ctskymap"
-#define CTSKYMAP_VERSION "1.1.0"
+#define CTSKYMAP_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -77,6 +77,7 @@ protected:
     double        m_emin;       //!< Minimum energy (TeV)
     double        m_emax;       //!< Maximum energy (TeV)
     bool          m_publish;    //!< Publish sky map?
+    GChatter      m_chatter;    //!< Chattiness
 
     // Protected members
     GObservations m_obs;        //!< Observation container

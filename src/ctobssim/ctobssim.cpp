@@ -242,16 +242,15 @@ void ctobssim::run(void)
         m_save_and_dispose = true;
     }
 
-    // Determine the number of valid CTA observations, set energy dispersion
-    // flag for all CTA observations and save old values in save_edisp vector
-    int               n_observations = 0;
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
+    // Set energy dispersion flags of all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
+
+    // Determine the number of valid CTA observations
+    int n_observations = 0;
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
         if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
             n_observations++;
         }
     }
@@ -262,48 +261,29 @@ void ctobssim::run(void)
         m_use_xml = true;
     }
 
-    // Write execution mode into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Execution mode");
-        log << gammalib::parformat("Event list management");
-        if (m_save_and_dispose) {
-            log << "Save and dispose (reduces memory needs)" << std::endl;
-        }
-        else {
-            log << "Keep events in memory" << std::endl;
-        }
-        log << gammalib::parformat("Output format");
-        if (m_use_xml) {
-            log << "Write Observation Definition XML file" << std::endl;
-        }
-        else {
-            log << "Write single event list FITS file" << std::endl;
-        }
-    }
+    // Write execution model into logger
+    log_header1(NORMAL, "Execution mode");
+    std::string mode = (m_save_and_dispose)
+                       ? "Save and dispose (reduces memory needs)"
+                       : "Keep events in memory";
+    std::string xml  = (m_use_xml)
+                       ? "Write Observation Definition XML file"
+                       : "Write single event list FITS file";
+    log_value(NORMAL, "Event list management", mode);
+    log_value(NORMAL, "Output format", xml);
 
     // Write seed values into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Seed values");
-        for (int i = 0; i < m_rans.size(); ++i) {
-            log << gammalib::parformat("Seed "+gammalib::str(i));
-            log << gammalib::str(m_rans[i].seed()) << std::endl;
-        }
+    log_header1(NORMAL, "Seed values");
+    for (int i = 0; i < m_rans.size(); ++i) {
+        log_value(NORMAL, "Seed "+gammalib::str(i),
+                  gammalib::str(m_rans[i].seed()));
     }
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Observation", m_obs.size()));
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Simulate observation", m_obs.size()));
-    }
+    log_header1(TERSE, gammalib::number("Simulate observation", m_obs.size()));
 
     // From here on the code can be parallelized if OpenMP support
     // is enabled. The code in the following block corresponds to the
@@ -433,13 +413,8 @@ void ctobssim::run(void)
 
     } // end pragma omp parallel
 
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
-    }
+    // Restore energy dispersion flags of all CTA observations
+    restore_edisp(m_obs, save_edisp);
 
     // Return
     return;
@@ -467,16 +442,8 @@ void ctobssim::run(void)
  ***************************************************************************/
 void ctobssim::save(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Save observations");
-        }
-        else {
-            log.header1("Save observation");
-        }
-    }
+    // Write header into logger
+    log_header1(TERSE, gammalib::number("Save observation", m_obs.size()));
 
     // Case A: Save event file(s) and XML metadata information
     if (m_use_xml) {
@@ -1460,10 +1427,7 @@ void ctobssim::save_fits(void)
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
         // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Event list file");
-            log << m_outevents << std::endl;
-        }
+        log_value(NORMAL, "Event list file", m_outevents);
 
         // Save observation into FITS file
         obs->save(m_outevents, clobber());
@@ -1492,16 +1456,7 @@ void ctobssim::save_xml(void)
     m_prefix    = (*this)["prefix"].string();
 
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outevents.substr(m_outevents.length()-4,4));
-    if (suffix != ".xml") {
-        log << "*** WARNING: Name of observation definition output file \""+
-               m_outevents+"\"" << std::endl;
-        log << "*** WARNING: does not terminate with \".xml\"." << std::endl;
-        log << "*** WARNING: This is not an error, but might be misleading."
-               " It is recommended" << std::endl;
-        log << "*** WARNING: to use the suffix \".xml\" for observation"
-               " definition files." << std::endl;
-    }
+    log_string(TERSE, warn_xml_suffix(m_outevents));
 
     // Save only if event lists have not yet been saved and disposed
     if (!m_save_and_dispose) {
@@ -1526,10 +1481,7 @@ void ctobssim::save_xml(void)
                     obs->eventfile(outfile);
 
                     // Log filename
-                    if (logTerse()) {
-                        log << gammalib::parformat("Event list file");
-                        log << outfile << std::endl;
-                    }
+                    log_value(NORMAL, "Event list file", outfile);
 
                     // Save observation into FITS file
                     obs->save(outfile, clobber());

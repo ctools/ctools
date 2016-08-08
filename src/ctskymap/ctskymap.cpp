@@ -221,64 +221,34 @@ void ctskymap::run(void)
     // Get parameters
     get_parameters();
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Map observations");
-        }
-        else {
-            log.header1("Map observation");
-        }
-    }
+    // Write header into logger
+    log_header1(TERSE, gammalib::number("Map observation", m_obs.size()));
 
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
-        // Write header for observation
-        if (logTerse()) {
-            std::string header = m_obs[i]->instrument() + " observation";
-            if (m_obs[i]->name().length() > 1) {
-                header += " \"" + m_obs[i]->name() + "\"";
-            }
-            if (m_obs[i]->id().length() > 1) {
-                header += " (id=" + m_obs[i]->id() +")";
-            }
-            log.header3(header);
-        }
+        // Write header for the current observation
+        log_header3(TERSE, get_obs_header(m_obs[i]));
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Skip observation if it's not CTA
         if (obs == NULL) {
-            if (logTerse()) {
-                log << " Skipping ";
-                log << m_obs[i]->instrument();
-                log << " observation" << std::endl;
-            }
+            std::string msg = " Skipping "+m_obs[i]->instrument()+
+                              " observation";
+            log_string(NORMAL, msg);
             continue;
         }
 
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
-            if (logTerse()) {
-                log << " Skipping binned ";
-                log << obs->instrument();
-                log << " observation" << std::endl;
-            }
+            std::string msg = " Skipping binned "+obs->instrument()+
+                              " observation";
+            log_string(NORMAL, msg);
             continue;
         }
 
@@ -309,22 +279,16 @@ void ctskymap::run(void)
 void ctskymap::save(void)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save sky map");
-    }
+    log_header1(TERSE, "Save sky map");
 
     // Get sky map filename
     m_outmap  = (*this)["outmap"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outmap.is_empty()) {
+    // Determine whether the map is empty
+    bool map_is_empty = ((m_skymap.nx() == 0) || (m_skymap.ny() == 0));
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Sky map file");
-            log << m_outmap.url() << std::endl;
-        }
+    // Save sky map if filename and the map are not empty
+    if (!m_outmap.is_empty() && !map_is_empty) {
 
         // Create empty FITS file
         GFits fits;
@@ -336,6 +300,13 @@ void ctskymap::save(void)
         fits.saveto(m_outmap, clobber());
 
     }
+
+    // Write into logger what has been done
+    std::string fname = (m_outmap.is_empty()) ? "NONE" : m_outmap.url();
+    if (map_is_empty) {
+        fname.append(" (map is empty, no file created)");
+    }
+    log_value(NORMAL, "Sky map file", fname);
 
     // Return
     return;
@@ -349,11 +320,8 @@ void ctskymap::save(void)
  ***************************************************************************/
 void ctskymap::publish(const std::string& name)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish sky map");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Publish sky map");
 
     // Set default name is user name is empty
     std::string user_name(name);
@@ -361,15 +329,66 @@ void ctskymap::publish(const std::string& name)
         user_name = CTSKYMAP_NAME;
     }
 
-    // Log filename
-    if (logTerse()) {
-        log << gammalib::parformat("Publish sky map");
-        log << user_name << std::endl;
-    }
+    // Write sky map name into logger
+    log_value(NORMAL, "Sky map name", user_name);
 
     // Publish sky map
     m_skymap.publish(user_name);
 
+    // Return
+    return;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                             Private methods                             =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Initialise class members
+ ***************************************************************************/
+void ctskymap::init_members(void)
+{
+    // Initialise members
+    m_obs.clear();
+    m_skymap.clear();
+    m_emin    = 0.0;
+    m_emax    = 0.0;
+    m_publish = false;
+    m_chatter = static_cast<GChatter>(2);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Copy class members
+ *
+ * @param[in] app Application.
+ ***************************************************************************/
+void ctskymap::copy_members(const ctskymap& app)
+{
+    // Copy attributes
+    m_obs     = app.m_obs;
+    m_skymap  = app.m_skymap;
+    m_emin    = app.m_emin;
+    m_emax    = app.m_emax;
+    m_publish = app.m_publish;
+    m_chatter = app.m_chatter;
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Delete class members
+ ***************************************************************************/
+void ctskymap::free_members(void)
+{
     // Return
     return;
 }
@@ -408,6 +427,7 @@ void ctskymap::get_parameters(void)
     m_emin    = (*this)["emin"].real();
     m_emax    = (*this)["emax"].real();
     m_publish = (*this)["publish"].boolean();
+    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Read ahead parameters
     if (read_ahead()) {
@@ -436,131 +456,66 @@ void ctskymap::get_parameters(void)
  ***************************************************************************/
 void ctskymap::map_events(GCTAObservation* obs)
 {
-    // Continue only if observation pointer is valid
-    if (obs != NULL) {
+    // Make sure that the observation holds a CTA event list. If this
+    // is not the case then throw an exception.
+    if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
+        throw GException::no_list(G_BIN_EVENTS);
+    }
 
-        // Make sure that the observation holds a CTA event list. If this
-        // is not the case then throw an exception.
-        if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
-            throw GException::no_list(G_BIN_EVENTS);
+    // Setup energy range covered by data
+    GEnergy  emin;
+    GEnergy  emax;
+    GEbounds ebds;
+    emin.TeV(m_emin);
+    emax.TeV(m_emax);
+
+    // Initialise binning statistics
+    int num_outside_map    = 0;
+    int num_outside_erange = 0;
+    int num_in_map         = 0;
+
+    // Fill sky map
+    GCTAEventList* events = static_cast<GCTAEventList*>
+                                       (const_cast<GEvents*>(obs->events()));
+    for (int i = 0; i < events->size(); ++i) {
+
+        // Get event
+        GCTAEventAtom* event = (*events)[i];
+
+        // Skip if energy is out of range
+        if (event->energy() < emin || event->energy() > emax) {
+            num_outside_erange++;
+            continue;
         }
 
-        // Setup energy range covered by data
-        GEnergy  emin;
-        GEnergy  emax;
-        GEbounds ebds;
-        emin.TeV(m_emin);
-        emax.TeV(m_emax);
+        // Determine sky pixel
+        GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
+        GSkyDir      dir   = inst->dir();
+        GSkyPixel    pixel = m_skymap.dir2pix(dir);
 
-        // Initialise binning statistics
-        int num_outside_map    = 0;
-        int num_outside_erange = 0;
-        int num_in_map         = 0;
-
-        // Fill sky map
-        GCTAEventList* events = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-        for (int i = 0; i < events->size(); ++i) {
-
-            // Get event
-            GCTAEventAtom* event = (*events)[i];
-
-            // Skip if energy is out of range
-            if (event->energy() < emin || event->energy() > emax) {
-                num_outside_erange++;
-                continue;
-            }
-
-            // Determine sky pixel
-            GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
-            GSkyDir      dir   = inst->dir();
-            GSkyPixel    pixel = m_skymap.dir2pix(dir);
-
-            // Skip if pixel is out of range
-            if (pixel.x() < -0.5 || pixel.x() > (m_skymap.nx() - 0.5) ||
-                pixel.y() < -0.5 || pixel.y() > (m_skymap.ny() - 0.5)) {
-                num_outside_map++;
-                continue;
-            }
-
-            // Fill event in skymap
-            m_skymap(pixel, 0) += 1.0;
-            num_in_map++;
-
-        } // endfor: looped over all events
-
-        // Log binning results
-        if (logTerse()) {
-            log << gammalib::parformat("Events in list");
-            log << obs->events()->size() << std::endl;
-            log << gammalib::parformat("Events in map");
-            log << num_in_map << std::endl;
-            log << gammalib::parformat("Events outside map area");
-            log << num_outside_map << std::endl;
-            log << gammalib::parformat("Events outside energies");
-            log << num_outside_erange << std::endl;
+        // Skip if pixel is out of range
+        if (pixel.x() < -0.5 || pixel.x() > (m_skymap.nx() - 0.5) ||
+            pixel.y() < -0.5 || pixel.y() > (m_skymap.ny() - 0.5)) {
+            num_outside_map++;
+            continue;
         }
 
-        // Log map
-        if (logVerbose()) {
-            log.indent(1);
-            log << m_skymap << std::endl;
-            log.indent(0);
-        }
+        // Fill event in skymap
+        m_skymap(pixel, 0) += 1.0;
+        num_in_map++;
 
-    } // endif: observation was valid
+    } // endfor: looped over all events
 
-    // Return
-    return;
-}
+    // Log binning results
+    log_value(NORMAL, "Events in list", obs->events()->size());
+    log_value(NORMAL, "Events in map", num_in_map);
+    log_value(NORMAL, "Events outside map area", num_outside_map);
+    log_value(NORMAL, "Events outside energies", num_outside_erange);
 
+    // Write sky map into header
+    log_header2(EXPLICIT, "Sky map");
+    log_string(EXPLICIT, m_skymap.print(m_chatter));
 
-/*==========================================================================
- =                                                                         =
- =                             Private methods                             =
- =                                                                         =
- ==========================================================================*/
-
-/***********************************************************************//**
- * @brief Initialise class members
- ***************************************************************************/
-void ctskymap::init_members(void)
-{
-    // Initialise members
-    m_obs.clear();
-    m_skymap.clear();
-    m_emin    = 0.0;
-    m_emax    = 0.0;
-    m_publish = false;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Copy class members
- *
- * @param[in] app Application.
- ***************************************************************************/
-void ctskymap::copy_members(const ctskymap& app)
-{
-    // Copy attributes
-    m_obs     = app.m_obs;
-    m_skymap  = app.m_skymap;
-    m_emin    = app.m_emin;
-    m_emax    = app.m_emax;
-    m_publish = app.m_publish;
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Delete class members
- ***************************************************************************/
-void ctskymap::free_members(void)
-{
     // Return
     return;
 }

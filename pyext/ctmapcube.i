@@ -44,11 +44,12 @@ public:
     virtual ~ctmapcube(void);
 
     // Methods
-    void clear(void);
-    void run(void);
-    void save(void);
-    void publish(const std::string& name = "");
-    void models(const GModels& models);
+    void                            clear(void);
+    void                            run(void);
+    void                            save(void);
+    void                            publish(const std::string& name = "");
+    const GModelSpatialDiffuseCube& mapcube(void) const;
+    void                            models(const GModels& models);
 };
 
 

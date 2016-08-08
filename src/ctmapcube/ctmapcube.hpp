@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTMAPCUBE_NAME    "ctmapcube"
-#define CTMAPCUBE_VERSION "1.0.0"
+#define CTMAPCUBE_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -55,11 +55,12 @@ public:
     ctmapcube& operator=(const ctmapcube& app);
 
     // Methods
-    void clear(void);
-    void run(void);
-    void save(void);
-    void publish(const std::string& name = "");
-    void models(const GModels& models);
+    void                            clear(void);
+    void                            run(void);
+    void                            save(void);
+    void                            publish(const std::string& name = "");
+    const GModelSpatialDiffuseCube& mapcube(void) const;
+    void                            models(const GModels& models);
 
 protected:
     // Protected methods
@@ -79,11 +80,24 @@ protected:
     GFilename m_outcube;                //!< Output map cube filename
     double    m_ptsrcsig;               //!< Point source sigma (arcmin)
     bool      m_publish;                //!< Publish map cube?
+    GChatter  m_chatter;                //!< Chattiness
 
     // Protected members
     GModels                  m_models;  //!< Model container
     GModelSpatialDiffuseCube m_cube;    //!< Map cube
 };
+
+
+/***********************************************************************//**
+ * @brief Return map cube
+ *
+ * @return Map cube
+ ***************************************************************************/
+inline
+const GModelSpatialDiffuseCube& ctmapcube::mapcube(void) const
+{
+    return (m_cube);
+}
 
 
 /***********************************************************************//**

@@ -105,9 +105,12 @@ protected:
     std::string       get_obs_header(const GObservation* obs);
     GEnergies         insert_energy_boundaries(const GEnergies&       energies,
                                                const GCTAObservation& obs);
+    std::vector<bool> cube_layer_usage(const GEbounds& cube_ebounds,
+                                       const GEbounds& list_ebounds) const;
 
     // Protected warning strings
     std::string     warn_too_few_energies(const GEnergies& energies) const;
+    std::string     warn_xml_suffix(const GFilename& filename) const;
 
     // Protected members
     bool            m_read_ahead; //!< Read ahead output parameters

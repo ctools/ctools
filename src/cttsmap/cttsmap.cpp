@@ -215,36 +215,15 @@ void cttsmap::run(void)
     // Get task parameters
     get_parameters();
 
-    // Set energy dispersion flag for all CTA observations and save old
+    // Set energy dispersion flags of all CTA observations and save old
     // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
-    }
+    std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
 
-    // Write observation(s) into logger
-    if (logTerse()) {
-        log << std::endl;
-        if (m_obs.size() > 1) {
-            log.header1("Observations");
-        }
-        else {
-            log.header1("Observation");
-        }
-        log << m_obs << std::endl;
-    }
+    // Write input observation container into logger
+    log_observations(NORMAL, m_obs, "Input observation");
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Initialise TS map");
-    }
-
+    log_header1(TERSE, "Initialise TS map");
 
     // Get bins to be computed
     // To split the computation on several jobs,
@@ -270,10 +249,7 @@ void cttsmap::run(void)
 	if (m_logL0 == 0.0) {
 
         // Write header
-        if (logTerse()) {
-            log << std::endl;
-            log.header1("Compute NULL Hypothesis for TS computation");
-        }
+        log_header1(TERSE, "Compute NULL Hypothesis for TS computation");
 
 		// Compute likelihood without the test source
 		m_obs.models(models);
@@ -283,10 +259,7 @@ void cttsmap::run(void)
 	}
 
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate TS map");
-    }
+    log_header1(TERSE, "Generate TS map");
 
     // Loop over grid positions
     for (int i = binmin; i < binmax; ++i) {
@@ -295,12 +268,8 @@ void cttsmap::run(void)
     	GSkyDir bincentre = m_tsmap.inx2dir(i);
 
     	// Header for verbose logging
-    	if (logExplicit()) {
-            std::string msg = "Computing TS for bin number "+gammalib::str(i)+
-                              " at "+bincentre.print();
-            log << std::endl;
-            log.header2(msg);
-    	}
+        log_header2(EXPLICIT, "Computing TS for bin number "+gammalib::str(i)+
+                    " at "+bincentre.print());
 
     	// Add test source at current bin position
         if (m_testsource != NULL) {
@@ -360,13 +329,8 @@ void cttsmap::run(void)
     // Bring models to initial state
     m_obs.models(models_orig);
 
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
-    }
+    // Restore energy dispersion flags of all CTA observations
+    restore_edisp(m_obs, save_edisp);
 
     // Optionally publish TS map
     if (m_publish) {
@@ -386,22 +350,16 @@ void cttsmap::run(void)
 void cttsmap::save(void)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save TS map");
-    }
+    log_header1(TERSE, "Save TS map");
 
     // Get TS map filename
     m_outmap = (*this)["outmap"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outmap.is_empty()) {
+    // Determine whether the TS map is empty
+    bool map_is_empty = ((m_tsmap.nx() == 0) || (m_tsmap.ny() == 0));
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("TS map file");
-            log << m_outmap.url() << std::endl;
-        }
+    // Save only if filename is non-empty
+    if (!m_outmap.is_empty() && !map_is_empty) {
 
         // Create fits file
         GFits fits;
@@ -428,6 +386,13 @@ void cttsmap::save(void)
 
     } // endif: TS map filename was valid
 
+    // Write into logger what has been done
+    std::string fname = (m_outmap.is_empty()) ? "NONE" : m_outmap.url();
+    if (map_is_empty) {
+        fname.append(" (TS map is empty, no file created)");
+    }
+    log_value(NORMAL, "TS map file", fname);
+
     // Return
     return;
 }
@@ -440,11 +405,8 @@ void cttsmap::save(void)
  ***************************************************************************/
 void cttsmap::publish(const std::string& name)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish TS map");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Publish TS map");
 
     // Set default name is user name is empty
     std::string user_name(name);
@@ -452,11 +414,8 @@ void cttsmap::publish(const std::string& name)
         user_name = CTTSMAP_NAME;
     }
 
-    // Log filename
-    if (logTerse()) {
-        log << gammalib::parformat("Publish TS map");
-        log << user_name << std::endl;
-    }
+    // Write TS map name into logger
+    log_value(NORMAL, "TS map name", user_name);
 
     // Publish TS map
     m_tsmap.publish(user_name);

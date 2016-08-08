@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -85,7 +86,7 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check map cube
-        self._check_cube('ctmapcube_cmd1.fits')
+        self._check_result_file('ctmapcube_cmd1.fits')
 
         # Setup ctmapcube command
         cmd = ctmapcube+' inmodel="events_that_do_not_exist.fits"'+ \
@@ -107,10 +108,26 @@ class Test(test):
         """
         Test ctmapcube from Python
         """
-        # Set-up ctmapcube
+        # Allocate ctmapcube
         mapcube = ctools.ctmapcube()
+
+        # Check that empty ctmapcube tool holds an map cube that has no
+        # energy bins
+        self._check_cube(mapcube.mapcube(), nmaps=0, npixels=0)
+
+        # Check that saving does not nothing
+        mapcube['outcube'] = 'ctmapcube_py0.fits'
+        mapcube['logfile'] = 'ctmapcube_py0.log'
+        mapcube.logFileOpen()
+        mapcube.save()
+        self.test_assert(not os.path.isfile('ctmapcube_py0.fits'),
+             'Check that no map cube has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        mapcube.clear()
+
+        # Now set ctmapcube parameters
         mapcube['inmodel']  = self._model
-        mapcube['outcube']  = 'ctmapcube_py1.fits'
         mapcube['ebinalg']  = 'LOG'
         mapcube['emin']     = 0.1
         mapcube['emax']     = 100.0
@@ -122,6 +139,7 @@ class Test(test):
         mapcube['proj']     = 'CAR'
         mapcube['xref']     = 83.63
         mapcube['yref']     = 22.01
+        mapcube['outcube']  = 'ctmapcube_py1.fits'
         mapcube['logfile']  = 'ctmapcube_py1.log'
         mapcube['chatter']  = 2
 
@@ -133,31 +151,76 @@ class Test(test):
         mapcube.save()
 
         # Check map cube
-        self._check_cube('ctmapcube_py1.fits')
+        self._check_result_file('ctmapcube_py1.fits')
+
+        # Copy ctmapcube tool
+        cpy_mapcube = mapcube.copy()
+
+        # Check map cube of ctmapcube copy
+        self._check_cube(cpy_mapcube.mapcube())
+
+        # Execute copy of ctmapcube tool again, now with a higher chatter
+        # level than before
+        cpy_mapcube['outcube'] = 'ctmapcube_py2.fits'
+        cpy_mapcube['logfile'] = 'ctmapcube_py2.log'
+        cpy_mapcube['publish'] = True
+        cpy_mapcube['chatter'] = 3
+        cpy_mapcube.logFileOpen()  # Needed to get a new log file
+        cpy_mapcube.execute()
+
+        # Check result file
+        self._check_result_file('ctmapcube_py2.fits')
+
+        # Now clear copy of ctmapcube tool
+        cpy_mapcube.clear()
+
+        # Check that the cleared copy has also cleared the map cube
+        self._check_cube(cpy_mapcube.mapcube(), nmaps=0, npixels=0)
 
         # Return
         return
 
-    # Check map cube
-    def _check_cube(self, filename):
+    # Check result file
+    def _check_result_file(self, filename):
         """
         Check content of map cube
 
         Parameters
         ----------
         filename : str
-            Map cube file name.
+            Map cube file name
         """
         # Load map cube
         cube = gammalib.GModelSpatialDiffuseCube(filename)
 
-        # Test map cube
-        #self.test_value(cube.maps(), 10, "10 maps")
-        #self.test_value(cube.pixels(), 10000, "10000 map pixels")
-        # The map cube is not loaded by default !!!! We should add the method so that
-        # the attributes are known !!!!
-        self.test_value(cube.maps(), 0, '10 maps')
-        self.test_value(cube.pixels(), 0, '10000 map pixels')
+        # Check map cube
+        self._check_cube(cube)
+
+        # Return
+        return
+
+    # Check map cube
+    def _check_cube(self, cube, nmaps=10, npixels=10000):
+        """
+        Check map cube
+
+        Parameters
+        ----------
+        cube : `~gammalib.GModelSpatialDiffuseCube`
+            Map cube
+        nmaps : int, optional
+            Number of maps
+        npixels : int, optional
+            Number of pixels
+        """
+        # Get energies (this forces loading in case the map cube is not
+        # loaded)
+        energies = cube.energies()
+        self.test_value(len(cube.energies()), nmaps, 'Check number of energies')
+        
+        # Check dimensions
+        self.test_value(cube.maps(), nmaps, 'Check number of maps')
+        self.test_value(cube.pixels(), npixels, 'Check number of pixels')
 
         # Return
         return

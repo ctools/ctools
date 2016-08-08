@@ -88,6 +88,7 @@ protected:
     GFilename m_outcube;      //!< Output model cube
     bool      m_apply_edisp;  //!< Apply energy dispersion?
     bool      m_publish;      //!< Publish model cube?
+    GChatter  m_chatter;      //!< Chattiness
 
     // Protected members
     GObservations m_obs;         //!< Observation container

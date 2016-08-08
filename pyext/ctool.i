@@ -84,26 +84,31 @@ public:
     virtual void execute(void);
 
     // Make methods private in Python by prepending an underscore
-    %rename(_read_ahead)            read_ahead;
-    %rename(_time_reference)        time_reference;
-    %rename(_get_observations)      get_observations;
-    %rename(_setup_observations)    setup_observations;
-    %rename(_create_ebounds)        create_ebounds;
-    %rename(_create_map)            create_map;
-    %rename(_create_cube)           create_cube;
-    %rename(_create_cta_obs)        create_cta_obs;
-    %rename(_require_inobs)         require_inobs;
-    %rename(_require_inobs_nolist)  require_inobs_nolist;
-    %rename(_require_inobs_nocube)  require_inobs_nocube;
-    %rename(_log_observations)      log_observations;
-    %rename(_log_models)            log_models;
-    %rename(_set_response)          set_response;
-    %rename(_set_obs_response)      set_obs_response;
-    %rename(_set_obs_bounds)        set_obs_bounds;
-    %rename(_get_mean_pointing)     get_mean_pointing;
-    %rename(_get_current_rss)       get_current_rss;
-    %rename(_get_obs_header)        get_obs_header;
-    %rename(_warn_too_few_energies) warn_too_few_energies;
+    %rename(_read_ahead)               read_ahead;
+    %rename(_time_reference)           time_reference;
+    %rename(_get_observations)         get_observations;
+    %rename(_setup_observations)       setup_observations;
+    %rename(_create_ebounds)           create_ebounds;
+    %rename(_create_map)               create_map;
+    %rename(_create_cube)              create_cube;
+    %rename(_create_cta_obs)           create_cta_obs;
+    %rename(_require_inobs)            require_inobs;
+    %rename(_require_inobs_nolist)     require_inobs_nolist;
+    %rename(_require_inobs_nocube)     require_inobs_nocube;
+    %rename(_log_observations)         log_observations;
+    %rename(_log_models)               log_models;
+    %rename(_set_response)             set_response;
+    %rename(_set_edisp)                set_edisp;
+    %rename(_restore_edisp)            restore_edisp;
+    %rename(_set_obs_response)         set_obs_response;
+    %rename(_set_obs_bounds)           set_obs_bounds;
+    %rename(_get_mean_pointing)        get_mean_pointing;
+    %rename(_get_current_rss)          get_current_rss;
+    %rename(_get_obs_header)           get_obs_header;
+    %rename(_insert_energy_boundaries) insert_energy_boundaries;
+    %rename(_cube_layer_usage)         cube_layer_usage;
+    %rename(_warn_too_few_energies)    warn_too_few_energies;
+    %rename(_warn_xml_suffix)          warn_xml_suffix;
 
     // Protected methods
     const bool&           read_ahead(void) const;
@@ -131,16 +136,23 @@ public:
                                const std::string& what = "Model");
 
     // Protected support methods
-    void            set_response(GObservations& obs);
-    void            set_obs_response(GCTAObservation* obs);
-    void            set_obs_bounds(GObservations& obs);
-    GSkyDir         get_mean_pointing(const GObservations& obs);
-    size_t          get_current_rss(void);
-    std::string     get_obs_header(const GObservation* obs);
-    GEnergies       insert_energy_boundaries(const GEnergies&       energies,
-                                             const GCTAObservation& obs);
+    void              set_response(GObservations& obs);
+    std::vector<bool> set_edisp(GObservations& obs, const bool& edisp) const;
+    void              restore_edisp(GObservations& obs,
+                                    const std::vector<bool>& edisp) const;
+    void              set_obs_response(GCTAObservation* obs);
+    void              set_obs_bounds(GObservations& obs);
+    GSkyDir           get_mean_pointing(const GObservations& obs);
+    size_t            get_current_rss(void);
+    std::string       get_obs_header(const GObservation* obs);
+    GEnergies         insert_energy_boundaries(const GEnergies&       energies,
+                                               const GCTAObservation& obs);
+    std::vector<bool> cube_layer_usage(const GEbounds& cube_ebounds,
+                                       const GEbounds& list_ebounds) const;
+
     // Protected warning strings
     std::string     warn_too_few_energies(const GEnergies& energies) const;
+    std::string     warn_xml_suffix(const GFilename& filename) const;
 };
 
 

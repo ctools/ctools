@@ -1543,6 +1543,49 @@ GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
 
 
 /***********************************************************************//**
+ * @brief Determine the counts cube layer usage.
+ *
+ * @param[in] ebounds_cube Energy boundaries of the counts cube.
+ * @param[in] ebounds_list Energy boundaries of the event list.
+ * @return Vector of usage flags.
+ *
+ * Determines a vector of counts cube layer usage flags that signal whether
+ * an event should actually be filled in the counts cube or not. This makes
+ * sure that no partially filled bins will exist in the counts cube.
+ ***************************************************************************/
+std::vector<bool> ctool::cube_layer_usage(const GEbounds& cube_ebounds,
+                                          const GEbounds& list_ebounds) const
+{
+    // Set energy margin
+    const GEnergy energy_margin(0.01, "GeV");
+
+    // Initialise usage vector
+    std::vector<bool> usage(cube_ebounds.size(), true);
+
+    // Loop over all energy bins of the cube
+    for (int iebin = 0; iebin < cube_ebounds.size(); ++iebin) {
+
+        // If the counts cube energy bin is fully contained within the
+        // energy boundaries of the event list the signal usage of this
+        // counts cube bin. Partially overlapping energy bins are signaled
+        // for non-usage, which avoids having partially filled bins in the
+        // counts cube. Some margin is applied that effectively reduces the
+        // width of the counts cube energy bin. This should cope with any
+        // rounding errors that come from reading and writing the energy
+        // boundary information to a FITS file.
+        usage[iebin] = list_ebounds.contains(cube_ebounds.emin(iebin) +
+                                             energy_margin,
+                                             cube_ebounds.emax(iebin) -
+                                             energy_margin);
+
+    } // endfor: looped over all energy bins
+
+    // Return usage
+    return usage;
+}
+
+
+/***********************************************************************//**
  * @brief Set warning string if there are too few energies
  *
  * @param[in] energies Energies.
@@ -1577,6 +1620,37 @@ std::string ctool::warn_too_few_energies(const GEnergies& energies) const
                        "\n         energy range would be "+
                        gammalib::str(nrequired)+" bins. Consider increasing "
                        "the number of energy bins.");
+    }
+
+    // Return warning
+    return warning;
+}
+
+
+/***********************************************************************//**
+ * @brief Set warning string if file has no .xml suffix
+ *
+ * @param[in] filename Filename.
+ * @return Warning string.
+ *
+ * Sets a warning string if the filename has not ".xml" suffix.
+ ***************************************************************************/
+std::string ctool::warn_xml_suffix(const GFilename& filename) const
+{
+    // Initialise warning
+    std::string warning;
+
+    // Get filename suffix
+    std::string fname  = std::string(filename);
+    std::string suffix = gammalib::tolower(fname.substr(fname.length()-4,4));
+    
+    // Warn if there are not enough energy bins
+    if (suffix != ".xml") {
+        warning.append("\nWARNING: Name of observation definition output file "
+                       "\""+filename+"\" does not terminate with \".xml\"."
+                       "\n         This is not an error, but may be misleading. "
+                       "It is recommended to use the suffix"
+                       "\n         \".xml\" for observation definition files.");
     }
 
     // Return warning

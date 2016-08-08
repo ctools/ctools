@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -71,8 +72,8 @@ class Test(test):
                       ' inmodel="'+self._model+'"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=20 nxpix=200 nypix=200'+ \
-                      ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
+                      ' emin=0.1 emax=100.0 enumbins=10 nxpix=40 nypix=40'+ \
+                      ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
                       ' logfile="ctmodel_cmd1.log" chatter=1'
 
@@ -94,8 +95,8 @@ class Test(test):
                       ' inmodel="model_that_does_not_exist.xml"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' rad=5.0 ra=83.63 dec=22.01 tmin=0.0 tmax=1800'+ \
-                      ' emin=0.1 emax=100.0 enumbins=20 nxpix=200 nypix=200'+ \
-                      ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
+                      ' emin=0.1 emax=100.0 enumbins=10 nxpix=40 nypix=40'+ \
+                      ' binsz=0.1 coordsys="CEL" proj="CAR"'+ \
                       ' xref=83.63 yref=22.01'+ \
                       ' logfile="ctmodel_cmd2.log" chatter=1'
 
@@ -111,10 +112,25 @@ class Test(test):
         """
         Test ctmodel from Python
         """
-        # Set-up ctmodel from scratch
+        # Allocate ctmodel
         model = ctools.ctmodel()
+
+        # Check that empty ctmodel tool holds an empty model cube
+        self._check_cube(model.cube(), nx=0, ny=0, nebins=0)
+
+        # Check that saving does not nothing
+        model['outcube']  = 'ctmodel_py0.fits'
+        model['logfile']  = 'ctmodel_py0.log'
+        model.logFileOpen()
+        model.save()
+        self.test_assert(not os.path.isfile('ctmodel_py0.fits'),
+             'Check that no model cube has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        model.clear()
+
+        # Now set ctmodel parameters
         model['incube']   = 'NONE'
-        model['outcube']  = 'ctmodel_py1.fits'
         model['inmodel']  = self._model
         model['inobs']    = 'NONE'
         model['expcube']  = 'NONE'
@@ -128,15 +144,16 @@ class Test(test):
         model['tmin']     = 0
         model['tmax']     = 1800
         model['emin']     = 0.1
-        model['emax']     = 100
-        model['enumbins'] = 20
-        model['nxpix']    = 200
-        model['nypix']    = 200
-        model['binsz']    = 0.02
+        model['emax']     = 100.0
+        model['enumbins'] = 10
+        model['nxpix']    = 40
+        model['nypix']    = 40
+        model['binsz']    = 0.1
         model['coordsys'] = 'CEL'
         model['proj']     = 'CAR'
         model['xref']     = 83.63
         model['yref']     = 22.01
+        model['outcube']  = 'ctmodel_py1.fits'
         model['logfile']  = 'ctmodel_py1.log'
         model['chatter']  = 2
 
@@ -148,6 +165,30 @@ class Test(test):
         # Check result file
         self._check_result_file('ctmodel_py1.fits')
 
+        # Copy ctmodel tool
+        cpy_model = model.copy()
+
+        # Check model cube of ctmodel copy
+        self._check_cube(cpy_model.cube())
+
+        # Execute copy of ctmodel tool again, now with a higher chatter
+        # level than before
+        cpy_model['outcube'] = 'ctmodel_py2.fits'
+        cpy_model['logfile'] = 'ctmodel_py2.log'
+        cpy_model['publish'] = True
+        cpy_model['chatter'] = 3
+        cpy_model.logFileOpen()  # Needed to get a new log file
+        cpy_model.execute()
+
+        # Check result file
+        self._check_result_file('ctmodel_py2.fits')
+
+        # Now clear copy of ctmodel tool
+        cpy_model.clear()
+
+        # Check that the cleared copy has also cleared the model cube
+        self._check_cube(cpy_model.cube(), nx=0, ny=0, nebins=0)
+
         # Return
         return
 
@@ -155,20 +196,41 @@ class Test(test):
     def _check_result_file(self, filename):
         """
         Check result file
+
+        Parameters
+        ----------
+        filename : str
+            Model cube file name
         """
         # Open result file
-        fits = gammalib.GFits(filename)
+        cube = gammalib.GCTAEventCube(filename)
 
-        # Get HDUs
-        cube    = fits['Primary']
-        ebounds = fits['EBOUNDS']
-        gti     = fits['GTI']
+        # Check cube
+        self._check_cube(cube)
 
-        # Check dimensions
-        self.test_value(cube.naxis(), 3, 'Check for 3 cube dimensions')
-        self.test_value(cube.naxes(0), 200, 'Check for 200 pixels in X')
-        self.test_value(cube.naxes(1), 200, 'Check for 200 pixels in Y')
-        self.test_value(cube.naxes(2), 20, 'Check for 20 pixels in Z')
+        # Return
+        return
+
+    # Check model cube
+    def _check_cube(self, cube, nx=40, ny=40, nebins=10):
+        """
+        Check model cube
+
+        Parameters
+        ----------
+        cube : `~gammalib.GCTAEventCube`
+            Model cube
+        nx : int, optional
+            Number of pixels in X direction
+        ny : int, optional
+            Number of pixels in Y direction
+        nebins : int, optional
+            Number of energy bins
+        """
+        # Check number of bins per axis
+        self.test_value(cube.nx(), nx, 'Check number of X pixels')
+        self.test_value(cube.ny(), ny, 'Check number of Y pixels')
+        self.test_value(cube.ebins(), nebins, 'Check number of energy bins')
 
         # Return
         return

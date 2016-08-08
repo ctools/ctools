@@ -192,15 +192,15 @@ void ctmapcube::run(void)
     // Get task parameters
     get_parameters();
 
-    // Write models into logger
-    if (logTerse()) {
-        log << std::endl;
-        log.header1(gammalib::number("Model", m_models.size()));
-        log << m_models << std::endl;
-    }
+    // Write input model container into logger
+    log_models(NORMAL, m_models, "Input model");
 
     // Generate map cube
     create_cube();
+
+    // Write result cube into logger
+    log_header1(NORMAL, "Map cube");
+    log_string(NORMAL, m_cube.print(m_chatter));
 
     // Optionally publish map cube
     if (m_publish) {
@@ -220,27 +220,27 @@ void ctmapcube::run(void)
 void ctmapcube::save(void)
 {
     // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Save map cube");
-    }
+    log_header1(TERSE, "Save map cube");
 
     // Get map cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outcube.is_empty()) {
+    // Determine whether the cube is empty
+    bool cube_is_empty = ((m_cube.cube().nx()    == 0) ||
+                          (m_cube.cube().ny()    == 0) ||
+                          (m_cube.cube().nmaps() == 0));
 
-        // Log filename
-        if (logTerse()) {
-            log << gammalib::parformat("Map cube file");
-            log << m_outcube.url() << std::endl;
-        }
-
-        // Save map cube into FITS file
+    // Save map cube if filename and the map cube are not empty
+    if (!m_outcube.is_empty() && !cube_is_empty) {
         m_cube.save(m_outcube, clobber());
-
     }
+
+    // Write into logger what has been done
+    std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
+    if (cube_is_empty) {
+        fname.append(" (cube is empty, no file created)");
+    }
+    log_value(NORMAL, "Map cube file", fname);
 
     // Return
     return;
@@ -256,11 +256,8 @@ void ctmapcube::save(void)
  ***************************************************************************/
 void ctmapcube::publish(const std::string& name)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Publish map cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Publish map cube");
 
     // Set default name is user name is empty
     std::string user_name(name);
@@ -268,11 +265,8 @@ void ctmapcube::publish(const std::string& name)
         user_name = CTMAPCUBE_NAME;
     }
 
-    // Log filename
-    if (logTerse()) {
-        log << gammalib::parformat("Map cube");
-        log << user_name << std::endl;
-    }
+    // Write map cube name into logger
+    log_value(NORMAL, "Map cube name", user_name);
 
     // Publish map cube
     m_cube.cube().publish(user_name);
@@ -297,6 +291,7 @@ void ctmapcube::init_members(void)
     m_outcube.clear();
     m_ptsrcsig = 1.0;
     m_publish  = false;
+    m_chatter  = static_cast<GChatter>(2);
 
     // Initialise protected members
     m_models.clear();
@@ -318,6 +313,7 @@ void ctmapcube::copy_members(const ctmapcube& app)
     m_outcube  = app.m_outcube;
     m_ptsrcsig = app.m_ptsrcsig;
     m_publish  = app.m_publish;
+    m_chatter  = app.m_chatter;
 
     // Copy protected members
     m_models = app.m_models;
@@ -372,6 +368,7 @@ void ctmapcube::get_parameters(void)
     // Get remaining hidden parameters
     m_ptsrcsig = (*this)["ptsrcsig"].real();
     m_publish  = (*this)["publish"].boolean();
+    m_chatter  = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Read optionally output cube filenames
     if (read_ahead()) {
@@ -462,11 +459,8 @@ GEnergies ctmapcube::create_energies(void)
  ***************************************************************************/
 void ctmapcube::create_cube(void)
 {
-    // Write header
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Generate map cube");
-    }
+    // Write header into logger
+    log_header1(TERSE, "Generate map cube");
 
     // Loop over all models
     for (int i = 0; i < m_models.size(); ++i) {
@@ -478,10 +472,7 @@ void ctmapcube::create_cube(void)
         if (model == NULL) {
 
             // Signal that model is skipped
-            if (logNormal()) {
-                log << gammalib::parformat("Skip model");
-                log << m_models[i]->name() << std::endl;
-            }
+            log_value(NORMAL, "Skip model", m_models[i]->name());
 
             // Continue
             continue;
@@ -489,10 +480,7 @@ void ctmapcube::create_cube(void)
         }
 
         // Signal that model is used
-        if (logNormal()) {
-            log << gammalib::parformat("Use model");
-            log << m_models[i]->name() << std::endl;
-        }
+        log_value(NORMAL, "Use model", m_models[i]->name());
 
         // Add sky model
         if (dynamic_cast<GModelSpatialPointSource*>(model->spatial()) != NULL) {
@@ -503,13 +491,6 @@ void ctmapcube::create_cube(void)
         }
 
     } // endfor: looped over energies
-
-    // Log cube
-    if (logTerse()) {
-        log << std::endl;
-        log.header1("Map cube");
-        log << m_cube << std::endl;
-    }
 
     // Return
     return;

@@ -36,7 +36,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "1.0.0"
+#define CTSELECT_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -102,6 +102,7 @@ protected:
     double      m_emax;       //!< Upper energy
     std::string m_expr;       //!< Selection expression
     std::string m_usethres;   //!< Energy threshold type
+    GChatter    m_chatter;    //!< Chattiness
 
     // Protected members
     GObservations            m_obs;           //!< Observations container
