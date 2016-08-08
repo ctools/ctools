@@ -166,6 +166,14 @@ def test(installed=False, debug=False):
     ver = sys.version.split()[0]
     if ver >= '2.6.0':
 
+        # Check for VHEFITS environment variable
+        if 'VHEFITS' in os.environ:
+            
+            # If environment variable exists then unset for the test cases.
+            # Since Python is executed in a subprocess this will not impact
+            # the environment variable in the parent shell.
+            del os.environ['VHEFITS']
+
         # Allocate test suites
         suite_csfindobs  = test_csfindobs.Test()
         suite_csiactcopy = test_csiactcopy.Test()
