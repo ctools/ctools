@@ -374,26 +374,18 @@ in ctools.
    Source intensities are generally given in units of
    :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}`.
 
-   Exceptions to this rule exist for the following spatial models:
-
-   - ``DiffuseIsotropic``: intensity units are given per steradian, e.g.
-     :math:`{\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}\,{\rm sr}^{-1}`
-
-   - ``DiffuseMapCube``: intensities are unitless, the spectral model
-     presents a relative scaling of the diffuse model
+   An exception to this rule exists for the ``DiffuseMapCube`` spatial
+   model where intensities are unitless and the spectral model presents a
+   relative scaling of the diffuse model cube values.
 
    If spectral models are used for a background model component, intensity 
    units are generally given in
    :math:`{\rm counts}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1}\,{\rm sr}^{-1}`
    and correspond to the on-axis count rate.
 
-   Exceptions to this rule exist for the following spatial models:
-
-   - ``CTAIrfBackground``: intensities are unitless, the spectral model 
-     presents a relative scaling of the background model
-
-   - ``CTACubeBackground``: intensities are unitless, the spectral model 
-     presents a relative scaling of the background model
+   Exceptions to this rule exist for the ``CTAIrfBackground`` and
+   ``CTACubeBackground`` models where intensities are unitless and the spectral
+   model presents a relative scaling of the background model values.
 
 
 Constant
