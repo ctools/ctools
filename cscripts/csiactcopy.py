@@ -40,11 +40,11 @@ class csiactcopy(ctools.cscript):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Set name
         self._name          = 'csiactcopy'
-        self._version       = '1.1.0'
+        self._version       = '1.2.0'
         self._datapath      = os.getenv('VHEFITS','')
         self._remote_master = gammalib.GFilename()
         self._remote_base   = ''
@@ -66,7 +66,6 @@ class csiactcopy(ctools.cscript):
         """
         Get parameters from parfile and setup the observation
         """
-        
         # Get Parameters
         self._remote_master = self['remote_master'].filename()
         if not self._remote_master.exists():
@@ -88,11 +87,11 @@ class csiactcopy(ctools.cscript):
 
     def _copy(self, source, clobber):     
         """
-        Copy file to outpath
+        Copy file to self._outpath directory
         
         Parameters
         ----------
-        source : string
+        source : str
             Path of file to be copied
 
         Returns
@@ -100,7 +99,6 @@ class csiactcopy(ctools.cscript):
         filesize : float
             Size of the file that was copied
         """
-        
         # Get file destination
         destination = os.path.join(self._outpath,
                                    os.path.relpath(source, self._remote_base))
@@ -147,29 +145,29 @@ class csiactcopy(ctools.cscript):
     def _merge(self, localfits, remotefits, hduname, clobber):
         """
         Merge remote and local fits files
+
         If the local fits file is not present, a new one is created.
         
         Parameters
         ----------
-        localfits : string
+        localfits : str
             Path of local index FITS file         
-        remotefits : string
+        remotefits : str
             Path of remote index FITS file         
-        hduname : string
+        hduname : str
             Name of HDU extension to be merged       
         clobber : bool
             Flag if remote content should overwrite local content        
         """    
-        
-        # Logging
-        self._log_value(gammalib.TERSE, 'Local file', localfits)
-        self._log_value(gammalib.TERSE, 'Remote file', remotefits)
-        self._log_value(gammalib.TERSE, 'HDU name', hduname)
+        # Write input parameters into logger
+        self._log_value(gammalib.NORMAL, 'Local file', localfits)
+        self._log_value(gammalib.NORMAL, 'Remote file', remotefits)
+        self._log_value(gammalib.NORMAL, 'HDU name', hduname)
         if clobber:
             preference = 'Remote'
         else:
             preference = 'Local'
-        self._log_value(gammalib.TERSE, 'Conflict preference', preference)
+        self._log_value(gammalib.NORMAL, 'Conflict preference', preference)
     
         # Check if local fits file is available
         if os.path.isfile(localfits):    
@@ -187,12 +185,13 @@ class csiactcopy(ctools.cscript):
         for obs_id in lobs_col:
             local_obs.append(obs_id)      
              
-        # Initialise list of runlists
-        # This is kluge: to circumvent a too long file name, we split the 
-        # runlists into chunks of 50 observations maximum
-        runlists = []
+        # Initialise run list. A kluge has been implemented to circumvent a
+        # too long file name: the run list is split into chunks of 50
+        # observations maximum. Note also the "//" division operator that
+        # makes sure that "i" is an integer on Python 3.
+        runlists       = []
         runs_per_chunk = 50
-        for i in range(len(self._runs) / runs_per_chunk + 1):
+        for i in range(len(self._runs) // runs_per_chunk + 1):
             chunk = self._runs[i * runs_per_chunk : (i + 1) * runs_per_chunk]
             runlists.append(chunk)
 
@@ -241,8 +240,8 @@ class csiactcopy(ctools.cscript):
             remote_obs.append(obs_id)
         
         # Log entries of index files   
-        self._log_value(gammalib.TERSE, 'Remote entries', len(remote_obs))
-        self._log_value(gammalib.TERSE, 'Local entries', len(local_obs))
+        self._log_value(gammalib.NORMAL, 'Remote entries', len(remote_obs))
+        self._log_value(gammalib.NORMAL, 'Local entries', len(local_obs))
 
         # initialise counter for logging
         removed_rows = 0
@@ -311,7 +310,7 @@ class csiactcopy(ctools.cscript):
             what = 'Removed local rows'
         else:
             what = 'Skipped remote rows'
-        self._log_value(gammalib.TERSE, what, removed_rows)
+        self._log_value(gammalib.NORMAL, what, removed_rows)
 
         # Loop over columns 
         for i in range(local_hdu.ncols()):
@@ -330,6 +329,65 @@ class csiactcopy(ctools.cscript):
         # Return
         return
 
+    def _set_runs(self, filename):
+        """
+        Set the run list
+
+        Parameters
+        ----------
+        filename : `~gammalib.GFilename`
+            Run list file name
+
+        Returns
+        -------
+        runs : list of int
+            Run list
+        """
+        # Write header into logger
+        self._log_header1(gammalib.TERSE, 'Set runlist')
+        
+        # Initialise runlist
+        runs = []
+        
+        # If runlist file exists then open file and extract the run
+        # information into the run list
+        if filename.exists():
+
+            # Open the runlist file
+            runfile = open(filename.url())
+            
+            # Read runlist file and append all run ID as integers to the
+            # run list. Skip any blank or comment lines
+            for line in runfile.readlines():
+                if len(line) == 0:
+                    continue
+                if line[0] == '#':
+                    continue
+                if len(line.split()) > 0:
+                    run = int(line.split()[0])
+                    runs.append(run)
+                    self._log_value(gammalib.EXPLICIT, 'Run %d' % len(runs), run)
+            
+            # Close runlist file
+            runfile.close()   
+            
+            # Logging
+            self._log_value(gammalib.NORMAL, 'Number of observations',
+                            len(runs))
+        
+        # ... otherwise, if the runlist file is 'NONE' then leave the
+        # run list empty. This implies copying all available data.
+        elif filename == 'NONE':
+            self._log_string(gammalib.NORMAL, 'Copy all available data')
+        
+        # ... otherwise raise an exception
+        else:
+            msg = '*** ERROR: Runlist file "%s" not available' % filename
+            raise RuntimeError(msg)
+        
+        # Return run list
+        return runs
+
 
     # Public methods
     def run(self):
@@ -344,46 +402,12 @@ class csiactcopy(ctools.cscript):
         self._get_parameters()
 
         # Make destination directory if not available
-        if not os.path.isdir(self._outpath):            
-            os.makedirs(self._outpath)   
-        
-        # Log output
-        if self._logTerse():
-            self._log('\n')
-            self._log.header2('Runlist information')
-        
-        # Initialise runlist array   
-        self._runs = []
-        
-        # Check if runlist file is available
-        if self._runlist.exists():
-            runfile = open(self._runlist.url())
-            
-            # Read runlist
-            for line in runfile.readlines():
-                if len(line) == 0:
-                    continue
-                if line[0] == '#':
-                    continue
-                if len(line.split()) > 0:
-                    self._runs.append(int(line.split()[0]))
-            
-            # Close runlist file
-            runfile.close()   
-            
-            # Logging
-            self._log_value(gammalib.TERSE, 'Number of observations',
-                            len(self._runs))
-        
-        # Copy all data if runlist file is 'NONE'
-        elif self._runlist == 'NONE':
-            self._log_string(gammalib.TERSE, 'Copy all available data')
-        
-        # Raise exception if file not valid
-        else:
-            raise RuntimeError('*** ERROR: Runlist file "'+
-                               self._runlist+'" not available.')
-        
+        if not os.path.isdir(self._outpath):
+            os.makedirs(self._outpath)
+
+        # Set run list
+        self._runs = self._set_runs(self._runlist)
+
         # Check for availability of remote master file
         if not self._remote_master.exists():
             raise RuntimeError('*** ERROR: Remote master file "'+
@@ -409,17 +433,16 @@ class csiactcopy(ctools.cscript):
         # Initialise file names to be copied
         files = set()
         
-        # Logging
-        if self._logTerse():
-            self._log('\n')
-            self._log.header2('Loop over remote configs')
+        # Write header into logger
+        self._log_header2(gammalib.TERSE, 'Loop over remote configs')
         
         # Loop over configs
         for config in configs: 
             
-            # Logging          
-            if self._logVerbose():
-                self._log.header2(str(config['name']))
+            # Write header into logger. The str() is needed since
+            # "config['name']" is <type 'unicode'>, and under Python 2 a
+            # string is expected.
+            self._log_header2(gammalib.VERBOSE, str(config['name']))
             
             # Check if prodname was found
             if config['name'] == self._prodname:
@@ -428,14 +451,16 @@ class csiactcopy(ctools.cscript):
                 has_prod = True           
                 
                 # Build path of index files
-                remote_hdu = os.path.join(self._remote_base, config['hduindx'])
-                remote_obs = os.path.join(self._remote_base, config['obsindx'])
+                remote_hdu = str(os.path.join(self._remote_base,
+                                              config['hduindx']))
+                remote_obs = str(os.path.join(self._remote_base,
+                                              config['obsindx']))
                 
                 # Log information
-                self._log_header3(gammalib.TERSE, 'Remote config "'+
+                self._log_header3(gammalib.NORMAL, 'Remote config "'+
                                   self._prodname+'"')
-                self._log_value(gammalib.TERSE, 'HDU index', remote_hdu)
-                self._log_value(gammalib.TERSE, 'Observation index', remote_obs)
+                self._log_value(gammalib.NORMAL, 'HDU index', remote_hdu)
+                self._log_value(gammalib.NORMAL, 'Observation index', remote_obs)
                 
                 # Open remote HDU index file
                 fits = gammalib.GFits(str(remote_hdu))
@@ -457,11 +482,10 @@ class csiactcopy(ctools.cscript):
                 for run in self._runs:
                     
                     # Check for run not in remote data store
-                    if not run in remote_ids:  
-                        if self._logNormal():
-                            self._log('Skip observation '+str(run)+': ')
-                            self._log('ID not available remotely')
-                            self._log('\n')
+                    if not run in remote_ids:
+                        msg = ('Skip observation "%s": ID not available '
+                               'remotely' % str(run))
+                        self._log_string(msg)
                 
                 # Loop over remote HDU index file
                 for row in range(table.nrows()):
@@ -510,11 +534,11 @@ class csiactcopy(ctools.cscript):
                             cp_size += table['SIZE'][row]
                             
                 # Log file information
-                self._log_header2(gammalib.TERSE, 'File information')
-                self._log_value(gammalib.TERSE, 'Number of files', len(files))
+                self._log_header2(gammalib.NORMAL, 'File information')
+                self._log_value(gammalib.NORMAL, 'Number of files', len(files))
                 if has_size:
                     size = float(cp_size) * 1.0e-6
-                    self._log_value(gammalib.TERSE, 'Size', '%.2f MB' % size)
+                    self._log_value(gammalib.NORMAL, 'Size', '%.2f MB' % size)
                 self._log_header3(gammalib.VERBOSE, 'File names')
                 for filename in files:
                     self._log_string(gammalib.VERBOSE, str(filename)+'\n')
@@ -586,16 +610,11 @@ class csiactcopy(ctools.cscript):
             k += 1
         
         # Logging
-        if self._logNormal() and not self._logVerbose():
-            self._log.parformat('Status')
-            self._log('Finished')
-            self._log('\n')
-        
+        self._log_value(gammalib.NORMAL, 'Status', 'Finished')
+
         # Logging about index files
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Updating index files')
-        
+        self._log_header1(gammalib.TERSE, 'Updating index files')
+
         # Build local hdu index file name
         local_hdu = os.path.join(self._outpath,
                                  os.path.relpath(remote_hdu,
@@ -657,16 +676,15 @@ class csiactcopy(ctools.cscript):
             # Check if index files are available
             if not (gammalib.GFilename(str(hdu)).is_fits() and
                     gammalib.GFilename(str(obs)).is_fits()):
-                if self._logTerse():
-                    self._log('Removing "'+str(config['name'])+'" ')
-                    self._log('(not available)')
-                    self._log('\n')
+                self._log_value(gammalib.NORMAL,
+                                'Removing "'+str(config['name']),
+                                'Not available')
             else:
                 # Append config if valid
                 newconfigs.append(config)
-                if self._logTerse():
-                    self._log('Keeping "'+str(config['name'])+'"')
-                    self._log('\n')
+                self._log_value(gammalib.NORMAL,
+                                'Keeping "'+str(config['name']),
+                                'Available')
             
             # Signals that downloaded config is available
             if config['name'] == self._prodname:
