@@ -213,18 +213,8 @@ class Test(test):
         self._check_cube(cpy_bkgcube.bkgcube(), nenergies=0)
         self._check_models(cpy_bkgcube.models(), nmodels=0)
 
-        # Prepare observation container
-        obs1 = gammalib.GCTAObservation(self._events)
-        obs2 = gammalib.GCTAObservation(self._cntcube)
-        obs3 = gammalib.GLATObservation()
-        obs1.id('0001')
-        obs2.id('0002')
-        obs3.id('0001')
-        obs3.events(gammalib.GLATEventList())
-        obs = gammalib.GObservations()
-        obs.append(obs1)
-        obs.append(obs2)
-        obs.append(obs3)
+        # Get mixel observation container
+        obs = self._obs_mixed()
         obs.models(gammalib.GModels(self._model))
 
         # Set-up ctbkgcube from observation container

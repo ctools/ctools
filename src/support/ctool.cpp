@@ -1646,7 +1646,7 @@ std::string ctool::warn_xml_suffix(const GFilename& filename) const
     
     // Warn if there are not enough energy bins
     if (suffix != ".xml") {
-        warning.append("\nWARNING: Name of observation definition output file "
+        warning.append("WARNING: Name of observation definition output file "
                        "\""+filename+"\" does not terminate with \".xml\"."
                        "\n         This is not an error, but may be misleading. "
                        "It is recommended to use the suffix"

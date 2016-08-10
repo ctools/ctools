@@ -373,6 +373,12 @@ void ctlike::get_parameters(void)
 
     } // endif: there was no observation in the container
 
+    // ... otherwise add response information and energy boundaries in case
+    // that they are missing
+    else {
+        setup_observations(m_obs);
+    }
+
     // If only single observation is used, read statistics parameter
     if (!m_use_xml) {
 

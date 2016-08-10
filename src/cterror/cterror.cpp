@@ -475,6 +475,11 @@ void cterror::get_parameters(void)
 
     } // endif: there was no observation in the container
 
+    // ... otherwise add response information and energy boundaries in case
+    // that they are missing
+    else {
+        setup_observations(m_obs);
+    }
 
     // If there are no models associated with the observations then
     // load now the model definition

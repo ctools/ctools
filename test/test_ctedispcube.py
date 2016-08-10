@@ -185,6 +185,38 @@ class Test(test):
         # cube
         self._check_cube(cpy_edispcube.edispcube(), nenergies=0, nmigras=0)
 
+        # Get mixed observation container
+        obs = self._obs_mixed()
+
+        # Set-up ctedispcube from observation container
+        edispcube = ctools.ctedispcube(obs)
+        edispcube['incube']    = 'NONE'
+        edispcube['caldb']     = self._caldb
+        edispcube['irf']       = self._irf
+        edispcube['ebinalg']   = 'LOG'
+        edispcube['emin']      = 0.1
+        edispcube['emax']      = 100.0
+        edispcube['enumbins']  = 20
+        edispcube['nxpix']     = 10
+        edispcube['nypix']     = 10
+        edispcube['binsz']     = 0.4
+        edispcube['coordsys']  = 'CEL'
+        edispcube['proj']      = 'CAR'
+        edispcube['xref']      = 83.63
+        edispcube['yref']      = 22.01
+        edispcube['migramax']  = 2.0
+        edispcube['migrabins'] = 10
+        edispcube['outcube']   = 'ctedispcube_py3.fits'
+        edispcube['logfile']   = 'ctedispcube_py3.log'
+        edispcube['chatter']   = 4
+
+        # Execute ctedispcube tool
+        edispcube.logFileOpen()  # Make sure we get a log file
+        edispcube.execute()
+
+        # Check result file
+        self._check_result_file('ctedispcube_py3.fits')
+
         # Return
         return
 

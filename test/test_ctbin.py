@@ -194,15 +194,9 @@ class Test(test):
         self.test_value(bin.cube().size(), 0,
              'Check that empty ctbin has an empty counts cube')
 
-        # Prepare observation container for stacked analysis
-        cta = gammalib.GCTAObservation(self._events)
-        obs = gammalib.GObservations()
-        cta.id('0001')
-        obs.append(cta)
-        cta.id('0002')
-        obs.append(cta)
-        cta.id('0003')
-        obs.append(cta)
+        # Prepare observation container for stacking of events into a
+        # single counts cube
+        obs = self._obs_events()
 
         # Set-up ctbin using an observation container
         bin = ctools.ctbin(obs)

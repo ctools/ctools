@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -106,8 +107,24 @@ class Test(test):
         """
         Test ctcubemask from Python
         """
-        # Set-up ctcubemask
+        # Allocate ctcubemask
         mask = ctools.ctcubemask()
+
+        # Check that empty ctcubemask tool holds an empty observation
+        self._check_obs(mask.obs(), nobs=0)
+
+        # Check that saving saves an empty counts cube
+        mask['outcube'] = 'ctcubemask_py0.fits'
+        mask['logfile'] = 'ctcubemask_py0.log'
+        mask.logFileOpen()
+        mask.save()
+        self.test_assert(not os.path.isfile('ctcubemask_py0.fits'),
+             'Check that no counts cube has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        mask.clear()
+
+        # Now set ctcubemask parameters
         mask['inobs']   = self._cntcube
         mask['regfile'] = self._exclusion
         mask['ra']      = 83.63
@@ -127,14 +144,15 @@ class Test(test):
         # Check result file
         self._check_result_file('ctcubemask_py1.fits')
 
-        # Set-up ctcubemask without exclusion regions
+        # Set-up ctcubemask without exclusion regions but tighter energy
+        # selection
         mask = ctools.ctcubemask()
         mask['inobs']   = self._cntcube
         mask['regfile'] = 'NONE'
         mask['ra']      = 83.63
         mask['dec']     = 22.01
         mask['rad']     = 3.0
-        mask['emin']    = 0.1
+        mask['emin']    = 1.0
         mask['emax']    = 100.0
         mask['outcube'] = 'ctcubemask_py2.fits'
         mask['logfile'] = 'ctcubemask_py2.log'
@@ -146,22 +164,54 @@ class Test(test):
         mask.execute()
 
         # Check result file
-        self._check_result_file('ctcubemask_py2.fits', events=5542)
+        self._check_result_file('ctcubemask_py2.fits', events=573)
 
-        # Copy ctcubemask tool and execute copy
-        cpy_mask = mask
+        # Copy ctcubemask tool
+        cpy_mask = mask.copy()
+
+        # Check that ctcubemask tool holds one observation
+        self._check_obs(cpy_mask.obs())
+
+        # Execute copy of ctcubemask tool again, now with a higher chatter
+        # level than before
         cpy_mask['outcube'] = 'ctcubemask_py3.fits'
         cpy_mask['logfile'] = 'ctcubemask_py3.log'
-        cpy_mask['chatter']  = 4
+        cpy_mask['chatter'] = 4
         cpy_mask.execute()
 
         # Check result file
-        self._check_result_file('ctcubemask_py3.fits', events=5542)
+        self._check_result_file('ctcubemask_py3.fits', events=573)
 
         # Clear ctcubemask tool
-        mask.clear()
+        cpy_mask.clear()
 
-        # TODO: Do some test after clearing
+        # Check that empty ctcubemask tool holds an empty observation
+        self._check_obs(cpy_mask.obs(), nobs=0)
+
+        # Prepare observation container
+        obs = self._obs_mixed()
+        obs.models(gammalib.GModels(self._model))
+
+        # Set-up ctcubemask from observation container, don't perform any
+        # energy selection
+        mask = ctools.ctcubemask(obs)
+        mask['regfile'] = 'NONE'
+        mask['ra']      = 83.63
+        mask['dec']     = 22.01
+        mask['rad']     = 3.0
+        mask['emin']    = 'NONE'
+        mask['emax']    = 'NONE'
+        mask['outcube'] = 'ctcubemask_py4.xml'
+        mask['logfile'] = 'ctcubemask_py4.log'
+        mask['chatter'] = 3
+        mask['debug']   = True
+
+        # Execute ctcubemask tool
+        mask.logFileOpen()   # Make sure we get a log file
+        mask.execute()
+
+        # Check result file
+        self._check_result_file('filtered_crab_cntmap.fits', events=5542)
 
         # Return
         return
@@ -177,6 +227,24 @@ class Test(test):
         # Check counts cube
         self.test_value(cube.size(), 800000, 'Check for number of cube bins')
         self.test_value(cube.number(), events, 'Check for number of events')
+
+        # Return
+        return
+
+    # Check observation container
+    def _check_obs(self, obs, nobs=1):
+        """
+        Check observation container
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Observation container
+        nobs : int, optional
+            Expected number of observations
+        """
+        # Check size of observation container
+        self.test_value(obs.size(), nobs, 'Check size of observation container')
 
         # Return
         return

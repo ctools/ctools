@@ -301,7 +301,7 @@ void ctcubemask::save(void)
     // Get counts cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Case A: Save event file(s) and XML metadata information
+    // Case A: Save counts cube(s) and XML metadata information
     if (m_use_xml) {
 
         // Get prefix
@@ -311,7 +311,7 @@ void ctcubemask::save(void)
         save_xml();
     }
 
-    // Case B: Save event file as FITS file
+    // Case B: Save counts cube as FITS file
     else {
         save_fits();
     }
@@ -404,9 +404,9 @@ void ctcubemask::init_members(void)
 void ctcubemask::copy_members(const ctcubemask& app)
 {
     // Copy parameters
-	m_regfile = app.m_regfile;
+    m_regfile = app.m_regfile;
     m_outcube = app.m_outcube;
-	m_prefix  = app.m_prefix;
+    m_prefix  = app.m_prefix;
     m_usepnt  = app.m_usepnt;
     m_ra      = app.m_ra;
     m_dec     = app.m_dec;
@@ -471,7 +471,7 @@ void ctcubemask::get_parameters(void)
     } // endif: there was no observation in the container
 
     // Get parameters
-	m_regfile = (*this)["regfile"].filename();
+    m_regfile = (*this)["regfile"].filename();
     m_usepnt  = (*this)["usepnt"].boolean();
     if (!m_usepnt) {
 
@@ -725,18 +725,23 @@ std::string ctcubemask::set_outfile_name(const std::string& filename) const
  ***************************************************************************/
 void ctcubemask::save_fits(void)
 {
-    // Save only if filename is non-empty
-    if (!m_outcube.is_empty()) {
+    // Save only if filename is non-empty and if there are observations
+    if (!m_outcube.is_empty() && m_obs.size() > 0) {
 
         // Get CTA observation from observation container
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
 
-        // Log counts cube file name
-        log_value(NORMAL, "Counts cube file", m_outcube.url());
+        // Handle only CTA observations
+        if (obs != NULL) {
 
-        // Save event list
-        save_counts_map(obs, m_outcube);
+            // Log counts cube file name
+            log_value(NORMAL, "Counts cube file", m_outcube.url());
+
+            // Save counts cube
+            obs->save(m_outcube, clobber());
         
+        } // endif: observation was a CTA observation
+
     }
 
     // Return
@@ -745,30 +750,20 @@ void ctcubemask::save_fits(void)
 
 
 /***********************************************************************//**
- * @brief Save counts map(s) in XML format.
+ * @brief Save counts cube(s) in XML format.
  *
- * Save the counts map(s) into FITS files and write the file path information
- * into a XML file. The filename of the XML file is specified by the
- * m_outfile member, the filename(s) of the counts map(s) are built by
+ * Save the counts cube(s) into FITS files and write the file path
+ * information into an XML file. The filename of the XML file is specified by
+ * the m_outfile member, the filename(s) of the counts cube(s) are built by
  * prepending the prefix given by the m_prefix member to the input counts
- * map(s) filenames. Any path present in the input filename will be stripped,
- * i.e. the counts map(s) will be written in the local working directory
- * (unless a path is specified in the m_prefix member).
+ * cube(s) filenames. Any path present in the input filename will be
+ * stripped, i.e. the counts cube(s) will be written in the local working
+ * directory (unless a path is specified in the m_prefix member).
  ***************************************************************************/
 void ctcubemask::save_xml(void)
 {
     // Issue warning if output filename has no .xml suffix
-    std::string suffix = gammalib::tolower(m_outcube.url().substr(
-                                                    m_outcube.length()-4,4));
-    if (suffix != ".xml") {
-        std::string msg = "\nWARNING: Name of observation definition output "
-                          "file \""+m_outcube+"\" does not terminate with\n"
-                          "         \".xml\". This is not an error, but may "
-                          "be misleading. It is recommended to use the\n"
-                          "         suffix \".xml\" for observation definition "
-                          "files.";
-        log_string(TERSE, msg);
-    }
+    log_string(TERSE, warn_xml_suffix(m_outcube.url()));
 
     // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
@@ -788,8 +783,8 @@ void ctcubemask::save_xml(void)
             // Log counts cube file name
             log_value(NORMAL, "Counts cube file", outfile);
 
-            // Save event list
-            save_counts_map(obs, outfile);
+            // Save counts cube
+            obs->save(outfile, clobber());
 
         } // endif: observation was a CTA observations
 
@@ -801,30 +796,3 @@ void ctcubemask::save_xml(void)
     // Return
     return;
 }
-
-
-
-/***********************************************************************//**
- * @brief Save a single counts map into a FITS file
- *
- * @param[in] obs Pointer to CTA observation.
- * @param[in] outfile Output file name.
- *
- * This method saves a single counts map into a FITS file. The method does
- * nothing if the observation pointer is not valid.
- ***************************************************************************/
-void ctcubemask::save_counts_map(const GCTAObservation* obs,
-                                 const std::string&     outfile) const
-{
-    // Save only if observation is valid
-    if (obs != NULL) {
-
-        // Save observation into FITS file
-        obs->save(outfile, clobber());
-
-    } // endif: observation was valid
-
-    // Return
-    return;
-}
-

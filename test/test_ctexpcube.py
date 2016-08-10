@@ -181,6 +181,36 @@ class Test(test):
         # Check that the cleared copy has also cleared the exposure cube
         self._check_cube(cpy_expcube.expcube(), nenergies=0)
 
+        # Get mixed observation container
+        obs = self._obs_mixed()
+
+        # Set-up ctexpcube from observation container
+        expcube = ctools.ctexpcube(obs)
+        expcube['incube']   = 'NONE'
+        expcube['caldb']    = self._caldb
+        expcube['irf']      = self._irf
+        expcube['ebinalg']  = 'LOG'
+        expcube['emin']     = 0.1
+        expcube['emax']     = 100.0
+        expcube['enumbins'] = 20
+        expcube['nxpix']    = 200
+        expcube['nypix']    = 200
+        expcube['binsz']    = 0.02
+        expcube['coordsys'] = 'CEL'
+        expcube['proj']     = 'CAR'
+        expcube['xref']     = 83.63
+        expcube['yref']     = 22.01
+        expcube['logfile']  = 'ctexpcube_py3.log'
+        expcube['outcube']  = 'ctexpcube_py3.fits'
+        expcube['chatter']  = 4
+
+        # Execute ctexpcube tool
+        expcube.logFileOpen()  # Needed to get a new log file
+        expcube.execute()
+
+        # Check result file
+        self._check_result_file('ctexpcube_py3.fits')
+
         # Return
         return
 

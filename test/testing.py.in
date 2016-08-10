@@ -97,3 +97,70 @@ class test(gammalib.GPythonTestSuite):
 
         # Return return code
         return rc
+
+    # Return observation container with 3 identical event lists
+    def _obs_events(self):
+        """
+        Return observation container with 3 identical event lists
+
+        Returns
+        -------
+        obs : `~gammalib.gammalib.GObservations`
+            Observations container
+        """
+        # Load CTA event list
+        cta = gammalib.GCTAObservation(self._events)
+
+        # Allocate observation container
+        obs = gammalib.GObservations()
+
+        # Append CTA observation with ID "0001"
+        cta.id('0001')
+        obs.append(cta)
+
+        # Append CTA observation with ID "0002"
+        cta.id('0002')
+        obs.append(cta)
+
+        # Append CTA observation with ID "0003"
+        cta.id('0003')
+        obs.append(cta)
+
+        # Return observation container
+        return obs
+
+    # Return observation container with event list, counts cube and LAT
+    # observation
+    def _obs_mixed(self):
+        """
+        Return observation container with event list, counts cube and LAT
+        observation
+
+        Returns
+        -------
+        obs : `~gammalib.gammalib.GObservations`
+            Observations container
+        """
+        # Load CTA event list
+        obs1 = gammalib.GCTAObservation(self._events)
+        obs1.id('0001')
+
+        # Load CTA counts cube
+        obs2 = gammalib.GCTAObservation(self._cntcube)
+        obs2.id('0002')
+
+        # Create empty LAT observation
+        obs3 = gammalib.GLATObservation()
+        obs3.id('0001')
+        obs3.events(gammalib.GLATEventList())
+
+        # Allocate observation container
+        obs = gammalib.GObservations()
+
+        # Append observations to container
+        obs.append(obs1)
+        obs.append(obs2)
+        obs.append(obs3)
+
+        # Return observation container
+        return obs

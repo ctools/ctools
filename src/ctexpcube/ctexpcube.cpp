@@ -386,6 +386,12 @@ void ctexpcube::get_parameters(void)
 
     } // endif: there was no observation in the container
 
+    // ... otherwise add response information and energy boundaries in case
+    // that they are missing
+    else {
+        setup_observations(m_obs);
+    }
+
     // Get the incube filename
     std::string incube = (*this)["incube"].filename();
 

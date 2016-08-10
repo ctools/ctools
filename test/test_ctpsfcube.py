@@ -131,7 +131,6 @@ class Test(test):
         # Now set ctpsfcube parameters
         psfcube['inobs']    = self._events
         psfcube['incube']   = 'NONE'
-        psfcube['outcube']  = 'ctpsfcube_py1.fits'
         psfcube['caldb']    = self._caldb
         psfcube['irf']      = self._irf
         psfcube['ebinalg']  = 'LOG'
@@ -147,6 +146,7 @@ class Test(test):
         psfcube['yref']     = 22.01
         psfcube['amax']     = 0.3
         psfcube['anumbins'] = 10
+        psfcube['outcube']  = 'ctpsfcube_py1.fits'
         psfcube['logfile']  = 'ctpsfcube_py1.log'
         psfcube['chatter']  = 2
 
@@ -183,6 +183,38 @@ class Test(test):
 
         # Check that the cleared copy has also cleared the PSF cube
         self._check_cube(cpy_psfcube.psfcube(), nenergies=0)
+
+        # Get mixed observation container
+        obs = self._obs_mixed()
+
+        # Set-up ctpsfcube from observation container
+        psfcube = ctools.ctpsfcube(obs)
+        psfcube['incube']   = 'NONE'
+        psfcube['caldb']    = self._caldb
+        psfcube['irf']      = self._irf
+        psfcube['ebinalg']  = 'LOG'
+        psfcube['emin']     = 0.1
+        psfcube['emax']     = 100
+        psfcube['enumbins'] = 20
+        psfcube['nxpix']    = 10
+        psfcube['nypix']    = 10
+        psfcube['binsz']    = 0.4
+        psfcube['coordsys'] = 'CEL'
+        psfcube['proj']     = 'CAR'
+        psfcube['xref']     = 83.63
+        psfcube['yref']     = 22.01
+        psfcube['amax']     = 0.3
+        psfcube['anumbins'] = 10
+        psfcube['outcube']  = 'ctpsfcube_py3.fits'
+        psfcube['logfile']  = 'ctpsfcube_py3.log'
+        psfcube['chatter']  = 4
+
+        # Execute ctpsfcube tool
+        psfcube.logFileOpen()   # Make sure we get a log file
+        psfcube.execute()
+
+        # Check result file
+        self._check_result_file('ctpsfcube_py3.fits')
 
         # Return
         return

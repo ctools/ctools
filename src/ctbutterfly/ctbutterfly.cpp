@@ -573,9 +573,8 @@ void ctbutterfly::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * @exception GException::invalid_value
- *            Test source not found or no RA/DEC parameters found for test
- *            source.
+ * @exception GException::feature_not_implemented
+ *            Loading of covariance matrix is not yet implemented.
  *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Most parameters are only required if no observation exists so
@@ -597,6 +596,11 @@ void ctbutterfly::get_parameters(void)
 
     } // endif: there was no observation in the container
 
+    // ... otherwise add response information and energy boundaries in case
+    // that they are missing
+    else {
+        setup_observations(m_obs);
+    }
 
     // If there is are no models associated with the observations then
     // load now the model definition

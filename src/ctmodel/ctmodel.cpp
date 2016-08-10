@@ -456,6 +456,12 @@ void ctmodel::get_parameters(void)
         get_obs();
     }
 
+    // ... otherwise add response information and energy boundaries in case
+    // that they are missing
+    else {
+        setup_observations(m_obs);
+    }
+
     // If we have now excactly one CTA observation (but no cube has yet been
     // appended to the observation) then check whether this observation
     // is a binned observation, and if yes, extract the counts cube for

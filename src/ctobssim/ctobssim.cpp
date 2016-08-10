@@ -561,9 +561,10 @@ void ctobssim::get_parameters(void)
         
     }
 
-    // ... otherwise make sure that observation boundaries are set
+    // ... otherwise add response information and energy boundaries in case
+    // that they are missing
     else {
-        set_obs_bounds(m_obs);
+        setup_observations(m_obs);
     }
 
     // Read model definition file if required

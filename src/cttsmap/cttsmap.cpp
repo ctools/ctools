@@ -523,6 +523,12 @@ void cttsmap::get_parameters(void)
 
     } // endif: there was no observation in the container
 
+    // ... otherwise add response information and energy boundaries in case
+    // that they are missing
+    else {
+        setup_observations(m_obs);
+    }
+
     // If there is are no models associated with the observations then
     // load now the model definition
     if (m_obs.models().size() == 0) {

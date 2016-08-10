@@ -36,7 +36,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME    "ctcubemask"
-#define CTCUBEMASK_VERSION "1.1.0"
+#define CTCUBEMASK_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -75,8 +75,6 @@ protected:
     std::string set_outfile_name(const std::string& filename) const;
     void        save_fits(void);
     void        save_xml(void);
-    void        save_counts_map(const GCTAObservation* obs,
-                                const std::string&     outfile) const;
 
     // User parameters
 	GFilename   m_regfile;    //!< ds9 region file
