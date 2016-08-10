@@ -182,17 +182,27 @@ class cspull(ctools.cscript):
         # If we have a binned obeservation then specify the lower and
         # upper energy limit
         if self._enumbins > 0:
+
+            # Get energy range in TeV
             emin = self['emin'].real()
             emax = self['emax'].real()
+
+            # Set number of energy bins to at least 30 per energy decade
+            enumbins = int((math.log10(self['emax'].real()) -
+                            math.log10(self['emin'].real())) * 30.0)
+            if self._enumbins > enumbins:
+                enumbins = self._enumbins
+
         else:
-            emin = None
-            emax = None
+            emin     = None
+            emax     = None
+            enumbins = 0
 
         # Simulate events
         obs = obsutils.sim(self._obs,
                            emin=emin,
                            emax=emax,
-                           nbins=self._enumbins,
+                           nbins=enumbins,
                            seed=seed,
                            binsz=self._binsz,
                            npix=self._npix,
