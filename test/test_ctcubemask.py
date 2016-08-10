@@ -204,7 +204,6 @@ class Test(test):
         mask['outcube'] = 'ctcubemask_py4.xml'
         mask['logfile'] = 'ctcubemask_py4.log'
         mask['chatter'] = 3
-        mask['debug']   = True
 
         # Execute ctcubemask tool
         mask.logFileOpen()   # Make sure we get a log file
