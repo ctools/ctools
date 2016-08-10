@@ -25,7 +25,7 @@ import ctools
 # Simulate observations #
 # ===================== #
 def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
-        emin=None, emax=None, nbins=0,
+        emin=None, emax=None, nbins=0, addbounds=False,
         binsz=0.05, npix=200, proj='TAN', coord='GAL'):
     """
     Simulate events for all observations in the container
@@ -58,6 +58,8 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Maximum energy of counts cube for binned (TeV)
     nbins : int, optional
         Number of energy bins (0=unbinned)
+    addbounds : bool, optional
+        Add boundaries at observation energies
     binsz : float, optional
         Pixel size for binned simulation (deg/pixel)
     npix : int, optional
@@ -92,22 +94,15 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
     # Binned option?
     if nbins > 0:
 
-        # If energy boundaries are not given then determine common energy
-        # boundaries for all observations
+        # If energy boundaries are not given then determine the minimum and
+        # the maximum energies from all observations and use these values
+        # as energy boundaries. The energy boundaries are given in TeV.
         if emin == None or emax == None:
-            emin = None
-            emax = None
+            emin = 1.0e30
+            emax = 0.0
             for run in sim.obs():
-                run_emin = run.events().ebounds().emin().TeV()
-                run_emax = run.events().ebounds().emax().TeV()
-                if emin == None:
-                    emin = run_emin
-                elif run_emin > emin:
-                    emin = run_emin
-                if emax == None:
-                    emax = run_emax
-                elif run_emax > emax:
-                    emax = run_emax
+                emin = min(run.events().ebounds().emin().TeV(), emin)
+                emax = max(run.events().ebounds().emax().TeV(), emax)
 
         # Allocate ctbin application and set parameters
         bin = ctools.ctbin(sim.obs())
@@ -136,26 +131,16 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         # cubes and append them to the observation
         if len(sim.obs()) > 1:
 
-            # Get xref, yref, coordsys and proj from counts cube
-            _xref     = bin.cube().counts().projection().crval(0)
-            _yref     = bin.cube().counts().projection().crval(1)
-            _coordsys = bin.cube().counts().projection().coordsys()
-            _proj     = bin.cube().counts().projection().code()
-
-            # Kluge: map "EQU" to "CEL" coordinate system (not sure why the
-            # GSkyProjection::coordsys returns "EQU" instead of "CEL"
-            if _coordsys == 'EQU':
-                _coordsys = 'CEL'
-
-            # Get stacked response
-            response = get_stacked_response(sim.obs(), _xref, _yref,
+            # Get stacked response (use pointing for map centre)
+            response = get_stacked_response(sim.obs(), None, None,
                                             binsz=binsz, nxpix=npix, nypix=npix,
                                             emin=emin, emax=emax, enumbins=nbins,
                                             edisp=edisp,
-                                            coordsys=_coordsys, proj=_proj,
+                                            coordsys=coord, proj=proj,
+                                            addbounds=addbounds,
                                             log=log, debug=debug,
                                             chatter=chatter)
-        
+
             # Set stacked response
             if edisp:
                 bin.obs()[0].response(response['expcube'],
@@ -478,10 +463,13 @@ def set_observations(ra, dec, rad, tstart, duration, emin, emax, irf, caldb,
 # ==================== #
 def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
                          emin=0.1, emax=100.0, enumbins=20, edisp=False,
-                         coordsys='GAL', proj='TAN',
+                         coordsys='GAL', proj='TAN', addbounds=False,
                          log=False, debug=False, chatter=2):
     """
     Get stacked response cubes
+
+    If no xref and yref arguments have been specified then use the pointing
+    information to determine the map centre
 
     Parameters
     ----------
@@ -509,6 +497,8 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
         Coordinate system
     proj : str, optional
         Projection
+    addbounds : bool, optional
+        Add boundaries at observation energies
     log : bool, optional
         Create log file(s)
     debug : bool, optional
@@ -521,6 +511,13 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     result : dict
         Dictionary of response cubes
     """
+    # If no xref and yref arguments have been specified then use the pointing
+    # information
+    if xref == None or yref == None:
+        usepnt = True
+    else:
+        usepnt = False
+
     # Compute spatial binning for point spread function and energy dispersion
     # cubes
     psf_binsz = 10.0 * binsz
@@ -529,63 +526,69 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
 
     # Create exposure cube
     expcube = ctools.ctexpcube(obs)
-    expcube['incube']   = 'NONE'
-    expcube['usepnt']   = False
-    expcube['ebinalg']  = 'LOG'
-    expcube['xref']     = xref
-    expcube['yref']     = yref
-    expcube['binsz']    = binsz
-    expcube['nxpix']    = nxpix
-    expcube['nypix']    = nypix
-    expcube['enumbins'] = enumbins
-    expcube['emin']     = emin
-    expcube['emax']     = emax
-    expcube['coordsys'] = coordsys
-    expcube['proj']     = proj
-    expcube['debug']    = debug
-    expcube['chatter']  = chatter
+    expcube['incube']    = 'NONE'
+    expcube['usepnt']    = usepnt
+    expcube['ebinalg']   = 'LOG'
+    expcube['binsz']     = binsz
+    expcube['nxpix']     = nxpix
+    expcube['nypix']     = nypix
+    expcube['enumbins']  = enumbins
+    expcube['emin']      = emin
+    expcube['emax']      = emax
+    expcube['coordsys']  = coordsys
+    expcube['proj']      = proj
+    expcube['addbounds'] = addbounds
+    expcube['debug']     = debug
+    expcube['chatter']   = chatter
+    if not usepnt:
+        expcube['xref'] = xref
+        expcube['yref'] = yref
     if log:
         expcube.logFileOpen()
     expcube.run()
 
     # Create point spread function cube
     psfcube = ctools.ctpsfcube(obs)
-    psfcube['incube']   = 'NONE'
-    psfcube['usepnt']   = False
-    psfcube['ebinalg']  = 'LOG'
-    psfcube['xref']     = xref
-    psfcube['yref']     = yref
-    psfcube['binsz']    = psf_binsz
-    psfcube['nxpix']    = psf_nxpix
-    psfcube['nypix']    = psf_nypix
-    psfcube['enumbins'] = enumbins
-    psfcube['emin']     = emin
-    psfcube['emax']     = emax
-    psfcube['coordsys'] = coordsys
-    psfcube['proj']     = proj
-    psfcube['debug']    = debug
-    psfcube['chatter']  = chatter
+    psfcube['incube']    = 'NONE'
+    psfcube['usepnt']    = usepnt
+    psfcube['ebinalg']   = 'LOG'
+    psfcube['binsz']     = psf_binsz
+    psfcube['nxpix']     = psf_nxpix
+    psfcube['nypix']     = psf_nypix
+    psfcube['enumbins']  = enumbins
+    psfcube['emin']      = emin
+    psfcube['emax']      = emax
+    psfcube['coordsys']  = coordsys
+    psfcube['proj']      = proj
+    psfcube['addbounds'] = addbounds
+    psfcube['debug']     = debug
+    psfcube['chatter']   = chatter
+    if not usepnt:
+        psfcube['xref'] = xref
+        psfcube['yref'] = yref
     if log:
         psfcube.logFileOpen()
     psfcube.run()
 
     # Create background cube
     bkgcube = ctools.ctbkgcube(obs)
-    bkgcube['incube']   = 'NONE'
-    bkgcube['usepnt']   = False
-    bkgcube['ebinalg']  = 'LOG'
-    bkgcube['xref']     = xref
-    bkgcube['yref']     = yref
-    bkgcube['binsz']    = binsz
-    bkgcube['nxpix']    = nxpix
-    bkgcube['nypix']    = nypix
-    bkgcube['enumbins'] = enumbins
-    bkgcube['emin']     = emin
-    bkgcube['emax']     = emax
-    bkgcube['coordsys'] = coordsys
-    bkgcube['proj']     = proj
-    bkgcube['debug']    = debug
-    bkgcube['chatter']  = chatter
+    bkgcube['incube']    = 'NONE'
+    bkgcube['usepnt']    = usepnt
+    bkgcube['ebinalg']   = 'LOG'
+    bkgcube['binsz']     = binsz
+    bkgcube['nxpix']     = nxpix
+    bkgcube['nypix']     = nypix
+    bkgcube['enumbins']  = enumbins
+    bkgcube['emin']      = emin
+    bkgcube['emax']      = emax
+    bkgcube['coordsys']  = coordsys
+    bkgcube['proj']      = proj
+    bkgcube['addbounds'] = addbounds
+    bkgcube['debug']     = debug
+    bkgcube['chatter']   = chatter
+    if not usepnt:
+        bkgcube['xref'] = xref
+        bkgcube['yref'] = yref
     if log:
         bkgcube.logFileOpen()
     bkgcube.run()
@@ -593,21 +596,23 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     # If energy dispersion is requested then create energy dispersion cube
     if edisp:
         edispcube = ctools.ctedispcube(obs)
-        edispcube['incube']   = 'NONE'
-        edispcube['usepnt']   = False
-        edispcube['ebinalg']  = 'LOG'
-        edispcube['xref']     = xref
-        edispcube['yref']     = yref
-        edispcube['binsz']    = psf_binsz
-        edispcube['nxpix']    = psf_nxpix
-        edispcube['nypix']    = psf_nypix
-        edispcube['enumbins'] = enumbins
-        edispcube['emin']     = emin
-        edispcube['emax']     = emax
-        edispcube['coordsys'] = coordsys
-        edispcube['proj']     = proj
-        edispcube['debug']    = debug
-        edispcube['chatter']  = chatter
+        edispcube['incube']    = 'NONE'
+        edispcube['usepnt']    = usepnt
+        edispcube['ebinalg']   = 'LOG'
+        edispcube['binsz']     = psf_binsz
+        edispcube['nxpix']     = psf_nxpix
+        edispcube['nypix']     = psf_nypix
+        edispcube['enumbins']  = enumbins
+        edispcube['emin']      = emin
+        edispcube['emax']      = emax
+        edispcube['coordsys']  = coordsys
+        edispcube['proj']      = proj
+        edispcube['addbounds'] = addbounds
+        edispcube['debug']     = debug
+        edispcube['chatter']   = chatter
+        if not usepnt:
+            edispcube['xref'] = xref
+            edispcube['yref'] = yref
         if log:
             edispcube.logFileOpen()
         edispcube.run()
