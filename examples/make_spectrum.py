@@ -125,17 +125,21 @@ def plot_spectrum(spectrum, plotfile):
     ul_ed_engs  = []
     ul_eu_engs  = []
     ul_flux     = []
- 
-    # Loop over rows of the file
+
+    # Get number of spectral points
     nrows = table.nrows()
+
+    # Loop over rows of the file
     for row in range(nrows):
 
-        # Get TS
+        # Get TS value, flux and flux error
         ts    = c_ts.real(row)
         flx   = c_flux.real(row)
         e_flx = c_eflux.real(row)
 
-        # Switch
+        # If the TS > 9 and the flux error is smaller than the flux then
+        # take the fitted flux and flux error and append them to the
+        # arrays
         if ts > 9.0 and e_flx < flx:
 
             # Add information
@@ -145,7 +149,8 @@ def plot_spectrum(spectrum, plotfile):
             eu_engs.append(c_eu.real(row))
             e_flux.append(c_eflux.real(row))
 
-        #
+        # ... otherwise take the upper limit and append it to the upper
+        # limit array
         else:
 
             # Add information
@@ -161,10 +166,15 @@ def plot_spectrum(spectrum, plotfile):
     # Plot the spectrum 
     plt.loglog()
     plt.grid()
+
+    # Plot error bars for flux points and upper limits for upper limit
+    # points
     plt.errorbar(energies, flux, yerr=e_flux, xerr=[ed_engs, eu_engs],
                  fmt='ro')
     plt.errorbar(ul_energies, ul_flux, xerr=[ul_ed_engs, ul_eu_engs],
                  yerr=1.0e-11, uplims=True, fmt='ro')
+
+    # Add plot labels
     plt.xlabel('Energy (TeV)')
     plt.ylabel(r'E$^{2}$dN/dE (erg cm$^{-2}$ s$^{-1}$)')
 
