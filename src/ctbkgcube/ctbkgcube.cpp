@@ -343,17 +343,12 @@ void ctbkgcube::save(void)
     m_outcube  = (*this)["outcube"].filename();
     m_outmodel = (*this)["outmodel"].filename();
 
-    // Determine whether the cube is empty
-    bool cube_is_empty = ((m_background.cube().nx()    == 0) ||
-                          (m_background.cube().ny()    == 0) ||
-                          (m_background.cube().nmaps() == 0));
-
     // Determine whether a model definition file should be written
     bool write_moddef = ((!m_outmodel.is_empty()) &&
                          (gammalib::tolower(m_outmodel.url()) != "none"));
 
     // Save background cube if filename and the background cube are not empty
-    if (!m_outcube.is_empty() && !cube_is_empty) {
+    if (!m_outcube.is_empty() && !m_background.cube().is_empty()) {
         m_background.save(m_outcube, clobber());
     }
 
@@ -365,7 +360,7 @@ void ctbkgcube::save(void)
     // Write into logger what has been done
     std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
     std::string mname = (write_moddef) ? m_outmodel.url() : "NONE";
-    if (cube_is_empty) {
+    if (m_background.cube().is_empty()) {
         fname.append(" (cube is empty, no file created)");
     }
     log_value(NORMAL, "Background cube file", fname);
@@ -497,7 +492,7 @@ void ctbkgcube::get_parameters(void)
     std::string incube = (*this)["incube"].filename();
 
     // Check for filename validity
-    if ((gammalib::toupper(incube) == "NONE") ||
+    if ((gammalib::toupper(incube)          == "NONE") ||
         (gammalib::strip_whitespace(incube) == "")) {
 
         // Create an event cube based on task parameters
@@ -520,18 +515,19 @@ void ctbkgcube::get_parameters(void)
     } // endelse: cube was loaded from file
 
     // If there are no models associated with the observations then load now
-    // the model definition from the XML file
+    // the model definition from the XML file. Throw an exception if the
+    // input model is not set.
     if (m_obs.models().size() == 0) {
-        if ((*this)["inmodel"].is_undefined()) {
+        std::string inmodel = (*this)["inmodel"].filename();
+        if ((gammalib::toupper(inmodel)          == "NONE") ||
+            (gammalib::strip_whitespace(inmodel) == "")) {
             std::string msg = "No model definition XML file specified. "
                               "Please set the \"inmodel\" parameter to the "
                               "XML file that contains the background model "
                               "definition.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
-        std::string inmodel = (*this)["inmodel"].filename();
-        GModels     models(inmodel);
-        m_obs.models(models);
+        m_obs.models(GModels(inmodel));
     }
 
     // Get remaining parameters

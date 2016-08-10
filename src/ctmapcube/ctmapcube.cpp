@@ -225,19 +225,14 @@ void ctmapcube::save(void)
     // Get map cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Determine whether the cube is empty
-    bool cube_is_empty = ((m_cube.cube().nx()    == 0) ||
-                          (m_cube.cube().ny()    == 0) ||
-                          (m_cube.cube().nmaps() == 0));
-
     // Save map cube if filename and the map cube are not empty
-    if (!m_outcube.is_empty() && !cube_is_empty) {
+    if (!m_outcube.is_empty() && !m_cube.cube().is_empty()) {
         m_cube.save(m_outcube, clobber());
     }
 
     // Write into logger what has been done
     std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
-    if (cube_is_empty) {
+    if (m_cube.cube().is_empty()) {
         fname.append(" (cube is empty, no file created)");
     }
     log_value(NORMAL, "Map cube file", fname);

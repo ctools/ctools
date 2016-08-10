@@ -261,19 +261,14 @@ void ctexpcube::save(void)
     // Get exposure cube filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Determine whether the cube is empty
-    bool cube_is_empty = ((m_expcube.cube().nx()    == 0) ||
-                          (m_expcube.cube().ny()    == 0) ||
-                          (m_expcube.cube().nmaps() == 0));
-
     // Save exposure cube if filename and the exposure cube are not empty
-    if (!m_outcube.is_empty() && !cube_is_empty) {
+    if (!m_outcube.is_empty() && !m_expcube.cube().is_empty()) {
         m_expcube.save(m_outcube, clobber());
     }
 
     // Write into logger what has been done
     std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
-    if (cube_is_empty) {
+    if (m_expcube.cube().is_empty()) {
         fname.append(" (cube is empty, no file created)");
     }
     log_value(NORMAL, "Exposure cube file", fname);

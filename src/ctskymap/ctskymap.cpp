@@ -284,11 +284,8 @@ void ctskymap::save(void)
     // Get sky map filename
     m_outmap  = (*this)["outmap"].filename();
 
-    // Determine whether the map is empty
-    bool map_is_empty = ((m_skymap.nx() == 0) || (m_skymap.ny() == 0));
-
     // Save sky map if filename and the map are not empty
-    if (!m_outmap.is_empty() && !map_is_empty) {
+    if (!m_outmap.is_empty() && !m_skymap.is_empty()) {
 
         // Create empty FITS file
         GFits fits;
@@ -303,7 +300,7 @@ void ctskymap::save(void)
 
     // Write into logger what has been done
     std::string fname = (m_outmap.is_empty()) ? "NONE" : m_outmap.url();
-    if (map_is_empty) {
+    if (m_skymap.is_empty()) {
         fname.append(" (map is empty, no file created)");
     }
     log_value(NORMAL, "Sky map file", fname);

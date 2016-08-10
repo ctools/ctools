@@ -355,11 +355,8 @@ void cttsmap::save(void)
     // Get TS map filename
     m_outmap = (*this)["outmap"].filename();
 
-    // Determine whether the TS map is empty
-    bool map_is_empty = ((m_tsmap.nx() == 0) || (m_tsmap.ny() == 0));
-
     // Save only if filename is non-empty
-    if (!m_outmap.is_empty() && !map_is_empty) {
+    if (!m_outmap.is_empty() && !m_tsmap.is_empty()) {
 
         // Create fits file
         GFits fits;
@@ -388,7 +385,7 @@ void cttsmap::save(void)
 
     // Write into logger what has been done
     std::string fname = (m_outmap.is_empty()) ? "NONE" : m_outmap.url();
-    if (map_is_empty) {
+    if (m_tsmap.is_empty()) {
         fname.append(" (TS map is empty, no file created)");
     }
     log_value(NORMAL, "TS map file", fname);

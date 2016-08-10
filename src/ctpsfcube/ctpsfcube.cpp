@@ -250,19 +250,14 @@ void ctpsfcube::save(void)
     // Get output filename
     m_outcube = (*this)["outcube"].filename();
 
-    // Determine whether the cube is empty
-    bool cube_is_empty = ((m_psfcube.cube().nx()    == 0) ||
-                          (m_psfcube.cube().ny()    == 0) ||
-                          (m_psfcube.cube().nmaps() == 0));
-
     // Save PSF cube if filename and the PSF cube are not empty
-    if (!m_outcube.is_empty() && !cube_is_empty) {
+    if (!m_outcube.is_empty() && !m_psfcube.cube().is_empty()) {
         m_psfcube.save(m_outcube, clobber());
     }
 
     // Write into logger what has been done
     std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
-    if (cube_is_empty) {
+    if (m_psfcube.cube().is_empty()) {
         fname.append(" (cube is empty, no file created)");
     }
     log_value(NORMAL, "PSF cube file", fname);

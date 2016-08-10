@@ -131,6 +131,24 @@ class Test(test):
         # Check model container
         self._check_models(gammalib.GModels('ctbkgcube_py0.xml'), nmodels=0)
 
+        # Check saving with empty file names
+        bkgcube['outcube']  = ''
+        bkgcube['outmodel'] = ''
+        bkgcube['logfile']  = 'ctbkgcube_py1.log'
+        bkgcube.logFileOpen()
+        bkgcube.save()
+
+        # Check saving with "none" model definiton name
+        bkgcube['outcube']  = ''
+        bkgcube['outmodel'] = 'NONE'
+        bkgcube['logfile']  = 'ctbkgcube_py2.log'
+        bkgcube.logFileOpen()
+        bkgcube.save()
+
+        # Check that publish method with user name does not lead to an
+        # exception or segfault
+        bkgcube.publish('My background cube')
+
         # Check that clearing does not lead to an exception or segfault
         bkgcube.clear()
 
@@ -151,9 +169,9 @@ class Test(test):
         bkgcube['proj']     = 'CAR'
         bkgcube['xref']     = 83.63
         bkgcube['yref']     = 22.01
-        bkgcube['outcube']  = 'ctbkgcube_py1.fits'
-        bkgcube['outmodel'] = 'ctbkgcube_py1.xml'
-        bkgcube['logfile']  = 'ctbkgcube_py1.log'
+        bkgcube['outcube']  = 'ctbkgcube_py3.fits'
+        bkgcube['outmodel'] = 'ctbkgcube_py3.xml'
+        bkgcube['logfile']  = 'ctbkgcube_py3.log'
         bkgcube['chatter']  = 2
 
         # Run ctbkgcube tool
@@ -162,7 +180,7 @@ class Test(test):
         bkgcube.save()
 
         # Check result files
-        self._check_result_files('ctbkgcube_py1')
+        self._check_result_files('ctbkgcube_py3')
 
         # Copy ctbkgcube tool
         cpy_bkgcube = bkgcube.copy()
@@ -174,14 +192,10 @@ class Test(test):
         # Execute copy of ctbkgcube tool again, now with a higher chatter
         # level than before. In addition, use counts cube to define the
         # background cube
-        #cpy_bkgcube['inobs']     = self._events
-        #cpy_bkgcube['inmodel']   = self._model
         cpy_bkgcube['incube']    = self._cntcube
-        #cpy_bkgcube['caldb']     = self._caldb
-        #cpy_bkgcube['irf']       = self._irf
-        cpy_bkgcube['outcube']   = 'ctbkgcube_py2.fits'
-        cpy_bkgcube['outmodel']  = 'ctbkgcube_py2.xml'
-        cpy_bkgcube['logfile']   = 'ctbkgcube_py2.log'
+        cpy_bkgcube['outcube']   = 'ctbkgcube_py4.fits'
+        cpy_bkgcube['outmodel']  = 'ctbkgcube_py4.xml'
+        cpy_bkgcube['logfile']   = 'ctbkgcube_py4.log'
         cpy_bkgcube['chatter']   = 3
         cpy_bkgcube['publish']   = True
         cpy_bkgcube['addbounds'] = True
@@ -189,7 +203,7 @@ class Test(test):
         cpy_bkgcube.execute()
 
         # Check result files
-        self._check_result_files('ctbkgcube_py2')
+        self._check_result_files('ctbkgcube_py4')
 
         # Now clear copy of ctbkgcube tool
         cpy_bkgcube.clear()
@@ -215,7 +229,7 @@ class Test(test):
 
         # Set-up ctbkgcube from observation container
         bkgcube = ctools.ctbkgcube(obs)
-        bkgcube['incube']    = 'NONE'
+        bkgcube['incube']    = ''
         bkgcube['caldb']     = self._caldb
         bkgcube['irf']       = self._irf
         bkgcube['ebinalg']   = 'LOG'
@@ -229,9 +243,9 @@ class Test(test):
         bkgcube['proj']      = 'CAR'
         bkgcube['xref']      = 83.63
         bkgcube['yref']      = 22.01
-        bkgcube['outcube']   = 'ctbkgcube_py3.fits'
-        bkgcube['outmodel']  = 'ctbkgcube_py3.xml'
-        bkgcube['logfile']   = 'ctbkgcube_py3.log'
+        bkgcube['outcube']   = 'ctbkgcube_py5.fits'
+        bkgcube['outmodel']  = 'ctbkgcube_py5.xml'
+        bkgcube['logfile']   = 'ctbkgcube_py5.log'
         bkgcube['addbounds'] = True
         bkgcube['chatter']   = 4
 
@@ -240,7 +254,7 @@ class Test(test):
         bkgcube.execute()
 
         # Check result files
-        self._check_result_files('ctbkgcube_py3', nenergies=23)
+        self._check_result_files('ctbkgcube_py5', nenergies=23)
 
         # Return
         return

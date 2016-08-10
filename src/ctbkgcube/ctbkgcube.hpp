@@ -70,7 +70,6 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void init_cube(void);
-    //void fill_cube(GCTAObservation* obs);
 
     // User parameters
     GFilename          m_outcube;     //!< Filename of output cube
