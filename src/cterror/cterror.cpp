@@ -250,85 +250,80 @@ void cterror::run(void)
     log_value(NORMAL, "Maximum log likelihood", gammalib::str(m_best_logL,3));
     log_string(NORMAL, m_obs.models().print(m_chatter));
 
-    // Continue only if source model exists
-    if (m_obs.models().contains(m_srcname)) {
+    // Save best fitting models
+    GModels models_best = m_obs.models();
 
-        // Save best fitting models
-        GModels models_best = m_obs.models();
+    // Get pointer on model
+    GModel* model = models_best[m_srcname];
 
-        // Get pointer on model
-        GModel* model = models_best[m_srcname];
+    // Get number of parameters
+    int npars = model->size();
 
-        // Get number of parameters
-        int npars = model->size();
+    // Loop over parameters of sky model
+    for (int i = 0; i < npars; ++i) {
 
-        // Loop over parameters of sky model
-        for (int i = 0; i < npars; ++i) {
+        // Skip parameter if it is fixed
+        if (model->at(i).is_fixed()) {
+            continue;
+        }
 
-            // Skip parameter if it is fixed
-            if (model->at(i).is_fixed()) {
-                continue;
-            }
-
-            // Initialise with best fitting models
-            m_obs.models(models_best);
-
-            // Get pointer on model parameter
-            GModels& current_models = const_cast<GModels&>(m_obs.models());
-            m_model_par             = &(current_models[m_srcname]->at(i));
-
-            // Extract current value
-            m_value = m_model_par->factor_value();
-
-            // Compute parameter bracketing
-            double parmin = std::max(m_model_par->factor_min(),
-                                     m_value - 10.0*m_model_par->factor_error());
-            double parmax = std::min(m_model_par->factor_max(),
-                                     m_value + 10.0*m_model_par->factor_error());
-
-            // Write header and initial parameters into logger
-            log_header1(TERSE, "Compute error for source \""+m_srcname+"\""
-                               " parameter \""+m_model_par->name()+"\"");
-            log_value(NORMAL, "Confidence level",
-                      gammalib::str(m_confidence*100.0)+" %");
-            log_value(NORMAL, "Log-likelihood difference", m_dlogL);
-            log_value(NORMAL, "Initial factor range",
-                      "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
-
-            // Compute lower and upper boundaries
-            double value_lo = error_bisection(parmin, m_value);
-            double value_hi = error_bisection(m_value, parmax);
-
-            // Compute errors
-            double error           = 0.5 * (value_hi - value_lo);
-            double error_neg       = m_value  - value_lo;
-            double error_pos       = value_hi - m_value;
-            double error_value     = std::abs(error*m_model_par->scale());
-            double error_value_neg = std::abs(error_neg*m_model_par->scale());
-            double error_value_pos = std::abs(error_pos*m_model_par->scale());
-
-            // Write results into logger
-            std::string unit = " " + m_model_par->unit();
-            log_value(NORMAL, "Lower parameter factor", value_lo);
-            log_value(NORMAL, "Upper parameter factor", value_hi);
-            log_value(NORMAL, "Error from curvature",
-                      gammalib::str(m_model_par->error()) + unit);
-            log_value(NORMAL, "Error from profile",
-                      gammalib::str(error_value) + unit);
-            log_value(NORMAL, "Negative profile error",
-                      gammalib::str(error_value_neg) + unit);
-            log_value(NORMAL, "Positive profile error",
-                      gammalib::str(error_value_pos) + unit);
-
-            // Save error result
-            model->at(i).factor_error(error);
-
-        } // endfor: looped over spectral parameters
-
-        // Restore best fitting models (now with new errors computed)
+        // Initialise with best fitting models
         m_obs.models(models_best);
 
-    } // endif: source model exists
+        // Get pointer on model parameter
+        GModels& current_models = const_cast<GModels&>(m_obs.models());
+        m_model_par             = &(current_models[m_srcname]->at(i));
+
+        // Extract current value
+        m_value = m_model_par->factor_value();
+
+        // Compute parameter bracketing
+        double parmin = std::max(m_model_par->factor_min(),
+                                 m_value - 10.0*m_model_par->factor_error());
+        double parmax = std::min(m_model_par->factor_max(),
+                                 m_value + 10.0*m_model_par->factor_error());
+
+        // Write header and initial parameters into logger
+        log_header1(TERSE, "Compute error for source \""+m_srcname+"\""
+                           " parameter \""+m_model_par->name()+"\"");
+        log_value(NORMAL, "Confidence level",
+                  gammalib::str(m_confidence*100.0)+" %");
+        log_value(NORMAL, "Log-likelihood difference", m_dlogL);
+        log_value(NORMAL, "Initial factor range",
+                  "["+gammalib::str(parmin)+", "+gammalib::str(parmax)+"]");
+
+        // Compute lower and upper boundaries
+        double value_lo = error_bisection(parmin, m_value);
+        double value_hi = error_bisection(m_value, parmax);
+
+        // Compute errors
+        double error           = 0.5 * (value_hi - value_lo);
+        double error_neg       = m_value  - value_lo;
+        double error_pos       = value_hi - m_value;
+        double error_value     = std::abs(error*m_model_par->scale());
+        double error_value_neg = std::abs(error_neg*m_model_par->scale());
+        double error_value_pos = std::abs(error_pos*m_model_par->scale());
+
+        // Write results into logger
+        std::string unit = " " + m_model_par->unit();
+        log_value(NORMAL, "Lower parameter factor", value_lo);
+        log_value(NORMAL, "Upper parameter factor", value_hi);
+        log_value(NORMAL, "Error from curvature",
+                  gammalib::str(m_model_par->error()) + unit);
+        log_value(NORMAL, "Error from profile",
+                  gammalib::str(error_value) + unit);
+        log_value(NORMAL, "Negative profile error",
+                  gammalib::str(error_value_neg) + unit);
+        log_value(NORMAL, "Positive profile error",
+                  gammalib::str(error_value_pos) + unit);
+
+        // Save error result
+        model->at(i).factor_error(error);
+
+    } // endfor: looped over spectral parameters
+
+    // Restore best fitting models (now with new errors computed)
+    m_obs.models(models_best);
 
     // Recover optimizer
     m_opt = best_opt;

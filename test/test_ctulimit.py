@@ -99,7 +99,25 @@ class Test(test):
         """
         Test ctulimit from Python
         """
-        # Set-up ctulimit
+        # Allocate ctulimit
+        ulimit = ctools.ctulimit()
+
+        # Check that empty ctulimit tool holds zero upper limits
+        self.test_value(ulimit.diff_ulimit(), 0.0, 1.0e-23,
+                        'Check differential upper limit')
+        self.test_value(ulimit.flux_ulimit(), 0.0, 1.0e-17,
+                        'Check upper limit on photon flux')
+        self.test_value(ulimit.eflux_ulimit(), 0.0, 1.0e-16,
+                        'Check upper limit on energy flux')
+
+        # Check that saving does not nothing
+        ulimit.logFileOpen()
+        ulimit.save()
+
+        # Check that clearing does not lead to an exception or segfault
+        ulimit.clear()
+
+        # Now set ctulimit parameters
         ulimit = ctools.ctulimit()
         ulimit['inobs']   = self._events
         ulimit['inmodel'] = self._model
@@ -114,8 +132,50 @@ class Test(test):
         ulimit.run()
         ulimit.save()
 
-        # Check result file
-        self._check_result_file('ctulimit_py1.log')
+        # Check results
+        self.test_value(ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+                        'Check differential upper limit')
+        self.test_value(ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
+                        'Check upper limit on photon flux')
+        self.test_value(ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
+                        'Check upper limit on energy flux')
+
+        # Copy ctulimit tool
+        cpy_ulimit = ulimit.copy()
+
+        # Check results of copy
+        self.test_value(cpy_ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+                        'Check differential upper limit')
+        self.test_value(cpy_ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
+                        'ulimit upper limit on photon flux')
+        self.test_value(cpy_ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
+                        'Check upper limit on energy flux')
+
+        # Execute copy of ctulimit tool again, now with a higher chatter
+        # level than before
+        cpy_ulimit['logfile'] = 'ctulimit_py2.log'
+        cpy_ulimit['chatter'] = 3
+        cpy_ulimit.logFileOpen()  # Needed to get a new log file
+        cpy_ulimit.execute()
+
+        # Check results
+        self.test_value(cpy_ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+                        'Check differential upper limit')
+        self.test_value(cpy_ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
+                        'ulimit upper limit on photon flux')
+        self.test_value(cpy_ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
+                        'Check upper limit on energy flux')
+
+        # Now clear copy of ctulimit tool
+        cpy_ulimit.clear()
+
+        # Check that empty ctulimit tool holds zero upper limits
+        self.test_value(cpy_ulimit.diff_ulimit(), 0.0, 1.0e-23,
+                        'Check differential upper limit')
+        self.test_value(cpy_ulimit.flux_ulimit(), 0.0, 1.0e-17,
+                        'Check upper limit on photon flux')
+        self.test_value(cpy_ulimit.eflux_ulimit(), 0.0, 1.0e-16,
+                        'Check upper limit on energy flux')
 
         # Return
         return

@@ -228,17 +228,9 @@ void ctulimit::run(void)
     // Get task parameters
     get_parameters();
 
-    // Set energy dispersion flag for all CTA observations and save old
+    // Set energy dispersion flags of all CTA observations and save old
     // values in save_edisp vector
-    std::vector<bool> save_edisp;
-    save_edisp.assign(m_obs.size(), false);
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            save_edisp[i] = obs->response()->apply_edisp();
-            obs->response()->apply_edisp(m_apply_edisp);
-        }
-    }
+    std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
 
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
@@ -338,13 +330,8 @@ void ctulimit::run(void)
     // Recover optimizer
     m_opt = best_opt;
 
-    // Restore energy dispersion flag for all CTA observations
-    for (int i = 0; i < m_obs.size(); ++i) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-        if (obs != NULL) {
-            obs->response()->apply_edisp(save_edisp[i]);
-        }
-    }
+    // Restore energy dispersion flags of all CTA observations
+    restore_edisp(m_obs, save_edisp);
 
     // Return
     return;

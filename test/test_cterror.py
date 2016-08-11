@@ -161,6 +161,41 @@ class Test(test):
         # Check that the cleared copy has also cleared the observations
         self._check_obs(cpy_error.obs(), nobs=0, nmodels=0)
 
+        # Prepare observation container with a single event list
+        obs = gammalib.GObservations()
+        obs.append(gammalib.GCTAObservation(self._events))
+        obs.models(gammalib.GModels(self._model))
+
+        # Setup cterror tool from observation container
+        error = ctools.cterror(obs)
+        error['srcname']  = 'Crab'
+        error['caldb']    = self._caldb
+        error['irf']      = self._irf
+        error['outmodel'] = 'cterror_py3.xml'
+        error['logfile']  = 'cterror_py3.log'
+        error['chatter']  = 4
+
+        # Execute cterror tool
+        error.logFileOpen()   # Make sure we get a log file
+        error.execute()
+
+        # Check result file
+        self._check_result_file('cterror_py3.xml')
+
+        # And now a run with not enough iterations
+        error['max_iter'] = 1
+        error['outmodel'] = 'cterror_py4.xml'
+        error['logfile']  = 'cterror_py4.log'
+        
+        # Execute cterror tool and catch the exception
+        error.logFileOpen()   # Make sure we get a log file
+        self.test_try('Test cterror with not enough iterations')
+        try:
+            error.execute()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
         # Return
         return
 

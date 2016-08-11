@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -103,10 +104,25 @@ class Test(test):
         """
         Test ctskymap from Python
         """
-        # Set-up ctskymap
+        # Allocate ctskymap
         skymap = ctools.ctskymap()
+
+        # Check that empty ctskymap tool holds a map that has no pixels
+        self._check_map(skymap.map(), nx=0, ny=0)
+
+        # Check that saving does not nothing
+        skymap['outmap']  = 'ctskymap_py0.fits'
+        skymap['logfile'] = 'ctskymap_py0.log'
+        skymap.logFileOpen()
+        skymap.save()
+        self.test_assert(not os.path.isfile('ctskymap_py0.fits'),
+             'Check that no sky map has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        skymap.clear()
+
+        # Now set ctskymap parameters
         skymap['inobs']    = self._events
-        skymap['outmap']   = 'ctskymap_py1.fits'
         skymap['emin']     = 0.1
         skymap['emax']     = 100
         skymap['nxpix']    = 200
@@ -116,6 +132,7 @@ class Test(test):
         skymap['proj']     = 'CAR'
         skymap['xref']     = 83.63
         skymap['yref']     = 22.01
+        skymap['outmap']   = 'ctskymap_py1.fits'
         skymap['logfile']  = 'ctskymap_py1.log'
         skymap['chatter']  = 2
 
@@ -127,21 +144,111 @@ class Test(test):
         # Check result file
         self._check_result_file('ctskymap_py1.fits')
 
+        # Copy ctskymap tool
+        cpy_skymap = skymap.copy()
+
+        # Check sky map of ctskymap copy
+        self._check_map(cpy_skymap.map())
+
+        # Execute copy of ctskymap tool again, now with a higher chatter
+        # level than before
+        cpy_skymap['usepnt']  = True
+        cpy_skymap['emin']    = 0.2
+        cpy_skymap['emax']    = 150.0
+        cpy_skymap['outmap']  = 'ctskymap_py2.fits'
+        cpy_skymap['logfile'] = 'ctskymap_py2.log'
+        cpy_skymap['publish'] = True
+        cpy_skymap['chatter'] = 3
+        cpy_skymap.logFileOpen()  # Needed to get a new log file
+        cpy_skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_py2.fits')
+
+        # Now clear copy of ctskymap tool
+        cpy_skymap.clear()
+
+        # Check that cleared ctskymap tool holds a map that has no pixels
+        self._check_map(cpy_skymap.map(), nx=0, ny=0)
+
+        # Get mixed observation container
+        obs = self._obs_mixed()
+
+        # Allocate ctskymap tool from observation container
+        skymap = ctools.ctskymap(obs)
+        skymap['emin']     = 0.1
+        skymap['emax']     = 100
+        skymap['nxpix']    = 200
+        skymap['nypix']    = 200
+        skymap['binsz']    = 0.02
+        skymap['coordsys'] = 'CEL'
+        skymap['proj']     = 'CAR'
+        skymap['xref']     = 83.63
+        skymap['yref']     = 22.01
+        skymap['outmap']   = 'ctskymap_py3.fits'
+        skymap['logfile']  = 'ctskymap_py3.log'
+        skymap['chatter']  = 4
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_py3.fits')
+
+        # Publish with name
+        skymap.publish('My sky map')
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nx=200, ny=200):
         """
         Check result file
+
+        Parameters
+        ----------
+        filename : str
+            Sky map file name
+        nx : int, optional
+            Number of X pixels
+        ny : int, optional
+            Number of Y pixels
         """
         # Open result file
-        result = gammalib.GSkyMap(filename)
+        skymap = gammalib.GSkyMap(filename)
 
+        # Check sky map
+        self._check_map(skymap, nx=nx, ny=ny)
+
+        # Return
+        return
+
+    # Check sky map
+    def _check_map(self, skymap, nx=200, ny=200):
+        """
+        Check sky map
+
+        Parameters
+        ----------
+        skymap : `~gammalib.GSkyMap`
+            Sky map
+        nx : int, optional
+            Number of X pixels
+        ny : int, optional
+            Number of Y pixels
+        """
+        # Determine number of maps
+        if nx > 0 and ny > 0:
+            nmaps = 1
+        else:
+            nmaps = 0
+        
         # Check dimensions
-        self.test_value(result.nmaps(), 1, 'Check for one map')
-        self.test_value(result.nx(), 200, 'Check for 200 pixels in X')
-        self.test_value(result.ny(), 200, 'Check for 200 pixels in Y')
+        self.test_value(skymap.nmaps(), nmaps, 'Check number of maps')
+        self.test_value(skymap.nx(), nx, 'Check for number of X pixels')
+        self.test_value(skymap.ny(), ny, 'Check for number of Y pixels')
 
         # Return
         return

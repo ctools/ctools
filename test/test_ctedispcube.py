@@ -206,6 +206,7 @@ class Test(test):
         edispcube['yref']      = 22.01
         edispcube['migramax']  = 2.0
         edispcube['migrabins'] = 10
+        edispcube['addbounds'] = True
         edispcube['outcube']   = 'ctedispcube_py3.fits'
         edispcube['logfile']   = 'ctedispcube_py3.log'
         edispcube['chatter']   = 4

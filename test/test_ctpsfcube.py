@@ -187,27 +187,29 @@ class Test(test):
         # Get mixed observation container
         obs = self._obs_mixed()
 
-        # Set-up ctpsfcube from observation container
+        # Set-up ctpsfcube from observation container and input counts
+        # cube
         psfcube = ctools.ctpsfcube(obs)
-        psfcube['incube']   = 'NONE'
-        psfcube['caldb']    = self._caldb
-        psfcube['irf']      = self._irf
-        psfcube['ebinalg']  = 'LOG'
-        psfcube['emin']     = 0.1
-        psfcube['emax']     = 100
-        psfcube['enumbins'] = 20
-        psfcube['nxpix']    = 10
-        psfcube['nypix']    = 10
-        psfcube['binsz']    = 0.4
-        psfcube['coordsys'] = 'CEL'
-        psfcube['proj']     = 'CAR'
-        psfcube['xref']     = 83.63
-        psfcube['yref']     = 22.01
-        psfcube['amax']     = 0.3
-        psfcube['anumbins'] = 10
-        psfcube['outcube']  = 'ctpsfcube_py3.fits'
-        psfcube['logfile']  = 'ctpsfcube_py3.log'
-        psfcube['chatter']  = 4
+        psfcube['incube']    = self._cntcube
+        psfcube['caldb']     = self._caldb
+        psfcube['irf']       = self._irf
+        #psfcube['ebinalg']   = 'LOG'
+        #psfcube['emin']      = 0.1
+        #psfcube['emax']      = 100
+        #psfcube['enumbins']  = 20
+        #psfcube['nxpix']     = 10
+        #psfcube['nypix']     = 10
+        #psfcube['binsz']     = 0.4
+        #psfcube['coordsys']  = 'CEL'
+        #psfcube['proj']      = 'CAR'
+        #psfcube['xref']      = 83.63
+        #psfcube['yref']      = 22.01
+        psfcube['amax']      = 0.3
+        psfcube['anumbins']  = 10
+        psfcube['addbounds'] = True
+        psfcube['outcube']   = 'ctpsfcube_py3.fits'
+        psfcube['logfile']   = 'ctpsfcube_py3.log'
+        psfcube['chatter']   = 4
 
         # Execute ctpsfcube tool
         psfcube.logFileOpen()   # Make sure we get a log file

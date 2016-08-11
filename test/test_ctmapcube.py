@@ -177,6 +177,36 @@ class Test(test):
         # Check that the cleared copy has also cleared the map cube
         self._check_cube(cpy_mapcube.mapcube(), nmaps=0, npixels=0)
 
+        # Allocate ctmapcube tools, set models and do now a linear
+        # binning; also do not use Gaussian point sources
+        mapcube = ctools.ctmapcube()
+        mapcube.models(gammalib.GModels(self._model))
+        mapcube['ebinalg']  = 'LIN'
+        mapcube['emin']     = 0.1
+        mapcube['emax']     = 100.0
+        mapcube['enumbins'] = 10
+        mapcube['nxpix']    = 100
+        mapcube['nypix']    = 100
+        mapcube['binsz']    = 0.04
+        mapcube['coordsys'] = 'CEL'
+        mapcube['proj']     = 'CAR'
+        mapcube['xref']     = 83.63
+        mapcube['yref']     = 22.01
+        mapcube['ptsrcsig'] = 0.0
+        mapcube['outcube']  = 'ctmapcube_py3.fits'
+        mapcube['logfile']  = 'ctmapcube_py3.log'
+        mapcube['chatter']  = 4
+
+        # Execute mapcube
+        mapcube.logFileOpen()  # Needed to get a new log file
+        mapcube.execute()
+
+        # Check result file
+        self._check_result_file('ctmapcube_py3.fits')
+
+        # Publish with a name
+        mapcube.publish('My map cube')
+
         # Return
         return
 

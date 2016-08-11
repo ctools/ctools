@@ -189,11 +189,38 @@ class Test(test):
         # Check that the cleared copy has also cleared the model cube
         self._check_cube(cpy_model.cube(), nx=0, ny=0, nebins=0)
 
+        # Get mixed observation container
+        obs = self._obs_mixed()
+
+        # Setup ctmodel tool from observation container and get model cube
+        # definition from counts cube
+        model = ctools.ctmodel(obs)
+        model.models(gammalib.GModels(self._model))
+        model['incube']   = self._cntcube
+        model['expcube']  = 'NONE'
+        model['psfcube']  = 'NONE'
+        model['bkgcube']  = 'NONE'
+        model['caldb']    = self._caldb
+        model['irf']      = self._irf
+        model['outcube']  = 'ctmodel_py3.fits'
+        model['logfile']  = 'ctmodel_py3.log'
+        model['chatter']  = 4
+
+        # Execute ctmodel tool
+        model.logFileOpen()  # Needed to get a new log file
+        model.execute()
+
+        # Check result file
+        self._check_result_file('ctmodel_py3.fits', nx=200, ny=200, nebins=20)
+
+        # Publish with name
+        model.publish('My model')
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nx=40, ny=40, nebins=10):
         """
         Check result file
 
@@ -201,12 +228,18 @@ class Test(test):
         ----------
         filename : str
             Model cube file name
+        nx : int, optional
+            Number of pixels in X direction
+        ny : int, optional
+            Number of pixels in Y direction
+        nebins : int, optional
+            Number of energy bins
         """
         # Open result file
         cube = gammalib.GCTAEventCube(filename)
 
         # Check cube
-        self._check_cube(cube)
+        self._check_cube(cube, nx=nx, ny=ny, nebins=nebins)
 
         # Return
         return

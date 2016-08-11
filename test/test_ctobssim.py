@@ -154,6 +154,12 @@ class Test(test):
         sim['logfile']   = 'ctobssim_py2.log'
         sim['chatter']   = 3
 
+        # Double maximum event range
+        max_rate = sim.max_rate()
+        sim.max_rate(2*max_rate)
+        self.test_value(sim.max_rate(), 2*max_rate, 1.0e-3,
+                        'Check setting of maximum event rate')
+
         # Run tool
         sim.logFileOpen()
         sim.run()

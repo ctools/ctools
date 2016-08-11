@@ -160,6 +160,32 @@ class Test(test):
         # Check that the cleared copy has also cleared the observations
         self._check_obs(cpy_like.obs(), nobs=0, nmodels=0)
 
+        # Prepare observation container with a single event list
+        obs = gammalib.GObservations()
+        obs.append(gammalib.GCTAObservation(self._events))
+
+        # Prepare a special model to enforce TS computation
+        models = gammalib.GModels(self._model)
+        models['Crab'].tscalc(True)
+        obs.models(models)
+
+        # Allocate ctlike tool from observation container
+        like = ctools.ctlike(obs)
+        like['caldb']           = self._caldb
+        like['irf']             = self._irf
+        like['refit']           = True
+        like['fix_spat_for_ts'] = True
+        like['outmodel']        = 'ctlike_py3.xml'
+        like['logfile']         = 'ctlike_py3.log'
+        like['chatter']         = 4
+
+        # Execute ctlike
+        like.logFileOpen()  # Needed to get a new log file
+        like.execute()
+
+        # Check result file
+        self._check_result_file('ctlike_py3.xml')
+
         # Return
         return
 

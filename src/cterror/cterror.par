@@ -35,7 +35,7 @@ outmodel, f, a, "results.xml",,, "Output model XML file"
 #=============================
 confidence, r, h, 0.68,0.0,1.0, "Confidence level"
 tol,        r, h, 1e-3,,, "Computation tolerance"
-max_iter,   i, h, 50,,, "Maximum number of iterations"
+max_iter,   i, h, 50,1,1000, "Maximum number of iterations"
 
 #
 # Standard parameters
