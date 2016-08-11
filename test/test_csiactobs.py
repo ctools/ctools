@@ -129,6 +129,32 @@ class Test(test):
         """
         Test csiactobs from Python
         """
+        # Allocate empty csiactobs script
+        iactobs = cscripts.csiactobs()
+
+        # Check that empty csiactobs sciript has an empty observation container
+        # and energy boundaries
+        self.test_value(iactobs.obs().size(), 0,
+             'Check that empty csiactobs has an empty observation container')
+        self.test_value(iactobs.ebounds().size(), 0,
+             'Check that empty csiactobs has empty energy bins')
+
+        # Check that saving saves an empty model definition file
+        iactobs['outobs']   = 'csiactobs_obs_py0.xml'
+        iactobs['outmodel'] = 'csiactobs_bgd_py0.xml'
+        iactobs['logfile']  = 'csiactobs_py0.log'
+        iactobs.logFileOpen()
+        iactobs.save()
+
+        # Check empty observation definition XML file
+        #self._check_obsdef('csiactobs_obs_py0.xml', 0) # See #1841
+        
+        # Check empty model definition XML file
+        self._check_moddef('csiactobs_bgd_py0.xml', 0)
+
+        # Check that clearing does not lead to an exception or segfault
+        #iactobs.clear()
+
         # Set-up csiactobs
         iactobs = cscripts.csiactobs()
         iactobs['datapath'] = self._datapath
