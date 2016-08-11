@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import math
 import gammalib
 import ctools
 
@@ -468,8 +469,12 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     """
     Get stacked response cubes
 
-    If no xref and yref arguments have been specified then use the pointing
-    information to determine the map centre
+    The number of energies bins are set to at least 30 bins per decade, and
+    the "enumbins" parameter is only used if the number of bins is larger
+    than 30 bins per decade.
+
+    If the xref or yref arguments are "None" the response cube centre will be
+    determined from the pointing information in the observation container.
 
     Parameters
     ----------
@@ -518,11 +523,17 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     else:
         usepnt = False
 
+    # Set number of energy bins to at least 30 per energy decade
+    _enumbins = int((math.log10(emax) - math.log10(emin)) * 30.0)
+    if enumbins > _enumbins:
+        _enumbins = enumbins
+
     # Compute spatial binning for point spread function and energy dispersion
-    # cubes
+    # cubes. The spatial binning is 10 times coarser than the spatial binning
+    # of the exposure and background cubes. At least 2 spatial are required.
     psf_binsz = 10.0 * binsz
-    psf_nxpix = min(nxpix // 10, 2)  # Make sure result is int
-    psf_nypix = min(nypix // 10, 2)  # Make sure result is int
+    psf_nxpix = max(nxpix // 10, 2)  # Make sure result is int
+    psf_nypix = max(nypix // 10, 2)  # Make sure result is int
 
     # Create exposure cube
     expcube = ctools.ctexpcube(obs)
@@ -532,7 +543,7 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     expcube['binsz']     = binsz
     expcube['nxpix']     = nxpix
     expcube['nypix']     = nypix
-    expcube['enumbins']  = enumbins
+    expcube['enumbins']  = _enumbins
     expcube['emin']      = emin
     expcube['emax']      = emax
     expcube['coordsys']  = coordsys
@@ -555,7 +566,7 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     psfcube['binsz']     = psf_binsz
     psfcube['nxpix']     = psf_nxpix
     psfcube['nypix']     = psf_nypix
-    psfcube['enumbins']  = enumbins
+    psfcube['enumbins']  = _enumbins
     psfcube['emin']      = emin
     psfcube['emax']      = emax
     psfcube['coordsys']  = coordsys
@@ -578,7 +589,7 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     bkgcube['binsz']     = binsz
     bkgcube['nxpix']     = nxpix
     bkgcube['nypix']     = nypix
-    bkgcube['enumbins']  = enumbins
+    bkgcube['enumbins']  = _enumbins
     bkgcube['emin']      = emin
     bkgcube['emax']      = emax
     bkgcube['coordsys']  = coordsys
@@ -602,7 +613,7 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
         edispcube['binsz']     = psf_binsz
         edispcube['nxpix']     = psf_nxpix
         edispcube['nypix']     = psf_nypix
-        edispcube['enumbins']  = enumbins
+        edispcube['enumbins']  = _enumbins
         edispcube['emin']      = emin
         edispcube['emax']      = emax
         edispcube['coordsys']  = coordsys
