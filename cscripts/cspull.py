@@ -235,13 +235,13 @@ class cspull(ctools.cscript):
             for model in models:
                 like = ctools.cterror(obs)
                 like['srcname'] = model.name()
-                like['edisp']   = edisp=self._edisp
+                like['edisp']   = self._edisp
                 like['debug']   = self._logDebug()
                 like['chatter'] = self._chatter
                 like.run()
         else:
             like = ctools.ctlike(obs)
-            like['edisp']   = edisp=self._edisp
+            like['edisp']   = self._edisp
             like['debug']   = self._logDebug()
             like['chatter'] = self._chatter
             like.run()
