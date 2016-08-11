@@ -44,11 +44,10 @@ public:
     virtual ~ctselect(void);
 
     // Methods
-    void                  clear(void);
-    void                  run(void);
-    void                  save(void);
-    const GObservations&  obs(void) const;
-    const GTimeReference& time_reference(void) const;
+    void                 clear(void);
+    void                 run(void);
+    void                 save(void);
+    const GObservations& obs(void) const;
 };
 
 

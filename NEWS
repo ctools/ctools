@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-6 August 2016
+12 August 2016
 
 
 Introduction
@@ -37,6 +37,9 @@ ctselect - CTA event selection
 ------------------------------
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
+
+The time_reference() method has been removed since the method is part of the
+ctool base class, and exposed in Python as _time_reference().
 
 
 ctbin - CTA event binning

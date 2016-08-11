@@ -246,20 +246,12 @@ void ctbkgcube::run(void)
         // Flag removal
         bool remove = true;
 
-        // Do we have a CTA, HESS, MAGIC or VERITAS specific model?
-        if (m_bkgmdl[i]->is_valid("CTA", "") ||
-            m_bkgmdl[i]->is_valid("HESS", "") ||
-            m_bkgmdl[i]->is_valid("MAGIC", "") ||
-            m_bkgmdl[i]->is_valid("VERITAS", "")) {
-
-            // Do we have a background model?
-            if (dynamic_cast<GModelData*>(m_bkgmdl[i]) != NULL) {
-
-                // ... then keep model
-                remove = false;
-
-            } // endif: had a background model
-        } // endif: had a CTA, HESS, MAGIC or VERITAS model
+        // If we have a data space model with "GCTA" classname then we
+        // have a CTA background model and we want to keep the model
+        if ((dynamic_cast<GModelData*>(m_bkgmdl[i]) != NULL) &&
+            (m_bkgmdl[i]->classname().substr(0,4) == "GCTA")) {
+            remove = false;
+        }
 
         // Log model removal or keeping
         std::string what  = (remove) ? "Remove model" : "Keep model";

@@ -291,8 +291,8 @@ void ctselect::run(void)
         // If we have an input file then check it
         if (!m_infiles[i].empty()) {
             std::string message = check_infile(m_infiles[i], m_evtname[i]);
-            if (message.length() > 0) {
-                throw GException::app_error(G_RUN, message);
+            if (!message.empty()) {
+                throw GException::invalid_value(G_RUN, message);
             }
         }
 
@@ -322,8 +322,8 @@ void ctselect::run(void)
         // If we have a temporary file then check it
         if (!filename.empty()) {
             std::string message = check_infile(filename, m_evtname[i]);
-            if (message.length() > 0) {
-                throw GException::app_error(G_RUN, message);
+            if (!message.empty()) {
+                throw GException::invalid_value(G_RUN, message);
             }
         }
 
@@ -611,8 +611,9 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Write header into logger
     log_header3(NORMAL, "Events selection");
 
-    // Initialise selection string
+    // Initialise selection and addition strings
     std::string selection;
+    std::string add;
 
     // Initialise selection flags
     bool remove_all = false;
@@ -679,6 +680,7 @@ void ctselect::select_events(GCTAObservation*   obs,
         sprintf(cmin, "%.8f", tmin);
         sprintf(cmax, "%.8f", tmax);
         selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
+        add       = " && ";
         log_value(NORMAL, "Time range",
                   gammalib::str(tmin)+" - "+gammalib::str(tmax)+" s");
 
@@ -686,11 +688,6 @@ void ctselect::select_events(GCTAObservation*   obs,
 
     // Make energy selection
     if (m_select_energy) {
-
-        // If we have aready a selection than add an "&&" operator
-        if (selection.length() > 0) {
-            selection += " && ";
-        }
 
         // Log the requested energy selection
         if (logNormal()) {
@@ -725,43 +722,40 @@ void ctselect::select_events(GCTAObservation*   obs,
                 char cmax[80];
                 sprintf(cmin, "%.8f", emin);
                 sprintf(cmax, "%.8f", emax);
-                selection += "ENERGY >= "+std::string(cmin)+" && ENERGY <= "+
-                             std::string(cmax);
+                selection += add + "ENERGY >= " + std::string(cmin)+
+                                   " && ENERGY <= " + std::string(cmax);
+                add        = " && ";
             }
         }
         else if (emin > 0.0) {
             char cmin[80];
             sprintf(cmin, "%.8f", emin);
-            selection += "ENERGY >= "+std::string(cmin);
+            selection += add + "ENERGY >= " + std::string(cmin);
+            add        = " && ";
         }
         else if (emax > 0.0) {
             char cmax[80];
             sprintf(cmax, "%.8f", emax);
-            selection += "ENERGY <= "+std::string(cmax);
+            selection += add + "ENERGY <= " + std::string(cmax);
+            add        = " && ";
         }
         else {
-            log << "None" << std::endl;
             remove_all = true;
         }
 
     } // endif: made energy selection
 
-    // Make ROI selection
+    // Make RoI selection
     if (m_select_roi) {
 
-        // If we have aready a selection than add an "&&" operator
-        if (selection.length() > 0) {
-            selection += " && ";
-        }
-
-        // Log the requested ROI
+        // Log the requested RoI
         log_value(NORMAL, "Requested RoI",
                   "Centre(RA,DEC)=("+gammalib::str(ra)+", "+
                   gammalib::str(dec)+") deg, Radius="+gammalib::str(m_rad)+
                   " deg");
 
-        // If we have already an ROI then make sure that the selected
-        // ROI overlaps with the existing ROI
+        // If we have already an RoI then make sure that the selected
+        // ROI overlaps with the existing RoI
         double roi_radius = list->roi().radius();
         if (roi_radius > 0.0) {
             GSkyDir roi_centre = list->roi().centre().dir();
@@ -777,7 +771,7 @@ void ctselect::select_events(GCTAObservation*   obs,
             }
         }
 
-        // Log the selected ROI
+        // Log the selected RoI
         if (logNormal()) {
             log << gammalib::parformat("Selected RoI");
             if (rad <= 0.0) {
@@ -790,29 +784,25 @@ void ctselect::select_events(GCTAObservation*   obs,
             }
         }
         
-        // Format ROI selection
+        // Format RoI selection
         char cra[80];
         char cdec[80];
         char crad[80];
         sprintf(cra,  "%.6f", ra);
         sprintf(cdec, "%.6f", dec);
         sprintf(crad, "%.6f", rad);
-        selection += "ANGSEP("+std::string(cra)+"," +
-                     std::string(cdec)+",RA,DEC) <= " +
-                     std::string(crad);
+        selection += add + "ANGSEP("+std::string(cra)+"," +
+                           std::string(cdec)+",RA,DEC) <= " +
+                           std::string(crad);
+        add        = " && ";
 
     } // endif: made ROI selection
 
     // Make an expression selection
     if (select_expr) {
 
-        // If we have aready a selection than add an "&&" operator
-        if (selection.length() > 0) {
-            selection += " && ";
-        }
-
         // Append the expression
-        selection += "("+gammalib::strip_whitespace(m_expr)+")";
+        selection += add + "("+gammalib::strip_whitespace(m_expr)+")";
 
     } // endif: made expression selection
 
@@ -875,11 +865,10 @@ void ctselect::select_events(GCTAObservation*   obs,
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
         list->roi(GCTARoi(instdir, rad));
-    } // endif: Roi selection was performed
+    }
 
+    // ... otherwise restore old RoI information if it existed
     else if (old_roi.is_valid()) {
-        // Restore old RoI information in case no selection was performed
-        // and RoI was existing before
         list->roi(old_roi);
     }
 
@@ -891,11 +880,10 @@ void ctselect::select_events(GCTAObservation*   obs,
         GEbounds ebounds;
         ebounds.append(GEnergy(emin, "TeV"), GEnergy(emax, "TeV"));
         list->ebounds(ebounds);
-    } //endif: energy selection was performed
+    }
 
+    // ... otherwise restore old Ebounds if they existed
     else if (old_ebounds.size() > 0) {
-        // Restore old Ebounds in case no energy selection was performed
-        // and observation already had valid Ebounds
         list->ebounds(old_ebounds);
     }
 
@@ -1342,65 +1330,60 @@ void ctselect::save_event_list(const GCTAObservation* obs,
                                const std::string&     gtiname,
                                const std::string&     outfile) const
 {
-    // Save only if observation is valid
-    if (obs != NULL) {
+    // Save only if we have an event list
+    if (obs->eventtype() == "EventList") {
 
-        // Save only if we have an event list
-        if (obs->eventtype() == "EventList") {
-
-            // Set output FITS file event extension names
-            GFilename   outname(outfile);
-            std::string outevt = evtname;
-            std::string outgti = gtiname;
-            if (outname.has_extname()) {
-                std::vector<std::string> extnames =
-                           gammalib::split(outname.extname(), ";");
-                if (extnames.size() > 0) {
-                    std::string extname = gammalib::strip_whitespace(extnames[0]);
-                    if (!extname.empty()) {
-                        outevt = extname;
-                    }
-                }
-                if (extnames.size() > 1) {
-                    std::string extname = gammalib::strip_whitespace(extnames[1]);
-                    if (!extname.empty()) {
-                        outgti = extname;
-                    }
+        // Set output FITS file event extension names
+        GFilename   outname(outfile);
+        std::string outevt = evtname;
+        std::string outgti = gtiname;
+        if (outname.has_extname()) {
+            std::vector<std::string> extnames =
+                       gammalib::split(outname.extname(), ";");
+            if (extnames.size() > 0) {
+                std::string extname = gammalib::strip_whitespace(extnames[0]);
+                if (!extname.empty()) {
+                    outevt = extname;
                 }
             }
-
-            // Create output FITS file
-            GFits outfits;
-
-            // Write observation into FITS file
-            obs->write(outfits, outevt, outgti);
-
-            // Copy all extensions other than evtname and gtiname extensions
-            // from the input to the output event list. The evtname and
-            // gtiname extensions are written by the save method, all others
-            // that may eventually be present have to be copied over
-            // explicitly.
-            GFits infits(infile);
-            for (int extno = 1; extno < infits.size(); ++extno) {
-                GFitsHDU* hdu = infits.at(extno);
-                if (hdu->extname() != evtname &&
-                    hdu->extname() != gtiname &&
-                    hdu->extname() != outevt  &&
-                    hdu->extname() != outgti) {
-                    outfits.append(*hdu);
+            if (extnames.size() > 1) {
+                std::string extname = gammalib::strip_whitespace(extnames[1]);
+                if (!extname.empty()) {
+                    outgti = extname;
                 }
             }
+        }
 
-            // Close input file
-            infits.close();
+        // Create output FITS file
+        GFits outfits;
 
-            // Save file to disk and close it (we need both operations)
-            outfits.saveto(outname.url(), clobber());
-            outfits.close();
+        // Write observation into FITS file
+        obs->write(outfits, outevt, outgti);
 
-        } // endif: observation was unbinned
+        // Copy all extensions other than evtname and gtiname extensions
+        // from the input to the output event list. The evtname and
+        // gtiname extensions are written by the save method, all others
+        // that may eventually be present have to be copied over
+        // explicitly.
+        GFits infits(infile);
+        for (int extno = 1; extno < infits.size(); ++extno) {
+            GFitsHDU* hdu = infits.at(extno);
+            if (hdu->extname() != evtname &&
+                hdu->extname() != gtiname &&
+                hdu->extname() != outevt  &&
+                hdu->extname() != outgti) {
+                outfits.append(*hdu);
+            }
+        }
 
-    } // endif: observation was valid
+        // Close input file
+        infits.close();
+
+        // Save file to disk and close it (we need both operations)
+        outfits.saveto(outname.url(), clobber());
+        outfits.close();
+
+    } // endif: observation was unbinned
 
     // Return
     return;

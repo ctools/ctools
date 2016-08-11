@@ -39,6 +39,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set test data
+        self._invalid_events = self._datadir + '/invalid_event_list.fits'
+
         # Return
         return
 
@@ -104,7 +107,7 @@ class Test(test):
         """
         Test ctselect from Python
         """
-        # Allocate ctselect
+        # Allocate empty ctselect tool
         select = ctools.ctselect()
 
         # Check that empty ctselect tool holds an empty observation
@@ -122,7 +125,6 @@ class Test(test):
         select.clear()
 
         # Now set ctselect parameters
-        select = ctools.ctselect()
         select['inobs']   = self._events
         select['ra']      = 83.63
         select['dec']     = 22.01
@@ -130,7 +132,7 @@ class Test(test):
         select['tmin']    = 0
         select['tmax']    = 1800
         select['emin']    = 0.1
-        select['emax']    = 100
+        select['emax']    = 100.0
         select['outobs']  = 'ctselect_py1.fits'
         select['logfile'] = 'ctselect_py1.log'
         select['chatter'] = 2
@@ -166,7 +168,6 @@ class Test(test):
 
         # Check result file
         self._check_result_file('ctselect_py2.fits')
-        print('Step3')
 
         # Execute again the copy of ctselect tool again, now using the pointing
         # information in the input observation
@@ -186,19 +187,75 @@ class Test(test):
         # Check that cleared ctselect tool holds no observations and events
         self._check_obs(cpy_select.obs(), nobs=0)
 
+        # Get mixed observation container
+        obs = self._obs_mixed()
+
+        # Now setup ctselect tool from observation container. We make an
+        # event selection that will result in zero events in the file.
+        select = ctools.ctselect(obs)
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 3.0
+        select['tmin']    = 0
+        select['tmax']    = 1800
+        select['emin']    = 120.0
+        select['emax']    = 130.0
+        select['expr']    = 'DETX == 0'
+        select['outobs']  = 'ctselect_py4.fits'
+        select['logfile'] = 'ctselect_py4.log'
+        select['chatter'] = 3
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py4.fits', nevents=0)
+
+        # Setup ctselect tool for an invalid event file
+        select = ctools.ctselect()
+        select['inobs']   = self._invalid_events
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 3
+        select['tmin']    = 0
+        select['tmax']    = 1800
+        select['emin']    = 0.1
+        select['emax']    = 100.0
+        select['outobs']  = 'ctselect_py5.fits'
+        select['logfile'] = 'ctselect_py5.log'
+        select['chatter'] = 3
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
+        self.test_try('Test invalid event file')
+        try:
+            select.execute()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nevents=6127):
         """
         Check result file
+
+        Parameters
+        ----------
+        filename : str
+            Event list file name
+        nevents : int, optional
+            Expected number of events
         """
         # Open result file
         events = gammalib.GCTAEventList(filename)
 
         # Check event list
-        self._check_events(events, nevents=6127)
+        self._check_events(events, nevents=nevents)
 
         # Return
         return

@@ -618,10 +618,10 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
 
         // Change boundaries for further iteration
         if (eval_mid > 0.0) {
-            wrk_max = mid;
+            wrk_max = mid;     // logL too large, new range = [wrk_min, mid]
         }
-        else if (eval_mid < 0.0) {
-            wrk_min = mid;
+        else {
+            wrk_min = mid;     // logL too small, new range = [mid, wrk_max]
         }
 
         // Increment counter
@@ -672,7 +672,7 @@ double ctulimit::evaluate(const double& value)
     else {
         std::string msg = "Value of parameter \""+m_model_par->name()+"\" "
                           "outside of validity range requested. To omit "
-                          "this error please enlarge the  parameter range "
+                          "this error please enlarge the parameter range "
                           "in the model XML file.";
         throw GException::invalid_value(G_EVALUATE, msg);
     }

@@ -118,7 +118,6 @@ class Test(test):
         ulimit.clear()
 
         # Now set ctulimit parameters
-        ulimit = ctools.ctulimit()
         ulimit['inobs']   = self._events
         ulimit['inmodel'] = self._model
         ulimit['srcname'] = 'Crab'
@@ -139,6 +138,13 @@ class Test(test):
                         'Check upper limit on photon flux')
         self.test_value(ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
+
+        # Check obs() method
+        self.test_value(ulimit.obs().size(), 1,
+                        'Check number of observations in container')
+
+        # Check opt() method
+        self.test_value(ulimit.opt().status(), 0, 'Check optimizer status')
 
         # Copy ctulimit tool
         cpy_ulimit = ulimit.copy()
@@ -166,6 +172,9 @@ class Test(test):
         self.test_value(cpy_ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
 
+        # Save copy of observation container for later
+        obs = cpy_ulimit.obs().copy()
+
         # Now clear copy of ctulimit tool
         cpy_ulimit.clear()
 
@@ -176,6 +185,52 @@ class Test(test):
                         'Check upper limit on photon flux')
         self.test_value(cpy_ulimit.eflux_ulimit(), 0.0, 1.0e-16,
                         'Check upper limit on energy flux')
+
+        # Now set ctulimit tool using the observation container from last
+        # time. This should avoid the necessity to recompute the maximum
+        # likelihood
+        ulimit = ctools.ctulimit(obs)
+        #ulimit['inobs']   = self._events
+        #ulimit['inmodel'] = self._model
+        ulimit['srcname'] = 'Crab'
+        #ulimit['caldb']   = self._caldb
+        #ulimit['irf']     = self._irf
+        ulimit['logfile'] = 'ctulimit_py3.log'
+        ulimit['chatter'] = 4
+
+        # Execute ctulimit tool
+        ulimit.logFileOpen()  # Needed to get a new log file
+        ulimit.execute()
+
+        # Check results
+        self.test_value(ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+                        'Check differential upper limit')
+        self.test_value(ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
+                        'ulimit upper limit on photon flux')
+        self.test_value(ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
+                        'Check upper limit on energy flux')
+
+        # Test invalid model name
+        self.test_try('Test invalid model name')
+        try:
+            ulimit['srcname'] = 'Weihnachtsstern'
+            ulimit['logfile'] = 'ctulimit_py4.log'
+            ulimit.logFileOpen()
+            ulimit.execute()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Test specification of background model
+        ulimit['srcname'] = 'Background'
+        ulimit['logfile'] = 'ctulimit_py5.log'
+        ulimit.logFileOpen()
+        self.test_try('Test invalid model name')
+        try:
+            ulimit.execute()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
 
         # Return
         return

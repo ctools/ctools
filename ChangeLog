@@ -1,8 +1,9 @@
-2016-08-06
+2016-08-12
 
         * Version 1.2.0 released
         ========================
 
+        Remove ctselect::time_reference() method
         Add ctool and cscript pars() methods (#1838)
         Fix ctbin::save() bug for empty observation container (#1835)
         Fix exception when calling ctools clear() methods (#1835)

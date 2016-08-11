@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the cttsmap tool.
+# This scripts performs unit tests for the cttsmap tool
 #
 # Copyright (C) 2014-2016 Juergen Knoedlseder
 #
@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -105,14 +106,31 @@ class Test(test):
         """
         Test cttsmap from Python
         """
-        # Set-up cttsmap
+        # Allocate empty cttsmap tool
         tsmap = ctools.cttsmap()
+
+        # Check that empty cttsmap tool holds an empty observation and an
+        # empty TS map
+        self._check_obs(tsmap.obs(), nobs=0)
+        self._check_ts_map(tsmap.tsmap(), nx=0, ny=0)
+
+        # Check that saving does not nothing
+        tsmap['outmap']  = 'cttsmap_py0.fits'
+        tsmap['logfile'] = 'cttsmap_py0.log'
+        tsmap.logFileOpen()
+        tsmap.save()
+        self.test_assert(not os.path.isfile('cttsmap_py0.fits'),
+             'Check that no TS map has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        tsmap.clear()
+
+        # Now set cttsmap parameters
         tsmap['inobs']    = self._events
         tsmap['inmodel']  = self._model
         tsmap['srcname']  = 'Crab'
         tsmap['caldb']    = self._caldb
         tsmap['irf']      = self._irf
-        tsmap['outmap']   = 'cttsmap_py1.fits'
         tsmap['nxpix']    = 3
         tsmap['nypix']    = 3
         tsmap['binsz']    = 0.02
@@ -120,6 +138,7 @@ class Test(test):
         tsmap['proj']     = 'CAR'
         tsmap['xref']     = 83.63
         tsmap['yref']     = 22.01
+        tsmap['outmap']   = 'cttsmap_py1.fits'
         tsmap['logfile']  = 'cttsmap_py1.log'
         tsmap['chatter']  = 2
 
@@ -131,32 +150,116 @@ class Test(test):
         # Check result file
         self._check_result_file('cttsmap_py1.fits')
 
+        # Copy cttsmap tool
+        cpy_tsmap = tsmap.copy()
+
+        # Check observation container and TS map of copy
+        self._check_obs(cpy_tsmap.obs())
+        self._check_ts_map(cpy_tsmap.tsmap())
+
+        # Execute copy of cttsmap tool again, now with a higher chatter
+        # level than before
+        cpy_tsmap['binmin']  = 0
+        cpy_tsmap['binmax']  = 1
+        cpy_tsmap['outmap']  = 'cttsmap_py2.fits'
+        cpy_tsmap['logfile'] = 'cttsmap_py2.log'
+        cpy_tsmap['chatter'] = 3
+        cpy_tsmap['publish'] = True
+        cpy_tsmap.logFileOpen()  # Needed to get a new log file
+        cpy_tsmap.execute()
+
+        # Check result file
+        self._check_result_file('cttsmap_py2.fits')
+
+        # Now clear copy of cttsmap tool
+        cpy_tsmap.clear()
+
+        # Check that the cleared copy has also cleared the observation
+        # container and TS map
+        self._check_obs(cpy_tsmap.obs(), nobs=0)
+        self._check_ts_map(cpy_tsmap.tsmap(), nx=0, ny=0)
+
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, nx=3, ny=3):
         """
         Check result file
+
+        Parameters
+        ----------
+        filename : str
+            TS map file name
+        nx : int, optional
+            Number of X pixels
+        ny : int, optional
+            Number of Y pixels
         """
         # Open result file
         fits = gammalib.GFits(filename)
 
         # Get HDUs
-        ts        = fits['Primary']
-        prefactor = fits['Prefactor']
-        index     = fits['Index']
+        ts    = fits['Primary']
+        pre   = fits['Prefactor']
+        index = fits['Index']
 
         # Check dimensions
-        self.test_value(ts.naxis(), 2, 'Check for 2 dimensions')
-        self.test_value(ts.naxes(0), 3, 'Check for 3 pixels in X')
-        self.test_value(ts.naxes(1), 3, 'Check for 3 pixels in Y')
-        self.test_value(prefactor.naxis(), 2, 'Check for 2 dimensions')
-        self.test_value(prefactor.naxes(0), 3, 'Check for 3 pixels in X')
-        self.test_value(prefactor.naxes(1), 3, 'Check for 3 pixels in Y')
-        self.test_value(index.naxis(), 2, 'Check for 2 dimensions')
-        self.test_value(index.naxes(0), 3, 'Check for 3 pixels in X')
-        self.test_value(index.naxes(1), 3, 'Check for 3 pixels in Y')
+        self.test_value(ts.naxis(), 2, 'Check for TS map dimensions')
+        self.test_value(ts.naxes(0), nx, 'Check for TS map pixels in X')
+        self.test_value(ts.naxes(1), ny, 'Check for TS map pixels in Y')
+        self.test_value(pre.naxis(), 2, 'Check for Prefactor map dimensions')
+        self.test_value(pre.naxes(0), nx, 'Check for Prefactor map pixels in X')
+        self.test_value(pre.naxes(1), ny, 'Check for Prefactor map pixels in Y')
+        self.test_value(index.naxis(), 2, 'Check for Index map dimensions')
+        self.test_value(index.naxes(0), nx, 'Check for Index map pixels in X')
+        self.test_value(index.naxes(1), ny, 'Check for Index map pixels in Y')
+
+        # Return
+        return
+
+    # Check observation
+    def _check_obs(self, obs, nobs=1):
+        """
+        Check observation
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Models
+        nobs : int, optional
+            Expected number of observations
+        """
+        # Check number of observations
+        self.test_value(obs.size(), nobs, 'Check number of observations')
+
+        # Return
+        return
+
+    # Check TS map
+    def _check_ts_map(self, tsmap, nx=3, ny=3):
+        """
+        Check TS map
+
+        Parameters
+        ----------
+        tsmap : `~gammalib.GSkyMap`
+            TS map
+        nx : int, optional
+            Number of X pixels
+        ny : int, optional
+            Number of Y pixels
+        """
+        # Determine number of maps
+        if nx > 0 and ny > 0:
+            nmaps = 1
+        else:
+            nmaps = 0
+        
+        # Check dimensions
+        self.test_value(tsmap.nmaps(), nmaps, 'Check number of maps')
+        self.test_value(tsmap.nx(), nx, 'Check for number of X pixels')
+        self.test_value(tsmap.ny(), ny, 'Check for number of Y pixels')
 
         # Return
         return

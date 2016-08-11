@@ -234,7 +234,7 @@ void cttsmap::run(void)
 
     // Initialise optimizer
     GOptimizerLM* opt = (logExplicit()) ? new GOptimizerLM(&log)
-        	                            : new GOptimizerLM();
+                                        : new GOptimizerLM();
 
     // Store initial models
     GModels models_orig = m_obs.models();
@@ -246,15 +246,15 @@ void cttsmap::run(void)
     models.remove(m_srcname);
 
     // Get likelihood of null hypothesis if not given before
-	if (m_logL0 == 0.0) {
+    if (m_logL0 == 0.0) {
 
         // Write header
         log_header1(TERSE, "Compute NULL Hypothesis for TS computation");
 
-		// Compute likelihood without the test source
-		m_obs.models(models);
-		m_obs.optimize(*opt);
-		m_logL0 = -(opt->value());
+        // Compute likelihood without the test source
+        m_obs.models(models);
+        m_obs.optimize(*opt);
+        m_logL0 = -(opt->value());
 
 	}
 
@@ -272,11 +272,9 @@ void cttsmap::run(void)
                     " at "+bincentre.print());
 
     	// Add test source at current bin position
-        if (m_testsource != NULL) {
-            (*m_testsource)["RA"].value(bincentre.ra_deg());
-            (*m_testsource)["DEC"].value(bincentre.dec_deg());
-            models.append(*m_testsource);
-        }
+        (*m_testsource)["RA"].value(bincentre.ra_deg());
+        (*m_testsource)["DEC"].value(bincentre.dec_deg());
+        models.append(*m_testsource);
 
     	// Assign models to observations
     	m_obs.models(models);
@@ -292,16 +290,11 @@ void cttsmap::run(void)
 
     	// Log information
     	if (logExplicit()) {
-    		log << " TS value ....: ";
-            log << ts << std::endl;
+            log_value(EXPLICIT, "TS value", ts);
     	}
-        else if (logTerse()) {
-    		log << "TS for bin number ";
-            log << i;
-            log << " at ";
-            log << bincentre.print();
-            log << ": ";
-            log << ts << std::endl;
+        else if (logNormal()) {
+            log_value(NORMAL, "TS value (bin "+gammalib::str(i)+")",
+                      gammalib::str(ts)+" ("+bincentre.print()+")");
         }
 
     	// Get test source model instance
@@ -312,11 +305,9 @@ void cttsmap::run(void)
     	m_tsmap(i) = ts;
 
     	// Extract fitted test source parameters
-        if (m_testsource != NULL) {
-            for (int j = 0; j < m_mapnames.size(); ++j) {
-                m_maps[j](i) = (*testsource)[m_mapnames[j]].value();
-            }
-    	}
+        for (int j = 0; j < m_mapnames.size(); ++j) {
+            m_maps[j](i) = (*testsource)[m_mapnames[j]].value();
+        }
 
     	// Set status of bin to true
     	m_statusmap(i) = 1.0;
@@ -479,7 +470,8 @@ void cttsmap::copy_members(const cttsmap& app)
     m_statusmap = app.m_statusmap;
 
     // Clone protected members
-    m_testsource = (app.m_testsource != NULL) ? app.m_testsource->clone() : NULL;
+    m_testsource = (app.m_testsource != NULL) ? app.m_testsource->clone()
+                                              : NULL;
 
     // Return
     return;
@@ -491,6 +483,12 @@ void cttsmap::copy_members(const cttsmap& app)
  ***************************************************************************/
 void cttsmap::free_members(void)
 {
+    // Free test source
+    if (m_testsource != NULL) {
+        delete m_testsource;
+        m_testsource = NULL;
+    }
+
     // Return
     return;
 }
@@ -519,26 +517,24 @@ void cttsmap::get_parameters(void)
     // Get name of test source
     m_srcname = (*this)["srcname"].string();
 
-    // Get Model and store it as protected member
+    // Get model and store it as protected member. Note that the clone
+    // method will never return a NULL pointer, hence we do not need
+    // to check the pointer.
     m_testsource = m_obs.models()[m_srcname]->clone();
 
     // Check if model has RA and DEC parameters which are necessary to
     // continue
-    if (m_testsource != NULL) {
-        if (!m_testsource->has_par("RA") || !m_testsource->has_par("DEC")) {
-            std::string msg = "Source \""+m_srcname+"\" has no \"RA\" and "
-                              "\"DEC\" parameters. Only sources with \"RA\" "
-                              " and \"DEC\" parameters can be used as test "
-                              "sources.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
+    if (!m_testsource->has_par("RA") || !m_testsource->has_par("DEC")) {
+        std::string msg = "Source \""+m_srcname+"\" has no \"RA\" and "
+                          "\"DEC\" parameters. Only sources with \"RA\" "
+                          "and \"DEC\" parameters can be used as test "
+                          "sources.";
+        throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
     // Fix the spatial parameters of the test source
-    if (m_testsource != NULL) {
-        (*m_testsource)["RA"].fix();
-        (*m_testsource)["DEC"].fix();
-    }
+    (*m_testsource)["RA"].fix();
+    (*m_testsource)["DEC"].fix();
 
     // Create sky map based on task parameters
     GSkyMap map = create_map(m_obs);
@@ -583,32 +579,27 @@ void cttsmap::init_maps(const GSkyMap& map)
     m_tsmap = GSkyMap(map);
 
     // Initialise map information
-	m_statusmap.clear();
+    m_statusmap.clear();
 
-	// Create status map
-	m_statusmap = GSkyMap(map);
+    // Create status map
+    m_statusmap = GSkyMap(map);
 
-	// Initialise maps of free parameters
-    if (m_testsource != NULL) {
+    // Loop over all model parameters
+    for (int i = 0; i < m_testsource->size(); i++) {
+    
+        // Skip fixed parameters
+        if ((*m_testsource)[i].is_fixed()) {
+            continue;
+        }
 
-        // Loop over all model parameters
-        for (int i = 0; i < m_testsource->size(); i++) {
-        
-            // Skip fixed parameters
-            if ((*m_testsource)[i].is_fixed()) {
-                continue;
-            }
+        // Add sky map for free parameters. Note that push_back will
+        // create a copy.
+        m_maps.push_back(map);
 
-            // Add sky map for free parameters. Note that push_back will
-            // create a copy.
-            m_maps.push_back(map);
-
-            // Store parameter name
-            m_mapnames.push_back((*m_testsource)[i].name());
-        
-        } // endfor: looped over all model parameters
-
-	} // endif: test source was valid
+        // Store parameter name
+        m_mapnames.push_back((*m_testsource)[i].name());
+    
+    } // endfor: looped over all model parameters
 
     // Return
     return;

@@ -62,7 +62,6 @@ public:
     void                  run(void);
     void                  save(void);
     const GObservations&  obs(void) const;
-    const GTimeReference& time_reference(void) const;
 
 protected:
     // Protected methods
@@ -126,18 +125,6 @@ inline
 const GObservations& ctselect::obs(void) const
 {
     return m_obs;
-}
-
-
-/***********************************************************************//**
- * @brief Return CTA time reference
- *
- * @return CTA time reference
- ***************************************************************************/
-inline
-const GTimeReference& ctselect::time_reference(void) const
-{
-    return m_cta_ref;
 }
 
 #endif /* CTSELECT_HPP */

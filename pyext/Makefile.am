@@ -64,6 +64,7 @@ testscripts = ctools/tests/__init__.py \
 testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_events.fits.gz \
            $(top_srcdir)/test/data/crab_cntmap.fits.gz \
+           $(top_srcdir)/test/data/invalid_event_list.fits.gz \
            $(top_srcdir)/test/data/exclusion.reg
 
 # Install test scripts and test data. Note that we don't need to prepend
