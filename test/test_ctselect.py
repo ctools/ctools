@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -103,10 +104,26 @@ class Test(test):
         """
         Test ctselect from Python
         """
-        # Set-up ctselect
+        # Allocate ctselect
+        select = ctools.ctselect()
+
+        # Check that empty ctselect tool holds an empty observation
+        self._check_obs(select.obs(), nobs=0)
+
+        # Check that saving does nothing
+        select['outobs']  = 'ctselect_py0.fits'
+        select['logfile'] = 'ctselect_py0.log'
+        select.logFileOpen()
+        select.save()
+        self.test_assert(not os.path.isfile('ctselect_py0.fits'),
+             'Check that no event list has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        select.clear()
+
+        # Now set ctselect parameters
         select = ctools.ctselect()
         select['inobs']   = self._events
-        select['outobs']  = 'ctselect_py1.fits'
         select['ra']      = 83.63
         select['dec']     = 22.01
         select['rad']     = 3
@@ -114,6 +131,7 @@ class Test(test):
         select['tmax']    = 1800
         select['emin']    = 0.1
         select['emax']    = 100
+        select['outobs']  = 'ctselect_py1.fits'
         select['logfile'] = 'ctselect_py1.log'
         select['chatter'] = 2
 
@@ -125,6 +143,49 @@ class Test(test):
         # Check result file
         self._check_result_file('ctselect_py1.fits')
 
+        # Copy ctselect tool
+        cpy_select = select.copy()
+
+        # Check observation of ctselect copy
+        self._check_obs(cpy_select.obs())
+
+        # Execute copy of ctselect tool again, now with a higher chatter
+        # level than before and without any selection
+        cpy_select['ra']      = 'NONE'
+        cpy_select['dec']     = 'NONE'
+        cpy_select['rad']     = 'NONE'
+        cpy_select['tmin']    = 'NONE'
+        cpy_select['tmax']    = 'NONE'
+        cpy_select['emin']    = 'NONE'
+        cpy_select['emax']    = 'NONE'
+        cpy_select['outobs']  = 'ctselect_py2.fits'
+        cpy_select['logfile'] = 'ctselect_py2.log'
+        cpy_select['chatter'] = 3
+        cpy_select.logFileOpen()  # Needed to get a new log file
+        cpy_select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py2.fits')
+        print('Step3')
+
+        # Execute again the copy of ctselect tool again, now using the pointing
+        # information in the input observation
+        cpy_select['usepnt']  = True
+        cpy_select['outobs']  = 'ctselect_py3.fits'
+        cpy_select['logfile'] = 'ctselect_py3.log'
+        cpy_select['chatter'] = 4
+        cpy_select.logFileOpen()  # Needed to get a new log file
+        cpy_select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py3.fits')
+
+        # Now clear copy of ctselect tool
+        cpy_select.clear()
+
+        # Check that cleared ctselect tool holds no observations and events
+        self._check_obs(cpy_select.obs(), nobs=0)
+
         # Return
         return
 
@@ -134,16 +195,59 @@ class Test(test):
         Check result file
         """
         # Open result file
-        result = gammalib.GCTAEventList(filename)
+        events = gammalib.GCTAEventList(filename)
 
-        # Check file
-        self.test_value(result.size(), 6127, 'Check for 6127 events')
-        self.test_value(result.roi().centre().dir().ra_deg(), 83.63, 1.0e-6,
-                        'Check for ROI Right Ascension')
-        self.test_value(result.roi().centre().dir().dec_deg(), 22.01, 1.0e-6,
-                        'Check for ROI Declination')
-        self.test_value(result.roi().radius(), 3.0, 1.0e-6,
-                        'Check for ROI Radius')
+        # Check event list
+        self._check_events(events, nevents=6127)
+
+        # Return
+        return
+
+    # Check observation and event list
+    def _check_obs(self, obs, nobs=1, nevents=6127):
+        """
+        Check observation and event list
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Models
+        nobs : int, optional
+            Expected number of observations
+        nevents : int, optional
+            Expected number of events
+        """
+        # Check number of observations
+        self.test_value(obs.size(), nobs, 'Check number of observations')
+
+        # If there is an observation then check the event list of the first
+        # one
+        if obs.size() > 0:
+            self._check_events(obs[0].events(), nevents=nevents)
+
+        # Return
+        return
+
+    # Check events
+    def _check_events(self, events, nevents=6127):
+        """
+        Check event list
+
+        Parameters
+        ----------
+        events : `~gammalib.GCTAEventList`
+            Event list
+        nevents : int, optional
+            Expected number of events
+        """
+        # Check event list
+        self.test_value(events.size(), nevents, 'Check number of events')
+        self.test_value(events.roi().centre().dir().ra_deg(), 83.63, 1.0e-6,
+                        'Check for RoI centre Right Ascension')
+        self.test_value(events.roi().centre().dir().dec_deg(), 22.01, 1.0e-6,
+                        'Check for RoI centre Declination')
+        self.test_value(events.roi().radius(), 3.0, 1.0e-6,
+                        'Check for RoI radius')
 
         # Return
         return

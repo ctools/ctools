@@ -1418,8 +1418,9 @@ void ctobssim::simulate_background(GCTAObservation* obs,
  ***************************************************************************/
 void ctobssim::save_fits(void)
 {
-    // Save only if event list has not yet been saved and disposed
-    if (!m_save_and_dispose) {
+    // Save only if event list has not yet been saved and disposed and if
+    // there are observations
+    if (!m_save_and_dispose && m_obs.size() > 0) {
 
         // Get output filename
         m_outevents = (*this)["outevents"].filename();

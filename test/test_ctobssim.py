@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from cscripts import obsutils
@@ -71,7 +72,7 @@ class Test(test):
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="'+self._model+'" '+ \
-                       ' outevents="events.fits"'+ \
+                       ' outevents="ctobssim_cmd1.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
                        ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'+ \
@@ -86,12 +87,12 @@ class Test(test):
              'Check successful execution from command line')
 
         # Load counts cube and check content.
-        evt = gammalib.GCTAEventList('events.fits')
+        evt = gammalib.GCTAEventList('ctobssim_cmd1.fits')
         self._test_list(evt, 6881)
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
-                       ' outevents="events.fits"'+ \
+                       ' outevents="ctobssim_cmd2.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
                        ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'+ \
@@ -109,10 +110,26 @@ class Test(test):
         """
         Test ctobssim from Python
         """
-        # Set-up ctobssim
+        # Allocate ctobssim
+        sim = ctools.ctobssim()
+
+        # Check that empty ctobssim tool holds an empty observation
+        self.test_value(sim.obs().size(), 0, 'Check number of observations')
+
+        # Check that saving saves an empty model definition file
+        sim['outevents'] = 'ctobssim_py0.fits'
+        sim['logfile']   = 'ctobssim_py0.log'
+        sim.logFileOpen()
+        sim.save()
+        self.test_assert(not os.path.isfile('ctobssim_py0.fits'),
+             'Check that no event list has been created')
+
+        # Check that clearing does not lead to an exception or segfault
+        sim.clear()
+
+        # Now set ctobssim parameters
         sim = ctools.ctobssim()
         sim['inmodel']   = self._model
-        sim['outevents'] = 'events.fits'
         sim['caldb']     = self._caldb
         sim['irf']       = self._irf
         sim['ra']        = 83.63
@@ -122,6 +139,7 @@ class Test(test):
         sim['tmax']      = 1800.0
         sim['emin']      = 0.1
         sim['emax']      = 100.0
+        sim['outevents'] = 'ctobssim_py1.fits'
         sim['logfile']   = 'ctobssim_py1.log'
         sim['chatter']   = 2
 
@@ -137,7 +155,7 @@ class Test(test):
         sim.save()
 
         # Load counts cube and check content.
-        evt = gammalib.GCTAEventList('events.fits')
+        evt = gammalib.GCTAEventList('ctobssim_py1.fits')
         self._test_list(evt, 6881)
 
         # Set-up observation container
@@ -149,7 +167,7 @@ class Test(test):
 
         # Set-up ctobssim from observation container
         sim = ctools.ctobssim(obs)
-        sim['outevents'] = 'sim_events.xml'
+        sim['outevents'] = 'ctobssim_py2.xml'
         sim['inmodel']   = self._model
         sim['logfile']   = 'ctobssim_py2.log'
         sim['chatter']   = 3
@@ -175,7 +193,7 @@ class Test(test):
         sim.save()
 
         # Load events
-        obs = gammalib.GObservations('sim_events.xml')
+        obs = gammalib.GObservations('ctobssim_py2.xml')
 
         # Retrieve observation and check content
         self._test_list(obs[0].events(), 6003)
@@ -186,7 +204,6 @@ class Test(test):
         # Set-up ctobssim with invalid event file
         sim = ctools.ctobssim()
         sim['inmodel']   = 'model_file_that_does_not_exist.xml'
-        sim['outevents'] = 'events.fits'
         sim['caldb']     = self._caldb
         sim['irf']       = self._irf
         sim['ra']        = 83.63
@@ -196,6 +213,7 @@ class Test(test):
         sim['tmax']      = 1800.0
         sim['emin']      = 0.1
         sim['emax']      = 100.0
+        sim['outevents'] = 'ctobssim_py3.fits'
         sim['logfile']   = 'ctobssim_py3.log'
         sim['chatter']   = 4
 

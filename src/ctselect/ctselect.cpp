@@ -314,8 +314,7 @@ void ctselect::run(void)
         // Log saved FITS file.
         if (logExplicit()) {
             GFits tmpfile(filename);
-            log << std::endl;
-            log.header1("FITS file content of temporary file");
+            log.header3("FITS file content of temporary file");
             log << tmpfile << std::endl;
             tmpfile.close();
         }
@@ -609,6 +608,9 @@ void ctselect::select_events(GCTAObservation*   obs,
                              const std::string& evtname,
                              const std::string& gtiname)
 {
+    // Write header into logger
+    log_header3(NORMAL, "Events selection");
+
     // Initialise selection string
     std::string selection;
 
@@ -818,9 +820,9 @@ void ctselect::select_events(GCTAObservation*   obs,
     log_value(NORMAL, "cfitsio selection", selection);
 
     // Build input filename including selection expression
-    std::string expression = filename;
+    std::string expression = filename + "[" + evtname + "]";
     if (selection.length() > 0) {
-        expression += "["+evtname+"]["+selection+"]";
+        expression += "["+selection+"]";
     }
 
     // Dump FITS filename including selection expression
@@ -830,7 +832,7 @@ void ctselect::select_events(GCTAObservation*   obs,
     GFits file(expression);
 
     // Log selected FITS file
-    log_header1(EXPLICIT, "FITS file content after selection");
+    log_header3(EXPLICIT, "FITS file content after selection");
     log_string(EXPLICIT, file.print(m_chatter));
 
     // Check if we have an events HDU
@@ -864,7 +866,11 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Get CTA event list pointer
     list = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
 
-    // If ROI selection has been applied then set the event list ROI
+    // Make sure that events are fetched since the temporary file will be
+    // closed later
+    list->fetch();
+
+    // If RoI selection has been applied then set the event list RoI
     if (m_select_roi) {
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
@@ -872,7 +878,7 @@ void ctselect::select_events(GCTAObservation*   obs,
     } // endif: Roi selection was performed
 
     else if (old_roi.is_valid()) {
-        // Restore old Roi information in case no selection was performed
+        // Restore old RoI information in case no selection was performed
         // and RoI was existing before
         list->roi(old_roi);
     }
@@ -1178,43 +1184,48 @@ std::string ctselect::get_gtiname(const std::string& filename,
  ***************************************************************************/
 void ctselect::save_fits(void)
 {
-    // Get output filename
-    m_outobs = (*this)["outobs"].filename();
+    // Save only if there are observations
+    if (m_obs.size() > 0) {
 
-    // Get CTA observation from observation container
-    GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+        // Get output filename
+        m_outobs = (*this)["outobs"].filename();
 
-    // Save only if it's a CTA observation
-    if (obs != NULL) {
+        // Get CTA observation from observation container
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+
+        // Save only if it's a CTA observation
+        if (obs != NULL) {
     
-        // Save only if file name is non-empty
-        if (m_infiles[0].length() > 0) {
+            // Save only if file name is non-empty
+            if (m_infiles[0].length() > 0) {
 
-            // Create file name object
-            GFilename fname(m_outobs);
+                // Create file name object
+                GFilename fname(m_outobs);
 
-            // Extract filename and event extension name
-            std::string outfile = fname.url();
+                // Extract filename and event extension name
+                std::string outfile = fname.url();
 
-            // Append event extension name. We handle here the possibility
-            // to write the events into a different extension.
-            if (fname.has_extname()) {
-                outfile += "["+fname.extname()+"]";
-            }
-            else {
-                outfile += "["+m_evtname[0]+"]";
-            }
+                // Append event extension name. We handle here the possibility
+                // to write the events into a different extension.
+                if (fname.has_extname()) {
+                    outfile += "["+fname.extname()+"]";
+                }
+                else {
+                    outfile += "["+m_evtname[0]+"]";
+                }
 
-            // Log filename
-            log_value(NORMAL, "Event list file", outfile);
+                // Log filename
+                log_value(NORMAL, "Event list file", outfile);
 
-            // Save event list
-            save_event_list(obs, m_infiles[0], m_evtname[0], m_gtiname[0],
-                            outfile);
+                // Save event list
+                save_event_list(obs, m_infiles[0], m_evtname[0], m_gtiname[0],
+                                outfile);
 
-        } // endif: filename was non empty
+            } // endif: filename was non empty
 
-    } // endif: observation was CTA observation
+        } // endif: observation was CTA observation
+
+    } // endif: there were observations
 
     // Return
     return;
