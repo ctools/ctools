@@ -107,6 +107,7 @@ public:
     %rename(_get_obs_header)           get_obs_header;
     %rename(_insert_energy_boundaries) insert_energy_boundaries;
     %rename(_cube_layer_usage)         cube_layer_usage;
+    %rename(_is_valid_filename)        is_valid_filename;
     %rename(_warn_too_few_energies)    warn_too_few_energies;
     %rename(_warn_xml_suffix)          warn_xml_suffix;
 
@@ -154,6 +155,7 @@ public:
                                                const GCTAObservation& obs);
     std::vector<bool> cube_layer_usage(const GEbounds& cube_ebounds,
                                        const GEbounds& list_ebounds) const;
+    bool              is_valid_filename(const GFilename& filename) const;
 
     // Protected warning strings
     std::string     warn_too_few_energies(const GEnergies& energies) const;

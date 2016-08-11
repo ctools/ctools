@@ -340,27 +340,13 @@ void ctpsfcube::get_parameters(void)
     double amax     = (*this)["amax"].real();
     int    anumbins = (*this)["anumbins"].integer();
 
-    // Check for filename validity
-    if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
+    // If the "incube" file name is valid then setup the PSF cube from the
+    // counts cube. Otherwise create a counts cube from the user parameters
+    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
+                                                   : create_cube(m_obs);
 
-        // Create an event cube based on task parameters
-        GCTAEventCube cube = create_cube(m_obs);
-
-        // Define psf cube
-        m_psfcube = GCTACubePsf(cube, amax, anumbins);
-
-    }
-
-    // ... otherwise setup the PSF cube from the counts map
-    else {
-
-        // Load event cube from filename
-        GCTAEventCube cube(incube);
-
-        // Define psf cube
-        m_psfcube = GCTACubePsf(cube, amax, anumbins);
-
-    } // endelse: cube loaded from file
+    // Define PSF cube
+    m_psfcube = GCTACubePsf(cube, amax, anumbins);
 
     // Get remaining parameters
     m_addbounds = (*this)["addbounds"].boolean();

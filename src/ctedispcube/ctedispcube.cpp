@@ -356,27 +356,14 @@ void ctedispcube::get_parameters(void)
     double migramax  = (*this)["migramax"].real();
     int    migrabins = (*this)["migrabins"].integer();
 
-    // Check for filename validity
-    if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
+    // If the "incube" file name is valid then setup the energy dispersion
+    // cube from the counts cube. Otherwise create a counts cube from the
+    // user parameters
+    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
+                                                   : create_cube(m_obs);
 
-        // Create an event cube based on task parameters
-        GCTAEventCube cube = create_cube(m_obs);
-
-        // Define edisp cube
-        m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
-
-    }
-
-    // ... otherwise setup the energy disperison cube from the counts map
-    else {
-
-        // Load event cube from filename
-        GCTAEventCube cube(incube);
-
-        // Define Edisp cube
-        m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
-
-    } // endelse: cube loaded from file
+    // Define edisp cube
+    m_edispcube = GCTACubeEdisp(cube, migramax, migrabins);
 
     // Get remaining parameters
     m_addbounds = (*this)["addbounds"].boolean();

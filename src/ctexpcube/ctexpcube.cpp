@@ -376,27 +376,14 @@ void ctexpcube::get_parameters(void)
     // Get the incube filename
     std::string incube = (*this)["incube"].filename();
 
-    // Check for filename validity
-    if ((incube == "NONE") || (gammalib::strip_whitespace(incube) == "")) {
-
-       // Create an event cube based on task parameters
-       GCTAEventCube cube = create_cube(m_obs);
-
-       // Define exposure cube
-       m_expcube = GCTACubeExposure(cube);
-
-    } // endif: filename was not valid
-
-    // ... otherwise setup the exposure cube from the counts map
-    else {
-
-        // Load event cube from filename
-        GCTAEventCube cube(incube);
-
-        // Define exposure cube
-        m_expcube = GCTACubeExposure(cube);
-
-    } // endelse: cube loaded from file
+    // If the "incube" file name is valid then setup the exposure cube from
+    // the counts cube. Otherwise create a counts cube from the user
+    // parameters
+    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
+                                                   : create_cube(m_obs);
+    
+    // Define exposure cube
+    m_expcube = GCTACubeExposure(cube);
 
     // Get remaining parameters
     m_addbounds = (*this)["addbounds"].boolean();

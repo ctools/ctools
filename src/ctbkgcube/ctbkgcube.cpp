@@ -33,7 +33,6 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                        "ctbkgcube::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -344,8 +343,7 @@ void ctbkgcube::save(void)
     m_outmodel = (*this)["outmodel"].filename();
 
     // Determine whether a model definition file should be written
-    bool write_moddef = ((!m_outmodel.is_empty()) &&
-                         (gammalib::tolower(m_outmodel.url()) != "none"));
+    bool write_moddef = is_valid_filename(m_outmodel);
 
     // Save background cube if filename and the background cube are not empty
     if (!m_outcube.is_empty() && !m_background.cube().is_empty()) {
@@ -465,58 +463,29 @@ void ctbkgcube::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * @exception GException::invalid_value
- *            No background model definition XML file specified.
- *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
  ***************************************************************************/
 void ctbkgcube::get_parameters(void)
 {
-    // Setup observations from "inobs" parameter. Do not accept counts cubes.
+    // Setup observations from "inobs" parameter. Require response and accept
+    // event lists, but do not accept counts cubes.
     setup_observations(m_obs, true, true, false);
 
     // Get the incube filename
     std::string incube = (*this)["incube"].filename();
 
-    // Check for filename validity
-    if ((gammalib::toupper(incube)          == "NONE") ||
-        (gammalib::strip_whitespace(incube) == "")) {
-
-        // Create an event cube based on task parameters
-        GCTAEventCube cube = create_cube(m_obs);
-
-        // Define background cube
-        m_background = GCTACubeBackground(cube);
-
-    } // endif: filename was not valid
-
-    // ... otherwise setup the background cube from the counts map
-    else {
-
-        // Load event cube from filename
-        GCTAEventCube cube(incube);
-
-        // Define background cube from file
-        m_background = GCTACubeBackground(cube);
+    // If the "incube" file name is valid then setup the background cube from
+    // the counts cube. Otherwise create a counts cube from the user
+    // parameters
+    GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
+                                                   : create_cube(m_obs);
     
-    } // endelse: cube was loaded from file
+    // Define background cube
+    m_background = GCTACubeBackground(cube);
 
-    // If there are no models associated with the observations then load now
-    // the model definition from the XML file. Throw an exception if the
-    // input model is not set.
-    if (m_obs.models().size() == 0) {
-        std::string inmodel = (*this)["inmodel"].filename();
-        if ((gammalib::toupper(inmodel)          == "NONE") ||
-            (gammalib::strip_whitespace(inmodel) == "")) {
-            std::string msg = "No model definition XML file specified. "
-                              "Please set the \"inmodel\" parameter to the "
-                              "XML file that contains the background model "
-                              "definition.";
-            throw GException::invalid_value(G_GET_PARAMETERS, msg);
-        }
-        m_obs.models(GModels(inmodel));
-    }
+    // Setup models from "inmodel" parameter
+    setup_models(m_obs);
 
     // Get remaining parameters
     m_addbounds = (*this)["addbounds"].boolean();

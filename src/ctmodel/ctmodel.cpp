@@ -517,19 +517,9 @@ void ctmodel::get_parameters(void)
         // Read cube definition file
         std::string incube = (*this)["incube"].filename();
 
-        // If no cube file has been specified then create a cube from
-        // the task parameters ...
-        if ((incube == "NONE") ||
-            (gammalib::strip_whitespace(incube) == "")) {
-            
-            // Create cube from scratch
-            m_cube = create_cube(m_obs);
-
-        }
-
-        // ... otherwise load the cube from file and reset all bins
-        // to zero
-        else {
+        // If the cube filename is valid the load the cube and set all cube
+        // bins to zero
+        if (is_valid_filename(incube)) {
 
             // Load cube from given file
             m_cube.load(incube);
@@ -538,6 +528,12 @@ void ctmodel::get_parameters(void)
             for (int i = 0; i < m_cube.size(); ++i) {
                 m_cube[i]->counts(0.0);
             }
+
+        } // endif: cube filename was valid
+
+        // ... otherwise create a cube from the user parameters
+        else {
+            m_cube = create_cube(m_obs);
         }
 
         // Signal that cube has been set
@@ -601,6 +597,8 @@ void ctmodel::get_parameters(void)
  * a stacked observation is requested (as detected by the presence of the
  * "expcube", "psfcube", and "bkgcube" parameters). In that case, it appended
  * a dummy event cube to the observation.
+ *
+ * @TODO Support stacked energy dispersion
  ***************************************************************************/
 void ctmodel::get_obs(void)
 {
@@ -609,7 +607,7 @@ void ctmodel::get_obs(void)
 
     // If no observation definition file has been specified then read all
     // parameters that are necessary to create an observation from scratch
-    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
+    if (!is_valid_filename(filename)) {
 
         // Get response cube filenames
         std::string expcube = (*this)["expcube"].filename();
@@ -618,10 +616,8 @@ void ctmodel::get_obs(void)
 
         // If the filenames are valid then build an observation from cube
         // response information
-        if ((expcube != "NONE") && (psfcube != "NONE") && (bkgcube != "NONE") &&
-            (gammalib::strip_whitespace(expcube) != "") &&
-            (gammalib::strip_whitespace(psfcube) != "") &&
-            (gammalib::strip_whitespace(bkgcube) != "")) {
+        if (is_valid_filename(expcube) && is_valid_filename(psfcube) &&
+            is_valid_filename(bkgcube)) {
 
             // Get exposure, PSF and background cubes
             GCTACubeExposure   exposure(expcube);
@@ -667,7 +663,7 @@ void ctmodel::get_obs(void)
 
         }
 
-    } // endif: filename was "NONE" or ""
+    } // endif: filename was not valid
 
     // ... otherwise we have a file name
     else {

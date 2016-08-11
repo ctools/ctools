@@ -50,7 +50,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_SETUP_OBSERVATION       "ctool::setup_observations(GObservations&)"
-#define SETUP_MODELS      "ctool::setup_models(GObservations&, std::string&)"
+#define G_SETUP_MODELS    "ctool::setup_models(GObservations&, std::string&)"
 #define G_GET_MEAN_POINTING        "ctool::get_mean_pointing(GObservations&)"
 #define G_CREATE_EBOUNDS                            "ctool::create_ebounds()"
 #define G_RESTORE_EDISP               "ctool::restore_edisp(GObservations&, "\
@@ -319,9 +319,9 @@ void ctool::free_members(void)
  * information from user parameters.
  *
  * If the observation container @p obs is empty, the method will extract the
- * filename from the "inobs" parameter, and if the filename is neither empty
- * nor "NONE", it will load the observation container from the specified file.
- * Otherwise, the method will throw an exception.
+ * filename from the "inobs" parameter and load the observation container
+ * from the specified file. If the filename is either empty or "NONE" the
+ * method will throw an exception.
  *
  * If the "inobs" file is a FITS file, and depending on the information that
  * is found in the FITS file, the method will append a single CTA observation
@@ -362,8 +362,7 @@ void ctool::setup_observations(GObservations& obs,
 
         // Throw an exception if the "inobs" parameter is not a valid
         // filename
-        if ((gammalib::toupper(filename.url()) == "NONE") ||
-             filename.is_empty()) {
+        if (!is_valid_filename(filename)) {
             std::string msg = "The \"inobs\" parameter \""+filename.url()+
                               "\" is not a valid filename. Please specify "
                               "a valid event list, counts cube or "
@@ -450,7 +449,8 @@ void ctool::setup_observations(GObservations& obs,
  * @param[in] name Mandatory model name
  *
  * @exception GException::invalid_value
- *            Mandatory model name not found in observation container.
+ *            Model definiton XML filename not valid or mandatory model name
+ *            not found in model container.
  *
  * Setup a model container by loading the models from the "inmodel"
  * parameter.
@@ -458,10 +458,12 @@ void ctool::setup_observations(GObservations& obs,
  * If the model container in the observation container @p obs is empty, the
  * method will extract the model container filename from the "inmodel"
  * parameter, load the model container and assign it to the observations
- * container.
+ * container. If the filename is either empty or "NONE" the method will
+ * throw an exception.
  *
  * If a mandatory model name is specified, the method will further check
- * whether a model with the name exists in the model container.
+ * whether a model with the name exists in the model container. If it does
+ * not exist, an exception is thrown.
  ***************************************************************************/
 void ctool::setup_models(GObservations&     obs,
                          const std::string& name)
@@ -473,6 +475,15 @@ void ctool::setup_models(GObservations&     obs,
 
         // Get models XML filename
         GFilename filename = (*this)["inmodel"].filename();
+
+        // Throw an exception if the "inmodel" parameter is not a valid
+        // filename
+        if (!is_valid_filename(filename)) {
+            std::string msg = "The \"inmodel\" parameter \""+filename.url()+
+                              "\" is not a valid filename. Please specify "
+                              "a valid model definition XML file.";
+            throw GException::invalid_value(G_SETUP_MODELS, msg);
+        }
 
         // Load model container and assign it to observations container
         obs.models(GModels(filename.url()));
@@ -489,7 +500,7 @@ void ctool::setup_models(GObservations&     obs,
             std::string msg = "Model \""+name+"\" not found in model "
                               "container. Please add a model with that name "
                               "or check for possible typos.";
-            throw GException::invalid_value(SETUP_MODELS, msg);
+            throw GException::invalid_value(G_SETUP_MODELS, msg);
         }
 
     } // endif: mandatory model name existed
@@ -790,18 +801,18 @@ GCTAObservation ctool::create_cta_obs(void)
  *
  * @param[in] method Method name.
  *
- * Throw an exception if the inobs parameter is either NONE or an empty
+ * Throw an exception if the "inobs" parameter is either "NONE" or an empty
  * string.
  ***************************************************************************/
 void ctool::require_inobs(const std::string& method)
 {
     // Get inobs filename
-    std::string filename = (*this)["inobs"].filename();
+    GFilename filename = (*this)["inobs"].filename();
 
     // Throw exception if no infile is given
-    if (filename == "NONE" || gammalib::strip_whitespace(filename) == "") {
+    if (!is_valid_filename(filename)) {
         std::string msg = "A valid file needs to be specified for the "
-                          "\"inobs\" parameter, yet \""+filename+
+                          "\"inobs\" parameter, yet \""+filename.url()+
                           "\" was given."
                           " Specify a valid observation definition or "
                           "FITS file to proceed.";
@@ -1165,12 +1176,8 @@ void ctool::set_obs_response(GCTAObservation* obs)
             GFilename bkgcube((*this)["bkgcube"].filename());
 
             // Extract stacked response information if available
-            if ((gammalib::toupper(expcube.url()) != "NONE") &&
-                (gammalib::toupper(psfcube.url()) != "NONE") &&
-                (gammalib::toupper(bkgcube.url()) != "NONE") &&
-                !expcube.is_empty() &&
-                !psfcube.is_empty() &&
-                !bkgcube.is_empty()) {
+            if (is_valid_filename(expcube) && is_valid_filename(psfcube) &&
+                is_valid_filename(bkgcube)) {
 
                 // Load exposure, PSF and background cubes
                 GCTACubeExposure   exposure(expcube);
@@ -1182,8 +1189,7 @@ void ctool::set_obs_response(GCTAObservation* obs)
                 if (query_edisp) {
 
                     // If filename is valid then use energy dispersion ...
-                    if ((gammalib::toupper(edispcube.url()) != "NONE") &&
-                        !edispcube.is_empty()) {
+                    if (is_valid_filename(edispcube)) {
 
                         // Load energy dispersion cube
                         GCTACubeEdisp edisp(edispcube);
@@ -1355,7 +1361,7 @@ GObservations ctool::get_observations(const bool& get_response)
 
     // If no observation definition file has been specified then read all
     // parameters that are necessary to create an observation from scratch
-    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
+    if (!is_valid_filename(filename)) {
 
         // Setup a new CTA observation
         GCTAObservation cta_obs = create_cta_obs();
@@ -1371,7 +1377,7 @@ GObservations ctool::get_observations(const bool& get_response)
        // Append observation to container
        obs.append(cta_obs);
 
-    } // endif: filename was "NONE" or ""
+    } // endif: filename was valid
 
     // ... otherwise we have a file name
     else {

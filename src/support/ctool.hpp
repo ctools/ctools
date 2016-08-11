@@ -112,6 +112,7 @@ protected:
                                                const GCTAObservation& obs);
     std::vector<bool> cube_layer_usage(const GEbounds& cube_ebounds,
                                        const GEbounds& list_ebounds) const;
+    bool              is_valid_filename(const GFilename& filename) const;
 
     // Protected warning strings
     std::string     warn_too_few_energies(const GEnergies& energies) const;
@@ -131,9 +132,14 @@ protected:
 
 
 /***********************************************************************//**
- * @brief Return observation container
+ * @brief Signal whether parameters should be read ahead
  *
- * @return Reference to observation container
+ * @return True if parameters should be read ahead
+ *
+ * Ahead reading of parameter is useful in case that some parameters are only
+ * required in a late stage of the processing. By reading them ahead it is
+ * assured that these parameters will be queried at the beginning of the
+ * tool execution.
  ***************************************************************************/
 inline
 const bool& ctool::read_ahead(void) const
@@ -151,6 +157,21 @@ inline
 const GTimeReference& ctool::time_reference(void) const
 {
     return (m_cta_ref);
+}
+
+
+/***********************************************************************//**
+ * @brief Check of a filename is valid
+ *
+ * @return True if filename is valid
+ *
+ * Checks whether a filename is not empty and not "NONE".
+ ***************************************************************************/
+inline
+bool ctool::is_valid_filename(const GFilename& filename) const
+{
+    return (!filename.is_empty() &&
+            (gammalib::tolower(filename.url()) != "none"));
 }
 
 #endif /* CTOOL_HPP */

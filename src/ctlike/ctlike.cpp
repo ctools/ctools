@@ -319,9 +319,8 @@ void ctlike::save(void)
     // Get output filename
     m_outmodel = (*this)["outmodel"].filename();
 
-    // Save only if filename is non-empty
-    if (!m_outmodel.is_empty() &&
-        gammalib::toupper(m_outmodel.url()) != "NONE") {
+    // Save only if filename is valid
+    if (is_valid_filename(m_outmodel)) {
 
         // Log filename
         log_value(NORMAL, "Model definition file", m_outmodel.url());
@@ -331,7 +330,7 @@ void ctlike::save(void)
 
     }
 
-    // ... otherwise signal that file was not save
+    // ... otherwise signal that file was not saved
     else {
         log_value(NORMAL, "Model definition file", "NONE");
     }
