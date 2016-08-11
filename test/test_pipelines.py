@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs tests processing pipelines.
+# This scripts performs tests processing pipelines
 #
-# Copyright (C) 2014 Juergen Knoedlseder
+# Copyright (C) 2014-2016 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,27 +72,24 @@ class Test(gammalib.GPythonTestSuite):
         Test unbinned pipeline with FITS file saving
         """
         # Set script parameters
-        model_name           = self._model
         events_name          = 'events.fits'
         selected_events_name = 'selected_events.fits'
         result_name          = 'results.xml'
-        caldb                = self._caldb
-        irf                  = self._irf
         ra                   =   83.63
         dec                  =   22.01
         rad_sim              =   10.0
+        rad_select           =    3.0
         tstart               =    0.0
         tstop                = 1800.0
         emin                 =    0.1
         emax                 =  100.0
-        rad_select           =    3.0
 
         # Simulate events
         sim = ctools.ctobssim()
-        sim['inmodel']   = model_name
+        sim['inmodel']   = self._model
         sim['outevents'] = events_name
-        sim['caldb']     = caldb
-        sim['irf']       = irf
+        sim['caldb']     = self._caldb
+        sim['irf']       = self._irf
         sim['ra']        = ra
         sim['dec']       = dec
         sim['rad']       = rad_sim
@@ -118,10 +115,10 @@ class Test(gammalib.GPythonTestSuite):
         # Perform maximum likelihood fitting
         like = ctools.ctlike()
         like['inobs']    = selected_events_name
-        like['inmodel']  = model_name
+        like['inmodel']  = self._model
         like['outmodel'] = result_name
-        like['caldb']    = caldb
-        like['irf']      = irf
+        like['caldb']    = self._caldb
+        like['irf']      = self._irf
         like.execute()
 
         # Return
@@ -133,23 +130,20 @@ class Test(gammalib.GPythonTestSuite):
         Test unbinned in-memory pipeline
         """
         # Set script parameters
-        model_name = self._model
-        caldb      = self._caldb
-        irf        = self._irf
         ra         =   83.63
         dec        =   22.01
         rad_sim    =   10.0
+        rad_select =    3.0
         tstart     =    0.0
         tstop      = 1800.0
         emin       =    0.1
         emax       =  100.0
-        rad_select =    3.0
 
         # Simulate events
         sim = ctools.ctobssim()
-        sim['inmodel'] = model_name
-        sim['caldb']   = caldb
-        sim['irf']     = irf
+        sim['inmodel'] = self._model
+        sim['caldb']   = self._caldb
+        sim['irf']     = self._irf
         sim['ra']      = ra
         sim['dec']     = dec
         sim['rad']     = rad_sim

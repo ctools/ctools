@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for cscripts.
+# This scripts performs unit tests for cscripts
 #
 # Copyright (C) 2016 Juergen Knoedlseder
 #
@@ -74,7 +74,7 @@ def test(installed=False, debug=False):
         testdir = inspect.getfile(cscripts.tests)
         dirname = os.path.dirname(testdir)
 
-        # Copy over test data and irf
+        # Copy test data in "data" directory
         os.system('cp -r %s %s' % (dirname+'/data', 'data'))
 
         # Set test data environment variable
@@ -86,14 +86,18 @@ def test(installed=False, debug=False):
     else:
         os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
 
-    # Set PFILES environment variable
+    # Create a local "pfiles" directory and set PFILES environment variable
     try:
         os.mkdir('pfiles')
     except:
         pass
     os.environ['PFILES'] = 'pfiles'
 
-    # Copy over pfiles
+    # Copy the cscripts parameter files into the "pfiles" directory. For a
+    # non-installed test we copy the parameter files from the "cscripts"
+    # source directory into the "pfiles" directory, for an installed version
+    # we get all parameter files from the "syspfiles" directory. Also make
+    # sure that all parameter files are writable.
     if not installed:
         os.system('cp -r %s/cscripts/*.par pfiles/'% (os.environ['TEST_SRCDIR']))
         os.system('chmod u+w pfiles/*')
@@ -162,16 +166,16 @@ def test(installed=False, debug=False):
     suites.append(suite_csworkflow)
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
-    # module which is only available since Python 2.6+
+    # module which is only available since Python 2.6+)
     ver = sys.version.split()[0]
     if ver >= '2.6.0':
 
         # Check for VHEFITS environment variable
         if 'VHEFITS' in os.environ:
             
-            # If environment variable exists then unset for the test cases.
-            # Since Python is executed in a subprocess this will not impact
-            # the environment variable in the parent shell.
+            # If the environment variable exists then unset it for the test
+            # cases. Since Python is executed in a subprocess this will not
+            # impact the environment variable in the parent shell.
             del os.environ['VHEFITS']
 
         # Allocate test suites

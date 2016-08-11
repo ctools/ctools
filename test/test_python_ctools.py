@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the ctools package.
+# This scripts performs unit tests for the ctools package
 #
 # Copyright (C) 2012-2016 Juergen Knoedlseder
 #
@@ -54,9 +54,50 @@ def test(installed=False):
     installed : bool, optional
         Flag indicating whether the script has been installed or not
     """
-    # Set environment variables first
+    # If we have an installed version then create a temporary
+    # directory and copy over all information that is needed
     if installed:
+
+        # Create temporary working directory
+        import tempfile
+        path = tempfile.mkdtemp()
+        os.chdir(path)
+
+        # Get test directory
+        import inspect
+        testdir = inspect.getfile(ctools.tests)
+        dirname = os.path.dirname(testdir)
+
+        # Copy test data in "data" directory
+        os.system('cp -r %s %s' % (dirname+'/data', 'data'))
+
+        # Set test data environment variable
         os.environ['TEST_DATA'] = 'data'
+
+    # ... otherwise set the calibration database to the one shipped with the
+    # package; we don't need to set the 'TEST_DATA', this is done by the
+    # test environment
+    else:
+        os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
+
+    # Create a local "pfiles" directory and set PFILES environment variable
+    try:
+        os.mkdir('pfiles')
+    except:
+        pass
+    os.environ['PFILES'] = 'pfiles'
+
+    # Copy the ctools parameter files into the "pfiles" directory. For a
+    # non-installed test we copy the parameter files from the respective
+    # source directories into the "pfiles" directory, for an installed version
+    # we get all parameter files from the "syspfiles" directory. Also make
+    # sure that all parameter files are writable.
+    if not installed:
+        os.system('cp -r %s/src/*/*.par pfiles/' % (os.environ['TEST_SRCDIR']))
+        os.system('chmod u+w pfiles/*')
+    else:
+        os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
+        os.system('chmod u+w pfiles/*')
 
     # Allocate test suite container
     suites = gammalib.GTestSuites('ctools unit testing')
@@ -117,42 +158,6 @@ def test(installed=False):
     suites.append(suite_ctulimit)
     suites.append(suite_cterror)
     suites.append(suite_pipelines)
-
-    # If we have an installed version then create a temporary
-    # directory and copy over all information that is needed
-    if installed:
-
-        # Create temporary working directory
-        import tempfile
-        path = tempfile.mkdtemp()
-        os.chdir(path)
-
-        # Get test directory
-        import inspect
-        testdir = inspect.getfile(ctools.tests)
-        dirname = os.path.dirname(testdir)
-
-        # Copy over test data and irf
-        os.system('cp -r %s %s' % (dirname+'/data', 'data'))
-
-    # ... otherwise set the calibration database
-    else:
-        os.environ['CALDB'] = '%s/caldb' % (os.environ['TEST_SRCDIR'])
-
-    # Set PFILES environment variable
-    try:
-        os.mkdir('pfiles')
-    except:
-        pass
-    os.environ['PFILES'] = 'pfiles'
-
-    # Copy over pfiles
-    if not installed:
-        os.system('cp -r %s/src/*/*.par pfiles/' % (os.environ['TEST_SRCDIR']))
-        os.system('chmod u+w pfiles/*')
-    else:
-        os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
-        os.system('chmod u+w pfiles/*')
 
     # Run test suite
     success = suites.run()
