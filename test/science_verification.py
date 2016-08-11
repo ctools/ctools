@@ -326,6 +326,10 @@ class sciver(gammalib.GPythonTestSuite):
         ----------
         name : str
             Parameter name
+        lim_mean : float, optional
+            Limit for mean value
+        lim_std : float, optional
+            Limit for standard deviation
         """
         # Set minima and maximum
         mean_min = -lim_mean
@@ -670,12 +674,16 @@ if __name__ == '__main__':
     # Append test suite to container
     suites.append(suite_sciver)
 
-    # Set PFILES environment variable
+    # Create pfiles directory
     try:
         os.mkdir('pfiles')
     except:
         pass
+
+    # Copy ctools parameter files into pfiles directory
     os.system('cp -r ../src/*/*.par pfiles/')
+
+    # Set PFILES environment variable
     os.environ['PFILES'] = 'pfiles'
 
     # Run test suite
