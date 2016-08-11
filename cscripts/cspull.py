@@ -203,6 +203,7 @@ class cspull(ctools.cscript):
                            emin=emin,
                            emax=emax,
                            nbins=enumbins,
+                           addbounds=True,
                            seed=seed,
                            binsz=self._binsz,
                            npix=self._npix,
