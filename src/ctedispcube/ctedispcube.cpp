@@ -346,26 +346,8 @@ void ctedispcube::free_members(void)
  ***************************************************************************/
 void ctedispcube::get_parameters(void)
 {
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
-
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Throw exception if counts cube is given
-        require_inobs_nocube(G_GET_PARAMETERS);
-
-        // Build observation container
-        m_obs = get_observations();
-
-    } // endif: there was no observation in the container
-
-    // ... otherwise add response information and energy boundaries in case
-    // that they are missing
-    else {
-        setup_observations(m_obs);
-    }
+    // Setup observations from "inobs" parameter. Do not accept counts cubes.
+    setup_observations(m_obs, true, true, false);
 
     // Get the incube filename
     std::string incube = (*this)["incube"].filename();

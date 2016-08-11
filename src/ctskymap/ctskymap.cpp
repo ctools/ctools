@@ -35,7 +35,6 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
 #define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
-#define G_GET_PARAMETERS                         "ctskymap::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -402,20 +401,9 @@ void ctskymap::free_members(void)
  ***************************************************************************/
 void ctskymap::get_parameters(void)
 {
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
-
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Throw exception if counts cube is given
-        require_inobs_nocube(G_GET_PARAMETERS);
-
-        // Get observation container without response (not needed)
-        m_obs = get_observations(false);
-
-    } // endif: there was no observation in the container
+    // Setup observations from "inobs" parameter. Do not request response
+    // information and do not accept counts cubes.
+    setup_observations(m_obs, false, true, false);
 
     // Create sky map based on task parameters
     m_skymap = create_map(m_obs);

@@ -34,7 +34,6 @@
 #include "GOptimizer.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                         "cterror::get_parameters()"
 #define G_ERR_BISECTION         "cterror::error_bisection(double&, double&)"
 #define G_EVALUATE                              "cterror::evaluate(double&)"
 
@@ -455,52 +454,19 @@ void cterror::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * @exception GException::invalid_value
- *            Test source not found.
- *
  * Get all task parameters from parameter file or (if required) by querying
  * the user.
  ***************************************************************************/
 void cterror::get_parameters(void)
 {
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
+    // Setup observations from "inobs" parameter
+    setup_observations(m_obs);
+    
+    // Setup models from "inmodel" parameter
+    setup_models(m_obs, (*this)["srcname"].string());
 
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Build observation container
-        m_obs = get_observations();
-
-    } // endif: there was no observation in the container
-
-    // ... otherwise add response information and energy boundaries in case
-    // that they are missing
-    else {
-        setup_observations(m_obs);
-    }
-
-    // If there are no models associated with the observations then
-    // load now the model definition
-    if (m_obs.models().size() == 0) {
-
-        // Get models XML filename
-        std::string filename = (*this)["inmodel"].filename();
-
-        // Setup models for optimizing.
-        m_obs.models(GModels(filename));
-
-    } // endif: no models were associated with observations
-
-    // Get name of test source and check container for this name
+    // Get name of test source
     m_srcname = (*this)["srcname"].string();
-    if (!m_obs.models().contains(m_srcname)) {
-        std::string msg = "Source \""+m_srcname+"\" not found in model "
-                          "container. Please add a source with that name "
-                          "or check for possible typos.";
-        throw GException::invalid_value(G_GET_PARAMETERS, msg);
-    }
 
     // Read energy dispersion flag
     m_apply_edisp = (*this)["edisp"].boolean();

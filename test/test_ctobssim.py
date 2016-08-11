@@ -74,7 +74,8 @@ class Test(test):
                        ' outevents="events.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
-                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
+                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'+ \
+                       ' logfile="ctobssim_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -93,7 +94,8 @@ class Test(test):
                        ' outevents="events.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
-                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'
+                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'+ \
+                       ' logfile="ctobssim_cmd2.log" chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -120,8 +122,11 @@ class Test(test):
         sim['tmax']      = 1800.0
         sim['emin']      = 0.1
         sim['emax']      = 100.0
+        sim['logfile']   = 'ctobssim_py1.log'
+        sim['chatter']   = 2
 
         # Run tool
+        sim.logFileOpen()
         sim.run()
 
         # Check content of observation
@@ -146,8 +151,11 @@ class Test(test):
         sim = ctools.ctobssim(obs)
         sim['outevents'] = 'sim_events.xml'
         sim['inmodel']   = self._model
+        sim['logfile']   = 'ctobssim_py2.log'
+        sim['chatter']   = 3
 
         # Run tool
+        sim.logFileOpen()
         sim.run()
 
         # Retrieve observation and check content
@@ -182,10 +190,13 @@ class Test(test):
         sim['tmax']      = 1800.0
         sim['emin']      = 0.1
         sim['emax']      = 100.0
+        sim['logfile']   = 'ctobssim_py3.log'
+        sim['chatter']   = 4
 
         # Run ctbin tool
         self.test_try('Run ctobssim with invalid model file')
         try:
+            sim.logFileOpen()
             sim.run()
             self.test_try_failure()
         except:

@@ -33,7 +33,6 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                           "ctlike::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -361,23 +360,8 @@ void ctlike::save(void)
  ***************************************************************************/
 void ctlike::get_parameters(void)
 {
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
-
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Get observation container
-        m_obs = get_observations();
-
-    } // endif: there was no observation in the container
-
-    // ... otherwise add response information and energy boundaries in case
-    // that they are missing
-    else {
-        setup_observations(m_obs);
-    }
+    // Setup observations from "inobs" parameter
+    setup_observations(m_obs);
 
     // If only single observation is used, read statistics parameter
     if (!m_use_xml) {

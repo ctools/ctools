@@ -500,8 +500,7 @@ void cttsmap::free_members(void)
  * @brief Get application parameters
  *
  * @exception GException::invalid_value
- *            Test source not found or no RA/DEC parameters found for test
- *            source.
+ *            Test source has no RA/DEC parameters.
  *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Most parameters are only required if no observation exists so
@@ -511,44 +510,14 @@ void cttsmap::free_members(void)
  ***************************************************************************/
 void cttsmap::get_parameters(void)
 {
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
+    // Setup observations from "inobs" parameter
+    setup_observations(m_obs);
+    
+    // Setup models from "inmodel" parameter
+    setup_models(m_obs, (*this)["srcname"].string());
 
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Get observation container
-        m_obs = get_observations();
-
-    } // endif: there was no observation in the container
-
-    // ... otherwise add response information and energy boundaries in case
-    // that they are missing
-    else {
-        setup_observations(m_obs);
-    }
-
-    // If there is are no models associated with the observations then
-    // load now the model definition
-    if (m_obs.models().size() == 0) {
-
-        // Get models XML filename
-        std::string filename = (*this)["inmodel"].filename();
-
-        // Setup models for optimizing.
-        m_obs.models(GModels(filename));
-
-    } // endif: no models were associated with observations
-
-    // Get name of test source and check container for this name
+    // Get name of test source
     m_srcname = (*this)["srcname"].string();
-    if (!m_obs.models().contains(m_srcname)) {
-        std::string msg = "Source \""+m_srcname+"\" not found in model "
-                          "container. Please add a source with that name "
-                          "or check for a possible typos.";
-    	throw GException::invalid_value(G_GET_PARAMETERS, msg);
-    }
 
     // Get Model and store it as protected member
     m_testsource = m_obs.models()[m_srcname]->clone();

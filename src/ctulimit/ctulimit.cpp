@@ -34,7 +34,6 @@
 #include "GOptimizer.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                         "ctulimit::get_parameters()"
 #define G_GET_MODEL_PARAMETER               "ctulimit::get_model_parameter()"
 #define G_UL_BISECTION             "ctulimit::ul_bisection(double&, double&)"
 #define G_EVALUATE                              "ctulimit::evaluate(double&)"
@@ -461,46 +460,18 @@ void ctulimit::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * @exception GException::invalid_value
- *            Test source not found.
- *
  * Get all task parameters from parameter file or (if required) by querying
  * the user.
  ***************************************************************************/
 void ctulimit::get_parameters(void)
 {
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
+    // Setup observations from "inobs" parameter
+    setup_observations(m_obs);
+    
+    // Setup models from "inmodel" parameter
+    setup_models(m_obs, (*this)["srcname"].string());
 
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Build observation container
-        m_obs = get_observations();
-
-    } // endif: there was no observation in the container
-
-    // ... otherwise add response information and energy boundaries in case
-    // that they are missing
-    else {
-        setup_observations(m_obs);
-    }
-
-    // If there is are no models associated with the observations then
-    // load now the model definition
-    if (m_obs.models().size() == 0) {
-
-        // Get models XML filename
-        std::string filename = (*this)["inmodel"].filename();
-
-        // Setup models for optimizing.
-        m_obs.models(GModels(filename));
-
-    } // endif: no models were associated with observations
-
-    // Get name of test source. The get_model_parameter() method will check
-    // where a source with the given name exists in the model container.
+    // Get name of test source
     m_srcname = (*this)["srcname"].string();
 
     // Get relevant model and parameter for upper limit computation

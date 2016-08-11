@@ -36,7 +36,6 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_RUN                                             "ctcubemask::run()"
 #define G_APPLY_MASK               "ctcubemask::apply_mask(GCTAObservation*)"
-#define G_GET_PARAMETERS                       "ctcubemask::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -439,9 +438,6 @@ void ctcubemask::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- *  @exception GException::invalid_value
- *          Parameter "inobs" is required for ctcubemask.
- *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. 
  *
@@ -455,20 +451,9 @@ void ctcubemask::get_parameters(void)
     m_select_energy = true;
     m_select_roi    = true;
 
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
-
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Throw exception if event list is given
-        require_inobs_nolist(G_GET_PARAMETERS);
-
-        // Build observation container without response (not needed)
-        m_obs = get_observations(false);
-
-    } // endif: there was no observation in the container
+    // Setup observations from "inobs" parameter. Do not request response
+    // information and do not accept event lists.
+    setup_observations(m_obs, false, false, true);
 
     // Get parameters
     m_regfile = (*this)["regfile"].filename();

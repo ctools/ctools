@@ -37,7 +37,6 @@
 #define G_SELECT_EVENTS          "ctselect::select_events(GCTAObservation*, "\
                                   "std::string&, std::string&, std::string&)"
 #define G_SET_EBOUNDS    "ctselect::set_ebounds(GCTAObservation*, GEbounds&)"
-#define G_GET_PARAMETERS                         "ctselect::get_parameters()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -502,20 +501,9 @@ void ctselect::get_parameters(void)
     m_select_roi    = true;
     m_select_time   = true;
 
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
-
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Throw exception if counts cube is given
-        require_inobs_nocube(G_GET_PARAMETERS);
-
-        // Get observation container without response (not needed)
-        m_obs = get_observations(false);
-
-    } // endif: there was no observation in the container
+    // Setup observations from "inobs" parameter. Do not request response
+    // information and do not accept counts cubes.
+    setup_observations(m_obs, false, true, false);
 
     // Get parameters
     m_usepnt = (*this)["usepnt"].boolean();

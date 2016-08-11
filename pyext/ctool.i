@@ -113,8 +113,12 @@ public:
     // Protected methods
     const bool&           read_ahead(void) const;
     const GTimeReference& time_reference(void) const;
-    GObservations         get_observations(const bool& get_response = true);
-    void                  setup_observations(GObservations& obs);
+
+    // Protected high-level setup methods
+    void setup_observations(GObservations& obs, const bool& response = true,
+                                                const bool& list = true,
+                                                const bool& cube = true);
+    void setup_models(GObservations& obs, const std::string& name = "");
 
     // Protected methods that create objects from user parameters
     GEbounds        create_ebounds(void);
@@ -142,6 +146,7 @@ public:
                                     const std::vector<bool>& edisp) const;
     void              set_obs_response(GCTAObservation* obs);
     void              set_obs_bounds(GObservations& obs);
+    GObservations     get_observations(const bool& get_response = true);
     GSkyDir           get_mean_pointing(const GObservations& obs);
     size_t            get_current_rss(void);
     std::string       get_obs_header(const GObservation* obs);

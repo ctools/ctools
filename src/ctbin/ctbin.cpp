@@ -437,20 +437,9 @@ void ctbin::free_members(void)
  ***************************************************************************/
 void ctbin::get_parameters(void)
 {
-    // If there are no observations in container then load them via user
-    // parameters
-    if (m_obs.size() == 0) {
-
-        // Throw exception if no input observation file is given
-        require_inobs(G_GET_PARAMETERS);
-
-        // Throw exception if counts cube is given
-        require_inobs_nocube(G_GET_PARAMETERS);
-
-        // Get observation container without response (not needed)
-        m_obs = get_observations(false);
-
-    } // endif: there was no observation in the container
+    // Setup observations from "inobs" parameter. Do not request response
+    // information and do not accept counts cubes.
+    setup_observations(m_obs, false, true, false);
 
     // Create an event cube based on task parameters
     GCTAEventCube cube = create_cube(m_obs);

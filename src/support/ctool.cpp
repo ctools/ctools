@@ -50,6 +50,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_SETUP_OBSERVATION       "ctool::setup_observations(GObservations&)"
+#define SETUP_MODELS      "ctool::setup_models(GObservations&, std::string&)"
 #define G_GET_MEAN_POINTING        "ctool::get_mean_pointing(GObservations&)"
 #define G_CREATE_EBOUNDS                            "ctool::create_ebounds()"
 #define G_RESTORE_EDISP               "ctool::restore_edisp(GObservations&, "\
@@ -304,189 +305,194 @@ void ctool::free_members(void)
 
 
 /***********************************************************************//**
- * @brief Get observation container
- *
- * @param[in] get_response Indicates whether response information should
- *                         be loaded (default: true)
- *
- * Get an observation container according to the user parameters. The method
- * supports loading of a individual FITS file or an observation definition
- * file in XML format. If the input filename is empty, parameters are read
- * to build a CTA observation from scratch.
- ***************************************************************************/
-GObservations ctool::get_observations(const bool& get_response)
-{
-    // Initialise empty observation container
-    GObservations obs;
-
-    // Get the filename from the input parameters
-    std::string filename = (*this)["inobs"].filename();
-
-    // If no observation definition file has been specified then read all
-    // parameters that are necessary to create an observation from scratch
-    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
-
-        // Setup a new CTA observation
-        GCTAObservation cta_obs = create_cta_obs();
-
-        // Get response if required
-        if (get_response) {
-
-            // Set response
-            set_obs_response(&cta_obs);
-
-        } // endif: response was required
-
-       // Append observation to container
-       obs.append(cta_obs);
-
-    } // endif: filename was "NONE" or ""
-
-    // ... otherwise we have a file name
-    else {
-
-        // If file is a FITS file then create an empty CTA observation
-        // and load file into observation
-        if (GFilename(filename).is_fits()) {
-
-            // Allocate empty CTA observation
-            GCTAObservation cta_obs;
-
-            // Load data
-            cta_obs.load(filename);
-
-            // Get response if required
-            if (get_response) {
-
-                // Set response
-                set_obs_response(&cta_obs);
-
-            } // endif: response was required
-
-            // Append observation to container
-            obs.append(cta_obs);
-
-            // Signal that no XML file should be used for storage
-            m_use_xml = false;
-
-        }
-
-        // ... otherwise load file into observation container
-        else {
-
-            // Load observations from XML file
-            obs.load(filename);
-
-            // Get response if required
-            if (get_response) {
-
-                // For all observations that have no response, set the response
-                // from the task parameters
-                set_response(obs);
-
-            } // endif: response was required
-
-            // Set observation boundary parameters (emin, emax, rad)
-            set_obs_bounds(obs);
-
-            // Signal that XML file should be used for storage
-            m_use_xml = true;
-
-        } // endelse: file was an XML file
-
-    }
-
-    // Return observation container
-    return obs;
-}
-
-
-/***********************************************************************//**
  * @brief Setup observation container
  *
  * @param[in] obs Observation container
+ * @param[in] response Require response
+ * @param[in] list Accept event list as "inobs" parameter
+ * @param[in] cube Accept counts cube as "inobs" parameter
  *
  * @exception GException::invalid_value
  *            Invalid "inobs" parameter encountered.
  *
- * Setup an observation container by appending all required information that
- * is missing using user parameters.
+ * Setup an observation container by extracting all required missing
+ * information from user parameters.
  *
  * If the observation container @p obs is empty, the method will extract the
  * filename from the "inobs" parameter, and if the filename is neither empty
- * nor "NONE", will load the observation container from the specified file.
- * If the file is a FITS file, and dependent on the information that is found
- * in the FITS file, the method will append a single CTA observation to the
- * observation container, containing either an event list or a counts cube.
- * Otherwise, the method assumes that the file is an observation definition
- * XML file and will load that file into the observation container.
+ * nor "NONE", it will load the observation container from the specified file.
+ * Otherwise, the method will throw an exception.
  *
- * If the filename is empty or "NONE", the method will throw an exception.
+ * If the "inobs" file is a FITS file, and depending on the information that
+ * is found in the FITS file, the method will append a single CTA observation
+ * to the observation container, containing either an event list or a counts
+ * cube. It will set the m_use_xml member to false to signal that no
+ * observation XML file should be used for saving. The @p list and @p cube
+ * parameters can be used to specify whether the method actually should accept
+ * event lists or counts cube. If it shouldn't the method will throw an
+ * exception.
  *
- * The method will then setup the response for all CTA observations in the
- * container (see the set_response() method for more information).
- * 
- * The method will furthermore setup the observation boundaries for all CTA
- * observations in the container that contain event lists (see the
- * set_obs_bounds() method for more information).
+ * If the "inobs" file is not a FITS file, the method assumes that an
+ * observation definition XML file has been specified, and will load that
+ * file into the observation container. It will set the m_use_xml member to
+ * true to signal that an observation XML file should be used for saving. No
+ * checking on event list or counts cubes will be done on the observation
+ * container.
+ *
+ * By default, the method will also setup the response for all CTA
+ * observations in the container. In case that no response information is
+ * required, the @p response argument should be set to @p false. See the
+ * set_response() method for details.
+ *
+ *
+ * The method will also setup the observation boundaries for all CTA
+ * observations in the container that contain event lists. For details, see
+ * the set_obs_bounds() method.
  ***************************************************************************/
-void ctool::setup_observations(GObservations& obs)
+void ctool::setup_observations(GObservations& obs,
+                               const bool&    response,
+                               const bool&    list,
+                               const bool&    cube)
 {
     // Load observations if there are none in the container
     if (obs.size() == 0) {
 
         // Get the filename from the "inobs" parameter
-        GFilename filename((*this)["inobs"].filename());
-        
-        // Load observation container from file if the filename is neither
-        // "NONE" nor empty ...
-        if ((gammalib::toupper(filename.url()) != "NONE") &&
-            !filename.is_empty()) {
+        GFilename filename = (*this)["inobs"].filename();
 
-            // If file does not exist then throw an exceptions
-            if (!filename.exists()) {
-                std::string msg = "The \"inobs\" parameter \""+filename+
-                                  "\" specifies a file that does not "
-                                  "exist. Please specify  a valid event "
-                                  "list, counts cube or  observation "
-                                  "definition XML file.";
-                throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
-            }
-
-            // If the file is a FITS file then load it into a CTA
-            // observation and append that observation to the container ...
-            else if (filename.is_fits()) {
-                GCTAObservation cta(filename);
-                obs.append(cta);
-            }
-
-            // ... otherwise it is assumed that the file is an observation
-            // definition XML file and the file is loaded into the
-            // observation container
-            else {
-                obs.load(filename);
-            }
-
-        }
-
-        // ... otherwise, if the filename is "NONE" or empty then throw
-        // an exception.
-        else {
-            std::string msg = "The \"inobs\" parameter \""+filename+
+        // Throw an exception if the "inobs" parameter is not a valid
+        // filename
+        if ((gammalib::toupper(filename.url()) == "NONE") ||
+             filename.is_empty()) {
+            std::string msg = "The \"inobs\" parameter \""+filename.url()+
                               "\" is not a valid filename. Please specify "
                               "a valid event list, counts cube or "
                               "observation definition XML file.";
             throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
         }
 
+        // If file does not exist then throw an exceptions
+        if (!filename.exists()) {
+            std::string msg = "The \"inobs\" parameter \""+filename.url()+
+                              "\" specifies a file that does not "
+                              "exist. Please specify  a valid event "
+                              "list, counts cube or  observation "
+                              "definition XML file.";
+            throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
+        }
+
+        // If the file is a FITS file then load it into a CTA
+        // observation and append that observation to the container ...
+        else if (filename.is_fits()) {
+
+            // Load CTA observation
+            GCTAObservation cta(filename);
+
+            // If no event list is accepted but an event list has been
+            // loaded then throw an exception
+            if (!list && cta.eventtype() == "EventList") {
+                std::string msg = "The \"inobs\" parameter \""+filename.url()+
+                                  "\" specifies an event list, but this "
+                                  "tool does not accept event lists.";
+                throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
+            }
+
+            // If no counts cube is accepted but a conts cube has been
+            // loaded then throw an exception
+            if (!cube && cta.eventtype() == "CountsCube") {
+                std::string msg = "The \"inobs\" parameter \""+filename.url()+
+                                  "\" specifies a counts cube, but this "
+                                  "tool does not accept counts cubes.";
+                throw GException::invalid_value(G_SETUP_OBSERVATION, msg);
+            }
+
+            // Append CTA observation to observation container
+            obs.append(cta);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+
+        } // endelse: file was a FITS file
+
+        // ... otherwise it is assumed that the file is an observation
+        // definition XML file and the file is loaded into the
+        // observation container
+        else {
+
+            // Load observation definition file
+            obs.load(filename);
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+        } // endelse: file was an XML file
+
     } // endif: there were no observations in the container
 
     // Setup the response for all CTA observations in the observation
-    // container
-    set_response(obs);
+    // container if response information is required
+    if (response) {
+        set_response(obs);
+    }
 
     // Setup boundaries for all CTA observations containing event lists
     set_obs_bounds(obs);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Setup model container
+ *
+ * @param[in] obs Observation container
+ * @param[in] name Mandatory model name
+ *
+ * @exception GException::invalid_value
+ *            Mandatory model name not found in observation container.
+ *
+ * Setup a model container by loading the models from the "inmodel"
+ * parameter.
+ *
+ * If the model container in the observation container @p obs is empty, the
+ * method will extract the model container filename from the "inmodel"
+ * parameter, load the model container and assign it to the observations
+ * container.
+ *
+ * If a mandatory model name is specified, the method will further check
+ * whether a model with the name exists in the model container.
+ ***************************************************************************/
+void ctool::setup_models(GObservations&     obs,
+                         const std::string& name)
+{
+    // If there are no models in the observation container then load model
+    // container from the "inmodel" parameter and attach it to the
+    // observation container
+    if (obs.models().size() == 0) {
+
+        // Get models XML filename
+        GFilename filename = (*this)["inmodel"].filename();
+
+        // Load model container and assign it to observations container
+        obs.models(GModels(filename.url()));
+
+    } // endif: no models were in observations container
+
+    // If a mandatory model name exists then check whether this model is
+    // part of the observation container. Throw an exception if the model
+    // does not exist
+    if (!name.empty()) {
+
+        // Throw an exception if the model name does not exist
+        if (!obs.models().contains(name)) {
+            std::string msg = "Model \""+name+"\" not found in model "
+                              "container. Please add a model with that name "
+                              "or check for possible typos.";
+            throw GException::invalid_value(SETUP_MODELS, msg);
+        }
+
+    } // endif: mandatory model name existed
 
     // Return
     return;
@@ -1325,6 +1331,104 @@ void ctool::set_obs_bounds(GObservations& obs)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Get observation container
+ *
+ * @param[in] get_response Indicates whether response information should
+ *                         be loaded (default: true)
+ *
+ * Get an observation container according to the user parameters. The method
+ * supports loading of a individual FITS file or an observation definition
+ * file in XML format. If the input filename is empty, parameters are read
+ * to build a CTA observation from scratch.
+ ***************************************************************************/
+GObservations ctool::get_observations(const bool& get_response)
+{
+    // Initialise empty observation container
+    GObservations obs;
+
+    // Get the filename from the input parameters
+    std::string filename = (*this)["inobs"].filename();
+
+    // If no observation definition file has been specified then read all
+    // parameters that are necessary to create an observation from scratch
+    if ((filename == "NONE") || (gammalib::strip_whitespace(filename) == "")) {
+
+        // Setup a new CTA observation
+        GCTAObservation cta_obs = create_cta_obs();
+
+        // Get response if required
+        if (get_response) {
+
+            // Set response
+            set_obs_response(&cta_obs);
+
+        } // endif: response was required
+
+       // Append observation to container
+       obs.append(cta_obs);
+
+    } // endif: filename was "NONE" or ""
+
+    // ... otherwise we have a file name
+    else {
+
+        // If file is a FITS file then create an empty CTA observation
+        // and load file into observation
+        if (GFilename(filename).is_fits()) {
+
+            // Allocate empty CTA observation
+            GCTAObservation cta_obs;
+
+            // Load data
+            cta_obs.load(filename);
+
+            // Get response if required
+            if (get_response) {
+
+                // Set response
+                set_obs_response(&cta_obs);
+
+            } // endif: response was required
+
+            // Append observation to container
+            obs.append(cta_obs);
+
+            // Signal that no XML file should be used for storage
+            m_use_xml = false;
+
+        }
+
+        // ... otherwise load file into observation container
+        else {
+
+            // Load observations from XML file
+            obs.load(filename);
+
+            // Get response if required
+            if (get_response) {
+
+                // For all observations that have no response, set the response
+                // from the task parameters
+                set_response(obs);
+
+            } // endif: response was required
+
+            // Set observation boundary parameters (emin, emax, rad)
+            set_obs_bounds(obs);
+
+            // Signal that XML file should be used for storage
+            m_use_xml = true;
+
+        } // endelse: file was an XML file
+
+    }
+
+    // Return observation container
+    return obs;
 }
 
 
