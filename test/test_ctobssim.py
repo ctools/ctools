@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# This scripts performs unit tests for the ctobssim tool.
+# This scripts performs unit tests for the ctobssim tool
 #
 # Copyright (C) 2014-2016 Juergen Knoedlseder
 #
@@ -165,10 +165,10 @@ class Test(test):
                 {'ra': 82.63, 'dec': 22.01}]
         obs = obsutils.set_obs_list(pnts, caldb=self._caldb, irf=self._irf)
 
-        # Set-up ctobssim from observation container
+        # Set-up ctobssim tool from observation container
         sim = ctools.ctobssim(obs)
-        sim['outevents'] = 'ctobssim_py2.xml'
         sim['inmodel']   = self._model
+        sim['outevents'] = 'ctobssim_py2.xml'
         sim['logfile']   = 'ctobssim_py2.log'
         sim['chatter']   = 3
 
@@ -178,7 +178,7 @@ class Test(test):
         self.test_value(sim.max_rate(), 2*max_rate, 1.0e-3,
                         'Check setting of maximum event rate')
 
-        # Run tool
+        # Run ctobssim tool
         sim.logFileOpen()
         sim.run()
 
@@ -201,30 +201,31 @@ class Test(test):
         self._test_list(obs[2].events(), 5955)
         self._test_list(obs[3].events(), 6030)
 
-        # Set-up ctobssim with invalid event file
-        sim = ctools.ctobssim()
-        sim['inmodel']   = 'model_file_that_does_not_exist.xml'
-        sim['caldb']     = self._caldb
-        sim['irf']       = self._irf
-        sim['ra']        = 83.63
-        sim['dec']       = 22.01
-        sim['rad']       = 10.0
-        sim['tmin']      = 0.0
-        sim['tmax']      = 1800.0
-        sim['emin']      = 0.1
-        sim['emax']      = 100.0
-        sim['outevents'] = 'ctobssim_py3.fits'
-        sim['logfile']   = 'ctobssim_py3.log'
-        sim['chatter']   = 4
+        # Copy ctobssim tool
+        cpy_sim = sim.copy()
 
-        # Run ctbin tool
-        self.test_try('Run ctobssim with invalid model file')
-        try:
-            sim.logFileOpen()
-            sim.run()
-            self.test_try_failure()
-        except:
-            self.test_try_success()
+        # Retrieve observation and check content of copy
+        self._test_observation(cpy_sim, nobs=4, pnts=pnts)
+        self._test_list(cpy_sim.obs()[0].events(), 6003)
+        self._test_list(cpy_sim.obs()[1].events(), 6084)
+        self._test_list(cpy_sim.obs()[2].events(), 5955)
+        self._test_list(cpy_sim.obs()[3].events(), 6030)
+
+        # Execute copy of ctobssim tool again, now with a higher chatter
+        # level than before
+        cpy_sim['outevents'] = 'ctobssim_py3.xml'
+        cpy_sim['logfile']   = 'ctobssim_py3.log'
+        cpy_sim['chatter']   = 4
+        cpy_sim.logFileOpen()  # Needed to get a new log file
+        cpy_sim.execute()
+
+        # Check result file
+        obs = gammalib.GObservations('ctobssim_py3.xml')
+        self.test_value(obs.size(), 4, 'Check for number of observations')
+        self._test_list(obs[0].events(), 6003)
+        self._test_list(obs[1].events(), 6084)
+        self._test_list(obs[2].events(), 5955)
+        self._test_list(obs[3].events(), 6030)
 
         # Return
         return

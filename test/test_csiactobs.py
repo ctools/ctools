@@ -269,6 +269,7 @@ class Test(test):
         self.test_value(obs.size(), obs_expected,
                         'Check for '+str(obs_expected)+' observations in XML file')
         
+        # If there are observations in the XML file then check their content
         if obs_expected > 0:
             
             # Get response
