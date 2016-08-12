@@ -28,7 +28,7 @@
 #define CTLIKELIHOOD_HPP
 
 /* __ Includes ___________________________________________________________ */
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 
@@ -38,7 +38,7 @@
  *
  * @brief Base class for likelihood tools
  ***************************************************************************/
-class ctlikelihood : public ctool {
+class ctlikelihood : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -60,8 +60,7 @@ public:
     virtual void save(void) = 0;
 
     // Methods
-    const GObservations& obs(void) const;
-    const GOptimizer*    opt(void) const;
+    const GOptimizer* opt(void) const;
 
 protected:
     // Protected methods
@@ -71,23 +70,8 @@ protected:
     double evaluate(GModelPar& par, const double& value);
 
     // Protected members
-    GObservations m_obs; //!< Observation container
-    GOptimizerLM  m_opt; //!< Optimizer
+    GOptimizerLM m_opt; //!< Optimizer
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container.
- *
- * Returns a reference to the observation container.
- ***************************************************************************/
-inline
-const GObservations& ctlikelihood::obs(void) const
-{
-    return m_obs;
-}
 
 
 /***********************************************************************//**

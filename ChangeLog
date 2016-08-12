@@ -3,7 +3,7 @@
         * Version 1.2.0 released
         ========================
 
-        Introduce ctlikelihood base class (#1828)
+        Introduce ctobservation and ctlikelihood base classes (#1828)
         Remove ctselect::time_reference() method
         Add ctool and cscript pars() methods (#1838)
         Fix ctbin::save() bug for empty observation container (#1835)

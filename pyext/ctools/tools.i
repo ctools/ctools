@@ -46,6 +46,7 @@
 
 /* __ ctools base classes ________________________________________________ */
 %include "ctool.i"
+%include "ctobservation.i"
 %include "ctlikelihood.i"
 
 /* __ ctools _____________________________________________________________ */

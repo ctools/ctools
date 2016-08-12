@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile.am for ctool base class                                          #
+# Makefile.am for ctool base classes                                        #
 # ------------------------------------------------------------------------- #
 # Copyright (C) 2016 Juergen Knoedlseder                                    #
 # ------------------------------------------------------------------------- #
@@ -20,7 +20,9 @@
 #############################################################################
 
 # Define sources for this directory
-sources = ctool.cpp ctool.hpp ctlikelihood.cpp ctlikelihood.hpp
+sources = ctool.cpp ctool.hpp \
+          ctobservation.cpp ctobservation.hpp \
+          ctlikelihood.cpp ctlikelihood.hpp
 
 # Build libtool library
 noinst_LTLIBRARIES = libsupport.la

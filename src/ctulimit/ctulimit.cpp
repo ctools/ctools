@@ -192,6 +192,7 @@ void ctulimit::clear(void)
     // Free members
     free_members();
     this->ctlikelihood::free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -199,6 +200,7 @@ void ctulimit::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     this->ctlikelihood::init_members();
     init_members();
 

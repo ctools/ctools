@@ -1,5 +1,5 @@
 /***************************************************************************
- *              ctlikelihood - Base class for likelihood tools             *
+ *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2016 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
@@ -19,34 +19,34 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctlikelihood.i
- * @brief Likelihood tool base class interface definition
+ * @file ctobservation.i
+ * @brief Observation tool base class interface definition
  * @author Juergen Knoedlseder
  */
 
 %{
 /* Put headers and other declarations here that are needed for compilation */
-#include "ctlikelihood.hpp"
+#include "ctobservation.hpp"
 %}
 
 
 /***********************************************************************//**
- * @class ctlikelihood
+ * @class ctobservation
  *
  * @brief Base class for likelihood tools
  ***************************************************************************/
-class ctlikelihood : public ctobservation {
+class ctobservation : public ctool {
 
 public:
     // Constructors and destructors
-    ctlikelihood(void);
-    ctlikelihood(const std::string& name, const std::string& version);
-    ctlikelihood(const std::string& name, const std::string& version,
-                 const GObservations& obs);
-    ctlikelihood(const std::string& name, const std::string& version,
-                 int argc, char* argv[]);
-    ctlikelihood(const ctlikelihood& app);
-    virtual ~ctlikelihood(void);
+    ctobservation(void);
+    ctobservation(const std::string& name, const std::string& version);
+    ctobservation(const std::string& name, const std::string& version,
+                  const GObservations& obs);
+    ctobservation(const std::string& name, const std::string& version,
+                  int argc, char* argv[]);
+    ctobservation(const ctobservation& app);
+    virtual ~ctobservation(void);
 
     // Pure virtual methods
     virtual void clear(void) = 0;
@@ -54,12 +54,12 @@ public:
     virtual void save(void) = 0;
 
     // Methods
-    const GOptimizer* opt(void) const;
+    const GObservations& obs(void) const;
 };
 
 
 /***********************************************************************//**
  * @brief Likelihood tool Python extensions
  ***************************************************************************/
-%extend ctlikelihood {
+%extend ctobservation {
 }

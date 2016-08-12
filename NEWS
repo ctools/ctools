@@ -24,10 +24,26 @@ all parameters in a dictionary (#1838).
 
 Support model
 -------------
-The ctlikelihood base class was introduced from which all likelihood ctools
-now derive (ctlike, cttsmap, cterror, ctulimit). This avoids code duplication
-and provides all tools with a standard interface. All tools now have the
-obs() and opt() method (#1828).
+The ctobservation base class that derives from the ctool base class was
+introduced to provide a common base class for all ctools that hold an
+observation container. The class implements the following methods:
+- obs()                        Returns reference to observation container
+- first_unbinned_observation() First unbinned CTA observation in container
+- next_unbinned_observation()  Next unbinned CTA observation in container
+
+The ctlikelihood base class that derives from the ctobservation base class
+was introduced to provide a common base class for all ctools that perform
+maximum likelihood optimisations. The class holds an optimizer member. The
+class implements the following methods:
+- opt()      Returns pointer to optimizer
+- evaluate() Evaluates log-likelihood at a given parameter value
+The following ctools derive from the class:
+- cterror
+- ctlike
+- cttsmap
+- ctulimit
+
+The introduction of these base classes avoids code duplication.
 
 
 ctobssim - CTA observation simulation

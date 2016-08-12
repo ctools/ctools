@@ -1,5 +1,5 @@
 /***************************************************************************
- *              ctlikelihood - Base class for likelihood tools             *
+ *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2016 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
@@ -19,8 +19,8 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctlikelihood.cpp
- * @brief Likelihood tool base class implementation
+ * @file ctobservation.cpp
+ * @brief Observation tool base class implementation
  * @author Juergen Knoedlseder
  */
 
@@ -28,10 +28,9 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include "ctlikelihood.hpp"
+#include "ctobservation.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_EVALUATE              "ctlikelihood::evaluate(GModelPar&, double&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -47,9 +46,9 @@
 /***********************************************************************//**
  * @brief Void constructor
  *
- * Constructs an empty likelihood tool.
+ * Constructs an empty observation tool.
  ***************************************************************************/
-ctlikelihood::ctlikelihood(void) : ctobservation()
+ctobservation::ctobservation(void) : ctool()
 {
     // Initialise members
     init_members();
@@ -62,15 +61,14 @@ ctlikelihood::ctlikelihood(void) : ctobservation()
 /***********************************************************************//**
  * @brief Name constructor
  *
- * @param[in] name Likelihood tool name.
- * @param[in] version Likelihood tool version.
+ * @param[in] name Observation tool name.
+ * @param[in] version Observation tool version.
  *
- * Constructs a likelihood tool from the @p name and @p version. See the
+ * Constructs a observation tool from the @p name and @p version. See the
  * equivalent ctool constructor for details.
  ***************************************************************************/
-ctlikelihood::ctlikelihood(const std::string& name,
-                           const std::string& version) :
-              ctobservation(name, version)
+ctobservation::ctobservation(const std::string& name,
+                             const std::string& version) : ctool(name, version)
 {
     // Initialise members
     init_members();
@@ -83,20 +81,22 @@ ctlikelihood::ctlikelihood(const std::string& name,
 /***********************************************************************//**
  * @brief Observations constructor
  *
- * @param[in] name Likelihood tool name.
- * @param[in] version Likelihood tool version.
+ * @param[in] name Observation tool name.
+ * @param[in] version Observation tool version.
  * param[in] obs Observation container.
  *
- * Constructs a likelihood tool from the @p name, @p version and an
+ * Constructs a observation tool from the @p name, @p version and an
  * observation container.
  ***************************************************************************/
-ctlikelihood::ctlikelihood(const std::string&   name,
-                           const std::string&   version,
-                           const GObservations& obs) :
-              ctobservation(name, version, obs)
+ctobservation::ctobservation(const std::string&   name,
+                             const std::string&   version,
+                             const GObservations& obs) : ctool(name, version)
 {
     // Initialise members
     init_members();
+
+    // Set observations
+    m_obs = obs;
 
     // Return
     return;
@@ -106,19 +106,18 @@ ctlikelihood::ctlikelihood(const std::string&   name,
 /***********************************************************************//**
  * @brief Command line constructor
  *
- * @param[in] name Likelihood tool name.
- * @param[in] version Likelihood tool version.
+ * @param[in] name Observation tool name.
+ * @param[in] version Observation tool version.
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  *
- * Constructs a likelihood tool from the @p name, @p version and command
+ * Constructs a observation tool from the @p name, @p version and command
  * line arguments. See the equivalent ctool constructor for details.
  ***************************************************************************/
-ctlikelihood::ctlikelihood(const std::string& name,
-                           const std::string& version,
-                           int   argc,
-                           char *argv[]) :
-              ctobservation(name, version, argc, argv)
+ctobservation::ctobservation(const std::string& name,
+                             const std::string& version,
+                             int   argc,
+                             char *argv[]) : ctool(name, version, argc, argv)
 {
     // Initialise members
     init_members();
@@ -131,12 +130,12 @@ ctlikelihood::ctlikelihood(const std::string& name,
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app Likelihood tool.
+ * @param[in] app Observation tool.
  *
- * Constructs an instance of a likelihood tool by copying information from
- * another likelihood tool.
+ * Constructs an instance of a observation tool by copying information from
+ * another observation tool.
  ***************************************************************************/
-ctlikelihood::ctlikelihood(const ctlikelihood& app) : ctobservation(app)
+ctobservation::ctobservation(const ctobservation& app) : ctool(app)
 {
     // Initialise members
     init_members();
@@ -152,9 +151,9 @@ ctlikelihood::ctlikelihood(const ctlikelihood& app) : ctobservation(app)
 /***********************************************************************//**
  * @brief Destructor
  *
- * Destructs the likelihood tool.
+ * Destructs the observation tool.
  ***************************************************************************/
-ctlikelihood::~ctlikelihood(void)
+ctobservation::~ctobservation(void)
 {
     // Free members
     free_members();
@@ -173,18 +172,18 @@ ctlikelihood::~ctlikelihood(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Likelihood tool.
- * @return Likelihood tool.
+ * @param[in] app Observation tool.
+ * @return Observation tool.
  *
- * Assigns a likelihood tool.
+ * Assigns a observation tool.
  ***************************************************************************/
-ctlikelihood& ctlikelihood::operator=(const ctlikelihood& app)
+ctobservation& ctobservation::operator=(const ctobservation& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
 
         // Copy base class members
-        this->ctobservation::operator=(app);
+        this->ctool::operator=(app);
 
         // Free members
         free_members();
@@ -218,10 +217,10 @@ ctlikelihood& ctlikelihood::operator=(const ctlikelihood& app)
 /***********************************************************************//**
  * @brief Initialise class members
  ***************************************************************************/
-void ctlikelihood::init_members(void)
+void ctobservation::init_members(void)
 {
     // Initialise members
-    m_opt.clear();
+    m_obs.clear();
 
     // Return
     return;
@@ -231,12 +230,12 @@ void ctlikelihood::init_members(void)
 /***********************************************************************//**
  * @brief Copy class members
  *
- * @param[in] app Likelihood tool.
+ * @param[in] app Observation tool.
  ***************************************************************************/
-void ctlikelihood::copy_members(const ctlikelihood& app)
+void ctobservation::copy_members(const ctobservation& app)
 {
     // Copy members
-    m_opt = app.m_opt;
+    m_obs = app.m_obs;
 
     // Return
     return;
@@ -246,60 +245,8 @@ void ctlikelihood::copy_members(const ctlikelihood& app)
 /***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
-void ctlikelihood::free_members(void)
+void ctobservation::free_members(void)
 {
     // Return
     return;
-}
-
-
-/***********************************************************************//**
- * @brief Evaluates the log-likelihood function
- *
- * @param[in] par Model parameter
- * @param[in] value Model parameter factor value
- * @return Log-likelihood function
- *
- * Evaluates the log-likelihood function at a given @p value.
- ***************************************************************************/
-double ctlikelihood::evaluate(GModelPar& par, const double& value)
-{
-    // Initialise log-likelihood value
-    double logL = 0.0;
-
-    // Throw an exception if the parameter is below the minimum boundary
-    if (value < par.factor_min()) {
-        std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
-                          par.name()+"\" is below its minimum boundary "+
-                          gammalib::str(par.factor_min())+". To omit this "
-                          "error please lower the minimum parameter boundary.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Throw an exception if the parameter is above the maximum boundary
-    if (value > par.factor_max()) {
-        std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
-                          par.name()+"\" is above its maximum boundary "+
-                          gammalib::str(par.factor_max())+". To omit this "
-                          "error please raise the maximum parameter boundary.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Change parameter factor
-    par.factor_value(value);
-
-    // Fix parameter
-    par.fix();
-
-    // Re-optimize log-likelihood
-    m_obs.optimize(m_opt);
-
-    // Free parameter
-    par.free();
-
-    // Retrieve log-likelihood
-    logL = m_obs.logL();
-
-    // Return log-likelihood
-    return logL;
 }
