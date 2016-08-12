@@ -60,27 +60,20 @@ class cstsdist(ctools.cscript):
     # Private methods
     def _get_parameters(self):
         """
-        Get parameters from parfile and setup the observation.
+        Get parameters from parfile and setup the observation
         """
         # Set observation if not done before
-        if self._obs == None or self._obs.size() == 0:
+        if self._obs.size() == 0:
             self._obs = self._get_observations()
 
-            # Check for requested pattern and use above observation parameters
-            # to set wobble pattern
+            # Check for requested pattern and set wobble pattern
             if self['pattern'].string() == 'four':
-                self._obs = obsutils.set_observations(self['ra'].real(),
-                                                      self['dec'].real(),
-                                                      self['rad'].real(),
-                                                      self['tmin'].real(),
-                                                      self['tmax'].real(),
-                                                      self['emin'].real(),
-                                                      self['emax'].real(),
-                                                      self['irf'].string(),
-                                                      self['caldb'].string(),
+                self._obs = obsutils.set_observations(self['ra'].real(), self['dec'].real(), self['rad'].real(),
+                                                      self['tmin'].real(), self['tmax'].real(),
+                                                      self['emin'].real(), self['emax'].real(),
+                                                      self['irf'].string(), self['caldb'].string(),
                                                       deadc=self['deadc'].real(),
-                                                      pattern=self['pattern'].string(),
-                                                      offset=self['offset'].real())
+                                                      pattern=self['pattern'].string(), offset=self['offset'].real())
 
         # Get source name
         self._srcname = self['srcname'].string()

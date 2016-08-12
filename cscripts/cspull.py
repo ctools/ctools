@@ -51,7 +51,6 @@ class cspull(ctools.cscript):
         self._ntrials     = 0
         self._npix        = 0
         self._binsz       = 0.0
-        self._pattern     = 'single'
         self._enumbins    = 0
         self._seed        = 1
         self._chatter     = 2
@@ -75,25 +74,17 @@ class cspull(ctools.cscript):
         if self._obs.size() == 0:
             self._obs = self._get_observations()
 
-            # Check for requested pattern and use above
-            # observation parameters to set wobble pattern
-            self._pattern = self['pattern'].string()
-            if self._pattern == 'four':
-                self._obs = obsutils.set_observations(self['ra'].real(),
-                                                      self['dec'].real(),
-                                                      self['rad'].real(),
-                                                      self['tmin'].real(),
-                                                      self['tmax'].real(),
-                                                      self['emin'].real(),
-                                                      self['emax'].real(),
-                                                      self['irf'].string(),
-                                                      self['caldb'].string(),
+            # Check for requested pattern and set wobble pattern
+            if self['pattern'].string() == 'four':
+                self._obs = obsutils.set_observations(self['ra'].real(), self['dec'].real(), self['rad'].real(),
+                                                      self['tmin'].real(), self['tmax'].real(),
+                                                      self['emin'].real(), self['emax'].real(),
+                                                      self['irf'].string(), self['caldb'].string(),
                                                       deadc=self['deadc'].real(),
-                                                      pattern=self['pattern'].string(),
-                                                      offset=self['offset'].real())
+                                                      pattern=self['pattern'].string(), offset=self['offset'].real())
 
         # ... otherwise add response information and energy boundaries
-        # in case they are missing.
+        # in case they are missing
         else:
             self._setup_observations(self._obs)
 
