@@ -34,7 +34,8 @@
  *
  * @brief TS map calculation tool
  ***************************************************************************/
-class cttsmap : public ctool {
+class cttsmap : public ctlikelihood {
+
 public:
     // Constructors and destructors
     cttsmap(void);
@@ -44,12 +45,11 @@ public:
     virtual ~cttsmap(void);
     
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
-    const GSkyMap&       tsmap(void) const;
+    void           clear(void);
+    void           run(void);
+    void           save(void);
+    void           publish(const std::string& name = "");
+    const GSkyMap& tsmap(void) const;
 };
 
 

@@ -168,8 +168,8 @@ CLEANFILES = $(CLEAN_FILES) $(DEPFILES)
 # Files to be removed in build directory
 clean-local:
 	rm -rf build
-	rm -rf $(builddir)/ctools/*.py
-	rm -rf $(builddir)/ctools/*.pyc
+	rm -rf $(builddir)/ctools/c*.py
+	rm -rf $(builddir)/ctools/c*.pyc
 	rm -rf $(builddir)/ctools/*_wrap.cpp
 	rm -rf $(builddir)/ctools/_tools.so
 	rm -rf $(builddir)/ctools/__pycache__

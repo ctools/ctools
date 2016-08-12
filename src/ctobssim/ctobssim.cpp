@@ -1039,10 +1039,11 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
  * @brief Simulate source events for a time slice
  *
  * @param[in] obs Pointer on CTA observation.
+ * @param[in] rsp Pointer on CTA response.
  * @param[in,out] events Pointer on CTA event list.
- * @param[in] models Model list.
- * @param[in] tmin Start time.
- * @param[in] tmax Stop time.
+ * @param[in] model Model.
+ * @param[in] tstart Start time.
+ * @param[in] tstop Stop time.
  * @param[in] etrue_min Minimum true energy.
  * @param[in] etrue_max Maximum true energy.
  * @param[in] ereco_min Minimum reconstructed energy.

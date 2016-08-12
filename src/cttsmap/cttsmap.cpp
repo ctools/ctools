@@ -48,8 +48,10 @@
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty cttsmap tool.
  ***************************************************************************/
-cttsmap::cttsmap(void) : ctool(CTTSMAP_NAME, CTTSMAP_VERSION)
+cttsmap::cttsmap(void) : ctlikelihood(CTTSMAP_NAME, CTTSMAP_VERSION)
 {
     // Initialise members
     init_members();
@@ -64,22 +66,17 @@ cttsmap::cttsmap(void) : ctool(CTTSMAP_NAME, CTTSMAP_VERSION)
  *
  * param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs cttsmap tool from an observations container.
  ***************************************************************************/
 cttsmap::cttsmap(const GObservations& obs) :
-         ctool(CTTSMAP_NAME, CTTSMAP_VERSION)
+         ctlikelihood(CTTSMAP_NAME, CTTSMAP_VERSION, obs)
 {
     // Initialise members
     init_members();
 
-    // Set observations
-    m_obs = obs;
-
     // Return
     return;
 }
-
 
 
 /***********************************************************************//**
@@ -87,9 +84,12 @@ cttsmap::cttsmap(const GObservations& obs) :
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs an instance of the cttsmap tool that will parse user parameters
+ * that are provided as command line arguments.
  ***************************************************************************/
 cttsmap::cttsmap(int argc, char *argv[]) :
-         ctool(CTTSMAP_NAME, CTTSMAP_VERSION, argc, argv)
+         ctlikelihood(CTTSMAP_NAME, CTTSMAP_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -104,7 +104,7 @@ cttsmap::cttsmap(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-cttsmap::cttsmap(const cttsmap& app) : ctool(app)
+cttsmap::cttsmap(const cttsmap& app) : ctlikelihood(app)
 {
     // Initialise members
     init_members();
@@ -148,7 +148,7 @@ cttsmap& cttsmap::operator=(const cttsmap& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctlikelihood::operator=(app);
 
         // Free members
         free_members();
@@ -181,6 +181,7 @@ void cttsmap::clear(void)
 {
     // Free members
     free_members();
+    this->ctlikelihood::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -188,6 +189,7 @@ void cttsmap::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctlikelihood::init_members();
     init_members();
 
     // Write header into logger
@@ -232,9 +234,13 @@ void cttsmap::run(void)
     int binmin = (m_binmin == -1) ? 0 : m_binmin;
     int binmax = (m_binmax == -1) ? m_tsmap.npix() : m_binmax;
 
-    // Initialise optimizer
-    GOptimizerLM* opt = (logExplicit()) ? new GOptimizerLM(&log)
-                                        : new GOptimizerLM();
+    // Set optimizer logger
+    if (logExplicit()) {
+        static_cast<GOptimizerLM*>(&m_opt)->logger(&log);
+    }
+    else {
+        static_cast<GOptimizerLM*>(&m_opt)->logger(NULL);
+    }
 
     // Store initial models
     GModels models_orig = m_obs.models();
@@ -253,8 +259,8 @@ void cttsmap::run(void)
 
         // Compute likelihood without the test source
         m_obs.models(models);
-        m_obs.optimize(*opt);
-        m_logL0 = -(opt->value());
+        m_obs.optimize(m_opt);
+        m_logL0 = -(m_opt.value());
 
 	}
 
@@ -280,10 +286,10 @@ void cttsmap::run(void)
     	m_obs.models(models);
 
     	// Optimize observation container
-    	m_obs.optimize(*opt);
+    	m_obs.optimize(m_opt);
 
     	// Retrieve the Likelihood value
-    	double logL1 = -(opt->value());
+    	double logL1 = -(m_opt.value());
 
     	// Compute TS value
     	double ts = 2.0 * (logL1 - m_logL0);
@@ -431,7 +437,6 @@ void cttsmap::init_members(void)
     m_publish     = false;
 
     // Initialise protected members
-    m_obs.clear();
     m_binmin     = -1;
     m_binmax     = -1;
     m_logL0      = 0.0;
@@ -463,11 +468,10 @@ void cttsmap::copy_members(const cttsmap& app)
     m_binmin    = app.m_binmin;
     m_binmax    = app.m_binmax;
     m_logL0     = app.m_logL0;
-    m_obs       = app.m_obs;
     m_tsmap     = app.m_tsmap;
+    m_statusmap = app.m_statusmap;
     m_mapnames  = app.m_mapnames;
     m_maps      = app.m_maps;
-    m_statusmap = app.m_statusmap;
 
     // Clone protected members
     m_testsource = (app.m_testsource != NULL) ? app.m_testsource->clone()

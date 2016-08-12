@@ -37,7 +37,13 @@
 /***********************************************************************//**
  * @class ctool
  *
- * @brief ctool base class
+ * @brief Base class for ctools
+ *
+ * This class is the generic base class for all ctools. It enforces
+ * implementation of the clear(), run() and save() methods by all ctools,
+ * and it implements the execute() method.
+ *
+ * The class also provides a number of helper methods for ctools.
  ***************************************************************************/
 class ctool : public GApplication  {
 public:

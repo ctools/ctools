@@ -44,8 +44,11 @@
 %import(module="gammalib.base") "GBase.i";
 %import(module="gammalib.app")  "GApplication.i";
 
-/* __ ctools _____________________________________________________________ */
+/* __ ctools base classes ________________________________________________ */
 %include "ctool.i"
+%include "ctlikelihood.i"
+
+/* __ ctools _____________________________________________________________ */
 %include "ctbin.i"
 %include "ctobssim.i"
 %include "ctlike.i"

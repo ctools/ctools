@@ -1,7 +1,7 @@
 /***************************************************************************
  *                 cterror - Parameter error calculation tool              *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015 by Florent Forest                                   *
+ *  copyright (C) 2015-2016 by Florent Forest                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,9 +34,8 @@
  * @class cterror
  *
  * @brief Parameter error calculation tool
- *
  ***************************************************************************/
-class cterror : public ctool {
+class cterror : public ctlikelihood {
 
 public:
     // Constructors and destructors
@@ -47,11 +46,9 @@ public:
     virtual ~cterror(void);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GOptimizer*    opt(void) const;
+    void clear(void);
+    void run(void);
+    void save(void);
 };
 
 

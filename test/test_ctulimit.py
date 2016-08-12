@@ -103,9 +103,9 @@ class Test(test):
         ulimit = ctools.ctulimit()
 
         # Check that empty ctulimit tool holds zero upper limits
-        self.test_value(ulimit.diff_ulimit(), 0.0, 1.0e-23,
+        self.test_value(ulimit.diff_ulimit(), 0.0, 1.0e-21,
                         'Check differential upper limit')
-        self.test_value(ulimit.flux_ulimit(), 0.0, 1.0e-17,
+        self.test_value(ulimit.flux_ulimit(), 0.0, 1.0e-16,
                         'Check upper limit on photon flux')
         self.test_value(ulimit.eflux_ulimit(), 0.0, 1.0e-16,
                         'Check upper limit on energy flux')
@@ -132,9 +132,9 @@ class Test(test):
         ulimit.save()
 
         # Check results
-        self.test_value(ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+        self.test_value(ulimit.diff_ulimit(), 8.86803e-18, 1.0e-21,
                         'Check differential upper limit')
-        self.test_value(ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
+        self.test_value(ulimit.flux_ulimit(), 6.10509e-12, 1.0e-16,
                         'Check upper limit on photon flux')
         self.test_value(ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
@@ -150,10 +150,10 @@ class Test(test):
         cpy_ulimit = ulimit.copy()
 
         # Check results of copy
-        self.test_value(cpy_ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+        self.test_value(cpy_ulimit.diff_ulimit(), 8.86803e-18, 1.0e-21,
                         'Check differential upper limit')
-        self.test_value(cpy_ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
-                        'ulimit upper limit on photon flux')
+        self.test_value(cpy_ulimit.flux_ulimit(), 6.10509e-12, 1.0e-16,
+                        'Check upper limit on photon flux')
         self.test_value(cpy_ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
 
@@ -165,10 +165,10 @@ class Test(test):
         cpy_ulimit.execute()
 
         # Check results
-        self.test_value(cpy_ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+        self.test_value(cpy_ulimit.diff_ulimit(), 8.86803e-18, 1.0e-21,
                         'Check differential upper limit')
-        self.test_value(cpy_ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
-                        'ulimit upper limit on photon flux')
+        self.test_value(cpy_ulimit.flux_ulimit(), 6.10509e-12, 1.0e-16,
+                        'Check upper limit on photon flux')
         self.test_value(cpy_ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
 
@@ -179,9 +179,9 @@ class Test(test):
         cpy_ulimit.clear()
 
         # Check that empty ctulimit tool holds zero upper limits
-        self.test_value(cpy_ulimit.diff_ulimit(), 0.0, 1.0e-23,
+        self.test_value(cpy_ulimit.diff_ulimit(), 0.0, 1.0e-21,
                         'Check differential upper limit')
-        self.test_value(cpy_ulimit.flux_ulimit(), 0.0, 1.0e-17,
+        self.test_value(cpy_ulimit.flux_ulimit(), 0.0, 1.0e-16,
                         'Check upper limit on photon flux')
         self.test_value(cpy_ulimit.eflux_ulimit(), 0.0, 1.0e-16,
                         'Check upper limit on energy flux')
@@ -190,11 +190,7 @@ class Test(test):
         # time. This should avoid the necessity to recompute the maximum
         # likelihood
         ulimit = ctools.ctulimit(obs)
-        #ulimit['inobs']   = self._events
-        #ulimit['inmodel'] = self._model
         ulimit['srcname'] = 'Crab'
-        #ulimit['caldb']   = self._caldb
-        #ulimit['irf']     = self._irf
         ulimit['logfile'] = 'ctulimit_py3.log'
         ulimit['chatter'] = 4
 
@@ -203,10 +199,10 @@ class Test(test):
         ulimit.execute()
 
         # Check results
-        self.test_value(ulimit.diff_ulimit(), 8.86803e-18, 1.0e-23,
+        self.test_value(ulimit.diff_ulimit(), 8.86803e-18, 1.0e-21,
                         'Check differential upper limit')
-        self.test_value(ulimit.flux_ulimit(), 6.10509e-12, 1.0e-17,
-                        'ulimit upper limit on photon flux')
+        self.test_value(ulimit.flux_ulimit(), 6.10509e-12, 1.0e-16,
+                        'Check upper limit on photon flux')
         self.test_value(ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
 

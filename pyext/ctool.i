@@ -62,7 +62,7 @@ public:
 /***********************************************************************//**
  * @class ctool
  *
- * @brief ctool base class
+ * @brief Base class for ctools
  ***************************************************************************/
 class ctool : public GApplication  {
 public:

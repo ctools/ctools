@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2014 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2016 by Jurgen Knodlseder                           *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
  *
  * @brief Maximum likelihood fitting tool
  ***************************************************************************/
-class ctlike : public ctool {
+class ctlike : public ctlikelihood {
 public:
     // Constructors and destructors
     ctlike(void);
@@ -44,11 +44,9 @@ public:
     virtual ~ctlike(void);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GOptimizer*    opt(void) const;
+    void clear(void);
+    void run(void);
+    void save(void);
 };
 
 

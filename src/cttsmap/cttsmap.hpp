@@ -28,9 +28,7 @@
 #define CTTSMAP_HPP
 
 /* __ Includes ___________________________________________________________ */
-#include "GammaLib.hpp"
-#include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTTSMAP_NAME    "cttsmap"
@@ -55,7 +53,7 @@
  * grid of coordinates. The best fit results (TS, flux, index) are stored in
  * maps which are saved in the output FITS files.
  ***************************************************************************/
-class cttsmap : public ctool {
+class cttsmap : public ctlikelihood {
 
 public:
     // Constructors and destructors
@@ -69,12 +67,11 @@ public:
     cttsmap& operator=(const cttsmap& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
-    const GSkyMap&       tsmap(void) const;
+    void           clear(void);
+    void           run(void);
+    void           save(void);
+    void           publish(const std::string& name = "");
+    const GSkyMap& tsmap(void) const;
 
 protected:
     // Protected methods
@@ -96,25 +93,12 @@ protected:
     double                   m_logL0;       //!< Likelihood value of null hypothesis
 
     // Protected members
-    GObservations            m_obs;         //!< Observation container
     GSkyMap                  m_tsmap;       //!< TS map
     GSkyMap                  m_statusmap;   //!< Map of computed bins
     std::vector<std::string> m_mapnames;    //!< Names of free parameters
     std::vector<GSkyMap>     m_maps;        //!< Sky maps for each free parameter
     GModel*                  m_testsource;  //!< Pointer to test source for TS computation
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-inline
-const GObservations& cttsmap::obs(void) const
-{
-    return m_obs;
-}
 
 
 /***********************************************************************//**

@@ -35,7 +35,6 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_ERR_BISECTION         "cterror::error_bisection(double&, double&)"
-#define G_EVALUATE                              "cterror::evaluate(double&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -53,7 +52,7 @@
  *
  * Constructs an empty cterror tool.
  ***************************************************************************/
-cterror::cterror(void) : ctool(CTERROR_NAME, CTERROR_VERSION)
+cterror::cterror(void) : ctlikelihood(CTERROR_NAME, CTERROR_VERSION)
 {
     // Initialise members
     init_members();
@@ -68,22 +67,17 @@ cterror::cterror(void) : ctool(CTERROR_NAME, CTERROR_VERSION)
  *
  * param[in] obs Observation container.
  *
- * Constructs an instance of the cterror tool that will operate on the
- * provided observation container.
+ * Constructs cterror tool from an observations container.
  ***************************************************************************/
 cterror::cterror(const GObservations& obs) :
-         ctool(CTERROR_NAME, CTERROR_VERSION)
+         ctlikelihood(CTERROR_NAME, CTERROR_VERSION, obs)
 {
     // Initialise members
     init_members();
 
-    // Set observations
-    m_obs = obs;
-
     // Return
     return;
 }
-
 
 
 /***********************************************************************//**
@@ -96,7 +90,7 @@ cterror::cterror(const GObservations& obs) :
  * parameters that are provided as command line arguments.
  ***************************************************************************/
 cterror::cterror(int argc, char *argv[]) :
-         ctool(CTERROR_NAME, CTERROR_VERSION, argc, argv)
+         ctlikelihood(CTERROR_NAME, CTERROR_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -114,7 +108,7 @@ cterror::cterror(int argc, char *argv[]) :
  * Constructs an instance of the cterror tool by copying information from
  * another ctulimit tool.
  ***************************************************************************/
-cterror::cterror(const cterror& app) : ctool(app)
+cterror::cterror(const cterror& app) : ctlikelihood(app)
 {
     // Initialise members
     init_members();
@@ -162,7 +156,7 @@ cterror& cterror::operator=(const cterror& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctlikelihood::operator=(app);
 
         // Free members
         free_members();
@@ -195,6 +189,7 @@ void cterror::clear(void)
 {
     // Free members
     free_members();
+    this->ctlikelihood::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -202,6 +197,7 @@ void cterror::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctlikelihood::init_members();
     init_members();
 
     // Write header into logger
@@ -384,19 +380,17 @@ void cterror::init_members(void)
     // Initialise user parameters
     m_srcname.clear();
     m_outmodel.clear();
-    m_confidence = 0.68;
-    m_tol        = 1.0e-3;
-    m_max_iter   = 50;
-    m_value      = 0.0;
-    m_chatter    = static_cast<GChatter>(2);
+    m_confidence  = 0.68;
+    m_tol         = 1.0e-3;
+    m_max_iter    = 50;
+    m_apply_edisp = false;
+    m_chatter     = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
-    m_opt.clear();
+    m_value       = 0.0;
     m_dlogL       = 0.0;
     m_best_logL   = 0.0;
     m_model_par   = NULL;
-    m_apply_edisp = false;
 
     // Set optimizer parameters
     m_opt.max_iter(m_max_iter);
@@ -424,10 +418,9 @@ void cterror::copy_members(const cterror& app)
     m_chatter     = app.m_chatter;
 
     // Copy protected members
-    m_obs       = app.m_obs;
+    m_value     = app.m_value;
     m_dlogL     = app.m_dlogL;
     m_best_logL = app.m_best_logL;
-    m_opt       = app.m_opt;
     m_model_par = NULL;
 
     // Return
@@ -548,7 +541,7 @@ double cterror::error_bisection(const double& min, const double& max)
         mid = (wrk_min + wrk_max) / 2.0;
 
         // Calculate function value
-        double eval_mid = evaluate(mid);
+        double eval_mid = evaluate(*m_model_par, mid) - (m_best_logL + m_dlogL);
 
         // Write interval into logger
         log_value(EXPLICIT, "  Iteration "+gammalib::str(iter),
@@ -596,54 +589,4 @@ double cterror::error_bisection(const double& min, const double& max)
     // Return mid value
     return mid;
 
-}
-
-
-/***********************************************************************//**
- * @brief Evaluates the log-likelihood
- *
- * @param[in] value Parameter factor value
- * @return Log-likelihood value
- *
- * Evaluates the log-likelihood as a function of the parameter of interest.
- ***************************************************************************/
-double cterror::evaluate(const double& value)
-{
-    // Initialise log-likelihood value
-    double logL = 0.0;
-
-    // Check if given parameter is within boundaries
-    if (value > m_model_par->factor_min() && value < m_model_par->factor_max()) {
-
-        // Change parameter factor
-        m_model_par->factor_value(value);
-
-        // Fix parameter
-        m_model_par->fix();
-
-        // Re-optimize
-        m_obs.optimize(m_opt);
-
-        // Retrieve likelihood
-        logL = m_obs.logL();
-
-        // Free parameter
-        m_model_par->free();
-
-    } // endif: value was inside allowed range
-
-    // ... otherwise signal that the parameter went outside the boundaries
-    else {
-        std::string msg = "Value of parameter \""+m_model_par->name()+"\" "
-                          "outside of validity range requested. To omit "
-                          "this error please enlarge the parameter range "
-                          "in the model XML file.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Compute function value
-    double logL_difference = logL - m_best_logL - m_dlogL;
-
-    // Return
-    return logL_difference;
 }

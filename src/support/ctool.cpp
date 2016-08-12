@@ -1655,8 +1655,8 @@ GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
 /***********************************************************************//**
  * @brief Determine the counts cube layer usage.
  *
- * @param[in] ebounds_cube Energy boundaries of the counts cube.
- * @param[in] ebounds_list Energy boundaries of the event list.
+ * @param[in] cube_ebounds Energy boundaries of the counts cube.
+ * @param[in] list_ebounds Energy boundaries of the event list.
  * @return Vector of usage flags.
  *
  * Determines a vector of counts cube layer usage flags that signal whether

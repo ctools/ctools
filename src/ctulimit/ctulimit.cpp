@@ -36,7 +36,6 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_MODEL_PARAMETER               "ctulimit::get_model_parameter()"
 #define G_UL_BISECTION             "ctulimit::ul_bisection(double&, double&)"
-#define G_EVALUATE                              "ctulimit::evaluate(double&)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -54,7 +53,7 @@
  *
  * Constructs an empty ctulimit tool.
  ***************************************************************************/
-ctulimit::ctulimit(void) : ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
+ctulimit::ctulimit(void) : ctlikelihood(CTULIMIT_NAME, CTULIMIT_VERSION)
 {
     // Initialise members
     init_members();
@@ -69,17 +68,13 @@ ctulimit::ctulimit(void) : ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
  *
  * param[in] obs Observation container.
  *
- * Constructs an instance of the ctulimit tool that will operate on the
- * provided observation container.
+ * Constructs ctulimit tool from an observations container.
  ***************************************************************************/
 ctulimit::ctulimit(const GObservations& obs) :
-          ctool(CTULIMIT_NAME, CTULIMIT_VERSION)
+          ctlikelihood(CTULIMIT_NAME, CTULIMIT_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -97,7 +92,7 @@ ctulimit::ctulimit(const GObservations& obs) :
  * parameters that are provided as command line arguments.
  ***************************************************************************/
 ctulimit::ctulimit(int argc, char *argv[]) :
-          ctool(CTULIMIT_NAME, CTULIMIT_VERSION, argc, argv)
+          ctlikelihood(CTULIMIT_NAME, CTULIMIT_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -115,7 +110,7 @@ ctulimit::ctulimit(int argc, char *argv[]) :
  * Constructs an instance of the ctulimit tool by copying information from
  * another ctulimit tool.
  ***************************************************************************/
-ctulimit::ctulimit(const ctulimit& app) : ctool(app)
+ctulimit::ctulimit(const ctulimit& app) : ctlikelihood(app)
 {
     // Initialise members
     init_members();
@@ -163,7 +158,7 @@ ctulimit& ctulimit::operator=(const ctulimit& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctlikelihood::operator=(app);
 
         // Free members
         free_members();
@@ -196,6 +191,7 @@ void ctulimit::clear(void)
 {
     // Free members
     free_members();
+    this->ctlikelihood::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -203,6 +199,7 @@ void ctulimit::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctlikelihood::init_members();
     init_members();
 
     // Write header into logger
@@ -378,8 +375,6 @@ void ctulimit::init_members(void)
     m_chatter     = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
-    m_opt.clear();
     m_dlogL        = 0.0;
     m_skymodel     = NULL;
     m_model_par    = NULL;
@@ -418,13 +413,11 @@ void ctulimit::copy_members(const ctulimit& app)
     m_chatter     = app.m_chatter;
 
     // Copy protected members
-    m_obs          = app.m_obs;
     m_dlogL        = app.m_dlogL;
     m_best_logL    = app.m_best_logL;
     m_diff_ulimit  = app.m_diff_ulimit;
     m_flux_ulimit  = app.m_flux_ulimit;
     m_eflux_ulimit = app.m_eflux_ulimit;
-    m_opt          = app.m_opt;
 
     // Extract model parameter
     get_model_parameter();
@@ -609,7 +602,7 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
         double mid = (wrk_min + wrk_max) / 2.0;
 
         // Calculate function value
-        double eval_mid = evaluate(mid);
+        double eval_mid = evaluate(*m_model_par, mid) - (m_best_logL + m_dlogL);
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
@@ -632,54 +625,4 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
     // Return
     return;
 
-}
-
-
-/***********************************************************************//**
- * @brief Evaluates the log-likelihood
- *
- * @param[in] value Parameter factor value
- * @return Log-likelihood value
- *
- * Evaluates the log-likelihood as a function of the parameter of interest.
- ***************************************************************************/
-double ctulimit::evaluate(const double& value)
-{
-    // Initialise log-likelihood value
-    double logL = 0.0;
-
-    // Check if given parameter is within boundaries
-    if (value > m_model_par->factor_min() && value < m_model_par->factor_max()) {
-
-        // Change parameter factor
-        m_model_par->factor_value(value);
-
-        // Fix parameter
-        m_model_par->fix();
-
-        // Re-optimize
-        m_obs.optimize(m_opt);
-
-        // Retrieve likelihood
-        logL = m_obs.logL();
-
-        // Free parameter
-        m_model_par->free();
-
-    } // endif: value was inside allowed range
-
-    // ... otherwise signal that the parameter went outside the boundaries
-    else {
-        std::string msg = "Value of parameter \""+m_model_par->name()+"\" "
-                          "outside of validity range requested. To omit "
-                          "this error please enlarge the parameter range "
-                          "in the model XML file.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Compute function value
-    double logL_difference = logL - m_best_logL - m_dlogL;
-
-    // Return
-    return logL_difference;
 }

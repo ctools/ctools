@@ -28,14 +28,11 @@
 #define CTLIKE_HPP
 
 /* __ Includes ___________________________________________________________ */
-#include <string>
-#include "GammaLib.hpp"
-#include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTLIKE_NAME    "ctlike"
-#define CTLIKE_VERSION "1.1.0"
+#define CTLIKE_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -43,7 +40,7 @@
  *
  * @brief Maximum likelihood fitting tool
  ***************************************************************************/
-class ctlike : public ctool {
+class ctlike : public ctlikelihood {
 
 public:
     // Constructors and destructors
@@ -57,11 +54,9 @@ public:
     ctlike& operator=(const ctlike& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GOptimizer*    opt(void) const;
+    void clear(void);
+    void run(void);
+    void save(void);
 
 protected:
     // Protected methods
@@ -80,35 +75,9 @@ protected:
     GChatter      m_chatter;         //!< Chattiness
 
     // Members
-    GObservations m_obs;        //!< Observations
     int           m_max_iter;   //!< Maximum number of iterations
     int           m_max_stall;  //!< Maximum number of stalls
     double        m_logL;       //!< Maximum log likelihood
-    GOptimizer*   m_opt;        //!< Optimizer
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-inline
-const GObservations& ctlike::obs(void) const
-{
-    return m_obs;
-}
-
-
-/***********************************************************************//**
- * @brief Return optimizer
- *
- * @return Pointer to optimizer
- ***************************************************************************/
-inline
-const GOptimizer* ctlike::opt(void) const
-{
-    return m_opt;
-}
 
 #endif /* CTLIKE_HPP */

@@ -24,7 +24,10 @@ all parameters in a dictionary (#1838).
 
 Support model
 -------------
-None
+The ctlikelihood base class was introduced from which all likelihood ctools
+now derive (ctlike, cttsmap, cterror, ctulimit). This avoids code duplication
+and provides all tools with a standard interface. All tools now have the
+obs() and opt() method (#1828).
 
 
 ctobssim - CTA observation simulation
@@ -57,11 +60,15 @@ ctlike - Maximum likelihood fitting
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
 
+The class now derives from ctlikelihood (#1828).
+
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
+
+The class now derives from ctlikelihood (#1828).
 
 
 ctskymap - CTA sky mapping
@@ -134,11 +141,15 @@ of the tool (#1835).
 The tool now also supports spectral models with the new naming conventions, and
 in particular the "PhotonFlux" and "EnergyFlux" names (#1832).
 
+The class now derives from ctlikelihood (#1828).
+
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
+
+The class now derives from ctlikelihood (#1828).
 
 
 cscripts

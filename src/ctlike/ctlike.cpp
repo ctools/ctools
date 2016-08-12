@@ -48,7 +48,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctlike::ctlike(void) : ctool(CTLIKE_NAME, CTLIKE_VERSION)
+ctlike::ctlike(void) : ctlikelihood(CTLIKE_NAME, CTLIKE_VERSION)
 {
     // Initialise members
     init_members();
@@ -63,16 +63,13 @@ ctlike::ctlike(void) : ctool(CTLIKE_NAME, CTLIKE_VERSION)
  *
  * param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs ctlike tool from an observations container.
  ***************************************************************************/
-ctlike::ctlike(const GObservations& obs) : ctool(CTLIKE_NAME, CTLIKE_VERSION)
+ctlike::ctlike(const GObservations& obs) :
+        ctlikelihood(CTLIKE_NAME, CTLIKE_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -84,9 +81,12 @@ ctlike::ctlike(const GObservations& obs) : ctool(CTLIKE_NAME, CTLIKE_VERSION)
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs an instance of the ctlike tool that will parse user parameters
+ * that are provided as command line arguments.
  ***************************************************************************/
 ctlike::ctlike(int argc, char *argv[]) : 
-        ctool(CTLIKE_NAME, CTLIKE_VERSION, argc, argv)
+        ctlikelihood(CTLIKE_NAME, CTLIKE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -101,7 +101,7 @@ ctlike::ctlike(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctlike::ctlike(const ctlike& app) : ctool(app)
+ctlike::ctlike(const ctlike& app) : ctlikelihood(app)
 {
     // Initialise members
     init_members();
@@ -145,7 +145,7 @@ ctlike& ctlike::operator=(const ctlike& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctlikelihood::operator=(app);
 
         // Free members
         free_members();
@@ -178,6 +178,7 @@ void ctlike::clear(void)
 {
     // Free members
     free_members();
+    this->ctlikelihood::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -185,6 +186,7 @@ void ctlike::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctlikelihood::init_members();
     init_members();
 
     // Write header into logger
@@ -291,7 +293,7 @@ void ctlike::run(void)
 
     // Write results into logger
     log_header1(NORMAL, "Maximum likelihood optimisation results");
-    log_string(NORMAL, m_opt->print(m_chatter));
+    log_string(NORMAL, m_opt.print(m_chatter));
     log_value(NORMAL, "Maximum log likelihood", gammalib::str(m_logL,3));
     log_value(NORMAL, "Observed events  (Nobs)", gammalib::str(num_events,3));
     log_value(NORMAL, "Predicted events (Npred)", gammalib::str(npred,3)+
@@ -398,10 +400,10 @@ void ctlike::get_parameters(void)
 
     // Set optimizer logger
     if (logNormal()) {
-        static_cast<GOptimizerLM*>(m_opt)->logger(&log);
+        static_cast<GOptimizerLM*>(&m_opt)->logger(&log);
     }
     else {
-        static_cast<GOptimizerLM*>(m_opt)->logger(NULL);
+        static_cast<GOptimizerLM*>(&m_opt)->logger(NULL);
     }
 
     // Write parameters into logger
@@ -442,7 +444,7 @@ void ctlike::optimize_lm(void)
     }
 
     // Perform LM optimization
-    m_obs.optimize(*m_opt);
+    m_obs.optimize(m_opt);
 
     // Optionally refit
     if (m_refit) {
@@ -453,7 +455,7 @@ void ctlike::optimize_lm(void)
         log.indent(1);
 
         // Optimise again
-        m_obs.optimize(*m_opt);
+        m_obs.optimize(m_opt);
 
     }
 
@@ -464,10 +466,10 @@ void ctlike::optimize_lm(void)
                                     (m_obs.function()).curvature())->print());
 
     // Compute errors
-    m_obs.errors(*m_opt);
+    m_obs.errors(m_opt);
 
     // Store maximum log likelihood value
-    m_logL = -(m_opt->value());
+    m_logL = -(m_opt.value());
 
     // Remove indent
     log.indent(0);
@@ -490,7 +492,7 @@ double ctlike::reoptimize_lm(void)
     log.indent(1);
 
     // Create a clone of the optimizer for the re-optimisation
-    GOptimizer* opt = m_opt->clone();
+    GOptimizer* opt = m_opt.clone();
 
     // Perform LM optimization
     m_obs.optimize(*opt);
@@ -526,12 +528,10 @@ void ctlike::init_members(void)
 {
     // Initialise members
     m_outmodel.clear();
-    m_obs.clear();
     m_refit           = false;
     m_max_iter        = 100;   // Set maximum number of iterations
     m_max_stall       = 10;    // Set maximum number of stalls
     m_logL            = 0.0;
-    m_opt             = NULL;
     m_apply_edisp     = false;
     m_fix_spat_for_ts = false;
     m_chatter         = static_cast<GChatter>(2);
@@ -539,15 +539,9 @@ void ctlike::init_members(void)
     // Set logger properties
     log.date(true);
 
-    // Allocate LM optimizer
-    GOptimizerLM* opt = new GOptimizerLM();
-
     // Set optimizer parameters
-    opt->max_iter(m_max_iter);
-    opt->max_stalls(m_max_stall);
-
-    // Set optimizer pointer
-    m_opt = opt;
+    m_opt.max_iter(m_max_iter);
+    m_opt.max_stalls(m_max_stall);
 
     // Return
     return;
@@ -564,11 +558,9 @@ void ctlike::copy_members(const ctlike& app)
     // Copy attributes
     m_refit           = app.m_refit;
     m_outmodel        = app.m_outmodel;
-    m_obs             = app.m_obs;
     m_max_iter        = app.m_max_iter;
     m_max_stall       = app.m_max_stall;
     m_logL            = app.m_logL;
-    m_opt             = app.m_opt->clone();
     m_apply_edisp     = app.m_apply_edisp;
     m_fix_spat_for_ts = app.m_fix_spat_for_ts;
     m_chatter         = app.m_chatter;
@@ -583,12 +575,6 @@ void ctlike::copy_members(const ctlike& app)
  ***************************************************************************/
 void ctlike::free_members(void)
 {
-    // Free members
-    if (m_opt != NULL) delete m_opt;
-
-    // Mark pointers as free
-    m_opt = NULL;
-
     // Return
     return;
 }

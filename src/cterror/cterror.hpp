@@ -28,10 +28,7 @@
 #define CTERROR_HPP
 
 /* __ Includes ___________________________________________________________ */
-#include <string>
-#include "GammaLib.hpp"
-#include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTERROR_NAME    "cterror"
@@ -43,7 +40,7 @@
  *
  * @brief Parameter error calculation tool
  ***************************************************************************/
-class cterror : public ctool {
+class cterror : public ctlikelihood {
 
 public:
     // Constructors and destructors
@@ -57,11 +54,9 @@ public:
     cterror& operator=(const cterror& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GOptimizer*    opt(void) const;
+    void clear(void);
+    void run(void);
+    void save(void);
 
 protected:
     // Protected methods
@@ -69,7 +64,6 @@ protected:
     void   copy_members(const cterror& app);
     void   free_members(void);
     void   get_parameters(void);
-    double evaluate(const double& value);
     double error_bisection(const double& min, const double& max);
 
     // User parameters
@@ -78,40 +72,14 @@ protected:
     double        m_confidence;   //!< Confidence level
     double        m_tol;          //!< Tolerance for limit determination
     int           m_max_iter;     //!< Maximum number of iterations
-    double        m_value;        //!< Parameter value 
     bool          m_apply_edisp;  //!< Apply energy dispersion?
     GChatter      m_chatter;      //!< Chattiness
 
     // Protected members
-    GObservations m_obs;          //!< Observation container
+    double        m_value;        //!< Parameter value 
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
     GModelPar*    m_model_par;    //!< Pointer to model parameter
     double        m_best_logL;    //!< Best fit log likelihood of given model
-    GOptimizerLM  m_opt;          //!< Optimizer
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container.
- ***************************************************************************/
-inline
-const GObservations& cterror::obs(void) const
-{
-    return m_obs;
-}
-
-
-/***********************************************************************//**
- * @brief Return optimizer
- *
- * @return Pointer to optimizer.
- ***************************************************************************/
-inline
-const GOptimizer* cterror::opt(void) const
-{
-    return &m_opt;
-}
 
 #endif /* CTERROR_HPP */

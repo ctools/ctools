@@ -598,7 +598,7 @@ void ctmodel::get_parameters(void)
  * "expcube", "psfcube", and "bkgcube" parameters). In that case, it appended
  * a dummy event cube to the observation.
  *
- * @TODO Support stacked energy dispersion
+ * @todo Support stacked energy dispersion
  ***************************************************************************/
 void ctmodel::get_obs(void)
 {

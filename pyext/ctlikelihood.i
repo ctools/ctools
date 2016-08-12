@@ -1,7 +1,7 @@
 /***************************************************************************
- *                   ctulimit - Upper limit calculation tool               *
+ *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2016 by Michael Mayer                               *
+ *  copyright (C) 2016 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,45 +19,48 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctulimit
- * @brief Upper limit calculation tool
- * @author Michael Mayer
+ * @file ctlikelihood.i
+ * @brief Likelihood tool base class interface definition
+ * @author Juergen Knoedlseder
  */
+
 %{
 /* Put headers and other declarations here that are needed for compilation */
-#include "ctulimit.hpp"
+#include "ctlikelihood.hpp"
 %}
 
 
 /***********************************************************************//**
- * @class ctulimit
+ * @class ctlikelihood
  *
- * @brief Upper limit calculation tool
+ * @brief Base class for likelihood tools
  ***************************************************************************/
-class ctulimit : public ctlikelihood {
+class ctlikelihood : public ctool {
+
 public:
     // Constructors and destructors
-    ctulimit(void);
-    explicit ctulimit(const GObservations& obs);
-    ctulimit(int argc, char *argv[]);
-    ctulimit(const ctulimit& app);
-    virtual ~ctulimit(void);
-    
+    ctlikelihood(void);
+    ctlikelihood(const std::string& name, const std::string& version);
+    ctlikelihood(const std::string& name, const std::string& version,
+                 const GObservations& obs);
+    ctlikelihood(const std::string& name, const std::string& version,
+                 int argc, char* argv[]);
+    ctlikelihood(const ctlikelihood& app);
+    virtual ~ctlikelihood(void);
+
+    // Pure virtual methods
+    virtual void clear(void) = 0;
+    virtual void run(void) = 0;
+    virtual void save(void) = 0;
+
     // Methods
-    void          clear(void);
-    void          run(void);
-    void          save(void);
-    const double& diff_ulimit(void) const;
-    const double& flux_ulimit(void) const;
-    const double& eflux_ulimit(void) const;
+    const GObservations& obs(void) const;
+    const GOptimizer*    opt(void) const;
 };
 
 
 /***********************************************************************//**
- * @brief Upper limit calculation tool Python extensions
+ * @brief Likelihood tool Python extensions
  ***************************************************************************/
-%extend ctulimit {
-    ctulimit copy() {
-        return (*self);
-    }
+%extend ctlikelihood {
 }

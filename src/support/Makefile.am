@@ -20,7 +20,7 @@
 #############################################################################
 
 # Define sources for this directory
-sources = ctool.cpp ctool.hpp
+sources = ctool.cpp ctool.hpp ctlikelihood.cpp ctlikelihood.hpp
 
 # Build libtool library
 noinst_LTLIBRARIES = libsupport.la

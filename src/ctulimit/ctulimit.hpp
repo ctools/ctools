@@ -28,9 +28,7 @@
 #define CTULIMIT_HPP
 
 /* __ Includes ___________________________________________________________ */
-#include "GammaLib.hpp"
-#include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTULIMIT_NAME    "ctulimit"
@@ -50,7 +48,7 @@
  * During the computation the likelihood function is inspected to find the
  * best value for the upper limit.
  ***************************************************************************/
-class ctulimit : public ctool {
+class ctulimit : public ctlikelihood {
 
 public:
     // Constructors and destructors
@@ -64,14 +62,12 @@ public:
     ctulimit& operator=(const ctulimit& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const GObservations& obs(void) const;
-    const GOptimizer*    opt(void) const;
-    const double&        diff_ulimit(void) const;
-    const double&        flux_ulimit(void) const;
-    const double&        eflux_ulimit(void) const;
+    void          clear(void);
+    void          run(void);
+    void          save(void);
+    const double& diff_ulimit(void) const;
+    const double& flux_ulimit(void) const;
+    const double& eflux_ulimit(void) const;
 
 protected:
     // Protected methods
@@ -81,7 +77,6 @@ protected:
     void   get_parameters(void);
     void   get_model_parameter(void);
     void   ulimit_bisection(const double& parmin, const double& parmax);
-    double evaluate(const double& value);
 
     // User parameters
     std::string   m_srcname;      //!< Name of source which is moved around
@@ -97,7 +92,6 @@ protected:
     GChatter      m_chatter;      //!< Chattiness
 
     // Protected members
-    GObservations m_obs;          //!< Observation container
     double        m_dlogL;        //!< Likelihood difference for upper limit computation
     GModelSky*    m_skymodel;     //!< Pointer to sky model
     GModelPar*    m_model_par;    //!< Pointer to model parameter
@@ -105,32 +99,7 @@ protected:
     double        m_diff_ulimit;  //!< Differential upper limit value
     double        m_flux_ulimit;  //!< Flux upper limit value
     double        m_eflux_ulimit; //!< Energy flux upper limits
-    GOptimizerLM  m_opt;          //!< Optimizer
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container.
- ***************************************************************************/
-inline
-const GObservations& ctulimit::obs(void) const
-{
-    return m_obs;
-}
-
-
-/***********************************************************************//**
- * @brief Return optimizer
- *
- * @return Pointer to optimizer.
- ***************************************************************************/
-inline
-const GOptimizer* ctulimit::opt(void) const
-{
-    return &m_opt;
-}
 
 
 /***********************************************************************//**
