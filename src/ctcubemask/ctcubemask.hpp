@@ -81,9 +81,7 @@ protected:
     GFilename   m_outcube;    //!< Output event list or XML file
 	std::string m_prefix;     //!< Prefix for multiple counts maps
     bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
-    double      m_ra;         //!< RA of ROI centre
-    double      m_dec;        //!< DEC of ROI centre
-    double      m_rad;        //!< ROI radius
+    GCTARoi     m_roi;        //!< RoI selection
     double      m_emin;       //!< Lower energy
     double      m_emax;       //!< Upper energy
     bool        m_publish;    //!< Publish counts cube?

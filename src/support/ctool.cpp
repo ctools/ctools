@@ -997,6 +997,60 @@ void ctool::log_models(const GChatter&    chatter,
 
 
 /***********************************************************************//**
+ * @brief Return RoI from user parameters
+ *
+ * @param[in] obs Observation container.
+ * @return Region of interest.
+ *
+ * Returns region of interest from the user parameters "ra", "dec" and "rad".
+ * If the "usepnt" parameter exists and is "yes" then postpone then assume
+ * that the Right Ascension and Declination of the RoI centre will be set
+ * from the pointing direction somewhere else.
+ ***************************************************************************/
+GCTARoi ctool::get_roi(void)
+{
+    // Initialise an empty RoI
+    GCTARoi roi;
+
+    // Signal whether the pointing instead of the user parameters should be
+    // use for the RoI centre
+    bool usepnt = (has_par("usepnt") && (*this)["usepnt"].boolean());
+
+    // If pointing should not bet used the extract the RoI centre from the
+    // "ra" and "dec" parameters
+    if (!usepnt) {
+
+        // Read "ra" and "dec" parameters only if both are valid
+        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
+
+            // Read parameters
+            double ra  = (*this)["ra"].real();
+            double dec = (*this)["dec"].real();
+
+            // Set RoI
+            GCTAInstDir instdir;
+            instdir.dir().radec_deg(ra, dec);
+            roi.centre(instdir);
+
+            // Signal that we have a pointing direction
+            usepnt = true;
+
+        } // endif: "ra" and "dec" were valid
+
+    } // endif: pointing was not used for RoI centre
+
+    // If we have a RoI centre and if the "rad" parameter is valid then
+    // extract the RoI radius from the parameter
+    if (usepnt && (*this)["rad"].is_valid()) {
+        roi.radius((*this)["rad"].real());
+    }
+
+    // Return RoI
+    return roi;
+}
+
+
+/***********************************************************************//**
  * @brief Set response for all CTA observations in container
  *
  * @param[in,out] obs Observation container

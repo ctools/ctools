@@ -377,9 +377,7 @@ void ctcubemask::init_members(void)
     m_outcube.clear();
 	m_prefix.clear();
     m_usepnt  = false;
-    m_ra      = 0.0;
-    m_dec     = 0.0;
-    m_rad     = 0.0;
+    m_roi.clear();
     m_emin    = 0.0;
     m_emax    = 0.0;
     m_publish = false;
@@ -407,9 +405,7 @@ void ctcubemask::copy_members(const ctcubemask& app)
     m_outcube = app.m_outcube;
     m_prefix  = app.m_prefix;
     m_usepnt  = app.m_usepnt;
-    m_ra      = app.m_ra;
-    m_dec     = app.m_dec;
-    m_rad     = app.m_rad;
+    m_roi     = app.m_roi;
     m_emin    = app.m_emin;
     m_emax    = app.m_emax;
     m_publish = app.m_publish;
@@ -458,26 +454,10 @@ void ctcubemask::get_parameters(void)
     // Get parameters
     m_regfile = (*this)["regfile"].filename();
     m_usepnt  = (*this)["usepnt"].boolean();
-    if (!m_usepnt) {
 
-        // Check RA/DEC parameters for validity to read
-        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
-           m_ra         = (*this)["ra"].real();
-           m_dec        = (*this)["dec"].real();
-           m_select_roi = true;
-        }
-        else {
-           m_select_roi = false;
-        }
-    }
-
-    // Check if radius is valid for a RoI selection
-    if (m_select_roi && (*this)["rad"].is_valid()) {
-       m_rad = (*this)["rad"].real();
-    }
-    else {
-       m_select_roi = false;
-    }
+    // Get the RoI and enable RoI selection if the RoI is valid
+    m_roi        = get_roi();
+    m_select_roi = m_roi.is_valid();
 
     // Check for sanity of energy selection parameters
     if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
@@ -587,7 +567,7 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
         // Set all pixels inside selected energy bands but outside RoI
         // to -1.0 if requested
         if (m_select_roi) {
-            GSkyRegionCircle roi(m_ra, m_dec, m_rad);
+            GSkyRegionCircle roi(m_roi.centre().dir(), m_roi.radius());
             for (int i = e_idx1; i <= e_idx2; ++i) {
                 for (int pixel = 0; pixel < npix; ++pixel) {
                     GSkyDir dir = map.inx2dir(pixel);
@@ -599,9 +579,9 @@ void ctcubemask::apply_mask(GCTAObservation* obs)
 
             // Log selected RoI
             log_value(NORMAL, "Selected RoI",
-                              "RA="+gammalib::str(m_ra)+" deg, "+
-                              "DEC="+gammalib::str(m_dec)+" deg, "+
-                              "Radius="+gammalib::str(m_rad)+" deg");
+                      "RA="+gammalib::str(roi.centre().ra_deg())+" deg, "+
+                      "DEC="+gammalib::str(roi.centre().dec_deg())+" deg, "+
+                      "Radius="+gammalib::str(roi.radius())+" deg");
 
         } // endif: applied RoI selection
 

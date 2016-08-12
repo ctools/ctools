@@ -97,6 +97,7 @@ public:
     %rename(_require_inobs_nocube)     require_inobs_nocube;
     %rename(_log_observations)         log_observations;
     %rename(_log_models)               log_models;
+    %rename(_get_roi)                  get_roi;
     %rename(_set_response)             set_response;
     %rename(_set_edisp)                set_edisp;
     %rename(_restore_edisp)            restore_edisp;
@@ -139,6 +140,9 @@ public:
     void            log_models(const GChatter&    chatter,
                                const GModels&     models,
                                const std::string& what = "Model");
+
+    // Protected methods that extract user parameters
+    GCTARoi           get_roi(void);
 
     // Protected support methods
     void              set_response(GObservations& obs);

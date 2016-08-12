@@ -408,9 +408,7 @@ void ctselect::init_members(void)
     m_outobs.clear();
     m_prefix.clear();
     m_usepnt = false;
-    m_ra     = -1.0;
-    m_dec    = -1.0;
-    m_rad    = -1.0;
+    m_roi.clear();
     m_tmin   = 0.0;
     m_tmax   = 0.0;
     m_emin   = 0.0;
@@ -446,9 +444,7 @@ void ctselect::copy_members(const ctselect& app)
     m_outobs   = app.m_outobs;
     m_prefix   = app.m_prefix;
     m_usepnt   = app.m_usepnt;
-    m_ra       = app.m_ra;
-    m_dec      = app.m_dec;
-    m_rad      = app.m_rad;
+    m_roi      = app.m_roi;
     m_tmin     = app.m_tmin;
     m_tmax     = app.m_tmax;
     m_emin     = app.m_emin;
@@ -504,28 +500,12 @@ void ctselect::get_parameters(void)
     // information and do not accept counts cubes.
     setup_observations(m_obs, false, true, false);
 
-    // Get parameters
+    // Get some parameters
     m_usepnt = (*this)["usepnt"].boolean();
-    if (!m_usepnt) {
 
-        // Check RA/DEC parameters for validity to read
-        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
-            m_ra         = (*this)["ra"].real();
-            m_dec        = (*this)["dec"].real();
-            m_select_roi = true;
-        }
-        else {
-            m_select_roi = false;
-        }
-    }
-
-    // Check if radius is vaild for a RoI selection
-    if (m_select_roi && (*this)["rad"].is_valid()) {
-        m_rad = (*this)["rad"].real();
-    }
-    else {
-        m_select_roi = false;
-    }
+    // Get the RoI and enable RoI selection if the RoI is valid
+    m_roi        = get_roi();
+    m_select_roi = m_roi.is_valid();
 
     // Check for sanity of time selection parameters
     if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
@@ -640,11 +620,11 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Analyse expression to see if a selection is required
     bool select_expr = (gammalib::strip_whitespace(m_expr).length() > 0);
 
-    // Set RA/DEC selection. If the "usepnt" parameter is set to true then
-    // use the pointing direction as the ROI centre.
-    double ra  = m_ra;
-    double dec = m_dec;
-    double rad = m_rad;
+    // Set RoI selection. If the "usepnt" parameter is set to true then
+    // use the pointing direction as the RoI centre.
+    double ra  = m_roi.centre().dir().ra_deg();
+    double dec = m_roi.centre().dir().dec_deg();
+    double rad = m_roi.radius();
     if (m_usepnt) {
         const GCTAPointing &pnt = obs->pointing();
         ra  = pnt.dir().ra_deg();
@@ -751,7 +731,7 @@ void ctselect::select_events(GCTAObservation*   obs,
         // Log the requested RoI
         log_value(NORMAL, "Requested RoI",
                   "Centre(RA,DEC)=("+gammalib::str(ra)+", "+
-                  gammalib::str(dec)+") deg, Radius="+gammalib::str(m_rad)+
+                  gammalib::str(dec)+") deg, Radius="+gammalib::str(rad)+
                   " deg");
 
         // If we have already an RoI then make sure that the selected

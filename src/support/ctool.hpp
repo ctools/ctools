@@ -103,6 +103,9 @@ protected:
                                const GModels&     models,
                                const std::string& what = "Model");
 
+    // Protected methods that extract user parameters
+    GCTARoi           get_roi(void);
+
     // Protected support methods
     void              set_response(GObservations& obs);
     std::vector<bool> set_edisp(GObservations& obs, const bool& edisp) const;
