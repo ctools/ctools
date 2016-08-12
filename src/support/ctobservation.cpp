@@ -44,21 +44,6 @@
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Void constructor
- *
- * Constructs an empty observation tool.
- ***************************************************************************/
-ctobservation::ctobservation(void) : ctool()
-{
-    // Initialise members
-    init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
  * @brief Name constructor
  *
  * @param[in] name Observation tool name.

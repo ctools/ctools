@@ -39,7 +39,6 @@ class ctobservation : public ctool {
 
 public:
     // Constructors and destructors
-    ctobservation(void);
     ctobservation(const std::string& name, const std::string& version);
     ctobservation(const std::string& name, const std::string& version,
                   const GObservations& obs);

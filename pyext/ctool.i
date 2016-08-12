@@ -37,7 +37,6 @@
 class cscript : public ctool  {
 public:
     // Constructors and destructors
-    cscript(void) : ctool() {}
     cscript(const std::string& name, const std::string& version) : ctool(name, version) {}
     cscript(const std::string& name, const std::string& version,
             int argc, char* argv[]) : ctool(name, version, argc, argv) {}
@@ -67,7 +66,6 @@ public:
 class ctool : public GApplication  {
 public:
     // Constructors and destructors
-    ctool(void);
     ctool(const std::string& name, const std::string& version);
     ctool(const std::string& name, const std::string& version,
           int ARGC, char **ARGV);
@@ -179,7 +177,6 @@ public:
 class cscript : public ctool  {
 public:        
     // Constructors and destructors
-    cscript(void);
     cscript(const std::string& name, const std::string& version);
     cscript(const std::string& name, const std::string& version,
             int ARGC, char **ARGV);

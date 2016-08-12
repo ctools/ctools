@@ -45,21 +45,6 @@
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Void constructor
- *
- * Constructs an empty likelihood tool.
- ***************************************************************************/
-ctlikelihood::ctlikelihood(void) : ctobservation()
-{
-    // Initialise members
-    init_members();
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
  * @brief Name constructor
  *
  * @param[in] name Likelihood tool name.

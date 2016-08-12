@@ -42,7 +42,6 @@ class ctlikelihood : public ctobservation {
 
 public:
     // Constructors and destructors
-    ctlikelihood(void);
     ctlikelihood(const std::string& name, const std::string& version);
     ctlikelihood(const std::string& name, const std::string& version,
                  const GObservations& obs);
