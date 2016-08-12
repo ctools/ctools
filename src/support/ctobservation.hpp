@@ -65,17 +65,22 @@ public:
     // Methods
     const GObservations& obs(void) const;
 
+#ifdef SWIG
+public:
+#else
 protected:
-    // Protected methods
-    void init_members(void);
-    void copy_members(const ctobservation& app);
-    void free_members(void);
-
+#endif
     // Iterator methods and members
     GCTAObservation*       first_unbinned_observation(void);
     GCTAObservation*       next_unbinned_observation(void);
     const GCTAObservation* first_unbinned_observation(void) const;
     const GCTAObservation* next_unbinned_observation(void) const;
+
+protected:
+    // Protected methods
+    void init_members(void);
+    void copy_members(const ctobservation& app);
+    void free_members(void);
 
     // Protected members
     GObservations m_obs;            //!< Observation container

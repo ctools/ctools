@@ -53,13 +53,35 @@ public:
     virtual void run(void) = 0;
     virtual void save(void) = 0;
 
-    // Methods
+    // Public methods
     const GObservations& obs(void) const;
+
+    // Make methods private in Python by prepending an underscore
+    %rename(_first_unbinned_observation) first_unbinned_observation;
+    %rename(_next_unbinned_observation)  next_unbinned_observation;
+
+    // Protected methods
+    GCTAObservation* first_unbinned_observation(void);
+    GCTAObservation* next_unbinned_observation(void);
 };
 
 
 /***********************************************************************//**
- * @brief Likelihood tool Python extensions
+ * @brief Observation tool base class C++ extensions
  ***************************************************************************/
 %extend ctobservation {
 }
+
+
+/***********************************************************************//**
+ * @brief Observation tool base class Python extensions
+ ***************************************************************************/
+%pythoncode %{
+def _unbinned_observations(self):
+    obs = self._first_unbinned_observation()
+    while obs != None:
+        yield obs
+        obs = self._next_unbinned_observation()
+ctool._unbinned_observations   = _unbinned_observations
+cscript._unbinned_observations = _unbinned_observations
+%}
