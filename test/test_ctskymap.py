@@ -108,7 +108,7 @@ class Test(test):
         skymap = ctools.ctskymap()
 
         # Check that empty ctskymap tool holds a map that has no pixels
-        self._check_map(skymap.map(), nx=0, ny=0)
+        self._check_map(skymap.skymap(), nx=0, ny=0)
 
         # Check that saving does not nothing
         skymap['outmap']  = 'ctskymap_py0.fits'
@@ -148,7 +148,7 @@ class Test(test):
         cpy_skymap = skymap.copy()
 
         # Check sky map of ctskymap copy
-        self._check_map(cpy_skymap.map())
+        self._check_map(cpy_skymap.skymap())
 
         # Execute copy of ctskymap tool again, now with a higher chatter
         # level than before
@@ -169,7 +169,7 @@ class Test(test):
         cpy_skymap.clear()
 
         # Check that cleared ctskymap tool holds a map that has no pixels
-        self._check_map(cpy_skymap.map(), nx=0, ny=0)
+        self._check_map(cpy_skymap.skymap(), nx=0, ny=0)
 
         # Get mixed observation container
         obs = self._obs_mixed()

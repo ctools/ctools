@@ -1559,7 +1559,7 @@ size_t ctool::get_current_rss(void)
  *      XXX observation "name" (id=YYYYY)
  *
  ***************************************************************************/
-std::string ctool::get_obs_header(const GObservation* obs)
+std::string ctool::get_obs_header(const GObservation* obs) const
 {
     // Initialise header string
     std::string header = obs->instrument() + " observation";

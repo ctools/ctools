@@ -34,7 +34,7 @@
  *
  * @brief Sky mapping tool
  ***************************************************************************/
-class ctskymap : public ctool {
+class ctskymap : public ctobservation {
 public:
     // Constructors and destructors
     ctskymap(void);
@@ -48,7 +48,7 @@ public:
     void           run(void);
     void           save(void);
     void           publish(const std::string& name = "");
-    const GSkyMap& map(void) const;
+    const GSkyMap& skymap(void) const;
 };
 
 

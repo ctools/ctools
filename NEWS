@@ -30,6 +30,9 @@ observation container. The class implements the following methods:
 - obs()                        Returns reference to observation container
 - first_unbinned_observation() First unbinned CTA observation in container
 - next_unbinned_observation()  Next unbinned CTA observation in container
+The following ctools derive from the class:
+- ctbin
+- ctskymap
 
 The ctlikelihood base class that derives from the ctobservation base class
 was introduced to provide a common base class for all ctools that perform
@@ -91,6 +94,9 @@ ctskymap - CTA sky mapping
 --------------------------
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
+
+The ctskymap::map() method has been renamed to ctskymap::skymap() to avoid a
+name conflict with Python (#1828).
 
 
 ctmodel - CTA counts cube modelling

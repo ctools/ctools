@@ -71,8 +71,18 @@ protected:
     void copy_members(const ctobservation& app);
     void free_members(void);
 
+    // Iterator methods and members
+    GCTAObservation*       first_unbinned_observation(void);
+    GCTAObservation*       next_unbinned_observation(void);
+    const GCTAObservation* first_unbinned_observation(void) const;
+    const GCTAObservation* next_unbinned_observation(void) const;
+
     // Protected members
-    GObservations m_obs; //!< Observation container
+    GObservations m_obs;            //!< Observation container
+
+private:
+    // Private members
+    mutable int m_index_unbinned;   //!< Current index of unbinned observation
 };
 
 
@@ -87,6 +97,46 @@ inline
 const GObservations& ctobservation::obs(void) const
 {
     return m_obs;
+}
+
+
+/***********************************************************************//**
+ * @brief Return first unbinned CTA observation
+ *
+ * @return Pointer to first unbinned CTA observation
+ *
+ * Returns a pointer to the first unbinned CTA observation in the container.
+ * If no CTA observation exists a NULL pointer is returned.
+ *
+ * The method calls next_unbinned_observation(). See the method for details.
+ ***************************************************************************/
+inline
+GCTAObservation* ctobservation::first_unbinned_observation(void)
+{
+    return (const_cast<GCTAObservation*>
+            (static_cast<const ctobservation&>
+             (*this).first_unbinned_observation()));
+}
+
+
+/***********************************************************************//**
+ * @brief Return next unbinned CTA observation
+ *
+ * @return Pointer to next unbinned CTA observation
+ *
+ * Returns a pointer to the next unbinned CTA observation in the container.
+ * If no CTA observation exists any more a NULL pointer is returned.
+ *
+ * The method writes for each encountered observation a level 3 header into
+ * the logger. It will also signal when an observation was skipped because
+ * it either was not a CTA observation or not an unbinned observation.
+ ***************************************************************************/
+inline
+GCTAObservation* ctobservation::next_unbinned_observation(void)
+{
+    return (const_cast<GCTAObservation*>
+            (static_cast<const ctobservation&>
+             (*this).next_unbinned_observation()));
 }
 
 #endif /* CTOBSERVATION_HPP */

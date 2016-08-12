@@ -28,9 +28,7 @@
 #define CTSKYMAP_HPP
 
 /* __ Includes ___________________________________________________________ */
-#include "GammaLib.hpp"
-#include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTSKYMAP_NAME    "ctskymap"
@@ -44,7 +42,7 @@
  *
  * This class creates a sky map from a CTA event list.
  ***************************************************************************/
-class ctskymap : public ctool {
+class ctskymap : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -62,7 +60,7 @@ public:
     void           run(void);
     void           save(void);
     void           publish(const std::string& name = "");
-    const GSkyMap& map(void) const;
+    const GSkyMap& skymap(void) const;
 
 protected:
     // Protected methods
@@ -80,7 +78,6 @@ protected:
     GChatter      m_chatter;    //!< Chattiness
 
     // Protected members
-    GObservations m_obs;        //!< Observation container
     GSkyMap       m_skymap;     //!< Sky map
 };
 
@@ -91,7 +88,7 @@ protected:
  * @return Reference to observation container
  ***************************************************************************/
 inline
-const GSkyMap& ctskymap::map(void) const
+const GSkyMap& ctskymap::skymap(void) const
 {
     return m_skymap;
 }

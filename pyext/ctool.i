@@ -150,7 +150,7 @@ public:
     GObservations     get_observations(const bool& get_response = true);
     GSkyDir           get_mean_pointing(const GObservations& obs);
     size_t            get_current_rss(void);
-    std::string       get_obs_header(const GObservation* obs);
+    std::string       get_obs_header(const GObservation* obs) const;
     GEnergies         insert_energy_boundaries(const GEnergies&       energies,
                                                const GCTAObservation& obs);
     std::vector<bool> cube_layer_usage(const GEbounds& cube_ebounds,

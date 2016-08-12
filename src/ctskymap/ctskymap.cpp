@@ -49,8 +49,10 @@
 
 /***********************************************************************//**
  * @brief Void constructor
+ *
+ * Constructs an empty sky mapping tool.
  ***************************************************************************/
-ctskymap::ctskymap(void) : ctool(CTSKYMAP_NAME, CTSKYMAP_VERSION)
+ctskymap::ctskymap(void) : ctobservation(CTSKYMAP_NAME, CTSKYMAP_VERSION)
 {
     // Initialise members
     init_members();
@@ -65,17 +67,13 @@ ctskymap::ctskymap(void) : ctool(CTSKYMAP_NAME, CTSKYMAP_VERSION)
  *
  * param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Constructs sky mapping tool from an observation container.
  ***************************************************************************/
 ctskymap::ctskymap(const GObservations& obs) :
-          ctool(CTSKYMAP_NAME, CTSKYMAP_VERSION)
+          ctobservation(CTSKYMAP_NAME, CTSKYMAP_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -88,9 +86,12 @@ ctskymap::ctskymap(const GObservations& obs) :
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
+ *
+ * Constructs sky mapping tool using command line arguments for user
+ * parameter setting.
  ***************************************************************************/
 ctskymap::ctskymap(int argc, char *argv[]) : 
-          ctool(CTSKYMAP_NAME, CTSKYMAP_VERSION, argc, argv)
+          ctobservation(CTSKYMAP_NAME, CTSKYMAP_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -103,9 +104,9 @@ ctskymap::ctskymap(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app Application.
+ * @param[in] app Sky mapping tool.
  ***************************************************************************/
-ctskymap::ctskymap(const ctskymap& app) : ctool(app)
+ctskymap::ctskymap(const ctskymap& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -140,8 +141,8 @@ ctskymap::~ctskymap(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app Application.
- * @return Application.
+ * @param[in] app Sky mapping tool.
+ * @return Sky mapping tool.
  ***************************************************************************/
 ctskymap& ctskymap::operator=(const ctskymap& app)
 {
@@ -149,7 +150,7 @@ ctskymap& ctskymap::operator=(const ctskymap& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -174,21 +175,23 @@ ctskymap& ctskymap::operator=(const ctskymap& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear ctskymap tool
+ * @brief Clear sky mapping tool
  *
- * Clears ctskymap tool.
+ * Clears sky mapping tool.
  ***************************************************************************/
 void ctskymap::clear(void)
 {
     // Free members
     free_members();
     this->ctool::free_members();
+    this->ctobservation::free_members();
 
     // Clear base class (needed to conserve tool name and version)
     this->GApplication::clear();
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -200,18 +203,14 @@ void ctskymap::clear(void)
 
 
 /***********************************************************************//**
- * @brief Creates sky maps from data
+ * @brief Run the sky mapping tool
  *
- * This method is the main code. It
- * (1) reads task parameters from the par file
- * (2) initialises the sky maps
- * (3) loops over all observations to add its events to the sky map
+ * Generates a sky map from event list by looping over all unbinned CTA
+ * observation in the observation container and filling all events into
+ * a sky map.
  ***************************************************************************/
 void ctskymap::run(void)
 {
-    // Initialise statistics
-    int num_obs = 0;
-
     // Switch screen logging on in debug mode
     if (logDebug()) {
         log.cout(true);
@@ -226,37 +225,13 @@ void ctskymap::run(void)
     // Write header into logger
     log_header1(TERSE, gammalib::number("Map observation", m_obs.size()));
 
-    // Loop over all observation in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Write header for the current observation
-        log_header3(TERSE, get_obs_header(m_obs[i]));
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Skip observation if it's not CTA
-        if (obs == NULL) {
-            std::string msg = " Skipping "+m_obs[i]->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
-
-        // Skip observation if we have a binned observation
-        if (obs->eventtype() == "CountsCube") {
-            std::string msg = " Skipping binned "+obs->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
+    // Loop over all unbinned CTA observations in the container
+    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+         obs = next_unbinned_observation()) {
 
         // Map events into sky map
         map_events(obs);
             
-        // Increment observation counter
-        num_obs++;
-
     } // endfor: looped over observations
 
     // Optionally publish sky map
@@ -348,7 +323,6 @@ void ctskymap::publish(const std::string& name)
 void ctskymap::init_members(void)
 {
     // Initialise members
-    m_obs.clear();
     m_skymap.clear();
     m_emin    = 0.0;
     m_emax    = 0.0;
@@ -368,7 +342,6 @@ void ctskymap::init_members(void)
 void ctskymap::copy_members(const ctskymap& app)
 {
     // Copy attributes
-    m_obs     = app.m_obs;
     m_skymap  = app.m_skymap;
     m_emin    = app.m_emin;
     m_emax    = app.m_emax;

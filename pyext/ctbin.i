@@ -34,7 +34,7 @@
  *
  * @brief Event binning tool
  ***************************************************************************/
-class ctbin : public ctool {
+class ctbin : public ctobservation {
 public:
     // Constructors and destructors
     ctbin(void);
@@ -48,7 +48,6 @@ public:
     void                 run(void);
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
 };
 

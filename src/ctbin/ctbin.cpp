@@ -53,9 +53,9 @@
 /***********************************************************************//**
  * @brief Void constructor
  *
- * Constructs an empty ctbin tool.
+ * Constructs an empty event binning tool.
  ***************************************************************************/
-ctbin::ctbin(void) : ctool(CTBIN_NAME, CTBIN_VERSION)
+ctbin::ctbin(void) : ctobservation(CTBIN_NAME, CTBIN_VERSION)
 {
     // Initialise members
     init_members();
@@ -70,15 +70,13 @@ ctbin::ctbin(void) : ctool(CTBIN_NAME, CTBIN_VERSION)
  *
  * param[in] obs Observation container.
  *
- * Constructs ctbin tool from an observation container.
+ * Constructs event binning tool from an observation container.
  ***************************************************************************/
-ctbin::ctbin(const GObservations& obs) : ctool(CTBIN_NAME, CTBIN_VERSION)
+ctbin::ctbin(const GObservations& obs) :
+       ctobservation(CTBIN_NAME, CTBIN_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -92,11 +90,11 @@ ctbin::ctbin(const GObservations& obs) : ctool(CTBIN_NAME, CTBIN_VERSION)
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  *
- * Constructs ctbin tool using command line arguments for user parameter
- * setting.
+ * Constructs event binning tool using command line arguments for user
+ * parameter setting.
  ***************************************************************************/
 ctbin::ctbin(int argc, char *argv[]) : 
-       ctool(CTBIN_NAME, CTBIN_VERSION, argc, argv)
+       ctobservation(CTBIN_NAME, CTBIN_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -109,11 +107,11 @@ ctbin::ctbin(int argc, char *argv[]) :
 /***********************************************************************//**
  * @brief Copy constructor
  *
- * @param[in] app Application.
+ * @param[in] app Event binning tool.
  *
- * Constructs ctbin tool from another ctbin instance.
+ * Constructs event binning tool from another event binning tool.
  ***************************************************************************/
-ctbin::ctbin(const ctbin& app) : ctool(app)
+ctbin::ctbin(const ctbin& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -129,7 +127,7 @@ ctbin::ctbin(const ctbin& app) : ctool(app)
 /***********************************************************************//**
  * @brief Destructor
  *
- * Destructs ctbin tool.
+ * Destructs event binning tool.
  ***************************************************************************/
 ctbin::~ctbin(void)
 {
@@ -150,10 +148,10 @@ ctbin::~ctbin(void)
 /***********************************************************************//**
  * @brief Assignment operator
  *
- * @param[in] app ctbin tool.
- * @return ctbin tool.
+ * @param[in] app Event binning tool.
+ * @return Event binning tool.
  *
- * Assigns ctbin tool.
+ * Assigns event binning tool.
  ***************************************************************************/
 ctbin& ctbin::operator=(const ctbin& app)
 {
@@ -161,7 +159,7 @@ ctbin& ctbin::operator=(const ctbin& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -186,21 +184,23 @@ ctbin& ctbin::operator=(const ctbin& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear ctbin tool
+ * @brief Clear event binning tool
  *
- * Clears ctbin tool.
+ * Clears event binning tool.
  ***************************************************************************/
 void ctbin::clear(void)
 {
     // Free members
     free_members();
     this->ctool::free_members();
+    this->ctobservation::free_members();
 
     // Clear base class (needed to conserve tool name and version)
     this->GApplication::clear();
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -212,7 +212,7 @@ void ctbin::clear(void)
 
 
 /***********************************************************************//**
- * @brief Run the ctbin tool
+ * @brief Run the event binning tool
  *
  * Gets the user parameters and loops over all CTA observations in the
  * observation container to bin the events into a single counts cube. All
@@ -235,30 +235,9 @@ void ctbin::run(void)
     // Write header into logger
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
-    // Loop over all observations in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Write header for the current observation
-        log_header3(TERSE, get_obs_header(m_obs[i]));
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Skip observation if it's not CTA
-        if (obs == NULL) {
-            std::string msg = " Skipping "+m_obs[i]->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
-
-        // Skip observation if we have a binned observation
-        if (obs->eventtype() == "CountsCube") {
-            std::string msg = " Skipping binned "+obs->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
+    // Loop over all unbinned CTA observations in the container
+    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+         obs = next_unbinned_observation()) {
 
         // Fill the cube
         fill_cube(obs);
@@ -374,7 +353,6 @@ void ctbin::init_members(void)
     m_chatter = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
     m_counts.clear();
     m_weights.clear();
     m_ebounds.clear();
@@ -402,7 +380,6 @@ void ctbin::copy_members(const ctbin& app)
     m_chatter = app.m_chatter;
 
     // Copy protected members
-    m_obs       = app.m_obs;
     m_counts    = app.m_counts;
     m_weights   = app.m_weights;
     m_ebounds   = app.m_ebounds;

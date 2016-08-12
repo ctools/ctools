@@ -219,8 +219,11 @@ ctobservation& ctobservation::operator=(const ctobservation& app)
  ***************************************************************************/
 void ctobservation::init_members(void)
 {
-    // Initialise members
+    // Initialise protected members
     m_obs.clear();
+
+    // Initialise private members
+    m_index_unbinned = 0;
 
     // Return
     return;
@@ -234,8 +237,11 @@ void ctobservation::init_members(void)
  ***************************************************************************/
 void ctobservation::copy_members(const ctobservation& app)
 {
-    // Copy members
+    // Copy protected members
     m_obs = app.m_obs;
+
+    // Copy private members
+    m_index_unbinned = app.m_index_unbinned;
 
     // Return
     return;
@@ -249,4 +255,89 @@ void ctobservation::free_members(void)
 {
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Return first unbinned CTA observation (const version)
+ *
+ * @return Const pointer to first unbinned CTA observation
+ *
+ * Returns a const pointer to the first unbinned CTA observation in the
+ * container. If no CTA observation exists a NULL pointer is returned.
+ *
+ * The method calls next_unbinned_observation(). See the method for details.
+ ***************************************************************************/
+const GCTAObservation* ctobservation::first_unbinned_observation(void) const
+{
+    // Initialise index
+    m_index_unbinned = 0;
+
+    // Get next unbinned CTA observation
+    const GCTAObservation* obs = next_unbinned_observation();
+
+    // Return first CTA observation
+    return obs;
+}
+
+
+/***********************************************************************//**
+ * @brief Return next unbinned CTA observation (const version)
+ *
+ * @return Const pointer to next unbinned CTA observation
+ *
+ * Returns a const pointer to the next unbinned CTA observation in the
+ * container. If no CTA observation exists any more a NULL pointer is
+ * returned.
+ *
+ * The method writes for each encountered observation a level 3 header into
+ * the logger. It will also signal when an observation was skipped because
+ * it either was not a CTA observation or not an unbinned observation.
+ *
+ * @todo Logger methods should be declared const to avoid the const casting.
+ ***************************************************************************/
+const GCTAObservation* ctobservation::next_unbinned_observation(void) const
+{
+    // Initialise pointer on CTA observation
+    const GCTAObservation* obs = NULL;
+
+    // Loop over all remaining observation in the container
+    for (; m_index_unbinned < m_obs.size(); ++m_index_unbinned) {
+
+        // Write header for the current observation
+        const_cast<ctobservation*>(this)->log_header3(TERSE,
+                                   get_obs_header(m_obs[m_index_unbinned]));
+
+        // Case the observation to a CTA observation. This will return a
+        // NULL pointer if the observation is not a CTA observation.
+        obs = dynamic_cast<const GCTAObservation*>(m_obs[m_index_unbinned]);
+
+        // Skip observation if it's not CTA
+        if (obs == NULL) {
+            std::string msg = " Skipping "+
+                              m_obs[m_index_unbinned]->instrument()+
+                              " observation";
+            const_cast<ctobservation*>(this)->log_string(NORMAL, msg);
+            continue;
+        }
+
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            obs             = NULL;
+            std::string msg = " Skipping binned "+
+                              m_obs[m_index_unbinned]->instrument()+
+                              " observation";
+            const_cast<ctobservation*>(this)->log_string(NORMAL, msg);
+            continue;
+        }
+
+        // If we come to this point we have an unbinned CTA observation and
+        // we can forward the index to the next index and break the loop
+        m_index_unbinned++;
+        break;
+
+    } // endfor: looped over all observation
+
+    // Return next CTA observation
+    return obs;
 }

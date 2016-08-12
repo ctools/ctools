@@ -28,14 +28,11 @@
 #define CTBIN_HPP
 
 /* __ Includes ___________________________________________________________ */
-#include <vector>
-#include "GammaLib.hpp"
-#include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "1.1.0"
+#define CTBIN_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -63,7 +60,7 @@
  * PSF cubes should be used for response computation. This is however not
  * yet fully implemented.
  ***************************************************************************/
-class ctbin : public ctool {
+class ctbin : public ctobservation {
 public:
     // Constructors and destructors
     ctbin(void);
@@ -80,7 +77,6 @@ public:
     void                 run(void);
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
 
 protected:
@@ -100,7 +96,6 @@ protected:
     GChatter      m_chatter;  //!< Chattiness
 
     // Protected members
-    GObservations m_obs;      //!< Observation container
     GSkyMap       m_counts;   //!< Event cube counts
     GSkyMap       m_weights;  //!< Event cube weights
     GEbounds      m_ebounds;  //!< Energy boundaries
@@ -109,19 +104,6 @@ protected:
     double        m_ontime;   //!< Total ontime
     double        m_livetime; //!< Total livetime
 };
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- *
- * Returns a reference to an observation container.
- ***************************************************************************/
-inline
-const GObservations& ctbin::obs(void) const
-{
-    return m_obs;
-}
 
 
 /***********************************************************************//**
