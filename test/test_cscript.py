@@ -49,56 +49,56 @@ class cscript_test(ctools.cscript):
         return
 
     # Check is_valid_filename() method
-    def _check_is_valid_filename(self, filename):
+    def check_is_valid_filename(self, filename):
         return self._is_valid_filename(gammalib.GFilename(filename))
 
     # Check setup_observations() method
-    def _check_setup_observations(self, filename, list=True, cube=True):
+    def check_setup_observations(self, filename, events=True, cube=True):
         self.pars()['inobs'].value(filename)
         obs = gammalib.GObservations()
-        self._setup_observations(obs, True, list, cube)
+        self._setup_observations(obs, True, events, cube)
         return
 
     # Check setup_models() method
-    def _check_setup_models(self):
+    def check_setup_models(self):
         obs = gammalib.GObservations()
         self._setup_models(obs)
         return
 
     # Check create_ebounds() method
-    def _check_create_ebounds(self, filename):
+    def check_create_ebounds(self, filename):
         self.pars()['ebinfile'].value(filename)
         return self._create_ebounds()
 
     # Check require_inobs() method
-    def _check_require_inobs(self, filename):
+    def check_require_inobs(self, filename):
         self.pars()['inobs'].value(filename)
-        self._require_inobs('_check_require_inobs')
+        self._require_inobs('check_require_inobs')
         return
 
     # Check get_roi() method
-    def _check_get_roi(self):
+    def check_get_roi(self):
         return self._get_roi()
 
     # Check restore_edisp() method
-    def _check_restore_edisp(self):
+    def check_restore_edisp(self):
         obs   = gammalib.GObservations()
         edisp = [True, True]
         self._restore_edisp(obs, edisp)
         return
 
     # Check set_obs_bounds() method
-    def _check_set_obs_bounds(self):
-        obs  = gammalib.GObservations()
-        list = gammalib.GCTAEventList()
-        cta  = gammalib.GCTAObservation()
-        cta.events(list)
+    def check_set_obs_bounds(self):
+        obs    = gammalib.GObservations()
+        events = gammalib.GCTAEventList()
+        cta    = gammalib.GCTAObservation()
+        cta.events(events)
         obs.append(cta)
         self._set_obs_bounds(obs)
         return obs.copy()
 
     # Check get_mean_pointing() method
-    def _check_get_mean_pointing(self):
+    def check_get_mean_pointing(self):
         obs = gammalib.GObservations()
         return self._get_mean_pointing(obs)
 
@@ -149,7 +149,7 @@ class ctlikelihood_test(ctools.cslikelihood):
         return
 
     # Check evaluate() method
-    def _check_evaluate(self, value):
+    def check_evaluate(self, value):
         par = gammalib.GModelPar()
         par.value(2.0)
         par.range(1.0, 3.0)
@@ -230,17 +230,17 @@ class Test(test):
         empty = cscript_test()
 
         # Test is_valid_filename() method
-        self.test_assert(empty._check_is_valid_filename(self._model),
+        self.test_assert(empty.check_is_valid_filename(self._model),
                          'Check model definiton XML file')
-        self.test_assert(not empty._check_is_valid_filename(''),
+        self.test_assert(not empty.check_is_valid_filename(''),
                          'Check empty filename')
-        self.test_assert(not empty._check_is_valid_filename('NONE'),
+        self.test_assert(not empty.check_is_valid_filename('NONE'),
                          'Check "NONE" filename')
 
         # Test setup_observations() for invalid file name
         self.test_try('Check setup_observations() for "NONE"')
         try:
-            empty._check_setup_observations('NONE')
+            empty.check_setup_observations('NONE')
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -248,7 +248,7 @@ class Test(test):
         # Test setup_observations() for unacceptable event list
         self.test_try('Check setup_observations() for unacceptable event list')
         try:
-            empty._check_setup_observations(self._events, list=False)
+            empty.check_setup_observations(self._events, events=False)
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -256,7 +256,7 @@ class Test(test):
         # Test setup_observations() for unacceptable counts cube
         self.test_try('Check setup_observations() for unacceptable counts cube')
         try:
-            empty._check_setup_observations(self._cntcube, cube=False)
+            empty.check_setup_observations(self._cntcube, cube=False)
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -264,19 +264,19 @@ class Test(test):
         # Test setup_models() for invalid model definition file name
         self.test_try('Check setup_models() for invalid model definition file name')
         try:
-            empty._check_setup_models()
+            empty.check_setup_models()
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
 
         # Test create_ebounds() method for "EBOUNDS" extension
-        ebounds = empty._check_create_ebounds('test_ebinfile_ebounds.fits')
+        ebounds = empty.check_create_ebounds('test_ebinfile_ebounds.fits')
         self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
         self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
         self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
 
         # Test create_ebounds() method for "ENERGYBINS" extension
-        ebounds = empty._check_create_ebounds('test_ebinfile_energybins.fits')
+        ebounds = empty.check_create_ebounds('test_ebinfile_energybins.fits')
         self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
         self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
         self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
@@ -284,27 +284,33 @@ class Test(test):
         # Test create_ebounds() method for invalid extension
         self.test_try('Check create_ebounds() method for invalid extension')
         try:
-            empty._check_create_ebounds('test_ebinfile_energies.fits')
+            empty.check_create_ebounds('test_ebinfile_energies.fits')
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
 
+        # Test create_ebounds() method for "ENERGIES" extension
+        ebounds = empty.check_create_ebounds('test_ebinfile_energies.fits[ENERGIES]')
+        self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
+        self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
+        self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
+
         # Test require_inobs() method for invalid file name
         self.test_try('Check require_inobs() method for invalid file name')
         try:
-            empty._check_require_inobs('NONE')
+            empty.check_require_inobs('NONE')
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
 
         # Test get_roi() method
-        roi = empty._check_get_roi()
+        roi = empty.check_get_roi()
         self.test_assert(not roi.is_valid(), 'Check get_roi() method')
 
         # Test restore_edisp() method for invalid vector size
         #self.test_try('Check restore_edisp() method for invalid vector size')
         #try:
-        #    empty._check_restore_edisp()
+        #    empty.check_restore_edisp()
         #    self.test_try_failure('Exception not thrown')
         #except ValueError:
         #    self.test_try_success()
@@ -313,7 +319,7 @@ class Test(test):
         #       integer vector conversion.
 
         # Test set_obs_bounds() method
-        obs = empty._check_set_obs_bounds()
+        obs = empty.check_set_obs_bounds()
         self.test_value(obs.size(), 1, 'Check number of observations')
         self.test_value(obs[0].events().ebounds().size(), 1,
                         'Check number of energy boundaries')
@@ -328,7 +334,7 @@ class Test(test):
         self.test_try('Check get_mean_pointing() method for empty observation '
                       'container')
         try:
-            empty._check_get_mean_pointing()
+            empty.check_get_mean_pointing()
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -366,7 +372,7 @@ class Test(test):
         # Test evaluate() method for minimum value violation
         self.test_try('Check evaluate() for minimum value violation')
         try:
-            empty._check_evaluate(0.0)
+            empty.check_evaluate(0.0)
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -374,7 +380,7 @@ class Test(test):
         # Test evaluate() method for maximum value violation
         self.test_try('Check evaluate() for maximum value violation')
         try:
-            empty._check_evaluate(4.0)
+            empty.check_evaluate(4.0)
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()

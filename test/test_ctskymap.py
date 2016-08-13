@@ -152,13 +152,15 @@ class Test(test):
 
         # Execute copy of ctskymap tool again, now with a higher chatter
         # level than before
-        cpy_skymap['usepnt']  = True
-        cpy_skymap['emin']    = 0.2
-        cpy_skymap['emax']    = 150.0
-        cpy_skymap['outmap']  = 'ctskymap_py2.fits'
-        cpy_skymap['logfile'] = 'ctskymap_py2.log'
-        cpy_skymap['publish'] = True
-        cpy_skymap['chatter'] = 3
+        cpy_skymap['usepnt']   = True
+        cpy_skymap['emin']     = 0.2
+        cpy_skymap['emax']     = 150.0
+        cpy_skymap['coordsys'] = 'GAL'
+        cpy_skymap['proj']     = 'CAR'
+        cpy_skymap['outmap']   = 'ctskymap_py2.fits'
+        cpy_skymap['logfile']  = 'ctskymap_py2.log'
+        cpy_skymap['publish']  = True
+        cpy_skymap['chatter']  = 3
         cpy_skymap.logFileOpen()  # Needed to get a new log file
         cpy_skymap.execute()
 
