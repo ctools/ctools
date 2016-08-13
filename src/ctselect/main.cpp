@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctselect - CTA data selection tool main code             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2013 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -37,19 +37,31 @@
  *
  * @param[in] argc Number of arguments
  * @param[in] argv Arguments
+ *
+ * This is the main entry point of the ctselect application. It allocates a
+ * ctselect object and executes the application. Any exceptions that occur
+ * will be catched and corresponding error messages written in the
+ * application logger and on the standard output.
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
     // Initialise return code
     int rc = 1;
 
-    // Create instance of application
-    ctselect application(argc, argv);
+    // Initialise pointer on application
+    ctselect* application = NULL;
 
-    // Run application
+    // Execute application
     try {
+
+        // Create instance of application
+        application = new ctselect(argc, argv);
+
         // Execute application
-        application.execute();
+        application->execute();
+
+        // Delete application
+        delete application;
 
         // Signal success
         rc = 0;
@@ -58,12 +70,16 @@ int main (int argc, char *argv[])
 
         // Extract error message
         std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " ctselect. Run aborted ...";
+        std::string signal  = "*** ERROR encounterted in the execution of "
+                              "ctselect. Run aborted ...";
 
-        // Write error in logger
-        application.log << message << std::endl;
-        application.log << signal  << std::endl;
+        // If application exists then write error in logger and delete
+        // application
+        if (application != NULL) {
+            application->log << signal  << std::endl;
+            application->log << message << std::endl;
+            delete application;
+        }
 
         // Write error on standard output
         std::cout << message << std::endl;

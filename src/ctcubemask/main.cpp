@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctcubemask - CTA mask cube tool main code                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 Chia-Chun Lu                                        *
+ *  copyright (C) 2014-2016 Chia-Chun Lu                                   *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -37,19 +37,31 @@
  *
  * @param[in] argc Number of arguments
  * @param[in] argv Arguments
+ *
+ * This is the main entry point of the ctcubemask application. It allocates
+ * a ctcubemask object and executes the application. Any exceptions that
+ * occur will be catched and corresponding error messages written in the
+ * application logger and on the standard output.
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
     // Initialise return code
     int rc = 1;
 
-    // Create instance of application
-    ctcubemask application(argc, argv);
+    // Initialise pointer on application
+    ctcubemask* application = NULL;
 
-    // Run application
+    // Execute application
     try {
+
+        // Create instance of application
+        application = new ctcubemask(argc, argv);
+
         // Execute application
-        application.execute();
+        application->execute();
+
+        // Delete application
+        delete application;
 
         // Signal success
         rc = 0;
@@ -58,12 +70,16 @@ int main (int argc, char *argv[])
 
         // Extract error message
         std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " ctcubemask. Run aborted ...";
+        std::string signal  = "*** ERROR encounterted in the execution of "
+                              "ctcubemask. Run aborted ...";
 
-        // Write error in logger
-        application.log << message << std::endl;
-        application.log << signal  << std::endl;
+        // If application exists then write error in logger and delete
+        // application
+        if (application != NULL) {
+            application->log << signal  << std::endl;
+            application->log << message << std::endl;
+            delete application;
+        }
 
         // Write error on standard output
         std::cout << message << std::endl;

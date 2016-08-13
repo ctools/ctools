@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctulimit - upper limit calculation tool                *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015 by Michael Mayer                                    *
+ *  copyright (C) 2015-2016 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -46,13 +46,20 @@ int main (int argc, char *argv[])
     // Initialise return code
     int rc = 1;
 
-    // Create instance of application
-    ctulimit application(argc, argv);
+    // Initialise pointer on application
+    ctulimit* application = NULL;
 
-    // Run application
+    // Execute application
     try {
+
+        // Create instance of application
+        application = new ctulimit(argc, argv);
+
         // Execute application
-        application.execute();
+        application->execute();
+
+        // Delete application
+        delete application;
 
         // Signal success
         rc = 0;
@@ -61,12 +68,16 @@ int main (int argc, char *argv[])
 
         // Extract error message
         std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " ctulimit. Run aborted ...";
+        std::string signal  = "*** ERROR encounterted in the execution of "
+                              "ctulimit. Run aborted ...";
 
-        // Write error in logger
-        application.log << signal  << std::endl;
-        application.log << message << std::endl;
+        // If application exists then write error in logger and delete
+        // application
+        if (application != NULL) {
+            application->log << signal  << std::endl;
+            application->log << message << std::endl;
+            delete application;
+        }
 
         // Write error on standard output
         std::cout << signal  << std::endl;

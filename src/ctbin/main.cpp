@@ -1,7 +1,7 @@
 /***************************************************************************
- *                    ctbin - CTA data binning main code                   *
+ *                    ctbin - CTA binning tool main code                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2011 by Jurgen Knodlseder                           *
+ *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctbin/main.cpp
  * @brief CTA data binning tool main code
- * @author J. Knodlseder
+ * @author Juergen Knoedlseder
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -38,21 +38,30 @@
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  *
- * This is the main entry point of the gtbin application. It allocates a
- * ctbin object and runs the application.
+ * This is the main entry point of the ctbin application. It allocates a
+ * ctbin object and executes the application. Any exceptions that occur
+ * will be catched and corresponding error messages written in the
+ * application logger and on the standard output.
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
     // Initialise return code
     int rc = 1;
 
-    // Create instance of application
-    ctbin application(argc, argv);
+    // Initialise pointer on application
+    ctbin* application = NULL;
 
-    // Run application
+    // Execute application
     try {
+
+        // Create instance of application
+        application = new ctbin(argc, argv);
+
         // Execute application
-        application.execute();
+        application->execute();
+
+        // Delete application
+        delete application;
 
         // Signal success
         rc = 0;
@@ -61,12 +70,16 @@ int main (int argc, char *argv[])
 
         // Extract error message
         std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " ctbin. Run aborted ...";
+        std::string signal  = "*** ERROR encounterted in the execution of "
+                              "ctbin. Run aborted ...";
 
-        // Write error in logger
-        application.log << signal  << std::endl;
-        application.log << message << std::endl;
+        // If application exists then write error in logger and delete
+        // application
+        if (application != NULL) {
+            application->log << signal  << std::endl;
+            application->log << message << std::endl;
+            delete application;
+        }
 
         // Write error on standard output
         std::cout << signal  << std::endl;

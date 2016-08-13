@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctbkgcube - CTA background cube tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014 by Chia-Chun Lu                                     *
+ *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -39,20 +39,29 @@
  * @param[in] argv Command line arguments.
  *
  * This is the main entry point of the ctbkgcube application. It allocates a
- * ctbkgcube object and runs the application.
+ * ctbkgcube object and executes the application. Any exceptions that occur
+ * will be catched and corresponding error messages written in the
+ * application logger and on the standard output.
  ***************************************************************************/
 int main (int argc, char *argv[])
 {
     // Initialise return code
     int rc = 1;
 
-    // Create instance of application
-    ctbkgcube application(argc, argv);
+    // Initialise pointer on application
+    ctbkgcube* application = NULL;
 
-    // Run application
+    // Execute application
     try {
+
+        // Create instance of application
+        application = new ctbkgcube(argc, argv);
+
         // Execute application
-        application.execute();
+        application->execute();
+
+        // Delete application
+        delete application;
 
         // Signal success
         rc = 0;
@@ -61,12 +70,16 @@ int main (int argc, char *argv[])
 
         // Extract error message
         std::string message = e.what();
-        std::string signal  = "*** ERROR encounterted in the execution of"
-                              " ctbkgcube. Run aborted ...";
+        std::string signal  = "*** ERROR encounterted in the execution of "
+                              "ctbkgcube. Run aborted ...";
 
-        // Write error in logger
-        application.log << signal  << std::endl;
-        application.log << message << std::endl;
+        // If application exists then write error in logger and delete
+        // application
+        if (application != NULL) {
+            application->log << signal  << std::endl;
+            application->log << message << std::endl;
+            delete application;
+        }
 
         // Write error on standard output
         std::cout << signal  << std::endl;
