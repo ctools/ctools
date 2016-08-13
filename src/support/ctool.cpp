@@ -1777,8 +1777,8 @@ std::string ctool::warn_xml_suffix(const GFilename& filename) const
  *
  *      $CTOOLS//share/help/
  *
- * of the ctools installation and the help file has the name "<name>.txt",
- * where <name> stands for the name of the ctool.
+ * of the ctools installation and the help file has the name "name().txt",
+ * where name() stands for the name of the ctool.
  ***************************************************************************/
 void ctool::provide_help(void) const
 {

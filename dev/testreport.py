@@ -66,7 +66,7 @@ def report_one_failure(name, xml):
     type    = xml.attribute('type')
 
     # Print failure information
-    print('  Failure in %s:\n  "%s" (%s)' % (name, message, type))
+    print('  Failure in "%s":\n  "%s" (%s)' % (name, message, type))
 
     # Return
     return

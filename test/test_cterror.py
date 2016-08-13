@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import gammalib
 import ctools
 from testing import test
@@ -92,6 +93,20 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
+
+        # Setup cterror --help option
+        cmd = cterror+' --help'
+
+        # Check if execution was successful in case that the CTOOLS
+        # environment variable was set or failed otherwise
+        if 'CTOOLS' in os.environ:
+            rc   = 0
+            what = 'success'
+        else:
+            rc   = 1
+            what = 'failure'
+        self.test_value(self._execute(cmd), rc,
+             'Check execution %s from command line with --help option' % what)
 
         # Return
         return
