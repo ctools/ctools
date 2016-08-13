@@ -1,5 +1,5 @@
 /***************************************************************************
- *                 ctmapcube - CTA map cube generation tool                *
+ *                      support - support functions                        *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2016 by Juergen Knoedlseder                              *
  * ----------------------------------------------------------------------- *
@@ -19,59 +19,21 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctmapcube/main.cpp
- * @brief CTA map cube generation tool main code
+ * @file support
+ * @brief Support function definitions
  * @author Juergen Knoedlseder
  */
 
+#ifndef SUPPORT_HPP
+#define SUPPORT_HPP
+
 /* __ Includes ___________________________________________________________ */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#include "support.hpp"
-#include "ctmapcube.hpp"
+#include "ctool.hpp"
 
+/* __ Definitions ________________________________________________________ */
 
-/***********************************************************************//**
- * @brief Main entry point of application
- *
- * @param[in] argc Number of command line arguments.
- * @param[in] argv Command line arguments.
- *
- * This is the main entry point of the ctmapcube application. It allocates a
- * ctmapcube object and executes the application. Any exceptions that occur
- * will be catched and corresponding error messages written in the
- * application logger and into the standard output.
- ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Initialise return code
-    int rc = 1;
+/* __ Prototypes _________________________________________________________ */
+int  execute_ctool(ctool* tool);
+void report_ctool_failure(const std::string& name, const std::string& message);
 
-    // Initialise pointer on application
-    ctmapcube* application = NULL;
-
-    // Execute application
-    try {
-
-        // Create instance of application
-        application = new ctmapcube(argc, argv);
-
-        // Execute ctool
-        rc = execute_ctool(application);
-
-    }
-
-    catch (std::exception &e) {
-
-        // Report exception
-        report_ctool_failure("ctmapcube", e.what());
-
-    }
-
-    // Delete application
-    delete application;
-
-    // Return
-    return rc;
-}
+#endif /* SUPPORT_HPP */

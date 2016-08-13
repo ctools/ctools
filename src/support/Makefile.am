@@ -20,7 +20,8 @@
 #############################################################################
 
 # Define sources for this directory
-sources = ctool.cpp ctool.hpp \
+sources = support.cpp support.hpp \
+          ctool.cpp ctool.hpp \
           ctobservation.cpp ctobservation.hpp \
           ctlikelihood.cpp ctlikelihood.hpp
 

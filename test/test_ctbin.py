@@ -82,7 +82,7 @@ class Test(test):
              'Self test of test script')
 
         # Check if execution was successful
-        self.test_assert(self._execute(cmd) == 0,
+        self.test_value(self._execute(cmd), 0,
              'Check successful execution from command line')
 
         # Load counts cube and check content.
@@ -107,13 +107,11 @@ class Test(test):
         # Check if execution was successful in case that the CTOOLS
         # environment variable was set or failed otherwise
         if 'CTOOLS' in os.environ:
-            rc   = 0
-            what = 'success'
+            self.test_value(self._execute(cmd), 0,
+                 'Check successful execution with --help option')
         else:
-            rc   = 1
-            what = 'failure'
-        self.test_value(self._execute(cmd), rc,
-             'Check execution %s from command line with --help option' % what)
+            self.test_assert(self._execute(cmd) != 0,
+                 'Check execution failure with --help option')
 
         # Return
         return
