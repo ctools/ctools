@@ -61,15 +61,20 @@ public:
     // Methods
     const GOptimizer* opt(void) const;
 
+#ifndef SWIG
+protected:
+#endif
+    // Protected methods in C++, public in SWIG interface
+    double evaluate(GModelPar& par, const double& value);
+
 protected:
     // Protected methods
     void   init_members(void);
     void   copy_members(const ctlikelihood& app);
     void   free_members(void);
-    double evaluate(GModelPar& par, const double& value);
 
     // Protected members
-    GOptimizerLM m_opt; //!< Optimizer
+    GOptimizerLM m_opt;   //!< Optimizer
 };
 
 

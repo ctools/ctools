@@ -23,6 +23,7 @@ import sys
 import gammalib
 import cscripts
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import test_cscript
 import test_cscaldb
 import test_csfindobs
 import test_csinfo
@@ -105,65 +106,25 @@ def test(installed=False, debug=False):
         os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
         os.system('chmod u+w pfiles/*')
 
-    # Allocate test suite container
-    suites = gammalib.GTestSuites('cscripts unit testing')
-
-    # Allocate test suites
-    suite_cscaldb      = test_cscaldb.Test()
-    suite_csinfo       = test_csinfo.Test()
-    suite_cslightcrv   = test_cslightcrv.Test()
-    suite_csmodelinfo  = test_csmodelinfo.Test()
-    suite_csmodelmerge = test_csmodelmerge.Test()
-    suite_csobs2caldb  = test_csobs2caldb.Test()
-    suite_csobsdef     = test_csobsdef.Test()
-    suite_csobsinfo    = test_csobsinfo.Test()
-    suite_cspull       = test_cspull.Test()
-    suite_csresmap     = test_csresmap.Test()
-    suite_csroot2caldb = test_csroot2caldb.Test()
-    suite_cssens       = test_cssens.Test()
-    suite_csspec       = test_csspec.Test()
-    suite_cstsdist     = test_cstsdist.Test()
-    suite_cstsmapmerge = test_cstsmapmerge.Test()
-    suite_cstsmapsplit = test_cstsmapsplit.Test()
-    suite_csworkflow   = test_csworkflow.Test()
-
-    # Setup unit tests
-    suite_cscaldb.set()
-    suite_csinfo.set()
-    suite_cslightcrv.set()
-    suite_csmodelinfo.set()
-    suite_csmodelmerge.set()
-    suite_csobs2caldb.set()
-    suite_csobsdef.set()
-    suite_csobsinfo.set()
-    suite_cspull.set()
-    suite_csresmap.set()
-    suite_csroot2caldb.set()
-    suite_cssens.set()
-    suite_csspec.set()
-    suite_cstsdist.set()
-    suite_cstsmapmerge.set()
-    suite_cstsmapsplit.set()
-    suite_csworkflow.set()
-
-    # Append tests to container
-    suites.append(suite_cscaldb)
-    suites.append(suite_csinfo)
-    suites.append(suite_cslightcrv)
-    suites.append(suite_csmodelinfo)
-    suites.append(suite_csmodelmerge)
-    suites.append(suite_csobs2caldb)
-    suites.append(suite_csobsdef)
-    suites.append(suite_csobsinfo)
-    suites.append(suite_cspull)
-    suites.append(suite_csresmap)
-    suites.append(suite_csroot2caldb)
-    suites.append(suite_cssens)
-    suites.append(suite_csspec)
-    suites.append(suite_cstsdist)
-    suites.append(suite_cstsmapmerge)
-    suites.append(suite_cstsmapsplit)
-    suites.append(suite_csworkflow)
+    # Define list of test suites
+    tests = [test_cscript.Test(),
+             test_cscaldb.Test(),
+             test_csinfo.Test(),
+             test_cslightcrv.Test(),
+             test_csmodelinfo.Test(),
+             test_csmodelmerge.Test(),
+             test_csobs2caldb.Test(),
+             test_csobsdef.Test(),
+             test_csobsinfo.Test(),
+             test_cspull.Test(),
+             test_csresmap.Test(),
+             test_csroot2caldb.Test(),
+             test_cssens.Test(),
+             test_csspec.Test(),
+             test_cstsdist.Test(),
+             test_cstsmapmerge.Test(),
+             test_cstsmapsplit.Test(),
+             test_csworkflow.Test()]
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
     # module which is only available since Python 2.6+)
@@ -178,23 +139,19 @@ def test(installed=False, debug=False):
             # impact the environment variable in the parent shell.
             del os.environ['VHEFITS']
 
-        # Allocate test suites
-        suite_csfindobs  = test_csfindobs.Test()
-        suite_csiactcopy = test_csiactcopy.Test()
-        suite_csiactdata = test_csiactdata.Test()
-        suite_csiactobs  = test_csiactobs.Test()
+        # Append IACT script tests to list of test suites
+        tests.extend([test_csfindobs.Test(),
+                      test_csiactcopy.Test(),
+                      test_csiactdata.Test(),
+                      test_csiactobs.Test()])
 
-        # Setup unit tests
-        suite_csfindobs.set()
-        suite_csiactcopy.set()
-        suite_csiactdata.set()
-        suite_csiactobs.set()
+    # Allocate test suite container
+    suites = gammalib.GTestSuites('cscripts unit testing')
 
-        # Append tests to container
-        suites.append(suite_csfindobs)
-        suites.append(suite_csiactcopy)
-        suites.append(suite_csiactdata)
-        suites.append(suite_csiactobs)
+    # Set test suites and append them to suite container
+    for suite in tests:
+        suite.set()
+        suites.append(suite)
 
     # Run test suite
     success = suites.run()

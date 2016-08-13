@@ -111,6 +111,7 @@ class Test(test):
                         'Check upper limit on energy flux')
 
         # Check that saving does not nothing
+        ulimit['logfile'] = 'ctulimit_py0.log'
         ulimit.logFileOpen()
         ulimit.save()
 
@@ -157,13 +158,6 @@ class Test(test):
         self.test_value(cpy_ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
 
-        # Execute copy of ctulimit tool again, now with a higher chatter
-        # level than before
-        cpy_ulimit['logfile'] = 'ctulimit_py2.log'
-        cpy_ulimit['chatter'] = 3
-        cpy_ulimit.logFileOpen()  # Needed to get a new log file
-        cpy_ulimit.execute()
-
         # Check results
         self.test_value(cpy_ulimit.diff_ulimit(), 8.86803e-18, 1.0e-21,
                         'Check differential upper limit')
@@ -171,9 +165,6 @@ class Test(test):
                         'Check upper limit on photon flux')
         self.test_value(cpy_ulimit.eflux_ulimit(), 2.75669e-11, 1.0e-16,
                         'Check upper limit on energy flux')
-
-        # Save copy of observation container for later
-        obs = cpy_ulimit.obs().copy()
 
         # Now clear copy of ctulimit tool
         cpy_ulimit.clear()
@@ -186,13 +177,21 @@ class Test(test):
         self.test_value(cpy_ulimit.eflux_ulimit(), 0.0, 1.0e-16,
                         'Check upper limit on energy flux')
 
-        # Now set ctulimit tool using the observation container from last
-        # time. This should avoid the necessity to recompute the maximum
-        # likelihood
-        ulimit = ctools.ctulimit(obs)
+        # Run ctlike to get an initial log-likelihood solution
+        like = ctools.ctlike()
+        like['inobs']    = self._events
+        like['inmodel']  = self._model
+        like['caldb']    = self._caldb
+        like['irf']      = self._irf
+        like.run()
+
+        # Now set ctulimit tool using the observation container from the
+        # previous run. This should avoid the necessity to recompute the
+        # maximum likelihood
+        ulimit = ctools.ctulimit(like.obs())
         ulimit['srcname'] = 'Crab'
-        ulimit['logfile'] = 'ctulimit_py3.log'
-        ulimit['chatter'] = 4
+        ulimit['logfile'] = 'ctulimit_py2.log'
+        ulimit['chatter'] = 3
 
         # Execute ctulimit tool
         ulimit.logFileOpen()  # Needed to get a new log file
@@ -207,11 +206,11 @@ class Test(test):
                         'Check upper limit on energy flux')
 
         # Test invalid model name
+        ulimit['srcname'] = 'Weihnachtsstern'
+        ulimit['logfile'] = 'ctulimit_py3.log'
+        ulimit.logFileOpen()
         self.test_try('Test invalid model name')
         try:
-            ulimit['srcname'] = 'Weihnachtsstern'
-            ulimit['logfile'] = 'ctulimit_py4.log'
-            ulimit.logFileOpen()
             ulimit.execute()
             self.test_try_failure('Exception not thrown')
         except ValueError:
@@ -219,9 +218,21 @@ class Test(test):
 
         # Test specification of background model
         ulimit['srcname'] = 'Background'
-        ulimit['logfile'] = 'ctulimit_py5.log'
+        ulimit['logfile'] = 'ctulimit_py4.log'
         ulimit.logFileOpen()
         self.test_try('Test invalid model name')
+        try:
+            ulimit.execute()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Test run with too few iterations
+        ulimit['srcname']  = 'Crab'
+        ulimit['max_iter'] = 1
+        ulimit['logfile']  = 'ctulimit_py5.log'
+        ulimit.logFileOpen()
+        self.test_try('Test ctulimit with too few iterations')
         try:
             ulimit.execute()
             self.test_try_failure('Exception not thrown')

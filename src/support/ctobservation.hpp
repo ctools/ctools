@@ -64,9 +64,7 @@ public:
     // Methods
     const GObservations& obs(void) const;
 
-#ifdef SWIG
-public:
-#else
+#ifndef SWIG
 protected:
 #endif
     // Iterator methods and members

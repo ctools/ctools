@@ -26,14 +26,49 @@
 
 %{
 /* Put headers and other declarations here that are needed for compilation */
+#define SWIG
 #include "ctobservation.hpp"
+
+
+/***********************************************************************//**
+ * @class csobservation
+ *
+ * @brief csobservation base class
+ *
+ * This class is a non-abstract C++ implementation of the ctobservation base
+ * class. It serves as Python base class since Python does not know about
+ * abstract classes.
+ ***************************************************************************/
+class csobservation : public ctobservation  {
+public:
+    // Constructors and destructors
+    csobservation(const std::string& name, const std::string& version) :
+                  ctobservation(name, version) {}
+    csobservation(const std::string& name, const std::string& version,
+                  const GObservations& obs) :
+                  ctobservation(name, version, obs) {}
+    csobservation(const std::string& name, const std::string& version,
+                  int argc, char* argv[]) :
+                  ctobservation(name, version, argc, argv){}
+    csobservation(const csobservation& app) : ctobservation(app) {}
+    virtual ~csobservation(void) {}
+
+    // Dummy methods (implementation makes this class non-abstract)
+    virtual void clear(void) {}
+    virtual void run(void) {}
+    virtual void save(void) {}
+};
 %}
+
+// Include (int ARGC, char **ARGV) typemap to allow passing command line
+// arguments to GApplication constructor
+%include "argcargv.i"
 
 
 /***********************************************************************//**
  * @class ctobservation
  *
- * @brief Base class for likelihood tools
+ * @brief Base class for observation tools
  ***************************************************************************/
 class ctobservation : public ctool {
 
@@ -43,7 +78,7 @@ public:
     ctobservation(const std::string& name, const std::string& version,
                   const GObservations& obs);
     ctobservation(const std::string& name, const std::string& version,
-                  int argc, char* argv[]);
+                  int ARGC, char **ARGV);
     ctobservation(const ctobservation& app);
     virtual ~ctobservation(void);
 
@@ -66,6 +101,31 @@ public:
 
 
 /***********************************************************************//**
+ * @class csobservation
+ *
+ * @brief Base class for observation scripts
+ *
+ * This is the base class from which observation scripts should derive.
+ ***************************************************************************/
+class csobservation : public ctobservation  {
+public:        
+    // Constructors and destructors
+    csobservation(const std::string& name, const std::string& version);
+    csobservation(const std::string& name, const std::string& version,
+                  const GObservations& obs);
+    csobservation(const std::string& name, const std::string& version,
+                  int ARGC, char **ARGV);
+    csobservation(const csobservation& app);
+    virtual ~csobservation(void);
+
+    // Methods
+    virtual void clear(void);
+    virtual void run(void);
+    virtual void save(void);
+};
+
+
+/***********************************************************************//**
  * @brief Observation tool base class C++ extensions
  ***************************************************************************/
 %extend ctobservation {
@@ -76,6 +136,24 @@ public:
  * @brief Observation tool base class Python extensions
  ***************************************************************************/
 %pythoncode %{
+
+# Initialise application by calling the appropriate base class constructor.
+# The function supports either an observation container, or an argument
+# list or no argument as "argv" parameter. The function also writes the
+# header in the log file and switches the date on for logging.
+def _init_csobservation(self, argv):
+    if len(argv) > 0 and isinstance(argv[0],gammalib.GObservations):
+        csobservation.__init__(self, self._name, self._version, argv[0])
+    elif len(argv) > 0:
+        csobservation.__init__(self, self._name, self._version, *argv)
+    else:
+        csobservation.__init__(self, self._name, self._version)
+    # Set logger properties
+    self._log_header()
+    self._log.date(True)
+csobservation._init_csobservation = _init_csobservation
+
+# Define an iterator over all observations
 def _unbinned_observations(self):
     obs = self._first_unbinned_observation()
     while obs != None:

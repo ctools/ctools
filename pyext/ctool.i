@@ -86,12 +86,12 @@ public:
     %rename(_time_reference)           time_reference;
     %rename(_get_observations)         get_observations;
     %rename(_setup_observations)       setup_observations;
+    %rename(_setup_models)             setup_models;
     %rename(_create_ebounds)           create_ebounds;
     %rename(_create_map)               create_map;
     %rename(_create_cube)              create_cube;
     %rename(_create_cta_obs)           create_cta_obs;
     %rename(_require_inobs)            require_inobs;
-    %rename(_require_inobs_nolist)     require_inobs_nolist;
     %rename(_require_inobs_nocube)     require_inobs_nocube;
     %rename(_log_observations)         log_observations;
     %rename(_log_models)               log_models;
@@ -128,8 +128,10 @@ public:
 
     // Protected methods that check user parameters
     void            require_inobs(const std::string& method);
-    void            require_inobs_nolist(const std::string& method);
     void            require_inobs_nocube(const std::string& method);
+
+    // Protected methods that extract user parameters
+    GCTARoi         get_roi(void);
 
     // Protected methods for logging
     void            log_observations(const GChatter&      chatter,
@@ -138,9 +140,6 @@ public:
     void            log_models(const GChatter&    chatter,
                                const GModels&     models,
                                const std::string& what = "Model");
-
-    // Protected methods that extract user parameters
-    GCTARoi           get_roi(void);
 
     // Protected support methods
     void              set_response(GObservations& obs);

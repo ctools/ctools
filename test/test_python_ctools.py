@@ -99,65 +99,32 @@ def test(installed=False):
         os.system('cp -r %s/syspfiles/*.par pfiles/' % (os.environ['CTOOLS']))
         os.system('chmod u+w pfiles/*')
 
+    # Define list of test suites
+    tests = [test_ctobssim.Test(),
+             test_ctselect.Test(),
+             test_ctbin.Test(),
+             test_ctlike.Test(),
+             test_cttsmap.Test(),
+             test_ctmodel.Test(),
+             test_ctskymap.Test(),
+             test_ctexpcube.Test(),
+             test_ctpsfcube.Test(),
+             test_ctedispcube.Test(),
+             test_ctbkgcube.Test(),
+             test_ctmapcube.Test(),
+             test_ctcubemask.Test(),
+             test_ctbutterfly.Test(),
+             test_ctulimit.Test(),
+             test_cterror.Test(),
+             test_pipelines.Test()]
+
     # Allocate test suite container
     suites = gammalib.GTestSuites('ctools unit testing')
 
-    # Allocate test suites and append them to the container
-    suite_ctobssim    = test_ctobssim.Test()
-    suite_ctselect    = test_ctselect.Test()
-    suite_ctbin       = test_ctbin.Test()
-    suite_ctlike      = test_ctlike.Test()
-    suite_cttsmap     = test_cttsmap.Test()
-    suite_ctmodel     = test_ctmodel.Test()
-    suite_ctskymap    = test_ctskymap.Test()
-    suite_ctexpcube   = test_ctexpcube.Test()
-    suite_ctpsfcube   = test_ctpsfcube.Test()
-    suite_ctedispcube = test_ctedispcube.Test()
-    suite_ctbkgcube   = test_ctbkgcube.Test()
-    suite_ctmapcube   = test_ctmapcube.Test()
-    suite_ctcubemask  = test_ctcubemask.Test()
-    suite_ctbutterfly = test_ctbutterfly.Test()
-    suite_ctulimit    = test_ctulimit.Test()
-    suite_cterror     = test_cterror.Test()
-    suite_pipelines   = test_pipelines.Test()
-
-    # Setup unit tests
-    suite_ctobssim.set()
-    suite_ctselect.set()
-    suite_ctbin.set()
-    suite_ctlike.set()
-    suite_cttsmap.set()
-    suite_ctmodel.set()
-    suite_ctskymap.set()
-    suite_ctexpcube.set()
-    suite_ctpsfcube.set()
-    suite_ctedispcube.set()
-    suite_ctbkgcube.set()
-    suite_ctmapcube.set()
-    suite_ctcubemask.set()
-    suite_ctbutterfly.set()
-    suite_ctulimit.set()
-    suite_cterror.set()
-    suite_pipelines.set()
-
-    # Append tests to container
-    suites.append(suite_ctobssim)
-    suites.append(suite_ctselect)
-    suites.append(suite_ctbin)
-    suites.append(suite_ctlike)
-    suites.append(suite_cttsmap)
-    suites.append(suite_ctmodel)
-    suites.append(suite_ctskymap)
-    suites.append(suite_ctexpcube)
-    suites.append(suite_ctpsfcube)
-    suites.append(suite_ctedispcube)
-    suites.append(suite_ctbkgcube)
-    suites.append(suite_ctmapcube)
-    suites.append(suite_ctcubemask)
-    suites.append(suite_ctbutterfly)
-    suites.append(suite_ctulimit)
-    suites.append(suite_cterror)
-    suites.append(suite_pipelines)
+    # Set test suites and append them to suite container
+    for suite in tests:
+        suite.set()
+        suites.append(suite)
 
     # Run test suite
     success = suites.run()

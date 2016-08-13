@@ -181,10 +181,10 @@ class Test(test):
         skymap['nxpix']    = 200
         skymap['nypix']    = 200
         skymap['binsz']    = 0.02
-        skymap['coordsys'] = 'CEL'
+        skymap['coordsys'] = 'GAL'
         skymap['proj']     = 'CAR'
-        skymap['xref']     = 83.63
-        skymap['yref']     = 22.01
+        skymap['xref']     = 184.5575
+        skymap['yref']     =  -5.7844
         skymap['outmap']   = 'ctskymap_py3.fits'
         skymap['logfile']  = 'ctskymap_py3.log'
         skymap['chatter']  = 4

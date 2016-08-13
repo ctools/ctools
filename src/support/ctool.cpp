@@ -549,10 +549,10 @@ GEbounds ctool::create_ebounds(void)
                 file.close();
                 std::string msg = "No extension with name \"EBOUNDS\" or"
                                   " \"ENERGYBINS\" found in FITS file"
-                                  " \""+ebinfile+"\".\n"
-                                  "An \"EBOUNDS\" or \"ENERGYBINS\" extension"
-                                  " is required if the parameter \"ebinalg\""
-                                  " is set to \"FILE\".";
+                                  " \""+ebinfile+"\". An \"EBOUNDS\" or "
+                                  "\"ENERGYBINS\" extension is required if "
+                                  "the parameter \"ebinalg\" is set to "
+                                  "\"FILE\".";
                 throw GException::invalid_value(G_CREATE_EBOUNDS, msg);
             }
         }
@@ -788,6 +788,9 @@ GCTAObservation ctool::create_cta_obs(void)
  *
  * Throw an exception if the "inobs" parameter is either "NONE" or an empty
  * string.
+ *
+ * @todo This method is only used by csobsinfo, csresmap and csspec. We
+ * should try to get rid of it
  ***************************************************************************/
 void ctool::require_inobs(const std::string& method)
 {
@@ -810,63 +813,13 @@ void ctool::require_inobs(const std::string& method)
 
 
 /***********************************************************************//**
- * @brief Throws exception if inobs parameter is an event list
- *
- * @param[in] method Method name.
- *
- * Throw an exception if the inobs parameter is an event list.
- ***************************************************************************/
-void ctool::require_inobs_nolist(const std::string& method)
-{
-    // Get inobs filename
-    GFilename filename = (*this)["inobs"].filename();
-
-    // Continue only if we have a FITS file
-    if (filename.is_fits()) {
-
-        // Signal no list
-        bool is_list = false;
-    
-        // Try loading file as counts cube. If this is successful then
-        // throw an exception
-        try {
-
-            // Load list from file
-            GCTAEventList list(filename);
-
-            // If we're still alive then signal that we have a list
-            is_list = true;
-
-        }
-
-        // Catch any exceptions
-        catch (...) {
-            ;
-        }
-
-        // If we have an event list then throw an exception
-        if (is_list) {
-            std::string msg = "An event list has been specified for the "
-                              "\"inobs\" parameter, yet no event list "
-                              "can be specified as input observation."
-                              " Instead, specify a counts cube or an "
-                              "observation definition file.";
-            throw GException::invalid_value(method, msg);
-        }
-    
-    } // endif: we had a FITS file
-    
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
  * @brief Throws exception if inobs parameter is a counts cube
  *
  * @param[in] method Method name.
  *
  * Throw an exception if the inobs parameter is a counts cube.
+ *
+ * @todo This method is only used by ctobssim. We should try to get rid of it
  ***************************************************************************/
 void ctool::require_inobs_nocube(const std::string& method)
 {
@@ -1542,6 +1495,9 @@ GSkyDir ctool::get_mean_pointing(const GObservations& obs)
  * @brief Get current resident set size (physical memory use) in Bytes
  *
  * @return Physical memory use in Bytes.
+ *
+ * @todo This method is currently not used and can be removed if we do not
+ *       use it
  ***************************************************************************/
 size_t ctool::get_current_rss(void)
 {
