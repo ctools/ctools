@@ -728,6 +728,9 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Make RoI selection
     if (m_select_roi) {
 
+        // Store the original radius
+        double original_rad = rad;
+
         // Log the requested RoI
         log_value(NORMAL, "Requested RoI",
                   "Centre(RA,DEC)=("+gammalib::str(ra)+", "+
@@ -751,17 +754,20 @@ void ctselect::select_events(GCTAObservation*   obs,
             }
         }
 
-        // Log the selected RoI
-        if (logNormal()) {
-            log << gammalib::parformat("Selected RoI");
-            if (rad <= 0.0) {
-                log << "None. There is no overlap between existing ";
-                log << "and requested ROI." << std::endl;
-            }
-            else {
-                log << "Centre(RA,DEC)=(" << ra << ", " << dec << ") deg, ";
-                log << "Radius=" << rad << " deg" << std::endl;
-            }
+        // If the RoI radius is negative then there is no overlap between
+        // the existing and the requested RoI and the radius will be restored
+        // to the original value. We signal that all events should be
+        // removed.
+        if (rad <= 0.0) {
+            rad        = original_rad;
+            remove_all = true;
+            log_value(NORMAL, "Selected RoI", "None. There is no overlap "
+                      "between existing and requested RoI.");
+        }
+        else {
+            log_value(NORMAL, "Selected RoI", "Centre(RA,DEC)=("+
+                      gammalib::str(ra)+", "+gammalib::str(dec)+") deg, "
+                      "Radius="+gammalib::str(rad)+" deg");
         }
         
         // Format RoI selection
@@ -813,12 +819,13 @@ void ctselect::select_events(GCTAObservation*   obs,
         throw GException::invalid_value(G_SELECT_EVENTS, msg);
     }
 
-    // Determine number of events in the events HDU
-    int nevents = file.table(evtname)->nrows();
+    // Determine number of events in the events HDU. If removal of all events
+    // has been requested then set the number of events to zero.
+    int nevents = (remove_all) ? 0 : file.table(evtname)->nrows();
 
-    // If the selected event list is empty or if removal of all events
-    // has been requested then append an empty event list to the observation.
-    if ((nevents < 1) || (remove_all)) {
+    // If the selected event list is empty then append an empty event list
+    // to the observation
+    if (nevents < 1) {
 
         // Create empty event list
         GCTAEventList eventlist;

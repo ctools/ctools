@@ -72,8 +72,8 @@ class Test(test):
         cmd = ctselect+' inobs="'+self._events+'"'+ \
                        ' outobs="ctselect_cmd1.fits"'+ \
                        ' ra=83.63 dec=22.01 rad=3.0'+ \
-                       ' tmin=0.0 tmax=1800.0'+ \
-                       ' emin=0.1 emax=100.0'+ \
+                       ' tmin=500.0 tmax=1000.0'+ \
+                       ' emin=0.2 emax=80.0'+ \
                        ' logfile="ctselect_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -91,8 +91,8 @@ class Test(test):
         cmd = ctselect+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' outobs="ctselect_cmd2.fits"'+ \
                        ' ra=83.63 dec=22.01 rad=3.0'+ \
-                       ' tmin=0.0 tmax=1800.0'+ \
-                       ' emin=0.1 emax=100.0'+ \
+                       ' tmin=500.0 tmax=1000.0'+ \
+                       ' emin=0.2 emax=80.0'+ \
                        ' logfile="ctselect_cmd2.log" chatter=1'
 
         # Check if execution failed
@@ -143,10 +143,10 @@ class Test(test):
         select['ra']      = 83.63
         select['dec']     = 22.01
         select['rad']     = 3
-        select['tmin']    = 0
-        select['tmax']    = 1800
-        select['emin']    = 0.1
-        select['emax']    = 100.0
+        select['tmin']    = 500.0
+        select['tmax']    = 1000.0
+        select['emin']    = 0.2
+        select['emax']    = 80.0
         select['outobs']  = 'ctselect_py1.fits'
         select['logfile'] = 'ctselect_py1.log'
         select['chatter'] = 2
@@ -166,7 +166,9 @@ class Test(test):
         self._check_obs(cpy_select.obs())
 
         # Execute copy of ctselect tool again, now with a higher chatter
-        # level than before and without any selection
+        # level than before and without any selection. Since the tools
+        # still holds the same selected observation container from before
+        # the number of events will be identical.
         cpy_select['ra']      = 'NONE'
         cpy_select['dec']     = 'NONE'
         cpy_select['rad']     = 'NONE'
@@ -184,11 +186,16 @@ class Test(test):
         self._check_result_file('ctselect_py2.fits')
 
         # Execute again the copy of ctselect tool again, now using the pointing
-        # information in the input observation
-        cpy_select['usepnt']  = True
-        cpy_select['outobs']  = 'ctselect_py3.fits'
-        cpy_select['logfile'] = 'ctselect_py3.log'
-        cpy_select['chatter'] = 4
+        # information in the input observation. We also set the minimum values
+        # to valid event selections, but since the maximum values are still
+        # 'NONE', no event selections should occur.
+        cpy_select['usepnt']   = True
+        cpy_select['tmin']     = 500.0
+        cpy_select['emin']     = 0.2
+        cpy_select['usethres'] = 'USER'
+        cpy_select['outobs']   = 'ctselect_py3.fits'
+        cpy_select['logfile']  = 'ctselect_py3.log'
+        cpy_select['chatter']  = 4
         cpy_select.logFileOpen()  # Needed to get a new log file
         cpy_select.execute()
 
@@ -204,20 +211,27 @@ class Test(test):
         # Get mixed observation container
         obs = self._obs_mixed()
 
-        # Now setup ctselect tool from observation container. We make an
-        # event selection that will result in zero events in the file.
+        # Attach response function to first observation which is the
+        # event list. This is necessary to run the ctselect tool with
+        # "DEFAULT" thresholds.
+        obs[0].response('South_0.5h', gammalib.GCaldb('cta', 'prod2'))
+
+        # Setup ctselect tool from observation container. An energy range
+        # beyond the energies covered in the event file is specified, hence
+        # an empty event list will be saved.
         select = ctools.ctselect(obs)
-        select['ra']      = 83.63
-        select['dec']     = 22.01
-        select['rad']     = 3.0
-        select['tmin']    = 0
-        select['tmax']    = 1800
-        select['emin']    = 120.0
-        select['emax']    = 130.0
-        select['expr']    = 'DETX == 0'
-        select['outobs']  = 'ctselect_py4.fits'
-        select['logfile'] = 'ctselect_py4.log'
-        select['chatter'] = 3
+        select['ra']       = 83.63
+        select['dec']      = 22.01
+        select['rad']      = 3.0
+        select['tmin']     = 500.0
+        select['tmax']     = 1000.0
+        select['emin']     = 120.0
+        select['emax']     = 130.0
+        select['expr']     = 'DETX == 0'
+        select['usethres'] = 'DEFAULT' # Has no impact as IRF has no keywords
+        select['outobs']   = 'ctselect_py4.fits'
+        select['logfile']  = 'ctselect_py4.log'
+        select['chatter']  = 3
 
         # Execute tool
         select.logFileOpen()  # Needed to get a new log file
@@ -232,10 +246,10 @@ class Test(test):
         select['ra']      = 83.63
         select['dec']     = 22.01
         select['rad']     = 3
-        select['tmin']    = 0
-        select['tmax']    = 1800
-        select['emin']    = 0.1
-        select['emax']    = 100.0
+        select['tmin']    = 500.0
+        select['tmax']    = 1000.0
+        select['emin']    = 0.2
+        select['emax']    = 80.0
         select['outobs']  = 'ctselect_py5.fits'
         select['logfile'] = 'ctselect_py5.log'
         select['chatter'] = 3
@@ -249,12 +263,106 @@ class Test(test):
         except ValueError:
             self.test_try_success()
 
+        # Setup ctselect tool from event list with extension name. The "emax"
+        # value should be ignored.
+        select = ctools.ctselect()
+        select['inobs']   = self._events+'[EVENTS]'
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 3.0
+        select['tmin']    = 500.0
+        select['tmax']    = 1000.0
+        select['emin']    = 0.2
+        select['emax']    = 0.0     # Signals that "emax" should be ignored
+        select['outobs']  = 'ctselect_py6.fits'
+        select['logfile'] = 'ctselect_py6.log'
+        select['chatter'] = 3
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py6.fits', nevents=595)
+
+        # Now ignore the "emin" value.
+        select = ctools.ctselect()
+        select['inobs']   = self._events+'[EVENTS]'
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 3.0
+        select['tmin']    = 500.0
+        select['tmax']    = 1000.0
+        select['emin']    = 0.0     # Signals that "emin" should be ignored
+        select['emax']    = 80.0
+        select['outobs']  = 'ctselect_py7.fits'
+        select['logfile'] = 'ctselect_py7.log'
+        select['chatter'] = 3
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py7.fits', nevents=1684)
+
+        # Now set "emin > emax"
+        select['emin']    = 150.0
+        select['emax']    = 80.0
+        select['outobs']  = 'ctselect_py8.fits'
+        select['logfile'] = 'ctselect_py8.log'
+        select['chatter'] = 3
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py8.fits', nevents=0)
+
+        # Setup ctselect tool with an RoI that is displaced and of the same
+        # size as the original RoI. This should reduce the RoI radius
+        # automatically.
+        select = ctools.ctselect()
+        select['inobs']   = self._events
+        select['ra']      = 83.63
+        select['dec']     = 24.01
+        select['rad']     = 5.0
+        select['tmin']    = 500.0
+        select['tmax']    = 1000.0
+        select['emin']    = 0.2
+        select['emax']    = 80.0
+        select['outobs']  = 'ctselect_py9.fits'
+        select['logfile'] = 'ctselect_py9.log'
+        select['chatter'] = 3
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py9.fits', nevents=466, dec=24.01)
+
+        # Now put the RoI outside the existing RoI. This should leave to
+        # an empty event list.
+        select['ra']      =  83.63
+        select['dec']     = -22.01
+        select['outobs']  = 'ctselect_py10.fits[EVENTS;GTI]'
+        select['logfile'] = 'ctselect_py10.log'
+        select['chatter'] = 3
+
+        # Execute tool
+        select.logFileOpen()  # Needed to get a new log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py10.fits', nevents=0, dec=-22.01, rad=5.0)
 
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=6127):
+    def _check_result_file(self, filename, nevents=591, dec=22.01, rad=3.0):
         """
         Check result file
 
@@ -264,18 +372,22 @@ class Test(test):
             Event list file name
         nevents : int, optional
             Expected number of events
+        dec : float, optional
+            Expected Declination (deg)
+        rad : float, optional
+            Expected radius (deg)
         """
         # Open result file
         events = gammalib.GCTAEventList(filename)
 
         # Check event list
-        self._check_events(events, nevents=nevents)
+        self._check_events(events, nevents=nevents, dec=dec, rad=rad)
 
         # Return
         return
 
     # Check observation and event list
-    def _check_obs(self, obs, nobs=1, nevents=6127):
+    def _check_obs(self, obs, nobs=1, nevents=591):
         """
         Check observation and event list
 
@@ -300,7 +412,7 @@ class Test(test):
         return
 
     # Check events
-    def _check_events(self, events, nevents=6127):
+    def _check_events(self, events, nevents=591, dec=22.01, rad=3.0):
         """
         Check event list
 
@@ -310,14 +422,18 @@ class Test(test):
             Event list
         nevents : int, optional
             Expected number of events
+        dec : float, optional
+            Expected Declination (deg)
+        rad : float, optional
+            Expected radius (deg)
         """
         # Check event list
         self.test_value(events.size(), nevents, 'Check number of events')
-        self.test_value(events.roi().centre().dir().ra_deg(), 83.63, 1.0e-6,
+        self.test_value(events.roi().centre().dir().ra_deg(), 83.63,
                         'Check for RoI centre Right Ascension')
-        self.test_value(events.roi().centre().dir().dec_deg(), 22.01, 1.0e-6,
+        self.test_value(events.roi().centre().dir().dec_deg(), dec,
                         'Check for RoI centre Declination')
-        self.test_value(events.roi().radius(), 3.0, 1.0e-6,
+        self.test_value(events.roi().radius(), rad,
                         'Check for RoI radius')
 
         # Return
