@@ -101,6 +101,13 @@ class Test(test):
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
 
+        # Setup ctbin --help option
+        cmd = ctbin+' --help'
+
+        # Check if execution was successful
+        self.test_assert(self._execute(cmd) == 0,
+             'Check successful execution from command line with --help option')
+
         # Return
         return
 
@@ -231,7 +238,7 @@ class Test(test):
 
         # And finally go for a fully Pythonic version with all parameters
         # being specified in a dictionary
-        pars = {'inobs': self._events, 'ebinalg': 'LOG', 'emin': 0.1,
+        pars = {'inobs': self._events, 'ebinalg': 'LIN', 'emin': 0.1,
                 'emax': 100.0, 'enumbins': 10, 'nxpix': 40, 'nypix': 40,
                 'binsz': 0.1, 'coordsys': 'CEL', 'proj': 'CAR',
                 'xref': 83.63, 'yref': 22.01, 'outcube': 'ctbin_py4.fits',

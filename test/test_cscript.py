@@ -56,7 +56,7 @@ class cscript_test(ctools.cscript):
     def check_setup_observations(self, filename, events=True, cube=True):
         self.pars()['inobs'].value(filename)
         obs = gammalib.GObservations()
-        self._setup_observations(obs, True, events, cube)
+        self._setup_observations(obs, False, events, cube)
         return
 
     # Check setup_models() method
@@ -74,6 +74,12 @@ class cscript_test(ctools.cscript):
     def check_require_inobs(self, filename):
         self.pars()['inobs'].value(filename)
         self._require_inobs('check_require_inobs')
+        return
+
+    # Check require_inobs_nocube() method
+    def check_require_inobs_nocube(self, filename):
+        self.pars()['inobs'].value(filename)
+        self._require_inobs_nocube('check_require_inobs_nocube')
         return
 
     # Check get_roi() method
@@ -124,6 +130,14 @@ class ctobservation_test(ctools.csobservation):
 
         # Return
         return
+
+    # Check first_unbinned_observation() method
+    def check_first_unbinned_observation(self):
+        return self._first_unbinned_observation()
+
+    # Check next_unbinned_observation() method
+    def check_next_unbinned_observation(self):
+        return self._next_unbinned_observation()
 
 
 # ======================= #
@@ -245,6 +259,14 @@ class Test(test):
         except ValueError:
             self.test_try_success()
 
+        # Test setup_observations() for acceptable event list
+        self.test_try('Check setup_observations() for acceptable event list')
+        try:
+            empty.check_setup_observations(self._events, events=True)
+            self.test_try_success()
+        except ValueError:
+            self.test_try_failure('Exception thrown')
+
         # Test setup_observations() for unacceptable event list
         self.test_try('Check setup_observations() for unacceptable event list')
         try:
@@ -252,6 +274,14 @@ class Test(test):
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
+
+        # Test setup_observations() for acceptable counts cube
+        self.test_try('Check setup_observations() for acceptable counts cube')
+        try:
+            empty.check_setup_observations(self._cntcube, cube=True)
+            self.test_try_success()
+        except ValueError:
+            self.test_try_failure('Exception thrown')
 
         # Test setup_observations() for unacceptable counts cube
         self.test_try('Check setup_observations() for unacceptable counts cube')
@@ -299,6 +329,14 @@ class Test(test):
         self.test_try('Check require_inobs() method for invalid file name')
         try:
             empty.check_require_inobs('NONE')
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Test require_inobs_nocube() method for invalid file name
+        self.test_try('Check require_inobs_nocube() method for counts cube')
+        try:
+            empty.check_require_inobs_nocube(self._cntcube)
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
@@ -351,11 +389,11 @@ class Test(test):
         empty = ctobservation_test()
 
         # Test first_unbinned_observation() method
-        self.test_assert(empty._first_unbinned_observation() is None,
+        self.test_assert(empty.check_first_unbinned_observation() is None,
                          'Check first_unbinned_observation() method')
 
         # Test next_unbinned_observation() method
-        self.test_assert(empty._next_unbinned_observation() is None,
+        self.test_assert(empty.check_next_unbinned_observation() is None,
                          'Check next_unbinned_observation() method')
 
         # Return
