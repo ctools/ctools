@@ -73,8 +73,8 @@ class cssens(ctools.cscript):
         self._num_avg     = 3
         self._log_clients = False
         
-        # Initialise application by calling the appropriate class
-        # constructor.
+        # Initialise application by calling the appropriate base class
+        # constructor
         self._init_cscript(argv)
 
         # Return
@@ -294,13 +294,13 @@ class cssens(ctools.cscript):
         e_mean    = math.pow(10.0, loge)
         erg_mean  = e_mean * tev2erg
 
-        # Compute Crab unit (this is the factor with which the Prefactor needs
-        # to be multiplied to get 1 Crab
+        # Compute Crab unit. This is the factor with which the Prefactor needs
+        # to be multiplied to get 1 Crab.
         crab_flux = self._get_crab_flux(emin, emax)
         src_flux  = test_model[self._srcname].spectral().flux(emin, emax)
         crab_unit = crab_flux/src_flux
 
-        # Write header
+        # Write header and some introductory information into logger
         self._log_header2(gammalib.TERSE, 'Energies: '+str(emin)+' - '+str(emax))
         self._log_value(gammalib.TERSE, 'Crab flux', str(crab_flux)+' ph/cm2/s')
         self._log_value(gammalib.TERSE, 'Source model flux', str(src_flux)+
@@ -321,37 +321,38 @@ class cssens(ctools.cscript):
             # Update iteration counter
             iterations += 1
 
-            # Write header
-            if self._logExplicit():
-                self._log.header2('Iteration '+str(iterations))
+            # Write header for iteration into logger
+            self._log_header2(gammalib.EXPLICIT, 'Iteration '+str(iterations))
 
-            # Set test source model. crab_prefactor is the Prefactor that
-            # corresponds to 1 Crab
+            # Create a copy of the test models, set the prefactor of the test
+            # source in the models, and append the models to the observation.
+            # "crab_prefactor" is the Prefactor that corresponds to a flux of
+            # 1 Crab.
             models         = test_model.copy()
-            crab_prefactor = models[self._srcname]['Prefactor'].value() * \
-                             crab_unit
-            models[self._srcname]['Prefactor'].value(crab_prefactor * \
-                                                     test_crab_flux)
+            crab_prefactor = models[self._srcname]['Prefactor'].value() * crab_unit
+            models[self._srcname]['Prefactor'].value(crab_prefactor * test_crab_flux)
             self._obs.models(models)
 
-            # Simulate events
+            # Simulate events for the models. "sim" holds an observation
+            # container with observations containing the simulated events.
             sim = obsutils.sim(self._obs, nbins=self._enumbins, seed=iterations,
                                binsz=self._binsz, npix=self._npix,
                                log=self._log_clients,
                                debug=self['debug'].boolean(),
                                edisp=self._edisp)
 
-            # Determine number of events in simulation
+            # Determine number of events in simulation by summing the events
+            # over all observations in the observation container
             nevents = 0.0
             for run in sim:
                 nevents += run.events().number()
 
-            # Write simulation results
+            # Write simulation results into logger
             self._log_header3(gammalib.EXPLICIT, 'Simulation')
-            self._log_value(gammalib.EXPLICIT, 'Number of simulated events',
-                            nevents)
+            self._log_value(gammalib.EXPLICIT, 'Number of simulated events', nevents)
 
-            # Fit test source
+            # Fit test source to the simulated events in the observation
+            # container
             fit = ctools.ctlike(sim)
             fit['edisp']   = edisp=self._edisp
             fit['debug']   = self['debug'].boolean()
@@ -370,24 +371,28 @@ class cssens(ctools.cscript):
             photon_flux = source.spectral().flux(emin, emax)
             energy_flux = source.spectral().eflux(emin, emax)
 
-            # Compute differential sensitivity in unit erg/cm2/s
+            # Compute differential sensitivity in unit erg/cm2/s by evaluating
+            # the spectral model at the "e_mean" energy and by multipling the
+            # result with the energy squared. Since the "eval()" method returns
+            # an intensity in units of ph/cm2/s/MeV we multiply by 1.0e6 to
+            # convert into ph/cm2/s/TeV, by "e_mean" to convert into ph/cm2/s,
+            # and finally by "erg_mean" to convert to erg/cm2/s.
             energy      = gammalib.GEnergy(e_mean, 'TeV')
-            sensitivity = source.spectral().eval(energy) * e_mean*erg_mean * 1.0e6
+            sensitivity = source.spectral().eval(energy) * e_mean*erg_mean*1.0e6
 
             # Assess quality based on a comparison between Npred and Nevents
             quality = npred - nevents
 
-            # Write test source fit results
+            # Write test source fit results into logger
             self._log_header3(gammalib.EXPLICIT, 'Test source model fit')
             self._log_value(gammalib.EXPLICIT, 'Test statistics', ts)
             self._log_value(gammalib.EXPLICIT, 'log likelihood', logL)
-            self._log_value(gammalib.EXPLICIT, 'Number of predicted events',
-                                               quality)
+            self._log_value(gammalib.EXPLICIT, 'Number of predicted events', quality)
             self._log_value(gammalib.EXPLICIT, 'Fit quality', npred)
             for model in models:
                 self._log_value(gammalib.EXPLICIT, 'Model', model.name())
                 for par in model:
-                    self._log(str(par)+'\n')
+                    self._log_string(gammalib.EXPLICIT, str(par))
 
             # If TS was non-positive then increase the test flux and start
             # over
@@ -395,26 +400,27 @@ class cssens(ctools.cscript):
 
                 # If the number of iterations was exceeded then stop
                 if (iterations >= self._max_iter):
-                    if self._logTerse():
-                        self._log(' Test ended after %d iterations.\n' %
-                                  self._max_iter)
+                    self._log_string(gammalib.TERSE,
+                         ' Test ended after %d iterations.' % self._max_iter)
                     break
 
                 # Increase test flux by a factor of 2
                 test_crab_flux = test_crab_flux * 2.0
 
                 # Signal start we start over
-                if self._logExplicit():
-                    self._log('Non positive TS, increase test flux and start '
-                              'over.\n')
+                self._log_string(gammalib.EXPLICIT,
+                     'Non positive TS, increase test flux and start over.')
 
                 # ... and start over
                 continue
 
-            # Compute flux correction factor based on average TS
+            # Compute flux correction factor based on average TS. We
+            # assume here that the significance is proportional to the source
+            # flux, and that the significance scales as the square root of
+            # the Test Statistic
             correct = math.sqrt(self._ts_thres/ts)
 
-            # Compute extrapolated fluxes
+            # Compute extrapolated fluxes based on the flux correction factor
             crab_flux   = correct * crab_flux
             photon_flux = correct * photon_flux
             energy_flux = correct * energy_flux
@@ -437,7 +443,7 @@ class cssens(ctools.cscript):
                 for model in models:
                     self._log_value(gammalib.EXPLICIT, 'Model', model.name())
                     for par in model:
-                        self._log(str(par)+'\n')
+                        self._log_string(gammalib.EXPLICIT, str(par))
             elif self._logTerse():
                 name  = 'Iteration %d' % iterations
                 value = ('TS=%.4f corr=%e  %e ph/cm2/s = %e erg/cm2/s = %.2f '
@@ -447,7 +453,7 @@ class cssens(ctools.cscript):
 
             # Compute sliding average of extrapolated fitted prefactor,
             # photon and energy flux. This damps out fluctuations and
-            # improves convergence
+            # improves convergence.
             crab_flux   = 0.0
             photon_flux = 0.0
             energy_flux = 0.0
@@ -494,7 +500,7 @@ class cssens(ctools.cscript):
                               ' iterations.\n')
                 break
 
-        # Write fit results
+        # Write fit results into logger
         self._log_header3(gammalib.TERSE, 'Fit results')
         self._log_value(gammalib.TERSE, 'Test statistics', ts)
         self._log_value(gammalib.TERSE, 'Photon flux',
@@ -512,7 +518,7 @@ class cssens(ctools.cscript):
         for model in models:
             self._log_value(gammalib.TERSE, 'Model', model.name())
             for par in model:
-                self._log_string(gammalib.TERSE, str(par)+'\n')
+                self._log_string(gammalib.TERSE, str(par))
 
         # Restore energy boundaries of observation container
         for i, obs in enumerate(self._obs):
@@ -553,31 +559,15 @@ class cssens(ctools.cscript):
         models = modutils.test_source(self._obs.models(), self._srcname,
                                       ra=self._ra, dec=self._dec)
 
-        # Write observations into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1(gammalib.number('Observation',len(self._obs)))
-            self._log(str(self._obs))
-            self._log('\n')
-        if self._logExplicit():
-            for obs in self._obs:
-                self._log(str(obs))
-                self._log('\n')
+        # Write observation into logger
+        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
 
         # Write models into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Models')
-            self._log(str(models))
-            self._log('\n')
+        self._log_models(gammalib.NORMAL, models, 'Model')
 
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Sensitivity determination')
-            self._log.parformat('Type')
-            self._log(self._type)
-            self._log('\n')
+        self._log_header1(gammalib.TERSE, 'Sensitivity determination')
+        self._log_value(gammalib.TERSE, 'Type', str(self._type))
 
         # Loop over energy bins
         for ieng in range(self._ebounds.size()):
@@ -618,7 +608,6 @@ class cssens(ctools.cscript):
 
         # Return
         return
-
 
 
 # ======================== #

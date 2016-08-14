@@ -93,8 +93,6 @@ public:
     %rename(_create_cta_obs)           create_cta_obs;
     %rename(_require_inobs)            require_inobs;
     %rename(_require_inobs_nocube)     require_inobs_nocube;
-    %rename(_log_observations)         log_observations;
-    %rename(_log_models)               log_models;
     %rename(_get_roi)                  get_roi;
     %rename(_set_response)             set_response;
     %rename(_set_edisp)                set_edisp;
@@ -132,14 +130,6 @@ public:
 
     // Protected methods that extract user parameters
     GCTARoi         get_roi(void);
-
-    // Protected methods for logging
-    void            log_observations(const GChatter&      chatter,
-                                     const GObservations& obs,
-                                     const std::string&   what = "Observation");
-    void            log_models(const GChatter&    chatter,
-                               const GModels&     models,
-                               const std::string& what = "Model");
 
     // Protected support methods
     void              set_response(GObservations& obs);
@@ -193,11 +183,22 @@ public:
  * @brief ctool base class Python extensions
  ***************************************************************************/
 %extend ctool {
+    void _log_observations(const int&           chatter,
+                           const GObservations& obs,
+                           const std::string&   what = "Observation") {
+        self->log_observations(GChatter(chatter), obs, what);
+    }
+    void _log_models(const int&               chatter,
+                           const GModels&     models,
+                           const std::string& what = "Model") {
+        self->log_models(GChatter(chatter), models, what);
+    }
     void _read_ahead(const bool& flag) {
         self->m_read_ahead = flag;
         return;
     }
 }
+
 
 /***********************************************************************//**
  * @brief ctool and cscript base class Python extensions

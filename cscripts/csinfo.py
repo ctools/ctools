@@ -129,22 +129,19 @@ def csinfo_setup_check():
 
     # Check if the "GAMMALIB" environment variable is set
     sys.stdout.write('   GAMMALIB environment variable ... ')
-    if 'GAMMALIB' in os.environ:
+    gammalib_environ = 'GAMMALIB' in os.environ
+    if gammalib_environ:
         print('ok')
-        gammalib_environ = True
     else:
         print('NOT OK')
-        gammalib_environ = False
 
     # Check if the "CTOOLS" environment variable is set
     sys.stdout.write('   CTOOLS   environment variable ... ')
-    if 'CTOOLS' in os.environ:
+    ctools_environ = 'CTOOLS' in os.environ
+    if ctools_environ:
         print('ok')
-        ctools_environ = True
     else:
         print('NOT OK')
-        ctools_environ = False
-
 
     # Check if gammalib Python module import works
     sys.stdout.write('   gammalib Python import .......... ')

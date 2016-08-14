@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Generation of an observation definition file.
+# Generation of an observation definition file
 #
 # Copyright (C) 2015-2016 Juergen Knoedlseder
 #

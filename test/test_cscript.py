@@ -108,6 +108,23 @@ class cscript_test(ctools.cscript):
         obs = gammalib.GObservations()
         return self._get_mean_pointing(obs)
 
+    # Check set_obs_response() method
+    def check_set_obs_response(self, expcube, psfcube, bkgcube, edispcube, edisp):
+        obs    = gammalib.GCTAObservation()
+        counts = gammalib.GCTAEventCube()
+        obs.events(counts)
+        self.pars()['expcube'].value(expcube)
+        self.pars()['psfcube'].value(psfcube)
+        self.pars()['bkgcube'].value(bkgcube)
+        self.pars()['edispcube'].value(edispcube)
+        self.pars()['edisp'].value(edisp)
+        self._set_obs_response(obs)
+        return
+
+    # Check get_current_rss() method
+    def check_get_current_rss(self):
+        return self._get_current_rss()
+
 
 # ======================== #
 # ctobservation_test class #
@@ -196,6 +213,13 @@ class Test(test):
         pars.append(gammalib.GApplicationPar('rad','r','h','1.0','','',''))
         pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
         pars.append(gammalib.GApplicationPar('emax','r','h','10.0','','',''))
+        pars.append(gammalib.GApplicationPar('expcube','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('psfcube','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('bkgcube','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('edispcube','f','h','NONE','','',''))
+        pars.append(gammalib.GApplicationPar('edisp','b','h','yes','','',''))
+        pars.append(gammalib.GApplicationPar('caldb','s','h','prod2','','',''))
+        pars.append(gammalib.GApplicationPar('irf','s','h','South_0.5h','','',''))
         pars.append_standard()
         pars.save('cscript_test.par')
 
@@ -333,6 +357,14 @@ class Test(test):
         except ValueError:
             self.test_try_success()
 
+        # Test require_inobs_nocube() method for valid file name
+        self.test_try('Check require_inobs_nocube() method for event list')
+        try:
+            empty.check_require_inobs_nocube(self._events)
+            self.test_try_success()
+        except ValueError:
+            self.test_try_failure('Exception thrown')
+
         # Test require_inobs_nocube() method for invalid file name
         self.test_try('Check require_inobs_nocube() method for counts cube')
         try:
@@ -346,15 +378,12 @@ class Test(test):
         self.test_assert(not roi.is_valid(), 'Check get_roi() method')
 
         # Test restore_edisp() method for invalid vector size
-        #self.test_try('Check restore_edisp() method for invalid vector size')
-        #try:
-        #    empty.check_restore_edisp()
-        #    self.test_try_failure('Exception not thrown')
-        #except ValueError:
-        #    self.test_try_success()
-        #
-        # NOTE: This code does not work because of a missing list to
-        #       integer vector conversion.
+        self.test_try('Check restore_edisp() method for invalid vector size')
+        try:
+            empty.check_restore_edisp()
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
 
         # Test set_obs_bounds() method
         obs = empty.check_set_obs_bounds()
@@ -376,6 +405,28 @@ class Test(test):
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
+
+        # Test set_obs_response() method with 'NONE' files. If energy dispersion
+        # is requested then an exception will be thrown.
+        empty.check_set_obs_response('NONE', 'NONE', 'NONE', 'NONE', 'no')
+        empty.check_set_obs_response('NONE', 'NONE', 'NONE', 'NONE', 'yes')
+        self.test_try('Check set_obs_response() method for file names')
+        try:
+            empty.check_set_obs_response(self._datadir+'/crab_expcube.fits',
+                                         self._datadir+'/crab_psfcube.fits',
+                                         self._datadir+'/crab_bkgcube.fits',
+                                         'NONE', 'yes')
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+        empty.check_set_obs_response(self._datadir+'/crab_expcube.fits',
+                                     self._datadir+'/crab_psfcube.fits',
+                                     self._datadir+'/crab_bkgcube.fits',
+                                     self._datadir+'/crab_edispcube.fits',
+                                     'yes')
+
+        # Test get_current_rss() method
+        empty.check_get_current_rss()
 
         # Return
         return

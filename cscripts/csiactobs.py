@@ -78,6 +78,10 @@ class csiactobs(ctools.cscript):
         self._subdir           = ''
         self._debug            = False
 
+        # Initialise empty observation definition XML file
+        self._xml.append(gammalib.GXmlElement('observation_list '
+                                              'title="observation list"'))
+
         # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 

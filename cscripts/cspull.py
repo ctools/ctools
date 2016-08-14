@@ -236,31 +236,37 @@ class cspull(ctools.cscript):
         if self._logNormal():
             self._log.header3('Pulls')
 
-        # Gather results
-        colnames = []
-        values   = {}
-        colnames.append('LogL')
-        colnames.append('Sim_Events')
-        colnames.append('Npred_Events')
-        values['LogL']         = logL
-        values['Sim_Events']   = nevents
-        values['Npred_Events'] = npred
+        # Gather results in form of a list of result columns and a
+        # dictionary containing the results. The result contains the
+        # log-likelihood, the number of simulated events, the number of
+        # predicted events and for each fitted parameter the fitted value,
+        # the pull and the fit error.
+        #
+        # Note that we do not use the model and parameter iterators
+        # because we need the indices to get the true (or real) parameter
+        # values from the input models.
+        colnames = ['LogL', 'Sim_Events', 'Npred_Events']
+        values   = {'LogL': logL, 'Sim_Events': nevents, 'Npred_Events': npred}
         for i in range(models.size()):
-            model      = models[i]
-            model_name = model.name()
+            model = models[i]
             for k in range(model.size()):
                 par = model[k]
                 if par.is_free():
 
-                    # Set parameter name
-                    name = model_name+'_'+par.name()
+                    # Set name as a combination of model name and parameter
+                    # name separated by an underscore. In that way each
+                    # parameter has a unique name.
+                    name = model.name()+'_'+par.name()
 
-                    # Append parameter, Pull_parameter and e_parameter
+                    # Append parameter, Pull_parameter and e_parameter column
+                    # names
                     colnames.append(name)
                     colnames.append('Pull_'+name)
                     colnames.append('e_'+name)
 
-                    # Compute pull
+                    # Compute pull for this parameter as the difference
+                    #               (fitted - true) / error
+                    # In case that the error is 0 the pull is set to 99
                     fitted_value = par.value()
                     real_value   = self._obs.models()[i][k].value()
                     error        = par.error()
@@ -269,16 +275,16 @@ class cspull(ctools.cscript):
                     else:
                         pull = 99.0
 
-                    # Store results
-                    values[name] = fitted_value
+                    # Store results in dictionary
+                    values[name]         = fitted_value
                     values['Pull_'+name] = pull
                     values['e_'+name]    = error
 
-                    # Write result
+                    # Write results into logger
                     value = '%.4f (%e +/- %e)' % (pull, fitted_value, error)
                     self._log_value(gammalib.NORMAL, name, value)
 
-        # Bundle together results
+        # Bundle together results in a dictionary
         result = {'colnames': colnames, 'values': values}
 
         # Return
@@ -298,20 +304,10 @@ class cspull(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1(gammalib.number('Observation',len(self._obs)))
-            self._log(str(self._obs))
-            self._log('\n')
-        if self._logExplicit():
-            for obs in self._obs:
-                self._log(str(obs))
-                self._log('\n')
+        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
 
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Generate pull distribution')
+        self._log_header1(gammalib.TERSE, 'Generate pull distribution')
 
         # Loop over trials
         for seed in range(self._ntrials):

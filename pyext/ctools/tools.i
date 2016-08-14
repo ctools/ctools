@@ -36,6 +36,12 @@
 
 /* __ Include standard typemaps for vectors and strings __________________ */
 %include stl.i
+%include "std_vector.i"
+namespace std {
+   %template(vector_int)    vector<int>;
+   %template(vector_double) vector<double>;
+   %template(vector_bool)   vector<bool>;
+};
 
 /* __ Make sure that exceptions are catched ______________________________ */
 %import(module="gammalib.support") "GException.i";
