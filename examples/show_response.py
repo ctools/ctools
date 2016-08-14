@@ -52,7 +52,7 @@ def sigma_lima(Non, Noff, alpha=0.2):
     sigma : float
         Detection significance in Gaussian sigma
     """
-    # Compute sensitivity
+    # Compute sensitivity in Gaussian sigma
     alpha1 = alpha + 1.0
     sum    = Non + Noff
     arg1   = Non / sum
@@ -230,23 +230,67 @@ def show_one_sensitivity(rsp, name, color='r', duration=180000.0, alpha=0.2,
     logE  = [-1.7+0.2*i for i in range(nbins)]
     E     = [math.pow(10.0, e) for e in logE]
 
-    # Generate sensitivity vector
+    # Initialise sensitivity vector
     flux = [0.0 for i in range(nbins)]
+
+    # Loop over all energy bins
     for i in range(nbins):
-        ewidth     = (math.pow(10.0, logE[i]+0.1) - \
-                      math.pow(10.0, logE[i]-0.1))*1.0e6
-        aeff       = rsp.aeff()(logE[i])
-        r68        = rsp.psf().delta_max(logE[i]) / 5.0 / r68_to_sigma
+
+        # Compute the energy width in MeV
+        ewidth = (math.pow(10.0, logE[i]+0.1) - math.pow(10.0, logE[i]-0.1)) * \
+                 1.0e6
+
+        # Extract effective area in cm2 from Instrument Response Function
+        aeff = rsp.aeff()(logE[i])
+
+        # Extract 68% containment radius in radians from Instrument Response
+        # Function.
+        # A kluge is used since this information is not directly available,
+        # but the "delta_max()" method returns 5 times the "sigma" of the
+        # Gaussian PSF. Hence dividing by 5 gives the "sigma", and dividing
+        # by the 68% containment radius to sigma conversion factor gives
+        # r68.
+        r68 = rsp.psf().delta_max(logE[i]) / 5.0 / r68_to_sigma
+
+        # Compute the solid angle of the 68% containment radius
         solidangle = gammalib.twopi * (1.0 - math.cos(r68))
-        bgd_counts = rsp.background()(logE[i], 0.0, 0.0) * duration * ewidth * solidangle
-        Noff       = bgd_counts/alpha
+
+        # Compute the total number of background counts by multiplying the
+        # background rate by the observation duration, the energy width and
+        # the solid angle
+        bgd_counts = rsp.background()(logE[i], 0.0, 0.0) * \
+                     duration * ewidth * solidangle
+
+        # The number of Off counts is the total number of background counts
+        # divided by the "alpha" parameter
+        Noff = bgd_counts/alpha
+
+        # If there are Off counts then compute the corresponding On counts
+        # for "sigma" detection significance
         if Noff > 0:
-            Non        = Non_lima(sigma, Noff)
+
+            # Compute On counts using Li & Ma
+            Non = Non_lima(sigma, Noff)
+
+            # Get the source counts by subtracting the  background counts
+            # under the source. Make sure that the source counts are at least
+            # 5% of the background counts (low-energy background systematics)
+            # and that there are at least 10 source events (high-energy limit)
             src_counts = Non - bgd_counts
             if src_counts < 0.05*bgd_counts:
                 src_counts = 0.05*bgd_counts
             if src_counts < 10:
                 src_counts = 10.0
+
+            # Compute flux under the assumption that the source spectrum is
+            # a power law with index of -2.6. The flux is the source counts
+            # divided by the duration and 68% of the effective area times
+            # a conversion factor. The conversion factor is given by
+            #
+            #                 conv = 1.6021765 * E^2 / F(E)
+            #
+            # where E is the mean energy of the bin and F(E) is the flux in
+            # the bin
             emin    = gammalib.GEnergy(math.pow(10.0, logE[i]-0.1), 'TeV')
             emax    = gammalib.GEnergy(math.pow(10.0, logE[i]+0.1), 'TeV')
             epivot  = gammalib.GEnergy(math.pow(10.0, logE[i]), 'TeV')

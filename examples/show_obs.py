@@ -61,7 +61,7 @@ def run_csobsinfo(filename, ra, dec, debug=True):
     info['inobs'] = obsdef.url()
     info['debug'] = debug
 
-    # Set offset
+    # Set offset if the "ra" and "dec" arguments are not empty strings
     if ra != '' and dec != '':
         info['ra']     = float(ra)
         info['dec']    = float(dec)
@@ -94,14 +94,15 @@ def plot_information(info, ra, dec, plotfile):
     plotfile : str
         Plot filename
     """
-    # Retrieve observation info
+    # Retrieve observation information
     zeniths  = info.zeniths()
     azimuths = info.azimuths()
     offsets  = info.offsets()
     ebounds  = info.ebounds()
     gti      = info.gti()
 
-    # Create figure with subplots
+    # Create figure with subplots. In case that offset and energy boundary
+    # information is available a column is added to the subplots
     nrows = 2
     ncols = 2
     if info['offset'].boolean() and ebounds.size() > 0:
@@ -110,7 +111,7 @@ def plot_information(info, ra, dec, plotfile):
     plt.figure()
     plt.subplot(nrows, ncols, iplot)
 
-    # Plot zenith angle distribution
+    # Plot zenith angle histogram
     zmin = min(zeniths)
     zmax = max(zeniths)
     plt.hist(zeniths, bins=30, range=(zmin, zmax), fc='blue')
@@ -118,7 +119,7 @@ def plot_information(info, ra, dec, plotfile):
     plt.ylabel('Frequency')
     plt.title('Zenith angle distribution')
 
-    # Plot azimuth angle distribution
+    # Plot azimuth angle histogram
     iplot += 1
     plt.subplot(nrows, ncols, iplot)
     amin = min(azimuths)
@@ -128,7 +129,7 @@ def plot_information(info, ra, dec, plotfile):
     plt.ylabel('Frequency')
     plt.title('Azimuth distribution')
 
-    # Plot offset if possible
+    # If available, plot offset from target histogram
     if info['offset'].boolean():
         iplot += 1
         plt.subplot(nrows, ncols, iplot)
@@ -139,7 +140,7 @@ def plot_information(info, ra, dec, plotfile):
         plt.ylabel('Frequency')
         plt.title('Offset distribution')
 
-    # Plot energy thresholds if possible
+    # If available, plot energy thresholds histogram
     if ebounds.size() > 0:
         emin = []
         emax = []
@@ -155,7 +156,7 @@ def plot_information(info, ra, dec, plotfile):
         plt.legend(loc='upper left')
         plt.title('Energy threshold')
 
-    # Plot observation point in time wrt zenith angle
+    # Plot zenith angle versus mean observing time for all observations
     iplot += 1
     plt.subplot(nrows, ncols, iplot)
     times = []
