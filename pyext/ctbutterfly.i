@@ -34,7 +34,7 @@
  *
  * @brief Butterfly calculation tool
  ***************************************************************************/
-class ctbutterfly : public ctool {
+class ctbutterfly : public ctlikelihood {
 public:
     // Constructors and destructors
     ctbutterfly(void);
@@ -47,7 +47,7 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
-    const GObservations& obs(void) const;
+
 };
 
 

@@ -50,7 +50,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctexpcube::ctexpcube(void) : ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
+ctexpcube::ctexpcube(void) : ctobservation(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -69,13 +69,10 @@ ctexpcube::ctexpcube(void) : ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctexpcube::ctexpcube(const GObservations& obs) :
-           ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
+		ctobservation(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -90,7 +87,7 @@ ctexpcube::ctexpcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctexpcube::ctexpcube(int argc, char *argv[]) :
-           ctool(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, argc, argv)
+		ctobservation(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -105,7 +102,7 @@ ctexpcube::ctexpcube(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctexpcube::ctexpcube(const ctexpcube& app) : ctool(app)
+ctexpcube::ctexpcube(const ctexpcube& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -149,7 +146,7 @@ ctexpcube& ctexpcube::operator=(const ctexpcube& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -182,6 +179,7 @@ void ctexpcube::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -189,6 +187,7 @@ void ctexpcube::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -322,7 +321,6 @@ void ctexpcube::init_members(void)
     m_chatter   = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
     m_expcube.clear();
 
     // Return
@@ -344,7 +342,6 @@ void ctexpcube::copy_members(const ctexpcube& app)
     m_chatter   = app.m_chatter;
 
     // Copy protected members
-    m_obs     = app.m_obs;
     m_expcube = app.m_expcube;
 
     // Return

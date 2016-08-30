@@ -51,7 +51,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctcubemask::ctcubemask(void) : ctool(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
+ctcubemask::ctcubemask(void) : ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
 {
     // Initialise members
     init_members();
@@ -70,13 +70,10 @@ ctcubemask::ctcubemask(void) : ctool(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
  * an observation container.
  ***************************************************************************/
 ctcubemask::ctcubemask(const GObservations& obs) :
-            ctool(CTCUBEMASK_NAME, CTCUBEMASK_VERSION)
+		ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -92,7 +89,7 @@ ctcubemask::ctcubemask(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctcubemask::ctcubemask(int argc, char *argv[]) : 
-            ctool(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
+		ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -107,7 +104,7 @@ ctcubemask::ctcubemask(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctcubemask::ctcubemask(const ctcubemask& app) : ctool(app)
+ctcubemask::ctcubemask(const ctcubemask& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -151,7 +148,7 @@ ctcubemask& ctcubemask::operator=(const ctcubemask& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -184,6 +181,7 @@ void ctcubemask::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -191,6 +189,7 @@ void ctcubemask::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -383,7 +382,6 @@ void ctcubemask::init_members(void)
     m_publish = false;
 
     // Initialise protected members
-    m_obs.clear();
     m_infiles.clear();
     m_select_energy = true;
     m_select_roi    = true;
@@ -411,7 +409,6 @@ void ctcubemask::copy_members(const ctcubemask& app)
     m_publish = app.m_publish;
 
     // Copy protected members
-    m_obs           = app.m_obs;
     m_infiles       = app.m_infiles;
     m_select_energy = app.m_select_energy;
     m_select_roi    = app.m_select_roi;

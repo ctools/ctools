@@ -30,7 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTBKGCUBE_NAME    "ctbkgcube"
@@ -42,7 +42,7 @@
  *
  * @brief Background cube generation tool
  ***************************************************************************/
-class ctbkgcube : public ctool {
+class ctbkgcube : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -79,7 +79,6 @@ protected:
     GChatter           m_chatter;     //!< Chattiness
 
     // Protected members
-    GObservations      m_obs;         //!< Observation container
     GCTACubeBackground m_background;  //!< Background cube
     GModels            m_bkgmdl;      //!< CTA background models
     GModels            m_outmdl;      //!< Output models

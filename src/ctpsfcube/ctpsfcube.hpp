@@ -30,7 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTPSFCUBE_NAME    "ctpsfcube"
@@ -42,7 +42,7 @@
  *
  * @brief PSF cube generation tool
  ***************************************************************************/
-class ctpsfcube : public ctool {
+class ctpsfcube : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -75,7 +75,6 @@ protected:
     GChatter  m_chatter;         //!< Chattiness
 
     // Protected members
-    GObservations m_obs;         //!< Observation container
     GCTACubePsf   m_psfcube;     //!< PSF cube
 };
 

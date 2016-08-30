@@ -63,7 +63,7 @@ const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
  *
  * Constructs an empty ctobssim tool.
  ***************************************************************************/
-ctobssim::ctobssim(void) : ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
+ctobssim::ctobssim(void) : ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION)
 {
     // Initialise members
     init_members();
@@ -81,13 +81,10 @@ ctobssim::ctobssim(void) : ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
  * Constructs ctobssim tool from an observation container.
  ***************************************************************************/
 ctobssim::ctobssim(const GObservations& obs) :
-          ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION)
+          ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -104,7 +101,7 @@ ctobssim::ctobssim(const GObservations& obs) :
  * setting.
  ***************************************************************************/
 ctobssim::ctobssim(int argc, char *argv[]) :
-          ctool(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
+		ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -121,7 +118,7 @@ ctobssim::ctobssim(int argc, char *argv[]) :
  *
  * Constructs ctobssim tool from another ctobssim instance.
  ***************************************************************************/
-ctobssim::ctobssim(const ctobssim& app) : ctool(app)
+ctobssim::ctobssim(const ctobssim& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -169,7 +166,7 @@ ctobssim& ctobssim::operator=(const ctobssim& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -202,6 +199,7 @@ void ctobssim::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -209,6 +207,7 @@ void ctobssim::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -484,7 +483,6 @@ void ctobssim::init_members(void)
 
     // Initialise protected members
     m_rans.clear();
-    m_obs.clear();
     m_save_and_dispose = false;
 
     // Set fixed parameters
@@ -516,7 +514,6 @@ void ctobssim::copy_members(const ctobssim& app)
     // Copy protected members
     m_max_photons      = app.m_max_photons;
     m_rans             = app.m_rans;
-    m_obs              = app.m_obs;
     m_save_and_dispose = app.m_save_and_dispose;
     m_event_id         = app.m_event_id;
 

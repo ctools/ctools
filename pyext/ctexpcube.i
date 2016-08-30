@@ -34,7 +34,7 @@
  *
  * @brief Exposure cube generation tool
  ***************************************************************************/
-class ctexpcube : public ctool {
+class ctexpcube : public ctobservation {
 public:
     // Constructors and destructors
     ctexpcube(void);

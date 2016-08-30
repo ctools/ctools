@@ -50,7 +50,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctbkgcube::ctbkgcube(void) : ctool(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
+ctbkgcube::ctbkgcube(void) : ctobservation(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -69,13 +69,10 @@ ctbkgcube::ctbkgcube(void) : ctool(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctbkgcube::ctbkgcube(const GObservations& obs) :
-           ctool(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
+		ctobservation(CTBKGCUBE_NAME, CTBKGCUBE_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -90,7 +87,7 @@ ctbkgcube::ctbkgcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbkgcube::ctbkgcube(int argc, char *argv[]) :
-           ctool(CTBKGCUBE_NAME, CTBKGCUBE_VERSION, argc, argv)
+		ctobservation(CTBKGCUBE_NAME, CTBKGCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -105,7 +102,7 @@ ctbkgcube::ctbkgcube(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctbkgcube::ctbkgcube(const ctbkgcube& app) : ctool(app)
+ctbkgcube::ctbkgcube(const ctbkgcube& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -149,7 +146,7 @@ ctbkgcube& ctbkgcube::operator=(const ctbkgcube& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -182,6 +179,7 @@ void ctbkgcube::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -189,6 +187,7 @@ void ctbkgcube::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -407,7 +406,6 @@ void ctbkgcube::init_members(void)
     m_chatter   = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
     m_background.clear();
     m_bkgmdl.clear();
     m_outmdl.clear();
@@ -432,7 +430,6 @@ void ctbkgcube::copy_members(const ctbkgcube& app)
     m_chatter   = app.m_chatter;
 
     // Copy protected members
-    m_obs        = app.m_obs;
     m_background = app.m_background;
     m_bkgmdl     = app.m_bkgmdl;
     m_outmdl     = app.m_outmdl;

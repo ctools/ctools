@@ -34,7 +34,7 @@
  *
  * @brief Data selection tool
  ***************************************************************************/
-class ctselect : public ctool {
+class ctselect : public ctobservation {
 public:
     // Constructors and destructors
     ctselect(void);
@@ -47,7 +47,6 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
-    const GObservations& obs(void) const;
 };
 
 

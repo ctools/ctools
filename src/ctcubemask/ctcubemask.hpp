@@ -32,7 +32,7 @@
 #include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTCUBEMASK_NAME    "ctcubemask"
@@ -44,7 +44,7 @@
  *
  * @brief Cube filter tool
  ***************************************************************************/
-class ctcubemask : public ctool {
+class ctcubemask : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -62,7 +62,6 @@ public:
     void                 run(void);
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
 
 protected:
     // Protected methods
@@ -87,22 +86,10 @@ protected:
     bool        m_publish;    //!< Publish counts cube?
 
     // Protected members
-    GObservations            m_obs;           //!< Observations container
     std::vector<std::string> m_infiles;       //!< Input event filenames
     bool                     m_select_energy; //!< Perform energy selection
     bool                     m_select_roi;    //!< Perform ROI selection
 };
 
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-inline
-const GObservations& ctcubemask::obs(void) const
-{
-    return m_obs;
-}
 
 #endif /* CTCUBEMASK_HPP */

@@ -34,7 +34,7 @@
  *
  * @brief PSF cube generation tool
  ***************************************************************************/
-class ctpsfcube : public ctool {
+class ctpsfcube : public ctobservation {
 
 public:
     // Constructors and destructors

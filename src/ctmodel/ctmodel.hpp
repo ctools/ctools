@@ -30,7 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTMODEL_NAME    "ctmodel"
@@ -51,7 +51,7 @@
  * in form of FITS files (model maps) and an updated observation definition
  * XML file.
  ***************************************************************************/
-class ctmodel : public ctool {
+class ctmodel : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -69,7 +69,6 @@ public:
     void                 run(void);
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
     void                 cube(const GCTAEventCube& cube);
     void                 models(const GModels& models);
@@ -91,25 +90,12 @@ protected:
     GChatter  m_chatter;      //!< Chattiness
 
     // Protected members
-    GObservations m_obs;         //!< Observation container
     GCTAEventCube m_cube;        //!< Model cube
     GGti          m_gti;         //!< Model cube GTIs
     bool          m_has_cube;    //!< Signal if cube has been set or loaded
     bool          m_append_cube; //!< Signal that cube should be appended
     bool          m_binned;      //!< Signals that we are in binned mode
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container.
- ***************************************************************************/
-inline
-const GObservations& ctmodel::obs(void) const
-{
-    return m_obs;
-}
 
 
 /***********************************************************************//**

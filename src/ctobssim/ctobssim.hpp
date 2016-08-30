@@ -30,7 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
@@ -48,7 +48,7 @@
  * processed and the save method is called, events FITS files will be written
  * for each observation.
  ***************************************************************************/
-class ctobssim : public ctool {
+class ctobssim : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -65,7 +65,6 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
-    const GObservations& obs(void) const;
     const double&        max_rate(void) const;
     void                 max_rate(const double& max_rate);
 
@@ -141,25 +140,12 @@ protected:
     bool        m_apply_edisp; //!< Apply energy dispersion?
 
     // Protected members
-    mutable GObservations m_obs;              //!< Observation container
     mutable bool          m_save_and_dispose; //!< Save and dispose immediately
     int                   m_max_photons;      //!< Maximum number of photons/slice
     double                m_max_rate;         //!< Maximum photon rate
     std::vector<GRan>     m_rans;             //!< Random number generators
     int                   m_event_id;         //!< Event identifier
 };
-
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-inline
-const GObservations& ctobssim::obs(void) const
-{
-    return (m_obs);
-}
 
 
 /***********************************************************************//**

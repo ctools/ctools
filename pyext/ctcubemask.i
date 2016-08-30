@@ -34,7 +34,7 @@
  *
  * @brief Cube filter tool
  ***************************************************************************/
-class ctcubemask : public ctool {
+class ctcubemask : public ctobservation {
 public:
     // Constructors and destructors
     ctcubemask(void);
@@ -48,7 +48,6 @@ public:
     void                 run(void);
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
 };
 
 

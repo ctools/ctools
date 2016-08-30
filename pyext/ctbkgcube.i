@@ -34,7 +34,7 @@
  *
  * @brief Background cube generation tool
  ***************************************************************************/
-class ctbkgcube : public ctool  {
+class ctbkgcube : public ctobservation  {
 public:
     // Constructors and destructors
     ctbkgcube(void);

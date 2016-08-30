@@ -30,7 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTEDISPCUBE_NAME    "ctedispcube"
@@ -42,7 +42,7 @@
  *
  * @brief Energy dispersion cube generation tool
  ***************************************************************************/
-class ctedispcube : public ctool {
+class ctedispcube : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -75,7 +75,6 @@ protected:
     GChatter  m_chatter;       //!< Chattiness
 
     // Protected members
-    GObservations m_obs;       //!< Observation container
     GCTACubeEdisp m_edispcube; //!< Energy dispersion cube
 };
 

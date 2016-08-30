@@ -32,7 +32,7 @@
 #include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTSELECT_NAME    "ctselect"
@@ -44,7 +44,7 @@
  *
  * @brief Data selection tool
  ***************************************************************************/
-class ctselect : public ctool {
+class ctselect : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -61,7 +61,6 @@ public:
     void                  clear(void);
     void                  run(void);
     void                  save(void);
-    const GObservations&  obs(void) const;
 
 protected:
     // Protected methods
@@ -102,7 +101,6 @@ protected:
     GChatter    m_chatter;    //!< Chattiness
 
     // Protected members
-    GObservations            m_obs;           //!< Observations container
     std::vector<std::string> m_infiles;       //!< Input event filenames
     std::vector<std::string> m_evtname;       //!< Event extension names
     std::vector<std::string> m_gtiname;       //!< GTI extension names
@@ -113,16 +111,5 @@ protected:
     bool                     m_select_time;   //!< Perform time selection
 };
 
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-inline
-const GObservations& ctselect::obs(void) const
-{
-    return m_obs;
-}
 
 #endif /* CTSELECT_HPP */

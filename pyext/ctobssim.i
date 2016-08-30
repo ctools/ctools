@@ -34,7 +34,7 @@
  *
  * @brief Observation simulator tool
  ***************************************************************************/
-class ctobssim : public ctool {
+class ctobssim : public ctobservation {
 public:
     // Constructors and destructors
     ctobssim(void);
@@ -47,7 +47,6 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
-    const GObservations& obs(void) const;
     const double&        max_rate(void) const;
     void                 max_rate(const double& max_rate);
 };

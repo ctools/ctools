@@ -53,7 +53,7 @@ const GEnergy g_energy_margin(1.0e-12, "TeV");
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctmodel::ctmodel(void) : ctool(CTMODEL_NAME, CTMODEL_VERSION)
+ctmodel::ctmodel(void) : ctobservation(CTMODEL_NAME, CTMODEL_VERSION)
 {
     // Initialise members
     init_members();
@@ -71,13 +71,11 @@ ctmodel::ctmodel(void) : ctool(CTMODEL_NAME, CTMODEL_VERSION)
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctmodel::ctmodel(const GObservations& obs) : ctool(CTMODEL_NAME, CTMODEL_VERSION)
+ctmodel::ctmodel(const GObservations& obs) :
+		ctobservation(CTMODEL_NAME, CTMODEL_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -92,7 +90,7 @@ ctmodel::ctmodel(const GObservations& obs) : ctool(CTMODEL_NAME, CTMODEL_VERSION
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctmodel::ctmodel(int argc, char *argv[]) :
-         ctool(CTMODEL_NAME, CTMODEL_VERSION, argc, argv)
+		ctobservation(CTMODEL_NAME, CTMODEL_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -107,7 +105,7 @@ ctmodel::ctmodel(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctmodel::ctmodel(const ctmodel& app) : ctool(app)
+ctmodel::ctmodel(const ctmodel& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -151,7 +149,7 @@ ctmodel& ctmodel::operator=(const ctmodel& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -184,6 +182,7 @@ void ctmodel::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -191,6 +190,7 @@ void ctmodel::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -391,7 +391,6 @@ void ctmodel::init_members(void)
     m_chatter     = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
     m_cube.clear();
     m_gti.clear();
     m_has_cube    = false;
@@ -417,7 +416,6 @@ void ctmodel::copy_members(const ctmodel& app)
     m_chatter     = app.m_chatter;
 
     // Copy protected members
-    m_obs         = app.m_obs;
     m_cube        = app.m_cube;
     m_gti         = app.m_gti;
     m_has_cube    = app.m_has_cube;

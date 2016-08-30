@@ -53,7 +53,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctselect::ctselect(void) : ctool(CTSELECT_NAME, CTSELECT_VERSION)
+ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, CTSELECT_VERSION)
 {
     // Initialise members
     init_members();
@@ -72,13 +72,10 @@ ctselect::ctselect(void) : ctool(CTSELECT_NAME, CTSELECT_VERSION)
  * provided in an observation container.
  ***************************************************************************/
 ctselect::ctselect(const GObservations& obs) :
-          ctool(CTSELECT_NAME, CTSELECT_VERSION)
+		ctobservation(CTSELECT_NAME, CTSELECT_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -94,7 +91,7 @@ ctselect::ctselect(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctselect::ctselect(int argc, char *argv[]) : 
-          ctool(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
+		ctobservation(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -109,7 +106,7 @@ ctselect::ctselect(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctselect::ctselect(const ctselect& app) : ctool(app)
+ctselect::ctselect(const ctselect& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -153,7 +150,7 @@ ctselect& ctselect::operator=(const ctselect& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -186,6 +183,7 @@ void ctselect::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -193,6 +191,7 @@ void ctselect::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -418,7 +417,6 @@ void ctselect::init_members(void)
     m_chatter = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
     m_infiles.clear();
     m_evtname.clear();
     m_gtiname.clear();
@@ -454,7 +452,6 @@ void ctselect::copy_members(const ctselect& app)
     m_chatter  = app.m_chatter;
 
     // Copy protected members
-    m_obs           = app.m_obs;
     m_infiles       = app.m_infiles;
     m_evtname       = app.m_evtname;
     m_gtiname       = app.m_gtiname;

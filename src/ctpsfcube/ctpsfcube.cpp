@@ -49,7 +49,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctpsfcube::ctpsfcube(void) : ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+ctpsfcube::ctpsfcube(void) : ctobservation(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -68,13 +68,10 @@ ctpsfcube::ctpsfcube(void) : ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctpsfcube::ctpsfcube(const GObservations& obs) :
-           ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+		ctobservation(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -89,7 +86,7 @@ ctpsfcube::ctpsfcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctpsfcube::ctpsfcube(int argc, char *argv[]) :
-           ctool(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, argc, argv)
+		ctobservation(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -104,7 +101,7 @@ ctpsfcube::ctpsfcube(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctpsfcube::ctpsfcube(const ctpsfcube& app) : ctool(app)
+ctpsfcube::ctpsfcube(const ctpsfcube& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -148,7 +145,7 @@ ctpsfcube& ctpsfcube::operator=(const ctpsfcube& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -181,6 +178,7 @@ void ctpsfcube::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -188,6 +186,7 @@ void ctpsfcube::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -283,7 +282,6 @@ void ctpsfcube::init_members(void)
     m_chatter   = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
     m_psfcube.clear();
 
     // Return
@@ -304,7 +302,6 @@ void ctpsfcube::copy_members(const ctpsfcube& app)
     m_chatter   = app.m_chatter;
 
     // Copy protected members
-    m_obs     = app.m_obs;
     m_psfcube = app.m_psfcube;
 
     // Return

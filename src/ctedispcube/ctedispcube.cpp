@@ -52,7 +52,7 @@
  *
  * Constructs an empty energy dispersion tool.
  ***************************************************************************/
-ctedispcube::ctedispcube(void) : ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
+ctedispcube::ctedispcube(void) : ctobservation(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
 {
     // Initialise members
     init_members();
@@ -71,13 +71,10 @@ ctedispcube::ctedispcube(void) : ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
  * in an observation container @p obs.
  ***************************************************************************/
 ctedispcube::ctedispcube(const GObservations& obs) :
-             ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
+		ctobservation(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -95,7 +92,7 @@ ctedispcube::ctedispcube(const GObservations& obs) :
  * on the command line.
  ***************************************************************************/
 ctedispcube::ctedispcube(int argc, char *argv[]) :
-             ctool(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, argc, argv)
+		ctobservation(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -113,7 +110,7 @@ ctedispcube::ctedispcube(int argc, char *argv[]) :
  * Constructs an energy dispersion tool by copying anothere energy
  * dispersion tool.
  ***************************************************************************/
-ctedispcube::ctedispcube(const ctedispcube& app) : ctool(app)
+ctedispcube::ctedispcube(const ctedispcube& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -161,7 +158,7 @@ ctedispcube& ctedispcube::operator=(const ctedispcube& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctobservation::operator=(app);
 
         // Free members
         free_members();
@@ -194,6 +191,7 @@ void ctedispcube::clear(void)
 {
     // Free members
     free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -201,6 +199,7 @@ void ctedispcube::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
     init_members();
 
     // Write header into logger
@@ -299,7 +298,6 @@ void ctedispcube::init_members(void)
     m_chatter   = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_obs.clear();
     m_edispcube.clear();
 
     // Return
@@ -320,7 +318,6 @@ void ctedispcube::copy_members(const ctedispcube& app)
     m_chatter   = app.m_chatter;
 
     // Copy protected members
-    m_obs       = app.m_obs;
     m_edispcube = app.m_edispcube;
 
     // Return

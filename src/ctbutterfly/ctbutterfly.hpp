@@ -30,7 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTBUTTERFLY_NAME    "ctbutterfly"
@@ -53,7 +53,7 @@
  * range. The output is saved as an ascii files containing the confidence
  * band boundaries
  ***************************************************************************/
-class ctbutterfly : public ctool {
+class ctbutterfly : public ctlikelihood {
 
 public:
     // Constructors and destructors
@@ -70,7 +70,6 @@ public:
     void                 clear(void);
     void                 run(void);
     void                 save(void);
-    const GObservations& obs(void) const;
 
 protected:
     // Protected methods
@@ -99,8 +98,6 @@ protected:
     GChatter    m_chatter;      //!< Chattiness
 
     // Protected members
-    GOptimizerLM        m_opt;             //!< Optimizer
-    GObservations       m_obs;             //!< Observation container
     GMatrixSparse       m_covariance;      //!< Covariance matrix
     std::vector<double> m_energies;        //!< Energy values
     std::vector<double> m_intensities;     //!< Power law intensity
@@ -108,16 +105,5 @@ protected:
     std::vector<double> m_max_intensities; //!< Maximum intensities
 };
 
-
-/***********************************************************************//**
- * @brief Return observation container
- *
- * @return Reference to observation container
- ***************************************************************************/
-inline
-const GObservations& ctbutterfly::obs(void) const
-{
-    return m_obs;
-}
 
 #endif /* CTBUTTERFLY_HPP */

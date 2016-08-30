@@ -30,7 +30,7 @@
 /* __ Includes ___________________________________________________________ */
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
-#include "ctool.hpp"
+#include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
 #define CTEXPCUBE_NAME    "ctexpcube"
@@ -42,7 +42,7 @@
  *
  * @brief Exposure cube generation tool
  ***************************************************************************/
-class ctexpcube : public ctool {
+class ctexpcube : public ctobservation {
 
 public:
     // Constructors and destructors
@@ -77,7 +77,6 @@ protected:
     GChatter  m_chatter;            //!< Chattiness
 
     // Protected members
-    GObservations    m_obs;         //!< Observation container
     GCTACubeExposure m_expcube;     //!< Exposure cube
 };
 

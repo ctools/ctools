@@ -34,7 +34,7 @@
  *
  * @brief Model cube generation tool
  ***************************************************************************/
-class ctmodel : public ctool {
+class ctmodel : public ctobservation {
 public:
     // Constructors and destructors
     ctmodel(void);
@@ -48,7 +48,6 @@ public:
     void                 run(void);
     void                 save(void);
     void                 publish(const std::string& name = "");
-    const GObservations& obs(void) const;
     const GCTAEventCube& cube(void) const;
     void                 cube(const GCTAEventCube& cube);
     void                 models(const GModels& models);

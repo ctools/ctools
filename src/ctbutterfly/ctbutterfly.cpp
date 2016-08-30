@@ -52,7 +52,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctbutterfly::ctbutterfly(void) : ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION)
+ctbutterfly::ctbutterfly(void) : ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION)
 {
     // Initialise members
     init_members();
@@ -71,13 +71,10 @@ ctbutterfly::ctbutterfly(void) : ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION)
  * observations container.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(const GObservations& obs) :
-             ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION)
+		ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, obs)
 {
     // Initialise members
     init_members();
-
-    // Set observations
-    m_obs = obs;
 
     // Return
     return;
@@ -92,7 +89,7 @@ ctbutterfly::ctbutterfly(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(int argc, char *argv[]) :
-             ctool(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
+		ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -107,7 +104,7 @@ ctbutterfly::ctbutterfly(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctbutterfly::ctbutterfly(const ctbutterfly& app) : ctool(app)
+ctbutterfly::ctbutterfly(const ctbutterfly& app) : ctlikelihood(app)
 {
     // Initialise members
     init_members();
@@ -151,7 +148,7 @@ ctbutterfly& ctbutterfly::operator=(const ctbutterfly& app)
     if (this != &app) {
 
         // Copy base class members
-        this->ctool::operator=(app);
+        this->ctlikelihood::operator=(app);
 
         // Free members
         free_members();
@@ -184,6 +181,8 @@ void ctbutterfly::clear(void)
 {
     // Free members
     free_members();
+    this->ctlikelihood::free_members();
+    this->ctobservation::free_members();
     this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
@@ -191,6 +190,8 @@ void ctbutterfly::clear(void)
 
     // Initialise members
     this->ctool::init_members();
+    this->ctobservation::init_members();
+    this->ctlikelihood::init_members();
     init_members();
 
     // Write header into logger
@@ -512,8 +513,6 @@ void ctbutterfly::init_members(void)
     m_outfile.clear();
 
     // Initialise protected members
-    m_opt.clear();
-    m_obs.clear();
     m_covariance.clear();
     m_energies.clear();
     m_intensities.clear();
@@ -547,8 +546,6 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_outfile     = app.m_outfile;
  
     // Copy protected members
-    m_obs             = app.m_obs;
-    m_opt             = app.m_opt;
     m_covariance      = app.m_covariance;
     m_energies        = app.m_energies;
     m_intensities     = app.m_intensities;

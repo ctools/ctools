@@ -192,8 +192,8 @@ void ctbin::clear(void)
 {
     // Free members
     free_members();
-    this->ctool::free_members();
     this->ctobservation::free_members();
+    this->ctool::free_members();
 
     // Clear base class (needed to conserve tool name and version)
     this->GApplication::clear();

@@ -34,7 +34,7 @@
  *
  * @brief Energy dispersion cube generation tool
  ***************************************************************************/
-class ctedispcube : public ctool {
+class ctedispcube : public ctobservation {
 
 public:
     // Constructors and destructors
