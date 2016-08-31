@@ -100,6 +100,22 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
+        
+        # Setup ctbin command with different ebounds than input
+        cmd = ctbin+' inobs="'+self._events+'"'+ \
+                    ' outcube="cntmap_cmd3.fits"'+\
+                    ' emin=0.5 emax=20.0 enumbins=10 ebinalg="LOG"'+ \
+                    ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
+                    ' xref=83.63 yref=22.01 proj="CAR"'+ \
+                    ' logfile="ctbin_cmd3.log" chatter=3'
+
+        # Check if execution was successful
+        self.test_value(self._execute(cmd), 0,
+             'Check successful execution from command line')
+
+        # Load counts cube and check content.
+        evt = gammalib.GCTAEventCube('cntmap_cmd3.fits')
+        self._check_cube(evt, 890)
 
         # Setup ctbin --help option
         cmd = ctbin+' --help'

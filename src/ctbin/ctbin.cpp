@@ -523,9 +523,9 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Skip event if the corresponding counts cube energy bin is not
         // fully contained in the event list energy range. This avoids
         // having partially filled bins.
-        if (!usage[iebin]) {
-            num_outside_ebds++;
-            continue;
+        if (iebin == -1 || !usage[iebin]) {
+        	num_outside_ebds++;
+        	continue;
         }
 
         // Fill event in skymap
