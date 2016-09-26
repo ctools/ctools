@@ -99,15 +99,6 @@ class Test(test):
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
         
-        # Setup cstsmapmerge command
-        cmd = cstsmapmerge+' inmaps="'+self._events+' '+self._model+'"'+ \
-                           ' outmap="cstsmapmerge_cmd3.fits"'+ \
-                           ' logfile="cstsmapmerge_cmd3.log" chatter=4'
-                           
-                # Check if execution failed
-        self.test_assert(self._execute(cmd) != 0,
-             'Check input file that are no TS maps when executed from command line')
-              
         # Return
         return
 
