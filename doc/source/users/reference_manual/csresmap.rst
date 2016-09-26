@@ -67,8 +67,8 @@ General parameters
 ``emax [real]``
     Upper energy value for last energy bin (in TeV).
  	 	 
-``enumbins [integer]``
-    Number of energy bins.
+``(enumbins = 20) [integer]``
+    Number of model cube energy bins.
  	 	 
 ``ebinfile [file]``
     Name of the file containing the energy bin definition.
