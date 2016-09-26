@@ -97,20 +97,23 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
-        
+
         # Setup cttsmap command
         cmd = cttsmap+' inobs="'+self._events+'"'+ \
                       ' inmodel="'+self._model+'" srcname="Crab"'+ \
                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                       ' errors=yes'+ \
-                      ' outmap="cttsmap_cmd1.fits"'+ \
-                      ' nxpix=5 nypix=5 binsz=0.02'+ \
+                      ' outmap="cttsmap_cmd3.fits"'+ \
+                      ' nxpix=3 nypix=3 binsz=0.02'+ \
                       ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
-                      ' logfile="cttsmap_cmd1.log" chatter=1'
+                      ' logfile="cttsmap_cmd3.log" chatter=1'
 
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
+
+        # Check result file
+        self._check_result_file('cttsmap_cmd3.fits')
 
         # Setup cttsmap --help option
         cmd = cttsmap+' --help'
@@ -281,7 +284,7 @@ class Test(test):
             nmaps = 1
         else:
             nmaps = 0
-        
+
         # Check dimensions
         self.test_value(tsmap.nmaps(), nmaps, 'Check number of maps')
         self.test_value(tsmap.nx(), nx, 'Check for number of X pixels')
