@@ -148,7 +148,7 @@ class Test(test):
 
         # Check empty observation definition XML file
         self._check_obsdef('csiactobs_obs_py0.xml', 0)
-        
+
         # Check empty model definition XML file
         self._check_moddef('csiactobs_bgd_py0.xml', 0)
 

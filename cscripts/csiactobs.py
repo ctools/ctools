@@ -80,7 +80,7 @@ class csiactobs(ctools.cscript):
 
         # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
-        
+
         # Append an observation list to XML instance
         self._xml.append(gammalib.GXmlElement('observation_list title="observation list"'))
         self._xml_obslist = self._xml.element('observation_list', 0)
