@@ -98,7 +98,7 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
-
+        
         # Return
         return
 
@@ -160,10 +160,10 @@ class Test(test):
 
         # Check merged TS map
         self._check_result_file('cstsmapmerge_py4.fits')
-
-        # Set-up space-separated cstsmapmerge with invalid files
+        
+        # Set-up cstsmapmerge with incomplete file list
         merge = cscripts.cstsmapmerge()
-        merge['inmaps']  = self._events+' '+self._model
+        merge['inmaps']  = self._map0 + ' ' + self._events
         merge['outmap']  = 'cstsmapmerge_py5.fits'
         merge['logfile'] = 'cstsmapmerge_py5.log'
         merge['chatter'] = 4
@@ -172,13 +172,13 @@ class Test(test):
         merge.execute()
 
         # Check merged TS map
-        #self._check_result_file('cstsmapmerge_py5.fits')
+        self._check_result_file('cstsmapmerge_py5.fits', False)
 
         # Return
         return
 
     # Check result file
-    def _check_result_file(self, filename):
+    def _check_result_file(self, filename, test_complete = True):
         """
         Check result file
         """
@@ -189,6 +189,7 @@ class Test(test):
         ts        = fits['Primary']
         prefactor = fits['Prefactor']
         index     = fits['Index']
+        status    = fits['STATUS MAP']
 
         # Check dimensions
         self.test_value(ts.naxis(), 2, 'Check for 2 dimensions')
@@ -200,6 +201,23 @@ class Test(test):
         self.test_value(index.naxis(), 2, 'Check for 2 dimensions')
         self.test_value(index.naxes(0), 2, 'Check for 2 pixels in X')
         self.test_value(index.naxes(1), 1, 'Check for 1 pixel in Y')
+        self.test_value(status.naxis(), 2, 'Check for 2 dimensions')
+        self.test_value(status.naxes(0), 2, 'Check for 2 pixels in X')
+        self.test_value(status.naxes(1), 1, 'Check for 1 pixel in Y')
+        
+        # Initialise flag if map is complete
+        done = True
+        
+        # Loop over status sky map
+        for pix in status:
+            
+            # Check if pix is larger than threshold
+            if pix < -0.5:
+                done = False
+                break
+        
+        # Test for completeness of merged map
+        self.test_assert(done == test_complete, 'Test if map was merged completely')           
 
         # Return
         return
