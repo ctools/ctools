@@ -82,19 +82,20 @@ protected:
     void init_maps(const GSkyMap& map);
 
     // User parameters
-    std::string              m_srcname;     //!< Name of source which is moved around
-    GFilename                m_outmap;      //!< Output TS map file name
-    bool                     m_apply_edisp; //!< Apply energy dispersion?
-    bool                     m_publish;     //!< Publish TS map?
+    std::string m_srcname;     //!< Name of source which is moved around
+    GFilename   m_outmap;      //!< Output TS map file name
+    bool        m_apply_edisp; //!< Apply energy dispersion?
+    bool        m_publish;     //!< Publish TS map?
+    bool        m_errors;      //!< Compute and store parameter errors?
 
     // Parameters to control speed and job splitting
-    int                      m_binmin;      //!< Map bin number from which computation should start
-    int                      m_binmax;      //!< Map bin number where map computation should end
-    double                   m_logL0;       //!< Likelihood value of null hypothesis
+    int         m_binmin;      //!< Map bin number from which computation should start
+    int         m_binmax;      //!< Map bin number where map computation should end
+    double      m_logL0;       //!< Likelihood value of null hypothesis
 
     // Protected members
     GSkyMap                  m_tsmap;       //!< TS map
-    GSkyMap                  m_statusmap;   //!< Map of computed bins
+    GSkyMap                  m_statusmap;   //!< Map of optimizer fit status
     std::vector<std::string> m_mapnames;    //!< Names of free parameters
     std::vector<GSkyMap>     m_maps;        //!< Sky maps for each free parameter
     GModel*                  m_testsource;  //!< Pointer to test source for TS computation

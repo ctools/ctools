@@ -5,11 +5,11 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      cttsmap.par                                                   #
-#  Version:   1.1.0                                                         #
+#  Version:   1.2.0                                                         #
 #                                                                           #
 #  Author:    Michael Mayer                                                 #
-#             michael.mayer@desy.de                                         #
-#             DESY                                                          #
+#             michael.mayer@physik.hu-berlin.de                             #
+#             HU Berlin                                                     #
 #                                                                           #
 #  Purpose:   Parameter file for the cttsmap application                    #
 #                                                                           #
@@ -30,6 +30,11 @@ edisp,     b, h, no,,, "Apply energy dispersion?"
 outmap,    f, a, "tsmap.fits",,, "Output Test Statistic map file"
 
 #
+# TS map computation parameters
+#==============================
+errors,    b, h, no,,, "Compute and store parameter errors?"
+
+#
 # Spatial binning parameters
 #===========================
 usepnt,    b, h, no,,, "Use pointing instead of xref/yref parameters?"
@@ -43,7 +48,7 @@ proj,      s, a, "CAR", AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
 
 #
 # Parameters for splitting and speed purpose
-#===========================
+#===========================================
 binmin,    i, h, -1,,, "First bin to compute"
 binmax,    i, h, -1,,, "Last bin to compute"
 logL0,     r, h, 0.0,,, "LogLikelihood value of null hypothesis"
