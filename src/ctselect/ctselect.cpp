@@ -72,7 +72,7 @@ ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, CTSELECT_VERSION)
  * provided in an observation container.
  ***************************************************************************/
 ctselect::ctselect(const GObservations& obs) :
-		ctobservation(CTSELECT_NAME, CTSELECT_VERSION, obs)
+          ctobservation(CTSELECT_NAME, CTSELECT_VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -91,7 +91,7 @@ ctselect::ctselect(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctselect::ctselect(int argc, char *argv[]) : 
-		ctobservation(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
+          ctobservation(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -460,7 +460,7 @@ void ctselect::copy_members(const ctselect& app)
     m_select_energy = app.m_select_energy;
     m_select_roi    = app.m_select_roi;
     m_select_time   = app.m_select_time;
-    
+
     // Return
     return;
 }

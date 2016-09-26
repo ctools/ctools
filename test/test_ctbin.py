@@ -100,7 +100,7 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
-        
+
         # Setup ctbin command with different ebounds than input
         cmd = ctbin+' inobs="'+self._events+'"'+ \
                     ' outcube="cntmap_cmd3.fits"'+\

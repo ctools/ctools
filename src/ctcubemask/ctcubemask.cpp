@@ -70,7 +70,7 @@ ctcubemask::ctcubemask(void) : ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION
  * an observation container.
  ***************************************************************************/
 ctcubemask::ctcubemask(const GObservations& obs) :
-		ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, obs)
+            ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -89,7 +89,7 @@ ctcubemask::ctcubemask(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctcubemask::ctcubemask(int argc, char *argv[]) : 
-		ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
+            ctobservation(CTCUBEMASK_NAME, CTCUBEMASK_VERSION, argc, argv)
 {
     // Initialise members
     init_members();

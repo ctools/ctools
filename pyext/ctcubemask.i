@@ -44,10 +44,10 @@ public:
     virtual ~ctcubemask(void);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    void                 publish(const std::string& name = "");
+    void clear(void);
+    void run(void);
+    void save(void);
+    void publish(const std::string& name = "");
 };
 
 

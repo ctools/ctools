@@ -67,9 +67,9 @@ public:
     ctbutterfly& operator=(const ctbutterfly& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
+    void clear(void);
+    void run(void);
+    void save(void);
 
 protected:
     // Protected methods

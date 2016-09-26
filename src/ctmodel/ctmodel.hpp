@@ -82,7 +82,7 @@ protected:
     void get_obs(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
-    
+
     // User parameters
     GFilename m_outcube;      //!< Output model cube
     bool      m_apply_edisp;  //!< Apply energy dispersion?

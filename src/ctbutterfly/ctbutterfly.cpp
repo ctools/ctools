@@ -71,7 +71,7 @@ ctbutterfly::ctbutterfly(void) : ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERS
  * observations container.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(const GObservations& obs) :
-		ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, obs)
+             ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -89,7 +89,7 @@ ctbutterfly::ctbutterfly(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(int argc, char *argv[]) :
-		ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
+             ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
 {
     // Initialise members
     init_members();

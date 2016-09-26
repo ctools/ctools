@@ -44,9 +44,9 @@ public:
     virtual ~ctselect(void);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
+    void clear(void);
+    void run(void);
+    void save(void);
 };
 
 

@@ -101,7 +101,7 @@ ctobssim::ctobssim(const GObservations& obs) :
  * setting.
  ***************************************************************************/
 ctobssim::ctobssim(int argc, char *argv[]) :
-		ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
+          ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
 {
     // Initialise members
     init_members();

@@ -44,11 +44,11 @@ public:
     virtual ~ctobssim(void);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    const double&        max_rate(void) const;
-    void                 max_rate(const double& max_rate);
+    void          clear(void);
+    void          run(void);
+    void          save(void);
+    const double& max_rate(void) const;
+    void          max_rate(const double& max_rate);
 };
 
 

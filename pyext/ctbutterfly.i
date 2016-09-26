@@ -42,12 +42,11 @@ public:
     ctbutterfly(int argc, char *argv[]);
     ctbutterfly(const ctbutterfly& app);
     virtual ~ctbutterfly(void);
-    
-    // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
 
+    // Methods
+    void clear(void);
+    void run(void);
+    void save(void);
 };
 
 
