@@ -21,8 +21,6 @@
 import gammalib
 import cscripts
 from testing import test
-from __builtin__ import False
-from Carbon.Aliases import false
 
 
 # ================================== #
