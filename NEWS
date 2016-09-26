@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-12 August 2016
+26 September 2016
 
 
 Introduction
@@ -32,6 +32,14 @@ observation container. The class implements the following methods:
 - next_unbinned_observation()  Next unbinned CTA observation in container
 The following ctools derive from the class:
 - ctbin
+- ctbkgcube
+- ctcubemask
+- ctedispcube
+- ctexpcube
+- ctmodel
+- ctobssim
+- ctpsfcube
+- ctselect
 - ctskymap
 
 The ctlikelihood base class that derives from the ctobservation base class
@@ -41,6 +49,7 @@ class implements the following methods:
 - opt()      Returns pointer to optimizer
 - evaluate() Evaluates log-likelihood at a given parameter value
 The following ctools derive from the class:
+- ctbutterfly
 - cterror
 - ctlike
 - cttsmap
@@ -66,6 +75,9 @@ ctool base class, and exposed in Python as _time_reference().
 
 ctbin - CTA event binning
 -------------------------
+The ctbin segfaulted when running on an observation container with different
+energy thresholds. This problem is now fixed (#1850).
+
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
 

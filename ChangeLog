@@ -1,10 +1,12 @@
-2016-08-12
+2016-09-26
 
         * Version 1.2.0 released
         ========================
 
+        Fix ctbin segfault bug for varying energy thresholds (#1850)
+        Make csresmap enumbins parameter hidden (#1844)
         Rename ctskymap::map() to ctskymap::skymap() (#1828)
-        Introduce ctobservation and ctlikelihood base classes (#1828)
+        Introduce ctobservation and ctlikelihood base classes (#1828, #1846)
         Remove ctselect::time_reference() method
         Add ctool and cscript pars() methods (#1838)
         Fix ctbin::save() bug for empty observation container (#1835)
