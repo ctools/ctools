@@ -166,9 +166,7 @@ class cscaldb(ctools.cscript):
                 continue
 
             # Write mission into logger
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Mission: '+mission)
+            self._log_header1(gammalib.TERSE, 'Mission: '+mission)
 
             # Extract instruments
             instruments = self._get_instruments(caldb, mission)
@@ -176,10 +174,9 @@ class cscaldb(ctools.cscript):
             # Loop over instruments
             for instrument in instruments:
 
-                # Write mission into logger
-                if self._logTerse():
-                    self._log.header3('Response functions in database "'+
-                                      instrument+'"')
+                # Write instrument into logger
+                self._log_header3(gammalib.TERSE, 'Response functions in database "'+
+                                                  instrument+'"')
 
                 # Open calibration index file and retrieve calibrations
                 filename = '/data/'+mission+'/'+instrument+'/caldb.indx'
