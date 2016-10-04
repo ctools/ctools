@@ -101,7 +101,7 @@ def get_positions(xmin, xmax, ymin, ymax, step):
 # ====================== #
 def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
               separation=3.0, hours=100.0,
-              site=None, lst=True, autodec=0.0):
+              site=None, caldb='prod2', lst=True, autodec=0.0):
     """
     Setup pointing patch on the sky
 
@@ -170,25 +170,18 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
             else:
                 obs_site = site
 
-            # Set site dependent Prod2 50 hour IRF and add up exposure for
-            # a given site
-            caldb = 'prod2'
-            if obs_site == 'North':
-                if lst:
-                    irf = 'North_50h'
-                else:
-                    irf = 'North_50h'
-                exposure_north += duration
-            else:
-                if lst:
-                    irf = 'South_50h'
-                else:
-                    irf = 'South_50h'
-                exposure_south += duration
+            # Set IRF
+            irf = set_irf(obs_site, obs, caldb, lst=lst)
 
             # Set IRF information
             obs['caldb'] = caldb
             obs['irf']   = irf
+
+            # Add up exposure for a given site
+            if obs_site == 'North':
+                exposure_north += duration
+            else:
+                exposure_south += duration
 
         # Append observation
         obsdef.append(obs)
@@ -206,10 +199,77 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
     return obsdef
 
 
+# ================================== #
+# Setup Instrument Response Function #
+# ================================== #
+def set_irf(site, obs, caldb, lst=True):
+    """
+    Setup Instrument Response Function
+
+    Parameters
+    ----------
+    site : str
+        Array site (either 'South' or 'North')
+    obs : dict
+        Dictionary with pointing information
+    caldb : str
+        Calibration database
+    lst : bool, optional
+        Use LSTs
+
+    Returns
+    -------
+    irf : str
+        IRF name
+    """
+    # Handle 'prod2'
+    if caldb == 'prod2':
+        if site == 'North':
+            irf = 'North_50h'
+        else:
+            irf = 'South_50h'
+
+    # Handle 'prod3'
+    elif caldb == 'prod3':
+
+        # Compute Right Ascension and Declination of pointing
+        pnt = gammalib.GSkyDir()
+        pnt.lb_deg(obs['lon'], obs['lat'])
+        ra  = pnt.ra_deg()
+        dec = pnt.dec_deg()
+
+        # Set geographic latitude of array
+        if site == 'North':
+            geolat = +28.7569
+        else:
+            geolat = -24.58
+
+        # Compute best possible zenith angle
+        zenith = abs(dec - geolat)
+        print(dec, zenith)
+
+        # Set IRF
+        if site == 'North':
+            irf = 'North_50h'
+        else:
+            irf = 'South_50h'
+        if zenith < 30.0:
+            irf += '_z20'
+        else:
+            irf += '_z40'
+
+    # ... otherwise return an empty string
+    else:
+        irf = ''
+
+    # Return IRF
+    return irf
+
+
 # =========================== #
 # Setup Galactic plane survey #
 # =========================== #
-def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, lst=True):
+def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True):
     """
     Setup Galactic plane survey
 
@@ -221,6 +281,8 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, lst=True):
         Minimum Galactic Latitude (deg)
     bmax : float, optional
         Maximum Galactic Latitude (deg)
+    caldb : str, optional
+        Calibration database name
     lst : bool, optional
         Use LSTs
 
@@ -235,27 +297,27 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, lst=True):
     # Add inner region South
     obsdef.extend(set_patch(lmin=-60.0, lmax=60.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=780,
-                            site='South', lst=lst))
+                            site='South', caldb=caldb, lst=lst))
 
     # Add Vela & Carina region
     obsdef.extend(set_patch(lmin=240.0, lmax=300.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=180,
-                            site='South', lst=lst))
+                            site='South', caldb=caldb, lst=lst))
 
     # Add 210-240 region
     obsdef.extend(set_patch(lmin=210.0, lmax=240.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=60,
-                            site='South', lst=lst))
+                            site='South', caldb=caldb, lst=lst))
 
     # Add Cygnus, Perseus
     obsdef.extend(set_patch(lmin=60.0, lmax=150.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=450,
-                            site='North', lst=lst))
+                            site='North', caldb=caldb, lst=lst))
 
     # Add Anticentre
     obsdef.extend(set_patch(lmin=150.0, lmax=210.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=150,
-                            site='North', lst=lst))
+                            site='North', caldb=caldb, lst=lst))
 
     # Return observation definition
     return obsdef
@@ -264,7 +326,7 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, lst=True):
 # ========================== #
 # Setup Extragalactic survey #
 # ========================== #
-def set_extgal(separation=3.0, lst=True):
+def set_extgal(separation=3.0, caldb='prod2', lst=True):
     """
     Setup Extragalactic survey.
 
@@ -272,6 +334,8 @@ def set_extgal(separation=3.0, lst=True):
     ----------
     separation : float, optional
         Pointing separation (deg)
+    caldb : str, optional
+        Calibration database name
     lst : bool, optional
         Use LSTs
 
@@ -286,7 +350,8 @@ def set_extgal(separation=3.0, lst=True):
     # Set patch
     obsdef.extend(set_patch(lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0,
                             separation=separation, hours=1000,
-                            site='Automatic', lst=lst, autodec=10.0))
+                            site='Automatic', caldb=caldb, lst=lst,
+                            autodec=10.0))
 
     # Return observation definition
     return obsdef
@@ -295,12 +360,14 @@ def set_extgal(separation=3.0, lst=True):
 # ========================= #
 # Setup Galactic centre KSP #
 # ========================= #
-def set_gc(lst=True):
+def set_gc(caldb='prod2', lst=True):
     """
     Setup Galactic centre KSP.
 
     Parameters
     ----------
+    caldb : str, optional
+        Calibration database name
     lst : bool, optional
         Use LSTs
 
@@ -315,12 +382,12 @@ def set_gc(lst=True):
     # Central wobble
     obsdef.extend(set_patch(lmin=-0.5, lmax=0.5, bmin=-0.5, bmax=0.5,
                             separation=0.1, hours=525,
-                            site='South', lst=lst))
+                            site='South', caldb=caldb, lst=lst))
 
     # Extended region
     obsdef.extend(set_patch(lmin=-10.0, lmax=10.0, bmin=-10.0, bmax=10.0,
                             separation=1.5, hours=300,
-                            site='South', lst=lst))
+                            site='South', caldb=caldb, lst=lst))
 
     # Return observation definition
     return obsdef
@@ -329,7 +396,7 @@ def set_gc(lst=True):
 # ============= #
 # Setup LMC KSP #
 # ============= #
-def set_lmc(hours=250.0, lst=True):
+def set_lmc(hours=250.0, caldb='prod2', lst=True):
     """
     Setup LMC KSP.
 
@@ -337,6 +404,8 @@ def set_lmc(hours=250.0, lst=True):
     ----------
     hours : float, optional
         Total observation duration (h)
+    caldb : str, optional
+        Calibration database name
     lst : bool, optional
         Use LSTs
 
@@ -372,12 +441,10 @@ def set_lmc(hours=250.0, lst=True):
         # Set positions and duration
         obs = {'lon': lon, 'lat': lat, 'duration': duration}
 
+        # Set IRF
+        irf = set_irf(obs_site, obs, caldb, lst=lst)
+
         # Add IRF
-        caldb = 'prod2'
-        if lst:
-            irf = 'South_50h'
-        else:
-            irf = 'South_50h'
         obs['caldb'] = caldb
         obs['irf']   = irf
 
@@ -467,27 +534,31 @@ def make_pointings():
         print('     lmc      LMC survey')
         sys.exit()
 
+    # Set calibration database
+    caldb = 'prod3'
+    lst   = True
+
     # Galactic plane survey
     if obsname == 'gps':
-        obsdef = set_gps(lst=True)
+        obsdef = set_gps(caldb=caldb, lst=lst)
         write_obsdef('gps.dat', obsdef)
     elif obsname == 'gps3':
-        obsdef = set_gps(separation=1.5, lst=True)
+        obsdef = set_gps(separation=1.5, caldb=caldb, lst=lst)
         write_obsdef('gps3.dat', obsdef)
 
     # Extragalactic survey
     elif obsname == 'extgal':
-        obsdef = set_extgal(lst=True)
+        obsdef = set_extgal(caldb=caldb, lst=lst)
         write_obsdef('extgal.dat', obsdef)
 
     # Galactic centre
     elif obsname == 'gc':
-        obsdef = set_gc(lst=True)
+        obsdef = set_gc(caldb=caldb, lst=lst)
         write_obsdef('gc.dat', obsdef)
 
     # LMC
     elif obsname == 'lmc':
-        obsdef = set_lmc(lst=True)
+        obsdef = set_lmc(caldb=caldb, lst=lst)
         write_obsdef('lmc.dat', obsdef)
 
     # Invalid pattern
