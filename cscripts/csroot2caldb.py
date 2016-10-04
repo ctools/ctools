@@ -21,6 +21,7 @@
 import os
 import sys
 import math
+import copy
 from datetime import datetime
 import gammalib
 import ctools
@@ -69,6 +70,8 @@ class csroot2caldb(ctools.cscript):
         self['inst'].string()
         self['id'].string()
         self['analysis'].string()
+        self['zenith'].real()
+        self['azimuth'].real()
         self['version'].string()
         self['psftype'].string()
         self['split'].boolean()
@@ -102,6 +105,10 @@ class csroot2caldb(ctools.cscript):
         cal_version  = 'VERSION('+self['version'].string()+')'
         cal_cut      = 'CLASS(BEST)'
         cal_analysis = 'ANALYSIS('+self['analysis'].string()+')'
+        cal_zenith   = 'ZENITH(%.3f)deg' % self['zenith'].real()
+        cal_azimuth  = 'AZIMUTH(%.3f)deg' % self['azimuth'].real()
+        cal_bounds   = [cal_name, cal_version, cal_cut, cal_analysis, \
+                        cal_zenith, cal_azimuth]
 
         # Set IRF information
         irf['CAL_TEL']      = 'CTA'
@@ -118,19 +125,19 @@ class csroot2caldb(ctools.cscript):
         irf['REF_TIME']     = 51544.0
         irf['EA_NAME']      = 'EFF_AREA'
         irf['EA_DOC']       = 'CAL/GEN/92-019'
-        irf['EA_BOUNDS']    = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['EA_BOUNDS']    = copy.deepcopy(cal_bounds)
         irf['EA_DESC']      = 'CTA effective area'
         irf['PSF_NAME']     = 'RPSF'
         irf['PSF_DOC']      = 'CAL/GEN/92-020'
-        irf['PSF_BOUNDS']   = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['PSF_BOUNDS']   = copy.deepcopy(cal_bounds)
         irf['PSF_DESC']     = 'CTA point spread function'
         irf['EDISP_NAME']   = 'EDISP'
         irf['EDISP_DOC']    = '???'
-        irf['EDISP_BOUNDS'] = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['EDISP_BOUNDS'] = copy.deepcopy(cal_bounds)
         irf['EDISP_DESC']   = 'CTA energy dispersion'
         irf['BGD_NAME']     = 'BGD'
         irf['BGD_DOC']      = '???'
-        irf['BGD_BOUNDS']   = [cal_name, cal_version, cal_cut, cal_analysis]
+        irf['BGD_BOUNDS']   = copy.deepcopy(cal_bounds)
         irf['BGD_DESC']     = 'CTA background'
 
         # Return metadata
@@ -590,9 +597,9 @@ class csroot2caldb(ctools.cscript):
                     ereco.SetBinContent(ieng+1,ioff+1,value)
 
         # Set boundaries (use Ereco boundaries)
-        bounds = self._make_2D(ereco, ds['HDU_EA'], None, 'm2')
-        for b in bounds:
-            irf['EA_BOUNDS'].append(b)
+        #bounds = self._make_2D(ereco, ds['HDU_EA'], None, 'm2')
+        #for b in bounds:
+        #    irf['EA_BOUNDS'].append(b)
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_EA'], irf['EA_NAME'],
@@ -689,9 +696,9 @@ class csroot2caldb(ctools.cscript):
                 zero.SetBinContent(ieng+1,ioff+1,0.0)
 
         # Set boundaries
-        bounds = self._make_2D(r68, ds['HDU_PSF'], None, 'deg')
-        for b in bounds:
-            irf['PSF_BOUNDS'].append(b)
+        #bounds = self._make_2D(r68, ds['HDU_PSF'], None, 'deg')
+        #for b in bounds:
+        #    irf['PSF_BOUNDS'].append(b)
         irf['PSF_BOUNDS'].append('PSF(GAUSS)')
 
         # Write boundary keywords
@@ -825,9 +832,9 @@ class csroot2caldb(ctools.cscript):
                 sigma2D.SetBinContent(ieng+1,ioff+1,sigma)
 
         # Set boundaries
-        bounds = self._make_2D(r68, ds['HDU_PSF'], None, 'deg')
-        for b in bounds:
-            irf['PSF_BOUNDS'].append(b)
+        #bounds = self._make_2D(r68, ds['HDU_PSF'], None, 'deg')
+        #for b in bounds:
+        #    irf['PSF_BOUNDS'].append(b)
         irf['PSF_BOUNDS'].append('PSF(KING)')
 
         # Write boundary keywords
@@ -868,9 +875,9 @@ class csroot2caldb(ctools.cscript):
         matrix = tfile.Get('EestOverEtrue_offaxis')
 
         # Set boundaries
-        bounds = self._make_3D_migra(matrix, ds['HDU_EDISP'], None, '')
-        for b in bounds:
-            irf['EDISP_BOUNDS'].append(b)
+        #bounds = self._make_3D_migra(matrix, ds['HDU_EDISP'], None, '')
+        #for b in bounds:
+        #    irf['EDISP_BOUNDS'].append(b)
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_EDISP'], irf['EDISP_NAME'],
@@ -921,9 +928,9 @@ class csroot2caldb(ctools.cscript):
             self._renorm_onaxis(array, array_1D)
 
         # Set boundaries
-        bounds = self._make_3D(array, ds['HDU_BGD'], None, 'deg')
-        for b in bounds:
-            irf['BGD_BOUNDS'].append(b)
+        #bounds = self._make_3D(array, ds['HDU_BGD'], None, 'deg')
+        #for b in bounds:
+        #    irf['BGD_BOUNDS'].append(b)
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_BGD'], irf['BGD_NAME'],
@@ -1012,7 +1019,6 @@ class csroot2caldb(ctools.cscript):
 
         # Return
         return
-
 
     def _renorm_onaxis(self, hist2D, hist1D):
         """

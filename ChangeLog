@@ -1,8 +1,9 @@
-2016-09-26
+2016-10-04
 
         * Version 1.2.0 released
         ========================
 
+        Add zenith and azimuth angle information to IRF caldb (#1853)
         Fix ctbin segfault bug for varying energy thresholds (#1850)
         Make csresmap enumbins parameter hidden (#1844)
         Rename ctskymap::map() to ctskymap::skymap() (#1828)

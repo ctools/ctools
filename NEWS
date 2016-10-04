@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-26 September 2016
+4 October 2016
 
 
 Introduction
@@ -188,9 +188,12 @@ The class now derives from ctlikelihood (#1828).
 
 cscripts
 --------
-Added the support modules "modutils" and "ioutils" to the cscripts module
-and removed the obsolete functions fit(), cterror(), cntmap() and modmap()
-from the "obsutils" module (#1830).
+Added the support modules "modutils" and "ioutils" to the cscripts module and
+removed the obsolete functions fit(), cterror(), cntmap() and modmap() from the
+"obsutils" module (#1830).
+
+The csroot2caldb script now takes the zenith and azimuth angles as parameters
+and writes them into the calibration database.
 
 
 Examples
