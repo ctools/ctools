@@ -1,0 +1,40 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csviscube.par                                                 #
+#  Version:   1.0.0                                                         #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csviscube script                       #
+#                                                                           #
+#############################################################################
+#
+# General parameters
+#===================
+tmin,       r, a,   0.0,,, "Start time (CTA MET in seconds)"
+tmax,       r, a,  31557600.0,,, "End time (CTA MET in seconds)"
+geolon,     r, a,  79.4041,,, "Geographic longitude of array (deg)"
+geolat,     r, a, -24.6272,,, "Geographic latitude of array (deg)"
+sunzenith,  r, h, 105.0,,, "Minimum Sun zenith angle for observations (deg)"
+moonzenith, r, h, 90.0,,, "Minimum Moon zenith angle for observations (deg)"
+outfile,    f, a, viscube.fits,,, "Visibility cube output file"
+
+#
+# Visibility cube parameters
+#===========================
+binsz, r, h, 1.0,,, "Image scale (in degrees/pixel)"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csviscube.log,,, "Log filename"

@@ -40,6 +40,7 @@ __all__ = [
     "cstsdist",
     "cstsmapmerge",
     "cstsmapsplit",
+    "csviscube",
     "csworkflow",
     "obsutils",
     "modutils",
@@ -69,6 +70,7 @@ from cscripts.csspec       import csspec
 from cscripts.cstsdist     import cstsdist
 from cscripts.cstsmapmerge import cstsmapmerge
 from cscripts.cstsmapsplit import cstsmapsplit
+from cscripts.csviscube    import csviscube
 from cscripts.csworkflow   import csworkflow
 from cscripts              import obsutils
 from cscripts              import modutils

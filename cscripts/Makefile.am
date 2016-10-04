@@ -37,6 +37,7 @@ pythonscripts = $(builddir)/__init__.py \
                 $(srcdir)/cstsdist.py \
                 $(srcdir)/cstsmapmerge.py \
                 $(srcdir)/cstsmapsplit.py \
+                $(srcdir)/csviscube.py \
                 $(srcdir)/csworkflow.py \
                 $(srcdir)/csfindobs.py \
                 $(srcdir)/csiactcopy.py \
@@ -63,6 +64,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/cstsdist.par \
            $(srcdir)/cstsmapmerge.par \
            $(srcdir)/cstsmapsplit.par \
+           $(srcdir)/csviscube.par \
            $(srcdir)/csworkflow.par \
            $(srcdir)/csfindobs.par \
            $(srcdir)/csiactcopy.par \
@@ -86,6 +88,7 @@ linkscripts = cscaldb \
               cstsdist \
               cstsmapmerge \
               cstsmapsplit \
+              csviscube \
               csworkflow \
               csfindobs \
               csiactcopy \
@@ -111,6 +114,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_cstsdist.py \
               $(top_srcdir)/test/test_cstsmapmerge.py \
               $(top_srcdir)/test/test_cstsmapsplit.py \
+              $(top_srcdir)/test/test_csviscube.py \
               $(top_srcdir)/test/test_csworkflow.py \
               $(top_srcdir)/test/test_csfindobs.py \
               $(top_srcdir)/test/test_csiactcopy.py \
