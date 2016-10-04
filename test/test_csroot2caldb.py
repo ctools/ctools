@@ -79,7 +79,7 @@ class Test(test):
         cmd = csroot2caldb+' infile="'+self._infile+'"'+ \
                            ' outdir="csroot2caldb_cmd1"'+ \
                            ' inst=prod3 id=South_50h version=prod3'+ \
-                           ' analysis=DESY'+ \
+                           ' analysis=DESY zenith=20.0 azimuth=0.0'+ \
                            ' logfile="csroot2caldb_cmd1.log" chatter=2'
 
         # Check if execution of wrong command fails
@@ -107,6 +107,8 @@ class Test(test):
         caldb['id']            = 'South_50h'
         caldb['version']       = 'prod3'
         caldb['analysis']      = 'DESY'
+        caldb['zenith']        = 20.0
+        caldb['azimuth']       = 0.0
         caldb['psftype']       = 'King'
         caldb['norm1d']        = True
         caldb['rebin']         = True

@@ -246,7 +246,6 @@ def set_irf(site, obs, caldb, lst=True):
 
         # Compute best possible zenith angle
         zenith = abs(dec - geolat)
-        print(dec, zenith)
 
         # Set IRF
         if site == 'North':
@@ -442,7 +441,7 @@ def set_lmc(hours=250.0, caldb='prod2', lst=True):
         obs = {'lon': lon, 'lat': lat, 'duration': duration}
 
         # Set IRF
-        irf = set_irf(obs_site, obs, caldb, lst=lst)
+        irf = set_irf('South', obs, caldb, lst=lst)
 
         # Add IRF
         obs['caldb'] = caldb

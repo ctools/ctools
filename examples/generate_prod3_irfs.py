@@ -83,6 +83,8 @@ def generate_prod3_irfs():
         caldb['id']            = entry['id']
         caldb['version']       = entry['inst']
         caldb['analysis']      = entry.setdefault('analysis', 'DESY')
+        caldb['zenith']        = entry.setdefault('zenith', 20.0)
+        caldb['azimuth']       = entry.setdefault('azimuth', 0.0)
         caldb['psftype']       = entry.setdefault('psftype', 'Gauss')
         caldb['norm1d']        = entry.setdefault('norm1d', False)
         caldb['rebin']         = entry.setdefault('rebin', False)
