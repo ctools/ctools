@@ -28,7 +28,9 @@ outfile,    f, a, viscube.fits,,, "Visibility cube output file"
 #
 # Visibility cube parameters
 #===========================
-binsz, r, h, 1.0,,, "Image scale (in degrees/pixel)"
+binsz, r, h, 1.0,,, "Image scale (deg/pixel)"
+dz,    r, h, 1.0,,, "Zenith angle bin size (deg)"
+zmax,  r, h, 60.0,,, "Maximum zenith angle (deg)"
 
 #
 # Standard parameters

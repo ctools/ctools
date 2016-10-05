@@ -67,7 +67,7 @@ class Test(test):
 
         # Setup csviscube command
         cmd = csviscube+' tmin=0.0 tmax=31557600.0 geolon=79.4041'+\
-                        ' geolat=-24.6272 outfile=csviscube_cmd1.fits'+\
+                        ' geolat=-24.6272 binsz=3.0 outfile=csviscube_cmd1.fits'+\
                         ' logfile="csviscube_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -92,6 +92,7 @@ class Test(test):
         viscube['tmax']    =  31557600.0
         viscube['geolon']  =  79.4041
         viscube['geolat']  = -24.6272
+        viscube['binsz']   = 3.0
         viscube['outfile'] = 'csviscube_py1.fits'
         viscube['logfile'] = 'csviscube_py1.log'
         viscube['chatter'] = 2
