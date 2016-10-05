@@ -1,8 +1,9 @@
-2016-10-04
+2016-10-05
 
         * Version 1.2.0 released
         ========================
 
+        Add csviscube script (#1853)
         Add zenith and azimuth angle information to IRF caldb (#1853)
         Fix ctbin segfault bug for varying energy thresholds (#1850)
         Make csresmap enumbins parameter hidden (#1844)

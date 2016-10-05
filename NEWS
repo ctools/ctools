@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-4 October 2016
+5 October 2016
 
 
 Introduction
@@ -193,7 +193,12 @@ removed the obsolete functions fit(), cterror(), cntmap() and modmap() from the
 "obsutils" module (#1830).
 
 The csroot2caldb script now takes the zenith and azimuth angles as parameters
-and writes them into the calibration database.
+and writes them into the calibration database (#1835).
+
+Added a csviscube script that computes the visibility cube providing the number
+of hours that a given position on the sky is observable under a given zenith
+angle by an IACT array during a given time period. The tool implements so far
+a Sun constraint, but no Moon constraint (#1835).
 
 
 Examples

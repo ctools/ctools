@@ -40,6 +40,7 @@ cscripts
    :maxdepth: 1
 
    cscaldb --- Lists available instrument response functions <cscaldb>
+   csviscube --- Computes visibility cube <csviscube>
    cslightcrv --- Computes lightcurve <cslightcrv>
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
