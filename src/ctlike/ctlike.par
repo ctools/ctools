@@ -27,6 +27,7 @@ caldb,           s, a, "prod2",,, "Calibration database"
 irf,             s, a, "South_0.5h",,, "Instrument response function"
 edisp,           b, h, no,,, "Apply energy dispersion?"
 outmodel,        f, a, "crab_results.xml",,, "Output model XML file"
+covmat,          f, h, "NONE",,, "Output covariance matrix FITS file"
 
 #
 # Maximisation parameters

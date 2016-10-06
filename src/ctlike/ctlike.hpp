@@ -73,6 +73,7 @@ protected:
     bool          m_apply_edisp;     //!< Apply energy dispersion?
     bool          m_fix_spat_for_ts; //!< Fix spatial parameters for TS computation?
     GChatter      m_chatter;         //!< Chattiness
+    GFilename     m_covmat;          //!< Covariance matrix output FITS file name
 
     // Members
     int           m_max_iter;   //!< Maximum number of iterations

@@ -331,7 +331,13 @@ void ctlike::save(void)
 
         // Write results out as XML model
         m_obs.models().save(m_outmodel);
+    }
 
+    // Save covarianve matrix only if filename is valid
+    if (is_valid_filename(m_covmat)) {
+
+        // Save covarianve matrix
+        m_obs.save_covmat(m_covmat);
     }
 
     // ... otherwise signal that file was not saved
@@ -393,6 +399,7 @@ void ctlike::get_parameters(void)
     m_apply_edisp     = (*this)["edisp"].boolean();
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
     m_chatter         = static_cast<GChatter>((*this)["chatter"].integer());
+    m_covmat          = (*this)["covmat"].filename();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -530,6 +537,7 @@ void ctlike::init_members(void)
 {
     // Initialise members
     m_outmodel.clear();
+    m_covmat.clear();
     m_refit           = false;
     m_max_iter        = 100;   // Set maximum number of iterations
     m_max_stall       = 10;    // Set maximum number of stalls
@@ -560,6 +568,7 @@ void ctlike::copy_members(const ctlike& app)
     // Copy attributes
     m_refit           = app.m_refit;
     m_outmodel        = app.m_outmodel;
+    m_covmat          = app.m_covmat;
     m_max_iter        = app.m_max_iter;
     m_max_stall       = app.m_max_stall;
     m_logL            = app.m_logL;
