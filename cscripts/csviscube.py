@@ -19,8 +19,6 @@
 #
 # ==========================================================================
 import sys
-import glob
-import os
 import math
 import gammalib
 import ctools
@@ -99,7 +97,7 @@ class csviscube(ctools.cscript):
 
         Returns
         -------
-        map : `~gammalib.GSkyMap`
+        zmap : `~gammalib.GSkyMap`
             Allsky map comprising the zenith angle for an hour angle of 0.
 
         The zenith angle of a position (ra,dec) depends on the declination and
@@ -117,7 +115,7 @@ class csviscube(ctools.cscript):
         the local meridian.
         """
         # Initialise zenith angle map
-        map = gammalib.GSkyMap('CAR','CEL',0.0,0.0,-dx,dy,nx,ny)
+        zmap = gammalib.GSkyMap('CAR','CEL',0.0,0.0,-dx,dy,nx,ny)
 
         # Set hour angle and declination vectors
         hours = [(float(i)+0.5)*dx for i in range(nx)]
@@ -140,15 +138,15 @@ class csviscube(ctools.cscript):
                 cos_h  = math.cos(h*gammalib.deg2rad)
                 zenith = math.acos(sin_lat*sin_dec +
                                    cos_lat*cos_dec*cos_h)*gammalib.rad2deg
-                map[index] = zenith
+                zmap[index] = zenith
                 index     += 1
 
         # Log zenith angle map
         self._log_header2(gammalib.EXPLICIT, 'Zenith angle map')
-        self._log_string(gammalib.EXPLICIT, str(map))
+        self._log_string(gammalib.EXPLICIT, str(zmap))
 
         # Return zenith angle map
-        return map
+        return zmap
 
     def _sun_radec(self, time):
         """
@@ -228,8 +226,7 @@ class csviscube(ctools.cscript):
 
         # Compute Right Ascension and Declination of Sun in degrees and
         # convert the Declination into radians
-        sunra, sundec = self._sun_radec(time)
-        sundec *= gammalib.deg2rad
+        sundec = self._sun_radec(time)[1] * gammalib.deg2rad
 
         # Compute some sines and cosines
         cos_sunzenith = math.cos(sunzenith)
@@ -264,7 +261,7 @@ class csviscube(ctools.cscript):
         self._log_header2(gammalib.NORMAL, 'Hour angle weights')
 
         # Get array geographic longitude
-        geolon = self['geolon'].real()
+        #geolon = self['geolon'].real()
 
         # Get time interval
         tmin = gammalib.GTime(self['tmin'].real(), 's')
@@ -415,7 +412,7 @@ class csviscube(ctools.cscript):
         self._log_value(gammalib.NORMAL, 'Maximum zenith angle', str(zmax)+' deg')
 
         # Compute zenith angle map
-        map = self._zenith_angle_map(nx,ny,dx,dy)
+        zmap = self._zenith_angle_map(nx,ny,dx,dy)
 
         # Setup hour angle weights. They specify for how many hours a given
         # hour angle is observed during the covered time period.
@@ -431,14 +428,14 @@ class csviscube(ctools.cscript):
             shift = hour_angle['angle']
 
             # Initialise shifted zenith angle map
-            map_shift = gammalib.GSkyMap('CAR','CEL',shift,0.0,-dx,dy,nx,ny)
+            zmap_shift = gammalib.GSkyMap('CAR','CEL',shift,0.0,-dx,dy,nx,ny)
 
             # Merge zenith angle map into shifted map
-            map_shift += map
+            zmap_shift += zmap
 
             # Loop over all pixels of the shifted map and add the hours during
             # which the shifted map occurs to the relevant zenith angle bin
-            for i, zenith in enumerate(map_shift):
+            for i, zenith in enumerate(zmap_shift):
                 iz = int(zenith/dz)
                 if iz < nz:
                     self._cube[i,iz] += hour_angle['hours']
