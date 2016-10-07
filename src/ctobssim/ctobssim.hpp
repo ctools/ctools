@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTOBSSIM_NAME    "ctobssim"
-#define CTOBSSIM_VERSION "1.1.0"
+#define CTOBSSIM_VERSION "1.2.0"
 
 
 /***********************************************************************//**
@@ -65,6 +65,7 @@ public:
     void          clear(void);
     void          run(void);
     void          save(void);
+    void          publish(const std::string& name = "");
     const double& max_rate(void) const;
     void          max_rate(const double& max_rate);
 

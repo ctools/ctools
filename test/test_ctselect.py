@@ -177,6 +177,7 @@ class Test(test):
         cpy_select['outobs']  = 'ctselect_py2.fits'
         cpy_select['logfile'] = 'ctselect_py2.log'
         cpy_select['chatter'] = 3
+        cpy_select['publish'] = True
         cpy_select.logFileOpen()  # Needed to get a new log file
         cpy_select.execute()
 

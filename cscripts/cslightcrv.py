@@ -614,6 +614,10 @@ class cslightcrv(ctools.cscript):
         self._fits = gammalib.GFits()
         self._fits.append(table)
 
+        # Optionally publish light curve
+        if self['publish'].boolean():
+            self.publish()
+
         # Return
         return
 
@@ -654,6 +658,36 @@ class cslightcrv(ctools.cscript):
 
             # Save spectrum
             self._fits.saveto(outfile, self._clobber())
+
+        # Return
+        return
+
+    def publish(self, name=''):
+        """
+        Publish light curve
+
+        Parameters
+        ----------
+        name : str, optional
+            Name of light curve
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Publish light curve')
+
+        # Continue only if light curve is valid
+        if self._fits.contains('LIGHTCURVE'):
+
+            # Set default name is user name is empty
+            if not name:
+                user_name = self._name
+            else:
+                user_name = name
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Light curve name', user_name)
+
+            # Publish light curve
+            self._fits.publish('LIGHTCURVE', user_name)
 
         # Return
         return

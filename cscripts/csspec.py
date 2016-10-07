@@ -268,18 +268,17 @@ class csspec(ctools.cscript):
                     par.fix()
 
         # Write header
+        self._log_header1(gammalib.TERSE, 'Generate spectrum')
         if self._logTerse():
-            self._log("\n")
-            self._log.header1("Generate spectrum")  
-            self._log(str(self._ebounds))    
+            self._log(str(self._ebounds))
 
         # Initialise FITS Table with extension "SPECTRUM"
         table = gammalib.GFitsBinTable(self._ebounds.size())
-        table.extname("SPECTRUM")
+        table.extname('SPECTRUM')
 
         # Add Header for compatibility with gammalib.GMWLSpectrum
-        table.card("INSTRUME", "CTA", "Name of Instrument")
-        table.card("TELESCOP", "CTA", "Name of Telescope")
+        table.card('INSTRUME', 'CTA', 'Name of Instrument')
+        table.card('TELESCOP', 'CTA', 'Name of Telescope')
 
         # Create FITS table columns
         nrows        = self._ebounds.size()
@@ -470,12 +469,16 @@ class csspec(ctools.cscript):
         self._fits = gammalib.GFits()
         self._fits.append(table)
 
+        # Optionally publish light curve
+        if self['publish'].boolean():
+            self.publish()
+
         # Return
         return
 
     def execute(self):
         """
-        Execute the script.
+        Execute the script
         """
         # Open logfile
         self.logFileOpen()
@@ -494,27 +497,52 @@ class csspec(ctools.cscript):
 
     def save(self):
         """
-        Save spectrum.
+        Save spectrum
         """
         # Write header
-        if self._logTerse():
-            self._log("\n")
-            self._log.header1("Save spectrum")
+        self._log_header1(gammalib.TERSE, 'Save spectrum')
 
         # Get outmap parameter
-        outfile = self["outfile"].filename()
+        outfile = self['outfile'].filename()
         
         # Continue only filename and residual map are valid
         if self._fits != None:
 
             # Log file name
-            if self._logTerse():
-                self._log(gammalib.parformat("Spectrum file"))
-                self._log(outfile.url())
-                self._log("\n")
+            self._log_value(gammalib.NORMAL, 'Spectrum file', outfile.url())
 
             # Save spectrum
             self._fits.saveto(outfile, self._clobber)
+
+        # Return
+        return
+
+    def publish(self, name=''):
+        """
+        Publish spectrum
+
+        Parameters
+        ----------
+        name : str, optional
+            Name of spectrum
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Publish spectrum')
+
+        # Continue only if spectrum is valid
+        if self._fits.contains('SPECTRUM'):
+
+            # Set default name is user name is empty
+            if not name:
+                user_name = self._name
+            else:
+                user_name = name
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Spectrum name', user_name)
+
+            # Publish spectrum
+            self._fits.publish('SPECTRUM', user_name)
 
         # Return
         return

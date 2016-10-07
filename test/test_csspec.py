@@ -130,6 +130,7 @@ class Test(test):
         spec['emax']     = 100.0
         spec['logfile']  = 'csspec_py1.log'
         spec['chatter']  = 2
+        spec['publish']  = True
 
         # Run csspec script
         spec.logFileOpen()   # Make sure we get a log file
@@ -155,6 +156,7 @@ class Test(test):
         spec['emax']      = 100.0
         spec['logfile']   = 'csspec_py2.log'
         spec['chatter']   = 3
+        spec['publish']   = False
 
         # Execute csspec script
         spec.execute()

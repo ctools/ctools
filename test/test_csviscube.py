@@ -34,7 +34,7 @@ class Test(test):
     # Constructor
     def __init__(self):
         """
-        Constructor.
+        Constructor
         """
         # Call base class constructor
         test.__init__(self)
@@ -45,7 +45,7 @@ class Test(test):
     # Set test functions
     def set(self):
         """
-        Set all test functions.
+        Set all test functions
         """
         # Set test name
         self.name('csviscube')
@@ -60,7 +60,7 @@ class Test(test):
     # Test csviscube on command line
     def _test_cmd(self):
         """
-        Test csviscube on the command line.
+        Test csviscube on the command line
         """
         # Set script name
         csviscube = self._script('csviscube')
@@ -84,7 +84,7 @@ class Test(test):
     # Test csviscube from Python
     def _test_python(self):
         """
-        Test csviscube from Python.
+        Test csviscube from Python
         """
         # Set-up csviscube
         viscube = cscripts.csviscube()
@@ -96,6 +96,7 @@ class Test(test):
         viscube['outfile'] = 'csviscube_py1.fits'
         viscube['logfile'] = 'csviscube_py1.log'
         viscube['chatter'] = 2
+        viscube['publish'] = True
 
         # Run script
         viscube.logFileOpen()   # Make sure we get a log file

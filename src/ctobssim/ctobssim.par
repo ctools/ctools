@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctobssim.par                                                  #
-#  Version:   1.1.0                                                         #
+#  Version:   1.2.0                                                         #
 #                                                                           #
 #  Author:    Juergen Knoedlseder                                           #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -43,6 +43,7 @@ eslices, i, h, 10,1,100, "Number of energy slices"
 #
 # Standard parameters
 #====================
+publish, b, h, no,,, "Publish event list on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"

@@ -32,6 +32,8 @@
 #include <typeinfo> 
 #include "ctobssim.hpp"
 #include "GTools.hpp"
+#include "GFits.hpp"
+
 
 /* __ Method name definitions ____________________________________________ */
 #define G_GET_PARAMETERS                         "ctobssim::get_parameters()"
@@ -415,6 +417,11 @@ void ctobssim::run(void)
     // Restore energy dispersion flags of all CTA observations
     restore_edisp(m_obs, save_edisp);
 
+    // Optionally publish event list(s)
+    if ((*this)["publish"].boolean()) {
+        publish();
+    }
+
     // Return
     return;
 }
@@ -453,6 +460,60 @@ void ctobssim::save(void)
     else {
         save_fits();
     }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Publish event lists
+ *
+ * @param[in] name Event list name.
+ ***************************************************************************/
+void ctobssim::publish(const std::string& name)
+{
+    // Write header into logger
+    log_header1(TERSE, gammalib::number("Publish event list", m_obs.size()));
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+        // Handle only CTA observations
+        if (obs != NULL) {
+
+            // Continue only if there is an event list
+            if (obs->events()->size() != 0) {
+
+                // Set default name if user name is empty
+                std::string user_name(name);
+                if (user_name.empty()) {
+                    user_name = CTOBSSIM_NAME;
+                }
+
+                // If there are several event lists then add an index
+                if (m_use_xml) {
+                    user_name += gammalib::str(i);
+                }
+
+                // Write event list name into logger
+                log_value(NORMAL, "Event list name", user_name);
+
+                // Write events into in-memory FITS file
+                GFits fits;
+                obs->write(fits);
+
+                // Publish
+                fits.publish("EVENTS", user_name);
+
+            } // endif: there were events
+
+        } // endif: observation was a CTA observation
+
+    } // endfor: looped over observations
 
     // Return
     return;
