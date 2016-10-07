@@ -1,8 +1,9 @@
-2016-10-05
+2016-10-07
 
         * Version 1.2.0 released
         ========================
 
+        Add publish parameter and methods to ctobssim, ctselect, cslightcrv and csspec (#1871)
         Add csviscube script (#1853)
         Add zenith and azimuth angle information to IRF caldb (#1853)
         Fix ctbin segfault bug for varying energy thresholds (#1850)

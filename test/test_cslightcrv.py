@@ -126,6 +126,7 @@ class Test(test):
         lcrv['outfile']  = 'cslightcrv_py1.fits'
         lcrv['logfile']  = 'cslightcrv_py1.log'
         lcrv['chatter']  = 2
+        lcrv['publish']  = True
 
         # Run cslightcrv script and save light curve
         lcrv.logFileOpen()   # Make sure we get a log file

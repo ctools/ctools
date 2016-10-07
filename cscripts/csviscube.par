@@ -35,6 +35,7 @@ zmax,  r, h, 60.0,,, "Maximum zenith angle (deg)"
 #
 # Standard parameters
 #====================
+publish, b, h, no,,, "Publish visibility cube on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"

@@ -61,6 +61,7 @@ public:
     void clear(void);
     void run(void);
     void save(void);
+    void publish(const std::string& name = "");
 
 protected:
     // Protected methods

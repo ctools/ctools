@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctselect.par                                                  #
-#  Version:   1.0.0                                                         #
+#  Version:   1.2.0                                                         #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -38,6 +38,7 @@ usethres,s, h, "NONE",NONE|DEFAULT|USER,, "Energy threshold type"
 #
 # Standard parameters
 #====================
+publish, b, h, no,,, "Publish event list on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"

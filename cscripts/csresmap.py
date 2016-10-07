@@ -295,7 +295,7 @@ class csresmap(ctools.cscript):
 
     def publish(self, name=''):
         """
-        Publish residual map.
+        Publish residual map
 
         Parameters
         ----------

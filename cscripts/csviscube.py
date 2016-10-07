@@ -462,6 +462,10 @@ class csviscube(ctools.cscript):
         # Compute visibility cube
         self._visibility_cube()
 
+        # Optionally publish map
+        if self['publish'].boolean():
+            self.publish()
+
         # Return
         return
 
@@ -480,6 +484,33 @@ class csviscube(ctools.cscript):
 
         # Save the visibility cube
         self._cube.save(outfile, self['clobber'].boolean())
+
+        # Return
+        return
+
+    def publish(self, name=''):
+        """
+        Publish visibility cube
+
+        Parameters
+        ----------
+        name : str, optional
+            Name of visibility cube
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Publish visibility cube')
+
+        # Set default name is user name is empty
+        if not name:
+            user_name = self._name
+        else:
+            user_name = name
+
+        # Log cube name
+        self._log_value(gammalib.TERSE, 'Visibility cube name', user_name)
+
+        # Publish cube
+        self._cube.publish(user_name)
 
         # Return
         return

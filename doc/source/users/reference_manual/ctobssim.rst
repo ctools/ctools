@@ -107,7 +107,7 @@ Standard parameters
 -------------------
 
 ``(publish = no) [boolean]``
-    Specifies whether the event list should be published on VO Hub.
+    Specifies whether the event list(s) should be published on VO Hub.
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:

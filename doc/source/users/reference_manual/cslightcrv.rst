@@ -118,6 +118,9 @@ General parameters
 Standard parameters
 -------------------
 
+``(publish = no) [boolean]``
+    Specifies whether the light curve should be published on VO Hub.
+
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      chatter = 0: no information will be logged

@@ -2,6 +2,17 @@
 #                                                                           #
 #                       CTA Science Analysis Tools                          #
 #                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      ctobssim.par                                                  #
+#  Version:   1.2.0                                                         #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the ctobssim application                   #
+#                                                                           #
 #############################################################################
 #
 # General parameters

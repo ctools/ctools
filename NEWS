@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-5 October 2016
+7 October 2016
 
 
 Introduction
@@ -63,6 +63,9 @@ ctobssim - CTA observation simulation
 The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
 
+A publish() method has been added that publishes the simulated event lists on
+a VO hub (#1871).
+
 
 ctselect - CTA event selection
 ------------------------------
@@ -71,6 +74,9 @@ of the tool (#1835).
 
 The time_reference() method has been removed since the method is part of the
 ctool base class, and exposed in Python as _time_reference().
+
+A publish() method has been added that publishes the simulated event lists on
+a VO hub (#1871).
 
 
 ctbin - CTA event binning
@@ -199,6 +205,9 @@ Added a csviscube script that computes the visibility cube providing the number
 of hours that a given position on the sky is observable under a given zenith
 angle by an IACT array during a given time period. The tool implements so far
 a Sun constraint, but no Moon constraint (#1835).
+
+A publish() method has been added to cslightcrv and csspec that publishes the
+results on a VO hub (#1871).
 
 
 Examples
