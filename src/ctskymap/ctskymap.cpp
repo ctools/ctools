@@ -294,7 +294,7 @@ void ctskymap::publish(const std::string& name)
     // Write header into logger
     log_header1(TERSE, "Publish sky map");
 
-    // Set default name is user name is empty
+    // Set default name if user name is empty
     std::string user_name(name);
     if (user_name.empty()) {
         user_name = CTSKYMAP_NAME;

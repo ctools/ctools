@@ -228,6 +228,7 @@ class Test(test):
         cpy_sim['outevents'] = 'ctobssim_py3.xml'
         cpy_sim['logfile']   = 'ctobssim_py3.log'
         cpy_sim['chatter']   = 4
+        cpy_sim['publish']   = True
         cpy_sim.logFileOpen()  # Needed to get a new log file
         cpy_sim.execute()
 

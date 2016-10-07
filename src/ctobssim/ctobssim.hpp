@@ -65,6 +65,7 @@ public:
     void          clear(void);
     void          run(void);
     void          save(void);
+    void          publish(const std::string& name = "");
     const double& max_rate(void) const;
     void          max_rate(const double& max_rate);
 
