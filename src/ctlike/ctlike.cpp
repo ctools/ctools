@@ -228,19 +228,18 @@ void ctlike::run(void)
     // Optimize model parameters using LM optimizer
     optimize_lm();
 
-    // Save covarianve matrix if valid filename is passed
+    // Save covariance matrix if valid filename is passed
     if (is_valid_filename(m_covmat)) {
 
-    // Write header
-    log_header1(TERSE, "Saving covariance matrix");
+        // Write header
+        log_header1(TERSE, "Saving covariance matrix");
 
-    // Log filename
-    log_value(NORMAL, "Covariance matrix file", m_covmat.url());
+        // Log filename
+        log_value(NORMAL, "Covariance matrix file", m_covmat.url());
 
         // Save covarianve matrix
         m_obs.save_covmat(m_covmat);
     }
-
 
     // Store Npred
     double npred = m_obs.npred();
