@@ -70,6 +70,7 @@ protected:
     // User parameters
     bool          m_refit;           //!< Refitting
     GFilename     m_outmodel;        //!< Source model output XML file name
+    GFilename     m_outcovmat;       //!< Covariance matrix output FITS file name
     bool          m_apply_edisp;     //!< Apply energy dispersion?
     bool          m_fix_spat_for_ts; //!< Fix spatial parameters for TS computation?
     GChatter      m_chatter;         //!< Chattiness

@@ -1,8 +1,9 @@
-2016-10-07
+2016-10-17
 
         * Version 1.2.0 released
         ========================
 
+        Add outcovmat parameter to ctlike (#1863)
         Add publish parameter and methods to ctobssim, ctselect, cslightcrv and csspec (#1871)
         Add csviscube script (#1853)
         Add zenith and azimuth angle information to IRF caldb (#1853)
