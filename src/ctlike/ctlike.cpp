@@ -228,19 +228,13 @@ void ctlike::run(void)
     // Optimize model parameters using LM optimizer
     optimize_lm();
 
-    // Save covariance matrix if valid filename is passed
-    if (is_valid_filename(m_covmat)) {
+    // Get pointer to curvature matrix
+    GMatrixSparse* curvature_ptr =
+        const_cast<GObservations::likelihood&>(m_obs.function()).curvature();
 
-        // Write header
-        log_header1(TERSE, "Saving covariance matrix");
-
-        // Log filename
-        log_value(NORMAL, "Covariance matrix file", m_covmat.url());
-
-        // Save covarianve matrix
-        m_obs.save_covmat(m_covmat);
-    }
-
+    // Store copy of curvature matrix
+    GMatrixSparse curvature = *curvature_ptr;
+    
     // Store Npred
     double npred = m_obs.npred();
     
@@ -318,6 +312,9 @@ void ctlike::run(void)
     // Restore energy dispersion flags of all CTA observations
     restore_edisp(m_obs, save_edisp);
 
+    // Restore curvature matrix
+    *curvature_ptr = curvature;
+
     // Return
     return;
 }
@@ -326,15 +323,17 @@ void ctlike::run(void)
 /***********************************************************************//**
  * @brief Save results
  *
- * This method saves the fit results in a XML file.
+ * This method saves the fit results into a XML file and a FITS file. If
+ * the filename parameters are "NONE", the files are not saved.
  ***************************************************************************/
 void ctlike::save(void)
 {
     // Write header
     log_header1(TERSE, "Save results");
 
-    // Get output filename
-    m_outmodel = (*this)["outmodel"].filename();
+    // Get output filenames
+    m_outmodel  = (*this)["outmodel"].filename();
+    m_outcovmat = (*this)["outcovmat"].filename();
 
     // Save only if filename is valid
     if (is_valid_filename(m_outmodel)) {
@@ -344,11 +343,28 @@ void ctlike::save(void)
 
         // Write results out as XML model
         m_obs.models().save(m_outmodel);
+
     }
 
     // ... otherwise signal that file was not saved
     else {
         log_value(NORMAL, "Model definition file", "NONE");
+    }
+
+    // Save covariance matrix if filename is valid
+    if (is_valid_filename(m_outcovmat)) {
+
+        // Log filename
+        log_value(NORMAL, "Covariance matrix file", m_outcovmat.url());
+
+        // Save covarianve matrix
+        m_obs.function().save(m_outcovmat);
+
+    }
+
+    // ... otherwise signal that no covariance matrix was not saved
+    else {
+        log_value(NORMAL, "Covariance matrix file", "NONE");
     }
 
     // Return
@@ -405,12 +421,12 @@ void ctlike::get_parameters(void)
     m_apply_edisp     = (*this)["edisp"].boolean();
     m_fix_spat_for_ts = (*this)["fix_spat_for_ts"].boolean();
     m_chatter         = static_cast<GChatter>((*this)["chatter"].integer());
-    m_covmat          = (*this)["covmat"].filename();
 
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outmodel = (*this)["outmodel"].filename();
+        m_outmodel  = (*this)["outmodel"].filename();
+        m_outcovmat = (*this)["outcovmat"].filename();
     }
 
     // Set optimizer logger
@@ -543,7 +559,7 @@ void ctlike::init_members(void)
 {
     // Initialise members
     m_outmodel.clear();
-    m_covmat.clear();
+    m_outcovmat.clear();
     m_refit           = false;
     m_max_iter        = 100;   // Set maximum number of iterations
     m_max_stall       = 10;    // Set maximum number of stalls
@@ -574,7 +590,7 @@ void ctlike::copy_members(const ctlike& app)
     // Copy attributes
     m_refit           = app.m_refit;
     m_outmodel        = app.m_outmodel;
-    m_covmat          = app.m_covmat;
+    m_outcovmat       = app.m_outcovmat;
     m_max_iter        = app.m_max_iter;
     m_max_stall       = app.m_max_stall;
     m_logL            = app.m_logL;

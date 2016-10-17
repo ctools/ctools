@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-26 September 2016
+17 October 2016
 
 
 Introduction
@@ -92,6 +92,10 @@ The clear() method now calls GApplication::clear() to conserve the properties
 of the tool (#1835).
 
 The class now derives from ctlikelihood (#1828).
+
+The hidden parameter "outcovmat" has been added that by default is set to "NONE".
+If instead a FITS filename is given, ctlike will write the coraviance matrix of
+the fit into a FITS file (#1863).
 
 
 cttsmap - Generation of Test Statistic map
