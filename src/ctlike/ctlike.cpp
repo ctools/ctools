@@ -228,12 +228,9 @@ void ctlike::run(void)
     // Optimize model parameters using LM optimizer
     optimize_lm();
 
-    // Get pointer to curvature matrix
-    GMatrixSparse* curvature_ptr =
-        const_cast<GObservations::likelihood&>(m_obs.function()).curvature();
-
     // Store copy of curvature matrix
-    GMatrixSparse curvature = *curvature_ptr;
+    GMatrixSparse curvature =
+        *(const_cast<GObservations::likelihood&>(m_obs.function()).curvature());
     
     // Store Npred
     double npred = m_obs.npred();
@@ -313,7 +310,8 @@ void ctlike::run(void)
     restore_edisp(m_obs, save_edisp);
 
     // Restore curvature matrix
-    *curvature_ptr = curvature;
+    *(const_cast<GObservations::likelihood&>(m_obs.function()).curvature()) =
+        curvature;
 
     // Return
     return;
