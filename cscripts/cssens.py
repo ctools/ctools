@@ -201,11 +201,11 @@ class cssens(ctools.cscript):
             Maximum energy
         """
         # Loop over all observations in container
-        for obs in self._obs:
+        for i, obs in enumerate(self._obs):
 
-            # Get observation energy boundaries
-            obs_ebounds = obs.events().ebounds()
-            
+            # Get energy boundaries of the observation
+            obs_ebounds = self._obs_ebounds[i]
+    
             # Get minimum and maximum energy of the observation
             obs_emin = obs_ebounds.emin()
             obs_emax = obs_ebounds.emax()
@@ -546,9 +546,10 @@ class cssens(ctools.cscript):
         # Get parameters
         self._get_parameters()
         
-        # Loop over observations and store ebounds
+        # Loop over observations and store a deep copy of the energy
+        # boundaries for later use
         for obs in self._obs:
-            self._obs_ebounds.append(obs.events().ebounds())
+            self._obs_ebounds.append(obs.events().ebounds().copy())
         
         # Initialise script
         colnames = ['loge', 'emin', 'emax', 'crab_flux', 'photon_flux',

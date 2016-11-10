@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-17 October 2016
+10 November 2016
 
 
 Introduction
@@ -212,6 +212,9 @@ a Sun constraint, but no Moon constraint (#1835).
 
 A publish() method has been added to cslightcrv and csspec that publishes the
 results on a VO hub (#1871).
+
+Fix energy boundary handling in cssens that has been corrupted during code
+refactoring (#1873).
 
 
 Examples
