@@ -71,71 +71,73 @@ public:
 
 protected:
     // Protected methods
-    void     init_members(void);
-    void     copy_members(const ctobssim& app);
-    void     free_members(void);
-    void     get_parameters(void);
-    void     simulate_source(GCTAObservation* obs,
-                           const GModels&   models,
-                           GRan&            ran, 
-                           GLog*            wrklog = NULL);
-    void     simulate_interval(GCTAObservation*       obs,
-                               const GCTAResponseIrf* rsp,
-                               GCTAEventList*         events,
-                               const GModels&         models,
-                               const GTime&           tmin,
-                               const GTime&           tmax,
-                               const GEnergy&         etrue_min,
-                               const GEnergy&         etrue_max,
-                               const GEnergy&         ereco_min,
-                               const GEnergy&         ereco_max,
-                               const GSkyDir&         dir,
-                               const double&          rad,
-                               const double&          area,
-                               GRan&                  ran,
-                               GLog*                  wrklog,
-                               int&                   indent,
-                               std::vector<int>&      nphotons,
-                               std::vector<int>&      nevents);
-    void     simulate_time_slice(GCTAObservation*       obs,
-                                 const GCTAResponseIrf* rsp,
-                                 GCTAEventList*         events,
-                                 const GModelSky*       model,
-                                 const GTime&           tstart,
-                                 const GTime&           tstop,
-                                 const GEnergy&         etrue_min,
-                                 const GEnergy&         etrue_max,
-                                 const GEnergy&         ereco_min,
-                                 const GEnergy&         ereco_max,
-                                 const GSkyDir&         dir,
-                                 const double&          rad,
-                                 const double&          area,
-                                 GRan&                  ran,
-                                 GLog*                  wrklog,
-                                 int&                   indent,
-                                 int&                   nphotons,
-                                 int&                   nevents);
-    GEbounds get_ebounds(const GEbounds& ebounds) const;
-    double   get_area(GCTAObservation* obs,
-                      const GEnergy&   emin,
-                      const GEnergy&   emax) const;
-    double   get_model_flux(const GModelSky* model,
-                            const GEnergy&   emin,
-                            const GEnergy&   emax,
-                            const GSkyDir&   centre,
-                            const double&    radius,
-                            const int&       indent,
-                            GLog*            wrklog);
-    void     simulate_background(GCTAObservation* obs,
-                                 const GModels&   models,
-                                 GRan&            ran,
-                                 GLog*            wrklog = NULL);
-    void     save_fits(void);
-    void     save_xml(void);
+    void        init_members(void);
+    void        copy_members(const ctobssim& app);
+    void        free_members(void);
+    void        get_parameters(void);
+    void        simulate_source(GCTAObservation* obs,
+                                const GModels&   models,
+                                GRan&            ran,
+                                GLog*            wrklog = NULL);
+    void        simulate_interval(GCTAObservation*       obs,
+                                  const GCTAResponseIrf* rsp,
+                                  GCTAEventList*         events,
+                                  const GModels&         models,
+                                  const GTime&           tmin,
+                                  const GTime&           tmax,
+                                  const GEnergy&         etrue_min,
+                                  const GEnergy&         etrue_max,
+                                  const GEnergy&         ereco_min,
+                                  const GEnergy&         ereco_max,
+                                  const GSkyDir&         dir,
+                                  const double&          rad,
+                                  const double&          area,
+                                  GRan&                  ran,
+                                  GLog*                  wrklog,
+                                  int&                   indent,
+                                  std::vector<int>&      nphotons,
+                                  std::vector<int>&      nevents);
+    void        simulate_time_slice(GCTAObservation*       obs,
+                                    const GCTAResponseIrf* rsp,
+                                    GCTAEventList*         events,
+                                    const GModelSky*       model,
+                                    const GTime&           tstart,
+                                    const GTime&           tstop,
+                                    const GEnergy&         etrue_min,
+                                    const GEnergy&         etrue_max,
+                                    const GEnergy&         ereco_min,
+                                    const GEnergy&         ereco_max,
+                                    const GSkyDir&         dir,
+                                    const double&          rad,
+                                    const double&          area,
+                                    GRan&                  ran,
+                                    GLog*                  wrklog,
+                                    int&                   indent,
+                                    int&                   nphotons,
+                                    int&                   nevents);
+    GEbounds    get_ebounds(const GEbounds& ebounds) const;
+    double      get_area(GCTAObservation* obs,
+                         const GEnergy&   emin,
+                         const GEnergy&   emax) const;
+    double      get_model_flux(const GModelSky* model,
+                               const GEnergy&   emin,
+                               const GEnergy&   emax,
+                               const GSkyDir&   centre,
+                               const double&    radius,
+                               const int&       indent,
+                               GLog*            wrklog);
+    void        simulate_background(GCTAObservation* obs,
+                                    const GModels&   models,
+                                    GRan&            ran,
+                                    GLog*            wrklog = NULL);
+    void        save_fits(void);
+    void        save_xml(void);
+    std::string outfile(const int& index);
 
     // User parameters
     std::string m_outevents;   //!< Output events file
     std::string m_prefix;      //!< Prefix for multiple event lists
+    int         m_startindex;  //!< Start index for multiple event lists
     int         m_seed;        //!< Random number generator seed
     int         m_eslices;     //!< Number of energy slices
     bool        m_apply_edisp; //!< Apply energy dispersion?

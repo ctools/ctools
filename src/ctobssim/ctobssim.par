@@ -17,13 +17,14 @@
 #
 # General parameters
 #===================
-inobs,     f, h, NONE,,, "Input event list or observation definition XML file"
-inmodel,   f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
-caldb,     s, a, prod2,,, "Calibration database"
-irf,       s, a, South_0.5h,,, "Instrument response function"
-edisp,     b, h, no,,, "Apply energy dispersion?"
-outevents, f, a, events.fits,,, "Output event data file or observation definition XML file"
-prefix,    s, h, sim_events_,,, "Prefix for event lists in observation definition XML file"
+inobs,      f, h, NONE,,, "Input event list or observation definition XML file"
+inmodel,    f, a, $CTOOLS/share/models/crab.xml,,, "Input model XML file"
+caldb,      s, a, prod2,,, "Calibration database"
+irf,        s, a, South_0.5h,,, "Instrument response function"
+edisp,      b, h, no,,, "Apply energy dispersion?"
+outevents,  f, a, events.fits,,, "Output event data file or observation definition XML file"
+prefix,     s, h, sim_events_,,, "Prefix for event lists in observation definition XML file"
+startindex, i, h, 1,,, "Start index for event lists in observation definition XML file"
 
 #
 # Simulation parameters

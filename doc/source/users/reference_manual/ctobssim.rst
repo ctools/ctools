@@ -64,7 +64,10 @@ General parameters
  	 	 
 ``(prefix = sim_events_) [string]``
     Prefix for event list in observation definition XML file.
- 	 	 
+
+``(startindex = 1) [integer]``
+    Start index of event list in observation definition XML file.
+
 ``(seed = 1) [integer]``
     Integer seed value to be used for Monte Carlo simulations. Keep this 
     parameter at the same value for repeatable simulations, or increment 

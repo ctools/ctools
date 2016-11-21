@@ -375,17 +375,8 @@ void ctobssim::run(void)
             // If requested, event lists are saved immediately
             if (m_save_and_dispose) {
 
-                // Set event output file name. If multiple observations are
-                // handled, build the filename from prefix and observation
-                // index. Otherwise use the outfile parameter.
-                std::string outfile;
-                if (m_use_xml) {
-                    m_prefix = (*this)["prefix"].string();
-                    outfile  = m_prefix + gammalib::str(i) + ".fits";
-                }
-                else {
-                    outfile  = (*this)["outevents"].filename();
-                }
+                // Set event output file name
+                std::string outfile = this->outfile(i);
 
                 // Store output file name in original observation
                 obs->eventfile(outfile);
@@ -537,6 +528,7 @@ void ctobssim::init_members(void)
     // Initialise user parameters
     m_outevents.clear();
     m_prefix.clear();
+    m_startindex  = 1;
     m_seed        = 1;
     m_eslices     = 10;
     m_apply_edisp = false;
@@ -567,6 +559,7 @@ void ctobssim::copy_members(const ctobssim& app)
     // Copy user parameters
     m_outevents   = app.m_outevents;
     m_prefix      = app.m_prefix;
+    m_startindex  = app.m_startindex;
     m_seed        = app.m_seed;
     m_eslices     = app.m_eslices;
     m_apply_edisp = app.m_apply_edisp;
@@ -640,8 +633,9 @@ void ctobssim::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outevents = (*this)["outevents"].filename();
-        m_prefix    = (*this)["prefix"].string();
+        m_outevents  = (*this)["outevents"].filename();
+        m_prefix     = (*this)["prefix"].string();
+        m_startindex = (*this)["startindex"].integer();
     }
 
     // Initialise random number generators. We initialise here one random
@@ -1512,9 +1506,8 @@ void ctobssim::save_fits(void)
  ***************************************************************************/
 void ctobssim::save_xml(void)
 {
-    // Get output filename and prefix
-    m_outevents = (*this)["outevents"].filename();
-    m_prefix    = (*this)["prefix"].string();
+    // Get output filename, prefix and start index
+    m_outevents  = (*this)["outevents"].filename();
 
     // Issue warning if output filename has no .xml suffix
     log_string(TERSE, warn_xml_suffix(m_outevents));
@@ -1535,8 +1528,7 @@ void ctobssim::save_xml(void)
                 if (obs->events()->size() != 0) {
 
                     // Set event output file name
-                    std::string outfile = m_prefix + gammalib::str(i) +
-                                          ".fits";
+                    std::string outfile = this->outfile(i);
 
                     // Store output file name in observation
                     obs->eventfile(outfile);
@@ -1560,4 +1552,51 @@ void ctobssim::save_xml(void)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Return output filename
+ *
+ * @param[in] index Observation index
+ * @return Output filename
+ *
+ * Return output filename for observation with @p index.
+ ***************************************************************************/
+std::string ctobssim::outfile(const int& index)
+{
+    // Initialise output filename
+    std::string outfile;
+
+    // If multiple observations are handled then build the filename from
+    // prefix and observation index plus startindex. The format is
+    // [prefix]NNNNNN.fits, where NNNNNN is a 6-digit integer
+    if (m_use_xml) {
+
+        // Get prefix and start index
+        m_prefix     = (*this)["prefix"].string();
+        m_startindex = (*this)["startindex"].integer();
+
+        // Build filename
+        char buffer[256];
+        std::sprintf(buffer, "%s%6.6d.fits", m_prefix.c_str(),
+                                             index + m_startindex);
+
+        // Set output filename
+        outfile = std::string(buffer);
+
+    }
+
+    // ... otherwise use the outfile parameter
+    else {
+    
+        // Get output event list file name
+        m_outevents = (*this)["outevents"].filename();
+    
+        // Set output filename
+        outfile = std::string(m_outevents);
+    }
+
+    // Return
+    return outfile;
 }
