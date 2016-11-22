@@ -61,7 +61,7 @@ class csmodelselect(ctools.cscript):
         # Query input parameters
         self['inobs'].filename()
         self['inmodel'].filename()
-        
+
         # Query hidden parameters
         self['roilimit'].real()
         self['roimargin'].real()
@@ -85,7 +85,7 @@ class csmodelselect(ctools.cscript):
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
-        
+
         # Return
         return
 
@@ -111,7 +111,7 @@ class csmodelselect(ctools.cscript):
         ethres    = self['ethres'].real()
         fluxlimit = self['fluxlimit'].real()
         tslimit   = self['tslimit'].real()
-        
+
         # Initialise selection flag to True
         select = True
         msg    = 'Select by default'
@@ -133,8 +133,11 @@ class csmodelselect(ctools.cscript):
                 # Get RoI centre and radius. The RoI radius is limited by
                 # roilimit. A margin given by roimargin is added to the RoI
                 # radius.
-                obs_centre = o.roi().centre().dir()
-                obs_radius = o.roi().radius()
+                #obs_centre = o.roi().centre().dir() # Segmentation fault
+                #obs_radius = o.roi().radius()       # Segmentation fault
+                obs_roi    = o.roi()
+                obs_centre = obs_roi.centre().dir()
+                obs_radius = obs_roi.radius()
                 if obs_radius > roilimit:
                     obs_radius = roilimit
                 obs_radius += roimargin
@@ -154,7 +157,6 @@ class csmodelselect(ctools.cscript):
             if model.ts() < tslimit:
                 select = False
                 msg    = 'Exclude since below TS limit (TS=%.3f)' % model.ts()
-                
 
         # If model is selected and if model is a sky model then apply flux
         # limit selection
@@ -245,7 +247,7 @@ class csmodelselect(ctools.cscript):
 
         # Loop over model components
         for model in self._models:
-            
+
             # If model should be selected then set model parameters and append
             # model to the output container
             if self._select_model(model, self._obs):
@@ -261,7 +263,7 @@ class csmodelselect(ctools.cscript):
 
         # Write selected models into logger
         self._log_models(gammalib.VERBOSE, self._models, 'Selected model')
-        
+
         # Return
         return
 
@@ -274,22 +276,22 @@ class csmodelselect(ctools.cscript):
 
         # Get output filename in case it was not read ahead
         outmodel = self['outmodel'].filename()
-        
+
         # If file exists and clobber flag is false then raise an exception
         if outmodel.exists() and not self._clobber:
             msg = ('Cannot save "'+outmodel.url()+'": File already exists. '
                    'Use parameter clobber=yes to allow overwriting of files.')
             raise RuntimeError(msg)
-        
+
         # Otherwise log filename and save file
         else:
             # Log filename
             self._log_value(gammalib.NORMAL, 'Model definition XML file',
                                              outmodel.url())
-    
+
             # Save models
             self._models.save(outmodel)
-        
+
         # Return
         return
 
@@ -320,6 +322,6 @@ if __name__ == '__main__':
 
     # Create instance of application
     app = csmodelselect(sys.argv)
-    
+
     # Execute application
     app.execute()
