@@ -1,0 +1,41 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csmodelselect.par                                             #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             jknodlseder@irap.omp.eu                                       #
+#             IRAP, Toulouse, France                                        #
+#                                                                           #
+#  Purpose:   Parameter file for the csmodelselect script                   #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,    f, a, obs.xml,,, "Input event list or observation definition XML file"
+inmodel,  f, a, inmodel.xml,,, "Input model definition XML file"
+outmodel, f, a, outmodel.xml,,, "Output model definition XML file"
+
+#
+# Script parameters
+#==================
+roilimit,  r, h, 4.5,,,     "Maximum RoI radius (deg)"
+roimargin, r, h, 0.1,,,     "Radial margin to be added to RoIs (deg)"
+ethres,    r, h, 0.1,,,     "Energy threshold for source flux selection (TeV)"
+fluxlimit, r, h, 1.0e-12,,, "Minimum source flux for selection (ph/cm2/s)"
+tslimit,   r, h, 10.0,,,    "Minimum Test Statistic for selection"
+fit_pos,   b, h, yes,,,     "Fit source positions?"
+fit_shape, b, h, no,,,      "Fit source shapes?"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csmodelselect.log,,, "Log filename"

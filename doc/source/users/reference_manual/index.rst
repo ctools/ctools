@@ -44,6 +44,7 @@ cscripts
    cslightcrv --- Computes lightcurve <cslightcrv>
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
+   csmodelselect --- Select models from model definition file <csmodelselect>
    csobsdef --- Generates observation definition file <csobsdef>
    csobsinfo --- Shows observation container content <csobsinfo>
    cspull --- Generates pull distribution <cspull>

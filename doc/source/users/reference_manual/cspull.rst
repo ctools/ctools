@@ -124,7 +124,8 @@ Standard parameters
     Specifies whether an existing output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
-    Enables debug mode. In debug mode the executable will dump any log file output to the console.
+    Enables debug mode. In debug mode the executable will dump any log file
+    output to the console.
  	 	 
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").

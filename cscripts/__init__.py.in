@@ -29,6 +29,7 @@ __all__ = [
     "cslightcrv",
     "csmodelinfo",
     "csmodelmerge",
+    "csmodelselect",
     "csobs2caldb",
     "csobsdef",
     "csobsinfo",
@@ -54,28 +55,29 @@ if cur_version > req_version:
                     "csiactobs"])
 
 # Import
-from cscripts.cscaldb      import cscaldb
-from cscripts.csinfo       import csinfo
-from cscripts.cslightcrv   import cslightcrv
-from cscripts.csmodelinfo  import csmodelinfo
-from cscripts.csmodelmerge import csmodelmerge
-from cscripts.csobs2caldb  import csobs2caldb
-from cscripts.csobsdef     import csobsdef
-from cscripts.csobsinfo    import csobsinfo
-from cscripts.cspull       import cspull
-from cscripts.csresmap     import csresmap
-from cscripts.csroot2caldb import csroot2caldb
-from cscripts.cssens       import cssens
-from cscripts.csspec       import csspec
-from cscripts.cstsdist     import cstsdist
-from cscripts.cstsmapmerge import cstsmapmerge
-from cscripts.cstsmapsplit import cstsmapsplit
-from cscripts.csviscube    import csviscube
-from cscripts.csworkflow   import csworkflow
-from cscripts              import obsutils
-from cscripts              import modutils
-from cscripts              import calutils
-from cscripts              import ioutils
+from cscripts.cscaldb       import cscaldb
+from cscripts.csinfo        import csinfo
+from cscripts.cslightcrv    import cslightcrv
+from cscripts.csmodelinfo   import csmodelinfo
+from cscripts.csmodelmerge  import csmodelmerge
+from cscripts.csmodelselect import csmodelselect
+from cscripts.csobs2caldb   import csobs2caldb
+from cscripts.csobsdef      import csobsdef
+from cscripts.csobsinfo     import csobsinfo
+from cscripts.cspull        import cspull
+from cscripts.csresmap      import csresmap
+from cscripts.csroot2caldb  import csroot2caldb
+from cscripts.cssens        import cssens
+from cscripts.csspec        import csspec
+from cscripts.cstsdist      import cstsdist
+from cscripts.cstsmapmerge  import cstsmapmerge
+from cscripts.cstsmapsplit  import cstsmapsplit
+from cscripts.csviscube     import csviscube
+from cscripts.csworkflow    import csworkflow
+from cscripts               import obsutils
+from cscripts               import modutils
+from cscripts               import calutils
+from cscripts               import ioutils
 if cur_version > req_version:
     from cscripts.csfindobs  import csfindobs
     from cscripts.csiactcopy import csiactcopy

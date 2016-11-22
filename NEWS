@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-21 November 2016
+22 November 2016
 
 
 Introduction
@@ -218,6 +218,9 @@ results on a VO hub (#1871).
 
 Fix energy boundary handling in cssens that has been corrupted during code
 refactoring (#1873).
+
+Added csmodelselect script that allows selecting models from a model definition
+XML file (#1879).
 
 
 Examples
