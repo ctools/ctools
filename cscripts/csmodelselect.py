@@ -28,7 +28,7 @@ import ctools
 # =================== #
 class csmodelselect(ctools.cscript):
     """
-    Selects model from a model container
+    Selects model from a model definition XML file
     """
 
     # Constructor
@@ -97,7 +97,7 @@ class csmodelselect(ctools.cscript):
         ----------
         model : `~gammalib.GModel`
             Model
-        obs : `~gammalib.GObservation`
+        obs : `~gammalib.GObservations`
             Observation container
 
         Returns
@@ -237,7 +237,7 @@ class csmodelselect(ctools.cscript):
         models = gammalib.GModels()
 
         # Write input observation container into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation');
+        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
 
         # Write input models into logger
         self._log_models(gammalib.VERBOSE, self._models, 'Input model')

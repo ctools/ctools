@@ -33,6 +33,7 @@ __all__ = [
     "csobs2caldb",
     "csobsdef",
     "csobsinfo",
+    "csobsselect",
     "cspull",
     "csresmap",
     "csroot2caldb",
@@ -64,6 +65,7 @@ from cscripts.csmodelselect import csmodelselect
 from cscripts.csobs2caldb   import csobs2caldb
 from cscripts.csobsdef      import csobsdef
 from cscripts.csobsinfo     import csobsinfo
+from cscripts.csobsselect   import csobsselect
 from cscripts.cspull        import cspull
 from cscripts.csresmap      import csresmap
 from cscripts.csroot2caldb  import csroot2caldb

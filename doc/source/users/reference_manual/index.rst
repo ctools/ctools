@@ -47,6 +47,7 @@ cscripts
    csmodelselect --- Select models from model definition file <csmodelselect>
    csobsdef --- Generates observation definition file <csobsdef>
    csobsinfo --- Shows observation container content <csobsinfo>
+   csobsselect --- Select observations from observation definition file <csobsselect>
    cspull --- Generates pull distribution <cspull>
    csresmap --- Generates residual map <csresmap>
    cssens --- Computes CTA sensitivity <cssens>

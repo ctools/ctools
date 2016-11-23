@@ -30,10 +30,10 @@ General parameters
     Output model definition XML file
 
 ``(roilimit = 4.5) [real]``
-    Maximum RoI radius (deg)
+    Maximum RoI radius (degrees)
 
 ``(roimargin = 0.1) [real]``
-    Radial margin to be added to RoIs (deg)
+    Radial margin to be added to RoIs (degrees)
 
 ``(ethres = 0.1) [real]``
     Energy threshold for source flux selection (TeV)
@@ -83,4 +83,4 @@ Standard parameters
 Related tools or scripts
 ------------------------
 
-None
+:doc:`csobsselect`

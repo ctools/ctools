@@ -34,6 +34,7 @@ import test_csmodelselect
 import test_csobs2caldb
 import test_csobsdef
 import test_csobsinfo
+import test_csobsselect
 import test_cspull
 import test_csresmap
 import test_csroot2caldb
@@ -119,6 +120,7 @@ def test(installed=False, debug=False):
              test_csobs2caldb.Test(),
              test_csobsdef.Test(),
              test_csobsinfo.Test(),
+             test_csobsselect.Test(),
              test_cspull.Test(),
              test_csresmap.Test(),
              test_csroot2caldb.Test(),

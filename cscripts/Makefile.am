@@ -30,6 +30,7 @@ pythonscripts = $(builddir)/__init__.py \
                 $(srcdir)/csobs2caldb.py \
                 $(srcdir)/csobsdef.py \
                 $(srcdir)/csobsinfo.py \
+                $(srcdir)/csobsselect.py \
                 $(srcdir)/cspull.py \
                 $(srcdir)/csresmap.py \
                 $(srcdir)/csroot2caldb.py  \
@@ -58,6 +59,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csobs2caldb.par \
            $(srcdir)/csobsdef.par \
            $(srcdir)/csobsinfo.par \
+           $(srcdir)/csobsselect.par \
            $(srcdir)/cspull.par \
            $(srcdir)/csresmap.par \
            $(srcdir)/csroot2caldb.par \
@@ -83,6 +85,7 @@ linkscripts = cscaldb \
               csobs2caldb \
               csobsdef \
               csobsinfo \
+              csobsselect \
               cspull \
               csresmap \
               csroot2caldb \

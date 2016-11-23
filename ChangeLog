@@ -1,8 +1,9 @@
-2016-11-22
+2016-11-23
 
         * Version 1.2.0 released
         ========================
 
+        Add csobsselect script (#1881)
         Add csmodelselect script (#1879)
         Add startindex parameter to ctobssim (#1878)
         Fix energy boundary handline in cssens (#1873)

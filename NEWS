@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-22 November 2016
+23 November 2016
 
 
 Introduction
@@ -221,6 +221,9 @@ refactoring (#1873).
 
 Added csmodelselect script that allows selecting models from a model definition
 XML file (#1879).
+
+Added csobsselect script that allows selecting observations from an observation
+definition XML file (#1881).
 
 
 Examples
