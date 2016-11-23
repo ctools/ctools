@@ -112,6 +112,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csobs2caldb.py \
               $(top_srcdir)/test/test_csobsdef.py \
               $(top_srcdir)/test/test_csobsinfo.py \
+              $(top_srcdir)/test/test_csobsselect.py \
               $(top_srcdir)/test/test_cslightcrv.py \
               $(top_srcdir)/test/test_cspull.py \
               $(top_srcdir)/test/test_csresmap.py \
