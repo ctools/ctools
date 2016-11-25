@@ -28,6 +28,7 @@
 #define CTSKYMAP_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <string>
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
@@ -69,13 +70,16 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void map_events(GCTAObservation* obs);
+    void bkg_subtract(GCTAObservation* obs);
+    void bkg_subtract_irf(GCTAObservation* obs);
 
     // User parameters
-    GFilename     m_outmap;     //!< Output file name
-    double        m_emin;       //!< Minimum energy (TeV)
-    double        m_emax;       //!< Maximum energy (TeV)
-    bool          m_publish;    //!< Publish sky map?
-    GChatter      m_chatter;    //!< Chattiness
+    GFilename     m_outmap;      //!< Output file name
+    double        m_emin;        //!< Minimum energy (TeV)
+    double        m_emax;        //!< Maximum energy (TeV)
+    std::string   m_bkgsubtract; //!< Background subtraction method
+    bool          m_publish;     //!< Publish sky map?
+    GChatter      m_chatter;     //!< Chattiness
 
     // Protected members
     GSkyMap       m_skymap;     //!< Sky map

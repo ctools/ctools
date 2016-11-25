@@ -1,8 +1,9 @@
-2016-11-23
+2016-11-25
 
         * Version 1.2.0 released
         ========================
 
+        Add background subtraction to ctskymap tool (#1882)
         Add csobsselect script (#1881)
         Add csmodelselect script (#1879)
         Add startindex parameter to ctobssim (#1878)

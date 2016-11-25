@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-23 November 2016
+25 November 2016
 
 
 Introduction
@@ -122,6 +122,11 @@ of the tool (#1835).
 
 The ctskymap::map() method has been renamed to ctskymap::skymap() to avoid a
 name conflict with Python (#1828).
+
+The tool now also supports subtraction of background models that can be enabled
+using the "bkgsubtract" parameter. If this parameter is set to "IRF" the
+background templates shipped with the Instrument Response Function will be
+subtracted from the sky map (#1882).
 
 
 ctmodel - CTA counts cube modelling

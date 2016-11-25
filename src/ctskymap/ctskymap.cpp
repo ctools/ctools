@@ -35,6 +35,7 @@
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
 #define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
+#define G_BKG_SUBTRACT_IRF     "ctskymap::bkg_subtract_irf(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -231,7 +232,10 @@ void ctskymap::run(void)
 
         // Map events into sky map
         map_events(obs);
-            
+
+        // Subtract background from sky map
+        bkg_subtract(obs);
+        
     } // endfor: looped over observations
 
     // Optionally publish sky map
@@ -324,10 +328,11 @@ void ctskymap::init_members(void)
 {
     // Initialise members
     m_skymap.clear();
-    m_emin    = 0.0;
-    m_emax    = 0.0;
-    m_publish = false;
-    m_chatter = static_cast<GChatter>(2);
+    m_emin        = 0.0;
+    m_emax        = 0.0;
+    m_bkgsubtract = "NONE";
+    m_publish     = false;
+    m_chatter     = static_cast<GChatter>(2);
 
     // Return
     return;
@@ -342,11 +347,12 @@ void ctskymap::init_members(void)
 void ctskymap::copy_members(const ctskymap& app)
 {
     // Copy attributes
-    m_skymap  = app.m_skymap;
-    m_emin    = app.m_emin;
-    m_emax    = app.m_emax;
-    m_publish = app.m_publish;
-    m_chatter = app.m_chatter;
+    m_skymap      = app.m_skymap;
+    m_emin        = app.m_emin;
+    m_emax        = app.m_emax;
+    m_bkgsubtract = app.m_bkgsubtract;
+    m_publish     = app.m_publish;
+    m_chatter     = app.m_chatter;
 
     // Return
     return;
@@ -382,10 +388,11 @@ void ctskymap::get_parameters(void)
     m_skymap = create_map(m_obs);
 
     // Get remaining parameters
-    m_emin    = (*this)["emin"].real();
-    m_emax    = (*this)["emax"].real();
-    m_publish = (*this)["publish"].boolean();
-    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
+    m_emin        = (*this)["emin"].real();
+    m_emax        = (*this)["emax"].real();
+    m_bkgsubtract = (*this)["bkgsubtract"].string();
+    m_publish     = (*this)["publish"].boolean();
+    m_chatter     = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Read ahead parameters
     if (read_ahead()) {
@@ -407,16 +414,18 @@ void ctskymap::get_parameters(void)
  *
  * @exception GException::no_list
  *            No event list found in observation.
- * @exception GCTAException::no_pointing
- *            No valid CTA pointing found.
  *
  * This method maps the events found in a CTA events list into a sky map.
  ***************************************************************************/
 void ctskymap::map_events(GCTAObservation* obs)
 {
+    // Get non-const pointer on a CTA event list
+    GCTAEventList* events = dynamic_cast<GCTAEventList*>
+                            (const_cast<GEvents*>(obs->events()));
+
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
-    if (dynamic_cast<const GCTAEventList*>(obs->events()) == NULL) {
+    if (events == NULL) {
         throw GException::no_list(G_BIN_EVENTS);
     }
 
@@ -433,8 +442,6 @@ void ctskymap::map_events(GCTAObservation* obs)
     int num_in_map         = 0;
 
     // Fill sky map
-    GCTAEventList* events = static_cast<GCTAEventList*>
-                                       (const_cast<GEvents*>(obs->events()));
     for (int i = 0; i < events->size(); ++i) {
 
         // Get event
@@ -473,6 +480,119 @@ void ctskymap::map_events(GCTAObservation* obs)
     // Write sky map into header
     log_header2(EXPLICIT, "Sky map");
     log_string(EXPLICIT, m_skymap.print(m_chatter));
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Subtract background events from skymap
+ *
+ * @param[in] obs CTA observation.
+ *
+ * Subtracts background events from the sky map using various methods. The
+ * background subtraction method is specified by the "bkgsubtract" parameter
+ * which can take the following values:
+ *
+ *     NONE - No background subtraction
+ *     IRF  - Background subtraction based on IRF template
+ ***************************************************************************/
+void ctskymap::bkg_subtract(GCTAObservation* obs)
+{
+    // Dispatch to apporpriate background subtraction method
+    if (m_bkgsubtract == "IRF") {
+        bkg_subtract_irf(obs);
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Subtract background events based on IRF template from sky map
+ *
+ * @param[in] obs CTA observation.
+ *
+ * @exception GException::invalid_value
+ *            No response information available for observation.
+ *            No background template available in instrument response function.
+ *
+ * Subtracts background events from the sky map using the IRF template.
+ ***************************************************************************/
+void ctskymap::bkg_subtract_irf(GCTAObservation* obs)
+{
+    // Get IRF response
+    const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+
+    // Throw an exception if observation has no instrument response function
+    if (rsp == NULL) {
+        std::string msg = "No response information available for "+
+                          get_obs_header(obs)+" to compute IRF background. "
+                          "Please specify response information or use "
+                          "another background subtraction method.";
+        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+    }
+
+    // Get IRF background template
+    const GCTABackground* bkg = rsp->background();
+
+    // Throw an exception if observation has no IRF background template
+    if (bkg == NULL) {
+        std::string msg = "No IRF background template found in instrument "
+                          "response function for "+
+                          get_obs_header(obs)+". Please specify an instrument "
+                          "response function containing a background template.";
+        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+    }
+
+    // Setup energy range covered by data
+    GEnergy  emin;
+    GEnergy  emax;
+    GEbounds ebds;
+    emin.TeV(m_emin);
+    emax.TeV(m_emax);
+
+    // Determine number of energy nodes, 20 per decade, at least 10 bins
+    int nebin = int((emax.log10TeV() - emin.log10TeV()) * 20.0);
+    if (nebin < 10) {
+        nebin = 10;
+    }
+
+    // Setup energy nodes for computation
+    GEnergies energies(nebin, emin, emax); // More complicated nbins later
+
+    // Loop over all sky map pixels
+    for (int i = 0; i < m_skymap.npix(); ++i) {
+
+        // Get sky direction of pixel
+        GSkyDir skydir = m_skymap.inx2dir(i);
+
+        // Convert sky direction in instrument direction
+        GCTAInstDir instdir = obs->pointing().instdir(skydir);
+
+        // Compute background value for each energy node
+        std::vector<double> values(energies.size(), 0.0);
+        for (int k = 0; k < energies.size(); ++k) {
+            values[k] = (*bkg)(energies[k].log10TeV(), instdir.detx(),
+                                                       instdir.dety());
+        }
+
+        // Integrate background values according to Trapezoid rule
+        double value = 0;
+        for (int k = 1; k < energies.size(); ++k) {
+            value += 0.5 * (values[k] + values[k-1]) *
+                           (energies[k].MeV() - energies[k-1].MeV());
+        }
+
+        // Multiply background rate with livetime and solid angle
+        value *= obs->livetime() * m_skymap.solidangle(i);
+
+        // Subtract background value from sky map
+        m_skymap(i,0) -= value;
+
+    } // endfor: looped over sky map pixels
 
     // Return
     return;
