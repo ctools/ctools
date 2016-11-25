@@ -26,7 +26,8 @@ You do this with the :ref:`ctskymap` tool by typing:
 
 We generated here a sky map centred on the Galactic Centre in Galactic
 coordinates using a cartesian projection.
-The sky map is 10° wide and 5° high, with an image scale of 0.02° per pixel.
+The sky map is 10 degrees wide and 5 degrees high, with an image scale of
+0.02 degrees per pixel.
 All events between 0.1 and 100 TeV were collected in the skymap.
 The :ref:`ctskymap` tool wrote the sky map into the FITS file ``skymap.fits``
 that was created in the ``my_first_analysis`` folder.

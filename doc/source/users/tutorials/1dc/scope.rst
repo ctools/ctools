@@ -23,7 +23,8 @@ The
 have been simulated from high-level
 :ref:`Instrument Response Functions <glossary_irf>`
 that correspond to an ideal CTA with good and stable atmosphere and instrument
-conditions; only zenith angles of 20° and 40° **(TBC)** have been simulated.
+conditions; only zenith angles of 20 degrees and 40 degrees **(TBC)** have been
+simulated.
 
 Data are provided for the Baseline arrays and the Threshold Implementation.
 
