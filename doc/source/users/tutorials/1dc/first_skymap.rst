@@ -24,14 +24,16 @@ You do this with the :ref:`ctskymap` tool by typing:
    Background subtraction method (NONE|IRF) [NONE]
    Output skymap file [skymap.fits]
 
-We generated here a sky map centred on the Galactic Centre in Galactic
+This generates a sky map centred on the Galactic Centre in Galactic
 coordinates using a cartesian projection.
 The sky map is 10 degrees wide and 5 degrees high, with an image scale of
 0.02 degrees per pixel.
-All events between 0.1 and 100 TeV were collected in the skymap.
-The :ref:`ctskymap` tool wrote the sky map into the FITS file ``skymap.fits``
-that was created in the ``my_first_analysis`` folder.
-The FITS file can be displayed using for example ds9 (see below):
+All events between 0.1 and 100 TeV are collected in the sky map.
+The sky map is written into the FITS file ``skymap.fits`` that is created in
+the working directory.
+The sky map, displayed using
+`ds9 <http://ds9.si.edu>`_,
+is shown below:
 
 .. figure:: first_skymap.png
    :width: 600px
@@ -41,15 +43,16 @@ The FITS file can be displayed using for example ds9 (see below):
 
 The sky map shows a wide-spread distribution of events with a number of sources
 superimposed.
-Most of the events are due to irreducable background that hampers the
+Most of the events originate from an irreducable background that hampers the
 recognition of the gamma-ray sources.
 To describe the irreducable background in the CTA data, templates of the
-background event distribution are shipped together with the
+background event distribution are included in the
 :ref:`Instrument Response Functions <glossary_irf>`.
-These template can be used by :ref:`ctskymap` to subtract the background
-contribution.
-To enable the background subtraction you should re-run :ref:`ctskymap` with
-the background subtraction method set to ``IRF`` as follows:
+These templates can be used by :ref:`ctskymap` to subtract the irreducable
+background contribution from the sky map.
+The background subtraction is enabled by running the :ref:`ctskymap` with
+the background subtraction method set to ``IRF``, as shown in the following
+example:
 
 .. code-block:: bash
 
@@ -68,8 +71,8 @@ the background subtraction method set to ``IRF`` as follows:
    Output skymap file [skymap.fits]
 
 The figure below shows the resulting sky map.
-The irreducable background has been subtracted and the sources of gamma-ray
-emission are now clearly descernable.
+The irreducable background has been subtracted from the sky map and the sources
+of gamma-ray emission are now clearly descernable.
 
 .. figure:: first_skymap_bkgsubtract.png
    :width: 600px
