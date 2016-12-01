@@ -1,8 +1,9 @@
-2016-11-25
+2016-12-01
 
         * Version 1.2.0 released
         ========================
 
+        Add cssrcdetect script (#1617)
         Add background subtraction to ctskymap tool (#1882)
         Add csobsselect script (#1881)
         Add csmodelselect script (#1879)

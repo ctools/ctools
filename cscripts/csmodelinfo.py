@@ -21,6 +21,7 @@
 import sys
 import gammalib
 import ctools
+from cscripts import modutils
 
 
 # ================= #
@@ -85,155 +86,6 @@ class csmodelinfo(ctools.cscript):
         
         # Return
         return
-
-    def _ds9attributes(self, model):
-        """
-        Returns attributes for DS9 string
-        Parameters
-        ----------
-        model : `~gammalib.GModel`
-            Model
-
-        Returns
-        -------
-        attributes : str
-            DS9 attribute string
-        """
-        # Determine region color. A model where all parameters are fixed will
-        # get the color defined by "fixed_color", a model with at least one
-        # free parameter will get the color defined by "free_color".
-        color = self['fixed_color'].string()
-        for par in model:
-            if par.is_free():
-                color = self['free_color'].string()
-                break
-
-        # Set DS9 attributes
-        attributes = (' color=%s width=%d font=%s %d %s %s' %
-                      (color, self['width'].integer(),
-                       self['fontfamily'].string(), self['fontsize'].integer(),
-                       self['fontweight'].string(), self['fontslant'].string()))
-
-        # Return attributes
-        return attributes
-
-    def _model2ds9string(self, model):
-        """
-        Converts model into a DS9 region string
-
-        Parameters
-        ----------
-        model : `~gammalib.GModel`
-            Model
-
-        Returns
-        -------
-        ds9string : str
-            DS9 region string
-        """
-        # Initialise DS9 region string
-        ds9string = ''
-
-        # Retrieve model sky direction. The model is skipped in case that
-        # it does not provide a sky direction.
-        is_valid = True  
-        try:
-            modelpos = model.spatial().dir()
-        except AttributeError:            
-            msg = ('Skip model "%s" since it has no sky direction.\n' %
-                   model.name())
-            self._log(msg)
-            is_valid = False
-
-        # Continue only if sky direction was found
-        if is_valid: 
-
-            # Retrieve model type and name   
-            modeltype = model.type()
-            modelname = model.name()
-
-            # Handle point source
-            if modeltype == 'PointSource':
-
-                # Append point with Right Ascension and Declination to the DS9
-                # string. The type of the point is specified by the "pnt_type"
-                # parameter, the size of the point by the "pnt_mark_size"
-                # parameter
-                ds9string += ('point(%.6f,%.6f) # point=%s %d' %
-                              (modelpos.ra_deg(), modelpos.dec_deg(),
-                               self['pnt_type'].string(),
-                               self['pnt_mark_size'].integer()))
-
-            # Handle extended sources    
-            elif modeltype == "ExtendedSource":
-
-                # Retrieve spatial model
-                spatial   = model.spatial()
-                classname = spatial.classname()
-
-                # Handle radial sources
-                if 'Radial' in classname:
-
-                    # Retrieve short name of model class (e.g. "Gauss"
-                    # or "Disk)
-                    shorttype = classname.split('Radial')[-1]
-
-                    # Handle Disk and Shell model
-                    if (classname == 'GModelSpatialRadialDisk' or
-                        classname == 'GModelSpatialRadialShell'):
-                        size = spatial.radius()
-
-                    # Handle Gauss Model
-                    elif classname == 'GModelSpatialRadialGauss':
-                        size = spatial.sigma()
-
-                    # Skip if source is unknown
-                    else:
-                        msg = ('Skip model "%s" since the radial model "%s" '
-                               'is unknown.\n' % (model.name(), classname))
-                        self._log(msg)
-                        is_valid = False
-
-                    # Append circle to DS9 string
-                    if is_valid:
-                        ds9string += ('circle(%.6f,%.6f,%.6f) #' %
-                                      (modelpos.ra_deg(), modelpos.dec_deg(),
-                                       size*3600.0))
-            
-                # Handle elliptical sources 
-                elif 'Elliptical' in classname:
-
-                    # Retrieve short name and source size
-                    shorttype = classname.split('Elliptical')[-1]
-                    size1     = spatial.semimajor()
-                    size2     = spatial.semiminor()
-                    angle     = spatial.posangle()
-
-                    # Append ellipse to DS9 string
-                    ds9string += ('ellipse(%.6f,%.6f,%.6f,%.6f,%.6f) #' %
-                                  (modelpos.ra_deg(), modelpos.dec_deg(),
-                                   size1*3600.0, size2*3600.0, angle+90.0))
-                
-                # Skip if source is neither radial nor elliptical      
-                else:
-                    msg = ('Skip model "%s" since the model "%s" is neither '
-                           'a point source, a radial source, nor an elliptical '
-                           'source.\n' % (model.name(), classname))
-                    self._log(msg)
-                    is_valid = False
-                
-                # Add short model type to modelname
-                if self['show_ext_type'].boolean():
-                    modelname +=' ('+shorttype+')'
-    
-            # Add DS9 attributes
-            if is_valid:
-                ds9string += self._ds9attributes(model)
-                if self['show_labels'].boolean():
-                    ds9string += ' text={'+modelname+'}'
-        
-        # Return string
-        return ds9string 
 
 
     # Public methods
@@ -407,36 +259,34 @@ class csmodelinfo(ctools.cscript):
             
             # Log filename
             self._log_value(gammalib.NORMAL, 'DS9 filename', ds9file.url())
-            
-            # Open file   
-            f = open(ds9file.url(), 'w')
-            
-            # Write coordinate system
-            f.write('fk5\n')
-             
-            # Loop over models
-            for model in self._models:
-                
-                # Continue only if point source or extended source model
-                if (model.type() == 'PointSource' or
-                    model.type() == 'ExtendedSource'):
-                    line = self._model2ds9string(model)
-                    if len(line):
-                        f.write(line+'\n')
-                
-                # Logging for diffuse components    
-                elif model.type() == 'DiffuseSource':
-                    self._log('Skipping diffuse model "'+model.name()+'".\n')
-                    
-                # Logging for background components 
-                else:
-                    if self._logExplicit():
-                        self._log('Skipping background model "'+model.name()+
-                                  '".\n')
-                                      
-            # Close file
-            f.close()
-        
+
+            # Get ds9 parameters
+            pnt_type      = self['pnt_type'].string()
+            pnt_mark_size = self['pnt_mark_size'].integer()
+            free_color    = self['free_color'].string()
+            fixed_color   = self['fixed_color'].string()
+            width         = self['width'].integer()
+            fontfamily    = self['fontfamily'].string()
+            fontsize      = self['fontsize'].integer()
+            fontweight    = self['fontweight'].string()
+            fontslant     = self['fontslant'].string()
+
+            # Save DS9 region file
+            errors = modutils.models2ds9file(self._models, ds9file.url(),
+                                             pnt_type=pnt_type,
+                                             pnt_mark_size=pnt_mark_size,
+                                             free_color=free_color,
+                                             fixed_color=fixed_color,
+                                             width=width,
+                                             fontfamily=fontfamily,
+                                             fontsize=fontsize,
+                                             fontweight=fontweight,
+                                             fontslant=fontslant)
+
+            # Log errors
+            if len(errors):
+                self._log(errors)
+    
         # Return
         return 
 

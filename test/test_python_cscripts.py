@@ -40,6 +40,7 @@ import test_csresmap
 import test_csroot2caldb
 import test_cssens
 import test_csspec
+import test_cssrcdetect
 import test_cstsdist
 import test_cstsmapmerge
 import test_cstsmapsplit
@@ -126,6 +127,7 @@ def test(installed=False, debug=False):
              test_csroot2caldb.Test(),
              test_cssens.Test(),
              test_csspec.Test(),
+             test_cssrcdetect.Test(),
              test_cstsdist.Test(),
              test_cstsmapmerge.Test(),
              test_cstsmapsplit.Test(),

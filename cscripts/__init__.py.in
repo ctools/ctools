@@ -39,6 +39,7 @@ __all__ = [
     "csroot2caldb",
     "cssens",
     "csspec",
+    "cssrcdetect",
     "cstsdist",
     "cstsmapmerge",
     "cstsmapsplit",
@@ -71,6 +72,7 @@ from cscripts.csresmap      import csresmap
 from cscripts.csroot2caldb  import csroot2caldb
 from cscripts.cssens        import cssens
 from cscripts.csspec        import csspec
+from cscripts.cssrcdetect   import cssrcdetect
 from cscripts.cstsdist      import cstsdist
 from cscripts.cstsmapmerge  import cstsmapmerge
 from cscripts.cstsmapsplit  import cstsmapsplit

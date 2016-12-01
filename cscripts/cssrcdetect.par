@@ -1,0 +1,41 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      cssrcdetect.par                                               #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             jknodlseder@irap.omp.eu                                       #
+#             IRAP, Toulouse, France                                        #
+#                                                                           #
+#  Purpose:   Parameter file for the cssrcdetect script                     #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inmap,      f, a, skymap.fits,,, "Input sky map file"
+outmodel,   f, a, models.xml,,, "Output model definition XML file"
+outds9file, f, a, ds9.reg,,, "Output DS9 region file"
+
+#
+# Script parameters
+#==================
+srcmodel,  s, a, POINT,POINT,, "Source model type"
+bkgmodel,  s, a, NONE,NONE|IRF|AEFF|CUBE,, "Background model type"
+threshold, r, a, 5.0,,, "Detection threshold (Gaussian sigma)"
+maxsrcs,   i, h, 20,1,1000, "Maximum number of sources"
+exclrad,   r, h, 0.2,,, "Exclusion radius (deg)"
+fit_pos,   b, h, yes,,, "Fit source positions?"
+fit_shape, b, h, yes,,, "Fit source shapes?"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, cssrcdetect.log,,, "Log filename"
