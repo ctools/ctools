@@ -17,6 +17,8 @@
 # General parameters
 #===================
 inobs,  f, a, "events.fits",,, "Input event list or observation definition XML file"
+caldb,  s, a, "prod2",,, "Calibration database"
+irf,    s, a, "South_0.5h",,, "Instrument response function"
 outmap, f, a, "skymap.fits",,, "Output skymap file"
 
 #

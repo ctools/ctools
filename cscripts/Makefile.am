@@ -36,6 +36,7 @@ pythonscripts = $(builddir)/__init__.py \
                 $(srcdir)/csroot2caldb.py  \
                 $(srcdir)/cssens.py \
                 $(srcdir)/csspec.py \
+                $(srcdir)/cssrcdetect.py \
                 $(srcdir)/cstsdist.py \
                 $(srcdir)/cstsmapmerge.py \
                 $(srcdir)/cstsmapsplit.py \
@@ -65,6 +66,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csroot2caldb.par \
            $(srcdir)/cssens.par \
            $(srcdir)/csspec.par \
+           $(srcdir)/cssrcdetect.par \
            $(srcdir)/cstsdist.par \
            $(srcdir)/cstsmapmerge.par \
            $(srcdir)/cstsmapsplit.par \
@@ -91,6 +93,7 @@ linkscripts = cscaldb \
               csroot2caldb \
               cssens \
               csspec \
+              cssrcdetect \
               cstsdist \
               cstsmapmerge \
               cstsmapsplit \
@@ -119,6 +122,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csroot2caldb.py \
               $(top_srcdir)/test/test_cssens.py \
               $(top_srcdir)/test/test_csspec.py \
+              $(top_srcdir)/test/test_cssrcdetect.py \
               $(top_srcdir)/test/test_cstsdist.py \
               $(top_srcdir)/test/test_cstsmapmerge.py \
               $(top_srcdir)/test/test_cstsmapsplit.py \
@@ -160,6 +164,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/pull.dat \
            $(top_srcdir)/test/data/sensitivity.dat \
            $(top_srcdir)/test/data/sensitivity_integral.dat \
+           $(top_srcdir)/test/data/skymap.fits \
            $(top_srcdir)/test/data/spectrum.fits \
            $(top_srcdir)/test/data/ts.dat \
            $(top_srcdir)/test/data/models_spatial.xml \

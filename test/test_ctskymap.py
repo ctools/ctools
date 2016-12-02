@@ -70,7 +70,7 @@ class Test(test):
                        ' outmap="ctskymap_cmd1.fits"'+ \
                        ' emin=0.1 emax=100.0 nxpix=200 nypix=200'+ \
                        ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
-                       ' xref=83.63 yref=22.01'+ \
+                       ' xref=83.63 yref=22.01 bkgsubtract="NONE"'+ \
                        ' logfile="ctskymap_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -89,7 +89,7 @@ class Test(test):
                        ' outmap="ctskymap_cmd2.fits"'+ \
                        ' emin=0.1 emax=100.0 nxpix=200 nypix=200'+ \
                        ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
-                       ' xref=83.63 yref=22.01'+ \
+                       ' xref=83.63 yref=22.01 bkgsubtract="NONE"'+ \
                        ' logfile="ctskymap_cmd2.log" chatter=2'
 
         # Check if execution failed
@@ -134,19 +134,20 @@ class Test(test):
         skymap.clear()
 
         # Now set ctskymap parameters
-        skymap['inobs']    = self._events
-        skymap['emin']     = 0.1
-        skymap['emax']     = 100
-        skymap['nxpix']    = 200
-        skymap['nypix']    = 200
-        skymap['binsz']    = 0.02
-        skymap['coordsys'] = 'CEL'
-        skymap['proj']     = 'CAR'
-        skymap['xref']     = 83.63
-        skymap['yref']     = 22.01
-        skymap['outmap']   = 'ctskymap_py1.fits'
-        skymap['logfile']  = 'ctskymap_py1.log'
-        skymap['chatter']  = 2
+        skymap['inobs']       = self._events
+        skymap['emin']        = 0.1
+        skymap['emax']        = 100
+        skymap['nxpix']       = 200
+        skymap['nypix']       = 200
+        skymap['binsz']       = 0.02
+        skymap['coordsys']    = 'CEL'
+        skymap['proj']        = 'CAR'
+        skymap['xref']        = 83.63
+        skymap['yref']        = 22.01
+        skymap['bkgsubtract'] = 'NONE'
+        skymap['outmap']      = 'ctskymap_py1.fits'
+        skymap['logfile']     = 'ctskymap_py1.log'
+        skymap['chatter']     = 2
 
         # Run ctskymap tool
         skymap.logFileOpen()   # Make sure we get a log file
@@ -190,18 +191,19 @@ class Test(test):
 
         # Allocate ctskymap tool from observation container
         skymap = ctools.ctskymap(obs)
-        skymap['emin']     = 0.1
-        skymap['emax']     = 100
-        skymap['nxpix']    = 200
-        skymap['nypix']    = 200
-        skymap['binsz']    = 0.02
-        skymap['coordsys'] = 'GAL'
-        skymap['proj']     = 'CAR'
-        skymap['xref']     = 184.5575
-        skymap['yref']     =  -5.7844
-        skymap['outmap']   = 'ctskymap_py3.fits'
-        skymap['logfile']  = 'ctskymap_py3.log'
-        skymap['chatter']  = 4
+        skymap['emin']        = 0.1
+        skymap['emax']        = 100
+        skymap['nxpix']       = 200
+        skymap['nypix']       = 200
+        skymap['binsz']       = 0.02
+        skymap['coordsys']    = 'GAL'
+        skymap['proj']        = 'CAR'
+        skymap['xref']        = 184.5575
+        skymap['yref']        =  -5.7844
+        skymap['bkgsubtract'] = 'NONE'
+        skymap['outmap']      = 'ctskymap_py3.fits'
+        skymap['logfile']     = 'ctskymap_py3.log'
+        skymap['chatter']     = 4
 
         # Execute tool
         skymap.logFileOpen()  # Needed to get a new log file
@@ -212,6 +214,31 @@ class Test(test):
 
         # Publish with name
         skymap.publish('My sky map')
+
+        # Allocate ctskymap tool from observation container
+        skymap = ctools.ctskymap(obs)
+        skymap['emin']        = 0.1
+        skymap['emax']        = 100
+        skymap['nxpix']       = 200
+        skymap['nypix']       = 200
+        skymap['binsz']       = 0.02
+        skymap['coordsys']    = 'GAL'
+        skymap['proj']        = 'CAR'
+        skymap['xref']        = 184.5575
+        skymap['yref']        =  -5.7844
+        skymap['bkgsubtract'] =  'IRF'
+        skymap['caldb']       = self._caldb
+        skymap['irf']         = self._irf
+        skymap['outmap']      = 'ctskymap_py4.fits'
+        skymap['logfile']     = 'ctskymap_py4.log'
+        skymap['chatter']     = 4
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_py3.fits')
 
         # Return
         return

@@ -70,8 +70,8 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void map_events(GCTAObservation* obs);
-    void bkg_subtract(GCTAObservation* obs);
-    void bkg_subtract_irf(GCTAObservation* obs);
+    void map_background(GCTAObservation* obs);
+    void map_background_irf(GCTAObservation* obs);
 
     // User parameters
     GFilename     m_outmap;      //!< Output file name
@@ -83,6 +83,8 @@ protected:
 
     // Protected members
     GSkyMap       m_skymap;     //!< Sky map
+    GSkyMap       m_bkgmap;     //!< Background map
+    GSkyMap       m_sigmap;     //!< Significance map
 };
 
 

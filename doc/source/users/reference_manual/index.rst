@@ -40,7 +40,6 @@ cscripts
    :maxdepth: 1
 
    cscaldb --- Lists available instrument response functions <cscaldb>
-   csviscube --- Computes visibility cube <csviscube>
    cslightcrv --- Computes lightcurve <cslightcrv>
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
@@ -52,11 +51,12 @@ cscripts
    csresmap --- Generates residual map <csresmap>
    cssens --- Computes CTA sensitivity <cssens>
    csspec --- Computes spectral points <csspec>
+   cssrcdetect --- Detects sources in sky map <cssrcdetect>
    cstsdist --- Generates Test Statistic distribution <cstsdist>
    cstsmapsplit --- Creates commands to split the Test Statistic map computations <cstsmapsplit>
    cstsmapmerge --- Merges slices from Test Statistic map computations <cstsmapmerge>
-   
- 
+   csviscube --- Computes visibility cube <csviscube>
+
 
 Scripts to manage an IACT database
 ----------------------------------

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-25 November 2016
+1 December 2016
 
 
 Introduction
@@ -206,29 +206,32 @@ The class now derives from ctlikelihood (#1828).
 
 cscripts
 --------
-Added the support modules "modutils" and "ioutils" to the cscripts module and
-removed the obsolete functions fit(), cterror(), cntmap() and modmap() from the
+Add the support modules "modutils" and "ioutils" to the cscripts module and
+remove the obsolete functions fit(), cterror(), cntmap() and modmap() from the
 "obsutils" module (#1830).
 
 The csroot2caldb script now takes the zenith and azimuth angles as parameters
 and writes them into the calibration database (#1835).
 
-Added a csviscube script that computes the visibility cube providing the number
+Add csviscube script that computes the visibility cube providing the number
 of hours that a given position on the sky is observable under a given zenith
 angle by an IACT array during a given time period. The tool implements so far
 a Sun constraint, but no Moon constraint (#1835).
 
-A publish() method has been added to cslightcrv and csspec that publishes the
-results on a VO hub (#1871).
+Add publish() method to cslightcrv and csspec that publishes the results on a
+VO hub (#1871).
 
 Fix energy boundary handling in cssens that has been corrupted during code
 refactoring (#1873).
 
-Added csmodelselect script that allows selecting models from a model definition
+Add csmodelselect script that allows selecting models from a model definition
 XML file (#1879).
 
-Added csobsselect script that allows selecting observations from an observation
+Add csobsselect script that allows selecting observations from an observation
 definition XML file (#1881).
+
+Add cssrcdetect script to detect sources in a sky map (#1617).
+
 
 
 Examples
