@@ -21,7 +21,7 @@ If this is not the case, please read :ref:`1dc_getting`.
    first_data
    first_select_obs
    first_skymap
-   first_select_models
+   first_detect
    first_fitting
    first_residuals
    first_stacked

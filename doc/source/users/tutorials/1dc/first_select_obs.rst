@@ -3,8 +3,8 @@
 Selecting the relevant observations
 -----------------------------------
 
-Let us in the following assume that you want to analyse the Galactic Plane
-Survey data obtained with baseline arrays around the Galactic Centre.
+Let's assume that you want to analyse the Galactic Plane Survey data obtained
+with the baseline array around the Galactic Centre.
 For the purpose of this first analysis, you should create a subfolder under
 the ``1dc`` folder (or any other convenient place) that will contain the
 results for your first analysis.
