@@ -5,7 +5,6 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctlike.par                                                    #
-#  Version:   1.2.0                                                         #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -18,7 +17,7 @@
 # General parameters
 #===================
 inobs,     f, a, "events.fits",,, "Input event list, counts cube or observation definition XML file"
-inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
+inmodel,   f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
 expcube,   f, a, "NONE",,, "Input exposure cube file (only needed for stacked analysis)"
 psfcube,   f, a, "NONE",,, "Input PSF cube file (only needed for stacked analysis)"
 edispcube, f, a, "NONE",,, "Input energy dispersion cube file (only needed for stacked analysis)"
@@ -26,7 +25,7 @@ bkgcube,   f, a, "NONE",,, "Input background cube file (only needed for stacked 
 caldb,     s, a, "prod2",,, "Calibration database"
 irf,       s, a, "South_0.5h",,, "Instrument response function"
 edisp,     b, h, no,,, "Apply energy dispersion?"
-outmodel,  f, a, "crab_results.xml",,, "Output model XML file"
+outmodel,  f, a, "crab_results.xml",,, "Output model definition XML file"
 outcovmat, f, h, "NONE",,, "Output covariance matrix FITS file"
 
 #

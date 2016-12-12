@@ -17,7 +17,7 @@
 #
 # General parameters
 #===================
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
 outcube,  f, a, "mapcube.fits",,, "Output map cube file"
 ptsrcsig, r, h, 1.0,0,60, "Point source Gaussian sigma in arcmin"
 

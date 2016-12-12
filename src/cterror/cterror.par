@@ -6,7 +6,6 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      cterror.par                                                   #
-#  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Florent Forest                                                #
 #             florent.forest@isae.fr                                        #
@@ -19,7 +18,7 @@
 # General parameters
 #===================
 inobs,    f, a, "events.fits",,, "Input event list, counts cube or observation definition XML file"
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model XML file"
+inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definiton XML file"
 srcname,  s, a, "Crab",,, "Source of interest"
 expcube,  f, a, "NONE",,, "Input exposure cube file (only needed for stacked analysis)"
 psfcube,  f, a, "NONE",,, "Input PSF cube file (only needed for stacked analysis)"
@@ -28,7 +27,7 @@ bkgcube,  f, a, "NONE",,, "Input background cube file (only needed for stacked a
 caldb,    s, a, "prod2",,, "Calibration database"
 irf,      s, a, "South_0.5h",,, "Instrument response function"
 edisp,    b, h, no,,, "Apply energy dispersion?"
-outmodel, f, a, "results.xml",,, "Output model XML file"
+outmodel, f, a, "results.xml",,, "Output model definiton XML file"
 
 #
 # Error calculation parameters
