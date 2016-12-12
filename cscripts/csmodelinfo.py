@@ -79,7 +79,7 @@ class csmodelinfo(ctools.cscript):
 
         # Query ahead DS9 filename
         if self._read_ahead():
-            self["ds9file"].filename()
+            self['outds9file'].filename()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -249,7 +249,7 @@ class csmodelinfo(ctools.cscript):
         Save models to ds9 region file
         """
         # Get output filename
-        ds9file = self['ds9file'].filename()
+        ds9file = self['outds9file'].filename()
 
         # Check if DS9 file is valid
         if ds9file != '' and ds9file != 'NONE':

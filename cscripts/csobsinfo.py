@@ -84,7 +84,7 @@ class csobsinfo(ctools.cscript):
 
         # Read ahead DS9 filename
         if self._read_ahead():
-            self['ds9file'].filename()
+            self['outds9file'].filename()
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -327,11 +327,11 @@ class csobsinfo(ctools.cscript):
 
         This method saves all pointing directions that are found in the
         observation container into a DS9 region file. If "NONE" is
-        specified for the "ds9file" parameter the method does nothing.
+        specified for the "outds9file" parameter the method does nothing.
         """
 
         # Get output filename in case it was not read ahead
-        ds9file = self['ds9file'].filename()
+        ds9file = self['outds9file'].filename()
 
         # Check if DS9 file is valid
         if ds9file.url() != 'NONE':

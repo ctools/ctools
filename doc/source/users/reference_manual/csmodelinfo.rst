@@ -30,8 +30,8 @@ General parameters
 ``inmodel [file]``
     Event list, counts cube, or observation definition file
 
-``(ds9file = NONE) [file]``
-    Output DS9 region file containing models
+``outds9file [file]``
+    Output DS9 region file containing soucre positions
 
 ``(pnt_type=cross) <circle|box|diamond|cross|x|arrow|boxcircle> [string]``
     Marker type for point sources

@@ -1,8 +1,9 @@
-2016-12-01
+2016-12-12
 
         * Version 1.2.0 released
         ========================
 
+        Change ds9file parameter to outds9file
         Add cssrcdetect script (#1617)
         Add background subtraction to ctskymap tool (#1882)
         Add csobsselect script (#1881)

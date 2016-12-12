@@ -74,7 +74,7 @@ class Test(test):
 
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="'+self._models_spec+'"'+ \
-                          ' ds9file="csmodelinfo_cmd1.reg"'+ \
+                          ' outds9file="csmodelinfo_cmd1.reg"'+ \
                           ' logfile="csmodelinfo_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -90,7 +90,7 @@ class Test(test):
 
         # Setup csmodelinfo command
         cmd = csmodelinfo+' inmodel="model_that_does_not_exist.xml"'+ \
-                          ' ds9file="csmodelinfo_cmd2.reg"'+ \
+                          ' outds9file="csmodelinfo_cmd2.reg"'+ \
                           ' logfile="csmodelinfo_cmd2.log"'
 
         # Check if execution failed
@@ -107,10 +107,10 @@ class Test(test):
         """
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo['inmodel']  = self._models_spat
-        modelinfo['ds9file']  = 'csmodelinfo_py1.reg'
-        modelinfo['logfile']  = 'csmodelinfo_py1.log'
-        modelinfo['chatter']  = 2
+        modelinfo['inmodel']    = self._models_spat
+        modelinfo['outds9file'] = 'csmodelinfo_py1.reg'
+        modelinfo['logfile']    = 'csmodelinfo_py1.log'
+        modelinfo['chatter']    = 2
 
         # Run csmodelinfo script and save DS9 file
         modelinfo.logFileOpen()   # Make sure we get a log file
@@ -122,10 +122,10 @@ class Test(test):
 
         # Set-up csmodelinfo
         modelinfo = cscripts.csmodelinfo()
-        modelinfo['inmodel']  = self._models_spec
-        modelinfo['ds9file']  = 'csmodelinfo_py2.reg'
-        modelinfo['logfile']  = 'csmodelinfo_py2.log'
-        modelinfo['chatter']  = 3
+        modelinfo['inmodel']    = self._models_spec
+        modelinfo['outds9file'] = 'csmodelinfo_py2.reg'
+        modelinfo['logfile']    = 'csmodelinfo_py2.log'
+        modelinfo['chatter']    = 3
 
         # Execute csmodelinfo script
         modelinfo.execute()

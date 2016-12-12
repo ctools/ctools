@@ -73,7 +73,7 @@ class Test(test):
 
         # Setup csobsinfo command
         cmd = csobsinfo+' inobs="'+self._inobs+'"'+ \
-                        ' ds9file="csobsinfo_cmd1.reg"'+ \
+                        ' outds9file="csobsinfo_cmd1.reg"'+ \
                         ' offset=yes ra=83.63 dec=22.01'+ \
                         ' logfile="csobsinfo_cmd1.log" chatter=1'
 
@@ -90,7 +90,7 @@ class Test(test):
 
         # Setup csobsinfo command
         cmd = csobsinfo+' inobs="obs_definition_that_does_not_exist.xml"'+ \
-                        ' ds9file="csobsinfo_cmd2.reg"'+ \
+                        ' outds9file="csobsinfo_cmd2.reg"'+ \
                         ' offset=yes ra=83.63 dec=22.01'+ \
                         ' logfile="csobsinfo_cmd2.log"'
 
@@ -108,13 +108,13 @@ class Test(test):
         """
         # Set-up csobsinfo
         obsinfo = cscripts.csobsinfo()
-        obsinfo['inobs']   = self._inobs
-        obsinfo['ds9file'] = 'csobsinfo_py1.reg'
-        obsinfo['offset']  = True
-        obsinfo['ra']      = 83.63
-        obsinfo['dec']     = 22.01
-        obsinfo['logfile'] = 'csobsinfo_py1.log'
-        obsinfo['chatter'] = 2
+        obsinfo['inobs']      = self._inobs
+        obsinfo['outds9file'] = 'csobsinfo_py1.reg'
+        obsinfo['offset']     = True
+        obsinfo['ra']         = 83.63
+        obsinfo['dec']        = 22.01
+        obsinfo['logfile']    = 'csobsinfo_py1.log'
+        obsinfo['chatter']    = 2
 
         # Run csobsinfo script and save XML file
         obsinfo.logFileOpen()   # Make sure we get a log file
@@ -126,13 +126,13 @@ class Test(test):
 
         # Set-up csobsinfo
         obsinfo = cscripts.csobsinfo()
-        obsinfo['inobs']   = self._inobs
-        obsinfo['ds9file'] = 'csobsinfo_py2.reg'
-        obsinfo['offset']  = True
-        obsinfo['ra']      = 83.63
-        obsinfo['dec']     = 22.01
-        obsinfo['logfile'] = 'csobsinfo_py2.log'
-        obsinfo['chatter'] = 3
+        obsinfo['inobs']      = self._inobs
+        obsinfo['outds9file'] = 'csobsinfo_py2.reg'
+        obsinfo['offset']     = True
+        obsinfo['ra']         = 83.63
+        obsinfo['dec']        = 22.01
+        obsinfo['logfile']    = 'csobsinfo_py2.log'
+        obsinfo['chatter']    = 3
 
         # Execute csobsinfo script
         obsinfo.execute()

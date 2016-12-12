@@ -41,6 +41,9 @@ General parameters
 ``inobs [file]``
     Event list, counts cube, or observation definition file
 
+``outds9file [file]``
+    DS9 region file containing pointing directions
+
 ``(offset = no) [file]``
     Compute offset from target to pointing positions
 
@@ -49,9 +52,6 @@ General parameters
 
 ``dec [real]``
     Target declination for offset computation (only queried if offset=yes)
-
-``(ds9file = NONE) [file]``
-    DS9 region file containing pointings
 
 
 Standard parameters

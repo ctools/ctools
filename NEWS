@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-1 December 2016
+12 December 2016
 
 
 Introduction
@@ -232,6 +232,8 @@ definition XML file (#1881).
 
 Add cssrcdetect script to detect sources in a sky map (#1617).
 
+The "ds9file" parameters were changed to "outds9file" to be consistent with
+the naming conventions.
 
 
 Examples

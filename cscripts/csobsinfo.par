@@ -5,7 +5,6 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      csobsinfo.par                                                 #
-#  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Michael Mayer                                                 #
 #             michael.mayer@physik.hu-berlin.de                             #
@@ -17,8 +16,8 @@
 #
 # Input and output parameters
 #============================
-inobs,   f, a, obs.xml,,, "Input event list, counts cube, or observation definition XML file"
-ds9file, f, h, NONE,,, "Output DS9 region file containing pointings"
+inobs,      f, a, obs.xml,,, "Input event list, counts cube, or observation definition XML file"
+outds9file, f, a, ds9.reg,,, "Output DS9 region file"
 
 #
 # Script parameters
