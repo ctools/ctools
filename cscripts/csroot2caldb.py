@@ -146,7 +146,7 @@ class csroot2caldb(ctools.cscript):
     def _make_dirs(self, version, irf):
         """
         Generate CALDB directory structure for one observation identifier
-        
+
         The structure is given by
 
             data/<tel>/<inst>/bcf/<obsid>
@@ -227,7 +227,7 @@ class csroot2caldb(ctools.cscript):
     def _open(self, irf, ds):
         """
         Open existing or create new calibration
-        
+
         The actual version will put all calibrations in the same file, although
         each part of the response function will have its own logical name. We
         can thus easily modify the script to put each calibration information
@@ -322,7 +322,7 @@ class csroot2caldb(ctools.cscript):
     def _open_hdu(self, fits, extname, name, doc, irf):
         """
         Open HDU
-        
+
         Opens a FITS binary table with given "extname". If HDU does not exist
         in the FITS file it will be created and appended to the FITS file.
 
@@ -534,10 +534,9 @@ class csroot2caldb(ctools.cscript):
     def _root2ea(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB effective area extension
-        
+ 
         The following ROOT histograms are used:
         - EffectiveAreaEtrue_offaxis -> EFFAREA
-        - EffectiveArea_offaxis      -> EFFAREA_RECO
 
         Parameters
         ----------
@@ -555,16 +554,13 @@ class csroot2caldb(ctools.cscript):
 
         # Get relevant ROOT histograms
         etrue = tfile.Get('EffectiveAreaEtrue_offaxis')
-        ereco = tfile.Get('EffectiveArea_offaxis')
 
         # If requested then normalize the 2D histogram on the on-axis 1D
         # histogram. This assures that the 2D histogram has the same on-axis
         # effective area dependence as the 1D histogram.
         if self['norm1d'].boolean():
             etrue_1D = tfile.Get('EffectiveAreaEtrue')
-            ereco_1D = tfile.Get('EffectiveArea')
             self._renorm_onaxis(etrue, etrue_1D)
-            self._renorm_onaxis(ereco, ereco_1D)
 
         # If requested then rebin the effective area Etrue histogram. This
         # increases the number of bins by a factor 10.
@@ -589,17 +585,6 @@ class csroot2caldb(ctools.cscript):
                 for ieng in range(neng):
                     value = etrue.GetBinContent(ieng+1,ioff+1) * eascale
                     etrue.SetBinContent(ieng+1,ioff+1,value)
-            neng    = ereco.GetXaxis().GetNbins()
-            noffset = ereco.GetYaxis().GetNbins()
-            for ioff in range(noffset):
-                for ieng in range(neng):
-                    value = ereco.GetBinContent(ieng+1,ioff+1) * eascale
-                    ereco.SetBinContent(ieng+1,ioff+1,value)
-
-        # Set boundaries (use Ereco boundaries)
-        #bounds = self._make_2D(ereco, ds['HDU_EA'], None, 'm2')
-        #for b in bounds:
-        #    irf['EA_BOUNDS'].append(b)
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_EA'], irf['EA_NAME'],
@@ -608,16 +593,13 @@ class csroot2caldb(ctools.cscript):
         # Create "EFFAREA" data column
         self._make_2D(etrue, ds['HDU_EA'], 'EFFAREA', 'm2')
 
-        # Create "EFFAREA_RECO" data column
-        self._make_2D(ereco, ds['HDU_EA'], 'EFFAREA_RECO', 'm2')
-
         # Return
         return
 
     def _root2psf(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB point spread function extension
-        
+
         Parameters
         ----------
         tfile : `~ROOT.TFile`
@@ -646,7 +628,7 @@ class csroot2caldb(ctools.cscript):
     def _root2psf_gauss(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB point spread function extension
-        
+
         The following ROOT histograms are used:
         - 1/(2*pi*SIGMA_1) -> SCALE
         - AngRes_offaxis -> SIGMA_1 (scaling: 1/0.8)
@@ -729,7 +711,7 @@ class csroot2caldb(ctools.cscript):
     def _root2psf_king(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB point spread function extension
-        
+
         The following ROOT histograms are used:
         - AngRes_offaxis
         - AngRes80_offaxis
@@ -853,7 +835,7 @@ class csroot2caldb(ctools.cscript):
     def _root2edisp(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB energy dispersion extension
-        
+
         The following ROOT histograms are used:
         - EestOverEtrue_offaxis  -> MATRIX
 
@@ -892,7 +874,7 @@ class csroot2caldb(ctools.cscript):
     def _root2bgd(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB background extension.
-        
+
         The following ROOT histograms are used:
         - BGRatePerSqDeg_offaxis -> BGD
 
@@ -945,7 +927,7 @@ class csroot2caldb(ctools.cscript):
     def _append_column_axis(self, hdu, name, unit, axis, log=False):
         """
         Append column of ROOT axis values to HDU
-        
+
         Parameters
         ----------
         hdu : `~gammalib.GFitsHDU`
@@ -991,7 +973,7 @@ class csroot2caldb(ctools.cscript):
     def _append_column_values(self, hdu, name, unit, values):
         """
         Append column of values to HDU
-        
+
         Parameters
         ----------
         hdu : `~gammalib.GFitsHDU`
@@ -1089,7 +1071,7 @@ class csroot2caldb(ctools.cscript):
                     for ioff in range(noffset):
                         value = hist2D_copy.GetBinContent(ieng+1,ioff+1) / onaxis
                         hist2D_copy.SetBinContent(ieng+1,ioff+1,value)
-            
+
             # Put back the energy dependence
             for ieng in range(neng):
                 onaxis = hist1D.GetBinContent(ieng+1)
@@ -1324,7 +1306,7 @@ class csroot2caldb(ctools.cscript):
     def _make_2D(self, array, hdu, name, unit, scale=1.0):
         """
         Make 2D data column as function of energy and offset angle
-        
+
         If the HDU has already the energy and offset angle columns, this method
         will simply add another data column. If name==None, the method will not
         append any data column.
@@ -1381,7 +1363,7 @@ class csroot2caldb(ctools.cscript):
     def _make_3D(self, array, hdu, name, unit):
         """
         Make 3D data column as function of DETX, DETY and energy
-        
+
         If the HDU has already the energy and offset angle columns, this method
         will simply add another data column. If name==None, the method will not
         append any data column.
@@ -1471,7 +1453,7 @@ class csroot2caldb(ctools.cscript):
     def _make_3D_migra(self, array, hdu, name, unit, scale=1.0):
         """
         Make 3D data column as function of ETRUE, MIGRA and THETA
-        
+
         If the HDU has already the energy and offset angle columns, this method
         will simply add another data column. If name==None, the method will not
         append any data column.
