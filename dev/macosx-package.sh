@@ -175,7 +175,7 @@ sed -i '' '$ i \
 productbuild --distribution $DISTFILE \
              --version $VERSION \
              --resources $SRCDIR/$CTOOLS \
-             --package-path $WRKDIR \
+             --package-path $PKGDIR \
              $PRODDIR/$CTOOLS.pkg
 
 # Add additional files to production folder
