@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-1 December 2016
+26 January 2017
 
 
 Introduction
@@ -195,6 +195,9 @@ in particular the "PhotonFlux" and "EnergyFlux" names (#1832).
 
 The class now derives from ctlikelihood (#1828).
 
+The tool now makes sure that the intensity parameter of the source of interest
+is free in the model optimisation that preceeds the upper limit computation.
+
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
@@ -232,11 +235,14 @@ definition XML file (#1881).
 
 Add cssrcdetect script to detect sources in a sky map (#1617).
 
+Improve the upper limit computation in the cslightcrv script. Now all source
+parameters, except the source intensity, are set to the initial values given
+in the model definition file for upper limit computation.
 
 
 Examples
 --------
-None
+Add show_lightcurve script to display a light curve.
 
 
 caldb
