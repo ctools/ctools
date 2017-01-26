@@ -248,6 +248,9 @@ void ctulimit::run(void)
         // Write header into logger
         log_header1(TERSE, "Compute best-fit likelihood");
 
+        // Make sure that requested model parameters is free
+        m_model_par->free();
+
         // Optimize and save best log-likelihood
         m_obs.optimize(m_opt);
         m_obs.errors(m_opt);
@@ -608,6 +611,9 @@ void ctulimit::ulimit_bisection(const double& min, const double& max)
 
         // Check for convergence inside tolerance
         if (std::abs(eval_mid) < m_tol) {
+            break;
+        }
+        if (std::abs(wrk_max-wrk_min) < m_tol) {
             break;
         }
 
