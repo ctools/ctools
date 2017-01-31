@@ -47,15 +47,17 @@ Implementation
 The general model is describe in ctools using a model definition XML file. 
 Below is a simple example of such a file comprising one source and one 
 background model.
-Each model is factorised in a spectral (tag ``<spectrum>``) and a 
-spatial component (tags ``<spatialModel>`` and ``<radialModel>``):
+Each model is factorised into
+a spectral (tag ``<spectrum>``),
+a spatial (tags ``<spatialModel>`` and ``<radialModel>``), and
+a temporal component (tag ``<temporal>``).
 
 .. math::
-  M(x,y,E) = M_{\rm spectral}(E) \times M_{\rm spatial}(x,y)
+  M(x,y,E,t) = M_{\rm spatial}(x,y|E) \times M_{\rm spectral}(E) \times M_{\rm temporal}(t)
 
 In this specific example, the source component ``Crab`` describes 
 a point source at the location of the Crab nebula with a power law spectral
-shape.
+shape that is constant in time.
 The background component ``Background`` is modelled as a radial Gaussian 
 function in offset angle squared (with the offset angle being defined as 
 the angle between pointing and measured event direction) and a spectral
@@ -66,15 +68,18 @@ function that is tabulated in an ASCII file.
   <?xml version="1.0" standalone="no"?>
   <source_library title="source library">
     <source name="Crab" type="PointSource">
+      <spatialModel type="PointSource">
+        <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+        <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+      </spatialModel>
       <spectrum type="PowerLaw">
          <parameter name="Prefactor"   scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
          <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
          <parameter name="PivotEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
       </spectrum>
-      <spatialModel type="PointSource">
-        <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
-        <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
-      </spatialModel>
+      <temporal type="Constant">
+        <parameter name="Normalization" scale="1.0" value="1.0" min="0.0" max="1000.0" free="0"/>
+      </temporal>
     </source>
     <source name="Background" type="RadialAcceptance" instrument="CTA">
       <spectrum type="FileFunction" file="$CTOOLS/share/models/bkg_dummy.txt">
@@ -102,6 +107,10 @@ After a maximum likelihood fit using :ref:`ctlike`, an
 term will be appended to each ``<parameter>`` tag.
 
 .. note::
+   For compatibility reasons with the Fermi/LAT XML format the ``<temporal>``
+   tag can be omitted for models that are constant in time.
+
+.. note::
 
    XML files are ASCII files and can be edited by hand using any text 
    editor.
@@ -124,17 +133,17 @@ term will be appended to each ``<parameter>`` tag.
    syntax used by the Fermi/LAT ScienceTools, but for reasons of clarity and
    homogenity of the various model and parameter names we have made some
    modifications.
-   Nevertheless, the exact format used by the Fermi/LAT ScienceTools is also
+   Nevertheless, the format used by the Fermi/LAT ScienceTools is also
    supported.
 
 
-.. _sec_spatial_models:
+.. _sec_spatial_src_models:
 
-Spatial model components
-~~~~~~~~~~~~~~~~~~~~~~~~
+Spatial source model components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following sections present the spatial model components that are available 
-in ctools.
+in ctools for gamma-ray sources.
 
 Point source
 ^^^^^^^^^^^^
@@ -289,6 +298,47 @@ Diffuse source
     ``Normalization`` can be replaced by ``Value``.
 
 
+Composite model
+^^^^^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <source name="Crab" type="CompositeSource">
+       <spatialModel type="Composite">
+         <spatialModel type="PointSource" component="PointSource">
+           <parameter name="RA"    scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+           <parameter name="DEC"   scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+         </spatialModel>
+         <spatialModel type="RadialGaussian">
+           <parameter name="RA"    scale="1.0" value="83.6331" min="-360" max="360" free="1"/>
+           <parameter name="DEC"   scale="1.0" value="22.0145" min="-90"  max="90"  free="1"/>
+           <parameter name="Sigma" scale="1.0" value="0.20"    min="0.01" max="10"  free="1"/>
+         </spatialModel>
+       </spatialModel>
+       <spectrum type="...">
+         ...
+       </spectrum>
+     </source>
+
+  This spatial model component implements a composite model that is the
+  sum of an arbitrary number of spatial models, computed using
+
+  .. math::
+     M_{\rm spatial}(x,y|E) = \frac{1}{N} \sum_{i=0}^{N-1} M_{\rm spatial}^{(i)}(x,y|E)
+
+  where :math:`M_{\rm spatial}^{(i)}(x,y|E)` is any spatial model component
+  (including another composite model), and :math:`N` is the number of
+  model components that are combined.
+
+
+.. _sec_spatial_bgd_models:
+
+Spatial background model components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following sections present the spatial model components that are available 
+in ctools for background modelling.
+
 CTA radial background
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -400,7 +450,7 @@ Constant
   This spectral model component implements the constant function
 
   .. math::
-    \frac{dN}{dE} = N_0
+    M_{\rm spectral}(E) = N_0
 
   where
 
@@ -428,7 +478,7 @@ Power law
   This spectral model component implements the power law function
 
   .. math::
-    \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
+    M_{\rm spectral}(E) = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
 
   where
 
@@ -462,8 +512,8 @@ Power law
   This spectral model component implements the power law function
 
   .. math::
-    \frac{dN}{dE} = \frac{N(\gamma+1)E^{\gamma}}
-                         {E_{\rm max}^{\gamma+1} - E_{\rm min}^{\gamma+1}}
+    M_{\rm spectral}(E) = \frac{N(\gamma+1)E^{\gamma}}
+                               {E_{\rm max}^{\gamma+1} - E_{\rm min}^{\gamma+1}}
 
   where
 
@@ -506,8 +556,8 @@ Exponentially cut-off power law
   function
 
   .. math::
-    \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
-                    \exp \left( \frac{-E}{E_{\rm cut}} \right)
+    M_{\rm spectral}(E) = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
+                          \exp \left( \frac{-E}{E_{\rm cut}} \right)
 
   where
 
@@ -548,10 +598,10 @@ Super exponentially cut-off power law
   law function
 
   .. math::
-    \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
-                    \exp \left( 
-                      -\left( \frac{E}{E_{\rm cut}} \right)^{\alpha}
-                    \right)
+     M_{\rm spectral}(E) = k_0 \left( \frac{E}{E_0} \right)^{\gamma}
+                           \exp \left(
+                           -\left( \frac{E}{E_{\rm cut}} \right)^{\alpha}
+                           \right)
 
   where
 
@@ -598,12 +648,12 @@ Broken power law
 
   .. math::
 
-    \frac{dN}{dE} = k_0 \times \left \{
-    \begin{eqnarray}
-      \left( \frac{E}{E_b} \right)^{\gamma_1} & {\rm if\,\,} E < E_b \\
-      \left( \frac{E}{E_b} \right)^{\gamma_2} & {\rm otherwise}
-    \end{eqnarray}
-    \right .
+     M_{\rm spectral}(E) = k_0 \times \left \{
+     \begin{eqnarray}
+       \left( \frac{E}{E_b} \right)^{\gamma_1} & {\rm if\,\,} E < E_b \\
+       \left( \frac{E}{E_b} \right)^{\gamma_2} & {\rm otherwise}
+     \end{eqnarray}
+     \right .
 
   where
 
@@ -616,14 +666,14 @@ Broken power law
 
   .. warning::
 
-    Note that the ``BreakEnergy`` parameter may be poorly constrained if
-    there is no clear spectral cut-off in the spectrum.
-    This model may lead to complications in the maximum likelihood fitting.
+     Note that the ``BreakEnergy`` parameter may be poorly constrained if
+     there is no clear spectral cut-off in the spectrum.
+     This model may lead to complications in the maximum likelihood fitting.
 
   .. note::
 
-    For compatibility with the Fermi/LAT ScienceTools the parameters
-    ``BreakEnergy`` can be replaced by ``BreakValue``.
+     For compatibility with the Fermi/LAT ScienceTools the parameters
+     ``BreakEnergy`` can be replaced by ``BreakValue``.
 
 
 Log parabola
@@ -641,7 +691,7 @@ Log parabola
   This spectral model component implements the log parabola function
 
   .. math::
-    \frac{dN}{dE} = k_0 \left( \frac{E}{E_0} \right)^{\gamma+\eta \ln(E/E_0)}
+     M_{\rm spectral}(E) = k_0 \left( \frac{E}{E_0} \right)^{\gamma+\eta \ln(E/E_0)}
 
   where
 
@@ -654,7 +704,7 @@ Log parabola
 
   .. warning::
 
-    The ``PivotEnergy`` parameter is not intended to be fitted.
+     The ``PivotEnergy`` parameter is not intended to be fitted.
 
   An alternative XML format is supported for compatibility with the Fermi/LAT
   XML format:
@@ -688,8 +738,8 @@ Gaussian
   This spectral model component implements the gaussian function
 
   .. math::
-    \frac{dN}{dE} = \frac{N_0}{\sqrt{2\pi}\sigma}
-                    \exp \left( \frac{-(E-\bar{E})^2}{2 \sigma^2} \right)
+     M_{\rm spectral}(E) = \frac{N_0}{\sqrt{2\pi}\sigma}
+                           \exp \left( \frac{-(E-\bar{E})^2}{2 \sigma^2} \right)
 
   where
 
@@ -721,7 +771,7 @@ File function
   The only parameter is a multiplicative normalization:
 
   .. math::
-    \frac{dN}{dE} = N_0 \left. \frac{dN}{dE} \right\rvert_{\rm file}
+     M_{\rm spectral}(E) = N_0 \left. \frac{dN}{dE} \right\rvert_{\rm file}
 
   where
 
@@ -729,11 +779,11 @@ File function
 
   .. warning::
 
-    If the file name is given without a path it is expected that the file
-    resides in the same directory than the XML file.
-    If the file resides in a different directory, an absolute path name should
-    be specified.
-    Any environment variable present in the path name will be expanded.
+     If the file name is given without a path it is expected that the file
+     resides in the same directory than the XML file.
+     If the file resides in a different directory, an absolute path name should
+     be specified.
+     Any environment variable present in the path name will be expanded.
 
 
 Node function
@@ -741,16 +791,16 @@ Node function
 
   .. code-block:: xml
 
-   <spectrum type="NodeFunction">
-     <node>
-       <parameter name="Energy"    scale="1.0"   value="1.0" min="0.1"   max="1.0e20" free="0"/>
-       <parameter name="Intensity" scale="1e-07" value="1.0" min="1e-07" max="1000.0" free="1"/>
-     </node>
-     <node>
-       <parameter name="Energy"    scale="10.0"  value="1.0" min="0.1"   max="1.0e20" free="0"/>
-       <parameter name="Intensity" scale="1e-08" value="1.0" min="1e-07" max="1000.0" free="1"/>
-     </node>
-   </spectrum>
+     <spectrum type="NodeFunction">
+       <node>
+         <parameter name="Energy"    scale="1.0"   value="1.0" min="0.1"   max="1.0e20" free="0"/>
+         <parameter name="Intensity" scale="1e-07" value="1.0" min="1e-07" max="1000.0" free="1"/>
+       </node>
+       <node>
+         <parameter name="Energy"    scale="10.0"  value="1.0" min="0.1"   max="1.0e20" free="0"/>
+         <parameter name="Intensity" scale="1e-08" value="1.0" min="1e-07" max="1000.0" free="1"/>
+       </node>
+     </spectrum>
 
   This spectral model component implements a generalised broken 
   power law which is defined by a set of energy and intensity values
@@ -762,14 +812,73 @@ Node function
 
   .. warning::
 
-    An arbitrary number of energy-intensity nodes can be defined in a node 
-    function.
-    The nodes need to be sorted by increasing energy.
-    Although the fitting of the ``Energy`` parameters is formally possible 
-    it may lead to numerical complications.
-    If ``Energy`` parameters are to be fitted make sure that the ``min`` 
-    and ``max`` attributes are set in a way that avoids inversion of the energy 
-    ordering.
+     An arbitrary number of energy-intensity nodes can be defined in a node
+     function.
+     The nodes need to be sorted by increasing energy.
+     Although the fitting of the ``Energy`` parameters is formally possible
+     it may lead to numerical complications.
+     If ``Energy`` parameters are to be fitted make sure that the ``min``
+     and ``max`` attributes are set in a way that avoids inversion of the energy
+     ordering.
+
+
+Composite model
+^^^^^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <spectrum type="Composite">
+       <spectrum type="PowerLaw" component="SoftComponent">
+         <parameter name="Prefactor"   scale="1e-17" value="3"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Index"       scale="-1"    value="3.5" min="0.0"   max="+5.0"   free="1"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="1"  min="0.01"  max="1000.0" free="0"/>
+       </spectrum>
+       <spectrum type="PowerLaw" component="HardComponent">
+         <parameter name="Prefactor"   scale="1e-17" value="5"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Index"       scale="-1"    value="2.0" min="0.0"   max="+5.0"   free="1"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="1"  min="0.01"  max="1000.0" free="0"/>
+       </spectrum>
+     </spectrum>
+
+  This spectral model component implements a composite model that is the
+  sum of an arbitrary number of spectral models, computed using
+
+  .. math::
+     M_{\rm spectral}(E) = \sum_{i=0}^{N-1} M_{\rm spectral}^{(i)}(E)
+
+  where :math:`M_{\rm spectral}^{(i)}(E)` is any spectral model component
+  (including another composite model), and :math:`N` is the number of
+  model components that are combined.
+
+
+Multiplicative model
+^^^^^^^^^^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <spectrum type="Multiplicative">
+       <spectrum type="PowerLaw" component="PowerLawComponent">
+         <parameter name="Prefactor"   scale="1e-17" value="1.0"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Index"       scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+         <parameter name="PivotEnergy" scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="0"/>
+       </spectrum>
+       <spectrum type="ExponentialCutoffPowerLaw" component="CutoffComponent">
+         <parameter name="Prefactor"    scale="1.0" value="1.0" min="1e-07" max="1000.0" free="0"/>
+         <parameter name="Index"        scale="1.0" value="0.0" min="-2.0"  max="+2.0"   free="0"/>
+         <parameter name="CutoffEnergy" scale="1e6" value="1.0" min="0.01"  max="1000.0" free="1"/>
+         <parameter name="PivotEnergy"  scale="1e6" value="1.0" min="0.01"  max="1000.0" free="0"/>
+       </spectrum>
+     </spectrum>
+
+  This spectral model component implements a composite model that is the
+  product of an arbitrary number of spectral models, computed using
+
+  .. math::
+     M_{\rm spectral}(E) = \prod_{i=0}^{N-1} M_{\rm spectral}^{(i)}(E)
+
+  where :math:`M_{\rm spectral}^{(i)}(E)` is any spectral model component
+  (including another composite model), and :math:`N` is the number of
+  model components that are multiplied.
 
 
 .. _sec_temporal_models:
@@ -785,6 +894,121 @@ Constant
 
   .. code-block:: xml
 
-   <temporalModel type="Constant">
-     <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="0"/>
-   </temporalModel>
+     <temporal type="Constant">
+       <parameter name="Normalization" scale="1.0" value="1.0" min="0.1" max="10.0" free="0"/>
+     </temporal>
+
+  This temporal model component implements a constant source
+
+  .. math::
+
+     M_{\rm temporal}(t) = N_0
+
+  where
+
+  * :math:`N_0` = ``Normalization``
+
+
+Light Curve
+^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <temporal type="LightCurve" file="model_temporal_lightcurve.fits">
+       <parameter name="Normalization" scale="1" value="1.0" min="0.0" max="1000.0" free="0"/>
+     </temporal>
+
+  This temporal model component implements a light curve :math:`r(t)`
+
+  .. math::
+     M_{\rm temporal}(t) = N_0 \times r(t)
+
+  where
+
+  * :math:`N_0` = ``Normalization``
+
+  The light curve is defined by nodes in a FITS file that specify the relative
+  flux normalization as function of time (file ``model_temporal_lightcurve.fits``
+  in the example above). The structure of the light curve FITS
+  file is shown in the figure below. The light curve is defined in the first
+  extension of the FITS file and consists of a binary table with the columns
+  ``TIME`` and ``NORM``. Times in the ``TIME`` columns are given in seconds
+  and are counted with respect to a time reference that is defined in the
+  header of the binary table. Times need to be specified in ascending order.
+  The values in the ``NORM`` column specify :math:`r(t)` at times :math:`t`,
+  and should be comprised between 0 and 1.
+
+  .. _fig_model_lightcurve:
+
+  .. figure:: model_lightcurve.png
+     :align: center
+     :width: 100%
+
+     *Structure of light curve FITS file*
+
+  .. warning::
+     Fitting of light curves only makes sense for an unbinned maximum likelihood
+     analysis, since in a binned or stacked analysis the times of individual
+     events are dropped.
+
+
+Phase Curve
+^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <temporal type="PhaseCurve" file="model_temporal_phasecurve.fits">
+       <parameter name="Normalization" scale="1" value="1.0"     min="0.0" max="1000.0"   free="0"/>
+       <parameter name="MJD"           scale="1" value="51544.5" min="0.0" max="100000.0" free="0"/>
+       <parameter name="Phase"         scale="1" value="0.0"     min="0.0" max="1.0"      free="0"/>
+       <parameter name="F0"            scale="1" value="1.0"     min="0.0" max="1000.0"   free="0"/>
+       <parameter name="F1"            scale="1" value="0.1"     min="0.0" max="1000.0"   free="0"/>
+       <parameter name="F2"            scale="1" value="0.01"    min="0.0" max="1000.0"   free="0"/>
+     </temporal>
+
+  This temporal model component implements a phase curve :math:`r(\Phi(t))`
+
+  .. math::
+     M_{\rm temporal}(t) = N_0 \times r(\Phi(t))
+
+  where the phase as function of time is computed using
+
+  .. math::
+     \Phi(t) = \Phi_0 + f(t-t_0) + \frac{1}{2}\dot{f} (t-t_0)^2 +
+                                   \frac{1}{6}\ddot{f} (t-t_0)^3
+
+  and
+
+  * :math:`N_0` = ``Normalization``
+  * :math:`t_0` = ``MJD``
+  * :math:`\Phi_0` = ``Phase``
+  * :math:`f` = ``F0``
+  * :math:`\dot{f}` = ``F1``
+  * :math:`\ddot{f}` = ``F2``
+
+  The phase curve is defined by nodes in a FITS file that specify the relative
+  flux normalization as function of phase (file ``model_temporal_phasecurve.fits``
+  in the example above). The structure of the phase curve
+  FITS file is shown in the figure below. The phase curve is defined in the
+  first extension of the FITS file and consists of a binary table with the
+  columns ``PHASE`` and ``NORM``. Phase values in the ``PHASE`` column need to
+  be comprised between 0 and 1 and need to be given in ascending order. The
+  values in the ``NORM`` column specify :math:`r(\Phi(t))` at phases
+  :math:`\Phi(t)`, and should be comprised between 0 and 1.
+
+  .. _fig_model_phasecurve:
+
+  .. figure:: model_phasecurve.png
+     :align: center
+     :width: 40%
+
+     *Structure of phase curve FITS file*
+
+  .. warning::
+     Fitting of phase curves only makes sense for an unbinned maximum likelihood
+     analysis, since in a binned or stacked analysis the times of individual
+     events are dropped.
+
+  .. warning::
+     Fitting of phase curve parameters may not properly work for pulsar
+     frequencies.
