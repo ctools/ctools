@@ -100,7 +100,7 @@ def get_positions(xmin, xmax, ymin, ymax, step):
 # Setup patch on the sky #
 # ====================== #
 def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
-              separation=3.0, hours=100.0,
+              separation=3.0, hours=100.0, run_duration=30.0,
               site=None, caldb='prod2', lst=True, autodec=0.0):
     """
     Setup pointing patch on the sky
@@ -118,7 +118,9 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
     separation : float, optional
         Pointing separation (deg)
     hours : float, optional
-        Total observation duration (h)
+        Total observation duration (hours)
+    run_duration : float, optional
+        Run duration (min)
     site : str, optional
         Array site (one of 'Automatic', 'South', 'North')
     lst : bool, optional
@@ -148,43 +150,56 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
     # Set observations
     for pnt in pointings:
 
-        # Set positions and duration
-        obs = {'lon': pnt['x'], 'lat': pnt['y'], 'duration': duration}
+        # Compute number of runs for this pointing
+        if run_duration > 0.0:
+            n_runs   = int(duration / (run_duration*60.0) + 0.5)
+            exposure = run_duration*60.0
+            if n_runs < 1:
+                n_runs = 1
+        else:
+            n_runs   = 1
+            exposure = duration
 
-        # Optionally add-in site dependent IRF
-        if site != None:
+        # Loop over number of runs
+        for run in range(n_runs):
 
-            # If automatic site switching is requested then set the North
-            # IRF for declinations greater or equal than "autodec" and the
-            # South IRF for declination smaller than "autodec".
-            if site == 'Automatic':
-                pos = gammalib.GSkyDir()
-                pos.lb_deg(pnt['x'], pnt['y'])
-                dec = pos.dec_deg()
-                if (dec >= autodec):
-                    obs_site = 'North'
+            # Set positions and duration
+            obs = {'lon': pnt['x'], 'lat': pnt['y'], 'duration': exposure}
+
+            # Optionally add-in site dependent IRF
+            if site != None:
+
+                # If automatic site switching is requested then set the North
+                # IRF for declinations greater or equal than "autodec" and the
+                # South IRF for declination smaller than "autodec".
+                if site == 'Automatic':
+                    pos = gammalib.GSkyDir()
+                    pos.lb_deg(pnt['x'], pnt['y'])
+                    dec = pos.dec_deg()
+                    if (dec >= autodec):
+                        obs_site = 'North'
+                    else:
+                        obs_site = 'South'
+
+                # ... otherwise use the specified site, North or South
                 else:
-                    obs_site = 'South'
+                    obs_site = site
 
-            # ... otherwise use the specified site, North or South
-            else:
-                obs_site = site
+                # Set IRF
+                irf = set_irf(obs_site, obs, caldb, lst=lst)
 
-            # Set IRF
-            irf = set_irf(obs_site, obs, caldb, lst=lst)
+                # Set IRF information
+                obs['caldb'] = caldb
+                obs['irf']   = irf
 
-            # Set IRF information
-            obs['caldb'] = caldb
-            obs['irf']   = irf
+                # Add up exposure for a given site
+                if obs_site == 'North':
+                    exposure_north += exposure
+                else:
+                    exposure_south += exposure
 
-            # Add up exposure for a given site
-            if obs_site == 'North':
-                exposure_north += duration
-            else:
-                exposure_south += duration
-
-        # Append observation
-        obsdef.append(obs)
+            # Append observation
+            obsdef.append(obs)
 
     # Dump statistics
     print('Number of pointings: %d (%.2f s)' % (n_pnt,duration))
@@ -229,8 +244,8 @@ def set_irf(site, obs, caldb, lst=True):
         else:
             irf = 'South_50h'
 
-    # Handle 'prod3'
-    elif caldb == 'prod3':
+    # Handle 'prod3' and 'prod3b'
+    elif caldb == 'prod3' or caldb == 'prod3b':
 
         # Compute Right Ascension and Declination of pointing
         pnt = gammalib.GSkyDir()
@@ -249,13 +264,14 @@ def set_irf(site, obs, caldb, lst=True):
 
         # Set IRF
         if site == 'North':
-            irf = 'North_50h'
+            irf = 'North'
         else:
-            irf = 'South_50h'
+            irf = 'South'
         if zenith < 30.0:
             irf += '_z20'
         else:
             irf += '_z40'
+        irf += '_50h'
 
     # ... otherwise return an empty string
     else:
@@ -534,7 +550,7 @@ def make_pointings():
         sys.exit()
 
     # Set calibration database
-    caldb = 'prod3'
+    caldb = 'prod3b'
     lst   = True
 
     # Galactic plane survey
