@@ -62,6 +62,9 @@ General parameters
 ``duration [real]``
     Duration of observation (in seconds).
 
+``(name = "") [string]``
+    Observation name.
+
 ``(caldb = "") [string]``
     Calibration database.
  	 	 

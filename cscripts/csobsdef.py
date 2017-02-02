@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generation of an observation definition file
 #
-# Copyright (C) 2015-2016 Juergen Knoedlseder
+# Copyright (C) 2015-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ class csobsdef(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csobsdef'
-        self._version = '1.2.0'
+        self._version = '1.3.0'
 
         # Initialise class members
         self._obs    = gammalib.GObservations()
@@ -217,7 +217,7 @@ class csobsdef(ctools.cscript):
             if 'name' in header:
                 name = self._pntdef[row, header.index('name')]
             else:
-                name = 'None'
+                name = self['name'].string()
             obs.name(name)
 
             # Set observation identifier. If no observation identified was
