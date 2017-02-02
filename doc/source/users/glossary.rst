@@ -1,6 +1,12 @@
 Glossary
 ========
 
+.. _glossary_countscube:
+
+.. topic:: Counts cube
+
+   Bla bla ...
+
 .. _glossary_eventlist:
 
 .. topic:: Event list
