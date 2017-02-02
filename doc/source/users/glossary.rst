@@ -13,6 +13,12 @@ Glossary
 
    Bla bla ...
 
+.. _glossary_gti:
+
+.. topic:: Good Time Interval
+
+   Bla bla ...
+
 .. _glossary_irf:
 
 .. topic:: Instrument Response Functions

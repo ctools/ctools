@@ -7,6 +7,8 @@ First CTA Data Challenge
    :maxdepth: 2
 
    scope
-   getting
+   getting_tools
+   getting_data
+   data_organisation
    first
 
