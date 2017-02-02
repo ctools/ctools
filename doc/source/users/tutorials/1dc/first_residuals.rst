@@ -20,8 +20,8 @@ You do this with the :ref:`csresmap` script by providing the output
    Upper energy limit (TeV) [100.0]
    Coordinate System (CEL|GAL) [CEL] GAL
    Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
-   Size of the X axis in pixels [200] 500
-   Size of the Y axis in pixels [200] 250
+   Size of the X axis in pixels [200] 400
+   Size of the Y axis in pixels [200] 400
    Pixel size (deg/pixel) [0.02] 0.02
    Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUBDIV] SUB
    Output residual map file [resmap.fits]
@@ -38,7 +38,7 @@ relatively high detection threshold that you used in the source detection
 step.
 
 .. figure:: first_skymap_residual.png
-   :width: 600px
+   :width: 400px
    :align: center
 
    *Residual sky map after subtraction of the fitted model*

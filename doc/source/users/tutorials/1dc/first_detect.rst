@@ -37,7 +37,7 @@ Due to the relatively high threshold of ten standard deviations, only two
 sources were detected.
 
 .. figure:: first_skymap_sources.png
-   :width: 600px
+   :width: 400px
    :align: center
 
    *Background subtracted sky map of the events recorded during the Galactic Plane Survey around the Galactic Centre with the detected sources overlaid*
@@ -67,8 +67,8 @@ for a model fitting with :ref:`ctlike`.
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA" value="266.424004498437" error="0" scale="1" free="1" />
-         <parameter name="DEC" value="-29.0049010253548" error="0" scale="1" free="1" />
+         <parameter name="RA" value="266.4120906928" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-29.0219729468991" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="Src002" type="PointSource">
@@ -78,8 +78,8 @@ for a model fitting with :ref:`ctlike`.
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA" value="266.843692146479" error="0" scale="1" free="1" />
-         <parameter name="DEC" value="-28.1289200709305" error="0" scale="1" free="1" />
+         <parameter name="RA" value="266.863094306139" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.1392765822294" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="Background" type="CTAIrfBackground">

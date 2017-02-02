@@ -20,7 +20,7 @@ You run the :ref:`ctlike` tool as follows:
    Input model definition XML file [$CTOOLS/share/models/crab.xml] models.xml
    Output model definition XML file [crab_results.xml] results.xml
 
-The tool will take a few minutes to perform the model fitting, and will write
+The tool will take several minutes to perform the model fitting, and will write
 the results into an updated
 :ref:`model definition XML file <glossary_moddef>`
 containing the fitted model parameters and their statistical uncertainties.
@@ -29,33 +29,33 @@ converged properly, as illustrated in the example below:
 
 .. code-block:: bash
 
-   2016-12-02T12:06:03: +=================================+
-   2016-12-02T12:06:03: | Maximum likelihood optimisation |
-   2016-12-02T12:06:03: +=================================+
-   2016-12-02T12:06:19:  >Iteration   0: -logL=13460292.282, Lambda=1.0e-03
-   2016-12-02T12:06:34:  >Iteration   1: -logL=13447430.338, Lambda=1.0e-03, delta=12861.944, max(|grad|)=38643.139247 [Index:13]
-   2016-12-02T12:06:49:  >Iteration   2: -logL=13444219.743, Lambda=1.0e-04, delta=3210.595, max(|grad|)=18223.630095 [RA:0]
-   2016-12-02T12:07:05:  >Iteration   3: -logL=13442740.130, Lambda=1.0e-05, delta=1479.613, max(|grad|)=12560.528406 [RA:0]
-   2016-12-02T12:07:20:  >Iteration   4: -logL=13442178.499, Lambda=1.0e-06, delta=561.631, max(|grad|)=5836.127526 [RA:0]
-   2016-12-02T12:07:35:  >Iteration   5: -logL=13442096.088, Lambda=1.0e-07, delta=82.411, max(|grad|)=1183.057138 [RA:0]
-   2016-12-02T12:07:50:  >Iteration   6: -logL=13442094.149, Lambda=1.0e-08, delta=1.939, max(|grad|)=55.233391 [RA:0]
-   2016-12-02T12:08:06:  >Iteration   7: -logL=13442094.147, Lambda=1.0e-09, delta=0.002, max(|grad|)=-3.893441 [RA:6]
-   2016-12-02T12:08:21:
-   2016-12-02T12:08:21: +=========================================+
-   2016-12-02T12:08:21: | Maximum likelihood optimisation results |
-   2016-12-02T12:08:21: +=========================================+
-   2016-12-02T12:08:21: === GOptimizerLM ===
-   2016-12-02T12:08:21:  Optimized function value ..: 13442094.147
-   2016-12-02T12:08:21:  Absolute precision ........: 0.005
-   2016-12-02T12:08:21:  Acceptable value decrease .: 2
-   2016-12-02T12:08:21:  Optimization status .......: converged
-   2016-12-02T12:08:21:  Number of parameters ......: 16
-   2016-12-02T12:08:21:  Number of free parameters .: 10
-   2016-12-02T12:08:21:  Number of iterations ......: 7
-   2016-12-02T12:08:21:  Lambda ....................: 1e-10
-   2016-12-02T12:08:21:  Maximum log likelihood ....: -13442094.147
-   2016-12-02T12:08:21:  Observed events  (Nobs) ...: 1899265.000
-   2016-12-02T12:08:21:  Predicted events (Npred) ..: 1899225.997 (Nobs - Npred = 39.0025871018879)
+   2017-02-02T15:11:01: +=================================+
+   2017-02-02T15:11:01: | Maximum likelihood optimisation |
+   2017-02-02T15:11:01: +=================================+
+   2017-02-02T15:12:10:  >Iteration   0: -logL=39119340.262, Lambda=1.0e-03
+   2017-02-02T15:13:12:  >Iteration   1: -logL=39113674.616, Lambda=1.0e-03, delta=5665.646, max(|grad|)=25710.424562 [Index:13]
+   2017-02-02T15:14:14:  >Iteration   2: -logL=39111144.224, Lambda=1.0e-04, delta=2530.392, max(|grad|)=-17928.193858 [DEC:1]
+   2017-02-02T15:15:16:  >Iteration   3: -logL=39109792.705, Lambda=1.0e-05, delta=1351.519, max(|grad|)=-10987.858986 [DEC:1]
+   2017-02-02T15:16:19:  >Iteration   4: -logL=39109377.992, Lambda=1.0e-06, delta=414.713, max(|grad|)=-4554.316982 [DEC:1]
+   2017-02-02T15:17:20:  >Iteration   5: -logL=39109337.418, Lambda=1.0e-07, delta=40.574, max(|grad|)=-910.537530 [DEC:1]
+   2017-02-02T15:18:21:  >Iteration   6: -logL=39109336.839, Lambda=1.0e-08, delta=0.579, max(|grad|)=-70.481486 [DEC:1]
+   2017-02-02T15:19:26:  >Iteration   7: -logL=39109336.837, Lambda=1.0e-09, delta=0.002, max(|grad|)=-3.284527 [DEC:1]
+   2017-02-02T15:20:30:
+   2017-02-02T15:20:30: +=========================================+
+   2017-02-02T15:20:30: | Maximum likelihood optimisation results |
+   2017-02-02T15:20:30: +=========================================+
+   2017-02-02T15:20:30: === GOptimizerLM ===
+   2017-02-02T15:20:30:  Optimized function value ..: 39109336.837
+   2017-02-02T15:20:30:  Absolute precision ........: 0.005
+   2017-02-02T15:20:30:  Acceptable value decrease .: 2
+   2017-02-02T15:20:30:  Optimization status .......: converged
+   2017-02-02T15:20:30:  Number of parameters ......: 16
+   2017-02-02T15:20:30:  Number of free parameters .: 10
+   2017-02-02T15:20:30:  Number of iterations ......: 7
+   2017-02-02T15:20:30:  Lambda ....................: 1e-10
+   2017-02-02T15:20:30:  Maximum log likelihood ....: -39109336.837
+   2017-02-02T15:20:30:  Observed events  (Nobs) ...: 7736578.000
+   2017-02-02T15:20:30:  Predicted events (Npred) ..: 7736555.998 (Nobs - Npred = 22.002333926037)
 
 You may also convert the fitted model positions into a `ds9 <http://ds9.si.edu>`_
 region file using the :ref:`csmodelinfo` script so that you can overlay the

@@ -17,8 +17,8 @@ You do this with the :ref:`ctskymap` tool by typing:
    Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
    Image scale (in degrees/pixel) [0.02]
-   Size of the X axis in pixels [200] 500
-   Size of the Y axis in pixels [200] 250
+   Size of the X axis in pixels [200] 400
+   Size of the Y axis in pixels [200] 400
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Background subtraction method (NONE|IRF) [NONE]
@@ -36,7 +36,7 @@ The sky map, displayed using
 is shown below:
 
 .. figure:: first_skymap.png
-   :width: 600px
+   :width: 400px
    :align: center
 
    *Sky map of the events recorded during the Galactic Plane Survey around the Galactic Centre*
@@ -63,8 +63,8 @@ example:
    Projection method (AIT|AZP|CAR|MER|MOL|STG|TAN) [CAR]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
    Image scale (in degrees/pixel) [0.02]
-   Size of the X axis in pixels [200] 500
-   Size of the Y axis in pixels [200] 250
+   Size of the X axis in pixels [200] 400
+   Size of the Y axis in pixels [200] 400
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Background subtraction method (NONE|IRF) [NONE] IRF
@@ -75,7 +75,7 @@ The irreducable background has been subtracted from the sky map and the sources
 of gamma-ray emission are now clearly descernable.
 
 .. figure:: first_skymap_bkgsubtract.png
-   :width: 600px
+   :width: 400px
    :align: center
 
    *Background subtracted sky map of the events recorded during the Galactic Plane Survey around the Galactic Centre*
