@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -235,7 +235,10 @@ void ctskymap::run(void)
 
         // Compute background sky map
         map_background(obs);
-        
+
+        // Dispose events to free memory
+        obs->dispose_events();
+
     } // endfor: looped over observations
 
     // If background subtract was required then compute significance map
