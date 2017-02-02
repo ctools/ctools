@@ -4,7 +4,7 @@ Getting the data
 ================
 
 The data for the
-:ref:`First CTA Data Challenge <glossary_1dc>`
+:ref:`first CTA Data Challenge <glossary_1dc>`
 are bundled with the
 :ref:`Instrument Response Functions <glossary_irf>`
 into a single tarball.
@@ -22,7 +22,8 @@ You can then uncompress and deploy the data at any place by typing
    should be typed on the command line of a console.
 
 After deploying you should have the folder ``1dc`` in your current working
-directory. Within that directory, please set the following environment variables:
+directory. In your current working directory, please type the following to
+set the ``CALDB`` and ``CTADATA`` environment variables:
 
 .. code-block:: bash
 

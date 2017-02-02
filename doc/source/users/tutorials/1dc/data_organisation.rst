@@ -3,6 +3,9 @@
 Data organisation
 -----------------
 
+Layout
+^^^^^^
+
 The content of the ``1dc`` folder should be as follows:
 
 .. code-block:: bash
@@ -51,11 +54,15 @@ The content of the ``1dc`` folder should be as follows:
    models/map_ics.fits.gz
    models/map_pi0.fits.gz
 
+
+Instrument Response Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 The ``caldb`` folder contains the
 :ref:`Instrument Response Functions <glossary_irf>`
 that are necessary for the analysis of the simulated CTA data.
 The folder contains the ``prod3b`` response that should be used for the
-:ref:`First CTA Data Challenge <glossary_1dc>`.
+:ref:`first CTA Data Challenge <glossary_1dc>`.
 The following response functions are available:
 
  +-----------------------+-------+---------------+--------+----------+
@@ -110,16 +117,30 @@ The following response functions are available:
  | ``North_TS_z40_0.5h`` | North | Threshold     | 40 deg | 30 min   |
  +-----------------------+-------+---------------+--------+----------+
 
+.. warning::
+   The **50 hours**
+   :ref:`Instrument Response Functions <glossary_irf>`
+   were used for the **simulation** of the
+   :ref:`first CTA Data Challenge <glossary_1dc>`
+   data. Please use only these response functions for the analysis. If you use
+   :ref:`Observation Definition Files <glossary_obsdef>`
+   for the analysis (see below) the appropriate 50 hours response functions
+   will be used automatically.
+
+
+Event data
+^^^^^^^^^^
+
 The ``data`` folder contains the calibrated, reconstructed and background
 reduced event data that were procuded for the
-:ref:`First CTA Data Challenge <glossary_1dc>`
+:ref:`first CTA Data Challenge <glossary_1dc>`
 and that were stored into FITS files.
 Each event file contains the events for an
 :ref:`observation <glossary_obs>`
 (or run) of 30 minutes duration and comprises an
-:ref:`event lists <glossary_eventlist>`
+:ref:`event list <glossary_eventlist>`
 and a
-:ref:`Good Time Interval <glossary_gti>`
+:ref:`Good Time Intervals <glossary_gti>`
 binary table extension (see figure below).
 
 .. figure:: event_file.png
@@ -145,7 +166,8 @@ the pointing direction in Right Ascension and Declination (see figure below).
    The pointing direction during an observation is fixed.
 
 .. warning::
-   Only the following header keywords have meaningful values:
+   Only the following header keywords in the ``EVENTS`` table have meaningful
+   values:
 
    * ``DATE_OBS`` - start date of observation (UTC)
    * ``TIME_OBS`` - start time of observation (UTC)
@@ -218,12 +240,16 @@ Event files exist for
  | Extragalactic   | Threshold     | ``egal_threshold`` |
  +-----------------+---------------+--------------------+
 
+
+Observation Definition Files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 The files ``obs_XXX_YYYYY.xml`` are so called
 :ref:`Observation Definition Files <glossary_obsdef>`
 that contain the information (or metadata) of a list of observations.
-The files are plain ASCII files in XML format that be inspected and
+The files are plain ASCII files in XML format that can be inspected and
 manipulated by any text editor.
-The following files are included in the data distribution:
+The following files are included in the distribution:
 
  +----------------------------+--------------------------------------------------------+
  | File                       | Purpose                                                |
@@ -245,8 +271,12 @@ The following files are included in the data distribution:
  | ``obs_all_threshold.xml``  | All surveys combined performed with threshold arrays   |
  +----------------------------+--------------------------------------------------------+
 
+
+Models
+^^^^^^
+
 The ``models`` folder contains the definitions of all source and background
-models that have been used for simulating the data.
+models that were used for simulating the data.
 The file ``models_gc.xml`` is a so called
 :ref:`Model Definition File <glossary_moddef>`
 that collects the definition of all model components used for the Galactic
@@ -255,9 +285,11 @@ The files ``models_gps.xml`` and ``models_egal.xml`` are the equivalent files
 for the Galactic Plane Survey and the Extragalactic Survey.
 The other files in the folder are FITS files containing sky maps that were
 used as spatial templates for modelling extended or diffuse emission components.
-There files are reference in the
-:ref:`Model Definition File <glossary_moddef>`
-files.
+
+.. warning::
+   The FITS template files should always reside in the same folder as the
+   :ref:`model definition XML files <glossary_moddef>`
+   since the latter reference the former.
 
 
 
