@@ -511,7 +511,32 @@ class cslightcrv(ctools.cscript):
         # Write observation into logger
         if self._logTerse():
             self._log('\n')
-            self._log.header1(gammalib.number('Observation',len(self._obs)))
+            self._log.header1(gammalib.number('Input observation',len(self._obs)))
+            self._log(str(self._obs))
+            self._log('\n')
+
+        # Get time boundaries
+        tmin = self._tbins.tstart(0)
+        tmax = self._tbins.tstop(self._tbins.size()-1)
+
+        # Select events
+        select = ctools.ctselect(self._obs)
+        select['emin'] = self['emin'].real()
+        select['emax'] = self['emax'].real()
+        select['tmin'] = tmin.convert(self._time_reference())
+        select['tmax'] = tmax.convert(self._time_reference())
+        select['rad']  = 'UNDEFINED'
+        select['ra']   = 'UNDEFINED'
+        select['dec']  = 'UNDEFINED'
+        select.run()
+
+        # Extract observations
+        self._obs = select.obs().copy()
+
+        # Write observation into logger
+        if self._logTerse():
+            self._log('\n')
+            self._log.header1(gammalib.number('Selected observation',len(self._obs)))
             self._log(str(self._obs))
             self._log('\n')
 
