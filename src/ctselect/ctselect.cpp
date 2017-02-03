@@ -934,9 +934,6 @@ void ctselect::select_events(GCTAObservation*   obs,
     obs->ontime(list->gti().ontime());
     obs->livetime(list->gti().ontime() * obs->deadc());
 
-    // Set observation attributes
-    obs->eventfile("");
-
     // Return
     return;
 }
