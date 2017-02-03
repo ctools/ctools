@@ -534,7 +534,7 @@ class cslightcrv(ctools.cscript):
             select['rad']  = 'UNDEFINED'
             select['ra']   = 'UNDEFINED'
             select['dec']  = 'UNDEFINED'
-            select.run()  
+            select.run()
 
             # Retrieve observation
             obs = select.obs()
@@ -577,8 +577,8 @@ class cslightcrv(ctools.cscript):
 
             # Extract parameter values
             for par in pars:
-                result['values'][par]      = source.spectral()[par].value()
-                result['values']['e_'+par] = source.spectral()[par].error()
+                result['values'][par]      = source[par].value()
+                result['values']['e_'+par] = source[par].error()
 
             # Calculate upper limit (-1 if not computed)
             ulimit_value = self._compute_ulimit(like.obs())
@@ -596,9 +596,9 @@ class cslightcrv(ctools.cscript):
             self._log.header3('Results')
             pars = self._get_free_par_names()
             for par in pars:
-                value = source.spectral()[par].value()
-                error = source.spectral()[par].error()
-                unit  = source.spectral()[par].unit()
+                value = source[par].value()
+                error = source[par].error()
+                unit  = source[par].unit()
                 self._log_value(gammalib.NORMAL, par,
                                 str(value)+' +/- '+str(error)+' '+unit)
             if result['ulimit'] > 0.0:
