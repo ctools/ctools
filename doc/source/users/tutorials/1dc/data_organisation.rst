@@ -224,21 +224,21 @@ An example of an ``EVENTS`` table is shown below.
 
 Event files exist for
 
- +-----------------+---------------+--------------------+
- | Survey          | Configuration | Prefix             |
- +=================+===============+====================+
- | Galactic Centre | Baseline      | ``gc_baseline``    |
- +-----------------+---------------+--------------------+
- | Galactic Plane  | Baseline      | ``gps_baseline``   |
- +-----------------+---------------+--------------------+
- | Extragalactic   | Baseline      | ``egal_baseline``  |
- +-----------------+---------------+--------------------+
- | Galactic Centre | Threshold     | ``gc_threshold``   |
- +-----------------+---------------+--------------------+
- | Galactic Plane  | Threshold     | ``gps_threshold``  |
- +-----------------+---------------+--------------------+
- | Extragalactic   | Threshold     | ``egal_threshold`` |
- +-----------------+---------------+--------------------+
+ +-----------------+---------------+--------------------+------------------+
+ | Survey          | Configuration | Prefix             | Energy range     |
+ +=================+===============+====================+==================+
+ | Galactic Centre | Baseline      | ``gc_baseline``    |                  |
+ +-----------------+---------------+--------------------+------------------+
+ | Galactic Plane  | Baseline      | ``gps_baseline``   | 30 GeV - 120 TeV |
+ +-----------------+---------------+--------------------+------------------+
+ | Extragalactic   | Baseline      | ``egal_baseline``  |                  |
+ +-----------------+---------------+--------------------+------------------+
+ | Galactic Centre | Threshold     | ``gc_threshold``   |                  |
+ +-----------------+---------------+--------------------+------------------+
+ | Galactic Plane  | Threshold     | ``gps_threshold``  |                  |
+ +-----------------+---------------+--------------------+------------------+
+ | Extragalactic   | Threshold     | ``egal_threshold`` |                  |
+ +-----------------+---------------+--------------------+------------------+
 
 
 Observation Definition Files
