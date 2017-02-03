@@ -26,8 +26,8 @@ upper flux limit.
 General parameters
 ------------------
 
-``(inobs = NONE) [file]``
-    Input event list, counts cube or observation definition XML file.
+``inobs [file]``
+    Input event list or observation definition XML file.
 
 ``inmodel [file]``
     Input model XML file.
@@ -36,23 +36,20 @@ General parameters
     Name of the source in the source model XML file which should be used
     for sensitivity computation.
 
-``outfile [file]``
-    Name of the source spectrum output file.
-
-``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
-
-``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
-
-``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
-
 ``caldb [string]``
     Calibration database.
  	 	 
 ``irf [string]``
     Instrumental response function.
+
+``(edisp = no) [boolean]``
+    Applies energy dispersion to response computation.
+
+``outfile [file]``
+    Name of the source spectrum output file.
+
+``(tbinalg = GTI) <FILE|LIN|GTI> [string]``
+    Algorithm for defining time bins.
 
 ``tmin [real]``
     Lightcurve start time (in MJD).
@@ -63,17 +60,8 @@ General parameters
 ``tbins [integer]``
     Number of time bins.
 
-``(tbinalg = GTI) <FILE|LIN|GTI> [string]``
-    Algorithm for defining time bins.
-
 ``tbinfile [file]``
     File defining the time binning.
-
-``binned [boolean]``
-    Use binned analysis in each time bin.
-
-``enumbins [integer]``
-    Number of energy bins per light curve bin (0=unbinned).
 
 ``emin [real]``
     Lower energy limit of events (in TeV).
@@ -81,6 +69,9 @@ General parameters
 ``emax [real]``
     Upper energy limit of events (in TeV).
  	 	 
+``enumbins [integer]``
+    Number of energy bins per light curve bin (0=unbinned).
+
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 

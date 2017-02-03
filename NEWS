@@ -244,6 +244,9 @@ Improve the upper limit computation in the cslightcrv script. Now all source
 parameters, except the source intensity, are set to the initial values given
 in the model definition file for upper limit computation.
 
+The cslightcrv script no longer accepts counts cubes on input as no light
+curves can be derived from counts cubes (#1920).
+
 
 Examples
 --------

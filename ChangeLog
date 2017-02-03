@@ -3,6 +3,7 @@
         * Version 1.2.0 released
         ========================
 
+        cslightcrv no longer accepts counts cubes on input (#1920)
         Set ctbin reference time to CTA reference time (#1922)
         Change ds9file parameter to outds9file
         Add cssrcdetect script (#1617)

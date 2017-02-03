@@ -41,7 +41,7 @@ class cslightcrv(ctools.cscript):
     The format of the ASCII file is one row per time bin, each specifying
     the start of stop value of the bin, separated by a whitespace. The
     times are given in Modified Julian Days (MJD). 
-    
+
     Examples:
             >>> lcrv = cslightcrv()
             >>> lcrv.run()
@@ -92,17 +92,18 @@ class cslightcrv(ctools.cscript):
         """
         Get parameters from parfile
         """
-        # Setup observations
-        self._setup_observations(self._obs)
+        # Setup observations (require response and allow event list, don't
+        # allow counts cube)
+        self._setup_observations(self._obs, True, True, False)
 
         # Set models if there are none in the container
         if self._obs.models().size() == 0:
             self._obs.models(self['inmodel'].filename())
 
-        # Get source name   
+        # Get source name
         self._srcname = self['srcname'].string()
 
-        # Get time boundaries             
+        # Get time boundaries
         self._tbins = self._create_tbounds()
 
         # Set stacked analysis flag to True if the requested number of
@@ -127,7 +128,7 @@ class cslightcrv(ctools.cscript):
             self['nxpix'].integer()
             self['nypix'].integer()
             self['binsz'].real()
-        
+
         # Do the same for the hidden parameters, just in case
         self['edisp'].boolean()
         self['calc_ulim'].boolean()
@@ -161,14 +162,14 @@ class cslightcrv(ctools.cscript):
         # values are "FILE", "LIN" and "GTI". This is enforced at
         # parameter file level, hence no checking is needed.
         algorithm = self['tbinalg'].string()
-        
+
         # If the algorithm is "FILE" then handle a FITS or an ASCII file for
         # the time bin definition
         if algorithm == 'FILE':
 
             # Get the filename
             filename = self['tbinfile'].filename()
-            
+
             # If the file a FITS file then load GTIs directly
             if filename.is_fits():
                 gti.load(filename)
@@ -212,14 +213,14 @@ class cslightcrv(ctools.cscript):
                 for i in range(obs.events().gti().size()):
                     gti.append(obs.events().gti().tstart(i),
                                obs.events().gti().tstop(i))
-    
+
         # Return Good Time Intervals
         return gti
 
     def _get_free_par_names(self):
         """
         Return list of free parameter names
-        
+
         Returns
         -------
         names : list of str
@@ -469,7 +470,7 @@ class cslightcrv(ctools.cscript):
 
         # Retrieve a new oberservation container
         new_obs = cntcube.obs().copy()
-        
+
         # Set stacked response
         if self['edisp'].boolean():
             new_obs[0].response(response['expcube'], response['psfcube'],
@@ -480,7 +481,7 @@ class cslightcrv(ctools.cscript):
 
         # Get new models
         models = response['models']
-        
+
         # Fix background models if required
         if self['fix_bkg'].boolean():
             for model in models:
@@ -688,7 +689,7 @@ class cslightcrv(ctools.cscript):
 
         # Get light curve filename
         outfile = self['outfile'].filename()
-        
+
         # Continue only filename and residual map are valid
         if self._fits != None:
 
