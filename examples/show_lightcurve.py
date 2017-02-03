@@ -47,12 +47,28 @@ def plot_lightcurve(filename, plotfile):
     # Read spectrum file    
     fits    = gammalib.GFits(filename)
     table   = fits.table(1)
+    
+    # Extract standard columns
     c_mjd   = table['MJD']
     c_emjd  = table['e_MJD']
-    c_flux  = table['EnergyFlux']
-    c_eflux = table['e_EnergyFlux']
     c_ts    = table['TS']
-    c_upper = table['EFluxUpperLimit']
+
+    # Extract columns dependent on flux type
+    if table.contains('EnergyFlux'):
+        c_flux  = table['EnergyFlux']
+        c_eflux = table['e_EnergyFlux']
+        c_upper = table['EFluxUpperLimit']
+        ylabel  = r'E $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)'
+    elif table.contains('PhotonFlux'):
+        c_flux  = table['PhotonFlux']
+        c_eflux = table['e_PhotonFlux']
+        c_upper = table['FluxUpperLimit']
+        ylabel  = r'N(E) (ph cm$^{-2}$ s$^{-1}$)'
+    else:
+        c_flux  = table['Prefactor']
+        c_eflux = table['e_Prefactor']
+        c_upper = table['DiffUpperLimit']
+        ylabel  = r'dN/dE (cm$^{-2}$ s$^{-1}$ MeV$^{-1}$)'
 
     # Initialise arrays to be filled
     mjd       = []
@@ -97,7 +113,7 @@ def plot_lightcurve(filename, plotfile):
     plt.errorbar(ul_mjd, ul_flux, xerr=[ul_e_mjd, ul_e_mjd],
                  yerr=ul_e_flux, uplims=True, fmt='ro')
     plt.xlabel('MJD (days)')
-    plt.ylabel(r'E $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
+    plt.ylabel(ylabel)
 
     # Show figure
     if len(plotfile) > 0:
