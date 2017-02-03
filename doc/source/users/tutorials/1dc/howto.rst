@@ -9,12 +9,14 @@ issues.
 .. toctree::
    :maxdepth: 2
 
+   howto_display
    howto_ts
    howto_tsmap
    howto_ulimit
    howto_lightcurve
    howto_phasecurve
    howto_exclude
+   howto_vo
 
 If you cannot find the answer to your question, have a look at the
 :ref:`first steps with ctools <quickstart>`
