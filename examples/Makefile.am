@@ -39,6 +39,7 @@ scripts = README.md \
           show_response.py \
           show_sensitivity.py \
           show_spectrum.py \
+          show_lightcurve.py \
           show_ts_distribution.py \
           show_obs.py
 

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Performs unit tests for the ctools example scripts
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -128,6 +128,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_sensitivity.py')
         self.append(self.test_show_spectrum,
                     'Test show_spectrum.py')
+        self.append(self.test_show_lightcurve,
+                    'Test show_lightcurve.py')
         self.append(self.test_show_ts_distribution,
                     'Test ts_distribution.py')
         self.append(self.test_show_obs,
@@ -397,6 +399,20 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_spectrum', args=args)
+
+        # Return
+        return
+
+    # Test show_lightcurve
+    def test_show_lightcurve(self):
+        """
+        Test show_lightcurve
+        """
+        # Set arguments
+        args = '-p example_show_lightcurve.eps %s/lightcurve.fits' % self._datadir
+
+        # Execute script
+        self._execute_python('show_lightcurve', args=args)
 
         # Return
         return

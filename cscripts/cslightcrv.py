@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a lightcurve.
 #
-# Copyright (C) 2014-2016 Michael Mayer
+# Copyright (C) 2014-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class cslightcrv(ctools.cscript):
         """
         # Set name
         self._name    = 'cslightcrv'
-        self._version = '1.2.0'
+        self._version = '1.3.0'
 
         # Initialise some members
         self._srcname = ''
@@ -335,18 +335,26 @@ class cslightcrv(ctools.cscript):
         table.append(ts)
 
         # Append upper limit column "UpperLimit"
-        ulimit = gammalib.GFitsTableDoubleCol('UpperLimit', nrows)
-        ulimit.unit('ph/cm2/s')
+        ul_diff  = gammalib.GFitsTableDoubleCol('DiffUpperLimit', nrows)
+        ul_flux  = gammalib.GFitsTableDoubleCol('FluxUpperLimit', nrows)
+        ul_eflux = gammalib.GFitsTableDoubleCol('EFluxUpperLimit', nrows)
+        ul_diff.unit('ph/cm2/s/MeV')
+        ul_flux.unit('ph/cm2/s')
+        ul_eflux.unit('erg/cm2/s')
         for i, result in enumerate(results):
-            ulimit[i] = result['ulimit']
-        table.append(ulimit)
+            ul_diff[i]  = result['ul_diff']
+            ul_flux[i]  = result['ul_flux']
+            ul_eflux[i] = result['ul_eflux']
+        table.append(ul_diff)
+        table.append(ul_flux)
+        table.append(ul_eflux)
 
         # Return table
         return table
 
     def _compute_ulimit(self, obs):
         """
-        Computes upper flux limit
+        Computes upper limit
 
         Parameters
         ----------
@@ -355,35 +363,57 @@ class cslightcrv(ctools.cscript):
 
         Returns
         -------
-        ulimit : float
-            Upper flux limit (-1.0 of not computed)
+        ul_diff, ul_flux, ul_eflux : tuple of float
+            Upper limits, -1.0 of not computed
         """
         # Initialise upper flux limit
-        ulimit_value = -1.0
-        
+        ul_diff  = -1.0
+        ul_flux  = -1.0
+        ul_eflux = -1.0
+
         # Perform computation only if requested
         if self['calc_ulim'].boolean():
 
             # Write header in logger
             if self._logExplicit():
-                self._log.header3('Computing upper flux limit')
+                self._log.header3('Computing upper limit')
 
-            # Create upper limit object  
-            ulimit = ctools.ctulimit(obs)
-            ulimit['srcname'] = self._srcname
-            ulimit['eref']    = 1.0
+            # Create copy of observations
+            cpy_obs = obs.copy()
 
-            # Try to run upper limit and catch any exceptions
+            # Fix parameters of source of interest in copy of observations.
+            # This assures that the original spectral parameters and position
+            # are used in the upper limit search. The ctulimit tool makes sure
+            # that the flux parameter is freed when needed.
+            source = cpy_obs.models()[self._srcname]
+            for par in source:
+                if par.is_free():
+                    par.fix()
+
+            # Create instance of upper limit tool
+            ulimit = ctools.ctulimit(cpy_obs)
+            ulimit['srcname']   = self._srcname
+            ulimit['eref']      = 1.0
+            ulimit['emin']      = self['emin'].real()
+            ulimit['emax']      = self['emax'].real()
+            ulimit['sigma_min'] = 0.0
+            ulimit['sigma_max'] = 3.0
+
+            # Try to run upper limit tool and catch any exceptions
             try:
                 ulimit.run()
-                ulimit_value = ulimit.flux_ulimit()
+                ul_diff  = ulimit.diff_ulimit()
+                ul_flux  = ulimit.flux_ulimit()
+                ul_eflux = ulimit.eflux_ulimit()
             except:
                 if self._logTerse():
-                    self._log('Upper limit flux calculation failed.\n')
-                ulimit_value = -1.0
+                    self._log('Upper limit calculation failed.\n')
+                ul_diff  = -1.0
+                ul_flux  = -1.0
+                ul_eflux = -1.0
 
-        # Return upper limit
-        return ulimit_value
+        # Return upper limit tuple
+        return ul_diff, ul_flux, ul_eflux
 
     def _bin_observation(self, obs):
         """
@@ -517,7 +547,9 @@ class cslightcrv(ctools.cscript):
             result = {'mjd': tmean.mjd(),
                       'e_mjd': twidth / gammalib.sec_in_day,
                       'ts': 0.0,
-                      'ulimit': 0.0,
+                      'ul_diff': 0.0,
+                      'ul_flux': 0.0,
+                      'ul_eflux': 0.0,
                       'pars': pars,
                       'values': {}}
 
@@ -581,9 +613,12 @@ class cslightcrv(ctools.cscript):
                 result['values']['e_'+par] = source[par].error()
 
             # Calculate upper limit (-1 if not computed)
-            ulimit_value = self._compute_ulimit(like.obs())
-            if ulimit_value > 0.0:
-                result['ulimit'] = ulimit_value
+            #ul_diff, ul_flux, ul_eflux = self._compute_ulimit(like.obs())
+            ul_diff, ul_flux, ul_eflux = self._compute_ulimit(obs)
+            if ul_diff > 0.0:
+                result['ul_diff']  = ul_diff
+                result['ul_flux']  = ul_flux
+                result['ul_eflux'] = ul_eflux
 
             # Extract Test Statistic value
             if self['calc_ts'].boolean():
@@ -601,9 +636,13 @@ class cslightcrv(ctools.cscript):
                 unit  = source[par].unit()
                 self._log_value(gammalib.NORMAL, par,
                                 str(value)+' +/- '+str(error)+' '+unit)
-            if result['ulimit'] > 0.0:
+            if ul_diff > 0.0:
                 self._log_value(gammalib.NORMAL, 'Upper flux limit',
-                                str(result['ulimit'])+' ph/cm2/s')
+                                str(result['ul_diff'])+' ph/cm2/s/MeV')
+                self._log_value(gammalib.NORMAL, 'Upper flux limit',
+                                str(result['ul_flux'])+' ph/cm2/s')
+                self._log_value(gammalib.NORMAL, 'Upper flux limit',
+                                str(result['ul_eflux'])+' erg/cm2/s')
             if self['calc_ts'].boolean():
                 self._log_value(gammalib.NORMAL, 'Test Statistic', result['ts'])
 
