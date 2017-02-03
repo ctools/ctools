@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -360,6 +360,9 @@ void ctbin::init_members(void)
     m_cube.clear();
     m_ontime   = 0.0;
     m_livetime = 0.0;
+
+    // Set CTA reference time
+    m_gti.reference(m_cta_ref);
 
     // Return
     return;

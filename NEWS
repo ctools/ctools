@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-26 January 2017
+3 February 2017
 
 
 Introduction
@@ -93,6 +93,8 @@ of the tool (#1835).
 The save() method led to a segmentation violation in case it was applied on an
 empty ctbin instance, and specifically in case that the instance contains an
 empty observation container. This bug has been fixed (#1835).
+
+The reference time is now set to the CTA reference type (#1922).
 
 
 ctlike - Maximum likelihood fitting

@@ -1,8 +1,9 @@
-2016-12-12
+2017-01-03
 
         * Version 1.2.0 released
         ========================
 
+        Set ctbin reference time to CTA reference time (#1922)
         Change ds9file parameter to outds9file
         Add cssrcdetect script (#1617)
         Add background subtraction to ctskymap tool (#1882)
