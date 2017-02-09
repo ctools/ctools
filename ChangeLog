@@ -1,8 +1,9 @@
-2017-01-03
+2017-02-09
 
         * Version 1.2.0 released
         ========================
 
+        Replace has_key() by in for Python 3.x compatibility (#1924)
         cslightcrv no longer accepts counts cubes on input (#1920)
         Set ctbin reference time to CTA reference time (#1922)
         Change ds9file parameter to outds9file

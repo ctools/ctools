@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.2.0
 
-3 February 2017
+9 February 2017
 
 
 Introduction
@@ -251,6 +251,9 @@ curves can be derived from counts cubes (#1920).
 Examples
 --------
 Add show_lightcurve script to display a light curve.
+
+Replace has_key() by "in" in example scripts for Python 3.x compatibility
+(#1924).
 
 
 caldb
