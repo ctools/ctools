@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools package                                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -65,20 +65,73 @@ uninstall-local: $(DOXYGEN_UNINSTALL_DATA_TARGETS)
 # Print out all rules
 help:
 	@echo "make targets:"; \
-	echo " all       - build all"; \
-    echo " check     - unit test"; \
-    echo " clean     - clean build"; \
-    echo " install   - install build (may required admin privileges)"; \
-    echo " doxygen   - generate Doxygen documentation"; \
-    echo " sphinx    - generate Sphinx documentation"; \
-    echo " cppcheck  - perform cppcheck"; \
-    echo " sloccount - perform Source Lines of Code count"; \
-    echo " cppncss   - perform cppncss complexity check"; \
-    echo " coverage  - determine code coverage"; \
-    echo " valgrind  - search for memory leaks"; \
-    echo " doc: doxygen sphinx"; \
-    echo " static-analysis: cppcheck sloccount cppncss"; \
-    echo " dynamic-analysis: coverage valgrind"
+	echo " all                  - build all"; \
+    echo " check                - unit test"; \
+    echo " clean                - clean build"; \
+    echo " install              - install build (may require admin privileges)"; \
+    echo " installcheck         - check installation"; \
+    echo " dist                 - generate tarball"; \
+    echo " distcheck            - check tarball"; \
+    echo " pkg                  - generate binary package"; \
+    echo " pkgcheck             - check binary package"; \
+    echo " doc                  - generate all documentation"; \
+    echo " doxygen              - generate Doxygen documentation"; \
+    echo " sphinx               - generate Sphinx documentation"; \
+    echo " science-verification - perform Science Verification"; \
+    echo " cppcheck             - perform cppcheck"; \
+    echo " sloccount            - perform Source Lines of Code count"; \
+    echo " cppncss              - perform cppncss complexity check"; \
+    echo " coverage             - determine code coverage"; \
+    echo " valgrind             - search for memory leaks"; \
+    echo " static-analysis      - perform static code analysis"; \
+    echo " dynamic-analysis     - perform dynamic code analysis"
+
+# Generate binary package
+pkg:
+	@case `uname -s` in \
+		Darwin*) \
+			echo "Darwin supported"; \
+			dev/pkgbuild-macosx.sh $(PACKAGE_VERSION); \
+			;; \
+		Linux*) \
+			if type lsb_release >/dev/null 2>&1; then \
+				case `lsb_release -irs` in \
+					CentOS*) \
+						echo "CentOS supported"; \
+						;; \
+					*) \
+						echo "Linux OS not supported"; \
+						;; \
+				esac \
+			fi \
+			;; \
+		*) \
+			echo "OS not supported"; \
+			;; \
+	esac
+
+# Check binary package
+pkgcheck:
+	@case `uname -s` in \
+		Darwin*) \
+			echo "Darwin supported"; \
+			;; \
+		Linux*) \
+			if type lsb_release >/dev/null 2>&1; then \
+				case `lsb_release -irs` in \
+					CentOS*) \
+						echo "CentOS supported"; \
+						;; \
+					*) \
+						echo "Linux OS not supported"; \
+						;; \
+				esac \
+			fi \
+			;; \
+		*) \
+			echo "OS not supported"; \
+			;; \
+	esac
 
 # Add static-analysis rule:
 static-analysis: cppcheck sloccount cppncss
