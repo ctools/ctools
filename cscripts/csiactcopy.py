@@ -2,7 +2,7 @@
 # ==========================================================================
 # Copies IACT data from remote machine
 #
-# Copyright (C) 2016 Michael Mayer
+# Copyright (C) 2016-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -116,21 +116,30 @@ class csiactcopy(ctools.cscript):
         self._log_value(gammalib.VERBOSE, 'Already exists', is_file)
         self._log_value(gammalib.VERBOSE, 'Overwrite', clobber)
         
-        # check if file could be skipped because clobber=no
+        # Check if file could be skipped because clobber=no
         if is_file and clobber == False:
             self._log_value(gammalib.VERBOSE, 'Copying', 'Skip (clobber=no)')
         
-        # check if file could be skipped because it is the same file
+        # ... check if file could be skipped because it is the same file as
+        # inferred from the file path and name (the file is in fact not
+        # checked) ...
         elif is_file and os.path.samefile(destination, source):
             self._log_value(gammalib.VERBOSE, 'Copying', 'Skip (same file)')
         
-        else:  
-            # Create directory if not existent
+        # ... otherwise copy file
+        else:
+            # Create directory if it does not exist
             dest_dir = os.path.dirname(destination)
             if not os.path.isdir(dest_dir):
                 os.makedirs(dest_dir)
-            
-            # Copy file (if source not identical to destination)
+
+            # If destination file exists then delete it. Make sure that file
+            # is writable for that
+            if os.path.isfile(destination):
+                os.chmod(destination, 420)
+                os.remove(destination)
+
+            # Copy file
             shutil.copy2(source, destination)
             
             # Get filesize
@@ -138,7 +147,7 @@ class csiactcopy(ctools.cscript):
             
             # Logging
             self._log_value(gammalib.VERBOSE, 'Copying', 'Done!')
-                
+        
         # Return 
         return filesize
 
