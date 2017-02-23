@@ -94,7 +94,7 @@ help:
 pkg:
 	@case `uname -s` in \
 		Darwin*) \
-			echo "Darwin supported"; \
+			echo "Build Mac OS X installation image"; \
 			dev/pkgbuild-macosx.sh $(PACKAGE_VERSION); \
 			;; \
 		Linux*) \
@@ -118,7 +118,8 @@ pkg:
 pkgcheck:
 	@case `uname -s` in \
 		Darwin*) \
-			echo "Darwin supported"; \
+			echo "Check Mac OS X installation image"; \
+			dev/pkgcheck-macosx.sh $(PACKAGE_VERSION); \
 			;; \
 		Linux*) \
 			if type lsb_release >/dev/null 2>&1; then \

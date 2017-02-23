@@ -42,7 +42,7 @@ CTOOLS=ctools-$VERSION
 # ============== #
 # Set parameters #
 # ============== #
-WRKDIR=$PWD/pkgbuild
+WRKDIR=$PWD/pkg_build
 INSTALLDIR=$WRKDIR/install
 SRCDIR=$WRKDIR/src
 PKGDIR=$WRKDIR/pkg
