@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctools unit tests                                         #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -60,7 +60,8 @@ clean-local:
 	rm -rf $(builddir)/pfiles
 	rm -rf $(builddir)/prod3
 	rm -rf $(builddir)/csroot2caldb_*
-	rm -rf $(builddir)/iactdata_*
+	rm -rf $(builddir)/csiactcopy_*
+	rm -rf $(builddir)/.DS_Store
 
 # Tests to be done on installed version
 if WITH_PYTHON

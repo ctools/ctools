@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools Python extension module                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2016 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -168,8 +168,9 @@ CLEANFILES = $(CLEAN_FILES) $(DEPFILES)
 # Files to be removed in build directory
 clean-local:
 	rm -rf build
+	rm -rf $(builddir)/ctools/tools.py
 	rm -rf $(builddir)/ctools/c*.py
-	rm -rf $(builddir)/ctools/c*.pyc
+	rm -rf $(builddir)/ctools/*.pyc
 	rm -rf $(builddir)/ctools/*_wrap.cpp
 	rm -rf $(builddir)/ctools/_tools.so
 	rm -rf $(builddir)/ctools/__pycache__

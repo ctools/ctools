@@ -108,7 +108,11 @@ linkscripts = cscaldb \
 testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/testing.py \
               $(top_srcdir)/test/test_python_cscripts.py \
+              $(top_srcdir)/test/test_cscript.py \
               $(top_srcdir)/test/test_cscaldb.py \
+              $(top_srcdir)/test/test_csfindobs.py \
+              $(top_srcdir)/test/test_csinfo.py \
+              $(top_srcdir)/test/test_cslightcrv.py \
               $(top_srcdir)/test/test_csmodelinfo.py \
               $(top_srcdir)/test/test_csmodelmerge.py \
               $(top_srcdir)/test/test_csmodelselect.py \
@@ -116,7 +120,6 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csobsdef.py \
               $(top_srcdir)/test/test_csobsinfo.py \
               $(top_srcdir)/test/test_csobsselect.py \
-              $(top_srcdir)/test/test_cslightcrv.py \
               $(top_srcdir)/test/test_cspull.py \
               $(top_srcdir)/test/test_csresmap.py \
               $(top_srcdir)/test/test_csroot2caldb.py \
@@ -214,7 +217,8 @@ testiactevents_DATA = $(testiactevents)
 
 # Files to be distributed in the tar file
 EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
-             $(testscripts) $(testdata) $(testiactdata)
+             $(testscripts) $(testdata) $(testiactdata) \
+             $(testiactevents)
 
 # Add install hook rule to create symbolic links for cscripts
 install-data-hook:
