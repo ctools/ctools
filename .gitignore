@@ -95,3 +95,4 @@ examples/*.fits
 examples/*.xml
 examples/*.dat
 examples/ctools
+pkgbuild

@@ -42,7 +42,7 @@ CTOOLS=ctools-$VERSION
 # ============== #
 # Set parameters #
 # ============== #
-WRKDIR=$PWD/osxpackage
+WRKDIR=$PWD/pkgbuild
 INSTALLDIR=$WRKDIR/install
 SRCDIR=$WRKDIR/src
 PKGDIR=$WRKDIR/pkg
@@ -79,7 +79,12 @@ mkdir -p $PRODDIR
 cd $SRCDIR
 if [ ! -d "$NCURSES" ]; then
     wget https://ftp.gnu.org/pub/gnu/ncurses/$NCURSES.tar.gz
-    tar xvfz $NCURSES.tar.gz
+    if [ "$?" -ne "0" ]; then
+        echo "*** Unable to download $NCURSES.tar.gz"
+        exit 1
+    else
+        tar xvfz $NCURSES.tar.gz
+    fi
 fi
 cd $NCURSES
 ./configure --prefix=$INSTALLDIR --with-shared
@@ -92,8 +97,13 @@ make install
 # ================ #
 cd $SRCDIR
 if [ ! -d "$READLINE" ]; then
-  wget https://ftp.gnu.org/pub/gnu/readline/$READLINE.tar.gz
-  tar xvfz $READLINE.tar.gz
+    wget https://ftp.gnu.org/pub/gnu/readline/$READLINE.tar.gz
+    if [ "$?" -ne "0" ]; then
+        echo "*** Unable to download $READLINE.tar.gz"
+        exit 1
+    else
+        tar xvfz $READLINE.tar.gz
+    fi
 fi
 cd $READLINE
 ./configure --prefix=$INSTALLDIR
@@ -107,7 +117,12 @@ make install
 cd $SRCDIR
 if [ ! -d "cfitsio" ]; then
     wget http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/$CFITSIO.tar.gz
-    tar xvfz $CFITSIO.tar.gz
+    if [ "$?" -ne "0" ]; then
+        echo "*** Unable to download $CFITSIO.tar.gz"
+        exit 1
+    else
+        tar xvfz $CFITSIO.tar.gz
+    fi
 fi
 cd cfitsio
 ./configure --prefix=$INSTALLDIR
@@ -121,9 +136,48 @@ make install
 cd $SRCDIR
 if [ ! -d "$GAMMALIB" ]; then
     wget http://cta.irap.omp.eu/ctools/releases/gammalib/$GAMMALIB.tar.gz
-    tar xvfz $GAMMALIB.tar.gz
+    if [ "$?" -ne "0" ]; then
+        if [ ! -d "gammalib" ]; then
+            echo "*** Unable to download $GAMMALIB.tar.gz, try cloning from GitLab"
+            export GIT_SSL_NO_VERIFY=true
+            git clone https://cta-gitlab.irap.omp.eu/gammalib/gammalib.git
+            if [ "$?" -ne "0" ]; then
+                echo "*** Unable to clone GammaLib from GitLab"
+                exit 1
+            fi
+        else
+            echo "*** Unable to download $GAMMALIB.tar.gz, use code in gammalib directory"
+        fi
+        cd gammalib
+    else
+        tar xvfz $GAMMALIB.tar.gz
+        cd $GAMMALIB
+    fi
 fi
-cd $GAMMALIB
+# If we got code from GitLab, then try using release branch, and if not
+# available, use devel branch.
+USE_BRANCH=
+if [ -d ".git" ]; then
+    git fetch
+    git checkout release
+    if [ "$?" -ne "0" ]; then
+        echo "*** No release branch found on GitLab, try devel branch"
+        git checkout devel
+        if [ "$?" -ne "0" ]; then
+            echo "*** No devel branch found on GitLab"
+            exit 1
+        else
+            echo "*** Use devel branch of GammaLib"
+            USE_BRANCH=devel
+        fi
+    else
+        echo "*** Use release branch of GammaLib"
+        USE_BRANCH=release
+    fi
+    git pull
+    ./autogen.sh
+fi
+# Build code
 ./configure --prefix=$INSTALLDIR
 make
 make install
@@ -133,11 +187,41 @@ make install
 # Install ctools #
 # ============== #
 cd $SRCDIR
+CTOOLS_DIR=$CTOOLS
 if [ ! -d "$CTOOLS" ]; then
     wget http://cta.irap.omp.eu/ctools/releases/ctools/$CTOOLS.tar.gz
-    tar xvfz $CTOOLS.tar.gz
+    if [ "$?" -ne "0" ]; then
+        if [ ! -d "ctools" ]; then
+            echo "*** Unable to download $CTOOLS.tar.gz, try cloning from GitLab"
+            export GIT_SSL_NO_VERIFY=true
+            git clone https://cta-gitlab.irap.omp.eu/ctools/ctools.git
+            if [ "$?" -ne "0" ]; then
+                echo "*** Unable to clone ctools from GitLab"
+                exit 1
+            fi
+        else
+            echo "*** Unable to download $CTOOLS.tar.gz, use code in ctools directory"
+        fi
+        cd ctools
+        CTOOLS_DIR=ctools
+    else
+        tar xvfz $CTOOLS.tar.gz
+        cd $CTOOLS
+    fi
 fi
-cd $CTOOLS
+# If we got code from GitLab, then use the same branch that was used for
+# GammaLib
+if [ -d ".git" ]; then
+    git fetch
+    git checkout $USE_BRANCH
+    if [ "$?" -ne "0" ]; then
+        echo "*** No $USE_BRANCH branch found on GitLab"
+        exit 1
+    fi
+    git pull
+    ./autogen.sh
+fi
+# Build code
 ./configure --prefix=$INSTALLDIR
 make
 make install
@@ -179,7 +263,7 @@ productbuild --distribution $DISTFILE \
              $PRODDIR/$CTOOLS.pkg
 
 # Add additional files to production folder
-cp $SRCDIR/$CTOOLS/COPYING $PRODDIR/License.txt
+cp $SRCDIR/$CTOOLS_DIR/COPYING $PRODDIR/License.txt
 
 # Add ReadMe
 /bin/cat <<EOM >$PRODDIR/ReadMe.txt
