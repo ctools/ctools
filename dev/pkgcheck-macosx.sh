@@ -17,6 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+# -------------------------------------------------------------------------
+#
+# This script checks the ctools Mac OS X package by installing it into the
+# /usr/local/gamma directory and running the Python tests.
+#
 # ==========================================================================
 
 # ============================================= #
@@ -53,27 +58,17 @@ if [ -d "$INSTALLDIR" ]; then
 fi
 
 
-# ====================== #
-# Clean package creation #
-# ====================== #
-#umount $WRKDIR
-#rm -rf $WRKDIR
+# ======================= #
+# Clean working directory #
+# ======================= #
+rm -rf $WRKDIR
 
 
-# ============================= #
-# Create package directory tree #
-# ============================= #
-#mkdir -p $WRKDIR
-
-
-# ================================= #
-# Create Mac OS X RAM disk (488 MB) #
-# ================================= #
-#DEVICE=$(hdiutil attach ram://1000000 -nomount)
-#diskutil erasevolume HFS+ 'ctools-test' $DEVICE
-#umount -f /Volumes/ctools-test
-#sudo diskutil enableOwnership $DEVICE
-#mount -t hfs $DEVICE $WRKDIR
+# ====================================== #
+# Create and step into working directory #
+# ====================================== #
+mkdir -p $WRKDIR
+cd $WRKDIR
 
 
 # =============== #
@@ -96,27 +91,20 @@ source $CTOOLS/bin/ctools-init.sh
 # ============ #
 # Test package #
 # ============ #
-python -c 'import gammalib; gammalib.test()'
-python -c 'import ctools; ctools.test()'
-python -c 'import cscripts; cscripts.test()'
+python -c 'import gammalib; gammalib.test()' | tee -a $LOGFILE
+python -c 'import ctools; ctools.test()' | tee -a $LOGFILE
+python -c 'import cscripts; cscripts.test()' | tee -a $LOGFILE
 
 
 # ======================= #
 # Clean package directory #
 # ======================= #
-#rm -rf $INSTALLDIR
+sudo rm -rf $INSTALLDIR
 
 
 # ============================== #
 # Recover installation directory #
 # ============================== #
-#if [ -d "$INSTALLDIR.backup" ]; then
-#    mv $INSTALLDIR.backup $INSTALLDIR
-#fi
-
-
-# =============== #
-# Detach RAM disk #
-# =============== #
-#hdiutil detach $WRKDIR
-
+if [ -d "$INSTALLDIR.backup" ]; then
+    mv $INSTALLDIR.backup $INSTALLDIR
+fi

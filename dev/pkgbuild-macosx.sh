@@ -374,7 +374,6 @@ you're facing.
 EOM
 
 
-
 # ==================== #
 # Create Mac OS X disk #
 # ==================== #
