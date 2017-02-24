@@ -65,14 +65,14 @@ LOGFILE=$PWD/pkg_build.log
 # Secure installation directory #
 # ============================= #
 if [ -d "$INSTALLDIR" ]; then
-    mv $INSTALLDIR $INSTALLDIR.backup
+    sudo mv $INSTALLDIR $INSTALLDIR.backup
 fi
 
 
 # ======================= #
 # Clean package directory #
 # ======================= #
-rm -rf $INSTALLDIR
+sudo rm -rf $INSTALLDIR
 rm -rf $PKGDIR
 rm -rf $PRODDIR
 rm -rf $DMGFILE
@@ -104,7 +104,7 @@ fi
 cd $NCURSES
 ./configure --prefix=$INSTALLDIR --with-shared | tee -a $LOGFILE
 make -j4 | tee -a $LOGFILE
-make install | tee -a $LOGFILE
+sudo make install | tee -a $LOGFILE
 make clean
 
 
@@ -125,7 +125,7 @@ fi
 cd $READLINE
 ./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
 make -j4 | tee -a $LOGFILE
-make install | tee -a $LOGFILE
+sudo make install | tee -a $LOGFILE
 make clean
 
 
@@ -146,7 +146,7 @@ fi
 cd cfitsio
 ./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
 make -j4 shared | tee -a $LOGFILE
-make install | tee -a $LOGFILE
+sudo make install | tee -a $LOGFILE
 make clean
 
 
@@ -201,7 +201,7 @@ fi
 # Build code
 ./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
 make -j4 | tee -a $LOGFILE
-make install | tee -a $LOGFILE
+sudo make install | tee -a $LOGFILE
 make clean
 
 
@@ -245,9 +245,9 @@ if [ -d ".git" ]; then
     ./autogen.sh
 fi
 # Build code
-./configure --prefix=$INSTALLDIR | tee $LOGFILE
-make -j4 | tee $LOGFILE
-make install | tee $LOGFILE
+./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
+make -j4 | tee -a $LOGFILE
+sudo make install | tee -a $LOGFILE
 make clean
 
 
@@ -258,14 +258,14 @@ make clean
 for file in ${INSTALLDIR}/lib/*.dylib
 do
     echo $file | tee -a $LOGFILE
-    install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib" $file
+    sudo install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib" $file
 done
 
 # Change links in binaries
 for file in ${INSTALLDIR}/bin/ct*
 do
     echo $file | tee -a $LOGFILE
-    install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib" $file
+    sudo install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib" $file
 done
 
 # Change links in Python modules
@@ -279,14 +279,14 @@ do
     for file in ${INSTALLDIR}/lib/$python/site-packages/gammalib/_*.so
     do
         echo $file | tee -a $LOGFILE
-        install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib"  $file
+        sudo install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib"  $file
     done
 
     # Change links in ctools modules
     for file in ${INSTALLDIR}/lib/$python/site-packages/ctools/_*.so
     do
         echo $file | tee -a $LOGFILE
-        install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib"  $file
+        sudo install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib"  $file
     done
 done
 
@@ -306,14 +306,14 @@ pkgbuild --identifier cta.irap.omp.eu.ctools.pkg \
 # ======================= #
 # Clean package directory #
 # ======================= #
-rm -rf $INSTALLDIR
+sudo rm -rf $INSTALLDIR
 
 
 # ============================== #
 # Recover installation directory #
 # ============================== #
 if [ -d "$INSTALLDIR.backup" ]; then
-    mv $INSTALLDIR.backup $INSTALLDIR
+    sudo mv $INSTALLDIR.backup $INSTALLDIR
 fi
 
 
@@ -397,6 +397,5 @@ hdiutil create -volname $CTOOLS \
 # ======================= #
 # Clean package directory #
 # ======================= #
-rm -rf $INSTALLDIR
 rm -rf $PKGDIR
 rm -rf $PRODDIR

@@ -54,7 +54,7 @@ LOGFILE=$PWD/pkg_check.log
 # Secure installation directory #
 # ============================= #
 if [ -d "$INSTALLDIR" ]; then
-    mv $INSTALLDIR $INSTALLDIR.backup
+    sudo mv $INSTALLDIR $INSTALLDIR.backup
 fi
 
 
@@ -106,5 +106,5 @@ sudo rm -rf $INSTALLDIR
 # Recover installation directory #
 # ============================== #
 if [ -d "$INSTALLDIR.backup" ]; then
-    mv $INSTALLDIR.backup $INSTALLDIR
+    sudo mv $INSTALLDIR.backup $INSTALLDIR
 fi
