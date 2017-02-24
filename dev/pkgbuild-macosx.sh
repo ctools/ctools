@@ -1,4 +1,4 @@
-#!/bin/bash -f
+#!/bin/bash
 # ==========================================================================
 # ctools Mac OS X package creation
 #
@@ -17,6 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+# -------------------------------------------------------------------------
+#
+# This script installs the ctools and GammaLib packages in the location
+# /usr/local/gamma and then builds a Mac OS X package which is finally put
+# onto a disk image. Any existing content in /usr/local/gamma will be
+# destroyed. The script needs the priviledges to create a folder in
+# /usr/local.
+#
 # ==========================================================================
 
 # ============================================= #
@@ -33,8 +41,8 @@ VERSION=$1
 # Set software component versions #
 # =============================== #
 CFITSIO=cfitsio3410
-NCURSES=ncurses-6.0
-READLINE=readline-7.0
+NCURSES=ncurses-5.9
+READLINE=readline-6.3
 GAMMALIB=gammalib-$VERSION
 CTOOLS=ctools-$VERSION
 
@@ -42,23 +50,33 @@ CTOOLS=ctools-$VERSION
 # ============== #
 # Set parameters #
 # ============== #
+INSTALLDIR=/usr/local/gamma
 WRKDIR=$PWD/pkg_build
-INSTALLDIR=$WRKDIR/install
 SRCDIR=$WRKDIR/src
 PKGDIR=$WRKDIR/pkg
 PRODDIR=$WRKDIR/prod
 PLISTFILE=$PKGDIR/$CTOOLS-components.plist
 DISTFILE=$PRODDIR/$CTOOLS.dist
 DMGFILE=$WRKDIR/$CTOOLS-macosx10.7.dmg
+LOGFILE=$PWD/pkg_build.log
 
 
-# ====================== #
-# Clean package creation #
-# ====================== #
+# ============================= #
+# Secure installation directory #
+# ============================= #
+if [ -d "$INSTALLDIR" ]; then
+    mv $INSTALLDIR $INSTALLDIR.backup
+fi
+
+
+# ======================= #
+# Clean package directory #
+# ======================= #
 rm -rf $INSTALLDIR
 rm -rf $PKGDIR
 rm -rf $PRODDIR
 rm -rf $DMGFILE
+rm -rf $LOGFILE
 
 
 # ============================= #
@@ -67,10 +85,6 @@ rm -rf $DMGFILE
 mkdir -p $SRCDIR
 mkdir -p $PKGDIR
 mkdir -p $PRODDIR
-
-
-# Make sure that wget is installed
-# TODO: If not installed, execute "brew install wget"
 
 
 # =============== #
@@ -87,9 +101,9 @@ if [ ! -d "$NCURSES" ]; then
     fi
 fi
 cd $NCURSES
-./configure --prefix=$INSTALLDIR --with-shared
-make
-make install
+./configure --prefix=$INSTALLDIR --with-shared | tee -a $LOGFILE
+make -j4 | tee -a $LOGFILE
+make install | tee -a $LOGFILE
 
 
 # ================ #
@@ -106,9 +120,9 @@ if [ ! -d "$READLINE" ]; then
     fi
 fi
 cd $READLINE
-./configure --prefix=$INSTALLDIR
-make
-make install
+./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
+make -j4 | tee -a $LOGFILE
+make install | tee -a $LOGFILE
 
 
 # =============== #
@@ -125,9 +139,9 @@ if [ ! -d "cfitsio" ]; then
     fi
 fi
 cd cfitsio
-./configure --prefix=$INSTALLDIR
-make shared
-make install
+./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
+make -j4 shared | tee -a $LOGFILE
+make install | tee -a $LOGFILE
 
 
 # ================ #
@@ -178,9 +192,9 @@ if [ -d ".git" ]; then
     ./autogen.sh
 fi
 # Build code
-./configure --prefix=$INSTALLDIR
-make
-make install
+./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
+make -j4 | tee -a $LOGFILE
+make install | tee -a $LOGFILE
 
 
 # ============== #
@@ -222,9 +236,49 @@ if [ -d ".git" ]; then
     ./autogen.sh
 fi
 # Build code
-./configure --prefix=$INSTALLDIR
-make
-make install
+./configure --prefix=$INSTALLDIR | tee $LOGFILE
+make -j4 | tee $LOGFILE
+make install | tee $LOGFILE
+
+
+# ================= #
+# Post-process code #
+# ================= #
+# Change links in libraries
+for file in ${INSTALLDIR}/lib/*.dylib
+do
+    echo $file | tee -a $LOGFILE
+    install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib" $file
+done
+
+# Change links in binaries
+for file in ${INSTALLDIR}/bin/ct*
+do
+    echo $file | tee -a $LOGFILE
+    install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib" $file
+done
+
+# Change links in Python modules
+pythons="python2.7"
+for python in $pythons
+do
+    # Print Python version
+    echo $python | tee -a $LOGFILE
+  
+    # Change links in gammalib modules
+    for file in ${INSTALLDIR}/lib/$python/site-packages/gammalib/_*.so
+    do
+        echo $file | tee -a $LOGFILE
+        install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib"  $file
+    done
+
+    # Change links in ctools modules
+    for file in ${INSTALLDIR}/lib/$python/site-packages/ctools/_*.so
+    do
+        echo $file | tee -a $LOGFILE
+        install_name_tool -change "@rpath/libcfitsio.5.dylib" "$INSTALLDIR/lib/libcfitsio.5.dylib"  $file
+    done
+done
 
 
 # ====================== #
@@ -237,6 +291,20 @@ pkgbuild --identifier cta.irap.omp.eu.ctools.pkg \
          --install-location /usr/local/gamma \
          --component-plist $PLISTFILE \
          $PKGDIR/$CTOOLS.pkg
+
+
+# ======================= #
+# Clean package directory #
+# ======================= #
+rm -rf $INSTALLDIR
+
+
+# ============================== #
+# Recover installation directory #
+# ============================== #
+if [ -d "$INSTALLDIR.backup" ]; then
+    mv $INSTALLDIR.backup $INSTALLDIR
+fi
 
 
 # ====================== #

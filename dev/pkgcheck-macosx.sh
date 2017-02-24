@@ -1,4 +1,4 @@
-#!/bin/bash -f
+#!/bin/bash
 # ==========================================================================
 # ctools Mac OS X package validation
 #
@@ -32,72 +32,65 @@ VERSION=$1
 # =============================== #
 # Set software component versions #
 # =============================== #
-#CFITSIO=cfitsio3410
-#NCURSES=ncurses-6.0
-#READLINE=readline-7.0
-#GAMMALIB=gammalib-$VERSION
 CTOOLS=ctools-$VERSION
 
 
 # ============== #
 # Set parameters #
 # ============== #
+INSTALLDIR=/usr/local/gamma
 WRKDIR=$PWD/pkg_check
 PKGDIR=$PWD/pkg_build
-
-
-#INSTALLDIR=$WRKDIR/install
-#SRCDIR=$WRKDIR/src
-#PKGDIR=$WRKDIR/pkg
-#PRODDIR=$WRKDIR/prod
-#PLISTFILE=$PKGDIR/$CTOOLS-components.plist
-#DISTFILE=$PRODDIR/$CTOOLS.dist
 DMGFILE=$PKGDIR/$CTOOLS-macosx10.7.dmg
+LOGFILE=$PWD/pkg_check.log
+
+
+# ============================= #
+# Secure installation directory #
+# ============================= #
+if [ -d "$INSTALLDIR" ]; then
+    mv $INSTALLDIR $INSTALLDIR.backup
+fi
 
 
 # ====================== #
 # Clean package creation #
 # ====================== #
-umount $WRKDIR
-rm -rf $WRKDIR
+#umount $WRKDIR
+#rm -rf $WRKDIR
 
 
 # ============================= #
 # Create package directory tree #
 # ============================= #
-mkdir -p $WRKDIR
+#mkdir -p $WRKDIR
 
 
 # ================================= #
 # Create Mac OS X RAM disk (488 MB) #
 # ================================= #
-DEVICE=$(hdiutil attach ram://1000000 -nomount)
-diskutil erasevolume HFS+ 'ctools-test' $DEVICE
-umount -f /Volumes/ctools-test
-#sudo diskutil enableOwnership $DEVICE       # You must be root for this command
-mount -t hfs $DEVICE $WRKDIR
+#DEVICE=$(hdiutil attach ram://1000000 -nomount)
+#diskutil erasevolume HFS+ 'ctools-test' $DEVICE
+#umount -f /Volumes/ctools-test
+#sudo diskutil enableOwnership $DEVICE
+#mount -t hfs $DEVICE $WRKDIR
 
 
 # =============== #
 # Install package #
 # =============== #
-echo $DMGFILE
 hdiutil attach $DMGFILE
-sudo installer -pkg /Volumes/$CTOOLS/$CTOOLS.pkg -target $WRKDIR # You must be root for this command
+sudo installer -pkg /Volumes/$CTOOLS/$CTOOLS.pkg -target /
 hdiutil detach /Volumes/$CTOOLS
 
 
 # ================= #
 # Configure package #
 # ================= #
-env
-export GAMMALIB=$WRKDIR/usr/local/gamma
+export GAMMALIB=$INSTALLDIR
 source $GAMMALIB/bin/gammalib-init.sh
-export CTOOLS=$WRKDIR/usr/local/gamma
+export CTOOLS=$INSTALLDIR
 source $CTOOLS/bin/ctools-init.sh
-echo
-echo
-env
 
 
 # ============ #
@@ -105,6 +98,21 @@ env
 # ============ #
 python -c 'import gammalib; gammalib.test()'
 python -c 'import ctools; ctools.test()'
+python -c 'import cscripts; cscripts.test()'
+
+
+# ======================= #
+# Clean package directory #
+# ======================= #
+#rm -rf $INSTALLDIR
+
+
+# ============================== #
+# Recover installation directory #
+# ============================== #
+#if [ -d "$INSTALLDIR.backup" ]; then
+#    mv $INSTALLDIR.backup $INSTALLDIR
+#fi
 
 
 # =============== #
