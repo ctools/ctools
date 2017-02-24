@@ -26,15 +26,6 @@ fi
 #
 # Set parameters
 # ==============
-#prefix="@prefix@"
-#exec_prefix="@exec_prefix@"
-#ctools_bin="@bindir@"
-#ctools_lib="@libdir@"
-#python_dir="@pythondir@"
-#python_exec_dir="@pyexecdir@"
-#pkgconfig_dir="@libdir@/pkgconfig"
-#man_dir="@datadir@/doc/ctools/man"
-#caldb_dir="@datadir@/caldb"
 prefix="$CTOOLS"
 ctools_bin="$CTOOLS/bin"
 ctools_lib="$CTOOLS/lib"
