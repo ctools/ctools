@@ -98,12 +98,14 @@ if [ ! -d "$NCURSES" ]; then
         exit 1
     else
         tar xvfz $NCURSES.tar.gz
+        rm -rf $NCURSES.tar.gz
     fi
 fi
 cd $NCURSES
 ./configure --prefix=$INSTALLDIR --with-shared | tee -a $LOGFILE
 make -j4 | tee -a $LOGFILE
 make install | tee -a $LOGFILE
+make clean
 
 
 # ================ #
@@ -117,12 +119,14 @@ if [ ! -d "$READLINE" ]; then
         exit 1
     else
         tar xvfz $READLINE.tar.gz
+        rm -rf $READLINE.tar.gz
     fi
 fi
 cd $READLINE
 ./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
 make -j4 | tee -a $LOGFILE
 make install | tee -a $LOGFILE
+make clean
 
 
 # =============== #
@@ -136,12 +140,14 @@ if [ ! -d "cfitsio" ]; then
         exit 1
     else
         tar xvfz $CFITSIO.tar.gz
+        rm -rf $CFITSIO.tar.gz
     fi
 fi
 cd cfitsio
 ./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
 make -j4 shared | tee -a $LOGFILE
 make install | tee -a $LOGFILE
+make clean
 
 
 # ================ #
@@ -165,6 +171,7 @@ if [ ! -d "$GAMMALIB" ]; then
         cd gammalib
     else
         tar xvfz $GAMMALIB.tar.gz
+        rm -rf $GAMMALIB.tar.gz
         cd $GAMMALIB
     fi
 fi
@@ -195,6 +202,7 @@ fi
 ./configure --prefix=$INSTALLDIR | tee -a $LOGFILE
 make -j4 | tee -a $LOGFILE
 make install | tee -a $LOGFILE
+make clean
 
 
 # ============== #
@@ -220,6 +228,7 @@ if [ ! -d "$CTOOLS" ]; then
         CTOOLS_DIR=ctools
     else
         tar xvfz $CTOOLS.tar.gz
+        rm -rf $CTOOLS.tar.gz
         cd $CTOOLS
     fi
 fi
@@ -239,6 +248,7 @@ fi
 ./configure --prefix=$INSTALLDIR | tee $LOGFILE
 make -j4 | tee $LOGFILE
 make install | tee $LOGFILE
+make clean
 
 
 # ================= #
@@ -382,3 +392,11 @@ hdiutil create -volname $CTOOLS \
                -srcfolder $PRODDIR/License.txt \
                -srcfolder $PRODDIR/ReadMe.txt \
                $DMGFILE
+
+
+# ======================= #
+# Clean package directory #
+# ======================= #
+rm -rf $INSTALLDIR
+rm -rf $PKGDIR
+rm -rf $PRODDIR
