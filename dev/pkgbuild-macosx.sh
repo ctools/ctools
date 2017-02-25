@@ -155,7 +155,11 @@ make clean
 # ================ #
 cd $SRCDIR
 if [ ! -d "$GAMMALIB" ]; then
-    wget http://cta.irap.omp.eu/ctools/releases/gammalib/$GAMMALIB.tar.gz
+    if [[ $GAMMALIB == *"dev"* ]]; then
+        command_that_does_not_exist_to_provoke_error
+    else
+        wget http://cta.irap.omp.eu/ctools/releases/gammalib/$GAMMALIB.tar.gz
+    fi
     if [ "$?" -ne "0" ]; then
         if [ ! -d "gammalib" ]; then
             echo "*** Unable to download $GAMMALIB.tar.gz, try cloning from GitLab"
@@ -211,7 +215,11 @@ make clean
 cd $SRCDIR
 CTOOLS_DIR=$CTOOLS
 if [ ! -d "$CTOOLS" ]; then
-    wget http://cta.irap.omp.eu/ctools/releases/ctools/$CTOOLS.tar.gz
+    if [[ $CTOOLS == *"dev"* ]]; then
+        command_that_does_not_exist_to_provoke_error
+    else
+        wget http://cta.irap.omp.eu/ctools/releases/ctools/$CTOOLS.tar.gz
+    fi
     if [ "$?" -ne "0" ]; then
         if [ ! -d "ctools" ]; then
             echo "*** Unable to download $CTOOLS.tar.gz, try cloning from GitLab"
