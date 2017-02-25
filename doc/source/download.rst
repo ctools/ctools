@@ -84,6 +84,18 @@ gammalib.
      -
 
 
+Development release
+-------------------
+
+The current ctools development release is ``ctools-1.2.0.dev1``.
+This release reflects the status of the current ``devel`` branch of
+the ctools git repository.
+
+* `Mac OS X binary package <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0.dev1-macosx10.7.dmg>`_ (Mac OS X 10.7+)
+* `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.2.0.dev1.tar.gz>`_ source code tarball
+* `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0.dev1.tar.gz>`_ source code tarball
+
+
 Git repository
 --------------
 
