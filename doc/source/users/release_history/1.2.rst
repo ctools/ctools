@@ -1,0 +1,78 @@
+.. _1.2:
+
+ctools 1.2 release (3 March 2017)
+=================================
+
+Overview
+--------
+
+ctools 1.2 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* Support for the first CTA Data Challenge
+* New scripts for source detection (``cssrcdetect``),
+  observation seclection (``csobsselect``),
+  and model selection (``csmodelselect``)
+
+Bug fixes
+---------
+
+* [`1924 <https://cta-redmine.irap.omp.eu/issues/1924>`_] -
+  Replace ``has_key()`` by ``in`` for Python 3.x compatibility
+* [`1922 <https://cta-redmine.irap.omp.eu/issues/1922>`_] -
+  ``cslightcrv`` no longer accepts counts cubes on input
+* [`1920 <https://cta-redmine.irap.omp.eu/issues/1920>`_] -
+  Set ``ctbin`` reference time to CTA reference time
+* [`1873 <https://cta-redmine.irap.omp.eu/issues/1873>`_] -
+  Fix energy boundary handline in ``cssens``
+* [`1850 <https://cta-redmine.irap.omp.eu/issues/1850>`_] -
+  Fix ``ctbin`` segfault bug for varying energy thresholds
+* [`1835 <https://cta-redmine.irap.omp.eu/issues/1835>`_] -
+  Fix ``ctbin::save()`` bug for empty observation container
+* [`1835 <https://cta-redmine.irap.omp.eu/issues/1835>`_] -
+  Fix exception when calling ctools ``clear()`` methods
+* [`1827 <https://cta-redmine.irap.omp.eu/issues/1827>`_] -
+  Fix lacking coverage measure for cscripts execution
+
+Improvements
+------------
+
+* Change ``ds9file`` parameter to ``outds9file``
+* [`1882 <https://cta-redmine.irap.omp.eu/issues/1882>`_] -
+  Add background subtraction to ``ctskymap`` tool
+* [`1878 <https://cta-redmine.irap.omp.eu/issues/1878>`_] -
+  Add startindex parameter to ``ctobssim``
+* [`1871 <https://cta-redmine.irap.omp.eu/issues/1871>`_] -
+  Add ``publish`` parameter and methods to ``ctobssim``, ``ctselect``, ``cslightcrv`` and ``csspec``
+* [`1863 <https://cta-redmine.irap.omp.eu/issues/1863>`_] -
+  Add ``outcovmat`` parameter to ``ctlike``
+* [`1853 <https://cta-redmine.irap.omp.eu/issues/1853>`_] -
+  Add zenith and azimuth angle information to IRF caldb
+* [`1846 <https://cta-redmine.irap.omp.eu/issues/1846>`_] -
+  Introduce ``ctobservation`` and ``ctlikelihood`` base classes
+* [`1844 <https://cta-redmine.irap.omp.eu/issues/1844>`_] -
+  Make ``csresmap`` ``enumbins`` parameter hidden
+* [`1838 <https://cta-redmine.irap.omp.eu/issues/1838>`_] -
+  Add ``ctool::pars()`` and ``cscript::pars()`` methods
+* [`1832 <https://cta-redmine.irap.omp.eu/issues/1832>`_] -
+  Add support for new spectral models in ``ctulimit``
+* [`1830 <https://cta-redmine.irap.omp.eu/issues/1830>`_] -
+  Add support modules to cscripts
+* [`1828 <https://cta-redmine.irap.omp.eu/issues/1828>`_] -
+  Rename ``ctskymap::map()`` to ``ctskymap::skymap()``
+* [`1819 <https://cta-redmine.irap.omp.eu/issues/1819>`_] -
+  Set ``addbounds`` parameters by default to ``no``
+* Remove ``ctselect::time_reference()`` method
+
+New features
+------------
+
+* [`1881 <https://cta-redmine.irap.omp.eu/issues/1881>`_] -
+  Add ``csobsselect`` script
+* [`1879 <https://cta-redmine.irap.omp.eu/issues/1879>`_] -
+  Add ``csmodelselect`` script
+* [`1853 <https://cta-redmine.irap.omp.eu/issues/1853>`_] -
+  Add ``csviscube`` script
+* [`1617 <https://cta-redmine.irap.omp.eu/issues/1617>`_] -
+  Add ``cssrcdetect`` script
