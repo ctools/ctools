@@ -41,6 +41,7 @@ class csobsdef(ctools.cscript):
     dec      - Declination of pointing (deg)
     lon      - Galactic longitude of pointing (deg)
     lat      - Galactic latitude of pointing (deg)
+    tmin     - Start of pointing (seconds)
     duration - Duration of pointing (seconds)
     emin     - Lower energy limit (TeV)
     emax     - Upper energy limit (TeV)
@@ -268,7 +269,9 @@ class csobsdef(ctools.cscript):
             obs.deadc(deadc)
 
             # Set Good Time Interval. If no information is provided then use
-            # the user parameter value "duration".
+            # the user parameter values "tmin" and "duration".
+            if 'tmin' in header:
+                self._tmin = float(self._pntdef[row, header.index('tmin')])
             if 'duration' in header:
                 duration = float(self._pntdef[row, header.index('duration')])
             else:

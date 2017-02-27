@@ -306,9 +306,11 @@ class csobsinfo(ctools.cscript):
         self._log_value(gammalib.TERSE, 'Maximum energy', max_value)
 
         # Log time range
+        tstart = '%.f (%s)' % (self._gti.tstart().mjd(), self._gti.tstart().utc())
+        tstop  = '%.f (%s)' % (self._gti.tstop().mjd(),  self._gti.tstop().utc())
         self._log_header3(gammalib.TERSE, 'Time range')
-        self._log_value(gammalib.TERSE, 'Start (MJD)', self._gti.tstart().mjd())
-        self._log_value(gammalib.TERSE, 'Stop (MJD)',  self._gti.tstop().mjd())
+        self._log_value(gammalib.TERSE, 'Start (MJD)', tstart)
+        self._log_value(gammalib.TERSE, 'Stop (MJD)',  tstop)
 
         # Log ontime and livetime in different units
         on_time   = '%.2f s = %.2f min = %.2f h' % \
