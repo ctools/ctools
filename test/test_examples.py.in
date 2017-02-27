@@ -134,6 +134,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test ts_distribution.py')
         self.append(self.test_show_obs,
                     'Test show_obs.py')
+        self.append(self.test_show_pointings,
+                    'Test show_pointings.py')
 
         # Return
         return
@@ -456,6 +458,20 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_obs', args=args)
+
+        # Return
+        return
+
+    # Test show_pointings
+    def test_show_pointings(self):
+        """
+        Test show_pointings
+        """
+        # Set arguments
+        args = '-p example_show_pointings.eps %s/obs_unbinned.xml' % self._datadir
+
+        # Execute script
+        self._execute_python('show_pointings', args=args)
 
         # Return
         return

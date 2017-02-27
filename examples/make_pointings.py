@@ -72,8 +72,7 @@ def get_positions(xmin, xmax, ymin, ymax, step):
         # is invariant of latitude.
         xstep   = step / math.cos(gammalib.deg2rad * y)
         nx      = int((xmax-xmin)/xstep+1.5)
-        rescale = (xmax-xmin)/(xstep*(nx-1))
-        xstep  *= rescale
+        xstep   = (xmax-xmin)/float(nx-1)
 
         # Set x offset. For every second row the x position is displace by
         # half a step size.
@@ -427,9 +426,9 @@ def set_extgal(separation=3.0, caldb='prod2', lst=True):
 
     # Set patch
     obsdef.extend(set_patch(tmin, lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0,
-                            separation=separation, hours=1000,
+                            separation=separation, hours=500, run_duration=25,
                             site='Automatic', caldb=caldb, lst=lst,
-                            autodec=10.0))
+                            autodec=-10.0))
 
     # Return observation definition
     return obsdef
@@ -501,6 +500,9 @@ def set_lmc(hours=250.0, caldb='prod2', lst=True):
     # Initialise observation definition
     obsdef = []
 
+    # Initialise start time (1-1-2021)
+    tmin = 7671.0 * 86400.0
+
     # Set LMC centre
     centre = gammalib.GSkyDir()
     centre.radec_deg(80.0, -69.0)
@@ -523,7 +525,7 @@ def set_lmc(hours=250.0, caldb='prod2', lst=True):
         lat = pnt.b_deg()
 
         # Set positions and duration
-        obs = {'lon': lon, 'lat': lat, 'duration': duration}
+        obs = {'lon': lon, 'lat': lat, 'tmin': tmin, 'duration': duration}
 
         # Set IRF
         irf = set_irf('South', obs, caldb, lst=lst)
@@ -534,6 +536,9 @@ def set_lmc(hours=250.0, caldb='prod2', lst=True):
 
         # Append observation
         obsdef.append(obs)
+
+        # Update start time for next pointing
+        tmin = set_tmin_for_next_pointing(tmin, duration)
 
     # Dump statistics
     print('Number of pointings: %d (%.2f s)' % (n_pnt,duration))
