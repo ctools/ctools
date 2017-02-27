@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates pointing patterns for CTA observations
 #
-# Copyright (C) 2015-2016 Juergen Knoedlseder
+# Copyright (C) 2015-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,10 +96,49 @@ def get_positions(xmin, xmax, ymin, ymax, step):
     return positions
 
 
+# ============== #
+# Set start time #
+# ============== #
+def set_tmin_for_next_pointing(tmin, duration):
+    """
+    Set start time for next pointing
+
+    Adds duration and 2 min for slew, and takes care of day and night. It is
+    assumed that the night lasts from [0,10] and the day lasts from [10,24]
+
+    Parameters
+    ----------
+    tmin : float
+        Start time of current pointing (sec)
+    duration : float
+        Duration of current pointing (sec)
+
+    Returns
+    -------
+    tmin : float
+        Start time of new pointing
+    """
+    # Update start time, add 2 min for slew
+    tmin += duration + 120.0
+
+    # If we have more than 10 hours in day then go to next day
+    hours_in_day = tmin/3600.0 % 24.0
+    if hours_in_day > 10.0:
+        days  = int(tmin/86400.0)
+        days += 1
+        tmin  = float(days) * 86400.0
+
+    # Dump result
+    #print(tmin, hours_in_day)
+
+    # Return start time
+    return tmin
+
+
 # ====================== #
 # Setup patch on the sky #
 # ====================== #
-def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
+def set_patch(tmin, lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
               separation=3.0, hours=100.0, run_duration=30.0,
               site=None, caldb='prod2', lst=True, autodec=0.0):
     """
@@ -107,6 +146,8 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
 
     Parameters
     ----------
+    tmin : float
+        Observation start time (seconds)
     lmin : float, optional
         Minimum Galactic Longitude (deg)
     lmax : float, optional
@@ -163,8 +204,12 @@ def set_patch(lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
         # Loop over number of runs
         for run in range(n_runs):
 
-            # Set positions and duration
-            obs = {'lon': pnt['x'], 'lat': pnt['y'], 'duration': exposure}
+            # Set positions, start time and duration
+            obs = {'lon': pnt['x'], 'lat': pnt['y'], \
+                   'tmin': tmin, 'duration': exposure}
+
+            # Update start time for next pointing
+            tmin = set_tmin_for_next_pointing(tmin, exposure)
 
             # Optionally add-in site dependent IRF
             if site != None:
@@ -309,28 +354,43 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True):
     # Initialise observation definition
     obsdef = []
 
+    # Initialise start time (1-1-2021)
+    tmin = 7671.0 * 86400.0
+
     # Add inner region South
-    obsdef.extend(set_patch(lmin=-60.0, lmax=60.0, bmin=bmin, bmax=bmax,
+    obsdef.extend(set_patch(tmin, lmin=-60.0, lmax=60.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=780,
                             site='South', caldb=caldb, lst=lst))
 
+    # Update start time
+    tmin = set_tmin_for_next_pointing(obsdef[-1]['tmin'], obsdef[-1]['duration'])
+
     # Add Vela & Carina region
-    obsdef.extend(set_patch(lmin=240.0, lmax=300.0, bmin=bmin, bmax=bmax,
+    obsdef.extend(set_patch(tmin, lmin=240.0, lmax=300.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=180,
                             site='South', caldb=caldb, lst=lst))
 
+    # Update start time
+    tmin = set_tmin_for_next_pointing(obsdef[-1]['tmin'], obsdef[-1]['duration'])
+
     # Add 210-240 region
-    obsdef.extend(set_patch(lmin=210.0, lmax=240.0, bmin=bmin, bmax=bmax,
+    obsdef.extend(set_patch(tmin, lmin=210.0, lmax=240.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=60,
                             site='South', caldb=caldb, lst=lst))
 
+    # Initialise start time
+    tmin = 7671.0 * 86400.0
+
     # Add Cygnus, Perseus
-    obsdef.extend(set_patch(lmin=60.0, lmax=150.0, bmin=bmin, bmax=bmax,
+    obsdef.extend(set_patch(tmin, lmin=60.0, lmax=150.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=450,
                             site='North', caldb=caldb, lst=lst))
 
+    # Update start time
+    tmin = set_tmin_for_next_pointing(obsdef[-1]['tmin'], obsdef[-1]['duration'])
+
     # Add Anticentre
-    obsdef.extend(set_patch(lmin=150.0, lmax=210.0, bmin=bmin, bmax=bmax,
+    obsdef.extend(set_patch(tmin, lmin=150.0, lmax=210.0, bmin=bmin, bmax=bmax,
                             separation=separation, hours=150,
                             site='North', caldb=caldb, lst=lst))
 
@@ -362,8 +422,11 @@ def set_extgal(separation=3.0, caldb='prod2', lst=True):
     # Initialise observation definition
     obsdef = []
 
+    # Initialise start time (1-1-2021)
+    tmin = 7671.0 * 86400.0
+
     # Set patch
-    obsdef.extend(set_patch(lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0,
+    obsdef.extend(set_patch(tmin, lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0,
                             separation=separation, hours=1000,
                             site='Automatic', caldb=caldb, lst=lst,
                             autodec=10.0))
@@ -394,13 +457,19 @@ def set_gc(caldb='prod2', lst=True):
     # Initialise observation definition
     obsdef = []
 
+    # Initialise start time (1-1-2021)
+    tmin = 7671.0 * 86400.0
+
     # Central wobble
-    obsdef.extend(set_patch(lmin=-0.5, lmax=0.5, bmin=-0.5, bmax=0.5,
+    obsdef.extend(set_patch(tmin, lmin=-0.5, lmax=0.5, bmin=-0.5, bmax=0.5,
                             separation=0.1, hours=525,
                             site='South', caldb=caldb, lst=lst))
 
+    # Update start time
+    tmin = set_tmin_for_next_pointing(obsdef[-1]['tmin'], obsdef[-1]['duration'])
+
     # Extended region
-    obsdef.extend(set_patch(lmin=-10.0, lmax=10.0, bmin=-10.0, bmax=10.0,
+    obsdef.extend(set_patch(tmin, lmin=-10.0, lmax=10.0, bmin=-10.0, bmax=10.0,
                             separation=1.5, hours=300,
                             site='South', caldb=caldb, lst=lst))
 
@@ -491,7 +560,7 @@ def write_obsdef(filename, obsdef):
     file = open(filename, 'w')
 
     # Write header
-    file.write('ra,dec,duration,caldb,irf\n')
+    file.write('ra,dec,tmin,duration,caldb,irf\n')
 
     # Loop over pointings
     for obs in obsdef:
@@ -509,8 +578,9 @@ def write_obsdef(filename, obsdef):
             dec = obs['dec']
 
         # Write information
-        file.write('%8.4f,%8.4f,%.4f,%s,%s\n' %
-                   (ra, dec, obs['duration'], obs['caldb'], obs['irf']))
+        file.write('%8.4f,%8.4f,%.4f,%.4f,%s,%s\n' %
+                   (ra, dec, obs['tmin'], obs['duration'], obs['caldb'], \
+                    obs['irf']))
 
     # Close file
     file.close()
