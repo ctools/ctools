@@ -33,7 +33,7 @@ if WITH_PYTHON
 # shipped with the distribution of whether the wrappers have to be build
 # using swig
 if BUILD_WRAPPERS
-  wrapperdir = $(builddir)
+  wrapperdir = $(top_builddir)/pyext
 else
   wrapperdir = $(srcdir)
 endif
@@ -99,8 +99,8 @@ CLEAN_FILES = $(BUILT_SOURCES)
 swig: $(BUILT_SOURCES)
 
 # Rule for building Python wrappers using SWIG.
-ctools/tools.py: ctools/tools_wrap.cpp
-ctools/tools_wrap.cpp: ctools/tools.i
+$(wrapperdir)/ctools/tools.py: $(wrapperdir)/ctools/tools_wrap.cpp
+$(wrapperdir)/ctools/tools_wrap.cpp: ctools/tools.i
 	if $(SWIGCOMPILE) -MMD -MF "tools.Tpi" -o ctools/tools_wrap.cpp $<; \
 	then mv -f "tools.Tpi" "tools.Pi"; else rm -f "tools.Tpi"; exit 1; fi
 
@@ -168,11 +168,11 @@ CLEANFILES = $(CLEAN_FILES) $(DEPFILES)
 # Files to be removed in build directory
 clean-local:
 	rm -rf build
-	rm -rf $(builddir)/ctools/tools.py
-	rm -rf $(builddir)/ctools/c*.py
-	rm -rf $(builddir)/ctools/*.pyc
-	rm -rf $(builddir)/ctools/*_wrap.cpp
-	rm -rf $(builddir)/ctools/_tools.so
-	rm -rf $(builddir)/ctools/__pycache__
+	rm -rf $(top_builddir)/pyext/ctools/tools.py
+	rm -rf $(top_builddir)/pyext/ctools/c*.py
+	rm -rf $(top_builddir)/pyext/ctools/*.pyc
+	rm -rf $(top_builddir)/pyext/ctools/*_wrap.cpp
+	rm -rf $(top_builddir)/pyext/ctools/_tools.so
+	rm -rf $(top_builddir)/pyext/ctools/__pycache__
 
 endif # WITH_PYTHON

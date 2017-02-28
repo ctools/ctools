@@ -20,7 +20,7 @@
 #############################################################################
 
 # Scripts to be distributed in $(pyexecdir)/cscripts
-pythonscripts = $(builddir)/__init__.py \
+pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/cscaldb.py \
                 $(srcdir)/csinfo.py \
                 $(srcdir)/cslightcrv.py \
@@ -242,15 +242,15 @@ uninstall-hook:
 # Files to be removed in build directory
 clean-local:
 	@if test '@srcdir@' != '@builddir@'; then \
-		rm -rf $(builddir)/cs*.py; \
-		rm -rf $(builddir)/obsutils.py; \
-		rm -rf $(builddir)/modutils.py; \
-		rm -rf $(builddir)/calutils.py; \
-		rm -rf $(builddir)/ioutils.py; \
-		rm -rf $(builddir)/*.par; \
+		rm -rf $(top_builddir)/cscripts/cs*.py; \
+		rm -rf $(top_builddir)/cscripts/obsutils.py; \
+		rm -rf $(top_builddir)/cscripts/modutils.py; \
+		rm -rf $(top_builddir)/cscripts/calutils.py; \
+		rm -rf $(top_builddir)/cscripts/ioutils.py; \
+		rm -rf $(top_builddir)/cscripts/*.par; \
 	fi
-	rm -rf $(builddir)/*.pyc
-	rm -rf $(builddir)/__pycache__
+	rm -rf $(top_builddir)/cscripts/*.pyc
+	rm -rf $(top_builddir)/cscripts/__pycache__
 
 # Uninstall the cscripts Python module
 uninstall-local:

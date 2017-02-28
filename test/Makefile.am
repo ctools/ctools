@@ -49,19 +49,19 @@ all-local:
 
 # Files to be removed in build directory
 clean-local:
-	rm -rf $(builddir)/*.fits
-	rm -rf $(builddir)/*.log
-	rm -rf $(builddir)/*.xml
-	rm -rf $(builddir)/*.eps
-	rm -rf $(builddir)/*.dat
-	rm -rf $(builddir)/*.reg
-	rm -rf $(builddir)/reports/*.xml
-	rm -rf $(builddir)/caldb
-	rm -rf $(builddir)/pfiles
-	rm -rf $(builddir)/prod3
-	rm -rf $(builddir)/csroot2caldb_*
-	rm -rf $(builddir)/csiactcopy_*
-	rm -rf $(builddir)/.DS_Store
+	rm -rf $(top_builddir)/test/*.fits
+	rm -rf $(top_builddir)/test/*.log
+	rm -rf $(top_builddir)/test/*.xml
+	rm -rf $(top_builddir)/test/*.eps
+	rm -rf $(top_builddir)/test/*.dat
+	rm -rf $(top_builddir)/test/*.reg
+	rm -rf $(top_builddir)/test/reports/*.xml
+	rm -rf $(top_builddir)/test/caldb
+	rm -rf $(top_builddir)/test/pfiles
+	rm -rf $(top_builddir)/test/prod3
+	rm -rf $(top_builddir)/test/csroot2caldb_*
+	rm -rf $(top_builddir)/test/csiactcopy_*
+	rm -rf $(top_builddir)/test/.DS_Store
 
 # Tests to be done on installed version
 if WITH_PYTHON
