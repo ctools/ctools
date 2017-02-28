@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile for ctools examples                                              #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -41,7 +41,8 @@ scripts = README.md \
           show_spectrum.py \
           show_lightcurve.py \
           show_ts_distribution.py \
-          show_obs.py
+          show_obs.py \
+          show_pointings.py
 
 # Set install directories
 scriptsdir    = $(datadir)/examples/python
