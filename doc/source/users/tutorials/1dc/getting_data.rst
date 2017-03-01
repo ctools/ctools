@@ -9,7 +9,7 @@ are bundled with the
 :ref:`Instrument Response Functions <glossary_irf>`
 into a single tarball.
 Click on
-`1dc.tar.gz <http://owncloud.cta-observatory.org/remote.php/webdav/1DC/1dc.tar.gz>`_
+`1dc.tar.gz <https://owncloud.cta-observatory.org/remote.php/webdav/1DC/1dc.tar.gz>`_
 to download the tarball (file size: 485 MB).
 You can then uncompress and deploy the data at any place by typing
 
