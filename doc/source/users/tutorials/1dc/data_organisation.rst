@@ -176,6 +176,10 @@ An example of an ``EVENTS`` table is shown below.
 
    *Content of an event list*
 
+.. warning::
+   The time stamps in the ``TIME`` column are **not** necessarily in ascending
+   order.
+
 
 Observation Definition Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
