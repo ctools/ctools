@@ -6,7 +6,7 @@ Data organisation
 Layout
 ^^^^^^
 
-The content of the ``1dc`` folder should be as follows:
+The content of the ``1dc.pre`` folder should be as follows:
 
 .. code-block:: bash
 
@@ -18,41 +18,16 @@ The content of the ``1dc`` folder should be as follows:
    caldb/data/cta/prod3b/bcf
    ...
    data/
-   data/gc_baseline_000001.fits
-   data/gc_baseline_000002.fits
+   data/baseline/
+   data/baseline/gc
+   data/baseline/gc/gc_baseline_000001.fits
+   data/baseline/gc/gc_baseline_000002.fits
    ...
-   data/gc_threshold_000001.fits
-   data/gc_threshold_000002.fits
-   ...
-   data/
-   data/gps_baseline_000001.fits
-   data/gps_baseline_000002.fits
-   ...
-   data/gps_threshold_000001.fits
-   data/gps_threshold_000002.fits
-   ...
-   data/egal_baseline_000001.fits
-   data/egal_baseline_000002.fits
-   ...
-   data/egal_threshold_000001.fits
-   data/egal_threshold_000002.fits
-   ...
-   data/obs_gc_baseline.xml
-   data/obs_gc_threshold.xml
-   data/obs_gps_baseline.xml
-   data/obs_gps_threshold.xml
-   data/obs_egal_baseline.xml
-   data/obs_egal_threshold.xml
-   data/obs_all_baseline.xml
-   data/obs_all_threshold.xml
    models/
    models/models_gc.xml
-   models/models_gps.xml
-   models/models_egal.xml
-   models/map_RXJ1713.fits.gz
-   models/map_VelaJunior.fits.gz
-   models/map_ics.fits.gz
-   models/map_pi0.fits.gz
+   ...
+   obs/
+   obs/obs_gc_baseline.xml
 
 
 Instrument Response Functions
@@ -63,58 +38,24 @@ The ``caldb`` folder contains the
 that are necessary for the analysis of the simulated CTA data.
 The folder contains the ``prod3b`` response that should be used for the
 :ref:`first CTA Data Challenge <glossary_1dc>`.
-The following response functions are available:
+In the pre-release, only the response functions for CTA South are
+available for a zenith angle of 20 deg.
+Specifically, the following response functions are available:
 
  +-----------------------+-------+---------------+--------+----------+
  | Response name         | Site  | Configuration | Zenith | Duration |
  +=======================+=======+===============+========+==========+
  | ``South_z20_50h``     | South | Baseline      | 20 deg | 50 hours |
  +-----------------------+-------+---------------+--------+----------+
- | ``South_z40_50h``     | South | Baseline      | 40 deg | 50 hours |
- +-----------------------+-------+---------------+--------+----------+
  | ``South_z20_5h``      | South | Baseline      | 20 deg | 5 hours  |
- +-----------------------+-------+---------------+--------+----------+
- | ``South_z40_5h``      | South | Baseline      | 40 deg | 5 hours  |
  +-----------------------+-------+---------------+--------+----------+
  | ``South_z20_0.5h``    | South | Baseline      | 20 deg | 30 min   |
  +-----------------------+-------+---------------+--------+----------+
- | ``South_z40_0.5h``    | South | Baseline      | 40 deg | 30 min   |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_z20_50h``     | North | Baseline      | 20 deg | 50 hours |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_z40_50h``     | North | Baseline      | 40 deg | 50 hours |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_z20_5h``      | North | Baseline      | 20 deg | 5 hours  |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_z40_5h``      | North | Baseline      | 40 deg | 5 hours  |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_z20_0.5h``    | North | Baseline      | 20 deg | 30 min   |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_z40_0.5h``    | North | Baseline      | 40 deg | 30 min   |
- +-----------------------+-------+---------------+--------+----------+
  | ``South_TS_z20_50h``  | South | Threshold     | 20 deg | 50 hours |
- +-----------------------+-------+---------------+--------+----------+
- | ``South_TS_z40_50h``  | South | Threshold     | 40 deg | 50 hours |
  +-----------------------+-------+---------------+--------+----------+
  | ``South_TS_z20_5h``   | South | Threshold     | 20 deg | 5 hours  |
  +-----------------------+-------+---------------+--------+----------+
- | ``South_TS_z40_5h``   | South | Threshold     | 40 deg | 5 hours  |
- +-----------------------+-------+---------------+--------+----------+
  | ``South_TS_z20_0.5h`` | South | Threshold     | 20 deg | 30 min   |
- +-----------------------+-------+---------------+--------+----------+
- | ``South_TS_z40_0.5h`` | South | Threshold     | 40 deg | 30 min   |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_TS_z20_50h``  | North | Threshold     | 20 deg | 50 hours |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_TS_z40_50h``  | North | Threshold     | 40 deg | 50 hours |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_TS_z20_5h``   | North | Threshold     | 20 deg | 5 hours  |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_TS_z40_5h``   | North | Threshold     | 40 deg | 5 hours  |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_TS_z20_0.5h`` | North | Threshold     | 20 deg | 30 min   |
- +-----------------------+-------+---------------+--------+----------+
- | ``North_TS_z40_0.5h`` | North | Threshold     | 40 deg | 30 min   |
  +-----------------------+-------+---------------+--------+----------+
 
 .. warning::
@@ -163,12 +104,25 @@ the pointing direction in Right Ascension and Declination (see figure below).
    *Header of an event list*
 
 .. note::
-   The pointing direction during an observation is fixed.
+   The pointing direction during an observation is fixed. The simulation has
+   the following characteristics:
+
+   * Number of observations (and pointings): 1673
+   * Duration of each observation: 1800 sec
+   * Deadtime fraction: 5%
+   * Total exposure time of simulation: 836.5 hours
+   * Simulated event energies: 30 GeV - 120 TeV
+   * Maximum off-axis angle: 5 deg
+   * Start data of observations: 1/1/2021
 
 .. warning::
    Only the following header keywords in the ``EVENTS`` table have meaningful
    values:
 
+   * ``DSTYPx`` - Data sub-space type
+   * ``DSUNIx`` - Data sub-space unit
+   * ``DSVALx`` - Data sub-space value
+   * ``DSREFx`` - Data sub-space reference
    * ``DATE_OBS`` - start date of observation (UTC)
    * ``TIME_OBS`` - start time of observation (UTC)
    * ``DATE_END`` - end date of observation (UTC)
@@ -222,54 +176,15 @@ An example of an ``EVENTS`` table is shown below.
 
    *Content of an event list*
 
-Event files exist for
-
- +-----------------+---------------+--------------------+------------------+
- | Survey          | Configuration | Prefix             | Energy range     |
- +=================+===============+====================+==================+
- | Galactic Centre | Baseline      | ``gc_baseline``    |                  |
- +-----------------+---------------+--------------------+------------------+
- | Galactic Plane  | Baseline      | ``gps_baseline``   | 30 GeV - 120 TeV |
- +-----------------+---------------+--------------------+------------------+
- | Extragalactic   | Baseline      | ``egal_baseline``  |                  |
- +-----------------+---------------+--------------------+------------------+
- | Galactic Centre | Threshold     | ``gc_threshold``   |                  |
- +-----------------+---------------+--------------------+------------------+
- | Galactic Plane  | Threshold     | ``gps_threshold``  |                  |
- +-----------------+---------------+--------------------+------------------+
- | Extragalactic   | Threshold     | ``egal_threshold`` |                  |
- +-----------------+---------------+--------------------+------------------+
-
 
 Observation Definition Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The files ``obs_XXX_YYYYY.xml`` are so called
-:ref:`Observation Definition Files <glossary_obsdef>`
-that contain the information (or metadata) of a list of observations.
-The files are plain ASCII files in XML format that can be inspected and
+The file ``obs_gc_baseline.xml`` is a so called
+:ref:`Observation Definition File <glossary_obsdef>`
+that contains the information (or metadata) of a list of observations.
+The file is a plain ASCII files in XML format that can be inspected and
 manipulated by any text editor.
-The following files are included in the distribution:
-
- +----------------------------+--------------------------------------------------------+
- | File                       | Purpose                                                |
- +============================+========================================================+
- | ``obs_gc_baseline.xml``    | Galactic Centre Survey performed with baseline arrays  |
- +----------------------------+--------------------------------------------------------+
- | ``obs_gc_threshold.xml``   | Galactic Centre Survey performed with threshold arrays |
- +----------------------------+--------------------------------------------------------+
- | ``obs_gps_baseline.xml``   | Galactic Plane Survey performed with baseline arrays   |
- +----------------------------+--------------------------------------------------------+
- | ``obs_gps_threshold.xml``  | Galactic Plane Survey performed with threshold arrays  |
- +----------------------------+--------------------------------------------------------+
- | ``obs_egal_baseline.xml``  | Extragalactic Survey performed with baseline arrays    |
- +----------------------------+--------------------------------------------------------+
- | ``obs_egal_threshold.xml`` | Extragalactic Survey performed with threshold arrays   |
- +----------------------------+--------------------------------------------------------+
- | ``obs_all_baseline.xml``   | All surveys combined performed with baseline arrays    |
- +----------------------------+--------------------------------------------------------+
- | ``obs_all_threshold.xml``  | All surveys combined performed with threshold arrays   |
- +----------------------------+--------------------------------------------------------+
 
 
 Models
@@ -281,13 +196,11 @@ The file ``models_gc.xml`` is a so called
 :ref:`Model Definition File <glossary_moddef>`
 that collects the definition of all model components used for the Galactic
 Centre Survey simulation.
-The files ``models_gps.xml`` and ``models_egal.xml`` are the equivalent files
-for the Galactic Plane Survey and the Extragalactic Survey.
-The other files in the folder are FITS files containing sky maps that were
-used as spatial templates for modelling extended or diffuse emission components.
+The other files in the folder are ASCII and FITS files containing spectral,
+temporal and spatial information that was used in the simulations.
 
 .. warning::
-   The FITS template files should always reside in the same folder as the
+   The ASCII and FITS files should always reside in the same folder as the
    :ref:`model definition XML files <glossary_moddef>`
    since the latter reference the former.
 

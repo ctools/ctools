@@ -3,51 +3,57 @@
 Getting the data
 ================
 
-The data for the
+A pre-release of the data for the
 :ref:`first CTA Data Challenge <glossary_1dc>`
-are available on the
+is available on the
 `CTA ownCloud server <https://owncloud.cta-observatory.org>`_.
 You need your usual CTA credentials to download the data.
+The full
+:ref:`first CTA Data Challenge <glossary_1dc>`
+data release is planned for the second half of March 2017.
 
-The data have been split in number of tarballs that are summarised in
-the following table. You may click on the links in the second column
-to download the data.
+The pre-release contains simulated data for the Galactic Centre Survey,
+:ref:`Instrument Response Functions (IRFs) <glossary_irf>`, and the
+:ref:`model definition files <glossary_moddef>`
+that were used for the simulation.
+The data were split into the separate files that can be downloaded
+by clicking on the following links:
 
- +-------------------------------+-------------------------------------------------------------------------------+
- | Content                       | Download link                                                                 |
- +===============================+===============================================================================+
- | Instrument Response Functions | `<https://owncloud.cta-observatory.org/remote.php/webdav/1dc/caldb.tar.gz>`_  |
- +-------------------------------+-------------------------------------------------------------------------------+
- | Sky and background models     | `<https://owncloud.cta-observatory.org/remote.php/webdav/1dc/models.tar.gz>`_ |
- +-------------------------------+-------------------------------------------------------------------------------+
+* `Galactic Centre Survey <https://owncloud.cta-observatory.org/remote.php/webdav/1dc.pre/gc-pre.tar.gz>`_ (5.9 GB)
+* `Instrument Response Functions <https://owncloud.cta-observatory.org/remote.php/webdav/1dc.pre/caldb-pre.tar.gz>`_ (0.2 MB)
+* `Sky and background models <https://owncloud.cta-observatory.org/remote.php/webdav/1dc.pre/models-pre.tar.gz>`_ (0.9 GB)
 
-You may also download the files using the ``wget`` tool from the command
-line by typing (``<user>`` needs to be replaced by your CTA user name):
+You can also download the files using the ``wget`` tool from the command
+line by typing:
 
 .. code-block:: bash
 
-   $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/caldb.tar.gz --user=<user> --ask-password
-   $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/models.tar.gz --user=<user> --ask-password
+   $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc.pre/gc-pre.tar.gz --user=<user> --ask-password
+   $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc.pre/caldb-pre.tar.gz --user=<user> --ask-password
+   $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc.pre/models-pre.tar.gz --user=<user> --ask-password
 
 .. warning::
-   Don't type the ``$`` symbol. It indicates in the following that a command
-   should be typed on the command line of a console.
+   ``<user>`` needs to be replaced by your CTA user name.
+   Don't type the ``$`` symbol. It indicates that a command should be typed
+   on the command line of a console.
 
 After downloading, uncompress the files at any place by typing
 
 .. code-block:: bash
 
-   $ tar xfvz caldb.tar.gz
-   $ tar xfvz models.tar.gz
+   $ tar xfvz gc-pre.tar.gz
+   $ tar xfvz caldb-pre.tar.gz
+   $ tar xfvz models-pre.tar.gz
 
-After that you should have the folder ``1dc`` in your current working
-directory. Type there the following to set the ``CALDB`` and ``CTADATA``
-environment variables:
+You should now have a folder named ``1dc.pre`` in your current working
+directory.
+
+Before continuing, please set the following environment variables:
 
 .. code-block:: bash
 
-   $ export CALDB=$PWD/1dc/caldb
-   $ export CTADATA=$PWD/1dc/data
+   $ export CALDB=$PWD/1dc.pre/caldb
+   $ export CTADATA=$PWD/1dc.pre/data
 
 .. note::
    You may consider adding the ``CALDB`` and ``CTADATA`` environment variables
