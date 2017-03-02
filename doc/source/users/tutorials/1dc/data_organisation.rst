@@ -113,7 +113,7 @@ the pointing direction in Right Ascension and Declination (see figure below).
    * Total exposure time of simulation: 836.5 hours
    * Simulated event energies: 30 GeV - 120 TeV
    * Maximum off-axis angle: 5 deg
-   * Start data of observations: 1/1/2021
+   * Start date of observations: 1/1/2021
 
 .. warning::
    Only the following header keywords in the ``EVENTS`` table have meaningful
