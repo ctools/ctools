@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctobssim - Observation simulator tool                  *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2011-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2011-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -50,6 +50,8 @@
 const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
 
 /* __ Debug definitions __________________________________________________ */
+//#define G_SOURCE_DEBUG
+//#define G_BACKGROUND_DEBUG
 
 /* __ Coding definitions _________________________________________________ */
 
@@ -609,7 +611,7 @@ void ctobssim::get_parameters(void)
 
         // Get observation container
         m_obs = get_observations();
-        
+
     }
 
     // ... otherwise add response information and energy boundaries in case
@@ -1079,7 +1081,7 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
             *wrklog << std::endl;
 
         }
-            
+
     } // endfor: looped over models
 
     // Return
@@ -1130,9 +1132,19 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
                                    int&                   nphotons,
                                    int&                   nevents)
 {
+    // Debug code: signal that we step into the model MC method
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::simulate_time_slice: model->mc in" << std::endl;
+    #endif
+
     // Get photons
     GPhotons photons = model->mc(area, dir, rad, etrue_min, etrue_max,
                                  tstart, tstop, ran);
+
+    // Debug code: signal that we came back
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::simulate_time_slice: model->mc out" << std::endl;
+    #endif
 
     // Dump number of simulated photons
     if (logExplicit()) {
@@ -1150,9 +1162,19 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
         // Increment photon counter
         nphotons++;
 
+        // Debug code: signal that we step into the response MC method
+        #if defined(G_SOURCE_DEBUG)
+        std::cout << "ctobssim::simulate_time_slice: rsp->mc in" << std::endl;
+        #endif
+
         // Simulate event. Note that this method includes the deadtime
         // correction.
         GCTAEventAtom* event = rsp->mc(area, photons[i], *obs, ran);
+
+        // Debug code: signal that we came back
+        #if defined(G_SOURCE_DEBUG)
+        std::cout << "ctobssim::simulate_time_slice: rsp->mc out" << std::endl;
+        #endif
 
         // Use event only if it exists and if it falls within ROI, the
         // reconstructed energy interval and the time slice
@@ -1193,7 +1215,7 @@ GEbounds ctobssim::get_ebounds(const GEbounds& ebounds) const
 {
     // Set energy bins
     GEbounds ebins(m_eslices, ebounds.emin(), ebounds.emax());
- 
+
     // Return energy bins
     return (ebins);
 }
@@ -1322,7 +1344,7 @@ double ctobssim::get_model_flux(const GModelSky* model,
             spectral = nodes;
 
         } // endif: spatial model was a diffuse cube
-    
+
         // Compute flux within [emin, emax] in model from spectral
         // component (units: ph/cm2/s)
         double flux0 = spectral->flux(emin, emax);
@@ -1396,10 +1418,20 @@ void ctobssim::simulate_background(GCTAObservation* obs,
             if (model != NULL &&
                 model->is_valid(obs->instrument(), obs->id())) {
 
+                // Debug code: signal that we step into the response MC method
+                #if defined(G_BACKGROUND_DEBUG)
+                std::cout << "ctobssim::simulate_background: model->mc in" << std::endl;
+                #endif
+
                 // Get simulated CTA event list. Note that this method
                 // includes the deadtime correction.
                 GCTAEventList* list =
                      dynamic_cast<GCTAEventList*>(model->mc(*obs, ran));
+
+                // Debug code: signal that we came back
+                #if defined(G_BACKGROUND_DEBUG)
+                std::cout << "ctobssim::simulate_background: model->mc out" << std::endl;
+                #endif
 
                 // Continue only if we got a CTA event list
                 if (list != NULL) {
@@ -1410,7 +1442,7 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                     // Initialise statistics
                     int n_appended    = 0;
                     int n_outside_roi = 0;
-                    
+
                     // Append events
                     for (int k = 0; k < list->size(); k++) {
 
@@ -1589,10 +1621,10 @@ std::string ctobssim::outfile(const int& index)
 
     // ... otherwise use the outfile parameter
     else {
-    
+
         // Get output event list file name
         m_outevents = (*this)["outevents"].filename();
-    
+
         // Set output filename
         outfile = std::string(m_outevents);
     }
