@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -253,7 +253,7 @@ double ctlikelihood::evaluate(GModelPar& par, const double& value)
     double logL = 0.0;
 
     // Throw an exception if the parameter is below the minimum boundary
-    if (value < par.factor_min()) {
+    if (par.has_min() && value < par.factor_min()) {
         std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
                           par.name()+"\" is below its minimum boundary "+
                           gammalib::str(par.factor_min())+". To omit this "
@@ -262,7 +262,7 @@ double ctlikelihood::evaluate(GModelPar& par, const double& value)
     }
 
     // Throw an exception if the parameter is above the maximum boundary
-    if (value > par.factor_max()) {
+    if (par.has_max() && value > par.factor_max()) {
         std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
                           par.name()+"\" is above its maximum boundary "+
                           gammalib::str(par.factor_max())+". To omit this "

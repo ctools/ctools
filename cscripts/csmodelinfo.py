@@ -263,6 +263,7 @@ class csmodelinfo(ctools.cscript):
             # Get ds9 parameters
             pnt_type      = self['pnt_type'].string()
             pnt_mark_size = self['pnt_mark_size'].integer()
+            show_labels   = self['show_labels'].boolean()
             free_color    = self['free_color'].string()
             fixed_color   = self['fixed_color'].string()
             width         = self['width'].integer()
@@ -275,6 +276,7 @@ class csmodelinfo(ctools.cscript):
             errors = modutils.models2ds9file(self._models, ds9file.url(),
                                              pnt_type=pnt_type,
                                              pnt_mark_size=pnt_mark_size,
+                                             show_labels=show_labels,
                                              free_color=free_color,
                                              fixed_color=fixed_color,
                                              width=width,

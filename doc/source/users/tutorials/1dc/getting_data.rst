@@ -46,17 +46,25 @@ After downloading, uncompress the files at any place by typing
    $ tar xfvz models-pre.tar.gz
 
 You should now have a folder named ``1dc.pre`` in your current working
-directory.
+directory with the following structure:
+
+.. code-block:: bash
+
+   1dc.pre/
+   1dc.pre/caldb
+   1dc.pre/data
+   1dc.pre/models
+   1dc.pre/obs
 
 Before continuing, please set the following environment variables:
 
 .. code-block:: bash
 
-   $ export CALDB=$PWD/1dc.pre/caldb
-   $ export CTADATA=$PWD/1dc.pre/data
+   $ export CTADATA=$PWD/1dc.pre
+   $ export CALDB=$CTADATA/caldb
 
 .. note::
-   You may consider adding the ``CALDB`` and ``CTADATA`` environment variables
+   You may consider adding the ``CTADATA`` and ``CALDB`` environment variables
    to your ``.bashrc`` file (or equivalent) so that your analysis environment
    for the
    :ref:`first CTA Data Challenge <glossary_1dc>`

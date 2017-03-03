@@ -57,7 +57,11 @@ General parameters
     Pre-computes the null hypothesis globally and passes the value to the
     individual commands.  If the parameter is set to ``no``, the null
     hypothesis will be computed in each run of :ref:`cttsmap` individually.
-    
+
+``(run_in_bkg = yes) [boolean]``
+    Append a ``&`` after each command in output file to simply execute the
+    file by running all :ref:`cttsmap` jobs in the background.
+
 ``outfile [file]``
 	Output ASCII file name where the commands are written to.
 

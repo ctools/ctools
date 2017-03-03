@@ -12,10 +12,10 @@ development.
 
 If you know the phase information of the pulsar or gamma-ray binary,
 you may specify a ``temporal`` model component of type ``PhaseCurve`` in the
-:ref:`model definition XML file <glossary_moddef>`
+:ref:`model definition file <glossary_moddef>`
 for the source and fit the information using an unbinned analysis.
 An example of a
-:ref:`model definition XML file <glossary_moddef>`
+:ref:`model definition file <glossary_moddef>`
 including a ``PhaseCurve`` model component is shown below.
 For more information, please read the following
 :ref:`description of the temporal model components <sec_temporal_models>`.

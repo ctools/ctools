@@ -12,6 +12,7 @@ issues.
    howto_display
    howto_ts
    howto_tsmap
+   howto_extent
    howto_ulimit
    howto_lightcurve
    howto_phasecurve

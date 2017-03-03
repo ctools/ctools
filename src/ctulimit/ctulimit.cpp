@@ -1,7 +1,7 @@
 /***************************************************************************
  *                   ctulimit - Upper limit calculation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2015-2016 by Michael Mayer                               *
+ *  copyright (C) 2015-2017 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -275,11 +275,15 @@ void ctulimit::run(void)
         error = value;
     }
 
-    // Compute parameter bracketing. In case that the parameter error is
-    double parmin = std::max(m_model_par->factor_min(),
-                             value - m_sigma_min * error);
-    double parmax = std::min(m_model_par->factor_max(),
-                             value + m_sigma_max * error);
+    // Compute parameter bracketing
+    double parmin = value - m_sigma_min * error;
+    double parmax = value + m_sigma_max * error;
+    if (m_model_par->has_min() && m_model_par->factor_min() > parmin) {
+        parmin = m_model_par->factor_min();
+    }
+    if (m_model_par->has_max() && m_model_par->factor_max() < parmax) {
+        parmax = m_model_par->factor_max();
+    }
 
     // Write header into logger
     log_header1(TERSE, "Compute upper limit");

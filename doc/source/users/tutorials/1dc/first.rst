@@ -23,6 +23,7 @@ We also assume that you have read the section about
    :maxdepth: 2
 
    first_select_obs
+   first_select_events
    first_skymap
    first_detect
    first_fitting

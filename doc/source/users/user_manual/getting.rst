@@ -63,7 +63,7 @@ in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz gammalib-1.1.0.tar.gz
+  $ tar xvfz gammalib-1.2.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -73,7 +73,7 @@ typing
 
 .. code-block:: bash
 
-  $ cd gammalib-1.1.0
+  $ cd gammalib-1.2.0
   $ ./configure
   $ make
   $ make check
@@ -135,7 +135,7 @@ an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
 
-  $ tar xvfz ctools-1.1.0.tar.gz
+  $ tar xvfz ctools-1.2.0.tar.gz
 
 (the ``$`` symbol indicates the console prompt and is not part of the
 command that you should type in).
@@ -144,7 +144,7 @@ Step in the directory and build the ctools by typing
 
 .. code-block:: bash
 
-  $ cd ctools-1.1.0
+  $ cd ctools-1.2.0
   $ ./configure
   $ make
 
@@ -182,7 +182,7 @@ following output at the end of the unit testing:
    PASS: test_python_cscripts.sh
    PASS: test_examples.py
    ============================================================================
-   Testsuite summary for ctools 1.1.0
+   Testsuite summary for ctools 1.2.0
    ============================================================================
    # TOTAL: 3
    # PASS:  3
@@ -321,6 +321,7 @@ As a quick check that your setup is okay you can run ``csinfo check``:
      CTOOLS   environment variable ... ok
      gammalib Python import .......... ok
      ctools   Python import .......... ok
+     cscripts Python import .......... ok
 
      ===> Your Gammalib / ctools setup is OK.
 

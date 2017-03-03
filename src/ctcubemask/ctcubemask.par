@@ -5,7 +5,6 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctcubemask.par                                                #
-#  Version:   1.1.0                                                         #
 #                                                                           #
 #  Author:    Chia-Chun Lu                                                  #
 #             c.lu@mpi-hd.mpg.de                                            #
@@ -18,7 +17,7 @@
 # General parameters
 #===================
 inobs,   f, a, "cntcube.fits",,, "Input counts cube or observation definition XML file"
-outcube, f, a, "filtered_cube.fits",,, "Output counts cube or observation definition XML file"
+outcube, f, a, "cntcube_filtered.fits",,, "Output counts cube or observation definition XML file"
 prefix,  s, h, "filtered_",,, "Prefix for counts cube in observation definition XML file"
 
 #

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Create commands to split TS map computation
 #
-# Copyright (C) 2016 Michael Mayer
+# Copyright (C) 2016-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
+import os
 import sys
 import math
 import gammalib
@@ -234,7 +235,11 @@ class cstsmapsplit(ctools.cscript):
             sliced_command = '%s binmin=%s binmax=%s outmap=%s logfile=%s' % \
                              (base_command, str(binmin), str(binmax),
                               outmap, outmap.replace('.fits','.log'))
-            
+
+            # If running in background is requested then append a &
+            if self['run_in_bkg'].boolean():
+                sliced_command += ' &'
+
             # Append command to list of commands
             self._cmd.append(sliced_command)
         
@@ -267,8 +272,11 @@ class cstsmapsplit(ctools.cscript):
         """
         Save commands to ASCII file
         """
+        # Get filename
+        filename = self._outfile.url()
+
         # Open file
-        f = open(self._outfile.url(), 'w')
+        f = open(filename, 'w')
         
         # Write commands to file
         for cmd in self._cmd:
@@ -276,7 +284,12 @@ class cstsmapsplit(ctools.cscript):
             
         # Close file
         f.close()
-        
+
+        # Make file executable
+        mode  = os.stat(filename).st_mode
+        mode |= (mode & 0o444) >> 2    # copy R bits to X
+        os.chmod(filename, mode)
+
         # Return
         return
 

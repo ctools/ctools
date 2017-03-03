@@ -30,6 +30,7 @@ errors,        b, h, no,,, "Compute/store parameter errors?"
 outmap,        f, a, tsmap.fits,,, "Output Test Statistic map file"
 bins_per_job,  i, a, 5,,, "Number of TS map bins per task"
 compute_null,  b, a, yes,,,"Compute null hypothesis first?"
+run_in_bkg,    b, h, yes,,, "Run cttsmap jobs in background?"
 outfile,       f, a, commands.dat,,, "ASCII file containing all commands"
 
 #

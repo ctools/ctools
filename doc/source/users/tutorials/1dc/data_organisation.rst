@@ -113,7 +113,8 @@ the pointing direction in Right Ascension and Declination (see figure below).
    * Total exposure time of simulation: 836.5 hours
    * Simulated event energies: 30 GeV - 120 TeV
    * Maximum off-axis angle: 5 deg
-   * Start date of observations: 1/1/2021
+   * Start date of observations: 2021-01-01 11:58:51
+   * End date of observations: 2021-03-30 12:28:51
 
 .. warning::
    Only the following header keywords in the ``EVENTS`` table have meaningful
@@ -123,6 +124,7 @@ the pointing direction in Right Ascension and Declination (see figure below).
    * ``DSUNIx`` - Data sub-space unit
    * ``DSVALx`` - Data sub-space value
    * ``DSREFx`` - Data sub-space reference
+   * ``OBS_ID`` - Observation identifier
    * ``DATE_OBS`` - start date of observation (UTC)
    * ``TIME_OBS`` - start time of observation (UTC)
    * ``DATE_END`` - end date of observation (UTC)
