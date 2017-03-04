@@ -44,6 +44,7 @@ test-driver
 testconf.sh
 coverage-report-python.xml
 coverage-report-cxx.xml
+ctools-*
 
 doc/html
 doc/man
