@@ -11,7 +11,7 @@ The reference version for the pre-release of the data is ``ctools-1.2.0``.
 the source code for both packages or use a pre-compiled binary package for
 Mac OS X that includes all necessary code:
 
-* `Mac OS X binary package <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0.macosx10.7.dmg>`_ (Mac OS X 10.7+)
+* `Mac OS X binary package <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0-macosx10.7.dmg>`_ (Mac OS X 10.7+)
 * `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.2.0.tar.gz>`_ source code tarball
 * `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0.tar.gz>`_ source code tarball
 
