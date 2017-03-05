@@ -28,7 +28,7 @@
 #############################################################################
 # Initialisation                                                            #
 #############################################################################
-AC_INIT([ctools], [1.2.0], [jurgen.knodlseder@irap.omp.eu], [ctools])
+AC_INIT([ctools], [1.3.0.dev1], [jurgen.knodlseder@irap.omp.eu], [ctools])
 AC_CONFIG_SRCDIR([src/ctselect/ctselect.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AM_INIT_AUTOMAKE([gnu no-dependencies foreign])
