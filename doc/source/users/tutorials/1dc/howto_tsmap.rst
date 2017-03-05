@@ -77,7 +77,7 @@ The figure below shows the resulting Test Statistic map.
       Size of the Y axis in pixels [200] 10
       Test source name [Crab] Src001
       Output Test Statistic map file [tsmap.fits] tsmap_split.fits
-      Number of TS map bins per task [5]
+      Number of TS map bins per task [5] 10
       Compute null hypothesis first? [yes]
       ASCII file containing all commands [commands.dat] tsmap_commands.dat
 
