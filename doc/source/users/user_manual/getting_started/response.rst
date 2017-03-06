@@ -37,16 +37,16 @@ CTA response functions
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The instrument response functions for CTA are factorised into 
-the effective area :math:`A_{\rm eff}(d, p, E, t)` (units :math:`cm^2`),
-the point spread function :math:`PSF(p' | d, p, E, t)`,
-and the energy dispersion :math:`E_{\rm disp}(E' | d, p, E, t)`
+the effective area :math:`A_{\rm eff}(p, E, t)` (units :math:`cm^2`),
+the point spread function :math:`PSF(p' | p, E, t)`,
+and the energy dispersion :math:`E_{\rm disp}(E' | p, E, t)`
 following:
 
 .. math::
-    R(p', E', t' | d, p, E, t) =
-    A_{\rm eff}(d, p, E, t) \times
-    PSF(p' | d, p, E, t) \times
-    E_{\rm disp}(E' | d, p, E, t)
+    R(p', E', t' | p, E, t) =
+    A_{\rm eff}(p, E, t) \times
+    PSF(p' | p, E, t) \times
+    E_{\rm disp}(E' | p, E, t)
 
 ctools are shipped with response functions for the northern and southern
 arrays, and variants are available that have been optimised for exposure
