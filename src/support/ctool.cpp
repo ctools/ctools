@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -30,6 +30,7 @@
 #endif
 #include <cstdlib>         // std::getenv() function
 #include <cstdio>          // std::fopen(), etc. functions
+#include <clocale>         // std::setlocale function
 #include "ctool.hpp"
 #include "GTools.hpp"
 
@@ -256,6 +257,9 @@ void ctool::init_members(void)
 
     // Set logger properties
     log.date(true);
+
+    // Set language to english to make sure that a dot is a dot
+    std::setlocale(LC_ALL, "en_US.UTF-8");
 
     // Return
     return;
