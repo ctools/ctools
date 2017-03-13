@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.2.0
+New Features and Important Changes in ctools 1.3.0.dev1
 
-9 February 2017
+13 March 2017
 
 
 Introduction
@@ -11,249 +11,108 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-The testing.py script has been modified so that cscripts that are executed
-from the command line are included in the coverage reports (#1827).
+None
 
 
 Python interface
 ----------------
-A pars() method has been added to the Python interface of all ctools and
-cscripts that allows assigning parameters from a dictionary or retrieving
-all parameters in a dictionary (#1838).
+None
 
 
 Support model
 -------------
-The ctobservation base class that derives from the ctool base class was
-introduced to provide a common base class for all ctools that hold an
-observation container. The class implements the following methods:
-- obs()                        Returns reference to observation container
-- first_unbinned_observation() First unbinned CTA observation in container
-- next_unbinned_observation()  Next unbinned CTA observation in container
-The following ctools derive from the class:
-- ctbin
-- ctbkgcube
-- ctcubemask
-- ctedispcube
-- ctexpcube
-- ctmodel
-- ctobssim
-- ctpsfcube
-- ctselect
-- ctskymap
-
-The ctlikelihood base class that derives from the ctobservation base class
-was introduced to provide a common base class for all ctools that perform
-maximum likelihood optimisations. The class holds an optimizer member. The
-class implements the following methods:
-- opt()      Returns pointer to optimizer
-- evaluate() Evaluates log-likelihood at a given parameter value
-The following ctools derive from the class:
-- ctbutterfly
-- cterror
-- ctlike
-- cttsmap
-- ctulimit
-
-The introduction of these base classes avoids code duplication.
+The ctool::init_members() method now sets the local language to English
+so that writing commas instead of dots is avoided (#1370).
 
 
 ctobssim - CTA observation simulation
 -------------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-A publish() method has been added that publishes the simulated event lists on
-a VO hub (#1871).
-
-The "startindex" parameter has been added to set the initial index for multiple
-event lists (#1878).
+None
 
 
 ctselect - CTA event selection
 ------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-The time_reference() method has been removed since the method is part of the
-ctool base class, and exposed in Python as _time_reference().
-
-A publish() method has been added that publishes the simulated event lists on
-a VO hub (#1871).
+None
 
 
 ctbin - CTA event binning
 -------------------------
-The ctbin segfaulted when running on an observation container with different
-energy thresholds. This problem is now fixed (#1850).
-
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-The save() method led to a segmentation violation in case it was applied on an
-empty ctbin instance, and specifically in case that the instance contains an
-empty observation container. This bug has been fixed (#1835).
-
-The reference time is now set to the CTA reference type (#1922).
+None
 
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-The class now derives from ctlikelihood (#1828).
-
-The hidden parameter "outcovmat" has been added that by default is set to "NONE".
-If instead a FITS filename is given, ctlike will write the coraviance matrix of
-the fit into a FITS file (#1863).
+None
 
 
 cttsmap - Generation of Test Statistic map
 ------------------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-The class now derives from ctlikelihood (#1828).
+None
 
 
 ctskymap - CTA sky mapping
 --------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-The ctskymap::map() method has been renamed to ctskymap::skymap() to avoid a
-name conflict with Python (#1828).
-
-The tool now also supports subtraction of background models that can be enabled
-using the "bkgsubtract" parameter. If this parameter is set to "IRF" the
-background templates shipped with the Instrument Response Function will be
-subtracted from the sky map (#1882).
+None
 
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctexpcube - CTA exposure cube generation
 ----------------------------------------
-Set hidden "addbounds" parameter by default to "no" (#1819).
-
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
-Set hidden "addbounds" parameter by default to "no" (#1819).
-
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctedispcube - CTA energy dispersion cube generation
 ---------------------------------------------------
-Set hidden "addbounds" parameter by default to "no" (#1819).
-
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
-Set hidden "addbounds" parameter by default to "no" (#1819).
-
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctcubemask - CTA cube filtering
 -------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
+None
 
 
 ctulimit - Compute upper limit
 ------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-The tool now also supports spectral models with the new naming conventions, and
-in particular the "PhotonFlux" and "EnergyFlux" names (#1832).
-
-The class now derives from ctlikelihood (#1828).
-
-The tool now makes sure that the intensity parameter of the source of interest
-is free in the model optimisation that preceeds the upper limit computation.
+None
 
 
 cterror - Likelihood profile error computation
 ----------------------------------------------
-The clear() method now calls GApplication::clear() to conserve the properties
-of the tool (#1835).
-
-The class now derives from ctlikelihood (#1828).
+None
 
 
 cscripts
 --------
-Add the support modules "modutils" and "ioutils" to the cscripts module and
-remove the obsolete functions fit(), cterror(), cntmap() and modmap() from the
-"obsutils" module (#1830).
-
-The csroot2caldb script now takes the zenith and azimuth angles as parameters
-and writes them into the calibration database (#1835).
-
-Add csviscube script that computes the visibility cube providing the number
-of hours that a given position on the sky is observable under a given zenith
-angle by an IACT array during a given time period. The tool implements so far
-a Sun constraint, but no Moon constraint (#1835).
-
-Add publish() method to cslightcrv and csspec that publishes the results on a
-VO hub (#1871).
-
-Fix energy boundary handling in cssens that has been corrupted during code
-refactoring (#1873).
-
-Add csmodelselect script that allows selecting models from a model definition
-XML file (#1879).
-
-Add csobsselect script that allows selecting observations from an observation
-definition XML file (#1881).
-
-Add cssrcdetect script to detect sources in a sky map (#1617).
-
-The "ds9file" parameters were changed to "outds9file" to be consistent with
-the naming conventions.
-
-Improve the upper limit computation in the cslightcrv script. Now all source
-parameters, except the source intensity, are set to the initial values given
-in the model definition file for upper limit computation.
-
-The cslightcrv script no longer accepts counts cubes on input as no light
-curves can be derived from counts cubes (#1920).
+None
 
 
 Examples
 --------
-Add show_lightcurve script to display a light curve.
-
-Replace has_key() by "in" in example scripts for Python 3.x compatibility
-(#1924).
+None
 
 
 caldb
