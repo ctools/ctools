@@ -286,9 +286,7 @@ class cstsmapsplit(ctools.cscript):
         f.close()
 
         # Make file executable
-        mode  = os.stat(filename).st_mode
-        mode |= (mode & 0o444) >> 2    # copy R bits to X
-        os.chmod(filename, mode)
+        os.system('chmod +x %s' % filename)
 
         # Return
         return

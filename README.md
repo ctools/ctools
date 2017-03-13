@@ -1,8 +1,8 @@
 ctools information
 ==================
-* Version:             1.2.0.dev1 (12 August 2016)
+* Version:             1.3.0.dev1 (12 August 2016)
 * Author:              Juergen Knoedlseder (jurgen.knodlseder@irap.omp.eu)
-* GammaLib dependency: 1.2.0.dev1
+* GammaLib dependency: 1.3.0.dev1
 
 [![Build Status](https://cta-jenkins.irap.omp.eu/buildStatus/icon?job=ctools-integrate-os)](https://cta-jenkins.irap.omp.eu/job/ctools-integrate-os/)
 
