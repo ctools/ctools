@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for observation handling
 #
-# Copyright (C) 2011-2016 Juergen Knoedlseder
+# Copyright (C) 2011-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 # ======================= #
 # Set one CTA observation #
 # ======================= #
-def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
+def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.98, \
             emin=0.1, emax=100.0, rad=5.0, \
             irf='South_50h', caldb='prod2', obsid='000000'):
     """
@@ -273,7 +273,7 @@ def set_obs(pntdir, tstart=0.0, duration=1800.0, deadc=0.95, \
 # ============================ #
 # Set list of CTA observations #
 # ============================ #
-def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.95, \
+def set_obs_list(obsdeflist, tstart=0.0, duration=1800.0, deadc=0.98, \
                  emin=0.1, emax=100.0, rad=5.0, \
                  irf='South_50h', caldb='prod2'):
     """
@@ -411,7 +411,7 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
 # Set observation container filled with CTA observations #
 # ====================================================== #
 def set_observations(ra, dec, rad, tstart, duration, emin, emax, irf, caldb,
-                     deadc=0.95, pattern='single', offset=1.5):
+                     deadc=0.98, pattern='single', offset=1.5):
     """
     Set an observation container filled with CTA observations
     

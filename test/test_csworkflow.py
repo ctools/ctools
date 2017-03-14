@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csworkflow script.
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -143,13 +143,13 @@ class Test(test):
         self.test_value(models['Crab'][2].value(),
                         5.71055e-16, 1.0e-5, 'Crab prefactor')
         self.test_value(models['Crab'][3].value(),
-                        -2.47559, 1.0e-5, 'Crab index')
+                        -2.463392, 1.0e-5, 'Crab index')
         self.test_value(models['Background'][0].value(),
-                        3.00491, 1.0e-5, 'Background model sigma')
+                        3.008828, 1.0e-5, 'Background model sigma')
         self.test_value(models['Background'][1].value(),
                         6.27131e-05, 1.0e-5, 'Background model prefactor')
         self.test_value(models['Background'][2].value(),
-                        -1.83164, 1.0e-5, 'Background model index')
+                        -1.833184, 1.0e-5, 'Background model index')
 
         # Return
         return

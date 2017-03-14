@@ -6,7 +6,7 @@
     <parameter name="GoodTimeIntervals" tmin="0" tmax="1800" />
     <parameter name="TimeReference" mjdrefi="51544" mjdreff="0.5" timeunit="s" timesys="TT" timeref="LOCAL" />
     <parameter name="RegionOfInterest" ra="83.6331" dec="21.0145" rad="1.5" />
-    <parameter name="Deadtime" deadc="0.95" />
+    <parameter name="Deadtime" deadc="0.98" />
     <parameter name="Calibration" database="prod2" response="South_0.5h" />
   </observation>
   <observation name="Crab" id="000002" instrument="CTA">
@@ -15,7 +15,7 @@
     <parameter name="GoodTimeIntervals" tmin="1800" tmax="3600" />
     <parameter name="TimeReference" mjdrefi="51544" mjdreff="0.5" timeunit="s" timesys="TT" timeref="LOCAL" />
     <parameter name="RegionOfInterest" ra="83.6331" dec="23.0145" rad="1.5" />
-    <parameter name="Deadtime" deadc="0.95" />
+    <parameter name="Deadtime" deadc="0.98" />
     <parameter name="Calibration" database="prod2" response="South_0.5h" />
   </observation>
 </observation_list>

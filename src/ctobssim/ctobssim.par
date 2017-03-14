@@ -36,7 +36,7 @@ tmin,    r, a, 0.0,,, "Start time (MET in s)"
 tmax,    r, a, 1800.0,,, "End time (MET in s)"
 emin,    r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,    r, a, 100.0,,, "Upper energy limit (TeV)"
-deadc,   r, h, 0.95,0,1, "Average deadtime correction factor"
+deadc,   r, h, 0.98,0,1, "Average deadtime correction factor"
 maxrate, r, h, 1.0e6,,, "Maximum photon rate"
 eslices, i, h, 10,1,100, "Number of energy slices"
 

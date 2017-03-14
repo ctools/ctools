@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cspull script.
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ class Test(test):
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
-                     ' enumbins=0 tmax=100.0 deadc=0.95 rad=5.0'+ \
+                     ' enumbins=0 tmax=100.0 deadc=0.98 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd1.log" chatter=1'
 
@@ -100,7 +100,7 @@ class Test(test):
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
-                     ' enumbins=0 tmax=100.0 deadc=0.95 rad=5.0'+ \
+                     ' enumbins=0 tmax=100.0 deadc=0.98 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
                      ' logfile="cspull_cmd2.log"'
 
@@ -129,7 +129,7 @@ class Test(test):
         pull['emax']     = 100.0
         pull['enumbins'] = 0
         pull['tmax']     = 100.0
-        pull['deadc']    = 0.95
+        pull['deadc']    = 0.98
         pull['rad']      = 5.0
         pull['logfile']  = 'cspull_py1.log'
         pull['chatter']  = 2
@@ -155,7 +155,7 @@ class Test(test):
         pull['emax']     = 100.0
         pull['enumbins'] = 10
         pull['tmax']     = 100.0
-        pull['deadc']    = 0.95
+        pull['deadc']    = 0.98
         pull['rad']      = 5.0
         pull['npix']     = 20
         pull['binsz']    = 0.2

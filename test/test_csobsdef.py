@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csobsdef script.
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ class Test(test):
                             'Check for "CTA" instrument')
             self.test_value(o.ontime(), 1800.0, 1.0e-6,
                             'Check for ontime')
-            self.test_value(o.deadc(), 0.95, 1.0e-6,
+            self.test_value(o.deadc(), 0.98, 1.0e-6,
                             'Check for deadtime correction')
             self.test_value(o.events().ebounds().emin().TeV(), 0.1, 1.0e-6,
                             'Check for minimum energy')

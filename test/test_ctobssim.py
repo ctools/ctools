@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctobssim tool
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2014-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_cmd1.fits')
-        self._test_list(evt, 6881)
+        self._test_list(evt, 7105)
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
@@ -161,14 +161,14 @@ class Test(test):
 
         # Check content of observation
         self._test_observation(sim)
-        self._test_list(sim.obs()[0].events(), 6881)
+        self._test_list(sim.obs()[0].events(), 7105)
 
         # Save events
         sim.save()
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_py1.fits')
-        self._test_list(evt, 6881)
+        self._test_list(evt, 7105)
 
         # Set-up observation container
         pnts = [{'ra': 83.63, 'dec': 21.01},
@@ -196,10 +196,10 @@ class Test(test):
 
         # Retrieve observation and check content
         self._test_observation(sim, nobs=4, pnts=pnts)
-        self._test_list(sim.obs()[0].events(), 6003)
-        self._test_list(sim.obs()[1].events(), 6084)
-        self._test_list(sim.obs()[2].events(), 5955)
-        self._test_list(sim.obs()[3].events(), 6030)
+        self._test_list(sim.obs()[0].events(), 6199)
+        self._test_list(sim.obs()[1].events(), 6305)
+        self._test_list(sim.obs()[2].events(), 6092)
+        self._test_list(sim.obs()[3].events(), 6192)
 
         # Save events
         sim.save()
@@ -208,20 +208,20 @@ class Test(test):
         obs = gammalib.GObservations('ctobssim_py2.xml')
 
         # Retrieve observation and check content
-        self._test_list(obs[0].events(), 6003)
-        self._test_list(obs[1].events(), 6084)
-        self._test_list(obs[2].events(), 5955)
-        self._test_list(obs[3].events(), 6030)
+        self._test_list(obs[0].events(), 6199)
+        self._test_list(obs[1].events(), 6305)
+        self._test_list(obs[2].events(), 6092)
+        self._test_list(obs[3].events(), 6192)
 
         # Copy ctobssim tool
         cpy_sim = sim.copy()
 
         # Retrieve observation and check content of copy
         self._test_observation(cpy_sim, nobs=4, pnts=pnts)
-        self._test_list(cpy_sim.obs()[0].events(), 6003)
-        self._test_list(cpy_sim.obs()[1].events(), 6084)
-        self._test_list(cpy_sim.obs()[2].events(), 5955)
-        self._test_list(cpy_sim.obs()[3].events(), 6030)
+        self._test_list(cpy_sim.obs()[0].events(), 6199)
+        self._test_list(cpy_sim.obs()[1].events(), 6305)
+        self._test_list(cpy_sim.obs()[2].events(), 6092)
+        self._test_list(cpy_sim.obs()[3].events(), 6192)
 
         # Execute copy of ctobssim tool again, now with a higher chatter
         # level than before
@@ -235,10 +235,10 @@ class Test(test):
         # Check result file
         obs = gammalib.GObservations('ctobssim_py3.xml')
         self.test_value(obs.size(), 4, 'Check for number of observations')
-        self._test_list(obs[0].events(), 6003)
-        self._test_list(obs[1].events(), 6084)
-        self._test_list(obs[2].events(), 5955)
-        self._test_list(obs[3].events(), 6030)
+        self._test_list(obs[0].events(), 6199)
+        self._test_list(obs[1].events(), 6305)
+        self._test_list(obs[2].events(), 6092)
+        self._test_list(obs[3].events(), 6192)
 
         # Return
         return
@@ -268,8 +268,8 @@ class Test(test):
                  'Observation is CTA observation')
             self.test_value(obs.ontime(), 1800.0, 1.0e-6,
                  'Ontime is 1800 sec')
-            self.test_value(obs.livetime(), 1710.0, 1.0e-6,
-                 'Livetime is 1710 sec')
+            self.test_value(obs.livetime(), 1764.0, 1.0e-6,
+                 'Livetime is 1764 sec')
             self.test_value(pnt.dir().ra_deg(), pnts[i]['ra'], 1.0e-6,
                  'Pointing Right Ascension is '+str(pnts[i]['ra'])+' deg')
             self.test_value(pnt.dir().dec_deg(), pnts[i]['dec'], 1.0e-6,

@@ -5,6 +5,7 @@
 
         Set local language to english (#1370)
         Enhance logfile output of csroot2caldb script
+        Set default deadc value to 0.98 (CTA has <2% deadtime)
 
 
 2017-02-09

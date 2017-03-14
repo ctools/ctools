@@ -11,7 +11,7 @@
 #
 # --------------------------------------------------------------------------
 #
-# Copyright (C) 2015-2016 Juergen Knoedlseder
+# Copyright (C) 2015-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import cscripts
 # ========================== #
 def generate_pull_distribution(model, obs='NONE', trials=100, \
                                caldb='prod2', irf='South_50h', \
-                               deadc=0.95, edisp=False, \
+                               deadc=0.98, edisp=False, \
                                ra=83.63, dec=22.01, rad=5.0, \
                                emin=0.1, emax=100.0, enumbins=0, \
                                duration=1800.0, \

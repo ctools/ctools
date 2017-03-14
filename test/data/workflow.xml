@@ -6,7 +6,7 @@
             <parameter name="caldb"   value="prod2" />
             <parameter name="irf"     value="South_0.5h" />
             <parameter name="edisp"   value="no" />
-            <parameter name="deadc"   value="0.95" />
+            <parameter name="deadc"   value="0.98" />
             <parameter name="ra"      value="83.63" />
             <parameter name="dec"     value="22.01" />
             <parameter name="target"  value="Crab" />

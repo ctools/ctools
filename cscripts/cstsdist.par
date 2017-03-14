@@ -26,7 +26,7 @@ bkgcube,   f, a, NONE,,, "Input background cube file (only needed for stacked an
 caldb,     s, a, prod2,,, "Calibration database"
 irf,       s, a, South_0.5h,,, "Instrument response function"
 edisp,     b, h, no,,, "Apply energy dispersion?"
-deadc,     r, h, 0.95,0,1, "Deadtime correction factor"
+deadc,     r, h, 0.98,0,1, "Deadtime correction factor"
 outfile,   f, a, ts.dat,,, "Output Test Statistic distribution file"
 
 #
