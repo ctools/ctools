@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generate IRFs in CALDB format from a ROOT offaxis performance file
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class csroot2caldb(ctools.cscript):
         """
         # Set name
         self._name    = 'csroot2caldb'
-        self._version = '1.2.0'
+        self._version = '1.3.0'
 
         # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
@@ -548,9 +548,7 @@ class csroot2caldb(ctools.cscript):
             Directory structure dictionary
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Generate effective area extension')
+        self._log_header1(gammalib.TERSE, 'Generate effective area extension')
 
         # Get relevant ROOT histograms
         etrue = tfile.Get('EffectiveAreaEtrue_offaxis')
@@ -609,11 +607,6 @@ class csroot2caldb(ctools.cscript):
         ds : dict
             Directory structure dictionary
         """
-        # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Generate point spread function extension')
-
         # King profile PSF
         if self['psftype'].string() == 'King':
             self._root2psf_king(tfile, irf, ds)
@@ -646,6 +639,10 @@ class csroot2caldb(ctools.cscript):
         ds : dict
             Directory structure dictionary
         """
+        # Write header
+        self._log_header1(gammalib.TERSE,
+                          'Generate Gaussian point spread function extension')
+
         # Get relevant ROOT histograms
         r68 = tfile.Get('AngRes_offaxis')
 
@@ -678,9 +675,6 @@ class csroot2caldb(ctools.cscript):
                 zero.SetBinContent(ieng+1,ioff+1,0.0)
 
         # Set boundaries
-        #bounds = self._make_2D(r68, ds['HDU_PSF'], None, 'deg')
-        #for b in bounds:
-        #    irf['PSF_BOUNDS'].append(b)
         irf['PSF_BOUNDS'].append('PSF(GAUSS)')
 
         # Write boundary keywords
@@ -725,6 +719,10 @@ class csroot2caldb(ctools.cscript):
         ds : dict
             Directory structure dictionary
         """
+        # Write header
+        self._log_header1(gammalib.TERSE,
+                          'Generate King point spread function extension')
+
         # Get relevant ROOT histograms
         r68 = tfile.Get('AngRes_offaxis')
         r80 = tfile.Get('AngRes80_offaxis')
@@ -802,9 +800,18 @@ class csroot2caldb(ctools.cscript):
                     # This takes care of pixels that are ill defined
                     # in the MC file.
                     if gamma == 0.0 and sigma == 0.0:
-                        gamma = last_gamma
-                        sigma = last_sigma
+                        gamma  = last_gamma
+                        sigma  = last_sigma
+                        status = ' (use last)'
+                    else:
+                        status = ''
 
+                    # Log results
+                    self._log_value(gammalib.EXPLICIT,
+                                    'ieng=%d ioff=%d%s' % (ieng,ioff,status),
+                                    'r68=%f r80=%f gamma=%f sigma=%f' %
+                                    (r_68, r_80, gamma, sigma))
+    
                     # Store surrent result as last result
                     last_gamma = gamma
                     last_sigma = sigma
@@ -814,9 +821,6 @@ class csroot2caldb(ctools.cscript):
                 sigma2D.SetBinContent(ieng+1,ioff+1,sigma)
 
         # Set boundaries
-        #bounds = self._make_2D(r68, ds['HDU_PSF'], None, 'deg')
-        #for b in bounds:
-        #    irf['PSF_BOUNDS'].append(b)
         irf['PSF_BOUNDS'].append('PSF(KING)')
 
         # Write boundary keywords
@@ -849,17 +853,10 @@ class csroot2caldb(ctools.cscript):
             Directory structure dictionary
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Generate energy dispersion extension')
+        self._log_header1(gammalib.TERSE, 'Generate energy dispersion extension')
 
         # Get relevant ROOT histograms
         matrix = tfile.Get('EestOverEtrue_offaxis')
-
-        # Set boundaries
-        #bounds = self._make_3D_migra(matrix, ds['HDU_EDISP'], None, '')
-        #for b in bounds:
-        #    irf['EDISP_BOUNDS'].append(b)
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_EDISP'], irf['EDISP_NAME'],
@@ -888,9 +885,7 @@ class csroot2caldb(ctools.cscript):
             Directory structure dictionary
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Generate 3D background extension')
+        self._log_header1(gammalib.TERSE, 'Generate 3D background extension')
 
         # Get relevant ROOT histograms
         array = tfile.Get('BGRatePerSqDeg_offaxis')
@@ -908,11 +903,6 @@ class csroot2caldb(ctools.cscript):
         if self['norm1d'].boolean():
             array_1D = tfile.Get('BGRatePerSqDeg')
             self._renorm_onaxis(array, array_1D)
-
-        # Set boundaries
-        #bounds = self._make_3D(array, ds['HDU_BGD'], None, 'deg')
-        #for b in bounds:
-        #    irf['BGD_BOUNDS'].append(b)
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_BGD'], irf['BGD_NAME'],
@@ -944,6 +934,9 @@ class csroot2caldb(ctools.cscript):
         # Continue only if columns does not yet exist
         if not hdu.contains(name):
 
+            # Write header
+            self._log_header3(gammalib.TERSE, 'Append axis column "%s"' % name)
+
             # Get number of axis bins
             nbins = axis.GetNbins()
 
@@ -967,6 +960,10 @@ class csroot2caldb(ctools.cscript):
                     value = pow(10.0, value)
                 hdu[name][0,i] = value
 
+            # Log values
+            self._log_value(gammalib.NORMAL, 'Number of axis bins', nbins)
+            self._log_value(gammalib.NORMAL, 'Unit', unit)
+
         # Return
         return
 
@@ -988,6 +985,9 @@ class csroot2caldb(ctools.cscript):
         # Continue only if columns does not yet exist
         if not hdu.contains(name):
 
+            # Write header
+            self._log_header3(gammalib.TERSE, 'Append value column "%s"' % name)
+
             # Get number of values
             nbins = len(values)
 
@@ -998,6 +998,10 @@ class csroot2caldb(ctools.cscript):
             # Fill column
             for i in range(nbins):
                 hdu[name][0,i] = values[i]
+
+            # Log values
+            self._log_value(gammalib.NORMAL, 'Number of values', nbins)
+            self._log_value(gammalib.NORMAL, 'Unit', unit)
 
         # Return
         return
@@ -1023,19 +1027,18 @@ class csroot2caldb(ctools.cscript):
         # Continue only if the 1D and 2D histograms have the same number
         # of energy bins
         if neng != hist1D.GetXaxis().GetNbins():
-            # Write header
-            if self._logTerse():
-                self._log(gammalib.parformat('On-axis normalisation'))
-                self._log('Impossible since energy binning of 1D histogram '
-                          '"%s" does not match that of 2D histogram "%s".\n' %
-                          (hist1D.GetName(), hist2D.GetName()))
+
+            # Log if energy binning differs
+            self._log_value(gammalib.TERSE, 'On-axis normalisation',
+                            'Impossible since energy binning of 1D histogram '
+                            '"%s" does not match that of 2D histogram "%s".' %
+                            (hist1D.GetName(), hist2D.GetName()))
         else:
-            # Write header
-            if self._logTerse():
-                self._log(gammalib.parformat('On-axis normalisation'))
-                self._log('On-axis values of 1D histogram "%s" imposed on '
-                          '2D histogram "%s".\n' %
-                          (hist1D.GetName(), hist2D.GetName()))
+            # Log on-axis normalisation
+            self._log_value(gammalib.TERSE, 'On-axis normalisation',
+                            'On-axis values of 1D histogram "%s" imposed on '
+                            '2D histogram "%s".' %
+                            (hist1D.GetName(), hist2D.GetName()))
 
             # Get a copy of 2D histogram
             hist2D_copy = hist2D.Clone()
@@ -1142,11 +1145,13 @@ class csroot2caldb(ctools.cscript):
                         if energy > ethres:
                             value = self._plaw_value(coeff, energy)
                             hist2D.SetBinContent(ieng+1,ioff+1,value)
-                            if self._logTerse():
-                                self._log(gammalib.parformat('Power law replacement'))
-                                self._log('%e cts/s/deg2 (E=%8.4f TeV (%d) '
-                                          'Off=%.2f deg (%d)\n' %
-                                          (value,engs[ieng],ieng,offset,ioff))
+
+                            # Log power law replacement
+                            self._log_value(gammalib.NORMAL,
+                                            'Power law replacement',
+                                            '%e cts/s/deg2 (E=%8.4f TeV (%d) '
+                                            'Off=%.2f deg (%d)' %
+                                            (value,engs[ieng],ieng,offset,ioff))
 
         # Return
         return
@@ -1292,11 +1297,14 @@ class csroot2caldb(ctools.cscript):
                 for ieng in range(i_start, i_stop+1):
                     if hist2D.GetBinContent(ieng+1,ioff+1) == 0.0:
                         hist2D.SetBinContent(ieng+1,ioff+1,value)
-                        if self._logTerse():
-                            self._log(gammalib.parformat('Background infill'))
-                            self._log('%e cts/s/deg2 (E=%8.4f TeV (%d) '
-                                      'Off=%.2f deg (%d)\n' %
-                                      (value,engs[ieng],ieng,offset,ioff))
+
+                        # Log background infill
+                        self._log_value(gammalib.NORMAL,
+                                        'Background infill',
+                                        '%e cts/s/deg2 (E=%8.4f TeV (%d) '
+                                        'Off=%.2f deg (%d)' %
+                                        (value,engs[ieng],ieng,offset,ioff))
+
                     else:
                         value = hist2D.GetBinContent(ieng+1,ioff+1)
 
@@ -1324,11 +1332,18 @@ class csroot2caldb(ctools.cscript):
         scale : float, optional
             Scaling factor for histogram values
         """
+        # Write header
+        self._log_header3(gammalib.TERSE, 'Make 2D data column "%s"' % name)
+
         # Extract energy and offset angle vectors
         energies = array.GetXaxis()
         offsets  = array.GetYaxis()
         neng     = energies.GetNbins()
         noffset  = offsets.GetNbins()
+
+        # Log parameters
+        self._log_value(gammalib.NORMAL, 'Number of energies', neng)
+        self._log_value(gammalib.NORMAL, 'Number of offsets', noffset)
 
         # Append axis columns to HDU
         self._append_column_axis(hdu, 'ENERG_LO', 'TeV', energies, log=True)
@@ -1379,6 +1394,9 @@ class csroot2caldb(ctools.cscript):
         unit : str
             Data unit
         """
+        # Write header
+        self._log_header3(gammalib.TERSE, 'Make 3D data column "%s"' % name)
+
         # Get User parameters
         scale      = self['bgdscale'].real()
         oversample = self['bgdoversample'].integer()
@@ -1397,6 +1415,13 @@ class csroot2caldb(ctools.cscript):
             ewidth.append(pow(10.0, energies.GetBinUpEdge(ieng+1) +6.0) -
                           pow(10.0, energies.GetBinLowEdge(ieng+1)+6.0))
 
+        # Log parameters
+        self._log_value(gammalib.NORMAL, 'Scale', scale)
+        self._log_value(gammalib.NORMAL, 'Oversample', oversample)
+        self._log_value(gammalib.NORMAL, 'Number of energies', neng)
+        self._log_value(gammalib.NORMAL, 'Number of offsets', noffset)
+        self._log_value(gammalib.NORMAL, 'Maximum offset', theta_max)
+
         # Build DETX and DETY axes
         ndet     = array.GetYaxis().GetNbins()
         ndets    = 2*ndet*oversample
@@ -1412,6 +1437,11 @@ class csroot2caldb(ctools.cscript):
             dets_lo.append(det_lo)
             dets_hi.append(det_hi)
             dets2.append(det_val*det_val)
+
+        # Log parameters
+        self._log_value(gammalib.NORMAL, 'Number of DETXY bins', ndets)
+        self._log_value(gammalib.NORMAL, 'Maximum DETXY', det_max)
+        self._log_value(gammalib.NORMAL, 'DETXY binsize', det_bin)
 
         # Append DETX_LO, DETX_HI, DETY_LO and DETY_HI columns
         self._append_column_values(hdu, 'DETX_LO', 'deg', dets_lo)
@@ -1471,6 +1501,10 @@ class csroot2caldb(ctools.cscript):
         scale : float, optional
             Scaling factor for histogram values
         """
+        # Write header
+        self._log_header3(gammalib.TERSE,
+                          'Make 3D migration matrix data column "%s"' % name)
+
         # Extract Etrue, Eobs/Etrue and offset angle vectors
         etrue   = array.GetXaxis()
         netrue  = etrue.GetNbins()
@@ -1482,6 +1516,11 @@ class csroot2caldb(ctools.cscript):
         for ieng in range(netrue):
             ewidth.append(pow(10.0, etrue.GetBinUpEdge(ieng+1) +6.0) - \
                           pow(10.0, etrue.GetBinLowEdge(ieng+1)+6.0))
+
+        # Log parameters
+        self._log_value(gammalib.NORMAL, 'Number of energies', netrue)
+        self._log_value(gammalib.NORMAL, 'Number of migrations', nmigra)
+        self._log_value(gammalib.NORMAL, 'Number of offsets', noffset)
 
         # Append axis columns to HDU
         self._append_column_axis(hdu, 'ETRUE_LO', 'TeV', etrue, log=True)
