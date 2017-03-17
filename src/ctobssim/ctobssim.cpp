@@ -1229,7 +1229,10 @@ GEbounds ctobssim::get_ebounds(const GEbounds& ebounds) const
  * @param[in] emax Maximum energy.
  * @return Simulation area (cm^2).
  *
- * Get the simulation area for an energy interval in units of cm^2.
+ * Get the simulation area for an energy interval in units of cm^2. This is
+ * done by extracting the maximum effective area value within the energy
+ * range [emin,emax] and by multiplying this value by 2 for security. The
+ * effective area is sampled at 10 energy values within the energy interval.
  ***************************************************************************/
 double ctobssim::get_area(GCTAObservation* obs,
                           const GEnergy&   emin,
@@ -1247,11 +1250,16 @@ double ctobssim::get_area(GCTAObservation* obs,
     }
 
     // Compute effective area at minimum and maximum energy
-    double area_emin = rsp->aeff()->max(emin.log10TeV(), 0.0, 0.0);
-    double area_emax = rsp->aeff()->max(emax.log10TeV(), 0.0, 0.0);
-
-    // Use maximum of both
-    double area = (area_emin > area_emax) ? area_emin : area_emax;
+    const int nbins   = 10;
+    double    logE    = emin.log10TeV();
+    double    logEbin = (emax.log10TeV() - logE)/double(nbins-1);
+    double    area    = 0.0;
+    for (int i = 0; i < nbins; ++i, logE += logEbin) {
+        double aeff = rsp->aeff()->max(logE, 0.0, 0.0);
+        if (aeff > area) {
+            area = aeff;
+        }
+    }
 
     // Multiply by security factor
     area *= 2.0;
