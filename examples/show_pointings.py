@@ -128,7 +128,7 @@ def plot_pointings(pnt, plotfile):
             color='b'
 
         # Set circle
-        circle = plt.Circle((l, p['b']), 4.0, color=color, fill=False)
+        circle = plt.Circle((l, p['b']), 3.0, color=color, fill=False)
 
         # Add circle
         ax.add_artist(circle)
