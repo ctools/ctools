@@ -805,7 +805,7 @@ void ctobssim::simulate_source(GCTAObservation* obs,
                 }
 
                 // Determine simulation area
-                double area = get_area(obs, ereco_min, ereco_max);
+                double area = get_area(obs, etrue_min, etrue_max);
 
                 // Log energy range and simulation area
                 if (logNormal()) {
@@ -1225,14 +1225,14 @@ GEbounds ctobssim::get_ebounds(const GEbounds& ebounds) const
  * @brief Get simulation area (cm^2)
  *
  * @param[in] obs Pointer on CTA observation.
- * @param[in] emin Minimum energy.
- * @param[in] emax Maximum energy.
+ * @param[in] emin Minimum true energy.
+ * @param[in] emax Maximum true energy.
  * @return Simulation area (cm^2).
  *
  * Get the simulation area for an energy interval in units of cm^2. This is
  * done by extracting the maximum effective area value within the energy
  * range [emin,emax] and by multiplying this value by 2 for security. The
- * effective area is sampled at 10 energy values within the energy interval.
+ * effective area is sampled at 100 energy values within the energy interval.
  ***************************************************************************/
 double ctobssim::get_area(GCTAObservation* obs,
                           const GEnergy&   emin,
