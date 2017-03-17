@@ -190,12 +190,6 @@ def plot_psf(sub, psf, emin=None, emax=None, tmin=None, tmax=None,
             value = psf.containment_radius(0.68, logenergy, theta*gammalib.deg2rad) * \
                     gammalib.rad2deg
 
-            # Limit containment radius values to [0.0,0.5]
-            if value < 0.0:
-                value = 0.0
-            if value > 0.5:
-                value = 0.5
-
             # Append value
             row.append(value)
 
@@ -203,7 +197,7 @@ def plot_psf(sub, psf, emin=None, emax=None, tmin=None, tmax=None,
         image.append(row)
 
     # Plot image
-    sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5)
+    sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5, vmin=0.0, vmax=0.5)
 
     # Show boundary contours
     contours = sub.contour(logenergies, thetas, image, [0.0], colors=('white'))
