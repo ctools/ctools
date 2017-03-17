@@ -241,7 +241,7 @@ uninstall-hook:
 
 # Files to be removed in build directory
 clean-local:
-	@if test '@top_srcdir@' != '@top_builddir@'; then \
+	@if ! [ '@top_srcdir@' -ef '@top_builddir@' ]; then \
 		rm -rf $(top_builddir)/cscripts/cs*.py; \
 		rm -rf $(top_builddir)/cscripts/obsutils.py; \
 		rm -rf $(top_builddir)/cscripts/modutils.py; \
