@@ -289,7 +289,7 @@ def set_irf(site, obs, caldb, lst=True):
             irf = 'South_50h'
 
     # Handle 'prod3' and 'prod3b'
-    elif caldb == 'prod3' or caldb == 'prod3b':
+    else:
 
         # Compute Right Ascension and Declination of pointing
         pnt = gammalib.GSkyDir()
@@ -316,10 +316,6 @@ def set_irf(site, obs, caldb, lst=True):
         else:
             irf += '_z40'
         irf += '_50h'
-
-    # ... otherwise return an empty string
-    else:
-        irf = ''
 
     # Return IRF
     return irf
@@ -460,7 +456,7 @@ def set_gc(caldb='prod2', lst=True):
     tmin = 7671.0 * 86400.0
 
     # Central wobble
-    obsdef.extend(set_patch(tmin, lmin=-0.5, lmax=0.5, bmin=-0.5, bmax=0.5,
+    obsdef.extend(set_patch(tmin, lmin=-1.0, lmax=1.0, bmin=-1.0, bmax=1.0,
                             separation=0.1, hours=525,
                             site='South', caldb=caldb, lst=lst))
 
@@ -468,8 +464,8 @@ def set_gc(caldb='prod2', lst=True):
     tmin = set_tmin_for_next_pointing(obsdef[-1]['tmin'], obsdef[-1]['duration'])
 
     # Extended region
-    obsdef.extend(set_patch(tmin, lmin=-10.0, lmax=10.0, bmin=-10.0, bmax=10.0,
-                            separation=1.5, hours=300,
+    obsdef.extend(set_patch(tmin, lmin=-3.0, lmax=3.0, bmin=3.0, bmax=10.0,
+                            separation=0.5, hours=300,
                             site='South', caldb=caldb, lst=lst))
 
     # Return observation definition
@@ -610,12 +606,16 @@ def make_pointings():
             need_help = True
         else:
             obsname = sys.argv[1]
+            if len(sys.argv) > 2:
+                caldb = sys.argv[2]
+            else:
+                caldb = 'prod3b'
     else:
         need_help = True
 
     # Print help if needed and exit
     if need_help:
-        print('Usage: make_pointing.py [OPTIONS]')
+        print('Usage: make_pointing.py [OPTIONS] [CALDB]')
         print('     -h       Display this usage message')
         print('     gps      Galactic plane survey (2 row scheme)')
         print('     gps3     Galactic plane survey (3 row scheme)')
@@ -624,9 +624,8 @@ def make_pointings():
         print('     lmc      LMC survey')
         sys.exit()
 
-    # Set calibration database
-    caldb = 'prod3b'
-    lst   = True
+    # Set LST simulation flag to true
+    lst = True
 
     # Galactic plane survey
     if obsname == 'gps':
