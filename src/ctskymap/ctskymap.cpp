@@ -489,9 +489,13 @@ void ctskymap::map_events(GCTAObservation* obs)
     emax.TeV(m_emax);
 
     // Initialise binning statistics
+    int num_outside_roi    = 0;
     int num_outside_map    = 0;
     int num_outside_erange = 0;
     int num_in_map         = 0;
+
+    // Extract region of interest from observation
+    GCTARoi roi = obs->roi();
 
     // Fill sky map
     for (int i = 0; i < events->size(); ++i) {
@@ -517,6 +521,12 @@ void ctskymap::map_events(GCTAObservation* obs)
             continue;
         }
 
+        // If RoI is valid then skip if  instrument direction is not within RoI
+        if (roi.is_valid() && !roi.contains(*inst)) {
+            continue;
+            num_outside_roi++;
+        }
+
         // Fill event in skymap
         m_skymap(pixel, 0) += 1.0;
         num_in_map++;
@@ -526,6 +536,7 @@ void ctskymap::map_events(GCTAObservation* obs)
     // Log binning results
     log_value(NORMAL, "Events in list", obs->events()->size());
     log_value(NORMAL, "Events in map", num_in_map);
+    log_value(NORMAL, "Events outside RoI", num_outside_roi);
     log_value(NORMAL, "Events outside map area", num_outside_map);
     log_value(NORMAL, "Events outside energies", num_outside_erange);
 
@@ -614,6 +625,9 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
         nebin = 10;
     }
 
+    // Extract region of interest from observation
+    GCTARoi roi = obs->roi();
+
     // Setup energy nodes for computation
     GEnergies energies(nebin, emin, emax); // More complicated nbins later
 
@@ -625,6 +639,12 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
 
         // Convert sky direction in instrument direction
         GCTAInstDir instdir = obs->pointing().instdir(skydir);
+
+        // If RoI is valid and instrument direction is not within RoI then
+        // skip pixel
+        if (roi.is_valid() && !roi.contains(instdir)) {
+            continue;
+        }
 
         // Compute background value for each energy node
         std::vector<double> values(energies.size(), 0.0);

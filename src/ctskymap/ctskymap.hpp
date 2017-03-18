@@ -1,7 +1,7 @@
 /***************************************************************************
  *                       ctskymap - Sky mapping tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,7 +33,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTSKYMAP_NAME    "ctskymap"
-#define CTSKYMAP_VERSION "1.2.0"
+#define CTSKYMAP_VERSION "1.3.0"
 
 
 /***********************************************************************//**
