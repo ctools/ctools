@@ -53,7 +53,8 @@ None
 ctskymap - CTA sky mapping
 --------------------------
 Any RoI is now taken into account in ctskymap so that if IRF background
-subtraction is requested the counts and background maps are coherent.
+subtraction is requested the counts and background maps are coherent
+(#1975).
 
 
 ctmodel - CTA counts cube modelling

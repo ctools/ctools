@@ -3,7 +3,7 @@
         * Version 1.3.0 released
         ========================
 
-        Take into account RoI in ctskymap
+        Take into account RoI in ctskymap (#1975)
         Set local language to english (#1370)
         Enhance logfile output of csroot2caldb script
         Set default deadc value to 0.98 (CTA has <2% deadtime)
