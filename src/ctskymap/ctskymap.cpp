@@ -30,7 +30,6 @@
 #endif
 #include <cstdio>
 #include "ctskymap.hpp"
-#include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
@@ -584,7 +583,8 @@ void ctskymap::map_background(GCTAObservation* obs)
  *            No background template available in instrument response function.
  *
  * Estimates the background in the sky map using the IRF template for a given
- * observation and adds this estimate to the background sky map.
+ * observation and adds this estimate to the background sky map. The IRF
+ * template is integrated numerically in energy.
  ***************************************************************************/
 void ctskymap::map_background_irf(GCTAObservation* obs)
 {
@@ -612,24 +612,16 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
         throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
     }
 
-    // Setup energy range covered by data
-    GEnergy  emin;
-    GEnergy  emax;
-    GEbounds ebds;
-    emin.TeV(m_emin);
-    emax.TeV(m_emax);
-
-    // Determine number of energy nodes, 20 per decade, at least 10 bins
-    int nebin = int((emax.log10TeV() - emin.log10TeV()) * 20.0);
-    if (nebin < 10) {
-        nebin = 10;
-    }
+    // Compute natural logarithm of energy range in MeV
+    double lnEmin = std::log(m_emin * 1.0e6);
+    double lnEmax = std::log(m_emax * 1.0e6);
 
     // Extract region of interest from observation
     GCTARoi roi = obs->roi();
 
-    // Setup energy nodes for computation
-    GEnergies energies(nebin, emin, emax); // More complicated nbins later
+    // Initialise statistics
+    int    calls = 0;
+    double total = 0.0;
 
     // Loop over all background map pixels
     for (int i = 0; i < m_bkgmap.npix(); ++i) {
@@ -646,28 +638,57 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
             continue;
         }
 
-        // Compute background value for each energy node
-        std::vector<double> values(energies.size(), 0.0);
-        for (int k = 0; k < energies.size(); ++k) {
-            values[k] = (*bkg)(energies[k].log10TeV(), instdir.detx(),
-                                                       instdir.dety());
-        }
+        // Setup integration function
+        ctskymap::irf_kern integrand(bkg, &instdir);
+        GIntegral          integral(&integrand);
 
-        // Integrate background values according to Trapezoid rule
-        double value = 0;
-        for (int k = 1; k < energies.size(); ++k) {
-            value += 0.5 * (values[k] + values[k-1]) *
-                           (energies[k].MeV() - energies[k-1].MeV());
-        }
+        // Set precision (has been carefully adjusted using a test simulation
+        // over the energy range 20 GeV - 120 TeV)
+        integral.eps(1.0e-7);
 
+        // Do Romberg integration
+        double value = integral.romberg(lnEmin, lnEmax);
+
+        // Update number of background function calls
+        calls += integral.calls();
+        
         // Multiply background rate with livetime and solid angle
         value *= obs->livetime() * m_bkgmap.solidangle(i);
 
         // Add number of background events to background map
         m_bkgmap(i,0) += value;
 
+        // Update total number of background events
+        total += value;
+
     } // endfor: looped over background map pixels
+  
+    // Log background subtraction results
+    log_value(NORMAL, "Events in background", int(total+0.5));
+    log_value(NORMAL, "Background evaluations", calls);
 
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Estimates the background in sky map based on IRF template
+ *
+ * @param[in] lnE Natural logarithm of energy in MeV.
+ ***************************************************************************/
+double ctskymap::irf_kern::eval(const double& lnE)
+{
+    // Get log10 of energy in TeV
+    double logE = lnE * gammalib::inv_ln10 - 6;
+
+    // Get function value
+    double value = (*m_bgd)(logE, m_dir->detx(), m_dir->dety());
+
+    // Correct for variable substitution
+    value *= std::exp(lnE);
+
+    // Return value
+    return value;
+}
+

@@ -73,6 +73,19 @@ protected:
     void map_background(GCTAObservation* obs);
     void map_background_irf(GCTAObservation* obs);
 
+    // Background integration kernel
+    class irf_kern : public GFunction {
+    public:
+        irf_kern(const GCTABackground* bgd,
+                 const GCTAInstDir*    dir) :
+                 m_bgd(bgd),
+                 m_dir(dir) { }
+        double eval(const double& lnE);
+    protected:
+        const GCTABackground* m_bgd;   //!< Pointer to background
+        const GCTAInstDir*    m_dir;   //!< Pointer to instrument direction
+    };
+
     // User parameters
     GFilename     m_outmap;      //!< Output file name
     double        m_emin;        //!< Minimum energy (TeV)
