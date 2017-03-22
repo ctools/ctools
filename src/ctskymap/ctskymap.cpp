@@ -644,7 +644,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
 
         // Set precision (has been carefully adjusted using a test simulation
         // over the energy range 20 GeV - 120 TeV)
-        integral.eps(1.0e-7);
+        integral.eps(1.0e-6);
 
         // Do Romberg integration
         double value = integral.romberg(lnEmin, lnEmax);
