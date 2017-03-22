@@ -1,8 +1,9 @@
-2017-03-21
+2017-03-22
 
         * Version 1.3.0 released
         ========================
 
+        Add csebins script (#1976)
         Take into account RoI in ctskymap and use numerical integration for IRF (#1975)
         Set local language to english (#1370)
         Enhance logfile output of csroot2caldb script

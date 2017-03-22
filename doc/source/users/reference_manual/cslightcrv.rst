@@ -46,7 +46,7 @@ General parameters
     Applies energy dispersion to response computation.
 
 ``outfile [file]``
-    Name of the source spectrum output file.
+    Name of the light curve output file.
 
 ``(tbinalg = GTI) <FILE|LIN|GTI> [string]``
     Algorithm for defining time bins.
@@ -125,7 +125,7 @@ Standard parameters
      chatter = 4: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
-    Specifies whether an existing source spectrum output file should be overwritten.
+    Specifies whether an existing light curve output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.

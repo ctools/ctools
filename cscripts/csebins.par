@@ -1,0 +1,39 @@
+#############################################################################
+#                                                                           #
+#                       CTA Science Analysis Tools                          #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+#                                                                           #
+#  File:      csebins.par                                                   #
+#                                                                           #
+#  Author:    Juergen Knoedlseder                                           #
+#             Jurgen.Knodlseder@irap.omp.eu                                 #
+#             IRAP                                                          #
+#                                                                           #
+#  Purpose:   Parameter file for the csebins script                         #
+#                                                                           #
+#############################################################################
+#
+# Input and output parameters
+#============================
+inobs,   f, a, NONE,,, "Input observation definition XML file"
+caldb,   s, a, prod2,,, "Calibration database"
+irf,     s, a, South_0.5h,,, "Instrument response function"
+outfile, f, a, ebounds.fits,,, "Output energy boundaries file"
+
+#
+# Script parameters
+#==================
+emin,      r, a, 0.02,,, "Minimum energy (TeV)"
+emax,      r, a, 300.0,,, "Maximum energy (TeV)"
+aeffthres, r, h, 0.2,,, "Fractional effective area change threshold"
+bkgthres,  r, h, 0.5,,, "Fractional background rate change threshold"
+
+#
+# Standard parameters
+#====================
+chatter, i, h, 2,0,4, "Chattiness of output"
+clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
+debug,   b, h, no,,, "Debugging mode activated"
+mode,    s, h, ql,,, "Mode of automatic parameters"
+logfile, f, h, csebins.log,,, "Log filename"

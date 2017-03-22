@@ -40,6 +40,7 @@ cscripts
    :maxdepth: 1
 
    cscaldb --- Lists available instrument response functions <cscaldb>
+   csebins --- Generates energy boundaries for stacked analysis <csebins>
    cslightcrv --- Computes lightcurve <cslightcrv>
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
