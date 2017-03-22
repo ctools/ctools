@@ -113,6 +113,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_python_cscripts.py \
               $(top_srcdir)/test/test_cscript.py \
               $(top_srcdir)/test/test_cscaldb.py \
+              $(top_srcdir)/test/test_csebins.py \
               $(top_srcdir)/test/test_csfindobs.py \
               $(top_srcdir)/test/test_csinfo.py \
               $(top_srcdir)/test/test_cslightcrv.py \
