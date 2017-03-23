@@ -338,6 +338,7 @@ productbuild --distribution $DISTFILE \
              --version $VERSION \
              --resources $SRCDIR/$CTOOLS \
              --package-path $PKGDIR \
+             --sign 'ctools' \
              $PRODDIR/$CTOOLS.pkg
 
 # Add additional files to production folder
