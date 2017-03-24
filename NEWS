@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-22 March 2017
+24 March 2017
 
 
 Introduction
@@ -87,7 +87,8 @@ None
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-None
+The tool now supports loading the energy binning definition from an energy
+boundary FITS file, behaving now similar to the other cube tools (#1978).
 
 
 ctcubemask - CTA cube filtering

@@ -1,10 +1,11 @@
-2017-03-22
+2017-03-24
 
         * Version 1.3.0 released
         ========================
 
+        Support energy boundary FITS file in ctmapcube (#1978)
         Add csebins script (#1976)
-        Take into account RoI in ctskymap and use numerical integration for IRF (#1975)
+        Consider RoI in ctskymap and use numerical integration for IRF (#1975)
         Set local language to english (#1370)
         Enhance logfile output of csroot2caldb script
         Set default deadc value to 0.98 (CTA has <2% deadtime)

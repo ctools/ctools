@@ -238,7 +238,13 @@ class Test(test):
                                        gammalib.GEnergy(10.0,'TeV'))
         ebounds.save('test_ebinfile_ebounds.fits[EBOUNDS]', True)
         ebounds.save('test_ebinfile_energybins.fits[ENERGYBINS]', True)
-        ebounds.save('test_ebinfile_energies.fits[ENERGIES]', True)
+        ebounds.save('test_ebinfile_bins.fits[BINS]', True)
+
+        # Create energy bin file
+        energies = gammalib.GEnergies(2, gammalib.GEnergy(1.0,'TeV'),
+                                         gammalib.GEnergy(10.0,'TeV'))
+        energies.save('test_ebinfile_energies.fits[ENERGIES]', True)
+        energies.save('test_ebinfile_engs.fits[ENGS]', True)
 
         # Return
         return
@@ -335,16 +341,28 @@ class Test(test):
         self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
         self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
 
+        # Test create_ebounds() method for "ENERGIES" extension
+        ebounds = empty.check_create_ebounds('test_ebinfile_energies.fits')
+        self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
+        self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
+        self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
+
         # Test create_ebounds() method for invalid extension
         self.test_try('Check create_ebounds() method for invalid extension')
         try:
-            empty.check_create_ebounds('test_ebinfile_energies.fits')
+            empty.check_create_ebounds('test_ebinfile_energies.fits[INVALID]')
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
 
-        # Test create_ebounds() method for "ENERGIES" extension
-        ebounds = empty.check_create_ebounds('test_ebinfile_energies.fits[ENERGIES]')
+        # Test create_ebounds() method for "BINS" extension
+        ebounds = empty.check_create_ebounds('test_ebinfile_bins.fits[BINS]')
+        self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
+        self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
+        self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')
+
+        # Test create_ebounds() method for "ENGS" extension
+        ebounds = empty.check_create_ebounds('test_ebinfile_engs.fits[ENGS]')
         self.test_value(ebounds.size(), 1, 'Check number of energy boundaries')
         self.test_value(ebounds.emin().TeV(), 1.0, 'Check minimum energy')
         self.test_value(ebounds.emax().TeV(), 10.0, 'Check maximum energy')

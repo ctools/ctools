@@ -349,7 +349,7 @@ void ctmapcube::get_parameters(void)
     } // endif: there were no models
 
     // Get energy binning parameters
-    GEnergies energies = create_energies();
+    GEnergies energies(create_ebounds());
 
     // Get spatial binning parameters
     double      xref     = (*this)["xref"].real();
@@ -382,68 +382,6 @@ void ctmapcube::get_parameters(void)
 
     // Return
     return;
-}
-
-
-/***********************************************************************//**
- * @brief Create map cube energies from user parameters
- *
- * Creates the map cube energies according to the user parameters. If the
- * @p ebinfile parameter is "FILE" the method loads the energy information
- * from a FITS file. The name of the FITS file is given by the @p ebinfile
- * parameter. If no extension name is specified the method will use assume
- * the name to be `ENERGIES`.
- *
- * If the @p ebinfile parameter is "LIN" the method will create a linearly
- * spaced series of @p enumbins energies in the interval @p emin to @p emax.
- * Otherwise, the @p ebinfile parameter is assumed to be "LOG" and the method
- * will create a logarithmically spaced series of @p enumbins energies in the
- * interval @p emin to @p emax.
- ***************************************************************************/
-GEnergies ctmapcube::create_energies(void)
-{
-    // Allocate energies
-    GEnergies energies;
-
-    // Get energy binning algorithm
-    std::string ebinalg = (*this)["ebinalg"].string();
-
-    // If energy binning algorithm is of type "FILE" (case sensitive), then
-    // read energies from FITS file ...
-    if (ebinalg == "FILE") {
-
-        // Get filename
-        GFilename ebinfile = (*this)["ebinfile"].filename();
-
-        // Load energies
-        energies.load(ebinfile);
-
-    } // endif: ebinalg was "FILE"
-
-    // ... otherwise use a linear or a logarithmically-spaced energy binning
-    else {
-
-        // Get task parameters
-        double emin     = (*this)["emin"].real();
-        double emax     = (*this)["emax"].real();
-        int    enumbins = (*this)["enumbins"].integer();
-
-        // Initialise log mode for ebinning
-        bool log = true;
-
-        // Check if algorithm is linear
-        if (ebinalg == "LIN") {
-            log = false;
-        }
-
-        // Setup energies
-        energies = GEnergies(enumbins, GEnergy(emin, "TeV"),
-                                       GEnergy(emax, "TeV"), log);
-
-    } // endelse: ebinalg was not "FILE"
-
-    // Return energies
-    return energies;
 }
 
 

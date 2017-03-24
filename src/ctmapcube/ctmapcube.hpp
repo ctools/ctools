@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmapcube - Map cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -34,7 +34,7 @@
 
 /* __Definitions _________________________________________________________ */
 #define CTMAPCUBE_NAME    "ctmapcube"
-#define CTMAPCUBE_VERSION "1.2.0"
+#define CTMAPCUBE_VERSION "1.3.0"
 
 
 /***********************************************************************//**
@@ -64,17 +64,16 @@ public:
 
 protected:
     // Protected methods
-    void      init_members(void);
-    void      copy_members(const ctmapcube& app);
-    void      free_members(void);
-    void      get_parameters(void);
-    GEnergies create_energies(void);
-    void      create_cube(void);
-    void      add_model(GModelSky* model);
-    void      add_ptsrc_model(GModelSky* model);
-    void      get_bounding_circle(GModelSky* model,
-                                  GSkyDir*   dir,
-                                  double*    radius) const;
+    void init_members(void);
+    void copy_members(const ctmapcube& app);
+    void free_members(void);
+    void get_parameters(void);
+    void create_cube(void);
+    void add_model(GModelSky* model);
+    void add_ptsrc_model(GModelSky* model);
+    void get_bounding_circle(GModelSky* model,
+                             GSkyDir*   dir,
+                             double*    radius) const;
 
     // User parameters
     GFilename m_outcube;                //!< Output map cube filename

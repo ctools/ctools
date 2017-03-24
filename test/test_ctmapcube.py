@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctmapcube tool.
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -242,7 +242,7 @@ class Test(test):
         return
 
     # Check map cube
-    def _check_cube(self, cube, nmaps=10, npixels=10000):
+    def _check_cube(self, cube, nmaps=11, npixels=10000):
         """
         Check map cube
 
