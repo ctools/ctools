@@ -245,6 +245,7 @@ class sciver(gammalib.GPythonTestSuite):
         self.append(self.spec_plaw_edisp, 'Test power law model with energy dispersion')
         self.append(self.spec_plaw_stacked, 'Test power law model with stacked analysis')
         self.append(self.spec_plaw2, 'Test power law 2 model')
+        self.append(self.spec_smoothbplaw, 'Test smoothly broken power law model')
         self.append(self.spec_eplaw, 'Test exponentially cut off power law model')
         self.append(self.spec_supeplaw, 'Test super exponentially cut off power law model')
         self.append(self.spec_logparabola, 'Test log parabola model')
@@ -416,6 +417,21 @@ class sciver(gammalib.GPythonTestSuite):
         self.pull('data/sciver/crab_plaw2')
         self.test('Pull_Crab_PhotonFlux')
         self.test('Pull_Crab_Index')
+        self.test('Pull_Background_Prefactor')
+        self.test('Pull_Background_Index')
+        return
+
+    # Test smoothly broken power law model
+    def spec_smoothbplaw(self):
+        """
+        Test smoothly broken power law model
+        """
+        self.pull('data/sciver/crab_smoothbplaw')
+        self.test('Pull_Crab_Prefactor')
+        self.test('Pull_Crab_Index1')
+        self.test('Pull_Crab_Index2')
+        self.test('Pull_Crab_BreakEnergy')
+        self.test('Pull_Crab_BreakSmoothness')
         self.test('Pull_Background_Prefactor')
         self.test('Pull_Background_Index')
         return
