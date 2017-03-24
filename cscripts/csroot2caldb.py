@@ -588,6 +588,14 @@ class csroot2caldb(ctools.cscript):
         self._set_cif_keywords(ds['HDU_EA'], irf['EA_NAME'],
                                irf['EA_BOUNDS'], irf['EA_DESC'], irf)
 
+        # Optionally write energy thresholds
+        if self['emin'].is_valid():
+            emin = self['emin'].real()
+            ds['HDU_EA'].card('LO_THRES', emin, '[TeV] Low energy threshold')
+        if self['emax'].is_valid():
+            emin = self['emax'].real()
+            ds['HDU_EA'].card('HI_THRES', emin, '[TeV] High energy threshold')
+
         # Create "EFFAREA" data column
         self._make_2D(etrue, ds['HDU_EA'], 'EFFAREA', 'm2')
 
