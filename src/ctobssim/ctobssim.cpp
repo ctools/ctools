@@ -500,7 +500,7 @@ void ctobssim::publish(const std::string& name)
                 obs->write(fits);
 
                 // Publish
-                fits.publish("EVENTS", user_name);
+                fits.publish(gammalib::extname_cta_events, user_name);
 
             } // endif: there were events
 

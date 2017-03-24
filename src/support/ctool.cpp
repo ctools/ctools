@@ -506,8 +506,8 @@ void ctool::setup_models(GObservations&     obs,
  *            No valid energy boundary extension found.
  *
  * Get the energy boundaries according to the user parameters. The method
- * supports loading of energy boundary information from the EBOUNDS or
- * ENERGYBINS extension, or setting energy boundaries using a linear
+ * supports loading of energy boundary information from the `EBOUNDS` or
+ * `ENERGYBINS` extension, or setting energy boundaries using a linear
  * or logarithmical spacing.
  *
  * The following parameters are read:
@@ -540,7 +540,7 @@ GEbounds ctool::create_ebounds(void)
             // Open energy boundary file using the EBOUNDS or ENERGYBINS
             // extension. Throw an exception if opening fails.
             GFits file(ebinfile);
-            if (file.contains("EBOUNDS")) {
+            if (file.contains(gammalib::extname_ebounds)) {
                 file.close();
                 ebounds.load(ebinfile);
             }
@@ -551,9 +551,11 @@ GEbounds ctool::create_ebounds(void)
             }
             else {
                 file.close();
-                std::string msg = "No extension with name \"EBOUNDS\" or"
+                std::string msg = "No extension with name \""+
+                                  gammalib::extname_ebounds+"\" or"
                                   " \"ENERGYBINS\" found in FITS file"
-                                  " \""+ebinfile+"\". An \"EBOUNDS\" or "
+                                  " \""+ebinfile+"\". An \""+
+                                  gammalib::extname_ebounds+"\" or "
                                   "\"ENERGYBINS\" extension is required if "
                                   "the parameter \"ebinalg\" is set to "
                                   "\"FILE\".";

@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -240,8 +240,8 @@ void ctselect::run(void)
         // Initialise event input and output filenames and the event
         // and GTI extension names
         m_infiles.push_back("");
-        m_evtname.push_back("EVENTS");
-        m_gtiname.push_back("GTI");
+        m_evtname.push_back(gammalib::extname_cta_events);
+        m_gtiname.push_back(gammalib::extname_gti);
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
@@ -438,7 +438,7 @@ void ctselect::publish(const std::string& name)
                 obs->write(fits);
 
                 // Publish
-                fits.publish("EVENTS", user_name);
+                fits.publish(gammalib::extname_cta_events, user_name);
 
             } // endif: there were events
 
@@ -1183,13 +1183,13 @@ std::string ctselect::set_outfile_name(const std::string& filename) const
  * Extracts the Good Time Intervals extension name from the event file. We
  * do this by loading the events and accessing the Good Time Intervals
  * extension name using the GCTAEventList::gtiname() method. If the file name
- * is empty, the method returns "GTI".
+ * is empty, the method returns `GTI`.
  ***************************************************************************/
 std::string ctselect::get_gtiname(const std::string& filename,
                                   const std::string& evtname) const
 {
     // Initialise GTI name
-    std::string gtiname = "GTI";
+    std::string gtiname = gammalib::extname_gti;
 
     // Continue only if the filename is not empty
     if (!filename.empty()) {

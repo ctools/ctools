@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmapcube - Map cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -392,7 +392,7 @@ void ctmapcube::get_parameters(void)
  * @p ebinfile parameter is "FILE" the method loads the energy information
  * from a FITS file. The name of the FITS file is given by the @p ebinfile
  * parameter. If no extension name is specified the method will use assume
- * the name to be "ENERGIES".
+ * the name to be `ENERGIES`.
  *
  * If the @p ebinfile parameter is "LIN" the method will create a linearly
  * spaced series of @p enumbins energies in the interval @p emin to @p emax.
