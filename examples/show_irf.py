@@ -24,6 +24,8 @@ import gammalib
 import cscripts
 try:
     import matplotlib.pyplot as plt
+    from matplotlib import ticker
+    from matplotlib.colors import LogNorm
     plt.figure()
     plt.close()
 except (ImportError, RuntimeError):
@@ -106,7 +108,9 @@ def plot_aeff(sub, aeff, emin=None, emax=None, tmin=None, tmax=None,
         image.append(row)
 
     # Plot image
-    sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5)
+    c    = sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5, vmin=1e6, norm=LogNorm())
+    cbar = plt.colorbar(c, orientation='horizontal', shrink=0.8)
+    cbar.set_label('cm$^2$')
 
     # Show boundary contours
     contours = sub.contour(logenergies, thetas, image, [0.0], colors=('white'))
@@ -188,7 +192,7 @@ def plot_psf(sub, psf, emin=None, emax=None, tmin=None, tmax=None,
 
             # Get containment radius value
             value = psf.containment_radius(0.68, logenergy, theta*gammalib.deg2rad) * \
-                    gammalib.rad2deg
+                    gammalib.rad2deg * 60.0
 
             # Append value
             row.append(value)
@@ -197,7 +201,12 @@ def plot_psf(sub, psf, emin=None, emax=None, tmin=None, tmax=None,
         image.append(row)
 
     # Plot image
-    sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5, vmin=0.0, vmax=0.5)
+    c    = sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5, vmin=0.0, vmax=18.0)
+    cbar = plt.colorbar(c, orientation='horizontal', shrink=0.8)
+    tick_locator = ticker.MaxNLocator(nbins=5)
+    cbar.locator = tick_locator
+    cbar.update_ticks()
+    cbar.set_label('arcmin')
 
     # Show boundary contours
     contours = sub.contour(logenergies, thetas, image, [0.0], colors=('white'))
@@ -250,6 +259,12 @@ def plot_edisp(sub, edisp, emin=None, emax=None, tmin=None, tmax=None,
     if emax == None:
         emax = edisp.table().axis_hi(ieng, neng-1)
 
+    # Determine migration range
+    imigra   = edisp.table().axis('MIGRA')
+    nmigra   = edisp.table().axis_bins(imigra)
+    migramin = edisp.table().axis_lo(imigra, 0)
+    migramax = edisp.table().axis_hi(imigra, nmigra-1)
+
     # Determine offset angle range
     itheta = edisp.table().axis('THETA')
     ntheta = edisp.table().axis_bins(itheta)
@@ -264,18 +279,22 @@ def plot_edisp(sub, edisp, emin=None, emax=None, tmin=None, tmax=None,
 
     # Set axes
     denergy     = (emax - emin)/(nengs-1)
+    dmigra      = (migramax - migramin)/(nmigra-1)
     dtheta      = (tmax - tmin)/(nthetas-1)
     logenergies = [emin+i*denergy for i in range(nengs)]
+    migras      = [migramin+i*dmigra  for i in range(nmigra)]
     thetas      = [tmax-i*dtheta  for i in range(nthetas)]
 
-    # Initialise image
-    image = []
+    # Initialise images
+    image_mean = []
+    image_std  = []
 
     # Loop over offset angles
     for theta in thetas:
 
-        # Initialise row
-        row = []
+        # Initialise rows
+        row_mean = []
+        row_std  = []
 
         # Compute detx and dety
         detx = theta*gammalib.deg2rad
@@ -284,26 +303,73 @@ def plot_edisp(sub, edisp, emin=None, emax=None, tmin=None, tmax=None,
         # Loop over energies
         for logenergy in logenergies:
 
-            # Get no migration energy dispersion value
-            value = edisp(logenergy, logenergy, theta*gammalib.deg2rad)
+            # Compute mean migration
+            mean = 0.0
+            std  = 0.0
+            num  = 0.0
+            for migra in migras:
+                if migra > 0.0:
+                    logobs = math.log10(migra) + logenergy
+                    value  = edisp(logobs, logenergy, theta*gammalib.deg2rad)
+                    mean  += migra * value
+                    std   += migra * migra * value
+                    num   += value
+            if num > 0.0:
+                mean /= num
+                std  /= num
+                arg   = std - mean * mean
+                if arg > 0.0:
+                    std = math.sqrt(arg)
+                else:
+                    std = 0.0
 
             # Append value
-            row.append(value)
+            row_mean.append(mean)
+            row_std.append(std)
 
-        # Append row
-        image.append(row)
+        # Append rows
+        image_mean.append(row_mean)
+        image_std.append(row_std)
+
+    # First subplot
+    f1 = plt.subplot(223)
 
     # Plot image
-    sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5)
+    c1    = f1.imshow(image_mean, extent=[emin,emax,tmin,tmax], aspect=0.5)
+    cbar1 = plt.colorbar(c1, orientation='horizontal', shrink=0.8)
+    tick_locator = ticker.MaxNLocator(nbins=5)
+    cbar1.locator = tick_locator
+    cbar1.update_ticks()
+    cbar1.set_label('E$_{reco}$ / E$_{true}$')
 
     # Show boundary contours
-    contours = sub.contour(logenergies, thetas, image, [0.0], colors=('white'))
-    sub.clabel(contours, inline=1, fontsize=8)
+    contours = f1.contour(logenergies, thetas, image_mean, [0.0], colors=('white'))
+    f1.clabel(contours, inline=1, fontsize=8)
 
     # Plot title and axis
-    sub.set_title('No migration energy dispersion')
-    sub.set_xlabel('log10(E/TeV)')
-    sub.set_ylabel('Offset angle (deg)')
+    f1.set_title('Mean of energy dispersion')
+    f1.set_xlabel('log10(E/TeV)')
+    f1.set_ylabel('Offset angle (deg)')
+
+    # Second subplot
+    f2 = plt.subplot(224)
+
+    # Plot image
+    c2    = f2.imshow(image_std, extent=[emin,emax,tmin,tmax], aspect=0.5)
+    cbar2 = plt.colorbar(c2, orientation='horizontal', shrink=0.8)
+    tick_locator = ticker.MaxNLocator(nbins=5)
+    cbar2.locator = tick_locator
+    cbar2.update_ticks()
+    cbar2.set_label('E$_{reco}$ / E$_{true}$')
+
+    # Show boundary contours
+    contours = f2.contour(logenergies, thetas, image_std, [0.0], colors=('white'))
+    f2.clabel(contours, inline=1, fontsize=8)
+
+    # Plot title and axis
+    f2.set_title('Standard deviation of energy dispersion')
+    f2.set_xlabel('log10(E/TeV)')
+    f2.set_ylabel('Offset angle (deg)')
 
     # Return
     return
@@ -386,7 +452,9 @@ def plot_bkg(sub, bkg, emin=None, emax=None, tmin=None, tmax=None,
         image.append(row)
 
     # Plot image
-    sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5)
+    c    = sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5, norm=LogNorm())
+    cbar = plt.colorbar(c, orientation='horizontal', shrink=0.8)
+    cbar.set_label('s$^{-1}$ MeV$^{-1}$ sr$^{-1}$')
 
     # Show boundary contours
     contours = sub.contour(logenergies, thetas, image, [0.0], colors=('white'))
@@ -454,26 +522,26 @@ def plot_irf(irf, emin, emax, tmin, tmax, plotfile):
                  (gammalib.toupper(mission), instrument, response, selection)
 
     # Create figure
-    fig = plt.figure(figsize=(12,8))
+    fig = plt.figure(figsize=(16,8))
 
     # Add title
     fig.suptitle(title, fontsize=16)
 
     # Plot Aeff
-    ax1 = fig.add_subplot(221)
+    ax1 = fig.add_subplot(231)
     plot_aeff(ax1, irf.aeff(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
 
     # Plot Psf
-    ax2 = fig.add_subplot(222)
+    ax2 = fig.add_subplot(232)
     plot_psf(ax2, irf.psf(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
 
-    # Plot Edisp
-    ax3 = fig.add_subplot(223)
-    plot_edisp(ax3, irf.edisp(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
-
     # Plot Background
-    ax4 = fig.add_subplot(224)
-    plot_bkg(ax4, irf.background(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
+    ax3 = fig.add_subplot(233)
+    plot_bkg(ax3, irf.background(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
+
+    # Plot Edisp
+    ax4 = fig.add_subplot(234)
+    plot_edisp(ax4, irf.edisp(), emin=emin, emax=emax, tmin=tmin, tmax=tmax)
 
     # Show plots or save it into file
     if len(plotfile) > 0:
