@@ -561,7 +561,7 @@ def write_obsdef(filename, obsdef):
     file = open(filename, 'w')
 
     # Write header
-    file.write('ra,dec,tmin,duration,caldb,irf\n')
+    file.write('ra,dec,tmin,duration,caldb,irf,emin,emax\n')
 
     # Loop over pointings
     for obs in obsdef:
@@ -578,10 +578,18 @@ def write_obsdef(filename, obsdef):
             ra  = obs['ra']
             dec = obs['dec']
 
+        # Set site dependent energy thresholds
+        if 'South' in obs['irf']:
+            emin =   0.030
+            emax = 160.0
+        else:
+            emin =  0.030
+            emax = 50.0
+
         # Write information
-        file.write('%8.4f,%8.4f,%.4f,%.4f,%s,%s\n' %
+        file.write('%8.4f,%8.4f,%.4f,%.4f,%s,%s,%.3f,%.1f\n' %
                    (ra, dec, obs['tmin'], obs['duration'], obs['caldb'], \
-                    obs['irf']))
+                    obs['irf'], emin, emax))
 
     # Close file
     file.close()
