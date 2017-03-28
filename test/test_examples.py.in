@@ -114,6 +114,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test pipeline_unbinned_mem.py')
         self.append(self.test_show_butterfly,
                     'Test show_butterfly.py')
+        self.append(self.test_show_irf,
+                    'Test show_irf.py')
         self.append(self.test_show_model,
                     'Test show_model.py')
         self.append(self.test_show_pha,
@@ -274,6 +276,20 @@ class Test(gammalib.GPythonTestSuite):
 
         # Execute script
         self._execute_python('show_butterfly', args=args)
+
+        # Return
+        return
+
+    # Test show_irf
+    def test_show_irf(self):
+        """
+        Test show_irf
+        """
+        # Set arguments
+        args = '-p example_show_irf.eps prod2 South_0.5h'
+
+        # Execute script
+        self._execute_python('show_irf', args=args)
 
         # Return
         return

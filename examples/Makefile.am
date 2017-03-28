@@ -32,6 +32,7 @@ scripts = README.md \
           pipeline_unbinned_disk.py \
           pipeline_unbinned_mem.py \
           show_butterfly.py \
+          show_irf.py \
           show_model.py \
           show_pha.py \
           show_pull_evolution.py \
