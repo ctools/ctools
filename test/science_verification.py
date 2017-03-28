@@ -431,7 +431,6 @@ class sciver(gammalib.GPythonTestSuite):
         self.test('Pull_Crab_Index1')
         self.test('Pull_Crab_Index2')
         self.test('Pull_Crab_BreakEnergy')
-        self.test('Pull_Crab_BreakSmoothness')
         self.test('Pull_Background_Prefactor')
         self.test('Pull_Background_Index')
         return
