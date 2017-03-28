@@ -676,6 +676,60 @@ Broken power law
      ``BreakEnergy`` can be replaced by ``BreakValue``.
 
 
+Smoothly broken power law
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  .. code-block:: xml
+
+     <spectrum type="SmoothBrokenPowerLaw">
+       <parameter name="Prefactor"       scale="1e-16" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+       <parameter name="Index1"          scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+       <parameter name="PivotEnergy"     scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="0"/>
+       <parameter name="Index2"          scale="-1"    value="2.70" min="0.01"  max="+5.0"   free="1"/>
+       <parameter name="BreakEnergy"     scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="1"/>
+       <parameter name="BreakSmoothness" scale="1.0"   value="0.2"  min="0.01"  max="10.0"   free="0"/>
+     </spectrum>
+
+  This spectral model component implements the smoothly broken power law function
+
+  .. math::
+   
+     M_{\rm spectral}(E) = k_0 \left( \frac{E}{E_0} \right)^{\gamma_1}
+                           \left[ 1 +
+                           \left( \frac{E}{E_b} \right)^{\frac{\gamma_1 - \gamma_2}{\beta}}
+                           \right]^{-\beta}
+
+  where
+
+  * :math:`k_0` = ``Prefactor``
+    :math:`({\rm ph}\,\,{\rm cm}^{-2}\,{\rm s}^{-1}\,{\rm MeV}^{-1})`
+  * :math:`\gamma_1` = ``Index1``
+  * :math:`E_0` = ``PivotEnergy``
+  * :math:`\gamma_2` = ``Index2``
+  * :math:`E_b` = ``BreakEnergy``
+    :math:`({\rm MeV})`
+  * :math:`\beta` = ``BreakSmoothness``
+
+  .. warning::
+
+     The pivot energy should be set far away from the expected break energy
+     value.
+
+  .. warning::
+
+     When the two indices are close together, the :math:`\beta` parameter
+     becomes poorly constrained. Since the :math:`\beta` parameter also scales
+     the indices, this can cause very large errors in the estimates of the
+     various spectral parameters. In this case, consider fixing :math:`\beta`.
+
+  .. note::
+
+     For compatibility with the Fermi/LAT ScienceTools the parameters
+     ``PivotEnergy`` can be replaced by ``Scale``,
+     ``BreakEnergy`` by ``BreakValue`` and
+     ``BreakSmoothness`` by  ``Beta``.
+
+
 Log parabola
 ^^^^^^^^^^^^
 
