@@ -1,8 +1,9 @@
-2017-03-24
+2017-03-28
 
         * Version 1.3.0 released
         ========================
 
+        Support of map cubes lying outside RoI in ctobssim 
         Support energy boundary FITS file in ctmapcube (#1978)
         Add csebins script (#1976)
         Consider RoI in ctskymap and use numerical integration for IRF (#1975)

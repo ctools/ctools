@@ -722,6 +722,11 @@ void ctobssim::simulate_source(GCTAObservation* obs,
                                GRan&            ran,
                                GLog*            wrklog)
 {
+    // Debug code: signal that we step into the simulate_source method
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::simulate_source: in" << std::endl;
+    #endif
+
     // Continue only if observation pointer is valid
     if (obs != NULL) {
 
@@ -898,6 +903,11 @@ void ctobssim::simulate_source(GCTAObservation* obs,
 
     } // endif: observation pointer was valid
 
+    // Debug code: signal that we are down with the simulate_source method
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::simulate_source: out" << std::endl;
+    #endif
+
     // Return
     return;
 }
@@ -946,6 +956,14 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
                                  std::vector<int>&      nphotons,
                                  std::vector<int>&      nevents)
 {
+    // Debug code: signal that we step into the simulate_interval method
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::simulate_interval: in";
+    std::cout << " Etrue=[" << etrue_min << "," << etrue_max << "]";
+    std::cout << " Ereco=[" << ereco_min << "," << ereco_max << "]";
+    std::cout << std::endl;
+    #endif
+
     // Loop over all models
     for (int i = 0; i < models.size(); ++i) {
 
@@ -1083,6 +1101,11 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
         }
 
     } // endfor: looped over models
+
+    // Debug code: signal that we are down with the simulate_interval method
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::simulate_interval: out" << std::endl;
+    #endif
 
     // Return
     return;
@@ -1289,6 +1312,13 @@ double ctobssim::get_model_flux(const GModelSky* model,
                                 const int&       indent,
                                 GLog*            wrklog)
 {
+    // Debug code: signal that we step into the get_model_flux method
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::get_model_flux: in";
+    std::cout << " Etrue=[" << emin << "," << emax << "]";
+    std::cout << std::endl;
+    #endif
+
     // Initialise flux
     double flux = 0.0;
 
@@ -1329,19 +1359,20 @@ double ctobssim::get_model_flux(const GModelSky* model,
         // function spectral model that is the product of the diffuse
         // cube node function and the spectral model evaluated at the
         // energies of the node function
-        GModelSpatialDiffuseCube* cube = dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
+        GModelSpatialDiffuseCube* cube =
+                     dynamic_cast<GModelSpatialDiffuseCube*>(model->spatial());
         if (cube != NULL) {
 
             // Set MC cone
             cube->set_mc_cone(centre, radius);
 
             // Allocate node function to replace the spectral component
-            GModelSpectralNodes* nodes = new GModelSpectralNodes(cube->spectrum());
+            GModelSpectralNodes* nodes =
+                          new GModelSpectralNodes(cube->spectrum());
             for (int i = 0; i < nodes->nodes(); ++i) {
                 GEnergy energy    = nodes->energy(i);
-                GTime   time;                              // Dummy time
                 double  intensity = nodes->intensity(i);
-                double  value     = spectral->eval(energy, time);
+                double  value     = spectral->eval(energy);
                 nodes->intensity(i, value * intensity);
             }
 
@@ -1351,11 +1382,18 @@ double ctobssim::get_model_flux(const GModelSky* model,
             // Set the spectral model pointer to the node function
             spectral = nodes;
 
+            // Kluge: if there are no nodes then the spectral->flux method
+            // will throw an exception. We therefore set here the use_model
+            // flag to false in case that there are no spectral nodes
+            if (nodes->nodes() == 0) {
+                use_model = false;
+            }
+
         } // endif: spatial model was a diffuse cube
 
         // Compute flux within [emin, emax] in model from spectral
         // component (units: ph/cm2/s)
-        double flux0 = spectral->flux(emin, emax);
+        double flux0 = (use_model) ? spectral->flux(emin, emax) : 0.0;
         flux         = flux0 * norm;
 
         // Dump flux
@@ -1378,6 +1416,11 @@ double ctobssim::get_model_flux(const GModelSky* model,
         if (free_spectral) delete spectral;
 
     } // endif: model overlaps with simulation region
+
+    // Debug code: signal that we step out of the get_model_flux method
+    #if defined(G_SOURCE_DEBUG)
+    std::cout << "ctobssim::get_model_flux: in" << std::endl;
+    #endif
 
     // Return model flux
     return flux;

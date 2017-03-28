@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-24 March 2017
+28 March 2017
 
 
 Introduction
@@ -27,7 +27,10 @@ so that writing commas instead of dots is avoided (#1370).
 
 ctobssim - CTA observation simulation
 -------------------------------------
-None
+The tool now supports map cubes that are not overlapping with the RoI.
+In this case, no spectral nodes exist and before the spectral flux()
+method called in ctobssim::get_model_flux() was throwing an exception.
+Now, for map cubes outside the RoI the flux is set to zero.
 
 
 ctselect - CTA event selection
