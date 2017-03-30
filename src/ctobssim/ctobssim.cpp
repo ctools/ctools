@@ -1419,7 +1419,7 @@ double ctobssim::get_model_flux(const GModelSky* model,
 
     // Debug code: signal that we step out of the get_model_flux method
     #if defined(G_SOURCE_DEBUG)
-    std::cout << "ctobssim::get_model_flux: in" << std::endl;
+    std::cout << "ctobssim::get_model_flux: out" << std::endl;
     #endif
 
     // Return model flux
