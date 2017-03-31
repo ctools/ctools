@@ -205,7 +205,6 @@ def plot_psf(sub, psf, emin=None, emax=None, tmin=None, tmax=None,
     cbar = plt.colorbar(c, orientation='horizontal', shrink=0.8)
     tick_locator = ticker.MaxNLocator(nbins=5)
     cbar.locator = tick_locator
-    cbar.update_ticks()
     cbar.set_label('arcmin')
 
     # Show boundary contours
@@ -339,7 +338,6 @@ def plot_edisp(sub, edisp, emin=None, emax=None, tmin=None, tmax=None,
     cbar1 = plt.colorbar(c1, orientation='horizontal', shrink=0.8)
     tick_locator = ticker.MaxNLocator(nbins=5)
     cbar1.locator = tick_locator
-    cbar1.update_ticks()
     cbar1.set_label('E$_{reco}$ / E$_{true}$')
 
     # Show boundary contours
@@ -359,7 +357,6 @@ def plot_edisp(sub, edisp, emin=None, emax=None, tmin=None, tmax=None,
     cbar2 = plt.colorbar(c2, orientation='horizontal', shrink=0.8)
     tick_locator = ticker.MaxNLocator(nbins=5)
     cbar2.locator = tick_locator
-    cbar2.update_ticks()
     cbar2.set_label('E$_{reco}$ / E$_{true}$')
 
     # Show boundary contours
@@ -427,6 +424,8 @@ def plot_bkg(sub, bkg, emin=None, emax=None, tmin=None, tmax=None,
     thetas      = [tmax-i*dtheta  for i in range(nthetas)]
 
     # Initialise image
+    vmin  = None
+    vmax  = None
     image = []
 
     # Loop over offset angles
@@ -448,11 +447,23 @@ def plot_bkg(sub, bkg, emin=None, emax=None, tmin=None, tmax=None,
             # Append value
             row.append(value)
 
+            # Set minimum and maximum
+            if value > 0.0:
+                if vmin == None:
+                    vmin = value
+                elif value < vmin:
+                    vmin = value
+                if vmax == None:
+                    vmax = value
+                elif value > vmax:
+                    vmax = value
+
         # Append row
         image.append(row)
 
     # Plot image
-    c    = sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5, norm=LogNorm())
+    c    = sub.imshow(image, extent=[emin,emax,tmin,tmax], aspect=0.5,
+                      vmin=vmin, vmax=vmax, norm=LogNorm())
     cbar = plt.colorbar(c, orientation='horizontal', shrink=0.8)
     cbar.set_label('s$^{-1}$ MeV$^{-1}$ sr$^{-1}$')
 
