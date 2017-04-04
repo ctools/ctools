@@ -3,6 +3,7 @@
         * Version 1.3.0 released
         ========================
 
+        If code originates from Git, always compile the Python bindings (#1985)
         Raise exception instead of exiting with return code in Python tests (#1983)
         Support of map cubes lying outside RoI in ctobssim 
         Support energy boundary FITS file in ctmapcube (#1978)
