@@ -92,6 +92,7 @@ protected:
     double      m_confidence;   //!< Confidence level
     int         m_max_iter;     //!< Maximum number of iterations
     bool        m_apply_edisp;  //!< Apply energy dispersion?
+    bool        m_gepmode;      //!< Switch to gaussian error propagation scheme
     bool        m_fit;          //!< Do fit?
     GEbounds    m_ebounds;      //!< Energy binning definition
     GFilename   m_outfile;      //!< Output ASCII file name

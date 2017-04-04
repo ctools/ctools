@@ -243,12 +243,15 @@ void ctbutterfly::run(void)
         m_obs.optimize(m_opt);
         m_obs.errors(m_opt);
 
-        // Get covariance matrix by inverting the curvature matrix. Note that
-        // the curvature matrix is for the unscaled parameters, hence we have
-        // to scale them before we can proceed.
+        // Get covariance matrix.
         GObservations::likelihood likelihood = m_obs.function();
-        m_covariance = likelihood.curvature()->invert();
-
+        if(!gepmode) {
+            m_covariance = likelihood.curvature()->invert();
+        }
+        else {   
+            m_covariance = likelihood.covariance();
+        }
+            
         // Write optimizer, optimised model and covariance matrix into logger
         log_string(NORMAL, m_opt.print(m_chatter));
         log_string(NORMAL, m_obs.models().print(m_chatter));
@@ -271,10 +274,13 @@ void ctbutterfly::run(void)
         GObservations::likelihood likelihood = m_obs.function();
         likelihood.eval(pars);
 
-        // Get covariance matrix by inverting the curvature matrix. Note that
-        // the curvature matrix is for the unscaled parameters, hence we have
-        // to scale them before we can proceed.
-        m_covariance = likelihood.curvature()->invert();
+        // Get covariance matrix.
+        if(!gepmode) {
+            m_covariance = likelihood.curvature()->invert();
+        }
+        else {   
+            m_covariance = likelihood.covariance();
+        }
 
         // Write covariance matrix into logger
         log_string(EXPLICIT, m_covariance.print(m_chatter));
@@ -284,105 +290,130 @@ void ctbutterfly::run(void)
     // Write header into logger
     log_header1(TERSE, "Prepare butterfly computation");
 
-    // Find parameter indices. We do this by the memory location of the
-    // model parameters.
-    GModelSky* skymodel = dynamic_cast<GModelSky*>(models[m_srcname]);
-    GModelPar* par_prefactor = &(*skymodel)["Prefactor"];
-    GModelPar* par_index     = &(*skymodel)["Index"];
-    int        inx_prefactor = -1;
-    int        inx_index     = -1;
-    for (int i = 0; i < models.npars(); ++i) {
-        if (models.pars()[i] == par_prefactor) {
-            inx_prefactor = i;
+    if (!m_gepmode) {
+    
+        // Find parameter indices. We do this by the memory location of the
+        // model parameters.
+        GModelSky* skymodel = dynamic_cast<GModelSky*>(models[m_srcname]);
+        GModelPar* par_prefactor = &(*skymodel)["Prefactor"];
+        GModelPar* par_index     = &(*skymodel)["Index"];
+        int        inx_prefactor = -1;
+        int        inx_index     = -1;
+        for (int i = 0; i < models.npars(); ++i) {
+            if (models.pars()[i] == par_prefactor) {
+                inx_prefactor = i;
+            }
+            if (models.pars()[i] == par_index) {
+                inx_index = i;
+            }
         }
-        if (models.pars()[i] == par_index) {
-            inx_index = i;
-        }
-    }
 
-    // Store model values and scales
-    double  prefactor_mean  = (*skymodel)["Prefactor"].value();
-    double  index_mean      = (*skymodel)["Index"].value();
-    double  pivot_mean      = (*skymodel)["PivotEnergy"].value();
-    double  prefactor_scale = (*skymodel)["Prefactor"].scale();
-    double  index_scale     = (*skymodel)["Index"].scale();
-    GEnergy pivot(pivot_mean, "MeV");
+        // Store model values
+        double  prefactor_mean  = (*skymodel)["Prefactor"].value();
+        double  index_mean      = (*skymodel)["Index"].value();
+        double  pivot_mean      = (*skymodel)["PivotEnergy"].value();
+        GEnergy pivot(pivot_mean, "MeV");
 
-    // Write parameter indices into logger
-    log_value(NORMAL, "Prefactor", gammalib::str(prefactor_mean)+
-                      " ph/cm2/s/MeV ("+gammalib::str(inx_prefactor)+")");
-    log_value(NORMAL, "Index", gammalib::str(index_mean)+
-                      " ("+gammalib::str(inx_index)+")");
-    log_value(NORMAL, "Pivot energy", pivot.print());
+        // Write parameter indices into logger
+        log_value(NORMAL, "Prefactor", gammalib::str(prefactor_mean)+
+                  " ph/cm2/s/MeV ("+gammalib::str(inx_prefactor)+")");
+        log_value(NORMAL, "Index", gammalib::str(index_mean)+
+                  " ("+gammalib::str(inx_index)+")");
+        log_value(NORMAL, "Pivot energy", pivot.print());
 
-    // Extract covariance elements
-    double cov_pp = m_covariance(inx_prefactor,inx_prefactor);
-    double cov_pg = m_covariance(inx_prefactor,inx_index);
-    double cov_gg = m_covariance(inx_index,inx_index);
+        // Extract covariance elements
+        double cov_pp = m_covariance(inx_prefactor,inx_prefactor);
+        double cov_pg = m_covariance(inx_prefactor,inx_index);
+        double cov_gg = m_covariance(inx_index,inx_index);
 
-    // Compute eigenvectors and eigenvalues
-    double  lambda1;
-    double  lambda2;
-    GVector vector1(2);
-    GVector vector2(2);
-    eigenvectors(cov_pp, cov_pg, cov_pg, cov_gg,
-                 &lambda1, &lambda2, &vector1, &vector2);
+        // Compute eigenvectors and eigenvalues
+        double  lambda1;
+        double  lambda2;
+        GVector vector1(2);
+        GVector vector2(2);
+        eigenvectors(cov_pp, cov_pg, cov_pg, cov_gg,
+                     &lambda1, &lambda2, &vector1, &vector2);
 
-    // Write eigenvectors and eigenvalues into logger
-    log_value(NORMAL, "Eigenvalue 1", lambda1);
-    log_value(NORMAL, "Eigenvalue 2", lambda2);
-    log_value(NORMAL, "Eigenvector 1", vector1.print());
-    log_value(NORMAL, "Eigenvector 2", vector2.print());
+        // Write eigenvectors and eigenvalues into logger
+        log_value(NORMAL, "Eigenvalue 1", lambda1);
+        log_value(NORMAL, "Eigenvalue 2", lambda2);
+        log_value(NORMAL, "Eigenvector 1", vector1.print());
+        log_value(NORMAL, "Eigenvector 2", vector2.print());
 
-    // Confidence scaling
-    double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
-    double scale = (sigma*sigma);
+        // Confidence scaling
+        double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
+        double scale = (sigma*sigma);
 
-    // Write confidence level information into logger
-    log_value(NORMAL, "Confidence level", m_confidence);
-    log_value(NORMAL, "Corresponding scaling", scale);
+        // Write confidence level information into logger
+        log_value(NORMAL, "Confidence level", m_confidence);
+        log_value(NORMAL, "Corresponding scaling", scale);
 
-    // Compute minor and major axes of error ellipse
-    double major = scale*std::sqrt(lambda1);
-    double minor = scale*std::sqrt(lambda2);
+        // Compute minor and major axes of error ellipse
+        double major = scale*std::sqrt(lambda1);
+        double minor = scale*std::sqrt(lambda2);
 
-    // Write header into logger
-    log_header1(TERSE, "Generate butterfly");
+        // Write header into logger
+        log_header1(TERSE, "Generate butterfly");
 
-    // Initialise result arrays
-    m_energies.assign(m_ebounds.size(), 0.0);
-    m_intensities.assign(m_ebounds.size(), 0.0);
-    m_min_intensities.assign(m_ebounds.size(), 1e30);
-    m_max_intensities.assign(m_ebounds.size(), 0.0);
+        // Initialise result arrays
+        m_energies.assign(m_ebounds.size(), 0.0);
+        m_intensities.assign(m_ebounds.size(), 0.0);
+        m_min_intensities.assign(m_ebounds.size(), 1e30);
+        m_max_intensities.assign(m_ebounds.size(), 0.0);
 
-    // Walk around the error ellipse
-    int    nt = 360;
-    double dt = gammalib::twopi/double(nt);
-    double t  = 0.0;
-    for (int i = 0; i < nt; ++i, t += dt) {
+        // Walk around the error ellipse
+        int    nt = 360;
+        double dt = gammalib::twopi/double(nt);
+        double t  = 0.0;
+        for (int i = 0; i < nt; ++i, t += dt) {
 
-        // Pre-compute sin and cosine
-        double sin_t = std::sin(t);
-        double cos_t = std::cos(t);
+            // Pre-compute sin and cosine
+            double sin_t = std::sin(t);
+            double cos_t = std::cos(t);
 
-        // Compute prefactor and index
-        double prefactor = (major * cos_t * vector1[0] +
-                            minor * sin_t * vector2[0]) * prefactor_scale +
-                           prefactor_mean;
-        double index     = (major * cos_t * vector1[1] +
-                            minor * sin_t * vector2[1]) * index_scale +
-                           index_mean;
+            // Compute prefactor and index
+            double prefactor = (major * cos_t * vector1[0] +
+                                minor * sin_t * vector2[0]) +
+                prefactor_mean;
+            double index     = (major * cos_t * vector1[1] +
+                                minor * sin_t * vector2[1]) +
+                index_mean;
 
-        // Write prefactor and index into logger
-        log_value(EXPLICIT, "Angle "+gammalib::str(t*gammalib::rad2deg),
-                  gammalib::str(prefactor)+" ph/cm2/s/MeV; "+
-                  gammalib::str(index));
+            // Write prefactor and index into logger
+            log_value(EXPLICIT, "Angle "+gammalib::str(t*gammalib::rad2deg),
+                      gammalib::str(prefactor)+" ph/cm2/s/MeV; "+
+                      gammalib::str(index));
 
-        // Setup power law model
-        GModelSpectralPlaw plaw(prefactor, index, pivot);
+            // Setup power law model
+            GModelSpectralPlaw plaw(prefactor, index, pivot);
 
-        // Evaluate power law at each energy and extract minimum and
-        // maximum intensity
+            // Evaluate power law at each energy and extract minimum and
+            // maximum intensity
+            for (int k = 0; k < m_ebounds.size(); ++k) {
+
+                // Get the energy of current bin
+                GTime   time;
+                GEnergy energy = m_ebounds.elogmean(k);
+
+                // Evaluate power law
+                double intensity = plaw.eval(energy, time);
+
+                // Get extremes
+                if (intensity < m_min_intensities[k]) {
+                    m_min_intensities[k] = intensity;
+                }
+                if (intensity > m_max_intensities[k]) {
+                    m_max_intensities[k] = intensity;
+                }
+
+            } // endfor: looped over all energies
+
+        } // endfor: looped over all angles
+
+        // Setup power law model for mean prefactor and index
+        GModelSpectralPlaw plaw(prefactor_mean, index_mean, pivot);
+
+        // Compute energy and intensity vectors for mean power law
         for (int k = 0; k < m_ebounds.size(); ++k) {
 
             // Get the energy of current bin
@@ -392,37 +423,112 @@ void ctbutterfly::run(void)
             // Evaluate power law
             double intensity = plaw.eval(energy, time);
 
-            // Get extremes
-            if (intensity < m_min_intensities[k]) {
-                m_min_intensities[k] = intensity;
-            }
-            if (intensity > m_max_intensities[k]) {
-                m_max_intensities[k] = intensity;
-            }
+            // Store results
+            m_energies[k]    = energy.MeV();
+            m_intensities[k] = intensity;
 
-        } // endfor: looped over all energies
+        } // endfor: looped over energies
 
-    } // endfor: looped over all angles
+    } //endif: use butterfly envelope for computation 
 
-    // Setup power law model for mean prefactor and index
-    GModelSpectralPlaw plaw(prefactor_mean, index_mean, pivot);
+    else {
 
-    // Compute energy and intensity vectors for mean power law
-    for (int k = 0; k < m_ebounds.size(); ++k) {
+        // Use gaussian error propagation scheme to calculate
+        // butterfly
+        log_header2(TERSE, "Using gaussian error propagation to"
+                           " calculate butterfly");
 
-        // Get the energy of current bin
-        GTime   time;
-        GEnergy energy = m_ebounds.elogmean(k);
+        // Initialise dummy time to evaluate spectral model
+        GTime time = GTime();
 
-        // Evaluate power law
-        double intensity = plaw.eval(energy, time);
+        // Initialise vector of gradients
+        GVector grad = GVector(m_obs.models().npars());
 
-        // Store results
-        m_energies[k]    = energy.MeV();
-        m_intensities[k] = intensity;
+        // Loop over energy bins positions
+        for (int i = 0; i < m_ebounds.size(); ++i) {
 
-    } // endfor: looped over energies
+            // Initialise number of gradients
+            int num_gradient = 0;
 
+            // Get the energy of current bin
+            GEnergy energy = m_ebounds.elogmean(i);
+
+            // Log status info
+            std::string msg = "Computing butterfly for bin number "+
+                               gammalib::str(i)+" at "+energy.print();
+            log_string(NORMAL, msg);
+	
+            // Initialise model flux value
+            double model_flux = 0.0;
+
+            // Loop over models
+            for (int j = 0; j < models.size(); ++j) {
+
+                // Check wether model is a skymodel
+                GModelSky* skymodel = dynamic_cast<GModelSky*>(models[j]);
+
+                // Yes ...
+                if (skymodel != NULL) {
+
+                    // Skip spatial models
+                    num_gradient += skymodel->spatial()->size();
+
+                    // Get pointer to spectral model
+                    GModelSpectral* spectral = skymodel->spectral();
+
+                    // Set flux value of source of interest, evaluate gradients
+                    if (skymodel->name() == m_srcname) {
+                        model_flux = spectral->eval(energy, time, true);
+                    } // endif: model was source of interest
+		
+                    // Loop over model parameters, get gradients
+                    // and assign them to the vector
+                    if(skymodel->name() == m_srcname) {
+
+                        // set gradient if we deal with source of interest
+                        for (int k = 0; k < spectral->size(); ++k) {
+                            grad[num_gradient] = (*spectral)[k].gradient();
+                            num_gradient++;
+			
+                        } // endfor: looped over spectral parameters
+		    
+                    } //endif: spectrum was of source of interest 
+                    else{
+                        // Skip gradient of other models (0=default)
+                        num_gradient += skymodel->spectral()->size();
+		     
+                    } //endelse: Model was not model of interest
+
+                    // Skip temporal models
+                    num_gradient += skymodel->temporal()->size();
+
+                } // endif: model was sky model
+
+                else {
+                    // Skip other models (e.g. GModelData instances)
+                    num_gradient += models[j]->size();
+
+                } // endelse: Model was not GModelSky
+
+            } // endfor: Looped over models
+
+            // Multiply covariance to the gradient vector
+            GVector vector = m_covariance * grad;
+
+            // Get the error from the scalar product
+            double error = std::sqrt(grad * vector);
+
+            // Store flux, value and energy for saving
+            m_intensities.push_back(model_flux);
+            m_energies.push_back(energy.MeV());
+            m_min_intensities.push_back(model_flux-error);
+            m_max_intensities.push_back(model_flux+error);
+   
+        } //endfor: loop over energy bin        
+        
+    }  //endelse: use gaussian error propagation
+
+    
     // Write header into logger
     log_header1(TERSE, "Results");
 
@@ -434,9 +540,11 @@ void ctbutterfly::run(void)
                   gammalib::str(m_intensities[k])+" ("+
                   gammalib::str(m_min_intensities[k])+", "+
                   gammalib::str(m_max_intensities[k])+") ph/cm2/s/MeV");
+        
+    } //endfor: loop over energy bin  
+    
 
-    } // endfor: looped over energies
-
+    
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
@@ -507,6 +615,7 @@ void ctbutterfly::init_members(void)
     m_confidence  = 0.68;
     m_max_iter    = 50;
     m_apply_edisp = false;
+    m_gepmode     = false;
     m_fit         = false;
     m_chatter     = static_cast<GChatter>(2);
     m_ebounds.clear();
@@ -540,6 +649,7 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_confidence  = app.m_confidence;
     m_max_iter    = app.m_max_iter;
     m_apply_edisp = app.m_apply_edisp;
+    m_gepmode     = app.m_gepmode;
     m_fit         = app.m_fit;
     m_chatter     = app.m_chatter;
     m_ebounds     = app.m_ebounds;
@@ -590,9 +700,6 @@ void ctbutterfly::get_parameters(void)
     // Get name of test source
     m_srcname = (*this)["srcname"].string();
 
-    // Check model name and type
-    check_model();
-
     // Create energy boundaries from user parameters
     m_ebounds = create_ebounds();
 
@@ -608,10 +715,16 @@ void ctbutterfly::get_parameters(void)
 
     // Get remaining parameters
     m_apply_edisp = (*this)["edisp"].boolean();
+    m_gepmode     = (*this)["gepmode"].boolean();
     m_confidence  = (*this)["confidence"].real();
     m_fit         = (*this)["fit"].boolean();
     m_chatter     = static_cast<GChatter>((*this)["chatter"].integer());
 
+    if (!m_gepmode) {
+        // Check model name and type
+        check_model();
+     }
+    
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
