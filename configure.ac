@@ -1,7 +1,7 @@
 #############################################################################
 # Configuration for ctools - tools for science analysis of CTA data         #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2011-2016 Juergen Knoedlseder                               #
+# Copyright (C) 2011-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -608,9 +608,10 @@ AC_C_INLINE
 # Python binding requires Python and either the files tools_wrap.cpp and    #
 # tools.py or swig to create these files.  The following conditionals are   #
 # set:                                                                      #
-# WITH_PYTHON   - Python bindings will be built                             #
-# HAVE_SWIG     - swig is available                                         #
-# HAVE_WRAPPERS - wrappers are available                                    #
+# WITH_PYTHON    - Python bindings will be built                            #
+# HAVE_SWIG      - swig is available                                        #
+# HAVE_WRAPPERS  - wrappers are available                                   #
+# BUILD_WRAPPERS - build the Python wrappers                                #
 #############################################################################
 # Initialise flags
 enable_python="no"
@@ -619,6 +620,12 @@ has_python_h="no"
 has_swig="no"
 has_wrappers="no"
 build_wrappers="no"
+
+# Check if the code is a git clone. In that case the systems switches to
+# developer mode which forces building of the Python interface with SWIG.
+AC_CHECK_FILE([.git/HEAD],
+              [from_git=yes;build_wrappers="yes"],
+              [from_git=no])
 
 # Python binding enabled?
 AC_ARG_ENABLE([python-binding],
@@ -1064,21 +1071,36 @@ else
   echo "  - GammaLib support             (no)    no gammalib library found"
 fi
 
+# Dump developer configuration
+if test "x$from_git" = "xyes"; then
+  echo "  * Developer configuration      (yes)"
+else
+  echo "  * End user configuration       (yes)"
+fi
+
 # Dump Python binding information
 if test "x$ac_enable_python_binding" = "xyes"; then
   if test "x$has_python" = "xyes"; then
     if test "x$has_python_h" = "xyes"; then
-      if test "x$has_wrappers" = "xyes"; then
-        if test "x$has_swig" = "xyes"; then
-          echo "  * Make Python binding          (yes)   use swig for updates"
+      if test "x$build_wrappers" = "xyes"; then
+        if test "x$has_wrappers" = "xyes"; then
+          if test "x$has_swig" = "xyes"; then
+            echo "  * Make Python binding          (yes)   use swig for updates"
+          else
+            echo "  * Make Python binding          (yes)   use wrappers"
+          fi
         else
-          echo "  * Make Python binding          (yes)   use wrappers"
+          if test "x$has_swig" = "xyes"; then
+            echo "  * Make Python binding          (yes)   use swig for building"
+          else
+            echo "  - Make Python binding          (no)    swig required to build wrappers"
+          fi
         fi
       else
-        if test "x$has_swig" = "xyes"; then
-          echo "  * Make Python binding          (yes)   use swig for building"
+        if test "x$has_wrappers" = "xyes"; then
+          echo "  - Make Python binding          (yes)   use existing wrappers"
         else
-          echo "  - Make Python binding          (no)    swig required to build wrappers"
+          echo "  - Make Python binding          (no)    wrappers not found"
         fi
       fi
     else
