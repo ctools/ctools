@@ -436,9 +436,9 @@ void ctbutterfly::run(void)
     else {
 
         // Use gaussian error propagation scheme to calculate
-        // butterfly
-        log_header2(TERSE, "Using gaussian error propagation to"
-                           " calculate butterfly");
+        // the butterfly
+        log_header2(TERSE, "Use gaussian error propagation to "
+                           "calculate butterfly");
 
         // Initialise dummy time to evaluate spectral model
         GTime time = GTime();
@@ -717,10 +717,8 @@ void ctbutterfly::get_parameters(void)
     m_fit         = (*this)["fit"].boolean();
     m_chatter     = static_cast<GChatter>((*this)["chatter"].integer());
 
-    if (!m_gepmode) {
-        // Check model name and type
-        check_model();
-     }
+    // Check model name and type
+    check_model();
     
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
@@ -760,12 +758,15 @@ void ctbutterfly::check_model(void)
             throw GException::invalid_value(G_CHECK_MODEL, msg);
         }
 
-        // Check that the spectral model is a power law
-        if (model->spectral()->type() != "PowerLaw") {
-            std::string msg = "\""+model->spectral()->type()+"\" cannot be "
-                              "used as spectral model for an butterfly "
-                              "computation. Please specify a power law model.";
-            throw GException::invalid_value(G_CHECK_MODEL, msg);
+        // Check that the spectral model is a power law for default mode
+        if(!m_gepmode){
+            if (model->spectral()->type() != "PowerLaw") {
+                std::string msg = "\""+model->spectral()->type()+"\" cannot be "
+                    "used as spectral model for an butterfly "
+                    "computation in default mode. Please specify a "
+                    "power law model or switch to gep mode.";
+                throw GException::invalid_value(G_CHECK_MODEL, msg);
+            }
         }
 
     } // endif: source model existed
