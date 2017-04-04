@@ -245,7 +245,7 @@ void ctbutterfly::run(void)
 
         // Get covariance matrix.
         GObservations::likelihood likelihood = m_obs.function();
-        if(!gepmode) {
+        if(!m_gepmode) {
             m_covariance = likelihood.curvature()->invert();
         }
         else {   
@@ -275,7 +275,7 @@ void ctbutterfly::run(void)
         likelihood.eval(pars);
 
         // Get covariance matrix.
-        if(!gepmode) {
+        if(!m_gepmode) {
             m_covariance = likelihood.curvature()->invert();
         }
         else {   
@@ -312,6 +312,8 @@ void ctbutterfly::run(void)
         double  prefactor_mean  = (*skymodel)["Prefactor"].value();
         double  index_mean      = (*skymodel)["Index"].value();
         double  pivot_mean      = (*skymodel)["PivotEnergy"].value();
+        double  prefactor_scale = (*skymodel)["Prefactor"].scale();
+        double  index_scale     = (*skymodel)["Index"].scale();
         GEnergy pivot(pivot_mean, "MeV");
 
         // Write parameter indices into logger
@@ -373,11 +375,11 @@ void ctbutterfly::run(void)
 
             // Compute prefactor and index
             double prefactor = (major * cos_t * vector1[0] +
-                                minor * sin_t * vector2[0]) +
-                prefactor_mean;
+                                minor * sin_t * vector2[0]) * prefactor_scale +
+                               prefactor_mean;
             double index     = (major * cos_t * vector1[1] +
-                                minor * sin_t * vector2[1]) +
-                index_mean;
+                                minor * sin_t * vector2[1]) * index_scale +
+                               index_mean;
 
             // Write prefactor and index into logger
             log_value(EXPLICIT, "Angle "+gammalib::str(t*gammalib::rad2deg),
@@ -452,11 +454,6 @@ void ctbutterfly::run(void)
 
             // Get the energy of current bin
             GEnergy energy = m_ebounds.elogmean(i);
-
-            // Log status info
-            std::string msg = "Computing butterfly for bin number "+
-                               gammalib::str(i)+" at "+energy.print();
-            log_string(NORMAL, msg);
 	
             // Initialise model flux value
             double model_flux = 0.0;
