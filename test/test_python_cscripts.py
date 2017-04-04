@@ -184,8 +184,9 @@ def test(installed=False, debug=False):
     if installed:
         os.system('rm -rf %s' % (path))
 
-    # Exit with return code
-    sys.exit(rc)
+    # Raise an exception in case of failure
+    if not success:
+        raise RuntimeError('At least one error occured during the test.')
 
 
 # ======================== #
