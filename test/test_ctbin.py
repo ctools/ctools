@@ -30,7 +30,7 @@ from testing import test
 class Test(test):
     """
     Test class for ctbin tool
-    
+
     This test class makes unit tests for the ctbin tool by using it from
     the command line and from Python.
     """
@@ -87,8 +87,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd1.fits')
-        #JKself._check_cube(evt, 5542)
-        self._check_cube(evt, 5543)
+        self._check_cube(evt, 5542)
 
         # Setup ctbin command
         cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
@@ -281,7 +280,7 @@ class Test(test):
     def _check_observation(self, ctbin, nevents, multiplier=1):
         """
         Check content of an observation
-        
+
         Parameters
         ----------
         ctbin : `~ctools.ctbin`
@@ -317,7 +316,7 @@ class Test(test):
     def _check_cube(self, cube, nevents, multiplier=1):
         """
         Check content of event cube
-        
+
         Parameters
         ----------
         cube : `~gammalib.GCTAEventCube`

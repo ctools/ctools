@@ -487,8 +487,7 @@ class Test(gammalib.GPythonTestSuite):
         args = '-p example_show_pointings.eps %s/obs_unbinned.xml' % self._datadir
 
         # Execute script
-        #JKself._execute_python('show_pointings', args=args)
-        self._execute_python('show_pointing', args=args)
+        self._execute_python('show_pointings', args=args)
 
         # Return
         return
@@ -533,7 +532,6 @@ if __name__ == '__main__':
     else:
         rc = 1
 
-    # Exit with return code
+    # Raise an exception in case of failure
     if not success:
         raise RuntimeError('At least one error occured during the test.')
-    #sys.exit(rc)
