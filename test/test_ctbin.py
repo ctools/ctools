@@ -87,7 +87,8 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd1.fits')
-        self._check_cube(evt, 5542)
+        #JKself._check_cube(evt, 5542)
+        self._check_cube(evt, 5543)
 
         # Setup ctbin command
         cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
