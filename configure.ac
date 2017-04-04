@@ -1018,6 +1018,7 @@ AC_CONFIG_FILES([Makefile
                  src/ctobssim/Makefile
                  src/ctskymap/Makefile
                  src/ctselect/Makefile
+                 src/ctphase/Makefile
                  src/ctexpcube/Makefile
                  src/ctpsfcube/Makefile
                  src/ctedispcube/Makefile

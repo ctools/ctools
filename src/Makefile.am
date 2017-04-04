@@ -40,7 +40,8 @@ SUBDIRS = support \
           cttsmap \
           ctbutterfly \
           ctulimit \
-          cterror
+          cterror \
+          ctphase
 
 # Scripts to be distributed
 scripts = ctools-setup \
@@ -68,7 +69,9 @@ libctools_la_LIBADD = support/libsupport.la \
                       cttsmap/libcttsmap.la \
                       ctbutterfly/libctbutterfly.la \
                       ctulimit/libctulimit.la \
-                      cterror/libcterror.la
+                      cterror/libcterror.la \
+                      ctphase/libctphase.la
+
 libctools_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
 
 # Distribute scripts
