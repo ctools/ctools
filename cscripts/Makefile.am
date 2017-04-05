@@ -223,7 +223,7 @@ EXTRA_DIST = $(binscripts) $(pythonscripts) $(parfiles) \
              $(testscripts) $(testdata) $(testiactdata) \
              $(testiactevents)
 
-# Add install hook rule to create symbolic links for cscripts
+# Add install hook rule to copy cscripts without .py into the bindir
 install-data-hook:
 	@binlist='$(binscripts)';\
 	for p in $$binlist; do \
@@ -232,11 +232,11 @@ install-data-hook:
 	@linklist='$(linkscripts)';\
 	for p in $$linklist; do \
 		rm -rf "$(DESTDIR)$(bindir)/$$p"; \
-		ln -s "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
-		chmod +x "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py"; \
+		cp "$(DESTDIR)$(pyexecdir)/cscripts/$$p.py" "$(DESTDIR)$(bindir)/$$p"; \
+		chmod +x "$(DESTDIR)$(bindir)/$$p"; \
 	done
 
-# Uninstall hook rule to remove the symbolic links for cscripts
+# Uninstall hook rule to remove the cscripts from the bindir
 uninstall-hook:
 	@linklist='$(linkscripts)';\
 	for p in $$linklist; do \
