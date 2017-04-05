@@ -342,9 +342,9 @@ void ctbutterfly::run(void)
         log_value(NORMAL, "Eigenvector 1", vector1.print());
         log_value(NORMAL, "Eigenvector 2", vector2.print());
 
-        // Confidence scaling
-        double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
-        double scale = (sigma*sigma);
+        // Confidence scaling, calculated from a Chi-Sqr. 
+        // distribution with 2 dof
+        double scale = std::sqrt( -2. * std::log(1.-m_confidence) );
 
         // Write confidence level information into logger
         log_value(NORMAL, "Confidence level", m_confidence);
