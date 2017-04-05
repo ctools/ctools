@@ -77,7 +77,7 @@ General parameters
     Performs maximum likelihood fitting of input model ignoring any provided
     covariance matrix.
 
-``(method = GAUSSIAN|ENVELOPE) [real]``
+``(method = GAUSSIAN|ENVELOPE) [string]``
     Computation method.
     
 ``(confidence = 0.68) [real]``
