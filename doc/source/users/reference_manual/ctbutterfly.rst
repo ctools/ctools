@@ -10,10 +10,10 @@ Synopsis
 --------
 
 This tool calculates a butterfly diagram for a specific source according to 
-its spectral model. The default method used for the calculation is Gaussian
-error propagation using the covariance matrix from a maximum likelihood fit.
-The butterfly diagram is the envelope of all power law models that are
-within a given confidence limit compatible with the data. By default a
+its spectral model. The butterfly diagram is the envelope of all power law
+models that are within a given confidence limit compatible with the data.
+The default method used for the calculation is Gaussian error propagation
+using the covariance matrix from a maximum likelihood fit. By default a
 confidence level of 68% is used, but the level can be adjusted using the
 hidden ``confidence`` parameter. For power law models, an alternative
 calculation method can be specified by setting the hidden parameter
@@ -79,8 +79,6 @@ General parameters
 
 ``(method = GAUSSIAN|ENVELOPE) [real]``
     Computation method.
-    ``GAUSSIAN``: Gaussian error propagation.
-    ``ENVELOPE``: Evaluate error ellipse. 
     
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
