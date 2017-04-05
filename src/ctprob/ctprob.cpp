@@ -1,7 +1,7 @@
 /***************************************************************************
- *                  ctmodel - Model cube generation tool                   *
+ *           ctprob - Computes probability for a given model               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2016 by Leonardo Di Venere                          *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctmodel.cpp
- * @brief Model cube generation tool implementation
- * @author Juergen Knoedlseder
+ * @file ctprob.cpp
+ * @brief Computes probability for a given model
+ * @author Leonardo Di Venere
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -29,12 +29,12 @@
 #include <config.h>
 #endif
 #include <cstdio>
-#include "ctmodel.hpp"
+#include "ctprob.hpp"
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                          "ctmodel::get_parameters()"
-#define G_FILL_CUBE                    "ctmodel::fill_cube(GCTAObservation*)"
+#define G_GET_PARAMETERS                          "ctprob::get_parameters()"
+#define G_FILL_CUBE                    "ctprob::fill_cube(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -53,7 +53,7 @@ const GEnergy g_energy_margin(1.0e-12, "TeV");
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctmodel::ctmodel(void) : ctobservation(CTMODEL_NAME, CTMODEL_VERSION)
+ctprob::ctprob(void) : ctobservation(CTPROB_NAME, CTPROB_VERSION)
 {
     // Initialise members
     init_members();
@@ -71,8 +71,8 @@ ctmodel::ctmodel(void) : ctobservation(CTMODEL_NAME, CTMODEL_VERSION)
  * This method creates an instance of the class by copying an existing
  * observations container.
  ***************************************************************************/
-ctmodel::ctmodel(const GObservations& obs) :
-         ctobservation(CTMODEL_NAME, CTMODEL_VERSION, obs)
+ctprob::ctprob(const GObservations& obs) :
+         ctobservation(CTPROB_NAME, CTPROB_VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -89,8 +89,8 @@ ctmodel::ctmodel(const GObservations& obs) :
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
-ctmodel::ctmodel(int argc, char *argv[]) :
-         ctobservation(CTMODEL_NAME, CTMODEL_VERSION, argc, argv)
+ctprob::ctprob(int argc, char *argv[]) :
+         ctobservation(CTPROB_NAME, CTPROB_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -105,7 +105,7 @@ ctmodel::ctmodel(int argc, char *argv[]) :
  *
  * @param[in] app Application.
  ***************************************************************************/
-ctmodel::ctmodel(const ctmodel& app) : ctobservation(app)
+ctprob::ctprob(const ctprob& app) : ctobservation(app)
 {
     // Initialise members
     init_members();
@@ -121,7 +121,7 @@ ctmodel::ctmodel(const ctmodel& app) : ctobservation(app)
 /***********************************************************************//**
  * @brief Destructor
  ***************************************************************************/
-ctmodel::~ctmodel(void)
+ctprob::~ctprob(void)
 {
     // Free members
     free_members();
@@ -143,7 +143,7 @@ ctmodel::~ctmodel(void)
  * @param[in] app Application.
  * @return Application.
  ***************************************************************************/
-ctmodel& ctmodel::operator=(const ctmodel& app)
+ctprob& ctprob::operator=(const ctprob& app)
 {
     // Execute only if object is not identical
     if (this != &app) {
@@ -174,11 +174,11 @@ ctmodel& ctmodel::operator=(const ctmodel& app)
  ==========================================================================*/
 
 /***********************************************************************//**
- * @brief Clear ctmodel tool
+ * @brief Clear ctprob tool
  *
- * Clears ctmodel tool.
+ * Clears ctprob tool.
  ***************************************************************************/
-void ctmodel::clear(void)
+void ctprob::clear(void)
 {
     // Free members
     free_members();
@@ -208,7 +208,7 @@ void ctmodel::clear(void)
  * observation container, loops over all CTA observations in the container
  * and generates a model map for each CTA observation.
  ***************************************************************************/
-void ctmodel::run(void)
+void ctprob::run(void)
 {
     // If we're in debug mode then all output is also dumped on the screen
     if (logDebug()) {
@@ -296,7 +296,7 @@ void ctmodel::run(void)
  * Saves the model cube into a FITS file specified using the "outfile"
  * task parameter.
  ***************************************************************************/
-void ctmodel::save(void)
+void ctprob::save(void)
 {
     // Write header
     log_header1(TERSE, "Save model cube");
@@ -326,7 +326,7 @@ void ctmodel::save(void)
  *
  * @param[in] name Model cube name.
  ***************************************************************************/
-void ctmodel::publish(const std::string& name)
+void ctprob::publish(const std::string& name)
 {
     // Write header into logger
     log_header1(TERSE, "Publish model cube");
@@ -334,7 +334,7 @@ void ctmodel::publish(const std::string& name)
     // Set default name is user name is empty
     std::string user_name(name);
     if (user_name.empty()) {
-        user_name = CTMODEL_NAME;
+        user_name = CTPROB_NAME;
     }
 
     // Log filename
@@ -355,7 +355,7 @@ void ctmodel::publish(const std::string& name)
  *
  * Set model cube and set all cube bins to zero.
  ***************************************************************************/
-void ctmodel::cube(const GCTAEventCube& cube)
+void ctprob::cube(const GCTAEventCube& cube)
 {
     // Set cube
     m_cube = cube;
@@ -382,7 +382,7 @@ void ctmodel::cube(const GCTAEventCube& cube)
 /***********************************************************************//**
  * @brief Initialise class members
  ***************************************************************************/
-void ctmodel::init_members(void)
+void ctprob::init_members(void)
 {
     // Initialise members
     m_outcube.clear();
@@ -407,7 +407,7 @@ void ctmodel::init_members(void)
  *
  * @param[in] app Application.
  ***************************************************************************/
-void ctmodel::copy_members(const ctmodel& app)
+void ctprob::copy_members(const ctprob& app)
 {
     // Copy attributes
     m_outcube     = app.m_outcube;
@@ -430,7 +430,7 @@ void ctmodel::copy_members(const ctmodel& app)
 /***********************************************************************//**
  * @brief Delete class members
  ***************************************************************************/
-void ctmodel::free_members(void)
+void ctprob::free_members(void)
 {
     // Return
     return;
@@ -443,7 +443,7 @@ void ctmodel::free_members(void)
  * Get all task parameters from parameter file or (if required) by querying
  * the user. The parameters are read in the correct order.
  ***************************************************************************/
-void ctmodel::get_parameters(void)
+void ctprob::get_parameters(void)
 {
     // Reset cube append flag
     m_append_cube = false;
@@ -598,7 +598,7 @@ void ctmodel::get_parameters(void)
  *
  * @todo Support stacked energy dispersion
  ***************************************************************************/
-void ctmodel::get_obs(void)
+void ctprob::get_obs(void)
 {
     // Get the filename from the input parameters
     std::string filename = (*this)["inobs"].filename();
@@ -723,7 +723,7 @@ void ctmodel::get_obs(void)
  * GTI of the model cube so that cube GTI is a list of the GTIs of all
  * observations that were used to generate the model cube.
  ***************************************************************************/
-void ctmodel::fill_cube(const GCTAObservation* obs)
+void ctprob::fill_cube(const GCTAObservation* obs)
 {
     // Get references to GTI and energy boundaries for the event list
     const GGti&     gti         = obs->events()->gti();

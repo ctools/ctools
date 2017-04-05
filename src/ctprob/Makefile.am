@@ -1,5 +1,5 @@
 #############################################################################
-# Makefile.am for ctmodel tool                                              #
+# Makefile.am for ctprob tool                                              #
 # ------------------------------------------------------------------------- #
 # Copyright (C) 2016 Juergen Knoedlseder                                    #
 # ------------------------------------------------------------------------- #
@@ -23,25 +23,25 @@
 INCLUDES = -I$(top_srcdir)/src/support
 
 # Program name
-bin_PROGRAMS = ctmodel
+bin_PROGRAMS = ctprob
 
 # Sources
-sources = ctmodel.cpp ctmodel.hpp
+sources = ctprob.cpp ctprob.hpp
 
 # Libtool library
-noinst_LTLIBRARIES = libctmodel.la
-libctmodel_la_SOURCES = $(sources)
-libctmodel_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
+noinst_LTLIBRARIES = libctprob.la
+libctprob_la_SOURCES = $(sources)
+libctprob_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
-ctmodel_SOURCES = main.cpp
-ctmodel_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
-ctmodel_CPPFLAGS = @CPPFLAGS@
-ctmodel_LDADD = libctmodel.la $(top_builddir)/src/support/libsupport.la
+ctprob_SOURCES = main.cpp
+ctprob_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
+ctprob_CPPFLAGS = @CPPFLAGS@
+ctprob_LDADD = libctprob.la $(top_builddir)/src/support/libsupport.la
 
 # Parameter files
 pfilesdir = $(prefix)/syspfiles
-pfiles_DATA = $(srcdir)/ctmodel.par
+pfiles_DATA = $(srcdir)/ctprob.par
 
 # Extra files to be distributed in the tar file
 EXTRA_DIST = $(pfiles_DATA)

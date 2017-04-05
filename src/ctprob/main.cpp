@@ -1,7 +1,7 @@
 /***************************************************************************
- *                     ctmodel - CTA counts model tool                     *
+ *           ctprob - Computes probability for a given model               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2016 by Leonardo Di Venere                          *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctmodel/main.cpp
- * @brief CTA counts model tool main code
- * @author Juergen Knoedlseder
+ * @file main.cpp
+ * @brief Computes probability for a given model
+ * @author Leonardo Di Venere
  */
 
 /* __ Includes ___________________________________________________________ */

@@ -1,7 +1,7 @@
 /***************************************************************************
- *                  ctmodel - Model cube generation tool                   *
+ *           ctprob - Computes probability for a given model               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2016 by Leonardo Di Venere                          *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,10 +19,11 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctmodel.hpp
- * @brief Model cube generation tool definition
- * @author Juergen Knoedlseder
+ * @file ctprob.hpp
+ * @brief Computes probability for a given model
+ * @author Leonardo Di Venere
  */
+
 
 #ifndef CTMODEL_HPP
 #define CTMODEL_HPP
