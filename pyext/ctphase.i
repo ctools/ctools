@@ -19,59 +19,43 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctphase/main.cpp
+ * @file ctphase.i
  * @brief Append phase information to CTA events file
  * @author Leonardo Di Venere
  */
-
-/* __ Includes ___________________________________________________________ */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#include "support.hpp"
+%{
+/* Put headers and other declarations here that are needed for compilation */
 #include "ctphase.hpp"
+%}
 
 
 /***********************************************************************//**
- * @brief Main entry point
+ * @class ctphase
  *
- * @param[in] argc Number of arguments
- * @param[in] argv Arguments
- *
- * This is the main entry point of the ctphase application. It allocates a
- * ctphase object and executes the application. Any exceptions that occur
- * will be catched and corresponding error messages written in the
- * application logger and into the standard output.
+ * @brief Data selection tool
  ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Initialise return code
-    int rc = 1;
+class ctphase : public ctobservation {
+public:
+    // Constructors and destructors
+    ctphase(void);
+    explicit ctphase(const GObservations& obs);
+    ctphase(int argc, char *argv[]);
+    ctphase(const ctphase& app);
+    virtual ~ctphase(void);
+    
+    // Methods
+    void clear(void);
+    void run(void);
+    void save(void);
+    void publish(const std::string& name = "");
+};
 
-    // Initialise pointer on application
-    ctphase* application = NULL;
 
-    // Execute application
-    try {
-
-        // Create instance of application
-        application = new ctphase(argc, argv);
-
-        // Execute ctool
-        rc = execute_ctool(application);
-
+/***********************************************************************//**
+ * @brief Data selection tool Python extension
+ ***************************************************************************/
+%extend ctphase {
+    ctphase copy() {
+        return (*self);
     }
-
-    catch (std::exception &e) {
-
-        // Report exception
-        report_ctool_failure("ctphase", e.what());
-
-    }
-
-    // Delete application
-    delete application;
-
-    // Return
-    return rc;
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *                      ctphase - Data selection tool                      *
+ *          ctphase - Append phase information to CTA events file          *
  * ----------------------------------------------------------------------- *
  *  copyright (C) 2017 by Leonardo Di Venere                               *
  * ----------------------------------------------------------------------- *
@@ -20,8 +20,8 @@
  ***************************************************************************/
 /**
  * @file ctphase.hpp
- * @brief Data selection tool definition
- * @author Juergen Knoedlseder
+ * @brief Append phase information to CTA events file
+ * @author Leonardo Di Venere
  */
 
 #ifndef CTPHASE_HPP
@@ -62,8 +62,6 @@ public:
     void run(void);
     void save(void);
     void publish(const std::string& name = "");
-
-    // TODO: Add Methods for updating model parameters
 
 protected:
     // Protected methods

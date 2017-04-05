@@ -44,6 +44,7 @@ testscripts = ctools/tests/__init__.py \
               $(top_srcdir)/test/test_python_ctools.py \
               $(top_srcdir)/test/test_ctobssim.py \
               $(top_srcdir)/test/test_ctselect.py \
+              $(top_srcdir)/test/test_ctphase.py \
               $(top_srcdir)/test/test_ctbin.py \
               $(top_srcdir)/test/test_ctlike.py \
               $(top_srcdir)/test/test_cttsmap.py \

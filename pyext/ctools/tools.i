@@ -61,6 +61,7 @@ namespace std {
 %include "ctlike.i"
 %include "ctmodel.i"
 %include "ctselect.i"
+%include "ctphase.i"
 %include "ctskymap.i"
 %include "ctexpcube.i"
 %include "ctpsfcube.i"

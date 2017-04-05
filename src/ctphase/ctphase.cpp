@@ -1,7 +1,7 @@
 /***************************************************************************
- *                      ctphase - Data selection tool                     *
+ *          ctphase - Append phase information to CTA events file          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
+ *  copyright (C) 2017 by Leonardo Di Venere                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,8 +20,8 @@
  ***************************************************************************/
 /**
  * @file ctphase.cpp
- * @brief Data selection tool definition
- * @author Juergen Knoedlseder
+ * @brief Append phase information to CTA events file
+ * @author Leonardo Di Venere
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -34,7 +34,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_RUN                                               "ctphase::run()"
-#define G_SELECT_EVENTS          "ctphase::select_events(GCTAObservation*, "\
+#define G_PHASE_EVENTS          "ctphase::phase_events(GCTAObservation*, "\
                                   "std::string&, std::string&, std::string&)"
 #define G_SET_EBOUNDS    "ctphase::set_ebounds(GCTAObservation*, GEbounds&)"
 
@@ -203,14 +203,10 @@ void ctphase::clear(void)
 
 
 /***********************************************************************//**
- * @brief Select event data
+ * @brief Append phase information to event data
  *
  * This method reads in the application parameters and loops over all
- * observations that were found to perform an event selection. Event
- * selection is done by writing each observation to a temporary file and
- * re-opening the temporary file using the cfitsio event filter syntax.
- * The temporary file is deleted after this action so that no disk overflow
- * will occur.
+ * observations that were found to append phase information to the data.
  ***************************************************************************/
 void ctphase::run(void)
 {
@@ -226,7 +222,7 @@ void ctphase::run(void)
     log_observations(NORMAL, m_obs, "Input observation");
 
     // Write header into logger
-    log_header1(TERSE, "Event selection");
+    log_header1(TERSE, "Appending phase informaiton");
 
     // Initialise counters
     int n_observations = 0;
@@ -283,7 +279,7 @@ void ctphase::run(void)
         // Fall through in case that the event file is empty
         if (obs->events()->size() == 0) {
             log_string(NORMAL, " Warning: No events in event file \""+
-                       m_infiles[i]+"\". Event selection skipped.");
+                       m_infiles[i]+"\". Event phasing skipped.");
             continue;
         }
 
@@ -326,7 +322,7 @@ void ctphase::run(void)
             }
         }
 
-        // Load observation from temporary file, including event selection
+        // Load observation from temporary file and compute phase
         phase_events(obs, filename, m_evtname[i], m_gtiname[i]);
 
         // Close temporary file
@@ -359,22 +355,22 @@ void ctphase::run(void)
 
 
 /***********************************************************************//**
- * @brief Save the selected event list(s)
+ * @brief Save the output event list(s)
  *
- * This method saves the selected event list(s) into FITS file(s). There are
+ * This method saves the updated event list(s) into FITS file(s). There are
  * two modes, depending on the m_use_xml flag.
  *
- * If m_use_xml is true, all selected event list(s) will be saved into FITS
+ * If m_use_xml is true, all output event list(s) will be saved into FITS
  * files, where the output filenames are constructued from the input
  * filenames by prepending the m_prefix string to name. Any path information
  * will be stripped form the input name, hence event files will be written
  * into the local working directory (unless some path information is present
  * in the prefix). In addition, an XML file will be created that gathers
- * the filename information for the selected event list(s). If an XML file
+ * the filename information for the output event list(s). If an XML file
  * was present on input, all metadata information will be copied from this
  * input file.
  *
- * If m_use_xml is false, the selected event list will be saved into a FITS
+ * If m_use_xml is false, the output event list will be saved into a FITS
  * file.
  ***************************************************************************/
 void ctphase::save(void)
@@ -506,6 +502,8 @@ void ctphase::copy_members(const ctphase& app)
  ***************************************************************************/
 void ctphase::free_members(void)
 {
+    m_phase.clear();
+    
     // Return
     return;
 }
@@ -528,19 +526,70 @@ void ctphase::get_parameters(void)
     // information and do not accept counts cubes.
     setup_observations(m_obs, false, true, false);
 
-    // Check for sanity of energy selection parameters
+    // Check for sanity of frequency and phase information
     if ((*this)["p0"].is_valid() &&
         (*this)["mjd"].is_valid() &&
         (*this)["f0"].is_valid()) {
         
-        m_phase = GModelTemporalPhaseCurve();
-        m_phase.norm(1.0);
-        m_phase.mjd((*this)["mjd"].real());
-        m_phase.phase((*this)["p0"].real());
-        m_phase.f0((*this)["f0"].real());
-        m_phase.f1((*this)["f1"].real());
-        m_phase.f2((*this)["f2"].real());
+        // The following creates an XML object responsible for initializing
+        // 'm_phase'. This was done as the default values for the parameters in
+        // 'GModelTemporalPhaseCurve' are such that the ranges are predefined.
+        // Initializing 'm_phase' from an XML object circumvents this restriction.
         
+        GXmlElement norm;
+        norm.name("parameter");
+        norm.attribute("name", "Normalization");
+        norm.attribute("value", "1");
+        norm.attribute("min", "0");
+        norm.attribute("max", "1000");
+        
+        GXmlElement mjd;
+        mjd.name("parameter");
+        mjd.attribute("name", "MJD");
+        mjd.attribute("value", (*this)["mjd"].value());
+        mjd.attribute("min", (*this)["mjd"].min());
+        mjd.attribute("max", (*this)["mjd"].max());
+        
+        GXmlElement p0;
+        p0.name("parameter");
+        p0.attribute("name", "Phase");
+        p0.attribute("value", (*this)["p0"].value());
+        p0.attribute("min", (*this)["p0"].min());
+        p0.attribute("max", (*this)["p0"].max());
+        
+        GXmlElement f0;
+        f0.name("parameter");
+        f0.attribute("name", "F0");
+        f0.attribute("value", (*this)["f0"].value());
+        f0.attribute("min", (*this)["f0"].min());
+        f0.attribute("max", (*this)["f0"].max());
+        
+        GXmlElement f1;
+        f1.name("parameter");
+        f1.attribute("name", "F1");
+        f1.attribute("value", (*this)["f1"].value());
+        f1.attribute("min", (*this)["f1"].min());
+        f1.attribute("max", (*this)["f1"].max());
+        
+        GXmlElement f2;
+        f2.name("parameter");
+        f2.attribute("name", "F2");
+        f2.attribute("value", (*this)["f2"].value());
+        f2.attribute("min", (*this)["f2"].min());
+        f2.attribute("max", (*this)["f2"].max());
+        
+        GXmlElement info;
+        info.append(norm);
+        info.append(mjd);
+        info.append(p0);
+        info.append(f0);
+        info.append(f1);
+        info.append(f2);
+        
+        info.attribute("file","");
+        
+        m_phase = GModelTemporalPhaseCurve();
+        m_phase.read(info);
     }
     else {
         GException::invalid_value("ctphase::get_parameters()",
@@ -576,12 +625,8 @@ void ctphase::get_parameters(void)
  * @exception GException::invalid_value
  *            No events extension found in FITS file.
  *
- * Select events from a FITS file by making use of the selection possibility
- * of the cfitsio library on loading a file. A selection string is created
- * from the specified criteria that is appended to the filename so that
- * cfitsio will automatically filter the event data. This selection string
- * is then applied when opening the FITS file. The event list in the current
- * observation is replaced by selected event list read from the FITS file.
+ * Append phase information to events from a FITS file by adding a "PHASE"
+ * column to the FITS file.
  ***************************************************************************/
 void ctphase::phase_events(GCTAObservation*   obs,
                              const std::string& filename,
@@ -590,13 +635,6 @@ void ctphase::phase_events(GCTAObservation*   obs,
 {
     // Write header into logger
     log_header3(NORMAL, "Events phasing");
-
-    // Initialise selection and addition strings
-    std::string selection;
-    std::string add;
-
-    // Initialise selection flags
-    bool remove_all = false;
 
     // Get CTA event list pointer
     GCTAEventList* list =
@@ -617,62 +655,7 @@ void ctphase::phase_events(GCTAObservation*   obs,
     if (!list->has_phase()) {
         list->has_phase(true);
     }
-/*
-    // Save GTI for later usage
-    GGti gti = list->gti();
 
-    // Build input filename including selection expression
-    std::string expression = filename;
-
-    // Dump FITS filename including selection expression
-    log_value(NORMAL, "FITS filename", expression);
-
-    // Open FITS file
-    GFits file(expression);
-
-    // Log selected FITS file
-    log_header3(EXPLICIT, "FITS file content after selection");
-    log_string(EXPLICIT, file.print(m_chatter));
-
-    // Check if we have an events HDU
-    if (!file.contains(evtname)) {
-        std::string msg = "No events extension \""+evtname+"\" found in "
-                          "FITS file. The expression \""+expression+"\" "
-                          "was used to open the FITS file.";
-        throw GException::invalid_value(G_SELECT_EVENTS, msg);
-    }
-
-    // Determine number of events in the events HDU. If removal of all events
-    // has been requested then set the number of events to zero.
-    int nevents = (remove_all) ? 0 : file.table(evtname)->nrows();
-
-    // If the selected event list is empty then append an empty event list
-    // to the observation
-    if (nevents < 1) {
-
-        // Create empty event list
-        GCTAEventList eventlist;
-
-        // Append list to observation
-        obs->events(eventlist);
-
-    }
-
-    // ... otherwise load the data from the temporary file
-    else {
-        obs->read(file);
-    }
-
-    // Get CTA event list pointer
-    list = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-
-    // Make sure that events are fetched since the temporary file will be
-    // closed later
-    list->fetch();
-
-    // Set event list GTI (in any case as any event list has a GTI)
-    list->gti(gti);
-*/
     // Return
     return;
 }
@@ -687,7 +670,7 @@ void ctphase::phase_events(GCTAObservation*   obs,
  * This method checks if the input FITS file is correct.
  ***************************************************************************/
 std::string ctphase::check_infile(const std::string& filename,
-                                   const std::string& evtname) const
+                                  const std::string& evtname) const
 {
     // Initialise message string
     std::string message = "";
@@ -805,7 +788,7 @@ std::string ctphase::get_gtiname(const std::string& filename,
         // Get GTI name
         gtiname = events.gtiname();
 
-    }
+    } // endif: filename was not empty
 
     // Return GTI name
     return (gtiname);
@@ -957,7 +940,7 @@ void ctphase::save_xml(void)
  *
  *      myfits.fits[EVENTS1;GTI1]
  *
- * will write the selected events into the "EVENTS1" extension and the
+ * will write the updated events into the "EVENTS1" extension and the
  * Good Time Intervals into the "GTI1" extension of the "myfits.fits" FITS
  * file. If the Good Time Intervals extension name is skipped, e.g.
  *
