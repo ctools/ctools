@@ -437,9 +437,17 @@ void ctbutterfly::run(void)
 
         // Use gaussian error propagation scheme to calculate
         // the butterfly
-        log_header2(TERSE, "Use gaussian error propagation to "
-                "calculate butterfly");
 
+        // Confidence scaling
+        double scale = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
+        
+        // Write confidence level information into logger
+        log_value(NORMAL, "Confidence level", m_confidence);
+        log_value(NORMAL, "Corresponding scaling", scale);
+
+        // Write header into logger
+        log_header1(TERSE, "Generate butterfly");
+        
         // Initialise dummy time to evaluate spectral model
         GTime time = GTime();
 
@@ -522,9 +530,8 @@ void ctbutterfly::run(void)
             // Get the error from the scalar product
             double error = std::sqrt(grad * vector);
 
-            // Confidence scaling
-            double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
-            error *= sigma;
+            // Multiply with confidence scaling
+            error *= scale;
 
             // Store flux, value and energy for saving
             m_intensities.push_back(model_flux);
@@ -774,8 +781,8 @@ void ctbutterfly::check_model(void)
             if (model->spectral()->type() != "PowerLaw") {
                 std::string msg = "\""+model->spectral()->type()+"\" cannot be "
                         "used as spectral model for an butterfly "
-                        "computation in default mode. Please specify a "
-                        "power law model or switch to gep mode.";
+                        "computation with method=ENVELOPE. Please specify a "
+                        "power law model or switch to method GAUSSIAN.";
                 throw GException::invalid_value(G_CHECK_MODEL, msg);
             }
         }
