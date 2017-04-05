@@ -723,7 +723,7 @@ void ctbutterfly::get_parameters(void)
 
     // Get remaining parameters
     m_apply_edisp = (*this)["edisp"].boolean();
-    m_gepmode     = (*this)["gepmode"].boolean();
+    m_gepmode     = (*this)["mode"].string() == std::string("GAUSSIAN");
     m_confidence  = (*this)["confidence"].real();
     m_fit         = (*this)["fit"].boolean();
     m_chatter     = static_cast<GChatter>((*this)["chatter"].integer());

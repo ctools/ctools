@@ -27,7 +27,7 @@ caldb,      s, a, "prod2",,, "Calibration database"
 irf,        s, a, "South_0.5h",,, "Instrument response function"
 edisp,      b, h, no,,, "Apply energy dispersion?"
 outfile,    f, a, "butterfly.txt",,, "Output ASCII file"
-gepmode,    b, h, no,,, "Use Gaussian Error Propagation"
+method,     s, h, GAUSSIAN, GAUSSIAN|ENVELOPE,,"Butterfly computation method"
 
 #
 # Butterfly parameters
