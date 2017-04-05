@@ -71,7 +71,7 @@ ctbutterfly::ctbutterfly(void) : ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERS
  * observations container.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(const GObservations& obs) :
-             ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, obs)
+                     ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -89,7 +89,7 @@ ctbutterfly::ctbutterfly(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbutterfly::ctbutterfly(int argc, char *argv[]) :
-             ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
+                     ctlikelihood(CTBUTTERFLY_NAME, CTBUTTERFLY_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -251,7 +251,7 @@ void ctbutterfly::run(void)
         else {   
             m_covariance = likelihood.covariance();
         }
-            
+
         // Write optimizer, optimised model and covariance matrix into logger
         log_string(NORMAL, m_opt.print(m_chatter));
         log_string(NORMAL, m_obs.models().print(m_chatter));
@@ -291,7 +291,7 @@ void ctbutterfly::run(void)
     log_header1(TERSE, "Prepare butterfly computation");
 
     if (!m_gepmode) {
-    
+
         // Find parameter indices. We do this by the memory location of the
         // model parameters.
         GModelSky* skymodel = dynamic_cast<GModelSky*>(models[m_srcname]);
@@ -318,9 +318,9 @@ void ctbutterfly::run(void)
 
         // Write parameter indices into logger
         log_value(NORMAL, "Prefactor", gammalib::str(prefactor_mean)+
-                  " ph/cm2/s/MeV ("+gammalib::str(inx_prefactor)+")");
+                " ph/cm2/s/MeV ("+gammalib::str(inx_prefactor)+")");
         log_value(NORMAL, "Index", gammalib::str(index_mean)+
-                  " ("+gammalib::str(inx_index)+")");
+                " ("+gammalib::str(inx_index)+")");
         log_value(NORMAL, "Pivot energy", pivot.print());
 
         // Extract covariance elements
@@ -334,7 +334,7 @@ void ctbutterfly::run(void)
         GVector vector1(2);
         GVector vector2(2);
         eigenvectors(cov_pp, cov_pg, cov_pg, cov_gg,
-                     &lambda1, &lambda2, &vector1, &vector2);
+                &lambda1, &lambda2, &vector1, &vector2);
 
         // Write eigenvectors and eigenvalues into logger
         log_value(NORMAL, "Eigenvalue 1", lambda1);
@@ -375,16 +375,16 @@ void ctbutterfly::run(void)
 
             // Compute prefactor and index
             double prefactor = (major * cos_t * vector1[0] +
-                                minor * sin_t * vector2[0]) * prefactor_scale +
-                               prefactor_mean;
+                    minor * sin_t * vector2[0]) * prefactor_scale +
+                            prefactor_mean;
             double index     = (major * cos_t * vector1[1] +
-                                minor * sin_t * vector2[1]) * index_scale +
-                               index_mean;
+                    minor * sin_t * vector2[1]) * index_scale +
+                            index_mean;
 
             // Write prefactor and index into logger
             log_value(EXPLICIT, "Angle "+gammalib::str(t*gammalib::rad2deg),
-                      gammalib::str(prefactor)+" ph/cm2/s/MeV; "+
-                      gammalib::str(index));
+                    gammalib::str(prefactor)+" ph/cm2/s/MeV; "+
+                    gammalib::str(index));
 
             // Setup power law model
             GModelSpectralPlaw plaw(prefactor, index, pivot);
@@ -438,7 +438,7 @@ void ctbutterfly::run(void)
         // Use gaussian error propagation scheme to calculate
         // the butterfly
         log_header2(TERSE, "Use gaussian error propagation to "
-                           "calculate butterfly");
+                "calculate butterfly");
 
         // Initialise dummy time to evaluate spectral model
         GTime time = GTime();
@@ -454,7 +454,7 @@ void ctbutterfly::run(void)
 
             // Get the energy of current bin
             GEnergy energy = m_ebounds.elogmean(i);
-	
+
             // Initialise model flux value
             double model_flux = 0.0;
 
@@ -467,37 +467,44 @@ void ctbutterfly::run(void)
                 // Yes ...
                 if (skymodel != NULL) {
 
-                    // Skip spatial models
-                    num_gradient += skymodel->spatial()->size();
-
-                    // Get pointer to spectral model
-                    GModelSpectral* spectral = skymodel->spectral();
-
                     // Set flux value of source of interest, evaluate gradients
                     if (skymodel->name() == m_srcname) {
+
+                        // Get spectral component of model
+                        GModelSpectral *spectral = skymodel->spectral();
+
                         model_flux = spectral->eval(energy, time, true);
+
+                        // Loop over all model parameters
+                        for (int k = 0; k < skymodel->size(); ++k) {
+
+                            // set gradient if we deal with spectral component
+                            bool parIsSpectral = false;
+
+                            for (int l = 0; l < spectral->size(); ++l) {
+
+                                if ((&((*spectral)[l])) == (&((*skymodel)[k]))) {
+                                    grad[num_gradient] = (*spectral)[l].gradient();
+                                    num_gradient++;
+                                    parIsSpectral = true;
+                                    break;
+                                }
+                            } // endfor: looped over spectral parameters
+
+
+                            if (!parIsSpectral) {
+                                // If parameter is spatial or temporal, count up
+                                num_gradient++;
+                            }
+
+                        } // endfor: looped over all model parameters
+
+
+
                     } // endif: model was source of interest
-		
-                    // Loop over model parameters, get gradients
-                    // and assign them to the vector
-                    if(skymodel->name() == m_srcname) {
-
-                        // set gradient if we deal with source of interest
-                        for (int k = 0; k < spectral->size(); ++k) {
-                            grad[num_gradient] = (*spectral)[k].gradient();
-                            num_gradient++;
-			
-                        } // endfor: looped over spectral parameters
-		    
-                    } //endif: spectrum was of source of interest 
-                    else{
-                        // Skip gradient of other models (0=default)
-                        num_gradient += skymodel->spectral()->size();
-		     
-                    } //endelse: Model was not model of interest
-
-                    // Skip temporal models
-                    num_gradient += skymodel->temporal()->size();
+                    else {
+                        num_gradient += skymodel->size();
+                    }
 
                 } // endif: model was sky model
 
@@ -515,17 +522,21 @@ void ctbutterfly::run(void)
             // Get the error from the scalar product
             double error = std::sqrt(grad * vector);
 
+            // Confidence scaling
+            double sigma = gammalib::erfinv(m_confidence) * gammalib::sqrt_two;
+            error *= sigma;
+
             // Store flux, value and energy for saving
             m_intensities.push_back(model_flux);
             m_energies.push_back(energy.MeV());
             m_min_intensities.push_back(model_flux-error);
             m_max_intensities.push_back(model_flux+error);
-   
+
         } //endfor: loop over energy bin        
-        
+
     }  //endelse: use gaussian error propagation
 
-    
+
     // Write header into logger
     log_header1(TERSE, "Results");
 
@@ -534,14 +545,14 @@ void ctbutterfly::run(void)
 
         // Write results into logger
         log_value(NORMAL, "Intensity at "+gammalib::str(m_energies[k])+" MeV",
-                  gammalib::str(m_intensities[k])+" ("+
-                  gammalib::str(m_min_intensities[k])+", "+
-                  gammalib::str(m_max_intensities[k])+") ph/cm2/s/MeV");
-        
-    } //endfor: loop over energy bin  
-    
+                gammalib::str(m_intensities[k])+" ("+
+                gammalib::str(m_min_intensities[k])+", "+
+                gammalib::str(m_max_intensities[k])+") ph/cm2/s/MeV");
 
-    
+    } //endfor: loop over energy bin  
+
+
+
     // Restore energy dispersion flag for all CTA observations
     for (int i = 0; i < m_obs.size(); ++i) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
@@ -651,7 +662,7 @@ void ctbutterfly::copy_members(const ctbutterfly& app)
     m_chatter     = app.m_chatter;
     m_ebounds     = app.m_ebounds;
     m_outfile     = app.m_outfile;
- 
+
     // Copy protected members
     m_covariance      = app.m_covariance;
     m_energies        = app.m_energies;
@@ -690,7 +701,7 @@ void ctbutterfly::get_parameters(void)
 {
     // Setup observations from "inobs" parameter
     setup_observations(m_obs);
-    
+
     // Setup models from "inmodel" parameter
     setup_models(m_obs, (*this)["srcname"].string());
 
@@ -704,8 +715,8 @@ void ctbutterfly::get_parameters(void)
     std::string matrixfilename = (*this)["matrix"].filename();
     if (matrixfilename != "NONE") {
         std::string msg = "Loading of matrix from file not implemented yet. "
-                          "Use filename = \"NONE\" to induce a recomputation of "
-                          "the matrix internally.";
+                "Use filename = \"NONE\" to induce a recomputation of "
+                "the matrix internally.";
         throw GException::feature_not_implemented(G_GET_PARAMETERS, msg);
         // m_covariance.load(matrixfilename);
     }
@@ -719,7 +730,7 @@ void ctbutterfly::get_parameters(void)
 
     // Check model name and type
     check_model();
-    
+
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
@@ -753,8 +764,8 @@ void ctbutterfly::check_model(void)
         GModelSky* model  = dynamic_cast<GModelSky*>(models[m_srcname]);
         if (model == NULL) {
             std::string msg = "Source \""+m_srcname+"\" is not a sky model. "
-                              "Please specify the name of a sky model for "
-                              "butterfly computation.";
+                    "Please specify the name of a sky model for "
+                    "butterfly computation.";
             throw GException::invalid_value(G_CHECK_MODEL, msg);
         }
 
@@ -762,9 +773,9 @@ void ctbutterfly::check_model(void)
         if(!m_gepmode){
             if (model->spectral()->type() != "PowerLaw") {
                 std::string msg = "\""+model->spectral()->type()+"\" cannot be "
-                    "used as spectral model for an butterfly "
-                    "computation in default mode. Please specify a "
-                    "power law model or switch to gep mode.";
+                        "used as spectral model for an butterfly "
+                        "computation in default mode. Please specify a "
+                        "power law model or switch to gep mode.";
                 throw GException::invalid_value(G_CHECK_MODEL, msg);
             }
         }
@@ -774,8 +785,8 @@ void ctbutterfly::check_model(void)
     // Otherwise throw an exception
     else {
         std::string msg = "Source \""+m_srcname+"\" not found in model "
-                          "container. Please add a source with that name "
-                          "or check for possible typos.";
+                "container. Please add a source with that name "
+                "or check for possible typos.";
         throw GException::invalid_value(G_CHECK_MODEL, msg);
     }
 
@@ -800,13 +811,13 @@ void ctbutterfly::check_model(void)
  * http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
  ***************************************************************************/
 void ctbutterfly::eigenvectors(const double& a,
-                               const double& b,
-                               const double& c,
-                               const double& d,
-                               double*       lambda1,
-                               double*       lambda2,
-                               GVector*      vector1,
-                               GVector*      vector2)
+        const double& b,
+        const double& c,
+        const double& d,
+        double*       lambda1,
+        double*       lambda2,
+        GVector*      vector1,
+        GVector*      vector2)
 {
     // Compute trace and determinant
     double trace = a + d;
@@ -841,7 +852,7 @@ void ctbutterfly::eigenvectors(const double& a,
     // Normalize eigenvectors
     *vector1 /= norm(*vector1);
     *vector2 /= norm(*vector2);
-    
+
     // Return
     return;
 }
