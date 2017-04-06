@@ -633,16 +633,30 @@ void ctphase::phase_events(GCTAObservation*   obs,
                              const std::string& evtname,
                              const std::string& gtiname)
 {
-    // Write header into logger
-    log_header3(NORMAL, "Events phasing");
-
     // Get CTA event list pointer
     GCTAEventList* list =
         static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
     
+    GCTAEventAtom* event = (*list)[0];
+    
+    // Print a warning into the log file if there are some precision concerns
+    double dt = std::abs(event->time() - m_phase.mjd());
+    if (((m_phase.f1() * dt) > 1.0e8) ||
+        (m_phase.f2() * dt * dt) > 1.0e8) {
+        log_string(NORMAL,"*** WARNING ***");
+        log_string(NORMAL,"   Values supplied for reference MJD and/or f1 and/or f2");
+        log_string(NORMAL,"   are large and may result in numerical precision issues.");
+        log_string(NORMAL,"   Consider using an ephemeris derived from a date closer");
+        log_string(NORMAL,"   to the data being analyzed.");
+        log_value(NORMAL, "     Observation ID", obs->obs_id());
+        log_value(NORMAL, "     Reference MJD", m_phase.mjd().mjd());
+        log_value(NORMAL, "     First event MJD", event->time().mjd());
+        log_string(NORMAL,"*** WARNING ***");
+    }
+    
     for (int evnt=0; evnt<list->size(); evnt++) {
         // Get the next event
-        GCTAEventAtom* event = (*list)[evnt];
+        event = (*list)[evnt];
         
         // Get the event time
         GTime time = event->time();

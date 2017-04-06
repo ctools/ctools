@@ -71,7 +71,7 @@ class Test(test):
         # Setup ctphase command
         cmd = ctphase+' inobs="'+self._events+'"'+ \
                        ' outobs="ctphase_cmd1.fits"'+ \
-                       ' p0=0.1 mjd=52400'+ \
+                       ' p0=0.1 mjd=51544.5'+ \
                        ' f0=0.1 f1=0. f2=0.'+ \
                        ' logfile="ctphase_cmd1.log" chatter=1'
 
@@ -89,7 +89,7 @@ class Test(test):
         # Setup ctphase command
         cmd = ctphase+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' outobs="ctphase_cmd2.fits"'+ \
-                       ' p0=0.1 mjd=52400'+ \
+                       ' p0=0.1 mjd=51544.5'+ \
                        ' f0=0.1 f1=0. f2=0.'+ \
                        ' logfile="ctphase_cmd2.log" chatter=1'
 
@@ -137,9 +137,9 @@ class Test(test):
         # Now set ctphase parameters
         phase['inobs']   = self._events
         phase['p0']      = 0.
-        phase['mjd']     = 52400
+        phase['mjd']     = 51544.5
         phase['f0']      = 1.
-        phase['f1']      = -0.2
+        phase['f1']      = 0.0
         phase['f2']      = 0.
         phase['outobs']  = 'ctphase_py1.fits'
         phase['logfile'] = 'ctphase_py1.log'
@@ -158,18 +158,18 @@ class Test(test):
 
         # Execute copy of ctphase tool again, now with a negative value
         # of initial phase to test for invalid parameter value
+        self.test_try('Test invalid parameter value')
         try:
-            self.test_try('Test invalid parameter value')
-            cpy_phase['p0']      = -0.5
-            cpy_phase['mjd']     = 52400
+            cpy_phase['mjd']     = 51544.5
             cpy_phase['f0']      = 1.
-            cpy_phase['f1']      = -0.2
+            cpy_phase['f1']      = 0.2
             cpy_phase['f2']      = 0.
             cpy_phase['outobs']  = 'ctphase_py2.fits'
             cpy_phase['logfile'] = 'ctphase_py2.log'
             cpy_phase['chatter'] = 3
             cpy_phase['publish'] = True
             cpy_phase.logFileOpen()  # Needed to get a new log file
+            cpy_phase['p0']      = -0.5
             cpy_phase.execute()
             self.test_try_failure('Exception not thrown')
         except ValueError:

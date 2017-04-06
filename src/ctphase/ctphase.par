@@ -24,11 +24,11 @@ prefix, s, h, "phased_",,, "Prefix for event lists in observation definition XML
 #
 # Phase information parameters
 #=====================
-mjd,    r, a, 52400,,, "Reference MJD for phase information"
-f0,     r, a, 1,,, "Frequency at reference MJD [Hz]"
-f1,     r, a, -0.2,,, "First freq. derivative at reference MJD [s^-1]"
-f2,     r, a, 0,,, "Second freq. derivative at reference MJD [s^-2]"
+mjd,    r, a, 51544.5,,, "Reference MJD for phase information"
 p0,     r, a, 0.1,0.0,1.0, "Phase at reference MJD"
+f0,     r, a, 1,,, "Frequency at reference MJD [Hz]"
+f1,     r, a, 0.0,,, "First freq. derivative at reference MJD [s^-1]"
+f2,     r, a, 0.0,,, "Second freq. derivative at reference MJD [s^-2]"
 
 #
 # Standard parameters
