@@ -289,10 +289,10 @@ class cssens(ctools.cscript):
         # Set energy boundaries
         self._set_obs_ebounds(emin, emax)
 
-        # Determine energy boundaries from first observation in the container
-        loge      = math.log10(math.sqrt(emin.TeV()*emax.TeV()))
-        e_mean    = math.pow(10.0, loge)
-        erg_mean  = e_mean * tev2erg
+        # Determine mean energy for energy boundary
+        e_mean   = math.sqrt(emin.TeV()*emax.TeV())
+        loge     = math.log10(e_mean)
+        erg_mean = e_mean * tev2erg
 
         # Compute Crab unit. This is the factor with which the Prefactor needs
         # to be multiplied to get 1 Crab.
