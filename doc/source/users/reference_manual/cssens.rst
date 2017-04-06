@@ -100,9 +100,6 @@ General parameters
 ``(max_iter = 50) [integer]``
     Maximum number of iterations.
  	 	 
-``(num_avg = 3) [integer]``
-    Number of iterations for sliding average.
-
 
 Standard parameters
 -------------------

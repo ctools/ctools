@@ -3,6 +3,7 @@
         * Version 1.3.0 released
         ========================
 
+        Implement regression scheme in cssens and remove num_avg parameter (#1989)
         Copy cscripts into bin directory instead of creating a symbolic links (#1987)
         If code originates from Git, always compile the Python bindings (#1985)
         Raise exception instead of exiting with return code in Python tests (#1983)

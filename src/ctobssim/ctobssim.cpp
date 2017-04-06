@@ -1471,7 +1471,8 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 
                 // Debug code: signal that we step into the response MC method
                 #if defined(G_BACKGROUND_DEBUG)
-                std::cout << "ctobssim::simulate_background: model->mc in" << std::endl;
+                std::cout << "ctobssim::simulate_background: model->mc in"
+                          << std::endl;
                 #endif
 
                 // Get simulated CTA event list. Note that this method
@@ -1481,7 +1482,8 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 
                 // Debug code: signal that we came back
                 #if defined(G_BACKGROUND_DEBUG)
-                std::cout << "ctobssim::simulate_background: model->mc out" << std::endl;
+                std::cout << "ctobssim::simulate_background: model->mc out"
+                          << std::endl;
                 #endif
 
                 // Continue only if we got a CTA event list

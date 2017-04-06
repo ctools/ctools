@@ -133,6 +133,10 @@ extension that can be used for a stacked analysis. The energy boundaries
 are set as function of the variation in the effective area and background
 rates of the Instrument Response Function (#1976).
 
+A regression scheme now replaces the averaging scheme in cssens as this
+allows more accurately the prediction of the flux value at the threshold
+Test Statistic. The num_avg parameter has been removed (#1989).
+
 
 Examples
 --------
