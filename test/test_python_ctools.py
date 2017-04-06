@@ -39,6 +39,7 @@ import test_ctcubemask
 import test_ctbutterfly
 import test_ctulimit
 import test_cterror
+import test_ctprob
 import test_pipelines
 
 
@@ -116,6 +117,7 @@ def test(installed=False):
              test_ctbutterfly.Test(),
              test_ctulimit.Test(),
              test_cterror.Test(),
+             test_ctprob.Test(),
              test_pipelines.Test()]
 
     # Allocate test suite container
