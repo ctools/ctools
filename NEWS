@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-5 April 2017
+6 April 2017
 
 
 Introduction
@@ -136,6 +136,11 @@ rates of the Instrument Response Function (#1976).
 A regression scheme now replaces the averaging scheme in cssens as this
 allows more accurately the prediction of the flux value at the threshold
 Test Statistic. The num_avg parameter has been removed (#1989).
+
+The names of some ROOT histograms has been changed in the Monte Carlo data
+and the "EffectiveAreaEtrue_offaxis" needed to be changed to
+"EffectiveAreaEtrueNoTheta2cut_offaxis" and "EffectiveAreaEtrue" to
+"EffectiveAreaEtrueNoTheta2cut" in csroot2caldb.
 
 
 Examples
