@@ -29,7 +29,7 @@
 #include <config.h>
 #endif
 #include "support.hpp"
-#include "ctmodel.hpp"
+#include "ctprob.hpp"
 
 
 /***********************************************************************//**
@@ -38,8 +38,8 @@
  * @param[in] argc Number of command line arguments.
  * @param[in] argv Command line arguments.
  *
- * This is the main entry point of the ctmodel application. It allocates a
- * ctmodel object and executes the application. Any exceptions that occur
+ * This is the main entry point of the ctprob application. It allocates a
+ * ctprob object and executes the application. Any exceptions that occur
  * will be catched and corresponding error messages written in the
  * application logger and into the standard output.
  ***************************************************************************/
@@ -49,13 +49,13 @@ int main (int argc, char *argv[])
     int rc = 1;
 
     // Initialise pointer on application
-    ctmodel* application = NULL;
+    ctprob* application = NULL;
 
     // Execute application
     try {
 
         // Create instance of application
-        application = new ctmodel(argc, argv);
+        application = new ctprob(argc, argv);
 
         // Execute ctool
         rc = execute_ctool(application);
@@ -65,7 +65,7 @@ int main (int argc, char *argv[])
     catch (std::exception &e) {
 
         // Report exception
-        report_ctool_failure("ctmodel", e.what());
+        report_ctool_failure("ctprob", e.what());
 
     }
 

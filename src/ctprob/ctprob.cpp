@@ -28,20 +28,18 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <cstdio>
+#include <cstdlib>
 #include "ctprob.hpp"
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_PARAMETERS                          "ctprob::get_parameters()"
-#define G_FILL_CUBE                    "ctprob::fill_cube(GCTAObservation*)"
+#define G_RUN                                               "ctprob::run()"
+#define G_GET_OBS                                       "ctprob::get_obs()"
 
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
-
-/* __ Constants __________________________________________________________ */
-const GEnergy g_energy_margin(1.0e-12, "TeV");
+//#define G_USE_MKSTEMP               //!< Use mkstemp for temporary filename
 
 
 /*==========================================================================
@@ -68,11 +66,11 @@ ctprob::ctprob(void) : ctobservation(CTPROB_NAME, CTPROB_VERSION)
  *
  * param[in] obs Observation container.
  *
- * This method creates an instance of the class by copying an existing
- * observations container.
+ * Creates an instance of the class that is initialised using the information
+ * provided in an observation container.
  ***************************************************************************/
 ctprob::ctprob(const GObservations& obs) :
-         ctobservation(CTPROB_NAME, CTPROB_VERSION, obs)
+          ctobservation(CTPROB_NAME, CTPROB_VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -83,14 +81,15 @@ ctprob::ctprob(const GObservations& obs) :
 
 
 
+
 /***********************************************************************//**
  * @brief Command line constructor
  *
  * @param[in] argc Number of arguments in command line.
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
-ctprob::ctprob(int argc, char *argv[]) :
-         ctobservation(CTPROB_NAME, CTPROB_VERSION, argc, argv)
+ctprob::ctprob(int argc, char *argv[]) : 
+          ctobservation(CTPROB_NAME, CTPROB_VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -202,40 +201,44 @@ void ctprob::clear(void)
 
 
 /***********************************************************************//**
- * @brief Generate the model map(s)
+ * @brief Append probability columns event data
  *
- * This method reads the task parameters from the parfile, sets up the
- * observation container, loops over all CTA observations in the container
- * and generates a model map for each CTA observation.
+ * This method reads in the application parameters and loops over all
+ * observations that were found to perform the probability calculation.
+ * Each observation is written to a temporary file, which is then 
+ * re-opened and used for the actual calculation. The temporary file
+ *  is deleted after this action so that no disk overflow will occur.
  ***************************************************************************/
 void ctprob::run(void)
 {
-    // If we're in debug mode then all output is also dumped on the screen
+    // Switch screen logging on in debug mode
     if (logDebug()) {
         log.cout(true);
     }
 
-    // Get task parameters
+    // Get parameters
     get_parameters();
-
-    // Set energy dispersion flags of all CTA observations and save old
-    // values in save_edisp vector
-    std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
 
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
-    // Write input model container into logger
-    log_models(NORMAL, m_obs.models(), "Input model");
+    // Write header into logger
+    log_header1(TERSE, "Event selection");
 
-    // Write header
-    log_header1(TERSE, "Generate model cube");
+    // Initialise counters
+    int n_observations = 0;
 
-    // Loop over all observations in the container
+    // Loop over all observation in the container
     for (int i = 0; i < m_obs.size(); ++i) {
 
         // Write header for the current observation
         log_header3(TERSE, get_obs_header(m_obs[i]));
+
+        // Initialise event input and output filenames and the event
+        // and GTI extension names
+        m_infiles.push_back("");
+        m_evtname.push_back(gammalib::extname_cta_events);
+        m_gtiname.push_back(gammalib::extname_gti);
 
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
@@ -248,13 +251,6 @@ void ctprob::run(void)
             continue;
         }
 
-        // Fill cube and leave loop if we are binned mode (meaning we 
-        // only have one binned observation)
-        if (m_binned) {
-            fill_cube(obs);
-            break;
-        }
-
         // Skip observation if we have a binned observation
         if (obs->eventtype() == "CountsCube") {
             std::string msg = " Skipping binned "+m_obs[i]->instrument()+
@@ -263,25 +259,95 @@ void ctprob::run(void)
             continue;
         }
 
-        // Fill the cube
-        fill_cube(obs);
+        // Increment counter
+        n_observations++;
 
-        // Dispose events to free memory if event file exists on disk
-        if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
-            obs->dispose_events();
+        // Save event file name (for possible saving)
+        m_infiles[i] = obs->eventfile();
+
+        // Extract event and GTI extension names from input FITS file
+        GFilename fname(m_infiles[i]);
+        if (fname.has_extname()) {
+            m_evtname[i] = fname.extname();
+        }
+        m_gtiname[i] = get_gtiname(fname.url(), m_evtname[i]);
+
+        // Write input file information into logger
+        log_value(NORMAL, "Input filename", m_infiles[i]);
+        log_value(NORMAL, "Event extension name", m_evtname[i]);
+        log_value(NORMAL, "GTI extension name", m_gtiname[i]);
+
+        // Fall through in case that the event file is empty
+        if (obs->events()->size() == 0) {
+            log_string(NORMAL, " Warning: No events in event file \""+
+                       m_infiles[i]+"\". Event selection skipped.");
+            continue;
         }
 
-    } // endfor: looped over observations
+        // If we have an input file then check it
+        if (!m_infiles[i].empty()) {
+            std::string message = check_infile(m_infiles[i], m_evtname[i]);
+            if (!message.empty()) {
+                throw GException::invalid_value(G_RUN, message);
+            }
+        }
 
-    // Write model cube into header
-    log_header1(NORMAL, "Model cube");
-    log_string(NORMAL, m_cube.print());
+        // Get temporary file name
+        #if G_USE_MKSTEMP
+        char tpl[]  = "ctprobXXXXXX";
+        int  fileid = mkstemp(tpl);
+        std::string filename(tpl);
+        #else
+        std::string filename = std::tmpnam(NULL);
+        #endif
 
-    // Restore energy dispersion flags of all CTA observations
-    restore_edisp(m_obs, save_edisp);
+        // Save observation in temporary file. We add here the events and
+        // GTI extension name so that the GCTAObservation::save method can
+        // use this information for writing the proper extension names into
+        // the temporary file
+        obs->save(filename+"["+m_evtname[i]+";"+ m_gtiname[i]+"]", true);
 
-    // Optionally publish model cube
-    if (m_publish) {
+        // Log saved FITS file.
+        if (logExplicit()) {
+            GFits tmpfile(filename);
+            log.header3("FITS file content of temporary file");
+            log << tmpfile << std::endl;
+            tmpfile.close();
+        }
+
+        // If we have a temporary file then check it
+        if (!filename.empty()) {
+            std::string message = check_infile(filename, m_evtname[i]);
+            if (!message.empty()) {
+                throw GException::invalid_value(G_RUN, message);
+            }
+        }
+
+        // Load observation from temporary file, including event selection
+        evaluate_probability(obs);
+	//select_events(obs, filename, m_evtname[i], m_gtiname[i]);
+
+        // Close temporary file
+        #if G_USE_MKSTEMP
+        close(fileid);
+        #endif
+
+        // Remove temporary file
+        std::remove(filename.c_str());
+
+    } // endfor: looped over all observations
+
+    // If more than a single observation has been handled then make sure that
+    // an XML file will be used for storage
+    if (n_observations > 1) {
+        m_use_xml = true;
+    }
+
+    // Write observation(s) into logger
+    log_observations(NORMAL, m_obs, "Output observation");
+
+    // Optionally publish event list(s)
+    if ((*this)["publish"].boolean()) {
         publish();
     }
 
@@ -291,30 +357,37 @@ void ctprob::run(void)
 
 
 /***********************************************************************//**
- * @brief Save model cube
+ * @brief Save the selected event list(s)
  *
- * Saves the model cube into a FITS file specified using the "outfile"
- * task parameter.
+ * This method saves the selected event list(s) into FITS file(s). There are
+ * two modes, depending on the m_use_xml flag.
+ *
+ * If m_use_xml is true, all selected event list(s) will be saved into FITS
+ * files, where the output filenames are constructued from the input
+ * filenames by prepending the m_prefix string to name. Any path information
+ * will be stripped form the input name, hence event files will be written
+ * into the local working directory (unless some path information is present
+ * in the prefix). In addition, an XML file will be created that gathers
+ * the filename information for the selected event list(s). If an XML file
+ * was present on input, all metadata information will be copied from this
+ * input file.
+ *
+ * If m_use_xml is false, the selected event list will be saved into a FITS
+ * file.
  ***************************************************************************/
 void ctprob::save(void)
 {
-    // Write header
-    log_header1(TERSE, "Save model cube");
-
-    // Get model cube filename
-    m_outcube = (*this)["outcube"].filename();
-
-    // Save only if filename is non-empty and cube has some size
-    if (!m_outcube.is_empty() && m_cube.size() > 0) {
-        m_cube.save(m_outcube, clobber());
+    // Write header into logger
+    log_header1(TERSE, gammalib::number("Save event list", m_obs.size()));
+    // Case A: Save event file(s) and XML metadata information
+    if (m_use_xml) {
+        save_xml();
     }
 
-    // Write into logger what has been done
-    std::string fname = (m_outcube.is_empty()) ? "NONE" : m_outcube.url();
-    if (m_cube.size() == 0) {
-        fname.append(" (cube is empty, no file created)");
+    // Case B: Save event file as FITS file
+    else {
+        save_fits();
     }
-    log_value(NORMAL, "Model cube file", fname);
 
     // Return
     return;
@@ -322,51 +395,53 @@ void ctprob::save(void)
 
 
 /***********************************************************************//**
- * @brief Publish model cube
+ * @brief Publish event lists
  *
- * @param[in] name Model cube name.
+ * @param[in] name Event list name.
  ***************************************************************************/
 void ctprob::publish(const std::string& name)
 {
     // Write header into logger
-    log_header1(TERSE, "Publish model cube");
+    log_header1(TERSE, gammalib::number("Publish event list", m_obs.size()));
 
-    // Set default name is user name is empty
-    std::string user_name(name);
-    if (user_name.empty()) {
-        user_name = CTPROB_NAME;
-    }
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
 
-    // Log filename
-    log_value(NORMAL, "Model cube name", user_name);
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
-    // Publish model cube
-    m_cube.counts().publish(user_name);
+        // Handle only CTA observations
+        if (obs != NULL) {
 
-    // Return
-    return;
-}
+            // Continue only if there is an event list
+            if (obs->events()->size() != 0) {
 
+                // Set default name if user name is empty
+                std::string user_name(name);
+                if (user_name.empty()) {
+                    user_name = CTPROB_NAME;
+                }
 
-/***********************************************************************//**
- * @brief Set model cube
- *
- * @param[in] cube Model cube.
- *
- * Set model cube and set all cube bins to zero.
- ***************************************************************************/
-void ctprob::cube(const GCTAEventCube& cube)
-{
-    // Set cube
-    m_cube = cube;
+                // If there are several event lists then add an index
+                if (m_use_xml) {
+                    user_name += gammalib::str(i);
+                }
 
-    // Set all cube bins to zero
-    for (int i = 0; i < m_cube.size(); ++i) {
-        m_cube[i]->counts(0.0);
-    }
+                // Write event list name into logger
+                log_value(NORMAL, "Event list name", user_name);
 
-    // Signal that cube has been set
-    m_has_cube = true;
+                // Write events into in-memory FITS file
+                GFits fits;
+                obs->write(fits);
+
+                // Publish
+                fits.publish(gammalib::extname_cta_events, user_name);
+
+            } // endif: there were events
+
+        } // endif: observation was a CTA observation
+
+    } // endfor: looped over observations
 
     // Return
     return;
@@ -384,18 +459,28 @@ void ctprob::cube(const GCTAEventCube& cube)
  ***************************************************************************/
 void ctprob::init_members(void)
 {
-    // Initialise members
-    m_outcube.clear();
-    m_apply_edisp = false;
-    m_publish     = false;
-    m_chatter     = static_cast<GChatter>(2);
+    // Initialise parameters
+    m_outobs.clear();
+    m_prefix.clear();
+    /*    m_usepnt = false;
+    m_roi.clear();
+    m_tmin   = 0.0;
+    m_tmax   = 0.0;
+    m_emin   = 0.0;
+    m_emax   = 0.0;
+    m_expr.clear();
+    m_usethres.clear();*/
+    m_chatter = static_cast<GChatter>(2);
 
     // Initialise protected members
-    m_cube.clear();
-    m_gti.clear();
-    m_has_cube    = false;
-    m_append_cube = false;
-    m_binned      = false;
+    m_infiles.clear();
+    m_evtname.clear();
+    m_gtiname.clear();
+    //    m_timemin.clear();
+    //m_timemax.clear();
+    //m_select_energy = true;
+    //m_select_roi    = true;
+    //m_select_time   = true;
 
     // Return
     return;
@@ -409,18 +494,28 @@ void ctprob::init_members(void)
  ***************************************************************************/
 void ctprob::copy_members(const ctprob& app)
 {
-    // Copy attributes
-    m_outcube     = app.m_outcube;
-    m_apply_edisp = app.m_apply_edisp;
-    m_publish     = app.m_publish;
-    m_chatter     = app.m_chatter;
+    // Copy parameters
+    m_outobs   = app.m_outobs;
+    m_prefix   = app.m_prefix;
+    /*    m_usepnt   = app.m_usepnt;
+    m_roi      = app.m_roi;
+    m_tmin     = app.m_tmin;
+    m_tmax     = app.m_tmax;
+    m_emin     = app.m_emin;
+    m_emax     = app.m_emax;
+    m_expr     = app.m_expr;
+    m_usethres = app.m_usethres;*/
+    m_chatter  = app.m_chatter;
 
     // Copy protected members
-    m_cube        = app.m_cube;
-    m_gti         = app.m_gti;
-    m_has_cube    = app.m_has_cube;
-    m_append_cube = app.m_append_cube;
-    m_binned      = app.m_binned;
+    m_infiles       = app.m_infiles;
+    m_evtname       = app.m_evtname;
+    m_gtiname       = app.m_gtiname;
+    /*    m_timemin       = app.m_timemin;
+    m_timemax       = app.m_timemax;
+    m_select_energy = app.m_select_energy;
+    m_select_roi    = app.m_select_roi;
+    m_select_time   = app.m_select_time;*/
 
     // Return
     return;
@@ -440,58 +535,31 @@ void ctprob::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all task parameters from parameter file or (if required) by querying
- * the user. The parameters are read in the correct order.
+ * Get all user parameters from parameter file or (if required) by querying
+ * the user. Times are assumed to be in the native CTA MJD format.
+ *
+ * This method also loads observations if no observations are yet allocated.
+ * Observations are either loaded from a single CTA even list, or from a
+ * XML file using the metadata information that is stored in that file.
  ***************************************************************************/
 void ctprob::get_parameters(void)
 {
-    // Reset cube append flag
-    m_append_cube = false;
-
-    // If there are no observations in container then load them via user
-    // parameters.
+    // Initialise selection flags
+  /*    m_select_energy = true;
+    m_select_roi    = true;
+    m_select_time   = true;
+  */
+    // Setup observations from "inobs" parameter. Do not request response
+    // information and do not accept counts cubes.
     if (m_obs.size() == 0) {
         get_obs();
     }
-
     // ... otherwise add response information and energy boundaries in case
     // that they are missing
     else {
         setup_observations(m_obs);
     }
-
-    // If we have now excactly one CTA observation (but no cube has yet been
-    // appended to the observation) then check whether this observation
-    // is a binned observation, and if yes, extract the counts cube for
-    // model generation
-    if ((m_obs.size() == 1) && (m_append_cube == false)) {
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
-
-        // Continue only if observation is a CTA observation
-        if (obs != NULL) {
-
-            // Check for binned observation
-            if (obs->eventtype() == "CountsCube") {
-
-                // Set cube from binned observation
-                GCTAEventCube* evtcube = dynamic_cast<GCTAEventCube*>
-                                         (const_cast<GEvents*>(obs->events()));
-
-                cube(*evtcube);
-
-                // Signal that cube has been set
-                m_has_cube = true;
-
-                // Signal that we are in binned mode
-                m_binned = true;
-
-            } // endif: observation was binned
-
-        } // endif: observation was CTA
-
-    } // endif: had exactly one observation
+    //setup_observations(m_obs, false, true, false);
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
@@ -507,65 +575,17 @@ void ctprob::get_parameters(void)
     // Get energy dispersion flag parameters
     m_apply_edisp = (*this)["edisp"].boolean();
 
-    // If we do not have yet a counts cube for model computation then check
-    // whether we should read it from the "incube" parameter or whether we
-    // should create it from scratch using the task parameters
-    if (!m_has_cube) {
-
-        // Read cube definition file
-        std::string incube = (*this)["incube"].filename();
-
-        // If the cube filename is valid the load the cube and set all cube
-        // bins to zero
-        if (is_valid_filename(incube)) {
-
-            // Load cube from given file
-            m_cube.load(incube);
-
-            // Set all cube bins to zero
-            for (int i = 0; i < m_cube.size(); ++i) {
-                m_cube[i]->counts(0.0);
-            }
-
-        } // endif: cube filename was valid
-
-        // ... otherwise create a cube from the user parameters
-        else {
-            m_cube = create_cube(m_obs);
-        }
-
-        // Signal that cube has been set
-        m_has_cube = true;
-
-    } // endif: we had no cube yet
 
     // Get remaining parameters
     m_publish = (*this)["publish"].boolean();
     m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
 
-    // Read optionally output cube filenames
+    // Optionally read ahead parameters so that they get correctly
+    // dumped into the log file
     if (read_ahead()) {
-        m_outcube = (*this)["outcube"].filename();
+        m_outobs = (*this)["outobs"].filename();
+        m_prefix = (*this)["prefix"].string();
     }
-
-    // If cube should be appended to first observation then do that now.
-    // This is a kluge that makes sure that the cube is passed as part
-    // of the observation in case that a cube response is used. The kluge
-    // is needed because the GCTACubeSourceDiffuse::set method needs to
-    // get the full event cube from the observation. It is also at this
-    // step that the GTI, which may just be a dummy GTI when create_cube()
-    // has been used, will be set.
-    if (m_append_cube) {
-
-        //TODO: Check that energy boundaries are compatible
-
-        // Attach GTI of observations to model cube
-        m_cube.gti(m_obs[0]->events()->gti());
-    
-        // Attach model cube to observations
-        m_obs[0]->events(m_cube);
-
-    } // endif: cube was scheduled for appending
 
     // Write parameters into logger
     log_parameters(TERSE);
@@ -578,89 +598,21 @@ void ctprob::get_parameters(void)
 /***********************************************************************//**
  * @brief Get observation container
  *
+ * @exception GException::invalid_value
+ *            Invalid FITS file.
+ *
  * Get an observation container according to the user parameters. The method
  * supports loading of a individual FITS file or an observation definition
  * file in XML format.
- *
- * If the input filename is empty, the method checks for the existence of the
- * "expcube", "psfcube" and "bkgcube" parameters. If file names have been
- * specified, the method loads the files and creates a dummy events cube that
- * is appended to the observation container.
- *
- * If no file names are specified for the "expcube", "psfcube" or "bkgcube"
- * parameters, the method reads the necessary parameters to build a CTA
- * observation from scratch.
- *
- * The method sets m_append_cube = true and m_binned = true in case that
- * a stacked observation is requested (as detected by the presence of the
- * "expcube", "psfcube", and "bkgcube" parameters). In that case, it appended
- * a dummy event cube to the observation.
- *
- * @todo Support stacked energy dispersion
  ***************************************************************************/
 void ctprob::get_obs(void)
 {
     // Get the filename from the input parameters
     std::string filename = (*this)["inobs"].filename();
 
-    // If no observation definition file has been specified then read all
-    // parameters that are necessary to create an observation from scratch
+    // If no observation definition file throw an exception 
     if (!is_valid_filename(filename)) {
-
-        // Get response cube filenames
-        std::string expcube = (*this)["expcube"].filename();
-        std::string psfcube = (*this)["psfcube"].filename();
-        std::string bkgcube = (*this)["bkgcube"].filename();
-
-        // If the filenames are valid then build an observation from cube
-        // response information
-        if (is_valid_filename(expcube) && is_valid_filename(psfcube) &&
-            is_valid_filename(bkgcube)) {
-
-            // Get exposure, PSF and background cubes
-            GCTACubeExposure   exposure(expcube);
-            GCTACubePsf        psf(psfcube);
-            GCTACubeBackground background(bkgcube);
-
-            // Create energy boundaries
-            GEbounds ebounds = create_ebounds();
-
-            // Create dummy sky map cube
-            GSkyMap map("CAR","GAL",0.0,0.0,1.0,1.0,1,1,ebounds.size());
-
-            // Create event cube
-            GCTAEventCube cube(map, ebounds, exposure.gti());
-
-            // Create CTA observation
-            GCTAObservation cta;
-            cta.events(cube);
-            cta.response(exposure, psf, background);
-
-            // Append observation to container
-            m_obs.append(cta);
-
-            // Signal that we are in binned mode
-            m_binned = true;
-
-            // Signal that we appended a cube
-            m_append_cube = true;
-
-        } // endif: cube response information was available
-
-        // ... otherwise build an observation from IRF response information
-        else {
-
-            // Create CTA observation
-            GCTAObservation cta = create_cta_obs();
-
-            // Set response
-            set_obs_response(&cta);
-
-            // Append observation to container
-            m_obs.append(cta);
-
-        }
-
+      throw GException::invalid_value(G_GET_OBS, "Input event list is not valid.");
     } // endif: filename was not valid
 
     // ... otherwise we have a file name
@@ -713,99 +665,426 @@ void ctprob::get_obs(void)
 }
 
 
+
 /***********************************************************************//**
- * @brief Fill model into model cube
+ * @brief Evaluate probability for events
  *
- * @param[in] obs CTA observation.
+ * @param[in,out] obs CTA observation.
  *
- * Adds the expected number of events for a given observation to the events
- * that are already found in the model cube. The method also updates the
- * GTI of the model cube so that cube GTI is a list of the GTIs of all
- * observations that were used to generate the model cube.
+ *
+ * For each event from the input event file evaluates the probability that
+ * the event comes from any of the source in the input model. This is done 
+ * by evaluating differential expected counts for the event direction and 
+ * energy and normalizing it to the total differential expected counts for 
+ * given model.
+ * observation is replaced by selected event list read from the FITS file.
+ *
+ * A FITS column for each source in the model is created and added to 
+ * the event list. The name of each column is made by the source name with 
+ * the prefix "PROB_".
  ***************************************************************************/
-void ctprob::fill_cube(const GCTAObservation* obs)
+void ctprob::evaluate_probability(GCTAObservation*   obs)
 {
-    // Get references to GTI and energy boundaries for the event list
-    const GGti&     gti         = obs->events()->gti();
-    const GEbounds& obs_ebounds = obs->ebounds();
+    // Write header into logger
+    log_header3(NORMAL, "Evaluating probability for events");
 
-    // Get cube energy boundaries
-    const GEbounds& cube_ebounds = m_cube.ebounds();
+    GCTAEventList* evts = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+    const GEvent* evt;
 
-    // Get counts cube usage flags
-    std::vector<bool> usage = cube_layer_usage(cube_ebounds, obs_ebounds);
+    double total=0.;
+    double value;
 
-    // Initialise empty, invalid RoI
-    GCTARoi roi;
+    std::vector<GFitsTableFloatCol*> columns;
 
-    // Retrieve RoI in case we have an unbinned observation
-    if (obs->eventtype() == "EventList") {
-        roi = obs->roi();
+    //define colums
+    for (int j = 0; j<m_obs.models().size(); ++j) {
+      const std::string mdl_name = m_obs.models()[j] ->name();
+      GFitsTableFloatCol* col = new GFitsTableFloatCol("PROB_"+mdl_name, evts->size());
+      columns.push_back(col);
     }
 
-    // Initialise statistics
-    double sum              = 0.0;
-    int    num_outside_ebds = 0;
-    int    num_outside_roi  = 0;
+    // Loop over events
+    for (int i = 0; i < evts->size(); ++i) {
+      total = 0.;
+      evt = (*evts)[i];
+      std::vector<double> values;
+      //Loop over models
+      for (int j = 0; j<m_obs.models().size(); ++j) {
+	value =  m_obs.models()[j]->eval( *evt, *obs);
+	values.push_back(value);
+	total += value;
+      }
+      for (int j = 0; j<m_obs.models().size(); ++j) {
+	values[j] /= total;
+	(*(columns[j]))(i) = values[j];
+      }
+    }
 
-    // Setup cube GTIs for this observation
-    m_cube.gti(obs->events()->gti());
-
-    // Loop over all cube bins
-    for (int i = 0; i < m_cube.size(); ++i) {
-
-        // Get cube bin
-        GCTAEventBin* bin = m_cube[i];
-
-        // Determine counts cube energy bin
-        int iebin = cube_ebounds.index(bin->energy());
-
-        // Skip bin if the corresponding counts cube energy bin is not fully
-        // contained in the event list energy range. This avoids having
-        // partially filled bins.
-        if (!usage[iebin]) {
-            num_outside_ebds++;
-            continue;
-        }
-
-        // If RoI is valid then skip bin if it is outside the RoI of the
-        // observation
-        if (roi.is_valid() && !roi.contains(*bin)) {
-            num_outside_roi++;
-            continue;
-        }
-
-        // Get actual bin value
-        double value = bin->counts();
-        
-        // Compute model value for cube bin
-        double model = m_obs.models().eval(*bin, *obs) * bin->size();
-
-        // Add model to actual value
-        value += model;
-        sum   += model;
-
-        // Store value
-        bin->counts(value);
-
-    } // endfor: looped over all cube bins
-
-    // Append GTIs of observation to list of GTIs
-    m_gti.extend(gti);
-
-    // Update GTIs
-    m_cube.gti(m_gti);
-
-    // Log filling results
-    log_value(NORMAL, "Model events in cube", sum);
-    log_value(NORMAL, "Bins outside energy range", num_outside_ebds);
-    log_value(NORMAL, "Bins outside RoI", num_outside_roi);
-
-    // Write model cube into header
-    log_header2(EXPLICIT, "Model cube");
-    log_string(EXPLICIT, m_cube.print(m_chatter));
+    //append columns to observation event list
+    for (int j = 0; j<m_obs.models().size(); ++j) {
+      evts->append_column(*columns[j]);
+    }
 
     // Return
     return;
 }
 
+
+
+/***********************************************************************//**
+ * @brief Check input filename
+ *
+ * @param[in] filename File name.
+ * @param[in] evtname Event extension name.
+ *
+ * This method checks if the input FITS file is correct.
+ ***************************************************************************/
+std::string ctprob::check_infile(const std::string& filename,
+                                   const std::string& evtname) const
+{
+    // Initialise message string
+    std::string message = "";
+
+    // Open FITS file
+    GFits fits(filename);
+
+    // Check for existence of events extensions
+    if (!fits.contains(evtname)) {
+        message = "No \""+evtname+"\" extension found in input file \""+
+                  filename + "\".";
+    }
+
+    // ... otherwise check column names
+    else {
+
+        // Get pointer to FITS table
+        GFitsTable* table = fits.table(evtname);
+
+        // Initialise list of missing columns
+        std::vector<std::string> missing;
+
+        // Check for existence of TIME column
+        if (!table->contains("TIME")) {
+            missing.push_back("TIME");
+        }
+
+        // Check for existence of ENERGY column
+        if (!table->contains("ENERGY")) {
+            missing.push_back("ENERGY");
+        }
+
+        // Check for existence of RA column
+        if (!table->contains("RA")) {
+            missing.push_back("RA");
+        }
+
+        // Check for existence of DEC column
+        if (!table->contains("DEC")) {
+            missing.push_back("DEC");
+        }
+
+        // Set error message for missing columns
+        if (!missing.empty()) {
+            message = "The following columns are missing in the "
+                      "\""+evtname+"\" extension of input file \""+
+                      filename + "\": ";
+            for (int i = 0; i < missing.size(); ++i) {
+                message += "\"" + missing[i] + "\"";
+                if (i < missing.size()-1) {
+                    message += ", ";
+                }
+            }
+        }
+
+    } // endelse: checked column names
+
+    // Return
+    return message;
+}
+
+
+/***********************************************************************//**
+ * @brief Set output file name.
+ *
+ * @param[in] filename Input file name.
+ *
+ * Converts an input file name into an output filename by prepending the
+ * prefix stored in the member m_prefix to the input file name. Any path as
+ * well as extension will be stripped from the input file name. Also a
+ * trailing ".gz" will be stripped as one cannot write into gzipped files.
+ ***************************************************************************/
+std::string ctprob::set_outfile_name(const std::string& filename) const
+{
+    // Create filename
+    GFilename fname(filename);
+
+    // Split input filename without any extensions into path elements
+    std::vector<std::string> elements = gammalib::split(fname.url(), "/");
+
+    // The last path element is the filename
+    std::string outname = m_prefix + elements[elements.size()-1];
+
+    // Strip any ".gz"
+    outname = gammalib::strip_chars(outname, ".gz");
+    
+    // Return output filename
+    return outname;
+}
+
+
+/***********************************************************************//**
+ * @brief Get Good Time Intervals extension name
+ *
+ * @param[in] filename Input file name.
+ * @param[in] evtname Events extension name.
+ *
+ * Extracts the Good Time Intervals extension name from the event file. We
+ * do this by loading the events and accessing the Good Time Intervals
+ * extension name using the GCTAEventList::gtiname() method. If the file name
+ * is empty, the method returns `GTI`.
+ ***************************************************************************/
+std::string ctprob::get_gtiname(const std::string& filename,
+                                  const std::string& evtname) const
+{
+    // Initialise GTI name
+    std::string gtiname = gammalib::extname_gti;
+
+    // Continue only if the filename is not empty
+    if (!filename.empty()) {
+
+        // Load events
+        GCTAEventList events(filename+"["+evtname+"]");
+
+        // Get GTI name
+        gtiname = events.gtiname();
+
+    }
+
+    // Return GTI name
+    return (gtiname);
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list in FITS format.
+ *
+ * Save the event list as a FITS file. The file name of the FITS file is
+ * specified by the "outobs" parameter.
+ ***************************************************************************/
+void ctprob::save_fits(void)
+{
+    // Save only if there are observations
+    if (m_obs.size() > 0) {
+
+        // Get output filename
+        m_outobs = (*this)["outobs"].filename();
+
+        // Get CTA observation from observation container
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+
+        // Save only if it's a CTA observation
+        if (obs != NULL) {
+    
+            // Save only if file name is non-empty
+            if (m_infiles[0].length() > 0) {
+
+                // Create file name object
+                GFilename fname(m_outobs);
+
+                // Extract filename and event extension name
+                std::string outfile = fname.url();
+
+                // Append event extension name. We handle here the possibility
+                // to write the events into a different extension.
+                if (fname.has_extname()) {
+                    outfile += "["+fname.extname()+"]";
+                }
+                else {
+                    outfile += "["+m_evtname[0]+"]";
+                }
+		
+                // Log filename
+                log_value(NORMAL, "Event list file", outfile);
+                // Save event list
+                save_event_list(obs, m_infiles[0], m_evtname[0], m_gtiname[0],
+                                outfile);
+
+            } // endif: filename was non empty
+
+        } // endif: observation was CTA observation
+
+    } // endif: there were observations
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list(s) in XML format.
+ *
+ * Save the event list(s) into FITS files and write the file path information
+ * into a XML file. The filename of the XML file is specified by the outfile
+ * parameter, the filename(s) of the event lists are built by prepending a
+ * prefix to the input event list filenames. Any path present in the input
+ * filename will be stripped, i.e. the event list(s) will be written in the
+ * local working directory (unless a path is specified in the prefix).
+ ***************************************************************************/
+void ctprob::save_xml(void)
+{
+    // Get output filename and prefix
+    m_outobs = (*this)["outobs"].filename();
+    m_prefix = (*this)["prefix"].string();
+
+    // Issue warning if output filename has no .xml suffix
+    log_string(TERSE, warn_xml_suffix(m_outobs));
+
+    // Loop over all observation in the container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // Get CTA observation
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+
+        // Skip observations that are no CTA observations
+        if (obs == NULL) {
+            continue;
+        }
+
+        // Skip observations that have empty names
+        if (m_infiles[i].length() == 0) {
+            continue;
+        }
+
+        // Set event output file name
+        std::string outfile = set_outfile_name(m_infiles[i]);
+
+        // Append event extension name
+        outfile += "["+m_evtname[i]+"]";
+
+        // Log filename
+        log_value(NORMAL, "Event list file", outfile);
+
+        // Store output file name in observation
+        obs->eventfile(outfile);
+
+        // Save event list
+        save_event_list(obs, m_infiles[i], m_evtname[i], m_gtiname[i],
+                        outfile);
+
+    } // endfor: looped over observations
+
+    // Write observation definition XML file name into logger
+    log_value(NORMAL, "Obs. definition file", m_outobs);
+
+    // Save observations in XML file
+    m_obs.save(m_outobs);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list into FITS file
+ *
+ * @param[in] obs Pointer to CTA observation.
+ * @param[in] infile Input file name.
+ * @param[in] evtname Event extension name.
+ * @param[in] gtiname GTI extension name.
+ * @param[in] outfile Output file name.
+ *
+ * Saves an event list and the corresponding Good Time Intervals into a FITS
+ * file and copy all others extensions from the input file to the output
+ * file.
+ *
+ * If an extension name is specified in the @p outfile argument, the events
+ * and eventually also the Good Time Intervals will be extracted from the
+ * argument and used for writing the events. The format is
+ *
+ *      <filename>[<event extension name;GTI extension name>]
+ *
+ * where <filename> needs to be replaced by the name of the FITS file,
+ * and <event extension name;GTI extension name> by the name of the events
+ * and Good Time Intervals extensions. For example 
+ *
+ *      myfits.fits[EVENTS1;GTI1]
+ *
+ * will write the selected events into the "EVENTS1" extension and the
+ * Good Time Intervals into the "GTI1" extension of the "myfits.fits" FITS
+ * file. If the Good Time Intervals extension name is skipped, e.g.
+ *
+ *      myfits.fits[EVENTS1]
+ *
+ * the original extension name for the Good Time Intervals will be kept.
+ * Analogously, only the Good Time Intervals extension name can be changed
+ * by specifying
+ *
+ *      myfits.fits[;GTI1]
+ *
+ * In none of the cases will the original events and Good Time Intervals be
+ * copied over to the output file.
+ ***************************************************************************/
+void ctprob::save_event_list(const GCTAObservation* obs,
+                               const std::string&     infile,
+                               const std::string&     evtname,
+                               const std::string&     gtiname,
+                               const std::string&     outfile) const
+{
+    // Save only if we have an event list
+    if (obs->eventtype() == "EventList") {
+
+        // Set output FITS file event extension names
+        GFilename   outname(outfile);
+        std::string outevt = evtname;
+        std::string outgti = gtiname;
+        if (outname.has_extname()) {
+            std::vector<std::string> extnames =
+                       gammalib::split(outname.extname(), ";");
+            if (extnames.size() > 0) {
+                std::string extname = gammalib::strip_whitespace(extnames[0]);
+                if (!extname.empty()) {
+                    outevt = extname;
+                }
+            }
+            if (extnames.size() > 1) {
+                std::string extname = gammalib::strip_whitespace(extnames[1]);
+                if (!extname.empty()) {
+                    outgti = extname;
+                }
+            }
+        }
+
+        // Create output FITS file
+        GFits outfits;
+
+        // Write observation into FITS file
+        obs->write(outfits, outevt, outgti);
+
+        // Copy all extensions other than evtname and gtiname extensions
+        // from the input to the output event list. The evtname and
+        // gtiname extensions are written by the save method, all others
+        // that may eventually be present have to be copied over
+        // explicitly.
+        GFits infits(infile);
+        for (int extno = 1; extno < infits.size(); ++extno) {
+            GFitsHDU* hdu = infits.at(extno);
+            if (hdu->extname() != evtname &&
+                hdu->extname() != gtiname &&
+                hdu->extname() != outevt  &&
+                hdu->extname() != outgti) {
+                outfits.append(*hdu);
+            }
+        }
+
+        // Close input file
+        infits.close();
+
+        // Save file to disk and close it (we need both operations)
+        outfits.saveto(outname.url(), clobber());
+        outfits.close();
+
+    } // endif: observation was unbinned
+
+    // Return
+    return;
+}

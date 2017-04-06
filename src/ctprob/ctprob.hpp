@@ -24,117 +24,91 @@
  * @author Leonardo Di Venere
  */
 
-
-#ifndef CTMODEL_HPP
-#define CTMODEL_HPP
+#ifndef CTPROB_HPP
+#define CTPROB_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <vector>
+#include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTMODEL_NAME    "ctmodel"
-#define CTMODEL_VERSION "1.1.0"
+#define CTPROB_NAME    "ctprob"
+#define CTPROB_VERSION "0.0.1"
 
 
 /***********************************************************************//**
- * @class ctmodel
+ * @class ctprob
  *
- * @brief Model cube generation tool
- *
- * This class creates counts model map(s). The definition of the counts model
- * can be taken from a predefined observation container, from the counts maps
- * found in an observation definition XML file, from an individual counts
- * map, or from the parameter definition.
- *
- * Results are stored in an observation container that can be written to disk
- * in form of FITS files (model maps) and an updated observation definition
- * XML file.
+ * @brief Data selection tool
  ***************************************************************************/
-class ctmodel : public ctobservation {
+class ctprob : public ctobservation {
 
 public:
     // Constructors and destructors
-    ctmodel(void);
-    explicit ctmodel(const GObservations& obs);
-    ctmodel(int argc, char *argv[]);
-    ctmodel(const ctmodel& app);
-    virtual ~ctmodel(void);
+    ctprob(void);
+    explicit ctprob(const GObservations& obs);
+    ctprob(int argc, char *argv[]);
+    ctprob(const ctprob& app);
+    virtual ~ctprob(void);
 
     // Operators
-    ctmodel& operator=(const ctmodel& app);
+    ctprob& operator=(const ctprob& app);
 
     // Methods
-    void                 clear(void);
-    void                 run(void);
-    void                 save(void);
-    void                 publish(const std::string& name = "");
-    const GCTAEventCube& cube(void) const;
-    void                 cube(const GCTAEventCube& cube);
-    void                 models(const GModels& models);
+    void clear(void);
+    void run(void);
+    void save(void);
+    void publish(const std::string& name = "");
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctmodel& app);
-    void free_members(void);
-    void get_parameters(void);
-    void get_obs(void);
-    void fill_cube(const GCTAObservation* obs);
-    bool has_cube(void) const;
+    void        init_members(void);
+    void        copy_members(const ctprob& app);
+    void        free_members(void);
+    void        get_parameters(void);
+    void        get_obs(void);
+    void        evaluate_probability(GCTAObservation*   obs);
+    std::string check_infile(const std::string& filename,
+                             const std::string& evtname) const;
+    std::string set_outfile_name(const std::string& filename) const;
+    std::string get_gtiname(const std::string& filename,
+                            const std::string& evtname) const;
+    void        save_fits(void);
+    void        save_xml(void);
+    void        save_event_list(const GCTAObservation* obs,
+                                const std::string&     infile,
+                                const std::string&     evtname,
+                                const std::string&     gtiname,
+                                const std::string&     outfile) const;
 
     // User parameters
-    GFilename m_outcube;      //!< Output model cube
-    bool      m_apply_edisp;  //!< Apply energy dispersion?
-    bool      m_publish;      //!< Publish model cube?
-    GChatter  m_chatter;      //!< Chattiness
+    std::string m_outobs;     //!< Output event list or XML file
+    std::string m_prefix;     //!< Prefix for multiple event lists
+  //    bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
+  //GCTARoi     m_roi;        //!< RoI selection
+  //double      m_tmin;       //!< Start time
+  //double      m_tmax;       //!< Stop time
+  //double      m_emin;       //!< Lower energy
+  //double      m_emax;       //!< Upper energy
+  //std::string m_expr;       //!< Selection expression
+  //std::string m_usethres;   //!< Energy threshold type
+    bool        m_apply_edisp;  //!< Apply energy dispersion?
+    bool        m_publish;      //!< Publish model cube?
+    GChatter    m_chatter;    //!< Chattiness
 
     // Protected members
-    GCTAEventCube m_cube;        //!< Model cube
-    GGti          m_gti;         //!< Model cube GTIs
-    bool          m_has_cube;    //!< Signal if cube has been set or loaded
-    bool          m_append_cube; //!< Signal that cube should be appended
-    bool          m_binned;      //!< Signals that we are in binned mode
+    std::vector<std::string> m_infiles;       //!< Input event filenames
+    std::vector<std::string> m_evtname;       //!< Event extension names
+    std::vector<std::string> m_gtiname;       //!< GTI extension names
+  //GTime                    m_timemin;       //!< Earliest time
+  //GTime                    m_timemax;       //!< Latest time
+  //bool                     m_select_energy; //!< Perform energy selection
+  //bool                     m_select_roi;    //!< Perform RoI selection
+  //bool                     m_select_time;   //!< Perform time selection
 };
 
 
-/***********************************************************************//**
- * @brief Return model cube
- *
- * @return Reference to model cube.
- ***************************************************************************/
-inline
-const GCTAEventCube& ctmodel::cube(void) const
-{
-    return m_cube;
-}
-
-
-/***********************************************************************//**
- * @brief Signal if cube has been set or loaded
- *
- * @return True if cube has been set or loaded.
- ***************************************************************************/
-inline
-bool ctmodel::has_cube(void) const
-{
-    return m_has_cube;
-}
-
-
-/***********************************************************************//**
- * @brief Set models
- *
- * @param[in] models Model container.
- *
- * Set model container that should be used for model generation.
- ***************************************************************************/
-inline
-void ctmodel::models(const GModels& models)
-{
-    m_obs.models(models);
-    return;
-}
-
-#endif /* CTMODEL_HPP */
+#endif /* CTPROB_HPP */
