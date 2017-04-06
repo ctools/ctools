@@ -69,6 +69,7 @@ protected:
     void        copy_members(const ctphase& app);
     void        free_members(void);
     void        get_parameters(void);
+    void        read_phase_info_from_xml(void);
     void        phase_events(GCTAObservation* obs,
                              const std::string& filename,
                              const std::string& evtname,

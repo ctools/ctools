@@ -526,10 +526,20 @@ void ctphase::get_parameters(void)
     // information and do not accept counts cubes.
     setup_observations(m_obs, false, true, false);
 
+    // Check whether a model XML file and source name were supplied
+    if (!((*this)["inmodel"].filename().file().empty()) &&
+        !((*this)["source"].string().empty())) {
+        
+        // Get the information from an xml file
+        read_phase_info_from_xml();
+    }
+    
     // Check for sanity of frequency and phase information
-    if ((*this)["p0"].is_valid() &&
-        (*this)["mjd"].is_valid() &&
-        (*this)["f0"].is_valid()) {
+    else if ((*this)["p0"].is_valid() &&
+             (*this)["mjd"].is_valid() &&
+             (*this)["f0"].is_valid()&&
+             (*this)["f1"].is_valid()&&
+             (*this)["f2"].is_valid()) {
         
         // The following creates an XML object responsible for initializing
         // 'm_phase'. This was done as the default values for the parameters in
@@ -593,7 +603,7 @@ void ctphase::get_parameters(void)
     }
     else {
         GException::invalid_value("ctphase::get_parameters()",
-                                  "Invalid parameter value for p0, mjd, or f0.");
+                                  "Invalid parameter value for p0, mjd, f0, f1, or f2.");
     }
 
     // Get other User parameters
@@ -611,6 +621,38 @@ void ctphase::get_parameters(void)
 
     // Return
     return;
+}
+
+/*************************************************************************
+ * @brief Read phase information from XML file
+ *
+ * @exception GException::par_error
+ *            Source does not have a temporal component with phase information.
+ ***************************************************************************/
+void ctphase::read_phase_info_from_xml(void)
+{
+    // Load the models from the xml file
+    GModels in_models((*this)["inmodel"].filename());
+    
+    // Get the temporal component of this source
+    std::string src_name = (*this)["source"].string();
+    GModelSky* model = dynamic_cast<GModelSky*>(in_models[src_name]);
+    GModelTemporalPhaseCurve* temporal_model = dynamic_cast<GModelTemporalPhaseCurve*>(model->temporal());
+    
+    // Make sure the model has a temporal component with phase info
+    if (temporal_model != NULL) {
+        
+        // Copy the phase model
+        m_phase = GModelTemporalPhaseCurve(*temporal_model);
+        
+    } else {
+        // Throw an error as there is no temporal component for this source
+        throw GException::par_error("ctphase::get_parameters(void)",
+                                    "source",
+                                    "\"" + src_name + "\" source model " +
+                                    "does not have a temporal component with "+
+                                    "phase information!");
+    }
 }
 
 
