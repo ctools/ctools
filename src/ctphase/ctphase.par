@@ -26,11 +26,11 @@ source,   s, h, ,,, "Source in model file to use for phase information"
 #
 # Phase information parameters
 #=====================
-mjd,    r, a,59000,,, "Reference MJD for phase information"
-p0,     r, a,0.0,0.0,1.0, "Phase at reference MJD"
-f0,     r, a,1,,, "Frequency at reference MJD [Hz]"
-f1,     r, a,1e-8,,, "First freq. derivative at reference MJD [s^-1]"
-f2,     r, a,1e-8,,, "Second freq. derivative at reference MJD [s^-2]"
+mjd,    r, a, 51544.5,,, "Reference MJD for phase information"
+p0,     r, a, 0.0,0.0,1.0, "Phase at reference MJD"
+f0,     r, a, 1,,, "Frequency at reference MJD [Hz]"
+f1,     r, a, 0.0,,, "First freq. derivative at reference MJD [s^-1]"
+f2,     r, a, 0.0,,, "Second freq. derivative at reference MJD [s^-2]"
 
 #
 # Standard parameters
