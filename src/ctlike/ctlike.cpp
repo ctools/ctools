@@ -321,7 +321,7 @@ void ctlike::run(void)
 /***********************************************************************//**
  * @brief Save results
  *
- * This method saves the fit results into a XML file and a FITS file. If
+ * This method saves the fit results into a XML file and a CSV file. If
  * the filename parameters are "NONE", the files are not saved.
  ***************************************************************************/
 void ctlike::save(void)
