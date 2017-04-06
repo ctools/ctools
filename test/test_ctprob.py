@@ -171,6 +171,27 @@ class Test(test):
         except ValueError:
             self.test_try_success()
 
+
+        # Setup ctprob with a list of observations and test prefix
+        prob = ctools.ctprob()
+        prob['inobs']  = self._datadir + '/obs_unbinned.xml'
+        prob['prefix'] = 'ctprob_py3_'
+        prob['outobs']  = 'ctprob_py3_obs.xml'
+        prob['inmodel']  = self._model
+        prob['caldb']  = self._caldb
+        prob['irf']  = self._irf
+        prob['edisp']  = True
+        prob['logfile'] = 'ctprob_py3.log'
+        prob['chatter'] = 3
+
+        # Run ctprob tool
+        prob.logFileOpen()   # Make sure we get a log file
+        prob.run()
+        prob.save()
+
+        # Check result file
+        self._check_result_file('ctprob_py3_crab_events.fits')
+
         # Return
         return
 

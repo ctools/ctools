@@ -223,7 +223,7 @@ void ctprob::run(void)
     log_observations(NORMAL, m_obs, "Input observation");
 
     // Write header into logger
-    log_header1(TERSE, "Event selection");
+    log_header1(TERSE, "Event probability evaluation");
 
     // Initialise counters
     int n_observations = 0;
@@ -280,7 +280,7 @@ void ctprob::run(void)
         // Fall through in case that the event file is empty
         if (obs->events()->size() == 0) {
             log_string(NORMAL, " Warning: No events in event file \""+
-                       m_infiles[i]+"\". Event selection skipped.");
+                       m_infiles[i]+"\". Event probability evaluation skipped.");
             continue;
         }
 
