@@ -31,6 +31,7 @@ ctools
    ctskymap --- Generates sky map <ctskymap>
    cttsmap --- Generates Test Statistic map <cttsmap>
    ctulimit --- Calculates upper limit <ctulimit>
+   ctprob --- Computes event probability for a given model <ctprob>
 
 
 cscripts

@@ -87,14 +87,6 @@ protected:
     // User parameters
     std::string m_outobs;     //!< Output event list or XML file
     std::string m_prefix;     //!< Prefix for multiple event lists
-  //    bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
-  //GCTARoi     m_roi;        //!< RoI selection
-  //double      m_tmin;       //!< Start time
-  //double      m_tmax;       //!< Stop time
-  //double      m_emin;       //!< Lower energy
-  //double      m_emax;       //!< Upper energy
-  //std::string m_expr;       //!< Selection expression
-  //std::string m_usethres;   //!< Energy threshold type
     bool        m_apply_edisp;  //!< Apply energy dispersion?
     bool        m_publish;      //!< Publish model cube?
     GChatter    m_chatter;    //!< Chattiness
@@ -103,11 +95,6 @@ protected:
     std::vector<std::string> m_infiles;       //!< Input event filenames
     std::vector<std::string> m_evtname;       //!< Event extension names
     std::vector<std::string> m_gtiname;       //!< GTI extension names
-  //GTime                    m_timemin;       //!< Earliest time
-  //GTime                    m_timemax;       //!< Latest time
-  //bool                     m_select_energy; //!< Perform energy selection
-  //bool                     m_select_roi;    //!< Perform RoI selection
-  //bool                     m_select_time;   //!< Perform time selection
 };
 
 

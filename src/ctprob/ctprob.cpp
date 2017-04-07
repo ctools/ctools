@@ -673,11 +673,11 @@ void ctprob::get_obs(void)
  *
  *
  * For each event from the input event file evaluates the probability that
- * the event comes from any of the source in the input model. This is done 
- * by evaluating differential expected counts for the event direction and 
- * energy and normalizing it to the total differential expected counts for 
- * given model. If only one source is provided in the model, the probability
- * is set to 1. for each photon.
+ * the event comes from any of the source in the input model.  This is done 
+ * by evaluating the differential expected counts for each source at the event 
+ * direction and energy and normalizing it to the total differential expected 
+ * counts for the given model. If only one source is provided in the model, 
+ * the probability is set to 1 for each photon.
  *
  * A FITS column for each source in the model is created and added to 
  * the event list. The name of each column is made by the source name with 
