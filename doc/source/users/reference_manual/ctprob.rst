@@ -3,7 +3,7 @@
 ctprob
 ========
 
-Compute event probability for a given model.
+Computes event probability for a given model.
 
 
 Synopsis
