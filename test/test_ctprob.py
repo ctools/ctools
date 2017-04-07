@@ -141,7 +141,6 @@ class Test(test):
         prob['edisp']  = True
         prob['logfile'] = 'ctprob_py1.log'
         prob['chatter'] = 2
-
         # Run ctprob tool
         prob.logFileOpen()   # Make sure we get a log file
         prob.run()
@@ -303,23 +302,28 @@ class Test(test):
             Names of the columns to check
         """
         # Check that the probability values are correctly normalized
-        try:
-            import pyfits as fits
-        except ImportError:
-            try:
-                import astropy.io.fits as fits
-            except ImportError:
-                print("Could not check columns in output file, since pyfits or astropy are necessary.")
-                return
-        hdu=fits.open(filename)
-        data =  hdu[1].data
-        nevt = len(data)
-        src=[]
+
+        # Open fits table
+        gfits = gammalib.GFits(filename)
+        gtable = gfits[1]
+        ncols = gtable.ncols()
+        nevt = gtable.nrows()
+        srcs=[]
+        # Loop over colnames
         for colname in colnames:
-            src1 = data.field(colname)
-            src.append(src1)
-        tot = sum(src)
-        self.test_value(sum(tot),nevt, 'Check that probability columns are normalized')
+            # self._check_column(filename, colnames)  # Check if column exists
+            # Get the correct column corresponding to colname from the table
+            for icol in range(ncols):
+                gcol = gtable[icol] 
+                if gcol.name()==colname:
+                    break
+            # Read and save column content 
+            src1 = []
+            for ievt in range(nevt):
+                src1.append(gcol[ievt])
+            srcs.extend(src1)
+        tot = sum(srcs)
+        self.test_value(int(tot+0.5),nevt, 'Check that probability columns are normalized')
 
         # Return
         return

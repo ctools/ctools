@@ -676,8 +676,8 @@ void ctprob::get_obs(void)
  * the event comes from any of the source in the input model. This is done 
  * by evaluating differential expected counts for the event direction and 
  * energy and normalizing it to the total differential expected counts for 
- * given model.
- * observation is replaced by selected event list read from the FITS file.
+ * given model. If only one source is provided in the model, the probability
+ * is set to 1. for each photon.
  *
  * A FITS column for each source in the model is created and added to 
  * the event list. The name of each column is made by the source name with 
@@ -708,14 +708,23 @@ void ctprob::evaluate_probability(GCTAObservation*   obs)
       total = 0.;
       evt = (*evts)[i];
       std::vector<double> values;
-      //Loop over models
-      for (int j = 0; j<m_obs.models().size(); ++j) {
-	value =  m_obs.models()[j]->eval( *evt, *obs);
+      //Check if you have more than one model
+      if (m_obs.models().size()>1) {
+	//Loop over models
+	for (int j = 0; j<m_obs.models().size(); ++j) {
+	  value =  m_obs.models()[j]->eval( *evt, *obs);
+	  values.push_back(value);
+	  total += value;
+	}
+      }
+      // if there is only one model a constant value equal to 1. is set for each photon
+      else {
+	value = 1.;
 	values.push_back(value);
 	total += value;
-      }
+      } // end if 
       for (int j = 0; j<m_obs.models().size(); ++j) {
-	values[j] /= total;
+	  values[j] /= total;
 	(*(columns[j]))(i) = values[j];
       }
     }
