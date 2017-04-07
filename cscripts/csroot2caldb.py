@@ -536,7 +536,8 @@ class csroot2caldb(ctools.cscript):
         Translate ROOT to CALDB effective area extension
  
         The following ROOT histograms are used:
-        - EffectiveAreaEtrue_offaxis -> EFFAREA
+        - EffectiveAreaEtrueNoTheta2cut_offaxis -> EFFAREA
+        - EffectiveAreaEtrueNoTheta2cut (for normalization)
 
         Parameters
         ----------
