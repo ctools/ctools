@@ -97,6 +97,8 @@ protected:
     double      m_tmax;       //!< Stop time
     double      m_emin;       //!< Lower energy
     double      m_emax;       //!< Upper energy
+    double      m_phasemin;   //!< Lower phase
+    double      m_phasemax;   //!< Upper phase
     std::string m_expr;       //!< Selection expression
     std::string m_usethres;   //!< Energy threshold type
     GChatter    m_chatter;    //!< Chattiness
@@ -110,6 +112,7 @@ protected:
     bool                     m_select_energy; //!< Perform energy selection
     bool                     m_select_roi;    //!< Perform RoI selection
     bool                     m_select_time;   //!< Perform time selection
+    bool                     m_select_phase;  //!< Perform phase selection
 };
 
 

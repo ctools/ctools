@@ -484,6 +484,7 @@ void ctselect::init_members(void)
     m_select_energy = true;
     m_select_roi    = true;
     m_select_time   = true;
+    m_select_phase  = true;
 
     // Return
     return;
@@ -519,6 +520,7 @@ void ctselect::copy_members(const ctselect& app)
     m_select_energy = app.m_select_energy;
     m_select_roi    = app.m_select_roi;
     m_select_time   = app.m_select_time;
+    m_select_phase  = app.m_select_phase;
 
     // Return
     return;
@@ -551,6 +553,7 @@ void ctselect::get_parameters(void)
     m_select_energy = true;
     m_select_roi    = true;
     m_select_time   = true;
+    m_select_phase  = true;
 
     // Setup observations from "inobs" parameter. Do not request response
     // information and do not accept counts cubes.
@@ -590,6 +593,16 @@ void ctselect::get_parameters(void)
     }
     else {
         m_select_energy = false;
+    }
+
+    // Check for sanity of phase selection parameters
+    if ((*this)["phasemin"].is_valid() && (*this)["phasemax"].is_valid()) {
+        m_phasemin     = (*this)["phasemin"].real();
+        m_phasemax     = (*this)["phasemax"].real();
+        m_select_phase = true;
+    }
+    else {
+        m_select_phase = false;
     }
 
     // Get other User parameters
@@ -721,6 +734,33 @@ void ctselect::select_events(GCTAObservation*   obs,
                   gammalib::str(tmin)+" - "+gammalib::str(tmax)+" s");
 
     } // endif: made time selection
+
+    // Make phase selection
+    if (m_select_phase) {
+        // Check if event_list has phase (m_has_phase)
+        if (list->has_phase()) {  // gammalib version from branch 1982-add-phase-info necessary
+            // Check if phasemax is larger than phasemin
+	    if (m_phasemax > m_phasemin) {
+	        // Format phase with sufficient accuracy and add to selection string
+	        char cmin[80];
+		char cmax[80];
+		sprintf(cmin, "%.8f", m_phasemin);
+		sprintf(cmax, "%.8f", m_phasemax);
+		selection += add + "PHASE >= "+std::string(cmin)+" && PHASE <= "+std::string(cmax);
+		add       = " && ";
+		log_value(NORMAL, "Phase range",
+			  gammalib::str(m_phasemin)+" - "+gammalib::str(m_phasemax));
+	    }
+	    else {
+	        log << "Invalid values for phasemin and phasemax. ";
+		log << "Phase selection skipped." << std::endl;
+	    }
+	}
+	else {
+	    log << "Event list has no PHASE column. ";
+	    log << "Phase selection skipped." << std::endl;
+	}
+    } // endif: made phase selection
 
     // Make energy selection
     if (m_select_energy) {
