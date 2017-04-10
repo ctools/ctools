@@ -53,7 +53,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, CTSELECT_VERSION)
+ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -72,7 +72,7 @@ ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, CTSELECT_VERSION)
  * provided in an observation container.
  ***************************************************************************/
 ctselect::ctselect(const GObservations& obs) :
-          ctobservation(CTSELECT_NAME, CTSELECT_VERSION, obs)
+          ctobservation(CTSELECT_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -91,7 +91,7 @@ ctselect::ctselect(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctselect::ctselect(int argc, char *argv[]) : 
-          ctobservation(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
+          ctobservation(CTSELECT_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

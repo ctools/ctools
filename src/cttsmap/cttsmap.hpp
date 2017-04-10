@@ -31,8 +31,7 @@
 #include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTTSMAP_NAME    "cttsmap"
-#define CTTSMAP_VERSION "1.2.0"
+#define CTTSMAP_NAME "cttsmap"
 
 
 /***********************************************************************//**

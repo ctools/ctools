@@ -52,7 +52,7 @@
  *
  * Constructs an empty sky mapping tool.
  ***************************************************************************/
-ctskymap::ctskymap(void) : ctobservation(CTSKYMAP_NAME, CTSKYMAP_VERSION)
+ctskymap::ctskymap(void) : ctobservation(CTSKYMAP_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -70,7 +70,7 @@ ctskymap::ctskymap(void) : ctobservation(CTSKYMAP_NAME, CTSKYMAP_VERSION)
  * Constructs sky mapping tool from an observation container.
  ***************************************************************************/
 ctskymap::ctskymap(const GObservations& obs) :
-          ctobservation(CTSKYMAP_NAME, CTSKYMAP_VERSION, obs)
+          ctobservation(CTSKYMAP_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -91,7 +91,7 @@ ctskymap::ctskymap(const GObservations& obs) :
  * parameter setting.
  ***************************************************************************/
 ctskymap::ctskymap(int argc, char *argv[]) : 
-          ctobservation(CTSKYMAP_NAME, CTSKYMAP_VERSION, argc, argv)
+          ctobservation(CTSKYMAP_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

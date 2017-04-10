@@ -33,8 +33,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTPSFCUBE_NAME    "ctpsfcube"
-#define CTPSFCUBE_VERSION "1.1.0"
+#define CTPSFCUBE_NAME "ctpsfcube"
 
 
 /***********************************************************************//**

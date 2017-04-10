@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctbutterfly - butterfly calculation tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Michael Mayer                               *
+ *  copyright (C) 2014-2017 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,8 +33,7 @@
 #include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTBUTTERFLY_NAME    "ctbutterfly"
-#define CTBUTTERFLY_VERSION "1.1.0"
+#define CTBUTTERFLY_NAME "ctbutterfly"
 
 
 /***********************************************************************//**
@@ -77,6 +76,10 @@ protected:
     void copy_members(const ctbutterfly& app);
     void free_members(void);
     void get_parameters(void);
+    void gaussian_error_propagation(GModels& models);
+    void ellipsoid_boundary(GModels& models);
+
+
     void check_model(void);
     void eigenvectors(const double& a,
                       const double& b,
@@ -89,10 +92,10 @@ protected:
 
     // User parameters
     std::string m_srcname;      //!< Name of source to compute butterfly
+    std::string m_method;       //!< Computation method
     double      m_confidence;   //!< Confidence level
     int         m_max_iter;     //!< Maximum number of iterations
     bool        m_apply_edisp;  //!< Apply energy dispersion?
-    bool        m_gepmode;      //!< Switch to gaussian error propagation scheme
     bool        m_fit;          //!< Do fit?
     GEbounds    m_ebounds;      //!< Energy binning definition
     GFilename   m_outfile;      //!< Output ASCII file name

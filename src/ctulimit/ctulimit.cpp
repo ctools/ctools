@@ -53,7 +53,7 @@
  *
  * Constructs an empty ctulimit tool.
  ***************************************************************************/
-ctulimit::ctulimit(void) : ctlikelihood(CTULIMIT_NAME, CTULIMIT_VERSION)
+ctulimit::ctulimit(void) : ctlikelihood(CTULIMIT_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -71,7 +71,7 @@ ctulimit::ctulimit(void) : ctlikelihood(CTULIMIT_NAME, CTULIMIT_VERSION)
  * Constructs ctulimit tool from an observations container.
  ***************************************************************************/
 ctulimit::ctulimit(const GObservations& obs) :
-          ctlikelihood(CTULIMIT_NAME, CTULIMIT_VERSION, obs)
+          ctlikelihood(CTULIMIT_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -92,7 +92,7 @@ ctulimit::ctulimit(const GObservations& obs) :
  * parameters that are provided as command line arguments.
  ***************************************************************************/
 ctulimit::ctulimit(int argc, char *argv[]) :
-          ctlikelihood(CTULIMIT_NAME, CTULIMIT_VERSION, argc, argv)
+          ctlikelihood(CTULIMIT_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

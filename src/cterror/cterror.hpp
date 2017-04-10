@@ -31,8 +31,7 @@
 #include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTERROR_NAME    "cterror"
-#define CTERROR_VERSION "1.2.0"
+#define CTERROR_NAME "cterror"
 
 
 /***********************************************************************//**

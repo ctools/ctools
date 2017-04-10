@@ -55,7 +55,7 @@
  *
  * Constructs an empty event binning tool.
  ***************************************************************************/
-ctbin::ctbin(void) : ctobservation(CTBIN_NAME, CTBIN_VERSION)
+ctbin::ctbin(void) : ctobservation(CTBIN_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -73,7 +73,7 @@ ctbin::ctbin(void) : ctobservation(CTBIN_NAME, CTBIN_VERSION)
  * Constructs event binning tool from an observation container.
  ***************************************************************************/
 ctbin::ctbin(const GObservations& obs) :
-       ctobservation(CTBIN_NAME, CTBIN_VERSION, obs)
+       ctobservation(CTBIN_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -94,7 +94,7 @@ ctbin::ctbin(const GObservations& obs) :
  * parameter setting.
  ***************************************************************************/
 ctbin::ctbin(int argc, char *argv[]) : 
-       ctobservation(CTBIN_NAME, CTBIN_VERSION, argc, argv)
+       ctobservation(CTBIN_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

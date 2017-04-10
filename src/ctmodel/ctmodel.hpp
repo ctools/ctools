@@ -33,8 +33,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTMODEL_NAME    "ctmodel"
-#define CTMODEL_VERSION "1.1.0"
+#define CTMODEL_NAME "ctmodel"
 
 
 /***********************************************************************//**

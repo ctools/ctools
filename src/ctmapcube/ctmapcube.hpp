@@ -33,8 +33,7 @@
 #include "ctool.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTMAPCUBE_NAME    "ctmapcube"
-#define CTMAPCUBE_VERSION "1.3.0"
+#define CTMAPCUBE_NAME "ctmapcube"
 
 
 /***********************************************************************//**

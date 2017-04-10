@@ -33,8 +33,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTEXPCUBE_NAME    "ctexpcube"
-#define CTEXPCUBE_VERSION "1.1.0"
+#define CTEXPCUBE_NAME "ctexpcube"
 
 
 /***********************************************************************//**

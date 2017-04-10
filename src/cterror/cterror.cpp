@@ -52,7 +52,7 @@
  *
  * Constructs an empty cterror tool.
  ***************************************************************************/
-cterror::cterror(void) : ctlikelihood(CTERROR_NAME, CTERROR_VERSION)
+cterror::cterror(void) : ctlikelihood(CTERROR_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -70,7 +70,7 @@ cterror::cterror(void) : ctlikelihood(CTERROR_NAME, CTERROR_VERSION)
  * Constructs cterror tool from an observations container.
  ***************************************************************************/
 cterror::cterror(const GObservations& obs) :
-         ctlikelihood(CTERROR_NAME, CTERROR_VERSION, obs)
+         ctlikelihood(CTERROR_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -90,7 +90,7 @@ cterror::cterror(const GObservations& obs) :
  * parameters that are provided as command line arguments.
  ***************************************************************************/
 cterror::cterror(int argc, char *argv[]) :
-         ctlikelihood(CTERROR_NAME, CTERROR_VERSION, argc, argv)
+         ctlikelihood(CTERROR_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();
