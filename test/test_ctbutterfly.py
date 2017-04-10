@@ -168,6 +168,9 @@ class Test(test):
         cpy_butterfly['outfile'] = 'ctbutterfly_py3.dat'
         cpy_butterfly['logfile'] = 'ctbutterfly_py3.log'
         cpy_butterfly['chatter'] = 4
+
+        # Execute ctbutterfly tool
+        cpy_butterfly.logFileOpen()   # Make sure we get a log file
         cpy_butterfly.execute()
 
         # Check result file

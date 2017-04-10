@@ -674,7 +674,13 @@ void ctbutterfly::gaussian_error_propagation(GModels& models)
 
     // Write header into logger
     log_header1(TERSE, "Generate butterfly");
-    
+ 
+    // Initialise result arrays
+    m_energies.clear();
+    m_intensities.clear();
+    m_min_intensities.clear();
+    m_max_intensities.clear();
+   
     // Initialise dummy time to evaluate spectral model
     GTime time = GTime();
 
