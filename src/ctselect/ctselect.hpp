@@ -35,8 +35,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTSELECT_NAME    "ctselect"
-#define CTSELECT_VERSION "1.2.0"
+#define CTSELECT_NAME "ctselect"
 
 
 /***********************************************************************//**

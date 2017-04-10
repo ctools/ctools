@@ -50,7 +50,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctmapcube::ctmapcube(void) : ctool(CTMAPCUBE_NAME, CTMAPCUBE_VERSION)
+ctmapcube::ctmapcube(void) : ctool(CTMAPCUBE_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -67,7 +67,7 @@ ctmapcube::ctmapcube(void) : ctool(CTMAPCUBE_NAME, CTMAPCUBE_VERSION)
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctmapcube::ctmapcube(int argc, char *argv[]) :
-           ctool(CTMAPCUBE_NAME, CTMAPCUBE_VERSION, argc, argv)
+           ctool(CTMAPCUBE_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

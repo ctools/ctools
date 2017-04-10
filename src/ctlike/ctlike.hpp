@@ -31,8 +31,7 @@
 #include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTLIKE_NAME    "ctlike"
-#define CTLIKE_VERSION "1.2.0"
+#define CTLIKE_NAME "ctlike"
 
 
 /***********************************************************************//**

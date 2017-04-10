@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-6 April 2017
+10 April 2017
 
 
 Introduction
@@ -113,7 +113,11 @@ None
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-None
+The tool now uses Gaussian error propagation as the standard method for the
+computation of the butterfly diagram. The envelope method that existed before
+is still available for power law spectral models as an option. The "method"
+parameter has been added to allow the selection of the computation method
+(#1862).
 
 
 ctulimit - Compute upper limit

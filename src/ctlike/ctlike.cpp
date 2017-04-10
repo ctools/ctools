@@ -48,7 +48,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctlike::ctlike(void) : ctlikelihood(CTLIKE_NAME, CTLIKE_VERSION)
+ctlike::ctlike(void) : ctlikelihood(CTLIKE_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -66,7 +66,7 @@ ctlike::ctlike(void) : ctlikelihood(CTLIKE_NAME, CTLIKE_VERSION)
  * Constructs ctlike tool from an observations container.
  ***************************************************************************/
 ctlike::ctlike(const GObservations& obs) :
-        ctlikelihood(CTLIKE_NAME, CTLIKE_VERSION, obs)
+        ctlikelihood(CTLIKE_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -86,7 +86,7 @@ ctlike::ctlike(const GObservations& obs) :
  * that are provided as command line arguments.
  ***************************************************************************/
 ctlike::ctlike(int argc, char *argv[]) : 
-        ctlikelihood(CTLIKE_NAME, CTLIKE_VERSION, argc, argv)
+        ctlikelihood(CTLIKE_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

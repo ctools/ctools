@@ -33,8 +33,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTBKGCUBE_NAME    "ctbkgcube"
-#define CTBKGCUBE_VERSION "1.1.0"
+#define CTBKGCUBE_NAME "ctbkgcube"
 
 
 /***********************************************************************//**

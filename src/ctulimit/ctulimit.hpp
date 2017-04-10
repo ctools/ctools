@@ -31,8 +31,7 @@
 #include "ctlikelihood.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTULIMIT_NAME    "ctulimit"
-#define CTULIMIT_VERSION "1.2.0"
+#define CTULIMIT_NAME "ctulimit"
 
 
 /***********************************************************************//**
