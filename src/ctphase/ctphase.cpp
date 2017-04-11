@@ -463,19 +463,23 @@ void ctphase::get_parameters(void)
     else {
 
         // Read phase curve user parameters
-        GFilename phasecurve = (*this)["phasecurve"].filename();
-        double    mjd_value  = (*this)["mjd"].real();
-        double    phase      = (*this)["phase"].real();
-        double    f0         = (*this)["f0"].real();
-        double    f1         = (*this)["f1"].real();
-        double    f2         = (*this)["f2"].real();
+        double mjd_value = (*this)["mjd"].real();
+        double phase     = (*this)["phase"].real();
+        double f0        = (*this)["f0"].real();
+        double f1        = (*this)["f1"].real();
+        double f2        = (*this)["f2"].real();
 
         // Set reference time
         GTime mjd;
         mjd.mjd(mjd_value);
 
         // Set phase curve
-        m_phase = GModelTemporalPhaseCurve(phasecurve, mjd, phase, f0, f1, f2);
+        m_phase = GModelTemporalPhaseCurve();
+        m_phase.mjd(mjd);
+        m_phase.phase(phase);
+        m_phase.f0(f0);
+        m_phase.f1(f1);
+        m_phase.f2(f2);
 
     } // endelse: read phase curve information from User parameters
 

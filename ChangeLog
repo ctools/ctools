@@ -3,6 +3,7 @@
         * Version 1.3.0 released
         ========================
 
+        Add ctphase tool (#1982)
         Add ctprob tool (#1991)
         ctlike stores covariance matrix in either CSV or FITS format (#1863)
         Use correct ROOT histograms in csroot2caldb

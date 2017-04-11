@@ -41,7 +41,6 @@ class Test(test):
 
         # Set test data
         self._model_file     = self._datadir + '/model_temporal_phasecurve.xml'
-        self._phase_file     = self._datadir + '/model_temporal_phasecurve.fits'
         self._invalid_events = self._datadir + '/invalid_event_list.fits'
 
         # Return
@@ -153,17 +152,16 @@ class Test(test):
         self._check_result_file('ctphase_py1.fits')
 
         # Now run ctphase tool without a model file
-        phase['inmodel']    = 'NONE'
-        phase['source']     = 'NONE'
-        phase['phasecurve'] = self._phase_file
-        phase['mjd']        = 51544.5
-        phase['phase']      = 0.0
-        phase['f0']         = 1.0
-        phase['f1']         = 0.1
-        phase['f2']         = 0.01
-        phase['outobs']     = 'ctphase_py2.fits'
-        phase['logfile']    = 'ctphase_py2.log'
-        phase['chatter']    = 3
+        phase['inmodel'] = 'NONE'
+        phase['source']  = 'NONE'
+        phase['mjd']     = 51544.5
+        phase['phase']   = 0.0
+        phase['f0']      = 1.0
+        phase['f1']      = 0.1
+        phase['f2']      = 0.01
+        phase['outobs']  = 'ctphase_py2.fits'
+        phase['logfile'] = 'ctphase_py2.log'
+        phase['chatter'] = 3
 
         # Execute ctphase tool
         phase.logFileOpen()   # Make sure we get a log file
@@ -204,11 +202,16 @@ class Test(test):
         nevents : int, optional
             Expected number of events
         """
-        # Open result file
-        events      = gammalib.GCTAEventList(filename)
+        # Open event list
+        events = gammalib.GCTAEventList(filename)
+
+        # Check event list
+        self.test_value(events.size(), nevents, 'Check number of events')
+
+        # Check phases
         phases      = [events[i].phase() for i in range(events.size())]
-        test_result = int(sum(phases)>0)
-        self.test_value(test_result, 1, 'Check number of events')
+        test_result = int(sum(phases) > 0)
+        self.test_value(test_result, 1, 'Check whether phase information is set')
 
         # Return
         return

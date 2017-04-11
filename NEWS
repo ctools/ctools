@@ -142,6 +142,13 @@ event list a column for each model component that will contain the probability
 that the event originates from that component (#1991).
 
 
+ctphase - Event phase computation
+---------------------------------
+The ctphase tool has been added that compute the phase for each event based on
+a temporal phase curve model. This allows for example to perform a pulsar or
+binary analysis (#1982).
+
+
 cscripts
 --------
 The csebins script has been added that generates an energy boundaries
