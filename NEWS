@@ -133,6 +133,15 @@ cterror - Likelihood profile error computation
 None
 
 
+ctprob - Event probability computation
+--------------------------------------
+The ctprob tool has been added that computates for each event the probability
+that the event originates from a given model component. The tool takes on input
+either an event list or an observation definition XML file. It appends to each
+event list a column for each model component that will contain the probability
+that the event originates from that component (#1991).
+
+
 cscripts
 --------
 The csebins script has been added that generates an energy boundaries
