@@ -1,7 +1,7 @@
 /***************************************************************************
  *                ctlike - Maximum likelihood fitting tool                 *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -321,8 +321,13 @@ void ctlike::run(void)
 /***********************************************************************//**
  * @brief Save results
  *
- * This method saves the fit results into a XML file and a CSV file. If
- * the filename parameters are "NONE", the files are not saved.
+ * This method saves the fit results and the covariance matrix. The fit
+ * results are written into a XML file while the covariance matrix is written
+ * into either a FITS or a CSV file, depending on the file type extension
+ * (an extension of `.fits` or `.fit` produce a FITS file, any other
+ * extension produces a CSV file).
+ *
+ * If the filenames are `NONE` no information is saved.
  ***************************************************************************/
 void ctlike::save(void)
 {
