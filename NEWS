@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-10 April 2017
+11 April 2017
 
 
 Introduction
@@ -57,7 +57,10 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-None
+The tool now stores the covariance matrix in either FITS or CSV format,
+depending on the file type specified in the file name. For file names
+terminating with ".fits" or ".fit" a FITS file will be written, otherwise
+a CSV file will be written (#1863).
 
 
 cttsmap - Generation of Test Statistic map

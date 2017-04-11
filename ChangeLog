@@ -3,6 +3,7 @@
         * Version 1.3.0 released
         ========================
 
+        ctlike stores covariance matrix in either CSV or FITS format (#1863)
         Use correct ROOT histograms in csroot2caldb
         Implement regression scheme in cssens and remove num_avg parameter (#1989)
         Implement Gaussian error propagation in ctbutterfly (#1862)
