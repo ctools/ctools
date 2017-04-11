@@ -1,45 +1,58 @@
-.. _ctprob:
+.. _ctphase:
 
-ctprob
-======
+ctphase
+=======
 
-Compute event probability for a given model.
+Computes the phase of each event using a temporal phase curve model.
 
 
 Synopsis
 --------
 
-This tool computes for each event the probability that the event originates
-from a one of the components of a model.
+This tool computes for each event the phase value based on a temporal phase
+curve model. The phase computation is required to derive for example the phase
+curve of a pulsar or a gamma-ray binary.
 
 The tool takes on input an event list or an observation definiton XML file and
-appends on output to each event file columns that provide the probabilities.
-The column names are formed from the model name that is prefixed with ``PROB_``.
+appends on output to each event file a ``PHASE`` column containing the phase
+value.
 
 
 General parameters
 ------------------
 
 ``inobs [file]``
-    Input event list or observation definition XML file
+    Input event list or observation definition XML file.
  	 	 
 ``outobs [file]``
     Output event list or observation definition XML file.
  	 	 
-``(prefix = "prob_") [string]``
+``(prefix = "phased_") [string]``
     Prefix for output event lists in observation definition XML file.
  	 	 
 ``inmodel [string]``
-    Input model definition XML file.
+    Input model definition XML file. If ``NONE`` is specified the phase
+    computation will be based on the ``mjd``, ``phase``, ``f0``, ``f1``, and ``f2``
+    parameters.
 
-``caldb [string]``
-    Calibration database.
- 	 	 
-``irf [string]``
-    Instrument response function.
- 	 	 
-``(edisp = no) [boolean]``
-    Applies energy dispersion to response computation.
+``srcname [string]``
+    Name of the source in the model definition XML file which should be used
+    to compute the event phases.
+
+``mjd [real]``
+    Reference time in Modified Julian Days for phase computation (in days).
+
+``phase [real]``
+    Phase value at reference time.
+
+``f0 [real]``
+    Frequency at reference time (in Hz).
+
+``f1 [real]``
+    First frequency derivative at reference time (in s^-2).
+
+``f2 [real]``
+    Second frequency derivative at reference time (in s^-3).
 
 
 Standard parameters
@@ -69,12 +82,12 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctprob.log) [string]``
+``(logfile = ctphase.log) [string]``
     Name of log file.
 
 
 Related tools or scripts
 ------------------------
 
-:doc:`ctphase`
+:doc:`ctprob`
 :doc:`csphasecrv`

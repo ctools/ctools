@@ -26,8 +26,9 @@ ctools
    ctmapcube --- Generates a map cube <ctmapcube>
    ctmodel --- Computes model counts cube <ctmodel>
    ctobssim --- Simulate observations <ctobssim>
-   ctpsfcube --- Generates point spread function cube <ctpsfcube>
+   ctphase --- Computes the phase of each event <ctphase>
    ctprob --- Computes event probability for a given model <ctprob>
+   ctpsfcube --- Generates point spread function cube <ctpsfcube>
    ctselect --- Selects event data <ctselect>
    ctskymap --- Generates sky map <ctskymap>
    cttsmap --- Generates Test Statistic map <cttsmap>

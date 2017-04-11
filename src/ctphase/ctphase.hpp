@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctphase.hpp
- * @brief Append phase information to CTA events file
+ * @brief Event phase computation tool interface definition
  * @author Joshua Cardenzana
  */
 
@@ -41,7 +41,9 @@
 /***********************************************************************//**
  * @class ctphase
  *
- * @brief Append phase columm to observation files
+ * @brief Event phase computation tool
+ *
+ * Computes the phase of each event using a temporal phase curve model
  ***************************************************************************/
 class ctphase : public ctobservation {
 
@@ -70,11 +72,8 @@ protected:
     void get_parameters(void);
     void phase_events(GCTAObservation* obs);
 
-    // User parameters
-    GChatter m_chatter;                 //!< Chattiness
-
     // Protected members
-    GModelTemporalPhaseCurve m_phase;   //!< Phase curve model
+    GModelTemporalPhaseCurve m_phase; //!< Phase curve model
 };
 
 

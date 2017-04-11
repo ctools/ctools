@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctphase.i
- * @brief Append phase information to CTA events file
+ * @brief Event phase computation tool interface definition
  * @author Joshua Cardenzana
  */
 %{
@@ -32,7 +32,7 @@
 /***********************************************************************//**
  * @class ctphase
  *
- * @brief Data selection tool
+ * @brief Event phase computation tool
  ***************************************************************************/
 class ctphase : public ctobservation {
 public:

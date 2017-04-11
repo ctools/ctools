@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctphase.cpp
- * @brief Append phase information to CTA events file
+ * @brief Event phase computation tool implementation
  * @author Joshua Cardenzana
  */
 
@@ -360,9 +360,6 @@ void ctphase::publish(const std::string& name)
  ***************************************************************************/
 void ctphase::init_members(void)
 {
-    // Initialise parameters
-    m_chatter = static_cast<GChatter>(2);
-
     // Initialise protected members
     m_phase.clear();
     
@@ -378,9 +375,6 @@ void ctphase::init_members(void)
  ***************************************************************************/
 void ctphase::copy_members(const ctphase& app)
 {
-    // Copy parameters
-    m_chatter = app.m_chatter;
-
     // Copy protected members
     m_phase = app.m_phase;
     
@@ -402,43 +396,47 @@ void ctphase::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all user parameters from parameter file or (if required) by querying
- * the user. Times are assumed to be in the native CTA MJD format.
- *
- * This method also loads observations if no observations are yet allocated.
- * Observations are either loaded from a single CTA even list, or from a
- * XML file using the metadata information that is stored in that file.
+ * Get all application parameters by either querying the parameters or by
+ * retrieving the parameters for the parameter file.
  ***************************************************************************/
 void ctphase::get_parameters(void)
 {
-
     // Setup observations from "inobs" parameter. Do not request response
     // information and do not accept counts cubes.
     setup_observations(m_obs, false, true, false);
 
-    // If a model definition XML file is provided the
-    GFilename inmodel = (*this)["inmodel"].filename();
-    if (is_valid_filename(inmodel)) {
+    // If there are no models in the observation container then load model
+    // from a model definiton XML file specified by the "inmodel" parameter.
+    // The model is only loaded of the file is valid.
+    if (m_obs.models().size() == 0) {
+        GFilename inmodel = (*this)["inmodel"].filename();
+        if (is_valid_filename(inmodel)) {
+            m_obs.models(inmodel);
+        }
+    }
 
-        // Load the models from the XML file
-        GModels models(inmodel);
-
+    // If there are models in the model container then attempt to build
+    // a temporal phase curve model from the specified source ...
+    if (m_obs.models().size() != 0) {
+    
         // Get the source component
-        std::string source = (*this)["source"].string();
+        std::string srcname = (*this)["srcname"].string();
 
         // Throw an exception if source is not found in the model container
-        if (!models.contains(source)) {
-            std::string msg = "Source model \""+source+"\" not found in model "
-                              "definition XML file \""+inmodel.url()+"\".";
+        if (!m_obs.models().contains(srcname)) {
+            std::string msg = "Source model \""+srcname+"\" not found in "
+                              "model container.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
         // Get pointer to source model
-        GModelSky* sky = dynamic_cast<GModelSky*>(models[source]);
+        const GModelSky* sky =
+              dynamic_cast<const GModelSky*>(m_obs.models()[srcname]);
 
         // Throw an exception if model is not a sky model
         if (sky == NULL) {
-            std::string msg = "Source model \""+source+"\" is not a sky model.";
+            std::string msg = "Source model \""+srcname+"\" is not a sky "
+                              "model.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
 
@@ -449,7 +447,7 @@ void ctphase::get_parameters(void)
         // Throw an exception if model has not a temporal phase curve
         // component
         if (phasecurve == NULL) {
-            std::string msg = "Source model \""+source+"\" does not have a "
+            std::string msg = "Source model \""+srcname+"\" does not have a "
                               "temporal component with phase information.";
             throw GException::invalid_value(G_GET_PARAMETERS, msg);
         }
@@ -459,7 +457,7 @@ void ctphase::get_parameters(void)
 
     } // endif: model definition XML file provided
 
-    // Otherwise read phase curve information from the parameter files
+    // ... otherwise read phase curve information from the parameter files
     else {
 
         // Read phase curve user parameters
@@ -483,9 +481,6 @@ void ctphase::get_parameters(void)
 
     } // endelse: read phase curve information from User parameters
 
-    // Get other User parameters
-    m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
-
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
@@ -507,7 +502,7 @@ void ctphase::get_parameters(void)
  * @param[in,out] obs CTA observation.
  *
  * @exception GException::invalid_value
- *            No events extension found in FITS file.
+ *            No events found in observation.
  *
  * Append phase information to events from a FITS file by adding a "PHASE"
  * column to the FITS file.

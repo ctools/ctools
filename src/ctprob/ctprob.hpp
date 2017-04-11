@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctprob.hpp
- * @brief Computes event probability for a given model
+ * @brief Event probability computation tool interface definition
  * @author Leonardo Di Venere
  */
 
@@ -41,7 +41,7 @@
 /***********************************************************************//**
  * @class ctprob
  *
- * @brief Data selection tool
+ * @brief Event probability computation tool
  ***************************************************************************/
 class ctprob : public ctobservation {
 
@@ -64,27 +64,16 @@ public:
 
 protected:
     // Protected methods
-    void        init_members(void);
-    void        copy_members(const ctprob& app);
-    void        free_members(void);
-    void        get_parameters(void);
-    void        get_obs(void);
-    void        evaluate_probability(GCTAObservation* obs);
-    std::string set_outfile_name(const std::string& filename) const;
-    void        save_fits(void);
-    void        save_xml(void);
+    void init_members(void);
+    void copy_members(const ctprob& app);
+    void free_members(void);
+    void get_parameters(void);
+    void evaluate_probability(GCTAObservation* obs);
 
     // User parameters
-    std::string m_outobs;      //!< Output event list or XML file
-    std::string m_prefix;      //!< Prefix for multiple event lists
-    bool        m_apply_edisp; //!< Apply energy dispersion?
-    bool        m_publish;     //!< Publish event list?
-    GChatter    m_chatter;     //!< Chattiness
-
-    // Protected members
-    std::vector<std::string> m_infiles;  //!< Input event filenames
-    std::vector<std::string> m_evtname;  //!< Event extension names
-    std::vector<std::string> m_gtiname;  //!< GTI extension names
+    bool     m_apply_edisp; //!< Apply energy dispersion?
+    bool     m_publish;     //!< Publish event list?
+    GChatter m_chatter;     //!< Chattiness
 };
 
 #endif /* CTPROB_HPP */

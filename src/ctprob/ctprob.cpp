@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctprob.cpp
- * @brief Computes event probability for a given model
+ * @brief Event probability computation tool implementation
  * @author Leonardo Di Venere
  */
 
@@ -33,7 +33,6 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_GET_OBS                                         "ctprob::get_obs()"
 #define G_EVALUATE_PROB      "ctprob::evaluate_probability(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
@@ -289,12 +288,12 @@ void ctprob::save(void)
 
     // Case A: Save event file(s) and XML metadata information
     if (m_use_xml) {
-        save_xml();
+        save_events_xml();
     }
 
     // Case B: Save event file as FITS file
     else {
-        save_fits();
+        save_events_fits();
     }
 
     // Return
@@ -368,14 +367,9 @@ void ctprob::publish(const std::string& name)
 void ctprob::init_members(void)
 {
     // Initialise parameters
-    m_outobs.clear();
-    m_prefix.clear();
-    m_chatter = static_cast<GChatter>(2);
-
-    // Initialise protected members
-    m_infiles.clear();
-    m_evtname.clear();
-    m_gtiname.clear();
+    m_apply_edisp = false;
+    m_publish     = false;
+    m_chatter     = static_cast<GChatter>(2);
 
     // Return
     return;
@@ -390,14 +384,9 @@ void ctprob::init_members(void)
 void ctprob::copy_members(const ctprob& app)
 {
     // Copy parameters
-    m_outobs   = app.m_outobs;
-    m_prefix   = app.m_prefix;
-    m_chatter  = app.m_chatter;
-
-    // Copy protected members
-    m_infiles       = app.m_infiles;
-    m_evtname       = app.m_evtname;
-    m_gtiname       = app.m_gtiname;
+    m_apply_edisp = app.m_apply_edisp;
+    m_publish     = app.m_publish;
+    m_chatter     = app.m_chatter;
 
     // Return
     return;
@@ -417,25 +406,14 @@ void ctprob::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all user parameters from parameter file or (if required) by querying
- * the user. Times are assumed to be in the native CTA MJD format.
- *
- * This method also loads observations if no observations are yet allocated.
- * Observations are either loaded from a single CTA even list, or from a
- * XML file using the metadata information that is stored in that file.
+ * Get all application parameters by either querying the parameters or by
+ * retrieving the parameters for the parameter file.
  ***************************************************************************/
 void ctprob::get_parameters(void)
 {
-    // Setup observations from "inobs" parameter. Do not request response
-    // information and do not accept counts cubes.
-    if (m_obs.size() == 0) {
-        get_obs();
-    }
-    // ... otherwise add response information and energy boundaries in case
-    // that they are missing
-    else {
-        setup_observations(m_obs);
-    }
+    // Setup observations from "inobs" parameter. Request response
+    // information, accept event lists but do not accept counts cubes.
+    setup_observations(m_obs, true, true, false);
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
@@ -451,7 +429,6 @@ void ctprob::get_parameters(void)
     // Get energy dispersion flag parameters
     m_apply_edisp = (*this)["edisp"].boolean();
 
-
     // Get remaining parameters
     m_publish = (*this)["publish"].boolean();
     m_chatter = static_cast<GChatter>((*this)["chatter"].integer());
@@ -459,8 +436,8 @@ void ctprob::get_parameters(void)
     // Optionally read ahead parameters so that they get correctly
     // dumped into the log file
     if (read_ahead()) {
-        m_outobs = (*this)["outobs"].filename();
-        m_prefix = (*this)["prefix"].string();
+        (*this)["outobs"].filename();
+        (*this)["prefix"].string();
     }
 
     // Write parameters into logger
@@ -469,77 +446,6 @@ void ctprob::get_parameters(void)
     // Return
     return;
 }
-
-
-/***********************************************************************//**
- * @brief Get observation container
- *
- * @exception GException::invalid_value
- *            Invalid FITS file.
- *
- * Get an observation container according to the user parameters. The method
- * supports loading of a individual FITS file or an observation definition
- * file in XML format.
- ***************************************************************************/
-void ctprob::get_obs(void)
-{
-    // Get the filename from the input parameters
-    std::string filename = (*this)["inobs"].filename();
-
-    // If no observation definition file throw an exception 
-    if (!is_valid_filename(filename)) {
-      throw GException::invalid_value(G_GET_OBS, "Input event list is not valid.");
-    } // endif: filename was not valid
-
-    // ... otherwise we have a file name
-    else {
-
-        // If file is a FITS file then create an empty CTA observation
-        // and load file into observation
-        if (GFilename(filename).is_fits()) {
-
-            // Allocate empty CTA observation
-            GCTAObservation cta;
-
-            // Load data
-            cta.load(filename);
-
-            // Set response
-            set_obs_response(&cta);
-
-            // Append observation to container
-            m_obs.append(cta);
-
-            // Signal that no XML file should be used for storage
-            m_use_xml = false;
-
-        }
-
-        // ... otherwise load file into observation container
-        else {
-
-            // Load observations from XML file
-            m_obs.load(filename);
-
-            // For all observations that have no response, set the response
-            // from the task parameters
-            set_response(m_obs);
-
-            // Set observation boundary parameters (emin, emax, rad)
-            set_obs_bounds(m_obs);
-
-            // Signal that XML file should be used for storage
-            m_use_xml = true;
-
-        } // endelse: file was an XML file
-
-    }
-
-    // Return
-    return;
-
-}
-
 
 
 /***********************************************************************//**
@@ -628,156 +534,6 @@ void ctprob::evaluate_probability(GCTAObservation* obs)
         }
 
     } // endif: there were model components
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Set output file name.
- *
- * @param[in] filename Input file name.
- *
- * Converts an input file name into an output filename by prepending the
- * prefix stored in the member m_prefix to the input file name. Any path as
- * well as extension will be stripped from the input file name. Also a
- * trailing ".gz" will be stripped as one cannot write into gzipped files.
- ***************************************************************************/
-std::string ctprob::set_outfile_name(const std::string& filename) const
-{
-    // Create filename
-    GFilename fname(filename);
-
-    // Split input filename without any extensions into path elements
-    std::vector<std::string> elements = gammalib::split(fname.url(), "/");
-
-    // The last path element is the filename
-    std::string outname = m_prefix + elements[elements.size()-1];
-
-    // Strip any ".gz"
-    outname = gammalib::strip_chars(outname, ".gz");
-    
-    // Return output filename
-    return outname;
-}
-
-
-/***********************************************************************//**
- * @brief Save event list in FITS format.
- *
- * Save the event list as a FITS file. The file name of the FITS file is
- * specified by the `outobs` parameter.
- ***************************************************************************/
-void ctprob::save_fits(void)
-{
-    // Save only if there are observations
-    if (m_obs.size() > 0) {
-
-        // Get output filename
-        m_outobs = (*this)["outobs"].filename();
-
-        // Loop over all unbinned CTA observations in the container
-        for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
-             obs = next_unbinned_observation()) {
-
-            // Get input file name and default extension names
-            std::string infile  = obs->eventfile();
-            std::string evtname = gammalib::extname_cta_events;
-            std::string gtiname = gammalib::extname_gti;
-
-            // Create file name object
-            GFilename fname(m_outobs);
-
-            // Extract filename and event extension name
-            std::string outfile = fname.url();
-
-            // Append event extension name. We handle here the possibility
-            // to write the events into a different extension.
-            if (fname.has_extname()) {
-                outfile += "["+fname.extname()+"]";
-            }
-            else {
-                outfile += "["+gammalib::extname_cta_events+"]";
-            }
-
-            // Log filename
-            log_value(NORMAL, "Event list file", outfile);
-            
-            // Save event list
-            save_event_list(obs, infile, evtname, gtiname, outfile);
-
-            // Exit the loop (if this method is called we should only
-            // have a single unbinned observation in the observation
-            // container
-            break;
-
-        } // endfor: looped over all unbinned observations
-
-    } // endif: there were observations
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Save event list(s) in XML format.
- *
- * Save the event list(s) into FITS files and write the file path information
- * into a XML file. The filename of the XML file is specified by the `outobs`
- * parameter, the filename(s) of the event lists are built by prepending a
- * prefix to the input event list filenames. Any path present in the input
- * filename will be stripped, i.e. the event list(s) will be written in the
- * local working directory (unless a path is specified in the prefix).
- ***************************************************************************/
-void ctprob::save_xml(void)
-{
-    // Get output filename and prefix
-    m_outobs = (*this)["outobs"].filename();
-    m_prefix = (*this)["prefix"].string();
-
-    // Issue warning if output filename has no .xml suffix
-    log_string(TERSE, warn_xml_suffix(m_outobs));
-
-    // Loop over all unbinned CTA observations in the container
-    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
-         obs = next_unbinned_observation()) {
-
-        // Get input file name and default extension names
-        std::string infile  = obs->eventfile();
-        std::string evtname = gammalib::extname_cta_events;
-        std::string gtiname = gammalib::extname_gti;
-
-        // Extract event and GTI extension names from input FITS file
-        GFilename fname(infile);
-        if (fname.has_extname()) {
-            evtname = fname.extname();
-        }
-        gtiname = get_gtiname(fname.url(), evtname);
-
-        // Set event output file name
-        std::string outfile = set_outfile_name(infile);
-
-        // Append event extension name
-        outfile += "["+evtname+"]";
-
-        // Log filename
-        log_value(NORMAL, "Event list file", outfile);
-
-        // Store output file name in observation
-        obs->eventfile(outfile);
-
-        // Save event list
-        save_event_list(obs, infile, evtname, gtiname, outfile);
-
-    } // endfor: looped over observations
-
-    // Write observation definition XML file name into logger
-    log_value(NORMAL, "Obs. definition file", m_outobs);
-
-    // Save observations in XML file
-    m_obs.save(m_outobs);
 
     // Return
     return;

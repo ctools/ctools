@@ -72,7 +72,7 @@ class Test(test):
         # Setup ctphase command
         cmd = ctphase+' inobs="'+self._events+'"'+ \
                       ' outobs="ctphase_cmd1.fits"'+ \
-                      ' inmodel="'+self._model_file+'" source="Crab"'+ \
+                      ' inmodel="'+self._model_file+'" srcname="Crab"'+ \
                       ' logfile="ctphase_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -89,7 +89,7 @@ class Test(test):
         # Setup ctphase command
         cmd = ctphase+' inobs="event_file_that_does_not_exist.fits"'+ \
                       ' outobs="ctphase_cmd2.fits"'+ \
-                      ' inmodel="'+self._model_file+'" source="Crab"'+ \
+                      ' inmodel="'+self._model_file+'" srcname="Crab"'+ \
                       ' logfile="ctphase_cmd2.log" chatter=1'
 
         # Check if execution failed
@@ -124,7 +124,7 @@ class Test(test):
 
         # Check that saving does nothing
         phase['inmodel'] = self._model_file
-        phase['source']  = 'Crab'
+        phase['srcname'] = 'Crab'
         phase['outobs']  = 'ctphase_py0.fits'
         phase['logfile'] = 'ctphase_py0.log'
         phase.logFileOpen()
@@ -138,7 +138,7 @@ class Test(test):
         # Now set ctphase parameters
         phase['inobs']   = self._events
         phase['inmodel'] = self._model_file
-        phase['source']  = 'Crab'
+        phase['srcname'] = 'Crab'
         phase['outobs']  = 'ctphase_py1.fits'
         phase['logfile'] = 'ctphase_py1.log'
         phase['chatter'] = 2
@@ -151,9 +151,13 @@ class Test(test):
         # Check result file
         self._check_result_file('ctphase_py1.fits')
 
+        # Clear phase tool
+        phase.clear()
+
         # Now run ctphase tool without a model file
+        phase['inobs']   = self._events
         phase['inmodel'] = 'NONE'
-        phase['source']  = 'NONE'
+        phase['srcname'] = 'NONE'
         phase['mjd']     = 51544.5
         phase['phase']   = 0.0
         phase['f0']      = 1.0
