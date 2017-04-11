@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctool - ctool base class                         *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2014-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -121,6 +121,13 @@ protected:
     std::vector<bool> cube_layer_usage(const GEbounds& cube_ebounds,
                                        const GEbounds& list_ebounds) const;
     bool              is_valid_filename(const GFilename& filename) const;
+    std::string       get_gtiname(const std::string& filename,
+                                  const std::string& evtname) const;
+    void              save_event_list(const GCTAObservation* obs,
+                                      const std::string&     infile,
+                                      const std::string&     evtname,
+                                      const std::string&     gtiname,
+                                      const std::string&     outfile) const;
 
     // Protected warning strings
     std::string     warn_too_few_energies(const GEnergies& energies) const;

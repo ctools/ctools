@@ -58,6 +58,7 @@ testscripts = ctools/tests/__init__.py \
               $(top_srcdir)/test/test_ctbutterfly.py \
               $(top_srcdir)/test/test_ctulimit.py \
               $(top_srcdir)/test/test_cterror.py \
+              $(top_srcdir)/test/test_ctprob.py \
               $(top_srcdir)/test/test_pipelines.py
 
 # Test data to be distributed in $(pyexecdir)/ctools/tests/data
