@@ -48,13 +48,13 @@ the spatial model parameters can be kept fixed during that computation
 ctlike generates an output model XML file that contains the values of the 
 best fitting model parameters. For all free parameters, an ``error`` attribute
 is added that provides the statistical uncertainty in the parameter estimate.
-In addition, the entire output of the covariance matrix to a separate FITS file
-can be queried (parameter ``outcovmat``). The parameter order given in the file
-corresponds to the arrangement of the covariance matrix entries. If computation
-of the Test Statistics has been requested for a model component, a ``ts``
-attribute providing the Test Statistics value is added. The output model can be
-used as an input model for other ctools.
+If computation of the Test Statistics has been requested for a model component,
+a ``ts`` attribute providing the Test Statistics value is added. The output model
+can be used as an input model for other ctools.
 
+In addition, the covariance matrix can be saved into a file by specifying a
+file name for the ``outcovmat`` parameter. If the file name ends with ``.fits``
+or ``.fit`` a FITS file is written, otherwise a CSV file is written.
 
 
 General parameters
@@ -89,7 +89,7 @@ General parameters
     the maximum likelihood fit.
 
 ``(outcovmat = NONE) [string]``
-    Output FITS file to store covariance matrix.
+    Output FITS or CSV file to store covariance matrix.
 
 ``(stat = POISSON) [string]``
     Fitting statistics (POISSON or GAUSSIAN; only affects binned analysis).
