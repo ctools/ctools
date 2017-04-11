@@ -1,7 +1,7 @@
 /***************************************************************************
- *           ctprob - Computes probability for a given model               *
+ *          ctprob - Computes event probability for a given model          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Leonardo Di Venere                          *
+ *  copyright (C) 2017 by Leonardo Di Venere                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctprob.hpp
- * @brief Computes probability for a given model
+ * @brief Computes event probability for a given model
  * @author Leonardo Di Venere
  */
 
@@ -35,8 +35,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTPROB_NAME    "ctprob"
-#define CTPROB_VERSION "0.0.1"
+#define CTPROB_NAME "ctprob"
 
 
 /***********************************************************************//**
@@ -70,32 +69,22 @@ protected:
     void        free_members(void);
     void        get_parameters(void);
     void        get_obs(void);
-    void        evaluate_probability(GCTAObservation*   obs);
-    std::string check_infile(const std::string& filename,
-                             const std::string& evtname) const;
+    void        evaluate_probability(GCTAObservation* obs);
     std::string set_outfile_name(const std::string& filename) const;
-    std::string get_gtiname(const std::string& filename,
-                            const std::string& evtname) const;
     void        save_fits(void);
     void        save_xml(void);
-    void        save_event_list(const GCTAObservation* obs,
-                                const std::string&     infile,
-                                const std::string&     evtname,
-                                const std::string&     gtiname,
-                                const std::string&     outfile) const;
 
     // User parameters
-    std::string m_outobs;     //!< Output event list or XML file
-    std::string m_prefix;     //!< Prefix for multiple event lists
-    bool        m_apply_edisp;  //!< Apply energy dispersion?
-    bool        m_publish;      //!< Publish model cube?
-    GChatter    m_chatter;    //!< Chattiness
+    std::string m_outobs;      //!< Output event list or XML file
+    std::string m_prefix;      //!< Prefix for multiple event lists
+    bool        m_apply_edisp; //!< Apply energy dispersion?
+    bool        m_publish;     //!< Publish event list?
+    GChatter    m_chatter;     //!< Chattiness
 
     // Protected members
-    std::vector<std::string> m_infiles;       //!< Input event filenames
-    std::vector<std::string> m_evtname;       //!< Event extension names
-    std::vector<std::string> m_gtiname;       //!< GTI extension names
+    std::vector<std::string> m_infiles;  //!< Input event filenames
+    std::vector<std::string> m_evtname;  //!< Event extension names
+    std::vector<std::string> m_gtiname;  //!< GTI extension names
 };
-
 
 #endif /* CTPROB_HPP */

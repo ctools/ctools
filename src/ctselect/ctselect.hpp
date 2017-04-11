@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctselect - Data selection tool                     *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -78,15 +78,8 @@ protected:
     std::string check_infile(const std::string& filename,
                              const std::string& evtname) const;
     std::string set_outfile_name(const std::string& filename) const;
-    std::string get_gtiname(const std::string& filename,
-                            const std::string& evtname) const;
     void        save_fits(void);
     void        save_xml(void);
-    void        save_event_list(const GCTAObservation* obs,
-                                const std::string&     infile,
-                                const std::string&     evtname,
-                                const std::string&     gtiname,
-                                const std::string&     outfile) const;
 
     // User parameters
     std::string m_outobs;     //!< Output event list or XML file

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctprob tool.
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2017 by Leonardo Di Venere
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ class Test(test):
                      ' outobs="ctprob_cmd1.fits"'+ \
                      ' inmodel='+self._model+ \
                      ' caldb='+self._caldb+' irf='+self._irf+ \
-                     ' edisp=yes'+ \
+                     ' edisp=no'+ \
                      ' logfile="ctprob_cmd1.log" chatter=1'
 
         # Check if execution was successful
@@ -88,7 +88,7 @@ class Test(test):
                      ' outobs="ctprob_cmd2.fits"'+ \
                      ' inmodel='+self._model+ \
                      ' caldb='+self._caldb+' irf='+self._irf+ \
-                     ' edisp=yes'+ \
+                     ' edisp=no'+ \
                      ' logfile="ctprob_cmd2.log" chatter=1'
 
         # Check if execution failed
@@ -135,12 +135,13 @@ class Test(test):
         # Now set ctprob parameters
         prob['inobs']   = self._events
         prob['outobs']  = 'ctprob_py1.fits'
-        prob['inmodel']  = self._model
-        prob['caldb']  = self._caldb
-        prob['irf']  = self._irf
-        prob['edisp']  = True
+        prob['inmodel'] = self._model
+        prob['caldb']   = self._caldb
+        prob['irf']     = self._irf
+        prob['edisp']   = False
         prob['logfile'] = 'ctprob_py1.log'
         prob['chatter'] = 2
+
         # Run ctprob tool
         prob.logFileOpen()   # Make sure we get a log file
         prob.run()
@@ -149,15 +150,14 @@ class Test(test):
         # Check result file
         self._check_result_file('ctprob_py1.fits')
 
-
         # Setup ctprob tool for an invalid event file
         prob = ctools.ctprob()
         prob['inobs']   = self._invalid_events
         prob['outobs']  = 'ctprob_py2.fits'
-        prob['inmodel']  = self._model
-        prob['caldb']  = self._caldb
-        prob['irf']  = self._irf
-        prob['edisp']  = True
+        prob['inmodel'] = self._model
+        prob['caldb']   = self._caldb
+        prob['irf']     = self._irf
+        prob['edisp']   = False
         prob['logfile'] = 'ctprob_py2.log'
         prob['chatter'] = 3
 
@@ -167,26 +167,24 @@ class Test(test):
         try:
             prob.execute()
             self.test_try_failure('Exception not thrown')
-        except ValueError:
+        except RuntimeError:
             self.test_try_success()
-
 
         # Setup ctprob with a list of observations and test prefix
         prob = ctools.ctprob()
-        prob['inobs']  = self._datadir + '/obs_unbinned.xml'
-        prob['prefix'] = 'ctprob_py3_'
+        prob['inobs']   = self._datadir + '/obs_unbinned.xml'
+        prob['prefix']  = 'ctprob_py3_'
         prob['outobs']  = 'ctprob_py3_obs.xml'
-        prob['inmodel']  = self._model
-        prob['caldb']  = self._caldb
-        prob['irf']  = self._irf
-        prob['edisp']  = True
+        prob['inmodel'] = self._model
+        prob['caldb']   = self._caldb
+        prob['irf']     = self._irf
+        prob['edisp']   = True
         prob['logfile'] = 'ctprob_py3.log'
-        prob['chatter'] = 3
+        prob['chatter'] = 4
 
         # Run ctprob tool
         prob.logFileOpen()   # Make sure we get a log file
-        prob.run()
-        prob.save()
+        prob.execute()
 
         # Check result file
         self._check_result_file('ctprob_py3_crab_events.fits')
@@ -213,8 +211,8 @@ class Test(test):
         self._check_events(events, nevents=nevents)
 
         # Check that probability columns exist
-        colname1 = "PROB_Background"
-        colname2 = "PROB_Crab"
+        colname1 = 'PROB_Background'
+        colname2 = 'PROB_Crab'
         self._check_column(filename, colname1)
         self._check_column(filename, colname2)        
 
@@ -291,8 +289,8 @@ class Test(test):
 
     def _check_normalization(self, filename, colnames):
         """
-        Check that the probability values in columns identified 
-        by colnames are correctly normalized.
+        Check that the probability values in columns identified by colnames are
+        correctly normalized.
 
         Parameters
         ----------
@@ -304,26 +302,31 @@ class Test(test):
         # Check that the probability values are correctly normalized
 
         # Open fits table
-        gfits = gammalib.GFits(filename)
+        gfits  = gammalib.GFits(filename)
         gtable = gfits[1]
-        ncols = gtable.ncols()
-        nevt = gtable.nrows()
-        srcs=[]
+        ncols  = gtable.ncols()
+        nevt   = gtable.nrows()
+        srcs   = []
+
         # Loop over colnames
         for colname in colnames:
-            # self._check_column(filename, colnames)  # Check if column exists
+
             # Get the correct column corresponding to colname from the table
             for icol in range(ncols):
                 gcol = gtable[icol] 
                 if gcol.name()==colname:
                     break
+
             # Read and save column content 
             src1 = []
             for ievt in range(nevt):
                 src1.append(gcol[ievt])
             srcs.extend(src1)
+
+        # Compute sum
         tot = sum(srcs)
-        self.test_value(int(tot+0.5),nevt, 'Check that probability columns are normalized')
+        self.test_value(int(tot+0.5), nevt, 'Check that probability columns '
+                                            'are normalized')
 
         # Return
         return

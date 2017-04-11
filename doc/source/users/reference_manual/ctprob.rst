@@ -1,24 +1,24 @@
-	.. _ctprob:
+.. _ctprob:
 
 ctprob
 ========
 
-Computes event probability for a given model.
+Compute event probability for a given model.
 
 
 Synopsis
 --------
 
-This tool takes an event list file (or an XML observation file) and a source 
-model as input. For each event, it evalutes the probability for that event 
-to come from each of the source in the model. This probability is obtained 
-evaluating the differential expected counts for each source at the event 
-direction and energy and normalizing it to the total differential expected 
-counts for the given model. If only one source is provided in the model, 
-the probability is set to 1 for each photon.
-A column for each source in the model is added to the event list in order to 
-store these values. The name of each column is made by the source name with 
-the prefix "PROB_".
+This tool takes an event list file (or an XML observation definition file) and
+a model as input and computes for each event the probability that it originates
+from a specific model component. The probability is computed by by evaluating
+the differential event probability for a given model and normalizing these
+probabilities so that the sum of the probabilities for all model components is
+unity for each event.
+
+The tool appends for each model component a single precision column to the event
+list that contains the event probabilities. The name of the column is build from
+the model name prefixed with ``PROB_``.
 
 
 General parameters
@@ -34,7 +34,7 @@ General parameters
     Prefix for output event lists in observation definition file.
  	 	 
 ``inmodel [string]``
-    Input model XML file.
+    Input model definition XML file.
 
 ``caldb [string]``
     Calibration database.
@@ -43,7 +43,7 @@ General parameters
     Instrument response function.
  	 	 
 ``(edisp = no) [boolean]``
-    Apply energy dispersion to response computation.
+    Applies energy dispersion to response computation.
 
 
 Standard parameters
@@ -73,7 +73,7 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctlike.log) [string]``
+``(logfile = ctprob.log) [string]``
     Name of log file.
 
 

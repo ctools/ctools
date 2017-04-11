@@ -1,7 +1,7 @@
 /***************************************************************************
- *           ctprob - Computes probability for a given model               *
+ *          ctprob - Computes event probability for a given model          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Leonardo Di Venere                          *
+ *  copyright (C) 2017 by Leonardo Di Venere                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -20,7 +20,7 @@
  ***************************************************************************/
 /**
  * @file ctprob.cpp
- * @brief Computes probability for a given model
+ * @brief Computes event probability for a given model
  * @author Leonardo Di Venere
  */
 
@@ -33,13 +33,12 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_RUN                                               "ctprob::run()"
-#define G_GET_OBS                                       "ctprob::get_obs()"
+#define G_GET_OBS                                         "ctprob::get_obs()"
+#define G_EVALUATE_PROB      "ctprob::evaluate_probability(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
 /* __ Coding definitions _________________________________________________ */
-//#define G_USE_MKSTEMP               //!< Use mkstemp for temporary filename
 
 
 /*==========================================================================
@@ -51,7 +50,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctprob::ctprob(void) : ctobservation(CTPROB_NAME, CTPROB_VERSION)
+ctprob::ctprob(void) : ctobservation(CTPROB_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -70,7 +69,7 @@ ctprob::ctprob(void) : ctobservation(CTPROB_NAME, CTPROB_VERSION)
  * provided in an observation container.
  ***************************************************************************/
 ctprob::ctprob(const GObservations& obs) :
-          ctobservation(CTPROB_NAME, CTPROB_VERSION, obs)
+        ctobservation(CTPROB_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -89,7 +88,7 @@ ctprob::ctprob(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctprob::ctprob(int argc, char *argv[]) : 
-          ctobservation(CTPROB_NAME, CTPROB_VERSION, argc, argv)
+        ctobservation(CTPROB_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -201,13 +200,11 @@ void ctprob::clear(void)
 
 
 /***********************************************************************//**
- * @brief Append probability columns event data
+ * @brief Runs the ctprob tool
  *
  * This method reads in the application parameters and loops over all
- * observations that were found to perform the probability calculation.
- * Each observation is written to a temporary file, which is then 
- * re-opened and used for the actual calculation. The temporary file
- *  is deleted after this action so that no disk overflow will occur.
+ * unbinned observations to compute the probability for each event that it
+ * comes from one of the model components.
  ***************************************************************************/
 void ctprob::run(void)
 {
@@ -219,123 +216,30 @@ void ctprob::run(void)
     // Get parameters
     get_parameters();
 
+    // Set energy dispersion flags of all CTA observations and save old
+    // values in save_edisp vector
+    std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
+
     // Write input observation container into logger
     log_observations(NORMAL, m_obs, "Input observation");
 
     // Write header into logger
-    log_header1(TERSE, "Event probability evaluation");
+    log_header1(TERSE, "Compute event probabilities");
 
     // Initialise counters
     int n_observations = 0;
 
-    // Loop over all observation in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Write header for the current observation
-        log_header3(TERSE, get_obs_header(m_obs[i]));
-
-        // Initialise event input and output filenames and the event
-        // and GTI extension names
-        m_infiles.push_back("");
-        m_evtname.push_back(gammalib::extname_cta_events);
-        m_gtiname.push_back(gammalib::extname_gti);
-
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Skip observation if it's not CTA
-        if (obs == NULL) {
-            std::string msg = " Skipping "+m_obs[i]->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
-
-        // Skip observation if we have a binned observation
-        if (obs->eventtype() == "CountsCube") {
-            std::string msg = " Skipping binned "+m_obs[i]->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
+    // Loop over all unbinned CTA observations in the container
+    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+         obs = next_unbinned_observation()) {
 
         // Increment counter
         n_observations++;
 
-        // Save event file name (for possible saving)
-        m_infiles[i] = obs->eventfile();
-
-        // Extract event and GTI extension names from input FITS file
-        GFilename fname(m_infiles[i]);
-        if (fname.has_extname()) {
-            m_evtname[i] = fname.extname();
-        }
-        m_gtiname[i] = get_gtiname(fname.url(), m_evtname[i]);
-
-        // Write input file information into logger
-        log_value(NORMAL, "Input filename", m_infiles[i]);
-        log_value(NORMAL, "Event extension name", m_evtname[i]);
-        log_value(NORMAL, "GTI extension name", m_gtiname[i]);
-
-        // Fall through in case that the event file is empty
-        if (obs->events()->size() == 0) {
-            log_string(NORMAL, " Warning: No events in event file \""+
-                       m_infiles[i]+"\". Event probability evaluation skipped.");
-            continue;
-        }
-
-        // If we have an input file then check it
-        if (!m_infiles[i].empty()) {
-            std::string message = check_infile(m_infiles[i], m_evtname[i]);
-            if (!message.empty()) {
-                throw GException::invalid_value(G_RUN, message);
-            }
-        }
-
-        // Get temporary file name
-        #if G_USE_MKSTEMP
-        char tpl[]  = "ctprobXXXXXX";
-        int  fileid = mkstemp(tpl);
-        std::string filename(tpl);
-        #else
-        std::string filename = std::tmpnam(NULL);
-        #endif
-
-        // Save observation in temporary file. We add here the events and
-        // GTI extension name so that the GCTAObservation::save method can
-        // use this information for writing the proper extension names into
-        // the temporary file
-        obs->save(filename+"["+m_evtname[i]+";"+ m_gtiname[i]+"]", true);
-
-        // Log saved FITS file.
-        if (logExplicit()) {
-            GFits tmpfile(filename);
-            log.header3("FITS file content of temporary file");
-            log << tmpfile << std::endl;
-            tmpfile.close();
-        }
-
-        // If we have a temporary file then check it
-        if (!filename.empty()) {
-            std::string message = check_infile(filename, m_evtname[i]);
-            if (!message.empty()) {
-                throw GException::invalid_value(G_RUN, message);
-            }
-        }
-
-        // Load observation from temporary file, including event selection
+        // Evaluate event probabilities
         evaluate_probability(obs);
-	//select_events(obs, filename, m_evtname[i], m_gtiname[i]);
 
-        // Close temporary file
-        #if G_USE_MKSTEMP
-        close(fileid);
-        #endif
-
-        // Remove temporary file
-        std::remove(filename.c_str());
-
-    } // endfor: looped over all observations
+    } // endfor: looped over observations
 
     // If more than a single observation has been handled then make sure that
     // an XML file will be used for storage
@@ -345,6 +249,9 @@ void ctprob::run(void)
 
     // Write observation(s) into logger
     log_observations(NORMAL, m_obs, "Output observation");
+
+    // Restore energy dispersion flags of all CTA observations
+    restore_edisp(m_obs, save_edisp);
 
     // Optionally publish event list(s)
     if ((*this)["publish"].boolean()) {
@@ -379,6 +286,7 @@ void ctprob::save(void)
 {
     // Write header into logger
     log_header1(TERSE, gammalib::number("Save event list", m_obs.size()));
+
     // Case A: Save event file(s) and XML metadata information
     if (m_use_xml) {
         save_xml();
@@ -544,11 +452,6 @@ void ctprob::free_members(void)
  ***************************************************************************/
 void ctprob::get_parameters(void)
 {
-    // Initialise selection flags
-  /*    m_select_energy = true;
-    m_select_roi    = true;
-    m_select_time   = true;
-  */
     // Setup observations from "inobs" parameter. Do not request response
     // information and do not accept counts cubes.
     if (m_obs.size() == 0) {
@@ -559,7 +462,6 @@ void ctprob::get_parameters(void)
     else {
         setup_observations(m_obs);
     }
-    //setup_observations(m_obs, false, true, false);
 
     // Read model definition file if required
     if (m_obs.models().size() == 0) {
@@ -671,144 +573,90 @@ void ctprob::get_obs(void)
  *
  * @param[in,out] obs CTA observation.
  *
+ * @exception GException::invalid_value
+ *            Observation does not contain an event list.
  *
- * For each event from the input event file evaluates the probability that
- * the event comes from any of the source in the input model.  This is done 
- * by evaluating the differential expected counts for each source at the event 
- * direction and energy and normalizing it to the total differential expected 
- * counts for the given model. If only one source is provided in the model, 
- * the probability is set to 1 for each photon.
+ * Computes for all events the probability that an event arises from a
+ * specific model component. The computation is done by by evaluating the
+ * differential event probability for a given model and normalizing these
+ * probabilities so that the sum of the probabilities for all model
+ * components is unity for each event.
  *
- * A FITS column for each source in the model is created and added to 
- * the event list. The name of each column is made by the source name with 
- * the prefix "PROB_".
+ * The method appends for each model component a single precision column to
+ * the event list that contains the event probabilities. The name of the
+ * column is build from the model name prefixed with `PROB_`.
  ***************************************************************************/
-void ctprob::evaluate_probability(GCTAObservation*   obs)
+void ctprob::evaluate_probability(GCTAObservation* obs)
 {
     // Write header into logger
-    log_header3(NORMAL, "Evaluating probability for events");
+    log_header3(NORMAL, "Evaluate events probabilities");
 
-    GCTAEventList* evts = static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
-    const GEvent* evt;
-
-    double total=0.;
-    double value;
-
-    std::vector<GFitsTableFloatCol*> columns;
-
-    //define colums
-    for (int j = 0; j<m_obs.models().size(); ++j) {
-      const std::string mdl_name = m_obs.models()[j] ->name();
-      GFitsTableFloatCol* col = new GFitsTableFloatCol("PROB_"+mdl_name, evts->size());
-      columns.push_back(col);
+    // Make sure that the observation holds a CTA event list. If this
+    // is not the case then throw an exception.
+    GCTAEventList* events = dynamic_cast<GCTAEventList*>(const_cast<GEvents*>
+                            (obs->events()));
+    if (events == NULL) {
+        std::string msg = "CTA Observation does not contain an event list. An "
+                          "event list is needed to compute the event "
+                          "probabilities.";
+        throw GException::invalid_value(G_EVALUATE_PROB, msg);
     }
 
-    // Loop over events
-    for (int i = 0; i < evts->size(); ++i) {
-      total = 0.;
-      evt = (*evts)[i];
-      std::vector<double> values;
-      //Check if you have more than one model
-      if (m_obs.models().size()>1) {
-	//Loop over models
-	for (int j = 0; j<m_obs.models().size(); ++j) {
-	  value =  m_obs.models()[j]->eval( *evt, *obs);
-	  values.push_back(value);
-	  total += value;
-	}
-      }
-      // if there is only one model a constant value equal to 1. is set for each photon
-      else {
-	value = 1.;
-	values.push_back(value);
-	total += value;
-      } // end if 
-      for (int j = 0; j<m_obs.models().size(); ++j) {
-	  values[j] /= total;
-	(*(columns[j]))(i) = values[j];
-      }
-    }
+    // Continue only if there are model components
+    int nmodels = m_obs.models().size();
+    if (nmodels > 0) {
 
-    //append columns to observation event list
-    for (int j = 0; j<m_obs.models().size(); ++j) {
-      evts->append_column(*columns[j]);
-    }
+        // Allocate single precision FITS table columns for all model components
+        std::vector<GFitsTableFloatCol*> columns;
+        for (int k = 0; k < nmodels; ++k) {
+            const std::string   colname = "PROB_" + m_obs.models()[k] ->name();
+            GFitsTableFloatCol* col     =
+                                new GFitsTableFloatCol(colname, events->size());
+            columns.push_back(col);
+        }
+
+        // Loop over all events in the event list
+        for (int i = 0; i < events->size(); ++i) {
+
+            // Initialise total probability
+            double total = 0.0;
+
+            // Get point to event
+            const GEvent* event = (*events)[i];
+
+            // Initialise probability vector
+            std::vector<double> probabilities(nmodels, 0.0);
+
+            // Loop over models
+            for (int k = 0; k < nmodels; ++k) {
+                double value      =  m_obs.models()[k]->eval(*event, *obs);
+                probabilities[k]  = value;
+                total            += value;
+            }
+
+            // Normalize probabilities to unity
+            if (total > 0.0) {
+                for (int k = 0; k < nmodels; ++k) {
+                    probabilities[k] /= total;
+                }
+            }
+
+            // Store probabilities in FITS columns
+            for (int k = 0; k < nmodels; ++k) {
+                (*(columns[k]))(i) = probabilities[k];
+            }
+	
+        } // endfor: looped over all events
+
+        // Append columns to event list
+        for (int k = 0; k < nmodels; ++k) {
+            events->append_column(*columns[k]);
+        }
+
+    } // endif: there were model components
 
     // Return
     return;
-}
-
-
-
-/***********************************************************************//**
- * @brief Check input filename
- *
- * @param[in] filename File name.
- * @param[in] evtname Event extension name.
- *
- * This method checks if the input FITS file is correct.
- ***************************************************************************/
-std::string ctprob::check_infile(const std::string& filename,
-                                   const std::string& evtname) const
-{
-    // Initialise message string
-    std::string message = "";
-
-    // Open FITS file
-    GFits fits(filename);
-
-    // Check for existence of events extensions
-    if (!fits.contains(evtname)) {
-        message = "No \""+evtname+"\" extension found in input file \""+
-                  filename + "\".";
-    }
-
-    // ... otherwise check column names
-    else {
-
-        // Get pointer to FITS table
-        GFitsTable* table = fits.table(evtname);
-
-        // Initialise list of missing columns
-        std::vector<std::string> missing;
-
-        // Check for existence of TIME column
-        if (!table->contains("TIME")) {
-            missing.push_back("TIME");
-        }
-
-        // Check for existence of ENERGY column
-        if (!table->contains("ENERGY")) {
-            missing.push_back("ENERGY");
-        }
-
-        // Check for existence of RA column
-        if (!table->contains("RA")) {
-            missing.push_back("RA");
-        }
-
-        // Check for existence of DEC column
-        if (!table->contains("DEC")) {
-            missing.push_back("DEC");
-        }
-
-        // Set error message for missing columns
-        if (!missing.empty()) {
-            message = "The following columns are missing in the "
-                      "\""+evtname+"\" extension of input file \""+
-                      filename + "\": ";
-            for (int i = 0; i < missing.size(); ++i) {
-                message += "\"" + missing[i] + "\"";
-                if (i < missing.size()-1) {
-                    message += ", ";
-                }
-            }
-        }
-
-    } // endelse: checked column names
-
-    // Return
-    return message;
 }
 
 
@@ -842,43 +690,10 @@ std::string ctprob::set_outfile_name(const std::string& filename) const
 
 
 /***********************************************************************//**
- * @brief Get Good Time Intervals extension name
- *
- * @param[in] filename Input file name.
- * @param[in] evtname Events extension name.
- *
- * Extracts the Good Time Intervals extension name from the event file. We
- * do this by loading the events and accessing the Good Time Intervals
- * extension name using the GCTAEventList::gtiname() method. If the file name
- * is empty, the method returns `GTI`.
- ***************************************************************************/
-std::string ctprob::get_gtiname(const std::string& filename,
-                                  const std::string& evtname) const
-{
-    // Initialise GTI name
-    std::string gtiname = gammalib::extname_gti;
-
-    // Continue only if the filename is not empty
-    if (!filename.empty()) {
-
-        // Load events
-        GCTAEventList events(filename+"["+evtname+"]");
-
-        // Get GTI name
-        gtiname = events.gtiname();
-
-    }
-
-    // Return GTI name
-    return (gtiname);
-}
-
-
-/***********************************************************************//**
  * @brief Save event list in FITS format.
  *
  * Save the event list as a FITS file. The file name of the FITS file is
- * specified by the "outobs" parameter.
+ * specified by the `outobs` parameter.
  ***************************************************************************/
 void ctprob::save_fits(void)
 {
@@ -888,39 +703,42 @@ void ctprob::save_fits(void)
         // Get output filename
         m_outobs = (*this)["outobs"].filename();
 
-        // Get CTA observation from observation container
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[0]);
+        // Loop over all unbinned CTA observations in the container
+        for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+             obs = next_unbinned_observation()) {
 
-        // Save only if it's a CTA observation
-        if (obs != NULL) {
-    
-            // Save only if file name is non-empty
-            if (m_infiles[0].length() > 0) {
+            // Get input file name and default extension names
+            std::string infile  = obs->eventfile();
+            std::string evtname = gammalib::extname_cta_events;
+            std::string gtiname = gammalib::extname_gti;
 
-                // Create file name object
-                GFilename fname(m_outobs);
+            // Create file name object
+            GFilename fname(m_outobs);
 
-                // Extract filename and event extension name
-                std::string outfile = fname.url();
+            // Extract filename and event extension name
+            std::string outfile = fname.url();
 
-                // Append event extension name. We handle here the possibility
-                // to write the events into a different extension.
-                if (fname.has_extname()) {
-                    outfile += "["+fname.extname()+"]";
-                }
-                else {
-                    outfile += "["+m_evtname[0]+"]";
-                }
-		
-                // Log filename
-                log_value(NORMAL, "Event list file", outfile);
-                // Save event list
-                save_event_list(obs, m_infiles[0], m_evtname[0], m_gtiname[0],
-                                outfile);
+            // Append event extension name. We handle here the possibility
+            // to write the events into a different extension.
+            if (fname.has_extname()) {
+                outfile += "["+fname.extname()+"]";
+            }
+            else {
+                outfile += "["+gammalib::extname_cta_events+"]";
+            }
 
-            } // endif: filename was non empty
+            // Log filename
+            log_value(NORMAL, "Event list file", outfile);
+            
+            // Save event list
+            save_event_list(obs, infile, evtname, gtiname, outfile);
 
-        } // endif: observation was CTA observation
+            // Exit the loop (if this method is called we should only
+            // have a single unbinned observation in the observation
+            // container
+            break;
+
+        } // endfor: looped over all unbinned observations
 
     } // endif: there were observations
 
@@ -933,7 +751,7 @@ void ctprob::save_fits(void)
  * @brief Save event list(s) in XML format.
  *
  * Save the event list(s) into FITS files and write the file path information
- * into a XML file. The filename of the XML file is specified by the outfile
+ * into a XML file. The filename of the XML file is specified by the `outobs`
  * parameter, the filename(s) of the event lists are built by prepending a
  * prefix to the input event list filenames. Any path present in the input
  * filename will be stripped, i.e. the event list(s) will be written in the
@@ -948,27 +766,27 @@ void ctprob::save_xml(void)
     // Issue warning if output filename has no .xml suffix
     log_string(TERSE, warn_xml_suffix(m_outobs));
 
-    // Loop over all observation in the container
-    for (int i = 0; i < m_obs.size(); ++i) {
+    // Loop over all unbinned CTA observations in the container
+    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+         obs = next_unbinned_observation()) {
 
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+        // Get input file name and default extension names
+        std::string infile  = obs->eventfile();
+        std::string evtname = gammalib::extname_cta_events;
+        std::string gtiname = gammalib::extname_gti;
 
-        // Skip observations that are no CTA observations
-        if (obs == NULL) {
-            continue;
+        // Extract event and GTI extension names from input FITS file
+        GFilename fname(infile);
+        if (fname.has_extname()) {
+            evtname = fname.extname();
         }
-
-        // Skip observations that have empty names
-        if (m_infiles[i].length() == 0) {
-            continue;
-        }
+        gtiname = get_gtiname(fname.url(), evtname);
 
         // Set event output file name
-        std::string outfile = set_outfile_name(m_infiles[i]);
+        std::string outfile = set_outfile_name(infile);
 
         // Append event extension name
-        outfile += "["+m_evtname[i]+"]";
+        outfile += "["+evtname+"]";
 
         // Log filename
         log_value(NORMAL, "Event list file", outfile);
@@ -977,8 +795,7 @@ void ctprob::save_xml(void)
         obs->eventfile(outfile);
 
         // Save event list
-        save_event_list(obs, m_infiles[i], m_evtname[i], m_gtiname[i],
-                        outfile);
+        save_event_list(obs, infile, evtname, gtiname, outfile);
 
     } // endfor: looped over observations
 
@@ -987,112 +804,6 @@ void ctprob::save_xml(void)
 
     // Save observations in XML file
     m_obs.save(m_outobs);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Save event list into FITS file
- *
- * @param[in] obs Pointer to CTA observation.
- * @param[in] infile Input file name.
- * @param[in] evtname Event extension name.
- * @param[in] gtiname GTI extension name.
- * @param[in] outfile Output file name.
- *
- * Saves an event list and the corresponding Good Time Intervals into a FITS
- * file and copy all others extensions from the input file to the output
- * file.
- *
- * If an extension name is specified in the @p outfile argument, the events
- * and eventually also the Good Time Intervals will be extracted from the
- * argument and used for writing the events. The format is
- *
- *      <filename>[<event extension name;GTI extension name>]
- *
- * where <filename> needs to be replaced by the name of the FITS file,
- * and <event extension name;GTI extension name> by the name of the events
- * and Good Time Intervals extensions. For example 
- *
- *      myfits.fits[EVENTS1;GTI1]
- *
- * will write the selected events into the "EVENTS1" extension and the
- * Good Time Intervals into the "GTI1" extension of the "myfits.fits" FITS
- * file. If the Good Time Intervals extension name is skipped, e.g.
- *
- *      myfits.fits[EVENTS1]
- *
- * the original extension name for the Good Time Intervals will be kept.
- * Analogously, only the Good Time Intervals extension name can be changed
- * by specifying
- *
- *      myfits.fits[;GTI1]
- *
- * In none of the cases will the original events and Good Time Intervals be
- * copied over to the output file.
- ***************************************************************************/
-void ctprob::save_event_list(const GCTAObservation* obs,
-                               const std::string&     infile,
-                               const std::string&     evtname,
-                               const std::string&     gtiname,
-                               const std::string&     outfile) const
-{
-    // Save only if we have an event list
-    if (obs->eventtype() == "EventList") {
-
-        // Set output FITS file event extension names
-        GFilename   outname(outfile);
-        std::string outevt = evtname;
-        std::string outgti = gtiname;
-        if (outname.has_extname()) {
-            std::vector<std::string> extnames =
-                       gammalib::split(outname.extname(), ";");
-            if (extnames.size() > 0) {
-                std::string extname = gammalib::strip_whitespace(extnames[0]);
-                if (!extname.empty()) {
-                    outevt = extname;
-                }
-            }
-            if (extnames.size() > 1) {
-                std::string extname = gammalib::strip_whitespace(extnames[1]);
-                if (!extname.empty()) {
-                    outgti = extname;
-                }
-            }
-        }
-
-        // Create output FITS file
-        GFits outfits;
-
-        // Write observation into FITS file
-        obs->write(outfits, outevt, outgti);
-
-        // Copy all extensions other than evtname and gtiname extensions
-        // from the input to the output event list. The evtname and
-        // gtiname extensions are written by the save method, all others
-        // that may eventually be present have to be copied over
-        // explicitly.
-        GFits infits(infile);
-        for (int extno = 1; extno < infits.size(); ++extno) {
-            GFitsHDU* hdu = infits.at(extno);
-            if (hdu->extname() != evtname &&
-                hdu->extname() != gtiname &&
-                hdu->extname() != outevt  &&
-                hdu->extname() != outgti) {
-                outfits.append(*hdu);
-            }
-        }
-
-        // Close input file
-        infits.close();
-
-        // Save file to disk and close it (we need both operations)
-        outfits.saveto(outname.url(), clobber());
-        outfits.close();
-
-    } // endif: observation was unbinned
 
     // Return
     return;

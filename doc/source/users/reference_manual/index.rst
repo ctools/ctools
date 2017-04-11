@@ -27,11 +27,11 @@ ctools
    ctmodel --- Computes model counts cube <ctmodel>
    ctobssim --- Simulate observations <ctobssim>
    ctpsfcube --- Generates point spread function cube <ctpsfcube>
+   ctprob --- Computes event probability for a given model <ctprob>
    ctselect --- Selects event data <ctselect>
    ctskymap --- Generates sky map <ctskymap>
    cttsmap --- Generates Test Statistic map <cttsmap>
    ctulimit --- Calculates upper limit <ctulimit>
-   ctprob --- Computes event probability for a given model <ctprob>
 
 
 cscripts

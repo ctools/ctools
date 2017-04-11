@@ -8,7 +8,7 @@
 #                                                                           #
 #  Author:    Leonardo Di Venere                                            #
 #             leonardo.divenere@ba.infn.it                                  #
-#             INFN                                	                    #
+#             INFN                                                          #
 #                                                                           #
 #  Purpose:   Parameter file for the ctprob application                     #
 #                                                                           #
@@ -16,13 +16,13 @@
 #
 # General parameters
 #===================
-inobs,  f, a, "events.fits",,, "Input event list or observation definition XML file"
-outobs, f, a, "prob_events.fits",,, "Output event list or observation definition XML file"
-prefix, s, h, "prob_",,, "Prefix for event lists in observation definition XML file"
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
-caldb,    s, a, "prod2",,, "Calibration database"
-irf,      s, a, "South_0.5h",,, "Instrument response function"
-edisp,    b, h, no,,, "Apply energy dispersion?"
+inobs,   f, a, "events.fits",,, "Input event list or observation definition XML file"
+outobs,  f, a, "prob_events.fits",,, "Output event list or observation definition XML file"
+prefix,  s, h, "prob_",,, "Prefix for event lists in observation definition XML file"
+inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
+caldb,   s, a, "prod2",,, "Calibration database"
+irf,     s, a, "South_0.5h",,, "Instrument response function"
+edisp,   b, h, no,,, "Apply energy dispersion?"
 
 #
 # Standard parameters

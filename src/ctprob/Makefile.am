@@ -1,7 +1,7 @@
 #############################################################################
-# Makefile.am for ctprob tool                                              #
+# Makefile.am for ctprob tool                                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2017 Leonardo Di Venere                                     #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
