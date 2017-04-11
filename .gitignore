@@ -71,6 +71,8 @@ src/ctcubemask/ctcubemask
 src/ctbutterfly/ctbutterfly
 src/ctulimit/ctulimit
 src/cterror/cterror
+src/ctprob/ctprob
+src/ctphase/ctphase
 test/pfiles/
 test/caldb/
 test/prod3

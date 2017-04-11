@@ -1,7 +1,7 @@
 #############################################################################
-# Makefile.am for ctphase tool                                              #
+# Makefile.am for ctprob tool                                               #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2017 Joshua Cardenzana                                      #
+# Copyright (C) 2017 Leonardo Di Venere                                     #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -23,25 +23,25 @@
 INCLUDES = -I$(top_srcdir)/src/support
 
 # Program name
-bin_PROGRAMS = ctphase
+bin_PROGRAMS = ctprob
 
 # Sources
-sources = ctphase.cpp ctphase.hpp
+sources = ctprob.cpp ctprob.hpp
 
-# Libtool library (only needed for python bindings)
-noinst_LTLIBRARIES = libctphase.la
-libctphase_la_SOURCES = $(sources)
-libctphase_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
+# Libtool library
+noinst_LTLIBRARIES = libctprob.la
+libctprob_la_SOURCES = $(sources)
+libctprob_la_LDFLAGS = @OPENMP_LIB_LDFLAGS@
 
 # Program definition
-ctphase_SOURCES = main.cpp
-ctphase_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
-ctphase_CPPFLAGS = @CPPFLAGS@
-ctphase_LDADD = libctphase.la $(top_builddir)/src/support/libsupport.la
+ctprob_SOURCES = main.cpp
+ctprob_LDFLAGS = $(LIB_LINK_OPTION) @LDFLAGS@
+ctprob_CPPFLAGS = @CPPFLAGS@
+ctprob_LDADD = libctprob.la $(top_builddir)/src/support/libsupport.la
 
 # Parameter files
 pfilesdir = $(prefix)/syspfiles
-pfiles_DATA = $(srcdir)/ctphase.par
+pfiles_DATA = $(srcdir)/ctprob.par
 
 # Extra files to be distributed in the tar file
 EXTRA_DIST = $(pfiles_DATA)

@@ -32,8 +32,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTSKYMAP_NAME    "ctskymap"
-#define CTSKYMAP_VERSION "1.3.0"
+#define CTSKYMAP_NAME "ctskymap"
 
 
 /***********************************************************************//**

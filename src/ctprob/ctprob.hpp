@@ -1,7 +1,7 @@
 /***************************************************************************
- *                 ctexpcube - Exposure cube generation tool               *
+ *          ctprob - Computes event probability for a given model          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2017 by Leonardo Di Venere                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,76 +19,72 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctexpcube.hpp
- * @brief Exposure cube generation tool definition
- * @author Juergen Knoedlseder
+ * @file ctprob.hpp
+ * @brief Computes event probability for a given model
+ * @author Leonardo Di Venere
  */
 
-#ifndef CTEXPCUBE_HPP
-#define CTEXPCUBE_HPP
+#ifndef CTPROB_HPP
+#define CTPROB_HPP
 
 /* __ Includes ___________________________________________________________ */
+#include <vector>
+#include <string>
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTEXPCUBE_NAME "ctexpcube"
+#define CTPROB_NAME "ctprob"
 
 
 /***********************************************************************//**
- * @class ctexpcube
+ * @class ctprob
  *
- * @brief Exposure cube generation tool
+ * @brief Data selection tool
  ***************************************************************************/
-class ctexpcube : public ctobservation {
+class ctprob : public ctobservation {
 
 public:
     // Constructors and destructors
-    ctexpcube(void);
-    explicit ctexpcube(const GObservations& obs);
-    ctexpcube(int argc, char *argv[]);
-    ctexpcube(const ctexpcube& app);
-    virtual ~ctexpcube(void);
+    ctprob(void);
+    explicit ctprob(const GObservations& obs);
+    ctprob(int argc, char *argv[]);
+    ctprob(const ctprob& app);
+    virtual ~ctprob(void);
 
     // Operators
-    ctexpcube& operator=(const ctexpcube& app);
+    ctprob& operator=(const ctprob& app);
 
     // Methods
-    void                    clear(void);
-    void                    run(void);
-    void                    save(void);
-    void                    publish(const std::string& name = "");
-    const GCTACubeExposure& expcube(void) const;
+    void clear(void);
+    void run(void);
+    void save(void);
+    void publish(const std::string& name = "");
 
 protected:
     // Protected methods
-    void init_members(void);
-    void copy_members(const ctexpcube& app);
-    void free_members(void);
-    void get_parameters(void);
-    void init_cube(void);
+    void        init_members(void);
+    void        copy_members(const ctprob& app);
+    void        free_members(void);
+    void        get_parameters(void);
+    void        get_obs(void);
+    void        evaluate_probability(GCTAObservation* obs);
+    std::string set_outfile_name(const std::string& filename) const;
+    void        save_fits(void);
+    void        save_xml(void);
 
     // User parameters
-    GFilename m_outcube;            //!< Output exposure cube file
-    bool      m_addbounds;          //!< Add energies at boundaries?
-    bool      m_publish;            //!< Publish exposure cube?
-    GChatter  m_chatter;            //!< Chattiness
+    std::string m_outobs;      //!< Output event list or XML file
+    std::string m_prefix;      //!< Prefix for multiple event lists
+    bool        m_apply_edisp; //!< Apply energy dispersion?
+    bool        m_publish;     //!< Publish event list?
+    GChatter    m_chatter;     //!< Chattiness
 
     // Protected members
-    GCTACubeExposure m_expcube;     //!< Exposure cube
+    std::vector<std::string> m_infiles;  //!< Input event filenames
+    std::vector<std::string> m_evtname;  //!< Event extension names
+    std::vector<std::string> m_gtiname;  //!< GTI extension names
 };
 
-
-/***********************************************************************//**
- * @brief Return exposure cube
- *
- * @return Exposure cube
- ***************************************************************************/
-inline
-const GCTACubeExposure& ctexpcube::expcube(void) const
-{
-    return (m_expcube);
-}
-
-#endif /* CTEXPCUBE_HPP */
+#endif /* CTPROB_HPP */

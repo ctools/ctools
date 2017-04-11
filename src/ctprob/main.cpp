@@ -1,7 +1,7 @@
 /***************************************************************************
- *          ctphase - Append phase information to CTA events file          *
+ *          ctprob - Computes event probability for a given model          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017 by Joshua Cardenzana                                *
+ *  copyright (C) 2017 by Leonardo Di Venere                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctphase/main.cpp
- * @brief Append phase information to CTA events file
- * @author Joshua Cardenzana
+ * @file main.cpp
+ * @brief Computes event probability for a given model
+ * @author Leonardo Di Venere
  */
 
 /* __ Includes ___________________________________________________________ */
@@ -29,17 +29,17 @@
 #include <config.h>
 #endif
 #include "support.hpp"
-#include "ctphase.hpp"
+#include "ctprob.hpp"
 
 
 /***********************************************************************//**
- * @brief Main entry point
+ * @brief Main entry point of application
  *
- * @param[in] argc Number of arguments
- * @param[in] argv Arguments
+ * @param[in] argc Number of command line arguments.
+ * @param[in] argv Command line arguments.
  *
- * This is the main entry point of the ctphase application. It allocates a
- * ctphase object and executes the application. Any exceptions that occur
+ * This is the main entry point of the ctprob application. It allocates a
+ * ctprob object and executes the application. Any exceptions that occur
  * will be catched and corresponding error messages written in the
  * application logger and into the standard output.
  ***************************************************************************/
@@ -49,13 +49,13 @@ int main (int argc, char *argv[])
     int rc = 1;
 
     // Initialise pointer on application
-    ctphase* application = NULL;
+    ctprob* application = NULL;
 
     // Execute application
     try {
 
         // Create instance of application
-        application = new ctphase(argc, argv);
+        application = new ctprob(argc, argv);
 
         // Execute ctool
         rc = execute_ctool(application);
@@ -65,7 +65,7 @@ int main (int argc, char *argv[])
     catch (std::exception &e) {
 
         // Report exception
-        report_ctool_failure("ctphase", e.what());
+        report_ctool_failure("ctprob", e.what());
 
     }
 

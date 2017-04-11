@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctphase - Append phase information to CTA events file          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017 by Leonardo Di Venere                               *
+ *  copyright (C) 2017 by Joshua Cardenzana                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctphase.i
  * @brief Append phase information to CTA events file
- * @author Leonardo Di Venere
+ * @author Joshua Cardenzana
  */
 %{
 /* Put headers and other declarations here that are needed for compilation */

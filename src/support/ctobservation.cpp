@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -325,4 +325,124 @@ const GCTAObservation* ctobservation::next_unbinned_observation(void) const
 
     // Return next CTA observation
     return obs;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list in FITS format.
+ *
+ * Save the event list as a FITS file. The file name of the FITS file is
+ * specified by the `outobs` parameter.
+ ***************************************************************************/
+void ctobservation::save_events_fits(void)
+{
+    // Save only if there are observations
+    if (m_obs.size() > 0) {
+
+        // Get output filename
+        std::string outobs = (*this)["outobs"].filename();
+
+        // Loop over all unbinned CTA observations in the container
+        for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+             obs = next_unbinned_observation()) {
+
+            // Get input file name and default extension names
+            std::string infile  = obs->eventfile();
+            std::string evtname = gammalib::extname_cta_events;
+            std::string gtiname = gammalib::extname_gti;
+
+            // Create file name object
+            GFilename fname(outobs);
+
+            // Extract filename and event extension name
+            std::string outfile = fname.url();
+
+            // Append event extension name. We handle here the possibility
+            // to write the events into a different extension.
+            if (fname.has_extname()) {
+                outfile += "["+fname.extname()+"]";
+            }
+            else {
+                outfile += "["+gammalib::extname_cta_events+"]";
+            }
+
+            // Log filename
+            log_value(NORMAL, "Event list file", outfile);
+            
+            // Save event list
+            save_event_list(obs, infile, evtname, gtiname, outfile);
+
+            // Exit the loop (if this method is called we should only
+            // have a single unbinned observation in the observation
+            // container
+            break;
+
+        } // endfor: looped over all unbinned observations
+
+    } // endif: there were observations
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Save event list(s) in XML format.
+ *
+ * Save the event list(s) into FITS files and write the file path information
+ * into a XML file. The filename of the XML file is specified by the `outobs`
+ * parameter, the filename(s) of the event lists are built by prepending a
+ * prefix to the input event list filenames. Any path present in the input
+ * filename will be stripped, i.e. the event list(s) will be written in the
+ * local working directory (unless a path is specified in the prefix).
+ ***************************************************************************/
+void ctobservation::save_events_xml(void)
+{
+    // Get output filename and prefix
+    std::string outobs = (*this)["outobs"].filename();
+
+    // Issue warning if output filename has no .xml suffix
+    log_string(TERSE, warn_xml_suffix(outobs));
+
+    // Loop over all unbinned CTA observations in the container
+    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+         obs = next_unbinned_observation()) {
+
+        // Get input file name and default extension names
+        std::string infile  = obs->eventfile();
+        std::string evtname = gammalib::extname_cta_events;
+        std::string gtiname = gammalib::extname_gti;
+
+        // Extract event and GTI extension names from input FITS file
+        GFilename fname(infile);
+        if (fname.has_extname()) {
+            evtname = fname.extname();
+        }
+        gtiname = get_gtiname(fname.url(), evtname);
+
+        // Set event output file name
+        std::string outfile = set_outfile_name(infile);
+
+        // Append event extension name
+        outfile += "["+evtname+"]";
+
+        // Log filename
+        log_value(NORMAL, "Event list file", outfile);
+
+        // Store output file name in observation
+        obs->eventfile(outfile);
+
+        // Save event list
+        save_event_list(obs, infile, evtname, gtiname, outfile);
+
+    } // endfor: looped over observations
+
+    // Write observation definition XML file name into logger
+    log_value(NORMAL, "Obs. definition file", outobs);
+
+    // Save observations in XML file
+    m_obs.save(outobs);
+
+    // Return
+    return;
 }

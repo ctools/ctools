@@ -67,7 +67,7 @@ const double g_roi_margin = 0.5;      //!< Simulation radius margin (degrees)
  *
  * Constructs an empty ctobssim tool.
  ***************************************************************************/
-ctobssim::ctobssim(void) : ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION)
+ctobssim::ctobssim(void) : ctobservation(CTOBSSIM_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -85,7 +85,7 @@ ctobssim::ctobssim(void) : ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION)
  * Constructs ctobssim tool from an observation container.
  ***************************************************************************/
 ctobssim::ctobssim(const GObservations& obs) :
-          ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION, obs)
+          ctobservation(CTOBSSIM_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -105,7 +105,7 @@ ctobssim::ctobssim(const GObservations& obs) :
  * setting.
  ***************************************************************************/
 ctobssim::ctobssim(int argc, char *argv[]) :
-          ctobservation(CTOBSSIM_NAME, CTOBSSIM_VERSION, argc, argv)
+          ctobservation(CTOBSSIM_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -1471,7 +1471,8 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 
                 // Debug code: signal that we step into the response MC method
                 #if defined(G_BACKGROUND_DEBUG)
-                std::cout << "ctobssim::simulate_background: model->mc in" << std::endl;
+                std::cout << "ctobssim::simulate_background: model->mc in"
+                          << std::endl;
                 #endif
 
                 // Get simulated CTA event list. Note that this method
@@ -1481,7 +1482,8 @@ void ctobssim::simulate_background(GCTAObservation* obs,
 
                 // Debug code: signal that we came back
                 #if defined(G_BACKGROUND_DEBUG)
-                std::cout << "ctobssim::simulate_background: model->mc out" << std::endl;
+                std::cout << "ctobssim::simulate_background: model->mc out"
+                          << std::endl;
                 #endif
 
                 // Continue only if we got a CTA event list

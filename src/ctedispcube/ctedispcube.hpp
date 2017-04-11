@@ -33,8 +33,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTEDISPCUBE_NAME    "ctedispcube"
-#define CTEDISPCUBE_VERSION "1.1.0"
+#define CTEDISPCUBE_NAME "ctedispcube"
 
 
 /***********************************************************************//**

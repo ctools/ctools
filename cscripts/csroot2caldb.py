@@ -536,7 +536,8 @@ class csroot2caldb(ctools.cscript):
         Translate ROOT to CALDB effective area extension
  
         The following ROOT histograms are used:
-        - EffectiveAreaEtrue_offaxis -> EFFAREA
+        - EffectiveAreaEtrueNoTheta2cut_offaxis -> EFFAREA
+        - EffectiveAreaEtrueNoTheta2cut (for normalization)
 
         Parameters
         ----------
@@ -551,13 +552,13 @@ class csroot2caldb(ctools.cscript):
         self._log_header1(gammalib.TERSE, 'Generate effective area extension')
 
         # Get relevant ROOT histograms
-        etrue = tfile.Get('EffectiveAreaEtrue_offaxis')
+        etrue = tfile.Get('EffectiveAreaEtrueNoTheta2cut_offaxis')
 
         # If requested then normalize the 2D histogram on the on-axis 1D
         # histogram. This assures that the 2D histogram has the same on-axis
         # effective area dependence as the 1D histogram.
         if self['norm1d'].boolean():
-            etrue_1D = tfile.Get('EffectiveAreaEtrue')
+            etrue_1D = tfile.Get('EffectiveAreaEtrueNoTheta2cut')
             self._renorm_onaxis(etrue, etrue_1D)
 
         # If requested then rebin the effective area Etrue histogram. This

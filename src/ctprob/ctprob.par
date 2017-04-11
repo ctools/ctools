@@ -4,33 +4,25 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 #                                                                           #
-#  File:      ctphase.par                                                   #
+#  File:      ctprob.par                                                    #
 #                                                                           #
-#  Author:    Joshua Cardenzana                                             #
-#             jcardenzana@irap.omp.eu                                       #
-#             IRAP                                                          #
+#  Author:    Leonardo Di Venere                                            #
+#             leonardo.divenere@ba.infn.it                                  #
+#             INFN                                                          #
 #                                                                           #
-#  Purpose:   Parameter file for the ctphase application                    #
+#  Purpose:   Parameter file for the ctprob application                     #
 #                                                                           #
 #############################################################################
 #
 # General parameters
 #===================
 inobs,   f, a, "events.fits",,, "Input event list or observation definition XML file"
-outobs,  f, a, "phased_events.fits",,, "Output event list or observation definition XML file"
-prefix,  s, h, "phased_",,, "Prefix for event lists in observation definition XML file"
-inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Model file defining the phase information"
-source,  s, a, "Crab",,, "Source in model file to use for phase information"
-
-#
-# Phase information parameters
-#=====================
-phasecurve, f, a, phase.fits,,, "Phase curve FITS file"
-mjd,        r, a, 51544.5,,, "Reference MJD for phase information"
-phase,      r, a, 0.0,0.0,1.0, "Phase at reference MJD"
-f0,         r, a, 1.0,,, "Frequency at reference MJD (Hz)"
-f1,         r, a, 0.1,,, "First freq. derivative at reference MJD (s^-1)"
-f2,         r, a, 0.01,,, "Second freq. derivative at reference MJD (s^-2)"
+outobs,  f, a, "prob_events.fits",,, "Output event list or observation definition XML file"
+prefix,  s, h, "prob_",,, "Prefix for event lists in observation definition XML file"
+inmodel, f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
+caldb,   s, a, "prod2",,, "Calibration database"
+irf,     s, a, "South_0.5h",,, "Instrument response function"
+edisp,   b, h, no,,, "Apply energy dispersion?"
 
 #
 # Standard parameters
@@ -40,4 +32,4 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctphase.log",,, "Log filename"
+logfile, f, h, "ctprob.log",,, "Log filename"

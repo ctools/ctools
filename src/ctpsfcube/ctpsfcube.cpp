@@ -49,7 +49,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctpsfcube::ctpsfcube(void) : ctobservation(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
+ctpsfcube::ctpsfcube(void) : ctobservation(CTPSFCUBE_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -68,7 +68,7 @@ ctpsfcube::ctpsfcube(void) : ctobservation(CTPSFCUBE_NAME, CTPSFCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctpsfcube::ctpsfcube(const GObservations& obs) :
-           ctobservation(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, obs)
+           ctobservation(CTPSFCUBE_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -86,7 +86,7 @@ ctpsfcube::ctpsfcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctpsfcube::ctpsfcube(int argc, char *argv[]) :
-           ctobservation(CTPSFCUBE_NAME, CTPSFCUBE_VERSION, argc, argv)
+           ctobservation(CTPSFCUBE_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

@@ -3,21 +3,25 @@
 ctbutterfly
 ===========
 
-Computes butterfly diagram for a power law model.
+Computes butterfly diagram for a given spectral model.
 
 
 Synopsis
 --------
 
-This tool calculates a butterfly diagram for a specific source with power law
-spectral model. The butterfly diagram is the envelope of all power law models
-that are within a given confidence limit compatible with the data. By default
-a confidence level of 68% is used, but the level can be adjusted using the 
-hidden ``confidence`` parameter. ctbutterfly computes this envelope by
-evaluating for each energy the minimum and maximum intensity of all power law
-models that fall within the error ellipse of the prefactor and index parameters.
-The error ellipse is derived from the covariance matrix of a maximum likelihood
-fit.
+This tool calculates a butterfly diagram for a specific source according to 
+its spectral model. The butterfly diagram is the envelope of all spectral
+models that are within a given confidence limit compatible with the data.
+The default method used for the calculation is Gaussian error propagation
+using the covariance matrix from a maximum likelihood fit. By default a
+confidence level of 68% is used, but the level can be adjusted using the
+hidden ``confidence`` parameter. For power law models, an alternative
+calculation method can be specified by setting the hidden parameter
+``method=ENVELOPE``. By using this method, the envelope is computed by
+evaluating for each energy the minimum and maximum intensity of all power
+law models that fall within the error ellipse of the prefactor and index
+parameters. The error ellipse is derived from the covariance matrix of a
+maximum likelihood fit.
 
 ctbutterfly assumes that the input model (parameter ``inmodel``) has been 
 adjusted using :doc:`ctlike` to the data, but if this is not the case you 
@@ -68,11 +72,14 @@ General parameters
  	 	 
 ``outfile [file]``
     Output butterfly ASCII file name.
-
+    
 ``(fit = no) [boolean]``
     Performs maximum likelihood fitting of input model ignoring any provided
     covariance matrix.
- 	 	 
+
+``(method = "GAUSSIAN") <GAUSSIAN|ENVELOPE> [string]``
+    Computation method.
+    
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
     

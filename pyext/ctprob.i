@@ -1,7 +1,7 @@
 /***************************************************************************
- *          ctphase - Append phase information to CTA events file          *
+ *           ctprob - Computes probability for a given model               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017 by Joshua Cardenzana                                *
+ *  copyright (C) 2012-2016 by Leonardo Di Venere                          *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -19,59 +19,43 @@
  *                                                                         *
  ***************************************************************************/
 /**
- * @file ctphase/main.cpp
- * @brief Append phase information to CTA events file
- * @author Joshua Cardenzana
+ * @file ctprob.i
+ * @brief Computes probability for a given model
+ * @author Leonardo Di Venere
  */
-
-/* __ Includes ___________________________________________________________ */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#include "support.hpp"
-#include "ctphase.hpp"
+%{
+/* Put headers and other declarations here that are needed for compilation */
+#include "ctprob.hpp"
+%}
 
 
 /***********************************************************************//**
- * @brief Main entry point
+ * @class ctprob
  *
- * @param[in] argc Number of arguments
- * @param[in] argv Arguments
- *
- * This is the main entry point of the ctphase application. It allocates a
- * ctphase object and executes the application. Any exceptions that occur
- * will be catched and corresponding error messages written in the
- * application logger and into the standard output.
+ * @brief Data selection tool
  ***************************************************************************/
-int main (int argc, char *argv[])
-{
-    // Initialise return code
-    int rc = 1;
+class ctprob : public ctobservation {
+public:
+    // Constructors and destructors
+    ctprob(void);
+    explicit ctprob(const GObservations& obs);
+    ctprob(int argc, char *argv[]);
+    ctprob(const ctprob& app);
+    virtual ~ctprob(void);
 
-    // Initialise pointer on application
-    ctphase* application = NULL;
+    // Methods
+    void clear(void);
+    void run(void);
+    void save(void);
+    void publish(const std::string& name = "");
+};
 
-    // Execute application
-    try {
 
-        // Create instance of application
-        application = new ctphase(argc, argv);
-
-        // Execute ctool
-        rc = execute_ctool(application);
-
+/***********************************************************************//**
+ * @brief Data selection tool Python extension
+ ***************************************************************************/
+%extend ctprob {
+    ctprob copy() {
+        return (*self);
     }
-
-    catch (std::exception &e) {
-
-        // Report exception
-        report_ctool_failure("ctphase", e.what());
-
-    }
-
-    // Delete application
-    delete application;
-
-    // Return
-    return rc;
 }

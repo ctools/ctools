@@ -53,7 +53,7 @@ const GEnergy g_energy_margin(1.0e-12, "TeV");
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctmodel::ctmodel(void) : ctobservation(CTMODEL_NAME, CTMODEL_VERSION)
+ctmodel::ctmodel(void) : ctobservation(CTMODEL_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -72,7 +72,7 @@ ctmodel::ctmodel(void) : ctobservation(CTMODEL_NAME, CTMODEL_VERSION)
  * observations container.
  ***************************************************************************/
 ctmodel::ctmodel(const GObservations& obs) :
-         ctobservation(CTMODEL_NAME, CTMODEL_VERSION, obs)
+         ctobservation(CTMODEL_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -90,7 +90,7 @@ ctmodel::ctmodel(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctmodel::ctmodel(int argc, char *argv[]) :
-         ctobservation(CTMODEL_NAME, CTMODEL_VERSION, argc, argv)
+         ctobservation(CTMODEL_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

@@ -50,7 +50,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctbkgcube::ctbkgcube(void) : ctobservation(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
+ctbkgcube::ctbkgcube(void) : ctobservation(CTBKGCUBE_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -69,7 +69,7 @@ ctbkgcube::ctbkgcube(void) : ctobservation(CTBKGCUBE_NAME, CTBKGCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctbkgcube::ctbkgcube(const GObservations& obs) :
-		ctobservation(CTBKGCUBE_NAME, CTBKGCUBE_VERSION, obs)
+		ctobservation(CTBKGCUBE_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -87,7 +87,7 @@ ctbkgcube::ctbkgcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctbkgcube::ctbkgcube(int argc, char *argv[]) :
-		ctobservation(CTBKGCUBE_NAME, CTBKGCUBE_VERSION, argc, argv)
+		ctobservation(CTBKGCUBE_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

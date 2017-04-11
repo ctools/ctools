@@ -35,8 +35,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTCUBEMASK_NAME    "ctcubemask"
-#define CTCUBEMASK_VERSION "1.2.0"
+#define CTCUBEMASK_NAME "ctcubemask"
 
 
 /***********************************************************************//**

@@ -50,7 +50,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctexpcube::ctexpcube(void) : ctobservation(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
+ctexpcube::ctexpcube(void) : ctobservation(CTEXPCUBE_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -69,7 +69,7 @@ ctexpcube::ctexpcube(void) : ctobservation(CTEXPCUBE_NAME, CTEXPCUBE_VERSION)
  * observations container.
  ***************************************************************************/
 ctexpcube::ctexpcube(const GObservations& obs) :
-           ctobservation(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, obs)
+           ctobservation(CTEXPCUBE_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -87,7 +87,7 @@ ctexpcube::ctexpcube(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctexpcube::ctexpcube(int argc, char *argv[]) :
-           ctobservation(CTEXPCUBE_NAME, CTEXPCUBE_VERSION, argc, argv)
+           ctobservation(CTEXPCUBE_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

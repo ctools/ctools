@@ -52,7 +52,7 @@
  *
  * Constructs an empty energy dispersion tool.
  ***************************************************************************/
-ctedispcube::ctedispcube(void) : ctobservation(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION)
+ctedispcube::ctedispcube(void) : ctobservation(CTEDISPCUBE_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -71,7 +71,7 @@ ctedispcube::ctedispcube(void) : ctobservation(CTEDISPCUBE_NAME, CTEDISPCUBE_VER
  * in an observation container @p obs.
  ***************************************************************************/
 ctedispcube::ctedispcube(const GObservations& obs) :
-             ctobservation(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, obs)
+             ctobservation(CTEDISPCUBE_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -92,7 +92,7 @@ ctedispcube::ctedispcube(const GObservations& obs) :
  * on the command line.
  ***************************************************************************/
 ctedispcube::ctedispcube(int argc, char *argv[]) :
-             ctobservation(CTEDISPCUBE_NAME, CTEDISPCUBE_VERSION, argc, argv)
+             ctobservation(CTEDISPCUBE_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

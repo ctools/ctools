@@ -1,7 +1,7 @@
 /***************************************************************************
  *          ctphase - Append phase information to CTA events file          *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2017 by Leonardo Di Venere                               *
+ *  copyright (C) 2017 by Joshua Cardenzana                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -21,7 +21,7 @@
 /**
  * @file ctphase.hpp
  * @brief Append phase information to CTA events file
- * @author Leonardo Di Venere
+ * @author Joshua Cardenzana
  */
 
 #ifndef CTPHASE_HPP
@@ -35,8 +35,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTPHASE_NAME    "ctphase"
-#define CTPHASE_VERSION "0.0.1"
+#define CTPHASE_NAME "ctphase"
 
 
 /***********************************************************************//**
@@ -65,38 +64,17 @@ public:
 
 protected:
     // Protected methods
-    void        init_members(void);
-    void        copy_members(const ctphase& app);
-    void        free_members(void);
-    void        get_parameters(void);
-    void        read_phase_info_from_xml(void);
-    void        phase_events(GCTAObservation* obs,
-                             const std::string& filename,
-                             const std::string& evtname,
-                             const std::string& gtiname);
-    std::string check_infile(const std::string& filename,
-                             const std::string& evtname) const;
-    std::string set_outfile_name(const std::string& filename) const;
-    std::string get_gtiname(const std::string& filename,
-                            const std::string& evtname) const;
-    void        save_fits(void);
-    void        save_xml(void);
-    void        save_event_list(const GCTAObservation* obs,
-                                const std::string&     infile,
-                                const std::string&     evtname,
-                                const std::string&     gtiname,
-                                const std::string&     outfile) const;
+    void init_members(void);
+    void copy_members(const ctphase& app);
+    void free_members(void);
+    void get_parameters(void);
+    void phase_events(GCTAObservation* obs);
 
     // User parameters
-    std::string m_outobs;               //!< Output event list or XML file
-    std::string m_prefix;               //!< Prefix for multiple event lists
-    GModelTemporalPhaseCurve m_phase;   //!< Phase information object
-    GChatter    m_chatter;              //!< Chattiness
+    GChatter m_chatter;                 //!< Chattiness
 
     // Protected members
-    std::vector<std::string> m_infiles;       //!< Input event filenames
-    std::vector<std::string> m_evtname;       //!< Event extension names
-    std::vector<std::string> m_gtiname;       //!< GTI extension names
+    GModelTemporalPhaseCurve m_phase;   //!< Phase curve model
 };
 
 

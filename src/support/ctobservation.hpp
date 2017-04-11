@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -78,6 +78,8 @@ protected:
     void init_members(void);
     void copy_members(const ctobservation& app);
     void free_members(void);
+    void save_events_fits(void);
+    void save_events_xml(void);
 
     // Protected members
     GObservations m_obs;            //!< Observation container

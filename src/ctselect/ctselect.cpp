@@ -53,7 +53,7 @@
 /***********************************************************************//**
  * @brief Void constructor
  ***************************************************************************/
-ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, CTSELECT_VERSION)
+ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -72,7 +72,7 @@ ctselect::ctselect(void) : ctobservation(CTSELECT_NAME, CTSELECT_VERSION)
  * provided in an observation container.
  ***************************************************************************/
 ctselect::ctselect(const GObservations& obs) :
-          ctobservation(CTSELECT_NAME, CTSELECT_VERSION, obs)
+          ctobservation(CTSELECT_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -91,7 +91,7 @@ ctselect::ctselect(const GObservations& obs) :
  * @param[in] argv Array of command line arguments.
  ***************************************************************************/
 ctselect::ctselect(int argc, char *argv[]) : 
-          ctobservation(CTSELECT_NAME, CTSELECT_VERSION, argc, argv)
+          ctobservation(CTSELECT_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();
@@ -1175,39 +1175,6 @@ std::string ctselect::set_outfile_name(const std::string& filename) const
 
 
 /***********************************************************************//**
- * @brief Get Good Time Intervals extension name
- *
- * @param[in] filename Input file name.
- * @param[in] evtname Events extension name.
- *
- * Extracts the Good Time Intervals extension name from the event file. We
- * do this by loading the events and accessing the Good Time Intervals
- * extension name using the GCTAEventList::gtiname() method. If the file name
- * is empty, the method returns `GTI`.
- ***************************************************************************/
-std::string ctselect::get_gtiname(const std::string& filename,
-                                  const std::string& evtname) const
-{
-    // Initialise GTI name
-    std::string gtiname = gammalib::extname_gti;
-
-    // Continue only if the filename is not empty
-    if (!filename.empty()) {
-
-        // Load events
-        GCTAEventList events(filename+"["+evtname+"]");
-
-        // Get GTI name
-        gtiname = events.gtiname();
-
-    }
-
-    // Return GTI name
-    return (gtiname);
-}
-
-
-/***********************************************************************//**
  * @brief Save event list in FITS format.
  *
  * Save the event list as a FITS file. The file name of the FITS file is
@@ -1321,112 +1288,6 @@ void ctselect::save_xml(void)
 
     // Save observations in XML file
     m_obs.save(m_outobs);
-
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Save event list into FITS file
- *
- * @param[in] obs Pointer to CTA observation.
- * @param[in] infile Input file name.
- * @param[in] evtname Event extension name.
- * @param[in] gtiname GTI extension name.
- * @param[in] outfile Output file name.
- *
- * Saves an event list and the corresponding Good Time Intervals into a FITS
- * file and copy all others extensions from the input file to the output
- * file.
- *
- * If an extension name is specified in the @p outfile argument, the events
- * and eventually also the Good Time Intervals will be extracted from the
- * argument and used for writing the events. The format is
- *
- *      <filename>[<event extension name;GTI extension name>]
- *
- * where <filename> needs to be replaced by the name of the FITS file,
- * and <event extension name;GTI extension name> by the name of the events
- * and Good Time Intervals extensions. For example 
- *
- *      myfits.fits[EVENTS1;GTI1]
- *
- * will write the selected events into the "EVENTS1" extension and the
- * Good Time Intervals into the "GTI1" extension of the "myfits.fits" FITS
- * file. If the Good Time Intervals extension name is skipped, e.g.
- *
- *      myfits.fits[EVENTS1]
- *
- * the original extension name for the Good Time Intervals will be kept.
- * Analogously, only the Good Time Intervals extension name can be changed
- * by specifying
- *
- *      myfits.fits[;GTI1]
- *
- * In none of the cases will the original events and Good Time Intervals be
- * copied over to the output file.
- ***************************************************************************/
-void ctselect::save_event_list(const GCTAObservation* obs,
-                               const std::string&     infile,
-                               const std::string&     evtname,
-                               const std::string&     gtiname,
-                               const std::string&     outfile) const
-{
-    // Save only if we have an event list
-    if (obs->eventtype() == "EventList") {
-
-        // Set output FITS file event extension names
-        GFilename   outname(outfile);
-        std::string outevt = evtname;
-        std::string outgti = gtiname;
-        if (outname.has_extname()) {
-            std::vector<std::string> extnames =
-                       gammalib::split(outname.extname(), ";");
-            if (extnames.size() > 0) {
-                std::string extname = gammalib::strip_whitespace(extnames[0]);
-                if (!extname.empty()) {
-                    outevt = extname;
-                }
-            }
-            if (extnames.size() > 1) {
-                std::string extname = gammalib::strip_whitespace(extnames[1]);
-                if (!extname.empty()) {
-                    outgti = extname;
-                }
-            }
-        }
-
-        // Create output FITS file
-        GFits outfits;
-
-        // Write observation into FITS file
-        obs->write(outfits, outevt, outgti);
-
-        // Copy all extensions other than evtname and gtiname extensions
-        // from the input to the output event list. The evtname and
-        // gtiname extensions are written by the save method, all others
-        // that may eventually be present have to be copied over
-        // explicitly.
-        GFits infits(infile);
-        for (int extno = 1; extno < infits.size(); ++extno) {
-            GFitsHDU* hdu = infits.at(extno);
-            if (hdu->extname() != evtname &&
-                hdu->extname() != gtiname &&
-                hdu->extname() != outevt  &&
-                hdu->extname() != outgti) {
-                outfits.append(*hdu);
-            }
-        }
-
-        // Close input file
-        infits.close();
-
-        // Save file to disk and close it (we need both operations)
-        outfits.saveto(outname.url(), clobber());
-        outfits.close();
-
-    } // endif: observation was unbinned
 
     // Return
     return;

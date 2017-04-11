@@ -73,6 +73,7 @@ namespace std {
 %include "ctbutterfly.i"
 %include "ctulimit.i"
 %include "cterror.i"
+%include "ctprob.i"
 
 /* __ Test function ______________________________________________________ */
 %pythoncode %{

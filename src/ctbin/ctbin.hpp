@@ -31,8 +31,7 @@
 #include "ctobservation.hpp"
 
 /* __Definitions _________________________________________________________ */
-#define CTBIN_NAME    "ctbin"
-#define CTBIN_VERSION "1.2.0"
+#define CTBIN_NAME "ctbin"
 
 
 /***********************************************************************//**

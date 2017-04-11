@@ -51,7 +51,7 @@
  *
  * Constructs an empty cttsmap tool.
  ***************************************************************************/
-cttsmap::cttsmap(void) : ctlikelihood(CTTSMAP_NAME, CTTSMAP_VERSION)
+cttsmap::cttsmap(void) : ctlikelihood(CTTSMAP_NAME, VERSION)
 {
     // Initialise members
     init_members();
@@ -69,7 +69,7 @@ cttsmap::cttsmap(void) : ctlikelihood(CTTSMAP_NAME, CTTSMAP_VERSION)
  * Constructs cttsmap tool from an observations container.
  ***************************************************************************/
 cttsmap::cttsmap(const GObservations& obs) :
-         ctlikelihood(CTTSMAP_NAME, CTTSMAP_VERSION, obs)
+         ctlikelihood(CTTSMAP_NAME, VERSION, obs)
 {
     // Initialise members
     init_members();
@@ -89,7 +89,7 @@ cttsmap::cttsmap(const GObservations& obs) :
  * that are provided as command line arguments.
  ***************************************************************************/
 cttsmap::cttsmap(int argc, char *argv[]) :
-         ctlikelihood(CTTSMAP_NAME, CTTSMAP_VERSION, argc, argv)
+         ctlikelihood(CTTSMAP_NAME, VERSION, argc, argv)
 {
     // Initialise members
     init_members();

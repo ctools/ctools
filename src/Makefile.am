@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctools module                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -41,7 +41,8 @@ SUBDIRS = support \
           ctbutterfly \
           ctulimit \
           cterror \
-          ctphase
+          ctphase \
+          ctprob
 
 # Scripts to be distributed
 scripts = ctools-setup \
@@ -70,7 +71,8 @@ libctools_la_LIBADD = support/libsupport.la \
                       ctbutterfly/libctbutterfly.la \
                       ctulimit/libctulimit.la \
                       cterror/libcterror.la \
-                      ctphase/libctphase.la
+                      ctphase/libctphase.la \
+                      ctprob/libctprob.la
 
 libctools_la_LDFLAGS = -version-info $(CTOOLS_LT_VERSION) @OPENMP_LIB_LDFLAGS@
 
