@@ -737,8 +737,8 @@ void ctselect::select_events(GCTAObservation*   obs,
 
     // Make phase selection
     if (m_select_phase) {
-        // Check if event_list has phase (m_has_phase)
-      if (true) { //list->has_phase()) {  // gammalib version from branch 1982-add-phase-info necessary
+        // Check if event_list has phase
+        if (list->has_phase()) { 
             // Check if phasemax is larger than phasemin
 	    if (m_phasemax > m_phasemin) {
 	        // Format phase with sufficient accuracy and add to selection string
