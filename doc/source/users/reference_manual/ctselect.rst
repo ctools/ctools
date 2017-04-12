@@ -85,12 +85,12 @@ General parameters
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no energy
     selection will be performed.
  	 	 
-``(phasemin = NONE) [real]``
+``(phasemin = 0.0) [real]``
     Lower phase limit of events.
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no phase
     selection will be performed.
  	 	 
-``(phasemax = NONE) [real]``
+``(phasemax = 1.0) [real]``
     Upper phase limit of events.
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no phase
     selection will be performed.
