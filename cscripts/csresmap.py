@@ -241,6 +241,27 @@ class csresmap(ctools.cscript):
             self._resmap -= modelmap
             self._resmap /= modelmap.sqrt()
 
+        # Calculate significance from Li&Ma derivation
+        elif algorithm == 'SIGNIF':
+            signmap = (self._resmap - modelmap).sign()
+            logmap = self._resmap/modelmap
+            # Masking pixels with 0 counts. Put a small value >0 for log calculation
+            # and restore the 0. value afterwards
+            mask = []
+            for i in range(logmap.npix()):
+                # Testing pixel i and map 0 (there is one map only after stacking)
+                if logmap[i,0] == 0:  
+                    mask.append(i)
+                    logmap[i,0] = 1e-10
+            logmap = logmap.log()
+            for i in mask:
+                logmap[i,0] = 0.
+
+            signif_squared_map = (self._resmap*logmap) + modelmap  - self._resmap
+            signif_squared_map *= 2.
+            unsigned_resmap = signif_squared_map.sqrt()
+            self._resmap = unsigned_resmap * signmap 
+
         # Raise exception if algorithm is unknown
         else:
             raise TypeError('Algorithm "'+algorithm+'" not known')

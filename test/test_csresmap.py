@@ -165,6 +165,54 @@ class Test(test):
         # Check pull distribution file
         self._check_result_file('csresmap_py2.fits', nx=200, ny=200)
 
+
+        # Run csresmap with SUBDIVSQRT algorithm
+        resmap = cscripts.csresmap()
+        resmap['inobs']     = self._cntcube
+        resmap['modcube']   = 'NONE'
+        resmap['expcube']   = 'NONE'
+        resmap['psfcube']   = 'NONE'
+        resmap['edispcube'] = 'NONE'
+        resmap['bkgcube']   = 'NONE'
+        resmap['caldb']     = self._caldb
+        resmap['irf']       = self._irf
+        resmap['inmodel']   = self._model
+        resmap['outmap']    = 'csresmap_py3.fits'
+        resmap['algorithm'] = 'SUBDIVSQRT'
+        resmap['logfile']   = 'csresmap_py3.log'
+        resmap['chatter']   = 3
+        resmap['publish']   = True
+
+        # Run csresmap script
+        resmap.execute()
+
+        # Check pull distribution file
+        self._check_result_file('csresmap_py3.fits', nx=200, ny=200)
+
+        # Run csresmap with SIGNIF algorithm
+        resmap = cscripts.csresmap()
+        resmap['inobs']     = self._cntcube
+        resmap['modcube']   = 'NONE'
+        resmap['expcube']   = 'NONE'
+        resmap['psfcube']   = 'NONE'
+        resmap['edispcube'] = 'NONE'
+        resmap['bkgcube']   = 'NONE'
+        resmap['caldb']     = self._caldb
+        resmap['irf']       = self._irf
+        resmap['inmodel']   = self._model
+        resmap['outmap']    = 'csresmap_py4.fits'
+        resmap['algorithm'] = 'SIGNIF'
+        resmap['logfile']   = 'csresmap_py4.log'
+        resmap['chatter']   = 3
+        resmap['publish']   = True
+
+        # Run csresmap script
+        resmap.execute()
+
+        # Check pull distribution file
+        self._check_result_file('csresmap_py4.fits', nx=200, ny=200)
+
+
         # Return
         return
 
