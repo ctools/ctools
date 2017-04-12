@@ -85,13 +85,12 @@ General parameters
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no energy
     selection will be performed.
  	 	 
-``(phasemin = 0.0) [real]``
-    Lower phase limit of events.
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no phase
-    selection will be performed.
- 	 	 
-``(phasemax = 1.0) [real]``
-    Upper phase limit of events.
+``(phase = NONE) [string]``
+    String to apply a phase selection. The string must contain the boundaries 
+    of the phase interval to be selected separated be a colon. More than one
+    interval can be specified at the same time. In this case intervals must be 
+    separated by a comma. Examples of valid strings are: phase = "0.3:0.6" or
+    phase = "0.3:0.6,0.8:0.9". 
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no phase
     selection will be performed.
  	 	 

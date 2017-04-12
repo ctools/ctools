@@ -357,6 +357,28 @@ class Test(test):
         # Check result file
         self._check_result_file('ctselect_py10.fits', nevents=0, dec=-22.01, rad=5.0)
 
+        # Now test phase cut
+        select = ctools.ctselect()
+        select['inobs']   = os.path.dirname(self._events)+"/phased_"+os.path.basename(self._events)
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 5.
+        select['tmin']    = "INDEF"
+        select['tmax']    = "INDEF"
+        select['emin']    = 0.1
+        select['emax']    = 100.0
+        select['phase']   = "0.1:0.4,0.6:0.8"
+        select['outobs']  = 'ctselect_py11.fits'
+        select['logfile'] = 'ctselect_py11.log'
+        select['chatter'] = 2
+
+        # Run ctselect tool
+        select.logFileOpen()   # Make sure we get a log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py11.fits', nevents=3159, dec=22.01, rad=5.)
+
         # Return
         return
 
