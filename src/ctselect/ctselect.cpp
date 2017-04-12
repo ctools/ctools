@@ -595,10 +595,25 @@ void ctselect::get_parameters(void)
         m_select_energy = false;
     }
 
-    // Check for sanity of phase selection parameters
+    /*    // Check for sanity of phase selection parameters
     if ((*this)["phasemin"].is_valid() && (*this)["phasemax"].is_valid()) {
         m_phasemin     = (*this)["phasemin"].real();
         m_phasemax     = (*this)["phasemax"].real();
+        m_select_phase = true;
+    }
+    else {
+        m_select_phase = false;
+	}*/
+
+    // Check for sanity of phase selection parameters
+    if ((*this)["phase"].is_valid()) {
+        std::string phase_expr = (*this)["phase"].string();
+	std::vector<std::string> phase_splits = gammalib::split(phase_expr, ",");
+	for (int i=0; i < phase_splits.size(); i++) {
+            std::vector<std::string> phase_toks = gammalib::split(phase_splits[i], ":");
+	    m_phasemin.push_back( std::strtod(phase_toks[0].c_str(), NULL) );
+	    m_phasemax.push_back( std::strtod(phase_toks[1].c_str(), NULL) );
+	}
         m_select_phase = true;
     }
     else {
@@ -739,21 +754,36 @@ void ctselect::select_events(GCTAObservation*   obs,
     if (m_select_phase) {
         // Check if event_list has phase
         if (list->has_phase()) { 
-            // Check if phasemax is larger than phasemin
-	    if (m_phasemax > m_phasemin) {
-	        // Format phase with sufficient accuracy and add to selection string
-	        char cmin[80];
-		char cmax[80];
-		sprintf(cmin, "%.8f", m_phasemin);
-		sprintf(cmax, "%.8f", m_phasemax);
-		selection += add + "PHASE >= "+std::string(cmin)+" && PHASE <= "+std::string(cmax);
-		add       = " && ";
-		log_value(NORMAL, "Phase range",
-			  gammalib::str(m_phasemin)+" - "+gammalib::str(m_phasemax));
-	    }
-	    else {
-	        log << "Invalid values for phasemin and phasemax. ";
-		log << "Phase selection skipped." << std::endl;
+	    bool is_first = true;
+	    // Loop over phase selections
+	    for (int i=0; i < m_phasemin.size(); i++) {
+	        // Check if phasemax is larger than phasemin
+	        if (m_phasemax[i] > m_phasemin[i]) {
+		    if (is_first) {
+		        selection += add + "( ";
+		    }
+		    else {
+		        selection += add;
+		    }
+		    // Format phase with sufficient accuracy and add to selection string
+		    char cmin[80];
+		    char cmax[80];
+		    sprintf(cmin, "%.8f", m_phasemin[i]);
+		    sprintf(cmax, "%.8f", m_phasemax[i]);
+		    selection += "(PHASE >= "+std::string(cmin)+" && PHASE <= "+std::string(cmax)+")";
+		    add       = " || ";
+		    is_first = false;
+		    log_value(NORMAL, "Phase range",
+			      gammalib::str(m_phasemin[i])+" - "+gammalib::str(m_phasemax[i]));
+		}
+		else {
+		    log << "Invalid values for phasemin and phasemax in interval "<<i<<". ";
+		    log << "Phase selection skipped for this interval." << std::endl;
+		}
+	    } // end for loop
+	    if (!is_first) {
+	        add = " && ";
+		selection += " )";
 	    }
 	}
 	else {
