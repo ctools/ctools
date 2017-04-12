@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctbutterfly tool.
 #
-# Copyright (C) 2014-2016 Michal Mayer
+# Copyright (C) 2014-2017 Michal Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -144,6 +144,7 @@ class Test(test):
         butterfly['srcname'] = 'Crab'
         butterfly['caldb']   = self._caldb
         butterfly['irf']     = self._irf
+        butterfly['method']  = 'ENVELOPE'
         butterfly['emin']    = 0.1
         butterfly['emax']    = 100.0
         butterfly['fit']     = True

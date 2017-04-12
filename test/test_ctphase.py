@@ -191,6 +191,72 @@ class Test(test):
         # Check result file
         self._check_result_file('ctphase_py3.fits')
 
+        # Now run ctphase tool without a model file and a significant
+        # MJD offset
+        phase['inobs']   = self._events
+        phase['inmodel'] = 'NONE'
+        phase['srcname'] = 'NONE'
+        phase['mjd']     = 51500.0
+        phase['phase']   = 0.0
+        phase['f0']      = 1.0
+        phase['f1']      = 0.1
+        phase['f2']      = 0.0001
+        phase['outobs']  = 'ctphase_py4.fits'
+        phase['logfile'] = 'ctphase_py4.log'
+        phase['chatter'] = 3
+
+        # Execute ctphase tool
+        phase.logFileOpen()   # Make sure we get a log file
+        phase.execute()
+
+        # Check result file
+        self._check_result_file('ctphase_py4.fits')
+
+        # Test invalid source name
+        self.test_try('Test ctphase with invalid source name')
+        try:
+            test = ctools.ctphase()
+            test['inobs']   = self._events
+            test['inmodel'] = self._model_file
+            test['srcname'] = 'Venus'
+            test['outobs']  = 'ctphase_py5.fits'
+            test['logfile'] = 'ctphase_py5.log'
+            test.logFileOpen()
+            test.execute()
+            self.test_try_failure('Exception not thrown')
+        except (ValueError):
+            self.test_try_success()
+
+        # Test invalid model type
+        self.test_try('Test ctphase with invalid model')
+        try:
+            test = ctools.ctphase()
+            test['inobs']   = self._events
+            test['inmodel'] = self._model
+            test['srcname'] = 'Background'
+            test['outobs']  = 'ctphase_py6.fits'
+            test['logfile'] = 'ctphase_py6.log'
+            test.logFileOpen()
+            test.execute()
+            self.test_try_failure('Exception not thrown')
+        except (ValueError):
+            self.test_try_success()
+
+        # Test invalid model without temporal phase curve model
+        self.test_try('Test ctphase with invalid model')
+        try:
+            test = ctools.ctphase()
+            test['inobs']   = self._events
+            test['inmodel'] = self._model
+            test['srcname'] = 'Crab'
+            test['outobs']  = 'ctphase_py7.fits'
+            test['logfile'] = 'ctphase_py7.log'
+            test.logFileOpen()
+            test.execute()
+            self.test_try_failure('Exception not thrown')
+        except (ValueError):
+            self.test_try_success()
+
         # Return
         return
 

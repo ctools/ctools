@@ -504,8 +504,8 @@ void ctphase::get_parameters(void)
  * @exception GException::invalid_value
  *            No events found in observation.
  *
- * Append phase information to events from a FITS file by adding a "PHASE"
- * column to the FITS file.
+ * Computes the phase for all events in an observation based on a temporal
+ * phase curve model.
  ***************************************************************************/
 void ctphase::phase_events(GCTAObservation* obs)
 {
@@ -525,20 +525,29 @@ void ctphase::phase_events(GCTAObservation* obs)
     // Continue only if there are events
     if (events->size() > 0) {
 
-        // Print a warning into the log file if there are some precision concerns
+        // Get MJD information of observation
         GCTAEventAtom* event = (*events)[0];
         double         dt    = std::abs(event->time() - m_phase.mjd());
-        if (((m_phase.f1() * dt) > 1.0e8) ||
-             (m_phase.f2() * dt * dt) > 1.0e8) {
-            log_string(NORMAL,"*** WARNING ***");
-            log_string(NORMAL,"   Values supplied for reference MJD and/or f1 and/or f2");
-            log_string(NORMAL,"   are large and may result in numerical precision issues.");
-            log_string(NORMAL,"   Consider using an ephemeris derived from a date closer");
-            log_string(NORMAL,"   to the data being analyzed.");
-            log_value(NORMAL, "     Observation ID", obs->obs_id());
-            log_value(NORMAL, "     Reference MJD", m_phase.mjd().mjd());
-            log_value(NORMAL, "     First event MJD", event->time().mjd());
-            log_string(NORMAL,"*** WARNING ***");
+        double         f1    = m_phase.f1() * dt;
+        double         f2    = m_phase.f2() * dt * dt;
+
+        // Log information about MJD of the observation
+        log_value(NORMAL, "Reference MJD", m_phase.mjd().mjd());
+        log_value(NORMAL, "First event MJD", event->time().mjd());
+        log_value(NORMAL, "First event offset", gammalib::str(dt)+" s");
+        log_value(NORMAL, "F1 * dt", gammalib::str(f1)+" Hz");
+        log_value(NORMAL, "F2 * dt * dt", gammalib::str(f2)+" Hz");
+
+        // Print a warning into the log file if there are some precision
+        // concerns
+        if ((f1 > 1.0e8) || (f2 > 1.0e8)) {
+            std::string msg = "\nWARNING: Values supplied for reference MJD "
+                              "and/or F1 and/or F2 are large and may\n"
+                              "         result in numerical precision issues. "
+                              "Consider using an ephemeris derived\n"
+                              "         from a date closer to the data being "
+                              "analyzed.\n";
+            log_string(TERSE, msg);
         }
 
         // Compute the phase for all events

@@ -139,6 +139,7 @@ class Test(test):
         prob['caldb']   = self._caldb
         prob['irf']     = self._irf
         prob['edisp']   = False
+        prob['publish'] = True
         prob['logfile'] = 'ctprob_py1.log'
         prob['chatter'] = 2
 
@@ -188,6 +189,23 @@ class Test(test):
 
         # Check result file
         self._check_result_file('ctprob_py3_crab_events.fits')
+
+        # Copy ctprob tool
+        cpy_prob = prob.copy()
+
+        # Clear phase tool
+        prob.clear()
+
+        # Execute copy
+        cpy_prob['prefix']  = 'ctprob_py4_'
+        cpy_prob['outobs']  = 'ctprob_py4_obs.xml'
+        cpy_prob['logfile'] = 'ctprob_py4.log'
+        cpy_prob['chatter'] = 4
+        cpy_prob.logFileOpen()  # Needed to get a new log file
+        cpy_prob.execute()
+
+        # Check result file
+        self._check_result_file('ctprob_py4_ctprob_py3_crab_events.fits')
 
         # Return
         return
