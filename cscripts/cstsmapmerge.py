@@ -2,7 +2,7 @@
 # ==========================================================================
 # Merge Test Statistic maps
 #
-# Copyright (C) 2015-2016 Michael Mayer
+# Copyright (C) 2015-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class cstsmapmerge(ctools.cscript):
         """
         # Set name
         self._name    = 'cstsmapmerge'
-        self._version = '1.1.0'
+        self._version = ctools.__version__
 
         # Initialise class members
         self._files        = None

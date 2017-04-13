@@ -50,7 +50,7 @@ class csroot2caldb(ctools.cscript):
         """
         # Set name
         self._name    = 'csroot2caldb'
-        self._version = '1.3.0'
+        self._version = ctools.__version__
 
         # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)

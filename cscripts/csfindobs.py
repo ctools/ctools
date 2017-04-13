@@ -2,7 +2,7 @@
 # ==========================================================================
 # Find observations from an IACT data store
 #
-# Copyright (C) 2016 Michael Mayer
+# Copyright (C) 2016-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class csfindobs(ctools.cscript):
         """
         # Set name
         self._name         = 'csfindobs'
-        self._version      = '1.2.0'
+        self._version      = ctools.__version__
         self._datapath     = os.getenv('VHEFITS','')
         self._prodname     = ''
         self._select_radec = True

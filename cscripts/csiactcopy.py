@@ -44,7 +44,7 @@ class csiactcopy(ctools.cscript):
         """
         # Set name
         self._name          = 'csiactcopy'
-        self._version       = '1.2.0'
+        self._version       = ctools.__version__
         self._datapath      = os.getenv('VHEFITS','')
         self._remote_master = gammalib.GFilename()
         self._remote_base   = ''

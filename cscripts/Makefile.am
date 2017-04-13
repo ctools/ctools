@@ -32,6 +32,7 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csobsdef.py \
                 $(srcdir)/csobsinfo.py \
                 $(srcdir)/csobsselect.py \
+                $(srcdir)/csphasecrv.py \
                 $(srcdir)/cspull.py \
                 $(srcdir)/csresmap.py \
                 $(srcdir)/csroot2caldb.py  \
@@ -63,6 +64,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csobsdef.par \
            $(srcdir)/csobsinfo.par \
            $(srcdir)/csobsselect.par \
+           $(srcdir)/csphasecrv.par \
            $(srcdir)/cspull.par \
            $(srcdir)/csresmap.par \
            $(srcdir)/csroot2caldb.par \
@@ -91,6 +93,7 @@ linkscripts = cscaldb \
               csobsdef \
               csobsinfo \
               csobsselect \
+              csphasecrv \
               cspull \
               csresmap \
               csroot2caldb \
@@ -183,7 +186,8 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/iact_runlist_1.dat \
            $(top_srcdir)/test/data/iact_runlist_2.dat \
            $(top_srcdir)/test/data/model_temporal_phasecurve.xml \
-           $(top_srcdir)/test/data/model_temporal_phasecurve.fits
+           $(top_srcdir)/test/data/model_temporal_phasecurve.fits \
+           $(top_srcdir)/test/data/phased_events.fits.gz
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \

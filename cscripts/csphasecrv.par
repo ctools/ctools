@@ -27,14 +27,14 @@ outfile,   f, a, phasecrv.fits,,, "Output fits file name."
 #
 # Script parameters
 #==================
-tbinalg,   s, a, LIN,LIN|FILE,, "Algorithm for defining time bins"
+phbinalg,  s, a, LIN,LIN|FILE,, "Algorithm for defining phase bins"
 phbins,    i, a, 5,1,10000, "Number of phase bins"
 phbinfile, f, a, NONE,,, "File defining the phase binning"
 emin,      r, a, 0.1,,, "Lower energy limit of events (TeV)"
 emax,      r, a, 100.0,,, "Upper energy limit of events (TeV)"
 enumbins,  i, a, 0,0,100, "Number of energy bins for binned (0=unbinned)"
 coordsys,  s, a, CEL,CEL|GAL,, "Coordinate System"
-proj,      s, a, CAR,AIT|AZP|CAR|MER|MOL|STG|TAN,, "Projection method"
+proj,      s, a, CAR,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
 xref,      r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or galactic l)"
 yref,      r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
 nxpix,     i, a, 200,,, "Size of the X axis in pixels"
@@ -44,6 +44,7 @@ binsz,     r, a, 0.02,,, "Pixel size (deg/pixel)"
 #
 # Standard parameters
 #====================
+publish, b, h, no,,, "Publish phase curve on VO Hub?"
 chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"

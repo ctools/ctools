@@ -43,13 +43,14 @@ cscripts
 
    cscaldb --- Lists available instrument response functions <cscaldb>
    csebins --- Generates energy boundaries for stacked analysis <csebins>
-   cslightcrv --- Computes lightcurve <cslightcrv>
+   cslightcrv --- Computes light curve <cslightcrv>
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
    csmodelselect --- Select models from model definition file <csmodelselect>
    csobsdef --- Generates observation definition file <csobsdef>
    csobsinfo --- Shows observation container content <csobsinfo>
    csobsselect --- Select observations from observation definition file <csobsselect>
+   csphasecrv --- Computes phase curve <csphasecrv>
    cspull --- Generates pull distribution <cspull>
    csresmap --- Generates residual map <csresmap>
    cssens --- Computes CTA sensitivity <cssens>

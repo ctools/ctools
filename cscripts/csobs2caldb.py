@@ -2,7 +2,7 @@
 # ==========================================================================
 # Creates a calibration database entry for an IACT observation.
 #
-# Copyright (C) 2015-2016 Michael Mayer
+# Copyright (C) 2015-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class csobs2caldb(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csobs2caldb'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise members
         self._observation = gammalib.GCTAObservation()

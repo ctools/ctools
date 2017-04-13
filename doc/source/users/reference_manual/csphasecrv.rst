@@ -9,13 +9,16 @@ Computes phase dependent spectra for a given source.
 Synopsis
 --------
 
-This script computes spectra by performing a maximum likelihood fit
-using :doc:`ctlike` in a series of phase bins for pulsars.
-The phase bins can be either specified in an ASCII file, as an interval
-divided into equally sized time bins.
-The format of the ASCII file is one row per time bin, each specifying the
-start of stop value of the phase bin, separated by a whitespace. The phase 
-goes from 0.0 to 1.0 .
+This script computes spectra by performing a maximum likelihood fit using
+:doc:`ctlike` in a series of phase bins for pulsars. The phase bins can be
+either specified in an ASCII file or as an interval divided into equally sized
+phase bins. The format of the ASCII file is one row per phase bin, each
+specifying the start of stop value of the phase bin, separated by a whitespace.
+The phase goes from 0.0 to 1.0.
+
+On output the script writes the fitting results into a FITS file. The script
+also produces one XML file per phase bin that contains the fitting results for
+that bin.
 
 
 General parameters
@@ -25,10 +28,10 @@ General parameters
     Input event list or observation definition XML file.
 
 ``inmodel [file]``
-    Input model XML file.
+    Input model definition XML file.
 
 ``srcname [string]``
-    Name of the periodic source in the source model XML file
+    Name of the periodic source in the source model XML file.
 
 ``caldb [string]``
     Calibration database.
@@ -40,10 +43,11 @@ General parameters
     Applies energy dispersion to response computation.
 
 ``outfile [file]``
-    Name of the XML output file. The phase intervall will be automatically appended to the name.
+    Name of the XML output file. The phase interval will be automatically
+    appended to the name.
 
-``(tbinalg = LIN) <FILE|LIN> [string]``
-    Algorithm for defining time bins.
+``phbinalg <FILE|LIN> [string]``
+    Algorithm for defining phase bins.
 
 ``phbins [integer]``
     Number of phase bins.
@@ -63,7 +67,7 @@ General parameters
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``xref [real]``
@@ -81,8 +85,12 @@ General parameters
 ``binsz [real]``
     Pixel size (in degrees/pixel).
 
+
 Standard parameters
 -------------------
+
+``(publish = no) [boolean]``
+    Specifies whether the phase curve should be published on VO Hub.
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:

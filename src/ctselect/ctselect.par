@@ -5,7 +5,6 @@
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  File:      ctselect.par                                                  #
-#  Version:   1.2.0                                                         #
 #                                                                           #
 #  Author:    Jurgen Knodlseder                                             #
 #             Jurgen.Knodlseder@irap.omp.eu                                 #
@@ -32,8 +31,8 @@ tmin,    r, a, 0.0,,, "Start time (CTA MET in seconds)"
 tmax,    r, a, 0.0,,, "End time (CTA MET in seconds)"
 emin,    r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,    r, a, 100.0,,, "Upper energy limit (TeV)"
-expr,    s, h, "",,, "Additional selection expression"
-usethres,s, h, "NONE",NONE|DEFAULT|USER,, "Energy threshold type"
+expr,    s, h, ,,, "Additional selection expression"
+usethres,s, h, NONE,NONE|DEFAULT|USER,, "Energy threshold type"
 
 #
 # Standard parameters

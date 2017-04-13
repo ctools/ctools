@@ -47,7 +47,7 @@ class cstsmapsplit(ctools.cscript):
 
         # Set name and version
         self._name    = 'cstsmapsplit'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Set data members
         self._outmap       = gammalib.GFilename()

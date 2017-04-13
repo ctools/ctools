@@ -2,7 +2,7 @@
 # ==========================================================================
 # Show the content of the ctools calibration database
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2014-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class cscaldb(ctools.cscript):
         """
         # Set name
         self._name    = 'cscaldb'
-        self._version = '1.1.0'
+        self._version = ctools.__version__
 
         # Initialise application by calling the appropriate class
         # constructor.

@@ -40,7 +40,7 @@ class csebins(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csebins'
-        self._version = '1.0.0'
+        self._version = ctools.__version__
 
         # Set members
         self._ebounds = gammalib.GEbounds()

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Executes analysis workflow
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ class csworkflow(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csworkflow'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Set members
         self._workflow = gammalib.GXml()

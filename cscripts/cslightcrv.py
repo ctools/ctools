@@ -69,7 +69,7 @@ class cslightcrv(ctools.cscript):
         """
         # Set name
         self._name    = 'cslightcrv'
-        self._version = '1.3.0'
+        self._version = ctools.__version__
 
         # Initialise some members
         self._srcname = ''
@@ -509,11 +509,7 @@ class cslightcrv(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1(gammalib.number('Input observation',len(self._obs)))
-            self._log(str(self._obs))
-            self._log('\n')
+        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
 
         # Get time boundaries
         tmin = self._tbins.tstart(0)

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Dump information about observation into log file
 #
-# Copyright (C) 2015-2016 Michael Mayer
+# Copyright (C) 2015-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class csobsinfo(ctools.cscript):
         """
         # Set name
         self._name    = 'csobsinfo'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise class members
         self._obj_dir        = None

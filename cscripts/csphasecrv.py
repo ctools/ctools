@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Generates pulsar spectra as a function of phase
+# Generates spectra as a function of phase
 #
-# Copyright (C) 2014-2017 Rolf Buehler
+# Copyright (C) 2017 Rolf Buehler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,22 +29,22 @@ from cscripts import obsutils
 # ================ #
 class csphasecrv(ctools.cscript):
     """
-    Generates a spectra in phase bins
+    Generates spectra in phase bins
 
     This script computes spectra by performing a maximum likelihood fit
-    using :doc:`ctlike` in a series of phase bins for pulsars.
-    The phase bins can be either specified in an ASCII file, as an interval
-    divided into equally sized phase bins. 
+    using :doc:`ctlike` in a series of phase bins for pulsars. The phase bins
+    can be either specified in an ASCII file or as an interval divided into
+    equally sized phase bins.
 
     Examples:
-            >>> phrv = csphasecrv()
-            >>> phrv.run()
+            >>> phcrv = csphasecrv()
+            >>> phcrv.run()
             >>> ... (querying for parameters) ...
-            >>> phrv = phrv.phasecrv()
+            >>> phcrv = phrv.phasecrv()
                 Generates phase fits and retrieves dictionary with best fit models.
 
-            >>> lcrv = csphasecrv(obs)
-            >>> lcrv.execute()
+            >>> phcrv = csphasecrv(obs)
+            >>> phcrv.execute()
             >>> ... (querying for parameters) ...
                 Generates phase fits from the observations 
                 and saves results in XML files.
@@ -57,13 +57,14 @@ class csphasecrv(ctools.cscript):
         """
         # Set name
         self._name    = 'csphasecrv'
-        self._version = '1.0.0'
+        self._version = ctools.__version__
 
-        # Initialise some members
+        # Initialise some members. Phases are stored in a nested list
+        # [[ph1min,ph1max], [ph2min,ph2max],..]
         self._srcname = ''
-        # Phases are stored in a nested list [[ph1min,ph1max], [ph2min,ph2max],..]
-        self._phbins  = [[0.0,1.0]]   
+        self._phbins  = [[0.0,1.0]]
         self._stacked = False
+        self._fits    = gammalib.GFits()
 
         # Initialise observation container from constructor arguments.
         self._obs, argv = self._set_input_obs(argv)
@@ -144,7 +145,7 @@ class csphasecrv(ctools.cscript):
         # Get algorithm to use for defining the time intervals. Possible
         # values are "FILE" or "LIN". This is enforced at
         # parameter file level, hence no checking is needed.
-        algorithm = self['tbinalg'].string()
+        algorithm = self['phbinalg'].string()
 
         # If the algorithm is "FILE" then handle a FITS or an ASCII file for
         # the time bin definition
@@ -173,8 +174,8 @@ class csphasecrv(ctools.cscript):
             # Compute time step and setup the GTIs
             ph_step = 1.0 / float(nbins)
             for i in range(nbins):
-                phmin = i *ph_step
-                phmax = (i+1)*ph_step
+                phmin = i     * ph_step
+                phmax = (i+1) * ph_step
                 phbins.append([phmin,phmax])
 
         # Return Good Time Intervals
@@ -252,6 +253,168 @@ class csphasecrv(ctools.cscript):
         # Return new oberservation container
         return new_obs
 
+    def _get_free_par_names(self):
+        """
+        Return list of free parameter names
+
+        Returns
+        -------
+        names : list of str
+            List of free parameter names.
+        """
+        # Initialise empty list of free parameter names
+        names = []
+
+        # Collect list of free parameter names
+        for par in self._obs.models()[self._srcname]:
+            if par.is_free():
+                names.append(par.name())
+
+        # Return names
+        return names
+
+    def _create_fits_table(self, results):
+        """
+        Creates FITS binary table containing light curve results
+
+        Parameters
+        ----------
+        results : list of dict
+            List of result dictionaries
+
+        Returns
+        -------
+        table : `~gammalib.GFitsBinTable`
+            FITS binary table containing light curve
+        """
+        # Determine number of rows in FITS table
+        nrows = len(results)
+
+        # Create FITS Table with extension "PHASECURVE"
+        table = gammalib.GFitsBinTable(nrows)
+        table.extname('PHASECURVE')
+
+        # Append phase columns "PHASE_MIN" and "PHASE_MAX"
+        phmin = gammalib.GFitsTableDoubleCol('PHASE_MIN', nrows)
+        phmax = gammalib.GFitsTableDoubleCol('PHASE_MAX', nrows)
+        for i, result in enumerate(results):
+            phmin[i] = result['phmin']
+            phmax[i] = result['phmax']
+        table.append(phmin)
+        table.append(phmax)
+
+        # Create parameter columns
+        for par in self._obs.models()[self._srcname]:
+            if par.is_free():
+                name   = par.name()
+                e_name = 'e_'+par.name()
+                col    = gammalib.GFitsTableDoubleCol(name, nrows)
+                e_col  = gammalib.GFitsTableDoubleCol(e_name, nrows)
+                col.unit(par.unit())
+                e_col.unit(par.unit())
+                for i, result in enumerate(results):
+                    col[i]   = result['values'][name]
+                    e_col[i] = result['values'][e_name]
+                table.append(col)
+                table.append(e_col)
+
+        # Return table
+        return table
+
+    def _create_fits(self):
+        """
+        Create FITS file object from fit results
+        """
+        # Initialise list of result dictionaries
+        results = []
+
+        # Get source parameters
+        pars = self._get_free_par_names()
+
+        # Loop over time bins
+        for i in range(len(self._phbins)):
+
+            # Get time boundaries
+            phmin = self._phbins[i][0]
+            phmax = self._phbins[i][1]
+
+            # Initialise result dictionary
+            result = {'phmin': phmin,
+                      'phmax': phmax,
+                      'pars': pars,
+                      'values': {}}
+            
+            # Store fit results
+            phname = str(phmin)+'-'+str(phmax)
+            source = self._fitmodels[phname][self._srcname]
+            for par in pars:
+                result['values'][par]      = source[par].value()
+                result['values']['e_'+par] = source[par].error()
+            
+            # Append result to list of dictionaries
+            results.append(result)
+            
+        # Create FITS table from results
+        table = self._create_fits_table(results)
+
+        # Create FITS file and append FITS table to FITS file
+        self._fits = gammalib.GFits()
+        self._fits.append(table)
+        
+        # Return
+        return
+
+    def _save_fits(self):
+        """
+        Saved phase fit results into a fits file
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save phase FITS file')
+
+        # Create FITS file
+        self._create_fits()
+
+        # Get file name
+        outfile = self['outfile'].filename()
+
+        # Log file name
+        self._log_value(gammalib.NORMAL, 'Phase curve file', outfile.url())
+
+        # Save to fits
+        self._fits.saveto(outfile, self._clobber())
+        
+        # Return
+        return
+
+    def _save_xml(self):
+        """
+        Save phase fit results into one XML model each bin
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save phase XML files')
+
+        # Get file name
+        outname = self['outfile'].filename()
+
+        # Loop over all phase bins
+        for phbin in self._phbins:
+
+            # Set file name for phase bin
+            phname        = str(phbin[0])+'-'+str(phbin[1])
+            replace_name  = '_phase_'+phname+'.xml'
+            outname_phase = (outname.file()).replace('.fits', replace_name)
+            outfile       = outname.path() + outname_phase
+
+            # Save XML file
+            self._fitmodels[phname].save(outfile)
+
+            # Log file name
+            name = 'Phase [%s] file' % phname
+            self._log_value(gammalib.NORMAL, name, outfile)
+        
+        # Return
+        return
+
 
     # Public methods
     def run(self):
@@ -264,24 +427,26 @@ class csphasecrv(ctools.cscript):
         
         # Get parameters
         self._get_parameters()
-        
+
         # Write observation into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1(gammalib.number('Input observation',len(self._obs)))
-            self._log(str(self._obs))
-            self._log('\n')
-                
-        #Store and clear observations to split them in phase
+        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
+        
+        # Store and clear observations to split them into phase bins
         orig_obs = self._obs.copy()
-        #self._obs.clear()
         
-        #Dictionary to save phase fitted models
+        # Dictionary to save phase fitted models
         self._fitmodels = {}
-        
-        #Loop over all phases
+
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Generate phase curve')
+
+        # Loop over all phases
         for phbin in self._phbins:
-            
+
+            # Write time bin into header
+            if self._logTerse():
+                self._log.header2('PHASE '+str(phbin[0])+'-'+str(phbin[1]))
+
             # Select events
             select = ctools.ctselect(orig_obs)
             select['emin'] = self['emin'].real()
@@ -291,13 +456,13 @@ class csphasecrv(ctools.cscript):
             select['rad']  = 'UNDEFINED'
             select['ra']   = 'UNDEFINED'
             select['dec']  = 'UNDEFINED'
-            select['expr'] = "PHASE>"+str(phbin[0])+" && PHASE<"+str(phbin[1])
+            select['expr'] = 'PHASE>'+str(phbin[0])+' && PHASE<'+str(phbin[1])
             select.run()
             
-            #Add phase to observation id
+            # Add phase to observation id
             for i in range(0,select.obs().size()):
                 oldid = select.obs()[i].id()
-                select.obs()[i].id(oldid+"_"+str(phbin[0])+"-"+str(phbin[1]))
+                select.obs()[i].id(oldid+'_'+str(phbin[0])+'-'+str(phbin[1]))
             obs = select.obs()
             
             # If a stacked analysis is requested then bin the events
@@ -318,15 +483,18 @@ class csphasecrv(ctools.cscript):
             # Renormalize models to phase selection
             # TODO move the scaling from the temporal to the spectral component
             for model in like.obs().models():
-                scaled_norm = model["Normalization"].value()/(phbin[1] - phbin[0])
-                model["Normalization"].value(scaled_norm)
+                scaled_norm = model['Normalization'].value()/(phbin[1] - phbin[0])
+                model['Normalization'].value(scaled_norm)
             
-            #Store fit model
-            self._fitmodels[str(phbin[0])+"-"+str(phbin[1])] = like.obs().models().copy()
+            # Store fit model
+            self._fitmodels[str(phbin[0])+'-'+str(phbin[1])] = like.obs().models().copy()
 
-            ## Store observations
-            #for ob in select.obs():
-                #self._obs.append(ob.copy())
+        # Create FITS file
+        self._create_fits()
+
+        # Optionally publish light curve
+        if self['publish'].boolean():
+            self.publish()
 
         # Return
         return
@@ -350,170 +518,56 @@ class csphasecrv(ctools.cscript):
         # Return
         return
 
-    def saveXML(self):
-        """
-        Save phase fits into one XML model each
-        """
-        # Write header
-        self._log_header1(gammalib.TERSE, 'Save phase XML')
-
-        # Get out filename
-        outfile = str()
-
-        # Save XMLs
-        for phbin in self._phbins:
-            phname = str(phbin[0])+"-"+str(phbin[1])
-            outname = self['outfile'].filename()
-            outname_ph = (outname.file()).replace(".fits","_ph_"+phname+".xml")
-            outfile = outname.path()+outname_ph
-            print outfile
-            self._fitmodels[phname].save(outfile)
-        
-        # Return
-        return
-    
     def save(self):
         """
         Saves results to fits and XML
         """
-        print "SAVING"
-        self.savefits()
-        self.saveXML()
+        # Save results to FITS
+        self._save_fits()
+
+        # Save results to XML files (one per phase bin)
+        self._save_xml()
         
         # Return
         return
 
-    def phaserv(self):
+    def publish(self, name=''):
+        """
+        Publish phase curve
+
+        Parameters
+        ----------
+        name : str, optional
+            Name of phase curve
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Publish phase curve')
+
+        # Continue only if light curve is valid
+        if self._fits.contains('PHASECURVE'):
+
+            # Set default name is user name is empty
+            if not name:
+                user_name = self._name
+            else:
+                user_name = name
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Phase curve name', user_name)
+
+            # Publish phase curve
+            self._fits.publish('PHASECURVE', user_name)
+
+        # Return
+        return
+
+    def phasecurve(self):
         """
         Return dictionary with best fit models
         """
         # Return
         return self._fitmodels
 
-    def _get_free_par_names(self):
-        """
-        Return list of free parameter names
-
-        Returns
-        -------
-        names : list of str
-            List of free parameter names.
-        """
-        # Initialise empty list of free parameter names
-        names = []
-
-        # Collect list of free parameter names
-        for par in self._obs.models()[self._srcname]:
-            if par.is_free():
-                names.append(par.name())
-
-        # Return names
-        return names
-
-    def savefits(self):
-        """
-        Saved phase fit results to a fits file
-        """
-        # Initialise list of result dictionaries
-        results = []
-
-        # Get source parameters
-        pars = self._get_free_par_names()
-
-        # Loop over time bins
-        for i in range(len(self._phbins)):
-
-            # Get time boundaries
-            phmin = self._phbins[i][0]
-            phmax = self._phbins[i][1]
-
-            # Write time bin into header
-            if self._logTerse():
-                self._log.header2('PHASE '+str(phmin)+'-'+str(phmax))
-
-            # Initialise result dictionary
-            result = {'phmin': phmin,
-                      'phmax': phmax,
-                      'pars': pars,
-                      'values': {}}
-                        # Extract parameter values
-            
-            #Store fit results
-            phname = str(phmin)+"-"+str(phmax)
-            source = self._fitmodels[phname][self._srcname]
-            for par in pars:
-                result['values'][par]      = source[par].value()
-                result['values']['e_'+par] = source[par].error()
-            
-            # Append result to list of dictionaries
-            results.append(result)
-            
-        # Create FITS table from results
-        table = self._create_fits_table(results)
-
-        # Create FITS file and append FITS table to FITS file
-        self._fits = gammalib.GFits()
-        self._fits.append(table)
-
-        # Save to fits
-        outfile = self['outfile'].filename()
-        print outfile
-        self._fits.saveto(outfile, self._clobber())
-        
-        #Return
-        return
-
-    def _create_fits_table(self, results):
-        """
-        Creates FITS binary table containing light curve results
-
-        Parameters
-        ----------
-        results : list of dict
-            List of result dictionaries
-
-        Returns
-        -------
-        table : `~gammalib.GFitsBinTable`
-            FITS binary table containing light curve
-        """
-        # Determine number of rows in FITS table
-        nrows = len(results)
-
-        # Create FITS Table with extension "LIGHTCURVE"
-        table = gammalib.GFitsBinTable(nrows)
-        table.extname('PHASESPEC')
-
-        # Append time columns "MJD" and "e_MJD"
-        phmin   = gammalib.GFitsTableDoubleCol('PHMIN', nrows)
-        phmax = gammalib.GFitsTableDoubleCol('PHMAX', nrows)
-        #mjd.unit('days')
-        #e_mjd.unit('days')
-        for i, result in enumerate(results):
-            phmin[i]   = result['phmin']
-            phmax[i]   = result['phmax']
-        table.append(phmin)
-        table.append(phmax)
-
-        # Create parameter columns
-        for par in self._obs.models()[self._srcname]:
-            if par.is_free():
-                name   = par.name()
-                e_name = 'e_'+par.name()
-                col    = gammalib.GFitsTableDoubleCol(name, nrows)
-                e_col  = gammalib.GFitsTableDoubleCol(e_name, nrows)
-                col.unit(par.unit())
-                e_col.unit(par.unit())
-                for i, result in enumerate(results):
-                    col[i]   = result['values'][name]
-                    e_col[i] = result['values'][e_name]
-                table.append(col)
-                table.append(e_col)
-
-        # Return table
-        return table
-
-        
         
 # ======================== #
 # Main routine entry point #

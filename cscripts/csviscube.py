@@ -2,7 +2,7 @@
 # ==========================================================================
 # Compute a visibility cube
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class csviscube(ctools.cscript):
         """
         # Set name
         self._name    = 'csviscube'
-        self._version = '1.0.0'
+        self._version = ctools.__version__
 
         # Initialise members
         self._cube = gammalib.GSkyMap()

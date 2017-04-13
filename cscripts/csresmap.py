@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates a residual map.
 #
-# Copyright (C) 2014-2016 Michael Mayer
+# Copyright (C) 2014-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class csresmap(ctools.cscript):
         """
         # Set name
         self._name    = 'csresmap'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise class members
         self._resmap       = None

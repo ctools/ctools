@@ -78,7 +78,7 @@ General parameters
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
-``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
+``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``emin [real]``

@@ -50,7 +50,7 @@ class cssens(ctools.cscript):
         """
         # Set name
         self._name    = 'cssens'
-        self._version = '1.3.0'
+        self._version = ctools.__version__
 
         # Initialise class members
         self._ebounds     = gammalib.GEbounds()

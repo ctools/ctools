@@ -2,7 +2,7 @@
 # ==========================================================================
 # This script generates the pull distribution for all model parameters.
 #
-# Copyright (C) 2011-2016 Juergen Knoedlseder
+# Copyright (C) 2011-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class cspull(ctools.cscript):
         """
         # Set name
         self._name    = 'cspull'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise some members
         self._edisp       = False

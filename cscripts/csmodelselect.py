@@ -2,7 +2,7 @@
 # ==========================================================================
 # Selects model from a model definition XML file
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class csmodelselect(ctools.cscript):
         """
         # Set name
         self._name    = 'csmodelselect'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise observation container from constructor arguments
         self._obs, argv = self._set_input_obs(argv)

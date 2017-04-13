@@ -2,7 +2,7 @@
 # ==========================================================================
 # Generates an IACT observation definition XML file.
 #
-# Copyright (C) 2015-2016 Michael Mayer
+# Copyright (C) 2015-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class csiactobs(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csiactobs'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise some members
         self._obs              = gammalib.GObservations()

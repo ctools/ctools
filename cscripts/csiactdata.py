@@ -2,7 +2,7 @@
 # ==========================================================================
 # Inspect an IACT data storage
 #
-# Copyright (C) 2015-2016 Michael Mayer
+# Copyright (C) 2015-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class csiactdata(ctools.cscript):
         """
         # Set name
         self._name        = 'csiactdata'
-        self._version     = '1.1.0'
+        self._version     = ctools.__version__
         self._datapath    = os.getenv('VHEFITS','')
         self._prodnames   = []
         self._master_indx = ''

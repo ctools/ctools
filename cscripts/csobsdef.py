@@ -86,7 +86,7 @@ class csobsdef(ctools.cscript):
         """
         # Set name and version
         self._name    = 'csobsdef'
-        self._version = '1.3.0'
+        self._version = ctools.__version__
 
         # Initialise class members
         self._obs    = gammalib.GObservations()

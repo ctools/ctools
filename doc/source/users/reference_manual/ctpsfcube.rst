@@ -87,15 +87,15 @@ General parameters
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
  	 	 
+``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
+    Projection method.
+
 ``xref [real]``
     Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
  	 	 
 ``yref [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
  	 	 
-``proj <AIT|AZP|CAR|MER|MOL|STG|TAN> [string]``
-    Projection method.
-
 ``(amax = 0.3) [real]``
     Upper bound of angular separation between true and measued photon
     direction (in degrees).
