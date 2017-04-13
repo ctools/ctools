@@ -34,6 +34,7 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_RUN                                               "ctselect::run()"
+#define G_GET_PARAMETERS                         "ctselect::get_parameters()"
 #define G_SELECT_EVENTS          "ctselect::select_events(GCTAObservation*, "\
                                   "std::string&, std::string&, std::string&)"
 #define G_SET_EBOUNDS    "ctselect::set_ebounds(GCTAObservation*, GEbounds&)"
@@ -481,9 +482,12 @@ void ctselect::init_members(void)
     m_gtiname.clear();
     m_timemin.clear();
     m_timemax.clear();
-    m_select_energy = true;
-    m_select_roi    = true;
-    m_select_time   = true;
+    m_phasemin.clear();
+    m_phasemax.clear();
+    m_select_energy = false;
+    m_select_roi    = false;
+    m_select_time   = false;
+    m_select_phase  = false;
 
     // Return
     return;
@@ -516,9 +520,12 @@ void ctselect::copy_members(const ctselect& app)
     m_gtiname       = app.m_gtiname;
     m_timemin       = app.m_timemin;
     m_timemax       = app.m_timemax;
+    m_phasemin      = app.m_phasemin;
+    m_phasemax      = app.m_phasemax;
     m_select_energy = app.m_select_energy;
     m_select_roi    = app.m_select_roi;
     m_select_time   = app.m_select_time;
+    m_select_phase  = app.m_select_phase;
 
     // Return
     return;
@@ -548,9 +555,10 @@ void ctselect::free_members(void)
 void ctselect::get_parameters(void)
 {
     // Initialise selection flags
-    m_select_energy = true;
-    m_select_roi    = true;
-    m_select_time   = true;
+    m_select_energy = false;
+    m_select_roi    = false;
+    m_select_time   = false;
+    m_select_phase  = false;
 
     // Setup observations from "inobs" parameter. Do not request response
     // information and do not accept counts cubes.
@@ -563,7 +571,7 @@ void ctselect::get_parameters(void)
     m_roi        = get_roi();
     m_select_roi = m_roi.is_valid();
 
-    // Check for sanity of time selection parameters
+    // Get time selection parameters
     if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
 
         // Get User parameters
@@ -578,19 +586,109 @@ void ctselect::get_parameters(void)
             m_select_time = true;
         }
     }
-    else {
-        m_select_time = false;
-    }
 
-    // Check for sanity of energy selection parameters
+    // Get energy selection parameters
     if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
         m_emin          = (*this)["emin"].real();
         m_emax          = (*this)["emax"].real();
         m_select_energy = true;
     }
-    else {
-        m_select_energy = false;
-    }
+
+    // Get phase selection string
+    std::string phase_expr = gammalib::strip_whitespace(gammalib::tolower(
+                                       (*this)["phase"].string()));
+
+    // Get phase selection parameters
+    if ((phase_expr.length() > 0) && (phase_expr != "none")) {
+
+        // Get phase selection string
+        std::string phase_expr = (*this)["phase"].string();
+
+        // Extract phase bins from selection string
+        std::vector<std::string> phase_splits = gammalib::split(phase_expr, ",");
+        for (int i = 0; i < phase_splits.size(); ++i) {
+
+            // Get minimum and maximum of phase bin
+            std::vector<std::string> phase_toks =
+                                     gammalib::split(phase_splits[i], ":");
+
+            // Throw an exception if there are not two elements
+            if (phase_toks.size() != 2) {
+                std::string msg = "Invalid phase selection string \""+
+                                  phase_splits[i]+"\" encountered. The phase "
+                                  "selection string requires a minimum and "
+                                  "maximum value separated by a colon, e.g. "
+                                  "\"0.3:0.5\".";
+                throw GException::invalid_value(G_GET_PARAMETERS, msg);
+            }
+
+            // Throw an exception if one of the elements is empty
+            if (gammalib::strip_whitespace(phase_toks[0]).length() == 0) {
+                std::string msg = "Invalid phase selection string \""+
+                                  phase_splits[i]+"\" encountered. The phase "
+                                  "selection string requires a minimum and "
+                                  "maximum value separated by a colon, e.g. "
+                                  "\"0.3:0.5\".";
+                throw GException::invalid_value(G_GET_PARAMETERS, msg);
+            }
+            if (gammalib::strip_whitespace(phase_toks[1]).length() == 0) {
+                std::string msg = "Invalid phase selection string \""+
+                                  phase_splits[i]+"\" encountered. The phase "
+                                  "selection string requires a minimum and "
+                                  "maximum value separated by a colon, e.g. "
+                                  "\"0.3:0.5\".";
+                throw GException::invalid_value(G_GET_PARAMETERS, msg);
+            }
+
+            // Get phase bin boundaries
+            double phase_min = gammalib::todouble(phase_toks[0]);
+            double phase_max = gammalib::todouble(phase_toks[1]);
+
+            // Throw an exception if phase minimum or maximum is outside the
+            // range [0,1]
+            if (phase_min < 0.0 || phase_min > 1.0) {
+                std::string msg = "Phase minimum "+gammalib::str(phase_min)+
+                                  " outside the valid range [0,1]. Please "
+                                  "specify phase interval boundaries comprised "
+                                  "within 0 and 1.";
+                throw GException::invalid_value(G_GET_PARAMETERS, msg);
+            }
+            if (phase_max < 0.0 || phase_max > 1.0) {
+                std::string msg = "Phase maximum "+gammalib::str(phase_max)+
+                                  " outside the valid range [0,1]. Please "
+                                  "specify phase interval boundaries comprised "
+                                  "within 0 and 1.";
+                throw GException::invalid_value(G_GET_PARAMETERS, msg);
+            }
+
+            // If phase minimum is smaller than phase maximum then append a
+            // single interval
+            if (phase_min < phase_max) {
+                m_phasemin.push_back(phase_min);
+                m_phasemax.push_back(phase_max);
+            }
+
+            // Otherwise if the phase minimum is larger than the maximum then
+            // consider this a wrap around interval and append one interval
+            // from phase minimum to 1 and another interval from 0 to phase
+            // maximum
+            else if (phase_min > phase_max) {
+                if (phase_min < 1.0) {
+                    m_phasemin.push_back(phase_min);
+                    m_phasemax.push_back(1.0);
+                }
+                if (phase_max > 0.0) {
+                    m_phasemin.push_back(0.0);
+                    m_phasemax.push_back(phase_max);
+                }
+            }
+
+        } // endfor: looped over phase selection string
+
+        // Signal that a phase selection information is available
+        m_select_phase = (m_phasemin.size() > 0);
+
+    } // endif: phase selection parameters were valid
 
     // Get other User parameters
     m_expr     = (*this)["expr"].string();
@@ -721,6 +819,54 @@ void ctselect::select_events(GCTAObservation*   obs,
                   gammalib::str(tmin)+" - "+gammalib::str(tmax)+" s");
 
     } // endif: made time selection
+
+    // Make phase selection
+    if (m_select_phase) {
+
+        // Check if event_list has phase
+        if (list->has_phase()) { 
+
+            // Loop over phase selections
+            for (int i = 0; i < m_phasemin.size(); ++i) {
+
+                // Check if phasemax is larger than phasemin
+                if (i == 0) {
+                    selection += add + "( ";
+                }
+                else {
+                    selection += add;
+                }
+
+                // Format phase with sufficient accuracy and add to selection string
+                char cmin[80];
+                char cmax[80];
+                sprintf(cmin, "%.8f", m_phasemin[i]);
+                sprintf(cmax, "%.8f", m_phasemax[i]);
+                selection += "(PHASE >= "+std::string(cmin)+" && PHASE <= "+
+                             std::string(cmax)+")";
+                add        = " || ";
+                log_value(NORMAL, "Phase range "+gammalib::str(i+1),
+                                  gammalib::str(m_phasemin[i])+" - "+
+                                  gammalib::str(m_phasemax[i]));
+
+            } // end for loop
+
+            // If phase intervals have been appended then close the selection
+            // string and take provision for appending another selection
+            if (m_phasemin.size() > 0) {
+                selection += " )";
+                add        = " && ";
+            }
+
+        } // endif: there was PHASE information in the event list
+
+        // Otherwise signal that no PHASE information is available
+        else {
+            log_value(NORMAL, "Phase range", "Event list has no \"PHASE\" "
+                              "column. Phase selection skipped.");
+        }
+
+    } // endif: made phase selection
 
     // Make energy selection
     if (m_select_energy) {

@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the ctselect tool.
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2014-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ class Test(test):
         test.__init__(self)
 
         # Set test data
+        self._phased_events  = self._datadir + '/phased_events.fits'
         self._invalid_events = self._datadir + '/invalid_event_list.fits'
 
         # Return
@@ -355,7 +356,136 @@ class Test(test):
         select.execute()
 
         # Check result file
-        self._check_result_file('ctselect_py10.fits', nevents=0, dec=-22.01, rad=5.0)
+        self._check_result_file('ctselect_py10.fits', nevents=0, dec=-22.01,
+                                rad=5.0)
+
+        # Now test phase cut
+        select = ctools.ctselect()
+        select['inobs']   = self._phased_events
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 5.0
+        select['tmin']    = 'INDEF'
+        select['tmax']    = 'INDEF'
+        select['emin']    = 0.1
+        select['emax']    = 100.0
+        select['phase']   = '0.1:0.4,0.6:0.8'
+        select['outobs']  = 'ctselect_py11.fits'
+        select['logfile'] = 'ctselect_py11.log'
+        select['chatter'] = 2
+
+        # Run ctselect tool
+        select.logFileOpen()   # Make sure we get a log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py11.fits', nevents=1909, rad=5.0)
+
+        # Now test anoother phase cut
+        select = ctools.ctselect()
+        select['inobs']   = self._phased_events
+        select['ra']      = 83.63
+        select['dec']     = 22.01
+        select['rad']     = 5.0
+        select['tmin']    = 'INDEF'
+        select['tmax']    = 'INDEF'
+        select['emin']    = 0.1
+        select['emax']    = 100.0
+        select['phase']   = '0.8:0.3'
+        select['outobs']  = 'ctselect_py12.fits'
+        select['logfile'] = 'ctselect_py12.log'
+        select['chatter'] = 2
+
+        # Run ctselect tool
+        select.logFileOpen()   # Make sure we get a log file
+        select.execute()
+
+        # Check result file
+        self._check_result_file('ctselect_py12.fits', nevents=1995, rad=5.0)
+
+        # Test invalid minimum phase value
+        self.test_try('Test invalid minimum phase value')
+        try:
+            select['phase']   = '-0.1:0.3'
+            select['outobs']  = 'ctselect_py13.fits'
+            select['logfile'] = 'ctselect_py13.log'
+            select.logFileOpen()
+            select.execute()
+            self.test_try_failure('Exception not thrown for "-0.1:0.3"')
+        except ValueError:
+            self.test_try_success()
+
+        # Test invalid minimum phase value
+        self.test_try('Test invalid minimum phase value')
+        try:
+            select['phase']   = '1.1:0.3'
+            select['outobs']  = 'ctselect_py14.fits'
+            select['logfile'] = 'ctselect_py14.log'
+            select.logFileOpen()
+            select.execute()
+            self.test_try_failure('Exception not thrown for "1.1:0.3"')
+        except ValueError:
+            self.test_try_success()
+
+        # Test invalid maximum phase value
+        self.test_try('Test invalid maximum phase value')
+        try:
+            select['phase']   = '0.1:-0.3'
+            select['outobs']  = 'ctselect_py15.fits'
+            select['logfile'] = 'ctselect_py15.log'
+            select.logFileOpen()
+            select.execute()
+            self.test_try_failure('Exception not thrown for "0.1:-0.3"')
+        except ValueError:
+            self.test_try_success()
+
+        # Test invalid maximum phase value
+        self.test_try('Test invalid maximum phase value')
+        try:
+            select['phase']   = '0.1:1.1'
+            select['outobs']  = 'ctselect_py16.fits'
+            select['logfile'] = 'ctselect_py16.log'
+            select.logFileOpen()
+            select.execute()
+            self.test_try_failure('Exception not thrown for "0.1:1.1"')
+        except ValueError:
+            self.test_try_success()
+
+        # Test invalid phase string
+        self.test_try('Test invalid phase string')
+        try:
+            select['phase']   = '0.1:'
+            select['outobs']  = 'ctselect_py17.fits'
+            select['logfile'] = 'ctselect_py17.log'
+            select.logFileOpen()
+            select.execute()
+            self.test_try_failure('Exception not thrown for "0.1:"')
+        except ValueError:
+            self.test_try_success()
+
+        # Test invalid phase string
+        self.test_try('Test invalid phase string')
+        try:
+            select['phase']   = ':1.0'
+            select['outobs']  = 'ctselect_py18.fits'
+            select['logfile'] = 'ctselect_py18.log'
+            select.logFileOpen()
+            select.execute()
+            self.test_try_failure('Exception not thrown for ":1.0"')
+        except ValueError:
+            self.test_try_success()
+
+        # Test invalid phase string
+        self.test_try('Test invalid phase string')
+        try:
+            select['phase']   = '0.1-1.0'
+            select['outobs']  = 'ctselect_py19.fits'
+            select['logfile'] = 'ctselect_py19.log'
+            select.logFileOpen()
+            select.execute()
+            self.test_try_failure('Exception not thrown for "0.1-1.0"')
+        except ValueError:
+            self.test_try_success()
 
         # Return
         return

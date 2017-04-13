@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-11 April 2017
+13 April 2017
 
 
 Introduction
@@ -47,7 +47,12 @@ Now, for map cubes outside the RoI the flux is set to zero.
 
 ctselect - CTA event selection
 ------------------------------
-None
+A "phase" parameter has been added to ctselect to allow event selection
+according to their phase information. The phase parameter accepts a
+string that provides a comma separated list of phase intervals in the
+format "0.1:0.4,0.6:0.8". Wrap around is supported (e.g. "0.8:0.1"
+selects events with phases in the intervals [0.8,1.0] and [0.0,0.1]
+(#1996).
 
 
 ctbin - CTA event binning

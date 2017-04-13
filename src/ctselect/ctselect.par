@@ -31,6 +31,7 @@ tmin,    r, a, 0.0,,, "Start time (CTA MET in seconds)"
 tmax,    r, a, 0.0,,, "End time (CTA MET in seconds)"
 emin,    r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,    r, a, 100.0,,, "Upper energy limit (TeV)"
+phase,   s, h, NONE,,, "Phase expression in the format phasemin0:phasemax0,phasemin1:phasemax1,..."
 expr,    s, h, ,,, "Additional selection expression"
 usethres,s, h, NONE,NONE|DEFAULT|USER,, "Energy threshold type"
 

@@ -52,38 +52,47 @@ General parameters
  	 	 
 ``ra [real]``
     Right Ascension of acceptance cone (or ROI) centre (J2000, in degrees).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, not ROI
+    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no ROI
     selection will be performed.
  	 	 
 ``dec [real]``
     Declination of acceptance cone (or ROI) centre (J2000, in degrees).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, not ROI
+    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no ROI
     selection will be performed.
  	 	 
 ``rad [real]``
     Radius of acceptance cone (or ROI) centre (in degrees).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, not ROI
+    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no ROI
     selection will be performed.
  	 	 
 ``tmin [real]``
     CTA mission elapsed start time defining the earliest event (in seconds).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, not time
+    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no time
     selection will be performed.
  	 	 
 ``tmax [real]``
     CTA mission elapsed stop time defining the latest event (in seconds).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, not time
+    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no time
     selection will be performed.
  	 	 
 ``emin [real]``
     Lower energy limit of events (in TeV).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, not energy
+    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no energy
     selection will be performed.
  	 	 
 ``emax [real]``
     Upper energy limit of events (in TeV).
-    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, not energy
+    If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no energy
     selection will be performed.
+ 	 	 
+``(phase = NONE) [string]``
+    String to apply a phase selection. The string must contain the boundaries 
+    of the phase interval to be selected separated be a colon. More than one
+    interval can be specified at the same time. In this case intervals must be 
+    separated by a comma. Examples of valid strings are: phase = "0.3:0.6",
+    phase = "0.3:0.6,0.8:0.9" or phase = "0.8:0.2". In the last case, events
+    with phases in the intervals [0.8,1.0] and [0.0,0.2] are selected. If NONE
+    is passed as value, no phase selection will be performed.
  	 	 
 ``(expr = "") [string]``
     Additional event selection expression (cfitsio syntax).
