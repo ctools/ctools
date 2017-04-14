@@ -482,8 +482,7 @@ void ctselect::init_members(void)
     m_gtiname.clear();
     m_timemin.clear();
     m_timemax.clear();
-    m_phasemin.clear();
-    m_phasemax.clear();
+    m_phases.clear();
     m_select_energy = false;
     m_select_roi    = false;
     m_select_time   = false;
@@ -520,8 +519,7 @@ void ctselect::copy_members(const ctselect& app)
     m_gtiname       = app.m_gtiname;
     m_timemin       = app.m_timemin;
     m_timemax       = app.m_timemax;
-    m_phasemin      = app.m_phasemin;
-    m_phasemax      = app.m_phasemax;
+    m_phases        = app.m_phases;
     m_select_energy = app.m_select_energy;
     m_select_roi    = app.m_select_roi;
     m_select_time   = app.m_select_time;
@@ -554,6 +552,9 @@ void ctselect::free_members(void)
  ***************************************************************************/
 void ctselect::get_parameters(void)
 {
+    // Clear some members
+    m_phases.clear();
+
     // Initialise selection flags
     m_select_energy = false;
     m_select_roi    = false;
@@ -661,32 +662,13 @@ void ctselect::get_parameters(void)
                 throw GException::invalid_value(G_GET_PARAMETERS, msg);
             }
 
-            // If phase minimum is smaller than phase maximum then append a
-            // single interval
-            if (phase_min < phase_max) {
-                m_phasemin.push_back(phase_min);
-                m_phasemax.push_back(phase_max);
-            }
-
-            // Otherwise if the phase minimum is larger than the maximum then
-            // consider this a wrap around interval and append one interval
-            // from phase minimum to 1 and another interval from 0 to phase
-            // maximum
-            else if (phase_min > phase_max) {
-                if (phase_min < 1.0) {
-                    m_phasemin.push_back(phase_min);
-                    m_phasemax.push_back(1.0);
-                }
-                if (phase_max > 0.0) {
-                    m_phasemin.push_back(0.0);
-                    m_phasemax.push_back(phase_max);
-                }
-            }
+            // Append phase interval
+            m_phases.append(phase_min, phase_max);
 
         } // endfor: looped over phase selection string
 
         // Signal that a phase selection information is available
-        m_select_phase = (m_phasemin.size() > 0);
+        m_select_phase = (m_phases.size() > 0);
 
     } // endif: phase selection parameters were valid
 
@@ -827,7 +809,7 @@ void ctselect::select_events(GCTAObservation*   obs,
         if (list->has_phase()) { 
 
             // Loop over phase selections
-            for (int i = 0; i < m_phasemin.size(); ++i) {
+            for (int i = 0; i < m_phases.size(); ++i) {
 
                 // Check if phasemax is larger than phasemin
                 if (i == 0) {
@@ -840,20 +822,20 @@ void ctselect::select_events(GCTAObservation*   obs,
                 // Format phase with sufficient accuracy and add to selection string
                 char cmin[80];
                 char cmax[80];
-                sprintf(cmin, "%.8f", m_phasemin[i]);
-                sprintf(cmax, "%.8f", m_phasemax[i]);
+                sprintf(cmin, "%.8f", m_phases.pmin(i));
+                sprintf(cmax, "%.8f", m_phases.pmax(i));
                 selection += "(PHASE >= "+std::string(cmin)+" && PHASE <= "+
                              std::string(cmax)+")";
                 add        = " || ";
                 log_value(NORMAL, "Phase range "+gammalib::str(i+1),
-                                  gammalib::str(m_phasemin[i])+" - "+
-                                  gammalib::str(m_phasemax[i]));
+                                  gammalib::str(m_phases.pmin(i))+" - "+
+                                  gammalib::str(m_phases.pmax(i)));
 
             } // end for loop
 
             // If phase intervals have been appended then close the selection
             // string and take provision for appending another selection
-            if (m_phasemin.size() > 0) {
+            if (m_phases.size() > 0) {
                 selection += " )";
                 add        = " && ";
             }
@@ -1074,6 +1056,11 @@ void ctselect::select_events(GCTAObservation*   obs,
     // ... otherwise restore old Ebounds if they existed
     else if (old_ebounds.size() > 0) {
         list->ebounds(old_ebounds);
+    }
+
+    // If a phase selection has been applied set the phase boundaries
+    if (m_select_phase && list->has_phase()) {
+        list->phases(m_phases);
     }
 
     // Recompute ontime and livetime.

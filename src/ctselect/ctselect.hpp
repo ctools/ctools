@@ -99,8 +99,7 @@ protected:
     std::vector<std::string> m_gtiname;       //!< GTI extension names
     GTime                    m_timemin;       //!< Earliest time
     GTime                    m_timemax;       //!< Latest time
-    std::vector<double>      m_phasemin;      //!< Phase bin minima
-    std::vector<double>      m_phasemax;      //!< Phase bin maxima
+    GPhases                  m_phases;        //!< Phase intervals
     bool                     m_select_energy; //!< Perform energy selection
     bool                     m_select_roi;    //!< Perform RoI selection
     bool                     m_select_time;   //!< Perform time selection
