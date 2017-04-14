@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-13 April 2017
+14 April 2017
 
 
 Introduction
@@ -43,6 +43,10 @@ The tool now supports map cubes that are not overlapping with the RoI.
 In this case, no spectral nodes exist and before the spectral flux()
 method called in ctobssim::get_model_flux() was throwing an exception.
 Now, for map cubes outside the RoI the flux is set to zero.
+
+The tool now also added Monte Carlo identifiers to the simulated events
+so that each event can be traced back to the model from which it originated
+(#1483).
 
 
 ctselect - CTA event selection

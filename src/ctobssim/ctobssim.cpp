@@ -363,6 +363,9 @@ void ctobssim::run(void)
             // Simulate source events
             simulate_background(&obs_clone, models, m_rans[i], &wrklog);
 
+            // Set Monte Carlo identifier and name correspondance
+            set_mc_id_names(&obs_clone, models);
+
             // Dump simulation results
             if (logTerse()) {
                 wrklog << gammalib::parformat("MC events");
@@ -1063,7 +1066,7 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
             }
 
             // Simulate time slice
-            simulate_time_slice(obs, rsp, events, model, tstart, tstop,
+            simulate_time_slice(obs, rsp, events, model, i+1, tstart, tstop,
                                 etrue_min, etrue_max, ereco_min, ereco_max,
                                 dir, rad, area,
                                 ran, wrklog, indent,
@@ -1119,6 +1122,7 @@ void ctobssim::simulate_interval(GCTAObservation*       obs,
  * @param[in] rsp Pointer on CTA response.
  * @param[in,out] events Pointer on CTA event list.
  * @param[in] model Model.
+ * @param[in] mc_id Monte Carlo identifier of model.
  * @param[in] tstart Start time.
  * @param[in] tstop Stop time.
  * @param[in] etrue_min Minimum true energy.
@@ -1140,6 +1144,7 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
                                    const GCTAResponseIrf* rsp,
                                    GCTAEventList*         events,
                                    const GModelSky*       model,
+                                   const int&             mc_id,
                                    const GTime&           tstart,
                                    const GTime&           tstop,
                                    const GEnergy&         etrue_min,
@@ -1207,8 +1212,17 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
                 event->energy() <= ereco_max &&
                 event->time() >= tstart &&
                 event->time() <= tstop) {
+
+                // Set event identifier
                 event->event_id(m_event_id);
+
+                // Set Monte Carlo identifier
+                event->mc_id(mc_id);
+
+                // Append event
                 events->append(*event);
+
+                // Increment counters
                 m_event_id++;
                 nevents++;
             }
@@ -1216,6 +1230,9 @@ void ctobssim::simulate_time_slice(GCTAObservation*       obs,
         }
 
     } // endfor: looped over events
+
+    // Signal that event list contains Monte Carlo identifiers
+    events->has_mc_id(true);
 
     // Return
     return;
@@ -1509,6 +1526,9 @@ void ctobssim::simulate_background(GCTAObservation* obs,
                             event->event_id(m_event_id);
                             m_event_id++;
 
+                            // Set Monte Carlo identifier
+                            event->mc_id(i+1);
+
                             // Append event
                             events->append(*event);
 
@@ -1540,6 +1560,64 @@ void ctobssim::simulate_background(GCTAObservation* obs,
             } // endif: model was valid
 
         } // endfor: looped over all models
+
+        // Signal that event list contains Monte Carlo identifiers
+        events->has_mc_id(true);
+
+    } // endif: observation pointer was valid
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Set correspondance between Monte Carlo identifier and model names
+ *
+ * @param[in] obs Pointer on CTA observation.
+ * @param[in] models Models.
+ * @param[in] wrklog Pointer to logger.
+ *
+ * Sets the correspondance between Monte Carlo identifier and model names.
+ ***************************************************************************/
+void ctobssim::set_mc_id_names(GCTAObservation* obs,
+                               const GModels&   models,
+                               GLog*            wrklog)
+{
+    // Continue only if observation pointer is valid
+    if (obs != NULL) {
+
+        // If no logger is specified then use the default logger
+        if (wrklog == NULL) {
+            wrklog = &log;
+        }
+
+        // Get pointer on event list (circumvent const correctness)
+        GCTAEventList* events =
+            static_cast<GCTAEventList*>(const_cast<GEvents*>(obs->events()));
+
+        // Initialise lists
+        std::vector<int>         ids;
+        std::vector<std::string> names;
+
+        // Loop over all models
+        for (int i = 0; i < models.size(); ++i) {
+
+            // Append identifier and names
+            ids.push_back(i+1);
+            names.push_back(models[i]->name());
+
+            // Dump identifier name correspondance
+            if (logNormal()) {
+                *wrklog << gammalib::parformat("MC identifier " +
+                                               gammalib::str(i+1));
+                *wrklog << models[i]->name() << std::endl;
+            }
+
+        } // endfor: looped over all models
+
+        // Set correspondance for the event list
+        events->set_mc_id_names(ids, names);
 
     } // endif: observation pointer was valid
 

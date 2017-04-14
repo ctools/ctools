@@ -1,8 +1,9 @@
-2017-04-13
+2017-04-14
 
         * Version 1.3.0 released
         ========================
 
+        ctobssim adds Monte Carlo identifiers to simulated events (#1483)
         Add "phase" parameter to ctselect (#1996)
         Add ctphase tool (#1982)
         Add ctprob tool (#1991)

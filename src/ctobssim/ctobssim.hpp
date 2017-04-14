@@ -100,6 +100,7 @@ protected:
                                     const GCTAResponseIrf* rsp,
                                     GCTAEventList*         events,
                                     const GModelSky*       model,
+                                    const int&             mc_id,
                                     const GTime&           tstart,
                                     const GTime&           tstop,
                                     const GEnergy&         etrue_min,
@@ -129,6 +130,9 @@ protected:
                                     const GModels&   models,
                                     GRan&            ran,
                                     GLog*            wrklog = NULL);
+    void        set_mc_id_names(GCTAObservation* obs,
+                                const GModels&   models,
+                                GLog*            wrklog = NULL);
     void        save_fits(void);
     void        save_xml(void);
     std::string outfile(const int& index);
