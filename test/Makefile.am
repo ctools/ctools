@@ -34,9 +34,9 @@ endif
 # Set test environment
 TESTS_ENVIRONMENT = @RUNSHARED@=$(top_builddir)/src/.libs$(TEST_ENV_DIR):$(LIBDIR_GAMMALIB):$(@RUNSHARED@) \
                     $(TEST_PYTHON_ENV) \
-                    TEST_SRCDIR=$(abs_top_srcdir) \
-                    TEST_BUILDDIR=$(abs_top_builddir) \
-                    TEST_DATA=$(abs_top_srcdir)/test/data
+                    TEST_SRCDIR=$(top_srcdir) \
+                    TEST_BUILDDIR=$(top_builddir) \
+                    TEST_DATA=$(top_srcdir)/test/data
 
 # Tests (these are the tests to be executed)
 TESTS = $(TEST_PYTHON_CTOOLS) \
