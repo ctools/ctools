@@ -491,6 +491,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
     // Initialise binning statistics
     int num_outside_roi  = 0;
+    int num_invalid_wcs  = 0;
     int num_outside_map  = 0;
     int num_outside_ebds = 0;
     int num_in_map       = 0;
@@ -501,14 +502,23 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Get event
         const GCTAEventAtom* event = (*events)[i];
 
-        // Determine sky pixel
+        // Determine event sky direction
         GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
         GSkyDir      dir   = inst->dir();
-        GSkyPixel    pixel = m_counts.dir2pix(dir);
 
-        // Skip event if corresponding counts cube pixel is outside RoI
+        // Skip event if it is outside the RoI
         if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
             num_outside_roi++;
+            continue;
+        }
+
+        // Determine sky pixel
+        GSkyPixel pixel;
+        try {
+            pixel = m_counts.dir2pix(dir);
+        }
+        catch (const GException::wcs_invalid_phi_theta&) {
+            num_invalid_wcs++;
             continue;
         }
 
@@ -547,7 +557,8 @@ void ctbin::fill_cube(GCTAObservation* obs)
     // Log filling results
     log_value(NORMAL, "Events in list", obs->events()->size());
     log_value(NORMAL, "Events in cube", num_in_map);
-    log_value(NORMAL, "Event bins outside RoI", num_outside_roi);
+    log_value(NORMAL, "Events outside RoI", num_outside_roi);
+    log_value(NORMAL, "Events/data with invalid WCS", num_invalid_wcs);
     log_value(NORMAL, "Events outside cube area", num_outside_map);
     log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
 
