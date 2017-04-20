@@ -396,7 +396,7 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True):
 # ========================== #
 # Setup Extragalactic survey #
 # ========================== #
-def set_extgal(separation=3.0, caldb='prod2', lst=True):
+def set_egal(separation=3.0, caldb='prod2', lst=True):
     """
     Setup Extragalactic survey.
 
@@ -624,12 +624,12 @@ def make_pointings():
     # Print help if needed and exit
     if need_help:
         print('Usage: make_pointing.py [OPTIONS] [CALDB]')
-        print('     -h       Display this usage message')
-        print('     gps      Galactic plane survey (2 row scheme)')
-        print('     gps3     Galactic plane survey (3 row scheme)')
-        print('     extgal   Extragalactic survey')
-        print('     gc       Galactic centre survey')
-        print('     lmc      LMC survey')
+        print('     -h     Display this usage message')
+        print('     gps    Galactic plane survey (2 row scheme)')
+        print('     gps3   Galactic plane survey (3 row scheme)')
+        print('     egal   Extragalactic survey')
+        print('     gc     Galactic centre survey')
+        print('     lmc    LMC survey')
         sys.exit()
 
     # Set LST simulation flag to true
@@ -644,9 +644,9 @@ def make_pointings():
         write_obsdef('gps3.dat', obsdef)
 
     # Extragalactic survey
-    elif obsname == 'extgal':
-        obsdef = set_extgal(caldb=caldb, lst=lst)
-        write_obsdef('extgal.dat', obsdef)
+    elif obsname == 'egal':
+        obsdef = set_egal(caldb=caldb, lst=lst)
+        write_obsdef('egal.dat', obsdef)
 
     # Galactic centre
     elif obsname == 'gc':
