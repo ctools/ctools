@@ -292,10 +292,10 @@ void ctbin::save(void)
 
         // Save only if observation is valid
         if (obs != NULL) {
-        
+
             // Log counts cube file name
             log_value(NORMAL, "Counts cube file", m_outcube.url());
-            
+
             // Save cube
             obs->save(m_outcube, clobber());
 
@@ -517,7 +517,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
         try {
             pixel = m_counts.dir2pix(dir);
         }
-        catch (const GException::wcs_invalid_phi_theta&) {
+        catch (std::exception &e) {
             num_invalid_wcs++;
             continue;
         }
@@ -558,7 +558,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
     log_value(NORMAL, "Events in list", obs->events()->size());
     log_value(NORMAL, "Events in cube", num_in_map);
     log_value(NORMAL, "Events outside RoI", num_outside_roi);
-    log_value(NORMAL, "Events/data with invalid WCS", num_invalid_wcs);
+    log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
     log_value(NORMAL, "Events outside cube area", num_outside_map);
     log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
 
@@ -738,7 +738,7 @@ void ctbin::obs_cube(void)
 
         // Append CTA observation
         container.append(obs);
-        
+
         // Copy over all remaining non-CTA observations
         for (int i = 0; i < m_obs.size(); ++i) {
             GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
