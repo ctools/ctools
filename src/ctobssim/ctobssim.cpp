@@ -1617,7 +1617,9 @@ void ctobssim::set_mc_id_names(GCTAObservation* obs,
         } // endfor: looped over all models
 
         // Set correspondance for the event list
-        events->set_mc_id_names(ids, names);
+        if ((ids.size() > 0) && (names.size() > 0)) {
+            events->set_mc_id_names(ids, names);
+        }
 
     } // endif: observation pointer was valid
 
