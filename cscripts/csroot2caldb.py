@@ -111,34 +111,48 @@ class csroot2caldb(ctools.cscript):
                         cal_zenith, cal_azimuth]
 
         # Set IRF information
-        irf['CAL_TEL']      = 'CTA'
-        irf['CAL_INST']     = self['inst'].string().upper()
-        irf['CAL_OBSID']    = self['id'].string()
-        irf['CAL_DET']      = 'NONE'
-        irf['CAL_FLT']      = 'NONE'
-        irf['CAL_CLASS']    = 'BCF'
-        irf['CAL_TYPE']     = 'DATA'
-        irf['CAL_QUAL']     = 0            # 0=good, 1=bad, 2=dubious, ...
-        irf['CAL_DATE']     = '14/01/30'
-        irf['VAL_DATE']     = '2014-01-30'
-        irf['VAL_TIME']     = '00:00:00'
-        irf['REF_TIME']     = 51544.0
-        irf['EA_NAME']      = 'EFF_AREA'
-        irf['EA_DOC']       = 'CAL/GEN/92-019'
-        irf['EA_BOUNDS']    = copy.deepcopy(cal_bounds)
-        irf['EA_DESC']      = 'CTA effective area'
-        irf['PSF_NAME']     = 'RPSF'
-        irf['PSF_DOC']      = 'CAL/GEN/92-020'
-        irf['PSF_BOUNDS']   = copy.deepcopy(cal_bounds)
-        irf['PSF_DESC']     = 'CTA point spread function'
-        irf['EDISP_NAME']   = 'EDISP'
-        irf['EDISP_DOC']    = '???'
-        irf['EDISP_BOUNDS'] = copy.deepcopy(cal_bounds)
-        irf['EDISP_DESC']   = 'CTA energy dispersion'
-        irf['BGD_NAME']     = 'BGD'
-        irf['BGD_DOC']      = '???'
-        irf['BGD_BOUNDS']   = copy.deepcopy(cal_bounds)
-        irf['BGD_DESC']     = 'CTA background'
+        irf['CAL_TEL']        = 'CTA'
+        irf['CAL_INST']       = self['inst'].string().upper()
+        irf['CAL_OBSID']      = self['id'].string()
+        irf['CAL_DET']        = 'NONE'
+        irf['CAL_FLT']        = 'NONE'
+        irf['CAL_CLASS']      = 'BCF'
+        irf['CAL_TYPE']       = 'DATA'
+        irf['CAL_QUAL']       = 0            # 0=good, 1=bad, 2=dubious, ...
+        irf['CAL_DATE']       = '14/01/30'
+        irf['VAL_DATE']       = '2014-01-30'
+        irf['VAL_TIME']       = '00:00:00'
+        irf['REF_TIME']       = 51544.0
+        irf['EA_NAME']        = 'EFF_AREA'
+        irf['EA_HDUCLAS3']    = 'FULL-ENCLOSURE'
+        irf['EA_HDUCLAS4']    = 'AEFF_2D'
+        irf['EA_DOC']         = 'CAL/GEN/92-019'
+        irf['EA_BOUNDS']      = copy.deepcopy(cal_bounds)
+        irf['EA_DESC']        = 'CTA effective area'
+        irf['PSF_NAME']       = 'RPSF'
+        irf['PSF_HDUCLAS3']   = 'FULL-ENCLOSURE'
+        irf['PSF_HDUCLAS4']   = 'PSF_3GAUSS'
+        irf['PSF_DOC']        = 'CAL/GEN/92-020'
+        irf['PSF_BOUNDS']     = copy.deepcopy(cal_bounds)
+        irf['PSF_DESC']       = 'CTA point spread function'
+        irf['EDISP_NAME']     = 'EDISP'
+        irf['EDISP_HDUCLAS3'] = 'FULL-ENCLOSURE'
+        irf['EDISP_HDUCLAS4'] = 'EDISP_2D'
+        irf['EDISP_DOC']      = '???'
+        irf['EDISP_BOUNDS']   = copy.deepcopy(cal_bounds)
+        irf['EDISP_DESC']     = 'CTA energy dispersion'
+        irf['BGD_NAME']       = 'BGD'
+        irf['BGD_HDUCLAS3']   = 'FULL-ENCLOSURE'
+        irf['BGD_HDUCLAS4']   = 'BKG_3D'
+        irf['BGD_DOC']        = '???'
+        irf['BGD_BOUNDS']     = copy.deepcopy(cal_bounds)
+        irf['BGD_DESC']       = 'CTA background'
+
+        # Set parameter dependent IRF information
+        if self['psftype'].string() == 'King':
+            irf['PSF_HDUCLAS4'] = 'PSF_KING'
+        else:
+            irf['PSF_HDUCLAS4'] = 'PSF_3GAUSS'
 
         # Return metadata
         return irf
@@ -268,16 +282,20 @@ class csroot2caldb(ctools.cscript):
 
         # Open HDUs
         ds['HDU_EA']    = self._open_hdu(ds['EA_FITS'], "EFFECTIVE AREA",
-                                         irf['EA_NAME'], irf['EA_DOC'],
+                                         irf['EA_NAME'], irf['EA_HDUCLAS3'],
+                                         irf['EA_HDUCLAS4'], irf['EA_DOC'],
                                          irf)
         ds['HDU_PSF']   = self._open_hdu(ds['PSF_FITS'], "POINT SPREAD FUNCTION",
-                                         irf['PSF_NAME'], irf['PSF_DOC'],
+                                         irf['PSF_NAME'], irf['PSF_HDUCLAS3'],
+                                         irf['PSF_HDUCLAS4'], irf['PSF_DOC'],
                                          irf)
         ds['HDU_EDISP'] = self._open_hdu(ds['EDISP_FITS'], "ENERGY DISPERSION",
-                                         irf['EDISP_NAME'], irf['EDISP_DOC'],
+                                         irf['EDISP_NAME'], irf['EDISP_HDUCLAS3'],
+                                         irf['EDISP_HDUCLAS4'], irf['EDISP_DOC'],
                                          irf)
         ds['HDU_BGD']   = self._open_hdu(ds['BGD_FITS'], "BACKGROUND",
-                                         irf['BGD_NAME'], irf['BGD_DOC'],
+                                         irf['BGD_NAME'], irf['BGD_HDUCLAS3'],
+                                         irf['BGD_HDUCLAS4'], irf['BGD_DOC'],
                                          irf)
 
         # Return
@@ -319,7 +337,7 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
-    def _open_hdu(self, fits, extname, name, doc, irf):
+    def _open_hdu(self, fits, extname, name, hduclas3, hduclas4, doc, irf):
         """
         Open HDU
 
@@ -334,6 +352,10 @@ class csroot2caldb(ctools.cscript):
             Extension name
         name : str
             Name string
+        hduclas3 : str
+            HDU class 3 string
+        hduclas4 : str
+            HDU class 4 string
         doc : str
             Document string
         irf : dict
@@ -354,7 +376,9 @@ class csroot2caldb(ctools.cscript):
             table.extname(extname)
 
             # Set OGIP keywords
-            self._set_ogip_keywords(table, doc, ['RESPONSE', name], irf)
+            self._set_ogip_keywords(table, doc,
+                                    ['RESPONSE', name, hduclas3, hduclas4],
+                                    irf)
 
             # Append table to FITS file
             fits.append(table)
@@ -391,7 +415,7 @@ class csroot2caldb(ctools.cscript):
         for i, item in enumerate(hduclas):
             key = 'HDUCLAS%d' % (i+1)
             hdu.card(key, item, 'HDU class')
-        hdu.card('HDUVERS', '1.0.0', 'HDU version')
+        hdu.card('HDUVERS', '0.2', 'HDU version')
 
         # Return
         return
