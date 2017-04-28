@@ -139,7 +139,7 @@ def set_tmin_for_next_pointing(tmin, duration):
 # ====================== #
 def set_patch(tmin, lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
               separation=3.0, hours=100.0, run_duration=30.0,
-              site=None, caldb='prod2', lst=True, autodec=0.0):
+              site=None, caldb='prod2', lst=True, autodec=0.0, north=True):
     """
     Setup pointing patch on the sky
 
@@ -167,6 +167,8 @@ def set_patch(tmin, lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
         Use LSTs
     autodec : float, optional
         Declination for switching automatically between South and North site
+    north : bool, optional
+        Also use North array
 
     Returns
     -------
@@ -228,6 +230,11 @@ def set_patch(tmin, lmin=-30.0, lmax=30.0, bmin=-1.5, bmax=+1.5,
                 # ... otherwise use the specified site, North or South
                 else:
                     obs_site = site
+
+                # Fall through if array is North array and North array should
+                # not be used
+                if not north and obs_site == 'North':
+                    continue
 
                 # Set IRF
                 irf = set_irf(obs_site, obs, caldb, lst=lst)
@@ -324,7 +331,8 @@ def set_irf(site, obs, caldb, lst=True):
 # =========================== #
 # Setup Galactic plane survey #
 # =========================== #
-def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True):
+def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True,
+            north=True):
     """
     Setup Galactic plane survey
 
@@ -340,6 +348,8 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True):
         Calibration database name
     lst : bool, optional
         Use LSTs
+    north : bool, optional
+        Also use North array
 
     Returns
     -------
@@ -373,21 +383,25 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True):
                             separation=separation, hours=60,
                             site='South', caldb=caldb, lst=lst))
 
-    # Initialise start time
-    tmin = 7671.0 * 86400.0
+    # Also use North array
+    if north:
 
-    # Add Cygnus, Perseus
-    obsdef.extend(set_patch(tmin, lmin=60.0, lmax=150.0, bmin=bmin, bmax=bmax,
-                            separation=separation, hours=450,
-                            site='North', caldb=caldb, lst=lst))
+        # Initialise start time
+        tmin = 7671.0 * 86400.0
 
-    # Update start time
-    tmin = set_tmin_for_next_pointing(obsdef[-1]['tmin'], obsdef[-1]['duration'])
+        # Add Cygnus, Perseus
+        obsdef.extend(set_patch(tmin, lmin=60.0, lmax=150.0,
+                                bmin=bmin, bmax=bmax, separation=separation,
+                                hours=450, site='North', caldb=caldb, lst=lst))
 
-    # Add Anticentre
-    obsdef.extend(set_patch(tmin, lmin=150.0, lmax=210.0, bmin=bmin, bmax=bmax,
-                            separation=separation, hours=150,
-                            site='North', caldb=caldb, lst=lst))
+        # Update start time
+        tmin = set_tmin_for_next_pointing(obsdef[-1]['tmin'],
+                                          obsdef[-1]['duration'])
+
+        # Add Anticentre
+        obsdef.extend(set_patch(tmin, lmin=150.0, lmax=210.0,
+                                bmin=bmin, bmax=bmax, separation=separation,
+                                hours=150, site='North', caldb=caldb, lst=lst))
 
     # Return observation definition
     return obsdef
@@ -396,7 +410,7 @@ def set_gps(separation=3.0, bmin=-1.3, bmax=1.3, caldb='prod2', lst=True):
 # ========================== #
 # Setup Extragalactic survey #
 # ========================== #
-def set_egal(separation=3.0, caldb='prod2', lst=True):
+def set_egal(separation=3.0, caldb='prod2', lst=True, north=True):
     """
     Setup Extragalactic survey.
 
@@ -408,6 +422,8 @@ def set_egal(separation=3.0, caldb='prod2', lst=True):
         Calibration database name
     lst : bool, optional
         Use LSTs
+    north : bool, optional
+        Also use North array
 
     Returns
     -------
@@ -424,7 +440,7 @@ def set_egal(separation=3.0, caldb='prod2', lst=True):
     obsdef.extend(set_patch(tmin, lmin=-90.0, lmax=90.0, bmin=+5.0, bmax=+88.0,
                             separation=separation, hours=500, run_duration=25,
                             site='Automatic', caldb=caldb, lst=lst,
-                            autodec=-10.0))
+                            autodec=-10.0, north=north))
 
     # Return observation definition
     return obsdef
@@ -639,6 +655,9 @@ def make_pointings():
     if obsname == 'gps':
         obsdef = set_gps(caldb=caldb, lst=lst)
         write_obsdef('gps.dat', obsdef)
+    elif obsname == 'gps_south':
+        obsdef = set_gps(caldb=caldb, lst=lst, north=False)
+        write_obsdef('gps.dat', obsdef)
     elif obsname == 'gps3':
         obsdef = set_gps(separation=1.5, caldb=caldb, lst=lst)
         write_obsdef('gps3.dat', obsdef)
@@ -646,6 +665,9 @@ def make_pointings():
     # Extragalactic survey
     elif obsname == 'egal':
         obsdef = set_egal(caldb=caldb, lst=lst)
+        write_obsdef('egal.dat', obsdef)
+    elif obsname == 'egal_south':
+        obsdef = set_egal(caldb=caldb, lst=lst, north=False)
         write_obsdef('egal.dat', obsdef)
 
     # Galactic centre
