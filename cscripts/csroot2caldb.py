@@ -125,34 +125,34 @@ class csroot2caldb(ctools.cscript):
         irf['REF_TIME']       = 51544.0
         irf['EA_NAME']        = 'EFF_AREA'
         irf['EA_HDUCLAS3']    = 'FULL-ENCLOSURE'
-        irf['EA_HDUCLAS4']    = 'AEFF_2D'
+        irf['EA_HDUCLAS4']    = '2D'
         irf['EA_DOC']         = 'CAL/GEN/92-019'
         irf['EA_BOUNDS']      = copy.deepcopy(cal_bounds)
         irf['EA_DESC']        = 'CTA effective area'
         irf['PSF_NAME']       = 'RPSF'
         irf['PSF_HDUCLAS3']   = 'FULL-ENCLOSURE'
-        irf['PSF_HDUCLAS4']   = 'PSF_3GAUSS'
+        irf['PSF_HDUCLAS4']   = '3GAUSS'
         irf['PSF_DOC']        = 'CAL/GEN/92-020'
         irf['PSF_BOUNDS']     = copy.deepcopy(cal_bounds)
         irf['PSF_DESC']       = 'CTA point spread function'
         irf['EDISP_NAME']     = 'EDISP'
         irf['EDISP_HDUCLAS3'] = 'FULL-ENCLOSURE'
-        irf['EDISP_HDUCLAS4'] = 'EDISP_2D'
+        irf['EDISP_HDUCLAS4'] = '2D'
         irf['EDISP_DOC']      = '???'
         irf['EDISP_BOUNDS']   = copy.deepcopy(cal_bounds)
         irf['EDISP_DESC']     = 'CTA energy dispersion'
-        irf['BGD_NAME']       = 'BGD'
+        irf['BGD_NAME']       = 'BKG'
         irf['BGD_HDUCLAS3']   = 'FULL-ENCLOSURE'
-        irf['BGD_HDUCLAS4']   = 'BKG_3D'
+        irf['BGD_HDUCLAS4']   = '3D'
         irf['BGD_DOC']        = '???'
         irf['BGD_BOUNDS']     = copy.deepcopy(cal_bounds)
         irf['BGD_DESC']       = 'CTA background'
 
         # Set parameter dependent IRF information
         if self['psftype'].string() == 'King':
-            irf['PSF_HDUCLAS4'] = 'PSF_KING'
+            irf['PSF_HDUCLAS4'] = 'KING'
         else:
-            irf['PSF_HDUCLAS4'] = 'PSF_3GAUSS'
+            irf['PSF_HDUCLAS4'] = '3GAUSS'
 
         # Return metadata
         return irf
