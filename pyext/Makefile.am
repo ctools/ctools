@@ -66,7 +66,10 @@ testscripts = ctools/tests/__init__.py \
 testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_events.fits.gz \
            $(top_srcdir)/test/data/crab_cntmap.fits.gz \
+           $(top_srcdir)/test/data/phased_events.fits.gz \
            $(top_srcdir)/test/data/invalid_event_list.fits.gz \
+           $(top_srcdir)/test/data/model_temporal_phasecurve.xml \
+           $(top_srcdir)/test/data/obs_unbinned.xml \
            $(top_srcdir)/test/data/exclusion.reg
 
 # Install test scripts and test data. Note that we don't need to prepend
@@ -121,6 +124,9 @@ EXTRA_DIST = ctools/tests \
              $(testscripts) \
              $(testdata) \
              $(testirf)
+dist-hook:
+	cp -r $(srcdir)/*.i $(distdir)
+	cp -r $(srcdir)/ctools/*.i $(distdir)/ctools
 
 # Dependencies. Obtain the list of dependencies by executing ls.
 DEPFILES = $(shell ls *.Pi 2> /dev/null)
@@ -163,6 +169,7 @@ uninstall-local:
 	rm -rf $(DESTDIR)$(pyexecdir)/ctools/tests/*.pyc
 	rm -rf $(DESTDIR)$(pyexecdir)/ctools/tests/__pycache__
 	rm -rf $(DESTDIR)$(pyexecdir)/ctools-@VERSION@*.egg-info
+	rm -rf $(DESTDIR)$(datarootdir)/ctools
 
 # Set files to be removed in 'make clean'
 CLEANFILES = $(CLEAN_FILES) $(DEPFILES)
