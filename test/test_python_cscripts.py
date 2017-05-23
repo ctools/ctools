@@ -168,19 +168,15 @@ def test(installed=False, debug=False):
     # Run test suite
     success = suites.run()
 
-    # If we have a non-installed version then save test results
+    # Save test results
     if not installed:
         suites.save('reports/cscripts.xml')
+    else:
+        suites.save('cscripts_reports.xml')
 
     # If debuging is requested then print test suites
     if debug:
         print(suites)
-
-    # Set return code
-    if success:
-        rc = 0
-    else:
-        rc = 1
 
     # Remove temporary direction
     if installed:
@@ -189,6 +185,9 @@ def test(installed=False, debug=False):
     # Raise an exception in case of failure
     if not success:
         raise RuntimeError('At least one error occured during the test.')
+
+    # Return
+    return
 
 
 # ======================== #
