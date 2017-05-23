@@ -25,6 +25,9 @@ The cscripts are now copied into the bin directory upon installation instead
 of creating symbolic links. This avoids problems on some VM file systems on
 which creation of symbolic links does not work (#1987).
 
+The missing *.i SWIG Python interface definition files were added to
+the release tarball (#2114).
+
 
 Python interface
 ----------------
