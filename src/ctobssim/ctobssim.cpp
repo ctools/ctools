@@ -1579,6 +1579,9 @@ void ctobssim::simulate_background(GCTAObservation* obs,
  * @param[in] wrklog Pointer to logger.
  *
  * Sets the correspondance between Monte Carlo identifier and model names.
+ * The method collects all Monte Carlo identifiers from the event list and
+ * sets the corresponding source names using the
+ * GCTAEventList::set_mc_id_names method.
  ***************************************************************************/
 void ctobssim::set_mc_id_names(GCTAObservation* obs,
                                const GModels&   models,
@@ -1600,26 +1603,53 @@ void ctobssim::set_mc_id_names(GCTAObservation* obs,
         std::vector<int>         ids;
         std::vector<std::string> names;
 
-        // Loop over all models
-        for (int i = 0; i < models.size(); ++i) {
+        // Collect all Monte Carlo identifiers
+        for (int i = 0; i < events->size(); ++i) {
 
-            // Append identifier and names
-            ids.push_back(i+1);
-            names.push_back(models[i]->name());
+            // Get Monte Carlo identifier for event
+            int id = (*events)[i]->mc_id();
 
-            // Dump identifier name correspondance
-            if (logNormal()) {
-                *wrklog << gammalib::parformat("MC identifier " +
-                                               gammalib::str(i+1));
-                *wrklog << models[i]->name() << std::endl;
+            // If this is the first event then push the Monte Carlo
+            // identifier into list ...
+            if (i == 0) {
+                ids.push_back(id);
+                names.push_back(models[id-1]->name());
             }
 
-        } // endfor: looped over all models
+            // ... otherwise push the Monte Carlo identifier only into list
+            // if the ID does not yet exist
+            else {
+                bool id_found = false;
+                for (int k = 0; k < ids.size(); ++k) {
+                    if (ids[k] == id) {
+                        id_found = true;
+                        break;
+                    }
+                }
+                if (!id_found) {
+                    ids.push_back(id);
+                    names.push_back(models[id-1]->name());
+                }
+            }
+
+        } // endfor: collected all Monte Carlo identifiers
 
         // Set correspondance for the event list
         if ((ids.size() > 0) && (names.size() > 0)) {
+
+            // Set Monte Carlo identifiers for event list
             events->set_mc_id_names(ids, names);
-        }
+
+            // Log Monte Carlo identifiers into log file
+            if (logNormal()) {
+                for (int k = 0; k < ids.size(); ++k) {
+                    *wrklog << gammalib::parformat("MC identifier " +
+                                                   gammalib::str(ids[k]));
+                    *wrklog << names[k] << std::endl;
+                }
+            }
+
+        } // endif: there were Monte Carlo identifiers
 
     } // endif: observation pointer was valid
 
