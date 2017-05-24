@@ -562,7 +562,7 @@ def set_lmc(hours=250.0, caldb='prod2', lst=True):
 # ======================================= #
 # Write observation definition dictionary #
 # ======================================= #
-def write_obsdef(filename, obsdef):
+def write_obsdef(filename, obsdef, idstart):
     """
     Write observation definition file
 
@@ -572,12 +572,17 @@ def write_obsdef(filename, obsdef):
         Observation definition file name
     obsdef : list of dict
         List of pointing definitions
+    idstart : int
+        First identifier of observation definition file
     """
     # Open file
     file = open(filename, 'w')
 
     # Write header
-    file.write('ra,dec,tmin,duration,caldb,irf,emin,emax\n')
+    file.write('id,ra,dec,tmin,duration,caldb,irf,emin,emax\n')
+
+    # Initialise identifier
+    id = idstart
 
     # Loop over pointings
     for obs in obsdef:
@@ -603,9 +608,12 @@ def write_obsdef(filename, obsdef):
             emax = 50.0
 
         # Write information
-        file.write('%8.4f,%8.4f,%.4f,%.4f,%s,%s,%.3f,%.1f\n' %
-                   (ra, dec, obs['tmin'], obs['duration'], obs['caldb'], \
+        file.write('%6.6d,%8.4f,%8.4f,%.4f,%.4f,%s,%s,%.3f,%.1f\n' %
+                   (id, ra, dec, obs['tmin'], obs['duration'], obs['caldb'], \
                     obs['irf'], emin, emax))
+
+        # Increment identifier
+        id += 1
 
     # Close file
     file.close()
@@ -654,31 +662,31 @@ def make_pointings():
     # Galactic plane survey
     if obsname == 'gps':
         obsdef = set_gps(caldb=caldb, lst=lst)
-        write_obsdef('gps.dat', obsdef)
+        write_obsdef('gps.dat', obsdef, 110000)
     elif obsname == 'gps_south':
         obsdef = set_gps(caldb=caldb, lst=lst, north=False)
-        write_obsdef('gps.dat', obsdef)
+        write_obsdef('gps.dat', obsdef, 120000)
     elif obsname == 'gps3':
         obsdef = set_gps(separation=1.5, caldb=caldb, lst=lst)
-        write_obsdef('gps3.dat', obsdef)
+        write_obsdef('gps3.dat', obsdef, 130000)
 
     # Extragalactic survey
     elif obsname == 'egal':
         obsdef = set_egal(caldb=caldb, lst=lst)
-        write_obsdef('egal.dat', obsdef)
+        write_obsdef('egal.dat', obsdef, 210000)
     elif obsname == 'egal_south':
         obsdef = set_egal(caldb=caldb, lst=lst, north=False)
-        write_obsdef('egal.dat', obsdef)
+        write_obsdef('egal.dat', obsdef, 220000)
 
     # Galactic centre
     elif obsname == 'gc':
         obsdef = set_gc(caldb=caldb, lst=lst)
-        write_obsdef('gc.dat', obsdef)
+        write_obsdef('gc.dat', obsdef, 310000)
 
     # LMC
     elif obsname == 'lmc':
         obsdef = set_lmc(caldb=caldb, lst=lst)
-        write_obsdef('lmc.dat', obsdef)
+        write_obsdef('lmc.dat', obsdef, 410000)
 
     # Invalid pattern
     else:
