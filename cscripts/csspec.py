@@ -427,8 +427,11 @@ class csspec(ctools.cscript):
 
             # Compute flux error
             parvalue  = source.spectral()[0].value()
-            rel_error = source.spectral()[0].error() / parvalue        
-            e_flux    = fitted_flux * rel_error
+            if parvalue != 0.0:
+                rel_error = source.spectral()[0].error() / parvalue
+                e_flux    = fitted_flux * rel_error
+            else:
+                e_flux = 0.0
 
             # Set values for storage
             TSvalues[i] = TS
