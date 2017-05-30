@@ -28,7 +28,7 @@ gammalib.
    * - `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ChangeLog>`_
      - `gammalib <http://cta.irap.omp.eu/ctools/releases/gammalib/ChangeLog>`_
      - Mac OS X package
-   * - `1.2.1 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0.tar.gz>`_
+   * - `1.2.1 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.1.tar.gz>`_
      - `1.2.0 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.2.0.tar.gz>`_
      - `ctools-1.2.1-macosx10.7.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.1-macosx10.7.dmg>`_
    * - `1.2.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0.tar.gz>`_
