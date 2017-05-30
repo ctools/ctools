@@ -6,14 +6,14 @@ Getting the analysis tools
 We recommend that you use ctools to analyse the data from the
 :ref:`first CTA Data Challenge <glossary_1dc>`.
 
-The reference version for the pre-release of the data is ``ctools-1.2.0``.
-``ctools-1.2.0`` depends on ``gammalib-1.2.0``. You may either download
+The reference version for the Data Challenge is ``ctools-1.3.0``.
+``ctools-1.3.0`` depends on ``gammalib-1.3.0``. You may either download
 the source code for both packages or use a pre-compiled binary package for
 Mac OS X that includes all necessary code:
 
-* `Mac OS X binary package <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0-macosx10.7.dmg>`_ (Mac OS X 10.7+)
-* `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.2.0.tar.gz>`_ source code tarball
-* `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.2.0.tar.gz>`_ source code tarball
+* `Mac OS X binary package <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.3.0-macosx10.7.dmg>`_ (Mac OS X 10.7+)
+* `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.3.0.tar.gz>`_ source code tarball
+* `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.3.0.tar.gz>`_ source code tarball
 
 After downloading, configure GammaLib and ctools as follows:
 

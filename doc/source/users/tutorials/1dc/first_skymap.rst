@@ -41,7 +41,7 @@ is shown below:
    :width: 400px
    :align: center
 
-   *Sky map of the events recorded around the Galactic Centre during the Galactic Centre Survey*
+   *Sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey*
 
 The sky map shows a wide-spread distribution of events with a number of sources
 superimposed.
@@ -80,4 +80,4 @@ of gamma-ray emission are now clearly discernable.
    :width: 400px
    :align: center
 
-   *Background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Centre Survey*
+   *Background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey*

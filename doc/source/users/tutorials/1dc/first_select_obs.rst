@@ -4,7 +4,7 @@ Selecting the relevant observations
 -----------------------------------
 
 Let's assume that you want to analyse the central region of our Galaxy using
-the data obtained during the Galactic Centre Survey.
+the data obtained during the Galactic Plane Survey.
 
 As first step you should create a folder that will contain your analysis
 results and any intermediate data products. In this example we name the
@@ -27,42 +27,39 @@ You do this with the :ref:`csobsselect` script by typing:
 .. code-block:: bash
 
    $ csobsselect
-   Input event list or observation definition XML file [obs.xml] $CTADATA/obs/obs_gc_baseline.xml
+   Input event list or observation definition XML file [obs.xml] $CTADATA/obs/obs_gps_baseline.xml
    Pointing selection region shape (CIRCLE|BOX) [CIRCLE]
    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL] GAL
    Galactic longitude of selection centre (deg) (0-360) [184.56] 0.0
    Galactic latitude of selection centre (deg) (-90-90) [-5.79] 0.0
-   Radius of selection circle (deg) (0-180) [5.0] 0.1
+   Radius of selection circle (deg) (0-180) [5.0] 3.0
    Output observation definition XML file [outobs.xml] obs.xml
 
 You selected ``CIRCLE`` as the shape of the pointing selection region,
 specified the Galactic Centre as the centre of the selection region, and
-selected all observations with pointing directions within 0.1 degrees from
-the Galactic Centre from the ``obs_gc_baseline.xml`` file.
+selected all observations with pointing directions within 3 degrees from
+the Galactic Centre from the ``obs_gps_baseline.xml`` file.
 The selected observations are written into the file ``obs.xml`` that will be
 created in the ``my_first_analysis`` folder.
-The content of the file will look as follows:
+The file will contain the definition of 57 observations and will look as
+follows:
 
 .. code-block:: xml
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <observation_list title="observation list">
-     <observation name="GC" id="000414" instrument="CTA">
-       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/validation/milano-noedisp/1dc.pre/data/baseline/gc/gc_baseline_000414.fits.gz" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
+     <observation name="GPS" id="120380" instrument="CTA">
+       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc.final/validation/1dc.south/data/baseline/gps/gps_baseline_120380.fits" />
+       <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
-     <observation name="GC" id="000415" instrument="CTA">
-       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/validation/milano-noedisp/1dc.pre/data/baseline/gc/gc_baseline_000415.fits.gz" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
-     </observation>
-     <observation name="GC" id="000416" instrument="CTA">
-       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/validation/milano-noedisp/1dc.pre/data/baseline/gc/gc_baseline_000416.fits.gz" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
+     <observation name="GPS" id="120381" instrument="CTA">
+       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc.final/validation/1dc.south/data/baseline/gps/gps_baseline_120381.fits" />
+       <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
      ...
-     <observation name="GC" id="000581" instrument="CTA">
-       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/validation/milano-noedisp/1dc.pre/data/baseline/gc/gc_baseline_000581.fits.gz" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
+     <observation name="GPS" id="121177" instrument="CTA">
+       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc.final/validation/1dc.south/data/baseline/gps/gps_baseline_121177.fits" />
+       <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
    </observation_list>
 

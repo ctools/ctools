@@ -40,7 +40,7 @@ sources were detected.
    :width: 400px
    :align: center
 
-   *Background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Centre Survey with the detected sources overlaid*
+   *Background subtracted sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey with the detected sources overlaid*
 
 Below is the content of the
 :ref:`model definition XML file <glossary_moddef>`
@@ -67,8 +67,8 @@ for a model fitting with :ref:`ctlike`.
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA" value="266.424004498437" error="0" scale="1" free="1" />
-         <parameter name="DEC" value="-29.0049010253548" error="0" scale="1" free="1" />
+         <parameter name="RA" value="266.404485683256" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.9944817753924" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="Src002" type="PointSource">
@@ -78,8 +78,8 @@ for a model fitting with :ref:`ctlike`.
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA" value="266.831945177213" error="0" scale="1" free="1" />
-         <parameter name="DEC" value="-28.1460284439951" error="0" scale="1" free="1" />
+         <parameter name="RA" value="266.882500217018" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.1496303606368" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="Background" type="CTAIrfBackground">
@@ -90,4 +90,3 @@ for a model fitting with :ref:`ctlike`.
        </spectrum>
      </source>
    </source_library>
-

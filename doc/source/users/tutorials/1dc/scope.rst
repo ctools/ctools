@@ -37,9 +37,10 @@ that correspond to an ideal CTA with good and stable atmosphere and instrument
 conditions; only zenith angles of 20 degrees and 40 degrees have been
 simulated.
 
-Data are provided for the baseline arrays and the threshold implementation.
+Data are provided for the baseline arrays. So far only data for the South array
+were simulated.
 
-Three Key Science Projects (KSPs) have been simulated using realistic pointing
+Three Key Science Projects (KSPs) were simulated using realistic pointing
 patterns as defined in the CTA Science Case document:
 
 * the Galactic Plane Scan (GPS)

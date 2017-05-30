@@ -32,21 +32,17 @@ the original event list file names replaced by the names of the new files:
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <observation_list title="observation list">
-     <observation name="GC" id="000414" instrument="CTA">
-       <parameter name="EventList" file="selected_gc_baseline_000414.fits" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
+     <observation name="GPS" id="120380" instrument="CTA">
+       <parameter name="EventList" file="selected_gps_baseline_120380.fits" />
+       <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
-     <observation name="GC" id="000415" instrument="CTA">
-       <parameter name="EventList" file="selected_gc_baseline_000415.fits" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
-     </observation>
-     <observation name="GC" id="000416" instrument="CTA">
-       <parameter name="EventList" file="selected_gc_baseline_000416.fits" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
+     <observation name="GPS" id="120381" instrument="CTA">
+       <parameter name="EventList" file="selected_gps_baseline_120381.fits" />
+       <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
      ...
-     <observation name="GC" id="000581" instrument="CTA">
-       <parameter name="EventList" file="selected_gc_baseline_000581.fits" />
-       <parameter name="Calibration" database="prod3b" response="South_z20_50h" />
+     <observation name="GPS" id="121177" instrument="CTA">
+       <parameter name="EventList" file="selected_gps_baseline_121177.fits" />
+       <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
    </observation_list>
