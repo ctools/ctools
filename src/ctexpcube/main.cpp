@@ -57,9 +57,6 @@ int main (int argc, char *argv[])
         // Create instance of application
         application = new ctexpcube(argc, argv);
 
-        // Execute application
-        application->execute();
-
         // Execute ctool
         rc = execute_ctool(application);
 

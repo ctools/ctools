@@ -517,4 +517,6 @@ if __name__ == '__main__':
         rc = 1
 
     # Exit with return code
-    sys.exit(rc)
+    if not success:
+        raise RuntimeError('At least one error occured during the test.')
+    #sys.exit(rc)

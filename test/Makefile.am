@@ -71,7 +71,15 @@ installcheck-local:
 	@export CTOOLS=$(DESTDIR)$(prefix); \
 	. $(DESTDIR)$(prefix)/bin/ctools-init.sh; \
 	python -c 'import ctools; ctools.test()'; \
-	python -c 'import cscripts; cscripts.test()'
+	if test "x$$?" != "x0"; then \
+		echo "*** ctools unit test failure!"; \
+		exit 1; \
+	fi; \
+	python -c 'import cscripts; cscripts.test()'; \
+	if test "x$$?" != "x0"; then \
+		echo "*** cscripts unit test failure!"; \
+		exit 1; \
+	fi
 endif
 
 # Add Valgrind rule
