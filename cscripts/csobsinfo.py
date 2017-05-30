@@ -143,7 +143,7 @@ class csobsinfo(ctools.cscript):
                 obs_name = obs.object()
             
             # Logging
-            if self._logTerse():
+            if self._logExplicit():
                 self._log.header2(obs_name)
                 
             # Retrieve observation name
@@ -185,8 +185,8 @@ class csobsinfo(ctools.cscript):
                 n_obs_unbinned += 1
                 is_binned     = 'no'
                 is_what       = 'Number of events'
-            self._log_value(gammalib.TERSE, 'Binned', is_binned)
-            self._log_value(gammalib.TERSE, is_what, obs.events().size())
+            self._log_value(gammalib.EXPLICIT, 'Binned', is_binned)
+            self._log_value(gammalib.EXPLICIT, is_what, obs.events().size())
 
             # Retrieve zenith and azimuth and store for later use
             zenith  = obs.pointing().zenith()
@@ -198,11 +198,9 @@ class csobsinfo(ctools.cscript):
             if self._compute_offset:
                 offset = pnt_dir.dist_deg(self._obj_dir)
                 self._offsets.append(offset)
-            else:
-                self._offsets.append(-1.0)
                     
             # Optionally log details
-            if self._logTerse():
+            if self._logExplicit():
                 
                 # Log the observation energy range (if available)
                 self._log.parformat('Energy range')
@@ -225,61 +223,55 @@ class csobsinfo(ctools.cscript):
                 self._log('\n')
                 
             # Log observation information
-            self._log_value(gammalib.TERSE, 'Ontime', '%.3f s' %
+            self._log_value(gammalib.EXPLICIT, 'Ontime', '%.3f s' %
                             obs.ontime())
-            self._log_value(gammalib.TERSE, 'Livetime', '%.3f s' %
+            self._log_value(gammalib.EXPLICIT, 'Livetime', '%.3f s' %
                             obs.livetime())
-            self._log_value(gammalib.TERSE, 'Deadtime fraction', '%.3f %%' %
+            self._log_value(gammalib.EXPLICIT, 'Deadtime fraction', '%.3f %%' %
                             deadfrac)
-            self._log_value(gammalib.TERSE, 'Pointing', pnt_dir)
+            self._log_value(gammalib.EXPLICIT, 'Pointing', pnt_dir)
 
             # Optionally log offset with respect to target direction
             if self._compute_offset:
-                self._log_value(gammalib.TERSE,
+                self._log_value(gammalib.EXPLICIT,
                                 'Offset from target', '%.2f deg' % offset)
 
             # Log Zenith and Azimuth angles
-            self._log_value(gammalib.TERSE, 'Zenith angle', '%.2f deg' %
+            self._log_value(gammalib.EXPLICIT, 'Zenith angle', '%.2f deg' %
                             zenith)
-            self._log_value(gammalib.TERSE, 'Azimuth angle', '%.2f deg' %
+            self._log_value(gammalib.EXPLICIT, 'Azimuth angle', '%.2f deg' %
                             azimuth)
                     
         # Write summary header
-        self._log_string(gammalib.TERSE, '\n')
-        self._log_header1(gammalib.TERSE, 'Summary')
+        self._log_header1(gammalib.NORMAL, 'Summary')
 
         # Log general summary
-        self._log_header3(gammalib.TERSE, 'Observations')
-        self._log_value(gammalib.TERSE, 'Unbinned observations', n_obs_unbinned)
-        self._log_value(gammalib.TERSE, 'Binned observations', n_obs_binned)
-        self._log_value(gammalib.TERSE, 'Binned observations', n_obs_binned)
-        self._log_header3(gammalib.TERSE, 'Events')
-        self._log_value(gammalib.TERSE, 'Number of events', n_events)
-        self._log_value(gammalib.TERSE, 'Number of bins', n_eventbins)
-
+        self._log_header3(gammalib.NORMAL, 'Observations')
+        self._log_value(gammalib.NORMAL, 'Unbinned observations', n_obs_unbinned)
+        self._log_value(gammalib.NORMAL, 'Binned observations', n_obs_binned)
+        self._log_header3(gammalib.NORMAL, 'Events')
+        self._log_value(gammalib.NORMAL, 'Number of events', n_events)
+        self._log_value(gammalib.NORMAL, 'Number of bins', n_eventbins)
 
         # Compute mean offset, azimuth and zenith angle
         if len(self._offsets) > 0:
-            mean_offset = sum(self._offsets) / len(self._offsets)
+            mean_offset = '%.2f deg' % (sum(self._offsets) / len(self._offsets))
         else:
             mean_offset = 'Unknown'
         if len(self._zeniths) > 0:
-            mean_zenith = sum(self._zeniths) / len(self._zeniths)
+            mean_zenith = '%.2f deg' % (sum(self._zeniths) / len(self._zeniths))
         else:
             mean_zenith = 'Unknown'
         if len(self._azimuths) > 0:
-            mean_azimuth = sum(self._azimuths) / len(self._azimuths)
+            mean_azimuth = '%.2f deg' % (sum(self._azimuths) / len(self._azimuths))
         else:
             mean_azimuth = 'Unknown'
         
         # Log mean offset, azimuth and zenith angle
-        self._log_header3(gammalib.TERSE, 'Pointings')
-        self._log_value(gammalib.TERSE, 'Mean offset angle', '%.2f deg' %
-                        mean_offset)
-        self._log_value(gammalib.TERSE, 'Mean zenith angle', '%.2f deg' %
-                        mean_zenith)
-        self._log_value(gammalib.TERSE, 'Mean azimuth angle', '%.2f deg' %
-                        mean_azimuth)
+        self._log_header3(gammalib.NORMAL, 'Pointings')
+        self._log_value(gammalib.NORMAL, 'Mean offset angle',  mean_offset)
+        self._log_value(gammalib.NORMAL, 'Mean zenith angle',  mean_zenith)
+        self._log_value(gammalib.NORMAL, 'Mean azimuth angle', mean_azimuth)
 
         # Optionally log names of observations. Note that the set class is
         # used to extract all different observation names from the list of
@@ -290,7 +282,6 @@ class csobsinfo(ctools.cscript):
             for name in obs_set:
                 self._log_value(gammalib.EXPLICIT,'"'+name+'"',
                                 obs_names.count(name))
-            self._log('\n')
 
         # Get energy boundary information
         if self._ebounds.size() == 0:
@@ -301,25 +292,28 @@ class csobsinfo(ctools.cscript):
             max_value = str(self._ebounds.emax())
 
         # Log energy range
-        self._log_header3(gammalib.TERSE, 'Energy range')
-        self._log_value(gammalib.TERSE, 'Minimum energy', min_value)
-        self._log_value(gammalib.TERSE, 'Maximum energy', max_value)
+        self._log_header3(gammalib.NORMAL, 'Energy range')
+        self._log_value(gammalib.NORMAL, 'Minimum energy', min_value)
+        self._log_value(gammalib.NORMAL, 'Maximum energy', max_value)
 
         # Log time range
-        tstart = '%.f (%s)' % (self._gti.tstart().mjd(), self._gti.tstart().utc())
-        tstop  = '%.f (%s)' % (self._gti.tstop().mjd(),  self._gti.tstop().utc())
-        self._log_header3(gammalib.TERSE, 'Time range')
-        self._log_value(gammalib.TERSE, 'Start (MJD)', tstart)
-        self._log_value(gammalib.TERSE, 'Stop (MJD)',  tstop)
+        mjd = '%.3f - %.3f' % (self._gti.tstart().mjd(),  self._gti.tstop().mjd())
+        utc = '%s - %s'     % (self._gti.tstart().utc(),  self._gti.tstop().utc())
+        met = '%.3f - %.3f' % (self._gti.tstart().convert(self._time_reference()),
+                               self._gti.tstop().convert(self._time_reference()))
+        self._log_header3(gammalib.NORMAL, 'Time range')
+        self._log_value(gammalib.NORMAL, 'MJD (days)', mjd)
+        self._log_value(gammalib.NORMAL, 'UTC',  utc)
+        self._log_value(gammalib.NORMAL, 'MET (seconds)', met)
 
         # Log ontime and livetime in different units
         on_time   = '%.2f s = %.2f min = %.2f h' % \
                     (ontime, ontime/60., ontime/3600.)
         live_time = '%.2f s = %.2f min = %.2f h' % \
                     (livetime, livetime/60., livetime/3600.)
-        self._log_value(gammalib.TERSE, 'Total ontime', on_time)
-        self._log_value(gammalib.TERSE, 'Total livetime', live_time)
-                 
+        self._log_value(gammalib.NORMAL, 'Total ontime', on_time)
+        self._log_value(gammalib.NORMAL, 'Total livetime', live_time)
+
         # Return
         return
 
@@ -342,7 +336,7 @@ class csobsinfo(ctools.cscript):
             self._log_header1(gammalib.TERSE, 'Save pointings in DS9 file')
 
             # Log filename
-            self._log_value(gammalib.TERSE, 'DS9 filename', ds9file.url())
+            self._log_value(gammalib.NORMAL, 'DS9 filename', ds9file.url())
             
             # Open file   
             f = open(ds9file.url(),'w')

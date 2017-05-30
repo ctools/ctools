@@ -66,20 +66,31 @@ def get_pointings(filename):
         run = obs.element('observation', i)
 
         # Get pointing parameter
-        npars = run.elements('parameter')
-        ra    = None
-        dec   = None
-        south = False
+        npars  = run.elements('parameter')
+        ra     = None
+        dec    = None
+        south  = False
+        evfile = None
         for k in range(npars):
             par = run.element('parameter', k)
             if par.attribute('name') == 'Pointing':
                 ra  = float(par.attribute('ra'))
                 dec = float(par.attribute('dec'))
-            if par.attribute('name') == 'Calibration':
+            elif par.attribute('name') == 'Calibration':
                 if 'South' in par.attribute('response'):
                     south = True
                 else:
                     south = False
+            elif par.attribute('name') == 'EventList':
+                evfile = par.attribute('file')
+
+        # If no pointing was found then load observation
+        if ra == None and evfile != None:
+            cta = gammalib.GCTAObservation(gammalib.GFilename(evfile))
+            ra  = cta.pointing().dir().ra_deg()
+            dec = cta.pointing().dir().dec_deg()
+
+        # Add valid pointing
         if ra != None:
             p   = gammalib.GSkyDir()
             p.radec_deg(ra, dec)

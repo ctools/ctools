@@ -14,6 +14,7 @@ issues.
    howto_tsmap
    howto_extent
    howto_ulimit
+   howto_edisp
    howto_lightcurve
    howto_phasecurve
    howto_exclude

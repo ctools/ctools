@@ -1,13 +1,60 @@
 Glossary
 ========
 
+.. _glossary_bkgcube:
+
+.. topic:: Background cube
+
+   A background cube is a 3-dimensional cube spanned by reconstructed Right
+   Ascension or Galactic longitude, reconstructed Declination or Galactic
+   latitude, and reconstructed photon energy.
+   The background cube :math:`B(p', E')` is computed
+   using
+
+   .. math::
+      B(p', E') = \frac{\sum_i B_i(p', E') \times \tau_i}
+                       {\sum_i \tau_i}
+
+   where
+   :math:`B_i(p', E')` is the background rate estimate for observation :math:`i`,
+   :math:`p'` is the reconstruction photon arrival direction,
+   :math:`E'` is the reconstruction photon energy,
+   and :math:`\tau_i` is the livetime of observation :math:`i`.
+   The sum is taken over all observations.
+
+
 .. _glossary_countscube:
 
 .. topic:: Counts cube
 
-   A counts cube is a three-dimensional data cube spanned by Right Ascension
-   or Galactic longitude, Declination or Galactic latitude, and reconstructed
-   energy. The binning is logarithmic in energy.
+   A counts cube is a 3-dimensional data cube spanned by reconstructed Right
+   Ascension or Galactic longitude, reconstructed Declination or Galactic
+   latitude, and reconstructed energy.
+
+
+.. _glossary_edispcube:
+
+.. topic:: Energy Dispersion cube
+
+   An energy dispersion cube is a 4-dimensional cube spanned by true Right
+   Ascension or Galactic longitude, true Declination or Galactic latitude, true
+   photon energy, and migration which is the ratio between reconstructed and true
+   photon energy.
+   The energy dispersion cube :math:`E_{\rm disp}(E'| p, E)` is computed
+   using
+
+   .. math::
+      E_{\rm disp}(E'| p, E) =
+      \frac{\sum_i E_{\rm disp,i}(E'| p, E) \times A_{\rm eff,i}(p, E) \times \tau_i}
+           {\sum_i E_{\rm disp,i}(E'| p, E) \times \tau_i}
+
+   where
+   :math:`E_{\rm disp,i}(E'| p, E)` is the energy dispersion for observation :math:`i`,
+   :math:`E'` is the reconstruction photon energy,
+   :math:`p` is the true photon arrival direction,
+   :math:`E` is the true photon energy,
+   and :math:`\tau_i` is the livetime of observation :math:`i`.
+   The sum is taken over all observations.
 
 
 .. _glossary_eventlist:
@@ -19,6 +66,26 @@ Glossary
    of the table provide event characteristics, such as trigger time,
    reconstructed arrival direction (in Right Ascension and Declination), and
    the reconstructed event energy.
+
+
+.. _glossary_expcube:
+
+.. topic:: Exposure cube
+
+   An exposure cube is a 3-dimensional cube spanned by true Right Ascension or
+   Galactic longitude, true Declination or Galactic latitude, and true photon
+   energy. The exposure
+   :math:`X(p, E)` is computed using
+
+   .. math::
+      X(p, E) = \sum_i A_{\rm eff,i}(p, E) \times \tau_i
+
+   where
+   :math:`A_{\rm eff,i}(p, E)` is the effective area for observation :math:`i`,
+   :math:`p` is the true photon arrival direction,
+   :math:`E` is the true photon energy,
+   and :math:`\tau_i` is the livetime of observation :math:`i`.
+   The sum is taken over all observations.
 
 
 .. _glossary_1dc:
@@ -136,3 +203,26 @@ Glossary
         </observation>
       </observation_list>
 
+
+.. _glossary_psfcube:
+
+.. topic:: Point Spread Function cube
+
+   A point spread function cube is a 4-dimensional cube spanned by true Right
+   Ascension or Galactic longitude, true Declination or Galactic latitude, true
+   photon energy, and offset angle between true and reconstructed arrival
+   direction of a photon.
+   The point spread function cube :math:`PSF(\delta | p, E)` is computed
+   using
+
+   .. math::
+      PSF(\delta | p, E) = \frac{\sum_i PSF_i(p' | p, E) \times A_{\rm eff,i}(p, E) \times \tau_i}
+                                {\sum_i A_{\rm eff,i}(p, E) \times \tau_i}
+
+   where
+   :math:`\delta` is the angular separation between the true and measured
+   photon directions :math:`p` and :math:`p'`, respectively,
+   :math:`A_{\rm eff,i}(p, E)` is the effective area for observation :math:`i`,
+   :math:`E` is the true photon energy,
+   and :math:`\tau_i` is the livetime of observation :math:`i`.
+   The sum is taken over all observations.

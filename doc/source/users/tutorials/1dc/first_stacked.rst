@@ -1,27 +1,23 @@
 .. _1dc_first_stacked:
 
-Performing a stacked analysis
------------------------------
+Stacking the data
+-----------------
 
-In the previous example you have fit the model to the data using an unbinned
-maximum likelihood method, which directly operates on the event lists without
-any binning of the data. This is the most precise method to analysis the CTA
-data, yet as you may have recognised, it is a time consuming method, in
-particular if you want to analyse a large number of events.
+.. admonition:: You will learn ...
 
-An alternative analysis method is the stacked analysis, where the data from
-all observations are binned into a single
-:ref:`counts cube <glossary_countscube>`,
-spanned by
-Right Ascension (or Galactic longitude),
-Declination (or Galactic latitude), and energy.
-For observation durations exceeding a few 10 hours, a stacked analysis is
-generally faster than an unbinned analysis, but any temporal information
-is lost.
+   ... how to **prepare the data for analysis** by stacking all events into
+   a counts cube and by computing the effective
+   :ref:`instrument response function <glossary_irf>`
+   for this counts cube.
 
-To perform a stacked analyses, you start with creating a
-:ref:`counts cube <glossary_countscube>`
-by typing
+   Please note that for the moment we do not consider the energy dispersion
+   since for many cases the effect of the energy dispersion is negligible,
+   and taking energy dispersion into account is computationally intensive. If
+   you want to learn how to take the energy dispersion into account please
+   read :ref:`this section<1dc_howto_edisp>`.
+
+To analyse the selected observations, we recommend to stack the events into
+a counts cube. You do this using the :ref:`ctbin` tool:
 
 .. code-block:: bash
 
@@ -37,17 +33,27 @@ by typing
    Algorithm for defining energy bins (FILE|LIN|LOG) [LOG]
    Start value for first energy bin in TeV [0.1]
    Stop value for last energy bin in TeV [100.0]
-   Number of energy bins (1-200) [20]
+   Number of energy bins (1-200) [20] 30
    Output counts cube file [cntcube.fits]
 
-This creates a 3-dimensional counts cube in Galactic coordinates, centred on
-the Galactic centre and 6 degrees x 6 degrees wide, with 20 logarithmically
-spaced energy bins between 100 GeV and 100 TeV.
+The :ref:`ctbin` tool creates a 3-dimensional counts cube in Galactic
+coordinates, centred on the Galactic centre and 6 degrees x 6 degrees wide,
+with 30 logarithmically spaced energy bins between 100 GeV and 100 TeV.
 
-As next step you have to compute the effective response function for the
-counts cube. The effective response function is composed of an exposure
-cube, a point spread function cube, and a background cube. You generate
-the cubes by typing
+Since the :ref:`ctbin` tool combines observations that potentially have
+different
+:ref:`instrument response functions <glossary_irf>`
+and exposure times into a single counts cube, you have to compute the
+effective
+:ref:`instrument response function <glossary_irf>`
+for this counts cube before you can analyse the data.
+For each component of the
+:ref:`instrument response function <glossary_irf>`
+there is a specific tool to perform this computation.
+
+First, :ref:`ctexpcube` computes the exposure of the stacked counts cube
+which is the effective area multiplied by the livetime for each observation.
+You run :ref:`ctexpcube` as follows:
 
 .. code-block:: bash
 
@@ -55,6 +61,25 @@ the cubes by typing
    Input event list or observation definition XML file [NONE] obs_selected.xml
    Input counts cube file to extract exposure cube definition [NONE] cntcube.fits
    Output exposure cube file [expcube.fits]
+
+This produces an
+:ref:`exposure cube <glossary_expcube>`
+FITS file that contains the exposure as function of sky position and energy.
+In the example above you extracted the binning of the exposure cube from
+the counts cube, which considerably reduces the number of User parameters
+that are queried by the tool.
+
+.. note::
+
+   The binning of an exposure cube does not need to correspond to the binning
+   of a counts cube. In any case, exposure values will be determined by
+   interpolation from the values stored in the exposure cube file. The same
+   is true for the point spread function and background cubes described
+   below.
+
+Next, :ref:`ctpsfcube` computes the weighted Point Spread Function of the
+stacked counts cube.
+You run :ref:`ctpsfcube` as follows:
 
 .. code-block:: bash
 
@@ -70,8 +95,25 @@ the cubes by typing
    Size of the Y axis in pixels [10]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Number of energy bins [20]
+   Number of energy bins [20] 30
    Output PSF cube file [psfcube.fits]
+
+This produces a
+:ref:`point spread function cube <glossary_psfcube>`
+FITS file that contains the weighted point spread function as function of
+sky position and energy.
+You may have noted in the example that the definiton of the
+:ref:`point spread function cube <glossary_psfcube>`
+has not been extracted from the counts cube, since this would lead to a
+large FITS file on output.
+The point spread function varies in fact only slowly over the field of view
+of the camera, and consequently it is sufficient to sample that variation
+at a large spatial scale of typically one degree.
+
+Finally, :ref:`ctbkgcube` computes a
+:ref:`background cube <glossary_bkgcube>`
+that predicts the number of background events in the counts cube.
+You run :ref:`ctbkgcube` as follows:
 
 .. code-block:: bash
 
@@ -82,135 +124,51 @@ the cubes by typing
    Output background cube file [bkgcube.fits]
    Output model definition XML file [NONE] stacked_models.xml
 
-.. note::
-   For convenience, the dimensions of the exposure and background cubes were
-   taken identical to the dimensions of the counts cube. This is however not
-   a requirement, and each of the cubes may have a different dimension and
-   size. For the point spread function cube a coarser spatial binning was
-   used to keep the size of the cube at a manageable level. The point spread
-   function cube varies in fact only slowly over the field of view, and a
-   coarse spatial binning is sufficient to capture that variability.
+This produces a
+:ref:`background cube <glossary_bkgcube>`
+FITS file that contains the predicted background rate as function of sky
+position and energy.
+The tool also produces a
+:ref:`model definition file <glossary_moddef>`
+on output that can serve as input for a maximum likelihood analysis. The file
+is a copy of the input
+:ref:`model definition file <glossary_moddef>`
+where the input background model will be replaced by a background model of
+type ``CTACubeBackground``. Below is the content of the
+:ref:`model definition file <glossary_moddef>`
+that was generated by :ref:`ctbkgcube`.
 
-With this prepatory work finished, you can now perform a binned maximum
-likelihood using :ref:`ctlike`. Instead of the
-:ref:`Observation Definition File <glossary_obsdef>`
-specified for the unbinned analysis, you now need to specify the
-:ref:`counts cube <glossary_countscube>`
-on input, and :ref:`ctlike` will then automatically query for the response
-cubes:
+.. code-block:: xml
 
-.. code-block:: bash
-
-   $ ctlike
-   Input event list, counts cube or observation definition XML file [obs_selected.xml] cntcube.fits
-   Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
-   Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
-   Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
-   Input model definition XML file [models_iem.xml] stacked_models.xml
-   Output model definition XML file [results_iem.xml] stacked_results.xml
-
-You may recognise that :ref:`ctlike` now runs significantly faster.
-An inspection of the log file ``ctlike.log`` demonstrates that the model fit
-converged properly:
-
-.. code-block:: bash
-
-   2017-03-03T23:12:24: +=================================+
-   2017-03-03T23:12:24: | Maximum likelihood optimisation |
-   2017-03-03T23:12:24: +=================================+
-   2017-03-03T23:12:33:  >Iteration   0: -logL=-1080268.343, Lambda=1.0e-03
-   2017-03-03T23:12:42:  >Iteration   1: -logL=-1089316.960, Lambda=1.0e-03, delta=9048.617, max(|grad|)=-22966.895106 [Prefactor:12]
-   2017-03-03T23:12:51:  >Iteration   2: -logL=-1092128.131, Lambda=1.0e-04, delta=2811.171, max(|grad|)=9934.069622 [Index:9]
-   2017-03-03T23:13:00:  >Iteration   3: -logL=-1093496.845, Lambda=1.0e-05, delta=1368.715, max(|grad|)=7376.873836 [Index:9]
-   2017-03-03T23:13:09:  >Iteration   4: -logL=-1093958.510, Lambda=1.0e-06, delta=461.664, max(|grad|)=3457.040882 [RA:6]
-   2017-03-03T23:13:18:  >Iteration   5: -logL=-1094024.130, Lambda=1.0e-07, delta=65.620, max(|grad|)=1299.113262 [RA:6]
-   2017-03-03T23:13:26:  >Iteration   6: -logL=-1094026.708, Lambda=1.0e-08, delta=2.578, max(|grad|)=329.460119 [RA:6]
-   2017-03-03T23:13:35:  >Iteration   7: -logL=-1094026.768, Lambda=1.0e-09, delta=0.060, max(|grad|)=58.463240 [DEC:7]
-   2017-03-03T23:13:44:  >Iteration   8: -logL=-1094026.769, Lambda=1.0e-10, delta=0.002, max(|grad|)=9.521771 [DEC:7]
-   2017-03-03T23:13:53:
-   2017-03-03T23:13:53: +=========================================+
-   2017-03-03T23:13:53: | Maximum likelihood optimisation results |
-   2017-03-03T23:13:53: +=========================================+
-   2017-03-03T23:13:53: === GOptimizerLM ===
-   2017-03-03T23:13:53:  Optimized function value ..: -1094026.769
-   2017-03-03T23:13:53:  Absolute precision ........: 0.005
-   2017-03-03T23:13:53:  Acceptable value decrease .: 2
-   2017-03-03T23:13:53:  Optimization status .......: converged
-   2017-03-03T23:13:53:  Number of parameters ......: 16
-   2017-03-03T23:13:53:  Number of free parameters .: 10
-   2017-03-03T23:13:53:  Number of iterations ......: 8
-   2017-03-03T23:13:53:  Lambda ....................: 1e-11
-   2017-03-03T23:13:53:  Maximum log likelihood ....: 1094026.769
-   2017-03-03T23:13:53:  Observed events  (Nobs) ...: 2244622.000
-   2017-03-03T23:13:53:  Predicted events (Npred) ..: 2244621.999 (Nobs - Npred = 0.00143111124634743)
-
-Similar to the unbinned analysis you can use
-:ref:`csresmap`
-to compute a residual map for a counts cube by typing
-
-.. code-block:: bash
-
-   $ csresmap
-   Input event list, counts cube, or observation definition XML file [obs_selected.xml] cntcube.fits
-   Input model cube file (generated with ctmodel) [NONE]
-   Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
-   Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
-   Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
-   Input model definition XML file [results.xml] stacked_results.xml
-   Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUB]
-   Output residual map file [resmap.fits] stacked_resmap.fits
-
-which generates a residual map that is similar to the map obtained for the
-unbinned analysis. The result is displayed below.
-
-.. figure:: first_skymap_residual_stacked.png
-   :width: 400px
-   :align: center
-
-   *Residual sky map after subtraction of the fitted model for a stacked analysis*
-
-You can also use
-:ref:`ctbutterfly`
-to compute a butterfly diagram for a counts cube by typing
-
-.. code-block:: bash
-
-   $ ctbutterfly
-   Input event list, counts cube or observation definition XML file [obs_selected.xml] cntcube.fits
-   Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
-   Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
-   Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
-   Source of interest [Src002] Src001
-   Input model definition XML file [results.xml] stacked_results.xml
-   Start value for first energy bin in TeV [0.1]
-   Stop value for last energy bin in TeV [100.0]
-   Output ASCII file [butterfly_src002.txt] butterfly_stacked_src001.txt
-
-and you can use
-:ref:`csspec`
-to derive a source spectrum from a counts cube by typing
-
-.. code-block:: bash
-
-   $ csspec
-   Input event list, counts cube, or observation definition XML file [obs_selected.xml] cntcube.fits
-   Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
-   Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
-   Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
-   Input model definition XML file [results.xml] stacked_results.xml
-   Source name [Src002] Src001
-   Binning algorithm (LIN|LOG|FILE) [LOG]
-   Lower energy limit (TeV) [0.1]
-   Upper energy limit (TeV) [100.0]
-   Number of energy bins (0=unbinned) [10]
-   Output spectrum file [spectrum_src002.fits] spectrum_stacked_src001.fits
-
-The results are again similar to the results for the unbinned analysis,
-as illustrated in the figure below:
-
-.. figure:: first_spectrum_stacked.png
-   :width: 600px
-   :align: center
-
-   *Butterfly diagrams determined with ctbutterfly and spectral points determined with csspec for Src001 (top) and Src002 (bottom) using a stacked analysis*
-
+   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+   <source_library title="source library">
+     <source name="Src002" type="PointSource">
+       <spectrum type="PowerLaw">
+         <parameter name="Prefactor" value="1" error="0" scale="5.7e-18" min="0" free="1" />
+         <parameter name="Index" value="1" error="-0" scale="-2.48" min="-4.03225806451613" max="4.03225806451613" free="1" />
+         <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
+       </spectrum>
+       <spatialModel type="PointSource">
+         <parameter name="RA" value="266.882500217018" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.1496303606368" error="0" scale="1" free="1" />
+       </spatialModel>
+     </source>
+     <source name="Src001" type="PointSource">
+       <spectrum type="PowerLaw">
+         <parameter name="Prefactor" value="1" error="0" scale="5.7e-18" min="0" free="1" />
+         <parameter name="Index" value="1" error="-0" scale="-2.48" min="-4.03225806451613" max="4.03225806451613" free="1" />
+         <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
+       </spectrum>
+       <spatialModel type="PointSource">
+         <parameter name="RA" value="266.404485683256" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.9944817753924" error="0" scale="1" free="1" />
+       </spatialModel>
+     </source>
+     <source name="BackgroundModel" type="CTACubeBackground" instrument="CTA,HESS,MAGIC,VERITAS">
+       <spectrum type="PowerLaw">
+         <parameter name="Prefactor" value="1" error="0" scale="1" min="0.01" max="100" free="1" />
+         <parameter name="Index" value="0" error="0" scale="1" min="-5" max="5" free="1" />
+         <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
+       </spectrum>
+     </source>
+   </source_library>

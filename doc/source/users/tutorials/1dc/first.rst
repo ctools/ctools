@@ -26,6 +26,7 @@ We also assume that you have read the section about
    first_select_events
    first_skymap
    first_detect
-   first_fitting
-   first_residuals
    first_stacked
+   first_fitting
+   first_improving
+   first_unbinned
