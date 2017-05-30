@@ -18,6 +18,7 @@ Bug fix releases:
    :maxdepth: 1
 
    ctools 1.0.1 <1.0.1>
+   ctools 1.2.1 <1.2.1>
 
 For older ctools versions see
 `here <https://cta-redmine.irap.omp.eu/projects/ctools/wiki/Release_notes>`_.
