@@ -243,13 +243,15 @@ void ctbutterfly::run(void)
         m_obs.optimize(m_opt);
         m_obs.errors(m_opt);
 
-        // Get covariance matrix.
+        // Get covariance matrix. For the envelope method we need an unscaled
+        // matrix, hence we directly access the curvature matrix and invert
+        // it
         GObservations::likelihood likelihood = m_obs.function();
         if (m_method == "GAUSSIAN") {
-            m_covariance = likelihood.curvature()->invert();
+            m_covariance = likelihood.covariance();
         }
         else {   
-            m_covariance = likelihood.covariance();
+            m_covariance = likelihood.curvature()->invert();
         }
 
         // Write optimizer, optimised model and covariance matrix into logger
@@ -274,12 +276,14 @@ void ctbutterfly::run(void)
         GObservations::likelihood likelihood = m_obs.function();
         likelihood.eval(pars);
 
-        // Get covariance matrix.
+        // Get covariance matrix. For the envelope method we need an unscaled
+        // matrix, hence we directly access the curvature matrix and invert
+        // it
         if (m_method == "GAUSSIAN") {
-            m_covariance = likelihood.curvature()->invert();
+            m_covariance = likelihood.covariance();
         }
         else {   
-            m_covariance = likelihood.covariance();
+            m_covariance = likelihood.curvature()->invert();
         }
 
         // Write covariance matrix into logger
@@ -503,6 +507,8 @@ void ctbutterfly::get_parameters(void)
 
 /***********************************************************************//**
  * @brief Compute butterfly using the ellipsoid boundary method
+ *
+ * @param[in] models Models.
  ***************************************************************************/
 void ctbutterfly::ellipsoid_boundary(GModels& models)
 {
@@ -560,9 +566,9 @@ void ctbutterfly::ellipsoid_boundary(GModels& models)
     log_value(NORMAL, "Eigenvector 1", vector1.print());
     log_value(NORMAL, "Eigenvector 2", vector2.print());
 
-    // Confidence scaling, calculated from a Chi-Sqr. 
-    // distribution with 2 dof
-    double scale = std::sqrt( -2. * std::log(1.-m_confidence) );
+    // Confidence scaling, calculated from a Chi-Squared distribution
+    // with 2 degrees of freedom
+    double scale = std::sqrt(-2.0 * std::log(1.0-m_confidence));
 
     // Write confidence level information into logger
     log_value(NORMAL, "Confidence level", m_confidence);
@@ -657,6 +663,8 @@ void ctbutterfly::ellipsoid_boundary(GModels& models)
 /***********************************************************************//**
  * @brief Compute butterfly using Gaussian error propagation
  *
+ * @param[in] models Models.
+ *
  * Computes the butterfly diagram using Gaussian error propagation. This
  * works for any kind of model.
  ***************************************************************************/
@@ -720,7 +728,9 @@ void ctbutterfly::gaussian_error_propagation(GModels& models)
                     // Loop over all model parameters
                     for (int k = 0; k < skymodel->size(); ++k) {
 
-                        // Set gradient if we deal with spectral component
+                        // Set gradient if we deal with spectral component.
+                        // Remember that the gradient() method returns full
+                        // parameter gradients (including the scale factor)
                         bool parIsSpectral = false;
                         for (int l = 0; l < spectral->size(); ++l) {
                             if ((&((*spectral)[l])) == (&((*skymodel)[k]))) {

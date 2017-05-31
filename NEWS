@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-23 May 2017
+31 May 2017
 
 
 Introduction
@@ -133,6 +133,9 @@ computation of the butterfly diagram. The envelope method that existed before
 is still available for power law spectral models as an option. The "method"
 parameter has been added to allow the selection of the computation method
 (#1862).
+
+A bug in the covariance matrix has been corrected that probably was introduced
+in the implementation of the Gaussian error propagation method (#2121).
 
 
 ctulimit - Compute upper limit
