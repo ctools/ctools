@@ -59,9 +59,8 @@ There are three model components in the file and each model component is
 identified using a unique ``name`` attribute.
 The first two components, ``"Src001"`` and ``"Src002"``, are the two point sources
 detected by :ref:`cssrcdetect`, the third component, ``"Background"``, is a
-background model component of type ``"CTAIrfBackground"``.
-The latter component was added because the background model type was set to
-``IRF`` in the :ref:`cssrcdetect` run.
+background model component of type ``"CTAIrfBackground"`` that was added because
+``IRF`` was specified for the ``Background model type`` when running the script.
 Having a background model component added allows to directly use the
 :ref:`model definition file <glossary_moddef>`
 for a model fitting with :ref:`ctlike`.

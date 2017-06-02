@@ -71,11 +71,12 @@ that are queried by the tool.
 
 .. note::
 
-   The binning of an exposure cube does not need to correspond to the binning
-   of a counts cube. In any case, exposure values will be determined by
+   The binning of the exposure cube does not need to correspond to the binning
+   of the counts cube. In any case, exposure values will be determined by
    interpolation from the values stored in the exposure cube file. The same
-   is true for the point spread function and background cubes described
-   below.
+   is true for the point spread function and background cubes that are
+   described below, or the energy dispersion cube that is described
+   :ref:`here<1dc_howto_edisp>`.
 
 Next, :ref:`ctpsfcube` computes the weighted Point Spread Function of the
 stacked counts cube.

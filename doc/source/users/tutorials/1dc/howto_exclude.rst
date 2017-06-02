@@ -3,6 +3,11 @@
 How to exclude pixels from a counts cube?
 -----------------------------------------
 
+.. admonition:: You will learn ...
+
+   ... how to **exclude pixels of a counts cube** from an analysis using
+   the :ref:`ctcubemask` tool.
+
 You can exclude bins in an analysis from a counts cube by using the
 :ref:`ctcubemask` tool.
 

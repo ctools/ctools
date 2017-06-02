@@ -27,8 +27,8 @@ For the following, make sure that you have set the ``CTADATA`` and ``CALDB``
 environment variables as desribed :ref:`here <1dc_getting_data>`.
 
 The first step of the analysis consists in selecting the observations from the
-:ref:`Observation Definition File <glossary_obsdef>`
-``obs_gc_baseline.xml`` that have pointing directions close to the Galactic
+:ref:`observation definition file <glossary_obsdef>`
+``obs_gps_baseline.xml`` that have pointing directions close to the Galactic
 Centre.
 You do this with the :ref:`csobsselect` script by typing:
 
@@ -95,7 +95,7 @@ The output of :ref:`csobsinfo` is shown below. :ref:`csobsselect` selected
   2017-06-02T08:10:00:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
 
 The resulting
-:ref:`Observation Definition File <glossary_obsdef>`
+:ref:`observation definition file <glossary_obsdef>`
 will look as follows:
 
 .. code-block:: xml
@@ -123,5 +123,5 @@ An ``<observation>`` element contains two parameters:
 the ``EventList`` parameter that specifies the name of the corresponding event
 file, and
 the ``Calibration`` parameter that specifies the
-:ref:`Instrument Response Function <glossary_irf>` that applies to the
+:ref:`instrument response function <glossary_irf>` that applies to the
 event file.

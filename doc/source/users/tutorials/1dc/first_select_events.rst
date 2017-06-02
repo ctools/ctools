@@ -8,6 +8,10 @@ Selecting the relevant events
    ... how to **select a subset of events** from the selected observations for
    your analysis.
 
+   The event selection is useful to restrict for example the energy range of
+   the events or the time interval covered, but also to select only events
+   within a given radial acceptance region (also called region of interest).
+
 As next step, you have to select the relevant events from the selected
 observations. You do this with the :ref:`ctselect` tool by typing:
 
@@ -67,7 +71,7 @@ displays a summary of the content of this new
 There are still 57 observations in the
 :ref:`observation definition file <glossary_obsdef>`
 but now the events are restricted to the energy interval 100 GeV - 100 TeV. In
-total there are 3 348 255 within this interval in the selected observations.
+total there are 3 348 255 events within this interval in the selected observations.
 
 The content of ``obs_selected.xml`` will look similar to the content of
 ``obs.xml`` with the original event list file names replaced by the names of

@@ -3,6 +3,11 @@
 How to compute upper limits?
 ----------------------------
 
+.. admonition:: You will learn ...
+
+   ... how to **determine the upper flux limit for a source** using the
+   :ref:`ctulimit` tool.
+
 You determine upper limits for gamma-ray sources using the :ref:`ctulimit`
 tool.
 
@@ -39,7 +44,7 @@ and then run the :ref:`ctulimit` as follows:
    Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
    Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
    Source of interest [Crab] Test
-   Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_models_iem_ul.xml
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_models-cutoff-iem-up.xml
 
 After the run, the upper gamma-ray flux limit for this test source can be
 extracted from the :ref:`ctulimit` log file:

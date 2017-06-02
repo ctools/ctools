@@ -5,7 +5,8 @@ How to display the results?
 
 .. admonition:: You will learn ...
 
-   ... how to **display results**.
+   ... how to **display results** using some example scripts written in
+   Python and requiring the ``matplotlib`` module.
 
 The ctools package does not contain any tools or scripts for graphical
 display of results since results are generally written into standard FITS
@@ -17,19 +18,19 @@ included in the ctools package that rely on the
 Python module. You can find these scripts in the
 ``$CTOOLS/share/examples/python`` folder. The following scripts are available:
 
-+------------------------+-----------------------------+
-| Script                 | Usage                       |
-+========================+=============================+
-| ``show_butterfly.py``  | Display a butterfly diagram |
-+------------------------+-----------------------------+
-| ``show_lightcurve.py`` | Display a light curve       |
-+------------------------+-----------------------------+
-| ``show_obs.py``        | Display observation summary |
-+------------------------+-----------------------------+
-| ``show_pointings.py``  | Display pointing directions |
-+------------------------+-----------------------------+
-| ``show_spectrum.py``   | Display a spectrum          |
-+------------------------+-----------------------------+
+  +------------------------+-----------------------------+
+  | Script                 | Usage                       |
+  +========================+=============================+
+  | ``show_butterfly.py``  | Display a butterfly diagram |
+  +------------------------+-----------------------------+
+  | ``show_lightcurve.py`` | Display a light curve       |
+  +------------------------+-----------------------------+
+  | ``show_obs.py``        | Display observation summary |
+  +------------------------+-----------------------------+
+  | ``show_pointings.py``  | Display pointing directions |
+  +------------------------+-----------------------------+
+  | ``show_spectrum.py``   | Display a spectrum          |
+  +------------------------+-----------------------------+
 
 Below some usage examples and the expected output:
 
@@ -42,6 +43,16 @@ Below some usage examples and the expected output:
    :align: center
 
    *Butterfly diagram displayed with show_butterfly.py*
+
+.. code-block:: bash
+
+   $ $CTOOLS/share/examples/python/show_lightcurve.py lightcurve.fits
+
+.. figure:: howto_lightcurve.png
+   :width: 600px
+   :align: center
+
+   *Light curve displayed with show_lightcurve.py*
 
 .. code-block:: bash
 

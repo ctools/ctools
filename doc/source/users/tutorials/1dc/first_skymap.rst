@@ -53,7 +53,7 @@ is shown below:
 
    *Sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey*
 
-The sky map shows a wide-spread distribution of events with a number of sources
+The sky map shows a wide-spread distribution of events with several sources
 superimposed.
 Many of the events originate from an irreducable background that hampers the
 recognition of the gamma-ray sources.

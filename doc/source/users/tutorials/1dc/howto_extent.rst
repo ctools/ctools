@@ -3,6 +3,11 @@
 How to determine the extension of a source?
 -------------------------------------------
 
+.. admonition:: You will learn ...
+
+   ... how you **determine the spatial extent of a source** by fitting an
+   extended source model to the data.
+
 To determine the spatial extension of a source, an extended source model
 has to be used in the
 :ref:`model definition file <glossary_moddef>`
@@ -15,15 +20,16 @@ Note that at the same time the source type has been set to
 
 .. code-block:: xml
 
-   <source name="Src001" type="ExtendedSource">
-     <spectrum type="PowerLaw">
-       <parameter name="Prefactor"   value="1" scale="5.7e-18" min="0" free="1" />
-       <parameter name="Index"       value="1" scale="-2.48"   min="-5" max="5" free="1" />
-       <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
+   <source name="Src001" type="PointSource">
+     <spectrum type="ExponentialCutoffPowerLaw">
+       <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+       <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+       <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
+       <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
      </spectrum>
      <spatialModel type="RadialGaussian">
-       <parameter name="RA"    scale="1.0" value="266.4240" min="-360"  max="360" free="1"/>
-       <parameter name="DEC"   scale="1.0" value="-29.0049" min="-90"   max="90"  free="1"/>
+       <parameter name="RA"    scale="1.0" value="266.4044" min="-360"  max="360" free="1"/>
+       <parameter name="DEC"   scale="1.0" value="-28.9945" min="-90"   max="90"  free="1"/>
        <parameter name="Sigma" scale="1.0" value="0.05"     min="0.001" max="10"  free="1"/>
      </spatialModel>
    </source>
