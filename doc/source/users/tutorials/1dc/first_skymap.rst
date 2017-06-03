@@ -3,6 +3,16 @@
 Generating a sky map from the events
 ------------------------------------
 
+  .. admonition:: What you will learn
+
+     You will learn how to **generate a sky map** from the selected events.
+
+     A background model based on the background template included in the
+     :ref:`instrument response functions <glossary_irf>`
+     may be subtracted from the sky map to display only celestial excess events,
+     but be aware that for the moment the background subtraction is
+     computationally intensive.
+
 After having selected the observations and the events you can begin your
 analysis.
 
@@ -43,13 +53,13 @@ is shown below:
 
    *Sky map of the events recorded around the Galactic Centre during the Galactic Plane Survey*
 
-The sky map shows a wide-spread distribution of events with a number of sources
+The sky map shows a wide-spread distribution of events with several sources
 superimposed.
 Many of the events originate from an irreducable background that hampers the
 recognition of the gamma-ray sources.
 To describe the irreducable background in the CTA data, templates of the
 background event distribution are included in the
-:ref:`Instrument Response Functions <glossary_irf>`.
+:ref:`instrument response functions <glossary_irf>`.
 These templates can be used by :ref:`ctskymap` to subtract the irreducable
 background contribution from the sky map.
 The background subtraction is enabled by running the :ref:`ctskymap` with

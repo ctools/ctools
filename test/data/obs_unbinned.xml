@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <observation_list title="observation list">
   <observation name="" id="00001" instrument="CTA">
-    <parameter name="EventList"           file="crab_events.fits" />
+    <parameter name="EventList"           file="$(TEST_DATA)/crab_events.fits" />
     <parameter name="EffectiveArea"       file="$(TEST_DATA)/irf_file.fits" />
     <parameter name="PointSpreadFunction" file="$(TEST_DATA)/irf_file.fits" />
     <parameter name="EnergyDispersion"    file="$(TEST_DATA)/irf_file.fits" />

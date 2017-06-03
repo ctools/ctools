@@ -29,13 +29,15 @@ You are highly invited to join one of the next coding sprints.
 You can also follow `@ctools_software <https://twitter.com/ctools_software>`_ on
 twitter to get informed about new ctools releases.
 
-Below a few links to learn how to contribute to ctools:
+Below some reasources to learn how to contribute to ctools:
 
 .. toctree::
    :maxdepth: 1
 
    git/index
    coding/index
+   profiling/index
+   releasing/index
 
 And here some status shields:
 

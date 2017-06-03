@@ -11,11 +11,11 @@ You need your usual CTA credentials to download the data.
 
 The release contains simulated data for the Galactic Plane Survey, the
 Galactic Centre Survey and the Extragalactic Survey,
-:ref:`Instrument Response Functions (IRFs) <glossary_irf>`, and the
+:ref:`instrument response functions (IRFs) <glossary_irf>`, and the
 :ref:`model definition files <glossary_moddef>`
 that were used for the simulation.
 In addition, ctools metadata, including
-:ref:`Observation Definition Files <glossary_obsdef>`
+:ref:`observation definition files <glossary_obsdef>`
 are available.
 
 The data were split into the separate files that can be downloaded

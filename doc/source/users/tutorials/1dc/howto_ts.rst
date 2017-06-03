@@ -3,10 +3,15 @@
 How to compute the signifiance of a source?
 -------------------------------------------
 
-To compute the significance of a given source you need to add the attribute
-``tscalc="1"`` to the ``<source>`` tag in the
+  .. admonition:: What you will learn
+
+     You will learn how to **compute the significance of a source detection**
+     using the :ref:`ctlike` tool.
+
+To compute the detection significance of a given source you need to add the
+attribute ``tscalc="1"`` to the ``<source>`` tag in the
 :ref:`model definition file <glossary_moddef>`
-and execute :ref:`ctlike` using this file.
+and execute :ref:`ctlike` using the modified file.
 The structure of the XML file with significance computation requested for
 ``Src001`` is shown below.
 
@@ -15,14 +20,16 @@ The structure of the XML file with significance computation requested for
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <source_library title="source library">
      <source name="Src001" type="PointSource" tscalc="1">
-       <spectrum type="PowerLaw">
-         <parameter name="Prefactor" value="1" error="0" scale="5.7e-18" min="0" free="1" />
-         <parameter name="Index" value="1" error="-0" scale="-2.48" min="-4.03225806451613" max="4.03225806451613" free="1" />
-         <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
+       <spectrum type="ExponentialCutoffPowerLaw">
+         <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+         <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
+         <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
        </spectrum>
-       <spatialModel type="PointSource">
-         <parameter name="RA" value="266.424004498437" error="0" scale="1" free="1" />
-         <parameter name="DEC" value="-29.0049010253548" error="0" scale="1" free="1" />
+       <spatialModel type="RadialDisk">
+         <parameter name="RA"     scale="1.0" value="266.4044" min="-360" max="360" free="1"/>
+         <parameter name="DEC"    scale="1.0" value="-28.9944" min="-90"  max="90"  free="1"/>
+         <parameter name="Radius" scale="1.0" value="0.1"      min="0.01" max="10"  free="1"/>
        </spatialModel>
      </source>
      ...
@@ -36,27 +43,21 @@ freedom, where :math:`p` is the number of free parameters of ``Src001``.
 For :math:`p=1`, the source significance is the square root of the Test
 Statistic.
 
-An excerpt of the :ref:`ctlike` log file is shown below where signifance
-computation was requested for ``Src001`` and ``Src002`` and the diffuse
-Galactic emission component ``IEM``. The computation has been done using
-a stacked analysis.
+An excerpt of the :ref:`ctlike` log file is shown below where significance
+computation was requested for ``Src001`` and ``Src002``. The computation was
+done using a stacked analysis.
 
 .. code-block:: bash
 
-   2017-03-03T23:36:07: === GModelSky ===
-   2017-03-03T23:36:07:  Name ......................: Src001
-   2017-03-03T23:36:07:  Instruments ...............: all
-   2017-03-03T23:36:07:  Test Statistic ............: 12650.600597267
+   2017-06-02T10:54:10: === GModelSky ===
+   2017-06-02T10:54:10:  Name ......................: Src001
+   2017-06-02T10:54:10:  Instruments ...............: all
+   2017-06-02T10:54:10:  Test Statistic ............: 8845.82638467156
    ...
-   2017-03-03T23:36:07: === GModelSky ===
-   2017-03-03T23:36:07:  Name ......................: Src002
-   2017-03-03T23:36:07:  Instruments ...............: all
-   2017-03-03T23:36:07:  Test Statistic ............: 2154.31897658715
-   ...
-   2017-03-03T23:36:07: === GModelSky ===
-   2017-03-03T23:36:07:  Name ......................: IEM
-   2017-03-03T23:36:07:  Instruments ...............: all
-   2017-03-03T23:36:07:  Test Statistic ............: 43070.3063685261
+   2017-06-02T10:54:10: === GModelSky ===
+   2017-06-02T10:54:10:  Name ......................: Src002
+   2017-06-02T10:54:10:  Instruments ...............: all
+   2017-06-02T10:54:10:  Test Statistic ............: 1437.33551948087
 
 The Test Statistic values are also written into the
 :ref:`model definition file <glossary_moddef>`
@@ -66,13 +67,10 @@ created by :ref:`ctlike`:
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <source_library title="source library">
-     <source name="Src001" type="PointSource" ts="12650.601" tscalc="1">
+     <source name="Src001" type="ExtendedSource" ts="8845.826" tscalc="1">
        ...
      </source>
-     <source name="Src002" type="PointSource" ts="2154.319" tscalc="1">
-       ...
-     </source>
-     <source name="IEM" type="DiffuseSource" ts="43070.306" tscalc="1">
+     <source name="Src002" type="PointSource" ts="1437.336" tscalc="1">
        ...
      </source>
      ...

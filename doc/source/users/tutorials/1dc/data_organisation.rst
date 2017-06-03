@@ -46,7 +46,7 @@ Instrument Response Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``caldb`` folder contains the
-:ref:`Instrument Response Functions <glossary_irf>`
+:ref:`instrument response functions <glossary_irf>`
 that are necessary for the analysis of the simulated CTA data.
 The folder contains the ``1dc`` response that should be used for the
 :ref:`first CTA Data Challenge <glossary_1dc>`.
@@ -102,7 +102,7 @@ Each event file contains the events for an
 :ref:`observation <glossary_obs>` and comprises an
 :ref:`event list <glossary_eventlist>`
 and a
-:ref:`Good Time Intervals <glossary_gti>`
+:ref:`good time intervals <glossary_gti>`
 binary table extension (see figure below).
 
 .. figure:: event_file.png
@@ -205,7 +205,7 @@ Observation Definition Files
 
 The files ``obs_egal_baseline.xml``, ``obs_gc_baseline.xml``, and
 ``obs_gps_baseline.xml`` are so called
-:ref:`Observation Definition Files <glossary_obsdef>`
+:ref:`observation definition files <glossary_obsdef>`
 containing the information (or metadata) of a list of observations.
 The file is a plain ASCII files in XML format that can be inspected and
 manipulated by any text editor.
@@ -218,7 +218,7 @@ The ``models`` folder contains the definitions of all source and background
 models that were used for simulating the data.
 The files ``models_egal.xml``, ``models_gc.xml`` and ``models_gps.xml`` are
 so called
-:ref:`Model Definition Files <glossary_moddef>`
+:ref:`model definition files <glossary_moddef>`
 collecting the definition of all model components used for the three surveys.
 Since the same sky model was used for all surveys the three files are
 identical.
