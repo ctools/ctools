@@ -3,15 +3,15 @@
 Fitting the model components directly to the events
 ---------------------------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to analyse the event data using an **unbinned maximum
-   likelihood analysis**.
+     You will learn how to analyse the event data using an **unbinned maximum
+     likelihood analysis**.
 
-   Use an unbinned maximum likelihood analysis if you have doubts about the
-   impact of the selected binning on your analysis and if the number of
-   observations is not too large (typically a few tens of 30 minute
-   observations). Or if you simply to not worry about computation time.
+     Use an unbinned maximum likelihood analysis if you have doubts about the
+     impact of the selected binning on your analysis and if the number of
+     observations is not too large (typically a few tens of 30 minute
+     observations). Or if you simply to not worry about computation time.
 
 Instead of binning the events into a counts cube and computing the effective
 :ref:`instrument response functions <glossary_irf>`

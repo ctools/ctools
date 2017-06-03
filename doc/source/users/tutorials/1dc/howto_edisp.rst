@@ -1,18 +1,18 @@
 .. _1dc_howto_edisp:
 
-How to take the energy dispersion into account
-----------------------------------------------
+How to take the energy dispersion into account?
+-----------------------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **take into account the energy dispersion** in a maximum
-   likelihood analysis.
+     You will learn how to **take the energy dispersion into account** when
+     fitting a model to the data using a maximum likelihood analysis.
 
-   Although the effect of the energy dispersion is often neglegible there
-   may be cases where you want to consider energy dispersion in an analysis,
-   for example if you are analysing the data down to very low energies.
-   Energy dispersion is fully implemented in ctools but is computationally
-   intensive. So be aware that the tools and scripts will take longer.
+     Although the effect of the energy dispersion is often neglegible there
+     may be cases where you want to consider energy dispersion in an analysis,
+     for example if you are analysing the data down to very low energies.
+     Energy dispersion is fully implemented in ctools but is computationally
+     intensive. So be aware that the tools and scripts will take longer.
 
 If you are doing a stacked analysis the first thing you need is an energy
 dispersion cube. You generate this cube using the :ref:`ctedispcube` tool:
@@ -34,7 +34,7 @@ dispersion cube. You generate this cube using the :ref:`ctedispcube` tool:
    Number of energy bins [20] 30
    Output energy dispersion cube file [edispcube.fits]
 
-This produces a
+This produces an
 :ref:`energy dispersion cube <glossary_edispcube>`
 FITS file that contains the weighted energy dispersion as function of
 sky position and energy.
@@ -53,9 +53,10 @@ during the fit:
    Input event list, counts cube or observation definition XML file [events.fits] cntcube.fits
    Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
    Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
+   Input energy dispersion cube file (only needed for stacked analysis) [NONE] edispcube.fits
    Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
    Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_models.xml
-   Output model definition XML file [crab_results.xml] stacked_results.xml
+   Output model definition XML file [crab_results.xml] stacked_results_edisp.xml
 
 If you are doing an unbinned analysis you do not need to generate an energy
 dispersion cube and you can directly run :ref:`ctlike` with the ``edisp=yes``

@@ -3,15 +3,15 @@
 Detecting candidate sources
 ---------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **detect candidate sources** in a sky map.
+     You will learn how to **detect candidate sources** in a sky map.
 
-   This will provide you with an initial
-   :ref:`model definition XML file <glossary_moddef>`
-   that can be directly used for maximum likelihood fitting. In subsequent
-   steps you will iteratively improve this model to obtain a reliable
-   description of the observed gamma-ray sky.
+     This will provide you with an initial
+     :ref:`model definition file <glossary_moddef>`
+     in XML format that can be directly used for maximum likelihood fitting.
+     In subsequent steps you will iteratively improve this model to obtain a
+     reliable description of the observed gamma-ray sky.
 
 As next step you need to identify the location of candidate sources in the
 sky map.

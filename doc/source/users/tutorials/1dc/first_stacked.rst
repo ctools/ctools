@@ -3,18 +3,18 @@
 Stacking the data
 -----------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **prepare the data for analysis** by stacking all events into
-   a counts cube and by computing the effective
-   :ref:`instrument response function <glossary_irf>`
-   for this counts cube.
+     You will learn how to **prepare the data for analysis** by stacking all
+     events into a counts cube and by computing the effective
+     :ref:`instrument response function <glossary_irf>`
+     for this counts cube.
 
-   Please note that for the moment we do not consider the energy dispersion
-   since for many cases the effect of the energy dispersion is negligible,
-   and taking energy dispersion into account is computationally intensive. If
-   you want to learn how to take the energy dispersion into account please
-   read :ref:`this section<1dc_howto_edisp>`.
+     Please note that for the moment we do not consider the energy dispersion
+     since for many cases the effect of the energy dispersion is negligible,
+     and taking energy dispersion into account is computationally intensive. If
+     you want to learn how to take the energy dispersion into account please
+     read :ref:`this section<1dc_howto_edisp>`.
 
 To analyse the selected observations, we recommend to stack the events into
 a counts cube. You do this using the :ref:`ctbin` tool:

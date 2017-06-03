@@ -3,10 +3,10 @@
 How to determine the extension of a source?
 -------------------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how you **determine the spatial extent of a source** by fitting an
-   extended source model to the data.
+     You will learn how you **determine the spatial extent of a source** by
+     fitting an extended source model to the data.
 
 To determine the spatial extension of a source, an extended source model
 has to be used in the
@@ -15,7 +15,7 @@ of the source of interest.
 In the example below, a ``RadialGaussian`` model is used for the source
 ``Src001`` to model the spatial morphology of the source by an axisymmetric
 Gaussian profile with the Gaussian width ``sigma`` as free parameter.
-Note that at the same time the source type has been set to
+Note that at the same time the source type was set to
 ``ExtendedSource``.
 
 .. code-block:: xml
@@ -41,31 +41,31 @@ log file and will also be written into the output
 :ref:`model definition file <glossary_moddef>`.
 
 For illustration, an excerpt of the :ref:`ctlike` log file is shown below.
-The Gaussian width of ``Src001`` has been fitted to 0.0218 +/- 0.0006 degrees.
+The Gaussian width of ``Src001`` has been fitted to 0.049 +/- 0.001 degrees.
 
 .. code-block:: xml
 
-   2017-03-04T17:44:06: === GModelSky ===
-   2017-03-04T17:44:06:  Name ......................: Src001
-   2017-03-04T17:44:06:  Instruments ...............: all
-   2017-03-04T17:44:06:  Instrument scale factors ..: unity
-   2017-03-04T17:44:06:  Observation identifiers ...: all
-   2017-03-04T17:44:06:  Model type ................: ExtendedSource
-   2017-03-04T17:44:06:  Model components ..........: "RadialGaussian" * "PowerLaw" * "Constant"
-   2017-03-04T17:44:06:  Number of parameters ......: 7
-   2017-03-04T17:44:06:  Number of spatial par's ...: 3
-   2017-03-04T17:44:06:   RA .......................: 266.416716505268 +/- 0.000753191747203773 [-360,360] deg (free,scale=1)
-   2017-03-04T17:44:06:   DEC ......................: -29.0044104159472 +/- 0.000655420291471696 [-90,90] deg (free,scale=1)
-   2017-03-04T17:44:06:   Sigma ....................: 0.02183871432113 +/- 0.000636651479386333 [0.001,10] deg (free,scale=1)
-   2017-03-04T17:44:06:  Number of spectral par's ..: 3
-   2017-03-04T17:44:06:   Prefactor ................: 4.85894838349519e-17 +/- 7.40461052122477e-19 [0,infty[ ph/cm2/s/MeV (free,scale=5.7e-18,gradient)
-   2017-03-04T17:44:06:   Index ....................: -2.29168205335762 +/- 0.00909936860902909 [10,-10]  (free,scale=-2.48,gradient)
-   2017-03-04T17:44:06:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
-   2017-03-04T17:44:06:  Number of temporal par's ..: 1
-   2017-03-04T17:44:06:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2017-06-03T16:09:45: === GModelSky ===
+   2017-06-03T16:09:45:  Name ......................: Src001
+   2017-06-03T16:09:45:  Instruments ...............: all
+   2017-06-03T16:09:45:  Instrument scale factors ..: unity
+   2017-06-03T16:09:45:  Observation identifiers ...: all
+   2017-06-03T16:09:45:  Model type ................: ExtendedSource
+   2017-06-03T16:09:45:  Model components ..........: "RadialGaussian" * "ExponentialCutoffPowerLaw" * "Constant"
+   2017-06-03T16:09:45:  Number of parameters ......: 8
+   2017-06-03T16:09:45:  Number of spatial par's ...: 3
+   2017-06-03T16:09:45:   RA .......................: 266.420293012532 +/- 0.00132113631921452 [-360,360] deg (free,scale=1)
+   2017-06-03T16:09:45:   DEC ......................: -29.0055014958646 +/- 0.00116849557635297 [-90,90] deg (free,scale=1)
+   2017-06-03T16:09:45:   Sigma ....................: 0.0488254879944832 +/- 0.000993438752316212 [0.001,10] deg (free,scale=1)
+   2017-06-03T16:09:45:  Number of spectral par's ..: 4
+   2017-06-03T16:09:45:   Prefactor ................: 3.2695646853429e-17 +/- 6.35060270585935e-19 [1e-25,1e-15] ph/cm2/s/MeV (free,scale=1e-18,gradient)
+   2017-06-03T16:09:45:   Index ....................: -2.25022445798271 +/- 0.0188890753731813 [-0,-5]  (free,scale=-1,gradient)
+   2017-06-03T16:09:45:   CutoffEnergy .............: 28286052.9486927 +/- 6883002.00397237 [100000,10000000000] MeV (free,scale=10000000,gradient)
+   2017-06-03T16:09:45:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+   2017-06-03T16:09:45:  Number of temporal par's ..: 1
+   2017-06-03T16:09:45:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. warning::
-   The errors returned by :ref:`ctlike` are purely statistical. In addition
-   there are systematic uncertainties, such as for example the limits in the
-   knowledge of the point spread function. It remains to be seen whether CTA
-   will be able to reliably determine source extents as small as 0.02 degrees.
+   The parameter errors returned by :ref:`ctlike` are purely statistical. In
+   addition to the statistical errors there are systematic uncertainties, such
+   as for example the limits on the knowledge of the point spread function.

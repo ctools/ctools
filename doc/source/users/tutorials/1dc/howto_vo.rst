@@ -3,12 +3,12 @@
 How to use Virtual Observatory tools with ctools?
 -------------------------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to interaction with Virtual Observatory tools such as
-   `Aladin <http://aladin.u-strasbg.fr>`_
-   or
-   `Topcat <http://www.star.bris.ac.uk/~mbt/topcat/>`_.
+     You will learn how to interact with the Virtual Observatory tools
+     `Aladin <http://aladin.u-strasbg.fr>`_ for image display and
+     `Topcat <http://www.star.bris.ac.uk/~mbt/topcat/>`_ for display of tables
+     such as event lists.
 
 Several ctools can interact with Virtual Observatory tools such as
 `Aladin <http://aladin.u-strasbg.fr>`_
@@ -117,9 +117,7 @@ energy (see below).
    *Display of event list in 3-dimensional representation*
 
 Below the list of tools and scripts that interact with Virtual Observatory
-tools. Some tools or scripts publish tables instead of images, and the tables
-can for example by displayed and explored using
-`Topcat <http://www.star.bris.ac.uk/~mbt/topcat/>`_.
+tools.
 
   +-------------------+--------+-------------------+
   | Tool or script    | Object | VO tool (example) |
@@ -145,6 +143,10 @@ can for example by displayed and explored using
   | :ref:`ctmodel`    | Image  | Aladin            |
   +-------------------+--------+-------------------+
   | :ref:`ctobssim`   | Table  | Topcat            |
+  +-------------------+--------+-------------------+
+  | :ref:`ctphase`    | Table  | Topcat            |
+  +-------------------+--------+-------------------+
+  | :ref:`ctprob`     | Table  | Topcat            |
   +-------------------+--------+-------------------+
   | :ref:`ctselect`   | Table  | Topcat            |
   +-------------------+--------+-------------------+

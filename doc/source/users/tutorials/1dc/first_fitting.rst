@@ -3,22 +3,20 @@
 Fitting the model components to the counts cube
 -----------------------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **fit a parametric model** to the counts cube using an
-   maximum liklihood algorithm.
+     You will learn how to **fit a parametric model** to the counts cube using
+     a maximum likelihood algorithm.
 
-   You will also learn how to display the fit results in form of
-   `ds9 <http://ds9.si.edu>`_
-   region files, butterfly diagrams and spectral points.
+     You will also learn how to display the fit results in form of
+     `ds9 <http://ds9.si.edu>`_
+     region files, butterfly diagrams and spectral points.
 
-   Please note that display tools are **not** part of ctools, yet some
-   scripts for result display that use the ``matplotlib`` Python module can be
-   found in the
-   ``$CTOOLS/share/examples/python``
-   folder. For example you may use ``show_butterfly.py`` to display a butterfly
-   diagram or ``show_spectrum.py`` to display spectral points. Do not hesitate to
-   copy and adjust these scripts as needed, they are examples.
+     Please note that display tools are **not** part of ctools, yet some
+     scripts for result display that use the ``matplotlib`` Python module can be
+     found in the
+     ``$CTOOLS/share/examples/python``
+     folder (see :ref:`how to display results<1dc_howto_display>`).
 
 Now you are ready to fit the model to the counts cube and to determine its
 maximum likelihood parameters.

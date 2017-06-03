@@ -3,14 +3,15 @@
 Selecting the relevant events
 -----------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **select a subset of events** from the selected observations for
-   your analysis.
+     You will learn how to **select a subset of events** from the selected
+     observations for your analysis.
 
-   The event selection is useful to restrict for example the energy range of
-   the events or the time interval covered, but also to select only events
-   within a given radial acceptance region (also called region of interest).
+     The event selection is necessary if you want to restrict for example the
+     energy range of the events or the time interval that should be covered,
+     but also if you want to select only events within a given radial
+     acceptance region (also called region of interest).
 
 As next step, you have to select the relevant events from the selected
 observations. You do this with the :ref:`ctselect` tool by typing:

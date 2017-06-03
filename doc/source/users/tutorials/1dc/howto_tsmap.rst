@@ -3,10 +3,10 @@
 How to generate a Test Statistic map?
 -------------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **generate a map of source detection significances** using the
-   :ref:`cttsmap` tool.
+     You will learn how to **generate a map of source detection significances**
+     to localise a gamma-ray source.
 
 If you want to know how the Test Statistic changes with source position you
 can create a Test Statistic map using the :ref:`cttsmap` tool. A Test
@@ -56,12 +56,12 @@ The figure below shows the resulting Test Statistic map.
 
    The ``binmin`` and ``binmax`` parameters can be used to compute only a
    subset of the bins in a map (see :ref:`cttsmap`). This functionality is
-   used by the :ref:`cstsmapsplit` to generate a command sequence that is
+   used by the :ref:`cstsmapsplit` script to generate a command sequence that is
    useful for parallelizing the Test Statistic map computation. The
    :ref:`cstsmapmerge` script can then be used to recombine the different
    partial maps into a single Test Statistic map.
 
-   To produce the same result that has been produced above by the single
+   To produce the same result that was produced above by the single
    :ref:`cttsmap` run, now however split over ten :ref:`cttsmap` jobs that
    can be executed in parallel, type
 
@@ -86,7 +86,7 @@ The figure below shows the resulting Test Statistic map.
       Compute null hypothesis first? [yes]
       ASCII file containing all commands [commands.dat] tsmap_commands.dat
 
-   The :ref:`cstsmapmerge` script creates the following ASCII file on output:
+   The :ref:`cstsmapsplit` script creates the following ASCII file on output:
 
    .. code-block:: bash
 
@@ -107,9 +107,9 @@ The figure below shows the resulting Test Statistic map.
 
       ./tsmap_commands.dat
 
-   This will execute ten :ref:`cttsmap` jobs and parallel that each creates
-   ten pixels of the Test Statistic map. You combine the resulting ten Test
-   Statistic maps into a single map by typing
+   This will execute 10 :ref:`cttsmap` jobs in parallel. Each of the jobs will
+   compute 10 pixels of the Test Statistic map. You combine the resulting 10
+   Test Statistic maps into a single map by typing
 
    .. code-block:: bash
 

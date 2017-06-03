@@ -3,13 +3,13 @@
 Selecting the relevant observations
 -----------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **select a subset of observations** from the Data Challenge data
-   for your analysis.
+     You will learn how to **select a subset of observations** from the Data
+     Challenge data for your analysis.
 
-   We recommended to analyse the data region by region since the analysis of
-   the Data Challenge data in a single shot will be very very time consuming.
+     We recommended to analyse the data region by region since the analysis of
+     the Data Challenge data in a single shot will be very very time consuming.
 
 Let's assume that you want to analyse the central region of our Galaxy using
 the data obtained during the Galactic Plane Survey.

@@ -3,10 +3,10 @@
 Iteratively improving the model
 -------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **iteratively improve** your source model by inspecting the
-   fit residuals and by adjusting the model components as needed.
+     You will learn how to **iteratively improve** your source model by
+     inspecting the fit residuals and by adjusting the model components as needed.
 
 After doing the model fit you should investigate the residuals to verify that
 the model components properly describe the observed event distribution.

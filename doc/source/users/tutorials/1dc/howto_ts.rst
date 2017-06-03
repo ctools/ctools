@@ -3,15 +3,15 @@
 How to compute the signifiance of a source?
 -------------------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **compute the significance of a source detection** using the
-   :ref:`ctlike` tool.
+     You will learn how to **compute the significance of a source detection**
+     using the :ref:`ctlike` tool.
 
 To compute the detection significance of a given source you need to add the
 attribute ``tscalc="1"`` to the ``<source>`` tag in the
 :ref:`model definition file <glossary_moddef>`
-and execute :ref:`ctlike` using this file.
+and execute :ref:`ctlike` using the modified file.
 The structure of the XML file with significance computation requested for
 ``Src001`` is shown below.
 
@@ -43,7 +43,7 @@ freedom, where :math:`p` is the number of free parameters of ``Src001``.
 For :math:`p=1`, the source significance is the square root of the Test
 Statistic.
 
-An excerpt of the :ref:`ctlike` log file is shown below where signifance
+An excerpt of the :ref:`ctlike` log file is shown below where significance
 computation was requested for ``Src001`` and ``Src002``. The computation was
 done using a stacked analysis.
 

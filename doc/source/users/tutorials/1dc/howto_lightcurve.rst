@@ -3,10 +3,10 @@
 How to generate a light curve?
 ------------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **generate a light curve** for a source using the
-   :ref:`cslightcrv` script.
+     You will learn how to **generate a light curve** for a source to study
+     the temporal variation of the flux and spectrum.
 
 You can generate a light curve using the :ref:`cslightcrv` script which
 takes on input an
@@ -25,7 +25,7 @@ The following example illustrates how you can generate a light curve for
 corresponding to the dates from 2021-01-21 (12:00:00) to 2021-01-22 (00:00:00)
 (to convert dates to MJD and vice versa we suggest to use the
 `xTime Date and Time Conversion Utility <https://heasarc.gsfc.nasa.gov/cgi-bin/Tools/xTime/xTime.pl>`_).
-The time interval is linearly divided into 100 time bins.
+The time interval is linearly divided into 20 time bins.
 
 .. code-block:: bash
 

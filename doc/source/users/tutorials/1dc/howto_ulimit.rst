@@ -3,10 +3,10 @@
 How to compute upper limits?
 ----------------------------
 
-.. admonition:: You will learn ...
+  .. admonition:: What you will learn
 
-   ... how to **determine the upper flux limit for a source** using the
-   :ref:`ctulimit` tool.
+     You will learn how to **determine the upper flux limit for a source**
+     using the :ref:`ctulimit` tool.
 
 You determine upper limits for gamma-ray sources using the :ref:`ctulimit`
 tool.
@@ -34,7 +34,7 @@ for example
      </spatialModel>
    </source>
 
-and then run the :ref:`ctulimit` as follows:
+and then run the :ref:`ctulimit` tool as follows:
 
 .. code-block:: bash
 
@@ -51,12 +51,12 @@ extracted from the :ref:`ctulimit` log file:
 
 .. code-block:: bash
 
-   2017-03-04T20:29:08: +=====================+
-   2017-03-04T20:29:08: | Upper limit results |
-   2017-03-04T20:29:08: +=====================+
-   2017-03-04T20:29:08:  Differential flux limit ...: 1.01134913337855e-20 ph/cm2/s/MeV at 1 TeV
-   2017-03-04T20:29:08:  Integral flux limit .......: 6.82594737233183e-15 ph/cm2/s within [1-100] TeV
-   2017-03-04T20:29:08:  Energy flux limit .........: 3.00560602939917e-14 erg/cm2/s within [1-100] TeV
+   2017-06-02T17:00:09: +=====================+
+   2017-06-02T17:00:09: | Upper limit results |
+   2017-06-02T17:00:09: +=====================+
+   2017-06-02T17:00:09:  Differential flux limit ...: 4.50187740703557e-20 ph/cm2/s/MeV at 1 TeV
+   2017-06-02T17:00:09:  Integral flux limit .......: 3.03847378149801e-14 ph/cm2/s within [1-100] TeV
+   2017-06-02T17:00:09:  Energy flux limit .........: 1.33790294880664e-13 erg/cm2/s within [1-100] TeV
 
 .. warning::
    It is important to fix the spectral index of the test source in the
