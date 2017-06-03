@@ -41,6 +41,7 @@ scripts = README.md \
           show_sensitivity.py \
           show_spectrum.py \
           show_lightcurve.py \
+          show_phases.py \
           show_ts_distribution.py \
           show_obs.py \
           show_pointings.py

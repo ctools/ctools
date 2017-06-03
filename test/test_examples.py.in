@@ -120,6 +120,8 @@ class Test(gammalib.GPythonTestSuite):
                     'Test show_model.py')
         self.append(self.test_show_pha,
                     'Test show_pha.py')
+        self.append(self.test_show_phases,
+                    'Test show_phases.py')
         self.append(self.test_show_pull_evolution,
                     'Test show_pull_evolution.py')
         self.append(self.test_show_pull_histogram,
@@ -334,6 +336,20 @@ class Test(gammalib.GPythonTestSuite):
         # Return
         return
 
+    # Test show_phases
+    def test_show_phases(self):
+        """
+        Test show_phases
+        """
+        # Set arguments
+        args = '-p example_show_phases.eps %s/phased_events.fits' % self._datadir
+
+        # Execute script
+        self._execute_python('show_phases', args=args)
+
+        # Return
+        return
+
     # Test show_pull_evolution
     def test_show_pull_evolution(self):
         """
@@ -525,12 +541,6 @@ if __name__ == '__main__':
 
     # Save test results
     suites.save('reports/examples.xml')
-
-    # Set return code
-    if success:
-        rc = 0
-    else:
-        rc = 1
 
     # Raise an exception in case of failure
     if not success:
