@@ -121,7 +121,7 @@ class cscaldb(ctools.cscript):
 
         # Extract response names from calibrations and append them to the
         # response name list
-        nrows = calibrations.length()
+        nrows = calibrations.nrows()
         ncols = calibrations.number()
         for row in range(nrows):
             for col in range(ncols):
