@@ -196,9 +196,32 @@ a maximum likelihood model fit.
    *Butterfly diagrams determined with ctbutterfly and spectral points determined with csspec for Src001 (red) and Src002 (blue)*
 
 Obviously, ``Src001`` has a spectral cut-off (red flux points) and hence is not
-adequately described by a power law model.
-Replacing the spectral model of ``Src001`` by an exponentially cut-off
-power law improves the fit to the data, as illustrated by the figure below.
+adequately described by a power law model. You should therefore replace the
+power law in the
+:ref:`model definition file <glossary_moddef>`
+by an exponentially cutoff power law, as shown below:
+
+.. code-block:: xml
+
+   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+   <source_library title="source library">
+     <source name="Src001" type="PointSource">
+       <spectrum type="ExponentialCutoffPowerLaw">
+         <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
+         <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
+         <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
+         <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
+       </spectrum>
+       <spatialModel type="PointSource">
+         <parameter name="RA"  value="266.4045" scale="1" free="1" />
+         <parameter name="DEC" value="-28.9945" scale="1" free="1" />
+       </spatialModel>
+     </source>
+     ...
+   </source_library>
+
+Fitting this model to the data improves the fit and the resulting butterfly
+diagram now reasonably well follows the spectral points:
 
 .. figure:: first_spectrum_cutoff_stacked.png
    :width: 600px
