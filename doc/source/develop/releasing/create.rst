@@ -58,7 +58,7 @@ questions about the changes you did.
     Have interfaces changed since last release? (y/n): y
    Libtool version changed to '3:0:0'
 
-Then you have to commit all changes and push then into the git repository.
+Then you have to commit all changes and push them into the git repository.
 
 .. code-block:: bash
 

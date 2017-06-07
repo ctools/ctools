@@ -1,0 +1,64 @@
+.. _1.3:
+
+ctools 1.3 release (7 June 2017)
+================================
+
+Overview
+--------
+
+ctools 1.3 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* :ref:`ctphase` for phasing events
+* :ref:`ctprob` for event probabilities
+* :ref:`csebins` for an automatic computation of an optimal energy binning
+
+Bug fixes
+---------
+
+* [`2121 <https://cta-redmine.irap.omp.eu/issues/2121>`_] -
+  Correct covariance matrix computation in ctbutterfly
+* [`2114 <https://cta-redmine.irap.omp.eu/issues/2114>`_] -
+  Add missing ``*.i`` SWIG file into release tarball
+* Use correct ROOT histograms in :ref:`csroot2caldb`
+* [`1987 <https://cta-redmine.irap.omp.eu/issues/1987>`_] -
+  Copy cscripts into bin directory instead of creating a symbolic links
+* [`1983 <https://cta-redmine.irap.omp.eu/issues/1983>`_] -
+  Raise exception instead of exiting with return code in Python tests
+* Support of map cubes lying outside RoI in ctobssim
+* [`1975 <https://cta-redmine.irap.omp.eu/issues/1975>`_] -
+  Consider RoI in :ref:`ctskymap` and use numerical integration for IRF
+* [`1370 <https://cta-redmine.irap.omp.eu/issues/1370>`_] -
+  Set local language to english
+
+
+Improvements
+------------
+
+* [`1996 <https://cta-redmine.irap.omp.eu/issues/1996>`_] -
+  Add ``phase`` parameter to :ref:`ctselect`
+* [`1989 <https://cta-redmine.irap.omp.eu/issues/1989>`_] -
+  Implement regression scheme in :ref:`cssens` and remove ``num_avg`` parameter
+* [`1985 <https://cta-redmine.irap.omp.eu/issues/1985>`_] -
+  If code originates from Git, always compile the Python bindings
+* [`1978 <https://cta-redmine.irap.omp.eu/issues/1978>`_] -
+  Support energy boundary FITS file in ctmapcube
+* [`1863 <https://cta-redmine.irap.omp.eu/issues/1863>`_] -
+  :ref:`ctlike` stores covariance matrix in either CSV or FITS format
+* [`1862 <https://cta-redmine.irap.omp.eu/issues/1862>`_] -
+  Implement Gaussian error propagation in :ref:`ctbutterfly`
+* [`1483 <https://cta-redmine.irap.omp.eu/issues/1483>`_] -
+  :ref:`ctobssim` adds Monte Carlo identifiers to simulated events
+* Enhance logfile output of :ref:`csroot2caldb` script
+* Set default ``deadc`` value to 0.98 (CTA has <2% deadtime)
+
+New features
+------------
+
+* [`1991 <https://cta-redmine.irap.omp.eu/issues/1991>`_] -
+  Add :ref:`ctprob` tool
+* [`1982 <https://cta-redmine.irap.omp.eu/issues/1982>`_] -
+  Add :ref:`ctphase` tool
+* [`1976 <https://cta-redmine.irap.omp.eu/issues/1976>`_] -
+  Add :ref:`csebins` script

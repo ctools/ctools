@@ -58,6 +58,8 @@ uninstall-local: $(DOXYGEN_UNINSTALL_DATA_TARGETS)
 # Files to be removed in build directory
 clean-local:
 	rm -rf $(top_builddir)/.DS_Store
+	rm -rf $(top_builddir)/doc/html
+	rm -rf $(top_builddir)/doc/man
 
 #
 # Additional rules

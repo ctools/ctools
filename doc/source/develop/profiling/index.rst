@@ -7,7 +7,7 @@ Profiling of the ctools can be done by various tools. Here we describe how ctool
 profiled using valgrind.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    install
    usage
