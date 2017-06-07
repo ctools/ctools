@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.0.dev1
 
-31 May 2017
+7 June 2017
 
 
 Introduction
@@ -112,7 +112,9 @@ None
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
-None
+The tool now throws an exception if no valid background model was found in
+the model container. This prevents from creating an empty background cube
+(#1652).
 
 
 ctmapcube - CTA map cube generation

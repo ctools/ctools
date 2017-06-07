@@ -29,9 +29,10 @@ Bug fixes
 * Support of map cubes lying outside RoI in ctobssim
 * [`1975 <https://cta-redmine.irap.omp.eu/issues/1975>`_] -
   Consider RoI in :ref:`ctskymap` and use numerical integration for IRF
+* [`1652 <https://cta-redmine.irap.omp.eu/issues/1652>`_] -
+  :ref:`ctbkgcube` throws exception if no background model is found
 * [`1370 <https://cta-redmine.irap.omp.eu/issues/1370>`_] -
   Set local language to english
-
 
 Improvements
 ------------

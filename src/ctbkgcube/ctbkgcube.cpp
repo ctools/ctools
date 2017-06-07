@@ -1,7 +1,7 @@
 /***************************************************************************
  *               ctbkgcube - Background cube generation tool               *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2017 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -33,6 +33,7 @@
 #include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
+#define G_RUN                                              "ctbkgcube::run()"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -236,6 +237,9 @@ void ctbkgcube::run(void)
     m_bkgmdl            = m_obs.models();
     m_outmdl.clear();
 
+    // Initialise instruments string
+    std::string instruments;
+
     // Remove all models that are not CTA background models from the
     // container and put all removed components in the output
     // container
@@ -249,7 +253,15 @@ void ctbkgcube::run(void)
         // have a CTA background model and we want to keep the model
         if ((dynamic_cast<GModelData*>(m_bkgmdl[i]) != NULL) &&
             (m_bkgmdl[i]->classname().substr(0,4) == "GCTA")) {
+
+            // Signal that model should be kept
             remove = false;
+
+            // Collect instrument identifiers
+            if (instruments.length() > 0) {
+                instruments += ",";
+            }
+            instruments += m_bkgmdl[i]->instruments();
         }
 
         // Log model removal or keeping
@@ -266,6 +278,16 @@ void ctbkgcube::run(void)
         }
 
     } // endfor: looped over all background models
+
+    // If there are no models in the background model container then throw
+    // an exception since we need at least one model to generate a background
+    // cube
+    if (m_bkgmdl.size() == 0) {
+        std::string msg = "No background model found in model container. "
+                          "At least one background model is required in the "
+                          "model container to generate a background cube.";
+        throw GException::invalid_value(G_RUN, msg);
+    }
 
     // Write header
     log_header1(TERSE, "Generate background cube");
@@ -291,10 +313,8 @@ void ctbkgcube::run(void)
     // Set model name
     model.name("BackgroundModel");
 
-    // Set model instrument
-    // TODO: Account for possibility to have observations from different
-    // IACTs in the same container
-    model.instruments("CTA,HESS,MAGIC,VERITAS");
+    // Set model instruments
+    model.instruments(instruments);
 
     // Append model to output container
     m_outmdl.append(model);
@@ -469,7 +489,7 @@ void ctbkgcube::get_parameters(void)
     // parameters
     GCTAEventCube cube = is_valid_filename(incube) ? GCTAEventCube(incube)
                                                    : create_cube(m_obs);
-    
+
     // Define background cube
     m_background = GCTACubeBackground(cube);
 
