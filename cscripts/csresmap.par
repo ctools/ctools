@@ -43,7 +43,7 @@ yref,      r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DE
 nxpix,     i, a, 200,,, "Size of the X axis in pixels"
 nypix,     i, a, 200,,, "Size of the Y axis in pixels"
 binsz,     r, a, 0.02,,, "Pixel size (deg/pixel)"
-algorithm, s, a, SUBDIV,SUB|SUBDIV|SUBDIVSQRT|SIGNIF,, "Residual map computation algorithm"
+algorithm, s, a, SUBDIV,SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE,, "Residual map computation algorithm"
 
 #
 # Standard parameters

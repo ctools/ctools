@@ -117,7 +117,7 @@ def test(installed=False):
              test_ctulimit.Test(),
              test_cterror.Test(),
              test_pipelines.Test()]
-    
+
     # Allocate test suite container
     suites = gammalib.GTestSuites('ctools unit testing')
 
