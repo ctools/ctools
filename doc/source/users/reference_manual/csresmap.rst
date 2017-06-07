@@ -16,11 +16,12 @@ be provided so that the script can bin the data internally. The model
 is then convolved with the instrumental response function for that
 binning and used for residual computation. Before residual computation,
 the counts and model cubes are collapsed into maps by summing over all
-energies. Three options exist then for residual computation:
+energies. Four options exist then for residual computation:
 
 * the subtraction of the model from the counts (SUB)
 * the subtraction and division by the model (SUBDIV)
 * the subtraction and division by the square root of the model (SUBDIVSQRT)
+* the computation of the significance using Li & Ma (SIGNIFICANCE)
 
 The residual map is written into a FITS file.  
 
@@ -95,16 +96,16 @@ General parameters
     Cube bin size (in degrees/pixel).
  	 	 
 ``(algorithm = SUBDIV) <SUB|SUBDIV|SUBDIVSQRT|SIGNIF> [string]``
-    Algorithm used to generate the residual map.
+    Algorithm used to generate the residual map:
 
-    SUB:         DATA - MODEL
+     ``SUB``: :math:`DATA - MODEL`
 
-    SUBDIV:     (DATA - MODEL)/MODEL
+     ``SUBDIV``: :math:`\frac{DATA - MODEL}{MODEL}`
 
-    SUBDIVSQRT: (DATA - MODEL)/sqrt(MODEL)
+     ``SUBDIVSQRT``: :math:`\frac{DATA - MODEL}{\sqrt{MODEL}}`
 
-    SIGNIF:     sign(DATA-MODEL) * sqrt( 2*( DATA*log(DATA/MODEL) + MODEL - DATA ) )
-     	 	 
+     ``SIGNIFICANCE``: :math:`{\rm sign}(DATA-MODEL) \times \sqrt{ 2 \times ( DATA \times \ln \left(\frac{DATA}{MODEL} \right) + MODEL - DATA ) }`
+
 
 Standard parameters
 -------------------
@@ -114,15 +115,15 @@ Standard parameters
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
-     chatter = 0: no information will be logged
+     ``chatter = 0``: no information will be logged
      
-     chatter = 1: only errors will be logged
+     ``chatter = 1``: only errors will be logged
      
-     chatter = 2: errors and actions will be logged
+     ``chatter = 2``: errors and actions will be logged
      
-     chatter = 3: report about the task execution
+     ``chatter = 3``: report about the task execution
      
-     chatter = 4: detailed report about the task execution
+     ``chatter = 4``: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
     Specifies whether an existing residual map file should be overwritten.

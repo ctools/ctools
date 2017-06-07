@@ -19,6 +19,7 @@
 #
 # ==========================================================================
 import sys
+import math
 import gammalib
 import ctools
 
@@ -241,21 +242,21 @@ class csresmap(ctools.cscript):
 
         # Calculate significance from Li&Ma derivation
         elif algorithm == 'SIGNIFICANCE':
+
+            # Compute sign map
             signmap = (self._resmap - modelmap).sign()
+
+            # Compute logarithm of map. For that we mask pixels
             logmap  = self._resmap/modelmap
-            # Masking pixels with zero counts. Put a small value >0 for log
-            # calculation and restore the zero value afterwards
-            mask = []
             for i in range(logmap.npix()):
-                # Testing pixel i and map 0 (there is one map only after stacking)
-                if logmap[i,0] == 0:  
-                    mask.append(i)
-                    logmap[i,0] = 1e-10
-            logmap = logmap.log()
-            for i in mask:
-                logmap[i,0] = 0.
+                if logmap[i] > 0.0:
+                    logmap[i] = math.log(logmap[i])
+                else:
+                    logmap[i] = 0.0
+            
+            # Compute significance map
             signif_squared_map  = (self._resmap*logmap) + modelmap  - self._resmap
-            signif_squared_map *= 2.
+            signif_squared_map *= 2.0
             unsigned_resmap     = signif_squared_map.sqrt()
             self._resmap        = unsigned_resmap * signmap
 

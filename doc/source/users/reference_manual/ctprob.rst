@@ -50,15 +50,15 @@ Standard parameters
 
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
-     chatter = 0: no information will be logged
+     ``chatter = 0``: no information will be logged
      
-     chatter = 1: only errors will be logged
+     ``chatter = 1``: only errors will be logged
      
-     chatter = 2: errors and actions will be logged
+     ``chatter = 2``: errors and actions will be logged
      
-     chatter = 3: report about the task execution
+     ``chatter = 3``: report about the task execution
      
-     chatter = 4: detailed report about the task execution
+     ``chatter = 4``: detailed report about the task execution
  	 	 
 ``(clobber = yes) [boolean]``
     Specifies whether existing output files should be overwritten.
