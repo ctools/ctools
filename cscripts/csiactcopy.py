@@ -239,7 +239,7 @@ class csiactcopy(ctools.cscript):
                 
                 # Loop over rows and columns to copy over values exteding remote HDU
                 for col in tmp_hdu:
-                    for row in range(col.length()):
+                    for row in range(col.nrows()):
                         remote_hdu[col.name()][size + row] = col[row]
 
         # Get remote obs_id
@@ -329,7 +329,7 @@ class csiactcopy(ctools.cscript):
             remote_col = remote_hdu[i]    
             
             # Loop over entries and merge
-            for j in range(remote_col.length()):
+            for j in range(remote_col.nrows()):
                 local_col[j+old_local_rows] = remote_col[j]
         
         # Save local fits file

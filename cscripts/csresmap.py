@@ -34,7 +34,7 @@ class csresmap(ctools.cscript):
     # Constructor
     def __init__(self, *argv):
         """
-        Constructor.
+        Constructor
         """
         # Set name
         self._name    = 'csresmap'
@@ -113,13 +113,13 @@ class csresmap(ctools.cscript):
                 self['nypix'].integer()
                 self['binsz'].real()
                 self['ebinalg'].string()
-                if self['ebinalg'].string() == "FILE":
+                if self['ebinalg'].string() == 'FILE':
                     self['ebinfile'].filename()
                 else:
                     self['emin'].real()
                     self['emax'].real()
                     self['enumbins'].integer()
-                
+
         # Query parameters
         self['edisp'].boolean()
         self['algorithm'].string()
@@ -152,11 +152,7 @@ class csresmap(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1(gammalib.number('Observation',len(self._obs)))
-            self._log(str(self._obs))
-            self._log('\n')
+        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
 
         # If a counts and model cube are specified then load them as sky map
         if self._use_maps:
@@ -175,9 +171,7 @@ class csresmap(ctools.cscript):
             else:
 
                 # Write header
-                if self._logTerse():
-                    self._log('\n')
-                    self._log.header1('Generate binned map (ctbin)')
+                self._log_header1(gammalib.TERSE, 'Generate binned map (ctbin)')
 
                 # Create countsmap
                 bin = ctools.ctbin(self._obs)
@@ -207,9 +201,7 @@ class csresmap(ctools.cscript):
             countmap = cta_counts_cube.counts()
 
             # Write header
-            if self._logTerse():
-                self._log('\n')
-                self._log.header1('Generate model map (ctmodel)')
+            self._log_header1(gammalib.TERSE, 'Generate model map (ctmodel)')
 
             # Create model map
             model = ctools.ctmodel(self._obs)
