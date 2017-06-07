@@ -94,9 +94,17 @@ General parameters
 ``binsz [real]``
     Cube bin size (in degrees/pixel).
  	 	 
-``(algorithm = SUBDIV) <SUB|SUBDIV|SUBDIVSQRT> [string]``
+``(algorithm = SUBDIV) <SUB|SUBDIV|SUBDIVSQRT|SIGNIF> [string]``
     Algorithm used to generate the residual map.
- 	 	 
+
+    SUB:         DATA - MODEL
+
+    SUBDIV:     (DATA - MODEL)/MODEL
+
+    SUBDIVSQRT: (DATA - MODEL)/sqrt(MODEL)
+
+    SIGNIF:     sign(DATA-MODEL) * sqrt( 2*( DATA*log(DATA/MODEL) + MODEL - DATA ) )
+     	 	 
 
 Standard parameters
 -------------------
