@@ -271,9 +271,10 @@ void ctbkgcube::run(void)
         log_value(NORMAL, what, value);
 
         // If removal is requested, append model to output container and
-        // remove it from the background model container ...
+        // remove it from the background model container. We use here the
+        // insert() method to assure that the model order is preserved.
         if (remove) {
-            m_outmdl.append(*(m_bkgmdl[i]));
+            m_outmdl.insert(0, *(m_bkgmdl[i]));
             m_bkgmdl.remove(i);
         }
 
