@@ -23,7 +23,7 @@ You do this with the :ref:`csresmap` script by providing the output
    Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
    Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
    Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_results_cutoff.xml
-   Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUBDIV] SUB
+   Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE) [SUBDIV] SUB
    Output residual map file [resmap.fits] resmap.fits
 
 This produces the file ``resmap.fits`` that contains a residual map that
@@ -52,23 +52,23 @@ as illustrated below:
        <spectrum type="ExponentialCutoffPowerLaw">
          <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
          <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
+         <parameter name="CutoffEnergy" scale="1e6"   value="10.0" min="0.01"  max="1000.0" free="1"/>
          <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA"  value="266.404485683256"  scale="1" free="1" />
-         <parameter name="DEC" value="-28.9944817753924" scale="1" free="1" />
+         <parameter name="RA" value="266.4120906928" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-29.0219729468991" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="Src002" type="PointSource">
        <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   value="1" scale="5.7e-18" min="0" free="1" />
-         <parameter name="Index"       value="1" scale="-2.48" min="-4.0" max="4.0" free="1" />
+         <parameter name="Prefactor" value="1" error="0" scale="5.7e-18" min="0" free="1" />
+         <parameter name="Index" value="1" error="-0" scale="-2.48" min="-4.03225806451613" max="4.03225806451613" free="1" />
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA"  value="266.882500217018"  scale="1" free="1" />
-         <parameter name="DEC" value="-28.1496303606368" scale="1" free="1" />
+         <parameter name="RA" value="266.793148201606" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.1253038992376" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="IEM" type="DiffuseSource">
@@ -114,24 +114,24 @@ on input to the :ref:`ctlike` tool:
        <spectrum type="ExponentialCutoffPowerLaw">
          <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
          <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
+         <parameter name="CutoffEnergy" scale="1e6"   value="10.0" min="0.01"  max="1000.0" free="1"/>
          <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
        </spectrum>
        <spatialModel type="RadialDisk">
-         <parameter name="RA"     value="266.4044" scale="1.0" min="-360" max="360" free="1"/>
-         <parameter name="DEC"    value="-28.9944" scale="1.0" min="-90"  max="90"  free="1"/>
-         <parameter name="Radius" value="0.1"      scale="1.0" min="0.01" max="10"  free="1"/>
+         <parameter name="RA"     value="266.4121" scale="1.0" min="-360"  max="360" free="1"/>
+         <parameter name="DEC"    value="-29.0220" scale="1.0" min="-90"   max="90"  free="1"/>
+         <parameter name="Radius" value="0.01"     scale="1.0" min="0.001" max="10"  free="1"/>
        </spatialModel>
      </source>
      <source name="Src002" type="PointSource">
        <spectrum type="PowerLaw">
-         <parameter name="Prefactor"   value="1" scale="5.7e-18" min="0" free="1" />
-         <parameter name="Index"       value="1" scale="-2.48" min="-4.0" max="4.0" free="1" />
+         <parameter name="Prefactor" value="1" error="0" scale="5.7e-18" min="0" free="1" />
+         <parameter name="Index" value="1" error="-0" scale="-2.48" min="-4.03225806451613" max="4.03225806451613" free="1" />
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA"  value="266.882500217018"  scale="1" free="1" />
-         <parameter name="DEC" value="-28.1496303606368" scale="1" free="1" />
+         <parameter name="RA" value="266.793148201606" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.1253038992376" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="IEM" type="DiffuseSource">
@@ -153,7 +153,7 @@ on input to the :ref:`ctlike` tool:
 
 As shown in the residual map below, the emission hole at the position of
 ``Src001`` has now disappeared. The disk model has in fact been fitted with
-a radius of 5.4 +/- 0.1 arcmin, indicating that ``Src001`` is significantly
+a radius of 5.3 +/- 0.1 arcmin, indicating that ``Src001`` is significantly
 extended. The remaining residuals suggest that also ``Src002`` may be
 slightly extended, but it is left as an exercise to the User to test this
 hypothesis.

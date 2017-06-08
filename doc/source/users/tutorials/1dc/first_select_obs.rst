@@ -67,32 +67,32 @@ observations into the console:
 
 The output of :ref:`csobsinfo` is shown below. :ref:`csobsselect` selected
 57 observations from the Galactic Plane Survey data containing a total of
-6 207 354 events.
+6 209 281 events.
 
 .. code-block:: bash
 
-  2017-06-02T08:10:00: +=========+
-  2017-06-02T08:10:00: | Summary |
-  2017-06-02T08:10:00: +=========+
-  2017-06-02T08:10:00: === Observations ===
-  2017-06-02T08:10:00:  Unbinned observations .....: 57
-  2017-06-02T08:10:00:  Binned observations .......: 0
-  2017-06-02T08:10:00: === Events ===
-  2017-06-02T08:10:00:  Number of events ..........: 6207354
-  2017-06-02T08:10:00:  Number of bins ............: 0
-  2017-06-02T08:10:00: === Pointings ===
-  2017-06-02T08:10:00:  Mean offset angle .........: Unknown
-  2017-06-02T08:10:00:  Mean zenith angle .........: 0.00 deg
-  2017-06-02T08:10:00:  Mean azimuth angle ........: 0.00 deg
-  2017-06-02T08:10:00: === Energy range ===
-  2017-06-02T08:10:00:  Minimum energy ............: 30 GeV
-  2017-06-02T08:10:00:  Maximum energy ............: 160 TeV
-  2017-06-02T08:10:00: === Time range ===
-  2017-06-02T08:10:00:  MJD (days) ................: 59235.500 - 59276.921
-  2017-06-02T08:10:00:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
-  2017-06-02T08:10:00:  MET (seconds) .............: 664502400.000 - 668081160.000
-  2017-06-02T08:10:00:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
-  2017-06-02T08:10:00:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
+   2017-06-08T07:23:37: +=========+
+   2017-06-08T07:23:37: | Summary |
+   2017-06-08T07:23:37: +=========+
+   2017-06-08T07:23:37: === Observations ===
+   2017-06-08T07:23:37:  Unbinned observations .....: 57
+   2017-06-08T07:23:37:  Binned observations .......: 0
+   2017-06-08T07:23:37: === Events ===
+   2017-06-08T07:23:37:  Number of events ..........: 6209281
+   2017-06-08T07:23:37:  Number of bins ............: 0
+   2017-06-08T07:23:37: === Pointings ===
+   2017-06-08T07:23:37:  Mean offset angle .........: Unknown
+   2017-06-08T07:23:37:  Mean zenith angle .........: 0.00 deg
+   2017-06-08T07:23:37:  Mean azimuth angle ........: 0.00 deg
+   2017-06-08T07:23:37: === Energy range ===
+   2017-06-08T07:23:37:  Minimum energy ............: 30 GeV
+   2017-06-08T07:23:37:  Maximum energy ............: 160 TeV
+   2017-06-08T07:23:37: === Time range ===
+   2017-06-08T07:23:37:  MJD (days) ................: 59235.500 - 59276.921
+   2017-06-08T07:23:37:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
+   2017-06-08T07:23:37:  MET (seconds) .............: 664502400.000 - 668081160.000
+   2017-06-08T07:23:37:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
+   2017-06-08T07:23:37:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
 
 The resulting
 :ref:`observation definition file <glossary_obsdef>`

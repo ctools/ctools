@@ -2,9 +2,10 @@ Documentation
 =============
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
 
    about
    download
    users/index
    develop/index
+   users/help

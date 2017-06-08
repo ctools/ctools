@@ -48,44 +48,49 @@ converged properly, as illustrated in the example below:
 
 .. code-block:: bash
 
-   2017-06-06T23:54:05: +=================================+
-   2017-06-06T23:54:05: | Maximum likelihood optimisation |
-   2017-06-06T23:54:05: +=================================+
-   2017-06-06T23:54:18:  >Iteration   0: -logL=242350.348, Lambda=1.0e-03
-   2017-06-06T23:54:31:  >Iteration   1: -logL=222183.040, Lambda=1.0e-03, delta=20167.308, step=1.0e+00, max(|grad|)=50064.145481 [Index:13]
-   2017-06-06T23:54:44:  >Iteration   2: -logL=218671.485, Lambda=1.0e-04, delta=3511.555, step=1.0e+00, max(|grad|)=-11302.678938 [RA:6]
-   2017-06-06T23:54:57:  >Iteration   3: -logL=217673.527, Lambda=1.0e-05, delta=997.958, step=1.0e+00, max(|grad|)=-9593.644236 [RA:6]
-   2017-06-06T23:55:10:  >Iteration   4: -logL=217505.751, Lambda=1.0e-06, delta=167.776, step=1.0e+00, max(|grad|)=-6625.379605 [RA:6]
-   2017-06-06T23:55:23:  >Iteration   5: -logL=217465.972, Lambda=1.0e-07, delta=39.779, step=1.0e+00, max(|grad|)=-4315.893743 [RA:6]
-   2017-06-06T23:55:37:  >Iteration   6: -logL=217446.648, Lambda=1.0e-08, delta=19.324, step=1.0e+00, max(|grad|)=3158.486974 [RA:0]
-   2017-06-06T23:55:50:  >Iteration   7: -logL=217437.175, Lambda=1.0e-09, delta=9.473, step=1.0e+00, max(|grad|)=2234.551298 [RA:0]
-   2017-06-06T23:56:03:  >Iteration   8: -logL=217432.730, Lambda=1.0e-10, delta=4.445, step=1.0e+00, max(|grad|)=1578.966812 [RA:0]
-   2017-06-06T23:56:17:  >Iteration   9: -logL=217430.542, Lambda=1.0e-11, delta=2.187, step=1.0e+00, max(|grad|)=1164.679821 [RA:0]
-   2017-06-06T23:56:31:  >Iteration  10: -logL=217429.374, Lambda=1.0e-12, delta=1.168, step=1.0e+00, max(|grad|)=816.726019 [RA:0]
-   2017-06-06T23:56:44:  >Iteration  11: -logL=217428.835, Lambda=1.0e-13, delta=0.539, step=1.0e+00, max(|grad|)=543.038385 [RA:0]
-   2017-06-06T23:56:58:  >Iteration  12: -logL=217428.635, Lambda=1.0e-14, delta=0.201, step=1.0e+00, max(|grad|)=290.465021 [RA:0]
-   2017-06-06T23:57:12:  >Iteration  13: -logL=217428.574, Lambda=1.0e-15, delta=0.061, step=1.0e+00, max(|grad|)=223.932827 [RA:0]
-   2017-06-06T23:57:25:  >Iteration  14: -logL=217428.528, Lambda=1.0e-16, delta=0.046, step=1.0e+00, max(|grad|)=228.672746 [RA:0]
-   2017-06-06T23:57:38:  >Iteration  15: -logL=217428.480, Lambda=1.0e-17, delta=0.049, step=1.0e+00, max(|grad|)=179.805198 [RA:0]
-   2017-06-06T23:57:52:  >Iteration  16: -logL=217428.459, Lambda=1.0e-18, delta=0.021, step=1.0e+00, max(|grad|)=103.278218 [RA:0]
-   2017-06-06T23:58:05:  >Iteration  17: -logL=217428.452, Lambda=1.0e-19, delta=0.006, step=1.0e+00, max(|grad|)=62.896707 [RA:0]
-   2017-06-06T23:58:18:  >Iteration  18: -logL=217428.448, Lambda=1.0e-20, delta=0.004, step=1.0e+00, max(|grad|)=41.622300 [RA:0]
-   2017-06-06T23:58:31:
-   2017-06-06T23:58:31: +=========================================+
-   2017-06-06T23:58:31: | Maximum likelihood optimisation results |
-   2017-06-06T23:58:31: +=========================================+
-   2017-06-06T23:58:31: === GOptimizerLM ===
-   2017-06-06T23:58:31:  Optimized function value ..: 217428.448
-   2017-06-06T23:58:31:  Absolute precision ........: 0.005
-   2017-06-06T23:58:31:  Acceptable value decrease .: 2
-   2017-06-06T23:58:31:  Optimization status .......: converged
-   2017-06-06T23:58:31:  Number of parameters ......: 16
-   2017-06-06T23:58:31:  Number of free parameters .: 10
-   2017-06-06T23:58:31:  Number of iterations ......: 18
-   2017-06-06T23:58:31:  Lambda ....................: 1e-21
-   2017-06-06T23:58:31:  Maximum log likelihood ....: -217428.448
-   2017-06-06T23:58:31:  Observed events  (Nobs) ...: 2204717.000
-   2017-06-06T23:58:31:  Predicted events (Npred) ..: 2204716.997 (Nobs - Npred = 0.00284357415512204)
+   2017-06-08T08:20:32: +=================================+
+   2017-06-08T08:20:32: | Maximum likelihood optimisation |
+   2017-06-08T08:20:32: +=================================+
+   2017-06-08T08:20:46:  >Iteration   0: -logL=242767.783, Lambda=1.0e-03
+   2017-06-08T08:21:00:  >Iteration   1: -logL=222518.221, Lambda=1.0e-03, delta=20249.562, step=1.0e+00, max(|grad|)=50533.167265 [Index:13]
+   2017-06-08T08:21:14:  >Iteration   2: -logL=218997.783, Lambda=1.0e-04, delta=3520.439, step=1.0e+00, max(|grad|)=-13548.755375 [DEC:1]
+   2017-06-08T08:21:29:  >Iteration   3: -logL=217965.881, Lambda=1.0e-05, delta=1031.901, step=1.0e+00, max(|grad|)=-11344.447813 [DEC:1]
+   2017-06-08T08:21:43:  >Iteration   4: -logL=217775.661, Lambda=1.0e-06, delta=190.220, step=1.0e+00, max(|grad|)=-7778.127593 [DEC:1]
+   2017-06-08T08:21:57:  >Iteration   5: -logL=217725.868, Lambda=1.0e-07, delta=49.793, step=1.0e+00, max(|grad|)=-4796.822100 [DEC:1]
+   2017-06-08T08:22:11:  >Iteration   6: -logL=217701.511, Lambda=1.0e-08, delta=24.357, step=1.0e+00, max(|grad|)=-3267.160620 [RA:6]
+   2017-06-08T08:22:25:  >Iteration   7: -logL=217688.626, Lambda=1.0e-09, delta=12.885, step=1.0e+00, max(|grad|)=-2438.542445 [RA:6]
+   2017-06-08T08:22:40:  >Iteration   8: -logL=217681.375, Lambda=1.0e-10, delta=7.250, step=1.0e+00, max(|grad|)=-1905.466691 [RA:6]
+   2017-06-08T08:22:54:  >Iteration   9: -logL=217677.367, Lambda=1.0e-11, delta=4.008, step=1.0e+00, max(|grad|)=-1338.131602 [RA:6]
+   2017-06-08T08:23:08:  >Iteration  10: -logL=217675.391, Lambda=1.0e-12, delta=1.977, step=1.0e+00, max(|grad|)=-1117.908664 [RA:6]
+   2017-06-08T08:23:22:  >Iteration  11: -logL=217674.202, Lambda=1.0e-13, delta=1.188, step=1.0e+00, max(|grad|)=-683.041271 [RA:6]
+   2017-06-08T08:23:36:  >Iteration  12: -logL=217673.712, Lambda=1.0e-14, delta=0.490, step=1.0e+00, max(|grad|)=-481.729534 [RA:6]
+   2017-06-08T08:23:50:  >Iteration  13: -logL=217673.495, Lambda=1.0e-15, delta=0.217, step=1.0e+00, max(|grad|)=-385.504388 [RA:6]
+   2017-06-08T08:24:04:  >Iteration  14: -logL=217673.327, Lambda=1.0e-16, delta=0.168, step=1.0e+00, max(|grad|)=-314.151335 [RA:6]
+   2017-06-08T08:24:18:  >Iteration  15: -logL=217673.231, Lambda=1.0e-17, delta=0.096, step=1.0e+00, max(|grad|)=-227.509872 [RA:6]
+   2017-06-08T08:24:32:  >Iteration  16: -logL=217673.170, Lambda=1.0e-18, delta=0.060, step=1.0e+00, max(|grad|)=-176.781601 [RA:6]
+   2017-06-08T08:24:47:  >Iteration  17: -logL=217673.138, Lambda=1.0e-19, delta=0.032, step=1.0e+00, max(|grad|)=-124.109305 [RA:6]
+   2017-06-08T08:25:01:  >Iteration  18: -logL=217673.124, Lambda=1.0e-20, delta=0.014, step=1.0e+00, max(|grad|)=-88.895131 [RA:6]
+   2017-06-08T08:25:15:  >Iteration  19: -logL=217673.117, Lambda=1.0e-21, delta=0.007, step=1.0e+00, max(|grad|)=-63.724112 [RA:6]
+   2017-06-08T08:25:29:  >Iteration  20: -logL=217673.112, Lambda=1.0e-22, delta=0.006, step=1.0e+00, max(|grad|)=61.601206 [DEC:7]
+   2017-06-08T08:25:43:  >Iteration  21: -logL=217673.107, Lambda=1.0e-23, delta=0.005, step=1.0e+00, max(|grad|)=58.318115 [DEC:7]
+   2017-06-08T08:25:57:  >Iteration  22: -logL=217673.101, Lambda=1.0e-24, delta=0.006, step=1.0e+00, max(|grad|)=50.936104 [DEC:7]
+   2017-06-08T08:26:12:  >Iteration  23: -logL=217673.097, Lambda=1.0e-25, delta=0.004, step=1.0e+00, max(|grad|)=46.423925 [DEC:7]
+   2017-06-08T08:26:26:
+   2017-06-08T08:26:26: +=========================================+
+   2017-06-08T08:26:26: | Maximum likelihood optimisation results |
+   2017-06-08T08:26:26: +=========================================+
+   2017-06-08T08:26:26: === GOptimizerLM ===
+   2017-06-08T08:26:26:  Optimized function value ..: 217673.097
+   2017-06-08T08:26:26:  Absolute precision ........: 0.005
+   2017-06-08T08:26:26:  Acceptable value decrease .: 2
+   2017-06-08T08:26:26:  Optimization status .......: converged
+   2017-06-08T08:26:26:  Number of parameters ......: 16
+   2017-06-08T08:26:26:  Number of free parameters .: 10
+   2017-06-08T08:26:26:  Number of iterations ......: 23
+   2017-06-08T08:26:26:  Lambda ....................: 1e-26
+   2017-06-08T08:26:26:  Maximum log likelihood ....: -217673.097
+   2017-06-08T08:26:26:  Observed events  (Nobs) ...: 2205594.000
+   2017-06-08T08:26:26:  Predicted events (Npred) ..: 2205593.994 (Nobs - Npred = 0.00562562886625528)
 
 You may also convert the fitted model positions into a `ds9 <http://ds9.si.edu>`_
 region file using the :ref:`csmodelinfo` script so that you can overlay the
@@ -122,16 +127,16 @@ You create the butterfly diagram for the first source using
 
 .. code-block:: bash
 
-  $ ctbutterfly
-  Input event list, counts cube or observation definition XML file [events.fits] cntcube.fits
-  Input exposure cube file (only needed for stacked analysis) [ctexpcube.fits] expcube.fits
-  Input PSF cube file (only needed for stacked analysis) [psfcube.fits]
-  Input background cube file (only needed for stacked analysis) [bkgcube.fits]
-  Source of interest [Crab] Src001
-  Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_results.xml
-  Start value for first energy bin in TeV [0.1]
-  Stop value for last energy bin in TeV [100.0]
-  Output ASCII file [butterfly.txt] butterfly_src001.txt
+   $ ctbutterfly
+   Input event list, counts cube or observation definition XML file [events.fits] cntcube.fits
+   Input exposure cube file (only needed for stacked analysis) [NONE] expcube.fits
+   Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
+   Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
+   Source of interest [Crab] Src001
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_results.xml
+   Start value for first energy bin in TeV [0.1]
+   Stop value for last energy bin in TeV [100.0]
+   Output ASCII file [butterfly.txt] butterfly_src001.txt
 
 and for the second source using
 
@@ -221,7 +226,7 @@ by an exponentially cutoff power law, as shown below:
    </source_library>
 
 Fitting this model to the data improves the fit and the resulting butterfly
-diagram now reasonably well follows the spectral points:
+diagram follows now reasonably well the spectral points:
 
 .. figure:: first_spectrum_cutoff_stacked.png
    :width: 600px

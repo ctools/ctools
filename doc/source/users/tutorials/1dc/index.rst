@@ -4,7 +4,7 @@ First CTA Data Challenge
 ========================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    scope
    getting_tools

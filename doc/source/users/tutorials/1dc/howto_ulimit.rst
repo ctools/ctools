@@ -44,19 +44,19 @@ and then run the :ref:`ctulimit` tool as follows:
    Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
    Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
    Source of interest [Crab] Test
-   Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_models-cutoff-iem-up.xml
+   Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_models_cutoff_iem_up.xml
 
 After the run, the upper gamma-ray flux limit for this test source can be
 extracted from the :ref:`ctulimit` log file:
 
 .. code-block:: bash
 
-   2017-06-02T17:00:09: +=====================+
-   2017-06-02T17:00:09: | Upper limit results |
-   2017-06-02T17:00:09: +=====================+
-   2017-06-02T17:00:09:  Differential flux limit ...: 4.50187740703557e-20 ph/cm2/s/MeV at 1 TeV
-   2017-06-02T17:00:09:  Integral flux limit .......: 3.03847378149801e-14 ph/cm2/s within [1-100] TeV
-   2017-06-02T17:00:09:  Energy flux limit .........: 1.33790294880664e-13 erg/cm2/s within [1-100] TeV
+   2017-06-08T15:39:54: +=====================+
+   2017-06-08T15:39:54: | Upper limit results |
+   2017-06-08T15:39:54: +=====================+
+   2017-06-08T15:39:54:  Differential flux limit ...: 2.4438738640373e-20 ph/cm2/s/MeV at 1 TeV
+   2017-06-08T15:39:54:  Integral flux limit .......: 1.64945554704815e-14 ph/cm2/s within [1-100] TeV
+   2017-06-08T15:39:54:  Energy flux limit .........: 7.26289446286815e-14 erg/cm2/s within [1-100] TeV
 
 .. warning::
    It is important to fix the spectral index of the test source in the

@@ -11,8 +11,11 @@ How to take the energy dispersion into account?
      Although the effect of the energy dispersion is often neglegible there
      may be cases where you want to consider energy dispersion in an analysis,
      for example if you are analysing the data down to very low energies.
+
+  .. warning::
      Energy dispersion is fully implemented in ctools but is computationally
-     intensive. So be aware that the tools and scripts will take longer.
+     intensive. So be aware that the **tools and scripts will take a substantial
+     amount of computing time**.
 
 If you are doing a stacked analysis the first thing you need is an energy
 dispersion cube. You generate this cube using the :ref:`ctedispcube` tool:

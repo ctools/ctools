@@ -46,33 +46,33 @@ displays a summary of the content of this new
 
 .. code-block:: bash
 
-  2017-06-02T08:21:04: +=========+
-  2017-06-02T08:21:04: | Summary |
-  2017-06-02T08:21:04: +=========+
-  2017-06-02T08:21:04: === Observations ===
-  2017-06-02T08:21:04:  Unbinned observations .....: 57
-  2017-06-02T08:21:04:  Binned observations .......: 0
-  2017-06-02T08:21:04: === Events ===
-  2017-06-02T08:21:04:  Number of events ..........: 3348255
-  2017-06-02T08:21:04:  Number of bins ............: 0
-  2017-06-02T08:21:04: === Pointings ===
-  2017-06-02T08:21:04:  Mean offset angle .........: Unknown
-  2017-06-02T08:21:04:  Mean zenith angle .........: 0.00 deg
-  2017-06-02T08:21:04:  Mean azimuth angle ........: 0.00 deg
-  2017-06-02T08:21:04: === Energy range ===
-  2017-06-02T08:21:04:  Minimum energy ............: 100 GeV
-  2017-06-02T08:21:04:  Maximum energy ............: 100 TeV
-  2017-06-02T08:21:04: === Time range ===
-  2017-06-02T08:21:04:  MJD (days) ................: 59235.500 - 59276.921
-  2017-06-02T08:21:04:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
-  2017-06-02T08:21:04:  MET (seconds) .............: 664502400.000 - 668081160.000
-  2017-06-02T08:21:04:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
-  2017-06-02T08:21:04:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
+   2017-06-08T07:42:01: +=========+
+   2017-06-08T07:42:01: | Summary |
+   2017-06-08T07:42:01: +=========+
+   2017-06-08T07:42:01: === Observations ===
+   2017-06-08T07:42:01:  Unbinned observations .....: 57
+   2017-06-08T07:42:01:  Binned observations .......: 0
+   2017-06-08T07:42:01: === Events ===
+   2017-06-08T07:42:01:  Number of events ..........: 3349183
+   2017-06-08T07:42:01:  Number of bins ............: 0
+   2017-06-08T07:42:01: === Pointings ===
+   2017-06-08T07:42:01:  Mean offset angle .........: Unknown
+   2017-06-08T07:42:01:  Mean zenith angle .........: 0.00 deg
+   2017-06-08T07:42:01:  Mean azimuth angle ........: 0.00 deg
+   2017-06-08T07:42:01: === Energy range ===
+   2017-06-08T07:42:01:  Minimum energy ............: 100 GeV
+   2017-06-08T07:42:01:  Maximum energy ............: 100 TeV
+   2017-06-08T07:42:01: === Time range ===
+   2017-06-08T07:42:01:  MJD (days) ................: 59235.500 - 59276.921
+   2017-06-08T07:42:01:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
+   2017-06-08T07:42:01:  MET (seconds) .............: 664502400.000 - 668081160.000
+   2017-06-08T07:42:01:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
+   2017-06-08T07:42:01:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
 
 There are still 57 observations in the
 :ref:`observation definition file <glossary_obsdef>`
 but now the events are restricted to the energy interval 100 GeV - 100 TeV. In
-total there are 3 348 255 events within this interval in the selected observations.
+total there are 3 349 183 events within this interval in the selected observations.
 
 The content of ``obs_selected.xml`` will look similar to the content of
 ``obs.xml`` with the original event list file names replaced by the names of

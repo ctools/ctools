@@ -23,13 +23,13 @@ The structure of the XML file with significance computation requested for
        <spectrum type="ExponentialCutoffPowerLaw">
          <parameter name="Prefactor"    scale="1e-18" value="5.7"  min="1e-07" max="1000.0" free="1"/>
          <parameter name="Index"        scale="-1"    value="2.48" min="0.0"   max="+5.0"   free="1"/>
-         <parameter name="CutoffEnergy" scale="1e7"   value="1.0"  min="0.01"  max="1000.0" free="1"/>
+         <parameter name="CutoffEnergy" scale="1e6"   value="10.0" min="0.01"  max="1000.0" free="1"/>
          <parameter name="PivotEnergy"  scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="0"/>
        </spectrum>
        <spatialModel type="RadialDisk">
-         <parameter name="RA"     scale="1.0" value="266.4044" min="-360" max="360" free="1"/>
-         <parameter name="DEC"    scale="1.0" value="-28.9944" min="-90"  max="90"  free="1"/>
-         <parameter name="Radius" scale="1.0" value="0.1"      min="0.01" max="10"  free="1"/>
+         <parameter name="RA"     scale="1.0" value="266.4121" min="-360"  max="360" free="1"/>
+         <parameter name="DEC"    scale="1.0" value="-29.0220" min="-90"   max="90"  free="1"/>
+         <parameter name="Radius" scale="1.0" value="0.01"     min="0.001" max="10"  free="1"/>
        </spatialModel>
      </source>
      ...
@@ -52,12 +52,12 @@ done using a stacked analysis.
    2017-06-02T10:54:10: === GModelSky ===
    2017-06-02T10:54:10:  Name ......................: Src001
    2017-06-02T10:54:10:  Instruments ...............: all
-   2017-06-02T10:54:10:  Test Statistic ............: 8845.82638467156
+   2017-06-02T10:54:10:  Test Statistic ............: 8794.57365422026
    ...
    2017-06-02T10:54:10: === GModelSky ===
    2017-06-02T10:54:10:  Name ......................: Src002
    2017-06-02T10:54:10:  Instruments ...............: all
-   2017-06-02T10:54:10:  Test Statistic ............: 1437.33551948087
+   2017-06-02T10:54:10:  Test Statistic ............: 1439.46021600731
 
 The Test Statistic values are also written into the
 :ref:`model definition file <glossary_moddef>`
@@ -67,10 +67,10 @@ created by :ref:`ctlike`:
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <source_library title="source library">
-     <source name="Src001" type="ExtendedSource" ts="8845.826" tscalc="1">
+     <source name="Src001" type="ExtendedSource" ts="8794.574" tscalc="1">
        ...
      </source>
-     <source name="Src002" type="PointSource" ts="1437.336" tscalc="1">
+     <source name="Src002" type="PointSource" ts="1439.460" tscalc="1">
        ...
      </source>
      ...

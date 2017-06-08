@@ -196,7 +196,7 @@ probability threshold to >20% by adding the attribute
    Output event list or observation definition XML file [obs_vela_phased_selected.xml] obs_vela_phased_prob_selected.xml
 
 The selected events as a function of phase are displayed below. Unfortunately
-there is still no indication of a phase dependence of the event rate.
+there is still no clear signal for a phase dependence of the event rate.
 
 .. figure:: howto_phasecurve_probphases.png
    :width: 600px
@@ -225,11 +225,12 @@ after the :ref:`ctselect` command:
    End time (CTA MET in seconds) [0.0]
    Lower energy limit (TeV) [0.03]
    Upper energy limit (TeV) [160.0]
+   Output event list or observation definition XML file [obs_vela_phased_prob_selected.xml] obs_vela_phased_mcid.xml
 
-The resulting phase histogram is shown below. It now becomes obvious that there
-are too few events in the simulated data to allow for a significant detection
-of the pulsar. The events from the Vela pulsar are in fact burried into the
-background events.
+The resulting phase histogram is shown below. It now becomes obvious that
+the peaks seen in the event histogram do indeed correspond to the expected
+peaks from the Vela pulsar, but there are too few events in the simulated data
+to allow for a unambiguous detection of the pulsar.
 
 .. figure:: howto_phasecurve_mcid.png
    :width: 700px

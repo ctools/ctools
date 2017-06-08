@@ -1,7 +1,7 @@
 # ==========================================================================
 # Utility functions for model handling
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -258,7 +258,7 @@ def model2ds9string(model, pnt_type='cross', pnt_mark_size=12,
 
                 # Append circle to DS9 string
                 if is_valid:
-                    ds9string += ('circle(%.6f,%.6f,%.6f) #' %
+                    ds9string += ('circle(%.6f,%.6f,%.6f") #' %
                                   (modelpos.ra_deg(), modelpos.dec_deg(),
                                    size*3600.0))
         
@@ -272,7 +272,7 @@ def model2ds9string(model, pnt_type='cross', pnt_mark_size=12,
                 angle     = spatial.posangle()
 
                 # Append ellipse to DS9 string
-                ds9string += ('ellipse(%.6f,%.6f,%.6f,%.6f,%.6f) #' %
+                ds9string += ('ellipse(%.6f,%.6f,%.6f",%.6f",%.6f) #' %
                               (modelpos.ra_deg(), modelpos.dec_deg(),
                                size1*3600.0, size2*3600.0, angle+90.0))
             
