@@ -26,6 +26,15 @@
         Set default deadc value to 0.98 (CTA has <2% deadtime)
 
 
+2017-05-30
+
+        * Bug fix version 1.2.1 released
+        ================================
+
+        Include SWIG interface files into tarball
+        Avoid double execution to ctexpcube
+
+
 2017-02-09
 
         * Version 1.2.0 released

@@ -1,0 +1,14 @@
+.. _1.2.1:
+
+ctools 1.2.1 release (30 May 2017)
+==================================
+
+Overview
+--------
+
+ctools 1.2.1 is a bug fix for ctools release 1.2.
+
+The following bugs have been fixed:
+
+* Include SWIG interface files into tarball
+* Avoid double execution to :ref:`ctexpcube`
