@@ -247,7 +247,9 @@ class csresmap(ctools.cscript):
             signmap = (self._resmap - modelmap).sign()
 
             # Compute logarithm of map. For that we mask pixels
-            logmap  = self._resmap/modelmap
+            #logmap  = self._resmap/modelmap
+            logmap  = self._resmap.copy()   # Python 3.x kluge
+            logmap /= modelmap
             for i in range(logmap.npix()):
                 if logmap[i] > 0.0:
                     logmap[i] = math.log(logmap[i])
