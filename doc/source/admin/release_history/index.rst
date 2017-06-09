@@ -1,4 +1,4 @@
-.. _release:
+.. _sec_release:
 
 Release History
 ===============

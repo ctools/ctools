@@ -1,4 +1,4 @@
-.. _sec_high_level:
+.. _sec_iact_high_level:
 
 High level analysis tools for IACT data
 =======================================
@@ -291,7 +291,7 @@ value is added to the output file. For instance a map of the prefactor can be vi
   $ ds9 tsmap.fits[Prefactor] 
 
 Since :ref:`cttsmap` has to run a parameter optimisation in each skymap bin, it is very time comsuming to
-compute a fine-granulated TS sky map. Read here how to split up the :ref:`computation into several jobs <sec_tips>`. 
+compute a fine-granulated TS sky map. Read here how to split up the :ref:`computation into several jobs <sec_iact_tips>`. 
 Similar as many other tools :ref:`cttsmap` can also work on binned observation input:
 
 .. code-block:: bash

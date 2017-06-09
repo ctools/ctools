@@ -3,12 +3,9 @@ User Manual
 ===========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    introduction
-   getting
    getting_started/index
-   iact_analysis/index
    plotting
-   glossary
 

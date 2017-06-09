@@ -1,4 +1,4 @@
-.. _dev_releasing_merge:
+.. _dev_releasing_devel:
 
 Incrementing the development version
 ====================================

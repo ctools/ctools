@@ -1,4 +1,4 @@
-.. _beyond:
+.. _sec_beyond:
 
 Beyond the first steps
 ----------------------
@@ -11,7 +11,7 @@ And you should be ready for doing your own cutting edge CTA science data
 analyses.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    beyond_combine
    beyond_stacked

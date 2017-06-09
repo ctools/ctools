@@ -77,7 +77,7 @@ asked.
 
   The GammaLib interface is still not fully stabilised, hence ctools is
   continuously adapted to match the interface evolution
-  (see the :ref:`download` section for a correspondance of versions).
+  (see the :ref:`sec_download` section for a correspondance of versions).
   We plan however to put the GammaLib interface under change control.
   ctools should then become more independent from GammaLib.
 

@@ -1,11 +1,16 @@
-.. _help:
+.. _sec_help:
 
 Getting Help
 ============
 
-If you need help you should first check the
-:ref:`Frequently Asked Questions <faq>` and the list of
-:ref:`Known Issues <issues>`.
+If you need help you should first check
+
+.. toctree::
+   :maxdepth: 1
+
+   faq
+   issues
+
 In case that you do not find an answer to your question you may post your 
 question on the ctools@irap.omp.eu mailing list.
 To subscribe to this list you simply need to send an e-mail to

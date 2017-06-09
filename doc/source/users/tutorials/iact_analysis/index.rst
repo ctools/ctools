@@ -1,8 +1,10 @@
+.. _sec_iact:
+
 Analysing current IACT data
 ===========================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    copy
    analysis

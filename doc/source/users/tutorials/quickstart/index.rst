@@ -15,7 +15,7 @@ fitted spectral model. And you will learn how to take energy dispersion
 into account.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    simulating
    binning

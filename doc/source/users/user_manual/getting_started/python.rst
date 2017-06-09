@@ -1,4 +1,4 @@
-.. _python:
+.. _sec_python:
 
 Using ctools from Python
 ------------------------

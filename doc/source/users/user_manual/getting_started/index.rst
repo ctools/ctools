@@ -1,12 +1,12 @@
-Getting started
-===============
+.. _sec_using:
+
+Using ctools
+============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   quickstart
-   beyond
+   python
    models
    response
-   python
 

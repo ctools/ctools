@@ -11,5 +11,4 @@ First CTA Data Challenge
    getting_data
    data_organisation
    first
-   howto
 

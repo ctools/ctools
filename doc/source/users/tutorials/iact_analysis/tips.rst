@@ -1,4 +1,4 @@
-.. _sec_tips:
+.. _sec_iact_tips:
 
 Tips, Tricks and FAQs
 =====================
@@ -260,7 +260,7 @@ parameter:
 Compute flux maps
 -----------------
 The creation of a flux map is much more expensive in terms of computing than an
-excess map. In the section about :ref:`high level analysis tools <sec_high_level>`,
+excess map. In the section about :ref:`high level analysis tools <sec_iact_high_level>`,
 the usage of :ref:`cttsmap` was demonstrated. This tool can also be used to
 generate flux maps. For this, the user has to incorporate a test source in the
 XML model file. This source should consist of a spectral component using a

@@ -1,7 +1,7 @@
-.. _sec_getting:
+.. _sec_install:
 
-Getting the ctools
-==================
+Installing ctools
+=================
 
 Before you start
 ----------------
@@ -58,7 +58,7 @@ You will need the following to build the GammaLib:
 Furthermore it is recommended to have readline and ncurses installed
 (including the developer packages).
 
-After downloading the GammaLib tarball (see :ref:`download`), save it
+After downloading the GammaLib tarball (see :ref:`sec_download`), save it
 in an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash
@@ -130,7 +130,7 @@ If you use C shell or a variant then add the following to your
 Building ctools
 ---------------
 
-After downloading the ctools tarball (see :ref:`download`), save it in 
+After downloading the ctools tarball (see :ref:`sec_download`), save it in 
 an appropriate location (for example ``$HOME/builds``), and type
 
 .. code-block:: bash

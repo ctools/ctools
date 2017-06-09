@@ -1,4 +1,4 @@
-.. _response:
+.. _sec_response:
 
 CTA Instrument Response Functions
 ---------------------------------

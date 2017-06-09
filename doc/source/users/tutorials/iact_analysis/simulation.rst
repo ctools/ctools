@@ -1,4 +1,4 @@
-.. _sec_simulation:
+.. _sec_iact_simulation:
 
 Simulating IACT data
 ====================
@@ -10,7 +10,7 @@ Simulations for a specific observation container
 ------------------------------------------------
 On default, :ref:`ctobssim` builds a new observation container by querying relevant user parameters. In case
 an observation XML container is already in place, the hidden parameter ``inobs`` can be specified (:ref:`see here how to create an
-observation container <sec_analysis>`). It might be useful to run :ref:`ctselect` beforehand to ensure that the simulation knows about
+observation container <sec_iact_analysis>`). It might be useful to run :ref:`ctselect` beforehand to ensure that the simulation knows about
 energy thresholds, field of view, etc. If an unselected observation container is used, the simulation tool will query for global energy
 boundaries and a global RoI radius. The following example illustrates the usage of an already selected observation container.
 
@@ -59,7 +59,7 @@ observations with at a certain zenith angle range (20-25 degrees) and azimuth an
 	Runlist outfile [zen20_az90.lis]
 	
 Of course, further details could be specified, e.g. one might want to check for a certain range of muon efficieny, or any other parameter which impacts IRFs.
-The output runlist subsequently has to be converted to an observation XML file using :ref:`csiactobs` (:ref:`see here how to execute this tool <sec_analysis>`).
+The output runlist subsequently has to be converted to an observation XML file using :ref:`csiactobs` (:ref:`see here how to execute this tool <sec_iact_analysis>`).
 In the following it is assumed that the observation XML file of the selected representative observations is produced and called ``myobs.xml``.
 
 Create caldb entry

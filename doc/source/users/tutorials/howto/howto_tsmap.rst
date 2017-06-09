@@ -39,7 +39,7 @@ The :ref:`cttsmap` tool creates a FITS file containing for each pixel the
 Test Statistic value as well as the fit parameters for the test source.
 The figure below shows the resulting Test Statistic map.
 
-.. figure:: first_tsmap.png
+.. figure:: howto_tsmap.png
    :width: 400px
    :align: center
 

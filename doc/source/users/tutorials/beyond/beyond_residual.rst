@@ -49,7 +49,7 @@ The :ref:`csresmap` script is then used as follows:
   Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT) [SUBDIV] 
 
 In our example, the map will cover a field of 4° x 4° centred on the
-Crab nebula at a pixel scale of 0.02° per pixel.
+Crab nebula at a pixel scale of 0.02 degrees per pixel.
 The resulting residual map ``resmap.fits``, smoothed with a Gaussian
 kernel of 3 pixels to enhance features, is shown in the following figure.
 Obviously, the map is free from any significant residuals.

@@ -1,10 +1,10 @@
-.. _sec_analysis:
+.. _sec_iact_analysis:
 
 Analysing IACT data
 ===================
 
 In order to analyse data from current IACTs, you first have to retrieve the
-data. Information on how to do that can be found in the section :ref:`sec_copy`.
+data. Information on how to do that can be found in the section :ref:`sec_iact_copy`.
 
 Check available FITS production
 -------------------------------
@@ -174,7 +174,7 @@ Alternatively, you can merged models using the :ref:`csmodelmerge` script:
 A list of available sky models can be found
 `here <http://gammalib.sourceforge.net/user_manual/modules/model.html>`_.
 If you are not familiar with creating sky models you should read the section
-about :ref:`modelling CTA data <models>`.
+about :ref:`modelling CTA data <sec_models>`.
 
 
 Example XML files

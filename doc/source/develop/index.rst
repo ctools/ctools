@@ -1,4 +1,4 @@
-.. _develop:
+.. _sec_develop:
 
 Developer documentation
 =======================
@@ -38,6 +38,14 @@ Below some reasources to learn how to contribute to ctools:
    coding/index
    profiling/index
    releasing/index
+
+Links:
+
+* `GitLab <https://cta-gitlab.irap.omp.eu/ctools/ctools>`_
+* `GitHub <https://github.com/ctools/ctools>`_
+* `Redmine <https://cta-redmine.irap.omp.eu/projects/ctools>`_
+* `Open HUB <https://www.openhub.net/p/ctools_>`_
+* `Source code documentation (Doxygen) <doxygen/index.html>`_
 
 And here some status shields:
 

@@ -1,4 +1,4 @@
-.. _sec_copy:
+.. _sec_iact_copy:
 
 Copying IACT data
 ==================

@@ -24,7 +24,7 @@ After downloading, configure GammaLib and ctools as follows:
    $ export CTOOLS=/usr/local/gamma
    $ source $CTOOLS/bin/ctools-init.sh
 
-Have a look at :ref:`getting the ctools <sec_getting>` if you need more
+Have a look at :ref:`getting the ctools <sec_install>` if you need more
 information about the installation and configuration process.
 
 .. note::

@@ -1,4 +1,4 @@
-.. _download:
+.. _sec_download:
 
 Download
 ========
@@ -15,11 +15,14 @@ Releases
 
 The latest ctools release is ``ctools-1.2.1`` (30 May 2017).
 
-Below a table of ctools releases. Please note that at this stage of the
-project there is a strict link between the ctools and gammalib versions.
-Please make sure that you have the corresponding gammalib version installed
-before installing ctools. The Mac OS X packages comprise both ctools and
-gammalib.
+Below a table of ctools releases. Please read the :ref:`sec_release` to
+learn more about new features and corrected bugs in a given release.
+
+.. warning::
+   At this stage of the project there is a strict link between the ctools and
+   gammalib versions. Please make sure that you have the corresponding gammalib
+   version installed before installing ctools. The Mac OS X packages comprise
+   both ctools and gammalib.
 
 .. list-table::
    :header-rows: 1
@@ -155,7 +158,7 @@ the following command sequence (the code will be installed into the
    $ export CTOOLS=/usr/local/gamma
    $ source $CTOOLS/bin/ctools-init.sh
 
-Please read the :ref:`sec_getting` section if you need more information on
+Please read the :ref:`sec_install` section if you need more information on
 how to install ctools.
 
 .. note::

@@ -1,3 +1,5 @@
+.. _sec_contents:
+
 Documentation
 =============
 
@@ -5,7 +7,7 @@ Documentation
    :maxdepth: 1
 
    about
-   download
+   admin/index
    users/index
    develop/index
-   users/help
+   help/index
