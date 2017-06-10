@@ -28,8 +28,8 @@ learn more about new features and corrected bugs in a given release.
    :header-rows: 1
    :widths: 5 5 10
 
-   * - `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ChangeLog>`_
-     - `gammalib <http://cta.irap.omp.eu/ctools/releases/gammalib/ChangeLog>`_
+   * - ctools
+     - gammalib
      - Mac OS X package
    * - `1.3.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.3.0.tar.gz>`_
      - `1.3.0 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.3.0.tar.gz>`_
