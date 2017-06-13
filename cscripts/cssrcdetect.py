@@ -45,6 +45,13 @@ class cssrcdetect(ctools.cscript):
         # Set protected members
         self._models = gammalib.GModels()
 
+        # Initialise sky map from constructor arguments
+        if len(argv) > 0 and isinstance(argv[0], gammalib.GSkyMap):
+            self._map = argv[0]
+            argv      = argv[1:]
+        else:
+            self._map = gammalib.GSkyMap()
+
         # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
@@ -57,8 +64,9 @@ class cssrcdetect(ctools.cscript):
         """
         Get parameters from parfile
         """
-        # Query input parameters
-        self['inmap'].filename()
+        # Query input parameters if sky map is empty
+        if self._map.is_empty():
+            self['inmap'].filename()
 
         # Query further parameters
         self['srcmodel'].string()
@@ -228,7 +236,7 @@ class cssrcdetect(ctools.cscript):
         # Compute mean and standard deviation
         mean /= float(map.npix())
         std  /= float(map.npix())
-        std  -= mean
+        std  -= mean * mean
         std   = math.sqrt(std)
 
         # Return mean and standard deviation
@@ -334,6 +342,31 @@ class cssrcdetect(ctools.cscript):
         return model
 
 
+    def _load_skymap(self):
+        """
+        Load sky map
+
+        Returns
+        -------
+        map : `~gammalib.GSkyMap()`
+            Sky map
+        """
+        # Get skymap filename
+        inmap = self['inmap'].filename()
+
+        # Open sky map file
+        fits = gammalib.GFits(inmap)
+
+        # Extract primary extension as sky map
+        map = gammalib.GSkyMap(fits.image(0))
+
+        # Close sky map file
+        fits.close()
+
+        # Return
+        return map
+
+
     # Public methods
     def run(self):
         """
@@ -352,20 +385,12 @@ class cssrcdetect(ctools.cscript):
         # Write header
         self._log_header1(gammalib.NORMAL, 'Source detection')
 
-        # Get skymap filename
-        inmap = self['inmap'].filename()
-
-        # Open sky map file
-        fits = gammalib.GFits(inmap)
-
-        # Extract primary extension as counts map
-        counts = gammalib.GSkyMap(fits.image(0))
+        # If sky map is empty then load it from input parameter
+        if self._map.is_empty():
+            self._map = self._load_skymap()
 
         # Detect sources
-        self._detect_sources(counts)
-
-        # Close sky map file
-        fits.close()
+        self._detect_sources(self._map)
 
         # Write detected sources as models into logger
         self._log_models(gammalib.NORMAL, self._models, 'Detected source model')
@@ -432,6 +457,12 @@ class cssrcdetect(ctools.cscript):
 
         # Return
         return
+
+    def models(self):
+        """
+        Return model container
+        """
+        return self._models
 
     def execute(self):
         """
