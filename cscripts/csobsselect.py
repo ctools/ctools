@@ -55,8 +55,10 @@ class csobsselect(ctools.cscript):
         """
         Get parameters from parfile and setup observations
         """
-        # Query input parameters
-        self['inobs'].filename()
+        # If there are no observations in container then query the inobs
+        # parameter
+        if self._obs.size() == 0:
+            self['inobs'].filename()
         
         # Query relevant pointing selection parameters
         pntselect = self['pntselect'].string()
@@ -326,6 +328,12 @@ class csobsselect(ctools.cscript):
 
         # Return
         return
+
+    def obs(self):
+        """
+        Return observation container
+        """
+        return self._obs
 
     def execute(self):
         """
