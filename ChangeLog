@@ -1,3 +1,13 @@
+2017-06-23
+
+        * Bug fix version 1.3.1 released
+        ================================
+
+        Properly forward working log file pointer in ctobssim::set_mc_id_names() (#2123)
+        Correct computation of standard deviations in cssrcdetect
+        csobsselect accepts an observation container upon construction
+
+
 2017-06-07
 
         * Version 1.3.0 released

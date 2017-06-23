@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.3.0.dev1
+New Features and Important Changes in ctools 1.3.1
 
-7 June 2017
+23 June 2017
 
 
 Introduction
@@ -11,22 +11,7 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-The Python unit tests now raise exceptions instead of exiting with a non-
-zero return code so that the user is not thrown out of Python after calling
-ctools.test() and cscripts.test() (#1983).
-
-If the code originates from the Git repository the configuration now switches
-to developer mode which implies that the Python bindings are always built.
-This solves the problem that occured for developers that could not get rid
-of existing Python wrappers, even if they modified the Python interface
-(#1985).
-
-The cscripts are now copied into the bin directory upon installation instead
-of creating symbolic links. This avoids problems on some VM file systems on
-which creation of symbolic links does not work (#1987).
-
-The missing *.i SWIG Python interface definition files were added to
-the release tarball (#2114).
+None
 
 
 Python interface
@@ -36,30 +21,19 @@ None
 
 Support model
 -------------
-The ctool::init_members() method now sets the local language to English
-so that writing commas instead of dots is avoided (#1370).
+None
 
 
 ctobssim - CTA observation simulation
 -------------------------------------
-The tool now supports map cubes that are not overlapping with the RoI.
-In this case, no spectral nodes exist and before the spectral flux()
-method called in ctobssim::get_model_flux() was throwing an exception.
-Now, for map cubes outside the RoI the flux is set to zero.
-
-The tool now also added Monte Carlo identifiers to the simulated events
-so that each event can be traced back to the model from which it originated
-(#1483).
+The working log file pointer is now correctly forwarded to
+ctobssim::set_mc_id_names() which avoids exceptions when running the
+tool under OpenMP (#2123).
 
 
 ctselect - CTA event selection
 ------------------------------
-A "phase" parameter has been added to ctselect to allow event selection
-according to their phase information. The phase parameter accepts a
-string that provides a comma separated list of phase intervals in the
-format "0.1:0.4,0.6:0.8". Wrap around is supported (e.g. "0.8:0.1"
-selects events with phases in the intervals [0.8,1.0] and [0.0,0.1]
-(#1996).
+None
 
 
 ctbin - CTA event binning
@@ -69,10 +43,7 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-The tool now stores the covariance matrix in either FITS or CSV format,
-depending on the file type specified in the file name. For file names
-terminating with ".fits" or ".fit" a FITS file will be written, otherwise
-a CSV file will be written (#1863).
+None
 
 
 cttsmap - Generation of Test Statistic map
@@ -82,12 +53,7 @@ None
 
 ctskymap - CTA sky mapping
 --------------------------
-Any RoI is now taken into account in ctskymap so that if IRF background
-subtraction is requested the counts and background maps are coherent. In
-addition, the energy integration over the background template is now done
-numerically so that strong variations in the background rate, such as
-those occuring close to the threshold, are correctly taken into account
-(#1975).
+None
 
 
 ctmodel - CTA counts cube modelling
@@ -112,15 +78,12 @@ None
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
-The tool now throws an exception if no valid background model was found in
-the model container. This prevents from creating an empty background cube
-(#1652).
+None
 
 
 ctmapcube - CTA map cube generation
 -----------------------------------
-The tool now supports loading the energy binning definition from an energy
-boundary FITS file, behaving now similar to the other cube tools (#1978).
+None
 
 
 ctcubemask - CTA cube filtering
@@ -130,14 +93,7 @@ None
 
 ctbutterfly - Generate butterfly diagrams
 -----------------------------------------
-The tool now uses Gaussian error propagation as the standard method for the
-computation of the butterfly diagram. The envelope method that existed before
-is still available for power law spectral models as an option. The "method"
-parameter has been added to allow the selection of the computation method
-(#1862).
-
-A bug in the covariance matrix has been corrected that probably was introduced
-in the implementation of the Gaussian error propagation method (#2121).
+None
 
 
 ctulimit - Compute upper limit
@@ -152,35 +108,19 @@ None
 
 ctprob - Event probability computation
 --------------------------------------
-The ctprob tool has been added that computates for each event the probability
-that the event originates from a given model component. The tool takes on input
-either an event list or an observation definition XML file. It appends to each
-event list a column for each model component that will contain the probability
-that the event originates from that component (#1991).
+None
 
 
 ctphase - Event phase computation
 ---------------------------------
-The ctphase tool has been added that compute the phase for each event based on
-a temporal phase curve model. This allows for example to perform a pulsar or
-binary analysis (#1982).
+None
 
 
 cscripts
 --------
-The csebins script has been added that generates an energy boundaries
-extension that can be used for a stacked analysis. The energy boundaries
-are set as function of the variation in the effective area and background
-rates of the Instrument Response Function (#1976).
+The csobsselect script now accepts an observation container upon construction.
 
-A regression scheme now replaces the averaging scheme in cssens as this
-allows more accurately the prediction of the flux value at the threshold
-Test Statistic. The num_avg parameter has been removed (#1989).
-
-The names of some ROOT histograms has been changed in the Monte Carlo data
-and the "EffectiveAreaEtrue_offaxis" needed to be changed to
-"EffectiveAreaEtrueNoTheta2cut_offaxis" and "EffectiveAreaEtrue" to
-"EffectiveAreaEtrueNoTheta2cut" in csroot2caldb.
+The standard deviation computation in cssrcdetect has been corrected.
 
 
 Examples
