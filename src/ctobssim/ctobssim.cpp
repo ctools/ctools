@@ -364,7 +364,7 @@ void ctobssim::run(void)
             simulate_background(&obs_clone, models, m_rans[i], &wrklog);
 
             // Set Monte Carlo identifier and name correspondance
-            set_mc_id_names(&obs_clone, models);
+            set_mc_id_names(&obs_clone, models, &wrklog);
 
             // Dump simulation results
             if (logTerse()) {
