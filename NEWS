@@ -1,4 +1,4 @@
-New Features and Important Changes in ctools 1.3.1
+New Features and Important Changes in ctools 1.4.0
 
 23 June 2017
 
@@ -26,9 +26,7 @@ None
 
 ctobssim - CTA observation simulation
 -------------------------------------
-The working log file pointer is now correctly forwarded to
-ctobssim::set_mc_id_names() which avoids exceptions when running the
-tool under OpenMP (#2123).
+None
 
 
 ctselect - CTA event selection
@@ -118,9 +116,7 @@ None
 
 cscripts
 --------
-The csobsselect script now accepts an observation container upon construction.
-
-The standard deviation computation in cssrcdetect has been corrected.
+None
 
 
 Examples
