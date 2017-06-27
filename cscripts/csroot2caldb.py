@@ -29,7 +29,7 @@ from cscripts import calutils
 
 # Optional ROOT import
 try:
-    from ROOT import TFile
+    from ROOT import TFile, TH2F, TH3F
     _has_root = True
 except ImportError:
     _has_root = False
@@ -651,6 +651,78 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
+    def _root2psf_get_r68_and_r80(self, tfile):
+        """
+        Generates 68% and 80% containment radii histograms from
+        AngularPSF2DEtrue_offaxis histogram
+
+        Parameters
+        ----------
+        tfile : `~ROOT.TFile`
+            ROOT file
+
+        Returns
+        -------
+        r68, r80 : Tuple of `~ROOT.THF2`
+            68% and 80% containment radius ROOT histograms
+        """
+        # Get relevant ROOT histograms
+        psf = tfile.Get('AngularPSF2DEtrue_offaxis')
+
+        # Extract axes
+        energies = psf.GetXaxis()
+        dists    = psf.GetYaxis()
+        offsets  = psf.GetZaxis()
+
+        # Extract number of bins in histogram
+        neng    = energies.GetNbins()
+        ndist   = dists.GetNbins()
+        noffset = offsets.GetNbins()
+
+        # Create r68 and r80 histograms
+        r68 = TH2F('AngRes68Etrue_offaxis',
+                   'Angular resolution (68% containment)',
+                   neng,    energies.GetBinLowEdge(1), energies.GetBinUpEdge(neng),
+                   noffset, offsets.GetBinLowEdge(1),  offsets.GetBinUpEdge(noffset))
+        r80 = TH2F('AngRes80Etrue_offaxis',
+                   'Angular resolution (80% containment)',
+                   neng,    energies.GetBinLowEdge(1), energies.GetBinUpEdge(neng),
+                   noffset, offsets.GetBinLowEdge(1),  offsets.GetBinUpEdge(noffset))
+
+        # Loop over all energy and offset angle bins
+        for ieng in range(neng):
+            for ioff in range(noffset):
+            
+                # Compute PDF integral
+                pdf_integral = 0.0
+                for idist in range(ndist):
+                    pdf_integral += psf.GetBinContent(ieng+1,idist+1,ioff+1)
+
+                # Compute 68% containment radius
+                pdf_68    = 0.0
+                r68_angle = 0.0
+                for idist in range(ndist):
+                    pdf_68 += psf.GetBinContent(ieng+1,idist+1,ioff+1)
+                    if pdf_68 > 0.68*pdf_integral:
+                        r68_angle = dists.GetBinLowEdge(idist+1)
+                        break
+
+                # Compute 80% containment radius
+                pdf_80    = 0.0
+                r80_angle = 0.0
+                for idist in range(ndist):
+                    pdf_80 += psf.GetBinContent(ieng+1,idist+1,ioff+1)
+                    if pdf_80 > 0.80*pdf_integral:
+                        r80_angle = dists.GetBinLowEdge(idist+1)
+                        break
+
+                # Set histogram values
+                r68.SetBinContent(ieng+1,ioff+1,r68_angle)
+                r80.SetBinContent(ieng+1,ioff+1,r80_angle)
+
+        # Return
+        return r68, r80
+
     def _root2psf_gauss(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB point spread function extension
@@ -677,7 +749,8 @@ class csroot2caldb(ctools.cscript):
                           'Generate Gaussian point spread function extension')
 
         # Get relevant ROOT histograms
-        r68 = tfile.Get('AngRes_offaxis')
+        #r68 = tfile.Get('AngRes_offaxis')
+        r68, _ = self._root2psf_get_r68_and_r80(tfile)
 
         # Extract number of bins in histogram
         neng    = r68.GetXaxis().GetNbins()
@@ -757,8 +830,9 @@ class csroot2caldb(ctools.cscript):
                           'Generate King point spread function extension')
 
         # Get relevant ROOT histograms
-        r68 = tfile.Get('AngRes_offaxis')
-        r80 = tfile.Get('AngRes80_offaxis')
+        #r68 = tfile.Get('AngRes_offaxis')
+        #r80 = tfile.Get('AngRes80_offaxis')
+        r68, r80 = self._root2psf_get_r68_and_r80(tfile)
 
         # Extract number of bins in histogram
         neng    = r68.GetXaxis().GetNbins()
@@ -869,6 +943,80 @@ class csroot2caldb(ctools.cscript):
         # Return
         return
 
+    def _root2edisp_get_migra(self, tfile):
+        """
+        Generates migration matrix histogram from AngularPSF2DEtrue_offaxis
+        histogram
+
+        Parameters
+        ----------
+        tfile : `~ROOT.TFile`
+            ROOT file
+
+        Returns
+        -------
+        migra : `~ROOT.TH3F`
+            Migration matrix
+        """
+        # Get relevant ROOT histograms
+        matrix = tfile.Get('MigMatrixNoTheta2cut_offaxis')
+
+        # Extract axes
+        ereco   = matrix.GetXaxis()
+        etrue   = matrix.GetYaxis()
+        offsets = matrix.GetZaxis()
+
+        # Extract number of bins in histogram
+        nereco  = ereco.GetNbins()
+        netrue  = etrue.GetNbins()
+        noffset = offsets.GetNbins()
+
+        # Set number of migration bins
+        nmigra = 300
+
+        # Create migra histograms
+        migra = TH3F('EestOverEtrue_offaxis',
+                     'Migration',
+                     netrue,  etrue.GetBinLowEdge(1),   etrue.GetBinUpEdge(netrue),
+                     nmigra,  0.0,                      3.0,
+                     noffset, offsets.GetBinLowEdge(1), offsets.GetBinUpEdge(noffset))
+
+        # Loop over true energies
+        for ietrue in range(netrue):
+
+            # Get true energy in TeV
+            e_true = math.pow(10.0, migra.GetXaxis().GetBinCenter(ietrue+1))
+            
+            # Loop over migration values
+            for imigra in range(nmigra):
+
+                # Get migration value
+                migration = migra.GetYaxis().GetBinCenter(imigra+1)
+
+                # Compute reconstructed energy in TeV
+                e_reco = e_true * migration
+
+                # Continue only if reconstructed energy is positive
+                if e_reco > 0.0:
+
+                    # Get reconstructed bin
+                    ireco = ereco.FindFixBin(math.log10(e_reco))
+
+                    # Continue only if bin is valid
+                    if ireco > 0 and ireco <= nereco:
+
+                        # Loop over offset angles
+                        for ioff in range(noffset):
+
+                            # Get bin value
+                            value = matrix.GetBinContent(ireco,ietrue+1,ioff+1)
+
+                            # Set bin value
+                            migra.SetBinContent(ietrue+1,imigra+1,ioff+1,value)
+
+        # Return
+        return migra
+
     def _root2edisp(self, tfile, irf, ds):
         """
         Translate ROOT to CALDB energy dispersion extension
@@ -889,7 +1037,8 @@ class csroot2caldb(ctools.cscript):
         self._log_header1(gammalib.TERSE, 'Generate energy dispersion extension')
 
         # Get relevant ROOT histograms
-        matrix = tfile.Get('EestOverEtrue_offaxis')
+        matrix = self._root2edisp_get_migra(tfile)
+        #matrix = tfile.Get('EestOverEtrue_offaxis')
 
         # Write boundary keywords
         self._set_cif_keywords(ds['HDU_EDISP'], irf['EDISP_NAME'],
