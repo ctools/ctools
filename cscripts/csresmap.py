@@ -246,19 +246,27 @@ class csresmap(ctools.cscript):
             # Compute sign map
             signmap = (self._resmap - modelmap).sign()
 
-            # Compute logarithm of map. For that we mask pixels
-            #logmap  = self._resmap/modelmap
-            logmap  = self._resmap.copy()   # Python 3.x kluge
-            logmap /= modelmap
-            for i in range(logmap.npix()):
+            # Loop over every bin in the map
+            for i in range(self._resmap.npix()):
+                
+                # If the model value > 0.0 do the computation as normal
                 model_val = modelmap[i]
                 if model_val > 0.0:
+                    
+                    # If the data value is also > 0 then proceed as normal
                     data_val = self._resmap[i]
                     if data_val > 0.0:
+                        # Compute the significance^2 and save it to the map
                         log_val = math.log(data_val/model_val)
                         self._resmap[i] = (data_val*log_val) + model_val  - data_val
+                    
+                    # If the data value is less than zero, then compute the
+                    # reduced value of the above expression. This is necessary
+                    # to avoid computing log(0).
                     else:
                         self._resmap[i] = model_val
+            
+                # If the model value is zero, hard-code the significance to 0
                 else:
                     self._resmap[i] = 0.0
             
