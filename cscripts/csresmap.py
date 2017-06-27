@@ -251,16 +251,21 @@ class csresmap(ctools.cscript):
             logmap  = self._resmap.copy()   # Python 3.x kluge
             logmap /= modelmap
             for i in range(logmap.npix()):
-                if logmap[i] > 0.0:
-                    logmap[i] = math.log(logmap[i])
+                model_val = modelmap[i]
+                if model_val > 0.0:
+                    data_val = self._resmap[i]
+                    if data_val > 0.0:
+                        log_val = math.log(data_val/model_val)
+                        self._resmap[i] = (data_val*log_val) + model_val  - data_val
+                    else:
+                        self._resmap[i] = model_val
                 else:
-                    logmap[i] = 0.0
+                    self._resmap[i] = 0.0
             
             # Compute significance map
-            signif_squared_map  = (self._resmap*logmap) + modelmap  - self._resmap
-            signif_squared_map *= 2.0
-            unsigned_resmap     = signif_squared_map.sqrt()
-            self._resmap        = unsigned_resmap * signmap
+            self._resmap *= 2.0
+            self._resmap  = self._resmap.sqrt()
+            self._resmap  = self._resmap * signmap
 
         # Raise exception if algorithm is unknown
         else:
