@@ -545,7 +545,9 @@ void ctbin::fill_cube(GCTAObservation* obs)
         }
 
         // Fill event in skymap
+        #pragma omp critical
         m_counts(pixel, iebin) += 1.0;
+        
         num_in_map++;
 
     } // endfor: looped over all events
