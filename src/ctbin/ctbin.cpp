@@ -236,8 +236,11 @@ void ctbin::run(void)
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
     // Loop over all unbinned CTA observations in the container
-    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
-         obs = next_unbinned_observation()) {
+//    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+//         obs = next_unbinned_observation()) {
+    #pragma omp parallel for
+    for (int o=0; o<m_obs.size(); o++) {
+        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
 
         // Fill the cube
         fill_cube(obs);
@@ -555,6 +558,7 @@ void ctbin::fill_cube(GCTAObservation* obs)
     m_livetime += obs->livetime();
 
     // Log filling results
+    log_header3(TERSE, get_obs_header(obs));
     log_value(NORMAL, "Events in list", obs->events()->size());
     log_value(NORMAL, "Events in cube", num_in_map);
     log_value(NORMAL, "Events outside RoI", num_outside_roi);
