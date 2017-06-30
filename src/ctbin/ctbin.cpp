@@ -235,26 +235,21 @@ void ctbin::run(void)
     // Write header into logger
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
+    // Extract out all of the non-NULL observations
+    log_header2(TERSE, "Executing pre-loop");
+    std::vector<GCTAObservation*> obs_list(0);
+    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+            obs = next_unbinned_observation()) {
+        obs_list.push_back(obs);
+    }
+
+    // Write sub-header into logger
+    log_header2(TERSE, "Filling observations");
+
     // Loop over all unbinned CTA observations in the container
     #pragma omp parallel for
-    for (int o=0; o<m_obs.size(); o++) {
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
-
-        // Skip if the observation is NULL. This can happen if the observation
-        // isn't a CTA observation
-        if (obs == NULL) {
-            std::string msg = " Skipping "+obs->instrument()+" observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
-        
-        // Skip observation if we have a binned observation
-        if (obs->eventtype() == "CountsCube") {
-            obs             = NULL;
-            std::string msg = " Skipping binned "+obs->instrument()+" observation";
-            log_string(NORMAL, msg);
-            continue;
-        }
+    for (int oindx=0; oindx<obs_list.size(); ++oindx) {
+        GCTAObservation* obs = obs_list[oindx];
         
         // Fill the cube
         fill_cube(obs);
@@ -282,8 +277,6 @@ void ctbin::run(void)
         publish();
     }
 
-log_string(NORMAL, "RUNNING HAS FINISHED");
-    
     // Return
     return;
 }
