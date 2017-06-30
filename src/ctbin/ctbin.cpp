@@ -240,6 +240,22 @@ void ctbin::run(void)
     for (int o=0; o<m_obs.size(); o++) {
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[o]);
 
+        // Skip if the observation is NULL. This can happen if the observation
+        // isn't a CTA observation
+        if (obs == NULL) {
+            std::string msg = " Skipping "+obs->instrument()+" observation";
+            log_string(NORMAL, msg);
+            continue;
+        }
+        
+        // Skip observation if we have a binned observation
+        if (obs->eventtype() == "CountsCube") {
+            obs             = NULL;
+            std::string msg = " Skipping binned "+obs->instrument()+" observation";
+            log_string(NORMAL, msg);
+            continue;
+        }
+        
         // Fill the cube
         fill_cube(obs);
 
@@ -266,6 +282,8 @@ void ctbin::run(void)
         publish();
     }
 
+log_string(NORMAL, "RUNNING HAS FINISHED");
+    
     // Return
     return;
 }
@@ -550,22 +568,25 @@ void ctbin::fill_cube(GCTAObservation* obs)
 
     } // endfor: looped over all events
 
-    // Append GTIs
-    m_gti.extend(events->gti());
-
-    // Update ontime and livetime
-    m_ontime   += obs->ontime();
-    m_livetime += obs->livetime();
-
-    // Log filling results
-    log_header3(TERSE, get_obs_header(obs));
-    log_value(NORMAL, "Events in list", obs->events()->size());
-    log_value(NORMAL, "Events in cube", num_in_map);
-    log_value(NORMAL, "Events outside RoI", num_outside_roi);
-    log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
-    log_value(NORMAL, "Events outside cube area", num_outside_map);
-    log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
-
+    #pragma omp critical
+    {
+        // Append GTIs
+        m_gti.extend(events->gti());
+        
+        // Update ontime and livetime
+        m_ontime   += obs->ontime();
+        m_livetime += obs->livetime();
+        
+        // Log filling results
+        log_header3(TERSE, get_obs_header(obs));
+        log_value(NORMAL, "Events in list", obs->events()->size());
+        log_value(NORMAL, "Events in cube", num_in_map);
+        log_value(NORMAL, "Events outside RoI", num_outside_roi);
+        log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
+        log_value(NORMAL, "Events outside cube area", num_outside_map);
+        log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
+    }
+    
     // Return
     return;
 }
