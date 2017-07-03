@@ -49,6 +49,9 @@ scripts = ctools-setup \
           ctools-init.sh \
           ctools-init.csh
 
+# Headers to be distributed
+pkginclude_HEADERS = ctools.hpp
+
 # Build libtool library for ctools. This is needed to provide
 # a shared library that can be loaded for python bindings. We do
 # not have to build this library if no python bindings are used.
