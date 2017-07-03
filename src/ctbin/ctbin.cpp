@@ -233,21 +233,22 @@ void ctbin::run(void)
     log_observations(NORMAL, m_obs, "Input observation");
 
     // Write header into logger
-    log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
+    log_header1(TERSE, gammalib::number("Find unbinned observation", m_obs.size()));
 
-    // Extract out all of the non-NULL observations
-    log_header2(TERSE, "Executing pre-loop");
+    // Find all unbinned CTA observations in m_obs
     std::vector<GCTAObservation*> obs_list(0);
     for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
             obs = next_unbinned_observation()) {
+        std::string msg = " Including unbinned "+obs->instrument()+" observation";
+        log_string(NORMAL, msg);
         obs_list.push_back(obs);
     }
 
-    // Write sub-header into logger
-    log_header2(TERSE, "Filling observations");
-
+    // Write header into logger
+    log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
+    
     // Loop over all unbinned CTA observations in the container
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for (int oindx=0; oindx<obs_list.size(); ++oindx) {
         GCTAObservation* obs = obs_list[oindx];
         
