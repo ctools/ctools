@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctedispcube tool                                          #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctedispcube
 
 # Sources
 sources = ctedispcube.cpp ctedispcube.hpp
+
+# Headers
+pkginclude_HEADERS = ctedispcube.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctedispcube.la

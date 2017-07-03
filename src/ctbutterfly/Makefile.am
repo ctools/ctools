@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctbutterfly tool                                          #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctbutterfly
 
 # Sources
 sources = ctbutterfly.cpp ctbutterfly.hpp
+
+# Headers
+pkginclude_HEADERS = ctbutterfly.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctbutterfly.la

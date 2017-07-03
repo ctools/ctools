@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctmapcube tool                                            #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctmapcube
 
 # Sources
 sources = ctmapcube.cpp ctmapcube.hpp
+
+# Headers
+pkginclude_HEADERS = ctmapcube.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctmapcube.la

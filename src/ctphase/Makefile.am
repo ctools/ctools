@@ -28,6 +28,9 @@ bin_PROGRAMS = ctphase
 # Sources
 sources = ctphase.cpp ctphase.hpp
 
+# Headers
+pkginclude_HEADERS = ctphase.hpp
+
 # Libtool library (only needed for python bindings)
 noinst_LTLIBRARIES = libctphase.la
 libctphase_la_SOURCES = $(sources)

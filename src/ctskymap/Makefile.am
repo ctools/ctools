@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctskymap tool                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctskymap
 
 # Sources
 sources = ctskymap.cpp ctskymap.hpp
+
+# Headers
+pkginclude_HEADERS = ctskymap.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctskymap.la

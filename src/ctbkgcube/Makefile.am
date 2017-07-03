@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctbkgcube tool                                            #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctbkgcube
 
 # Sources
 sources = ctbkgcube.cpp ctbkgcube.hpp
+
+# Headers
+pkginclude_HEADERS = ctbkgcube.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctbkgcube.la
