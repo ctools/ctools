@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.4.0
 
-23 June 2017
+3 July 2017
 
 
 Introduction
@@ -11,7 +11,8 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-None
+The ctools header files are now installed into $(prefix)/include/ctools
+(#2145).
 
 
 Python interface

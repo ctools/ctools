@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctool base classes                                        #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -24,6 +24,12 @@ sources = support.cpp support.hpp \
           ctool.cpp ctool.hpp \
           ctobservation.cpp ctobservation.hpp \
           ctlikelihood.cpp ctlikelihood.hpp
+
+# Headers
+pkginclude_HEADERS = support.hpp \
+                     ctool.hpp \
+                     ctobservation.hpp \
+                     ctlikelihood.hpp
 
 # Build libtool library
 noinst_LTLIBRARIES = libsupport.la

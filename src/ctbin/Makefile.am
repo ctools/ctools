@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctbin tool                                                #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctbin
 
 # Sources
 sources = ctbin.cpp ctbin.hpp
+
+# Headers
+pkginclude_HEADERS = ctbin.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctbin.la

@@ -28,6 +28,9 @@ bin_PROGRAMS = ctprob
 # Sources
 sources = ctprob.cpp ctprob.hpp
 
+# Headers
+pkginclude_HEADERS = ctprob.hpp
+
 # Libtool library
 noinst_LTLIBRARIES = libctprob.la
 libctprob_la_SOURCES = $(sources)

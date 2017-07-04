@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctobssim tool                                             #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctobssim
 
 # Sources
 sources = ctobssim.cpp ctobssim.hpp
+
+# Headers
+pkginclude_HEADERS = ctobssim.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctobssim.la

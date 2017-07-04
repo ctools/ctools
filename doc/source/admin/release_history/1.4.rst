@@ -1,0 +1,29 @@
+.. _1.4:
+
+ctools 1.4 release (TBD)
+================================
+
+Overview
+--------
+
+ctools 1.4 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* TBW
+
+
+Bug fixes
+---------
+
+
+
+Improvements
+------------
+
+* [`2145 <https://cta-redmine.irap.omp.eu/issues/2145>`_] -
+  Install C++ header files
+
+
+New features
+------------

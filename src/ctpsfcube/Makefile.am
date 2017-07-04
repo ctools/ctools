@@ -1,7 +1,7 @@
 #############################################################################
 # Makefile.am for ctpsfcube tool                                            #
 # ------------------------------------------------------------------------- #
-# Copyright (C) 2016 Juergen Knoedlseder                                    #
+# Copyright (C) 2016-2017 Juergen Knoedlseder                               #
 # ------------------------------------------------------------------------- #
 #                                                                           #
 #  This program is free software: you can redistribute it and/or modify     #
@@ -27,6 +27,9 @@ bin_PROGRAMS = ctpsfcube
 
 # Sources
 sources = ctpsfcube.cpp ctpsfcube.hpp
+
+# Headers
+pkginclude_HEADERS = ctpsfcube.hpp
 
 # Libtool library
 noinst_LTLIBRARIES = libctpsfcube.la
