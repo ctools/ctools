@@ -248,7 +248,7 @@ void ctbin::run(void)
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
     
     // Loop over all unbinned CTA observations in the container
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for
     for (int oindx=0; oindx<obs_list.size(); ++oindx) {
         GCTAObservation* obs = obs_list[oindx];
         
@@ -371,6 +371,7 @@ void ctbin::init_members(void)
     m_ebounds.clear();
     m_gti.clear();
     m_cube.clear();
+    m_dirs.clear();
     m_ontime   = 0.0;
     m_livetime = 0.0;
 
@@ -401,6 +402,7 @@ void ctbin::copy_members(const ctbin& app)
     m_ebounds   = app.m_ebounds;
     m_gti       = app.m_gti;
     m_cube      = app.m_cube;
+    m_dirs      = app.m_dirs;
     m_ontime    = app.m_ontime;
     m_livetime  = app.m_livetime;
 
@@ -443,6 +445,13 @@ void ctbin::get_parameters(void)
     m_counts  = 0.0;
     m_weights = m_counts;
 
+    // Cache sky directions in m_counts
+    m_dirs.resize(m_counts.npix());
+    for (int pix=0; pix<m_counts.npix(); pix++) {
+        m_dirs[pix] = m_counts.inx2dir(pix);
+        m_dirs[pix].radec(m_dirs[pix].ra(), m_dirs[pix].dec());
+    }
+    
     // Get energy boundaries
     m_ebounds = cube.ebounds();
 
@@ -570,16 +579,16 @@ void ctbin::fill_cube(GCTAObservation* obs)
         // Update ontime and livetime
         m_ontime   += obs->ontime();
         m_livetime += obs->livetime();
-        
-        // Log filling results
-        log_header3(TERSE, get_obs_header(obs));
-        log_value(NORMAL, "Events in list", obs->events()->size());
-        log_value(NORMAL, "Events in cube", num_in_map);
-        log_value(NORMAL, "Events outside RoI", num_outside_roi);
-        log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
-        log_value(NORMAL, "Events outside cube area", num_outside_map);
-        log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
     }
+    
+    // Log filling results
+    log_header3(TERSE, get_obs_header(obs));
+    log_value(NORMAL, "Events in list", obs->events()->size());
+    log_value(NORMAL, "Events in cube", num_in_map);
+    log_value(NORMAL, "Events outside RoI", num_outside_roi);
+    log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
+    log_value(NORMAL, "Events outside cube area", num_outside_map);
+    log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
     
     // Return
     return;
@@ -627,12 +636,9 @@ void ctbin::set_weights(GCTAObservation* obs)
 
     // Loop over all pixels in counts cube
     for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
-
-        // Get pixel sky direction
-        GSkyDir dir = m_counts.inx2dir(pixel);
-
+        
         // Skip pixel if it is outside the RoI
-        if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+        if (roi.centre().dir().dist_deg(m_dirs[pixel]) > roi.radius()) {
             continue;
         }
 

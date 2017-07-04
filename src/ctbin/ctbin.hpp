@@ -102,6 +102,7 @@ protected:
     GCTAEventCube m_cube;     //!< Events cube (for cube() method)
     double        m_ontime;   //!< Total ontime
     double        m_livetime; //!< Total livetime
+    std::vector<GSkyDir> m_dirs;  //!< Cached GSkyDir for each pixel in m_counts
 };
 
 
