@@ -1,0 +1,28 @@
+.. _1.3.1:
+
+ctools 1.3.1 release
+====================
+
+Overview
+--------
+
+ctools 1.3.1 is a bug fix for ctools release 1.3.
+
+The following bugs have been fixed:
+
+* [`2136 <https://cta-redmine.irap.omp.eu/issues/2136>`_] -
+  Fix csresmap significance computation error
+* [`2135 <https://cta-redmine.irap.omp.eu/issues/2135>`_] -
+  Use ``MigMatrixNoTheta2cut_offaxis`` and ``AngularPSF2DEtrue_offaxis``
+  histograms to compute PSF and energy dispersion IRFs
+* [`2127 <https://cta-redmine.irap.omp.eu/issues/2127>`_] -
+  Add ``self.logFileOpen()`` to ``cstsmapsplit.execute()`` method
+* [`2123 <https://cta-redmine.irap.omp.eu/issues/2123>`_] -
+  Properly forward working log file pointer in ``ctobssim::set_mc_id_names()``
+* Correct computation of standard deviations in :ref:`cssrcdetect`
+* :ref:`csobsselect` accepts an observation container upon construction
+
+The following improvements have been made:
+
+* [`2147 <https://cta-redmine.irap.omp.eu/issues/2147>`_] -
+  Reduce computation time of ctmodel and parallelize using OpenMP

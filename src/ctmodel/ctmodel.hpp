@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -79,6 +79,7 @@ protected:
     void free_members(void);
     void get_parameters(void);
     void get_obs(void);
+    void extract_cube_properties(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
 
@@ -89,11 +90,17 @@ protected:
     GChatter  m_chatter;      //!< Chattiness
 
     // Protected members
-    GCTAEventCube m_cube;        //!< Model cube
-    GGti          m_gti;         //!< Model cube GTIs
-    bool          m_has_cube;    //!< Signal if cube has been set or loaded
-    bool          m_append_cube; //!< Signal that cube should be appended
-    bool          m_binned;      //!< Signals that we are in binned mode
+    GCTAEventCube            m_cube;        //!< Model cube
+    GGti                     m_gti;         //!< Model cube GTIs
+    bool                     m_has_cube;    //!< Signal if cube exists
+    bool                     m_append_cube; //!< Signal to append cube
+    bool                     m_binned;      //!< Signal binned mode
+    std::vector<GCTAInstDir> m_dir;         //!< Cube directions
+    std::vector<double>      m_solidangle;  //!< Cube solid angles
+    std::vector<GEnergy>     m_energy;      //!< Cube energies
+    std::vector<GEnergy>     m_ewidth;      //!< Cube energy widths
+    GTime                    m_time;        //!< Cube time
+    double                   m_ontime;      //!< Cube ontime
 };
 
 
