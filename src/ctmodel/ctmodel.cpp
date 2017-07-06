@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctmodel - Model cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2012-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2012-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -218,6 +218,9 @@ void ctmodel::run(void)
     // Get task parameters
     get_parameters();
 
+    // Extract cube properties
+    extract_cube_properties();
+
     // Set energy dispersion flags of all CTA observations and save old
     // values in save_edisp vector
     std::vector<bool> save_edisp = set_edisp(m_obs, m_apply_edisp);
@@ -232,43 +235,44 @@ void ctmodel::run(void)
     log_header1(TERSE, "Generate model cube");
 
     // Loop over all observations in the container
+    #pragma omp parallel for
     for (int i = 0; i < m_obs.size(); ++i) {
-
-        // Write header for the current observation
-        log_header3(TERSE, get_obs_header(m_obs[i]));
-
+        
         // Get CTA observation
         GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
 
         // Skip observation if it's not CTA
         if (obs == NULL) {
+            log_header3(TERSE, get_obs_header(m_obs[i]));
             std::string msg = " Skipping "+m_obs[i]->instrument()+
                               " observation";
             log_string(NORMAL, msg);
-            continue;
         }
 
-        // Fill cube and leave loop if we are binned mode (meaning we 
+        // Fill cube and leave loop if we are binned mode (meaning we
         // only have one binned observation)
-        if (m_binned) {
+        else if (m_binned) {
             fill_cube(obs);
-            break;
+            i = m_obs.size();
         }
 
         // Skip observation if we have a binned observation
-        if (obs->eventtype() == "CountsCube") {
+        else if (obs->eventtype() == "CountsCube") {
+            log_header3(TERSE, get_obs_header(m_obs[i]));
             std::string msg = " Skipping binned "+m_obs[i]->instrument()+
                               " observation";
             log_string(NORMAL, msg);
-            continue;
         }
 
-        // Fill the cube
-        fill_cube(obs);
-
-        // Dispose events to free memory if event file exists on disk
-        if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
-            obs->dispose_events();
+        // Otherwise, everything seems to be fine, so fill the cube from obs
+        else {
+            // Fill the cube
+            fill_cube(obs);
+            
+            // Dispose events to free memory if event file exists on disk
+            if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
+                obs->dispose_events();
+            }
         }
 
     } // endfor: looped over observations
@@ -396,6 +400,12 @@ void ctmodel::init_members(void)
     m_has_cube    = false;
     m_append_cube = false;
     m_binned      = false;
+    m_dir.clear();
+    m_solidangle.clear();
+    m_energy.clear();
+    m_ewidth.clear();
+    m_time.clear();
+    m_ontime      = 0.0;
 
     // Return
     return;
@@ -421,6 +431,12 @@ void ctmodel::copy_members(const ctmodel& app)
     m_has_cube    = app.m_has_cube;
     m_append_cube = app.m_append_cube;
     m_binned      = app.m_binned;
+    m_dir         = app.m_dir;
+    m_solidangle  = app.m_solidangle;
+    m_energy      = app.m_energy;
+    m_ewidth      = app.m_ewidth;
+    m_time        = app.m_time;
+    m_ontime      = app.m_ontime;
 
     // Return
     return;
@@ -478,7 +494,6 @@ void ctmodel::get_parameters(void)
                 // Set cube from binned observation
                 GCTAEventCube* evtcube = dynamic_cast<GCTAEventCube*>
                                          (const_cast<GEvents*>(obs->events()));
-
                 cube(*evtcube);
 
                 // Signal that cube has been set
@@ -714,6 +729,60 @@ void ctmodel::get_obs(void)
 
 
 /***********************************************************************//**
+ * @brief Extract cube properties in data members
+ ***************************************************************************/
+void ctmodel::extract_cube_properties(void)
+{
+    // Clear cube properties
+    m_dir.clear();
+    m_solidangle.clear();
+    m_energy.clear();
+    m_ewidth.clear();
+
+    // Get number of spatial pixels and energy layers in counts cube
+    int npix   = m_cube.npix();
+    int nebins = m_cube.ebins();
+
+    // Reserve capacity in vectors
+    m_dir.reserve(npix);
+    m_solidangle.reserve(npix);
+    m_energy.reserve(nebins);
+    m_ewidth.reserve(nebins);
+
+    // Loop over all the spatial bins and extract spatial cube properties
+    for (int i = 0; i < npix; ++i) {
+
+        // Get cube bin
+        GCTAEventBin* bin = m_cube[i];
+
+        // Extract sky direction and solid angle
+        m_dir.push_back(bin->dir());
+        m_solidangle.push_back(bin->solidangle());
+
+    } // endfor: looped over spatial bins
+
+    // Loop over all the spectral bins and extract spectral cube properties
+    for (int iebin = 0, ibin = 0; iebin < nebins; ++iebin, ibin += npix) {
+
+        // Get cube bin
+        GCTAEventBin* bin = m_cube[ibin];
+
+        // Extract energy and energy width
+        m_energy.push_back(bin->energy());
+        m_ewidth.push_back(bin->ewidth());
+
+    } // endfor: looped over spectral bins
+
+    // Set time and ontime
+    m_time   = m_cube[0]->time();
+    m_ontime = m_cube[0]->ontime();
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
  * @brief Fill model into model cube
  *
  * @param[in] obs CTA observation.
@@ -725,6 +794,10 @@ void ctmodel::get_obs(void)
  ***************************************************************************/
 void ctmodel::fill_cube(const GCTAObservation* obs)
 {
+    // Get number of spatial and spectral bins in counts cube
+    int npix   = m_cube.npix();
+    int nebins = m_cube.ebins();
+
     // Get references to GTI and energy boundaries for the event list
     const GGti&     gti         = obs->events()->gti();
     const GEbounds& obs_ebounds = obs->ebounds();
@@ -748,64 +821,88 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     int    num_outside_ebds = 0;
     int    num_outside_roi  = 0;
 
-    // Setup cube GTIs for this observation
-    m_cube.gti(obs->events()->gti());
+    // Extract copy of models from observation container
+    GModels models(m_obs.models());
 
-    // Loop over all cube bins
-    for (int i = 0; i < m_cube.size(); ++i) {
+    // Get pointer to event cube pixels
+    double* pixels = const_cast<double*>(m_cube.counts().pixels());
 
-        // Get cube bin
-        GCTAEventBin* bin = m_cube[i];
+    // Initialise event bin
+    GCTAEventBin bin;
 
-        // Determine counts cube energy bin
-        int iebin = cube_ebounds.index(bin->energy());
+    // Set event bin attributes that are constant for a counts cube
+    bin.time(m_time);
+    bin.ontime(m_ontime);
+    bin.weight(1.0);
 
-        // Skip bin if the corresponding counts cube energy bin is not fully
-        // contained in the event list energy range. This avoids having
-        // partially filled bins.
-        if (!usage[iebin]) {
-            num_outside_ebds++;
-            continue;
-        }
+    // Loop over all the spatial bins
+    for (int i = 0; i < npix; ++i) {
 
         // If RoI is valid then skip bin if it is outside the RoI of the
         // observation
-        if (roi.is_valid() && !roi.contains(*bin)) {
-            num_outside_roi++;
+        if (roi.is_valid() && !roi.contains(m_dir[i])) {
+            num_outside_roi += nebins;
             continue;
         }
 
-        // Get actual bin value
-        double value = bin->counts();
-        
-        // Compute model value for cube bin
-        double model = m_obs.models().eval(*bin, *obs) * bin->size();
+        // Set instrument direction and solid angle of bin
+        bin.dir(m_dir[i]);
+        bin.solidangle(m_solidangle[i]);
 
-        // Add model to actual value
-        value += model;
-        sum   += model;
+        // Loop over all of the energy bins of the cube
+        for (int iebin = 0, ibin = i; iebin < nebins; ++iebin, ibin += npix) {
 
-        // Store value
-        bin->counts(value);
+            // Skip bin if the corresponding counts cube energy bin is not fully
+            // contained in the event list energy range. This avoids having
+            // partially filled bins.
+            if (!usage[iebin]) {
+                num_outside_ebds++;
+                continue;
+            }
+
+            // Set energy and energy width of bin
+            bin.energy(m_energy[iebin]);
+            bin.ewidth(m_ewidth[iebin]);
+
+            // Compute model value for cube bin
+            double model = models.eval(bin, *obs) * bin.size();
+
+            // Sum model
+            sum += model;
+
+            // Store value
+            #pragma omp critical(ctmodel_fill_cube)
+            pixels[ibin] += model;
+
+        } // endfor: looped over all spatial bins
 
     } // endfor: looped over all cube bins
 
-    // Append GTIs of observation to list of GTIs
-    m_gti.extend(gti);
-
     // Update GTIs
-    m_cube.gti(m_gti);
+    #pragma omp critical(ctmodel_fill_cube)
+    {
+        // Append GTIs of observation to list of GTIs
+        m_gti.extend(gti);
+
+        // Update GTIs
+        m_cube.gti(m_gti);
+    }
 
     // Log filling results
-    log_value(NORMAL, "Model events in cube", sum);
-    log_value(NORMAL, "Bins outside energy range", num_outside_ebds);
-    log_value(NORMAL, "Bins outside RoI", num_outside_roi);
+    #pragma omp critical(ctmodel_fill_cube)
+    {
+        log_header3(TERSE, get_obs_header(obs));
+        log_value(NORMAL, "Model events in cube", sum);
+        log_value(NORMAL, "Bins outside energy range", num_outside_ebds);
+        log_value(NORMAL, "Bins outside RoI", num_outside_roi);
+    }
 
     // Write model cube into header
-    log_header2(EXPLICIT, "Model cube");
-    log_string(EXPLICIT, m_cube.print(m_chatter));
+    if (m_chatter >= EXPLICIT) {
+        log_header2(EXPLICIT, "Model cube");
+        log_string(EXPLICIT, m_cube.print(m_chatter));
+    }
 
     // Return
     return;
 }
-
