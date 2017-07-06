@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.1
 
-3 July 2017
+7 July 2017
 
 
 Introduction
@@ -58,7 +58,8 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+The efficiency of the model computation has been improved and OpenMP is
+now used to parallelize the model computation (#2147).
 
 
 ctexpcube - CTA exposure cube generation
