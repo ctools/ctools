@@ -405,7 +405,6 @@ void ctmodel::init_members(void)
     m_energy.clear();
     m_ewidth.clear();
     m_time.clear();
-    m_ontime      = 0.0;
 
     // Return
     return;
@@ -436,7 +435,6 @@ void ctmodel::copy_members(const ctmodel& app)
     m_energy      = app.m_energy;
     m_ewidth      = app.m_ewidth;
     m_time        = app.m_time;
-    m_ontime      = app.m_ontime;
 
     // Return
     return;
@@ -773,9 +771,8 @@ void ctmodel::extract_cube_properties(void)
 
     } // endfor: looped over spectral bins
 
-    // Set time and ontime
-    m_time   = m_cube[0]->time();
-    m_ontime = m_cube[0]->ontime();
+    // Set time
+    m_time = m_cube[0]->time();
 
     // Return
     return;
@@ -832,7 +829,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
 
     // Set event bin attributes that are constant for a counts cube
     bin.time(m_time);
-    bin.ontime(m_ontime);
+    bin.ontime(obs->ontime());
     bin.weight(1.0);
 
     // Loop over all the spatial bins

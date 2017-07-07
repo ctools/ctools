@@ -100,7 +100,6 @@ protected:
     std::vector<GEnergy>     m_energy;      //!< Cube energies
     std::vector<GEnergy>     m_ewidth;      //!< Cube energy widths
     GTime                    m_time;        //!< Cube time
-    double                   m_ontime;      //!< Cube ontime
 };
 
 
