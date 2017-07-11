@@ -315,7 +315,8 @@ void ctbkgcube::run(void)
     model.name("BackgroundModel");
 
     // Set model instruments
-    model.instruments(instruments);
+    //model.instruments(instruments);
+    model.instruments("CTA,HESS,MAGIC,VERITAS"); // Temporary fix for #2140
 
     // Append model to output container
     m_outmdl.append(model);

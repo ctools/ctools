@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.3.1
 
-7 July 2017
+11 July 2017
 
 
 Introduction
@@ -79,7 +79,13 @@ None
 
 ctbkgcube - CTA background cube generation
 ------------------------------------------
-None
+The XML file created echoed the instruments that were found in the
+input XML file but this created some problems when using ctmodel on
+data created with ctobssim which always generates CTA data. A clean
+fix of the problem requires a proper handling of the TELESCOP keywords
+in all classes that read event and IRF information. For the moment a
+quick fix is to add all possible VHE instruments as attribute to the
+XML file (#2140).
 
 
 ctmapcube - CTA map cube generation
