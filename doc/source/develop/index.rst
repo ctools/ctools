@@ -45,7 +45,7 @@ Links:
 * `GitHub <https://github.com/ctools/ctools>`_
 * `Redmine <https://cta-redmine.irap.omp.eu/projects/ctools>`_
 * `Open HUB <https://www.openhub.net/p/ctools_>`_
-* `Source code documentation (Doxygen) <doxygen/index.html>`_
+* `Source code documentation (Doxygen) <../doxygen/index.html>`_
 
 And here some status shields:
 
