@@ -303,8 +303,9 @@ Here an example of how to use ``obsutils``:
     Number of predicted events : 0
    >>> obs.models(gammalib.GModels("${CTOOLS}/share/models/crab.xml"))
    >>> obs = obsutils.sim(obs)
-   >>> like = obsutils.fit(obs)
-   >>> print(like.obs().models())   
+   >>> like = ctools.ctlike(obs)
+   >>> like.run()
+   >>> print(like.obs().models())
    === GModels ===
     Number of models ..........: 2
     Number of parameters ......: 10
@@ -320,13 +321,10 @@ cover the 0.1-100 TeV energy range and a field of view of 5°.
 The ``South_0.5h`` IRF from the Prod2 calibration database will be used.
 A model is then appended to the observation container using the
 ``obs.models()`` method.
-The ``obsutils.sim()`` function then simulates the event data, the
-``obsutils.fit()`` function performs a maximum likelihood fit.
-
-.. note::
-
-   The ``obsutils`` module is not yet fully developed and more convenience 
-   functions will be added in the future.
+The ``obsutils.sim()`` function then simulates the event data and returns
+an observation container with the simulated observations.
+The observation container is then passed to ``ctlike`` for maximum likelihood
+fitting.
 
 
 Access analysis results
@@ -365,13 +363,21 @@ In the following it is assumed that you have a ctlike object called
  
   .. code-block:: python
   
-    like.opt().value() # Returns likelihood value
+    logL = like.opt().value() # Returns log-likelihood value
+    print(logL)
+
+  or alternatively
+
+  .. code-block:: python
+  
+    logL = like.obs().function().value() # Returns log-likelihood value
+    print(logL)
 
 * Curvature Matrix (aka Hessian)
 
   .. code-block:: python
    
-    curvature = like.opt().curvature().invert() # Return GMatrix object 
+    curvature = like.obs().function().curvature() # Return GMatrixSparse object
     print(curvature)
 
   To get the covariance matrix, the curvature matrix needs to be
