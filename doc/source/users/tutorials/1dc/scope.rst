@@ -36,11 +36,7 @@ were simulated from high-level
 that correspond to an ideal CTA with good and stable atmosphere and instrument
 conditions; only zenith angles of 20 degrees and 40 degrees were
 simulated.
-
-Data are provided for the baseline arrays. So far only data for the South array
-were simulated, data for the North array will be provided once the
-:ref:`instrument response functions <glossary_irf>`
-for the North array are available.
+Data are provided for the baseline arrays.
 
 Three Key Science Projects (KSPs) were simulated using realistic pointing
 patterns as defined in the CTA Science Case document:

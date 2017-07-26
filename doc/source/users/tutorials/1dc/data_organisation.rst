@@ -6,7 +6,7 @@ Data organisation
 Layout
 ^^^^^^
 
-The content of the ``1dc.south`` folder should be as follows:
+The content of the ``1dc`` folder should be as follows:
 
 .. code-block:: bash
 
@@ -20,16 +20,16 @@ The content of the ``1dc.south`` folder should be as follows:
    data/
    data/baseline/
    data/baseline/egal
-   data/baseline/egal/egal_baseline_220000.fits
-   data/baseline/egal/egal_baseline_220001.fits
+   data/baseline/egal/egal_baseline_210000.fits
+   data/baseline/egal/egal_baseline_210001.fits
    ...
    data/baseline/gc
    data/baseline/gc/gc_baseline_310000.fits
    data/baseline/gc/gc_baseline_310001.fits
    ...
    data/baseline/gps
-   data/baseline/gps/gps_baseline_120000.fits
-   data/baseline/gps/gps_baseline_120001.fits
+   data/baseline/gps/gps_baseline_110000.fits
+   data/baseline/gps/gps_baseline_110001.fits
    ...
    models/
    models/models_egal.xml
@@ -50,8 +50,6 @@ The ``caldb`` folder contains the
 that are necessary for the analysis of the simulated CTA data.
 The folder contains the ``1dc`` response that should be used for the
 :ref:`first CTA Data Challenge <glossary_1dc>`.
-Currently only the response functions for CTA South are
-available for zenith angles of 20 deg and 40 deg.
 Specifically, the following response functions are available:
 
  +-----------------------+-------+---------------+--------+----------+
@@ -60,6 +58,10 @@ Specifically, the following response functions are available:
  | ``South_z20_50h``     | South | Baseline      | 20 deg | 50 hours |
  +-----------------------+-------+---------------+--------+----------+
  | ``South_z40_50h``     | South | Baseline      | 40 deg | 50 hours |
+ +-----------------------+-------+---------------+--------+----------+
+ | ``North_z20_50h``     | North | Baseline      | 20 deg | 50 hours |
+ +-----------------------+-------+---------------+--------+----------+
+ | ``North_z40_50h``     | North | Baseline      | 40 deg | 50 hours |
  +-----------------------+-------+---------------+--------+----------+
 
 
@@ -80,13 +82,13 @@ table below:
    +-----------------------------------+---------------------+---------------------+---------------------+
    | Parameter                         |       GPS           |        GC           |         EGAL        |
    +===================================+=====================+=====================+=====================+
-   | Number of observations            |                2046 |                1671 |                 489 |
+   | Number of observations            |                3270 |                1671 |                1271 |
    +-----------------------------------+---------------------+---------------------+---------------------+
    | Duration of each observation      |              1800 s |              1800 s |              1500 s |
    +-----------------------------------+---------------------+---------------------+---------------------+
    | Deadtime fraction                 |                  2% |                  2% |                  2% |
    +-----------------------------------+---------------------+---------------------+---------------------+
-   | Total exposure time of simulation |              1023 h |             835.5 h |            203.75 h |
+   | Total exposure time of simulation |              1635 h |             835.5 h |            529.58 h |
    +-----------------------------------+---------------------+---------------------+---------------------+
    | Simulated event energies          |    30 GeV - 160 TeV |    30 GeV - 160 TeV |    30 GeV - 160 TeV |
    +-----------------------------------+---------------------+---------------------+---------------------+
@@ -94,7 +96,7 @@ table below:
    +-----------------------------------+---------------------+---------------------+---------------------+
    | Start date of observations        | 2021-01-01T11:58:51 | 2021-01-01T11:58:51 | 2021-01-01T11:58:51 |
    +-----------------------------------+---------------------+---------------------+---------------------+
-   | End date of observations          | 2021-04-18T18:52:51 | 2021-03-29T21:32:51 | 2021-02-11T20:29:51 |
+   | End date of observations          | 2021-04-18T18:52:51 | 2021-03-29T21:32:51 | 2021-02-25T14:38:51 |
    +-----------------------------------+---------------------+---------------------+---------------------+
 
 
