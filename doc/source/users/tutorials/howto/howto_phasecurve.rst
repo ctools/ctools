@@ -195,8 +195,9 @@ probability threshold to >20% by adding the attribute
    Upper energy limit (TeV) [160.0]
    Output event list or observation definition XML file [obs_vela_phased_selected.xml] obs_vela_phased_prob_selected.xml
 
-The selected events as a function of phase are displayed below. Unfortunately
-there is still no clear signal for a phase dependence of the event rate.
+The selected events as a function of phase are displayed below. There is now a
+hint for a phase dependence of the event rate, although this hint is not very
+significant.
 
 .. figure:: howto_phasecurve_probphases.png
    :width: 600px

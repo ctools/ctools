@@ -51,12 +51,12 @@ extracted from the :ref:`ctulimit` log file:
 
 .. code-block:: bash
 
-   2017-06-08T15:39:54: +=====================+
-   2017-06-08T15:39:54: | Upper limit results |
-   2017-06-08T15:39:54: +=====================+
-   2017-06-08T15:39:54:  Differential flux limit ...: 2.4438738640373e-20 ph/cm2/s/MeV at 1 TeV
-   2017-06-08T15:39:54:  Integral flux limit .......: 1.64945554704815e-14 ph/cm2/s within [1-100] TeV
-   2017-06-08T15:39:54:  Energy flux limit .........: 7.26289446286815e-14 erg/cm2/s within [1-100] TeV
+   2017-07-28T07:03:03: +=====================+
+   2017-07-28T07:03:03: | Upper limit results |
+   2017-07-28T07:03:03: +=====================+
+   2017-07-28T07:03:03:  Differential flux limit ...: 6.39388221102118e-21 ph/cm2/s/MeV at 1 TeV
+   2017-07-28T07:03:03:  Integral flux limit .......: 4.31545368823519e-15 ph/cm2/s within [1-100] TeV
+   2017-07-28T07:03:03:  Energy flux limit .........: 1.90018365473006e-14 erg/cm2/s within [1-100] TeV
 
 .. warning::
    It is important to fix the spectral index of the test source in the

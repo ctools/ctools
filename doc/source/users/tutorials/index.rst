@@ -8,6 +8,6 @@ Tutorials
 
    quickstart/index
    beyond/index
-   howto/index
    1dc/index
+   howto/index
    iact_analysis/index
