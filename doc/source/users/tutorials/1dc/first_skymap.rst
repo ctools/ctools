@@ -44,7 +44,7 @@ All events between 100 GeV and 100 TeV are collected in the sky map.
 The sky map is written into the FITS file ``skymap.fits`` that is created in
 the working directory.
 The sky map, displayed using
-`ds9 <http://ds9.si.edu>`_,
+`ds9 <http://ds9.si.edu>`_ with a small Gaussian kernel smoothing applied,
 is shown below:
 
 .. figure:: first_skymap.png

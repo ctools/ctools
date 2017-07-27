@@ -67,32 +67,32 @@ observations into the console:
 
 The output of :ref:`csobsinfo` is shown below. :ref:`csobsselect` selected
 57 observations from the Galactic Plane Survey data containing a total of
-6 209 281 events.
+6 046 100 events.
 
 .. code-block:: bash
 
-   2017-06-08T07:23:37: +=========+
-   2017-06-08T07:23:37: | Summary |
-   2017-06-08T07:23:37: +=========+
-   2017-06-08T07:23:37: === Observations ===
-   2017-06-08T07:23:37:  Unbinned observations .....: 57
-   2017-06-08T07:23:37:  Binned observations .......: 0
-   2017-06-08T07:23:37: === Events ===
-   2017-06-08T07:23:37:  Number of events ..........: 6209281
-   2017-06-08T07:23:37:  Number of bins ............: 0
-   2017-06-08T07:23:37: === Pointings ===
-   2017-06-08T07:23:37:  Mean offset angle .........: Unknown
-   2017-06-08T07:23:37:  Mean zenith angle .........: 0.00 deg
-   2017-06-08T07:23:37:  Mean azimuth angle ........: 0.00 deg
-   2017-06-08T07:23:37: === Energy range ===
-   2017-06-08T07:23:37:  Minimum energy ............: 30 GeV
-   2017-06-08T07:23:37:  Maximum energy ............: 160 TeV
-   2017-06-08T07:23:37: === Time range ===
-   2017-06-08T07:23:37:  MJD (days) ................: 59235.500 - 59276.921
-   2017-06-08T07:23:37:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
-   2017-06-08T07:23:37:  MET (seconds) .............: 664502400.000 - 668081160.000
-   2017-06-08T07:23:37:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
-   2017-06-08T07:23:37:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
+   2017-07-27T09:58:12: +=========+
+   2017-07-27T09:58:12: | Summary |
+   2017-07-27T09:58:12: +=========+
+   2017-07-27T09:58:12: === Observations ===
+   2017-07-27T09:58:12:  Unbinned observations .....: 57
+   2017-07-27T09:58:12:  Binned observations .......: 0
+   2017-07-27T09:58:12: === Events ===
+   2017-07-27T09:58:12:  Number of events ..........: 6046100
+   2017-07-27T09:58:12:  Number of bins ............: 0
+   2017-07-27T09:58:12: === Pointings ===
+   2017-07-27T09:58:12:  Mean offset angle .........: Unknown
+   2017-07-27T09:58:12:  Mean zenith angle .........: 0.00 deg
+   2017-07-27T09:58:12:  Mean azimuth angle ........: 0.00 deg
+   2017-07-27T09:58:12: === Energy range ===
+   2017-07-27T09:58:12:  Minimum energy ............: 30 GeV
+   2017-07-27T09:58:12:  Maximum energy ............: 160 TeV
+   2017-07-27T09:58:12: === Time range ===
+   2017-07-27T09:58:12:  MJD (days) ................: 59235.500 - 59276.921
+   2017-07-27T09:58:12:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
+   2017-07-27T09:58:12:  MET (seconds) .............: 664502400.000 - 668081160.000
+   2017-07-27T09:58:12:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
+   2017-07-27T09:58:12:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
 
 The resulting
 :ref:`observation definition file <glossary_obsdef>`
@@ -102,17 +102,17 @@ will look as follows:
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <observation_list title="observation list">
-     <observation name="GPS" id="120380" instrument="CTA">
-       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc.final/validation/1dc.south/data/baseline/gps/gps_baseline_120380.fits" />
+     <observation name="GPS" id="110380" instrument="CTA">
+       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc/tutorial/1dc/data/baseline/gps/gps_baseline_110380.fits" />
        <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
-     <observation name="GPS" id="120381" instrument="CTA">
-       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc.final/validation/1dc.south/data/baseline/gps/gps_baseline_120381.fits" />
+     <observation name="GPS" id="110381" instrument="CTA">
+       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc/tutorial/1dc/data/baseline/gps/gps_baseline_110381.fits" />
        <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
      ...
-     <observation name="GPS" id="121177" instrument="CTA">
-       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc.final/validation/1dc.south/data/baseline/gps/gps_baseline_121177.fits" />
+     <observation name="GPS" id="111177" instrument="CTA">
+       <parameter name="EventList" file="/Users/jurgen/analysis/cta/dc/1dc/1dc/tutorial/1dc/data/baseline/gps/gps_baseline_111177.fits" />
        <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
    </observation_list>

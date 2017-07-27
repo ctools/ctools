@@ -76,8 +76,8 @@ for a model fitting with :ref:`ctlike`.
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA" value="266.4120906928" error="0" scale="1" free="1" />
-         <parameter name="DEC" value="-29.0219729468991" error="0" scale="1" free="1" />
+         <parameter name="RA" value="266.424004498437" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-29.0049010253548" error="0" scale="1" free="1" />
        </spatialModel>
      </source>
      <source name="Src002" type="PointSource">
@@ -87,9 +87,9 @@ for a model fitting with :ref:`ctlike`.
          <parameter name="PivotEnergy" value="1" scale="300000" free="0" />
        </spectrum>
        <spatialModel type="PointSource">
-         <parameter name="RA" value="266.793148201606" error="0" scale="1" free="1" />
-         <parameter name="DEC" value="-28.1253038992376" error="0" scale="1" free="1" />
-       </spatialModel>
+         <parameter name="RA" value="266.831945177213" error="0" scale="1" free="1" />
+         <parameter name="DEC" value="-28.1460284439951" error="0" scale="1" free="1" />
+        </spatialModel>
      </source>
      <source name="Background" type="CTAIrfBackground">
        <spectrum type="PowerLaw">

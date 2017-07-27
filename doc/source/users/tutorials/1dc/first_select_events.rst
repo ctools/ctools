@@ -46,33 +46,33 @@ displays a summary of the content of this new
 
 .. code-block:: bash
 
-   2017-06-08T07:42:01: +=========+
-   2017-06-08T07:42:01: | Summary |
-   2017-06-08T07:42:01: +=========+
-   2017-06-08T07:42:01: === Observations ===
-   2017-06-08T07:42:01:  Unbinned observations .....: 57
-   2017-06-08T07:42:01:  Binned observations .......: 0
-   2017-06-08T07:42:01: === Events ===
-   2017-06-08T07:42:01:  Number of events ..........: 3349183
-   2017-06-08T07:42:01:  Number of bins ............: 0
-   2017-06-08T07:42:01: === Pointings ===
-   2017-06-08T07:42:01:  Mean offset angle .........: Unknown
-   2017-06-08T07:42:01:  Mean zenith angle .........: 0.00 deg
-   2017-06-08T07:42:01:  Mean azimuth angle ........: 0.00 deg
-   2017-06-08T07:42:01: === Energy range ===
-   2017-06-08T07:42:01:  Minimum energy ............: 100 GeV
-   2017-06-08T07:42:01:  Maximum energy ............: 100 TeV
-   2017-06-08T07:42:01: === Time range ===
-   2017-06-08T07:42:01:  MJD (days) ................: 59235.500 - 59276.921
-   2017-06-08T07:42:01:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
-   2017-06-08T07:42:01:  MET (seconds) .............: 664502400.000 - 668081160.000
-   2017-06-08T07:42:01:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
-   2017-06-08T07:42:01:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
+   2017-07-27T10:02:26: +=========+
+   2017-07-27T10:02:26: | Summary |
+   2017-07-27T10:02:26: +=========+
+   2017-07-27T10:02:26: === Observations ===
+   2017-07-27T10:02:26:  Unbinned observations .....: 57
+   2017-07-27T10:02:26:  Binned observations .......: 0
+   2017-07-27T10:02:26: === Events ===
+   2017-07-27T10:02:26:  Number of events ..........: 3084639
+   2017-07-27T10:02:26:  Number of bins ............: 0
+   2017-07-27T10:02:26: === Pointings ===
+   2017-07-27T10:02:26:  Mean offset angle .........: Unknown
+   2017-07-27T10:02:26:  Mean zenith angle .........: 0.00 deg
+   2017-07-27T10:02:26:  Mean azimuth angle ........: 0.00 deg
+   2017-07-27T10:02:26: === Energy range ===
+   2017-07-27T10:02:26:  Minimum energy ............: 100 GeV
+   2017-07-27T10:02:26:  Maximum energy ............: 100 TeV
+   2017-07-27T10:02:26: === Time range ===
+   2017-07-27T10:02:26:  MJD (days) ................: 59235.500 - 59276.921
+   2017-07-27T10:02:26:  UTC .......................: 2021-01-21T11:58:51 - 2021-03-03T22:04:51
+   2017-07-27T10:02:26:  MET (seconds) .............: 664502400.000 - 668081160.000
+   2017-07-27T10:02:26:  Total ontime ..............: 102600.00 s = 1710.00 min = 28.50 h
+   2017-07-27T10:02:26:  Total livetime ............: 100548.00 s = 1675.80 min = 27.93 h
 
 There are still 57 observations in the
 :ref:`observation definition file <glossary_obsdef>`
 but now the events are restricted to the energy interval 100 GeV - 100 TeV. In
-total there are 3 349 183 events within this interval in the selected observations.
+total there are 3 084 639 events within this interval in the selected observations.
 
 The content of ``obs_selected.xml`` will look similar to the content of
 ``obs.xml`` with the original event list file names replaced by the names of
@@ -82,17 +82,17 @@ the new event files:
 
    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
    <observation_list title="observation list">
-     <observation name="GPS" id="120380" instrument="CTA">
-       <parameter name="EventList" file="selected_gps_baseline_120380.fits" />
+     <observation name="GPS" id="110380" instrument="CTA">
+       <parameter name="EventList" file="selected_gps_baseline_110380.fits" />
        <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
-     <observation name="GPS" id="120381" instrument="CTA">
-       <parameter name="EventList" file="selected_gps_baseline_120381.fits" />
+     <observation name="GPS" id="110381" instrument="CTA">
+       <parameter name="EventList" file="selected_gps_baseline_110381.fits" />
        <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
      ...
-     <observation name="GPS" id="121177" instrument="CTA">
-       <parameter name="EventList" file="selected_gps_baseline_121177.fits" />
+     <observation name="GPS" id="111177" instrument="CTA">
+       <parameter name="EventList" file="selected_gps_baseline_111177.fits" />
        <parameter name="Calibration" database="1dc" response="South_z20_50h" />
      </observation>
    </observation_list>
