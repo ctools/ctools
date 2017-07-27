@@ -842,9 +842,10 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
             continue;
         }
 
-        // Set instrument direction and solid angle of bin
+        // Set instrument direction, solid angle and pixel index of bin
         bin.dir(m_dir[i]);
         bin.solidangle(m_solidangle[i]);
+        bin.ipix(i);
 
         // Loop over all of the energy bins of the cube
         for (int iebin = 0, ibin = i; iebin < nebins; ++iebin, ibin += npix) {
@@ -857,9 +858,10 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
                 continue;
             }
 
-            // Set energy and energy width of bin
+            // Set energy, energy width and energy index of bin
             bin.energy(m_energy[iebin]);
             bin.ewidth(m_ewidth[iebin]);
+            bin.ieng(iebin);
 
             // Compute model value for cube bin
             double model = models.eval(bin, *obs) * bin.size();

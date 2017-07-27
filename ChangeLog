@@ -1,8 +1,9 @@
-2017-07-03
+2017-07-27
 
         * Version 1.4.0 released
         ========================
 
+        Fix ctmodel bug for stacked analysis with diffuse maps or cubes (#2171)
         Install ctools header files (#2145)
 
 

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.4.0
 
-3 July 2017
+27 July 2017
 
 
 Introduction
@@ -57,7 +57,10 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+The diffuse response computation for a stacked analysis require the ipix() and iend()
+attributes set in order to properly cache the response values, yet the ctmodel
+modifications introduced in version 1.3.1 did not properly set these attributes.
+This has been corrected (#2171).
 
 
 ctexpcube - CTA exposure cube generation

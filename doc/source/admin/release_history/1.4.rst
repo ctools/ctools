@@ -21,6 +21,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2171 <https://cta-redmine.irap.omp.eu/issues/2171>`_] -
+  Fix ctmodel bug for stacked analysis with diffuse maps or cubes
 * [`2145 <https://cta-redmine.irap.omp.eu/issues/2145>`_] -
   Install C++ header files
 
