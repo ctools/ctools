@@ -204,6 +204,9 @@ class cscaldb(ctools.cscript):
         # Open logfile
         self.logFileOpen()
 
+        # Read ahead output parameters
+        self._read_ahead(True)
+
         # Run the script
         self.run()
 

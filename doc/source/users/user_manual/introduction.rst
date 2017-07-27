@@ -53,8 +53,7 @@ command line or used as Python classes, as illustrated below:
   >>> import cscripts
   >>> pull = cscripts.cspull()
 
-In this User Manual you will now learn how to install and use the ctools
-package.
+In this User Manual you will now learn how to use the ctools package.
 If you encounter any problems, please read the :ref:`sec_help` section.
 And you should read the :ref:`sec_develop` section if you would like to
 contribute to the ctools developments.
