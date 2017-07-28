@@ -1,7 +1,7 @@
 /***************************************************************************
  *                        ctbin - Event binning tool                       *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2010-2016 by Juergen Knoedlseder                         *
+ *  copyright (C) 2010-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -102,6 +102,9 @@ protected:
     GCTAEventCube m_cube;     //!< Events cube (for cube() method)
     double        m_ontime;   //!< Total ontime
     double        m_livetime; //!< Total livetime
+
+    // Cache members
+    std::vector<GSkyDir> m_dirs; //!< Cached GSkyDir for each pixel in m_counts
 };
 
 

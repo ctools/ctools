@@ -233,11 +233,32 @@ void ctbin::run(void)
     log_observations(NORMAL, m_obs, "Input observation");
 
     // Write header into logger
+    log_header1(TERSE, gammalib::number("Find unbinned observation",
+                m_obs.size()));
+
+    // Find all unbinned CTA observations in m_obs
+    std::vector<GCTAObservation*> obs_list(0);
+    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
+            obs = next_unbinned_observation()) {
+
+        // Push observation into list
+        obs_list.push_back(obs);
+
+        // Write message
+        std::string msg = " Including unbinned "+obs->instrument()+
+                          " observation";
+        log_string(NORMAL, msg);
+    }
+
+    // Write header into logger
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
     // Loop over all unbinned CTA observations in the container
-    for (GCTAObservation* obs = first_unbinned_observation(); obs != NULL;
-         obs = next_unbinned_observation()) {
+    #pragma omp parallel for
+    for (int i = 0; i < obs_list.size(); ++i) {
+
+        // Get pointer to observation
+        GCTAObservation* obs = obs_list[i];
 
         // Fill the cube
         fill_cube(obs);
@@ -361,6 +382,9 @@ void ctbin::init_members(void)
     m_ontime   = 0.0;
     m_livetime = 0.0;
 
+    // Initialise cache members
+    m_dirs.clear();
+
     // Set CTA reference time
     m_gti.reference(m_cta_ref);
 
@@ -383,13 +407,16 @@ void ctbin::copy_members(const ctbin& app)
     m_chatter = app.m_chatter;
 
     // Copy protected members
-    m_counts    = app.m_counts;
-    m_weights   = app.m_weights;
-    m_ebounds   = app.m_ebounds;
-    m_gti       = app.m_gti;
-    m_cube      = app.m_cube;
-    m_ontime    = app.m_ontime;
-    m_livetime  = app.m_livetime;
+    m_counts   = app.m_counts;
+    m_weights  = app.m_weights;
+    m_ebounds  = app.m_ebounds;
+    m_gti      = app.m_gti;
+    m_cube     = app.m_cube;
+    m_ontime   = app.m_ontime;
+    m_livetime = app.m_livetime;
+
+    // Copy cache members
+    m_dirs = app.m_dirs;
 
     // Return
     return;
@@ -441,6 +468,13 @@ void ctbin::get_parameters(void)
     // dumped into the log file
     if (read_ahead()) {
         m_outcube = (*this)["outcube"].filename();
+    }
+
+    // Cache sky directions in m_counts
+    m_dirs.resize(m_counts.npix());
+    for (int pix = 0; pix < m_counts.npix(); ++pix) {
+        m_dirs[pix] = m_counts.inx2dir(pix);
+        m_dirs[pix].radec(m_dirs[pix].ra(), m_dirs[pix].dec());
     }
 
     // Write parameters into logger
@@ -503,8 +537,8 @@ void ctbin::fill_cube(GCTAObservation* obs)
         const GCTAEventAtom* event = (*events)[i];
 
         // Determine event sky direction
-        GCTAInstDir* inst  = (GCTAInstDir*)&(event->dir());
-        GSkyDir      dir   = inst->dir();
+        GCTAInstDir* inst = (GCTAInstDir*)&(event->dir());
+        GSkyDir      dir  = inst->dir();
 
         // Skip event if it is outside the RoI
         if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
@@ -542,25 +576,36 @@ void ctbin::fill_cube(GCTAObservation* obs)
         }
 
         // Fill event in skymap
+        #pragma omp critical(ctbin_fill_cube)
         m_counts(pixel, iebin) += 1.0;
+
+        // Increment number of maps
         num_in_map++;
 
     } // endfor: looped over all events
 
-    // Append GTIs
-    m_gti.extend(events->gti());
+    // Update time information
+    #pragma omp critical(ctbin_fill_cube)
+    {
+        // Append GTIs
+        m_gti.extend(events->gti());
 
-    // Update ontime and livetime
-    m_ontime   += obs->ontime();
-    m_livetime += obs->livetime();
+        // Update ontime and livetime
+        m_ontime   += obs->ontime();
+        m_livetime += obs->livetime();
+    }
 
     // Log filling results
-    log_value(NORMAL, "Events in list", obs->events()->size());
-    log_value(NORMAL, "Events in cube", num_in_map);
-    log_value(NORMAL, "Events outside RoI", num_outside_roi);
-    log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
-    log_value(NORMAL, "Events outside cube area", num_outside_map);
-    log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
+    #pragma omp critical(ctbin_fill_cube)
+    {
+        log_header3(TERSE, get_obs_header(obs));
+        log_value(NORMAL, "Events in list", obs->events()->size());
+        log_value(NORMAL, "Events in cube", num_in_map);
+        log_value(NORMAL, "Events outside RoI", num_outside_roi);
+        log_value(NORMAL, "Events with invalid WCS", num_invalid_wcs);
+        log_value(NORMAL, "Events outside cube area", num_outside_map);
+        log_value(NORMAL, "Events outside energy bins", num_outside_ebds);
+    }
 
     // Return
     return;
@@ -609,11 +654,8 @@ void ctbin::set_weights(GCTAObservation* obs)
     // Loop over all pixels in counts cube
     for (int pixel = 0; pixel < m_counts.npix(); ++pixel) {
 
-        // Get pixel sky direction
-        GSkyDir dir = m_counts.inx2dir(pixel);
-
         // Skip pixel if it is outside the RoI
-        if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+        if (roi.centre().dir().dist_deg(m_dirs[pixel]) > roi.radius()) {
             continue;
         }
 
@@ -624,7 +666,9 @@ void ctbin::set_weights(GCTAObservation* obs)
             if (!usage[iebin]) {
                 continue;
             }
+
             // Signal that bin was filled
+            #pragma omp critical(ctbin_set_weights)
             m_weights(pixel, iebin) = 1.0;
 
         } // endfor: looped over energy layers of counts cube

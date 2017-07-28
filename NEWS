@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.4.0
 
-27 July 2017
+28 July 2017
 
 
 Introduction
@@ -37,7 +37,9 @@ None
 
 ctbin - CTA event binning
 -------------------------
-None
+The loop over the observations was parallelized using OpenMP for faster
+execution. In addition, the sky directions were cached for faster computation
+of the weights (#1970).
 
 
 ctlike - Maximum likelihood fitting
