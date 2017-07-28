@@ -1,9 +1,10 @@
-2017-07-03
+2017-07-28
 
         * Version 1.4.0 released
         ========================
 
         Install ctools header files (#2145)
+        Parallelize event binning in ctbin using OpenMP (#1970)
 
 
 2017-06-23

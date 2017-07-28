@@ -23,6 +23,8 @@ Improvements
 
 * [`2145 <https://cta-redmine.irap.omp.eu/issues/2145>`_] -
   Install C++ header files
+* [`1970 <https://cta-redmine.irap.omp.eu/issues/1970>`_] -
+  Parallelize :ref:`ctbin` using OpenMP
 
 
 New features
