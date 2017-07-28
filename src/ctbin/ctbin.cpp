@@ -254,7 +254,7 @@ void ctbin::run(void)
     log_header1(TERSE, gammalib::number("Bin observation", m_obs.size()));
 
     // Loop over all unbinned CTA observations in the container
-    #pragma omp parallel for(ctbin_run)
+    #pragma omp parallel for
     for (int i = 0; i < obs_list.size(); ++i) {
 
         // Get pointer to observation
