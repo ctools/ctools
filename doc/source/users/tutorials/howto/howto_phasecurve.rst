@@ -92,7 +92,7 @@ the event.
 
 To generate now a phase curve of the Vela pulsar you need to select all events
 that are close to the source using the :ref:`ctselect` tool. To select for
-example all events within 0.5 degrees of the Vela pulsar you need to type
+example all events within 0.2 degrees of the Vela pulsar you need to type
 the following:
 
 .. code-block:: bash
@@ -101,21 +101,21 @@ the following:
    Input event list or observation definition XML file [events.fits] obs_vela_phased.xml
    RA for ROI centre (degrees) (0-360) [83.63] 128.838
    Dec for ROI centre (degrees) (-90-90) [22.01] -45.178
-   Radius of ROI (degrees) (0-180) [3.0] 0.5
+   Radius of ROI (degrees) (0-180) [3.0] 0.2
    Start time (CTA MET in seconds) [0.0]
    End time (CTA MET in seconds) [0.0]
    Lower energy limit (TeV) [0.1] 0.03
    Upper energy limit (TeV) [100.0] 160.0
    Output event list or observation definition XML file [selected_events.fits] obs_vela_phased_selected.xml
 
-The selected events as a function of phase are displayed below. There is no
-obvious indication of a phase dependence of the event rate.
+The selected events as a function of phase are displayed below. There is a
+clear indication for a phase dependence of the event rate.
 
 .. figure:: howto_phasecurve_phases.png
    :width: 600px
    :align: center
 
-   *Phase histogram for events selected within 0.5 degrees of the Vela pulsar*
+   *Phase histogram for events selected within 0.2 degrees of the Vela pulsar*
 
 An alternative method to select events from the
 :ref:`observation definition file <glossary_obsdef>`
@@ -179,12 +179,12 @@ probability value for all model components.
 
 You now can perform an event selection based on the probability that an event
 originates from the Vela pulsar. In the following example we set the
-probability threshold to >20% by adding the attribute
-``expr="PROB_VelaPulsar>0.2"`` after the :ref:`ctselect` command:
+probability threshold to >10% by adding the attribute
+``expr="PROB_VelaPulsar>0.1"`` after the :ref:`ctselect` command:
 
 .. code-block:: bash
 
-   $ ctselect expr="PROB_VelaPulsar>0.2"
+   $ ctselect expr="PROB_VelaPulsar>0.1"
    Input event list or observation definition XML file [obs_vela_phased.xml] obs_vela_phased_prob.xml
    RA for ROI centre (degrees) (0-360) [128.838]
    Dec for ROI centre (degrees) (-90-90) [-45.178]
@@ -195,15 +195,15 @@ probability threshold to >20% by adding the attribute
    Upper energy limit (TeV) [160.0]
    Output event list or observation definition XML file [obs_vela_phased_selected.xml] obs_vela_phased_prob_selected.xml
 
-The selected events as a function of phase are displayed below. There is now a
-hint for a phase dependence of the event rate, although this hint is not very
-significant.
+The selected events as a function of phase are displayed below. The background
+is considerably reduced with respect to the simple radius cut that was
+used before, and the pulsations of the Vela pulsar are now clearly visible.
 
 .. figure:: howto_phasecurve_probphases.png
    :width: 600px
    :align: center
 
-   *Phase histogram of events for events having a probability of >20% in originating from the Vela pulsar*
+   *Phase histogram of events for events having a probability of >10% in originating from the Vela pulsar*
 
 Since every event in the event files of the Data Challenge is tagged with a
 Monte Carlo identifier that specifies from which model component it was
@@ -211,13 +211,13 @@ simulated, you may check how many events from the Vela pulsar are actually
 expected in the data. The correspondance between the model components and
 the Monte Carlo identifiers is given in the header of the event files
 (see :ref:`1dc_data_organisation`), and from there you will find out that
-the Vela pulsar has the Monte Carlo identifier ``86``. You can then select only
-the events with this identifier by adding the attribute ``expr="MC_ID==86"``
+the Vela pulsar has the Monte Carlo identifier ``91``. You can then select only
+the events with this identifier by adding the attribute ``expr="MC_ID==91"``
 after the :ref:`ctselect` command:
 
 .. code-block:: bash
 
-   $ ctselect expr="MC_ID==86"
+   $ ctselect expr="MC_ID==91"
    Input event list or observation definition XML file [obs_vela_phased_prob.xml] obs_vela_phased.xml
    RA for ROI centre (degrees) (0-360) [128.838]
    Dec for ROI centre (degrees) (-90-90) [-45.178]
@@ -228,10 +228,11 @@ after the :ref:`ctselect` command:
    Upper energy limit (TeV) [160.0]
    Output event list or observation definition XML file [obs_vela_phased_prob_selected.xml] obs_vela_phased_mcid.xml
 
-The resulting phase histogram is shown below. It now becomes obvious that
-the peaks seen in the event histogram do indeed correspond to the expected
-peaks from the Vela pulsar, but there are too few events in the simulated data
-to allow for a unambiguous detection of the pulsar.
+The resulting phase histogram is shown below. It confirms that the peaks seen
+in the event histogram do indeed correspond to the expected peaks from the Vela
+pulsar. Note that the peak has an amplitude of about 460 events, while the peak
+in the figures above is about 250 events, indicating that almost half of the
+events have been surpressed by the radius or probability cuts.
 
 .. figure:: howto_phasecurve_mcid.png
    :width: 700px
