@@ -13,7 +13,7 @@ bugs.
 Releases
 --------
 
-The latest ctools release is ``ctools-1.3.1`` (20 July 2017).
+The latest ctools release is ``ctools-1.4.0`` (1 August 2017).
 
 Below a table of ctools releases. Please read the :ref:`sec_release` to
 learn more about new features and corrected bugs in a given release.
@@ -31,6 +31,9 @@ learn more about new features and corrected bugs in a given release.
    * - ctools
      - gammalib
      - Mac OS X package
+   * - `1.4.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.0.tar.gz>`_
+     - `1.4.0 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.4.0.tar.gz>`_
+     - `ctools-1.4.0-macosx10.7.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.0-macosx10.7.dmg>`_
    * - `1.3.1 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.3.1.tar.gz>`_
      - `1.3.1 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.3.1.tar.gz>`_
      - `ctools-1.3.1-macosx10.7.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.3.1-macosx10.7.dmg>`_
@@ -102,13 +105,13 @@ learn more about new features and corrected bugs in a given release.
 Development release
 -------------------
 
-The current ctools development release is ``ctools-1.4.0.dev1``.
+The current ctools development release is ``ctools-1.5.0.dev1``.
 This release reflects the status of the current ``devel`` branch of
 the ctools git repository.
 
-* `Mac OS X binary package <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.0.dev1-macosx10.7.dmg>`_ (Mac OS X 10.7+)
-* `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.4.0.dev1.tar.gz>`_ source code tarball
-* `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.0.dev1.tar.gz>`_ source code tarball
+* `Mac OS X binary package <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.5.0.dev1-macosx10.7.dmg>`_ (Mac OS X 10.7+)
+* `GammaLib <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.5.0.dev1.tar.gz>`_ source code tarball
+* `ctools <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.5.0.dev1.tar.gz>`_ source code tarball
 
 
 Git repository

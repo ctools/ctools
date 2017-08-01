@@ -1,28 +1,24 @@
 .. _1.4:
 
-ctools 1.4 release (TBD)
-================================
+ctools 1.4 release (1 August 2017)
+==================================
 
 Overview
 --------
 
 ctools 1.4 is a major release that adds significant functionality.
 
-In particular, this release provides:
-
-* TBW
-
 
 Bug fixes
 ---------
 
+* [`2171 <https://cta-redmine.irap.omp.eu/issues/2171>`_] -
+  Fix ctmodel bug for stacked analysis with diffuse maps or cubes
 
 
 Improvements
 ------------
 
-* [`2171 <https://cta-redmine.irap.omp.eu/issues/2171>`_] -
-  Fix ctmodel bug for stacked analysis with diffuse maps or cubes
 * [`2145 <https://cta-redmine.irap.omp.eu/issues/2145>`_] -
   Install C++ header files
 * [`1970 <https://cta-redmine.irap.omp.eu/issues/1970>`_] -
@@ -31,3 +27,5 @@ Improvements
 
 New features
 ------------
+
+None
