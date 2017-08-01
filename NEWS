@@ -1,6 +1,6 @@
-New Features and Important Changes in ctools 1.4.0
+New Features and Important Changes in ctools 1.5.0
 
-28 July 2017
+1 August 2017
 
 
 Introduction
@@ -11,8 +11,7 @@ ctools release with respect to the precedent release.
 
 Configuration
 -------------
-The ctools header files are now installed into $(prefix)/include/ctools
-(#2145).
+None
 
 
 Python interface
@@ -37,9 +36,7 @@ None
 
 ctbin - CTA event binning
 -------------------------
-The loop over the observations was parallelized using OpenMP for faster
-execution. In addition, the sky directions were cached for faster computation
-of the weights (#1970).
+None
 
 
 ctlike - Maximum likelihood fitting
@@ -59,10 +56,7 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-The diffuse response computation for a stacked analysis require the ipix() and iend()
-attributes set in order to properly cache the response values, yet the ctmodel
-modifications introduced in version 1.3.1 did not properly set these attributes.
-This has been corrected (#2171).
+None
 
 
 ctexpcube - CTA exposure cube generation
