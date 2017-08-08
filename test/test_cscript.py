@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cspull script.
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class cscript_test(ctools.cscript):
         """
         # Set name
         self._name    = 'cscript_test'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise observation container from constructor arguments
         self._obs, argv = self._set_input_obs(argv)
@@ -84,7 +84,8 @@ class cscript_test(ctools.cscript):
 
     # Check get_roi() method
     def check_get_roi(self):
-        return self._get_roi()
+        pnt = gammalib.GCTAPointing()
+        return self._get_roi(pnt)
 
     # Check restore_edisp() method
     def check_restore_edisp(self):
@@ -140,7 +141,7 @@ class ctobservation_test(ctools.csobservation):
         """
         # Set name
         self._name    = 'ctobservation_test'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise application by calling the appropriate class constructor
         self._init_csobservation(argv)
@@ -171,7 +172,7 @@ class ctlikelihood_test(ctools.cslikelihood):
         """
         # Set name
         self._name    = 'ctlikelihood_test'
-        self._version = '1.2.0'
+        self._version = ctools.__version__
 
         # Initialise application by calling the appropriate class constructor
         self._init_cslikelihood(argv)
@@ -213,6 +214,8 @@ class Test(test):
         pars.append(gammalib.GApplicationPar('rad','r','h','1.0','','',''))
         pars.append(gammalib.GApplicationPar('emin','r','h','1.0','','',''))
         pars.append(gammalib.GApplicationPar('emax','r','h','10.0','','',''))
+        pars.append(gammalib.GApplicationPar('tmin','t','h','2005-10-08T14:30:25','','',''))
+        pars.append(gammalib.GApplicationPar('tmax','t','h','2005-10-08T14:58:26','','',''))
         pars.append(gammalib.GApplicationPar('expcube','f','h','NONE','','',''))
         pars.append(gammalib.GApplicationPar('psfcube','f','h','NONE','','',''))
         pars.append(gammalib.GApplicationPar('bkgcube','f','h','NONE','','',''))

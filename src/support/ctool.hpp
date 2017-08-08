@@ -84,27 +84,31 @@ protected:
     void setup_models(GObservations& obs, const std::string& name = "");
 
     // Protected methods that create objects from user parameters
-    GEbounds        create_ebounds(void);
-    GSkyMap         create_map(const GObservations& obs);
-    GCTAEventCube   create_cube(const GObservations& obs);
-    GCTAObservation create_cta_obs(void);
+    GEbounds          create_ebounds(void);
+    GSkyMap           create_map(const GObservations& obs);
+    GCTAEventCube     create_cube(const GObservations& obs);
+    GCTAObservation   create_cta_obs(void);
 
     // Protected methods that check user parameters
-    void            require_inobs(const std::string& method);
-    void            require_inobs_nolist(const std::string& method);
-    void            require_inobs_nocube(const std::string& method);
-
-    // Protected methods for logging
-    void            log_observations(const GChatter&      chatter,
-                                     const GObservations& obs,
-                                     const std::string&   what = "Observation");
-    void            log_models(const GChatter&    chatter,
-                               const GModels&     models,
-                               const std::string& what = "Model");
+    void              require_inobs(const std::string& method);
+    void              require_inobs_nolist(const std::string& method);
+    void              require_inobs_nocube(const std::string& method);
 
     // Protected methods that extract user parameters
-    GCTARoi           get_roi(void);
+    GCTARoi           get_roi(const GCTAPointing& pnt = GCTAPointing());
+    GEbounds          get_ebounds(void);
+    GGti              get_gti(void);
+    GCTAPointing      get_pointing(void);
+    GSkyDir           get_skydir(void);
     std::string       set_outfile_name(const std::string& filename);
+
+    // Protected methods for logging
+    void              log_observations(const GChatter&      chatter,
+                                       const GObservations& obs,
+                                       const std::string&   what = "Observation");
+    void              log_models(const GChatter&    chatter,
+                                 const GModels&     models,
+                                 const std::string& what = "Model");
 
     // Protected support methods
     void              set_response(GObservations& obs);

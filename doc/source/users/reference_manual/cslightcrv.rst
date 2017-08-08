@@ -51,11 +51,11 @@ General parameters
 ``(tbinalg = GTI) <FILE|LIN|GTI> [string]``
     Algorithm for defining time bins.
 
-``tmin [real]``
-    Lightcurve start time (in MJD).
+``tmin [time]``
+    Lightcurve start time (UTC string, JD, MJD or time in seconds).
 
-``tmax [real]``
-    Lightcurve stop time (in MJD).
+``tmax [time]``
+    Lightcurve stop time (UTC string, JD, MJD or time in seconds).
 
 ``tbins [integer]``
     Number of time bins.

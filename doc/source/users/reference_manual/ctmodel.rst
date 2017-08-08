@@ -86,11 +86,11 @@ General parameters
 ``rad [real]``
     Radius of field of view (in degrees).
  	 	 
-``tmin [real]``
-    CTA mission elapsed start time (in seconds).
+``tmin [time]``
+    Start time (UTC string, JD, MJD or time in seconds).
  	 	 
-``tmax [real]``
-    CTA mission elapsed stop time (in seconds).
+``tmax [time]``
+    Stop time (UTC string, JD, MJD or time in seconds).
  	 	 
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.

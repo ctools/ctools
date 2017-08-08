@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cstsdist script.
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ class Test(test):
                        ' srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' ntrials=1 ra=83.63 dec=22.01 emin=0.1 emax=100.0'+ \
-                       ' enumbins=0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
+                       ' enumbins=0 tmin=0.0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
                        ' binsz=0.05'+ \
                        ' outfile="cstsdist_cmd1.dat"'+ \
                        ' logfile="cstsdist_cmd1.log" chatter=2'
@@ -94,7 +94,7 @@ class Test(test):
                        ' srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' ntrials=1 ra=83.63 dec=22.01 emin=0.1 emax=100.0'+ \
-                       ' enumbins=0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
+                       ' enumbins=0 tmin=0.0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
                        ' binsz=0.05'+ \
                        ' outfile="cstsdist_cmd2.dat"'+ \
                        ' logfile="cstsdist_cmd2.log" chatter=2'
@@ -123,6 +123,7 @@ class Test(test):
         tsdist['emin']     = 0.1
         tsdist['emax']     = 100.0
         tsdist['enumbins'] = 0
+        tsdist['tmin']     = 0.0
         tsdist['tmax']     = 1800.0
         tsdist['rad']      = 5.0
         tsdist['outfile']  = 'cstsdist_py1.dat'
@@ -151,6 +152,7 @@ class Test(test):
         tsdist['emin']     = 0.1
         tsdist['emax']     = 100.0
         tsdist['enumbins'] = 10
+        tsdist['tmin']     = 0.0
         tsdist['tmax']     = 1800.0
         tsdist['rad']      = 5.0
         tsdist['npix']     = 50

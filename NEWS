@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-1 August 2017
+8 August 2017
 
 
 Introduction
@@ -26,12 +26,14 @@ None
 
 ctobssim - CTA observation simulation
 -------------------------------------
-None
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
 
 
 ctselect - CTA event selection
 ------------------------------
-None
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
 
 
 ctbin - CTA event binning
@@ -56,7 +58,8 @@ None
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
-None
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
 
 
 ctexpcube - CTA exposure cube generation
@@ -116,7 +119,8 @@ None
 
 cscripts
 --------
-None
+Use t-type parameters for "tmin" and "tmax" to all specifying times in various
+formats (#1864).
 
 
 Examples

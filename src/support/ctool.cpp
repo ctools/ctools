@@ -737,9 +737,9 @@ GCTAEventCube ctool::create_cube(const GObservations& obs)
 
 
 /***********************************************************************//**
- * @brief Create a CTA observation from user parameters
+ * @brief Create a CTA observation from User parameters
  *
- * Creates an empty CTA observation from user parameters. An empty event list
+ * Creates an empty CTA observation from User parameters. An empty event list
  * including RoI, GTI and energy boundary information is attached to the
  * observation. The method also sets the pointing direction using the ra and
  * dec parameter, the ROI based on ra, dec and rad, a single GTI based on
@@ -760,45 +760,24 @@ GCTAEventCube ctool::create_cube(const GObservations& obs)
  ***************************************************************************/
 GCTAObservation ctool::create_cta_obs(void)
 {
-    // Get CTA observation parameters
-    double ra    = (*this)["ra"].real();
-    double dec   = (*this)["dec"].real();
-    double rad   = (*this)["rad"].real();
+    // Get deadtime correction User parameter
     double deadc = (*this)["deadc"].real();
-    double t_min = (*this)["tmin"].real();
-    double t_max = (*this)["tmax"].real();
-    double e_min = (*this)["emin"].real();
-    double e_max = (*this)["emax"].real();
 
     // Allocate CTA observation and empty event list
     GCTAObservation obs;
     GCTAEventList   list;
 
     // Set pointing direction
-    GCTAPointing pnt;
-    GSkyDir      skydir;
-    skydir.radec_deg(ra, dec);
-    pnt.dir(skydir);
+    GCTAPointing pnt = get_pointing();
 
-    // Set ROI
-    GCTAInstDir instdir(skydir);
-    GCTARoi     roi(instdir, rad);
+    // Set RoI
+    GCTARoi roi = get_roi(pnt);
 
     // Set GTI
-    GGti  gti(m_cta_ref);
-    GTime tstart;
-    GTime tstop;
-    tstart.set(t_min, m_cta_ref);
-    tstop.set(t_max, m_cta_ref);
-    gti.append(tstart, tstop);
+    GGti gti = get_gti();
 
     // Set energy boundaries
-    GEbounds ebounds;
-    GEnergy  emin;
-    GEnergy  emax;
-    emin.TeV(e_min);
-    emax.TeV(e_max);
-    ebounds.append(emin, emax);
+    GEbounds ebounds = get_ebounds();
 
     // Set CTA event list attributes
     list.roi(roi);
@@ -870,7 +849,7 @@ void ctool::require_inobs_nocube(const std::string& method)
 
         // Signal no cube
         bool is_cube = false;
-    
+
         // Try loading file as counts cube. If this is successful then
         // throw an exception
         try {
@@ -897,9 +876,9 @@ void ctool::require_inobs_nocube(const std::string& method)
                               "observation definition file.";
             throw GException::invalid_value(method, msg);
         }
-    
+
     } // endif: we had a FITS file
-    
+
     // Return
     return;
 }
@@ -974,17 +953,21 @@ void ctool::log_models(const GChatter&    chatter,
 
 
 /***********************************************************************//**
- * @brief Return RoI from user parameters
+ * @brief Return RoI from User parameters
  *
- * @param[in] obs Observation container.
- * @return Region of interest.
+ * @param[in] pnt Pointing direction.
+ * @return Region of Interest.
  *
- * Returns region of interest from the user parameters "ra", "dec" and "rad".
- * If the "usepnt" parameter exists and is "yes" then postpone then assume
- * that the Right Ascension and Declination of the RoI centre will be set
- * from the pointing direction somewhere else.
+ * Returns Region of Interest (RoI) from the User parameters "ra", "dec" and
+ * "rad". If any of the parameters "ra", "dec" or "rad" is not valid an
+ * invalid RoI is returned.
+ *
+ * If the "usepnt" parameter exists and is set to "yes", the RoI centre will
+ * be taken from the specified pointing direction instead of the "ra" and
+ * "dec" parameters. Make sure to provide a valid pointing direction in case
+ * that you want to use the "usepnt" User parameter.
  ***************************************************************************/
-GCTARoi ctool::get_roi(void)
+GCTARoi ctool::get_roi(const GCTAPointing& pnt)
 {
     // Initialise an empty RoI
     GCTARoi roi;
@@ -993,37 +976,169 @@ GCTARoi ctool::get_roi(void)
     // use for the RoI centre
     bool usepnt = (has_par("usepnt") && (*this)["usepnt"].boolean());
 
-    // If pointing should not bet used the extract the RoI centre from the
-    // "ra" and "dec" parameters
-    if (!usepnt) {
+    // If the pointing direction should be used then extract the RoI centre
+    // from the pointing direction
+    if (usepnt) {
+        roi.centre(GCTAInstDir(pnt.dir()));
+    }
 
-        // Read "ra" and "dec" parameters only if both are valid
-        if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
+    // ... otherwise extract the RoI centre from "ra" and "dec" User
+    // parameters if they are valid
+    else if ((*this)["ra"].is_valid() && (*this)["dec"].is_valid()) {
 
-            // Read parameters
-            double ra  = (*this)["ra"].real();
-            double dec = (*this)["dec"].real();
+        // Get Sky direction
+        GSkyDir skydir = get_skydir();
 
-            // Set RoI
-            GCTAInstDir instdir;
-            instdir.dir().radec_deg(ra, dec);
-            roi.centre(instdir);
+        // Convert into CTA instrument direction
+        GCTAInstDir instdir(skydir);
 
-            // Signal that we have a pointing direction
-            usepnt = true;
+        // Set RoI centre
+        roi.centre(instdir);
 
-        } // endif: "ra" and "dec" were valid
+        // Signal that we have a centre
+        usepnt = true;
 
-    } // endif: pointing was not used for RoI centre
+    } // endelse: set RoI centre from User parameters
 
-    // If we have a RoI centre and if the "rad" parameter is valid then
-    // extract the RoI radius from the parameter
+    // Extract the RoI radius from the "rad" parameter if we have a centre
+    // and the "rad" parameter is valid
     if (usepnt && (*this)["rad"].is_valid()) {
         roi.radius((*this)["rad"].real());
     }
 
     // Return RoI
     return roi;
+}
+
+
+/***********************************************************************//**
+ * @brief Return energy boundaries from User parameters
+ *
+ * @return Energy boundaries.
+ *
+ * Returns energy boundaries from the User parameters "emin" and "emax". If
+ * one of "emin" or "emax" is not valid, an empty energy boundaries object
+ * is returned. If "emin" is not valid, "emax" is not queried.
+ ***************************************************************************/
+GEbounds ctool::get_ebounds(void)
+{
+    // Initialise energy boundaries
+    GEbounds ebounds;
+
+    // Get minimum energy from "emin" User parameter
+    GApplicationPar parmin = (*this)["emin"];
+
+    // Continue only if "emin" has a valid energy value
+    if (parmin.is_valid()) {
+
+        // Get maximum energy from "emax" User parameter
+        GApplicationPar parmax = (*this)["emax"];
+
+        // Continue only if "emax" has a valid energy value
+        if (parmax.is_valid()) {
+
+            // Read minimum and maximum energy parameters in TeV
+            double e_min = parmin.real();
+            double e_max = parmax.real();
+
+            // Set energy boundaries
+            GEnergy emin;
+            GEnergy emax;
+            emin.TeV(e_min);
+            emax.TeV(e_max);
+            ebounds.append(emin, emax);
+
+        } // endif: "emax" parameter was valid
+
+    } // endif: "emin" parameter was valid
+
+    // Return energy boundaries
+    return ebounds;
+}
+
+
+/***********************************************************************//**
+ * @brief Return Good Time Intervals from User parameter
+ *
+ * @return Good Time Intervals.
+ *
+ * Returns Good Time Intervals from the User parameters "tmin" and "tmax",
+ * taking into account the transformation into the CTA reference time system.
+ * If one of "tmin" or "tmax" is not valid, an empty Good Time Interval
+ * object is returned. If "tmin" is not valid, "tmax" is not queried.
+ ***************************************************************************/
+GGti ctool::get_gti(void)
+{
+    // Initialise Good Time Intervals with CTA reference time
+    GGti gti(m_cta_ref);
+
+    // Get minimum time from "tmin" User parameter
+    GApplicationPar parmin = (*this)["tmin"];
+
+    // Continue only if "tmin" has a valid time value
+    if (parmin.is_valid()) {
+
+        // Get maximum time from "tmax" User parameter
+        GApplicationPar parmax = (*this)["tmax"];
+
+        // Continue only if "tmax" has a valid time value
+        if (parmax.is_valid()) {
+
+            // Get minimum and maximum time for CTA time reference
+            GTime tmin = parmin.time(m_cta_ref);
+            GTime tmax = parmax.time(m_cta_ref);
+
+            // Append GTI
+            gti.append(tmin, tmax);
+
+        } // endif: "tmax" parameter was valid
+
+    } // endif: "tmin" parameter was valid
+
+    // Return GTI
+    return gti;
+}
+
+
+/***********************************************************************//**
+ * @brief Return CTA pointing from User parameters
+ *
+ * @return CTA pointing.
+ *
+ * Returns CTA pointing from the User parameters "ra" and "dec".
+ ***************************************************************************/
+GCTAPointing ctool::get_pointing(void)
+{
+    // Get sky direction
+    GSkyDir skydir = get_skydir();
+
+    // Set CTA pointing
+    GCTAPointing pnt(skydir);
+
+    // Return pointing
+    return pnt;
+}
+
+
+/***********************************************************************//**
+ * @brief Return sky direction from User parameters
+ *
+ * @return Sky direction.
+ *
+ * Returns sky direction from the User parameters "ra" and "dec".
+ ***************************************************************************/
+GSkyDir ctool::get_skydir(void)
+{
+    // Read Right Ascension and Declination parameters
+    double ra  = (*this)["ra"].real();
+    double dec = (*this)["dec"].real();
+
+    // Set sky direction
+    GSkyDir skydir;
+    skydir.radec_deg(ra, dec);
+
+    // Return sky direction
+    return skydir;
 }
 
 
@@ -1056,7 +1171,7 @@ std::string ctool::set_outfile_name(const std::string& filename)
 
     // Strip any ".gz"
     outname = gammalib::strip_chars(outname, ".gz");
-    
+
     // Return output filename
     return outname;
 }
@@ -1120,7 +1235,7 @@ std::vector<bool> ctool::set_edisp(GObservations& obs, const bool& edisp) const
 
         // Yes, then set the energy dispersion flag
         if (cta != NULL) {
-        
+
             // Save old energy dispersion flag
             old_edisp[i] = cta->response()->apply_edisp();
 
@@ -1280,7 +1395,7 @@ void ctool::set_obs_response(GCTAObservation* obs)
 
                         // Set response without energy dispersion
                         obs->response(exposure, psf, background);
-                        
+
                     } // endelse: no energy dispersion was available
 
                 } // endif: energy dispersion needed
@@ -1322,7 +1437,7 @@ void ctool::set_obs_response(GCTAObservation* obs)
 
         // Attach response to observation
         obs->response(response);
-        
+
         // Signal response availability
         has_response = true;
 
@@ -1398,7 +1513,7 @@ void ctool::set_obs_bounds(GObservations& obs)
                 list->roi(roi);
             }
         }
-        
+
     } // endfor: looped over observations
 
     // Return
@@ -1682,14 +1797,14 @@ GEnergies ctool::insert_energy_boundaries(const GEnergies&       energies,
         bool insert = true;
         int  index  = -1;
         for (int k = 0; k < engs.size(); ++k) {
-        
+
             // If energy exists already then skip the boundary and examine the
             // next one. We consider here 1 MeV as being sufficiently close.
             if (std::abs(engs[k].MeV()-energy.MeV()) < 1.0) {
                 insert = false;
                 break;
             }
-        
+
             // If energy is above the boundary energy we found the index
             if (engs[k] > energy) {
                 index = k;
@@ -1927,7 +2042,7 @@ std::string ctool::warn_too_few_energies(const GEnergies& energies) const
     double logEmin   = std::log10(energies[0].TeV());
     double logEmax   = std::log10(energies[n-1].TeV());
     int    nrequired = int((logEmax - logEmin) * 25.0);
-    
+
     // Warn if there are not enough energy bins
     if (n < nrequired) {
         warning.append("\nWARNING: Only "+gammalib::str(n-1)+" energy bins "
@@ -1961,7 +2076,7 @@ std::string ctool::warn_xml_suffix(const GFilename& filename) const
     // Get filename suffix
     std::string fname  = std::string(filename);
     std::string suffix = gammalib::tolower(fname.substr(fname.length()-4,4));
-    
+
     // Warn if there are not enough energy bins
     if (suffix != ".xml") {
         warning.append("WARNING: Name of observation definition output file "

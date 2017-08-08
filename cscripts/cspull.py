@@ -76,8 +76,10 @@ class cspull(ctools.cscript):
 
             # Check for requested pattern and set wobble pattern
             if self['pattern'].string() == 'four':
+                tmin     = self['tmin'].time(self._time_reference()).secs()
+                duration = self['tmax'].time(self._time_reference()).secs() - tmin
                 self._obs = obsutils.set_observations(self['ra'].real(), self['dec'].real(), self['rad'].real(),
-                                                      self['tmin'].real(), self['tmax'].real(),
+                                                      tmin, duration,
                                                       self['emin'].real(), self['emax'].real(),
                                                       self['irf'].string(), self['caldb'].string(),
                                                       deadc=self['deadc'].real(),

@@ -33,20 +33,20 @@ outfile,   f, a, ts.dat,,, "Output Test Statistic distribution file"
 # Script parameters
 #==================
 ntrials,  i, a, 10,,, "Number of trials"
-ra,       r, a, 83.63,0,360, "RA of pointing (deg)"
-dec,      r, a, 22.01,-90,90, "Dec of pointing (deg)"
+ra,       r, a, 83.63,0,360, "RA of pointing (degrees)"
+dec,      r, a, 22.01,-90,90, "Dec of pointing (degrees)"
 coordsys, s, a, CEL,CEL|GAL,, "Coordinate system (CEL - celestial, GAL - galactic)"
 proj,     s, a, TAN,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
 emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
 emax,     r, a, 100.0,,, "Upper energy limit (TeV)"
 enumbins, i, a, 0,,, "Number of energy bins (0=unbinned)"
-tmin,     r, h, 0.0,,, "Start time (MET in s)"
-tmax,     r, a, 1800.0,,, "Duration (s)"
+tmin,     t, a, 2020-01-01T00:00:00,,, "Start time (UTC string, JD, MJD or time in seconds)"
+tmax,     t, a, 2020-01-01T00:30:00,,, "Stop time (UTC string, JD, MJD or time in seconds)"
 npix,     i, a, 200,,, "Number of pixels for binned"
-binsz,    r, a, 0.05,,, "Pixel size for binned (deg/pixel)"
-rad,      r, h, 5.0,0,180, "Radius of ROI (deg)"
+binsz,    r, a, 0.05,,, "Pixel size for binned (degrees/pixel)"
+rad,      r, h, 5.0,0,180, "Radius of ROI (degrees)"
 pattern,  s, h, single,single|four,, "Observation pattern"
-offset,   r, h, 1.5,,, "Observation pattern offset (deg)"
+offset,   r, h, 1.5,,, "Observation pattern offset (degrees)"
 
 #
 # Standard parameters

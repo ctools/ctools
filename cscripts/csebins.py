@@ -22,7 +22,6 @@ import sys
 import math
 import gammalib
 import ctools
-#from cscripts import obsutils
 
 
 # ============= #
@@ -175,7 +174,7 @@ class csebins(ctools.cscript):
 
         # Build list of response dictionaries
         responses = []
-        
+  
         # Loop over all observations
         for run in obs:
 

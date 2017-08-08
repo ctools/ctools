@@ -191,17 +191,15 @@ class cslightcrv(ctools.cscript):
         elif algorithm == 'LIN':
 
             # Get start and stop time and number of time bins
-            time_min = self['tmin'].real()
-            time_max = self['tmax'].real()
+            time_min = self['tmin'].time(self._time_reference())
+            time_max = self['tmax'].time(self._time_reference())
             nbins    = self['tbins'].integer()
 
-            # Compute time step and setup the GTIs
+            # Compute time step in seconds and setup the GTIs
             time_step = (time_max - time_min) / float(nbins)
             for i in range(nbins):
-                tmin = gammalib.GTime()
-                tmax = gammalib.GTime()
-                tmin.mjd(time_min +    i *time_step)
-                tmax.mjd(time_min + (i+1)*time_step)
+                tmin = time_min +    i *time_step
+                tmax = time_min + (i+1)*time_step
                 gti.append(tmin,tmax)
 
         # If the algorithm is "GTI" then extract the GTIs from the observations

@@ -72,7 +72,7 @@ class Test(test):
         cmd = cslightcrv+' inobs="'+self._events+'"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' tbinalg="LIN" tmin=51544.50 tmax=51544.53'+ \
+                         ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
                          ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd1.log" chatter=1'
@@ -92,7 +92,7 @@ class Test(test):
         cmd = cslightcrv+' inobs="events_that_do_not_exist.fits"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' tbinalg="LIN" tmin=51544.50 tmax=51544.53'+ \
+                         ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
                          ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd2.log"'
@@ -117,8 +117,8 @@ class Test(test):
         lcrv['caldb']    = self._caldb
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
-        lcrv['tmin']     = 51544.50
-        lcrv['tmax']     = 51544.53
+        lcrv['tmin']     = 'MJD 51544.50'
+        lcrv['tmax']     = 'MJD 51544.53'
         lcrv['tbins']    = 3
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
@@ -206,8 +206,8 @@ class Test(test):
         lcrv['caldb']    = self._caldb
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
-        lcrv['tmin']     = 51544.50
-        lcrv['tmax']     = 51544.53
+        lcrv['tmin']     = 'MJD 51544.50'
+        lcrv['tmax']     = 'MJD 51544.53'
         lcrv['tbins']    = 2
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0

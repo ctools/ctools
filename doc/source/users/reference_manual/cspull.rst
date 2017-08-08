@@ -83,11 +83,11 @@ General parameters
 ``enumbins [integer]``
     Number of energy bins (0=unbinned).
  	 	 
-``(tmin = 0.0) [real]``
-    Start time (in seconds).
+``tmin [time]``
+    Start time (UTC string, JD, MJD or time in seconds).
  	 	 
-``tmax [real]``
-    Stop time (in seconds).
+``tmax [time]``
+    Stop time (UTC string, JD, MJD or time in seconds).
  	 	 
 ``npix [integer]``
     Number of pixels for binned analysis.

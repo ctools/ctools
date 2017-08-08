@@ -466,10 +466,7 @@ void ctselect::init_members(void)
     // Initialise parameters
     m_outobs.clear();
     m_prefix.clear();
-    m_usepnt = false;
-    m_roi.clear();
-    m_tmin   = 0.0;
-    m_tmax   = 0.0;
+    m_gti.clear();
     m_emin   = 0.0;
     m_emax   = 0.0;
     m_expr.clear();
@@ -484,8 +481,6 @@ void ctselect::init_members(void)
     m_timemax.clear();
     m_phases.clear();
     m_select_energy = false;
-    m_select_roi    = false;
-    m_select_time   = false;
     m_select_phase  = false;
 
     // Return
@@ -503,10 +498,7 @@ void ctselect::copy_members(const ctselect& app)
     // Copy parameters
     m_outobs   = app.m_outobs;
     m_prefix   = app.m_prefix;
-    m_usepnt   = app.m_usepnt;
-    m_roi      = app.m_roi;
-    m_tmin     = app.m_tmin;
-    m_tmax     = app.m_tmax;
+    m_gti      = app.m_gti;
     m_emin     = app.m_emin;
     m_emax     = app.m_emax;
     m_expr     = app.m_expr;
@@ -521,8 +513,6 @@ void ctselect::copy_members(const ctselect& app)
     m_timemax       = app.m_timemax;
     m_phases        = app.m_phases;
     m_select_energy = app.m_select_energy;
-    m_select_roi    = app.m_select_roi;
-    m_select_time   = app.m_select_time;
     m_select_phase  = app.m_select_phase;
 
     // Return
@@ -557,36 +547,18 @@ void ctselect::get_parameters(void)
 
     // Initialise selection flags
     m_select_energy = false;
-    m_select_roi    = false;
-    m_select_time   = false;
     m_select_phase  = false;
 
     // Setup observations from "inobs" parameter. Do not request response
     // information and do not accept counts cubes.
     setup_observations(m_obs, false, true, false);
 
-    // Get some parameters
-    m_usepnt = (*this)["usepnt"].boolean();
+    // Query the RoI
+    GCTAPointing pnt;
+    GCTARoi      roi = get_roi(pnt);
 
-    // Get the RoI and enable RoI selection if the RoI is valid
-    m_roi        = get_roi();
-    m_select_roi = m_roi.is_valid();
-
-    // Get time selection parameters
-    if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
-
-        // Get User parameters
-        m_tmin = (*this)["tmin"].real();
-        m_tmax = (*this)["tmax"].real();
-
-        // Additional check for time values
-        if (m_tmin >= m_tmax) {
-            m_select_time = false;
-        }
-        else {
-            m_select_time = true;
-        }
-    }
+    // Get Good Time Intervals (empty if no selection is done)
+    m_gti = get_gti();
 
     // Get energy selection parameters
     if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
@@ -686,8 +658,8 @@ void ctselect::get_parameters(void)
 
     // Set time interval with input times given in CTA reference
     // time (in seconds)
-    m_timemin.set(m_tmin, m_cta_ref);
-    m_timemax.set(m_tmax, m_cta_ref);
+    m_timemin = m_gti.tstart();
+    m_timemax = m_gti.tstop();
 
     // Write parameters into logger
     log_parameters(TERSE);
@@ -716,8 +688,7 @@ void ctselect::get_parameters(void)
  * observation is replaced by selected event list read from the FITS file.
  *
  * Good Time Intervals of the observation will be limited to the time
- * interval [m_tmin, m_tmax]. If m_tmin=m_tmax=0, no time selection is
- * performed.
+ * interval [m_timemin, m_timemax].
  ***************************************************************************/
 void ctselect::select_events(GCTAObservation*   obs,
                              const std::string& filename,
@@ -756,21 +727,19 @@ void ctselect::select_events(GCTAObservation*   obs,
     // Analyse expression to see if a selection is required
     bool select_expr = (gammalib::strip_whitespace(m_expr).length() > 0);
 
-    // Set RoI selection. If the "usepnt" parameter is set to true then
-    // use the pointing direction as the RoI centre.
-    double ra  = m_roi.centre().dir().ra_deg();
-    double dec = m_roi.centre().dir().dec_deg();
-    double rad = m_roi.radius();
-    if (m_usepnt) {
-        const GCTAPointing &pnt = obs->pointing();
-        ra  = pnt.dir().ra_deg();
-        dec = pnt.dir().dec_deg();
-    }
-    
+    // Set RoI selection
+    GCTARoi roi = get_roi(obs->pointing());
+    double  ra  = roi.centre().dir().ra_deg();
+    double  dec = roi.centre().dir().dec_deg();
+    double  rad = roi.radius();
+
+    // Signal that RoI selection should be performed
+    bool select_roi = roi.is_valid();
+
     // Set time selection interval. We make sure here that the time selection
     // interval cannot be wider than the GTIs covering the data. This is done
     // using GGti's reduce() method.
-    if (m_select_time) {
+    if (!m_gti.is_empty()) {
 
         // Reduce GTIs to specified time interval. The complicated cast is
         // necessary here because the gti() method is declared const, so
@@ -783,8 +752,8 @@ void ctselect::select_events(GCTAObservation*   obs,
     GGti gti = list->gti();
 
     // Make time selection
-    if (m_select_time) {
-    
+    if (!m_gti.is_empty()) {
+
         // Extract effective time interval in the reference time of the
         // event list. We get this reference time from gti.reference().
         double tmin = gti.tstart().convert(gti.reference());
@@ -910,7 +879,7 @@ void ctselect::select_events(GCTAObservation*   obs,
     } // endif: made energy selection
 
     // Make RoI selection
-    if (m_select_roi) {
+    if (select_roi) {
 
         // Store the original radius
         double original_rad = rad;
@@ -1032,7 +1001,7 @@ void ctselect::select_events(GCTAObservation*   obs,
     list->fetch();
 
     // If RoI selection has been applied then set the event list RoI
-    if (m_select_roi) {
+    if (select_roi) {
         GCTAInstDir instdir;
         instdir.dir().radec_deg(ra, dec);
         list->roi(GCTARoi(instdir, rad));
@@ -1326,7 +1295,7 @@ void ctselect::save_fits(void)
 
         // Save only if it's a CTA observation
         if (obs != NULL) {
-    
+
             // Save only if file name is non-empty
             if (m_infiles[0].length() > 0) {
 

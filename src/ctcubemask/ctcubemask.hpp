@@ -1,7 +1,7 @@
 /***************************************************************************
  *                      ctcubemask - Cube filter tool                      *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2017 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -78,8 +78,6 @@ protected:
 	GFilename   m_regfile;    //!< ds9 region file
     GFilename   m_outcube;    //!< Output event list or XML file
 	std::string m_prefix;     //!< Prefix for multiple counts maps
-    bool        m_usepnt;     //!< Use pointing instead of RA/DEC parameters
-    GCTARoi     m_roi;        //!< RoI selection
     double      m_emin;       //!< Lower energy
     double      m_emax;       //!< Upper energy
     bool        m_publish;    //!< Publish counts cube?
@@ -87,7 +85,6 @@ protected:
     // Protected members
     std::vector<std::string> m_infiles;       //!< Input event filenames
     bool                     m_select_energy; //!< Perform energy selection
-    bool                     m_select_roi;    //!< Perform ROI selection
 };
 
 

@@ -75,7 +75,9 @@ class Test(test):
                        ' outevents="ctobssim_cmd1.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
-                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'+ \
+                       ' tmin="2020-01-01T00:00:00"'+ \
+                       ' tmax="2020-01-01T00:30:00"'+ \
+                       ' emin=0.1 emax=100.0'+ \
                        ' logfile="ctobssim_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
@@ -95,7 +97,9 @@ class Test(test):
                        ' outevents="ctobssim_cmd2.fits"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'" '+ \
                        ' ra=83.63 dec=22.01 rad=10.0'+ \
-                       ' tmin=0.0 tmax=1800.0 emin=0.1 emax=100.0'+ \
+                       ' tmin="2020-01-01T00:00:00"'+ \
+                       ' tmax="2020-01-01T00:30:00"'+ \
+                       ' emin=0.1 emax=100.0'+ \
                        ' logfile="ctobssim_cmd2.log" chatter=1'
 
         # Check if execution failed
@@ -147,8 +151,8 @@ class Test(test):
         sim['ra']        = 83.63
         sim['dec']       = 22.01
         sim['rad']       = 10.0
-        sim['tmin']      = 0.0
-        sim['tmax']      = 1800.0
+        sim['tmin']      = '2020-01-01T00:00:00'
+        sim['tmax']      = '2020-01-01T00:30:00'
         sim['emin']      = 0.1
         sim['emax']      = 100.0
         sim['outevents'] = 'ctobssim_py1.fits'

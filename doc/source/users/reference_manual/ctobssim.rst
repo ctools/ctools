@@ -83,12 +83,12 @@ General parameters
 ``rad [real]``
     Radius of CTA field of view (simulation cone radius) (in degrees).
  	 	 
-``tmin [real]``
-    Mission elapsed start time of observation (in seconds).
+``tmin [time]``
+    Start time (UTC string, JD, MJD or time in seconds).
  	 	 
-``tmax [real]``
-    Mission elapsed stop time of observation (in seconds).
- 	 	 
+``tmax [time]``
+    Stop time (UTC string, JD, MJD or time in seconds).
+
 ``emin [real]``
     Lower energy limit of simulated events (in TeV).
  	 	 

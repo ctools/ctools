@@ -65,13 +65,13 @@ General parameters
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no ROI
     selection will be performed.
  	 	 
-``tmin [real]``
-    CTA mission elapsed start time defining the earliest event (in seconds).
+``tmin [time]``
+    Start time (UTC string, JD, MJD or time in seconds).
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no time
     selection will be performed.
  	 	 
-``tmax [real]``
-    CTA mission elapsed stop time defining the latest event (in seconds).
+``tmax [time]``
+    Stop time (UTC string, JD, MJD or time in seconds).
     If INDEF, NONE, UNDEF or UNDEFINED is passed as value, no time
     selection will be performed.
  	 	 

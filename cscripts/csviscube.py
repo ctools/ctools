@@ -36,7 +36,7 @@ class csviscube(ctools.cscript):
     def __init__(self, *argv):
         """
         Constructor
-        
+
         Parameters
         ----------
         argv : list of str
@@ -68,8 +68,8 @@ class csviscube(ctools.cscript):
         Get all parameters
         """
         # Query parameters
-        self['tmin'].real()
-        self['tmax'].real()
+        self['tmin'].time()
+        self['tmax'].time()
         self['geolon'].real()
         self['geolat'].real()
         self['outfile'].filename()
@@ -107,7 +107,7 @@ class csviscube(ctools.cscript):
 
         The hour angle h (or local hour angle, LHA) is defined as the difference
         between local siderial time (LST) and the Right Ascension
-    
+
         h = LST - ra
 
         The map is computed for h=-ra which is equivalent to GST=lon (or LST=0).
@@ -234,7 +234,7 @@ class csviscube(ctools.cscript):
         cos_geolat    = math.cos(geolat)
         sin_sundec    = math.sin(sundec)
         cos_sundec    = math.cos(sundec)
-        
+
         # Compute Right Ascension difference when Sun is below the mimimum
         # zenith angle in degrees
         dra = math.acos((cos_sunzenith - sin_geolat * sin_sundec) /
@@ -264,17 +264,17 @@ class csviscube(ctools.cscript):
         #geolon = self['geolon'].real()
 
         # Get time interval
-        tmin = gammalib.GTime(self['tmin'].real(), 's')
-        tmax = gammalib.GTime(self['tmax'].real(), 's')
+        tmin = self['tmin'].time(self._time_reference())
+        tmax = self['tmax'].time(self._time_reference())
 
         # Initialise hour angle list
         hour_angles = []
-        
+
         # Set number of hour angle bins and compute conversion factor and weight
         nsteps = 1000
         ra2inx = float(nsteps)/360.0 # Conversion from RA (deg) to index
         weight = 24.0/float(nsteps)  # Weight per hour angle step
-    
+
         # Initialise hour angle array and weight
         hours  = [0.0 for i in range(nsteps)]
 
@@ -298,11 +298,11 @@ class csviscube(ctools.cscript):
             # Compute the time from now when the Sun will culminate. The time
             # is here expressed in degrees
             dra_sun = self._sun_ra_exclusion(time)
-            
+
             # Set [0,ra_start] and [ra_stop,360.0]
             ra_start = sunra - dra_sun
             ra_stop  = sunra + dra_sun
-            
+
             # Case 1: The RA interval during which the Sun is above the zenith
             # angle constraint is fully comprised within the [0,360] interval.
             # In that case the dark time is comprised of two intervals:
@@ -378,7 +378,7 @@ class csviscube(ctools.cscript):
     def _visibility_cube(self):
         """
         Compute visibility cube
-        
+
         Compute visibility cube by displacing the zenith angle map for all
         hour angles. The visibility cube contains the number of hours a given
         celestial position is visible under a given zenith angle interval.
@@ -475,7 +475,7 @@ class csviscube(ctools.cscript):
 
         # Get outfile parameter
         outfile = self['outfile'].filename()
-        
+
         # Log file name
         self._log_value(gammalib.NORMAL, 'Visibility cube file', outfile.url())
 

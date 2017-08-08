@@ -24,11 +24,11 @@ On output, the script will provide a FITS file containing the visibility cube.
 General parameters
 ------------------
 
-``tmin [real]``
-    Start time of the observation.
+``tmin [time]``
+    Start time of observation (UTC string, JD, MJD or time in seconds).
 
-``tmax [real]``
-    Stop time of the observation.
+``tmax [time]``
+    Stop time of observation (UTC string, JD, MJD or time in seconds).
 
 ``geolon [real]``
     Geographic longitude of the IACT array in degrees.

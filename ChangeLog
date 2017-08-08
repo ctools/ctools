@@ -1,7 +1,9 @@
-2017-08-01
+2017-08-08
 
         * Version 1.5.0 released
         ========================
+
+        Use t-type parameters for all "tmin" and "tmax" parameters (#1864)
 
 
 2017-07-28
