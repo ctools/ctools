@@ -1025,32 +1025,21 @@ GEbounds ctool::get_ebounds(void)
     // Initialise energy boundaries
     GEbounds ebounds;
 
-    // Get minimum energy from "emin" User parameter
-    GApplicationPar parmin = (*this)["emin"];
+    // Continue only if "emin" and "emax" has a valid energy value
+    if ((*this)["emin"].is_valid() && (*this)["emax"].is_valid()) {
 
-    // Continue only if "emin" has a valid energy value
-    if (parmin.is_valid()) {
+        // Read minimum and maximum energy parameters in TeV
+        double e_min = (*this)["emin"].real();
+        double e_max = (*this)["emax"].real();
 
-        // Get maximum energy from "emax" User parameter
-        GApplicationPar parmax = (*this)["emax"];
+        // Set energy boundaries
+        GEnergy emin;
+        GEnergy emax;
+        emin.TeV(e_min);
+        emax.TeV(e_max);
+        ebounds.append(emin, emax);
 
-        // Continue only if "emax" has a valid energy value
-        if (parmax.is_valid()) {
-
-            // Read minimum and maximum energy parameters in TeV
-            double e_min = parmin.real();
-            double e_max = parmax.real();
-
-            // Set energy boundaries
-            GEnergy emin;
-            GEnergy emax;
-            emin.TeV(e_min);
-            emax.TeV(e_max);
-            ebounds.append(emin, emax);
-
-        } // endif: "emax" parameter was valid
-
-    } // endif: "emin" parameter was valid
+    } // endif: "emin" and "emax" parameters were valid
 
     // Return energy boundaries
     return ebounds;
@@ -1072,28 +1061,17 @@ GGti ctool::get_gti(void)
     // Initialise Good Time Intervals with CTA reference time
     GGti gti(m_cta_ref);
 
-    // Get minimum time from "tmin" User parameter
-    GApplicationPar parmin = (*this)["tmin"];
-
     // Continue only if "tmin" has a valid time value
-    if (parmin.is_valid()) {
+    if ((*this)["tmin"].is_valid() && (*this)["tmax"].is_valid()) {
 
-        // Get maximum time from "tmax" User parameter
-        GApplicationPar parmax = (*this)["tmax"];
+        // Get minimum and maximum time for CTA time reference
+        GTime tmin = (*this)["tmin"].time(m_cta_ref);
+        GTime tmax = (*this)["tmax"].time(m_cta_ref);
 
-        // Continue only if "tmax" has a valid time value
-        if (parmax.is_valid()) {
+        // Append GTI
+        gti.append(tmin, tmax);
 
-            // Get minimum and maximum time for CTA time reference
-            GTime tmin = parmin.time(m_cta_ref);
-            GTime tmax = parmax.time(m_cta_ref);
-
-            // Append GTI
-            gti.append(tmin, tmax);
-
-        } // endif: "tmax" parameter was valid
-
-    } // endif: "tmin" parameter was valid
+    } // endif: "tmin" and "tmax" parameters were valid
 
     // Return GTI
     return gti;
