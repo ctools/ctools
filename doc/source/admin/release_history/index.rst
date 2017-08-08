@@ -8,6 +8,7 @@ Major releases:
 .. toctree::
    :maxdepth: 1
 
+   ctools 1.5 <1.5>
    ctools 1.4 <1.4>
    ctools 1.3 <1.3>
    ctools 1.2 <1.2>

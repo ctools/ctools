@@ -1,0 +1,32 @@
+.. _1.5:
+
+ctools 1.5 release
+==================
+
+Overview
+--------
+
+ctools 1.5 is a major release that adds significant functionality.
+
+In particular, this release provides:
+
+* Specifcation of times in various formats (UTC, MJD, JD, MET)
+
+
+Bug fixes
+---------
+
+* TBW
+
+
+Improvements
+------------
+
+* TBW
+
+
+New features
+------------
+
+* [`1864 <https://cta-redmine.irap.omp.eu/issues/1864>`_] -
+  Use t-type parameters for all ``tmin`` and ``tmax`` parameters
