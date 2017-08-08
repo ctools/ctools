@@ -696,7 +696,7 @@ void ctselect::select_events(GCTAObservation*   obs,
                              const std::string& gtiname)
 {
     // Write header into logger
-    log_header3(NORMAL, "Events selection");
+    log_header3(NORMAL, "Event selection");
 
     // Initialise selection and addition strings
     std::string selection;
@@ -766,8 +766,13 @@ void ctselect::select_events(GCTAObservation*   obs,
         sprintf(cmax, "%.8f", tmax);
         selection = "TIME >= "+std::string(cmin)+" && TIME <= "+std::string(cmax);
         add       = " && ";
-        log_value(NORMAL, "Time range",
-                  gammalib::str(tmin)+" - "+gammalib::str(tmax)+" s");
+        log_value(NORMAL, "Time range (MJD)",
+                  gammalib::str(gti.tstart().mjd())+" - "+
+                  gammalib::str(gti.tstop().mjd())+" days");
+        log_value(NORMAL, "Time range (UTC)",
+                  gti.tstart().utc()+" - "+gti.tstop().utc());
+        log_value(NORMAL, "Time range (MET)",
+                  gammalib::str(tmin)+" - "+gammalib::str(tmax)+" seconds");
 
     } // endif: made time selection
 

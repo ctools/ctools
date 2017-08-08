@@ -67,13 +67,16 @@ General parameters
     Input model XML file.
  	 	 
 ``expcube [file]``
-    Input exposure cube file (only needed for stacked analysis).
+    Input exposure cube file.
 
 ``psfcube [file]``
-    Input PSF cube file (only needed for stacked analysis).
+    Input PSF cube file.
 
 ``bkgcube [file]``
-    Input background cube file (only needed for stacked analysis).
+    Input background cube file.
+
+``edispcube [file]``
+    Input energy dispersion cube file.
 
 ``caldb [string]``
     Calibration database.

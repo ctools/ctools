@@ -25,10 +25,10 @@ General parameters
 ------------------
 
 ``tmin [time]``
-    Start time of observation (UTC string, JD, MJD or time in seconds).
+    Start time of observation (UTC string, JD, MJD or MET in seconds).
 
 ``tmax [time]``
-    Stop time of observation (UTC string, JD, MJD or time in seconds).
+    Stop time of observation (UTC string, JD, MJD or MET in seconds).
 
 ``geolon [real]``
     Geographic longitude of the IACT array in degrees.

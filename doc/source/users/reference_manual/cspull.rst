@@ -84,10 +84,10 @@ General parameters
     Number of energy bins (0=unbinned).
  	 	 
 ``tmin [time]``
-    Start time (UTC string, JD, MJD or time in seconds).
+    Start time (UTC string, JD, MJD or MET in seconds).
  	 	 
 ``tmax [time]``
-    Stop time (UTC string, JD, MJD or time in seconds).
+    Stop time (UTC string, JD, MJD or MET in seconds).
  	 	 
 ``npix [integer]``
     Number of pixels for binned analysis.

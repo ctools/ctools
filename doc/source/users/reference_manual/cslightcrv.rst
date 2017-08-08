@@ -52,10 +52,10 @@ General parameters
     Algorithm for defining time bins.
 
 ``tmin [time]``
-    Lightcurve start time (UTC string, JD, MJD or time in seconds).
+    Lightcurve start time (UTC string, JD, MJD or MET in seconds).
 
 ``tmax [time]``
-    Lightcurve stop time (UTC string, JD, MJD or time in seconds).
+    Lightcurve stop time (UTC string, JD, MJD or MET in seconds).
 
 ``tbins [integer]``
     Number of time bins.

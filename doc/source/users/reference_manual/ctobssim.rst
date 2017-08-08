@@ -84,10 +84,10 @@ General parameters
     Radius of CTA field of view (simulation cone radius) (in degrees).
  	 	 
 ``tmin [time]``
-    Start time (UTC string, JD, MJD or time in seconds).
+    Start time (UTC string, JD, MJD or MET in seconds).
  	 	 
 ``tmax [time]``
-    Stop time (UTC string, JD, MJD or time in seconds).
+    Stop time (UTC string, JD, MJD or MET in seconds).
 
 ``emin [real]``
     Lower energy limit of simulated events (in TeV).

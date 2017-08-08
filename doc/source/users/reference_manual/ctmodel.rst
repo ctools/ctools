@@ -87,10 +87,10 @@ General parameters
     Radius of field of view (in degrees).
  	 	 
 ``tmin [time]``
-    Start time (UTC string, JD, MJD or time in seconds).
+    Start time (UTC string, JD, MJD or MET in seconds).
  	 	 
 ``tmax [time]``
-    Stop time (UTC string, JD, MJD or time in seconds).
+    Stop time (UTC string, JD, MJD or MET in seconds).
  	 	 
 ``(deadc = 0.95) [real]``
     Average deadtime correction factor.
