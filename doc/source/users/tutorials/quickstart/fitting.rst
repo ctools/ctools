@@ -1,7 +1,7 @@
-.. _sec_fitting_cta:
+.. _start_fitting:
 
-Fitting CTA data
-----------------
+Fitting binned data
+-------------------
 
   .. admonition:: What you will learn
 
@@ -28,8 +28,8 @@ have been binned into a counts cube and the fit computes the log-likelihood
 function by summing over all 200 x 200 x 20 bins of the counts cube. There is
 an alternative method, the so called *unbinned* mode, where the events are
 not binned into a counts cube and the log-likelihood is computed directly by
-summing over all events. We will explore the *unbinned* mode later (see
-:ref:`here <sec_unbinned_cta>`).
+summing over all events.
+:ref:`We will explore the unbinned mode later <start_unbinned>`.
 
 The :ref:`ctlike` tool produced a
 :ref:`model definition XML output file <glossary_moddef>`

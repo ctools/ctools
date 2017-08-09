@@ -36,13 +36,16 @@ General parameters
     Input model cube file (generated with ctmodel).
 
 ``expcube [file]``
-    Input exposure cube file (only needed for stacked analysis).
+    Input exposure cube file.
 
 ``psfcube [file]``
-    Input PSF cube file (only needed for stacked analysis).
+    Input PSF cube file.
+
+``edispcube [file]``
+    Input energy dispersion cube file.
 
 ``bkgcube [file]``
-    Input background cube file (only needed for stacked analysis).
+    Input background cube file.
 
 ``inmodel [file]``
     Input model XML file.
@@ -61,48 +64,48 @@ General parameters
 
 ``(ebinalg = LOG) <FILE|LIN|LOG> [string]``
     Algorithm for defining energy bins.
- 	 	 
+
 ``emin [real]``
     Lower energy value for first energy bin (in TeV).
- 	 	 
+
 ``emax [real]``
     Upper energy value for last energy bin (in TeV).
- 	 	 
+
 ``(enumbins = 20) [integer]``
     Number of model cube energy bins.
- 	 	 
+
 ``ebinfile [file]``
     Name of the file containing the energy bin definition.
- 	 	 
+
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
+
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``xref [real]``
     Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
- 	 	 
+
 ``yref [real]``
     Declination / Galactic latitude of cube centre (J2000, in degrees).
- 	 	 
+
 ``nxpix [integer]``
     Number of cube bins in Right Ascension or Galactic longitude.
- 	 	 
+
 ``nypix [integer]``
     Number of cube bins in Declination or Galactic latitude.
- 	 	 
+
 ``binsz [real]``
     Cube bin size (in degrees/pixel).
- 	 	 
-``(algorithm = SUBDIV) <SUB|SUBDIV|SUBDIVSQRT|SIGNIF> [string]``
+
+``algorithm <SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE> [string]``
     Algorithm used to generate the residual map:
 
      ``SUB``: :math:`DATA - MODEL`
 
-     ``SUBDIV``: :math:`\frac{DATA - MODEL}{MODEL}`
+     ``SUBDIV``: :math:`(DATA - MODEL) / MODEL`
 
-     ``SUBDIVSQRT``: :math:`\frac{DATA - MODEL}{\sqrt{MODEL}}`
+     ``SUBDIVSQRT``: :math:`(DATA - MODEL) / \sqrt{MODEL}`
 
      ``SIGNIFICANCE``: :math:`{\rm sign}(DATA-MODEL) \times \sqrt{ 2 \times ( DATA \times \ln \left(\frac{DATA}{MODEL} \right) + MODEL - DATA ) }`
 
@@ -116,21 +119,21 @@ Standard parameters
 ``(chatter = 2) [integer]``
     Verbosity of the executable:
      ``chatter = 0``: no information will be logged
-     
+
      ``chatter = 1``: only errors will be logged
-     
+
      ``chatter = 2``: errors and actions will be logged
-     
+
      ``chatter = 3``: report about the task execution
-     
+
      ``chatter = 4``: detailed report about the task execution
- 	 	 
+
 ``(clobber = yes) [boolean]``
     Specifies whether an existing residual map file should be overwritten.
- 	 	 
+
 ``(debug = no) [boolean]``
     Enables debug mode. In debug mode the executable will dump any log file output to the console.
- 	 	 
+
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 

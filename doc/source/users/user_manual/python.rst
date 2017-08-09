@@ -22,7 +22,7 @@ To illustrate how to use ctools from Python, below is a working example
 of an event list simulation using the :ref:`ctobssim` class.
 An instance ``sim`` of the :ref:`ctobssim` class is generated and user 
 parameters are set for this instance using the ``[ ]`` operator.
-See the :ref:`reference` for a list of parameters and their types).
+See the :ref:`reference` for a list of parameters and their types.
 The ``execute()`` method executes the :ref:`ctobssim` class in the same 
 way as if it were executed from the command line.
 

@@ -1,12 +1,12 @@
-.. _sec_simulating_cta:
+.. _start_simulating:
 
-Simulating CTA data
--------------------
+Simulating event data
+---------------------
 
   .. admonition:: What you will learn
 
      You will learn how to use the :ref:`ctobssim` tool from the command
-     line to **simulate CTA event data**.
+     line to **simulate event data**.
 
      :ref:`ctobssim` draws random events using a model of the celestial
      gamma-ray intensity distribution that was convolved with the
@@ -39,7 +39,7 @@ characteristics of the simulation:
 
 Each line represents a query for one parameter value.
 The line starts with a short description of the parameter, followed by 
-the default value proposed by ctobssim in squared brackets ``[ ]``.
+the default value proposed by :ref:`ctobssim` in squared brackets ``[ ]``.
 
 **If no parameter value is entered the default value will be used**.
 Otherwise, the specified value will overwrite the default value.
@@ -181,13 +181,22 @@ To use for example a seed value of 41 you should type:
 
   $ ctobssim seed=41
 
-:ref:`ctobssim` will write 2 files in the working directory: ``events.fits``
+..
+
+  .. note::
+
+     Hidden parameters are parameters that are not queried by a tool since
+     in general their values is not expected to change frequently. To change
+     hidden parameters they have to be given as arguments on the command line.
+     Multiple hidden parameters need to be separated by a white space.
+
+:ref:`ctobssim` will write two files in the working directory: ``events.fits``
 and ``ctobssim.log``. The first file contains the simulated events in FITS 
 format and can be inspected using ``fv`` or ``ds9``. The FITS file will 
 contain three extensions: an empty primary image, a binary table named 
 ``EVENTS`` that holds the events (one row per event), and a binary table
 named ``GTI`` holding the Good Time Intervals (for the moment a single row
-with 2 columns providing the start and the stop time of the simulated time
+with two columns providing the start and the stop time of the simulated time
 interval).
 
 The second file produced by :ref:`ctobssim` is a human readable log file that
@@ -271,6 +280,6 @@ the hidden ``debug`` parameter to yes:
      ``debug`` and you can use these parameters to control the log file
      output. In addition, all tools have the hidden parameter ``clobber``
      that allows to overwrite existing files (set to ``yes`` by default)
-     and ``mode`` that defines the mode of automatic tool parameters (set to
-     ``ql`` by default).
+     and ``mode`` that defines the mode of automatic parameters (set to
+     ``ql`` for *query and learn* by default).
 

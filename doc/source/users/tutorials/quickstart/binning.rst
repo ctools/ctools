@@ -1,12 +1,12 @@
-.. _sec_binning_cta:
+.. _start_binning:
 
-Binning CTA data
-----------------
+Binning event data
+------------------
 
   .. admonition:: What you will learn
 
      You will learn how to use the :ref:`ctbin` tool to **bin the selected
-     CTA event data into a counts cube**.
+     event data into a counts cube**.
 
      A counts cube is a 3-dimensional data cube that is spanned by Right
      Ascension (or Galactic longitude), Declination (or Galactic latitude),

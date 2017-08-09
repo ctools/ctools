@@ -53,13 +53,16 @@ General parameters
     Name of source model for which the butterfly diagram should be computed.
  	 	 
 ``expcube [file]``
-    Input exposure cube file (only needed for stacked analysis).
+    Input exposure cube file.
 
 ``psfcube [file]``
-    Input PSF cube file (only needed for stacked analysis).
+    Input PSF cube file.
+
+``edispcube [file]``
+    Input energy dispersion cube file.
 
 ``bkgcube [file]``
-    Input background cube file (only needed for stacked analysis).
+    Input background cube file.
 
 ``caldb [string]``
     Calibration database.
@@ -79,7 +82,7 @@ General parameters
 
 ``(method = "GAUSSIAN") <GAUSSIAN|ENVELOPE> [string]``
     Computation method.
-    
+
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
     
@@ -88,16 +91,16 @@ General parameters
 
 ``(ebinalg = "LOG") <FILE|LIN|LOG> [string]``
     Butterfly energy binning algorithm.
- 	 	 
+
 ``emin [real]``
     Minimum energy of butterfly (in TeV).
- 	 	 
+
 ``emax [real]``
     Maximum energy of butterfly (in TeV).
- 	 	 
+
 ``(enumbins = 100) [string]``
     Number of energy bins of butterfly.
- 	 	 
+
 ``(ebinfile = "NONE") [string]``
     File for energy binning algorithm.
 

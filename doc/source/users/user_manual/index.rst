@@ -10,4 +10,3 @@ User Manual
    response
    models
    plotting
-   python

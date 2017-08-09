@@ -1,4 +1,4 @@
-.. _sec_unbinned_cta:
+.. _start_unbinned:
 
 Doing an unbinned analysis
 --------------------------
@@ -53,7 +53,7 @@ hence there is no loss of information due to histogramming.
 Below you see the corresponding output from the ``ctlike.log`` file. The fitted
 parameters are essentially identical to the ones found in binned mode.
 The slight difference with respect to the binned analysis may be explained
-by the different event sample that has been used for the analysis: while 
+by the different event sample that were used for the analysis: while
 binned likelihood works on rectangular counts cubes, unbinned likelihood works
 on circular event selection regions. It is thus not possible to select exactly
 the same events for both analyses.
@@ -115,3 +115,12 @@ the same events for both analyses.
    2017-08-08T20:56:28:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
    2017-08-08T20:56:28:  Number of temporal par's ..: 1
    2017-08-08T20:56:28:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+
+..
+
+  .. note::
+
+     Many tools or scripts can also be used in unbinned mode, including
+     :ref:`csresmap`, :ref:`ctbutterfly` and :ref:`csspec` that were used
+     earlier. It is sufficient to replace the input counts cube by an event
+     list to activate unbinned mode for these tools.

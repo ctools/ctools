@@ -43,16 +43,19 @@ General parameters
     for Test Statistics computation.
 
 ``outfile [file]``
-    ASCII file containing the TS distribution values.
+    Output ASCII file containing the TS distribution values.
 
 ``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
+    Input exposure cube file.
 
 ``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
+    Input PSF cube file.
+
+``edispcube [file]``
+    Input energy dispersion cube file.
 
 ``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
+    Input background cube file.
 
 ``caldb [string]``
     Calibration database.

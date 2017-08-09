@@ -1,4 +1,4 @@
-.. _sec_skymap:
+.. _start_skymap:
 
 Generating a sky map
 --------------------
@@ -6,7 +6,7 @@ Generating a sky map
   .. admonition:: What you will learn
 
      You will learn how to use the :ref:`ctskymap` tool to **generate a sky
-     map from the selected CTA event data**.
+     map from the selected event data**.
 
 Now let's have a look into the selected data by generating a sky map. You do
 this with the :ref:`ctskymap` tool as follows:
@@ -68,6 +68,8 @@ example:
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Background subtraction method (NONE|IRF) [NONE] IRF
+   Calibration database [prod2]
+   Instrument response function [South_0.5h] 
    Output skymap file [skymap.fits] skymap_subtracted.fits
 
 The resulting sky map, displayed using

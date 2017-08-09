@@ -1,4 +1,4 @@
-.. _sec_edisp_cta:
+.. _start_edisp:
 
 Taking the energy dispersion into account
 -----------------------------------------
@@ -15,7 +15,7 @@ Taking the energy dispersion into account
   .. warning::
      Energy dispersion is fully implemented in ctools but is computationally
      intensive. So be aware that the **tools and scripts will take a substantial
-     amount of computing time**.
+     amount of computing time if energy dispersion is considered**.
 
 You may not have recognised, but the examples you have exercised so far
 have neglected the impact of the energy dispersion on the analysis. In reality,
@@ -39,7 +39,7 @@ To simulate events taking the energy dispersion into account you run the
    Calibration database [prod2]
    Instrument response function [South_0.5h]
    Input model definition XML file [$CTOOLS/share/models/crab.xml]
-   Output event data file or observation definition XML file [events.fits]
+   Output event data file or observation definition XML file [events.fits] events_edisp.fits
 
 You then select events from the simulated data as before using the
 :ref:`ctselect` tool:
@@ -47,7 +47,7 @@ You then select events from the simulated data as before using the
 .. code-block:: bash
 
    $ ctselect
-   Input event list or observation definition XML file [events.fits]
+   Input event list or observation definition XML file [events.fits] events_edisp.fits
    RA for ROI centre (degrees) (0-360) [83.63]
    Dec for ROI centre (degrees) (-90-90) [22.01]
    Radius of ROI (degrees) (0-180) [3.0]
@@ -55,7 +55,7 @@ You then select events from the simulated data as before using the
    Stop time (UTC string, JD, MJD or MET in seconds) [NONE] 2020-01-01T00:40:00
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Output event list or observation definition XML file [selected_events.fits]
+   Output event list or observation definition XML file [selected_events.fits] selected_events_edisp.fits
 
 Then you bin as before the selected events into a counts cube using the
 :ref:`ctbin` tool:
@@ -63,7 +63,7 @@ Then you bin as before the selected events into a counts cube using the
 .. code-block:: bash
 
    $ ctbin
-   Input event list or observation definition XML file [events.fits] selected_events.fits
+   Input event list or observation definition XML file [selected_events.fits] selected_events_edisp.fits
    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63]
    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01]
    Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR]
@@ -75,7 +75,7 @@ Then you bin as before the selected events into a counts cube using the
    Start value for first energy bin in TeV [0.1]
    Stop value for last energy bin in TeV [100.0]
    Number of energy bins (1-200) [20]
-   Output counts cube file [cntcube.fits]
+   Output counts cube file [cntcube.fits] cntcube_edisp.fits
 
 As next step you need to compute the
 :ref:`energy dispersion cube <glossary_edispcube>`
@@ -84,7 +84,7 @@ using the :ref:`ctexpcube` tool. You run the tool as follows:
 .. code-block:: bash
 
    $ ctedispcube
-   Input event list or observation definition XML file [NONE] selected_events.fits
+   Input event list or observation definition XML file [NONE] selected_events_edisp.fits
    Calibration database [prod2]
    Instrument response function [South_0.5h]
    Input counts cube file to extract energy dispersion cube definition [NONE]
@@ -108,13 +108,13 @@ energy dispersion cube:
 .. code-block:: bash
 
    $ ctlike edisp=yes
-   Input event list, counts cube or observation definition XML file [selected_events.fits] cntcube.fits
+   Input event list, counts cube or observation definition XML file [selected_events.fits] cntcube_edisp.fits
    Input exposure cube file [expcube.fits]
    Input PSF cube file [psfcube.fits]
    Input energy dispersion cube file [NONE] edispcube.fits
    Input background cube file [bkgcube.fits]
    Input model definition XML file [$CTOOLS/share/models/crab.xml] models.xml
-   Output model definition XML file [crab_results.xml]
+   Output model definition XML file [crab_results.xml] crab_results_edisp.xml
 
 You can also perform an unbinned maximum likelihood analysis taking the energy
 dispersion into account. In that case the energy dispersion information will be
@@ -125,8 +125,8 @@ and no energy dispersion cube is required:
 .. code-block:: bash
 
    $ ctlike edisp=yes
-   Input event list, counts cube or observation definition XML file [cntcube.fits] selected_events.fits
+   Input event list, counts cube or observation definition XML file [cntcube_edisp.fits] selected_events_edisp.fits
    Calibration database [prod2]
    Instrument response function [South_0.5h]
    Input model definition XML file [models.xml] $CTOOLS/share/models/crab.xml
-   Output model definition XML file [crab_results.xml]
+   Output model definition XML file [crab_results_edisp.xml] 

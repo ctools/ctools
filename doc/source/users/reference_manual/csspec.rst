@@ -54,21 +54,17 @@ General parameters
 ``inmodel [file]``
     Input model XML file.
 
-``srcname [string]``
-    Name of the source in the source model XML file which should be used
-    for sensitivity computation.
-
-``outfile [file]``
-    Name of the source spectrum output file.
-
 ``expcube [file]``
-    Exposure cube file (only needed for stacked analysis).
+    Input exposure cube file.
 
 ``psfcube [file]``
-    PSF cube file (only needed for stacked analysis).
+    Input PSF cube file.
+
+``edispcube [file]``
+    Input energy dispersion cube file.
 
 ``bkgcube [file]``
-    Background cube file (only needed for stacked analysis).
+    Input background cube file.
 
 ``caldb [string]``
     Calibration database.
@@ -78,6 +74,13 @@ General parameters
 
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation?
+
+``srcname [string]``
+    Name of the source in the source model XML file which should be used
+    for sensitivity computation.
+
+``outfile [file]``
+    Output source spectrum file.
 
 ``emin [real]``
     Lower energy limit of events (in TeV).

@@ -1,14 +1,14 @@
-.. _sec_selecting_cta:
+.. _start_selecting:
 
-Selecting CTA data
-------------------
+Selecting event data
+--------------------
 
   .. admonition:: What you will learn
 
      You will learn how to use the :ref:`ctselect` tool to **select relevant
-     events from the simulated CTA event data**.
+     events from the simulated event data**.
 
-As next step you may want to select some events from the simulated CTA data.
+As next step you may want to select some events from the simulated event data.
 You may want to restrict the events to a region of interest (ROI) of 3 degrees
 around the Crab nebula, you may want to extract a 30 minutes time slice
 from the data, and you may want to limit the energy range of the events
@@ -28,7 +28,7 @@ You do this event selection using the :ref:`ctselect` tool as follows:
    Upper energy limit (TeV) [100.0]
    Output event list or observation definition XML file [selected_events.fits]
 
-This created a new CTA event list FITS file ``selected_events.fits``
+This created a new event list FITS file ``selected_events.fits``
 that contains the selected data.
 Below an excerpt of the ``ctselect.log`` log file that illustrates the
 event selection:

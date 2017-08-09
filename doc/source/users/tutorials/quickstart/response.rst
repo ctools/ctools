@@ -1,7 +1,7 @@
-.. _sec_stacked_reponse:
+.. _start_binned_reponse:
 
-Pre-computing the response
---------------------------
+Pre-computing the binned response
+---------------------------------
 
   .. admonition:: What you will learn
 
