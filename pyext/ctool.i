@@ -99,6 +99,7 @@ public:
     %rename(_get_pointing)             get_pointing;
     %rename(_get_skydir)               get_skydir;
     %rename(_set_outfile_name)         set_outfile_name;
+    %rename(_is_stacked)               is_stacked;
     %rename(_set_response)             set_response;
     %rename(_set_edisp)                set_edisp;
     %rename(_restore_edisp)            restore_edisp;
@@ -142,6 +143,9 @@ public:
     GCTAPointing      get_pointing(void);
     GSkyDir           get_skydir(void);
     std::string       set_outfile_name(const std::string& filename);
+
+    // Protected methods that query user parameters
+    bool              is_stacked(void);
 
     // Protected support methods
     void              set_response(GObservations& obs);

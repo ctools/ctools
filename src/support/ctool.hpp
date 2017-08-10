@@ -102,6 +102,9 @@ protected:
     GSkyDir           get_skydir(void);
     std::string       set_outfile_name(const std::string& filename);
 
+    // Protected methods that query user parameters
+    bool              is_stacked(void);
+
     // Protected methods for logging
     void              log_observations(const GChatter&      chatter,
                                        const GObservations& obs,

@@ -1156,6 +1156,45 @@ std::string ctool::set_outfile_name(const std::string& filename)
 
 
 /***********************************************************************//**
+ * @brief Query user parameters for stacked analysis
+ *
+ * @return True if a stacked analysis should be done.
+ *
+ * Queries the user parameters "emin", "emax" and "enumbins", and if
+ * "enumbins" is positive, signal that a stacked analysis is requested. In
+ * that case, also the "coordsys", "proj", "xref", "yref", "nxpix", "nypix"
+ * and "binsz" parameters are queried.
+ *
+ * Using this method assures that the parameters are always queried in the
+ * same order.
+ ***************************************************************************/
+bool ctool::is_stacked(void)
+{
+    // First query the minimum and maximum energies
+    (*this)["emin"].real();
+    (*this)["emax"].real();
+
+    // Now query the number of energy bins and set the stacked flag
+    bool stacked = ((*this)["enumbins"].integer() > 0) ? true : false;
+
+    // If a stacked analysis is requested then query the spatial definition
+    // of the cube
+    if (stacked) {
+        (*this)["coordsys"].string();
+        (*this)["proj"].string();
+        (*this)["xref"].real();
+        (*this)["yref"].real();
+        (*this)["nxpix"].integer();
+        (*this)["nypix"].integer();
+        (*this)["binsz"].real();
+    }
+
+    // Return stacked flag
+    return stacked;
+}
+
+
+/***********************************************************************//**
  * @brief Set response for all CTA observations in container
  *
  * @param[in,out] obs Observation container

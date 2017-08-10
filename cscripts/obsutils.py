@@ -639,3 +639,82 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
 
     # Return response cubes
     return response
+
+
+# ================================= #
+# Get stacked observation container #
+# ================================= #
+def get_stacked_obs(cls, obs):
+    """
+    Bin an observation and return an observation container with a single
+    binned observation
+
+    Parameters
+    ----------
+    cls : `~ctools.cscript`
+        cscript class
+    obs : `~gammalib.GObservations`
+        Observation container
+
+    Returns
+    -------
+    obs : `~gammalib.GObservations`
+        Observation container where the first observation is a binned observation
+    """
+    # Write header
+    if cls._logExplicit():
+        cls._log.header3('Binning events')
+    
+    # Bin events
+    cntcube = ctools.ctbin(obs)
+    cntcube['usepnt']   = False
+    cntcube['ebinalg']  = 'LOG'
+    cntcube['xref']     = cls['xref'].real()
+    cntcube['yref']     = cls['yref'].real()
+    cntcube['binsz']    = cls['binsz'].real()
+    cntcube['nxpix']    = cls['nxpix'].integer()
+    cntcube['nypix']    = cls['nypix'].integer()
+    cntcube['enumbins'] = cls['enumbins'].integer()
+    cntcube['emin']     = cls['emin'].real()
+    cntcube['emax']     = cls['emax'].real()
+    cntcube['coordsys'] = cls['coordsys'].string()
+    cntcube['proj']     = cls['proj'].string()
+    cntcube.run()
+
+    # Write header
+    if cls._logExplicit():
+        cls._log.header3('Creating stacked response')
+
+    # Get stacked response
+    response = get_stacked_response(obs,
+                                    cls['xref'].real(),
+                                    cls['yref'].real(),
+                                    binsz=cls['binsz'].real(),
+                                    nxpix=cls['nxpix'].integer(),
+                                    nypix=cls['nypix'].integer(),
+                                    emin=cls['emin'].real(),
+                                    emax=cls['emax'].real(),
+                                    enumbins=cls['enumbins'].integer(),
+                                    edisp=cls['edisp'].boolean(),
+                                    coordsys=cls['coordsys'].string(),
+                                    proj=cls['proj'].string())
+
+    # Retrieve a new oberservation container
+    new_obs = cntcube.obs().copy()
+
+    # Set stacked response
+    if cls['edisp'].boolean():
+        new_obs[0].response(response['expcube'], response['psfcube'],
+                            response['edispcube'], response['bkgcube'])
+    else:
+        new_obs[0].response(response['expcube'], response['psfcube'],
+                            response['bkgcube'])
+
+    # Get new models
+    models = response['models']
+
+    # Set models for new oberservation container
+    new_obs.models(models)
+
+    # Return new oberservation container
+    return new_obs

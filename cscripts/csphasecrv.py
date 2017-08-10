@@ -91,33 +91,13 @@ class csphasecrv(ctools.cscript):
         # Get source name
         self._srcname = self['srcname'].string()
 
-        # Get time boundaries
+        # Get phase boundaries
         self._phbins = self._create_tbounds()
 
-        # Set stacked analysis flag to True if the requested number of
-        # energy bins is positive. Otherwise an unbinned analysis will
-        # be done and the stacked analysis flag will be set to False.
-        if self['enumbins'].integer() > 0:
-            self._stacked = True
-        else:
-            self._stacked = False
+        # Set stacked analysis flag and query relevant user parameters
+        self._stacked = self._is_stacked()
 
-        # Make sure that remaining user parameters are queried now. We
-        # do not store the actual parameter values as we do not want
-        # too many instance attributes with enhances the maintenance
-        # costs.
-        self['emin'].real()
-        self['emax'].real()
-        if self._stacked:
-            self['coordsys'].string()
-            self['proj'].string()
-            self['xref'].real()
-            self['yref'].real()
-            self['nxpix'].integer()
-            self['nypix'].integer()
-            self['binsz'].real()
-
-        # Do the same for the hidden parameters, just in case
+        # Query the hidden parameters, just in case
         self['edisp'].boolean()
         
         # Read ahead output parameters
@@ -180,78 +160,6 @@ class csphasecrv(ctools.cscript):
 
         # Return Good Time Intervals
         return phbins
-
-    def _bin_observation(self, obs):
-        """
-        Bin an observation if a binned analysis was requested
-
-        Parameters
-        ----------
-        obs : `~gammalib.GObservations`
-            Observation container
-
-        Returns
-        -------
-        obs : `~gammalib.GObservations`
-            Observation container where the first observation is a binned observation
-        """
-        # Header
-        if self._logExplicit():
-            self._log.header3('Binning events')
-
-        # Bin events
-        cntcube = ctools.ctbin(obs)
-        cntcube['usepnt']   = False
-        cntcube['ebinalg']  = 'LOG'
-        cntcube['xref']     = self['xref'].real()
-        cntcube['yref']     = self['yref'].real()
-        cntcube['binsz']    = self['binsz'].real()
-        cntcube['nxpix']    = self['nxpix'].integer()
-        cntcube['nypix']    = self['nypix'].integer()
-        cntcube['enumbins'] = self['enumbins'].integer()
-        cntcube['emin']     = self['emin'].real()
-        cntcube['emax']     = self['emax'].real()
-        cntcube['coordsys'] = self['coordsys'].string()
-        cntcube['proj']     = self['proj'].string()
-        cntcube.run()
-
-        # Header
-        if self._logExplicit():
-            self._log.header3('Creating stacked response')
-
-        # Get stacked response
-        response = obsutils.get_stacked_response(obs,
-                                                 self['xref'].real(),
-                                                 self['yref'].real(),
-                                                 binsz=self['binsz'].real(),
-                                                 nxpix=self['nxpix'].integer(),
-                                                 nypix=self['nypix'].integer(),
-                                                 emin=self['emin'].real(),
-                                                 emax=self['emax'].real(),
-                                                 enumbins=self['enumbins'].integer(),
-                                                 edisp=self['edisp'].boolean(),
-                                                 coordsys=self['coordsys'].string(),
-                                                 proj=self['proj'].string())
-
-        # Retrieve a new oberservation container
-        new_obs = cntcube.obs().copy()
-
-        # Set stacked response
-        if self['edisp'].boolean():
-            new_obs[0].response(response['expcube'], response['psfcube'],
-                                response['edispcube'], response['bkgcube'])
-        else:
-            new_obs[0].response(response['expcube'], response['psfcube'],
-                                response['bkgcube'])
-
-        # Get new models
-        models = response['models']
-
-        # Set models for new oberservation container     
-        new_obs.models(models)
-
-        # Return new oberservation container
-        return new_obs
 
     def _get_free_par_names(self):
         """
@@ -469,7 +377,8 @@ class csphasecrv(ctools.cscript):
             # and compute the stacked response functions and setup
             # an observation container with a single stacked observation.
             if self._stacked:
-                obs = self._bin_observation(select.obs())
+                #obs = self._bin_observation(select.obs())
+                obs = obsutils.get_stacked_obs(self, select.obs())
     
             # Header
             if self._logExplicit():
