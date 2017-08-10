@@ -66,14 +66,14 @@ class Test(test):
         Test csebins on the command line.
         """
         # Set script name
-        cslightcrv = self._script('csebins')
+        csebins = self._script('csebins')
 
-        # Setup cslightcrv command
-        cmd = cslightcrv+' inobs="NONE"'+ \
-                         ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' emin=0.1 emax=100.0'+ \
-                         ' outfile="csebins_cmd1.fits"'+ \
-                         ' logfile="csebins_cmd1.log" chatter=1'
+        # Setup csebins command
+        cmd = csebins+' inobs="NONE"'+ \
+                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
+                      ' emin=0.1 emax=100.0'+ \
+                      ' outfile="csebins_cmd1.fits"'+ \
+                      ' logfile="csebins_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -86,16 +86,19 @@ class Test(test):
         # Check energy boundaries
         self._check_ebounds('csebins_cmd1.fits', 33)
 
-        # Setup cslightcrv command
-        cmd = cslightcrv+' inobs="NONE"'+ \
-                         ' caldb="Database_that_does_not_exist" irf="'+self._irf+'"'+ \
-                         ' emin=0.1 emax=100.0'+ \
-                         ' outfile="csebins_cmd2.fits"'+ \
-                         ' logfile="csebins_cmd2.log" chatter=1'
+        # Setup csebins command
+        cmd = csebins+' inobs="NONE"'+ \
+                      ' caldb="Database_that_does_not_exist" irf="'+self._irf+'"'+ \
+                      ' emin=0.1 emax=100.0'+ \
+                      ' outfile="csebins_cmd2.fits"'+ \
+                      ' logfile="csebins_cmd2.log" chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
+
+        # Check csebins --help
+        self._check_help(csebins)
 
         # Return
         return

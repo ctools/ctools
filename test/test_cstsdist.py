@@ -103,6 +103,9 @@ class Test(test):
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
 
+        # Check cstsdist --help
+        self._check_help(cstsdist)
+
         # Return
         return
 

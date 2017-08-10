@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cstsmapsplit script.
 #
-# Copyright (C) 2016 Michael Mayer
+# Copyright (C) 2016-2017 Michael Mayer
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -120,6 +120,9 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
+
+        # Check cstsmapsplit --help
+        self._check_help(cstsmapsplit)
 
         # Return
         return

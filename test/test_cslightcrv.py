@@ -101,6 +101,9 @@ class Test(test):
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
 
+        # Check cslightcrv --help
+        self._check_help(cslightcrv)
+
         # Return
         return
 

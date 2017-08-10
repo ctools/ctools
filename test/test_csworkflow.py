@@ -89,6 +89,9 @@ class Test(test):
         # Check fit result
         self._check_fit_result('wf_crab_results.xml')
 
+        # Check csworkflow --help
+        self._check_help(csworkflow)
+
         # Return
         return
 

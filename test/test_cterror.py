@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the cterror tool.
 #
-# Copyright (C) 2015-2016 Florent Forest
+# Copyright (C) 2015-2017 Florent Forest
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,17 +94,8 @@ class Test(test):
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
 
-        # Setup cterror --help option
-        cmd = cterror+' --help'
-
-        # Check if execution was successful in case that the CTOOLS
-        # environment variable was set or failed otherwise
-        if 'CTOOLS' in os.environ:
-            self.test_value(self._execute(cmd), 0,
-                 'Check successful execution with --help option')
-        else:
-            self.test_assert(self._execute(cmd) != 0,
-                 'Check execution failure with --help option')
+        # Check cterror --help
+        self._check_help(cterror)
 
         # Return
         return

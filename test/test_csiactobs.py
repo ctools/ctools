@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csiactobs script
 #
-# Copyright (C) 2016 Juergen Knoedlseder
+# Copyright (C) 2016-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -120,6 +120,9 @@ class Test(test):
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input prodname when executed from command line')
+
+        # Check csiactobs --help
+        self._check_help(csiactobs)
 
         # Return
         return
