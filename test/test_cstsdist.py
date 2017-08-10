@@ -138,36 +138,6 @@ class Test(test):
         # Check pull distribution file
         self._check_result_file('cstsdist_py1.dat')
 
-        # Set-up binned cstsdist in four observation wobble mode
-        tsdist = cscripts.cstsdist()
-        tsdist['inmodel']  = self._model
-        tsdist['srcname']  = 'Crab'
-        tsdist['caldb']    = self._caldb
-        tsdist['irf']      = self._irf
-        tsdist['ntrials']  = 1
-        tsdist['ra']       = 83.63
-        tsdist['dec']      = 22.01
-        tsdist['coordsys'] = 'CEL'
-        tsdist['proj']     = 'TAN'
-        tsdist['emin']     = 0.1
-        tsdist['emax']     = 100.0
-        tsdist['enumbins'] = 10
-        tsdist['tmin']     = 0.0
-        tsdist['tmax']     = 1800.0
-        tsdist['rad']      = 5.0
-        tsdist['npix']     = 50
-        tsdist['binsz']    = 0.1
-        tsdist['pattern']  = 'four'
-        tsdist['outfile']  = 'cstsdist_py2.dat'
-        tsdist['logfile']  = 'cstsdist_py2.log'
-        tsdist['chatter']  = 4
-
-        # Execute cstsdist script
-        tsdist.execute()
-
-        # Check pull distribution file
-        self._check_result_file('cstsdist_py2.dat', ncols=9)
-
         # Return
         return
 

@@ -47,7 +47,6 @@ class cspull(ctools.cscript):
         self._coordsys    = 'CEL'
         self._proj        = 'TAN'
         self._log_clients = False  # Static parameter
-        self._offset      = 0.0
         self._ntrials     = 0
         self._npix        = 0
         self._binsz       = 0.0
@@ -74,17 +73,6 @@ class cspull(ctools.cscript):
         if self._obs.size() == 0:
             self._obs = self._get_observations()
 
-            # Check for requested pattern and set wobble pattern
-            if self['pattern'].string() == 'four':
-                tmin     = self['tmin'].time(self._time_reference()).secs()
-                duration = self['tmax'].time(self._time_reference()).secs() - tmin
-                self._obs = obsutils.set_observations(self['ra'].real(), self['dec'].real(), self['rad'].real(),
-                                                      tmin, duration,
-                                                      self['emin'].real(), self['emax'].real(),
-                                                      self['irf'].string(), self['caldb'].string(),
-                                                      deadc=self['deadc'].real(),
-                                                      pattern=self['pattern'].string(), offset=self['offset'].real())
-
         # ... otherwise add response information and energy boundaries
         # in case they are missing
         else:
@@ -107,7 +95,6 @@ class cspull(ctools.cscript):
         # Read other parameters    
         self._ntrials = self['ntrials'].integer()
         self._edisp   = self['edisp'].boolean()
-        self._offset  = self['offset'].real()
         self._seed    = self['seed'].integer()
         self._chatter = self['chatter'].integer()
 

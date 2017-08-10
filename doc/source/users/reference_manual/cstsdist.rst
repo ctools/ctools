@@ -63,7 +63,7 @@ General parameters
 ``irf [string]``
     Instrumental response function.
  	 	 
-``(deadc = 0.95) [real]``
+``(deadc = 0.98) [real]``
     Average deadtime correction factor.
 
 ``(edisp = no) [boolean]``
@@ -77,6 +77,9 @@ General parameters
  	 	 
 ``dec [real]``
     Declination of CTA pointing (J2000, in degrees).
+
+``(rad = 5.0) [real]``
+    ROI radius (in degrees).
 
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
@@ -104,15 +107,6 @@ General parameters
  	 	 
 ``binsz [real]``
     Pixel size for binned analysis.
-
-``(rad = 5.0) [real]``
-    Radius of ROI (in degrees).
-
-``(pattern = single) [string]``
-    Pattern for pointing simulation (single/four).
-
-``(offset = 1.5) [real]``
-    Observation pattern offset (in degrees).
 
 
 Standard parameters

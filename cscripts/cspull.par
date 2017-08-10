@@ -30,6 +30,7 @@ outfile, f, a, pull.dat,,, "Output pull distribution file"
 ntrials,  i, a, 10,,, "Number of trials"
 ra,       r, a, 83.6331,0,360, "RA of pointing (degrees)"
 dec,      r, a, 22.0145,-90,90, "Dec of pointing (degrees)"
+rad,      r, h, 5.0,0,180, "Radius of ROI (degrees)"
 coordsys, s, a, CEL,CEL|GAL,, "Coordinate system (CEL - celestial, GAL - galactic)"
 proj,     s, a, TAN,AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN,, "Projection method"
 emin,     r, a, 0.1,,, "Lower energy limit (TeV)"
@@ -39,12 +40,8 @@ tmin,     t, a, 2020-01-01T00:00:00,,, "Start time (UTC string, JD, MJD or MET i
 tmax,     t, a, 2020-01-01T00:30:00,,, "Stop time (UTC string, JD, MJD or MET in seconds)"
 npix,     i, a, 200,,, "Number of pixels for binned"
 binsz,    r, a, 0.05,,, "Pixel size for binned (degrees/pixel)"
-rad,      r, h, 5.0,0,180, "Radius of ROI (degrees)"
-pattern,  s, h, single,single|four,, "Observation pattern"
-offset,   r, h, 1.5,,, "Observation pattern offset (degrees)"
 profile,  b, h, no,,, "Use likelihood profile method for errors?"
 seed,     i, h, 1,,, "Initial random number generator seed"
-
 
 #
 # Standard parameters

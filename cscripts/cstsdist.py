@@ -66,17 +66,6 @@ class cstsdist(ctools.cscript):
         if self._obs.size() == 0:
             self._obs = self._get_observations()
 
-            # Check for requested pattern and set wobble pattern
-            if self['pattern'].string() == 'four':
-                tmin     = self['tmin'].time(self._time_reference()).secs()
-                duration = self['tmax'].time(self._time_reference()).secs() - tmin
-                self._obs = obsutils.set_observations(self['ra'].real(), self['dec'].real(), self['rad'].real(),
-                                                      tmin, duration,
-                                                      self['emin'].real(), self['emax'].real(),
-                                                      self['irf'].string(), self['caldb'].string(),
-                                                      deadc=self['deadc'].real(),
-                                                      pattern=self['pattern'].string(), offset=self['offset'].real())
-
         # Get source name
         self._srcname = self['srcname'].string()
 
