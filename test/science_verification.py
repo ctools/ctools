@@ -47,7 +47,6 @@ def generate_pull_distribution(model, obs='NONE', trials=100, \
                                duration=1800.0, \
                                npix=200, binsz=0.02, \
                                coordsys='CEL', proj='TAN', \
-                               pattern='single', offset=1.5, \
                                debug=False, chatter=2):
     """
     Generates pull distribution for a given model
@@ -90,10 +89,6 @@ def generate_pull_distribution(model, obs='NONE', trials=100, \
         Coordinate system (CEL or GAL)
     proj : str, optional
         Sky projection
-    pattern : str, optional
-        Pointing pattern
-    offset : float, optional
-        Offset between pointing directions
     debug : bool, optional
         Enable debugging?
     chatter : int, optional
@@ -131,8 +126,6 @@ def generate_pull_distribution(model, obs='NONE', trials=100, \
     pull['proj']     = proj
     pull['deadc']    = deadc
     pull['rad']      = rad
-    pull['pattern']  = pattern
-    pull['offset']   = offset
     pull['ntrials']  = trials
     pull['debug']    = debug
     pull['chatter']  = chatter
