@@ -53,7 +53,9 @@ in your paper and that you add the following acknowledgment:
    gamma-ray data.*
 
 If you wish, you can also include a link to http://cta.irap.omp.eu/ctools/
-(if the journal allows this) in addition to the above text.
+(if the journal allows this) in addition to the above text, as well as the
+identifier of the code in the Astrophysics Source Code Library (ASCL):
+`ascl:1601.005`.
 
 If you are giving a presentation or talk featuring work/research that makes
 use of ctools, we suggest using this logo on your title slide:
@@ -61,6 +63,8 @@ use of ctools, we suggest using this logo on your title slide:
 .. figure:: ctools-logo.jpg
    :width: 150px
    :align: center
+
+And to see who published an article using ctools you may check the `following link <http://cdsads.u-strasbg.fr/cgi-bin/nph-ref_query?bibcode=2016A%26A...593A...1K&amp;refs=CITATIONS&amp;db_key=AST>`_.
 
 
 License
