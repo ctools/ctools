@@ -55,7 +55,7 @@ in your paper and that you add the following acknowledgment:
 If you wish, you can also include a link to http://cta.irap.omp.eu/ctools/
 (if the journal allows this) in addition to the above text, as well as the
 identifier of the code in the Astrophysics Source Code Library (ASCL):
-`ascl:1601.005`.
+`ascl:1601.005 <http://ascl.net/1601.005>`_.
 
 If you are giving a presentation or talk featuring work/research that makes
 use of ctools, we suggest using this logo on your title slide:
