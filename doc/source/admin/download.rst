@@ -32,6 +32,9 @@ learn more about new features and corrected bugs in a given release.
      - gammalib
      - Mac OS X package
    * - `1.4.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.0.tar.gz>`_
+     - `1.4.1 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.4.1.tar.gz>`_
+     - `ctools-1.4.1-macosx10.7.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.1-macosx10.7.dmg>`_
+   * - `1.4.0 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.0.tar.gz>`_
      - `1.4.0 <http://cta.irap.omp.eu/ctools/releases/gammalib/gammalib-1.4.0.tar.gz>`_
      - `ctools-1.4.0-macosx10.7.dmg <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.4.0-macosx10.7.dmg>`_
    * - `1.3.1 <http://cta.irap.omp.eu/ctools/releases/ctools/ctools-1.3.1.tar.gz>`_
