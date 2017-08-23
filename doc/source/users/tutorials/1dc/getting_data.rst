@@ -10,7 +10,7 @@ data are available on the
 You need your usual CTA credentials to download the data.
 
 The release contains simulated data for the Galactic Plane Survey, the
-Galactic Centre Survey and the Extragalactic Survey,
+Galactic Centre Survey, the Extragalactic Survey and the AGN monitoring program,
 :ref:`instrument response functions (IRFs) <glossary_irf>`, and the
 :ref:`model definition files <glossary_moddef>`
 that were used for the simulation.
@@ -21,6 +21,7 @@ by clicking on the following links:
 * `Galactic Plane Survey <https://owncloud.cta-observatory.org/remote.php/webdav/1dc/gps.tar.gz>`_ (8.3 GB)
 * `Galactic Centre Survey <https://owncloud.cta-observatory.org/remote.php/webdav/1dc/gc.tar.gz>`_ (4.4 GB)
 * `Extragalactic Survey <https://owncloud.cta-observatory.org/remote.php/webdav/1dc/egal.tar.gz>`_ (2.5 GB)
+* `AGN monitoring program <https://owncloud.cta-observatory.org/remote.php/webdav/1dc/agn.tar.gz>`_ (??? GB)
 * `Instrument Response Functions <https://owncloud.cta-observatory.org/remote.php/webdav/1dc/caldb.tar.gz>`_ (1.2 MB)
 * `Sky and background models <https://owncloud.cta-observatory.org/remote.php/webdav/1dc/models.tar.gz>`_ (0.9 GB)
 
@@ -32,6 +33,7 @@ line by typing:
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/gps.tar.gz --user=<user> --ask-password
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/gc.tar.gz --user=<user> --ask-password
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/egal.tar.gz --user=<user> --ask-password
+   $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/agn.tar.gz --user=<user> --ask-password
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/caldb.tar.gz --user=<user> --ask-password
    $ wget https://owncloud.cta-observatory.org/remote.php/webdav/1dc/models.tar.gz --user=<user> --ask-password
 
@@ -47,6 +49,7 @@ After downloading, uncompress the files at any place by typing
    $ tar xfvz gps.tar.gz
    $ tar xfvz gc.tar.gz
    $ tar xfvz egal.tar.gz
+   $ tar xfvz agn.tar.gz
    $ tar xfvz caldb.tar.gz
    $ tar xfvz models.tar.gz
 
