@@ -6,9 +6,9 @@ includedir=${prefix}/include
 Name: ctools
 Description: CTA science analysis tools
 URL: http://cta.irap.omp.eu/ctools
-Version: 1.4.1
+Version: 1.4.0
 Requires: 
-Requires.private: gammalib >= 1.4.1
+Requires.private: gammalib >= 1.4.0
 Conflicts: 
 Cflags: -I${includedir}/ctools @OPENMP_CXXFLAGS@
 Libs: -L${libdir} -lctools
