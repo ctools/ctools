@@ -17,6 +17,10 @@ The content of the ``1dc`` folder should be as follows:
    caldb/data/cta/1dc/caldb.indx
    caldb/data/cta/1dc/bcf
    ...
+   data/baseline/agn
+   data/baseline/agn/agn_baseline_510000.fits
+   data/baseline/agn/agn_baseline_510001.fits
+   ...
    data/
    data/baseline/
    data/baseline/egal
@@ -32,11 +36,13 @@ The content of the ``1dc`` folder should be as follows:
    data/baseline/gps/gps_baseline_110001.fits
    ...
    models/
+   models/models_agn.xml
    models/models_egal.xml
    models/models_gc.xml
    models/models_gps.xml
    ...
    obs/
+   obs/obs_agn_baseline.xml
    obs/obs_egal_baseline.xml
    obs/obs_gc_baseline.xml
    obs/obs_gps_baseline.xml
@@ -75,29 +81,30 @@ and that were stored into FITS files.
 Event data are split into :ref:`observations <glossary_obs>` with a fixed
 pointing direction (observations are also known as runs).
 The duration of an observation is 25 minutes for the Extragalactic Survey
-and 30 minutes for the Galactic Plane and Centre surveys.
-The properties of the event data for all three surveys are summarised in the
+and 30 minutes for the Galactic Plane and Centre surveys and the AGN monitoring
+program.
+The properties of the event data for all simulations are summarised in the
 table below:
 
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | Parameter                         |       GPS           |        GC           |         EGAL        |
-   +===================================+=====================+=====================+=====================+
-   | Number of observations            |                3270 |                1671 |                1271 |
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | Duration of each observation      |              1800 s |              1800 s |              1500 s |
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | Deadtime fraction                 |                  2% |                  2% |                  2% |
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | Total exposure time of simulation |              1635 h |             835.5 h |            529.58 h |
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | Simulated event energies          |    30 GeV - 160 TeV |    30 GeV - 160 TeV |    30 GeV - 160 TeV |
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | Maximum off-axis angle            |               5 deg |               5 deg |               5 deg |
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | Start date of observations        | 2021-01-01T11:58:51 | 2021-01-01T11:58:51 | 2021-01-01T11:58:51 |
-   +-----------------------------------+---------------------+---------------------+---------------------+
-   | End date of observations          | 2021-04-18T18:52:51 | 2021-03-29T21:32:51 | 2021-02-25T14:38:51 |
-   +-----------------------------------+---------------------+---------------------+---------------------+
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | Parameter                         |        GPS       |         GC       |      EGAL        |       AGN       |
+   +===================================+==================+==================+==================+=================+
+   | Number of observations            |             3270 |             1671 |             1271 |            1920 |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | Duration of each observation      |           1800 s |           1800 s |           1500 s |          1800 s |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | Deadtime fraction                 |               2% |               2% |               2% |              2% |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | Total exposure time of simulation |           1635 h |          835.5 h |         529.58 h |        960.00 h |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | Simulated event energies          | 30 GeV - 160 TeV | 30 GeV - 160 TeV | 30 GeV - 160 TeV | 30 GeV - 50 TeV |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | Maximum off-axis angle            |            5 deg |            5 deg |            5 deg |           5 deg |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | Start date of observations        |       2021-01-01 |       2021-01-01 |       2021-01-01 |      2021-01-01 |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
+   | End date of observations          |       2021-04-18 |       2021-03-29 |       2021-02-25 |      2022-07-09 |
+   +-----------------------------------+------------------+------------------+------------------+-----------------+
 
 
 Each event file contains the events for an
@@ -205,8 +212,8 @@ An example of an ``EVENTS`` table is shown below.
 Observation Definition Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The files ``obs_egal_baseline.xml``, ``obs_gc_baseline.xml``, and
-``obs_gps_baseline.xml`` are so called
+The files ``obs_agn_baseline.xml``, ``obs_egal_baseline.xml``,
+``obs_gc_baseline.xml``, and ``obs_gps_baseline.xml`` are so called
 :ref:`observation definition files <glossary_obsdef>`
 containing the information (or metadata) of a list of observations.
 The file is a plain ASCII files in XML format that can be inspected and
@@ -218,11 +225,11 @@ Models
 
 The ``models`` folder contains the definitions of all source and background
 models that were used for simulating the data.
-The files ``models_egal.xml``, ``models_gc.xml`` and ``models_gps.xml`` are
-so called
+The files ``models_agn.xml``, ``models_egal.xml``, ``models_gc.xml`` and
+``models_gps.xml`` are so called
 :ref:`model definition files <glossary_moddef>`
 collecting the definition of all model components used for the three surveys.
-Since the same sky model was used for all surveys the three files are
+Since the same sky model was used for all surveys the four files are
 identical.
 The other files in the folder are ASCII and FITS files containing spectral,
 temporal and spatial information that was used in the simulations.

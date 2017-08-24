@@ -38,15 +38,16 @@ conditions; only zenith angles of 20 degrees and 40 degrees were
 simulated.
 Data are provided for the baseline arrays.
 
-Three Key Science Projects (KSPs) were simulated using realistic pointing
+Four Key Science Projects (KSPs) were simulated using realistic pointing
 patterns as defined in the CTA Science Case document:
 
 * the Galactic Plane Scan (GPS)
 * the Galactic Centre Survey (GC)
 * the Extragalactic Survey (EGAL)
+* an AGN monitoring program (AGN)
 
 The source model used for the simulations is distributed together with the
 data to the CTA Consortium Science Working Groups, so that analysis results
 can be compared to the Monte Carlo truth. The same source model was used for
-the simulation of all three surveys.
+all simulations.
 
