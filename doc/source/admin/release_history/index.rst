@@ -19,8 +19,8 @@ Bug fix releases:
 .. toctree::
    :maxdepth: 1
 
-   ctools 1.4.2 (is identical to 1.4)
-   ctools 1.4.1 (is identical to 1.4)
+   ctools 1.4.2 <1.4.2>
+   ctools 1.4.1 <1.4.1>
    ctools 1.3.1 <1.3.1>
    ctools 1.2.1 <1.2.1>
    ctools 1.0.1 <1.0.1>

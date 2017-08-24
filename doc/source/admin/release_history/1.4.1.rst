@@ -1,0 +1,11 @@
+.. _1.4.1:
+
+ctools 1.4.1 release (22 August 2017)
+=====================================
+
+Overview
+--------
+
+ctools 1.4.1 is a bug fix for ctools release 1.4.
+
+Except of a change in the documentation the code is identical to release 1.4.
