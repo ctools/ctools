@@ -14,7 +14,7 @@ has to be used in the
 for the source of interest.
 The example below is based on the source model that was determined
 during the
-:ref:`source detection step<1dc_select_models>`
+:ref:`iterative model improvement <1dc_first_improving>`
 of the
 :ref:`first CTA Data Challenge <glossary_1dc>`
 tutorial where two point sources were detected.
@@ -52,30 +52,30 @@ will then fit the disk radius of ``Src003``. The results can be seen in the
 log file and will also be written into the output
 :ref:`model definition file <glossary_moddef>`.
 For illustration, an excerpt of the :ref:`ctlike` log file is shown below.
-The disk with of ``Src003`` has been fitted to 0.334 +/- 0.003 degrees.
-The source is detected with a TS value of 5376.9.
+The disk with of ``Src003`` has been fitted to 0.335 +/- 0.003 degrees.
+The source is detected with a TS value of 5393.8.
 
-.. code-block:: xml
+.. code-block:: bash
 
-   2017-07-28T05:53:53: === GModelSky ===
-   2017-07-28T05:53:53:  Name ......................: Src003
-   2017-07-28T05:53:53:  Instruments ...............: all
-   2017-07-28T05:53:53:  Test Statistic ............: 5376.92376418598
-   2017-07-28T05:53:53:  Instrument scale factors ..: unity
-   2017-07-28T05:53:53:  Observation identifiers ...: all
-   2017-07-28T05:53:53:  Model type ................: ExtendedSource
-   2017-07-28T05:53:53:  Model components ..........: "RadialDisk" * "PowerLaw" * "Constant"
-   2017-07-28T05:53:53:  Number of parameters ......: 7
-   2017-07-28T05:53:53:  Number of spatial par's ...: 3
-   2017-07-28T05:53:53:   RA .......................: 266.309961354122 +/- 0.00363413551819907 [-360,360] deg (free,scale=1)
-   2017-07-28T05:53:53:   DEC ......................: -30.1920697862131 +/- 0.00315430125250908 [-90,90] deg (free,scale=1)
-   2017-07-28T05:53:53:   Radius ...................: 0.334199097561604 +/- 0.00257183907696455 [0.001,10] deg (free,scale=1)
-   2017-07-28T05:53:53:  Number of spectral par's ..: 3
-   2017-07-28T05:53:53:   Prefactor ................: 6.21523600805409e-17 +/- 1.05933757692423e-18 [0,5.7e-15] ph/cm2/s/MeV (free,scale=5.7e-18,gradient)
-   2017-07-28T05:53:53:   Index ....................: -2.73943047192846 +/- 0.0151745151814222 [9.92,-9.92]  (free,scale=-2.48,gradient)
-   2017-07-28T05:53:53:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
-   2017-07-28T05:53:53:  Number of temporal par's ..: 1
-   2017-07-28T05:53:53:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2017-08-25T19:37:47: === GModelSky ===
+   2017-08-25T19:37:47:  Name ......................: Src003
+   2017-08-25T19:37:47:  Instruments ...............: all
+   2017-08-25T19:37:47:  Test Statistic ............: 5393.78645148844
+   2017-08-25T19:37:47:  Instrument scale factors ..: unity
+   2017-08-25T19:37:47:  Observation identifiers ...: all
+   2017-08-25T19:37:47:  Model type ................: ExtendedSource
+   2017-08-25T19:37:47:  Model components ..........: "RadialDisk" * "PowerLaw" * "Constant"
+   2017-08-25T19:37:47:  Number of parameters ......: 7
+   2017-08-25T19:37:47:  Number of spatial par's ...: 3
+   2017-08-25T19:37:47:   RA .......................: 266.306975228126 +/- 0.00363322258453142 [-360,360] deg (free,scale=1)
+   2017-08-25T19:37:47:   DEC ......................: -30.1946569442618 +/- 0.0031545381615373 [-90,90] deg (free,scale=1)
+   2017-08-25T19:37:47:   Radius ...................: 0.335173109280516 +/- 0.00257226134023012 [0.001,10] deg (free,scale=1)
+   2017-08-25T19:37:47:  Number of spectral par's ..: 3
+   2017-08-25T19:37:47:   Prefactor ................: 6.23930379041412e-17 +/- 1.06204679984262e-18 [0,5.7e-15] ph/cm2/s/MeV (free,scale=5.7e-18,gradient)
+   2017-08-25T19:37:47:   Index ....................: -2.73810250489576 +/- 0.0151068737641297 [9.92,-9.92]  (free,scale=-2.48,gradient)
+   2017-08-25T19:37:47:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
+   2017-08-25T19:37:47:  Number of temporal par's ..: 1
+   2017-08-25T19:37:47:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. warning::
    The parameter errors returned by :ref:`ctlike` are purely statistical. In
@@ -83,7 +83,8 @@ The source is detected with a TS value of 5376.9.
    as for example the limits on the knowledge of the point spread function.
    These systematic uncertainties are **not** determined by ctools.
 
-The figure below shows the residual map after subtracting the three fitted
+The figure below shows the residual map, generated using the ``SIGNIFICANCE``
+method, after subtracting the three fitted
 sources and the diffuse emission model from the data. There is a ring-like
 residual at the position of ``Src003`` which suggests that an axisymmetric
 disk is not an accurate description of the data.
@@ -116,36 +117,36 @@ looks as follows:
 
 Running :ref:`ctlike` again with that model results in a Gaussian sigma of
 0.198 +/- 0.003 degrees for ``Src003``. The source is detected with a TS value
-of 5659.2 which is considerably larger than the TS value of 5376.9 that is found
+of 5665.7 which is considerably larger than the TS value of 5393.8 that is found
 above for the radial disk model.
 Below an excerpt of the :ref:`ctlike` log file:
 
-.. code-block:: xml
+.. code-block:: bash
 
-   2017-07-28T05:37:55: === GModelSky ===
-   2017-07-28T05:37:55:  Name ......................: Src003
-   2017-07-28T05:37:55:  Instruments ...............: all
-   2017-07-28T05:37:55:  Test Statistic ............: 5659.21767961094
-   2017-07-28T05:37:55:  Instrument scale factors ..: unity
-   2017-07-28T05:37:55:  Observation identifiers ...: all
-   2017-07-28T05:37:55:  Model type ................: ExtendedSource
-   2017-07-28T05:37:55:  Model components ..........: "RadialGaussian" * "PowerLaw" * "Constant"
-   2017-07-28T05:37:55:  Number of parameters ......: 7
-   2017-07-28T05:37:55:  Number of spatial par's ...: 3
-   2017-07-28T05:37:55:   RA .......................: 266.302363126862 +/- 0.00476126847653064 [-360,360] deg (free,scale=1)
-   2017-07-28T05:37:55:   DEC ......................: -30.1977095245935 +/- 0.00412840925183781 [-90,90] deg (free,scale=1)
-   2017-07-28T05:37:55:   Sigma ....................: 0.198403793257533 +/- 0.00298520334678877 [0.001,10] deg (free,scale=1)
-   2017-07-28T05:37:55:  Number of spectral par's ..: 3
-   2017-07-28T05:37:55:   Prefactor ................: 7.15243704872173e-17 +/- 1.40858695554198e-18 [0,5.7e-15] ph/cm2/s/MeV (free,scale=5.7e-18,gradient)
-   2017-07-28T05:37:55:   Index ....................: -2.71991083144987 +/- 0.0147325731477118 [9.92,-9.92]  (free,scale=-2.48,gradient)
-   2017-07-28T05:37:55:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
-   2017-07-28T05:37:55:  Number of temporal par's ..: 1
-   2017-07-28T05:37:55:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+   2017-08-25T20:32:55: === GModelSky ===
+   2017-08-25T20:32:55:  Name ......................: Src003
+   2017-08-25T20:32:55:  Instruments ...............: all
+   2017-08-25T20:32:55:  Test Statistic ............: 5665.73173788155
+   2017-08-25T20:32:55:  Instrument scale factors ..: unity
+   2017-08-25T20:32:55:  Observation identifiers ...: all
+   2017-08-25T20:32:55:  Model type ................: ExtendedSource
+   2017-08-25T20:32:55:  Model components ..........: "RadialGaussian" * "PowerLaw" * "Constant"
+   2017-08-25T20:32:55:  Number of parameters ......: 7
+   2017-08-25T20:32:55:  Number of spatial par's ...: 3
+   2017-08-25T20:32:55:   RA .......................: 266.30022317901 +/- 0.00475655134090925 [-360,360] deg (free,scale=1)
+   2017-08-25T20:32:55:   DEC ......................: -30.1993627725406 +/- 0.0041251924859714 [-90,90] deg (free,scale=1)
+   2017-08-25T20:32:55:   Sigma ....................: 0.198343910095786 +/- 0.00298438230006778 [0.001,10] deg (free,scale=1)
+   2017-08-25T20:32:55:  Number of spectral par's ..: 3
+   2017-08-25T20:32:55:   Prefactor ................: 7.15427332759485e-17 +/- 1.40842792023593e-18 [0,5.7e-15] ph/cm2/s/MeV (free,scale=5.7e-18,gradient)
+   2017-08-25T20:32:55:   Index ....................: -2.71899753120954 +/- 0.0146676775081257 [9.92,-9.92]  (free,scale=-2.48,gradient)
+   2017-08-25T20:32:55:   PivotEnergy ..............: 300000 MeV (fixed,scale=300000,gradient)
+   2017-08-25T20:32:55:  Number of temporal par's ..: 1
+   2017-08-25T20:32:55:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
 .. note::
    While the TS values can formally not be convert into a statistical
    significance between different spatial model hypotheses, a TS improvement
-   of 282.3 indicates a considerably better fit of the axisymmetric Gaussian
+   of 271.9 indicates a considerably better fit of the axisymmetric Gaussian
    model with respect to the radial disk model to the data.
 
 The figure below shows the residual map for the fit of ``Src003`` with an
