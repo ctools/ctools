@@ -48,34 +48,33 @@ converged properly, as illustrated in the example below:
 
 .. code-block:: bash
 
-   2017-07-27T14:05:58: +=================================+
-   2017-07-27T14:05:58: | Maximum likelihood optimisation |
-   2017-07-27T14:05:58: +=================================+
-   2017-07-27T14:06:07:  >Iteration   0: -logL=291743.621, Lambda=1.0e-03
-   2017-07-27T14:06:17:  >Iteration   1: -logL=266150.955, Lambda=1.0e-03, delta=25592.666, step=1.0e+00, max(|grad|)=65223.588855 [Index:13]
-   2017-07-27T14:06:26:  >Iteration   2: -logL=260665.430, Lambda=1.0e-04, delta=5485.525, step=1.0e+00, max(|grad|)=10907.804073 [Index:3]
-   2017-07-27T14:06:36:  >Iteration   3: -logL=258904.835, Lambda=1.0e-05, delta=1760.595, step=1.0e+00, max(|grad|)=6694.957421 [Index:3]
-   2017-07-27T14:06:45:  >Iteration   4: -logL=258545.054, Lambda=1.0e-06, delta=359.781, step=1.0e+00, max(|grad|)=2242.517259 [RA:0]
-   2017-07-27T14:06:55:  >Iteration   5: -logL=258531.804, Lambda=1.0e-07, delta=13.250, step=1.0e+00, max(|grad|)=631.774929 [RA:0]
-   2017-07-27T14:07:05:  >Iteration   6: -logL=258531.685, Lambda=1.0e-08, delta=0.120, step=1.0e+00, max(|grad|)=139.793278 [RA:0]
-   2017-07-27T14:07:14:  >Iteration   7: -logL=258531.673, Lambda=1.0e-09, delta=0.012, step=1.0e+00, max(|grad|)=62.479910 [DEC:1]
-   2017-07-27T14:07:24:  >Iteration   8: -logL=258531.670, Lambda=1.0e-10, delta=0.002, step=1.0e+00, max(|grad|)=29.031154 [DEC:1]
-   2017-07-27T14:07:33:
-   2017-07-27T14:07:33: +=========================================+
-   2017-07-27T14:07:33: | Maximum likelihood optimisation results |
-   2017-07-27T14:07:33: +=========================================+
-   2017-07-27T14:07:33: === GOptimizerLM ===
-   2017-07-27T14:07:33:  Optimized function value ..: 258531.670
-   2017-07-27T14:07:33:  Absolute precision ........: 0.005
-   2017-07-27T14:07:33:  Acceptable value decrease .: 2
-   2017-07-27T14:07:33:  Optimization status .......: converged
-   2017-07-27T14:07:33:  Number of parameters ......: 16
-   2017-07-27T14:07:33:  Number of free parameters .: 10
-   2017-07-27T14:07:33:  Number of iterations ......: 8
-   2017-07-27T14:07:33:  Lambda ....................: 1e-11
-   2017-07-27T14:07:33:  Maximum log likelihood ....: -258531.670
-   2017-07-27T14:07:33:  Observed events  (Nobs) ...: 2069142.000
-   2017-07-27T14:07:33:  Predicted events (Npred) ..: 2069141.997 (Nobs - Npred = 0.00287596974521875)
+   2017-08-25T14:19:45: +=================================+
+   2017-08-25T14:19:45: | Maximum likelihood optimisation |
+   2017-08-25T14:19:45: +=================================+
+   2017-08-25T14:19:54:  >Iteration   0: -logL=291914.550, Lambda=1.0e-03
+   2017-08-25T14:20:03:  >Iteration   1: -logL=266273.754, Lambda=1.0e-03, delta=25640.797, step=1.0e+00, max(|grad|)=65025.077045 [Index:13]
+   2017-08-25T14:20:13:  >Iteration   2: -logL=260715.584, Lambda=1.0e-04, delta=5558.169, step=1.0e+00, max(|grad|)=11091.356780 [Index:3]
+   2017-08-25T14:20:23:  >Iteration   3: -logL=258904.982, Lambda=1.0e-05, delta=1810.602, step=1.0e+00, max(|grad|)=6846.470902 [Index:3]
+   2017-08-25T14:20:32:  >Iteration   4: -logL=258532.557, Lambda=1.0e-06, delta=372.425, step=1.0e+00, max(|grad|)=1815.217272 [RA:0]
+   2017-08-25T14:20:42:  >Iteration   5: -logL=258519.171, Lambda=1.0e-07, delta=13.386, step=1.0e+00, max(|grad|)=457.965339 [RA:0]
+   2017-08-25T14:20:51:  >Iteration   6: -logL=258519.093, Lambda=1.0e-08, delta=0.078, step=1.0e+00, max(|grad|)=106.109881 [RA:0]
+   2017-08-25T14:21:01:  >Iteration   7: -logL=258519.089, Lambda=1.0e-09, delta=0.004, step=1.0e+00, max(|grad|)=23.002701 [DEC:1]
+   2017-08-25T14:21:10:
+   2017-08-25T14:21:10: +=========================================+
+   2017-08-25T14:21:10: | Maximum likelihood optimisation results |
+   2017-08-25T14:21:10: +=========================================+
+   2017-08-25T14:21:10: === GOptimizerLM ===
+   2017-08-25T14:21:10:  Optimized function value ..: 258519.089
+   2017-08-25T14:21:10:  Absolute precision ........: 0.005
+   2017-08-25T14:21:10:  Acceptable value decrease .: 2
+   2017-08-25T14:21:10:  Optimization status .......: converged
+   2017-08-25T14:21:10:  Number of parameters ......: 16
+   2017-08-25T14:21:10:  Number of free parameters .: 10
+   2017-08-25T14:21:10:  Number of iterations ......: 7
+   2017-08-25T14:21:10:  Lambda ....................: 1e-10
+   2017-08-25T14:21:10:  Maximum log likelihood ....: -258519.089
+   2017-08-25T14:21:10:  Observed events  (Nobs) ...: 2069014.000
+   2017-08-25T14:21:10:  Predicted events (Npred) ..: 2069013.992 (Nobs - Npred = 0.00783161679282784)
 
 You may also convert the fitted model positions into a `ds9 <http://ds9.si.edu>`_
 region file using the :ref:`csmodelinfo` script so that you can overlay the

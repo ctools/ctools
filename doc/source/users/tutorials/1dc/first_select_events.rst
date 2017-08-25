@@ -21,7 +21,7 @@ observations. You do this with the :ref:`ctselect` tool by typing:
    $ ctselect
    Input event list or observation definition XML file [events.fits] obs.xml
    RA for ROI centre (degrees) (0-360) [83.63] UNDEFINED
-   Start time (CTA MET in seconds) [0.0] UNDEFINED
+   Start time (UTC string, JD, MJD or MET in seconds) [NONE]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
    Output event list or observation definition XML file [selected_events.fits] obs_selected.xml
@@ -53,7 +53,7 @@ displays a summary of the content of this new
    2017-07-27T10:02:26:  Unbinned observations .....: 57
    2017-07-27T10:02:26:  Binned observations .......: 0
    2017-07-27T10:02:26: === Events ===
-   2017-07-27T10:02:26:  Number of events ..........: 3084639
+   2017-07-27T10:02:26:  Number of events ..........: 3084595
    2017-07-27T10:02:26:  Number of bins ............: 0
    2017-07-27T10:02:26: === Pointings ===
    2017-07-27T10:02:26:  Mean offset angle .........: Unknown
@@ -72,7 +72,7 @@ displays a summary of the content of this new
 There are still 57 observations in the
 :ref:`observation definition file <glossary_obsdef>`
 but now the events are restricted to the energy interval 100 GeV - 100 TeV. In
-total there are 3 084 639 events within this interval in the selected observations.
+total there are 3 084 595 events within this interval in the selected observations.
 
 The content of ``obs_selected.xml`` will look similar to the content of
 ``obs.xml`` with the original event list file names replaced by the names of
