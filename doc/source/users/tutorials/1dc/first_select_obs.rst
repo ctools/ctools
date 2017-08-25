@@ -67,7 +67,7 @@ observations into the console:
 
 The output of :ref:`csobsinfo` is shown below. :ref:`csobsselect` selected
 57 observations from the Galactic Plane Survey data containing a total of
-6 046 100 events.
+6 045 130 events.
 
 .. code-block:: bash
 
@@ -78,7 +78,7 @@ The output of :ref:`csobsinfo` is shown below. :ref:`csobsselect` selected
    2017-07-27T09:58:12:  Unbinned observations .....: 57
    2017-07-27T09:58:12:  Binned observations .......: 0
    2017-07-27T09:58:12: === Events ===
-   2017-07-27T09:58:12:  Number of events ..........: 6046100
+   2017-07-27T09:58:12:  Number of events ..........: 6045130
    2017-07-27T09:58:12:  Number of bins ............: 0
    2017-07-27T09:58:12: === Pointings ===
    2017-07-27T09:58:12:  Mean offset angle .........: Unknown

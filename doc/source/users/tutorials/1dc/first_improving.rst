@@ -23,13 +23,13 @@ You do this with the :ref:`csresmap` script by providing the output
    Input PSF cube file (only needed for stacked analysis) [NONE] psfcube.fits
    Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
    Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_results_cutoff.xml
-   Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE) [SUBDIV] SUB
+   Residual map computation algorithm (SUB|SUBDIV|SUBDIVSQRT|SIGNIFICANCE) [SUBDIV] SIGNIFICANCE
    Output residual map file [resmap.fits]
 
 This produces the file ``resmap.fits`` that contains a residual map that
 you can display for example with `ds9 <http://ds9.si.edu>`_.
 The figure below shows the map, with the fitted source positions overlayed
-as white circles.
+as green circles.
 
 .. figure:: first_skymap_residual.png
    :width: 400px
@@ -90,11 +90,9 @@ as illustrated below:
 
 Repeating the fit with this model and producing a corresponding residual map
 produces the map shown below. Now, the residuals near the two point sources
-are flatter and the diffuse emission has largely disappeared. The diffuse
-emission is in fact a bit oversubtracted, which is probably due to the
-additional source components visible in the residual map. It is left as an
-exercise to the User to include model components for these additional
-sources in the
+are flat and the diffuse emission has disappeared. Some additional sources now
+become clearly visible. It is left as an exercise to the User to include model
+components for these additional sources in the
 :ref:`model definition file <glossary_moddef>`
 in order to reduce the fit residuals.
 An example for such an exercise is shown

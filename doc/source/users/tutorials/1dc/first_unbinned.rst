@@ -47,35 +47,35 @@ converged properly, as illustrated in the example below:
 
 .. code-block:: bash
 
-   2017-07-27T16:28:26: +=================================+
-   2017-07-27T16:28:26: | Maximum likelihood optimisation |
-   2017-07-27T16:28:26: +=================================+
-   2017-07-27T16:28:54:  >Iteration   0: -logL=20949416.217, Lambda=1.0e-03
-   2017-07-27T16:29:21:  >Iteration   1: -logL=20918674.227, Lambda=1.0e-03, delta=30741.990, step=1.0e+00, max(|grad|)=74249.049334 [Index:14]
-   2017-07-27T16:29:49:  >Iteration   2: -logL=20913114.563, Lambda=1.0e-04, delta=5559.664, step=1.0e+00, max(|grad|)=6728.499004 [RA:0]
-   2017-07-27T16:30:16:  >Iteration   3: -logL=20910994.152, Lambda=1.0e-05, delta=2120.411, step=1.0e+00, max(|grad|)=4949.846735 [RA:0]
-   2017-07-27T16:30:44:  >Iteration   4: -logL=20910115.048, Lambda=1.0e-06, delta=879.104, step=1.0e+00, max(|grad|)=2889.871293 [RA:0]
-   2017-07-27T16:31:12:  >Iteration   5: -logL=20909966.036, Lambda=1.0e-07, delta=149.012, step=1.0e+00, max(|grad|)=1190.543059 [RA:0]
-   2017-07-27T16:31:39:  >Iteration   6: -logL=20909948.012, Lambda=1.0e-08, delta=18.024, step=1.0e+00, max(|grad|)=550.745751 [DEC:1]
-   2017-07-27T16:32:06:  >Iteration   7: -logL=20909946.600, Lambda=1.0e-09, delta=1.412, step=1.0e+00, max(|grad|)=208.667347 [DEC:1]
-   2017-07-27T16:32:33:  >Iteration   8: -logL=20909946.575, Lambda=1.0e-10, delta=0.025, step=1.0e+00, max(|grad|)=51.069713 [DEC:1]
-   2017-07-27T16:33:00:  >Iteration   9: -logL=20909946.573, Lambda=1.0e-11, delta=0.002, step=1.0e+00, max(|grad|)=16.914402 [DEC:1]
-   2017-07-27T16:33:26:
-   2017-07-27T16:33:26: +=========================================+
-   2017-07-27T16:33:26: | Maximum likelihood optimisation results |
-   2017-07-27T16:33:26: +=========================================+
-   2017-07-27T16:33:26: === GOptimizerLM ===
-   2017-07-27T16:33:26:  Optimized function value ..: 20909946.573
-   2017-07-27T16:33:26:  Absolute precision ........: 0.005
-   2017-07-27T16:33:26:  Acceptable value decrease .: 2
-   2017-07-27T16:33:26:  Optimization status .......: converged
-   2017-07-27T16:33:26:  Number of parameters ......: 17
-   2017-07-27T16:33:26:  Number of free parameters .: 11
-   2017-07-27T16:33:26:  Number of iterations ......: 9
-   2017-07-27T16:33:26:  Lambda ....................: 1e-12
-   2017-07-27T16:33:26:  Maximum log likelihood ....: -20909946.573
-   2017-07-27T16:33:26:  Observed events  (Nobs) ...: 3084639.000
-   2017-07-27T16:33:26:  Predicted events (Npred) ..: 3084635.972 (Nobs - Npred = 3.0282306545414)
+   2017-08-25T15:09:18: +=================================+
+   2017-08-25T15:09:18: | Maximum likelihood optimisation |
+   2017-08-25T15:09:18: +=================================+
+   2017-08-25T15:09:48:  >Iteration   0: -logL=20951221.333, Lambda=1.0e-03
+   2017-08-25T15:10:14:  >Iteration   1: -logL=20920374.352, Lambda=1.0e-03, delta=30846.981, step=1.0e+00, max(|grad|)=74106.669528 [Index:14]
+   2017-08-25T15:10:41:  >Iteration   2: -logL=20914723.637, Lambda=1.0e-04, delta=5650.715, step=1.0e+00, max(|grad|)=6059.304173 [Index:14]
+   2017-08-25T15:11:07:  >Iteration   3: -logL=20912552.166, Lambda=1.0e-05, delta=2171.471, step=1.0e+00, max(|grad|)=4361.007623 [RA:0]
+   2017-08-25T15:11:33:  >Iteration   4: -logL=20911666.571, Lambda=1.0e-06, delta=885.595, step=1.0e+00, max(|grad|)=2602.512475 [RA:0]
+   2017-08-25T15:11:59:  >Iteration   5: -logL=20911523.902, Lambda=1.0e-07, delta=142.669, step=1.0e+00, max(|grad|)=1076.703629 [RA:0]
+   2017-08-25T15:12:26:  >Iteration   6: -logL=20911508.855, Lambda=1.0e-08, delta=15.047, step=1.0e+00, max(|grad|)=333.013402 [RA:0]
+   2017-08-25T15:12:52:  >Iteration   7: -logL=20911507.544, Lambda=1.0e-09, delta=1.311, step=1.0e+00, max(|grad|)=93.512904 [RA:0]
+   2017-08-25T15:13:18:  >Iteration   8: -logL=20911507.529, Lambda=1.0e-10, delta=0.015, step=1.0e+00, max(|grad|)=24.977311 [RA:0]
+   2017-08-25T15:13:45:  >Iteration   9: -logL=20911507.529, Lambda=1.0e-11, delta=0.000, step=1.0e+00, max(|grad|)=6.442211 [RA:0]
+   2017-08-25T15:14:12:
+   2017-08-25T15:14:12: +=========================================+
+   2017-08-25T15:14:12: | Maximum likelihood optimisation results |
+   2017-08-25T15:14:12: +=========================================+
+   2017-08-25T15:14:12: === GOptimizerLM ===
+   2017-08-25T15:14:12:  Optimized function value ..: 20911507.529
+   2017-08-25T15:14:12:  Absolute precision ........: 0.005
+   2017-08-25T15:14:12:  Acceptable value decrease .: 2
+   2017-08-25T15:14:12:  Optimization status .......: converged
+   2017-08-25T15:14:12:  Number of parameters ......: 17
+   2017-08-25T15:14:12:  Number of free parameters .: 11
+   2017-08-25T15:14:12:  Number of iterations ......: 9
+   2017-08-25T15:14:12:  Lambda ....................: 1e-12
+   2017-08-25T15:14:12:  Maximum log likelihood ....: -20911507.529
+   2017-08-25T15:14:12:  Observed events  (Nobs) ...: 3084595.000
+   2017-08-25T15:14:12:  Predicted events (Npred) ..: 3084591.999 (Nobs - Npred = 3.00117048900574)
 
 Also the :ref:`ctbutterfly` tool and the :ref:`csspec` and :ref:`csresmap`
 scripts can be run into unbinned mode by providing the
