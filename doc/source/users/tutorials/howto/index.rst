@@ -22,3 +22,5 @@ These examples can be easily adapted to any data you have at your disposal.
    howto_phasecurve
    howto_exclude
    howto_vo
+   How to analyse Fermi-LAT data with ctools? <fermi/index>
+   How to analyse H.E.S.S. data with ctools? <iact/index>

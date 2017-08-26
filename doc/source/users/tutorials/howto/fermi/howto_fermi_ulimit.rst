@@ -1,0 +1,61 @@
+.. _howto_fermi_ulimit:
+
+Derive upper flux limits for a source
+-------------------------------------
+
+  .. admonition:: What you will learn
+
+     You will learn how to use :ref:`ctulimit` to determine upper flux limits
+     from Fermi-LAT data using a likelihood profile method.
+
+Suppose there is another potential source in the field of view but you cannot
+see this source in a counts map, hence you want to derive an upper flux limit
+for the source. To do this you first have to add an additional source to the
+:ref:`model definition file <glossary_moddef>`. An example for a source at
+:math:`\alpha=122^\circ` and :math:`\delta=-42^\circ` is shown below:
+
+.. code-block:: xml
+
+   <?xml version="1.0" standalone="no"?>
+   <source_library title="source library">
+     <source type="PointSource" name="Test">
+       <spectrum type="PowerLaw">
+         <parameter name="PhotonFlux" scale="1e-12" value="1.0"      min="1e-07" max="1000.0"       free="1"/>
+         <parameter name="Index"      scale="1.0"   value="-2.0"     min="-5.0"  max="+5.0"      free="0"/>
+         <parameter name="LowerLimit" scale="1.0"   value="100.0"    min="10.0"  max="1000000.0" free="0"/>
+         <parameter name="UpperLimit" scale="1.0"   value="100000.0" min="10.0"  max="1000000.0" free="0"/>
+       </spectrum>
+       <spatialModel type="PointSource">
+         <parameter name="RA"  scale="1.0" value="122.00" min="-360" max="360" free="0"/>
+         <parameter name="DEC" scale="1.0" value="-42.00" min="-90"  max="90"  free="0"/>
+       </spatialModel>
+     </source>
+     <source type="PointSource" name="Vela">
+     ...
+   </source_library>
+
+Now you can run the :ref:`ctulimit` tool. Since the tool is normally tuned
+for Cherenkov Telescope data analysis, energies are by default given in TeV.
+To specify a reference energy of the differential flux limit of 1 GeV you
+need to provide the hidden parameter ``eref=0.001``. You can also set the
+flux interval for the intergal flux computation to 100 MeV - 100 GeV by
+specifying ``emin=0.0001 emax=0.1`` (all values are given in TeV):
+
+.. code-block:: bash
+
+   $ ctulimit eref=0.001 emin=0.0001 emax=0.1
+   Input event list, counts cube or observation definition XML file [obs.xml]
+   Source of interest [Test]
+   Input model definition XML file [model_lat_ulimit.xml]
+
+The results of the upper limit computation can then be extracted from the
+``ctulimit.log`` file that is created by :ref:`ctulimit`:
+
+.. code-block:: bash
+
+   2017-08-26T14:37:48: +=====================+
+   2017-08-26T14:37:48: | Upper limit results |
+   2017-08-26T14:37:48: +=====================+
+   2017-08-26T14:37:48:  Differential flux limit ...: 1.00100099727198e-13 ph/cm2/s/MeV at 0.001 TeV
+   2017-08-26T14:37:48:  Integral flux limit .......: 9.9999999627471e-10 ph/cm2/s within [0.0001-0.1] TeV
+   2017-08-26T14:37:48:  Energy flux limit .........: 1.10785216561628e-12 erg/cm2/s within [0.0001-0.1] TeV
