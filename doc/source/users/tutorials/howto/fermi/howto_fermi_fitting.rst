@@ -254,3 +254,9 @@ using the Fermi-LAT Science Tools.
         2017-08-26T13:05:12:  Test Statistic ............: 326326.556902542
 
      which is also close to the value determined by gtlike.
+
+  .. warning::
+
+     ctools supports for the moment only the fitting of point sources for
+     Fermi-LAT data. Other spatial shapes need to be preconvolved with the
+     instrument response functions and added to the ``srcmaps.fits`` file.

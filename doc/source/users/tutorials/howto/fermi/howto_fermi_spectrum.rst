@@ -60,7 +60,7 @@ will result in a spectrum. To do this type now:
 
 .. code-block:: bash
 
-   $ ctlike debug=yes
+   $ ctlike
    Input event list, counts cube or observation definition XML file [obs.xml]
    Input model definition XML file [models.xml] model_nodes.xml
    Output model definition XML file [vela_results.xml] vela_nodes_results.xml
