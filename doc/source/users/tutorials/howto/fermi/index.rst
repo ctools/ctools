@@ -8,7 +8,7 @@ Analysing Fermi-LAT data
      You will learn how to analyse data from the LAT telescope about NASA's
      `Fermi <https://fermi.gsfc.nasa.gov/ssc/>`_ satellite with ctools.
 
-You can use ctools to analyse data from the LAT telescope about NASA's
+You can use ctools to analyse data from the LAT telescope aboard NASA's
 `Fermi <https://fermi.gsfc.nasa.gov/ssc/>`_ satellite.
 To do this you need to be familar with the Fermi-LAT Science Tools that you
 will use to prepare the Fermi-LAT data for the analysis. You can download the

@@ -22,5 +22,10 @@ These examples can be easily adapted to any data you have at your disposal.
    howto_phasecurve
    howto_exclude
    howto_vo
+
+.. toctree::
+   :maxdepth: 1
+
    How to analyse Fermi-LAT data with ctools? <fermi/index>
+   How to analyse COMPTEL data with ctools? <comptel/index>
    How to analyse H.E.S.S. data with ctools? <iact/index>
