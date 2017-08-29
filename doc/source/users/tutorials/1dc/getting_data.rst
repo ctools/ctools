@@ -44,6 +44,10 @@ line by typing:
      on the command line of your terminal.
 
   .. note::
+     You may need to add the ``--no-check-certificate`` option to download the
+     files using ``wget``.
+
+  .. note::
      In case you encounter the following error message
 
 
