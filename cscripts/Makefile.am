@@ -28,6 +28,7 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csmodelinfo.py \
                 $(srcdir)/csmodelmerge.py \
                 $(srcdir)/csmodelselect.py \
+                $(srcdir)/csmodelsois.py \
                 $(srcdir)/csobs2caldb.py \
                 $(srcdir)/csobsdef.py \
                 $(srcdir)/csobsinfo.py \
@@ -60,6 +61,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csmodelinfo.par \
            $(srcdir)/csmodelmerge.par \
            $(srcdir)/csmodelselect.par \
+           $(srcdir)/csmodelsois.par \
            $(srcdir)/csobs2caldb.par \
            $(srcdir)/csobsdef.par \
            $(srcdir)/csobsinfo.par \
@@ -89,6 +91,7 @@ linkscripts = cscaldb \
               csmodelinfo \
               csmodelmerge \
               csmodelselect \
+              csmodelsois \
               csobs2caldb \
               csobsdef \
               csobsinfo \
@@ -123,6 +126,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csmodelinfo.py \
               $(top_srcdir)/test/test_csmodelmerge.py \
               $(top_srcdir)/test/test_csmodelselect.py \
+              $(top_srcdir)/test/test_csmodelsois.py \
               $(top_srcdir)/test/test_csobs2caldb.py \
               $(top_srcdir)/test/test_csobsdef.py \
               $(top_srcdir)/test/test_csobsinfo.py \

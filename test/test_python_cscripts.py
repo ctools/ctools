@@ -32,6 +32,7 @@ import test_cslightcrv
 import test_csmodelinfo
 import test_csmodelmerge
 import test_csmodelselect
+import test_csmodelsois
 import test_csobs2caldb
 import test_csobsdef
 import test_csobsinfo
@@ -121,6 +122,7 @@ def test(installed=False, debug=False):
              test_csmodelinfo.Test(),
              test_csmodelmerge.Test(),
              test_csmodelselect.Test(),
+             test_csmodelsois.Test(),
              test_csobs2caldb.Test(),
              test_csobsdef.Test(),
              test_csobsinfo.Test(),
