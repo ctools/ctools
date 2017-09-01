@@ -819,8 +819,7 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     int    num_outside_roi  = 0;
 
     // Extract copy of models from observation container
-    GModels models(m_obs.models());
-    trim_models(models, roi);
+    GModels models = trim_models(m_obs.models(), roi);
     
     // Get pointer to event cube pixels
     double* pixels = const_cast<double*>(m_cube.counts().pixels());
@@ -909,46 +908,53 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
 
 
 /***********************************************************************//**
- * @brief Remove the models falling outside a defined region of interest
+ * @brief Find the models falling inside a defined region of interest.
  *
- * @param[out] models           Model container to be trimmed
+ * @param[out] all_models       Model container to be trimmed
  * @param[in]  roi              Observation region of interest
+ * @return New model container contianing only models inside roi
+ *
+ * Note that a buffer is added to the observation region to ensure that
+ * point sources (which have radius=0) are appropriately included if they
+ * fall near the edge of the observation.
  ***************************************************************************/
-void ctmodel::trim_models(GModels& models, const GCTARoi& roi)
+GModels ctmodel::trim_models(const GModels& all_models, const GCTARoi& roi)
 {
     // Do nothing if roi is not valid. This will be the case for binned data
     // sets as they have the default roi radius of 0. In this case we would
     // remove ALL models, which is obviously incorrect. So we keep all models
     // when filling based on a counts cube.
     if (!roi.is_valid()) {
-        return;
+        return all_models;
     }
     
     // Remove all models that dont overlap with the region of interest. Note
-    // that an extra factor of 0.5 is used since point sources have regions
-    // of radius 0, which is a problem when they fall just barely outside the
+    // that an extra factor is used since point sources have regions of
+    // radius 0, which is a problem when they fall just barely outside the
     // ROI. This ensures point sources are appropriately included.
     GSkyRegionCircle obsreg(
         roi.centre().dir().ra_deg(),
         roi.centre().dir().dec_deg(),
-        roi.radius()+0.5);
+        roi.radius()+0.5);                  // Note the buffer
+
+    // Create the model object to be returned
+    GModels contained_models;
     
     // Loop over the models in the passed container
-    for (int mod=0; mod<models.size(); mod++) {
-        GModelSky* model = dynamic_cast<GModelSky*>(models.at(mod));
+    for (int mod=0; mod<all_models.size(); mod++) {
+        // Cast the model to a GModelSky object
+        GModelSky* model = dynamic_cast<GModelSky*>(all_models.at(mod)->clone());
         
         if (model == NULL) {
             // Model is most likely a background model and should be kept
-            continue;
-        } else if (!model->spatial()->region()->overlaps(obsreg)) {
-            // Model represents a source, does not overlap the observation
-            // and should be removed.
-            models.remove(mod);
+            contained_models.append(*all_models.at(mod)->clone());
             
-            // Decrement the index variable to prevent skipping the next model
-            mod--;
+        } else if (model->spatial()->region()->overlaps(obsreg)) {
+            // Model represents a source, that overlaps the observation
+            // and should be kept.
+            contained_models.append(*all_models.at(mod)->clone());
         }
     }
     
-    return;
+    return contained_models;
 }

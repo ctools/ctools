@@ -82,7 +82,7 @@ protected:
     void extract_cube_properties(void);
     void fill_cube(const GCTAObservation* obs);
     bool has_cube(void) const;
-    void trim_models(GModels& models, const GCTARoi& roi);
+    GModels trim_models(const GModels& models, const GCTARoi& roi);
     
     // User parameters
     GFilename m_outcube;      //!< Output model cube
