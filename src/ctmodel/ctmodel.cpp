@@ -952,8 +952,12 @@ GModels ctmodel::trim_models(const GModels& all_models, const GCTARoi& roi)
         } else if (model->spatial()->region()->overlaps(obsreg)) {
             // Model represents a source, that overlaps the observation
             // and should be kept.
-            contained_models.append(*all_models.at(mod)->clone());
+            contained_models.append(*model);
+            
+            // Delete model since it isnt needed anymore
+            delete model;
         }
+        
     }
     
     return contained_models;
