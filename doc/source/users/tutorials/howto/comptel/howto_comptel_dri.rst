@@ -84,12 +84,6 @@ in your terminal and type the following:
     # Create sky map for the definition of the DRX exposure map
     expo = gammalib.GSkyMap('CAR', 'GAL', 0.0, 0.0, 1.0, 1.0, 360, 180)
 
-    # Load observation definition XML file 'obs.xml' (the file you created above)
-    obsdef = gammalib.GObservations('obs.xml')
-
-    # Extract COMPTEL observation from that file (it's the first and unique observation)
-    obs = obsdef[0]
-
     # Allocate DRE, DRG and DRX. DRE and DRG have a 3rd Phibar dimension, starting at 0.0 deg,
     # with a binsize of 2.0 deg, and 25 Phibar layers.
     dre = gammalib.GCOMDri(cube, 0.0, 2.0, 25)
@@ -100,10 +94,13 @@ in your terminal and type the following:
     dre.ebounds(gammalib.GEbounds(gammalib.GEnergy(1.7, 'MeV'),
                                   gammalib.GEnergy(1.9, 'MeV')))
 
-    # Compute DRE, DRG and DRX (here is where the real magic happens)
-    dre.compute_dre(obs.events(), obs.oads(), obs.tim())
-    drg.compute_drg(obs.oads(), obs.tim())
-    drx.compute_drx(obs.oads(), obs.tim())
+    # Load observation definition XML file 'obs.xml' (the file you created above)
+    obsdef = gammalib.GObservations('obs.xml')
+
+    # Compute DRE, DRG and DRX for the first observation in the XML file
+    dre.compute_dre(obsdef[0])
+    drg.compute_drg(obsdef[0])
+    drx.compute_drx(obsdef[0])
 
     # Save DRE, DRG and DRX ('True' indicates to overwrite any existing file)
     dre.save('dre.fits', True)
