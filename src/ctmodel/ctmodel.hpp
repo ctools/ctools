@@ -80,9 +80,9 @@ protected:
     void get_parameters(void);
     void get_obs(void);
     void extract_cube_properties(void);
-    void fill_cube(const GCTAObservation* obs);
+    void fill_cube(const GCTAObservation* obs, GModels& models);
     bool has_cube(void) const;
-    GModels trim_models(const GModels& all_models, const GCTARoi& roi);
+    GModels trim_models(GModels& all_models, const GCTARoi& roi);
     
     // User parameters
     GFilename m_outcube;      //!< Output model cube
