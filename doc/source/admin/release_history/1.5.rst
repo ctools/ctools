@@ -22,7 +22,8 @@ Bug fixes
 Improvements
 ------------
 
-* TBW
+* [`2194 <https://cta-redmine.irap.omp.eu/issues/2194>`_] -
+  Add keywords to sky maps produced by :ref:`ctskymap`
 
 
 New features

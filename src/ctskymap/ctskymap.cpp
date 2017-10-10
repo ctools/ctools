@@ -283,23 +283,35 @@ void ctskymap::save(void)
         GFits fits;
 
         // Write sky map into FITS file
-        m_skymap.write(fits);
+        GFitsHDU* hdu = m_skymap.write(fits);
+
+        // Write keywords into sky map extension
+        write_ogip_keywords(hdu);
+        write_hdu_keywords(hdu);
 
         // If background subtraction is requested then write background map
         // and significance map to FITS file
         if (m_bkgsubtract != "NONE") {
         
             // Write background map into FITS file
-            m_bkgmap.write(fits);
+            hdu = m_bkgmap.write(fits);
 
             // Set background map extension name
-            fits[fits.size()-1]->extname("BACKGROUND");
+            hdu->extname("BACKGROUND");
+
+            // Write keywords into background extension
+            write_ogip_keywords(hdu);
+            write_hdu_keywords(hdu);
 
             // Write significance map into FITS file
-            m_sigmap.write(fits);
+            hdu = m_sigmap.write(fits);
 
             // Set significance map extension name
-            fits[fits.size()-1]->extname("SIGNIFICANCE");
+            hdu->extname("SIGNIFICANCE");
+
+            // Write keywords into significance extension
+            write_ogip_keywords(hdu);
+            write_hdu_keywords(hdu);
 
         } // endif: background subtraction was requested
 
@@ -666,6 +678,31 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
     // Log background subtraction results
     log_value(NORMAL, "Events in background", int(total+0.5));
     log_value(NORMAL, "Background evaluations", calls);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Write keywords in FITS HDU
+ *
+ * @param[in,out] hdu Pointer to FITS HDU.
+ *
+ * Writes keywords in FITS HDU.
+ ***************************************************************************/
+void ctskymap::write_hdu_keywords(GFitsHDU* hdu) const
+{
+    // Continue only if pointer is valid
+    if (hdu != NULL) {
+
+        // Set keywords
+        hdu->card("BKGSUB", m_bkgsubtract, "Background substraction method");
+        hdu->card("E_MIN",  m_emin, "[TeV] Lower energy boundary");
+        hdu->card("E_MAX",  m_emax, "[TeV] Upper energy boundary");
+        hdu->card("EUNIT",  "TeV",  "Units for E_MIN and E_MAX");
+
+    } // endif: pointer was valid
 
     // Return
     return;

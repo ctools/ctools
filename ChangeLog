@@ -1,9 +1,10 @@
-2017-08-08
+2017-10-10
 
         * Version 1.5.0 released
         ========================
 
         Use t-type parameters for all "tmin" and "tmax" parameters (#1864)
+        Add keywords to sky maps produced by ctskymap (#2194)
 
 
 2017-07-28
