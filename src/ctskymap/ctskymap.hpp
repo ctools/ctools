@@ -71,6 +71,7 @@ protected:
     void map_events(GCTAObservation* obs);
     void map_background(GCTAObservation* obs);
     void map_background_irf(GCTAObservation* obs);
+    void map_background_ring(GCTAObservation* obs);
 
     // Background integration kernel
     class irf_kern : public GFunction {
@@ -92,11 +93,15 @@ protected:
     std::string   m_bkgsubtract; //!< Background subtraction method
     bool          m_publish;     //!< Publish sky map?
     GChatter      m_chatter;     //!< Chattiness
-
+    double        m_roiradius;   //!< Region of interest radius
+    double        m_inradius;    //!< Inner ring radius
+    double        m_outradius;   //!< Outer ring radius
+    
     // Protected members
     GSkyMap       m_skymap;     //!< Sky map
     GSkyMap       m_bkgmap;     //!< Background map
     GSkyMap       m_sigmap;     //!< Significance map
+    GSkyMap       m_alphamap;   //!< Alpha map (if doing "RING" bkg subtraction)
 };
 
 

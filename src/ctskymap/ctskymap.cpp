@@ -32,9 +32,10 @@
 #include "ctskymap.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
-#define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
-#define G_BKG_SUBTRACT_IRF     "ctskymap::bkg_subtract_irf(GCTAObservation*)"
+#define G_INIT_MAP                  "ctskymap::init_map(GCTAObservation* obs)"
+#define G_BIN_EVENTS                  "ctskymap::map_events(GCTAObservation*)"
+#define G_BKG_SUBTRACT_IRF    "ctskymap::map_background_irf(GCTAObservation*)"
+#define G_BKG_SUBTRACT_RING  "ctskymap::map_background_ring(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -441,6 +442,9 @@ void ctskymap::get_parameters(void)
     // Read ahead parameters
     if (read_ahead()) {
         m_outmap  = (*this)["outmap"].filename();
+        m_roiradius = (this)["roiradius"].real();
+        m_inradius = (this)["m_inradius"].real();
+        m_outradius = (this)["m_outradius"].real();
     }
 
     // Create background map and significance map if background subtraction
@@ -448,6 +452,11 @@ void ctskymap::get_parameters(void)
     if (m_bkgsubtract != "NONE") {
         m_bkgmap = create_map(m_obs);
         m_sigmap = create_map(m_obs);
+
+        // If doing a ring background subtraction, generate an alpha map
+        if (m_bkgsubtract == "RING") {
+            m_alphamap = create_map(m_obs);
+        }
     }
 
     // Write parameters into logger
@@ -566,6 +575,8 @@ void ctskymap::map_background(GCTAObservation* obs)
     // Dispatch to appropriate background estimation method
     if (m_bkgsubtract == "IRF") {
         map_background_irf(obs);
+    } else if (m_bkgsubtract == "RING") {
+        map_background_ring(obs);
     }
 
     // Return
@@ -670,6 +681,23 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
     // Return
     return;
 }
+
+
+/***********************************************************************//**
+ * @brief Estimates the background in sky map based on the ring background method
+ *
+ * @param[in] obs CTA observation.
+ *
+ * @exception GException::invalid_value
+ *            No response information available for observation.
+ *            No background template available in instrument response function.
+ *
+ * Estimates the background in the sky map by summing the events within a ring
+ * centered at a given pixel's position. The pixels in the ring are weighted
+ * also by the background IRF value
+ ***************************************************************************/
+void ctskymap::map_background_ring(GCTAObservation* obs)
+{}
 
 
 /***********************************************************************//**
