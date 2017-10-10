@@ -16,16 +16,21 @@
 #
 # Input and output parameters
 #============================
-inobs,  f, a, obs.xml,,, "Input event list or observation definition XML file"
+inobs,      f, a, obs.xml,,, "Input event list or observation definition XML file"
 exclusion,  f,  h, NONE,,, "FITS WCS map of exclusion regions"
-outroot, f, a, spectrum.pha,,, "Root of the name for output PHA and XML files"
-outreg, f, h, NONE,,, "Output ds9 reg file showing source/background regions"
+outroot,    f, a, spectrum,,, "Root of the name for output PHA and XML files"
+outreg,     f, h, NONE,,, "Output ds9 reg file showing source/background regions"
 
 #
 # Script parameters
 #==================
+emin,      r, a, 0.1,,, "Lower energy limit (TeV)"
+emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
+enumbins,  i, a, 120,,, "Number of energy bins"
+ebinalg,   s, a, LOG,LIN|LOG|FILE,, "Binning algorithm"
+ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
 bkgmethod, s, a, REFLECTED,REFLECTED,, "Method for background estimation"
-srcshape, s, a, CIRCLE,CIRCLE,, "Shape of the source region"
+srcshape,  s, a, CIRCLE,CIRCLE,, "Shape of the source region"
 coordsys,  s, a, CEL,CEL|GAL,, "Coordinate system (CEL - celestial, GAL - galactic)"
 ra,        r, a, 83.63,0,360, "Right Ascension of source region centre (deg)"
 dec,       r, a, 22.01,-90,90, "Declination of source region centre (deg)"
@@ -33,7 +38,7 @@ glon,      r, a, 184.56,0,360, "Galactic longitude of source region centre (deg)
 glat,      r, a, -5.79,-90,90, "Galactic latitude of source region centre (deg)"
 rad,       r, a, 0.2,0,180, "Radius of source region circle (deg)"
 bkgregmin, i, h, 2,1,, "Minimum number of background region for REFLECTED method"
-stacking, b, a, yes,,, "Stack all runs into single pha or produce run-by-run files"
+stack,     b, a, yes,,, "Stack all runs into single pha (if no produce run-by-run files)"
 
 #
 # Standard parameters
