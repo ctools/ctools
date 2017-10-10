@@ -63,6 +63,7 @@ public:
 
     // Methods
     const GObservations& obs(void) const;
+    void                 write_ogip_keywords(GFitsHDU* hdu) const;
 
 #ifndef SWIG
 protected:
@@ -82,11 +83,18 @@ protected:
     void save_events_xml(void);
 
     // Protected members
-    GObservations m_obs;            //!< Observation container
+    GObservations m_obs;             //!< Observation container
 
 private:
     // Private members
-    mutable int m_index_unbinned;   //!< Current index of unbinned observation
+    mutable std::string m_ogip_telescope; //!< Name of telescope
+    mutable GTime       m_ogip_tstart;    //!< Start time for OGIP keywords
+    mutable GTime       m_ogip_tstop;     //!< Stop time for OGIP keywords
+    mutable double      m_ogip_telapse;   //!< Elapsed time
+    mutable double      m_ogip_exposure;  //!< Exposure time
+    mutable double      m_ogip_ontime;    //!< Ontime for OGIP keywords
+    mutable double      m_ogip_livetime;  //!< Livetime for OGIP keywords
+    mutable int         m_index_unbinned; //!< Current index of unbinned observation
 };
 
 

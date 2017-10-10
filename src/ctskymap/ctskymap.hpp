@@ -71,6 +71,7 @@ protected:
     void map_events(GCTAObservation* obs);
     void map_background(GCTAObservation* obs);
     void map_background_irf(GCTAObservation* obs);
+    void write_hdu_keywords(GFitsHDU* hdu) const;
 
     // Background integration kernel
     class irf_kern : public GFunction {

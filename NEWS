@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-8 August 2017
+10 October 2017
 
 
 Introduction
@@ -53,7 +53,9 @@ None
 
 ctskymap - CTA sky mapping
 --------------------------
-None
+Header keywords informing about the dates and times covered by the observations
+used to generate the skymap, as well as the event energy range, are now appended
+as header keywords to the FITS file (#2194).
 
 
 ctmodel - CTA counts cube modelling
