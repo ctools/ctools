@@ -21,6 +21,24 @@
 # ==========================================================================
 import gammalib
 import ctools
+import math
+
+
+def atan2(y, x):
+    """
+    helper function to solve triangulation problem
+    """
+    if x > 0:
+        val = math.atan(y / x)
+    elif x < 0 and y >= 0:
+        val = math.atan(y / x) + math.pi
+    elif x < 0 and y < 0:
+        val = math.atan(y / x) - math.pi
+    elif x == 0 and y > 0:
+        val = math.pi / 2
+    elif x == 0 and y < 0:
+        val = math.pi / 2
+    return val
 
 
 # =============== #
@@ -37,7 +55,7 @@ class csphagen(ctools.cscript):
         Constructor
         """
         # Set name, version
-        self._name = 'csfindobs'
+        self._name = 'csphagen'
         self._version = ctools.__version__
 
         # Initialise observation container from constructor arguments
@@ -90,11 +108,16 @@ class csphagen(ctools.cscript):
                 gammalib.GSkyRegionCircle(self._src_dir, self._rad))
 
         # Stacking
-        self._stack = self['stack'].bool()
+        self._stack = self['stack'].boolean()
 
         # Query ahead output parameters
         if (self._read_ahead()):
             self['outroot'].string()
+
+        # If there are no observations in container then get them from the
+        # parameter file
+        if self._obs.size() == 0:
+            self._obs = self._get_observations(False)
 
         # Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -111,6 +134,32 @@ class csphagen(ctools.cscript):
         pnt_dir = obs.pointing().dir()
         offset = pnt_dir.dist_deg(self._src_dir)
         outregions = []
+
+        if self._srcshape == "CIRCLE":
+            # angular separation of reflected regions wrt camera center
+            # and number
+            alpha = 2 * math.asin(2 * self._rad / offset)
+            N = int(2 * math.pi) / alpha
+            alpha = 2 * math.pi / N
+            # loop to create reflected regions
+            for s in range(2, N - 1):
+                phi = s * alpha
+                # region center
+                xii = offset(1 - 2 * math.sin(phi / 2))
+                yii = 2 * offset * math.sqrt(1 - math.sin(phi / 2) ** 2)
+                if phi > math.pi / 2:
+                    yii *= 1
+                theta = atan2(pnt_dir.dec_deg() - self._src_dir.dec_deg(),
+                              pnt_dir.ra_deg() - self._src_dir.ra_deg())
+                xi = xii * math.cos(theta) - yii * math.sin(theta)
+                yi = xii * math.sin(theta) + yii * math.cos(theta)
+                x = xi + pnt_dir.ra_deg()
+                y = yi + pnt_dir.dec_deg()
+                ctr_dir = gammalib.GSkyDir()
+                ctr_dir.radec_deg(x, y)
+                # region creation
+                region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
+                outregions.append(region)
 
         return outregions
 
@@ -140,7 +189,7 @@ class csphagen(ctools.cscript):
         for obs in self._obs:
             bkg_reg = gammalib.GSkyRegions()
             if self._bkgmethod == "REFLECTED":
-                regions = self.reflected_regions(obs)
+                regions = self._reflected_regions(obs)
             for region in regions:
                 bkg_reg.append(region)
             onoff = gammalib.GCTAOnOffObservation(obs, etrue, ereco,
