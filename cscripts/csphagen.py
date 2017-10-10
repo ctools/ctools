@@ -133,30 +133,44 @@ class csphagen(ctools.cscript):
         """
         pnt_dir = obs.pointing().dir()
         offset = pnt_dir.dist_deg(self._src_dir)
+        print("source", self._src_dir)
+        print("pointing", pnt_dir)
+        print("offset", offset)
         outregions = []
 
         if self._srcshape == "CIRCLE":
             # angular separation of reflected regions wrt camera center
             # and number
-            alpha = 2 * math.asin(2 * self._rad / offset)
-            N = int(2 * math.pi) / alpha
+            alpha = 2 * math.asin(self._rad / offset)
+            N = int(2 * math.pi / alpha)
             alpha = 2 * math.pi / N
+            # rotation angle of reference frame to generate regions
+            print("x,y", self._src_dir.ra_deg() - pnt_dir.ra_deg(),
+                  self._src_dir.dec_deg() - pnt_dir.dec_deg())
+            theta = atan2(self._src_dir.dec_deg() - pnt_dir.dec_deg(),
+                          self._src_dir.ra_deg() - pnt_dir.ra_deg())
+            # theta = 2 * math.asin(math.sqrt(
+            #     math.sin(self._src_dir.dec() - pnt_dir.dec()) ** 2 + math.cos(
+            #         self._src_dir.dec()) * math.cos(pnt_dir.dec()) * math.sin(
+            #         self._src_dir.ra() - pnt_dir.ra()) ** 2))
+            print("theta", theta)
             # loop to create reflected regions
-            for s in range(2, N - 1):
+            for s in range(0, N - 1):
+                print("=====")
                 phi = s * alpha
-                # region center
-                xii = offset(1 - 2 * math.sin(phi / 2))
-                yii = 2 * offset * math.sqrt(1 - math.sin(phi / 2) ** 2)
-                if phi > math.pi / 2:
-                    yii *= 1
-                theta = atan2(pnt_dir.dec_deg() - self._src_dir.dec_deg(),
-                              pnt_dir.ra_deg() - self._src_dir.ra_deg())
+                # print("phi",phi)
+                xii = offset * math.cos(phi)
+                yii = offset * math.sin(phi)
+                print(s, xii, yii)
                 xi = xii * math.cos(theta) - yii * math.sin(theta)
                 yi = xii * math.sin(theta) + yii * math.cos(theta)
+                print("rot", s, xi, yi)
                 x = xi + pnt_dir.ra_deg()
                 y = yi + pnt_dir.dec_deg()
                 ctr_dir = gammalib.GSkyDir()
                 ctr_dir.radec_deg(x, y)
+                print(s, x, y)
+                print(pnt_dir.dist_deg(ctr_dir))
                 # region creation
                 region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                 outregions.append(region)
