@@ -119,7 +119,7 @@ class csphagen(ctools.cscript):
 
     def _reflected_regions(self, obs):
         """
-        Calculate list of reflected regions for a single observation
+        Calculate list of reflected regions for a single observation (pointing)
         :param obs: observation
         :return: list of reflected regions
         """
@@ -127,7 +127,9 @@ class csphagen(ctools.cscript):
         pnt_dir = obs.pointing().dir()
         offset = pnt_dir.dist_deg(self._src_dir)
         if offset <= self._rad or offset >= self["maxoffset"].real():
-            pass
+            msg = 'Observation {} pointed at {} deg from source'.format(
+                obs.id(), offset)
+            self._log_value(gammalib.EXPLICIT, msg)
         else:
             posang = pnt_dir.posang_deg(self._src_dir)
             if self._srcshape == "CIRCLE":
@@ -137,7 +139,9 @@ class csphagen(ctools.cscript):
                 # 1.05 ensures background regions do not overlap due to numerical precision issues
                 N = int(2 * math.pi / alpha)
                 if N < self._bkgregmin + 3:
-                    pass
+                    msg = 'Observation {}: insufficient regions for background estimation'.format(
+                        obs.id(), offset)
+                    self._log_value(gammalib.EXPLICIT, msg)
                 else:
                     alpha = 360. / N
                     # loop to create reflected regions
@@ -148,7 +152,9 @@ class csphagen(ctools.cscript):
                         region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
-                                pass
+                                msg = 'Observation {}: reflected region overlaps with exclusion region'.format(
+                                    obs.id(), offset)
+                                self._log_value(gammalib.VERBOSE, msg)
                             else:
                                 outregions.append(region)
                         else:
@@ -158,6 +164,9 @@ class csphagen(ctools.cscript):
 
     # Public methods
     def run(self):
+        """
+        Run the script
+        """
         # Switch screen logging on in debug mode
         if self._logDebug():
             self._log.cout(True)
@@ -168,6 +177,8 @@ class csphagen(ctools.cscript):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
 
+        self._log_header1(gammalib.NORMAL,
+                          'Generation of source and background spectra')
         # Loop through observations and generate pha, arf, rmf files
         outobs = gammalib.GObservations()
         etrue = self._ebounds
@@ -178,11 +189,16 @@ class csphagen(ctools.cscript):
                 regions = self._reflected_regions(obs)
             for region in regions:
                 bkg_reg.append(region)
-            if bkg_reg.size() >= self._bkgregmin:
+            if bkg_reg.size() >= 1 or (
+                            self._bkgmethod == "REFLECTED" and bkg_reg.size() >= self._bkgregmin):
                 onoff = gammalib.GCTAOnOffObservation(obs, etrue, ereco,
                                                       self._src_reg, bkg_reg)
                 onoff.id(obs.id())
                 outobs.append(onoff)
+            else:
+                msg = 'Observation {} not included in spectra generation'.format(
+                    obs.id())
+                self._log_value(gammalib.NORMAL, msg)
 
         # Save PHA, ARF and RMFs
         for obs in outobs:
@@ -201,7 +217,11 @@ class csphagen(ctools.cscript):
                 self._outroot + '_{}_off.reg'.format(obs.id()))
 
         # Save On/Off observations
-        outobs.save(self._outroot + '.xml')
+        outname = self._outroot + '.xml'
+        outobs.save(outname)
+        # Log filename
+        self._log_value(gammalib.NORMAL,
+                        'Output observation definition XML file: ' + outname)
 
     def execute(self):
         """
