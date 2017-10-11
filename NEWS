@@ -126,6 +126,9 @@ None
 
 cscripts
 --------
+Add csmodelsois script that replaces selected models in a model container by
+a diffuse map cube (#2180).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 
