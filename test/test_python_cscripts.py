@@ -147,7 +147,7 @@ def test(installed=False, debug=False):
 
         # Check for VHEFITS environment variable
         if 'VHEFITS' in os.environ:
-            
+
             # If the environment variable exists then unset it for the test
             # cases. Since Python is executed in a subprocess this will not
             # impact the environment variable in the parent shell.

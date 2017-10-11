@@ -1,8 +1,9 @@
-2017-08-08
+2017-10-11
 
         * Version 1.5.0 released
         ========================
 
+        Add csmodelsois script (#2180)
         Use t-type parameters for all "tmin" and "tmax" parameters (#1864)
 
 

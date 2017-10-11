@@ -2,7 +2,7 @@
 # ==========================================================================
 # This scripts performs unit tests for the csmodelsois tool.
 #
-# Copyright (C) 2016-2017 Juergen Knoedlseder
+# Copyright (C) 2017 Josh Cardenzana
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,12 +71,12 @@ class Test(test):
 
         # Setup csmodelsois command
         cmd = csmodelsois+' inmodel="'+self._model+'"'+ \
-                        ' outcube="csmodelsois_cmd1.fits"'+\
-                        ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
-                        ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
-                        ' soilist="" outmodel=NONE'+ \
-                        ' ra=83.63 dec=22.01 proj=CAR'+ \
-                        ' logfile="csmodelsois_cmd1.log" chatter=1'
+                          ' outcube="csmodelsois_cmd1.fits"'+\
+                          ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
+                          ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
+                          ' soilist="" outmodel=NONE'+ \
+                          ' ra=83.63 dec=22.01 proj=CAR'+ \
+                          ' logfile="csmodelsois_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -91,12 +91,12 @@ class Test(test):
 
         # Setup csmodelsois command
         cmd = csmodelsois+' inmodel="events_that_do_not_exist.fits"'+ \
-                        ' outcube="ccsmodelsois_cmd2.fits"'+\
-                        ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
-                        ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
-                        ' soilist="" outmodel=NONE'+ \
-                        ' ra=83.63 dec=22.01 proj=CAR'+ \
-                        ' logfile="csmodelsois_cmd2.log"'
+                          ' outcube="ccsmodelsois_cmd2.fits"'+\
+                          ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
+                          ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
+                          ' soilist="" outmodel=NONE'+ \
+                          ' ra=83.63 dec=22.01 proj=CAR'+ \
+                          ' logfile="csmodelsois_cmd2.log"'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -202,7 +202,8 @@ class Test(test):
 
         # Now check that the output model file doesnt contain a Crab Sources
         models3 = gammalib.GModels('csmodelsois_py3.xml')
-        self.test_assert(not models3.contains("Crab"), 'Check Crab model is not present')
+        self.test_assert(not models3.contains('Crab'),
+                         'Check Crab model is not present')
         self.test_assert(models3.contains(modelsois.cubemodelname()), 
                          'Check cube model is present')
         self._check_result_file('csmodelsois_py3.fits')

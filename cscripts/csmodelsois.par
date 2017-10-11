@@ -16,11 +16,11 @@
 #
 # General parameters
 #===================
-inmodel,  f, a, "$CTOOLS/share/models/crab.xml",,, "Input model definition XML file"
-outcube,  f, a, "mapcube.fits",,, "Output map cube file"
+inmodel,  f, a, $CTOOLS/share/models/crab.xml,,, "Input model definition XML file"
+outcube,  f, a, mapcube.fits,,, "Output map cube file"
 ptsrcsig, r, h, 1.0,0,60, "Point source Gaussian sigma in arcmin"
-soilist,  s, a, "",,, "CSV list of sources to exclude from cube model"
-outmodel, f, a, "NONE",,, "Output model definition XML file"
+soilist,  s, a, ,,, "CSV list of sources to exclude from cube model"
+outmodel, f, a, model.xml,,, "Output model definition XML file"
 
 #
 # Energy binning parameters
@@ -52,4 +52,4 @@ chatter, i, h, 2,0,4, "Chattiness of output"
 clobber, b, h, yes,,, "Overwrite existing output files with new output files?"
 debug,   b, h, no,,, "Debugging mode activated"
 mode,    s, h, "ql",,, "Mode of automatic parameters"
-logfile, f, h, "ctmapcube.log",,, "Log filename"
+logfile, f, h, "csmodelsois.log",,, "Log filename"
