@@ -33,8 +33,8 @@
 
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
-#define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
-#define G_BKG_SUBTRACT_IRF     "ctskymap::bkg_subtract_irf(GCTAObservation*)"
+#define G_MAP_EVENTS                 "ctskymap::map_events(GCTAObservation*)"
+#define G_MAP_BACKGROUND_IRF "ctskymap::map_background_irf(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -297,7 +297,9 @@ void ctskymap::save(void)
             hdu = m_bkgmap.write(fits);
 
             // Set background map extension name
-            hdu->extname("BACKGROUND");
+            if (hdu != NULL) {
+                hdu->extname("BACKGROUND");
+            }
 
             // Write keywords into background extension
             write_ogip_keywords(hdu);
@@ -307,7 +309,9 @@ void ctskymap::save(void)
             hdu = m_sigmap.write(fits);
 
             // Set significance map extension name
-            hdu->extname("SIGNIFICANCE");
+            if (hdu != NULL) {
+                hdu->extname("SIGNIFICANCE");
+            }
 
             // Write keywords into significance extension
             write_ogip_keywords(hdu);
@@ -489,7 +493,7 @@ void ctskymap::map_events(GCTAObservation* obs)
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
     if (events == NULL) {
-        throw GException::no_list(G_BIN_EVENTS);
+        throw GException::no_list(G_MAP_EVENTS);
     }
 
     // Setup energy range covered by data
@@ -609,7 +613,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
                           get_obs_header(obs)+" to compute IRF background. "
                           "Please specify response information or use "
                           "another background subtraction method.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
     }
 
     // Get IRF background template
@@ -621,7 +625,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
                           "response function for "+
                           get_obs_header(obs)+". Please specify an instrument "
                           "response function containing a background template.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
     }
 
     // Compute natural logarithm of energy range in MeV
