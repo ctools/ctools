@@ -127,9 +127,10 @@ class csphagen(ctools.cscript):
         pnt_dir = obs.pointing().dir()
         offset = pnt_dir.dist_deg(self._src_dir)
         if offset <= self._rad or offset >= self["maxoffset"].real():
-            msg = 'Observation {} pointed at {} deg from source'.format(
-                obs.id(), offset)
-            self._log_value(gammalib.EXPLICIT, msg)
+            if self._logExplicit():
+                msg = 'Observation {} pointed at {} deg from source\n'.format(
+                    obs.id(), offset)
+                self._log(msg)
         else:
             posang = pnt_dir.posang_deg(self._src_dir)
             if self._srcshape == "CIRCLE":
@@ -139,9 +140,10 @@ class csphagen(ctools.cscript):
                 # 1.05 ensures background regions do not overlap due to numerical precision issues
                 N = int(2 * math.pi / alpha)
                 if N < self._bkgregmin + 3:
-                    msg = 'Observation {}: insufficient regions for background estimation'.format(
-                        obs.id(), offset)
-                    self._log_value(gammalib.EXPLICIT, msg)
+                    if self._logExplicit():
+                        msg = 'Observation {}: insufficient regions for background estimation\n'.format(
+                            obs.id(), offset)
+                        self._log = (msg)
                 else:
                     alpha = 360. / N
                     # loop to create reflected regions
@@ -152,9 +154,10 @@ class csphagen(ctools.cscript):
                         region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
-                                msg = 'Observation {}: reflected region overlaps with exclusion region'.format(
-                                    obs.id(), offset)
-                                self._log_value(gammalib.VERBOSE, msg)
+                                if self._logVerbose():
+                                    msg = 'Observation {}: reflected region overlaps with exclusion region\n'.format(
+                                        obs.id(), offset)
+                                    self._log(msg)
                             else:
                                 outregions.append(region)
                         else:
@@ -196,9 +199,10 @@ class csphagen(ctools.cscript):
                 onoff.id(obs.id())
                 outobs.append(onoff)
             else:
-                msg = 'Observation {} not included in spectra generation'.format(
-                    obs.id())
-                self._log_value(gammalib.NORMAL, msg)
+                if self._logNormal():
+                    msg = 'Observation {} not included in spectra generation\n'.format(
+                        obs.id())
+                    self._log(msg)
 
         # Save PHA, ARF and RMFs
         for obs in outobs:
@@ -220,8 +224,9 @@ class csphagen(ctools.cscript):
         outname = self._outroot + '.xml'
         outobs.save(outname)
         # Log filename
-        self._log_value(gammalib.NORMAL,
-                        'Output observation definition XML file: ' + outname)
+        if self._logNormal():
+            self._log(
+                'Output observation definition XML file: {}\n'.format(outname))
 
     def execute(self):
         """
