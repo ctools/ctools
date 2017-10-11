@@ -22,23 +22,7 @@
 import gammalib
 import ctools
 import math
-
-
-def atan2(y, x):
-    """
-    helper function to solve triangulation problem
-    """
-    if x > 0:
-        val = math.atan(y / x)
-    elif x < 0 and y >= 0:
-        val = math.atan(y / x) + math.pi
-    elif x < 0 and y < 0:
-        val = math.atan(y / x) - math.pi
-    elif x == 0 and y > 0:
-        val = math.pi / 2
-    elif x == 0 and y < 0:
-        val = math.pi / 2
-    return val
+import sys
 
 
 # =============== #
@@ -82,12 +66,14 @@ class csphagen(ctools.cscript):
         if self['ebinalg'].string() == 'FILE':
             self['ebinfile'].filename()
         else:
-            self['emin'].real()
-            self['emax'].real()
-            self['enumbins'].integer()
+            self._emin = self['emin'].real()
+            self._emax = self['emax'].real()
+            self._enumbins = self['enumbins'].integer()
 
         # Initialise background estimation method
         self._bkgmethod = self["bkgmethod"].string()
+        if self._bkgmethod == "REFLECTED":
+            self._bkgregmin = self["bkgregmin"].integer()
 
         # Initialise source position/region querying relevant parameters
         self._src_dir = gammalib.GSkyDir()
@@ -112,7 +98,7 @@ class csphagen(ctools.cscript):
 
         # Query ahead output parameters
         if (self._read_ahead()):
-            self['outroot'].string()
+            self._outroot = self['outroot'].string()
 
         # If there are no observations in container then get them from the
         # parameter file
@@ -131,49 +117,29 @@ class csphagen(ctools.cscript):
         :param obs: observation
         :return: list of reflected regions
         """
+        outregions = []
         pnt_dir = obs.pointing().dir()
         offset = pnt_dir.dist_deg(self._src_dir)
-        print("source", self._src_dir)
-        print("pointing", pnt_dir)
-        print("offset", offset)
-        outregions = []
-
-        if self._srcshape == "CIRCLE":
-            # angular separation of reflected regions wrt camera center
-            # and number
-            alpha = 2 * math.asin(self._rad / offset)
-            N = int(2 * math.pi / alpha)
-            alpha = 2 * math.pi / N
-            # rotation angle of reference frame to generate regions
-            print("x,y", self._src_dir.ra_deg() - pnt_dir.ra_deg(),
-                  self._src_dir.dec_deg() - pnt_dir.dec_deg())
-            theta = atan2(self._src_dir.dec_deg() - pnt_dir.dec_deg(),
-                          self._src_dir.ra_deg() - pnt_dir.ra_deg())
-            # theta = 2 * math.asin(math.sqrt(
-            #     math.sin(self._src_dir.dec() - pnt_dir.dec()) ** 2 + math.cos(
-            #         self._src_dir.dec()) * math.cos(pnt_dir.dec()) * math.sin(
-            #         self._src_dir.ra() - pnt_dir.ra()) ** 2))
-            print("theta", theta)
-            # loop to create reflected regions
-            for s in range(0, N - 1):
-                print("=====")
-                phi = s * alpha
-                # print("phi",phi)
-                xii = offset * math.cos(phi)
-                yii = offset * math.sin(phi)
-                print(s, xii, yii)
-                xi = xii * math.cos(theta) - yii * math.sin(theta)
-                yi = xii * math.sin(theta) + yii * math.cos(theta)
-                print("rot", s, xi, yi)
-                x = xi + pnt_dir.ra_deg()
-                y = yi + pnt_dir.dec_deg()
-                ctr_dir = gammalib.GSkyDir()
-                ctr_dir.radec_deg(x, y)
-                print(s, x, y)
-                print(pnt_dir.dist_deg(ctr_dir))
-                # region creation
-                region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
-                outregions.append(region)
+        if offset <= self._rad or offset>=4.:
+            pass
+        else:
+            posang = pnt_dir.posang_deg(self._src_dir)
+            if self._srcshape == "CIRCLE":
+                # angular separation of reflected regions wrt camera center
+                # and number
+                alpha = 2 * self._rad / offset
+                N = int(2 * math.pi / alpha)
+                if N < self._bkgregmin + 3:
+                    pass
+                else:
+                    alpha = 360. / N
+                    # loop to create reflected regions
+                    for s in range(2, N - 1):
+                        dphi = s * alpha
+                        ctr_dir = pnt_dir.clone()
+                        ctr_dir.rotate_deg(posang + dphi, offset)
+                        region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
+                        outregions.append(region)
 
         return outregions
 
@@ -183,6 +149,9 @@ class csphagen(ctools.cscript):
         if self._logDebug():
             self._log.cout(True)
 
+        # Get parameters
+        self._get_parameters()
+
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
 
@@ -191,12 +160,12 @@ class csphagen(ctools.cscript):
             pass
             ## need to load binning from file
         else:
-            etrue = gammalib.GEbounds(self["enumbins"],
-                                      gammalib.GEnergy(self["emin"], 'TeV'),
-                                      gammalib.GEnergy(self["emax"], 'TeV'))
-            ereco = gammalib.GEbounds(self["enumbins"],
-                                      gammalib.GEnergy(self["emin"], 'TeV'),
-                                      gammalib.GEnergy(self["emax"], 'TeV'))
+            etrue = gammalib.GEbounds(self._enumbins,
+                                      gammalib.GEnergy(self._emin, 'TeV'),
+                                      gammalib.GEnergy(self._emax, 'TeV'))
+            ereco = gammalib.GEbounds(self._enumbins,
+                                      gammalib.GEnergy(self._emin, 'TeV'),
+                                      gammalib.GEnergy(self._emax, 'TeV'))
 
         # Loop through observations and generate pha, arf, rmf files
         outobs = gammalib.GObservations()
@@ -207,5 +176,47 @@ class csphagen(ctools.cscript):
             for region in regions:
                 bkg_reg.append(region)
             onoff = gammalib.GCTAOnOffObservation(obs, etrue, ereco,
-                                                  self._src_region, bkg_reg)
+                                                  self._src_reg, bkg_reg)
             outobs.append(onoff)
+
+        # Save PHA, ARF and RMFs
+        for s, obs in enumerate(outobs):
+            obs.on_spec().save(self._outroot + '_{}_pha_on.fits'.format(s),
+                               True)
+            obs.off_spec().save(self._outroot + '_{}_pha_off.fits'.format(s),
+                                True)
+            obs.arf().save(self._outroot + '_{}_arf.fits'.format(s), True)
+            obs.rmf().save(self._outroot + '_{}_rmf.fits'.format(s), True)
+
+        # Save On/Off observations
+        outobs.save(self._outroot + '.xml')
+
+    def execute(self):
+        """
+        Execute the script
+        """
+        # Open logfile
+        self.logFileOpen()
+
+        # Read ahead output parameters
+        self._read_ahead(True)
+
+        # Run the script
+        self.run()
+
+        # Save residual map
+        self.save()
+
+        # Return
+        return
+
+
+# ======================== #
+# Main routine entry point #
+# ======================== #
+if __name__ == '__main__':
+    # Create instance of application
+    app = csphagen(sys.argv)
+
+    # Execute application
+    app.execute()

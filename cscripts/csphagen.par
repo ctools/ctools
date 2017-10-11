@@ -18,7 +18,7 @@
 #============================
 inobs,      f, a, obs.xml,,, "Input event list or observation definition XML file"
 exclusion,  f,  h, NONE,,, "FITS WCS map of exclusion regions"
-outroot,    f, a, spectrum,,, "Root of the name for output PHA and XML files"
+outroot,    s, a, spectrum,,, "Root of the name for output PHA and XML files"
 outreg,     f, h, NONE,,, "Output ds9 reg file showing source/background regions"
 
 #
@@ -29,8 +29,8 @@ emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
 enumbins,  i, a, 120,,, "Number of energy bins"
 ebinalg,   s, a, LOG,LIN|LOG|FILE,, "Binning algorithm"
 ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
-bkgmethod, s, a, REFLECTED,REFLECTED,, "Method for background estimation"
-srcshape,  s, a, CIRCLE,CIRCLE,, "Shape of the source region"
+bkgmethod, s, h, REFLECTED,REFLECTED,, "Method for background estimation"
+srcshape,  s, h, CIRCLE,CIRCLE,, "Shape of the source region"
 coordsys,  s, a, CEL,CEL|GAL,, "Coordinate system (CEL - celestial, GAL - galactic)"
 ra,        r, a, 83.63,0,360, "Right Ascension of source region centre (deg)"
 dec,       r, a, 22.01,-90,90, "Declination of source region centre (deg)"
