@@ -17,7 +17,7 @@
 # Input and output parameters
 #============================
 inobs,      f, a, obs.xml,,, "Input event list or observation definition XML file"
-exclusion,  f,  h, NONE,,, "FITS WCS map of exclusion regions"
+exclusion,  f,  h, NONE,,, "FITS with WCS map of exclusion regions"
 outroot,    s, a, spectrum,,, "Root of the name for output PHA, XML, and ds9 reg files"
 
 #
@@ -38,7 +38,7 @@ glat,      r, a, -5.79,-90,90, "Galactic latitude of source region centre (deg)"
 rad,       r, a, 0.2,0,180, "Radius of source region circle (deg)"
 bkgregmin, i, h, 2,1,1000, "Minimum number of background region for REFLECTED method"
 maxoffset, r, h, 4.,,, "Maximum offset of source from camera center to accept run"
-stack,     b, a, yes,,, "Stack all runs into single pha (if no produce run-by-run files)"
+stack,     b, a, no,,, "Stack all runs into single pha (if no produce run-by-run files)"
 
 #
 # Standard parameters

@@ -88,6 +88,12 @@ class csphagen(ctools.cscript):
             self._src_reg.append(
                 gammalib.GSkyRegionCircle(self._src_dir, self._rad))
 
+        # exclusion map
+        if self["exclusion"].filename().is_fits():
+            self._excl_reg = gammalib.GSkyRegionMap(
+                self["exclusion"].filename())
+            self._has_exclusion = True
+
         # Stacking
         self._stack = self['stack'].boolean()
 
@@ -140,7 +146,13 @@ class csphagen(ctools.cscript):
                         ctr_dir = pnt_dir.clone()
                         ctr_dir.rotate_deg(posang + dphi, offset)
                         region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
-                        outregions.append(region)
+                        if self._has_exclusion:
+                            if self._excl_reg.overlaps(region):
+                                pass
+                            else:
+                                outregions.append(region)
+                        else:
+                            outregions.append(region)
 
         return outregions
 
@@ -166,10 +178,11 @@ class csphagen(ctools.cscript):
                 regions = self._reflected_regions(obs)
             for region in regions:
                 bkg_reg.append(region)
-            onoff = gammalib.GCTAOnOffObservation(obs, etrue, ereco,
-                                                  self._src_reg, bkg_reg)
-            onoff.id(obs.id())
-            outobs.append(onoff)
+            if bkg_reg.size() > self._bkgregmin:
+                onoff = gammalib.GCTAOnOffObservation(obs, etrue, ereco,
+                                                      self._src_reg, bkg_reg)
+                onoff.id(obs.id())
+                outobs.append(onoff)
 
         # Save PHA, ARF and RMFs
         for obs in outobs:
