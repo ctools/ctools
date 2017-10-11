@@ -235,48 +235,55 @@ void ctmodel::run(void)
     log_header1(TERSE, "Generate model cube");
 
     // Loop over all observations in the container
-    #pragma omp parallel for
-    for (int i = 0; i < m_obs.size(); ++i) {
+    #pragma omp parallel
+    {
+        // Create a models object for this core
+        GModels models(m_obs.models());
         
-        // Get CTA observation
-        GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
-
-        // Skip observation if it's not CTA
-        if (obs == NULL) {
-            log_header3(TERSE, get_obs_header(m_obs[i]));
-            std::string msg = " Skipping "+m_obs[i]->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-        }
-
-        // Fill cube and leave loop if we are binned mode (meaning we
-        // only have one binned observation)
-        else if (m_binned) {
-            fill_cube(obs);
-            i = m_obs.size();
-        }
-
-        // Skip observation if we have a binned observation
-        else if (obs->eventtype() == "CountsCube") {
-            log_header3(TERSE, get_obs_header(m_obs[i]));
-            std::string msg = " Skipping binned "+m_obs[i]->instrument()+
-                              " observation";
-            log_string(NORMAL, msg);
-        }
-
-        // Otherwise, everything seems to be fine, so fill the cube from obs
-        else {
-            // Fill the cube
-            fill_cube(obs);
+        #pragma omp for schedule(static,1)
+        for (int i = 0; i < m_obs.size(); ++i) {
             
-            // Dispose events to free memory if event file exists on disk
-            if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
-                obs->dispose_events();
+            // Get CTA observation
+            GCTAObservation* obs = dynamic_cast<GCTAObservation*>(m_obs[i]);
+            
+            // Skip observation if it's not CTA
+            if (obs == NULL) {
+                log_header3(TERSE, get_obs_header(m_obs[i]));
+                std::string msg = " Skipping "+m_obs[i]->instrument()+
+                " observation";
+                log_string(NORMAL, msg);
             }
-        }
+            
+            // Fill cube and leave loop if we are binned mode (meaning we
+            // only have one binned observation)
+            else if (m_binned) {
+                fill_cube(obs, models);
+                i = m_obs.size();
+            }
+            
+            // Skip observation if we have a binned observation
+            else if (obs->eventtype() == "CountsCube") {
+                log_header3(TERSE, get_obs_header(m_obs[i]));
+                std::string msg = " Skipping binned "+m_obs[i]->instrument()+
+                " observation";
+                log_string(NORMAL, msg);
+            }
+            
+            // Otherwise, everything seems to be fine, so fill the cube from obs
+            else {
+                // Fill the cube
+                fill_cube(obs, models);
+                
+                // Dispose events to free memory if event file exists on disk
+                if (obs->eventfile().length() > 0 && obs->eventfile().exists()) {
+                    obs->dispose_events();
+                }
+            }
+            
+        } // endfor: looped over observations
 
-    } // endfor: looped over observations
-
+    } // end openmp parallel section
+    
     // Write model cube into header
     log_header1(NORMAL, "Model cube");
     log_string(NORMAL, m_cube.print());
@@ -789,7 +796,7 @@ void ctmodel::extract_cube_properties(void)
  * GTI of the model cube so that cube GTI is a list of the GTIs of all
  * observations that were used to generate the model cube.
  ***************************************************************************/
-void ctmodel::fill_cube(const GCTAObservation* obs)
+void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
 {
     // Get number of spatial and spectral bins in counts cube
     int npix   = m_cube.npix();
@@ -819,8 +826,8 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
     int    num_outside_roi  = 0;
 
     // Extract copy of models from observation container
-    GModels models(m_obs.models());
-
+    GModels ex_models = trim_models(models, roi);
+    
     // Get pointer to event cube pixels
     double* pixels = const_cast<double*>(m_cube.counts().pixels());
 
@@ -877,6 +884,9 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
 
     } // endfor: looped over all cube bins
 
+    // Re-append the models to the main model
+    models.extend(ex_models);
+    
     // Update GTIs
     #pragma omp critical(ctmodel_fill_cube)
     {
@@ -904,4 +914,67 @@ void ctmodel::fill_cube(const GCTAObservation* obs)
 
     // Return
     return;
+}
+
+
+/***********************************************************************//**
+ * @brief Find the models falling inside a defined region of interest.
+ *
+ * @param[in,out] all_models Model container to be trimmed.
+ * @param[in] roi Observation region of interest.
+ * @return New model container containing only models inside RoI.
+ *
+ * Note that a buffer is added to the observation region to ensure that
+ * point sources (which have radius=0) are appropriately included if they
+ * fall near the edge of the observation.
+ ***************************************************************************/
+GModels ctmodel::trim_models(GModels& all_models, const GCTARoi& roi)
+{
+    // Create the model container containing only models in RoI
+    GModels excluded_models;
+
+    // Do nothing if roi is not valid. This will be the case for binned data
+    // sets as they have the default roi radius of 0. In this case we would
+    // remove ALL models, which is obviously incorrect. So we keep all models
+    // when filling based on a counts cube.
+    if (!roi.is_valid()) {
+        return excluded_models;
+    }
+
+    // Remove all models that dont overlap with the region of interest. Note
+    // that an extra factor is used since point sources have regions of
+    // radius 0, which is a problem when they fall just barely outside the
+    // RoI. This ensures point sources are appropriately included.
+    GSkyRegionCircle obsreg(roi.centre().dir(), roi.radius()+0.5);
+
+    // Loop over the models in the passed container
+    for (int i = 0; i < all_models.size(); ++i) {
+
+        // Cast the model to a GModelSky object
+        GModelSky* model = dynamic_cast<GModelSky*>(all_models[i]);
+
+        // If model is not a GModelSky model than skip
+        if (model == NULL) {
+            continue;
+        }
+
+        // Otherwise, exclude the model if it isn't a diffuse cube and it
+        // doesn't overlap with the observation.
+        if (!(model->spatial()->code() == GMODEL_SPATIAL_DIFFUSE) &&
+            (!model->spatial()->region()->overlaps(obsreg))) {
+
+            // Append model to the excluded models
+            excluded_models.append(*model);
+
+            // Remove model
+            all_models.remove(i);
+
+            // Decrement to prevent skipping models
+            i--;
+        }
+
+    } // endfor: looped over all models
+
+    // Return excluded models
+    return excluded_models;
 }
