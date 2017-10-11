@@ -32,9 +32,10 @@
 #include "ctskymap.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_INIT_MAP                 "ctskymap::init_map(GCTAObservation* obs)"
-#define G_BIN_EVENTS                 "ctskymap::bin_events(GCTAObservation*)"
-#define G_BKG_SUBTRACT_IRF     "ctskymap::bkg_subtract_irf(GCTAObservation*)"
+#define G_GET_PARAMETERS                         "ctskymap::get_parameters()"
+#define G_MAP_EVENTS                 "ctskymap::map_events(GCTAObservation*)"
+#define G_MAP_BACKGROUND_IRF "ctskymap::map_background_irf(GCTAObservation*)"
+#define G_COMPUTE_EXPMAP         "ctskymap::compute_expmap(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -235,6 +236,11 @@ void ctskymap::run(void)
         // Compute background sky map
         map_background(obs);
 
+        // Optionally compute exposure map
+        if (m_exposure_map) {
+            compute_expmap(obs);
+        }
+
         // Dispose events to free memory
         obs->dispose_events();
 
@@ -285,6 +291,11 @@ void ctskymap::save(void)
         // Write sky map into FITS file
         GFitsHDU* hdu = m_skymap.write(fits);
 
+        // If HDU is valid then set sky map units
+        if (hdu != NULL) {
+            hdu->card("BUNIT", "counts", "Unit of sky map pixels");
+        }
+
         // Write keywords into sky map extension
         write_ogip_keywords(hdu);
         write_hdu_keywords(hdu);
@@ -292,12 +303,16 @@ void ctskymap::save(void)
         // If background subtraction is requested then write background map
         // and significance map to FITS file
         if (m_bkgsubtract != "NONE") {
-        
+
             // Write background map into FITS file
             hdu = m_bkgmap.write(fits);
 
-            // Set background map extension name
-            hdu->extname("BACKGROUND");
+            // If HDU is valid then set background map extension name and
+            // units
+            if (hdu != NULL) {
+                hdu->extname("BACKGROUND");
+                hdu->card("BUNIT", "counts", "Unit of background map pixels");
+            }
 
             // Write keywords into background extension
             write_ogip_keywords(hdu);
@@ -306,14 +321,36 @@ void ctskymap::save(void)
             // Write significance map into FITS file
             hdu = m_sigmap.write(fits);
 
-            // Set significance map extension name
-            hdu->extname("SIGNIFICANCE");
+            // If HDU is valid then set significance map extension name and
+            // units
+            if (hdu != NULL) {
+                hdu->extname("SIGNIFICANCE");
+                hdu->card("BUNIT", "sigma", "Unit of significance map pixels");
+            }
 
             // Write keywords into significance extension
             write_ogip_keywords(hdu);
             write_hdu_keywords(hdu);
 
         } // endif: background subtraction was requested
+
+        // If exposure map computation is requested then write exposure map
+        if (m_exposure_map) {
+
+            // Write exposure map into FITS file
+            hdu = m_expmap.write(fits);
+
+            // If HDU is valid then set exposure map extension name and units
+            if (hdu != NULL) {
+                hdu->extname("EXPOSURE");
+                hdu->card("BUNIT", "cm**2 s", "Unit of exposure map pixels");
+            }
+
+            // Write keywords into background extension
+            write_ogip_keywords(hdu);
+            write_hdu_keywords(hdu);
+
+        } // endif: exposure map was requested
 
         // Save FITS file to disk
         fits.saveto(m_outmap, clobber());
@@ -372,13 +409,15 @@ void ctskymap::init_members(void)
 {
     // Initialise members
     m_skymap.clear();
+    m_expmap.clear();
     m_bkgmap.clear();
     m_sigmap.clear();
-    m_emin        = 0.0;
-    m_emax        = 0.0;
-    m_bkgsubtract = "NONE";
-    m_publish     = false;
-    m_chatter     = static_cast<GChatter>(2);
+    m_emin         = 0.0;
+    m_emax         = 0.0;
+    m_bkgsubtract  = "NONE";
+    m_exposure_map = false;
+    m_publish      = false;
+    m_chatter      = static_cast<GChatter>(2);
 
     // Return
     return;
@@ -393,14 +432,16 @@ void ctskymap::init_members(void)
 void ctskymap::copy_members(const ctskymap& app)
 {
     // Copy attributes
-    m_skymap      = app.m_skymap;
-    m_bkgmap      = app.m_bkgmap;
-    m_sigmap      = app.m_sigmap;
-    m_emin        = app.m_emin;
-    m_emax        = app.m_emax;
-    m_bkgsubtract = app.m_bkgsubtract;
-    m_publish     = app.m_publish;
-    m_chatter     = app.m_chatter;
+    m_skymap       = app.m_skymap;
+    m_expmap       = app.m_expmap;
+    m_bkgmap       = app.m_bkgmap;
+    m_sigmap       = app.m_sigmap;
+    m_emin         = app.m_emin;
+    m_emax         = app.m_emax;
+    m_bkgsubtract  = app.m_bkgsubtract;
+    m_exposure_map = app.m_exposure_map;
+    m_publish      = app.m_publish;
+    m_chatter      = app.m_chatter;
 
     // Return
     return;
@@ -420,6 +461,9 @@ void ctskymap::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
+ * @exception GException::invalid_value
+ *            Invalid task parameter values.
+ *
  * Get all task parameters from parameter file or (if required) by querying
  * the user. Most parameters are only required if no observation exists so
  * far in the observation container. In this case, a single CTA observation
@@ -435,24 +479,33 @@ void ctskymap::get_parameters(void)
     // Create sky map based on task parameters
     m_skymap = create_map(m_obs);
 
-    // Get further parameters
-    m_emin        = (*this)["emin"].real();
-    m_emax        = (*this)["emax"].real();
-    m_bkgsubtract = (*this)["bkgsubtract"].string();
-
-    // If IRF background subtraction is requested then make sure that the
-    // CTA observations in the observation container have response information
-    if (m_bkgsubtract == "IRF") {
-        set_response(m_obs);
+    // Get energy range. Throw an exception if maximum energy is not larger
+    // than minimum energy
+    m_emin = (*this)["emin"].real();
+    m_emax = (*this)["emax"].real();
+    if (m_emax <= m_emin) {
+        std::string msg = "Maximum energy "+gammalib::str(m_emax)+" TeV is not "
+                          "larger than minimum energy "+gammalib::str(m_emin)+
+                          " TeV. Please specify a valid energy range.";
+        throw GException::invalid_value(G_GET_PARAMETERS, msg);
     }
 
-    // Get remaining parameters
-    m_publish     = (*this)["publish"].boolean();
-    m_chatter     = static_cast<GChatter>((*this)["chatter"].integer());
+    // Get further parameters
+    m_bkgsubtract  = (*this)["bkgsubtract"].string();
+    m_exposure_map = (*this)["expmap"].boolean();
+    m_publish      = (*this)["publish"].boolean();
+    m_chatter      = static_cast<GChatter>((*this)["chatter"].integer());
 
     // Read ahead parameters
     if (read_ahead()) {
         m_outmap  = (*this)["outmap"].filename();
+    }
+
+    // If IRF background subtraction or exposure map is requested then make
+    // sure that the CTA observations in the observation container have
+    // response information
+    if (m_bkgsubtract == "IRF" || m_exposure_map) {
+        set_response(m_obs);
     }
 
     // Create background map and significance map if background subtraction
@@ -460,6 +513,11 @@ void ctskymap::get_parameters(void)
     if (m_bkgsubtract != "NONE") {
         m_bkgmap = create_map(m_obs);
         m_sigmap = create_map(m_obs);
+    }
+
+    // Create exposure map if exposure computation is requested
+    if (m_exposure_map) {
+        m_expmap = create_map(m_obs);
     }
 
     // Write parameters into logger
@@ -489,7 +547,7 @@ void ctskymap::map_events(GCTAObservation* obs)
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
     if (events == NULL) {
-        throw GException::no_list(G_BIN_EVENTS);
+        throw GException::no_list(G_MAP_EVENTS);
     }
 
     // Setup energy range covered by data
@@ -609,7 +667,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
                           get_obs_header(obs)+" to compute IRF background. "
                           "Please specify response information or use "
                           "another background subtraction method.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
     }
 
     // Get IRF background template
@@ -621,7 +679,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
                           "response function for "+
                           get_obs_header(obs)+". Please specify an instrument "
                           "response function containing a background template.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
     }
 
     // Compute natural logarithm of energy range in MeV
@@ -651,7 +709,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
         }
 
         // Setup integration function
-        ctskymap::irf_kern integrand(bkg, &instdir);
+        ctskymap::bkg_kern integrand(bkg, &instdir);
         GIntegral          integral(&integrand);
 
         // Set precision (has been carefully adjusted using a test simulation
@@ -663,7 +721,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
 
         // Update number of background function calls
         calls += integral.calls();
-        
+
         // Multiply background rate with livetime and solid angle
         value *= obs->livetime() * m_bkgmap.solidangle(i);
 
@@ -674,10 +732,107 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
         total += value;
 
     } // endfor: looped over background map pixels
-  
+
     // Log background subtraction results
     log_value(NORMAL, "Events in background", int(total+0.5));
     log_value(NORMAL, "Background evaluations", calls);
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Compute the exposure map for an observation
+ *
+ * @param[in] obs CTA observation.
+ *
+ * @exception GException::invalid_value
+ *            No response information available for observation.
+ *            No effective area available in instrument response function.
+ *
+ * Estimates the background in the sky map using the IRF template for a given
+ * observation and adds this estimate to the background sky map. The IRF
+ * template is integrated numerically in energy.
+ ***************************************************************************/
+void ctskymap::compute_expmap(GCTAObservation* obs)
+{
+    // Get IRF response
+    const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+
+    // Throw an exception if observation has no instrument response function
+    if (rsp == NULL) {
+        std::string msg = "No response information available for "+
+                          get_obs_header(obs)+" to compute exposure map. "
+                          "Please specify response information.";
+        throw GException::invalid_value(G_COMPUTE_EXPMAP, msg);
+    }
+
+    // Get effective area response
+    const GCTAAeff* aeff = rsp->aeff();
+
+    // Throw an exception if observation has no effective area
+    if (aeff == NULL) {
+        std::string msg = "No effective area found in instrument response "
+                          "function for "+
+                          get_obs_header(obs)+". Please specify an instrument "
+                          "response function containing an effective area.";
+        throw GException::invalid_value(G_COMPUTE_EXPMAP, msg);
+    }
+
+    // Extract pointing direction from observation
+    GSkyDir pnt = obs->pointing().dir();
+
+    // Compute natural logarithm of energy range in TeV
+    double lnEmin = std::log(m_emin);
+    double lnEmax = std::log(m_emax);
+
+    // Extract region of interest from observation
+    GCTARoi roi = obs->roi();
+
+    // Initialise statistics
+    int calls = 0;
+
+    // Compute normalisation factor
+    double norm = obs->livetime() / (m_emax - m_emin);
+
+    // Loop over all exposure map pixels
+    for (int i = 0; i < m_expmap.npix(); ++i) {
+
+        // Get sky direction of pixel
+        GSkyDir dir = m_expmap.inx2dir(i);
+
+        // If RoI is valid and sky direction is not within RoI then skip pixel
+        if (roi.is_valid()) {
+            if (roi.centre().dir().dist_deg(dir) > roi.radius()) {
+                continue;
+            }
+        }
+
+        // Compute theta angle with respect to pointing direction in
+        // radians
+        double theta = pnt.dist(dir);
+
+        // Setup integration function
+        ctskymap::aeff_kern integrand(aeff, theta);
+        GIntegral           integral(&integrand);
+
+        // Set precision
+        integral.eps(1.0e-6);
+
+        // Do Romberg integration
+        double value = integral.romberg(lnEmin, lnEmax) * norm;
+
+        // Update number of effective area function calls
+        calls += integral.calls();
+
+        // Add exposure to map
+        m_expmap(i,0) += value;
+
+    } // endfor: looped over exposure map pixels
+ 
+    // Log exposure map computation results
+    log_value(NORMAL, "Exposure evaluations", calls);
 
     // Return
     return;
@@ -710,17 +865,38 @@ void ctskymap::write_hdu_keywords(GFitsHDU* hdu) const
 
 
 /***********************************************************************//**
+ * @brief Compute the effective area at a given sky direction and energy
+ *
+ * @param[in] lnE Natural logarithm of energy in TeV.
+ ***************************************************************************/
+double ctskymap::aeff_kern::eval(const double& lnE)
+{
+    // Get log10 of energy in TeV
+    double logE = lnE * gammalib::inv_ln10;
+
+    // Get function value
+    double value = (*m_aeff)(logE, m_theta);
+
+    // Correct for variable substitution
+    value *= std::exp(lnE);
+
+    // Return value
+    return value;
+}
+
+
+/***********************************************************************//**
  * @brief Estimates the background in sky map based on IRF template
  *
  * @param[in] lnE Natural logarithm of energy in MeV.
  ***************************************************************************/
-double ctskymap::irf_kern::eval(const double& lnE)
+double ctskymap::bkg_kern::eval(const double& lnE)
 {
     // Get log10 of energy in TeV
-    double logE = lnE * gammalib::inv_ln10 - 6;
+    double logE = lnE * gammalib::inv_ln10 - 6.0;
 
     // Get function value
-    double value = (*m_bgd)(logE, m_dir->detx(), m_dir->dety());
+    double value = (*m_bkg)(logE, m_dir->detx(), m_dir->dety());
 
     // Correct for variable substitution
     value *= std::exp(lnE);

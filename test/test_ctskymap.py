@@ -217,7 +217,7 @@ class Test(test):
         skymap['proj']        = 'CAR'
         skymap['xref']        = 184.5575
         skymap['yref']        =  -5.7844
-        skymap['bkgsubtract'] =  'IRF'
+        skymap['bkgsubtract'] = 'IRF'
         skymap['caldb']       = self._caldb
         skymap['irf']         = self._irf
         skymap['outmap']      = 'ctskymap_py4.fits'
@@ -229,7 +229,38 @@ class Test(test):
         skymap.execute()
 
         # Check result file
-        self._check_result_file('ctskymap_py3.fits')
+        self._check_result_file('ctskymap_py4.fits')
+        self._check_result_file('ctskymap_py4.fits[BACKGROUND]')
+        self._check_result_file('ctskymap_py4.fits[SIGNIFICANCE]')
+
+        # Now create also an exposure map
+        skymap = ctools.ctskymap()
+        skymap['inobs']       = self._events
+        skymap['emin']        = 0.1
+        skymap['emax']        = 100
+        skymap['nxpix']       = 200
+        skymap['nypix']       = 200
+        skymap['binsz']       = 0.02
+        skymap['coordsys']    = 'CEL'
+        skymap['proj']        = 'CAR'
+        skymap['xref']        = 83.63
+        skymap['yref']        = 22.01
+        skymap['expmap']      = True
+        skymap['bkgsubtract'] = 'NONE'
+        skymap['caldb']       = self._caldb
+        skymap['irf']         = self._irf
+        skymap['outmap']      = 'ctskymap_py5.fits'
+        skymap['logfile']     = 'ctskymap_py5.log'
+        skymap['chatter']     = 2
+
+        # Run ctskymap tool
+        skymap.logFileOpen()   # Make sure we get a log file
+        skymap.run()
+        skymap.save()
+
+        # Check result file
+        self._check_result_file('ctskymap_py5.fits')
+        self._check_result_file('ctskymap_py5.fits[EXPOSURE]')
 
         # Return
         return

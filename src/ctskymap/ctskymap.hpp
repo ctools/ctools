@@ -71,33 +71,48 @@ protected:
     void map_events(GCTAObservation* obs);
     void map_background(GCTAObservation* obs);
     void map_background_irf(GCTAObservation* obs);
+    void compute_expmap(GCTAObservation* obs);
     void write_hdu_keywords(GFitsHDU* hdu) const;
 
-    // Background integration kernel
-    class irf_kern : public GFunction {
+    // Effective area integration kernel
+    class aeff_kern : public GFunction {
     public:
-        irf_kern(const GCTABackground* bgd,
+        aeff_kern(const GCTAAeff* aeff, double theta) :
+                  m_aeff(aeff),
+                  m_theta(theta) { }
+        double eval(const double& lnE);
+    protected:
+        const GCTAAeff* m_aeff;  //!< Pointer to effective area
+        double          m_theta; //!< Offset angle
+    };
+
+    // Background integration kernel
+    class bkg_kern : public GFunction {
+    public:
+        bkg_kern(const GCTABackground* bkg,
                  const GCTAInstDir*    dir) :
-                 m_bgd(bgd),
+                 m_bkg(bkg),
                  m_dir(dir) { }
         double eval(const double& lnE);
     protected:
-        const GCTABackground* m_bgd;   //!< Pointer to background
-        const GCTAInstDir*    m_dir;   //!< Pointer to instrument direction
+        const GCTABackground* m_bkg; //!< Pointer to background
+        const GCTAInstDir*    m_dir; //!< Pointer to instrument direction
     };
 
     // User parameters
-    GFilename     m_outmap;      //!< Output file name
-    double        m_emin;        //!< Minimum energy (TeV)
-    double        m_emax;        //!< Maximum energy (TeV)
-    std::string   m_bkgsubtract; //!< Background subtraction method
-    bool          m_publish;     //!< Publish sky map?
-    GChatter      m_chatter;     //!< Chattiness
+    GFilename   m_outmap;       //!< Output file name
+    double      m_emin;         //!< Minimum energy (TeV)
+    double      m_emax;         //!< Maximum energy (TeV)
+    std::string m_bkgsubtract;  //!< Background subtraction method
+    bool        m_exposure_map; //!< Compute exposure map?
+    bool        m_publish;      //!< Publish sky map?
+    GChatter    m_chatter;      //!< Chattiness
 
     // Protected members
-    GSkyMap       m_skymap;     //!< Sky map
-    GSkyMap       m_bkgmap;     //!< Background map
-    GSkyMap       m_sigmap;     //!< Significance map
+    GSkyMap     m_skymap;     //!< Sky map
+    GSkyMap     m_expmap;     //!< Exposure map
+    GSkyMap     m_bkgmap;     //!< Background map
+    GSkyMap     m_sigmap;     //!< Significance map
 };
 
 

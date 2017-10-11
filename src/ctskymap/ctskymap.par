@@ -40,9 +40,10 @@ xref,     r, a, 83.63,0,360, "First coordinate of image center in degrees (RA or
 yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC or galactic b)"
 
 #
-# Background subtraction parameters
-#==================================
+# Map generation parameters
+#==========================
 bkgsubtract, s, a, NONE, NONE|IRF,, "Background subtraction method"
+expmap,      b, h, no,,, "Generate exposure map?"
 
 #
 # Standard parameters
