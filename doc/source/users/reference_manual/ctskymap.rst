@@ -74,7 +74,7 @@ General parameters
 ``yref [real]``
     Declination / Galactic latitude of image centre (J2000, in degrees).
  	 	 
-``bkgsubtract <NONE|IRF> [string]``
+``bkgsubtract <NONE|IRF|RING> [string]``
     Background subtraction method.
 
 

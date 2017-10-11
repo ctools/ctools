@@ -390,6 +390,14 @@ void ctskymap::copy_members(const ctskymap& app)
     m_bkgsubtract = app.m_bkgsubtract;
     m_publish     = app.m_publish;
     m_chatter     = app.m_chatter;
+    m_solidangle = app.m_solidangle;
+
+    // Variables for RING bkgd subtraction
+    m_exclmap = app.m_exclmap;
+    m_roiradius = app.m_roiradius;
+    m_inradius  = app.m_inradius;
+    m_outradius = app.m_outradius;
+    m_cnts = app.m_cnts;
 
     // Return
     return;
@@ -442,9 +450,22 @@ void ctskymap::get_parameters(void)
     // Read ahead parameters
     if (read_ahead()) {
         m_outmap    = (*this)["outmap"].filename();
-        m_roiradius = (*this)["roiradius"].real();
-        m_inradius  = (*this)["inradius"].real();
-        m_outradius = (*this)["outradius"].real();
+
+        if (m_bkgsubtract == "RING") {
+            // Get the integration region radii
+            m_roiradius = (*this)["roiradius"].real();
+            m_inradius  = (*this)["inradius"].real();
+            m_outradius = (*this)["outradius"].real();
+
+            // Make sure the values are reasonable
+            if (m_roiradius > m_inradius) {
+                std::string err("'roiradius' must be smaller than inner ring radius");
+                throw GException::invalid_value(err);
+            } else if (m_inradius > m_outradius) {
+                std::string err("Inner ring radius must be smaller than outer ring radius");
+                throw GException::invalid_value(err);
+            } // endif: Ring radius checks
+        }
     }
 
     // Create background map and significance map if background subtraction
@@ -749,11 +770,8 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
     double exposure = obs->livetime() ;
 
     // Cached background IRF sensitivities
-    std::vector<double>  sens(m_cnts.size(), 0.0);  
-    
-    // Keep track of the minimum and maximum pixels that need to be looped over
-    int imin(m_bkgmap.npix());
-    int imax(0);
+    std::vector<double> sens(m_cnts.size(), 0.0);  
+    std::vector<bool>   obsoverlap(m_cnts.size(), false);
 
     // Cache the IRF sensitivities
     // Loop over all map pixels
@@ -771,14 +789,13 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
             continue;
         }
 
+        // Notify that this bin overlaps the observation
+        obsoverlap[i] = true;
+
         // If bin is excluded in the exclusion, skip it
         if (m_exclmap(i) == 0.0) {
             continue;
         }
-
-        // Update pixel ranges
-        if (i > imax) imax = i;
-        if (i < imin) imin = i;
 
         // Setup integration function
         ctskymap::irf_kern integrand(bkg, &instdir);
@@ -802,18 +819,14 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
     GSkyRegionCircle inner_reg(0.0, 0.0, m_inradius);
     GSkyRegionCircle outer_reg(0.0, 0.0, m_outradius);
 
+log_string(NORMAL, "LOOPING ON BKG IRF DONE");
+log_string(NORMAL, "LOOPING ON EVENTS!");
     // Loop over all map pixels
-    for (int i = imin; i <= imax; ++i) {
+    for (int i = 0; i < m_bkgmap.npix(); ++i) {
 
-        // Get sky direction of pixel
-        GSkyDir skydir = m_bkgmap.inx2dir(i);
+        log_value(NORMAL, "PIXEL #", i);
 
-        // Convert sky direction in instrument direction
-        GCTAInstDir instdir = obs->pointing().instdir(skydir);
-
-        // If RoI is valid and instrument direction is not within RoI then
-        // skip pixel
-        if (roi.is_valid() && !roi.contains(instdir)) {
+        if (!obsoverlap[i]) {
             continue;
         }
 
@@ -825,19 +838,15 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
         // Loop again over every pixel in the observation to compute Non/Noff
         int n_on(0), n_off(0);
         double alpha_on(0.0), alpha_off(0.0);
-        for (int j = imin; j < imax; ++j) {
+        for (int j = 0; j < m_bkgmap.npix(); ++j) {
+
+            // Check if the observation overlaps this pixel
+            if (!obsoverlap[j]) {
+                continue;
+            }
 
             // Get sky direction of pixel
             skydir = m_bkgmap.inx2dir(i);
-
-            // Convert sky direction in instrument direction
-            instdir = obs->pointing().instdir(skydir);
-
-            // If RoI is valid and instrument direction is not within RoI then
-            // skip pixel
-            if (roi.is_valid() && !roi.contains(instdir)) {
-                continue;
-            }
 
             // Check if pixel is inside source region
             if (roi_reg.contains(skydir)) {
@@ -869,9 +878,6 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
         m_bkgmap(i,0) = n_on - (alpha * n_off);
 
     } // endfor: looped over background map pixels
-
-    // Update the likelihood values in the 
-
 
     // Zero out the alpha map to prepare it for the next observation
     std::vector<int>::iterator iter;

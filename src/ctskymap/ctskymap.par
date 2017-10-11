@@ -43,9 +43,9 @@ yref,     r, a, 22.01,-90,90, "Second coordinate of image center in degrees (DEC
 # Background subtraction parameters
 #==================================
 bkgsubtract, s, a, NONE, NONE|IRF|RING,, "Background subtraction method"
-roiradius,   r, h, 0.0,,, "Region of interest radius"
-inradius,    r, h, 0.6,,, "Inner ring radius"
-outradius,   r, h, 0.8,,, "Outer ring radius"
+roiradius,   r, a, 0.0,,, "Region of interest radius"
+inradius,    r, a, 0.6,,, "Inner ring radius"
+outradius,   r, a, 0.8,,, "Outer ring radius"
 regfile,     f, h, NONE,,, "Exclusion regions definition file"
 
 #
