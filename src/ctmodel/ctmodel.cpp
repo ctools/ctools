@@ -920,9 +920,9 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
 /***********************************************************************//**
  * @brief Find the models falling inside a defined region of interest.
  *
- * @param[out] all_models       Model container to be trimmed
- * @param[in]  roi              Observation region of interest
- * @return New model container contianing only models inside roi
+ * @param[in,out] all_models Model container to be trimmed.
+ * @param[in] roi Observation region of interest.
+ * @return New model container containing only models inside RoI.
  *
  * Note that a buffer is added to the observation region to ensure that
  * point sources (which have radius=0) are appropriately included if they
@@ -930,9 +930,9 @@ void ctmodel::fill_cube(const GCTAObservation* obs, GModels& models)
  ***************************************************************************/
 GModels ctmodel::trim_models(GModels& all_models, const GCTARoi& roi)
 {
-    // Create the model object to be returned
+    // Create the model container containing only models in RoI
     GModels excluded_models;
-    
+
     // Do nothing if roi is not valid. This will be the case for binned data
     // sets as they have the default roi radius of 0. In this case we would
     // remove ALL models, which is obviously incorrect. So we keep all models
@@ -940,35 +940,41 @@ GModels ctmodel::trim_models(GModels& all_models, const GCTARoi& roi)
     if (!roi.is_valid()) {
         return excluded_models;
     }
-    
+
     // Remove all models that dont overlap with the region of interest. Note
     // that an extra factor is used since point sources have regions of
     // radius 0, which is a problem when they fall just barely outside the
-    // ROI. This ensures point sources are appropriately included.
+    // RoI. This ensures point sources are appropriately included.
     GSkyRegionCircle obsreg(roi.centre().dir(), roi.radius()+0.5);
-    
+
     // Loop over the models in the passed container
-    for (int mod=0; mod<all_models.size(); mod++) {
+    for (int i = 0; i < all_models.size(); ++i) {
+
         // Cast the model to a GModelSky object
-        GModelSky* model = dynamic_cast<GModelSky*>(all_models.at(mod)->clone());
-        
+        GModelSky* model = dynamic_cast<GModelSky*>(all_models[i]);
+
+        // If model is not a GModelSky model than skip
         if (model == NULL) {
-            // Model is most likely a background model and should be kept
             continue;
         }
+
         // Otherwise, exclude the model if it isn't a diffuse cube and it
         // doesn't overlap with the observation.
-        else if (!(model->spatial()->code() == GMODEL_SPATIAL_DIFFUSE) &&
+        if (!(model->spatial()->code() == GMODEL_SPATIAL_DIFFUSE) &&
             (!model->spatial()->region()->overlaps(obsreg))) {
-            // Model represents a source, that doesn't overlap the observation
-            // and should be removed for now.
+
+            // Append model to the excluded models
             excluded_models.append(*model);
-            all_models.remove(mod);
-            mod--;  // decrement to prevent skipping models
+
+            // Remove model
+            all_models.remove(i);
+
+            // Decrement to prevent skipping models
+            i--;
         }
-        
-        delete model;
-    }
-    
+
+    } // endfor: looped over all models
+
+    // Return excluded models
     return excluded_models;
 }

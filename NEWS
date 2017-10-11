@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-8 August 2017
+11 October 2017
 
 
 Introduction
@@ -60,6 +60,11 @@ ctmodel - CTA counts cube modelling
 -----------------------------------
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
+
+The tool now also checks which models actually overlap with the RoI of a given
+observation and then only use these models to compute the model cube. The
+parallelization of the tool has also been optimised so that diffuse models are
+not loaded over and over again (#2189).
 
 
 ctexpcube - CTA exposure cube generation
