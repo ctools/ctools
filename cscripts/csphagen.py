@@ -61,14 +61,8 @@ class csphagen(ctools.cscript):
         if self._obs.size() == 0:
             self['inobs'].filename()
 
-        # Query energy binning parameters
-        self['ebinalg'].string()
-        if self['ebinalg'].string() == 'FILE':
-            self['ebinfile'].filename()
-        else:
-            self._emin = self['emin'].real()
-            self._emax = self['emax'].real()
-            self._enumbins = self['enumbins'].integer()
+        # Set energy bounds
+        self._ebounds = self._create_ebounds()
 
         # Initialise background estimation method
         self._bkgmethod = self["bkgmethod"].string()
@@ -100,6 +94,11 @@ class csphagen(ctools.cscript):
         if (self._read_ahead()):
             self._outroot = self['outroot'].string()
 
+        # Set some fixed parameters
+        self._chatter = self["chatter"].integer()
+        self._clobber = self["clobber"].boolean()
+        self._debug = self["debug"].boolean()
+
         # If there are no observations in container then get them from the
         # parameter file
         if self._obs.size() == 0:
@@ -120,7 +119,7 @@ class csphagen(ctools.cscript):
         outregions = []
         pnt_dir = obs.pointing().dir()
         offset = pnt_dir.dist_deg(self._src_dir)
-        if offset <= self._rad or offset>=4.:
+        if offset <= self._rad or offset >= 4.:
             pass
         else:
             posang = pnt_dir.posang_deg(self._src_dir)
@@ -155,20 +154,10 @@ class csphagen(ctools.cscript):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
 
-        # Set energy binning
-        if self['ebinalg'] == "FILE":
-            pass
-            ## need to load binning from file
-        else:
-            etrue = gammalib.GEbounds(self._enumbins,
-                                      gammalib.GEnergy(self._emin, 'TeV'),
-                                      gammalib.GEnergy(self._emax, 'TeV'))
-            ereco = gammalib.GEbounds(self._enumbins,
-                                      gammalib.GEnergy(self._emin, 'TeV'),
-                                      gammalib.GEnergy(self._emax, 'TeV'))
-
         # Loop through observations and generate pha, arf, rmf files
         outobs = gammalib.GObservations()
+        etrue = self._ebounds
+        ereco = self._ebounds
         for obs in self._obs:
             bkg_reg = gammalib.GSkyRegions()
             if self._bkgmethod == "REFLECTED":
