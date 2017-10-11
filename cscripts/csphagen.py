@@ -126,7 +126,7 @@ class csphagen(ctools.cscript):
         outregions = []
         pnt_dir = obs.pointing().dir()
         offset = pnt_dir.dist_deg(self._src_dir)
-        if offset <= self._rad or offset >= 4.:
+        if offset <= self._rad or offset >= self["maxoffset"].real():
             pass
         else:
             posang = pnt_dir.posang_deg(self._src_dir)
@@ -178,7 +178,7 @@ class csphagen(ctools.cscript):
                 regions = self._reflected_regions(obs)
             for region in regions:
                 bkg_reg.append(region)
-            if bkg_reg.size() > self._bkgregmin:
+            if bkg_reg.size() >= self._bkgregmin:
                 onoff = gammalib.GCTAOnOffObservation(obs, etrue, ereco,
                                                       self._src_reg, bkg_reg)
                 onoff.id(obs.id())
