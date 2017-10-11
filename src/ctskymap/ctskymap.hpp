@@ -72,6 +72,10 @@ protected:
     void map_background(GCTAObservation* obs);
     void map_background_irf(GCTAObservation* obs);
     void map_background_ring(GCTAObservation* obs);
+    void map_significance(void);
+    void map_exclusions(const GFilename& filename);
+    void map_exclusions_reg(const GFilename& filename);
+    void map_exclusions_fits(const GFilename& filename);
 
     // Background integration kernel
     class irf_kern : public GFunction {
@@ -101,7 +105,11 @@ protected:
     GSkyMap       m_skymap;     //!< Sky map
     GSkyMap       m_bkgmap;     //!< Background map
     GSkyMap       m_sigmap;     //!< Significance map
-    GSkyMap       m_alphamap;   //!< Alpha map (if doing "RING" bkg subtraction)
+    GSkyMap       m_exclmap;    //!< Exclusion map (if doing "RING" bkg subtraction)
+
+    // Caching variables to prevent multiple computations of the same thing
+    std::vector<int> m_cnts;          //!< Current observation counts (for "RING")
+    std::vector<double> m_solidangle; //!< Cached pixel solid angles
 };
 
 

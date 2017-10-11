@@ -30,6 +30,7 @@
 #endif
 #include <cstdio>
 #include "ctskymap.hpp"
+#include "GSkyRegions.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 #define G_INIT_MAP                  "ctskymap::init_map(GCTAObservation* obs)"
@@ -241,18 +242,9 @@ void ctskymap::run(void)
 
     } // endfor: looped over observations
 
-    // If background subtract was required then compute significance map
-    // and subtract background map from counts map
-    if (m_bkgsubtract != "NONE") {
-
-        // Compute significance map
-        m_sigmap = (m_skymap - m_bkgmap) / sqrt(m_skymap);
-
-        // Subtract background map from counts map
-        m_skymap -= m_bkgmap;
-
-    } // endif: background subtraction was requested
-
+    // Compute the significance map
+    map_significance();
+    
     // Optionally publish sky map
     if (m_publish) {
         publish();
@@ -368,6 +360,14 @@ void ctskymap::init_members(void)
     m_bkgsubtract = "NONE";
     m_publish     = false;
     m_chatter     = static_cast<GChatter>(2);
+    m_solidangle  = std::vector<double>(0);
+
+    // Variables for RING bkgd subtraction
+    m_exclmap.clear();
+    m_roiradius = 0.0;
+    m_inradius  = 0.0;
+    m_outradius = 0.0;
+    m_cnts = std::vector<int>(0);
 
     // Return
     return;
@@ -441,10 +441,10 @@ void ctskymap::get_parameters(void)
 
     // Read ahead parameters
     if (read_ahead()) {
-        m_outmap  = (*this)["outmap"].filename();
-        m_roiradius = (this)["roiradius"].real();
-        m_inradius = (this)["m_inradius"].real();
-        m_outradius = (this)["m_outradius"].real();
+        m_outmap    = (*this)["outmap"].filename();
+        m_roiradius = (*this)["roiradius"].real();
+        m_inradius  = (*this)["inradius"].real();
+        m_outradius = (*this)["outradius"].real();
     }
 
     // Create background map and significance map if background subtraction
@@ -452,10 +452,19 @@ void ctskymap::get_parameters(void)
     if (m_bkgsubtract != "NONE") {
         m_bkgmap = create_map(m_obs);
         m_sigmap = create_map(m_obs);
+        
+        // Setup the exclusions map
+        map_exclusions((*this)["regfile"].filename());
 
         // If doing a ring background subtraction, generate an alpha map
         if (m_bkgsubtract == "RING") {
-            m_alphamap = create_map(m_obs);
+            m_cnts = std::vector<int>(m_bkgmap.npix(), 0);
+        }
+
+        // Cache the pixel solid angles
+        m_solidangle = std::vector<double>(m_bkgmap.npix(), 0.0);
+        for (int i=0; i<m_bkgmap.npix(); i++) {
+            m_solidangle[i] = m_bkgmap.solidangle(i);
         }
     }
 
@@ -539,6 +548,11 @@ void ctskymap::map_events(GCTAObservation* obs)
         m_skymap(pixel, 0) += 1.0;
         num_in_map++;
 
+        // If doing the RING subtraction, keep tabs on counts from this obs
+        if (m_bkgsubtract == "RING") {
+            m_cnts[m_skymap.pix2inx(pixel)] += 1.0;
+        }
+        
     } // endfor: looped over all events
 
     // Log binning results
@@ -673,7 +687,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
         total += value;
 
     } // endfor: looped over background map pixels
-  
+
     // Log background subtraction results
     log_value(NORMAL, "Events in background", int(total+0.5));
     log_value(NORMAL, "Background evaluations", calls);
@@ -697,7 +711,293 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
  * also by the background IRF value
  ***************************************************************************/
 void ctskymap::map_background_ring(GCTAObservation* obs)
-{}
+{
+    // Get IRF response (to scale background counts)
+    const GCTAResponseIrf* rsp = dynamic_cast<const GCTAResponseIrf*>(obs->response());
+
+        // Throw an exception if observation has no instrument response function
+    if (rsp == NULL) {
+        std::string msg = "No response information available for "+
+                          get_obs_header(obs)+" to compute IRF background. "
+                          "Please specify response information or use "
+                          "another background subtraction method.";
+        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+    }
+
+    // Get IRF background template
+    const GCTABackground* bkg = rsp->background();
+
+    // Throw an exception if observation has no IRF background template
+    if (bkg == NULL) {
+        std::string msg = "No IRF background template found in instrument "
+                          "response function for "+
+                          get_obs_header(obs)+". Please specify an instrument "
+                          "response function containing a background template.";
+        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+    }
+
+    // Compute natural logarithm of energy range in MeV
+    double lnEmin = std::log(m_emin * 1.0e6);
+    double lnEmax = std::log(m_emax * 1.0e6);
+
+    // Extract region of interest from observation
+    GCTARoi roi = obs->roi();
+
+    // Initialise statistics
+    int    calls = 0;
+    double total = 0.0;
+    double exposure = obs->livetime() ;
+
+    // Cached background IRF sensitivities
+    std::vector<double>  sens(m_cnts.size(), 0.0);  
+    
+    // Keep track of the minimum and maximum pixels that need to be looped over
+    int imin(m_bkgmap.npix());
+    int imax(0);
+
+    // Cache the IRF sensitivities
+    // Loop over all map pixels
+    for (int i = 0; i < m_bkgmap.npix(); ++i) {
+
+        // Get sky direction of pixel
+        GSkyDir skydir = m_bkgmap.inx2dir(i);
+
+        // Convert sky direction in instrument direction
+        GCTAInstDir instdir = obs->pointing().instdir(skydir);
+    
+        // If RoI is valid and instrument direction is not within RoI then
+        // skip pixel
+        if (roi.is_valid() && !roi.contains(instdir)) {
+            continue;
+        }
+
+        // If bin is excluded in the exclusion, skip it
+        if (m_exclmap(i) == 0.0) {
+            continue;
+        }
+
+        // Update pixel ranges
+        if (i > imax) imax = i;
+        if (i < imin) imin = i;
+
+        // Setup integration function
+        ctskymap::irf_kern integrand(bkg, &instdir);
+        GIntegral          integral(&integrand);
+
+        // Set precision (has been carefully adjusted using a test simulation
+        // over the energy range 20 GeV - 120 TeV)
+        integral.eps(1.0e-6);
+
+        // Do Romberg integration to get the sensitivity (note: this assumes the
+        // background IRF is a good approximation for the radial sensitivity)
+        sens[i] = integral.romberg(lnEmin, lnEmax);
+
+        // Update number of background function calls
+        calls += integral.calls();
+
+    } // endfor: Loop for caching bkg IRF sensitivity
+
+    // Define the regions necessary to do the pixel checks
+    GSkyRegionCircle roi_reg(0.0, 0.0, m_roiradius);
+    GSkyRegionCircle inner_reg(0.0, 0.0, m_inradius);
+    GSkyRegionCircle outer_reg(0.0, 0.0, m_outradius);
+
+    // Loop over all map pixels
+    for (int i = imin; i <= imax; ++i) {
+
+        // Get sky direction of pixel
+        GSkyDir skydir = m_bkgmap.inx2dir(i);
+
+        // Convert sky direction in instrument direction
+        GCTAInstDir instdir = obs->pointing().instdir(skydir);
+
+        // If RoI is valid and instrument direction is not within RoI then
+        // skip pixel
+        if (roi.is_valid() && !roi.contains(instdir)) {
+            continue;
+        }
+
+        // Update the region positions
+        roi_reg.centre(skydir);
+        inner_reg.centre(skydir);
+        outer_reg.centre(skydir);
+
+        // Loop again over every pixel in the observation to compute Non/Noff
+        int n_on(0), n_off(0);
+        double alpha_on(0.0), alpha_off(0.0);
+        for (int j = imin; j < imax; ++j) {
+
+            // Get sky direction of pixel
+            skydir = m_bkgmap.inx2dir(i);
+
+            // Convert sky direction in instrument direction
+            instdir = obs->pointing().instdir(skydir);
+
+            // If RoI is valid and instrument direction is not within RoI then
+            // skip pixel
+            if (roi.is_valid() && !roi.contains(instdir)) {
+                continue;
+            }
+
+            // Check if pixel is inside source region
+            if (roi_reg.contains(skydir)) {
+                // Update n_on
+                n_on += m_cnts[j];
+
+                // Update alpha_on
+                alpha_on += m_solidangle[j] * sens[j];
+            }
+
+            // Otherwise check if it is in the background region
+            else if ((m_exclmap(j) == 1.0) &&
+                     !inner_reg.contains(skydir) &&
+                     outer_reg.contains(skydir)) {
+                // Update n_off
+                n_off += m_cnts[j];
+
+                // Update alpha_off
+                alpha_off += m_solidangle[j] * sens[j];
+            }
+            
+        } // endfor: sub-loop over pixels
+
+        // Compute the likelihood for this bin
+        double alpha = alpha_on / alpha_off;
+        m_sigmap(i,0) += std::log(1);
+
+        // Update the predicted background counts
+        m_bkgmap(i,0) = n_on - (alpha * n_off);
+
+    } // endfor: looped over background map pixels
+
+    // Update the likelihood values in the 
+
+
+    // Zero out the alpha map to prepare it for the next observation
+    std::vector<int>::iterator iter;
+    for (iter=m_cnts.begin(); iter!=m_cnts.end(); ++iter) {
+        (*iter) = 0;
+    }
+
+    // Return
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Computes the bin-by-bin significance if background subtraction requested
+ *
+ * Method computes the bin-by bin significance if a background subtraction 
+ * method is specified. If method is "IRF", Poisson statistics (in the Gaussian
+ * limit) are assumed. If method is "RING" a Li & Ma significance is computed
+ * for each bin (as well as a map of the computed alpha values). 
+ ***************************************************************************/
+void ctskymap::map_significance(void)
+{
+    // Check if no background subtraction is requested
+    if (m_bkgsubtract == "NONE") {
+        return;
+    }
+
+    // If background subtract was required then compute significance map..
+
+    // ... from "RING" method (Li & Ma eq. 17)
+    else if (m_bkgsubtract == "RING") {
+        // Multiply the significance map by '-2'
+        m_sigmap *= -2.0;
+
+        // Now the square root
+        m_sigmap = sqrt(m_sigmap);
+    } 
+
+    // ... using Poisson statistics in the Gaussian limit
+    else {
+        // Compute significance map
+        m_sigmap = (m_skymap - m_bkgmap) / sqrt(m_skymap);
+    } // endif: background subtraction was requested
+    
+    // Subtract background map from counts map
+    m_skymap -= m_bkgmap;
+}
+
+
+/***********************************************************************//**
+ * @brief Generates a map of pixels to be excluded from background estimation
+ *
+ * @param[in] filename Filename from which to take the exclusions from
+ ***************************************************************************/
+void ctskymap::map_exclusions(const GFilename& filename)
+{
+    // Otherwise, create the map and set all pixels to 1
+    m_exclmap = create_map(m_obs);
+    m_exclmap = 1.0;
+
+    // Make sure the exclusions filename is valid
+    if (!is_valid_filename(filename)) {
+        return;
+    }
+
+    // Fill the exclusions based on the regions supplied
+    if (filename.is_fits()) {
+        map_exclusions_fits(filename);
+    } else {
+        map_exclusions_reg(filename);
+    } // endif: generate exclusion map from filename
+
+    return;
+}
+
+
+/***********************************************************************//**
+ * @brief Fills exclusions map if file is a FITS image
+ *
+ * @param[in] filename Filename from which to take the exclusions from
+ ***************************************************************************/
+void ctskymap::map_exclusions_fits(const GFilename& filename)
+{
+    // Load the fits image
+    GSkyMap inmap(filename);
+
+    // Loop through the individual pixels in the exclusion map
+    GSkyDir dir;
+    for (int i=0; i<m_exclmap.npix(); i++) {
+        // Get the pixel direction
+        dir = m_exclmap.pix2dir(i);
+
+        // Check this sky position in the fits map
+        if (inmap.contains(dir) && (inmap(inmap.dir2inx(dir)) == 0.0)) {
+            // Set the pixel to 0
+            m_exclmap(i) = 0.0;
+
+        } // endif: pixel,region overlap check
+    } // endfor: Loop over exclusion map pixels
+}
+
+
+/***********************************************************************//**
+ * @brief Fills exclusions map if file is a DS9 region file
+ *
+ * @param[in] filename Filename from which to take the exclusions from
+ ***************************************************************************/
+void ctskymap::map_exclusions_reg(const GFilename& filename)
+{
+    // Load the exclusion regions
+    GSkyRegions regions(filename);
+
+    // Loop through the individual pixels in the exclusion map
+    GSkyDir dir;
+    for (int i=0; i<m_exclmap.npix(); i++) {
+        // Get the pixel position
+        dir = m_exclmap.pix2dir(i);
+
+        // Check if GSkyDir overlaps with the regions
+        if (regions.contains(dir)) {
+            // Set the pixel to 0
+            m_exclmap(i) = 0.0;
+
+        } // endif: pixel,region overlap check
+    } // endfor: loop over exclusion map pixels
+}
 
 
 /***********************************************************************//**
