@@ -166,16 +166,20 @@ class csphagen(ctools.cscript):
                 bkg_reg.append(region)
             onoff = gammalib.GCTAOnOffObservation(obs, etrue, ereco,
                                                   self._src_reg, bkg_reg)
+            onoff.id(obs.id())
             outobs.append(onoff)
 
         # Save PHA, ARF and RMFs
-        for s, obs in enumerate(outobs):
-            obs.on_spec().save(self._outroot + '_{}_pha_on.fits'.format(s),
+        for obs in outobs:
+            obs.on_spec().save(self._outroot + '_{}_pha_on.fits'.format(obs.id()),
                                True)
-            obs.off_spec().save(self._outroot + '_{}_pha_off.fits'.format(s),
+            obs.off_spec().save(self._outroot + '_{}_pha_off.fits'.format(obs.id()),
                                 True)
-            obs.arf().save(self._outroot + '_{}_arf.fits'.format(s), True)
-            obs.rmf().save(self._outroot + '_{}_rmf.fits'.format(s), True)
+            obs.arf().save(self._outroot + '_{}_arf.fits'.format(obs.id()), True)
+            obs.rmf().save(self._outroot + '_{}_rmf.fits'.format(obs.id()), True)
+            obs.on_regions().save(self._outroot + '_{}_on.reg'.format(obs.id()))
+            obs.off_regions().save(self._outroot + '_{}_off.reg'.format(obs.id()))
+
 
         # Save On/Off observations
         outobs.save(self._outroot + '.xml')

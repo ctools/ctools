@@ -18,8 +18,7 @@
 #============================
 inobs,      f, a, obs.xml,,, "Input event list or observation definition XML file"
 exclusion,  f,  h, NONE,,, "FITS WCS map of exclusion regions"
-outroot,    s, a, spectrum,,, "Root of the name for output PHA and XML files"
-outreg,     f, h, NONE,,, "Output ds9 reg file showing source/background regions"
+outroot,    s, a, spectrum,,, "Root of the name for output PHA, XML, and ds9 reg files"
 
 #
 # Script parameters
