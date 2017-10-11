@@ -68,6 +68,7 @@ class csphagen(ctools.cscript):
         self._bkgmethod = self["bkgmethod"].string()
         if self._bkgmethod == "REFLECTED":
             self._bkgregmin = self["bkgregmin"].integer()
+            self._maxoffset = self["maxoffset"].real()
 
         # Initialise source position/region querying relevant parameters
         self._src_dir = gammalib.GSkyDir()
@@ -126,7 +127,8 @@ class csphagen(ctools.cscript):
             if self._srcshape == "CIRCLE":
                 # angular separation of reflected regions wrt camera center
                 # and number
-                alpha = 2 * self._rad / offset
+                alpha = 1.05 * 2 * self._rad / offset
+                # 1.05 ensures background regions do not overlap due to numerical precision issues
                 N = int(2 * math.pi / alpha)
                 if N < self._bkgregmin + 3:
                     pass
@@ -171,15 +173,19 @@ class csphagen(ctools.cscript):
 
         # Save PHA, ARF and RMFs
         for obs in outobs:
-            obs.on_spec().save(self._outroot + '_{}_pha_on.fits'.format(obs.id()),
-                               True)
-            obs.off_spec().save(self._outroot + '_{}_pha_off.fits'.format(obs.id()),
-                                True)
-            obs.arf().save(self._outroot + '_{}_arf.fits'.format(obs.id()), True)
-            obs.rmf().save(self._outroot + '_{}_rmf.fits'.format(obs.id()), True)
+            obs.on_spec().save(
+                self._outroot + '_{}_pha_on.fits'.format(obs.id()),
+                True)
+            obs.off_spec().save(
+                self._outroot + '_{}_pha_off.fits'.format(obs.id()),
+                True)
+            obs.arf().save(self._outroot + '_{}_arf.fits'.format(obs.id()),
+                           True)
+            obs.rmf().save(self._outroot + '_{}_rmf.fits'.format(obs.id()),
+                           True)
             obs.on_regions().save(self._outroot + '_{}_on.reg'.format(obs.id()))
-            obs.off_regions().save(self._outroot + '_{}_off.reg'.format(obs.id()))
-
+            obs.off_regions().save(
+                self._outroot + '_{}_off.reg'.format(obs.id()))
 
         # Save On/Off observations
         outobs.save(self._outroot + '.xml')
