@@ -41,11 +41,14 @@ class Test(test):
         """
         # Call base class constructor
         test.__init__(self)
-        self._myevents = self._datadir + '/crab_offaxis1.fits'
+        self._myevents1 = self._datadir + '/crab_offaxis1.fits'
+        self._myevents2 = self._datadir + '/crab_offaxis2.fits'
         self._exclusion = self._datadir + '/crab_exclusion.fits'
         self._nreg_with_excl = 5
         self._nreg_wo_excl = 8
-        # number of expected background regions with/wo exclusion
+        self._nreg_mul = [self._nreg_with_excl, 6]
+        # number of expected background regions with/wo exclusion,
+        # and for two different runs
 
         # Return
         return
@@ -74,7 +77,7 @@ class Test(test):
         csphagen = self._script('csphagen')
         nbins = 120
 
-        cmd = csphagen + 'inobs="' + self._myevents + \
+        cmd = csphagen + 'inobs="' + self._myevents1 + \
               '" caldb="' + self._caldb + '" irf="' + self._irf + \
               '" ebinalg=LOG emin=0.1 emax=100. enumbins="' + nbins + \
               '" coordsys=CEL' + ' ra=83.633 dec=22.0145 rad=0.2 stack=no exclusion="' + \
@@ -90,7 +93,8 @@ class Test(test):
                          'Check successful execution from command line')
 
         # Check output files
-        self._check_output('genpha_cmd1', nbins, self._nreg_with_excl)
+        self._check_output('genpha_cmd1_', nbins, self._nreg_with_excl)
+        self._check_outobs('genpha_cmd1', 1)
 
         cmd = csphagen + 'inobs="events_that_do_not_exist.fits"' + \
               '" caldb="' + self._caldb + '" irf="' + self._irf + \
@@ -104,7 +108,7 @@ class Test(test):
                          'Check invalid input file when executed from command line')
 
         # Check cslightcrv --help
-        self._check_help(cslightcrv)
+        self._check_help(csphagen)
 
         # Return
         return
@@ -117,12 +121,12 @@ class Test(test):
 
         # Same test as from command line
         phagen = cscripts.csphagen()
-        phagen['inobs'] = self._myevents
+        phagen['inobs'] = self._myevents1
         phagen['caldb'] = self._caldb
         phagen['irf'] = self._irf
         phagen['ebinalg'] = 'LOG'
         phagen['emin'] = 0.1
-        phagen['emax']= 100.
+        phagen['emax'] = 100.
         phagen['enumbins'] = nbins
         phagen['coordsys'] = 'CEL'
         phagen['ra'] = 83.633
@@ -138,11 +142,12 @@ class Test(test):
         phagen.execute()
 
         # Check outout
-        self._check_output('genpha_py1', nbins, self._nreg_with_excl)
+        self._check_output('genpha_py1_', nbins, self._nreg_with_excl)
+        self._check_outobs('genpha_py1', 1)
 
-        # Second test, now without exclusion region
+        # Now test without exclusion region
         phagen = cscripts.csphagen()
-        phagen['inobs'] = self._myevents
+        phagen['inobs'] = self._myevents1
         phagen['caldb'] = self._caldb
         phagen['irf'] = self._irf
         phagen['ebinalg'] = 'LOG'
@@ -162,8 +167,44 @@ class Test(test):
         phagen.execute()
 
         # Check outout
-        self._check_output('genpha_py2', nbins, self._nreg_wo_excl)
+        self._check_output('genpha_py2_', nbins, self._nreg_wo_excl)
+        self._check_outobs('genpha_py2', 1)
 
+        # Test with multiple input observations, no stacking
+        # Create observation container
+        obs = gammalib.GObservations()
+        for s, events in enumerate([self._myevents1, self._myevents2]):
+            run = gammalib.GCTAObservation(events)
+            run.id(str(s + 1))
+            run.response(self.irf, self.caldb)
+            obs.append(run)
+
+        # Setup csphagen
+        phagen = cscripts.csphagen(obs)
+        phagen['ebinalg'] = 'LOG'
+        phagen['emin'] = 0.1
+        phagen['emax'] = 100.
+        phagen['enumbins'] = nbins
+        phagen['coordsys'] = 'CEL'
+        phagen['ra'] = 83.633
+        phagen['dec'] = 22.0145
+        phagen['rad'] = 0.2
+        phagen['stack'] = False
+        phagen['exclusion'] = self._exclusion
+        phagen['outroot'] = 'genpha_py3'
+        phagen['logfile'] = 'csphagen_py3.log'
+        phagen['chatter'] = 1
+
+        # Run script
+        phagen.execute()
+
+        # Check outout
+        for s in range(2):
+            self._check_output('genpha_py3_' + str(s + 1), nbins,
+                               self._nreg_mul[s])
+        self._check_outobs('genpha_py3', 2)
+
+        return
 
     def _check_ebounds(self, table, bins):
         """
@@ -300,28 +341,36 @@ class Test(test):
         # Return
         return
 
-    def _check_output(self, filenameroot, bins, nreg):
+    def _check_output(self, filenameroot, bins, nreg, nout):
         """
         Check the output from a csphagen run
         """
 
         # OGIP files
-        self._check_pha(filenameroot + '__pha_on.fits', bins)
-        self._check_pha(filenameroot + '__pha_off.fits', bins)
-        self._check_arf(filenameroot + '__arf.fits', bins)
-        self._check_rmf(filenameroot + '__rmf.fits', bins)
+        self._check_pha(filenameroot + '_pha_on.fits', bins)
+        self._check_pha(filenameroot + '_pha_off.fits', bins)
+        self._check_arf(filenameroot + '_arf.fits', bins)
+        self._check_rmf(filenameroot + '_rmf.fits', bins)
 
         # Observations
-        obs = gammalib.GObservations(filenameroot + '.xml')
-        self.test_value(obs.size(), 1, 'Check for ' + str(
-            number) + ' observations in XML file')
+
 
         # Regions
-        reg = gammalib.GSkyRegions(filenameroot + "__on.reg")
+        reg = gammalib.GSkyRegions(filenameroot + "_on.reg")
         self.test_value(reg.size(), 1, 'Check for ' + str(
             number) + ' region in source region file')
-        reg = gammalib.GSkyRegions(filenameroot + "__off.reg")
+        reg = gammalib.GSkyRegions(filenameroot + "_off.reg")
         self.test_value(reg.size(), nreg, 'Check for ' + str(
             number) + ' region in background region file')
+
+        return
+
+    def _check_outobs(self, filenameroot, nout):
+        """
+        Check the output XML file containing ON/OFF observations
+        """
+        obs = gammalib.GObservations(filenameroot + '.xml')
+        self.test_value(obs.size(), nout, 'Check for ' + str(
+            number) + ' observations in XML file')
 
         return
