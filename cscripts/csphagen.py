@@ -56,10 +56,9 @@ class csphagen(ctools.cscript):
         """
         Get parameters from parfile and setup observations
         """
-        # If there are no observations in container then query the inobs
-        # parameter
-        if self._obs.size() == 0:
-            self['inobs'].filename()
+        # Setup observations (require response and allow event list, don't
+        # allow counts cube)
+        self._setup_observations(self._obs, True, True, False)
 
         # Set energy bounds
         self._ebounds = self._create_ebounds()

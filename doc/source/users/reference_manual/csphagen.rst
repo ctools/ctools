@@ -20,7 +20,13 @@ General parameters
 ``inobs [file]``
     Input event list or observation definition XML file
 
-``exclusion [file]``
+``caldb [string]``
+    Calibration database.
+ 	 	 
+``irf [string]``
+    Instrument response function.
+
+``(exclusion = NONE) [file]``
     Optional FITS file containing a WCS map in the first hdu that defines sky regions not to be used for background estimation (where map value > 0) 
 
 ``outroot [string]``
@@ -41,10 +47,10 @@ General parameters
 ``ebinfile [file]``
     Name of the file containing the energy bin definition if FILE algorithm is used
 
-``bkgmethod [string]’’
+``(bkgmethod = REFLECTED) [string]’’
     Method for background estimation. REFLECTED: background evaluated in regions with the same shape as source region reflected w.r.t. pointing direction for each observation
 
-``srcshape [string]``
+``(srcshape = CIRCLE) [string]``
     Shape of the source region. CIRCLE: circular region around given position
 
 ``coordsys [string]``
@@ -65,10 +71,10 @@ General parameters
 ``rad [real]``
     Radius of source region circle (deg)
 
-``bkgregmin [integer]``
+``(bkgregmin = 2) [integer]``
     Minimum number of background regions for REFLECTED method. If not available, observation is skipped. (Default: 2)
 
-``maxoffset [real]``
+``(maxoffset = 4.) [real]``
     Maximum offset of source from camera center to accept observation
 
 ``stack [boolean]``
