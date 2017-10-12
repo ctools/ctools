@@ -92,6 +92,8 @@ class csphagen(ctools.cscript):
             self._excl_reg = gammalib.GSkyRegionMap(
                 self["exclusion"].filename())
             self._has_exclusion = True
+        else:
+            self._has_exclusion = False
 
         # Stacking
         self._stack = self['stack'].boolean()
@@ -239,9 +241,6 @@ class csphagen(ctools.cscript):
 
         # Run the script
         self.run()
-
-        # Save residual map
-        self.save()
 
         # Return
         return

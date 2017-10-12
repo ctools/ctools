@@ -41,10 +41,11 @@ class Test(test):
         """
         # Call base class constructor
         test.__init__(self)
-        self._myevents = self._datadir + '/crab_offaxis.fits'
+        self._myevents = self._datadir + '/crab_offaxis1.fits'
         self._exclusion = self._datadir + '/crab_exclusion.fits'
         self._nreg_with_excl = 5
-        # number of expected background regions with exclusion
+        self._nreg_wo_excl = 8
+        # number of expected background regions with/wo exclusion
 
         # Return
         return
@@ -107,6 +108,62 @@ class Test(test):
 
         # Return
         return
+
+    def _test_python(self):
+        """
+        Test csphagen from Python
+        """
+        nbins = 120
+
+        # Same test as from command line
+        phagen = cscripts.csphagen()
+        phagen['inobs'] = self._myevents
+        phagen['caldb'] = self._caldb
+        phagen['irf'] = self._irf
+        phagen['ebinalg'] = 'LOG'
+        phagen['emin'] = 0.1
+        phagen['emax']= 100.
+        phagen['enumbins'] = nbins
+        phagen['coordsys'] = 'CEL'
+        phagen['ra'] = 83.633
+        phagen['dec'] = 22.0145
+        phagen['rad'] = 0.2
+        phagen['stack'] = False
+        phagen['exclusion'] = self._exclusion
+        phagen['outroot'] = 'genpha_py1'
+        phagen['logfile'] = 'csphagen_py1.log'
+        phagen['chatter'] = 1
+
+        # Run script
+        phagen.execute()
+
+        # Check outout
+        self._check_output('genpha_py1', nbins, self._nreg_with_excl)
+
+        # Second test, now without exclusion region
+        phagen = cscripts.csphagen()
+        phagen['inobs'] = self._myevents
+        phagen['caldb'] = self._caldb
+        phagen['irf'] = self._irf
+        phagen['ebinalg'] = 'LOG'
+        phagen['emin'] = 0.1
+        phagen['emax'] = 100.
+        phagen['enumbins'] = nbins
+        phagen['coordsys'] = 'CEL'
+        phagen['ra'] = 83.633
+        phagen['dec'] = 22.0145
+        phagen['rad'] = 0.2
+        phagen['stack'] = False
+        phagen['outroot'] = 'genpha_py2'
+        phagen['logfile'] = 'csphagen_py2.log'
+        phagen['chatter'] = 1
+
+        # Run script
+        phagen.execute()
+
+        # Check outout
+        self._check_output('genpha_py2', nbins, self._nreg_wo_excl)
+
 
     def _check_ebounds(self, table, bins):
         """
