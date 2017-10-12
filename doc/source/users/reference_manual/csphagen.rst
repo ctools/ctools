@@ -21,7 +21,7 @@ General parameters
     Input event list or observation definition XML file
 
 ``exclusion [file]``
-    Optional FITS file containing a WCS map in the first edu defining sky regions not to be used for background estimation (where map value > 0) 
+    Optional FITS file containing a WCS map in the first hdu that defines sky regions not to be used for background estimation (where map value > 0) 
 
 ``outroot [string]``
     Root of the file name for output PHA, ARF, RMF, XML, and ds9 reg files
@@ -32,7 +32,7 @@ General parameters
 ``emax [real]``
     Upper energy limit (TeV) if LIN or LOG binning algorithms are used
 
-``enumbins [integer]``,  i, a, 120,,, "Number of energy bins"
+``enumbins [integer]``
     Number of energy bins. At least 30 bins per decade are recommended for proper evaluation of the instrument response
 
 ``ebinalg [string]’’
@@ -42,7 +42,7 @@ General parameters
     Name of the file containing the energy bin definition if FILE algorithm is used
 
 ``bkgmethod [string]’’
-    Method for background estimation. REFLECTED: background evaluated in regions with the same shape as source region reflected w.r.t. pointing direction 
+    Method for background estimation. REFLECTED: background evaluated in regions with the same shape as source region reflected w.r.t. pointing direction for each observation
 
 ``srcshape [string]``
     Shape of the source region. CIRCLE: circular region around given position
@@ -63,10 +63,10 @@ General parameters
     Galactic latitude of source region centre (deg)
 
 ``rad [real]``
-    Radius of source region circle (deg
+    Radius of source region circle (deg)
 
 ``bkgregmin [integer]``
-    Minimum number of background region for REFLECTED method. If not available, observation is skipped. (Default: 2)
+    Minimum number of background regions for REFLECTED method. If not available, observation is skipped. (Default: 2)
 
 ``maxoffset [real]``
     Maximum offset of source from camera center to accept observation
