@@ -76,6 +76,10 @@ protected:
     void map_exclusions(const GFilename& filename);
     void map_exclusions_reg(const GFilename& filename);
     void map_exclusions_fits(const GFilename& filename);
+    void compute_ring_values(const GSkyMap& counts, 
+                             const GSkyMap& sensitivity,
+                             const GSkyDir& position,
+                             double& non, double& noff, double& alpha);
 
     // Background integration kernel
     class irf_kern : public GFunction {
@@ -97,19 +101,24 @@ protected:
     std::string   m_bkgsubtract; //!< Background subtraction method
     bool          m_publish;     //!< Publish sky map?
     GChatter      m_chatter;     //!< Chattiness
+
+    // Parameters for configuring the RING background subtraction
     double        m_roiradius;   //!< Region of interest radius
     double        m_inradius;    //!< Inner ring radius
     double        m_outradius;   //!< Outer ring radius
-    
+    bool          m_runavgalpha; //!< Determines how alpha is computed
+
     // Protected members
     GSkyMap       m_skymap;     //!< Sky map
     GSkyMap       m_bkgmap;     //!< Background map
     GSkyMap       m_sigmap;     //!< Significance map
-    GSkyMap       m_exclmap;    //!< Exclusion map (if doing "RING" bkg subtraction)
+    GSkyMap       m_exclmap;    //!< Exclusion map (if "RING" bkg subtraction)
+    GSkyMap       m_alphamap;   //!< Alpha map values (if "RING" subtraction)
+    GSkyMap       m_onmap;      //!< On counts map (if "RING" subtraction)
 
     // Caching variables to prevent multiple computations of the same thing
-    std::vector<int> m_cnts;          //!< Current observation counts (for "RING")
-    std::vector<double> m_solidangle; //!< Cached pixel solid angles
+    std::vector<double>  m_solidangle; //!< Cached pixel solid angles
+    std::vector<GSkyDir> m_dirs;       //!< Cached pixel directions
 };
 
 

@@ -74,8 +74,29 @@ General parameters
 ``yref [real]``
     Declination / Galactic latitude of image centre (J2000, in degrees).
  	 	 
+
+Background subtraction configuration parameters
+-----------------------------------------------
+
 ``bkgsubtract <NONE|IRF|RING> [string]``
     Background subtraction method.
+
+``roiradius [real]``
+    Region of interest radius for RING subtraction (in degrees).
+
+``inradius [real]``
+    Inner ring radius for RING subtraction (in degrees).
+
+``outradius [real]``
+    Outer ring radius for RING subtraction (in degrees).
+
+``(regfile = NONE) [file]``
+    Exclusion region file as either a FITS map or DS9 region file.
+
+``(runavgalpha = yes) [boolean]``
+    Specifies whether or not to compute the run averaged alpha for RING 
+    subtraction. Setting to 'no' will result in computing the alpha parameter 
+    for each individual run (which can take a very long time).
 
 
 Standard parameters
