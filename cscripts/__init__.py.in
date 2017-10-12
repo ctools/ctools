@@ -35,6 +35,7 @@ __all__ = [
     "csobsdef",
     "csobsinfo",
     "csobsselect",
+    "csphagen",
     "csphasecrv",
     "cspull",
     "csresmap",
@@ -70,6 +71,7 @@ from cscripts.csobs2caldb   import csobs2caldb
 from cscripts.csobsdef      import csobsdef
 from cscripts.csobsinfo     import csobsinfo
 from cscripts.csobsselect   import csobsselect
+from cscripts.csphagen      import csphagen
 from cscripts.csphasecrv    import csphasecrv
 from cscripts.cspull        import cspull
 from cscripts.csresmap      import csresmap

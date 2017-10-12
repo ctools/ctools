@@ -79,7 +79,7 @@ class Test(test):
 
         cmd = csphagen + 'inobs="' + self._myevents1 + \
               '" caldb="' + self._caldb + '" irf="' + self._irf + \
-              '" ebinalg=LOG emin=0.1 emax=100. enumbins="' + nbins + \
+              '" ebinalg=LOG emin=0.1 emax=100. enumbins="' + str(nbins) + \
               '" coordsys=CEL' + ' ra=83.633 dec=22.0145 rad=0.2 stack=no exclusion="' + \
               self._exclusion + '" outroot=genpha_cmd1' + \
               ' logfile="csphagen_cmd1.log" chatter=1'
@@ -98,7 +98,7 @@ class Test(test):
 
         cmd = csphagen + 'inobs="events_that_do_not_exist.fits"' + \
               '" caldb="' + self._caldb + '" irf="' + self._irf + \
-              '" ebinalg=LOG emin=0.1 emax=100. enumbins="' + nbins + \
+              '" ebinalg=LOG emin=0.1 emax=100. enumbins="' + str(nbins) + \
               '" coordsys=CEL' + ' ra=83.633 dec=22.0145 rad=0.2 stack=no exclusion="' + \
               self._exclusion + '" outroot=genpha_cmd2' + \
               ' logfile="csphagen_cmd2.log" chatter=1'
@@ -141,7 +141,7 @@ class Test(test):
         # Run script
         phagen.execute()
 
-        # Check outout
+        # Check output
         self._check_output('genpha_py1_', nbins, self._nreg_with_excl)
         self._check_outobs('genpha_py1', 1)
 
@@ -166,7 +166,7 @@ class Test(test):
         # Run script
         phagen.execute()
 
-        # Check outout
+        # Check output
         self._check_output('genpha_py2_', nbins, self._nreg_wo_excl)
         self._check_outobs('genpha_py2', 1)
 
@@ -176,7 +176,7 @@ class Test(test):
         for s, events in enumerate([self._myevents1, self._myevents2]):
             run = gammalib.GCTAObservation(events)
             run.id(str(s + 1))
-            run.response(self.irf, self.caldb)
+            run.response(self._irf, gammalib.GCaldb('cta',self._caldb))
             obs.append(run)
 
         # Setup csphagen
@@ -257,7 +257,7 @@ class Test(test):
 
         # Check SPECTRUM table
         table = fits['EBOUNDS']
-        self._check_ebounds(table, nbins)
+        self._check_ebounds(table, bins)
 
         # Close FITS file
         fits.close()
@@ -333,7 +333,7 @@ class Test(test):
 
         # Check EBOUNDS table
         table = fits['EBOUNDS']
-        self._check_ebounds(table, nbins)
+        self._check_ebounds(table, bins)
 
         # Close FITS file
         fits.close()
@@ -341,7 +341,7 @@ class Test(test):
         # Return
         return
 
-    def _check_output(self, filenameroot, bins, nreg, nout):
+    def _check_output(self, filenameroot, bins, nreg):
         """
         Check the output from a csphagen run
         """
@@ -358,10 +358,10 @@ class Test(test):
         # Regions
         reg = gammalib.GSkyRegions(filenameroot + "_on.reg")
         self.test_value(reg.size(), 1, 'Check for ' + str(
-            number) + ' region in source region file')
+            1) + ' region in source region file')
         reg = gammalib.GSkyRegions(filenameroot + "_off.reg")
         self.test_value(reg.size(), nreg, 'Check for ' + str(
-            number) + ' region in background region file')
+            nreg) + ' region in background region file')
 
         return
 
@@ -371,6 +371,6 @@ class Test(test):
         """
         obs = gammalib.GObservations(filenameroot + '.xml')
         self.test_value(obs.size(), nout, 'Check for ' + str(
-            number) + ' observations in XML file')
+            nout) + ' observations in XML file')
 
         return
