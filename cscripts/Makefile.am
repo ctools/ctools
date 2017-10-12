@@ -32,8 +32,8 @@ pythonscripts = $(top_builddir)/cscripts/__init__.py \
                 $(srcdir)/csobsdef.py \
                 $(srcdir)/csobsinfo.py \
                 $(srcdir)/csobsselect.py \
+                $(srcdir)/csphagen.py \
                 $(srcdir)/csphasecrv.py \
-		$(srcdir)/csphagen.py \
                 $(srcdir)/cspull.py \
                 $(srcdir)/csresmap.py \
                 $(srcdir)/csroot2caldb.py  \
@@ -65,7 +65,7 @@ parfiles = $(srcdir)/cscaldb.par \
            $(srcdir)/csobsdef.par \
            $(srcdir)/csobsinfo.par \
            $(srcdir)/csobsselect.par \
-	   $(srcdir)/csphagen.par \
+           $(srcdir)/csphagen.par \
            $(srcdir)/csphasecrv.par \
            $(srcdir)/cspull.par \
            $(srcdir)/csresmap.par \
@@ -95,7 +95,7 @@ linkscripts = cscaldb \
               csobsdef \
               csobsinfo \
               csobsselect \
-	      csphagen \
+              csphagen \
               csphasecrv \
               cspull \
               csresmap \
