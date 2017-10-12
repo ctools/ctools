@@ -130,6 +130,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_csobsdef.py \
               $(top_srcdir)/test/test_csobsinfo.py \
               $(top_srcdir)/test/test_csobsselect.py \
+              $(top_srcdir)/test/test_csphagen.py \
               $(top_srcdir)/test/test_csphasecrv.py \
               $(top_srcdir)/test/test_cspull.py \
               $(top_srcdir)/test/test_csresmap.py \
@@ -158,6 +159,9 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_psfcube.fits.gz \
            $(top_srcdir)/test/data/crab_edispcube.fits.gz \
            $(top_srcdir)/test/data/crab_bkgcube.fits.gz \
+           $(top_srcdir)/test/data/crab_offaxis1.fits \
+           $(top_srcdir)/test/data/crab_offaxis2.fits \
+           $(top_srcdir)/test/data/crab_exclusion.fits \
            $(top_srcdir)/test/data/tsmap_0.fits \
            $(top_srcdir)/test/data/tsmap_1.fits \
            $(top_srcdir)/test/data/exclusion.reg \
