@@ -68,7 +68,7 @@ class csphagen(ctools.cscript):
         self._bkgmethod = self["bkgmethod"].string()
         if self._bkgmethod == "REFLECTED":
             self._bkgregmin = self["bkgregmin"].integer()
-            self._maxoffset = self["maxoffset"].real()
+        self._maxoffset = self["maxoffset"].real()
 
         # Initialise source position/region querying relevant parameters
         self._src_dir = gammalib.GSkyDir()
