@@ -33,10 +33,10 @@
 #include "GSkyRegions.hpp"
 
 /* __ Method name definitions ____________________________________________ */
-#define G_INIT_MAP                  "ctskymap::init_map(GCTAObservation* obs)"
-#define G_BIN_EVENTS                  "ctskymap::map_events(GCTAObservation*)"
-#define G_BKG_SUBTRACT_IRF    "ctskymap::map_background_irf(GCTAObservation*)"
-#define G_BKG_SUBTRACT_RING  "ctskymap::map_background_ring(GCTAObservation*)"
+#define G_INIT_MAP                   "ctskymap::init_map(GCTAObservation* obs)"
+#define G_MAP_EVENTS                   "ctskymap::map_events(GCTAObservation*)"
+#define G_MAP_BACKGROUND_IRF   "ctskymap::map_background_irf(GCTAObservation*)"
+#define G_MAP_BACKGROUND_RING "ctskymap::map_background_ring(GCTAObservation*)"
 
 /* __ Debug definitions __________________________________________________ */
 
@@ -604,7 +604,7 @@ void ctskymap::map_events(GCTAObservation* obs)
     log_value(NORMAL, "Events outside energies", num_outside_erange);
 
     // Write sky map into header
-    log_header2(EXPLICIT, "Sky map");
+    log_header1(EXPLICIT, "Sky map");
     log_string(EXPLICIT, m_skymap.print(m_chatter));
 
     // Return
@@ -762,7 +762,7 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
                           get_obs_header(obs)+" to compute IRF background. "
                           "Please specify response information or use "
                           "another background subtraction method.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_RING, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_RING, msg);
     }
 
     // Get IRF background template
@@ -774,7 +774,7 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
                           "response function for "+
                           get_obs_header(obs)+". Please specify an instrument "
                           "response function containing a background template.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_RING, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_RING, msg);
     }
 
     // Compute natural logarithm of energy range in MeV
@@ -918,7 +918,7 @@ void ctskymap::map_significance(void)
         if (m_runavgalpha) {
 
             // Log message about what is being done
-            log_header2(NORMAL, "Computing run averaged RBM map");
+            log_header1(NORMAL, "Computing run averaged RBM map");
             log_value(NORMAL, "Total pixels to process", m_onmap.npix());
 
             // Loop through each bin in the on-counts map
@@ -960,11 +960,13 @@ void ctskymap::map_significance(void)
 
         } // endif: m_runavgalpha
 
-        // Multiply the significance map by '-2'
-        m_sigmap *= -2.0;
+        // Multiply the significance map by '2', as per Li & Ma (1983) Eq. 17
+        m_sigmap *= 2.0;
 
-        // Now take the square root
-        m_sigmap = sign(m_sigmap) * sqrt( abs(m_sigmap) );
+        // Now take the square root. Since some bins can be negative, first take
+        // the absolute value of the map, square root that, then multiply each
+        // bin by its sign to preserve the +/- significance.
+        m_sigmap = sign(m_skymap - m_bkgmap) * sqrt( abs(m_sigmap) );
     }
 
     // ... using Poisson statistics in the Gaussian limit
