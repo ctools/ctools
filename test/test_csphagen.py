@@ -77,12 +77,12 @@ class Test(test):
         csphagen = self._script('csphagen')
         nbins = 120
 
-        cmd = csphagen + 'inobs="' + self._myevents1 + \
-              '" caldb="' + self._caldb + '" irf="' + self._irf + \
-              '" ebinalg=LOG emin=0.1 emax=100. enumbins="' + str(nbins) + \
-              '" coordsys=CEL' + ' ra=83.633 dec=22.0145 rad=0.2 stack=no exclusion="' + \
-              self._exclusion + '" outroot=genpha_cmd1' + \
-              ' logfile="csphagen_cmd1.log" chatter=1'
+        cmd = csphagen + ' inobs="' + self._myevents1 + '" caldb="' + \
+              self._caldb + '" irf="' + self._irf + \
+              '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
+              str(nbins) + ' coordsys="CEL" ra=83.633 dec=22.0145' + \
+              ' rad=0.2 stack="no" exclusion="' + self._exclusion + \
+              '" outroot="phagen_cmd1" logfile="csphagen_cmd1.log" chatter=1'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -93,21 +93,21 @@ class Test(test):
                          'Check successful execution from command line')
 
         # Check output files
-        self._check_output('genpha_cmd1_', nbins, self._nreg_with_excl)
-        self._check_outobs('genpha_cmd1', 1)
+        self._check_output('phagen_cmd1_', nbins, self._nreg_with_excl)
+        self._check_outobs('phagen_cmd1', 1)
 
-        cmd = csphagen + 'inobs="events_that_do_not_exist.fits"' + \
-              '" caldb="' + self._caldb + '" irf="' + self._irf + \
-              '" ebinalg=LOG emin=0.1 emax=100. enumbins="' + str(nbins) + \
-              '" coordsys=CEL' + ' ra=83.633 dec=22.0145 rad=0.2 stack=no exclusion="' + \
-              self._exclusion + '" outroot=genpha_cmd2' + \
-              ' logfile="csphagen_cmd2.log" chatter=1'
+        cmd = csphagen + ' inobs="events_that_do_not_exist.fits" caldb="' + \
+              self._caldb + '" irf="' + self._irf + \
+              '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
+              str(nbins) + ' coordsys="CEL" ra=83.633 dec=22.0145' + \
+              ' rad=0.2 stack="no" exclusion="' + self._exclusion + \
+              '" outroot="phagen_cmd1" logfile="csphagen_cmd1.log" chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
                          'Check invalid input file when executed from command line')
 
-        # Check cslightcrv --help
+        # Check csphagen --help
         self._check_help(csphagen)
 
         # Return
@@ -134,7 +134,7 @@ class Test(test):
         phagen['rad'] = 0.2
         phagen['stack'] = False
         phagen['exclusion'] = self._exclusion
-        phagen['outroot'] = 'genpha_py1'
+        phagen['outroot'] = 'phagen_py1'
         phagen['logfile'] = 'csphagen_py1.log'
         phagen['chatter'] = 1
 
@@ -142,8 +142,8 @@ class Test(test):
         phagen.execute()
 
         # Check output
-        self._check_output('genpha_py1_', nbins, self._nreg_with_excl)
-        self._check_outobs('genpha_py1', 1)
+        self._check_output('phagen_py1_', nbins, self._nreg_with_excl)
+        self._check_outobs('phagen_py1', 1)
 
         # Now test without exclusion region
         phagen = cscripts.csphagen()
@@ -159,7 +159,7 @@ class Test(test):
         phagen['dec'] = 22.0145
         phagen['rad'] = 0.2
         phagen['stack'] = False
-        phagen['outroot'] = 'genpha_py2'
+        phagen['outroot'] = 'phagen_py2'
         phagen['logfile'] = 'csphagen_py2.log'
         phagen['chatter'] = 1
 
@@ -167,8 +167,8 @@ class Test(test):
         phagen.execute()
 
         # Check output
-        self._check_output('genpha_py2_', nbins, self._nreg_wo_excl)
-        self._check_outobs('genpha_py2', 1)
+        self._check_output('phagen_py2_', nbins, self._nreg_wo_excl)
+        self._check_outobs('phagen_py2', 1)
 
         # Test with multiple input observations, no stacking
         # Create observation container
@@ -176,7 +176,7 @@ class Test(test):
         for s, events in enumerate([self._myevents1, self._myevents2]):
             run = gammalib.GCTAObservation(events)
             run.id(str(s + 1))
-            run.response(self._irf, gammalib.GCaldb('cta',self._caldb))
+            run.response(self._irf, gammalib.GCaldb('cta', self._caldb))
             obs.append(run)
 
         # Setup csphagen
@@ -191,7 +191,7 @@ class Test(test):
         phagen['rad'] = 0.2
         phagen['stack'] = False
         phagen['exclusion'] = self._exclusion
-        phagen['outroot'] = 'genpha_py3'
+        phagen['outroot'] = 'phagen_py3'
         phagen['logfile'] = 'csphagen_py3.log'
         phagen['chatter'] = 1
 
@@ -200,9 +200,9 @@ class Test(test):
 
         # Check outout
         for s in range(2):
-            self._check_output('genpha_py3_' + str(s + 1), nbins,
+            self._check_output('phagen_py3_' + str(s + 1), nbins,
                                self._nreg_mul[s])
-        self._check_outobs('genpha_py3', 2)
+        self._check_outobs('phagen_py3', 2)
 
         return
 
