@@ -1,26 +1,32 @@
-.. _ctmapcube:
+.. _csmodelsois:
 
-ctmapcube
-=========
+csmodelsois
+===========
 
-Generate a map cube from an input model.
+Generate a map cube from a subset of models in an input model.
 
 
 Synopsis
---------
+----------
 
-This tool generates a map cube from all sky model components contained in
-an input model. A map cube is a series of sky maps, each spanned by Right
+This tool generates a map cube from a subset of sky model components contained
+in an input model. A map cube is a series of sky maps, each spanned by Right
 Ascension or Galactic longitude and Declination or Galactic latitude. Each
 map corresponds to a specific photon energy. The energy binning of the map
 cube may be either linear, logarithmic, or custom defined using an input
 file.
 
-ctmapcube generates a map cube FITS file comprising two extensions. The
+csmodelsois generates a map cube FITS file comprising two extensions. The
 primary extension contains a 3-dimensional image containing the map cube
 values. A second extension named ``ENERGIES`` contains a binary table that
 defines the energy values of each map in the cube.
 
+Optionally, csmodelsois can also output an updated model XML file in which all
+sources from the input model XML file used to generate the map cube are
+replaced with an updated model that uses the generated map cube. This is done
+by specifying the 'outmodel' parameter. The 'soilist' parameter specifies a 
+list of source names (separated by ',') to be excluded from the generated
+cube.
 
 General parameters
 ------------------
@@ -28,8 +34,14 @@ General parameters
 ``inmodel [file]``
     Input model XML file.
 
+``outmodel [file]``
+    Output model XML file (not generated if set to ``NONE``).
+
 ``outcube [file]``
     Output map cube file.
+
+``soilist [string]``
+    CSV list of sources to be excluded from the generated map cube.
 
 ``(ptsrcsig = 1.0) [real]``
     Sigma of Gaussian to be used for point sources (in arcmin).
@@ -64,11 +76,17 @@ General parameters
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
-``xref [real]``
-    Right Ascension / Galactic longitude of cube centre (J2000, in degrees).
+``ra [real]``
+    Right Ascension of cube centre (J2000, in degrees).
 
-``yref [real]``
-    Declination / Galactic latitude of cube centre (J2000, in degrees).
+``dec [real]``
+    Declination of cube centre (J2000, in degrees).
+
+``glon [real]``
+    Galactic longitude of cube centre (in degrees).
+
+``glat [real]``
+    Galactic latitude of cube centre (in degrees).
 
 
 Standard parameters
@@ -98,11 +116,11 @@ Standard parameters
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = ctmapcube.log) [string]``
+``(logfile = csmodelsois.log) [string]``
     Name of log file.
 
 
 Related tools or scripts
 ------------------------
 
-:ref:`csmodelsois`
+:ref:`ctmapcube`

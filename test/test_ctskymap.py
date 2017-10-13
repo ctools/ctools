@@ -221,7 +221,7 @@ class Test(test):
         skymap['proj']        = 'CAR'
         skymap['xref']        = 184.5575
         skymap['yref']        =  -5.7844
-        skymap['bkgsubtract'] =  'IRF'
+        skymap['bkgsubtract'] = 'IRF'
         skymap['caldb']       = self._caldb
         skymap['irf']         = self._irf
         skymap['outmap']      = 'ctskymap_py4.fits'
@@ -234,6 +234,8 @@ class Test(test):
 
         # Check result file
         self._check_result_file('ctskymap_py4.fits')
+        self._check_result_file('ctskymap_py4.fits[BACKGROUND]')
+        self._check_result_file('ctskymap_py4.fits[SIGNIFICANCE]')
 
         # ================================
         # TEST RING BACKGROUND SUBTRACTION
@@ -268,6 +270,8 @@ class Test(test):
 
         # Check result file
         self._check_result_file('ctskymap_py5.fits', 100, 100)
+        self._check_result_file('ctskymap_py5.fits[BACKGROUND]', 100, 100)
+        self._check_result_file('ctskymap_py5.fits[SIGNIFICANCE]', 100, 100)
 
         # Return
         return

@@ -1,7 +1,7 @@
 /***************************************************************************
  *             ctobservation - Base class for observation tools            *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -89,6 +89,7 @@ public:
 
     // Public methods
     const GObservations& obs(void) const;
+    void                 write_ogip_keywords(GFitsHDU* hdu) const;
 
     // Make methods private in Python by prepending an underscore
     %rename(_first_unbinned_observation) first_unbinned_observation;

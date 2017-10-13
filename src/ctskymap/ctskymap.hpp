@@ -80,6 +80,7 @@ protected:
                              const GSkyMap& sensitivity,
                              const GSkyDir& position,
                              double& non, double& noff, double& alpha);
+    void write_hdu_keywords(GFitsHDU* hdu) const;
 
     // Background integration kernel
     class irf_kern : public GFunction {

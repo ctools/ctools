@@ -281,23 +281,39 @@ void ctskymap::save(void)
         GFits fits;
 
         // Write sky map into FITS file
-        m_skymap.write(fits);
+        GFitsHDU* hdu = m_skymap.write(fits);
+
+        // Write keywords into sky map extension
+        write_ogip_keywords(hdu);
+        write_hdu_keywords(hdu);
 
         // If background subtraction is requested then write background map
         // and significance map to FITS file
         if (m_bkgsubtract != "NONE") {
         
             // Write background map into FITS file
-            m_bkgmap.write(fits);
+            hdu = m_bkgmap.write(fits);
 
             // Set background map extension name
-            fits[fits.size()-1]->extname("BACKGROUND");
+            if (hdu != NULL) {
+                hdu->extname("BACKGROUND");
+            }
+
+            // Write keywords into background extension
+            write_ogip_keywords(hdu);
+            write_hdu_keywords(hdu);
 
             // Write significance map into FITS file
-            m_sigmap.write(fits);
+            hdu = m_sigmap.write(fits);
 
             // Set significance map extension name
-            fits[fits.size()-1]->extname("SIGNIFICANCE");
+            if (hdu != NULL) {
+                hdu->extname("SIGNIFICANCE");
+            }
+
+            // Write keywords into significance extension
+            write_ogip_keywords(hdu);
+            write_hdu_keywords(hdu);
 
         } // endif: background subtraction was requested
 
@@ -525,7 +541,7 @@ void ctskymap::map_events(GCTAObservation* obs)
     // Make sure that the observation holds a CTA event list. If this
     // is not the case then throw an exception.
     if (events == NULL) {
-        throw GException::no_list(G_BIN_EVENTS);
+        throw GException::no_list(G_MAP_EVENTS);
     }
 
     // Setup energy range covered by data
@@ -647,7 +663,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
                           get_obs_header(obs)+" to compute IRF background. "
                           "Please specify response information or use "
                           "another background subtraction method.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
     }
 
     // Get IRF background template
@@ -659,7 +675,7 @@ void ctskymap::map_background_irf(GCTAObservation* obs)
                           "response function for "+
                           get_obs_header(obs)+". Please specify an instrument "
                           "response function containing a background template.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_MAP_BACKGROUND_IRF, msg);
     }
 
     // Compute natural logarithm of energy range in MeV
@@ -855,6 +871,30 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
 
     // Zero out the counts map to prepare it for the next observation
     m_skymap = 0.0;
+
+    // Return
+    return;
+}
+
+/***********************************************************************//**
+ * @brief Write keywords in FITS HDU
+ *
+ * @param[in,out] hdu Pointer to FITS HDU.
+ *
+ * Writes keywords in FITS HDU.
+ ***************************************************************************/
+void ctskymap::write_hdu_keywords(GFitsHDU* hdu) const
+{
+    // Continue only if pointer is valid
+    if (hdu != NULL) {
+
+        // Set keywords
+        hdu->card("BKGSUB", m_bkgsubtract, "Background substraction method");
+        hdu->card("E_MIN",  m_emin, "[TeV] Lower energy boundary");
+        hdu->card("E_MAX",  m_emax, "[TeV] Upper energy boundary");
+        hdu->card("EUNIT",  "TeV",  "Units for E_MIN and E_MAX");
+
+    } // endif: pointer was valid
 
     // Return
     return;

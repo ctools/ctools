@@ -22,11 +22,16 @@ Bug fixes
 Improvements
 ------------
 
-* TBW
+* [`2194 <https://cta-redmine.irap.omp.eu/issues/2194>`_] -
+  Add keywords to sky maps produced by :ref:`ctskymap`
+* [`2189 <https://cta-redmine.irap.omp.eu/issues/2189>`_] -
+  Enhance efficiency of computations in :ref:`ctmodel`
 
 
 New features
 ------------
 
+* [`2180 <https://cta-redmine.irap.omp.eu/issues/2180>`_] -
+  Add :ref:`csmodelsois` script
 * [`1864 <https://cta-redmine.irap.omp.eu/issues/1864>`_] -
   Use t-type parameters for all ``tmin`` and ``tmax`` parameters
