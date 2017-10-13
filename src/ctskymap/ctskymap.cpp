@@ -442,7 +442,7 @@ void ctskymap::get_parameters(void)
 
     // If IRF background subtraction is requested then make sure that the
     // CTA observations in the observation container have response information
-    if (m_bkgsubtract == "IRF") {
+    if (m_bkgsubtract != "NONE") {
         set_response(m_obs);
     }
 
@@ -746,7 +746,7 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
                           get_obs_header(obs)+" to compute IRF background. "
                           "Please specify response information or use "
                           "another background subtraction method.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_BKG_SUBTRACT_RING, msg);
     }
 
     // Get IRF background template
@@ -758,7 +758,7 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
                           "response function for "+
                           get_obs_header(obs)+". Please specify an instrument "
                           "response function containing a background template.";
-        throw GException::invalid_value(G_BKG_SUBTRACT_IRF, msg);
+        throw GException::invalid_value(G_BKG_SUBTRACT_RING, msg);
     }
 
     // Compute natural logarithm of energy range in MeV
@@ -836,9 +836,7 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
         else {
 
             // Compute the on, off and alpha parameters
-            double n_on(0);
-            double n_off(0);
-            double alpha(0);
+            double n_on(0.0), n_off(0.0), alpha(0.0);
             compute_ring_values(m_skymap, sens, m_dirs[ibin],
                                 n_on, n_off, alpha);
 
@@ -885,6 +883,12 @@ void ctskymap::map_significance(void)
 
             // Loop through each bin in the on-counts map
             for (int i = 0; i < m_onmap.npix(); ++i) {
+
+                // Since this can take a long time, keep the user updated on
+                // the progress when another 10% of pixels is processed
+                if (i%(m_onmap.npix()/10)==0) {
+                    log_value(NORMAL, "Pixels remaining", m_onmap.npix()-i);
+                }
 
                 // Get bin coordinate
                 GSkyDir& skydir = m_dirs[i];

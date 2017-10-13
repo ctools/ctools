@@ -206,6 +206,10 @@ class Test(test):
         # Publish with name
         skymap.publish('My sky map')
 
+        # ================================
+        # TEST IRF BACKGROUND SUBTRACTION
+        # ================================
+        
         # Allocate ctskymap tool from observation container
         skymap = ctools.ctskymap(obs)
         skymap['emin']        = 0.1
@@ -229,7 +233,41 @@ class Test(test):
         skymap.execute()
 
         # Check result file
-        self._check_result_file('ctskymap_py3.fits')
+        self._check_result_file('ctskymap_py4.fits')
+
+        # ================================
+        # TEST RING BACKGROUND SUBTRACTION
+        # ================================
+
+        # Allocate ctskymap tool from observation container
+        skymap = ctools.ctskymap(obs)
+        skymap['emin']        = 0.1
+        skymap['emax']        = 100
+        skymap['nxpix']       = 100     # Make region smaller since the 'RING'
+        skymap['nypix']       = 100     # method takes longer to run than 'IRF'
+        skymap['binsz']       = 0.02
+        skymap['coordsys']    = 'CEL'
+        skymap['proj']        = 'CAR'
+        skymap['xref']        = 83.63
+        skymap['yref']        = 22.01
+        skymap['bkgsubtract'] = 'RING'
+        skymap['caldb']       = self._caldb
+        skymap['irf']         = self._irf
+        skymap['outmap']      = 'ctskymap_py5.fits'
+        skymap['logfile']     = 'ctskymap_py5.log'
+        skymap['chatter']     = 4
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['regfile']     = 'NONE' 
+        skymap['runavgalpha'] = True
+
+        # Execute tool
+        skymap.logFileOpen()  # Needed to get a new log file
+        skymap.execute()
+
+        # Check result file
+        self._check_result_file('ctskymap_py5.fits', 100, 100)
 
         # Return
         return
