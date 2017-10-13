@@ -204,6 +204,33 @@ class Test(test):
                                self._nreg_mul[s])
         self._check_outobs('phagen_py3', 2)
 
+        # Test with multiple input observations and stacking
+
+        # Setup csphagen
+        phagen = cscripts.csphagen(obs)
+        phagen['ebinalg'] = 'LOG'
+        phagen['emin'] = 0.1
+        phagen['emax'] = 100.
+        phagen['enumbins'] = nbins
+        phagen['coordsys'] = 'CEL'
+        phagen['ra'] = 83.633
+        phagen['dec'] = 22.0145
+        phagen['rad'] = 0.2
+        phagen['stack'] = True
+        phagen['exclusion'] = self._exclusion
+        phagen['outroot'] = 'phagen_py4'
+        phagen['logfile'] = 'csphagen_py4.log'
+        phagen['chatter'] = 1
+
+        # Run script
+        phagen.execute()
+
+        # Check outout
+        for s in range(2):
+            self._check_output('phagen_py4_stacked', nbins,
+                               0,check_regions=False)
+        self._check_outobs('phagen_py4', 1)
+
         return
 
     def _check_ebounds(self, table, bins):
@@ -341,7 +368,7 @@ class Test(test):
         # Return
         return
 
-    def _check_output(self, filenameroot, bins, nreg):
+    def _check_output(self, filenameroot, bins, nreg, check_regions = True):
         """
         Check the output from a csphagen run
         """
@@ -356,12 +383,13 @@ class Test(test):
 
 
         # Regions
-        reg = gammalib.GSkyRegions(filenameroot + "_on.reg")
-        self.test_value(reg.size(), 1, 'Check for ' + str(
-            1) + ' region in source region file')
-        reg = gammalib.GSkyRegions(filenameroot + "_off.reg")
-        self.test_value(reg.size(), nreg, 'Check for ' + str(
-            nreg) + ' region in background region file')
+        if check_regions:
+            reg = gammalib.GSkyRegions(filenameroot + "_on.reg")
+            self.test_value(reg.size(), 1, 'Check for ' + str(
+                1) + ' region in source region file')
+            reg = gammalib.GSkyRegions(filenameroot + "_off.reg")
+            self.test_value(reg.size(), nreg, 'Check for ' + str(
+                nreg) + ' region in background region file')
 
         return
 
