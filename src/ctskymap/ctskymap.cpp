@@ -475,7 +475,6 @@ void ctskymap::get_parameters(void)
             m_roiradius = (*this)["roiradius"].real();
             m_inradius  = (*this)["inradius"].real();
             m_outradius = (*this)["outradius"].real();
-            m_runavgalpha = (*this)["runavgalpha"].boolean();
 
             // Make sure that (roiradius < inradius < outradius)
             if (m_roiradius > m_inradius) {
@@ -498,10 +497,10 @@ void ctskymap::get_parameters(void)
         map_exclusions((*this)["regfile"].filename());
 
         // Cache the pixel areas
-        m_solidangle = std::vector<double>(m_bkgmap.npix(), 0.0);
+        m_solidangle.reserve(m_bkgmap.npix());
         m_dirs.reserve(m_bkgmap.npix());
         for (int i=0; i<m_bkgmap.npix(); i++) {
-            m_solidangle[i] = m_bkgmap.solidangle(i);
+            m_solidangle.push_back(m_bkgmap.solidangle(i));
             m_dirs.push_back(m_bkgmap.inx2dir(i));
         }
 
@@ -789,11 +788,6 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
     double total = 0.0;
     double exposure = obs->livetime() ;
 
-    // Create map for caching background IRF sensitivities
-    GSkyMap sens = create_map(m_obs);  
-
-    std::vector<int>     bin_indx(0);
-
     // Loop over all map pixels
     for (int i = 0; i < m_bkgmap.npix(); ++i) {
 
@@ -809,9 +803,6 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
             continue;
         }
 
-        // Add this bin to the list of bins overlapping the skymap
-        bin_indx.push_back( i );
-
         // Setup integration function
         ctskymap::irf_kern integrand(bkg, &instdir);
         GIntegral          integral(&integrand);
@@ -822,52 +813,16 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
 
         // Do Romberg integration to get the sensitivity (note: this assumes the
         // background IRF is a good approximation for the radial sensitivity)
-        sens(i,0) = integral.romberg(lnEmin, lnEmax) * 
-                    m_solidangle[i] * obs->livetime();
+        m_alphamap(i,0) += integral.romberg(lnEmin, lnEmax) * 
+                           m_solidangle[i] * obs->livetime();
 
+        // Store the counts in this bin
+        m_onmap(i,0) += m_skymap(i,0);
+        
         // Update number of background function calls
         calls += integral.calls();
 
     } // endfor: Loop for caching bkg IRF sensitivity
-
-    // Loop over all map pixels that fall in this observation
-    for (int i = 0; i < bin_indx.size(); ++i) {
-
-        // Get this bin
-        int ibin = bin_indx[i];
-
-        // If averaging parameters over all positions, then update intermediate
-        // values to be used in the full computation later
-        if (m_runavgalpha) {
-
-            // Store the sensitivity for this bin
-            m_alphamap(ibin,0) += sens(ibin,0);
-
-            // Store the counts in this bin
-            m_onmap(ibin,0) += m_skymap(ibin,0);
-        }
-
-        // Otherwise we need to re-loop on each observation to compute the
-        // alpha weighted value of Noff for this run
-        else {
-
-            // Compute the on, off and alpha parameters
-            double n_on(0.0), n_off(0.0), alpha(0.0);
-            compute_ring_values(m_skymap, sens, m_dirs[ibin],
-                                n_on, n_off, alpha);
-
-            // Update intermediate computation of significance
-            m_sigmap( ibin, 0 ) +=
-                n_on * std::log((1.0+alpha) * n_on / alpha / (n_on+n_off)) +
-                n_off * std::log((1.0+alpha) * n_off / (n_on+n_off));
-
-            // Update the predicted background counts and alpha parameters
-            m_alphamap( ibin, 0 ) += alpha;
-            m_bkgmap( ibin,0 )    += alpha * n_off;
-            m_onmap( ibin, 0 )    += n_on;
-        }
-
-    } // endfor: looped over background map pixels
 
     // Zero out the counts map to prepare it for the next observation
     m_skymap = 0.0;
@@ -875,6 +830,7 @@ void ctskymap::map_background_ring(GCTAObservation* obs)
     // Return
     return;
 }
+
 
 /***********************************************************************//**
  * @brief Write keywords in FITS HDU
@@ -914,63 +870,69 @@ void ctskymap::map_significance(void)
     // Compute significance from "RING" method (Li & Ma eq. 17)
     if (m_bkgsubtract == "RING") {
 
-        // Check if we're averaging the alpha parameter over all runs
-        if (m_runavgalpha) {
+        // Log message about what is being done
+        log_header1(NORMAL, "Computing RBM map");
+        log_value(NORMAL, "Total pixels to process", m_onmap.npix());
 
-            // Log message about what is being done
-            log_header1(NORMAL, "Computing run averaged RBM map");
-            log_value(NORMAL, "Total pixels to process", m_onmap.npix());
+        // Store the number of bins with an inappropriate alpha parameter
+        int num_bad_alpha(0);
+        // Loop through each bin in the on-counts map
+        for (int i = 0; i < m_onmap.npix(); ++i) {
 
-            // Loop through each bin in the on-counts map
-            for (int i = 0; i < m_onmap.npix(); ++i) {
+            // Reset the on/off counts and alpha for this bin
+            double n_on(0), n_off(0), alpha(0.0);
 
-                // Since this can take a long time, keep the user updated on
-                // the progress when another 10% of pixels is processed
-                if (i%(m_onmap.npix()/10)==0) {
-                    log_value(NORMAL, "Pixels remaining", m_onmap.npix()-i);
+            // Since this can take a long time, keep the user updated on
+            // the progress when another 10% of pixels is processed
+            if (i%(m_onmap.npix()/10)==0) {
+                log_value(NORMAL, "Pixels remaining", m_onmap.npix()-i);
+            }
+
+            // Get bin coordinates
+            GSkyDir& skydir = m_dirs[i];
+
+            // Compute the alpha and counts for this bin
+            compute_ring_values(m_onmap, m_alphamap, skydir,
+                                n_on, n_off, alpha);
+
+            // If alpha is reasonable, then store the results
+            if (alpha == 0.0) {
+                // Increment the bad alpha counter
+                num_bad_alpha++;
+            }
+            
+            else {
+                // Save the on-counts and alpha-weighted off-counts
+                m_skymap(i,0) = n_on;
+                m_bkgmap(i,0) = alpha * n_off;
+
+                // Compute significance
+                if (n_on == 0.0) {
+                    
+                    // The significance computation reduces to the following form
+                    m_sigmap(i,0) = -2.0 * n_off * std::log(1.0+alpha);
+
+                } else {
+                    // Save the significance
+                    m_sigmap(i,0) = (n_on < (alpha*n_off) ? -2.0:2.0 ) *
+                        (n_on  * std::log((1.0+alpha) * n_on / (alpha * (n_on+n_off))) +
+                         n_off * std::log((1.0+alpha) * n_off / (n_on+n_off)));
                 }
+            }
+        } // endfor: Loop over all pixels
 
-                // Get bin coordinate
-                GSkyDir& skydir = m_dirs[i];
-
-                // Compute the alpha and lambda for this bin
-                double n_on(0), n_off(0), alpha(0.0);
-                compute_ring_values(m_onmap, m_alphamap, skydir,
-                                    n_on, n_off, alpha);
-
-                // If alpha is reasonable, then store the results
-                if (alpha > 0.0) {
-                    // Save the on-counts
-                    m_skymap(i,0) = n_on;
-                
-                    // Save the significance and off-counts
-                    m_bkgmap(i,0) = alpha * n_off;
-                    m_sigmap(i,0) = 
-                        n_on  * std::log((1.0+alpha) * n_on / alpha / (n_on+n_off)) +
-                        n_off * std::log((1.0+alpha) * n_off / (n_on+n_off));
-                }
-            } // endfor: Loop over all pixels
-        }
-
-        // Otherwise most of the intensive calculations were done at the
-        // observation level.
-        else {
-            // m_onmap is the integral on-counts map, so update m_skymap
-            m_skymap = m_onmap;
-
-        } // endif: m_runavgalpha
-
-        // Multiply the significance map by '2', as per Li & Ma (1983) Eq. 17
-        m_sigmap *= 2.0;
+        // Log the number of bad-alpha bins
+        log_value(NORMAL, "Bins with bad alpha", num_bad_alpha);
 
         // Now take the square root. Since some bins can be negative, first take
         // the absolute value of the map, square root that, then multiply each
         // bin by its sign to preserve the +/- significance.
-        m_sigmap = sign(m_skymap - m_bkgmap) * sqrt( abs(m_sigmap) );
+        m_sigmap = sign(m_sigmap) * sqrt( abs(m_sigmap) );
     }
 
-    // ... using Poisson statistics in the Gaussian limit
+    // Compute significance using Poisson statistics in the Gaussian limit
     else {
+
         // Compute significance map
         m_sigmap = (m_skymap - m_bkgmap) / sqrt(m_skymap);
     
@@ -1018,6 +980,7 @@ void ctskymap::compute_ring_values(const GSkyMap& counts,
         if ((m_exclmap(j,0) == 1.0) &&
             outer_reg.contains(skydir) &&
             !inner_reg.contains(skydir)) {
+
             // Update n_off
             noff += counts(j,0);
 
@@ -1027,6 +990,7 @@ void ctskymap::compute_ring_values(const GSkyMap& counts,
 
         // Check if pixel is inside source region
         else if (roi_reg.contains(skydir)) {
+
             // Update n_on for significance computation
             non += counts(j,0);
 
@@ -1038,8 +1002,13 @@ void ctskymap::compute_ring_values(const GSkyMap& counts,
     } // endfor: sub-loop over pixels
 
     // Compute alpha
-    if (alpha_off == 0) {
+    if (alpha_off == 0.0) {
+        // The off region does not have any sensitivity or there are no events
+        // in either the on region or the off region
         alpha = 0.0;
+        non   = 0.0;
+        noff  = 0.0;
+
     } else {
         alpha = alpha_on / alpha_off;
     }
@@ -1092,6 +1061,7 @@ void ctskymap::map_exclusions_fits(const GFilename& filename)
 
         // Check this sky position in the fits map
         if (inmap.contains(dir) && (inmap(inmap.dir2inx(dir)) == 0.0)) {
+
             // Set the pixel to 0
             m_exclmap(i) = 0.0;
 
@@ -1111,10 +1081,10 @@ void ctskymap::map_exclusions_reg(const GFilename& filename)
     GSkyRegions regions(filename);
 
     // Loop through the individual pixels in the exclusion map
-    GSkyDir dir;
     for (int i=0; i<m_exclmap.npix(); i++) {
+
         // Get the pixel position
-        dir = m_exclmap.pix2dir(i);
+        GSkyDir dir = m_exclmap.pix2dir(i);
 
         // Check if GSkyDir overlaps with the regions
         if (regions.contains(dir)) {

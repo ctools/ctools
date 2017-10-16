@@ -261,8 +261,7 @@ class Test(test):
         skymap['roiradius']   = 0.1
         skymap['inradius']    = 0.6
         skymap['outradius']   = 0.8
-        skymap['regfile']     = 'NONE' 
-        skymap['runavgalpha'] = True
+        skymap['regfile']     = 'NONE'
 
         # Execute tool
         skymap.logFileOpen()  # Needed to get a new log file

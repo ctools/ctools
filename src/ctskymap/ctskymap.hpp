@@ -74,8 +74,8 @@ protected:
     void map_background_ring(GCTAObservation* obs);
     void map_significance(void);
     void map_exclusions(const GFilename& filename);
-    void map_exclusions_reg(const GFilename& filename);
     void map_exclusions_fits(const GFilename& filename);
+    void map_exclusions_reg(const GFilename& filename);
     void compute_ring_values(const GSkyMap& counts, 
                              const GSkyMap& sensitivity,
                              const GSkyDir& position,
@@ -107,7 +107,6 @@ protected:
     double        m_roiradius;   //!< Region of interest radius
     double        m_inradius;    //!< Inner ring radius
     double        m_outradius;   //!< Outer ring radius
-    bool          m_runavgalpha; //!< Determines how alpha is computed
 
     // Protected members
     GSkyMap       m_skymap;     //!< Sky map
