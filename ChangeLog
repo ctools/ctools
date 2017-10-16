@@ -4,6 +4,7 @@
         ========================
 
         Add csphagen script (#2208)
+        Add RING background method to ctskymap (#2207)
         Add keywords to sky maps produced by ctskymap (#2194)
         Enhance efficiency of computations in ctmodel (#2189)
         Add csmodelsois script (#2180)

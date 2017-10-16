@@ -71,6 +71,15 @@ protected:
     void map_events(GCTAObservation* obs);
     void map_background(GCTAObservation* obs);
     void map_background_irf(GCTAObservation* obs);
+    void map_background_ring(GCTAObservation* obs);
+    void map_significance(void);
+    void map_exclusions(const GFilename& filename);
+    void map_exclusions_fits(const GFilename& filename);
+    void map_exclusions_reg(const GFilename& filename);
+    void compute_ring_values(const GSkyMap& counts, 
+                             const GSkyMap& sensitivity,
+                             const GSkyDir& position,
+                             double& non, double& noff, double& alpha);
     void write_hdu_keywords(GFitsHDU* hdu) const;
 
     // Background integration kernel
@@ -91,13 +100,23 @@ protected:
     double        m_emin;        //!< Minimum energy (TeV)
     double        m_emax;        //!< Maximum energy (TeV)
     std::string   m_bkgsubtract; //!< Background subtraction method
+    double        m_roiradius;   //!< Region of interest radius for RING bkg.
+    double        m_inradius;    //!< Inner ring radius for RING bkg.
+    double        m_outradius;   //!< Outer ring radius for RING bkg.
     bool          m_publish;     //!< Publish sky map?
     GChatter      m_chatter;     //!< Chattiness
 
     // Protected members
-    GSkyMap       m_skymap;     //!< Sky map
-    GSkyMap       m_bkgmap;     //!< Background map
-    GSkyMap       m_sigmap;     //!< Significance map
+    GSkyMap       m_skymap;      //!< Sky map
+    GSkyMap       m_bkgmap;      //!< Background map
+    GSkyMap       m_sigmap;      //!< Significance map
+    GSkyMap       m_exclmap;     //!< Exclusion map for RING background
+    GSkyMap       m_alphamap;    //!< Alpha map values for RING background
+    GSkyMap       m_onmap;       //!< On counts map for RING background
+
+    // Caching variables to prevent multiple computations of the same thing
+    std::vector<double>  m_solidangle; //!< Cached pixel solid angles
+    std::vector<GSkyDir> m_dirs;       //!< Cached pixel directions
 };
 
 

@@ -57,6 +57,9 @@ Header keywords informing about the dates and times covered by the observations
 used to generate the skymap, as well as the event energy range, are now appended
 as header keywords to the FITS file (#2194).
 
+Add the RING background method, which is a classical analysis methods for IACT
+data analysis, for background subtraction (#2207).
+
 
 ctmodel - CTA counts cube modelling
 -----------------------------------
