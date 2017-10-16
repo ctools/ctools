@@ -1,8 +1,9 @@
-2017-08-08
+2017-10-16
 
         * Version 1.5.0 released
         ========================
 
+        Add csphagen script (#2208)
         Use t-type parameters for all "tmin" and "tmax" parameters (#1864)
 
 

@@ -41,12 +41,13 @@ class Test(test):
         """
         # Call base class constructor
         test.__init__(self)
-        self._myevents1 = self._datadir + '/crab_offaxis1.fits'
-        self._myevents2 = self._datadir + '/crab_offaxis2.fits'
-        self._exclusion = self._datadir + '/crab_exclusion.fits'
+        self._myevents1      = self._datadir + '/crab_offaxis1.fits'
+        self._myevents2      = self._datadir + '/crab_offaxis2.fits'
+        self._exclusion      = self._datadir + '/crab_exclusion.fits'
         self._nreg_with_excl = 5
-        self._nreg_wo_excl = 8
-        self._nreg_mul = [self._nreg_with_excl, 6]
+        self._nreg_wo_excl   = 8
+        self._nreg_mul       = [self._nreg_with_excl, 6]
+        self._nbins          = 20
         # number of expected background regions with/wo exclusion,
         # and for two different runs
 
@@ -75,14 +76,17 @@ class Test(test):
         """
         # Set script name
         csphagen = self._script('csphagen')
-        nbins = 120
 
-        cmd = csphagen + ' inobs="' + self._myevents1 + '" caldb="' + \
-              self._caldb + '" irf="' + self._irf + \
-              '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
-              str(nbins) + ' coordsys="CEL" ra=83.633 dec=22.0145' + \
-              ' rad=0.2 stack="no" exclusion="' + self._exclusion + \
-              '" outroot="phagen_cmd1" logfile="csphagen_cmd1.log" chatter=1'
+        # Setup csphagen command
+        cmd = csphagen + ' inobs="' + self._myevents1 + \
+                         '" caldb="' + self._caldb + '" irf="' + self._irf + \
+                         '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
+                         str(self._nbins) + \
+                         ' coordsys="CEL" ra=83.633 dec=22.0145' + \
+                         ' rad=0.2 stack="no" inexclusion="' + \
+                         self._exclusion + \
+                         '" outobs="csphagen_cmd1.xml" prefix="csphagen_cmd1" ' + \
+                         'logfile="csphagen_cmd1.log" chatter=2'
 
         # Check if execution of wrong command fails
         self.test_assert(self._execute('command_that_does_not_exist') != 0,
@@ -93,15 +97,19 @@ class Test(test):
                          'Check successful execution from command line')
 
         # Check output files
-        self._check_output('phagen_cmd1_', nbins, self._nreg_with_excl)
-        self._check_outobs('phagen_cmd1', 1)
+        self._check_output('csphagen_cmd1', self._nbins, self._nreg_with_excl)
+        self._check_outobs('csphagen_cmd1', 1)
 
-        cmd = csphagen + ' inobs="events_that_do_not_exist.fits" caldb="' + \
-              self._caldb + '" irf="' + self._irf + \
-              '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
-              str(nbins) + ' coordsys="CEL" ra=83.633 dec=22.0145' + \
-              ' rad=0.2 stack="no" exclusion="' + self._exclusion + \
-              '" outroot="phagen_cmd1" logfile="csphagen_cmd1.log" chatter=1'
+        # Setup csphagen command
+        cmd = csphagen + ' inobs="events_that_do_not_exist.fits" ' + \
+                         'caldb="' + self._caldb + '" irf="' + self._irf + \
+                         '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
+                         str(self._nbins) + \
+                         ' coordsys="CEL" ra=83.633 dec=22.0145' + \
+                         ' rad=0.2 stack="no" inexclusion="' + \
+                         self._exclusion + \
+                         '" outobs="csphagen_cmd2.xml" prefix="csphagen_cmd2" ' + \
+                         'logfile="csphagen_cmd2.log" chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -117,58 +125,58 @@ class Test(test):
         """
         Test csphagen from Python
         """
-        nbins = 120
-
         # Same test as from command line
         phagen = cscripts.csphagen()
-        phagen['inobs'] = self._myevents1
-        phagen['caldb'] = self._caldb
-        phagen['irf'] = self._irf
-        phagen['ebinalg'] = 'LOG'
-        phagen['emin'] = 0.1
-        phagen['emax'] = 100.
-        phagen['enumbins'] = nbins
-        phagen['coordsys'] = 'CEL'
-        phagen['ra'] = 83.633
-        phagen['dec'] = 22.0145
-        phagen['rad'] = 0.2
-        phagen['stack'] = False
-        phagen['exclusion'] = self._exclusion
-        phagen['outroot'] = 'phagen_py1'
-        phagen['logfile'] = 'csphagen_py1.log'
-        phagen['chatter'] = 1
+        phagen['inobs']       = self._myevents1
+        phagen['caldb']       = self._caldb
+        phagen['irf']         = self._irf
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
+        phagen['stack']       = False
+        phagen['inexclusion'] = self._exclusion
+        phagen['outobs']      = 'csphagen_py1.xml'
+        phagen['prefix']      = 'csphagen_py1'
+        phagen['logfile']     = 'csphagen_py1.log'
+        phagen['chatter']     = 1
 
         # Run script
         phagen.execute()
 
         # Check output
-        self._check_output('phagen_py1_', nbins, self._nreg_with_excl)
-        self._check_outobs('phagen_py1', 1)
+        self._check_output('csphagen_py1', self._nbins, self._nreg_with_excl)
+        self._check_outobs('csphagen_py1', 1)
 
         # Now test without exclusion region
         phagen = cscripts.csphagen()
-        phagen['inobs'] = self._myevents1
-        phagen['caldb'] = self._caldb
-        phagen['irf'] = self._irf
-        phagen['ebinalg'] = 'LOG'
-        phagen['emin'] = 0.1
-        phagen['emax'] = 100.
-        phagen['enumbins'] = nbins
+        phagen['inobs']    = self._myevents1
+        phagen['caldb']    = self._caldb
+        phagen['irf']      = self._irf
+        phagen['ebinalg']  = 'LOG'
+        phagen['emin']     = 0.1
+        phagen['emax']     = 100.0
+        phagen['enumbins'] = self._nbins
         phagen['coordsys'] = 'CEL'
-        phagen['ra'] = 83.633
-        phagen['dec'] = 22.0145
-        phagen['rad'] = 0.2
-        phagen['stack'] = False
-        phagen['outroot'] = 'phagen_py2'
-        phagen['logfile'] = 'csphagen_py2.log'
-        phagen['chatter'] = 1
+        phagen['ra']       = 83.633
+        phagen['dec']      = 22.0145
+        phagen['rad']      = 0.2
+        phagen['stack']    = False
+        phagen['outobs']   = 'csphagen_py2.xml'
+        phagen['prefix']   = 'csphagen_py2'
+        phagen['logfile']  = 'csphagen_py2.log'
+        phagen['chatter']  = 2
 
         # Run script
         phagen.execute()
 
         # Check output
-        self._check_output('phagen_py2_', nbins, self._nreg_wo_excl)
-        self._check_outobs('phagen_py2', 1)
+        self._check_output('csphagen_py2', self._nbins, self._nreg_wo_excl)
+        self._check_outobs('csphagen_py2', 1)
 
         # Test with multiple input observations, no stacking
         # Create observation container
@@ -181,55 +189,57 @@ class Test(test):
 
         # Setup csphagen
         phagen = cscripts.csphagen(obs)
-        phagen['ebinalg'] = 'LOG'
-        phagen['emin'] = 0.1
-        phagen['emax'] = 100.
-        phagen['enumbins'] = nbins
-        phagen['coordsys'] = 'CEL'
-        phagen['ra'] = 83.633
-        phagen['dec'] = 22.0145
-        phagen['rad'] = 0.2
-        phagen['stack'] = False
-        phagen['exclusion'] = self._exclusion
-        phagen['outroot'] = 'phagen_py3'
-        phagen['logfile'] = 'csphagen_py3.log'
-        phagen['chatter'] = 1
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
+        phagen['stack']       = False
+        phagen['inexclusion'] = self._exclusion
+        phagen['outobs']      = 'csphagen_py3.xml'
+        phagen['prefix']      = 'csphagen_py3'
+        phagen['logfile']     = 'csphagen_py3.log'
+        phagen['chatter']     = 3
 
         # Run script
         phagen.execute()
 
         # Check output
         for s in range(2):
-            self._check_output('phagen_py3_' + str(s + 1), nbins,
+            self._check_output('csphagen_py3_' + str(s + 1), self._nbins,
                                self._nreg_mul[s])
-        self._check_outobs('phagen_py3', 2)
+        self._check_outobs('csphagen_py3', 2)
 
         # Test with multiple input observations and stacking
 
         # Setup csphagen
         phagen = cscripts.csphagen(obs)
-        phagen['ebinalg'] = 'LOG'
-        phagen['emin'] = 0.1
-        phagen['emax'] = 100.
-        phagen['enumbins'] = nbins
-        phagen['coordsys'] = 'CEL'
-        phagen['ra'] = 83.633
-        phagen['dec'] = 22.0145
-        phagen['rad'] = 0.2
-        phagen['stack'] = True
-        phagen['exclusion'] = self._exclusion
-        phagen['outroot'] = 'phagen_py4'
-        phagen['logfile'] = 'csphagen_py4.log'
-        phagen['chatter'] = 1
+        phagen['ebinalg']     = 'LOG'
+        phagen['emin']        = 0.1
+        phagen['emax']        = 100.0
+        phagen['enumbins']    = self._nbins
+        phagen['coordsys']    = 'CEL'
+        phagen['ra']          = 83.633
+        phagen['dec']         = 22.0145
+        phagen['rad']         = 0.2
+        phagen['stack']       = True
+        phagen['inexclusion'] = self._exclusion
+        phagen['outobs']      = 'csphagen_py4.xml'
+        phagen['prefix']      = 'csphagen_py4'
+        phagen['logfile']     = 'csphagen_py4.log'
+        phagen['chatter']     = 4
 
         # Run script
         phagen.execute()
 
         # Check output
         for s in range(2):
-            self._check_output('phagen_py4_stacked', nbins,
+            self._check_output('csphagen_py4_stacked', self._nbins,
                                0, check_regions=False)
-        self._check_outobs('phagen_py4', 1)
+        self._check_outobs('csphagen_py4', 1)
 
         return
 
@@ -274,8 +284,7 @@ class Test(test):
 
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in PHA table' % len(
-                            cols))
+                        'Check for %d columns in PHA table' % len(cols))
         self.test_value(table.nrows(), bins,
                         'Check for %d rows in PHA table' % bins)
         for col in cols:
@@ -313,8 +322,7 @@ class Test(test):
 
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in ARF table' % len(
-                            cols))
+                        'Check for %d columns in ARF table' % len(cols))
         self.test_value(table.nrows(), bins,
                         'Check for %d rows in ARF table' % bins)
         for col in cols:
@@ -350,8 +358,7 @@ class Test(test):
 
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in RMF table' % len(
-                            cols))
+                        'Check for %d columns in RMF table' % len(cols))
         self.test_value(table.nrows(), bins,
                         'Check for %d rows in RMF table' % bins)
         for col in cols:
@@ -372,33 +379,39 @@ class Test(test):
         """
         Check the output from a csphagen run
         """
-
         # OGIP files
         self._check_pha(filenameroot + '_pha_on.fits', bins)
         self._check_pha(filenameroot + '_pha_off.fits', bins)
         self._check_arf(filenameroot + '_arf.fits', bins)
         self._check_rmf(filenameroot + '_rmf.fits', bins)
 
-        # Observations
-
-
-        # Regions
+        # Optionally check for regions
         if check_regions:
-            reg = gammalib.GSkyRegions(filenameroot + "_on.reg")
-            self.test_value(reg.size(), 1, 'Check for ' + str(
-                1) + ' region in source region file')
-            reg = gammalib.GSkyRegions(filenameroot + "_off.reg")
-            self.test_value(reg.size(), nreg, 'Check for ' + str(
-                nreg) + ' region in background region file')
 
+            # Check On region
+            onregion = (filenameroot+'_on.reg').replace('_1_', '_').replace('_2_', '_')
+            reg      = gammalib.GSkyRegions(onregion)
+            self.test_value(reg.size(), 1, 'Check for 1 region in source region file')
+
+            # Check for Off region
+            offregion = filenameroot + '_off.reg'
+            reg = gammalib.GSkyRegions(offregion)
+            self.test_value(reg.size(), nreg, 'Check for ' + str(nreg) +
+                            ' region in background region file')
+
+        # Return
         return
 
     def _check_outobs(self, filenameroot, nout):
         """
         Check the output XML file containing ON/OFF observations
         """
+        # Load observation container
         obs = gammalib.GObservations(filenameroot + '.xml')
-        self.test_value(obs.size(), nout, 'Check for ' + str(
-            nout) + ' observations in XML file')
 
+        # Check container size
+        self.test_value(obs.size(), nout, 'Check for ' + str(nout) +
+                        ' observations in XML file')
+
+        # Return
         return

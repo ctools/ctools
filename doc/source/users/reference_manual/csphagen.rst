@@ -1,57 +1,73 @@
 .. _csphagen:
 
 csphagen
-=========
+========
 
-Creates files necessary to perform a classical region-based spectral analysis on IACT data, i.e., source and background PHA files, ARF and RMF files.
+Creates files necessary to perform a classical region-based spectral analysis
+on IACT data, i.e., source and background PHA files, ARF and RMF files.
 
 
 Synopsis
 --------
 
-This script can be used to derive from an observation or a set of observations the count spectra in a source region and in background regions, as well as the detector response (effective area, energy redistribution matrix), that can be used to perform a classical 1D spectral analysis. The output files are saved in the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF). `See here <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
+This script can be used to derive from an observation or a set of observations
+the count spectra in a source region and in background regions, as well as the
+detector response (effective area, energy redistribution matrix), that can be
+used to perform a classical 1D spectral analysis. The output files are saved in
+the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF).
+`See here <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
 
-The outputs are: 1) the PHA, ARF, RMF files, either separately for each observation, or stacked for a set of observations, 2) DS9 regions files listing the source and background regions for each observation; 3) a new observation definition XML file. 
+The outputs are:
+1) the PHA, ARF, RMF files, either separately for each observation, or stacked
+   for a set of observations,
+2) DS9 regions files listing the source and background regions for each
+   observation;
+3) a new observation definition XML file.
 
 
 General parameters
 ------------------
 
 ``inobs [file]``
-    Input event list or observation definition XML file
+    Input event list or observation definition XML file.
 
 ``caldb [string]``
     Calibration database.
- 	 	 
+
 ``irf [string]``
     Instrument response function.
 
-``(exclusion = NONE) [file]``
-    Optional FITS file containing a WCS map in the first hdu that defines sky regions not to be used for background estimation (where map value > 0) 
+``(inexclusion = NONE) [file]``
+    Optional FITS file containing a WCS map in the first hdu that defines sky
+    regions not to be used for background estimation (where map value != 0).
 
-``outroot [string]``
-    Root of the file name for output PHA, ARF, RMF, XML, and ds9 reg files
+``outobs [string]``
+    Output observation definition XML file.
+
+``(prefix = onoff) [string]``
+    Prefix of the file name for output PHA, ARF, RMF, XML, and DS9 region files.
 
 ``emin [real]``
-    Lower energy limit (TeV) if LIN or LOG binning algorithms are used
+    Lower energy limit (TeV) if LIN or LOG binning algorithms are used.
 
 ``emax [real]``
-    Upper energy limit (TeV) if LIN or LOG binning algorithms are used
+    Upper energy limit (TeV) if LIN or LOG binning algorithms are used.
 
 ``enumbins [integer]``
-    Number of energy bins. At least 30 bins per decade are recommended for proper evaluation of the instrument response
+    Number of energy bins. At least 30 bins per decade are recommended for
+    proper evaluation of the instrument response.
 
 ``ebinalg [string]’’
-    Energy binning algorithm: LOG - logarithmically spaced energy bins; LIN - linearly spaced energy bins; FILE - energy bounds retrieved from file
+    Energy binning algorithm: LOG - logarithmically spaced energy bins;
+    LIN - linearly spaced energy bins; FILE - energy bounds retrieved from file.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition if FILE algorithm is used
-
-``(bkgmethod = REFLECTED) [string]’’
-    Method for background estimation. REFLECTED: background evaluated in regions with the same shape as source region reflected w.r.t. pointing direction for each observation
+    Name of the file containing the energy bin definition if FILE algorithm
+    is used.
 
 ``(srcshape = CIRCLE) [string]``
-    Shape of the source region. CIRCLE: circular region around given position
+    Shape of the source region.
+    CIRCLE: circular region around given position.
 
 ``coordsys [string]``
     Coordinate system (CEL - celestial, GAL - galactic)
@@ -71,14 +87,23 @@ General parameters
 ``rad [real]``
     Radius of source region circle (deg)
 
-``(bkgregmin = 2) [integer]``
-    Minimum number of background regions for REFLECTED method. If not available, observation is skipped. (Default: 2)
+``(bkgmethod = REFLECTED) [string]’’
+    Method for background estimation.
+    REFLECTED: background evaluated in regions with the same shape as source
+               region reflected w.r.t. pointing direction for each observation.
 
-``(maxoffset = 4.) [real]``
-    Maximum offset of source from camera center to accept observation
+``(bkgregmin = 2) [integer]``
+    Minimum number of background regions that are required for an observation.
+    If this number of background regions is not available the observation is
+    skipped.
+
+``(maxoffset = 4.0) [real]``
+    Maximum offset in degrees of source from camera center to accept the
+    observation.
 
 ``stack [boolean]``
-    Yes: Stack multiple observations into single PHA. No: produce run-by-run PHA files
+    Specifies whether multiple observations should be stacked (``yes``) or
+    whether run-wise PHA, ARF and RMF files should be produced (``no``).
 
 
 Standard parameters
@@ -100,13 +125,13 @@ Standard parameters
     Specifies whether an existing output runlist should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
-    Enables debug mode. In debug mode the executable will dump any log file output to the console.
+    Enables debug mode. In debug mode the executable will dump any log file
+    output to the console.
  	 	 
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").
 
-``(logfile = csfindobs.log) [filename]``
+``(logfile = csphagen.log) [filename]``
     Log filename.
-
 
 

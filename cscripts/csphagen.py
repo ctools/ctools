@@ -3,7 +3,7 @@
 # Computes the PHA spectra for source/background and ARF/RMF files using the
 # reflected region method
 #
-# Copyright (C) 2017- Luigi Tibaldo
+# Copyright (C) 2017 Luigi Tibaldo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import sys
 # =============== #
 class csphagen(ctools.cscript):
     """
-    Generate pha files for classical IACT spectral analysis
+    Generate PHA, ARF and RMF files for classical IACT spectral analysis
     """
 
     # Constructor
@@ -48,6 +48,15 @@ class csphagen(ctools.cscript):
         # Initialise application by calling the appropriate class constructor
         self._init_cscript(argv)
 
+        # Initialise other variables
+        self._outobs        = gammalib.GObservations()
+        self._ebounds       = gammalib.GEbounds()
+        self._src_dir       = gammalib.GSkyDir()
+        self._src_reg       = gammalib.GSkyRegions()
+        self._bkg_regs      = []
+        self._excl_reg      = None
+        self._has_exclusion = False
+
         # Return
         return
 
@@ -63,49 +72,43 @@ class csphagen(ctools.cscript):
         # Set energy bounds
         self._ebounds = self._create_ebounds()
 
-        # Initialise background estimation method
-        self._bkgmethod = self["bkgmethod"].string()
-        if self._bkgmethod == "REFLECTED":
-            self._bkgregmin = self["bkgregmin"].integer()
-        self._maxoffset = self["maxoffset"].real()
-
         # Initialise source position/region querying relevant parameters
         self._src_dir = gammalib.GSkyDir()
         self._src_reg = gammalib.GSkyRegions()
         coordsys = self['coordsys'].string()
-        if coordsys == "CEL":
-            ra = self['ra'].real()
+        if coordsys == 'CEL':
+            ra  = self['ra'].real()
             dec = self['dec'].real()
             self._src_dir.radec_deg(ra, dec)
-        elif coordsys == "GAL":
+        elif coordsys == 'GAL':
             glon = self['glon'].real()
             glat = self['glat'].real()
             self._src_dir.lb_deg(glon, glat)
         self._srcshape = self['srcshape'].string()
-        if self._srcshape == "CIRCLE":
+        if self._srcshape == 'CIRCLE':
             self._rad = self['rad'].real()
-            self._src_reg.append(
-                gammalib.GSkyRegionCircle(self._src_dir, self._rad))
+            self._src_reg.append(gammalib.GSkyRegionCircle(self._src_dir, self._rad))
 
-        # exclusion map
-        if self["exclusion"].filename().is_fits():
-            self._excl_reg = gammalib.GSkyRegionMap(
-                self["exclusion"].filename())
+        # Query background estimation method and parameters
+        bkgmethod = self['bkgmethod'].string()
+        if bkgmethod == 'REFLECTED':
+            self['bkgregmin'].integer()
+        self['maxoffset'].real()
+
+        # Exclusion map
+        if self['inexclusion'].filename().is_fits():
+            self._excl_reg = gammalib.GSkyRegionMap(self['inexclusion'].filename())
             self._has_exclusion = True
         else:
             self._has_exclusion = False
 
-        # Stacking
-        self._stack = self['stack'].boolean()
+        # Query remaining parametersStacking
+        self['stack'].boolean()
 
         # Query ahead output parameters
         if (self._read_ahead()):
-            self._outroot = self['outroot'].string()
-
-        # Set some fixed parameters
-        self._chatter = self["chatter"].integer()
-        self._clobber = self["clobber"].boolean()
-        self._debug = self["debug"].boolean()
+            self['outobs'].string()
+            self['prefix'].string()
 
         # If there are no observations in container then get them from the
         # parameter file
@@ -121,50 +124,66 @@ class csphagen(ctools.cscript):
     def _reflected_regions(self, obs):
         """
         Calculate list of reflected regions for a single observation (pointing)
-        :param obs: observation
-        :return: list of reflected regions
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservation()`
+            CTA observation
+
+        Returns
+        -------
+        regions : `~gammalib.GSkyRegions`
+            List of reflected regions
         """
-        outregions = []
+        # Initialise list of reflected regions
+        regions = gammalib.GSkyRegions()
+
+        # Get offset angle of source
         pnt_dir = obs.pointing().dir()
-        offset = pnt_dir.dist_deg(self._src_dir)
-        if offset <= self._rad or offset >= self["maxoffset"].real():
-            if self._logExplicit():
-                msg = 'Observation {} pointed at {} deg from source\n'.format(
-                    obs.id(), offset)
-                self._log(msg)
+        offset  = pnt_dir.dist_deg(self._src_dir)
+
+        # If ...
+        if offset <= self._rad or offset >= self['maxoffset'].real():
+            self._log_string(gammalib.EXPLICIT, 'Observation {} pointed at {} '
+                             'deg from source'.format(obs.id(), offset))
+
+        # ... otherwise
         else:
             posang = pnt_dir.posang_deg(self._src_dir)
-            if self._srcshape == "CIRCLE":
+            if self._srcshape == 'CIRCLE':
                 # angular separation of reflected regions wrt camera center
                 # and number
                 alpha = 1.05 * 2 * self._rad / offset
-                # 1.05 ensures background regions do not overlap due to numerical precision issues
-                N = int(2 * math.pi / alpha)
-                if N < self._bkgregmin + 3:
-                    if self._logExplicit():
-                        msg = 'Observation {}: insufficient regions for background estimation\n'.format(
-                            obs.id(), offset)
-                        self._log = (msg)
+                # 1.05 ensures background regions do not overlap due to
+                # numerical precision issues
+                N = int(2.0 * math.pi / alpha)
+                if N < self['bkgregmin'].integer() + 3:
+                    self._log_string(gammalib.EXPLICIT, 'Observation {}: '
+                                     'insufficient regions for background '
+                                     'estimation'.format(obs.id(), offset))
+
+                # Otherwise loop over position angle to create reflected
+                # regions
                 else:
-                    alpha = 360. / N
-                    # loop to create reflected regions
+                    alpha = 360.0 / N
                     for s in range(2, N - 1):
-                        dphi = s * alpha
+                        dphi    = s * alpha
                         ctr_dir = pnt_dir.clone()
                         ctr_dir.rotate_deg(posang + dphi, offset)
                         region = gammalib.GSkyRegionCircle(ctr_dir, self._rad)
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
-                                if self._logVerbose():
-                                    msg = 'Observation {}: reflected region overlaps with exclusion region\n'.format(
-                                        obs.id(), offset)
-                                    self._log(msg)
+                                self._log_string(gammalib.VERBOSE, 'Observation '
+                                                 '{}: reflected region overlaps '
+                                                 'with exclusion region'.
+                                                 format(obs.id(), offset))
                             else:
-                                outregions.append(region)
+                                regions.append(region)
                         else:
-                            outregions.append(region)
+                            regions.append(region)
 
-        return outregions
+        # Return reflected regions
+        return regions
 
     # Public methods
     def run(self):
@@ -181,74 +200,135 @@ class csphagen(ctools.cscript):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
 
+        # Write header
         self._log_header1(gammalib.NORMAL,
                           'Generation of source and background spectra')
+
+        # Initialise run variables
+        self._outobs   = gammalib.GObservations()
+        self._bkg_regs = []
+
         # Loop through observations and generate pha, arf, rmf files
-        # Save ON/OFF regions in ds9 reg files
-        outobs = gammalib.GObservations()
-        etrue = self._ebounds
-        ereco = self._ebounds
         for obs in self._obs:
+
+            # Initialise background regions for this observation
             bkg_reg = gammalib.GSkyRegions()
-            if self._bkgmethod == "REFLECTED":
-                regions = self._reflected_regions(obs)
-            for region in regions:
-                bkg_reg.append(region)
-            if bkg_reg.size() >= 1 or (
-                            self._bkgmethod == "REFLECTED" and bkg_reg.size() >= self._bkgregmin):
-                onoff = gammalib.GCTAOnOffObservation(obs, self._src_dir, etrue,
-                                                      ereco, self._src_reg,
+
+            # If reflected background is requested then created reflected
+            # background regions
+            if self['bkgmethod'].string() == 'REFLECTED':
+                bkg_reg = self._reflected_regions(obs)
+
+            # If there are reflected regions then create On/Off observation
+            # and append it to the output container
+            if bkg_reg.size() >= self['bkgregmin'].integer():
+                onoff = gammalib.GCTAOnOffObservation(obs, self._src_dir,
+                                                      self._ebounds,
+                                                      self._ebounds,
+                                                      self._src_reg,
                                                       bkg_reg)
                 onoff.id(obs.id())
-                outobs.append(onoff)
-                self._src_reg.save(
-                    self._outroot + '_{}_on.reg'.format(obs.id()))
-                bkg_reg.save(self._outroot + '_{}_off.reg'.format(obs.id()))
+                self._outobs.append(onoff)
+                self._bkg_regs.append({'regions': bkg_reg, 'id': obs.id()})
             else:
-                if self._logNormal():
-                    msg = 'Observation {} not included in spectra generation\n'.format(
-                        obs.id())
-                    self._log(msg)
+                self._log_string(gammalib.NORMAL, 'Observation {} not included '
+                                 'in spectra generation'.format(obs.id()))
 
-        # Save PHA, ARF and RMFs
-        if outobs.size() < 2 or self._stack == False:
-            for obs in outobs:
-                obs.on_spec().save(
-                    self._outroot + '_{}_pha_on.fits'.format(obs.id()),
-                    True)
-                obs.off_spec().save(
-                    self._outroot + '_{}_pha_off.fits'.format(obs.id()),
-                    True)
-                obs.arf().save(self._outroot + '_{}_arf.fits'.format(obs.id()),
-                               True)
-                obs.rmf().save(self._outroot + '_{}_rmf.fits'.format(obs.id()),
-                               True)
-        else:
-            if self._logVerbose():
-                msg = 'Stacking {} observations\n'.format(
-                    outobs.size())
-                self._log(msg)
-            stackobs = gammalib.GCTAOnOffObservation(outobs)
-            stackobs.on_spec().save(
-                self._outroot + '_stacked_pha_on.fits',
-                True)
-            stackobs.off_spec().save(
-                self._outroot + '_stacked_pha_off.fits',
-                True)
-            stackobs.arf().save(self._outroot + '_stacked_arf.fits',
-                                True)
-            stackobs.rmf().save(self._outroot + '_stacked_rmf.fits',
-                                True)
-            outobs = gammalib.GObservations()
-            outobs.append(stackobs)
+        # Stack observations
+        if self._outobs.size() > 1 and self['stack'].boolean() == True:
 
-        # Save On/Off observations
-        outname = self._outroot + '.xml'
-        outobs.save(outname)
-        # Log filename
-        if self._logNormal():
-            self._log(
-                'Output observation definition XML file: {}\n'.format(outname))
+            # Write header
+            self._log_header1(gammalib.NORMAL,
+                 'Stacking {} observations'.format(self._outobs.size()))
+
+            # Stack observations
+            stacked_obs = gammalib.GCTAOnOffObservation(self._outobs)
+
+            # Put stacked observations in output container
+            self._outobs = gammalib.GObservations()
+            self._outobs.append(stacked_obs)
+
+        # Return
+        return
+
+    def save(self):
+        """ 
+        Save data
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Save data')
+
+        # Get XMK output filename, prefix and clobber
+        outobs  = self['outobs'].string()
+        prefix  = self['prefix'].string()
+        clobber = self['clobber'].boolean()
+
+        # Loop over all observation in container
+        for obs in self._outobs:
+
+            # Set filenames
+            if self['stack'].boolean():
+                onname  = prefix + '_stacked_pha_on.fits'
+                offname = prefix + '_stacked_pha_off.fits'
+                arfname = prefix + '_stacked_arf.fits'
+                rmfname = prefix + '_stacked_rmf.fits'
+            elif self._outobs.size() > 1:
+                onname  = prefix + '_{}_pha_on.fits'.format(obs.id())
+                offname = prefix + '_{}_pha_off.fits'.format(obs.id())
+                arfname = prefix + '_{}_arf.fits'.format(obs.id())
+                rmfname = prefix + '_{}_rmf.fits'.format(obs.id())
+            else:
+                onname  = prefix + '_pha_on.fits'
+                offname = prefix + '_pha_off.fits'
+                arfname = prefix + '_arf.fits'
+                rmfname = prefix + '_rmf.fits'
+
+            # Save files
+            obs.on_spec().save(onname, clobber)
+            obs.off_spec().save(offname, clobber)
+            obs.arf().save(arfname, clobber)
+            obs.rmf().save(rmfname, clobber)
+
+            # Log file names
+            self._log_value(gammalib.NORMAL, 'PHA on file', onname)
+            self._log_value(gammalib.NORMAL, 'PHA off file', offname)
+            self._log_value(gammalib.NORMAL, 'ARF file', arfname)
+            self._log_value(gammalib.NORMAL, 'RMF file', arfname)
+
+        # Save observation definition XML file
+        self._outobs.save(outobs)
+
+        # Log file name
+        self._log_value(gammalib.NORMAL, 'Obs. definition XML file', outobs)
+
+        # Save ds9 On region file
+        regname = prefix + '_on.reg'
+        self._src_reg.save(regname)
+        self._log_value(gammalib.NORMAL, 'On region file', regname)
+
+        # Save ds9 Off region files
+        for bkg_reg in self._bkg_regs:
+
+            # Set filename
+            if len(self._bkg_regs) > 1:
+                regname = prefix + '_{}_off.reg'.format(bkg_reg['id'])
+            else:
+                regname = prefix + '_off.reg'
+
+            # Save ds9 region file
+            bkg_reg['regions'].save(regname)
+
+            # Log file name
+            self._log_value(gammalib.NORMAL, 'Off region file', regname)
+
+        # Return
+        return
+
+    def obs(self):
+        """
+        Return observation container
+        """
+        return self._outobs
 
     def execute(self):
         """
@@ -263,6 +343,9 @@ class csphagen(ctools.cscript):
         # Run the script
         self.run()
 
+        # Save result
+        self.save()
+
         # Return
         return
 
@@ -271,6 +354,7 @@ class csphagen(ctools.cscript):
 # Main routine entry point #
 # ======================== #
 if __name__ == '__main__':
+
     # Create instance of application
     app = csphagen(sys.argv)
 

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-8 August 2017
+16 October 2017
 
 
 Introduction
@@ -121,6 +121,9 @@ cscripts
 --------
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
+
+The script csphagen was added to allow the generation of PHA, ARF and RMF datasets
+for classical On/Off IACT analysis (#2208).
 
 
 Examples

@@ -16,11 +16,12 @@
 #
 # Input and output parameters
 #============================
-inobs,      f, a, obs.xml,,, "Input event list or observation definition XML file"
-caldb,      s, a, prod2,,, "Calibration database"
-irf,        s, a, South_0.5h,,, "Instrument response function"
-exclusion,  f,  h, NONE,,, "FITS with WCS map of exclusion regions"
-outroot,    s, a, spectrum,,, "Root of the name for output PHA, ARF, RMF, XML, and ds9 reg files"
+inobs,       f, a, obs.xml,,, "Input event list or observation definition XML file"
+caldb,       s, a, prod2,,, "Calibration database"
+irf,         s, a, South_0.5h,,, "Instrument response function"
+inexclusion, f, h, NONE,,, "Sky map of exclusion regions"
+outobs,      s, a, onoff_obs.xml,,, "Output observation definition XML file"
+prefix,      s, h, onoff,,, "Prefix for output files"
 
 #
 # Script parameters
@@ -30,7 +31,6 @@ emax,      r, a, 100.0,,, "Upper energy limit (TeV)"
 enumbins,  i, a, 120,,, "Number of energy bins"
 ebinalg,   s, a, LOG,LIN|LOG|FILE,, "Binning algorithm"
 ebinfile,  f, a, NONE,,, "Name of the file containing the energy bin definition"
-bkgmethod, s, h, REFLECTED,REFLECTED,, "Method for background estimation"
 srcshape,  s, h, CIRCLE,CIRCLE,, "Shape of the source region"
 coordsys,  s, a, CEL,CEL|GAL,, "Coordinate system (CEL - celestial, GAL - galactic)"
 ra,        r, a, 83.63,0,360, "Right Ascension of source region centre (deg)"
@@ -38,9 +38,10 @@ dec,       r, a, 22.01,-90,90, "Declination of source region centre (deg)"
 glon,      r, a, 184.56,0,360, "Galactic longitude of source region centre (deg)"
 glat,      r, a, -5.79,-90,90, "Galactic latitude of source region centre (deg)"
 rad,       r, a, 0.2,0,180, "Radius of source region circle (deg)"
-bkgregmin, i, h, 2,1,1000, "Minimum number of background region for REFLECTED method"
-maxoffset, r, h, 4.,,, "Maximum offset of source from camera center to accept observation"
-stack,     b, a, no,,, "Stack multiple observations into single On/Off PHA (if no produce run-by-run files)"
+bkgmethod, s, h, REFLECTED,REFLECTED,, "Method for background estimation"
+bkgregmin, i, h, 2,1,1000, "Minimum number of background regions"
+maxoffset, r, h, 4.0,,, "Maximum offset of source from camera center to accept observation"
+stack,     b, a, no,,, "Stack multiple observations into single PHA, ARF and RMF files?"
 
 #
 # Standard parameters
