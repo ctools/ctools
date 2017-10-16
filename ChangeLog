@@ -1,8 +1,9 @@
-2017-10-11
+2017-10-16
 
         * Version 1.5.0 released
         ========================
 
+        Add RING background method to ctskymap (#2207)
         Add keywords to sky maps produced by ctskymap (#2194)
         Enhance efficiency of computations in ctmodel (#2189)
         Add csmodelsois script (#2180)

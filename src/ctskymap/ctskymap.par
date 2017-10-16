@@ -46,7 +46,7 @@ bkgsubtract, s, a, NONE, NONE|IRF|RING,, "Background subtraction method"
 roiradius,   r, a, 0.0,,, "Source region radius for estimating on-counts (degrees)"
 inradius,    r, a, 0.6,,, "Inner ring radius (degrees)"
 outradius,   r, a, 0.8,,, "Outer ring radius (degrees)"
-regfile,     f, h, NONE,,, "Exclusion regions definition file"
+inexclusion, f, h, NONE,,, "Exclusion map or DS9 region file name"
 
 #
 # Standard parameters

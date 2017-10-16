@@ -22,6 +22,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2207 <https://cta-redmine.irap.omp.eu/issues/2207>`_] -
+  Add ``RING`` background method to :ref:`ctskymap`
 * [`2194 <https://cta-redmine.irap.omp.eu/issues/2194>`_] -
   Add keywords to sky maps produced by :ref:`ctskymap`
 * [`2189 <https://cta-redmine.irap.omp.eu/issues/2189>`_] -

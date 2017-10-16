@@ -237,31 +237,27 @@ class Test(test):
         self._check_result_file('ctskymap_py4.fits[BACKGROUND]')
         self._check_result_file('ctskymap_py4.fits[SIGNIFICANCE]')
 
-        # ================================
-        # TEST RING BACKGROUND SUBTRACTION
-        # ================================
-
-        # Allocate ctskymap tool from observation container
+        # Test RING background subtraction
         skymap = ctools.ctskymap(obs)
         skymap['emin']        = 0.1
         skymap['emax']        = 100
-        skymap['nxpix']       = 100     # Make region smaller since the 'RING'
-        skymap['nypix']       = 100     # method takes longer to run than 'IRF'
+        skymap['nxpix']       = 100  # Make region smaller since the 'RING'
+        skymap['nypix']       = 100  # method takes longer to run than 'IRF'
         skymap['binsz']       = 0.02
         skymap['coordsys']    = 'CEL'
         skymap['proj']        = 'CAR'
         skymap['xref']        = 83.63
         skymap['yref']        = 22.01
         skymap['bkgsubtract'] = 'RING'
+        skymap['roiradius']   = 0.1
+        skymap['inradius']    = 0.6
+        skymap['outradius']   = 0.8
+        skymap['inexclusion'] = 'NONE'
         skymap['caldb']       = self._caldb
         skymap['irf']         = self._irf
         skymap['outmap']      = 'ctskymap_py5.fits'
         skymap['logfile']     = 'ctskymap_py5.log'
         skymap['chatter']     = 4
-        skymap['roiradius']   = 0.1
-        skymap['inradius']    = 0.6
-        skymap['outradius']   = 0.8
-        skymap['regfile']     = 'NONE'
 
         # Execute tool
         skymap.logFileOpen()  # Needed to get a new log file
