@@ -198,7 +198,7 @@ class Test(test):
         # Run script
         phagen.execute()
 
-        # Check outout
+        # Check output
         for s in range(2):
             self._check_output('phagen_py3_' + str(s + 1), nbins,
                                self._nreg_mul[s])
@@ -225,10 +225,10 @@ class Test(test):
         # Run script
         phagen.execute()
 
-        # Check outout
+        # Check output
         for s in range(2):
             self._check_output('phagen_py4_stacked', nbins,
-                               0,check_regions=False)
+                               0, check_regions=False)
         self._check_outobs('phagen_py4', 1)
 
         return
@@ -240,10 +240,10 @@ class Test(test):
         cols = ['E_MIN', 'E_MAX']
 
         self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in light curve FITS table' % len(
+                        'Check for %d columns in energy bounds table' % len(
                             cols))
         self.test_value(table.nrows(), bins,
-                        'Check for %d rows in light curve FITS table' % bins)
+                        'Check for %d rows in energy bounds table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
@@ -263,7 +263,7 @@ class Test(test):
 
         # Check FITS file structure
         self.test_value(fits.size(), 3,
-                        'Check for 3 extensions in light curve FITS file')
+                        'Check for 3 extensions in PHA file')
         self.test_assert(fits.contains('SPECTRUM'),
                          'FITS file contains "SPECTRUM" extension')
         self.test_assert(fits.contains('EBOUNDS'),
@@ -274,10 +274,10 @@ class Test(test):
 
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in light curve FITS table' % len(
+                        'Check for %d columns in PHA table' % len(
                             cols))
         self.test_value(table.nrows(), bins,
-                        'Check for %d rows in light curve FITS table' % bins)
+                        'Check for %d rows in PHA table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
@@ -297,14 +297,14 @@ class Test(test):
         Check ARF file
         """
         # Expected column names
-        cols = ['ENERG_LO', 'ENERG_HI', 'SPECRESP', 'BACKGROUND', 'ALPHA']
+        cols = ['ENERG_LO', 'ENERG_HI', 'SPECRESP', 'BACKRESP']
 
         # Open FITS file
         fits = gammalib.GFits(filename)
 
         # Check FITS file structure
         self.test_value(fits.size(), 2,
-                        'Check for 2 extensions in light curve FITS file')
+                        'Check for 2 extensions in ARF file')
         self.test_assert(fits.contains('SPECRESP'),
                          'FITS file contains "SPECRESP" extension')
 
@@ -313,10 +313,10 @@ class Test(test):
 
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in light curve FITS table' % len(
+                        'Check for %d columns in ARF table' % len(
                             cols))
         self.test_value(table.nrows(), bins,
-                        'Check for %d rows in light curve FITS table' % bins)
+                        'Check for %d rows in ARF table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
@@ -339,7 +339,7 @@ class Test(test):
 
         # Check FITS file structure
         self.test_value(fits.size(), 3,
-                        'Check for 3 extensions in light curve FITS file')
+                        'Check for 3 extensions in RMF file')
         self.test_assert(fits.contains('MATRIX'),
                          'FITS file contains "MATRIX" extension')
         self.test_assert(fits.contains('EBOUNDS'),
@@ -350,10 +350,10 @@ class Test(test):
 
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in light curve FITS table' % len(
+                        'Check for %d columns in RMF table' % len(
                             cols))
         self.test_value(table.nrows(), bins,
-                        'Check for %d rows in light curve FITS table' % bins)
+                        'Check for %d rows in RMF table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
@@ -368,7 +368,7 @@ class Test(test):
         # Return
         return
 
-    def _check_output(self, filenameroot, bins, nreg, check_regions = True):
+    def _check_output(self, filenameroot, bins, nreg, check_regions=True):
         """
         Check the output from a csphagen run
         """

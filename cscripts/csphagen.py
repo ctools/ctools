@@ -184,6 +184,7 @@ class csphagen(ctools.cscript):
         self._log_header1(gammalib.NORMAL,
                           'Generation of source and background spectra')
         # Loop through observations and generate pha, arf, rmf files
+        # Save ON/OFF regions in ds9 reg files
         outobs = gammalib.GObservations()
         etrue = self._ebounds
         ereco = self._ebounds
@@ -195,9 +196,14 @@ class csphagen(ctools.cscript):
                 bkg_reg.append(region)
             if bkg_reg.size() >= 1 or (
                             self._bkgmethod == "REFLECTED" and bkg_reg.size() >= self._bkgregmin):
-                onoff = gammalib.GCTAOnOffObservation(obs, self._src_dir, etrue, ereco,self._src_reg, bkg_reg)
+                onoff = gammalib.GCTAOnOffObservation(obs, self._src_dir, etrue,
+                                                      ereco, self._src_reg,
+                                                      bkg_reg)
                 onoff.id(obs.id())
                 outobs.append(onoff)
+                self._src_reg.save(
+                    self._outroot + '_{}_on.reg'.format(obs.id()))
+                bkg_reg.save(self._outroot + '_{}_off.reg'.format(obs.id()))
             else:
                 if self._logNormal():
                     msg = 'Observation {} not included in spectra generation\n'.format(
@@ -205,8 +211,8 @@ class csphagen(ctools.cscript):
                     self._log(msg)
 
         # Save PHA, ARF and RMFs
-        for obs in outobs:
-            if outobs.size() < 2 or self._stack == False:
+        if outobs.size() < 2 or self._stack == False:
+            for obs in outobs:
                 obs.on_spec().save(
                     self._outroot + '_{}_pha_on.fits'.format(obs.id()),
                     True)
@@ -217,26 +223,24 @@ class csphagen(ctools.cscript):
                                True)
                 obs.rmf().save(self._outroot + '_{}_rmf.fits'.format(obs.id()),
                                True)
-            obs.on_regions().save(self._outroot + '_{}_on.reg'.format(obs.id()))
-            obs.off_regions().save(
-                self._outroot + '_{}_off.reg'.format(obs.id()))
-
-        if outobs.size() > 1 and self._stack == True:
+        else:
             if self._logVerbose():
                 msg = 'Stacking {} observations\n'.format(
                     outobs.size())
                 self._log(msg)
-            outobs = gammalib.GCTAOnOffObservation(outobs)
-            outobs.on_spec().save(
+            stackobs = gammalib.GCTAOnOffObservation(outobs)
+            stackobs.on_spec().save(
                 self._outroot + '_stacked_pha_on.fits',
                 True)
-            outobs.off_spec().save(
+            stackobs.off_spec().save(
                 self._outroot + '_stacked_pha_off.fits',
                 True)
-            outobs.arf().save(self._outroot + '_stacked_arf.fits',
-                              True)
-            outobs.rmf().save(self._outroot + '_stacked_rmf.fits',
-                              True)
+            stackobs.arf().save(self._outroot + '_stacked_arf.fits',
+                                True)
+            stackobs.rmf().save(self._outroot + '_stacked_rmf.fits',
+                                True)
+            outobs = gammalib.GObservations()
+            outobs.append(stackobs)
 
         # Save On/Off observations
         outname = self._outroot + '.xml'
