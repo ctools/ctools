@@ -10,6 +10,7 @@ ctools 1.5 is a major release that adds significant functionality.
 
 In particular, this release provides:
 
+* Support of classical IACT analysis
 * Specifcation of times in various formats (UTC, MJD, JD, MET)
 
 
@@ -31,6 +32,8 @@ Improvements
 New features
 ------------
 
+* [`2208 <https://cta-redmine.irap.omp.eu/issues/2208>`_] -
+  Add :ref:`csphagen` script
 * [`2180 <https://cta-redmine.irap.omp.eu/issues/2180>`_] -
   Add :ref:`csmodelsois` script
 * [`1864 <https://cta-redmine.irap.omp.eu/issues/1864>`_] -

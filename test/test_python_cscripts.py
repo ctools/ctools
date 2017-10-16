@@ -37,6 +37,7 @@ import test_csobs2caldb
 import test_csobsdef
 import test_csobsinfo
 import test_csobsselect
+import test_csphagen
 import test_csphasecrv
 import test_cspull
 import test_csresmap
@@ -127,6 +128,7 @@ def test(installed=False, debug=False):
              test_csobsdef.Test(),
              test_csobsinfo.Test(),
              test_csobsselect.Test(),
+             test_csphagen.Test(),
              test_csphasecrv.Test(),
              test_cspull.Test(),
              test_csresmap.Test(),

@@ -320,7 +320,7 @@ class csobsselect(ctools.cscript):
         # Otherwise log filename and save file
         else:
             # Log filename
-            self._log_value(gammalib.NORMAL, 'Observation definition XML file',
+            self._log_value(gammalib.NORMAL, 'Obs. definition XML file',
                                              outobs.url())
 
             # Save observations
