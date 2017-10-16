@@ -144,8 +144,8 @@ class csphagen(ctools.cscript):
 
         # If ...
         if offset <= self._rad or offset >= self['maxoffset'].real():
-            self._log_string(gammalib.EXPLICIT, 'Observation {} pointed at {} '
-                             'deg from source'.format(obs.id(), offset))
+            self._log_string(gammalib.EXPLICIT, 'Observation %s pointed at %.3f '
+                             'deg from source' % ((obs.id(), offset)))
 
         # ... otherwise
         else:
@@ -158,9 +158,9 @@ class csphagen(ctools.cscript):
                 # numerical precision issues
                 N = int(2.0 * math.pi / alpha)
                 if N < self['bkgregmin'].integer() + 3:
-                    self._log_string(gammalib.EXPLICIT, 'Observation {}: '
+                    self._log_string(gammalib.EXPLICIT, 'Observation %s: '
                                      'insufficient regions for background '
-                                     'estimation'.format(obs.id(), offset))
+                                     'estimation' % (obs.id()))
 
                 # Otherwise loop over position angle to create reflected
                 # regions
@@ -174,9 +174,9 @@ class csphagen(ctools.cscript):
                         if self._has_exclusion:
                             if self._excl_reg.overlaps(region):
                                 self._log_string(gammalib.VERBOSE, 'Observation '
-                                                 '{}: reflected region overlaps '
-                                                 'with exclusion region'.
-                                                 format(obs.id(), offset))
+                                                 '%s: reflected region overlaps '
+                                                 'with exclusion region' %
+                                                 (obs.id()))
                             else:
                                 regions.append(region)
                         else:
@@ -231,15 +231,15 @@ class csphagen(ctools.cscript):
                 self._outobs.append(onoff)
                 self._bkg_regs.append({'regions': bkg_reg, 'id': obs.id()})
             else:
-                self._log_string(gammalib.NORMAL, 'Observation {} not included '
-                                 'in spectra generation'.format(obs.id()))
+                self._log_string(gammalib.NORMAL, 'Observation %s not included '
+                                 'in spectra generation' % (obs.id()))
 
         # Stack observations
         if self._outobs.size() > 1 and self['stack'].boolean() == True:
 
             # Write header
-            self._log_header1(gammalib.NORMAL,
-                 'Stacking {} observations'.format(self._outobs.size()))
+            self._log_header1(gammalib.NORMAL, 'Stacking %d observations' %
+                              (self._outobs.size()))
 
             # Stack observations
             stacked_obs = gammalib.GCTAOnOffObservation(self._outobs)
@@ -273,10 +273,10 @@ class csphagen(ctools.cscript):
                 arfname = prefix + '_stacked_arf.fits'
                 rmfname = prefix + '_stacked_rmf.fits'
             elif self._outobs.size() > 1:
-                onname  = prefix + '_{}_pha_on.fits'.format(obs.id())
-                offname = prefix + '_{}_pha_off.fits'.format(obs.id())
-                arfname = prefix + '_{}_arf.fits'.format(obs.id())
-                rmfname = prefix + '_{}_rmf.fits'.format(obs.id())
+                onname  = prefix + '_%s_pha_on.fits' % (obs.id())
+                offname = prefix + '_%s_pha_off.fits' % (obs.id())
+                arfname = prefix + '_%s_arf.fits' % (obs.id())
+                rmfname = prefix + '_%s_rmf.fits' % (obs.id())
             else:
                 onname  = prefix + '_pha_on.fits'
                 offname = prefix + '_pha_off.fits'
@@ -311,7 +311,7 @@ class csphagen(ctools.cscript):
 
             # Set filename
             if len(self._bkg_regs) > 1:
-                regname = prefix + '_{}_off.reg'.format(bkg_reg['id'])
+                regname = prefix + '_%s_off.reg' % (bkg_reg['id'])
             else:
                 regname = prefix + '_off.reg'
 
