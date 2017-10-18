@@ -283,7 +283,7 @@ class csobsselect(ctools.cscript):
         self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
 
         # Write header
-        self._log_header1(gammalib.NORMAL, 'Observation selection')
+        self._log_header1(gammalib.TERSE, 'Observation selection')
 
         # Loop over observations
         for obs in self._obs:
