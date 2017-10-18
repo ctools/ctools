@@ -79,8 +79,13 @@ General parameters
     Name of the source in the source model XML file which should be used
     for sensitivity computation.
 
-``outfile [file]``
-    Output source spectrum file.
+``outfile <SLICE|NODES|AUTO> [file]``
+    Spectrum generation method.
+    ``SLICE``: Slice energy interval into ``enumbins`` independent bins.
+    ``NODES``: Replace spectral model by node function with ``enumbins`` nodes.
+    ``AUTO`` : Automatically select method based on input data. Will use ``SLICE``
+               for CTA-only observations and ``NODES`` for observations including
+               non-CTA data.
 
 ``emin [real]``
     Lower energy limit of events (in TeV).

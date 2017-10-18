@@ -29,7 +29,7 @@ import ctools
 class csspec(ctools.cscript):
     """
     Generates a spectrum
-    
+
     This class implements the generation of a spectral energy distribution
     from data.
     """
@@ -48,6 +48,7 @@ class csspec(ctools.cscript):
         self._fits        = None
         self._binned_mode = False
         self._onoff_mode  = False
+        self._method      = 'AUTO'
 
         # Initialise observation container from constructor arguments
         self._obs, argv = self._set_input_obs(argv)
@@ -75,16 +76,6 @@ class csspec(ctools.cscript):
         if self._obs == None or self._obs.size() == 0:
             self._require_inobs('csspec::get_parameters()')
             self._obs = self._get_observations()
-        # if we have one binned CTA observation, i.e. if we are in
-        # binned mode
-        #self._binned_mode = False
-        #self._onoff_mode  = False
-        #if self._obs.size() == 1:
-        #    if self._obs[0].classname() == 'GCTAObservation':
-        #        if self._obs[0].eventtype() == 'CountsCube':
-        #            self._binned_mode = True
-        #    elif self._obs[0].classname() == 'GCTAOnOffObservation':
-        #        self._onoff_mode = True
 
         # Set models if we have none
         if self._obs.models().size() == 0:
@@ -106,6 +97,8 @@ class csspec(ctools.cscript):
                     n_unbinned += 1
             elif obs.classname() == 'GCTAOnOffObservation':
                 n_onoff += 1
+        n_cta   = n_unbinned + n_binned + n_onoff
+        n_other = self._obs.size() - n_cta
 
         # Set script mode according to CTA observations
         if n_unbinned == 0 and n_binned != 0 and n_onoff == 0:
@@ -126,6 +119,9 @@ class csspec(ctools.cscript):
         # Set ebounds
         self._set_ebounds()
 
+        # Get method
+        self._method = self['method'].string()
+
         # Query other parameeters
         self['edisp'].boolean()
         self['calc_ulim'].boolean()
@@ -139,6 +135,35 @@ class csspec(ctools.cscript):
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
+
+        # Write spectrum method header and parameters
+        self._log_header1(gammalib.TERSE, 'Spectrum method')
+        self._log_value(gammalib.TERSE, 'Unbinned CTA observations', n_unbinned)
+        self._log_value(gammalib.TERSE, 'Binned CTA observations', n_binned)
+        self._log_value(gammalib.TERSE, 'On/off CTA observations', n_onoff)
+        self._log_value(gammalib.TERSE, 'Other observations', n_other)
+
+        # If there are a mix of CTA and non-CTA observations and the method
+        # is 'SLICE' then log a warning that non-CTA observations will be
+        # ignored
+        if n_cta > 0 and n_other > 0 and self._method == 'SLICE':
+            self._log_string(TERSE, '\nWARNING: Only CTA observation can be '
+                                    'handled with the "SLICE" method, all '
+                                    'non-CTA observation will be ignored.')
+
+        # If there are only non-CTA observations and the method is 'SLICE'
+        # then stop now
+        elif n_other > 0:
+            if self._method == 'SLICE':
+                msg = 'Selected "SLICE" method but none of the observations ' \
+                      'is a CTA observation. Please select "AUTO" or "NODES" ' \
+                      'if no CTA observation is provided.'
+                raise RuntimeError(msg)
+            else:
+                self._method = 'NODES'
+
+        # Log selected spectrum method
+        self._log_value(gammalib.TERSE, 'Selected spectrum method', self._method)
 
         # Return
         return
@@ -311,6 +336,56 @@ class csspec(ctools.cscript):
         # Return
         return
 
+    def _set_replace_src_spectrum_by_nodes(self):
+        """
+        Replace source spectrum by node function
+        """
+        # Initialise model container
+        models = gammalib.GModels()
+
+        # Loop over model containers
+        for model in self._obs.models():
+
+            # If we deal with source model then replace the spectral model
+            # by a node function
+            if model.name() == self['srcname'].string():
+
+                # Setup energies at log mean energies of bins
+                energies = gammalib.GEnergies()
+                for i in range(self._ebounds.size()):
+                    energies.append(self._ebounds.elogmean(i))
+                
+                # Setup spectral node function
+                spectrum = gammalib.GModelSpectralNodes(model.spectral(), energies)
+                spectrum.autoscale()
+
+                # Make sure that all nodes are positive
+                for i in range(spectrum.nodes()):
+                    par   = spectrum[i*2+1]
+                    value = par.value()
+                    min   = 1.0e-30 * value
+                    if min <= 0.0:
+                        min = 1.0e-50
+                        if min < value:
+                            value = min
+                    par.value(value)
+                    par.min(min)
+
+                # Set spectral component of source model
+                model.spectral(spectrum)
+
+                # Append model
+                models.append(model)
+
+            # ... otherwise just append model
+            else:
+                models.append(model)
+
+        # Put new model in observation containers
+        self._obs.models(models)
+
+        # Return
+        return
 
     def _select_onoff_obs(self, obs, emin, emax):
         """
@@ -444,10 +519,10 @@ class csspec(ctools.cscript):
 
         # Use ctselect for unbinned analysis
         else:
-            
+
             # Write header
             self._log_header3(gammalib.EXPLICIT, 'Selecting events')
-    
+
             # Select events
             select = ctools.ctselect(self._obs)
             select['ra']   = 'UNDEFINED'
@@ -458,7 +533,7 @@ class csspec(ctools.cscript):
             select['tmin'] = 'UNDEFINED'
             select['tmax'] = 'UNDEFINED'
             select.run()
-    
+
             # Retrieve observation
             obs = select.obs().copy()
 
@@ -610,6 +685,95 @@ class csspec(ctools.cscript):
         # Return results
         return results
 
+    def _fit_model(self):
+        """
+        Fit model to observations
+
+        Returns
+        -------
+        results : list of dict
+            List of dictionaries with fit results
+        """
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Generate spectrum')
+
+        # Write header for fitting
+        self._log_header3(gammalib.EXPLICIT, 'Performing fit')
+
+        # Perform maximum likelihood fit
+        like          = ctools.ctlike(self._obs)
+        like['edisp'] = self['edisp'].boolean()
+        like.run()
+
+        # Initialise fit results
+        results = []
+
+        # Extract fit results
+        model    = like.obs().models()[self['srcname'].string()]
+        spectrum = model.spectral()
+        ts       = model.ts()
+
+        # Loop over all nodes
+        for i in range(spectrum.nodes()):
+
+            # Get energy boundaries
+            emin      = self._ebounds.emin(i)
+            emax      = self._ebounds.emax(i)
+            elogmean  = self._ebounds.elogmean(i)
+
+            # Initialise dictionary
+            result = {'energy':      elogmean.TeV(),
+                      'energy_low':  (elogmean - emin).TeV(),
+                      'energy_high': (emax - elogmean).TeV(),
+                      'flux':        0.0,
+                      'flux_err':    0.0,
+                      'TS':          0.0,
+                      'ulimit':      0.0,
+                      'Npred':       0.0}
+
+            # Convert differential flux and flux error to nuFnu
+            norm               = elogmean.MeV() * elogmean.MeV()  * gammalib.MeV2erg
+            result['flux']     = spectrum[i*2+1].value() * norm
+            result['flux_err'] = spectrum[i*2+1].error() * norm
+
+            # Compute TS
+            if self['calc_ts'].boolean():
+
+                # Copy observation container
+                obs = like.obs().copy()
+
+                # Set intensity of node to tiny value
+                par = obs.models()[self['srcname'].string()].spectral()[i*2+1]
+                value = 1.0e-30 * par.value()
+                if par.min() > value:
+                    par.min(value)
+                par.value(value)
+                par.fix()
+
+                # Perform maximum likelihood fit
+                tslike          = ctools.ctlike(obs)
+                tslike['edisp'] = self['edisp'].boolean()
+                tslike.run()
+
+                # Store Test Statistic
+                model        = tslike.obs().models()[self['srcname'].string()]
+                result['TS'] = ts - model.ts()
+
+            # Log information
+            value = '%e +/- %e' % (result['flux'], result['flux_err'])
+            if self['calc_ulim'].boolean() and result['ulimit'] > 0.0:
+                value += ' [< %e]' % (result['ulimit'])
+            value += ' erg/cm2/s'
+            if self['calc_ts'].boolean() and result['TS'] > 0.0:
+                value += ' (TS = %.3f)' % (result['TS'])
+            self._log_value(gammalib.TERSE, 'Bin '+str(i+1), value)
+
+            # Append results
+            results.append(result)
+
+        # Return results
+        return results
+
     def _create_fits(self, results):
         """
         Create FITS file
@@ -688,14 +852,26 @@ class csspec(ctools.cscript):
         # Write input observation container into logger
         self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
 
-        # Adjust model parameters dependent on input user parameters
-        self._adjust_model_pars()
-
         # Write spectral binning into logger
         self._log_spectral_binning()
 
-        # Fit energy bins
-        results = self._fit_energy_bins()
+        # Adjust model parameters dependent on input user parameters
+        self._adjust_model_pars()
+
+        # Case A: "SLICE" method
+        if self._method == 'SLICE':
+
+            # Fit energy bins
+            results = self._fit_energy_bins()
+
+        # Case B: "NODES" method
+        elif self._method == 'NODES':
+
+            # Replace source spectrum by nodes function
+            self._set_replace_src_spectrum_by_nodes()
+
+            # Fit model
+            results = self._fit_model()
 
         # Create FITS file
         self._create_fits(results)
@@ -738,7 +914,7 @@ class csspec(ctools.cscript):
 
             # Get outmap parameter
             outfile = self['outfile'].filename()
-        
+
             # Log file name
             self._log_value(gammalib.NORMAL, 'Spectrum file', outfile.url())
 

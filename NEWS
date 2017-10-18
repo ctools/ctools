@@ -140,6 +140,13 @@ for classical On/Off IACT analysis (#2208).
 
 The csspec script now can also handle On/Off spectra for SED generation (#2231).
 
+The csspec script now can also handle non-CTA data. For that purpose a "method"
+parameter has been introduced that allows to selected between slicing of the data
+(method="SLICE"), which is only supported for CTA observations, and replacing of
+the spectral model by a node function (method="NODES"). If method="AUTO" the tool
+will use "SLICE" for observations containing only CTA data and "NODES" for observations
+containing other data (#1927).
+
 
 Examples
 --------
