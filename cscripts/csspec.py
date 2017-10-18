@@ -75,17 +75,16 @@ class csspec(ctools.cscript):
         if self._obs == None or self._obs.size() == 0:
             self._require_inobs('csspec::get_parameters()')
             self._obs = self._get_observations()
-
-        # Check if we have one binned CTA observation, i.e. if we are in
+        # if we have one binned CTA observation, i.e. if we are in
         # binned mode
-        self._binned_mode = False
-        self._onoff_mode  = False
-        if self._obs.size() == 1:
-            if self._obs[0].classname() == 'GCTAObservation':
-                if self._obs[0].eventtype() == 'CountsCube':
-                    self._binned_mode = True        
-            elif self._obs[0].classname() == 'GCTAOnOffObservation':
-                self._onoff_mode = True
+        #self._binned_mode = False
+        #self._onoff_mode  = False
+        #if self._obs.size() == 1:
+        #    if self._obs[0].classname() == 'GCTAObservation':
+        #        if self._obs[0].eventtype() == 'CountsCube':
+        #            self._binned_mode = True
+        #    elif self._obs[0].classname() == 'GCTAOnOffObservation':
+        #        self._onoff_mode = True
 
         # Set models if we have none
         if self._obs.models().size() == 0:
@@ -93,6 +92,36 @@ class csspec(ctools.cscript):
 
         # Query source name
         self['srcname'].string()
+
+        # Collect number of unbinned, binned and On/Off observations in
+        # observation container
+        n_unbinned = 0
+        n_binned   = 0
+        n_onoff    = 0
+        for obs in self._obs:
+            if obs.classname() == 'GCTAObservation':
+                if obs.eventtype() == 'CountsCube':
+                    n_binned += 1
+                else:
+                    n_unbinned += 1
+            elif obs.classname() == 'GCTAOnOffObservation':
+                n_onoff += 1
+
+        # Set script mode according to CTA observations
+        if n_unbinned == 0 and n_binned != 0 and n_onoff == 0:
+            self._binned_mode = True
+        elif n_unbinned == 0 and n_binned == 0 and n_onoff != 0:
+            self._onoff_mode = True
+        elif n_unbinned == 0 and n_binned != 0 and n_onoff != 0:
+            msg = 'Mix of binned and On/Off CTA observations found in ' \
+                  'observation container. csscript does not support this ' \
+                  'mix.'
+            raise RuntimeError(msg)
+        elif n_unbinned != 0 and (n_binned != 0 or n_onoff != 0):
+            msg = 'Mix of unbinned and binned or On/Off CTA observations ' \
+                  'found in observation container. csscript does not support ' \
+                  'this mix.'
+            raise RuntimeError(msg)
 
         # Set ebounds
         self._set_ebounds()
@@ -128,7 +157,11 @@ class csspec(ctools.cscript):
             # Create energy boundaries according to user parameters
             ebounds = self._create_ebounds()
 
-            #  Extract cube ebounds
+            # Extract binned energy boundaries from first observation in
+            # container. This assumes that all observations have the same
+            # energy binning. But even if this is not the case, the script
+            # should work reasonably well since for each observation the
+            # relevant energy bins will be selected.
             if self._binned_mode:
                 cube_ebounds = self._obs[0].events().ebounds()
             else:
@@ -140,18 +173,22 @@ class csspec(ctools.cscript):
 
                 # Extract minimum and maximum energy of user energy bin,
                 # including some rounding tolerance
-                emin = ebounds.emin(i).TeV() - 1e-6 # Rounding tolerance
-                emax = ebounds.emax(i).TeV() + 1e-6 # Rounding tolerance
+                emin = ebounds.emin(i).TeV() * 0.999 # Rounding tolerance
+                emax = ebounds.emax(i).TeV() * 1.001 # Rounding tolerance
 
                 # Set number of overlapping energy bins
                 nbins = 0
 
-                # Search first cube bin that is comprised within user energy bin
+                # Search first cube bin that is comprised within user energy
+                # bin
+                emin_value = -1.0
                 for k in range(cube_ebounds.size()):
                     if cube_ebounds.emin(k).TeV() >= emin and \
                        cube_ebounds.emax(k).TeV() <= emax:
                         emin_value = cube_ebounds.emin(k).TeV()
                         break
+                if emin_value < 0.0:
+                    continue
 
                 # Search last cube bin that is comprised within user energy bin
                 for k in range(cube_ebounds.size()):
@@ -196,6 +233,15 @@ class csspec(ctools.cscript):
             value = '%s - %s' % (str(cube_ebounds.emin()),
                                  str(cube_ebounds.emax()))
             self._log_value(gammalib.TERSE, 'Counts cube energy range', value)
+
+        # Log RMF energy range for On/Off mode
+        elif self._onoff_mode:
+            etrue = self._obs[0].rmf().etrue()
+            ereco = self._obs[0].rmf().emeasured()
+            vtrue = '%s - %s' % (str(etrue.emin()), str(etrue.emax()))
+            vreco = '%s - %s' % (str(ereco.emin()), str(ereco.emax()))
+            self._log_value(gammalib.TERSE, 'RMF true energy range', vtrue)
+            self._log_value(gammalib.TERSE, 'RMF measured energy range', vreco)
 
         # Log energy bins
         for i in range(self._ebounds.size()):
@@ -265,6 +311,84 @@ class csspec(ctools.cscript):
         # Return
         return
 
+
+    def _select_onoff_obs(self, obs, emin, emax):
+        """
+        Select an energy interval from one CTA On/Off observation
+
+        Parameters
+        ----------
+        obs : `~gammalib.GCTAOnOffObservation`
+            Minimum energy
+        emin : `~gammalib.GEnergy()`
+            Minimum energy
+        emax : `~gammalib.GEnergy()`
+            Maximum energy
+
+        Returns
+        -------
+        obs : `~gammalib.GCTAOnOffObservation`
+            CTA On/Off observation
+        """
+        # Select energy bins in etrue and ereco. 20% margin is added for
+        # true energies to take into account the energy dispersion. 0.1%
+        # margin is added for reconstructed energies to accomodate for
+        # rounding errors.
+        etrue = gammalib.GEbounds()
+        ereco = gammalib.GEbounds()
+        itrue = []
+        ireco = []
+        for i in range(obs.rmf().etrue().size()):
+            etrue_min = obs.rmf().etrue().emin(i)
+            etrue_max = obs.rmf().etrue().emax(i)
+            if etrue_min * 1.2 >= emin and etrue_max * 0.8 <= emax:
+                etrue.append(etrue_min, etrue_max)
+                itrue.append(i)
+        for i in range(obs.rmf().emeasured().size()):
+            ereco_min = obs.rmf().emeasured().emin(i)
+            ereco_max = obs.rmf().emeasured().emax(i)
+            if ereco_min * 1.001 >= emin and ereco_max * 0.999 <= emax:
+                ereco.append(ereco_min, ereco_max)
+                ireco.append(i)
+
+        # Extract PHA
+        pha_on  = gammalib.GPha(ereco)
+        pha_off = gammalib.GPha(ereco)
+        pha_on.exposure(obs.on_spec().exposure())
+        pha_off.exposure(obs.on_spec().exposure())
+        for idst, isrc in enumerate(ireco):
+            # On
+            pha_on[idst] = obs.on_spec()[isrc]
+            pha_on.areascal(idst, obs.on_spec().areascal(isrc))
+            pha_on.backscal(idst, obs.on_spec().backscal(isrc))
+            # Off
+            pha_off[idst] = obs.off_spec()[isrc]
+            pha_off.areascal(idst, obs.off_spec().areascal(isrc))
+            pha_off.backscal(idst, obs.off_spec().backscal(isrc))
+
+        # Extract ARF
+        arf          = gammalib.GArf(etrue)
+        arf_backresp = obs.arf()['BACKRESP']
+        backresp     = []
+        for idst, isrc in enumerate(itrue):
+            arf[idst] = obs.arf()[isrc]
+            backresp.append(arf_backresp[isrc])
+        arf.append('BACKRESP', backresp)
+
+        # Extract RMF
+        rmf = gammalib.GRmf(etrue, ereco)
+        for idst_true, isrc_true in enumerate(itrue):
+            for idst_reco, isrc_reco in enumerate(ireco):
+                rmf[idst_true, idst_reco] = obs.rmf()[isrc_true, isrc_reco]
+
+        # Set On/Off observations
+        id  = obs.id()
+        obs = gammalib.GCTAOnOffObservation(pha_on, pha_off, arf, rmf)
+        obs.id(id)
+
+        # Return observation
+        return obs
+
     def _select_obs(self, emin, emax):
         """
         Select observations for energy interval
@@ -278,7 +402,7 @@ class csspec(ctools.cscript):
 
         Returns
         -------
-        obs : `~gammalib.GObservations()`
+        obs : `~gammalib.GObservations`
             Observation container
         """
         # Use ctcubemask for binned analysis
@@ -296,7 +420,7 @@ class csspec(ctools.cscript):
             cubemask['emin']    = emin.TeV()
             cubemask['emax']    = emax.TeV()
             cubemask.run() 
-            
+
             # Set new binned observation
             obs = cubemask.obs().copy()
 
@@ -306,9 +430,17 @@ class csspec(ctools.cscript):
             # Write header
             self._log_header3(gammalib.EXPLICIT, 'Filtering PHA, ARF and RMF')
 
-            # DUMMY
-            obs = self._obs.copy()
+            # Initialise observation container
+            obs = gammalib.GObservations()
 
+            # Loop over all input observations and select energy bins for
+            # all On/Off observations
+            for run in self._obs:
+                if run.classname() == 'GCTAOnOffObservation':
+                    obs.append(self._select_onoff_obs(run, emin, emax))
+
+            # Append models
+            obs.models(self._obs.models())
 
         # Use ctselect for unbinned analysis
         else:
@@ -318,14 +450,14 @@ class csspec(ctools.cscript):
     
             # Select events
             select = ctools.ctselect(self._obs)
+            select['ra']   = 'UNDEFINED'
+            select['dec']  = 'UNDEFINED'
+            select['rad']  = 'UNDEFINED'
             select['emin'] = emin.TeV()
             select['emax'] = emax.TeV()
             select['tmin'] = 'UNDEFINED'
             select['tmax'] = 'UNDEFINED'
-            select['rad']  = 'UNDEFINED'
-            select['ra']   = 'UNDEFINED'
-            select['dec']  = 'UNDEFINED'
-            select.run()  
+            select.run()
     
             # Retrieve observation
             obs = select.obs().copy()
@@ -385,7 +517,7 @@ class csspec(ctools.cscript):
                 result['TS'] = source.ts()
 
             # Compute Npred value (only works for unbinned analysis)
-            if not self._binned_mode:
+            if not self._binned_mode and not self._onoff_mode:
                 for observation in like.obs():
                     result['Npred'] += observation.npred(source)
 

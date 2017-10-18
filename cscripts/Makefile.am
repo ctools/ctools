@@ -163,9 +163,9 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_psfcube.fits.gz \
            $(top_srcdir)/test/data/crab_edispcube.fits.gz \
            $(top_srcdir)/test/data/crab_bkgcube.fits.gz \
-           $(top_srcdir)/test/data/crab_offaxis1.fits \
-           $(top_srcdir)/test/data/crab_offaxis2.fits \
-           $(top_srcdir)/test/data/crab_exclusion.fits \
+           $(top_srcdir)/test/data/crab_offaxis1.fits.gz \
+           $(top_srcdir)/test/data/crab_offaxis2.fits.gz \
+           $(top_srcdir)/test/data/crab_exclusion.fits.gz \
            $(top_srcdir)/test/data/tsmap_0.fits \
            $(top_srcdir)/test/data/tsmap_1.fits \
            $(top_srcdir)/test/data/exclusion.reg \
@@ -199,7 +199,24 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/iact_runlist_2.dat \
            $(top_srcdir)/test/data/model_temporal_phasecurve.xml \
            $(top_srcdir)/test/data/model_temporal_phasecurve.fits \
-           $(top_srcdir)/test/data/phased_events.fits.gz
+           $(top_srcdir)/test/data/phased_events.fits.gz \
+           $(top_srcdir)/test/data/onoff_arf.fits.gz \
+           $(top_srcdir)/test/data/onoff_arf1.fits.gz \
+           $(top_srcdir)/test/data/onoff_arf2.fits.gz \
+           $(top_srcdir)/test/data/onoff_model.xml \
+           $(top_srcdir)/test/data/onoff_obs.xml \
+           $(top_srcdir)/test/data/onoff_obs1.xml \
+           $(top_srcdir)/test/data/onoff_obs2.xml \
+           $(top_srcdir)/test/data/onoff_obs_stacked.xml \
+           $(top_srcdir)/test/data/onoff_pha_off.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_off1.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_off2.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_on.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_on1.fits.gz \
+           $(top_srcdir)/test/data/onoff_pha_on2.fits.gz \
+           $(top_srcdir)/test/data/onoff_rmf.fits.gz \
+           $(top_srcdir)/test/data/onoff_rmf1.fits.gz \
+           $(top_srcdir)/test/data/onoff_rmf2.fits.gz
 
 # Test data to be distributed in $(pyexecdir)/cscripts/tests/data/iactdata
 testiactdata = $(top_srcdir)/test/data/iactdata/hdu-index.fits.gz \

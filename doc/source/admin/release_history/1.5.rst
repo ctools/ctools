@@ -23,6 +23,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2231 <https://cta-redmine.irap.omp.eu/issues/2231>`_] -
+  Enable handling of On/Off observations in :ref:`csspec`
 * [`2207 <https://cta-redmine.irap.omp.eu/issues/2207>`_] -
   Add ``RING`` background method to :ref:`ctskymap`
 * [`2194 <https://cta-redmine.irap.omp.eu/issues/2194>`_] -

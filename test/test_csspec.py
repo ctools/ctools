@@ -43,11 +43,13 @@ class Test(test):
         test.__init__(self)
 
         # Set members
-        self._inobs     = self._datadir + '/crab_cntmap_small.fits'
-        self._expcube   = self._datadir + '/crab_expcube.fits'
-        self._psfcube   = self._datadir + '/crab_psfcube.fits'
-        self._edispcube = self._datadir + '/crab_edispcube.fits'
-        self._bkgcube   = self._datadir + '/crab_bkgcube.fits'
+        self._inobs       = self._datadir + '/crab_cntmap_small.fits'
+        self._inonoff     = self._datadir + '/onoff_obs.xml'
+        self._expcube     = self._datadir + '/crab_expcube.fits'
+        self._psfcube     = self._datadir + '/crab_psfcube.fits'
+        self._edispcube   = self._datadir + '/crab_edispcube.fits'
+        self._bkgcube     = self._datadir + '/crab_bkgcube.fits'
+        self._onoff_model = self._datadir + '/onoff_model.xml'
 
         # Return
         return
@@ -140,7 +142,7 @@ class Test(test):
         spec.run()
         spec.save()
 
-        # Check pull distribution file
+        # Check result file
         self._check_result_file('csspec_py1.fits', 5)
 
         # Set-up binned csspec
@@ -164,8 +166,28 @@ class Test(test):
         # Execute csspec script
         spec.execute()
 
-        # Check pull distribution file
+        # Check result file
         self._check_result_file('csspec_py2.fits', 2)
+
+        # Set-up On/Off csspec
+        spec = cscripts.csspec()
+        spec['inobs']    = self._inonoff
+        spec['inmodel']  = self._onoff_model
+        spec['srcname']  = 'Crab'
+        spec['outfile']  = 'csspec_py3.fits'
+        spec['ebinalg']  = 'LOG'
+        spec['enumbins'] = 10
+        spec['emin']     = 0.1
+        spec['emax']     = 10.0
+        spec['logfile']  = 'csspec_py3.log'
+        spec['chatter']  = 4
+        spec['publish']  = False
+
+        # Execute csspec script
+        spec.execute()
+
+        # Check result file
+        self._check_result_file('csspec_py3.fits', 10)
 
         # Return
         return

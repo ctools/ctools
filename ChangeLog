@@ -1,8 +1,9 @@
-2017-10-16
+2017-10-18
 
         * Version 1.5.0 released
         ========================
 
+        Enable handling of On/Off observations in csspec (#2231)
         Add csphagen script (#2208)
         Add RING background method to ctskymap (#2207)
         Add keywords to sky maps produced by ctskymap (#2194)

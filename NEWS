@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-16 October 2017
+18 October 2017
 
 
 Introduction
@@ -137,6 +137,8 @@ formats (#1864).
 
 The script csphagen was added to allow the generation of PHA, ARF and RMF datasets
 for classical On/Off IACT analysis (#2208).
+
+The csspec script now can also handle On/Off spectra for SED generation (#2231).
 
 
 Examples
