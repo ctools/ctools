@@ -50,7 +50,7 @@ cscripts
    csobsdef --- Generates observation definition file <csobsdef>
    csobsinfo --- Shows observation container content <csobsinfo>
    csobsselect --- Select observations from observation definition file <csobsselect>
-   csphagen —-- Generates PHA, ARF, RMF files based on source/background regions <csphagen> 
+   csphagen --- Generates PHA, ARF, RMF files based on source/background regions <csphagen>
    csphasecrv --- Computes phase curve <csphasecrv>
    cspull --- Generates pull distribution <cspull>
    csresmap --- Generates residual map <csresmap>

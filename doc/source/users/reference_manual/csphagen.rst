@@ -18,6 +18,7 @@ the OGIP format normally used in X-ray astronomy (PHA, ARF, RMF).
 `See here <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`__.
 
 The outputs are:
+
 1) the PHA, ARF, RMF files, either separately for each observation, or stacked
    for a set of observations,
 2) DS9 regions files listing the source and background regions for each
@@ -48,29 +49,31 @@ General parameters
     Prefix of the file name for output PHA, ARF, RMF, XML, and DS9 region files.
 
 ``emin [real]``
-    Lower energy limit (TeV) if LIN or LOG binning algorithms are used.
+    Lower energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
 
 ``emax [real]``
-    Upper energy limit (TeV) if LIN or LOG binning algorithms are used.
+    Upper energy limit (TeV) if ``LIN`` or ``LOG`` binning algorithms are used.
 
 ``enumbins [integer]``
     Number of energy bins. At least 30 bins per decade are recommended for
     proper evaluation of the instrument response.
 
-``ebinalg [string]’’
-    Energy binning algorithm: LOG - logarithmically spaced energy bins;
-    LIN - linearly spaced energy bins; FILE - energy bounds retrieved from file.
+``ebinalg [string]``
+    Energy binning algorithm:
+    ``LOG`` : logarithmically spaced energy bins;
+    ``LIN`` : linearly spaced energy bins;
+    ``FILE``: energy bounds retrieved from file.
 
 ``ebinfile [file]``
-    Name of the file containing the energy bin definition if FILE algorithm
+    Name of the file containing the energy bin definition if ``FILE`` algorithm
     is used.
 
 ``(srcshape = CIRCLE) [string]``
     Shape of the source region.
-    CIRCLE: circular region around given position.
+    ``CIRCLE``: circular region around given position.
 
 ``coordsys [string]``
-    Coordinate system (CEL - celestial, GAL - galactic)
+    Coordinate system (``CEL`` - celestial, ``GAL`` - galactic)
 
 ``ra [real]``
     Right Ascension of source region centre (deg)
@@ -87,10 +90,10 @@ General parameters
 ``rad [real]``
     Radius of source region circle (deg)
 
-``(bkgmethod = REFLECTED) [string]’’
+``(bkgmethod = REFLECTED) [string]``
     Method for background estimation.
-    REFLECTED: background evaluated in regions with the same shape as source
-               region reflected w.r.t. pointing direction for each observation.
+    ``REFLECTED:`` background evaluated in regions with the same shape as
+    source region reflected w.r.t. pointing direction for each observation.
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an observation.
@@ -129,7 +132,7 @@ Standard parameters
     output to the console.
  	 	 
 ``(mode = ql) [string]``
-    Mode of automatic parameters (default is "ql", i.e. "query and learn").
+    Mode of automatic parameters (default is ``ql``, i.e. "query and learn").
 
 ``(logfile = csphagen.log) [filename]``
     Log filename.
