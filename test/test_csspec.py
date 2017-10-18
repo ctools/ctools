@@ -80,7 +80,7 @@ class Test(test):
         # Setup csspec command
         cmd = csspec+' inobs="'+self._events+'"'+ \
                      ' inmodel="'+self._model+'"'+ \
-                     ' srcname="Crab"'+ \
+                     ' srcname="Crab" method="AUTO"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
                      ' outfile="csspec_cmd1.fits"'+ \
@@ -100,7 +100,7 @@ class Test(test):
         # Setup csspec command
         cmd = csspec+' inobs="input_file_that_does_not_exist.fits"'+ \
                      ' inmodel="'+self._model+'"'+ \
-                     ' srcname="Crab"'+ \
+                     ' srcname="Crab" method="AUTO"'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
                      ' outfile="csspec_cmd2.fits"'+ \
@@ -129,6 +129,7 @@ class Test(test):
         spec['caldb']    = self._caldb
         spec['irf']      = self._irf
         spec['outfile']  = 'csspec_py1.fits'
+        spec['method']   = 'AUTO'
         spec['ebinalg']  = 'LOG'
         spec['enumbins'] = 5
         spec['emin']     = 0.1
@@ -155,6 +156,7 @@ class Test(test):
         spec['inmodel']   = self._model
         spec['srcname']   = 'Crab'
         spec['outfile']   = 'csspec_py2.fits'
+        spec['method']    = 'AUTO'
         spec['ebinalg']   = 'LOG'
         spec['enumbins']  = 2
         spec['emin']      = 0.1
@@ -175,6 +177,7 @@ class Test(test):
         spec['inmodel']  = self._onoff_model
         spec['srcname']  = 'Crab'
         spec['outfile']  = 'csspec_py3.fits'
+        spec['method']   = 'AUTO'
         spec['ebinalg']  = 'LOG'
         spec['enumbins'] = 10
         spec['emin']     = 0.1
@@ -188,6 +191,27 @@ class Test(test):
 
         # Check result file
         self._check_result_file('csspec_py3.fits', 10)
+
+        # Set-up On/Off csspec with NODES method
+        spec = cscripts.csspec()
+        spec['inobs']    = self._inonoff
+        spec['inmodel']  = self._onoff_model
+        spec['srcname']  = 'Crab'
+        spec['outfile']  = 'csspec_py4.fits'
+        spec['method']   = 'NODES'
+        spec['ebinalg']  = 'LOG'
+        spec['enumbins'] = 10
+        spec['emin']     = 0.1
+        spec['emax']     = 10.0
+        spec['logfile']  = 'csspec_py4.log'
+        spec['chatter']  = 4
+        spec['publish']  = False
+
+        # Execute csspec script
+        spec.execute()
+
+        # Check result file
+        self._check_result_file('csspec_py4.fits', 10)
 
         # Return
         return

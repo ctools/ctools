@@ -84,6 +84,9 @@ class csspec(ctools.cscript):
         # Query source name
         self['srcname'].string()
 
+        # Get spectrum generation method
+        self._method = self['method'].string()
+
         # Collect number of unbinned, binned and On/Off observations in
         # observation container
         n_unbinned = 0
@@ -100,27 +103,30 @@ class csspec(ctools.cscript):
         n_cta   = n_unbinned + n_binned + n_onoff
         n_other = self._obs.size() - n_cta
 
-        # Set script mode according to CTA observations
-        if n_unbinned == 0 and n_binned != 0 and n_onoff == 0:
-            self._binned_mode = True
-        elif n_unbinned == 0 and n_binned == 0 and n_onoff != 0:
-            self._onoff_mode = True
-        elif n_unbinned == 0 and n_binned != 0 and n_onoff != 0:
-            msg = 'Mix of binned and On/Off CTA observations found in ' \
-                  'observation container. csscript does not support this ' \
-                  'mix.'
-            raise RuntimeError(msg)
-        elif n_unbinned != 0 and (n_binned != 0 or n_onoff != 0):
-            msg = 'Mix of unbinned and binned or On/Off CTA observations ' \
-                  'found in observation container. csscript does not support ' \
-                  'this mix.'
-            raise RuntimeError(msg)
+        # If spectrum method is not "NODES" then set spectrum method and
+        # script mode according to type of CTA observations
+        if self._method != 'NODES':
+            if n_unbinned == 0 and n_binned != 0 and n_onoff == 0:
+                self._binned_mode = True
+                self._method      = 'SLICE'
+            elif n_unbinned == 0 and n_binned == 0 and n_onoff != 0:
+                self._onoff_mode = True
+                self._method      = 'SLICE'
+            elif n_unbinned == 0 and n_binned != 0 and n_onoff != 0:
+                msg = 'Mix of binned and On/Off CTA observations found in ' \
+                      'observation container. csscript does not support this ' \
+                      'mix.'
+                raise RuntimeError(msg)
+            elif n_unbinned != 0 and (n_binned != 0 or n_onoff != 0):
+                msg = 'Mix of unbinned and binned or On/Off CTA observations ' \
+                      'found in observation container. csscript does not support ' \
+                      'this mix.'
+                raise RuntimeError(msg)
+            elif n_unbinned != 0:
+                self._method = 'SLICE'
 
         # Set ebounds
         self._set_ebounds()
-
-        # Get method
-        self._method = self['method'].string()
 
         # Query other parameeters
         self['edisp'].boolean()

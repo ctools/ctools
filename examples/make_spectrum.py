@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ==========================================================================
-# Makes spectrum and optionally plot it
+# Makes and optionally displays spectrum
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2014-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,6 +72,7 @@ def create_spectrum(datadir):
     # Create spectrum
     spec = cscripts.csspec(sim.obs())
     spec['srcname']  = 'Crab'
+    spec['method']   = 'AUTO'
     spec['outfile']  = 'example_spectrum.fits'
     spec['expcube']  = 'NONE'
     spec['psfcube']  = 'NONE'

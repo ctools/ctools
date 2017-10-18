@@ -151,10 +151,11 @@ You create the spectrum for the first source using
    Input background cube file (only needed for stacked analysis) [NONE] bkgcube.fits
    Input model definition XML file [$CTOOLS/share/models/crab.xml] stacked_results.xml
    Source name [Crab] Src001
+   Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
    Binning algorithm (LIN|LOG|FILE) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Number of energy bins (0=unbinned) [20] 10
+   Number of energy bins [20] 10
    Output spectrum file [spectrum.fits] spectrum_src001.fits
 
 and for the second source using
@@ -168,10 +169,11 @@ and for the second source using
    Input background cube file (only needed for stacked analysis) [bkgcube.fits]
    Input model definition XML file [stacked_results.xml]
    Source name [Src001] Src002
+   Spectrum generation method (SLICE|NODES|AUTO) [AUTO] 
    Binning algorithm (LIN|LOG|FILE) [LOG]
    Lower energy limit (TeV) [0.1]
    Upper energy limit (TeV) [100.0]
-   Number of energy bins (0=unbinned) [10]
+   Number of energy bins [10]
    Output spectrum file [spectrum_src001.fits] spectrum_src002.fits
 
 The :ref:`csspec` script divided here the data into ten logarithmically
