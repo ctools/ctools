@@ -50,6 +50,7 @@ import test_cstsmapmerge
 import test_cstsmapsplit
 import test_csviscube
 import test_csworkflow
+import test_obsutils
 import test_csiactcopy
 import test_csiactdata
 import test_csiactobs
@@ -140,7 +141,8 @@ def test(installed=False, debug=False):
              test_cstsmapmerge.Test(),
              test_cstsmapsplit.Test(),
              test_csviscube.Test(),
-             test_csworkflow.Test()]
+             test_csworkflow.Test(),
+             test_obsutils.Test()]
 
     # Append tests for Python 2.6+ (the IACT cscripts depend on the json
     # module which is only available since Python 2.6+)

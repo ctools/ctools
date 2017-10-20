@@ -147,6 +147,7 @@ testscripts = $(srcdir)/tests/__init__.py \
               $(top_srcdir)/test/test_cstsmapsplit.py \
               $(top_srcdir)/test/test_csviscube.py \
               $(top_srcdir)/test/test_csworkflow.py \
+              $(top_srcdir)/test/test_obsutils.py \
               $(top_srcdir)/test/test_csiactcopy.py \
               $(top_srcdir)/test/test_csiactdata.py \
               $(top_srcdir)/test/test_csiactobs.py

@@ -399,9 +399,10 @@ def set_obs_patterns(pattern, ra=83.6331, dec=22.0145, offset=1.5):
             pntdir.rotate_deg(phi, offset)
             obsdeflist.append({'ra': pntdir.ra_deg(), 'dec': pntdir.dec_deg()})
 
-    # ... otherwise we have an unknown pattern
+    # ... otherwise raise an exception since we have an unknown pattern
     else:
-        print('Warning: Observation pattern "'+str(pattern)+'" not recognized.')
+        msg = 'Observation pattern "%s" not recognized.' % (pattern)
+        raise RuntimeError(msg)
 
     # Return observation definition list
     return obsdeflist
@@ -635,7 +636,7 @@ def get_stacked_response(obs, xref, yref, binsz=0.05, nxpix=200, nypix=200,
     response['bkgcube'] = bkgcube.bkgcube().copy()
     response['models']  = bkgcube.models().copy()
     if edisp:
-        response['edispcube'] = edispcube.expcube().copy()
+        response['edispcube'] = edispcube.edispcube().copy()
 
     # Return response cubes
     return response
