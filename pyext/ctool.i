@@ -91,7 +91,7 @@ public:
     %rename(_create_map)               create_map;
     %rename(_create_cube)              create_cube;
     %rename(_create_cta_obs)           create_cta_obs;
-    //%rename(_require_inobs)            require_inobs;
+    %rename(_require_inobs)            require_inobs;
     %rename(_require_inobs_nocube)     require_inobs_nocube;
     %rename(_get_roi)                  get_roi;
     %rename(_get_ebounds)              get_ebounds;
@@ -99,14 +99,14 @@ public:
     %rename(_get_pointing)             get_pointing;
     %rename(_get_skydir)               get_skydir;
     %rename(_set_outfile_name)         set_outfile_name;
-    //%rename(_is_stacked)               is_stacked;
+    %rename(_is_stacked)               is_stacked;
     %rename(_set_response)             set_response;
     %rename(_set_edisp)                set_edisp;
     %rename(_restore_edisp)            restore_edisp;
     %rename(_set_obs_response)         set_obs_response;
     %rename(_set_obs_bounds)           set_obs_bounds;
     %rename(_get_mean_pointing)        get_mean_pointing;
-    //%rename(_get_current_rss)          get_current_rss;
+    %rename(_get_current_rss)          get_current_rss;
     %rename(_get_obs_header)           get_obs_header;
     %rename(_insert_energy_boundaries) insert_energy_boundaries;
     %rename(_cube_layer_usage)         cube_layer_usage;
@@ -133,7 +133,7 @@ public:
     GCTAObservation   create_cta_obs(void);
 
     // Protected methods that check user parameters
-    //void              require_inobs(const std::string& method);
+    void              require_inobs(const std::string& method);
     void              require_inobs_nocube(const std::string& method);
 
     // Protected methods that extract user parameters
@@ -145,7 +145,7 @@ public:
     std::string       set_outfile_name(const std::string& filename);
 
     // Protected methods that query user parameters
-    //bool              is_stacked(void);
+    bool              is_stacked(void);
 
     // Protected support methods
     void              set_response(GObservations& obs);
@@ -156,7 +156,7 @@ public:
     void              set_obs_bounds(GObservations& obs);
     GObservations     get_observations(const bool& get_response = true);
     GSkyDir           get_mean_pointing(const GObservations& obs);
-    //size_t            get_current_rss(void);
+    size_t            get_current_rss(void);
     std::string       get_obs_header(const GObservation* obs) const;
     GEnergies         insert_energy_boundaries(const GEnergies&       energies,
                                                const GCTAObservation& obs);

@@ -810,7 +810,6 @@ GCTAObservation ctool::create_cta_obs(void)
  * @todo This method is only used by csobsinfo, csresmap and csspec. We
  * should try to get rid of it
  ***************************************************************************/
-/*
 void ctool::require_inobs(const std::string& method)
 {
     // Get inobs filename
@@ -829,7 +828,6 @@ void ctool::require_inobs(const std::string& method)
     // Return
     return;
 }
-*/
 
 
 /***********************************************************************//**
@@ -1170,7 +1168,6 @@ std::string ctool::set_outfile_name(const std::string& filename)
  * Using this method assures that the parameters are always queried in the
  * same order.
  ***************************************************************************/
-/*
 bool ctool::is_stacked(void)
 {
     // First query the minimum and maximum energies
@@ -1195,7 +1192,6 @@ bool ctool::is_stacked(void)
     // Return stacked flag
     return stacked;
 }
-*/
 
 
 /***********************************************************************//**
@@ -1706,7 +1702,6 @@ GSkyDir ctool::get_mean_pointing(const GObservations& obs)
  * @todo This method is currently not used and can be removed if we do not
  *       use it
  ***************************************************************************/
-/*
 size_t ctool::get_current_rss(void)
 {
     // Initialize resident set size
@@ -1747,7 +1742,6 @@ size_t ctool::get_current_rss(void)
     // Return resident set size
     return rss;
 }
-*/
 
 
 /***********************************************************************//**

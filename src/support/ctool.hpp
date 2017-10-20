@@ -90,7 +90,7 @@ protected:
     GCTAObservation   create_cta_obs(void);
 
     // Protected methods that check user parameters
-    //void              require_inobs(const std::string& method);
+    void              require_inobs(const std::string& method);
     void              require_inobs_nolist(const std::string& method);
     void              require_inobs_nocube(const std::string& method);
 
@@ -103,7 +103,7 @@ protected:
     std::string       set_outfile_name(const std::string& filename);
 
     // Protected methods that query user parameters
-    //bool              is_stacked(void);
+    bool              is_stacked(void);
 
     // Protected methods for logging
     void              log_observations(const GChatter&      chatter,
@@ -122,7 +122,7 @@ protected:
     void              set_obs_bounds(GObservations& obs);
     GObservations     get_observations(const bool& get_response = true);
     GSkyDir           get_mean_pointing(const GObservations& obs);
-    //size_t            get_current_rss(void);
+    size_t            get_current_rss(void);
     std::string       get_obs_header(const GObservation* obs) const;
     GEnergies         insert_energy_boundaries(const GEnergies&       energies,
                                                const GCTAObservation& obs);
