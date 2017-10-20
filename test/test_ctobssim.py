@@ -239,14 +239,14 @@ class Test(test):
         return
 
     # Check observation
-    def _test_observation(self, ctobssim, nobs=1,
+    def _test_observation(self, obssim, nobs=1,
                           pnts=[{'ra': 83.63, 'dec': 22.01}]):
         """
         Test content of an observation
         
         Parameters
         ----------
-        ctobssim : `~ctools.ctobssim`
+        obssim : `~ctools.ctobssim`
             ctobssim instance
         nobs : int
             Number of observations
@@ -254,10 +254,10 @@ class Test(test):
             List of pointing dictionaries
         """
         # Test observation container
-        self.test_value(ctobssim.obs().size(), nobs,
+        self.test_value(obssim.obs().size(), nobs,
              'There is one observation')
-        for i in range(ctobssim.obs().size()):
-            obs = gammalib.GCTAObservation(ctobssim.obs()[i])
+        for i in range(obssim.obs().size()):
+            obs = gammalib.GCTAObservation(obssim.obs()[i])
             pnt = obs.pointing()
             self.test_assert(obs.instrument() == 'CTA',
                  'Observation is CTA observation')

@@ -19,7 +19,7 @@
 #
 # ==========================================================================
 import os
-import gammalib
+#import gammalib
 import cscripts
 from testing import test
 

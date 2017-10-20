@@ -62,10 +62,11 @@ class csphasecrv(ctools.cscript):
 
         # Initialise some members. Phases are stored in a nested list
         # [[ph1min,ph1max], [ph2min,ph2max],..]
-        self._srcname = ''
-        self._phbins  = [[0.0,1.0]]
-        self._stacked = False
-        self._fits    = gammalib.GFits()
+        self._srcname   = ''
+        self._phbins    = [[0.0,1.0]]
+        self._stacked   = False
+        self._fits      = gammalib.GFits()
+        self._fitmodels = {}
 
         # Initialise observation container from constructor arguments.
         self._obs, argv = self._set_input_obs(argv)

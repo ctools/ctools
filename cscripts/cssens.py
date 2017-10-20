@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import csv
 import math
 import gammalib
 import ctools
@@ -386,9 +385,6 @@ class cssens(ctools.cscript):
             # and finally by "erg_mean" to convert to erg/cm2/s.
             energy      = gammalib.GEnergy(e_mean, 'TeV')
             sensitivity = source.spectral().eval(energy) * e_mean*erg_mean*1.0e6
-
-            # Assess quality based on a comparison between Npred and Nevents
-            quality = npred - nevents
 
             # Write fit results into logger
             name  = 'Iteration %d' % iterations

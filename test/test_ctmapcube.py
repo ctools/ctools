@@ -248,7 +248,6 @@ class Test(test):
         """
         # Get energies (this forces loading in case the map cube is not
         # loaded)
-        energies = cube.energies()
         self.test_value(len(cube.energies()), nmaps, 'Check number of energies')
         
         # Check dimensions

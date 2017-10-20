@@ -18,8 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
-import gammalib
+#import gammalib
 import ctools
 from testing import test
 
@@ -78,9 +77,6 @@ class Test(test):
         # Check if execution was successful
         self.test_assert(self._execute(cmd) == 0,
              'Check successful execution from command line')
-
-        # Check result file
-        self._check_result_file('ctulimit_cmd1.log')
 
         # Setup ctulimit command
         cmd = ctulimit+' inobs="event_file_that_does_not_exist.fits"'+ \
@@ -253,13 +249,5 @@ class Test(test):
         except ValueError:
             self.test_try_success()
 
-        # Return
-        return
-
-    # Check result file
-    def _check_result_file(self, filename):
-        """
-        Check result file
-        """
         # Return
         return

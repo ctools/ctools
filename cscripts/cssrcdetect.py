@@ -319,7 +319,7 @@ class cssrcdetect(ctools.cscript):
 
         # Get fit parameters
         fit_pos   = self['fit_pos'].boolean()
-        fit_shape = self['fit_shape'].boolean()
+        #fit_shape = self['fit_shape'].boolean()
 
         # Loop over all parameters
         for par in spatial:

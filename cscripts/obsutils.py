@@ -76,21 +76,21 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Observation container filled with simulated events
     """
     # Allocate ctobssim application and set parameters
-    sim = ctools.ctobssim(obs)
-    sim['seed']    = seed
-    sim['edisp']   = edisp
-    sim['chatter'] = chatter
-    sim['debug']   = debug
+    obssim = ctools.ctobssim(obs)
+    obssim['seed']    = seed
+    obssim['edisp']   = edisp
+    obssim['chatter'] = chatter
+    obssim['debug']   = debug
 
     # Optionally open the log file
     if log:
-        sim.logFileOpen()
+        obssim.logFileOpen()
 
     # Run ctobssim application. This will loop over all observations in the
     # container and simulation the events for each observation. Note that
     # events are not added together, they still apply to each observation
     # separately.
-    sim.run()
+    obssim.run()
 
     # Binned option?
     if nbins > 0:
@@ -101,12 +101,12 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         if emin == None or emax == None:
             emin = 1.0e30
             emax = 0.0
-            for run in sim.obs():
+            for run in obssim.obs():
                 emin = min(run.events().ebounds().emin().TeV(), emin)
                 emax = max(run.events().ebounds().emax().TeV(), emax)
 
         # Allocate ctbin application and set parameters
-        bin = ctools.ctbin(sim.obs())
+        bin = ctools.ctbin(obssim.obs())
         bin['ebinalg']  = 'LOG'
         bin['emin']     = emin
         bin['emax']     = emax
@@ -130,10 +130,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 
         # If we have multiple input observations then create stacked response
         # cubes and append them to the observation
-        if len(sim.obs()) > 1:
+        if len(obssim.obs()) > 1:
 
             # Get stacked response (use pointing for map centre)
-            response = get_stacked_response(sim.obs(), None, None,
+            response = get_stacked_response(obssim.obs(), None, None,
                                             binsz=binsz, nxpix=npix, nypix=npix,
                                             emin=emin, emax=emax, enumbins=nbins,
                                             edisp=edisp,
@@ -166,10 +166,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         # Make a deep copy of the observation that will be returned
         # (the ctobssim object will go out of scope one the function is
         # left)
-        obs = sim.obs().copy()
+        obs = obssim.obs().copy()
 
     # Delete the simulation
-    del sim
+    del obssim
 
     # Return observation container
     return obs

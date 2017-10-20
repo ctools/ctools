@@ -301,7 +301,7 @@ def set_irf(site, obs, caldb, lst=True):
         # Compute Right Ascension and Declination of pointing
         pnt = gammalib.GSkyDir()
         pnt.lb_deg(obs['lon'], obs['lat'])
-        ra  = pnt.ra_deg()
+        #ra  = pnt.ra_deg()
         dec = pnt.dec_deg()
 
         # Set geographic latitude of array

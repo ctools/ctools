@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import os
 import gammalib
 import ctools
 from testing import test
@@ -151,7 +150,7 @@ class Test(test):
         self._check_result_file('ctbutterfly_py2.dat')
 
         # Recover observation container
-        obs = butterfly.obs()
+        #obs = butterfly.obs()
 
         # TODO: Do someting test on observation container
 

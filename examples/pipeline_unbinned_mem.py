@@ -94,7 +94,7 @@ def pipeline_unbinned_mem():
     options = [{'option': '-d', 'value': 'data'}]
 
     # Get arguments and options from command line arguments
-    args, options = cscripts.ioutils.get_args_options(options, usage)
+    _, options = cscripts.ioutils.get_args_options(options, usage)
 
     # Extract script parameters from options
     datadir = options[0]['value']

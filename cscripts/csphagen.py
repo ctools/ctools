@@ -39,7 +39,7 @@ class csphagen(ctools.cscript):
         Constructor
         """
         # Set name, version
-        self._name = 'csphagen'
+        self._name    = 'csphagen'
         self._version = ctools.__version__
 
         # Initialise observation container from constructor arguments
@@ -56,6 +56,8 @@ class csphagen(ctools.cscript):
         self._bkg_regs      = []
         self._excl_reg      = None
         self._has_exclusion = False
+        self._srcshape      = ''
+        self._rad           = 0.0
 
         # Return
         return

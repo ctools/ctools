@@ -119,7 +119,7 @@ class csobsdef(ctools.cscript):
         # Return
         return
 
-    def _set_response(self, obs, caldb, irf):
+    def _set_irf(self, obs, caldb, irf):
         """
         Set response for an observation
         
@@ -258,7 +258,7 @@ class csobsdef(ctools.cscript):
             else:
                 irf = self['irf'].string()
             if caldb != '' and irf != '':
-                obs = self._set_response(obs, caldb, irf)
+                obs = self._set_irf(obs, caldb, irf)
 
             # Set deadtime correction factor. If no information is provided
             # then use the user parameter value "deadc".

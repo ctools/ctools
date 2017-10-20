@@ -20,7 +20,7 @@
 import csv
 import sys
 import gammalib
-import ctools
+#import ctools
 
 
 # ========================= #

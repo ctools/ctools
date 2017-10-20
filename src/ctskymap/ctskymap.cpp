@@ -600,8 +600,8 @@ void ctskymap::map_events(GCTAObservation* obs)
 
         // If RoI is valid then skip if  instrument direction is not within RoI
         if (roi.is_valid() && !roi.contains(*inst)) {
-            continue;
             num_outside_roi++;
+            continue;
         }
 
         // Fill event in skymap

@@ -32,7 +32,7 @@ import csv
 import math
 import sys
 import gammalib
-import ctools
+#import ctools
 import cscripts
 
 
@@ -100,7 +100,7 @@ def generate_pull_distribution(model, obs='NONE', trials=100, \
         Name of pull distribution output file
     """
     # Derive parameters
-    head, tail = os.path.split(model)
+    _, tail = os.path.split(model)
     inmodel    = model + '.xml'
     outfile    = 'cspull_' + tail + '.dat'
 
@@ -164,7 +164,7 @@ def analyse_pull_distribution(filename):
 
     # Read rows
     first   = True
-    index   = -1
+    #index   = -1
     samples = 0.0
     for row in reader:
 

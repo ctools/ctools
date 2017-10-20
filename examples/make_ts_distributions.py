@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==========================================================================
-import sys
 import cscripts
 
 
@@ -101,13 +100,13 @@ def make_ts_distribution():
                {'option': '-d', 'value': 'data'}]
 
     # Get arguments and options from command line arguments
-    args, options = cscripts.ioutils.get_args_options(options, usage)
+    _, options = cscripts.ioutils.get_args_options(options, usage)
 
     # Extract script parameters from options
     ntrials     = int(options[0]['value'])
     enumbins    = int(options[1]['value'])
     duration    = float(options[2]['value'])
-    max_threads = int(options[3]['value'])
+    #max_threads = int(options[3]['value'])
     datadir     = options[4]['value']
 
     # Loop over energy bands. The energy bands are those that are also
@@ -116,7 +115,7 @@ def make_ts_distribution():
 
         # Set energies
         loge  = -1.7 + ieng * 0.2
-        emean = pow(10.0, loge)
+        #emean = pow(10.0, loge)
         emin  = pow(10.0, loge-0.1)
         emax  = pow(10.0, loge+0.1)
         if loge < 0:
@@ -125,8 +124,8 @@ def make_ts_distribution():
             loge = 'p'+str(abs(loge))
 
         # Create TS
-        create_ts(datadir, loge, emin, emax, ntrials=ntrials, enumbins=enumbins,
-                  duration=duration)
+        create_ts(datadir, loge, emin, emax, ntrials=ntrials,
+                  enumbins=enumbins, duration=duration)
 
     # Return
     return

@@ -206,14 +206,14 @@ class Test(test):
         # Test invalid source name
         self.test_try('Test ctphase with invalid source name')
         try:
-            test = ctools.ctphase()
-            test['inobs']   = self._events
-            test['inmodel'] = self._model_file
-            test['srcname'] = 'Venus'
-            test['outobs']  = 'ctphase_py5.fits'
-            test['logfile'] = 'ctphase_py5.log'
-            test.logFileOpen()
-            test.execute()
+            phase = ctools.ctphase()
+            phase['inobs']   = self._events
+            phase['inmodel'] = self._model_file
+            phase['srcname'] = 'Venus'
+            phase['outobs']  = 'ctphase_py5.fits'
+            phase['logfile'] = 'ctphase_py5.log'
+            phase.logFileOpen()
+            phase.execute()
             self.test_try_failure('Exception not thrown')
         except (ValueError):
             self.test_try_success()
@@ -221,14 +221,14 @@ class Test(test):
         # Test invalid model type
         self.test_try('Test ctphase with invalid model')
         try:
-            test = ctools.ctphase()
-            test['inobs']   = self._events
-            test['inmodel'] = self._model
-            test['srcname'] = 'Background'
-            test['outobs']  = 'ctphase_py6.fits'
-            test['logfile'] = 'ctphase_py6.log'
-            test.logFileOpen()
-            test.execute()
+            phase = ctools.ctphase()
+            phase['inobs']   = self._events
+            phase['inmodel'] = self._model
+            phase['srcname'] = 'Background'
+            phase['outobs']  = 'ctphase_py6.fits'
+            phase['logfile'] = 'ctphase_py6.log'
+            phase.logFileOpen()
+            phase.execute()
             self.test_try_failure('Exception not thrown')
         except (ValueError):
             self.test_try_success()
@@ -236,14 +236,14 @@ class Test(test):
         # Test invalid model without temporal phase curve model
         self.test_try('Test ctphase with invalid model')
         try:
-            test = ctools.ctphase()
-            test['inobs']   = self._events
-            test['inmodel'] = self._model
-            test['srcname'] = 'Crab'
-            test['outobs']  = 'ctphase_py7.fits'
-            test['logfile'] = 'ctphase_py7.log'
-            test.logFileOpen()
-            test.execute()
+            phase = ctools.ctphase()
+            phase['inobs']   = self._events
+            phase['inmodel'] = self._model
+            phase['srcname'] = 'Crab'
+            phase['outobs']  = 'ctphase_py7.fits'
+            phase['logfile'] = 'ctphase_py7.log'
+            phase.logFileOpen()
+            phase.execute()
             self.test_try_failure('Exception not thrown')
         except (ValueError):
             self.test_try_success()

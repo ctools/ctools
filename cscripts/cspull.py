@@ -19,7 +19,6 @@
 #
 # ==========================================================================
 import sys
-import math
 import gammalib
 import ctools
 from cscripts import obsutils

@@ -2,7 +2,7 @@
 # ==========================================================================
 # Shows one or several CTA response functions.
 #
-# Copyright (C) 2014-2016 Juergen Knoedlseder
+# Copyright (C) 2014-2017 Juergen Knoedlseder
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,9 +54,9 @@ def sigma_lima(Non, Noff, alpha=0.2):
     """
     # Compute sensitivity in Gaussian sigma
     alpha1 = alpha + 1.0
-    sum    = Non + Noff
-    arg1   = Non / sum
-    arg2   = Noff / sum
+    Ntotal = Non + Noff
+    arg1   = Non  / Ntotal
+    arg2   = Noff / Ntotal
     term1  = Non  * math.log((alpha1/alpha)*arg1)
     term2  = Noff * math.log(alpha1*arg2)
     sigma  = math.sqrt(2.0 * (term1 + term2))
@@ -425,7 +425,7 @@ def show_response():
     options = [{'option': '-p', 'value': ''}]
 
     # Get arguments and options from command line arguments
-    args, options = cscripts.ioutils.get_args_options(options, usage)
+    _, options = cscripts.ioutils.get_args_options(options, usage)
 
     # Extract script parameters from options
     plotfile = options[0]['value']
