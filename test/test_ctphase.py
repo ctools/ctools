@@ -90,7 +90,7 @@ class Test(test):
         cmd = ctphase+' inobs="event_file_that_does_not_exist.fits"'+ \
                       ' outobs="ctphase_cmd2.fits"'+ \
                       ' inmodel="'+self._model_file+'" srcname="Crab"'+ \
-                      ' logfile="ctphase_cmd2.log" chatter=1'
+                      ' logfile="ctphase_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

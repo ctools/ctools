@@ -95,7 +95,7 @@ class Test(test):
                     ' emin=0.1 emax=100.0 enumbins=10 ebinalg="LOG"'+ \
                     ' nxpix=40 nypix=40 binsz=0.1 coordsys="CEL"'+ \
                     ' xref=83.63 yref=22.01 proj="CAR"'+ \
-                    ' logfile="ctbin_cmd2.log" chatter=1'
+                    ' logfile="ctbin_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

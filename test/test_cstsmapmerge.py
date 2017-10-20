@@ -93,7 +93,7 @@ class Test(test):
         # Setup cstsmapmerge command
         cmd = cstsmapmerge+' inmaps="map_that_does_not_exist.fits"'+ \
                            ' outmap="cstsmapmerge_cmd2.fits"'+ \
-                           ' logfile="cstsmapmerge_cmd2.log" chatter=2'
+                           ' logfile="cstsmapmerge_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

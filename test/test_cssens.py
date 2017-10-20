@@ -93,7 +93,7 @@ class Test(test):
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' duration=1800.0 rad=3.0 emin=1.0 emax=10.0 bins=1'+ \
                      ' outfile="cssens_cmd2.dat"'+ \
-                     ' logfile="cssens_cmd2.log" chatter=2'
+                     ' logfile="cssens_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

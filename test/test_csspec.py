@@ -104,7 +104,7 @@ class Test(test):
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                      ' ebinalg="LOG" enumbins=5 emin=0.1 emax=100.0'+ \
                      ' outfile="csspec_cmd2.fits"'+ \
-                     ' logfile="csspec_cmd2.log" chatter=1'
+                     ' logfile="csspec_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

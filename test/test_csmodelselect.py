@@ -90,7 +90,7 @@ class Test(test):
         cmd = csmodelselect+' inobs="'+self._events+'"'+ \
                             ' inmodel="model_that_does_not_exist.xml"'+ \
                             ' outmodel="csmodelselect_cmd2.xml"'+ \
-                            ' logfile="csmodelselect_cmd2.log"'
+                            ' logfile="csmodelselect_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

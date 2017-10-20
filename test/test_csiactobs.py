@@ -102,7 +102,8 @@ class Test(test):
                         ' bkgpars=1'+\
                         ' outobs="csiactobs_obs_cmd2.xml"'+ \
                         ' outmodel="csiactobs_bgd_cmd2.xml"'+ \
-                        ' logfile="csiactobs_cmd2.log" chatter=1'
+                        ' logfile="csiactobs_cmd2.log" debug=yes debug=yes'+ \
+                        ' chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
@@ -115,7 +116,8 @@ class Test(test):
                         ' bkgpars=1'+\
                         ' outobs="csiactobs_obs_cmd3.xml"'+ \
                         ' outmodel="csiactobs_bgd_cmd3.xml"'+ \
-                        ' logfile="csiactobs_cmd3.log" chatter=1'       
+                        ' logfile="csiactobs_cmd3.log" debug=yes debug=yes'+ \
+                        ' chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

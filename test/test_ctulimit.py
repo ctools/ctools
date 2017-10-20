@@ -86,7 +86,7 @@ class Test(test):
         cmd = ctulimit+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' logfile="ctulimit_cmd2.log" chatter=1'
+                       ' logfile="ctulimit_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

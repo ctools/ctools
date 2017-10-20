@@ -95,7 +95,7 @@ class Test(test):
                          ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
                          ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
-                         ' logfile="cslightcrv_cmd2.log"'
+                         ' logfile="cslightcrv_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

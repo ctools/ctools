@@ -89,7 +89,7 @@ class Test(test):
                      ' inmodel='+self._model+ \
                      ' caldb='+self._caldb+' irf='+self._irf+ \
                      ' edisp=no'+ \
-                     ' logfile="ctprob_cmd2.log" chatter=1'
+                     ' logfile="ctprob_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

@@ -96,7 +96,7 @@ class Test(test):
                           ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
                           ' soilist="" outmodel=NONE'+ \
                           ' ra=83.63 dec=22.01 proj=CAR'+ \
-                          ' logfile="csmodelsois_cmd2.log"'
+                          ' logfile="csmodelsois_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

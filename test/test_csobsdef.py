@@ -95,7 +95,7 @@ class Test(test):
                        ' outobs="csobsdef_cmd1.xml"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                        ' emin=0.1 emax=100.0 duration=1800.0 rad=5.0'+ \
-                       ' logfile="csobsdef_cmd2.log"'
+                       ' logfile="csobsdef_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

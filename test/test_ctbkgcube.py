@@ -98,7 +98,7 @@ class Test(test):
                         ' ebinalg="LOG" emin=0.1 emax=100.0 enumbins=20'+ \
                         ' nxpix=10 nypix=10 binsz=0.4'+ \
                         ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
-                        ' logfile="ctbkgcube_cmd2.log" chatter=1'
+                        ' logfile="ctbkgcube_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

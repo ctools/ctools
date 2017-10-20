@@ -95,7 +95,7 @@ class Test(test):
         cmd = csiactcopy+' remote_master="master_that_does_not_exist"'+ \
                          ' prodname="unit-test"'+ \
                          ' outpath="csiactcopy_cmd2"'+ \
-                         ' logfile="csiactcopy_cmd2.log"'
+                         ' logfile="csiactcopy_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

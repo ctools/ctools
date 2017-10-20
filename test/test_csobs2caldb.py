@@ -95,7 +95,7 @@ class Test(test):
         # Setup csobs2caldb command
         cmd = csobs2caldb+' inobs="xml_file_that_does_not_exist.xml"'+ \
                           ' caldb="cta" irf="Cmd2" rootdir="caldb"'+ \
-                          ' logfile="csobs2caldb_cmd2.log"'
+                          ' logfile="csobs2caldb_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

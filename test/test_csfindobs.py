@@ -94,7 +94,7 @@ class Test(test):
                         ' prodname="unit-test"'+ \
                         ' ra=83.63 dec=22.01 rad=1.5'+ \
                         ' outfile="runlist_cmd2.dat"'+ \
-                        ' logfile="csfindobs_cmd2.log"'
+                        ' logfile="csfindobs_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

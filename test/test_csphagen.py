@@ -111,7 +111,7 @@ class Test(test):
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
                          '" outobs="csphagen_cmd2.xml" prefix="csphagen_cmd2" ' + \
-                         'logfile="csphagen_cmd2.log" chatter=1'
+                         'logfile="csphagen_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

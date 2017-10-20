@@ -91,7 +91,7 @@ class Test(test):
                       ' caldb="Database_that_does_not_exist" irf="'+self._irf+'"'+ \
                       ' emin=0.1 emax=100.0'+ \
                       ' outfile="csebins_cmd2.fits"'+ \
-                      ' logfile="csebins_cmd2.log" chatter=1'
+                      ' logfile="csebins_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

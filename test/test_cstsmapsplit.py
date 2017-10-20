@@ -115,7 +115,7 @@ class Test(test):
                            ' compute_null=yes'+ \
                            ' bins_per_job=5'+ \
                            ' outfile="cstsmapsplit_cmd2.dat"'+ \
-                           ' logfile="cstsmapsplit_cmd2.log" chatter=2'
+                           ' logfile="cstsmapsplit_cmd2.log" debug=yes chatter=2'
         
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

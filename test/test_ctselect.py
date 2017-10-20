@@ -94,7 +94,7 @@ class Test(test):
                        ' ra=83.63 dec=22.01 rad=3.0'+ \
                        ' tmin=500.0 tmax=1000.0'+ \
                        ' emin=0.2 emax=80.0'+ \
-                       ' logfile="ctselect_cmd2.log" chatter=1'
+                       ' logfile="ctselect_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

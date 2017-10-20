@@ -96,7 +96,7 @@ class Test(test):
                           ' nxpix=10 nypix=10 binsz=0.4'+ \
                           ' coordsys="CEL" proj="CAR" xref=83.63 yref=22.01'+ \
                           ' migramax=2.0 migrabins=10'+ \
-                          ' logfile="ctedispcube_cmd2.log" chatter=2'
+                          ' logfile="ctedispcube_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

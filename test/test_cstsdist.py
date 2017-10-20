@@ -97,7 +97,7 @@ class Test(test):
                        ' enumbins=0 tmin=0.0 tmax=1800.0 rad=5.0 npix=200 npix=200'+ \
                        ' binsz=0.05'+ \
                        ' outfile="cstsdist_cmd2.dat"'+ \
-                       ' logfile="cstsdist_cmd2.log" chatter=2'
+                       ' logfile="cstsdist_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

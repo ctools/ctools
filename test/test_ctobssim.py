@@ -100,7 +100,7 @@ class Test(test):
                        ' tmin="2020-01-01T00:00:00"'+ \
                        ' tmax="2020-01-01T00:30:00"'+ \
                        ' emin=0.1 emax=100.0'+ \
-                       ' logfile="ctobssim_cmd2.log" chatter=1'
+                       ' logfile="ctobssim_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

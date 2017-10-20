@@ -90,7 +90,7 @@ class Test(test):
                           ' inmodel="'+self._model +'" srcname="Crab"'+ \
                           ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                           ' emin=0.1 emax=100.0'+ \
-                          ' logfile="ctbutterfly_cmd2.log" chatter=1'
+                          ' logfile="ctbutterfly_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

@@ -98,7 +98,7 @@ class Test(test):
                          ' phbinalg="LIN" phbins=5'+ \
                          ' enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="csphasecrv_cmd2.fits"'+ \
-                         ' logfile="csphasecrv_cmd2.log" chatter=1'
+                         ' logfile="csphasecrv_cmd2.log" debug=yes chatter=1'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

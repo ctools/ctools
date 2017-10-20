@@ -90,7 +90,7 @@ class Test(test):
                        ' emin=0.1 emax=100.0 nxpix=200 nypix=200'+ \
                        ' binsz=0.02 coordsys="CEL" proj="CAR"'+ \
                        ' xref=83.63 yref=22.01 bkgsubtract="NONE"'+ \
-                       ' logfile="ctskymap_cmd2.log" chatter=2'
+                       ' logfile="ctskymap_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

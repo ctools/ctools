@@ -102,7 +102,7 @@ class Test(test):
                      ' ra=83.6331 dec=22.0145 emin=0.1 emax=100.0'+ \
                      ' enumbins=0 tmin=0.0 tmax=100.0 deadc=0.98 rad=5.0'+ \
                      ' npix=200 binsz=0.05'+ \
-                     ' logfile="cspull_cmd2.log"'
+                     ' logfile="cspull_cmd2.log" debug=yes'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,

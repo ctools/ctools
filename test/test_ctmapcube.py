@@ -94,7 +94,7 @@ class Test(test):
                         ' emin=0.1 emax=100.0 enumbins=10 ebinalg=LOG'+ \
                         ' nxpix=100 nypix=100 binsz=0.04 coordsys=CEL'+ \
                         ' xref=83.63 yref=22.01 proj=CAR'+ \
-                        ' logfile="ctmapcube_cmd2.log"'
+                        ' logfile="ctmapcube_cmd2.log" debug=yes '
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
