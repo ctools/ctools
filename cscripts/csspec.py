@@ -153,9 +153,9 @@ class csspec(ctools.cscript):
         # is 'SLICE' then log a warning that non-CTA observations will be
         # ignored
         if n_cta > 0 and n_other > 0 and self._method == 'SLICE':
-            self._log_string(TERSE, '\nWARNING: Only CTA observation can be '
-                                    'handled with the "SLICE" method, all '
-                                    'non-CTA observation will be ignored.')
+            self._log_string(gammalib.TERSE, '\nWARNING: Only CTA observation '
+                             'can be handled with the "SLICE" method, all '
+                             'non-CTA observation will be ignored.')
 
         # If there are only non-CTA observations and the method is 'SLICE'
         # then stop now

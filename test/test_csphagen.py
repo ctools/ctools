@@ -41,6 +41,8 @@ class Test(test):
         """
         # Call base class constructor
         test.__init__(self)
+
+        # Set test datasets and parameters
         self._myevents1      = self._datadir + '/crab_offaxis1.fits'
         self._myevents2      = self._datadir + '/crab_offaxis2.fits'
         self._exclusion      = self._datadir + '/crab_exclusion.fits'
@@ -213,9 +215,8 @@ class Test(test):
                                self._nreg_mul[s])
         self._check_outobs('csphagen_py3', 2)
 
-        # Test with multiple input observations and stacking
-
-        # Setup csphagen
+        # Setup csphagen for test with multiple input observations and
+        # stacking
         phagen = cscripts.csphagen(obs)
         phagen['ebinalg']     = 'LOG'
         phagen['emin']        = 0.1
@@ -241,23 +242,26 @@ class Test(test):
                                0, check_regions=False)
         self._check_outobs('csphagen_py4', 1)
 
+        # Return
         return
 
     def _check_ebounds(self, table, bins):
         """
         Check EBOUNDS table
         """
+        # Expected column names
         cols = ['E_MIN', 'E_MAX']
 
-        self.test_value(table.ncols(), len(cols),
-                        'Check for %d columns in energy bounds table' % len(
-                            cols))
+        # Check number of columns, rows and column names
+        self.test_value(table.ncols(), len(cols), 'Check for %d columns in '
+                        'energy bounds table' % len(cols))
         self.test_value(table.nrows(), bins,
                         'Check for %d rows in energy bounds table' % bins)
         for col in cols:
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
 
+        # Return
         return
 
     def _check_pha(self, filename, bins):
