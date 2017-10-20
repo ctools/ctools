@@ -774,25 +774,6 @@ class csiactobs(ctools.cscript):
         # Return
         return       
     
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save residual map
-        self.save()
-
-        # Return
-        return
-
     def save(self):
         """
         Save observation definition and model definition XML file

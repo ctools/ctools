@@ -330,25 +330,6 @@ class csphagen(ctools.cscript):
         """
         return self._outobs
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save result
-        self.save()
-
-        # Return
-        return
-
 
 # ======================== #
 # Main routine entry point #

@@ -302,25 +302,6 @@ class csebins(ctools.cscript):
         # Return
         return self._ebounds
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the scrip
-        self.run()
-
-        # Save energy boundaries
-        self.save()
-
-        # Return
-        return
-
 
 # ======================== #
 # Main routine entry point #

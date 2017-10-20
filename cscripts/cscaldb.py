@@ -31,7 +31,7 @@ import ctools
 class cscaldb(ctools.cscript):
     """
     Shows the content of the ctools calibration database.
-    
+
     The ``cscaldb`` script writes the content of the calibration database
     into the ``cscaldb.log`` log file. If the ``debug`` parameter is set
     to ``yes`` the calibration database is also logged in the console.
@@ -41,7 +41,7 @@ class cscaldb(ctools.cscript):
     def __init__(self, *argv):
         """
         Constructor.
-        
+
         Parameters
         ----------
         argv : list of str
@@ -132,7 +132,7 @@ class cscaldb(ctools.cscript):
                     name  = cal[5:istop]
                     if names.count(name) == 0:
                         names.append(name)
-        
+
         # Sort response names
         names.sort()
 
@@ -193,22 +193,6 @@ class cscaldb(ctools.cscript):
                     for name in names:
                         self._log(name+'\n')
                     self._log('\n')
-
-        # Return
-        return
-
-    def execute(self):
-        """
-        Execute the script.
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
 
         # Return
         return

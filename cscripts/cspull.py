@@ -311,22 +311,6 @@ class cspull(ctools.cscript):
         # Return
         return
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Return
-        return
-
     def models(self, models):
         """
         Set model

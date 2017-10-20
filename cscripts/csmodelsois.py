@@ -194,25 +194,6 @@ class csmodelsois(ctools.cscript):
         # Return
         return
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save model
-        self.save()
-
-        # Return
-        return
-
     def save(self):
         """
         Save the cube and optionally the updated XML model file

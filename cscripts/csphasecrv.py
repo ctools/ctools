@@ -408,25 +408,6 @@ class csphasecrv(ctools.cscript):
         # Return
         return
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Save fitted models
-        self.save()
-
-        # Return
-        return
-
     def save(self):
         """
         Saves results to fits and XML

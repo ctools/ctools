@@ -642,22 +642,6 @@ class cssens(ctools.cscript):
         # Return
         return
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-
-        # Return
-        return
-
 
 # ======================== #
 # Main routine entry point #

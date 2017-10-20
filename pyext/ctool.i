@@ -294,6 +294,14 @@ def _pardict(self, *args):
             self[key] = args[0][key]
     else:
         raise TypeError('pardict() takes 0 or 1 arguments (%d given)' % len(args))
-ctool.pardict = _pardict
+ctool.pardict   = _pardict
 cscript.pardict = _pardict
+
+# Execute the script
+def _execute(self):
+    self.logFileOpen()
+    self._read_ahead(True)
+    self.run()
+    self.save()
+cscript.execute = _execute
 %}

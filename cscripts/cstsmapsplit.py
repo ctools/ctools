@@ -278,25 +278,6 @@ class cstsmapsplit(ctools.cscript):
         # Return
         return
 
-    def execute(self):
-        """
-        Execute the script
-        """
-        # Open logfile
-        self.logFileOpen()
-
-        # Read ahead output parameters
-        self._read_ahead(True)
-
-        # Run the script
-        self.run()
-        
-        # Save results
-        self.save()
-        
-        # Return
-        return
-
 
 # ======================== #
 # Main routine entry point #
