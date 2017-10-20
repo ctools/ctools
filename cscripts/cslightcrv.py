@@ -22,6 +22,7 @@ import sys
 import gammalib
 import ctools
 from cscripts import obsutils
+from cscripts import ioutils
 
 
 # ================ #
@@ -281,52 +282,24 @@ class cslightcrv(ctools.cscript):
         table = gammalib.GFitsBinTable(nrows)
         table.extname('LIGHTCURVE')
 
-        # Append time columns "MJD" and "e_MJD"
-        mjd   = gammalib.GFitsTableDoubleCol('MJD', nrows)
-        e_mjd = gammalib.GFitsTableDoubleCol('e_MJD', nrows)
-        mjd.unit('days')
-        e_mjd.unit('days')
-        for i, result in enumerate(results):
-            mjd[i]   = result['mjd']
-            e_mjd[i] = result['e_mjd']
-        table.append(mjd)
-        table.append(e_mjd)
+        # Append time columns
+        ioutils.append_result_column(table, results, 'MJD',   'days', 'mjd')
+        ioutils.append_result_column(table, results, 'e_MJD', 'days', 'e_mjd')
 
-        # Create parameter columns
-        for par in self._obs.models()[self._srcname]:
-            if par.is_free():
-                name   = par.name()
-                e_name = 'e_'+par.name()
-                col    = gammalib.GFitsTableDoubleCol(name, nrows)
-                e_col  = gammalib.GFitsTableDoubleCol(e_name, nrows)
-                col.unit(par.unit())
-                e_col.unit(par.unit())
-                for i, result in enumerate(results):
-                    col[i]   = result['values'][name]
-                    e_col[i] = result['values'][e_name]
-                table.append(col)
-                table.append(e_col)
+        # Append parameter columns
+        ioutils.append_model_par_column(table, self._obs.models()[self._srcname],
+                                        results)
 
         # Append Test Statistic column "TS"
-        ts = gammalib.GFitsTableDoubleCol('TS', nrows)
-        for i, result in enumerate(results):
-            ts[i] = result['ts']
-        table.append(ts)
+        ioutils.append_result_column(table, results, 'TS', '', 'ts')
 
-        # Append upper limit column "UpperLimit"
-        ul_diff  = gammalib.GFitsTableDoubleCol('DiffUpperLimit', nrows)
-        ul_flux  = gammalib.GFitsTableDoubleCol('FluxUpperLimit', nrows)
-        ul_eflux = gammalib.GFitsTableDoubleCol('EFluxUpperLimit', nrows)
-        ul_diff.unit('ph/cm2/s/MeV')
-        ul_flux.unit('ph/cm2/s')
-        ul_eflux.unit('erg/cm2/s')
-        for i, result in enumerate(results):
-            ul_diff[i]  = result['ul_diff']
-            ul_flux[i]  = result['ul_flux']
-            ul_eflux[i] = result['ul_eflux']
-        table.append(ul_diff)
-        table.append(ul_flux)
-        table.append(ul_eflux)
+        # Append upper limit columns
+        ioutils.append_result_column(table, results, 'DiffUpperLimit',
+                                     'ph/cm2/s/MeV', 'ul_diff')
+        ioutils.append_result_column(table, results, 'FluxUpperLimit',
+                                     'ph/cm2/s', 'ul_flux')
+        ioutils.append_result_column(table, results, 'EFluxUpperLimit',
+                                     'erg/cm2/s', 'ul_eflux')
 
         # Return table
         return table

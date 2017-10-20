@@ -22,6 +22,7 @@ import sys
 import gammalib
 import ctools
 from cscripts import obsutils
+from cscripts import ioutils
 
 
 # ================ #
@@ -183,7 +184,7 @@ class csphasecrv(ctools.cscript):
 
     def _create_fits_table(self, results):
         """
-        Creates FITS binary table containing light curve results
+        Creates FITS binary table containing phase curve results
 
         Parameters
         ----------
@@ -193,7 +194,7 @@ class csphasecrv(ctools.cscript):
         Returns
         -------
         table : `~gammalib.GFitsBinTable`
-            FITS binary table containing light curve
+            FITS binary table containing phase curve
         """
         # Determine number of rows in FITS table
         nrows = len(results)
@@ -202,29 +203,13 @@ class csphasecrv(ctools.cscript):
         table = gammalib.GFitsBinTable(nrows)
         table.extname('PHASECURVE')
 
-        # Append phase columns "PHASE_MIN" and "PHASE_MAX"
-        phmin = gammalib.GFitsTableDoubleCol('PHASE_MIN', nrows)
-        phmax = gammalib.GFitsTableDoubleCol('PHASE_MAX', nrows)
-        for i, result in enumerate(results):
-            phmin[i] = result['phmin']
-            phmax[i] = result['phmax']
-        table.append(phmin)
-        table.append(phmax)
+        # Append phase columns
+        ioutils.append_result_column(table, results, 'PHASE_MIN', '', 'phmin')
+        ioutils.append_result_column(table, results, 'PHASE_MAX', '', 'phmax')
 
-        # Create parameter columns
-        for par in self._obs.models()[self._srcname]:
-            if par.is_free():
-                name   = par.name()
-                e_name = 'e_'+par.name()
-                col    = gammalib.GFitsTableDoubleCol(name, nrows)
-                e_col  = gammalib.GFitsTableDoubleCol(e_name, nrows)
-                col.unit(par.unit())
-                e_col.unit(par.unit())
-                for i, result in enumerate(results):
-                    col[i]   = result['values'][name]
-                    e_col[i] = result['values'][e_name]
-                table.append(col)
-                table.append(e_col)
+        # Append parameter columns
+        ioutils.append_model_par_column(table, self._obs.models()[self._srcname],
+                                        results)
 
         # Return table
         return table
@@ -401,7 +386,7 @@ class csphasecrv(ctools.cscript):
         # Create FITS file
         self._create_fits()
 
-        # Optionally publish light curve
+        # Optionally publish phase curve
         if self['publish'].boolean():
             self.publish()
 
@@ -433,7 +418,7 @@ class csphasecrv(ctools.cscript):
         # Write header
         self._log_header1(gammalib.TERSE, 'Publish phase curve')
 
-        # Continue only if light curve is valid
+        # Continue only if phase curve is valid
         if self._fits.contains('PHASECURVE'):
 
             # Set default name is user name is empty
