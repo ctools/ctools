@@ -86,11 +86,21 @@ class Test(test):
         cmd = ctulimit+' inobs="event_file_that_does_not_exist.fits"'+ \
                        ' inmodel="'+self._model+'" srcname="Crab"'+ \
                        ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                       ' logfile="ctulimit_cmd2.log" debug=yes chatter=1'
+                       ' logfile="ctulimit_cmd2.log" debug=yes chatter=2'
 
         # Check if execution failed
         self.test_assert(self._execute(cmd) != 0,
              'Check invalid input file when executed from command line')
+
+        # Setup ctulimit command
+        cmd = ctulimit+' inobs="'+self._events+'"'+ \
+                       ' inmodel="'+self._model+'" srcname="Vela"'+ \
+                       ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
+                       ' logfile="ctulimit_cmd2.log" debug=yes chatter=2'
+
+        # Check if execution failed
+        self.test_assert(self._execute(cmd) != 0,
+             'Check invalid source name when executed from command line')
 
         # Check ctulimit --help
         self._check_help(ctulimit)
