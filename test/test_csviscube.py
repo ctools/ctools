@@ -66,7 +66,7 @@ class Test(test):
         csviscube = self._script('csviscube')
 
         # Setup csviscube command
-        cmd = csviscube+' tmin=0.0 tmax=31557600.0 geolon=79.4041'+\
+        cmd = csviscube+' tmin=0.0 tmax=10000.0 geolon=79.4041'+\
                         ' geolat=-24.6272 binsz=3.0 outfile=csviscube_cmd1.fits'+\
                         ' logfile="csviscube_cmd1.log" chatter=1'
 
@@ -92,7 +92,7 @@ class Test(test):
         # Set-up csviscube
         viscube = cscripts.csviscube()
         viscube['tmin']    =  0.0
-        viscube['tmax']    =  31557600.0
+        viscube['tmax']    =  10000.0
         viscube['geolon']  =  79.4041
         viscube['geolat']  = -24.6272
         viscube['binsz']   = 3.0
