@@ -152,12 +152,8 @@ class ctobservation_test(ctools.csobservation):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'ctobservation_test'
-        self._version = ctools.__version__
-
         # Initialise application by calling the appropriate class constructor
-        self._init_csobservation(argv)
+        self._init_csobservation('ctobservation_test', ctools.__version__, argv)
 
         # Return
         return
@@ -183,12 +179,8 @@ class ctlikelihood_test(ctools.cslikelihood):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'ctlikelihood_test'
-        self._version = ctools.__version__
-
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood(argv)
+        self._init_cslikelihood('ctlikelihood_test', ctools.__version__, argv)
 
         # Return
         return
