@@ -127,6 +127,11 @@ ctulimit - Compute upper limit
 Add "statistic" parameter to allow setting of optimizer statistic (#2237).
 
 
+support - Support classes
+-------------------------
+Add ctobservation.obs() method to set an observation container.
+
+
 cscaldb - Inspect calibration database
 --------------------------------------
 None
@@ -238,6 +243,10 @@ None
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
+The csspec script now derived from the cslikelihood base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the spectrum
+generation (#2237).
+
 The csspec script now can also handle On/Off spectra for SED generation (#2231).
 
 The csspec script now can also handle non-CTA data. For that purpose a "method"

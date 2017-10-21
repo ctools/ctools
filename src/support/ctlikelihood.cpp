@@ -305,6 +305,9 @@ double ctlikelihood::evaluate(GModelPar& par, const double& value)
  * For On/Off CTA observations of type GCTAOnOffObservation the fit statistic
  * is always set. Possible values are @c POISSON, @c CSTAT or @c WSTAT (case
  * insensitive).
+ *
+ * If @p statistic is any other string the fit statistic of the observations
+ * will not be modified.
  ***************************************************************************/
 void ctlikelihood::set_obs_statistic(const std::string& statistic)
 {

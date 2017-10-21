@@ -26,12 +26,12 @@ import ctools
 # ============ #
 # csspec class #
 # ============ #
-class csspec(ctools.cscript):
+class csspec(ctools.cslikelihood):
     """
     Generates a spectrum
 
-    This class implements the generation of a spectral energy distribution
-    from data.
+    This class implements the generation of a Spectral Energy Distribution
+    (SED) from gamma-ray observations.
     """
 
     # Constructors and destructors
@@ -39,9 +39,8 @@ class csspec(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'csspec'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_cslikelihood('csspec', ctools.__version__, argv)
 
         # Initialise data members
         self._ebounds     = gammalib.GEbounds()
@@ -49,12 +48,6 @@ class csspec(ctools.cscript):
         self._binned_mode = False
         self._onoff_mode  = False
         self._method      = 'AUTO'
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
@@ -73,13 +66,16 @@ class csspec(ctools.cscript):
         Get parameters from parfile and setup the observation
         """
         # Set observation if not done before
-        if self._obs == None or self._obs.size() == 0:
+        if self.obs().size() == 0:
             self._require_inobs('csspec::get_parameters()')
-            self._obs = self._get_observations()
+            self.obs(self._get_observations())
+
+        # Set observation statistic
+        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Set models if we have none
-        if self._obs.models().size() == 0:
-            self._obs.models(self['inmodel'].filename())
+        if self.obs().models().size() == 0:
+            self.obs().models(self['inmodel'].filename())
 
         # Query source name
         self['srcname'].string()
@@ -92,7 +88,7 @@ class csspec(ctools.cscript):
         n_unbinned = 0
         n_binned   = 0
         n_onoff    = 0
-        for obs in self._obs:
+        for obs in self.obs():
             if obs.classname() == 'GCTAObservation':
                 if obs.eventtype() == 'CountsCube':
                     n_binned += 1
@@ -101,7 +97,7 @@ class csspec(ctools.cscript):
             elif obs.classname() == 'GCTAOnOffObservation':
                 n_onoff += 1
         n_cta   = n_unbinned + n_binned + n_onoff
-        n_other = self._obs.size() - n_cta
+        n_other = self.obs().size() - n_cta
 
         # If spectrum method is not "NODES" then set spectrum method and
         # script mode according to type of CTA observations
@@ -194,9 +190,9 @@ class csspec(ctools.cscript):
             # should work reasonably well since for each observation the
             # relevant energy bins will be selected.
             if self._binned_mode:
-                cube_ebounds = self._obs[0].events().ebounds()
+                cube_ebounds = self.obs()[0].events().ebounds()
             else:
-                cube_ebounds = self._obs[0].rmf().etrue()
+                cube_ebounds = self.obs()[0].rmf().etrue()
 
             # Loop over user energy boundaries and collect all energy bins
             # that overlap
@@ -244,7 +240,7 @@ class csspec(ctools.cscript):
                       ' Specify overlapping energy range.'
                 raise RuntimeError(msg)
 
-        # Unbinned mode       
+        # Unbinned mode
         else:
             self._ebounds = self._create_ebounds()
 
@@ -260,15 +256,15 @@ class csspec(ctools.cscript):
 
         # Log counts cube energy range for binned mode
         if self._binned_mode:
-            cube_ebounds = self._obs[0].events().ebounds()
+            cube_ebounds = self.obs()[0].events().ebounds()
             value = '%s - %s' % (str(cube_ebounds.emin()),
                                  str(cube_ebounds.emax()))
             self._log_value(gammalib.TERSE, 'Counts cube energy range', value)
 
         # Log RMF energy range for On/Off mode
         elif self._onoff_mode:
-            etrue = self._obs[0].rmf().etrue()
-            ereco = self._obs[0].rmf().emeasured()
+            etrue = self.obs()[0].rmf().etrue()
+            ereco = self.obs()[0].rmf().emeasured()
             vtrue = '%s - %s' % (str(etrue.emin()), str(etrue.emax()))
             vreco = '%s - %s' % (str(ereco.emin()), str(ereco.emax()))
             self._log_value(gammalib.TERSE, 'RMF true energy range', vtrue)
@@ -291,7 +287,7 @@ class csspec(ctools.cscript):
         self._log_header1(gammalib.TERSE, 'Adjust model parameters')
 
         # Adjust model parameters dependent on input user parameters
-        for model in self._obs.models():
+        for model in self.obs().models():
 
             # Initialise TS flag for all models to false
             model.tscalc(False)
@@ -350,7 +346,7 @@ class csspec(ctools.cscript):
         models = gammalib.GModels()
 
         # Loop over model containers
-        for model in self._obs.models():
+        for model in self.obs().models():
 
             # If we deal with source model then replace the spectral model
             # by a node function
@@ -360,7 +356,7 @@ class csspec(ctools.cscript):
                 energies = gammalib.GEnergies()
                 for i in range(self._ebounds.size()):
                     energies.append(self._ebounds.elogmean(i))
-                
+
                 # Setup spectral node function
                 spectrum = gammalib.GModelSpectralNodes(model.spectral(), energies)
                 spectrum.autoscale()
@@ -388,7 +384,7 @@ class csspec(ctools.cscript):
                 models.append(model)
 
         # Put new model in observation containers
-        self._obs.models(models)
+        self.obs().models(models)
 
         # Return
         return
@@ -463,9 +459,11 @@ class csspec(ctools.cscript):
                 rmf[idst_true, idst_reco] = obs.rmf()[isrc_true, isrc_reco]
 
         # Set On/Off observations
-        id  = obs.id()
+        id        = obs.id()
+        statistic = obs.statistic()
         obs = gammalib.GCTAOnOffObservation(pha_on, pha_off, arf, rmf)
         obs.id(id)
+        obs.statistic(statistic)
 
         # Return observation
         return obs
@@ -493,7 +491,7 @@ class csspec(ctools.cscript):
             self._log_header3(gammalib.EXPLICIT, 'Filtering cube')
 
             # Select layers
-            cubemask            = ctools.ctcubemask(self._obs)
+            cubemask            = ctools.ctcubemask(self.obs())
             cubemask['regfile'] = 'NONE'
             cubemask['ra']      = 'UNDEFINED'
             cubemask['dec']     = 'UNDEFINED'
@@ -516,12 +514,12 @@ class csspec(ctools.cscript):
 
             # Loop over all input observations and select energy bins for
             # all On/Off observations
-            for run in self._obs:
+            for run in self.obs():
                 if run.classname() == 'GCTAOnOffObservation':
                     obs.append(self._select_onoff_obs(run, emin, emax))
 
             # Append models
-            obs.models(self._obs.models())
+            obs.models(self.obs().models())
 
         # Use ctselect for unbinned analysis
         else:
@@ -530,7 +528,7 @@ class csspec(ctools.cscript):
             self._log_header3(gammalib.EXPLICIT, 'Selecting events')
 
             # Select events
-            select = ctools.ctselect(self._obs)
+            select = ctools.ctselect(self.obs())
             select['ra']   = 'UNDEFINED'
             select['dec']  = 'UNDEFINED'
             select['rad']  = 'UNDEFINED'
@@ -707,7 +705,7 @@ class csspec(ctools.cscript):
         self._log_header3(gammalib.EXPLICIT, 'Performing fit')
 
         # Perform maximum likelihood fit
-        like          = ctools.ctlike(self._obs)
+        like          = ctools.ctlike(self.obs())
         like['edisp'] = self['edisp'].boolean()
         like.run()
 
@@ -856,7 +854,7 @@ class csspec(ctools.cscript):
         self._get_parameters()
 
         # Write input observation container into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write spectral binning into logger
         self._log_spectral_binning()
@@ -931,7 +929,7 @@ class csspec(ctools.cscript):
 
                 # Set default name is user name is empty
                 if not name:
-                    user_name = self._name
+                    user_name = self._name()
                 else:
                     user_name = name
 
@@ -959,7 +957,7 @@ class csspec(ctools.cscript):
         Set model
         """
         # Copy models
-        self._obs.models(models.clone())
+        self.obs().models(models.clone())
 
         # Return
         return
