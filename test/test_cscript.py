@@ -192,6 +192,37 @@ class ctlikelihood_test(ctools.cslikelihood):
         par.range(1.0, 3.0)
         return self._evaluate(par, value)
 
+    # Check set_obs_statistic() method for unbinned observation
+    def check_set_obs_statistic_unbinned(self, statistic):
+        obs    = gammalib.GObservations()
+        events = gammalib.GCTAEventList()
+        cta    = gammalib.GCTAObservation()
+        cta.events(events)
+        obs.append(cta)
+        self.obs(obs)
+        self._set_obs_statistic(statistic)
+        return gammalib.toupper(self.obs()[0].statistic())
+
+    # Check set_obs_statistic() method for binned observation
+    def check_set_obs_statistic_binned(self, statistic):
+        obs  = gammalib.GObservations()
+        cube = gammalib.GCTAEventCube()
+        cta  = gammalib.GCTAObservation()
+        cta.events(cube)
+        obs.append(cta)
+        self.obs(obs)
+        self._set_obs_statistic(statistic)
+        return gammalib.toupper(self.obs()[0].statistic())
+
+    # Check set_obs_statistic() method for On/Off observation
+    def check_set_obs_statistic_onoff(self, statistic):
+        obs = gammalib.GObservations()
+        cta = gammalib.GCTAOnOffObservation()
+        obs.append(cta)
+        self.obs(obs)
+        self._set_obs_statistic(statistic)
+        return gammalib.toupper(self.obs()[0].statistic())
+
 
 # ============================ #
 # Test class for base classes  #
@@ -611,6 +642,48 @@ class Test(test):
             self.test_try_failure('Exception not thrown')
         except ValueError:
             self.test_try_success()
+
+        # Test set_obs_statistic() method for unbinned observation
+        self.test_value(empty.check_set_obs_statistic_unbinned('CSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CSTAT") for unbinned')
+        self.test_value(empty.check_set_obs_statistic_unbinned('WSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("WSTAT") for unbinned')
+        self.test_value(empty.check_set_obs_statistic_unbinned('CHI2'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CHI2") for unbinned')
+        self.test_value(empty.check_set_obs_statistic_unbinned('DEFAULT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("DEFAULT") for unbinned')
+
+        # Test set_obs_statistic() method for binned observation
+        self.test_value(empty.check_set_obs_statistic_binned('CSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CSTAT") for binned')
+        self.test_value(empty.check_set_obs_statistic_binned('WSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("WSTAT") for binned')
+        self.test_value(empty.check_set_obs_statistic_binned('CHI2'),
+                        'CHI2',
+                        'Check set_obs_statistic("CHI2") for binned')
+        self.test_value(empty.check_set_obs_statistic_binned('DEFAULT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("DEFAULT") for binned')
+
+        # Test set_obs_statistic() method for On/Off observation
+        self.test_value(empty.check_set_obs_statistic_onoff('CSTAT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CSTAT") for On/Off')
+        self.test_value(empty.check_set_obs_statistic_onoff('WSTAT'),
+                        'WSTAT',
+                        'Check set_obs_statistic("WSTAT") for On/Off')
+        self.test_value(empty.check_set_obs_statistic_onoff('CHI2'),
+                        'CSTAT',
+                        'Check set_obs_statistic("CHI2") for On/Off')
+        self.test_value(empty.check_set_obs_statistic_onoff('DEFAULT'),
+                        'CSTAT',
+                        'Check set_obs_statistic("DEFAULT") for On/Off')
 
         # Return
         return
