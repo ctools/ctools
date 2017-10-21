@@ -62,6 +62,7 @@ public:
     virtual void save(void) = 0;
 
     // Methods
+    void                 obs(const GObservations& obs);
     const GObservations& obs(void) const;
     void                 write_ogip_keywords(GFitsHDU* hdu) const;
 
@@ -83,7 +84,7 @@ protected:
     void save_events_xml(void);
 
     // Protected members
-    GObservations m_obs;             //!< Observation container
+    GObservations       m_obs;            //!< Observation container
 
 private:
     // Private members
@@ -96,6 +97,21 @@ private:
     mutable double      m_ogip_livetime;  //!< Livetime for OGIP keywords
     mutable int         m_index_unbinned; //!< Current index of unbinned observation
 };
+
+
+/***********************************************************************//**
+ * @brief Set observation container
+ *
+ * @param[in] obs Observation container.
+ *
+ * Set observation container.
+ ***************************************************************************/
+inline
+void ctobservation::obs(const GObservations& obs)
+{
+    m_obs = obs;
+    return;
+}
 
 
 /***********************************************************************//**
