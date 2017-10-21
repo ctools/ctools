@@ -382,7 +382,7 @@ void ctlike::save(void)
  * by querying the user. Observation dependent parameters will only be read
  * if the observation container is actually empty. Observation dependent
  * parameters are:
- * "stat" (statistics to be used for observation),
+ * "stat" (statistic to be used for observation),
  * "caldb" (calibration database),
  * "irf" (instrument response function), and
  * "infile" (input file name).
@@ -397,14 +397,14 @@ void ctlike::get_parameters(void)
     // Setup observations from "inobs" parameter
     setup_observations(m_obs);
 
-    // If only single observation is used, read statistics parameter
+    // If only single observation is used, read statistic parameter
     if (!m_use_xml) {
 
         // Get other task parameters
-        std::string statistics = gammalib::toupper((*this)["stat"].string());
+        std::string statistic = gammalib::toupper((*this)["stat"].string());
 
-        // Set statistics
-        (*m_obs[0]).statistics(statistics);
+        // Set statistic
+        (*m_obs[0]).statistic(statistic);
     }
 
     // If there is are no models associated with the observations then
