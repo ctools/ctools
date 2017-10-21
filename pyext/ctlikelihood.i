@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -90,11 +90,13 @@ public:
     // Methods
     const GOptimizer* opt(void) const;
 
-    // Make methods private in Python by prepending an underscore
-    %rename(_evaluate) evaluate;
+    // Make methods protected in Python by prepending an underscore
+    %rename(_evaluate)          evaluate;
+    %rename(_set_obs_statistic) set_obs_statistic;
 
     // Protected methods
     double evaluate(GModelPar& par, const double& value);
+    void   set_obs_statistic(const std::string& statistic);
 };
 
 

@@ -378,26 +378,15 @@ void ctlike::save(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all required task parameters from the parameter file or (if specified)
- * by querying the user.
- *
- * This method handles both loading of FITS files and of handling XML
- * observation definition files.
+ * Get all required task parameters from the parameter file.
  ***************************************************************************/
 void ctlike::get_parameters(void)
 {
     // Setup observations from "inobs" parameter
     setup_observations(m_obs);
 
-    // If only single observation is used, read statistic parameter
-    if (!m_use_xml) {
-
-        // Get other task parameters
-        std::string statistic = gammalib::toupper((*this)["statistic"].string());
-
-        // Set statistic
-        (*m_obs[0]).statistic(statistic);
-    }
+    // Set observation statistic
+    set_obs_statistic(gammalib::toupper((*this)["statistic"].string()));
 
     // If there is are no models associated with the observations then
     // load now the model definition

@@ -31,7 +31,7 @@ outcovmat, f, h, "NONE",,, "Output covariance matrix FITS file"
 #
 # Maximisation parameters
 #========================
-statistic,       s, h, "POISSON",,, "Optimization statistics"
+statistic,       s, h, CSTAT,CSTAT|WSTAT|CHI2,, "Optimization statistic"
 refit,           b, h, no,,, "Do refitting?"
 fix_spat_for_ts, b, h, no,,, "Fix spatial parameters for TS computation?"
 

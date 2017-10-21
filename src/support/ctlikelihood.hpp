@@ -1,7 +1,7 @@
 /***************************************************************************
  *              ctlikelihood - Base class for likelihood tools             *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2016 by Juergen Knoedlseder                              *
+ *  copyright (C) 2016-2017 by Juergen Knoedlseder                         *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -66,6 +66,7 @@ protected:
 #endif
     // Protected methods in C++, public in SWIG interface
     double evaluate(GModelPar& par, const double& value);
+    void   set_obs_statistic(const std::string& statistic);
 
 protected:
     // Protected methods

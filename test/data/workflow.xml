@@ -83,7 +83,7 @@
             <parameter name="caldb"     value="caldb" actor="input" />
             <parameter name="irf"       value="irf"   actor="input" />
             <parameter name="edisp"     value="edisp" actor="input" />
-            <parameter name="statistic" value="POISSON" />
+            <parameter name="statistic" value="CSTAT" />
             <parameter name="edisp"     value="no" />
             <parameter name="refit"     value="no" />
             <parameter name="chatter"   value="chatter" actor="input" />

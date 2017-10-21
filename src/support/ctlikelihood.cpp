@@ -288,3 +288,56 @@ double ctlikelihood::evaluate(GModelPar& par, const double& value)
     // Return log-likelihood
     return logL;
 }
+
+
+/***********************************************************************//**
+ * @brief Set fit statistic for CTA observations
+ *
+ * @param[in] statistic Requested fit statistic.
+ *
+ * Sets the fit statistic for all CTA observations. The method handles
+ * regular CTA observations as well as On/Off observations.
+ *
+ * For regular CTA observations of type GCTAObservation the fit statistic is
+ * only set for binned or stacked observations. Possible values are
+ * @c POISSON, @c GAUSSIAN or @c CHI2 (case insensitive).
+ *
+ * For On/Off CTA observations of type GCTAOnOffObservation the fit statistic
+ * is always set. Possible values are @c POISSON, @c CSTAT or @c WSTAT (case
+ * insensitive).
+ ***************************************************************************/
+void ctlikelihood::set_obs_statistic(const std::string& statistic)
+{
+    // Convert statistic to upper case
+    std::string ustatistic = gammalib::toupper(statistic);
+
+    // Flag which observation types are handled
+    bool handle_cta   = ((ustatistic == "POISSON")  ||
+                         (ustatistic == "GAUSSIAN") ||
+                         (ustatistic == "CHI2"));
+    bool handle_onoff = ((ustatistic == "POISSON") ||
+                         (ustatistic == "CSTAT")   ||
+                         (ustatistic == "WSTAT"));
+
+    // Loop over all observation in container
+    for (int i = 0; i < m_obs.size(); ++i) {
+
+        // For regular CTA observations only set statistic for binned or
+        // stacked observations
+        if ((m_obs[i]->classname() == "GCTAObservation") && handle_cta) {
+            if (m_obs[i]->events()->classname() == "GCTAEventCube") {
+                m_obs[i]->statistic(statistic);
+            }
+        }
+
+        // For On/Off CTA observations always set statistic
+        else if ((m_obs[i]->classname() == "GCTAOnOffObservation") &&
+                 handle_onoff) {
+            m_obs[i]->statistic(statistic);
+        }
+
+    } // endfor: looped over all observations
+
+    // Return
+    return;
+}
