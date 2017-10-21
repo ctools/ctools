@@ -94,8 +94,8 @@ General parameters
 ``(outcovmat = NONE) [string]``
     Output FITS or CSV file to store covariance matrix.
 
-``(stat = POISSON) [string]``
-    Fitting statistics (POISSON or GAUSSIAN; only affects binned analysis).
+``(statistic = POISSON) [string]``
+    Fitting statistics (``POISSON`` or ``GAUSSIAN``; only affects binned analysis).
  	 	 
 ``(refit = no) [boolean]``
     Perform refitting of solution after initial fit.

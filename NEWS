@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-18 October 2017
+21 October 2017
 
 
 Introduction
@@ -43,7 +43,7 @@ None
 
 ctlike - Maximum likelihood fitting
 -----------------------------------
-None
+Rename "stats" parameter to "statistic" (#2238).
 
 
 cttsmap - Generation of Test Statistic map

@@ -379,15 +379,7 @@ void ctlike::save(void)
  * @brief Get application parameters
  *
  * Get all required task parameters from the parameter file or (if specified)
- * by querying the user. Observation dependent parameters will only be read
- * if the observation container is actually empty. Observation dependent
- * parameters are:
- * "stat" (statistic to be used for observation),
- * "caldb" (calibration database),
- * "irf" (instrument response function), and
- * "infile" (input file name).
- * The model will only be loaded if no model components exist in the
- * observation container.
+ * by querying the user.
  *
  * This method handles both loading of FITS files and of handling XML
  * observation definition files.
@@ -401,7 +393,7 @@ void ctlike::get_parameters(void)
     if (!m_use_xml) {
 
         // Get other task parameters
-        std::string statistic = gammalib::toupper((*this)["stat"].string());
+        std::string statistic = gammalib::toupper((*this)["statistic"].string());
 
         // Set statistic
         (*m_obs[0]).statistic(statistic);

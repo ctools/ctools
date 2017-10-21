@@ -44,3 +44,9 @@ New features
   Add :ref:`csmodelsois` script
 * [`1864 <https://cta-redmine.irap.omp.eu/issues/1864>`_] -
   Use t-type parameters for all ``tmin`` and ``tmax`` parameters
+
+Clean up
+--------
+
+* [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
+  Rename :ref:`ctlike` ``stat`` parameter to ``statistic``

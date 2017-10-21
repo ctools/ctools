@@ -75,22 +75,22 @@
     </actor>
     <actor name="ctlike" tool="ctlike">
         <input>
-            <parameter name="inobs"   value="outobs"  actor="ctselect" />
-            <parameter name="inmodel" value="inmodel" actor="input" />
-            <parameter name="expcube" value="NONE" />
-            <parameter name="psfcube" value="NONE" />
-            <parameter name="bkgcube" value="NONE" />
-            <parameter name="caldb"   value="caldb" actor="input" />
-            <parameter name="irf"     value="irf"   actor="input" />
-            <parameter name="edisp"   value="edisp" actor="input" />
-            <parameter name="stat"    value="POISSON" />
-            <parameter name="edisp"   value="no" />
-            <parameter name="refit"   value="no" />
-            <parameter name="chatter" value="chatter" actor="input" />
-            <parameter name="clobber" value="clobber" actor="input" />
-            <parameter name="debug"   value="debug" actor="input" />
-            <parameter name="mode"    value="mode" actor="input" />
-            <parameter name="logfile" value="ctlike.log" />
+            <parameter name="inobs"     value="outobs"  actor="ctselect" />
+            <parameter name="inmodel"   value="inmodel" actor="input" />
+            <parameter name="expcube"   value="NONE" />
+            <parameter name="psfcube"   value="NONE" />
+            <parameter name="bkgcube"   value="NONE" />
+            <parameter name="caldb"     value="caldb" actor="input" />
+            <parameter name="irf"       value="irf"   actor="input" />
+            <parameter name="edisp"     value="edisp" actor="input" />
+            <parameter name="statistic" value="POISSON" />
+            <parameter name="edisp"     value="no" />
+            <parameter name="refit"     value="no" />
+            <parameter name="chatter"   value="chatter" actor="input" />
+            <parameter name="clobber"   value="clobber" actor="input" />
+            <parameter name="debug"     value="debug" actor="input" />
+            <parameter name="mode"      value="mode" actor="input" />
+            <parameter name="logfile"   value="ctlike.log" />
         </input>
         <output>
             <parameter name="outmodel" value="wf_crab_results.xml" />
