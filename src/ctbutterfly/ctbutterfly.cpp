@@ -451,16 +451,15 @@ void ctbutterfly::free_members(void)
  * @exception GException::feature_not_implemented
  *            Loading of covariance matrix is not yet implemented.
  *
- * Get all task parameters from parameter file or (if required) by querying
- * the user. Most parameters are only required if no observation exists so
- * far in the observation container. In this case, a single CTA observation
- * will be added to the container, using the definition provided in the
- * parameter file.
+ * Get all task parameters from parameter file.
  ***************************************************************************/
 void ctbutterfly::get_parameters(void)
 {
     // Setup observations from "inobs" parameter
     setup_observations(m_obs);
+
+    // Set observation statistic
+    set_obs_statistic(gammalib::toupper((*this)["statistic"].string()));
 
     // Setup models from "inmodel" parameter
     setup_models(m_obs, (*this)["srcname"].string());
@@ -475,8 +474,8 @@ void ctbutterfly::get_parameters(void)
     std::string matrixfilename = (*this)["matrix"].filename();
     if (matrixfilename != "NONE") {
         std::string msg = "Loading of matrix from file not implemented yet. "
-                "Use filename = \"NONE\" to induce a recomputation of "
-                "the matrix internally.";
+                          "Use filename = \"NONE\" to induce a recomputation "
+                          "of the matrix internally.";
         throw GException::feature_not_implemented(G_GET_PARAMETERS, msg);
         // m_covariance.load(matrixfilename);
     }

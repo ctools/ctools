@@ -1,7 +1,7 @@
 /***************************************************************************
  *                    cttsmap - TS map calculation tool                    *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Michael Mayer                               *
+ *  copyright (C) 2014-2017 by Michael Mayer                               *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -525,16 +525,15 @@ void cttsmap::free_members(void)
  * @exception GException::invalid_value
  *            Test source has no RA/DEC parameters.
  *
- * Get all task parameters from parameter file or (if required) by querying
- * the user. Most parameters are only required if no observation exists so
- * far in the observation container. In this case, a single CTA observation
- * will be added to the container, using the definition provided in the
- * parameter file.
+ * Get all task parameters from parameter file.
  ***************************************************************************/
 void cttsmap::get_parameters(void)
 {
     // Setup observations from "inobs" parameter
     setup_observations(m_obs);
+
+    // Set observation statistic
+    set_obs_statistic(gammalib::toupper((*this)["statistic"].string()));
 
     // Setup models from "inmodel" parameter
     setup_models(m_obs, (*this)["srcname"].string());

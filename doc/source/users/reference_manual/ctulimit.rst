@@ -22,19 +22,18 @@ upper flux limit (specified by the hidden parameters ``emin`` and ``emax``)
 into the log file.
 
 
-
 General parameters
 ------------------
 
 ``inobs [file]``
     Input event list, counts cube or observation definition XML file.
- 	 	 
+
 ``inmodel [file]``
     Input model XML file.
- 	 	 
+
 ``srcname [string]``
     Name of source model for which the upper flux limit should be computed.
- 	 	 
+
 ``expcube [file]``
     Input exposure cube file.
 
@@ -49,36 +48,41 @@ General parameters
 
 ``caldb [string]``
     Calibration database.
- 	 	 
+
 ``irf [string]``
     Instrumental response function.
- 	 	 
+
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation.
- 	 	 
+
 ``(confidence = 0.95) [real]``
     Confidence level of upper limit.
-    
+
 ``(sigma_min = 0.0) [real]``
     Minimum boundary to start searching for upper limit value.
     Number of standard deviations above best fit value
-    
+
 ``(sigma_max = 10.0) [real]``
     Maximum boundary to start searching for upper limit value.
     Number of standard deviations above best fit value  
- 	 	 
+
 ``(eref = 1.0) [real])``
     Reference energy for differential limit (in TeV).
- 	 	 
+
 ``(emin = 1.0) [real])``
     Minimum energy for integral flux limit (in TeV).
- 	 	 
+
 ``(emax = 100) [real]``
     Maximum energy for integral flux limit (in TeV).
- 	 	 
+
 ``(tol = 1e-5) [real]``
     Computation tolerance.
-   
+
+``(statistic = CSTAT) <CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``CSTAT`` applies to all types of observations,
+    ``WSTAT``applies only to On/Off observations, and ``CHI2`` applies only
+    to binned or stacked observations.
+
 ``(max_iter = 50) [integer]``
     Maximum number of iterations before stopping the upper
     limit computations.
@@ -103,7 +107,8 @@ Standard parameters
     Specifies whether an existing output file should be overwritten.
  	 	 
 ``(debug = no) [boolean]``
-    Enables debug mode. In debug mode the executable will dump any log file output to the console.
+    Enables debug mode. In debug mode the executable will dump any log file
+    output to the console.
  	 	 
 ``(mode = ql) [string]``
     Mode of automatic parameters (default is "ql", i.e. "query and learn").

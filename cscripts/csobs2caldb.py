@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Creates a calibration database entry for an IACT observation.
+# Creates a calibration database entry for an IACT observation
 #
 # Copyright (C) 2015-2017 Michael Mayer
 #

@@ -50,6 +50,14 @@ General parameters
 ``(edisp = no) [boolean]``
     Applies energy dispersion to response computation.
 
+``(errors = no) [boolean]``
+    Compute and store parameter errors?
+
+``(statistic = CSTAT) <CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``CSTAT`` applies to all types of observations,
+    ``WSTAT``applies only to On/Off observations, and ``CHI2`` applies only
+    to binned or stacked observations.
+
 ``outmap [file]``
     Output Test Statistic map file.
 

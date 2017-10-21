@@ -86,6 +86,11 @@ General parameters
 ``(confidence = 0.68) [real]``
     Confidence level for error computation.
     
+``(statistic = CSTAT) <CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``CSTAT`` applies to all types of observations,
+    ``WSTAT``applies only to On/Off observations, and ``CHI2`` applies only
+    to binned or stacked observations.
+
 ``(matrix = "NONE") [file]``
     Input covariance matrix file (not used)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ==========================================================================
-# Generates an IACT observation definition XML file.
+# Generates an IACT observation definition XML file
 #
 # Copyright (C) 2015-2017 Michael Mayer
 #

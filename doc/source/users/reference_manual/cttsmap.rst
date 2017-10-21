@@ -62,34 +62,39 @@ General parameters
 
 ``outmap [file]``
     Output Test Statistic map file.
-    
+
 ``(errors = no) [boolean]``
     Compute and store parameter errors?
- 	 	 
+
+``(statistic = CSTAT) <CSTAT|WSTAT|CHI2> [string]``
+    Optimization statistic. ``CSTAT`` applies to all types of observations,
+    ``WSTAT``applies only to On/Off observations, and ``CHI2`` applies only
+    to binned or stacked observations.
+
 ``(usepnt = no) [boolean]``
     Use CTA pointing direction for map centre instead of xref/yref parameters?
- 	 	 
+
 ``nxpix [integer]``
     Number of map pixels in Right Ascension or Galactic longitude.
- 	 	 
+
 ``nypix [integer]``
     Number of map pixels in Declination or Galactic latitude.
- 	 	 
+
 ``binsz [real]``
     Map pixel size (in degrees/pixel).
- 	 	 
+
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
- 	 	 
+
 ``proj <AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN> [string]``
     Projection method.
 
 ``xref [real]``
     Right Ascension / Galactic longitude of map centre (J2000, in degrees).
- 	 	 
+
 ``yref [real]``
     Declination / Galactic latitude of map centre (J2000, in degrees).
- 	 	 
+
 ``(binmin = -1) [integer]``
     First bin to compute.
 
@@ -98,7 +103,7 @@ General parameters
 
 ``(logLO = -1) [real]``
     LogLikelihood value of null hypothesis.
- 	 	 
+
 
 Standard parameters
 -------------------

@@ -449,14 +449,16 @@ void ctulimit::free_members(void)
 /***********************************************************************//**
  * @brief Get application parameters
  *
- * Get all task parameters from parameter file or (if required) by querying
- * the user.
+ * Get all task parameters from parameter file.
  ***************************************************************************/
 void ctulimit::get_parameters(void)
 {
     // Setup observations from "inobs" parameter
     setup_observations(m_obs);
-    
+
+    // Set observation statistic
+    set_obs_statistic(gammalib::toupper((*this)["statistic"].string()));
+
     // Setup models from "inmodel" parameter
     setup_models(m_obs, (*this)["srcname"].string());
 
