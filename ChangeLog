@@ -1,9 +1,9 @@
-2017-10-21
+2017-10-22
 
         * Version 1.5.0 released
         ========================
 
-        Add "statistic" parameter to all likelihood tools (#2237)
+        Add "statistic" parameter to all likelihood tools and scripts (#2237)
         Rename ctlike "stat" parameter to "statistic" (#2237)
         Enable handling of On/Off observations in csspec (#2231)
         Add csphagen script (#2208)

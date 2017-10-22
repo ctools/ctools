@@ -28,7 +28,7 @@ from cscripts import ioutils
 # ============ #
 # cspull class #
 # ============ #
-class cspull(ctools.cscript):
+class cspull(ctools.cslikelihood):
     """
     Generates pull distributions for a model
     """
@@ -37,9 +37,8 @@ class cspull(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'cspull'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_cslikelihood('cspull', ctools.__version__, argv)
 
         # Initialise some members
         self._edisp       = False
@@ -53,12 +52,6 @@ class cspull(ctools.cscript):
         self._seed        = 1
         self._chatter     = 2
 
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
-
         # Return
         return
 
@@ -69,13 +62,16 @@ class cspull(ctools.cscript):
         Get parameters from parfile
         """
         # If there are no observations in container then get some ...
-        if self._obs.size() == 0:
-            self._obs = self._get_observations()
+        if self.obs().size() == 0:
+            self.obs(self._get_observations())
 
         # ... otherwise add response information and energy boundaries
         # in case they are missing
         else:
-            self._setup_observations(self._obs)
+            self._setup_observations(self.obs())
+
+        # Set observation statistic
+        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Get number of energy bins
         self._enumbins = self['enumbins'].integer()
@@ -88,8 +84,8 @@ class cspull(ctools.cscript):
             self._proj     = self['proj'].string()
 
         # Set models if we have none
-        if self._obs.models().size() == 0:
-            self._obs.models(self['inmodel'].filename())
+        if self.obs().models().size() == 0:
+            self.obs().models(self['inmodel'].filename())
 
         # Read other parameters    
         self._ntrials = self['ntrials'].integer()
@@ -168,7 +164,7 @@ class cspull(ctools.cscript):
             emax = None
 
         # Simulate events
-        obs = obsutils.sim(self._obs,
+        obs = obsutils.sim(self.obs(),
                            emin=emin,
                            emax=emax,
                            nbins=self._enumbins,
@@ -190,7 +186,7 @@ class cspull(ctools.cscript):
 
         # Write simulation results
         self._log_header3(gammalib.NORMAL, 'Simulation')
-        for run in self._obs:
+        for run in self.obs():
             self._log_value(gammalib.NORMAL, 'Input observation %s' % run.id(),
                             self._obs_string(run))
         for run in obs:
@@ -200,7 +196,7 @@ class cspull(ctools.cscript):
 
         # Fit model
         if self['profile'].boolean():
-            models = self._obs.models()
+            models = self.obs().models()
             for model in models:
                 like = ctools.cterror(obs)
                 like['srcname'] = model.name()
@@ -256,7 +252,7 @@ class cspull(ctools.cscript):
                     #               (fitted - true) / error
                     # In case that the error is 0 the pull is set to 99
                     fitted_value = par.value()
-                    real_value   = self._obs.models()[i][k].value()
+                    real_value   = self.obs().models()[i][k].value()
                     error        = par.error()
                     if error != 0.0:
                         pull = (fitted_value - real_value) / error
@@ -292,7 +288,7 @@ class cspull(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate pull distribution')
@@ -320,7 +316,7 @@ class cspull(ctools.cscript):
             Set model container
         """
         # Set model container
-        self._obs.models(models)
+        self.obs().models(models)
 
         # Return
         return

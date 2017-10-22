@@ -164,6 +164,10 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
+The script now derived from the cslikelihood base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the light
+curve generation (#2237).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 
@@ -185,8 +189,8 @@ None
 
 csmodelsois - Puts selected sources in diffuse model cube
 ---------------------------------------------------------
-Add csmodelsois script that replaces selected models in a model container by
-a diffuse map cube (#2180).
+Add script that replaces selected models in a model container by a diffuse
+map cube (#2180).
 
 
 csobs2caldb - Generate calibration database entry for an IACT observation
@@ -211,17 +215,22 @@ None
 
 csphagen - Generate On/Off observations
 ---------------------------------------
-The script csphagen was added to allow the generation of PHA, ARF and RMF datasets
-for classical On/Off IACT analysis (#2208).
+The script was added to allow the generation of PHA, ARF and RMF datasets for classical On/Off IACT analysis (#2208).
 
 
 csphasecrv - Generate phase curve
 ---------------------------------
-None
+The script now derived from the cslikelihood base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the light
+curve generation (#2237).
 
 
 cspull - Generate pull distributions
 ------------------------------------
+The script now derived from the cslikelihood base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the pull
+distribution generation (#2237).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 
@@ -238,18 +247,20 @@ None
 
 cssens - Computes sensitivity curve
 -----------------------------------
-None
+The script now derived from the cslikelihood base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the sensitivity
+computation (#2237).
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-The csspec script now derived from the cslikelihood base class. A "statistic"
+The script now derived from the cslikelihood base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the spectrum
 generation (#2237).
 
-The csspec script now can also handle On/Off spectra for SED generation (#2231).
+The script now can also handle On/Off spectra for SED generation (#2231).
 
-The csspec script now can also handle non-CTA data. For that purpose a "method"
+The script now can also handle non-CTA data. For that purpose a "method"
 parameter has been introduced that allows to selected between slicing of the data
 (method="SLICE"), which is only supported for CTA observations, and replacing of
 the spectral model by a node function (method="NODES"). If method="AUTO" the tool
@@ -264,6 +275,10 @@ None
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
+The script now derived from the cslikelihood base class. A "statistic"
+parameter was added to allow setting the optimizer statistic for the Test
+Statistic distribution generation (#2237).
+
 Use t-type parameters for "tmin" and "tmax" to all specifying times in various
 formats (#1864).
 
@@ -275,7 +290,8 @@ None
 
 cstsmapsplit - Prepare split Test Statistic computation
 -------------------------------------------------------
-None
+A "statistic" parameter was added to allow setting the optimizer statistic for
+the TS map generation (#2237).
 
 
 csviscube - Generate visibility cube

@@ -28,7 +28,7 @@ from cscripts import ioutils
 # ================ #
 # cslightcrv class #
 # ================ #
-class cslightcrv(ctools.cscript):
+class cslightcrv(ctools.cslikelihood):
     """
     Generates a lightcurve
 
@@ -68,21 +68,14 @@ class cslightcrv(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'cslightcrv'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_cslikelihood('cslightcrv', ctools.__version__, argv)
 
         # Initialise some members
         self._srcname = ''
         self._tbins   = gammalib.GGti()
         self._stacked = False
         self._fits    = gammalib.GFits()
-
-        # Initialise observation container from constructor arguments.
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise script by calling the appropriate class constructor.
-        self._init_cscript(argv)
 
         # Return
         return
@@ -95,11 +88,14 @@ class cslightcrv(ctools.cscript):
         """
         # Setup observations (require response and allow event list, don't
         # allow counts cube)
-        self._setup_observations(self._obs, True, True, False)
+        self._setup_observations(self.obs(), True, True, False)
+
+        # Set observation statistic
+        self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Set models if there are none in the container
-        if self._obs.models().size() == 0:
-            self._obs.models(self['inmodel'].filename())
+        if self.obs().models().size() == 0:
+            self.obs().models(self['inmodel'].filename())
 
         # Get source name
         self._srcname = self['srcname'].string()
@@ -188,7 +184,7 @@ class cslightcrv(ctools.cscript):
         elif algorithm == 'GTI':
 
             # Append the GTIs of all observations
-            for obs in self._obs:
+            for obs in self.obs():
                 for i in range(obs.events().gti().size()):
                     gti.append(obs.events().gti().tstart(i),
                                obs.events().gti().tstop(i))
@@ -209,7 +205,7 @@ class cslightcrv(ctools.cscript):
         names = []
 
         # Collect list of free parameter names
-        for par in self._obs.models()[self._srcname]:
+        for par in self.obs().models()[self._srcname]:
             if par.is_free():
                 names.append(par.name())
 
@@ -221,12 +217,10 @@ class cslightcrv(ctools.cscript):
         Adjust model parameters dependent on user parameters
         """
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Adjust model parameters')
+        self._log_header1(gammalib.TERSE, 'Adjust model parameters')
 
         # Adjust model parameters dependent on input user parameters
-        for model in self._obs.models():
+        for model in self.obs().models():
 
             # Set TS flag for all models to false. The source of interest will
             # be set to true later
@@ -237,8 +231,7 @@ class cslightcrv(ctools.cscript):
             classname = model.classname()
 
             # Log model name
-            if self._logNormal():
-                self._log.header3(model.name())
+            self._log_header3(gammalib.NORMAL, model.name())
 
             # If the model is the source of interest and the 'calc_ts' parameter
             # is true then enable the TS computation for the source
@@ -254,9 +247,7 @@ class cslightcrv(ctools.cscript):
                 for par in model:
                     if par.is_free():
                         par.fix()
-                        if self._logNormal():
-                            self._log(gammalib.parformat(par.name()))
-                            self._log('fixed\n')
+                        self._log_value(gammalib.NORMAL, par.name(), 'fixed')
 
         # Return
         return
@@ -287,7 +278,8 @@ class cslightcrv(ctools.cscript):
         ioutils.append_result_column(table, results, 'e_MJD', 'days', 'e_mjd')
 
         # Append parameter columns
-        ioutils.append_model_par_column(table, self._obs.models()[self._srcname],
+        ioutils.append_model_par_column(table,
+                                        self.obs().models()[self._srcname],
                                         results)
 
         # Append Test Statistic column "TS"
@@ -327,8 +319,7 @@ class cslightcrv(ctools.cscript):
         if self['calc_ulim'].boolean():
 
             # Write header in logger
-            if self._logExplicit():
-                self._log.header3('Computing upper limit')
+            self._log_header3(gammalib.EXPLICIT, 'Computing upper limit')
 
             # Create copy of observations
             cpy_obs = obs.copy()
@@ -358,8 +349,7 @@ class cslightcrv(ctools.cscript):
                 ul_flux  = ulimit.flux_ulimit()
                 ul_eflux = ulimit.eflux_ulimit()
             except:
-                if self._logTerse():
-                    self._log('Upper limit calculation failed.\n')
+                self._log_string(gammalib.TERSE, 'Upper limit calculation failed.')
                 ul_diff  = -1.0
                 ul_flux  = -1.0
                 ul_eflux = -1.0
@@ -414,14 +404,14 @@ class cslightcrv(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
         # Get time boundaries
         tmin = self._tbins.tstart(0)
         tmax = self._tbins.tstop(self._tbins.size()-1)
 
         # Select events
-        select = ctools.ctselect(self._obs)
+        select = ctools.ctselect(self.obs())
         select['emin'] = self['emin'].real()
         select['emax'] = self['emax'].real()
         select['tmin'] = tmin.convert(self._time_reference())
@@ -432,22 +422,18 @@ class cslightcrv(ctools.cscript):
         select.run()
 
         # Extract observations
-        self._obs = select.obs().copy()
+        self.obs(select.obs().copy())
 
         # Write observation into logger
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1(gammalib.number('Selected observation',len(self._obs)))
-            self._log(str(self._obs))
-            self._log('\n')
+        self._log_header1(gammalib.TERSE,
+                          gammalib.number('Selected observation',
+                                          len(self.obs())))
 
         # Adjust model parameters dependent on user parameters
         self._adjust_model_pars()
 
         # Write header
-        if self._logTerse():
-            self._log('\n')
-            self._log.header1('Generate lightcurve')
+        self._log_header1(gammalib.TERSE, 'Generate lightcurve')
 
         # Initialise list of result dictionaries
         results = []
@@ -463,8 +449,8 @@ class cslightcrv(ctools.cscript):
             tmax = self._tbins.tstop(i)
 
             # Write time bin into header
-            if self._logTerse():
-                self._log.header2('MJD '+str(tmin.mjd())+'-'+str(tmax.mjd()))
+            self._log_header2(gammalib.TERSE, 'MJD %f - %f ' %
+                              (tmin.mjd(), tmax.mjd()))
 
             # Compute time bin center and time width
             twidth = 0.5 * (tmax - tmin) # in seconds
@@ -481,11 +467,10 @@ class cslightcrv(ctools.cscript):
                       'values': {}}
 
             # Log information
-            if self._logExplicit():
-                self._log.header3('Selecting events')
+            self._log_header3(gammalib.EXPLICIT, 'Selecting events')
 
             # Select events
-            select = ctools.ctselect(self._obs)
+            select = ctools.ctselect(self.obs())
             select['emin'] = self['emin'].real()
             select['emax'] = self['emax'].real()
             select['tmin'] = tmin.convert(self._time_reference())
@@ -505,8 +490,7 @@ class cslightcrv(ctools.cscript):
                 obs = self._bin_observation(obs)
 
             # Header
-            if self._logExplicit():
-                self._log.header3('Fitting the data')
+            self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
 
             # Do maximum likelihood model fitting
             like = ctools.ctlike(obs)
@@ -626,7 +610,7 @@ class cslightcrv(ctools.cscript):
 
             # Set default name is user name is empty
             if not name:
-                user_name = self._name
+                user_name = self._name()
             else:
                 user_name = name
 
@@ -661,7 +645,7 @@ class cslightcrv(ctools.cscript):
             Set model container
         """
         # Copy models
-        self._obs.models(models)
+        self.obs().models(models)
 
         # Return
         return
