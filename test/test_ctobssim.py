@@ -274,20 +274,20 @@ class Test(test):
         return
 
     # Check event list
-    def _test_list(self, list, nevents):
+    def _test_list(self, eventlist, nevents):
         """
         Test content of event list
         
         Parameters
         ----------
-        list : `~gammalib.GCTAEventList`
+        eventlist : `~gammalib.GCTAEventList`
             Event list
         nevents : int
             Expected number of events
         """
         # Test event list
-        self.test_value(list.size(), nevents, str(nevents)+' elements')
-        self.test_value(list.number(), nevents, str(nevents)+' events')
+        self.test_value(eventlist.size(), nevents, str(nevents)+' elements')
+        self.test_value(eventlist.number(), nevents, str(nevents)+' events')
 
         # Return
         return

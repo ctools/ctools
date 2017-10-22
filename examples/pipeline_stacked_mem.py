@@ -65,20 +65,20 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
     sim.run()
 
     # Bin events into counts map
-    bin = ctools.ctbin(sim.obs())
-    bin['ebinalg']  = 'LOG'
-    bin['emin']     = emin
-    bin['emax']     = emax
-    bin['enumbins'] = enumbins
-    bin['nxpix']    = nxpix
-    bin['nypix']    = nypix
-    bin['binsz']    = binsz
-    bin['coordsys'] = coordsys
-    bin['proj']     = proj
-    bin['xref']     = ra
-    bin['yref']     = dec
-    bin['debug']    = debug
-    bin.run()
+    binning = ctools.ctbin(sim.obs())
+    binning['ebinalg']  = 'LOG'
+    binning['emin']     = emin
+    binning['emax']     = emax
+    binning['enumbins'] = enumbins
+    binning['nxpix']    = nxpix
+    binning['nypix']    = nypix
+    binning['binsz']    = binsz
+    binning['coordsys'] = coordsys
+    binning['proj']     = proj
+    binning['xref']     = ra
+    binning['yref']     = dec
+    binning['debug']    = debug
+    binning.run()
 
     # Create exposure cube
     expcube = ctools.ctexpcube(sim.obs())
@@ -132,14 +132,14 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
     bkgcube.run()
 
     # Attach background model to observation container
-    bin.obs().models(bkgcube.models())
+    binning.obs().models(bkgcube.models())
 
     # Set Exposure and Psf cube for first CTA observation
     # (ctbin will create an observation with a single container)
-    bin.obs()[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
+    binning.obs()[0].response(expcube.expcube(), psfcube.psfcube(), bkgcube.bkgcube())
 
     # Perform maximum likelihood fitting
-    like = ctools.ctlike(bin.obs())
+    like = ctools.ctlike(binning.obs())
     like['debug'] = True # Switch this always on for results in console
     like.run()
 

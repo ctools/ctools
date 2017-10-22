@@ -80,27 +80,27 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
         cubefile  = 'cube_'+eventfile
 
         # Bin events for that observation
-        bin = ctools.ctbin()
-        bin['inobs']    = eventfile
-        bin['outcube']  = cubefile
-        bin['ebinalg']  = 'LOG'
-        bin['emin']     = emin
-        bin['emax']     = emax
-        bin['enumbins'] = enumbins
-        bin['nxpix']    = nxpix
-        bin['nypix']    = nypix
-        bin['binsz']    = binsz
-        bin['coordsys'] = coordsys
-        bin['usepnt']   = True
-        bin['proj']     = proj
-        bin.execute()
+        binning = ctools.ctbin()
+        binning['inobs']    = eventfile
+        binning['outcube']  = cubefile
+        binning['ebinalg']  = 'LOG'
+        binning['emin']     = emin
+        binning['emax']     = emax
+        binning['enumbins'] = enumbins
+        binning['nxpix']    = nxpix
+        binning['nypix']    = nypix
+        binning['binsz']    = binsz
+        binning['coordsys'] = coordsys
+        binning['usepnt']   = True
+        binning['proj']     = proj
+        binning.execute()
 
         # Set observation ID
-        bin.obs()[0].id(cubefile)
-        bin.obs()[0].eventfile(cubefile)
+        binning.obs()[0].id(cubefile)
+        binning.obs()[0].eventfile(cubefile)
 
         # Append result to observations
-        obs.extend(bin.obs())
+        obs.extend(binning.obs())
 
     # Save XML file
     xml = gammalib.GXml()

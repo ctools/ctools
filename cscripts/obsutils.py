@@ -106,27 +106,27 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
                 emax = max(run.events().ebounds().emax().TeV(), emax)
 
         # Allocate ctbin application and set parameters
-        bin = ctools.ctbin(obssim.obs())
-        bin['ebinalg']  = 'LOG'
-        bin['emin']     = emin
-        bin['emax']     = emax
-        bin['enumbins'] = nbins
-        bin['usepnt']   = True # Use pointing for map centre
-        bin['nxpix']    = npix
-        bin['nypix']    = npix
-        bin['binsz']    = binsz
-        bin['coordsys'] = coord
-        bin['proj']     = proj
-        bin['chatter']  = chatter
-        bin['debug']    = debug
+        binning = ctools.ctbin(obssim.obs())
+        binning['ebinalg']  = 'LOG'
+        binning['emin']     = emin
+        binning['emax']     = emax
+        binning['enumbins'] = nbins
+        binning['usepnt']   = True # Use pointing for map centre
+        binning['nxpix']    = npix
+        binning['nypix']    = npix
+        binning['binsz']    = binsz
+        binning['coordsys'] = coord
+        binning['proj']     = proj
+        binning['chatter']  = chatter
+        binning['debug']    = debug
 
         # Optionally open the log file
         if log:
-            bin.logFileOpen()
+            binning.logFileOpen()
 
         # Run ctbin application. This will loop over all observations in
         # the container and bin the events in counts maps
-        bin.run()
+        binning.run()
 
         # If we have multiple input observations then create stacked response
         # cubes and append them to the observation
@@ -144,22 +144,22 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
 
             # Set stacked response
             if edisp:
-                bin.obs()[0].response(response['expcube'],
-                                      response['psfcube'],
-                                      response['edispcube'],
-                                      response['bkgcube'])
+                binning.obs()[0].response(response['expcube'],
+                                          response['psfcube'],
+                                          response['edispcube'],
+                                          response['bkgcube'])
             else:
-                bin.obs()[0].response(response['expcube'],
-                                      response['psfcube'],
-                                      response['bkgcube'])
+                binning.obs()[0].response(response['expcube'],
+                                          response['psfcube'],
+                                          response['bkgcube'])
 
             # Set new models
-            bin.obs().models(response['models'])
+            binning.obs().models(response['models'])
 
         # Make a deep copy of the observation that will be returned
         # (the ctbin object will go out of scope one the function is
         # left)
-        obs = bin.obs().copy()
+        obs = binning.obs().copy()
 
     else:
 

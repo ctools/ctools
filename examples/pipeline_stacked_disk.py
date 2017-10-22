@@ -75,22 +75,22 @@ def run_pipeline(obs, ra=83.63, dec=22.01, emin=0.1, emax=100.0,
     sim.execute()
 
     # Bin events into counts map
-    bin = ctools.ctbin()
-    bin['inobs']    = 'obs.xml'
-    bin['outcube']  = 'cntcube.fits'
-    bin['ebinalg']  = 'LOG'
-    bin['emin']     = emin
-    bin['emax']     = emax
-    bin['enumbins'] = enumbins
-    bin['nxpix']    = nxpix
-    bin['nypix']    = nypix
-    bin['binsz']    = binsz
-    bin['coordsys'] = coordsys
-    bin['proj']     = proj
-    bin['xref']     = ra
-    bin['yref']     = dec
-    bin['debug']    = debug
-    bin.execute()
+    binning = ctools.ctbin()
+    binning['inobs']    = 'obs.xml'
+    binning['outcube']  = 'cntcube.fits'
+    binning['ebinalg']  = 'LOG'
+    binning['emin']     = emin
+    binning['emax']     = emax
+    binning['enumbins'] = enumbins
+    binning['nxpix']    = nxpix
+    binning['nypix']    = nypix
+    binning['binsz']    = binsz
+    binning['coordsys'] = coordsys
+    binning['proj']     = proj
+    binning['xref']     = ra
+    binning['yref']     = dec
+    binning['debug']    = debug
+    binning.execute()
 
     # Create exposure cube
     expcube = ctools.ctexpcube()

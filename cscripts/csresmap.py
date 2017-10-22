@@ -175,28 +175,28 @@ class csresmap(ctools.cscript):
                 self._log_header1(gammalib.TERSE, 'Generate binned map (ctbin)')
 
                 # Create countsmap
-                bin = ctools.ctbin(self._obs)
-                bin['xref']     = self['xref'].real()
-                bin['yref']     = self['yref'].real()
-                bin['proj']     = self['proj'].string()
-                bin['coordsys'] = self['coordsys'].string()
-                bin['ebinalg']  = self['ebinalg'].string()
-                bin['nxpix']    = self['nxpix'].integer()
-                bin['nypix']    = self['nypix'].integer()
-                bin['binsz']    = self['binsz'].real()
+                binning = ctools.ctbin(self._obs)
+                binning['xref']     = self['xref'].real()
+                binning['yref']     = self['yref'].real()
+                binning['proj']     = self['proj'].string()
+                binning['coordsys'] = self['coordsys'].string()
+                binning['ebinalg']  = self['ebinalg'].string()
+                binning['nxpix']    = self['nxpix'].integer()
+                binning['nypix']    = self['nypix'].integer()
+                binning['binsz']    = self['binsz'].real()
                 if self['ebinalg'].string() == "FILE":
-                    bin['ebinfile'] = self['ebinfile'].filename().file()
+                    binning['ebinfile'] = self['ebinfile'].filename().file()
                 else:
-                    bin['enumbins'] = self['enumbins'].integer()
-                    bin['emin']     = self['emin'].real()
-                    bin['emax']     = self['emax'].real()
-                bin['chatter']  = self['chatter'].integer()
-                bin['clobber']  = self['clobber'].boolean()
-                bin['debug']    = self['debug'].boolean()
-                bin.run()
+                    binning['enumbins'] = self['enumbins'].integer()
+                    binning['emin']     = self['emin'].real()
+                    binning['emax']     = self['emax'].real()
+                binning['chatter']  = self['chatter'].integer()
+                binning['clobber']  = self['clobber'].boolean()
+                binning['debug']    = self['debug'].boolean()
+                binning.run()
 
                 # Retrieve counts cube
-                cta_counts_cube = bin.cube()
+                cta_counts_cube = binning.cube()
 
             # Assign GCTAEventCube to skymap
             countmap = cta_counts_cube.counts()
@@ -218,7 +218,7 @@ class csresmap(ctools.cscript):
 
         # Store counts map as residual map. Note that we need a special
         # construct here to avoid memory leaks. This seems to be a SWIG feature
-        # as SWIG creates a new object when calling bin.cube()
+        # as SWIG creates a new object when calling binning.cube()
         self._resmap = countmap.copy()
         self._resmap.stack_maps()
         modelmap.stack_maps()

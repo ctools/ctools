@@ -117,23 +117,23 @@ class cssrcdetect(ctools.cscript):
             self._log_value(gammalib.NORMAL, 'Map threshold', threshold)
 
             # Get maximum value and corresponding sky direction
-            value, dir = self._find_maximum(counts, threshold=threshold)
+            value, pos = self._find_maximum(counts, threshold=threshold)
 
             # If maximum found then log maximum and add model
-            if dir is not None:
+            if pos is not None:
 
                 # Set source name
                 name = 'Src%3.3d' % (i+1)
 
                 # Log maximum
                 self._log_value(gammalib.NORMAL, 'Map maximum', str(value))
-                self._log_value(gammalib.NORMAL, name+' position', str(dir))
+                self._log_value(gammalib.NORMAL, name+' position', str(pos))
             
                 # Add model
-                self._add_model(dir, name)
+                self._add_model(pos, name)
 
                 # Remove maximum from map
-                counts = self._remove_maximum(counts, dir, mean,
+                counts = self._remove_maximum(counts, pos, mean,
                                               radius=self['exclrad'].real())
 
             # ... otherwise log that no maximum was found and break iterations
@@ -149,44 +149,44 @@ class cssrcdetect(ctools.cscript):
         # Return
         return
 
-    def _find_maximum(self, map, threshold=0.0):
+    def _find_maximum(self, skymap, threshold=0.0):
         """
         Find maximum in a sky map
 
         Parameters
         ----------
-        map : `~gammalib.GSkyMap()`
+        skymap : `~gammalib.GSkyMap()`
             Sky map
         threshold : float, optional
             Threshold for maximum value
 
         Returns
         -------
-        value, dir : tuple of float and `~gammalib.GSkyDir()`
+        value, pos : tuple of float and `~gammalib.GSkyDir()`
             Maximum sky map value and corresponding sky direction
         """
         # Initialise maximum pixel value and sky direction
         value = threshold
-        dir   = None
+        pos   = None
 
         # Loop over all pixels and find maximum
-        for i in range(map.npix()):
-            if map[i] > value:
-                value = map[i]
-                dir   = map.inx2dir(i)
+        for i in range(skymap.npix()):
+            if skymap[i] > value:
+                value = skymap[i]
+                pos   = skymap.inx2dir(i)
 
         # Return sky direction of maximum
-        return value, dir
+        return value, pos
 
-    def _remove_maximum(self, map, dir, value=0.0, radius=0.1):
+    def _remove_maximum(self, skymap, pos, value=0.0, radius=0.1):
         """
         Remove maximum from sky map by replacing pixels with a given value
 
         Parameters
         ----------
-        map : `~gammalib.GSkyMap()`
+        skymap : `~gammalib.GSkyMap()`
             Sky map
-        dir : `~gammalib.GSkyDir()`
+        pos : `~gammalib.GSkyDir()`
             Sky direction of maximum
         value : float, optional
             Replacement value
@@ -195,28 +195,28 @@ class cssrcdetect(ctools.cscript):
 
         Returns
         -------
-        map : `~gammalib.GSkyMap()`
+        skymap : `~gammalib.GSkyMap()`
             Sky map with maximum removed
         """
         # Copy skymap
-        map_copy = map.copy()
+        skymap_copy = skymap.copy()
         
         # Loop over all pixels and find maximum
-        for i in range(map_copy.npix()):
-            mapdir = map_copy.inx2dir(i)
-            if mapdir.dist_deg(dir) < radius:
-                map_copy[i] = value
+        for i in range(skymap_copy.npix()):
+            skymap_dir = skymap_copy.inx2dir(i)
+            if skymap_dir.dist_deg(pos) < radius:
+                skymap_copy[i] = value
 
         # Return copy of map
-        return map_copy
+        return skymap_copy
 
-    def _map_moments(self, map):
+    def _map_moments(self, skymap):
         """
         Determine moments of sky map pixels
 
         Parameters
         ----------
-        map : `~gammalib.GSkyMap()`
+        skymap : `~gammalib.GSkyMap()`
             Sky map
 
         Returns
@@ -229,32 +229,32 @@ class cssrcdetect(ctools.cscript):
         std  = 0.0
 
         # Loop over all pixels
-        for i in range(map.npix()):
-            mean += map[i]
-            std  += map[i]*map[i]
+        for i in range(skymap.npix()):
+            mean += skymap[i]
+            std  += skymap[i]*skymap[i]
 
         # Compute mean and standard deviation
-        mean /= float(map.npix())
-        std  /= float(map.npix())
+        mean /= float(skymap.npix())
+        std  /= float(skymap.npix())
         std  -= mean * mean
         std   = math.sqrt(std)
 
         # Return mean and standard deviation
         return mean, std
 
-    def _add_model(self, dir, name):
+    def _add_model(self, pos, name):
         """
         Add model to model container
 
         Parameters
         ----------
-        dir : `~gammalib.GSkyDir()`
+        pos : `~gammalib.GSkyDir()`
             Sky direction of model
         name : str
             Model name
         """
         # Set point source model
-        model = self._set_ptsrc(dir)
+        model = self._set_ptsrc(pos)
 
         # Set model name
         model.name(name)
@@ -265,13 +265,13 @@ class cssrcdetect(ctools.cscript):
         # Return
         return
 
-    def _set_bkg(self, type):
+    def _set_bkg(self, modeltype):
         """
         Set background model
 
         Parameters
         ----------
-        type : str
+        modeltype : str
             Model type ('IRF', 'AEFF' or 'CUBE')
 
         Returns
@@ -284,11 +284,11 @@ class cssrcdetect(ctools.cscript):
                                                gammalib.GEnergy(1.0, 'TeV'))
 
         # Set background model
-        if type == 'IRF':
+        if modeltype == 'IRF':
             model = gammalib.GCTAModelIrfBackground(spectral)
-        elif type == 'AEFF':
+        elif modeltype == 'AEFF':
             model = gammalib.GCTAModelAeffBackground(spectral)
-        elif type == 'CUBE':
+        elif modeltype == 'CUBE':
             model = gammalib.GCTAModelCubeBackground(spectral)
         else:
             model = None
@@ -300,13 +300,13 @@ class cssrcdetect(ctools.cscript):
         # Return model
         return model
 
-    def _set_ptsrc(self, dir):
+    def _set_ptsrc(self, pos):
         """
         Set point source model
 
         Parameters
         ----------
-        dir : `~gammalib.GSkyDir()`
+        pos : `~gammalib.GSkyDir()`
             Sky direction of model
 
         Returns
@@ -315,7 +315,7 @@ class cssrcdetect(ctools.cscript):
             Point source model
         """
         # Set spatial component
-        spatial = gammalib.GModelSpatialPointSource(dir)
+        spatial = gammalib.GModelSpatialPointSource(pos)
 
         # Get fit parameters
         fit_pos   = self['fit_pos'].boolean()
@@ -348,7 +348,7 @@ class cssrcdetect(ctools.cscript):
 
         Returns
         -------
-        map : `~gammalib.GSkyMap()`
+        skymap : `~gammalib.GSkyMap()`
             Sky map
         """
         # Get skymap filename
@@ -358,13 +358,13 @@ class cssrcdetect(ctools.cscript):
         fits = gammalib.GFits(inmap)
 
         # Extract primary extension as sky map
-        map = gammalib.GSkyMap(fits.image(0))
+        skymap = gammalib.GSkyMap(fits.image(0))
 
         # Close sky map file
         fits.close()
 
         # Return
-        return map
+        return skymap
 
 
     # Public methods

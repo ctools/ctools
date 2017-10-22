@@ -84,10 +84,10 @@ class Test(test):
         Setup method for sim() function test
         """
         # Set-up observation container
-        dir = gammalib.GSkyDir()
-        dir.radec_deg(83.6331, 22.0145)
+        pnt = gammalib.GSkyDir()
+        pnt.radec_deg(83.6331, 22.0145)
         obs = gammalib.GObservations()
-        run = obsutils.set_obs(dir, duration=100.0, emin=1.0, emax=10.0)
+        run = obsutils.set_obs(pnt, duration=100.0, emin=1.0, emax=10.0)
         run.id('0')
         obs.append(run)
         if two:

@@ -70,21 +70,21 @@ def run_pipeline(obs, emin=0.1, emax=100.0,
         container.append(run)
 
         # Bin events for that observation
-        bin = ctools.ctbin(container)
-        bin['ebinalg']  = 'LOG'
-        bin['emin']     = emin
-        bin['emax']     = emax
-        bin['enumbins'] = enumbins
-        bin['nxpix']    = nxpix
-        bin['nypix']    = nypix
-        bin['binsz']    = binsz
-        bin['coordsys'] = coordsys
-        bin['usepnt']   = True
-        bin['proj']     = proj
-        bin.run()
+        binning = ctools.ctbin(container)
+        binning['ebinalg']  = 'LOG'
+        binning['emin']     = emin
+        binning['emax']     = emax
+        binning['enumbins'] = enumbins
+        binning['nxpix']    = nxpix
+        binning['nypix']    = nypix
+        binning['binsz']    = binsz
+        binning['coordsys'] = coordsys
+        binning['usepnt']   = True
+        binning['proj']     = proj
+        binning.run()
 
         # Append result to observations
-        obs.extend(bin.obs())
+        obs.extend(binning.obs())
 
     # Perform maximum likelihood fitting
     like = ctools.ctlike(obs)

@@ -363,15 +363,15 @@ class csspec(ctools.cslikelihood):
 
                 # Make sure that all nodes are positive
                 for i in range(spectrum.nodes()):
-                    par   = spectrum[i*2+1]
-                    value = par.value()
-                    min   = 1.0e-30 * value
-                    if min <= 0.0:
-                        min = 1.0e-50
-                        if min < value:
-                            value = min
+                    par     = spectrum[i*2+1]
+                    value   = par.value()
+                    minimum = 1.0e-30 * value
+                    if minimum <= 0.0:
+                        minimum = 1.0e-50
+                        if minimum < value:
+                            value = minimum
                     par.value(value)
-                    par.min(min)
+                    par.min(minimum)
 
                 # Set spectral component of source model
                 model.spectral(spectrum)
@@ -459,10 +459,10 @@ class csspec(ctools.cslikelihood):
                 rmf[idst_true, idst_reco] = obs.rmf()[isrc_true, isrc_reco]
 
         # Set On/Off observations
-        id        = obs.id()
+        obsid     = obs.id()
         statistic = obs.statistic()
         obs = gammalib.GCTAOnOffObservation(pha_on, pha_off, arf, rmf)
-        obs.id(id)
+        obs.id(obsid)
         obs.statistic(statistic)
 
         # Return observation
