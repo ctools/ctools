@@ -40,7 +40,7 @@ class csspec(ctools.csobservation):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_csobservation('csspec', ctools.__version__, argv)
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise data members
         self._ebounds     = gammalib.GEbounds()

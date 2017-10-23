@@ -69,7 +69,7 @@ class cslightcrv(ctools.csobservation):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_csobservation('cslightcrv', ctools.__version__, argv)
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise some members
         self._srcname = ''

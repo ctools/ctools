@@ -45,7 +45,7 @@ class cstsmapsplit(ctools.cslikelihood):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('cstsmapsplit', ctools.__version__, argv)
+        self._init_cslikelihood(self.__class__.__name__, ctools.__version__, argv)
 
         # Set data members
         self._outmap       = gammalib.GFilename()

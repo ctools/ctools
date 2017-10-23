@@ -37,7 +37,7 @@ class csmodelselect(ctools.csobservation):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_csobservation('csmodelselect', ctools.__version__, argv)
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
         # Set name
 
         # Initialise class members
