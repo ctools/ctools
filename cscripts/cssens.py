@@ -30,7 +30,7 @@ from cscripts import ioutils
 # ============ #
 # cssens class #
 # ============ #
-class cssens(ctools.cslikelihood):
+class cssens(ctools.csobservation):
     """
     Computes the CTA sensitivity
 
@@ -48,7 +48,7 @@ class cssens(ctools.cslikelihood):
         Constructor.
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('cssens', ctools.__version__, argv)
+        self._init_csobservation('cssens', ctools.__version__, argv)
 
         # Initialise class members
         self._ebounds     = gammalib.GEbounds()

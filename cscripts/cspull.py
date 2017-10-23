@@ -28,7 +28,7 @@ from cscripts import ioutils
 # ============ #
 # cspull class #
 # ============ #
-class cspull(ctools.cslikelihood):
+class cspull(ctools.csobservation):
     """
     Generates pull distributions for a model
     """
@@ -38,7 +38,7 @@ class cspull(ctools.cslikelihood):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('cspull', ctools.__version__, argv)
+        self._init_csobservation('cspull', ctools.__version__, argv)
 
         # Initialise some members
         self._edisp       = False

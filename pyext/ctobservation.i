@@ -90,15 +90,22 @@ public:
     // Public methods
     void                 obs(const GObservations& obs);
     const GObservations& obs(void) const;
-    void                 write_ogip_keywords(GFitsHDU* hdu) const;
 
     // Make methods private in Python by prepending an underscore
     %rename(_first_unbinned_observation) first_unbinned_observation;
     %rename(_next_unbinned_observation)  next_unbinned_observation;
+    %rename(_write_ogip_keywords)        write_ogip_keywords;
+    %rename(_set_obs_statistic)          set_obs_statistic;
+    %rename(_save_events_fits)           save_events_fits;
+    %rename(_save_events_xml)            save_events_xml;
 
     // Protected methods
     GCTAObservation* first_unbinned_observation(void);
     GCTAObservation* next_unbinned_observation(void);
+    void             write_ogip_keywords(GFitsHDU* hdu) const;
+    void             set_obs_statistic(const std::string& statistic);
+    void             save_events_fits(void);
+    void             save_events_xml(void);
 };
 
 

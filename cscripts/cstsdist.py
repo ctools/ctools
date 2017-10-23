@@ -29,7 +29,7 @@ from cscripts import ioutils
 # ============== #
 # cstsdist class #
 # ============== #
-class cstsdist(ctools.cslikelihood):
+class cstsdist(ctools.csobservation):
     """
     Generates Test Statistic distribution for a model
     """
@@ -40,7 +40,7 @@ class cstsdist(ctools.cslikelihood):
         Constructor.
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('cstsdist', ctools.__version__, argv)
+        self._init_csobservation('cstsdist', ctools.__version__, argv)
 
         # Initialise some members
         self._srcname     = ''

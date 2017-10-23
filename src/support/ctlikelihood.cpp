@@ -196,7 +196,65 @@ ctlikelihood& ctlikelihood::operator=(const ctlikelihood& app)
 
 /*==========================================================================
  =                                                                         =
- =                             Private methods                             =
+ =                   Protected methods exposed in Python                   =
+ =                                                                         =
+ ==========================================================================*/
+
+/***********************************************************************//**
+ * @brief Evaluates the log-likelihood function
+ *
+ * @param[in] par Model parameter
+ * @param[in] value Model parameter factor value
+ * @return Log-likelihood function
+ *
+ * Evaluates the log-likelihood function at a given @p value.
+ ***************************************************************************/
+double ctlikelihood::evaluate(GModelPar& par, const double& value)
+{
+    // Initialise log-likelihood value
+    double logL = 0.0;
+
+    // Throw an exception if the parameter is below the minimum boundary
+    if (par.has_min() && value < par.factor_min()) {
+        std::string msg = "Parameter \""+par.name()+"\" value"+
+                          gammalib::str(value)+" is below its minimum boundary "+
+                          gammalib::str(par.factor_min())+". To omit this "
+                          "error please lower the minimum parameter boundary.";
+        throw GException::invalid_value(G_EVALUATE, msg);
+    }
+
+    // Throw an exception if the parameter is above the maximum boundary
+    if (par.has_max() && value > par.factor_max()) {
+        std::string msg = "Parameter \""+par.name()+"\" value"+
+                          gammalib::str(value)+" is above its maximum boundary "+
+                          gammalib::str(par.factor_max())+". To omit this "
+                          "error please raise the maximum parameter boundary.";
+        throw GException::invalid_value(G_EVALUATE, msg);
+    }
+
+    // Change parameter factor
+    par.factor_value(value);
+
+    // Fix parameter
+    par.fix();
+
+    // Re-optimize log-likelihood
+    m_obs.optimize(m_opt);
+
+    // Free parameter
+    par.free();
+
+    // Retrieve log-likelihood
+    logL = m_obs.logL();
+
+    // Return log-likelihood
+    return logL;
+}
+
+
+/*==========================================================================
+ =                                                                         =
+ =                            Protected methods                            =
  =                                                                         =
  ==========================================================================*/
 
@@ -233,114 +291,6 @@ void ctlikelihood::copy_members(const ctlikelihood& app)
  ***************************************************************************/
 void ctlikelihood::free_members(void)
 {
-    // Return
-    return;
-}
-
-
-/***********************************************************************//**
- * @brief Evaluates the log-likelihood function
- *
- * @param[in] par Model parameter
- * @param[in] value Model parameter factor value
- * @return Log-likelihood function
- *
- * Evaluates the log-likelihood function at a given @p value.
- ***************************************************************************/
-double ctlikelihood::evaluate(GModelPar& par, const double& value)
-{
-    // Initialise log-likelihood value
-    double logL = 0.0;
-
-    // Throw an exception if the parameter is below the minimum boundary
-    if (par.has_min() && value < par.factor_min()) {
-        std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
-                          par.name()+"\" is below its minimum boundary "+
-                          gammalib::str(par.factor_min())+". To omit this "
-                          "error please lower the minimum parameter boundary.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Throw an exception if the parameter is above the maximum boundary
-    if (par.has_max() && value > par.factor_max()) {
-        std::string msg = "Value "+gammalib::str(value)+" of parameter \""+
-                          par.name()+"\" is above its maximum boundary "+
-                          gammalib::str(par.factor_max())+". To omit this "
-                          "error please raise the maximum parameter boundary.";
-        throw GException::invalid_value(G_EVALUATE, msg);
-    }
-
-    // Change parameter factor
-    par.factor_value(value);
-
-    // Fix parameter
-    par.fix();
-
-    // Re-optimize log-likelihood
-    m_obs.optimize(m_opt);
-
-    // Free parameter
-    par.free();
-
-    // Retrieve log-likelihood
-    logL = m_obs.logL();
-
-    // Return log-likelihood
-    return logL;
-}
-
-
-/***********************************************************************//**
- * @brief Set fit statistic for CTA observations
- *
- * @param[in] statistic Requested fit statistic.
- *
- * Sets the fit statistic for all CTA observations. The method handles
- * regular CTA observations as well as On/Off observations.
- *
- * For regular CTA observations of type GCTAObservation the fit statistic is
- * only set for binned or stacked observations. Possible values are
- * @c POISSON, @c GAUSSIAN or @c CHI2 (case insensitive).
- *
- * For On/Off CTA observations of type GCTAOnOffObservation the fit statistic
- * is always set. Possible values are @c POISSON, @c CSTAT or @c WSTAT (case
- * insensitive).
- *
- * If @p statistic is any other string the fit statistic of the observations
- * will not be modified.
- ***************************************************************************/
-void ctlikelihood::set_obs_statistic(const std::string& statistic)
-{
-    // Convert statistic to upper case
-    std::string ustatistic = gammalib::toupper(statistic);
-
-    // Flag which observation types are handled
-    bool handle_cta   = ((ustatistic == "POISSON")  ||
-                         (ustatistic == "GAUSSIAN") ||
-                         (ustatistic == "CHI2"));
-    bool handle_onoff = ((ustatistic == "POISSON") ||
-                         (ustatistic == "CSTAT")   ||
-                         (ustatistic == "WSTAT"));
-
-    // Loop over all observation in container
-    for (int i = 0; i < m_obs.size(); ++i) {
-
-        // For regular CTA observations only set statistic for binned or
-        // stacked observations
-        if ((m_obs[i]->classname() == "GCTAObservation") && handle_cta) {
-            if (m_obs[i]->events()->classname() == "GCTAEventCube") {
-                m_obs[i]->statistic(statistic);
-            }
-        }
-
-        // For On/Off CTA observations always set statistic
-        else if ((m_obs[i]->classname() == "GCTAOnOffObservation") &&
-                 handle_onoff) {
-            m_obs[i]->statistic(statistic);
-        }
-
-    } // endfor: looped over all observations
-
     // Return
     return;
 }

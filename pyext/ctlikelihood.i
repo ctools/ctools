@@ -91,12 +91,10 @@ public:
     const GOptimizer* opt(void) const;
 
     // Make methods protected in Python by prepending an underscore
-    %rename(_evaluate)          evaluate;
-    %rename(_set_obs_statistic) set_obs_statistic;
+    %rename(_evaluate) evaluate;
 
     // Protected methods
     double evaluate(GModelPar& par, const double& value);
-    void   set_obs_statistic(const std::string& statistic);
 };
 
 

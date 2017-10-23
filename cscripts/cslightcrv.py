@@ -28,7 +28,7 @@ from cscripts import ioutils
 # ================ #
 # cslightcrv class #
 # ================ #
-class cslightcrv(ctools.cslikelihood):
+class cslightcrv(ctools.csobservation):
     """
     Generates a lightcurve
 
@@ -69,7 +69,7 @@ class cslightcrv(ctools.cslikelihood):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('cslightcrv', ctools.__version__, argv)
+        self._init_csobservation('cslightcrv', ctools.__version__, argv)
 
         # Initialise some members
         self._srcname = ''

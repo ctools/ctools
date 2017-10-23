@@ -64,24 +64,25 @@ public:
     // Methods
     void                 obs(const GObservations& obs);
     const GObservations& obs(void) const;
-    void                 write_ogip_keywords(GFitsHDU* hdu) const;
 
 #ifndef SWIG
 protected:
 #endif
-    // Iterator methods and members
+    // Protected methods
     GCTAObservation*       first_unbinned_observation(void);
     GCTAObservation*       next_unbinned_observation(void);
     const GCTAObservation* first_unbinned_observation(void) const;
     const GCTAObservation* next_unbinned_observation(void) const;
+    void                   write_ogip_keywords(GFitsHDU* hdu) const;
+    void                   set_obs_statistic(const std::string& statistic);
+    void                   save_events_fits(void);
+    void                   save_events_xml(void);
 
 protected:
     // Protected methods
     void init_members(void);
     void copy_members(const ctobservation& app);
     void free_members(void);
-    void save_events_fits(void);
-    void save_events_xml(void);
 
     // Protected members
     GObservations       m_obs;            //!< Observation container

@@ -164,7 +164,7 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-The script now derived from the cslikelihood base class. A "statistic"
+The script now derived from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the light
 curve generation (#2237).
 
@@ -220,14 +220,14 @@ The script was added to allow the generation of PHA, ARF and RMF datasets for cl
 
 csphasecrv - Generate phase curve
 ---------------------------------
-The script now derived from the cslikelihood base class. A "statistic"
+The script now derived from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the light
 curve generation (#2237).
 
 
 cspull - Generate pull distributions
 ------------------------------------
-The script now derived from the cslikelihood base class. A "statistic"
+The script now derived from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the pull
 distribution generation (#2237).
 
@@ -247,14 +247,14 @@ None
 
 cssens - Computes sensitivity curve
 -----------------------------------
-The script now derived from the cslikelihood base class. A "statistic"
+The script now derived from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the sensitivity
 computation (#2237).
 
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-The script now derived from the cslikelihood base class. A "statistic"
+The script now derived from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the spectrum
 generation (#2237).
 
@@ -275,7 +275,7 @@ None
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-The script now derived from the cslikelihood base class. A "statistic"
+The script now derived from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the Test
 Statistic distribution generation (#2237).
 

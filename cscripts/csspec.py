@@ -26,7 +26,7 @@ import ctools
 # ============ #
 # csspec class #
 # ============ #
-class csspec(ctools.cslikelihood):
+class csspec(ctools.csobservation):
     """
     Generates a spectrum
 
@@ -40,7 +40,7 @@ class csspec(ctools.cslikelihood):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('csspec', ctools.__version__, argv)
+        self._init_csobservation('csspec', ctools.__version__, argv)
 
         # Initialise data members
         self._ebounds     = gammalib.GEbounds()

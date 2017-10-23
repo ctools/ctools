@@ -166,32 +166,6 @@ class ctobservation_test(ctools.csobservation):
     def check_next_unbinned_observation(self):
         return self._next_unbinned_observation()
 
-
-# ======================= #
-# ctlikelihood_test class #
-# ======================= #
-class ctlikelihood_test(ctools.cslikelihood):
-    """
-    Test class for the ctlikelihood base class
-    """
-    # Constructor
-    def __init__(self, *argv):
-        """
-        Constructor
-        """
-        # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('ctlikelihood_test', ctools.__version__, argv)
-
-        # Return
-        return
-
-    # Check evaluate() method
-    def check_evaluate(self, value):
-        par = gammalib.GModelPar()
-        par.value(2.0)
-        par.range(1.0, 3.0)
-        return self._evaluate(par, value)
-
     # Check set_obs_statistic() method for unbinned observation
     def check_set_obs_statistic_unbinned(self, statistic):
         obs    = gammalib.GObservations()
@@ -222,6 +196,32 @@ class ctlikelihood_test(ctools.cslikelihood):
         self.obs(obs)
         self._set_obs_statistic(statistic)
         return gammalib.toupper(self.obs()[0].statistic())
+
+
+# ======================= #
+# ctlikelihood_test class #
+# ======================= #
+class ctlikelihood_test(ctools.cslikelihood):
+    """
+    Test class for the ctlikelihood base class
+    """
+    # Constructor
+    def __init__(self, *argv):
+        """
+        Constructor
+        """
+        # Initialise application by calling the appropriate class constructor
+        self._init_cslikelihood('ctlikelihood_test', ctools.__version__, argv)
+
+        # Return
+        return
+
+    # Check evaluate() method
+    def check_evaluate(self, value):
+        par = gammalib.GModelPar()
+        par.value(2.0)
+        par.range(1.0, 3.0)
+        return self._evaluate(par, value)
 
 
 # ============================ #
@@ -616,33 +616,6 @@ class Test(test):
         self.test_assert(empty.check_next_unbinned_observation() is None,
                          'Check next_unbinned_observation() method')
 
-        # Return
-        return
-
-    # Test ctlikelihood base class
-    def _test_ctlikelihood(self):
-        """
-        Test ctlikelihood base class
-        """
-        # Allocate empty
-        empty = ctlikelihood_test()
-
-        # Test evaluate() method for minimum value violation
-        self.test_try('Check evaluate() for minimum value violation')
-        try:
-            empty.check_evaluate(0.0)
-            self.test_try_failure('Exception not thrown')
-        except ValueError:
-            self.test_try_success()
-
-        # Test evaluate() method for maximum value violation
-        self.test_try('Check evaluate() for maximum value violation')
-        try:
-            empty.check_evaluate(4.0)
-            self.test_try_failure('Exception not thrown')
-        except ValueError:
-            self.test_try_success()
-
         # Test set_obs_statistic() method for unbinned observation
         self.test_value(empty.check_set_obs_statistic_unbinned('CSTAT'),
                         'CSTAT',
@@ -684,6 +657,33 @@ class Test(test):
         self.test_value(empty.check_set_obs_statistic_onoff('DEFAULT'),
                         'CSTAT',
                         'Check set_obs_statistic("DEFAULT") for On/Off')
+
+        # Return
+        return
+
+    # Test ctlikelihood base class
+    def _test_ctlikelihood(self):
+        """
+        Test ctlikelihood base class
+        """
+        # Allocate empty
+        empty = ctlikelihood_test()
+
+        # Test evaluate() method for minimum value violation
+        self.test_try('Check evaluate() for minimum value violation')
+        try:
+            empty.check_evaluate(0.0)
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
+
+        # Test evaluate() method for maximum value violation
+        self.test_try('Check evaluate() for maximum value violation')
+        try:
+            empty.check_evaluate(4.0)
+            self.test_try_failure('Exception not thrown')
+        except ValueError:
+            self.test_try_success()
 
         # Return
         return

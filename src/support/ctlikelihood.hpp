@@ -66,7 +66,6 @@ protected:
 #endif
     // Protected methods in C++, public in SWIG interface
     double evaluate(GModelPar& par, const double& value);
-    void   set_obs_statistic(const std::string& statistic);
 
 protected:
     // Protected methods
