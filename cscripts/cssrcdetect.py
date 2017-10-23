@@ -38,9 +38,8 @@ class cssrcdetect(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'cssrcdetect'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Set protected members
         self._models = gammalib.GModels()
@@ -51,9 +50,6 @@ class cssrcdetect(ctools.cscript):
             argv      = argv[1:]
         else:
             self._map = gammalib.GSkyMap()
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return

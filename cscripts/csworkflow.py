@@ -51,16 +51,12 @@ class csworkflow(ctools.cscript):
         TypeError
             An invalid number of command line arguments was provided.
         """
-        # Set name and version
-        self._name    = 'csworkflow'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Set members
         self._workflow = gammalib.GXml()
         self._actors   = []
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return

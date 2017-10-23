@@ -35,15 +35,8 @@ class cscript_test(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'cscript_test'
-        self._version = ctools.__version__
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return
@@ -153,7 +146,7 @@ class ctobservation_test(ctools.csobservation):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_csobservation('ctobservation_test', ctools.__version__, argv)
+        self._init_csobservation(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return
@@ -211,7 +204,7 @@ class ctlikelihood_test(ctools.cslikelihood):
         Constructor
         """
         # Initialise application by calling the appropriate class constructor
-        self._init_cslikelihood('ctlikelihood_test', ctools.__version__, argv)
+        self._init_cslikelihood(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return

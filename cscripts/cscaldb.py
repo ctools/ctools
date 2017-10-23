@@ -53,13 +53,8 @@ class cscaldb(ctools.cscript):
         TypeError
             An invalid number of command line arguments was provided.
         """
-        # Set name
-        self._name    = 'cscaldb'
-        self._version = ctools.__version__
-
-        # Initialise application by calling the appropriate class
-        # constructor.
-        self._init_cscript(argv)
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Return
         return

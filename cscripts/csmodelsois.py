@@ -50,17 +50,13 @@ class csmodelsois(ctools.cscript):
         TypeError
             An invalid number of command line arguments was provided.
         """
-        # Set name and version
-        self._name    = 'csmodelsois'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
         
         # Initialize parameters
         self._cubegen    = ctools.ctmapcube()
         self._models     = gammalib.GModels()
         self._cubemodels = gammalib.GModels()
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
         
         # Return
         return

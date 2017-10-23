@@ -38,9 +38,8 @@ class cstsmapmerge(ctools.cscript):
         """
         Constructor.
         """
-        # Set name
-        self._name    = 'cstsmapmerge'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise class members
         self._files        = None
@@ -52,10 +51,6 @@ class cstsmapmerge(ctools.cscript):
         self._merged_files = []
         self._overwrite    = True
         self._delete       = False
-
-        # Initialise application by calling the appropriate class
-        # constructor.
-        self._init_cscript(argv)
 
         # Return
         return

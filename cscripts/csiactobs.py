@@ -45,9 +45,8 @@ class csiactobs(ctools.cscript):
         """
         Constructor
         """
-        # Set name and version
-        self._name    = 'csiactobs'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise some members
         self._obs              = gammalib.GObservations()
@@ -81,9 +80,6 @@ class csiactobs(ctools.cscript):
         # Initialise empty observation definition XML file
         self._xml.append(gammalib.GXmlElement('observation_list '
                                               'title="observation list"'))
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Append an observation list to XML instance
         self._xml.append(gammalib.GXmlElement('observation_list title="observation list"'))

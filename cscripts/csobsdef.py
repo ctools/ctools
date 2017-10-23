@@ -84,17 +84,13 @@ class csobsdef(ctools.cscript):
             List of IRAF command line parameter strings of the form
             ``parameter=3``.
         """
-        # Set name and version
-        self._name    = 'csobsdef'
-        self._version = ctools.__version__
+        # Initialise application by calling the base class constructor
+        self._init_cscript(self.__class__.__name__, ctools.__version__, argv)
 
         # Initialise class members
         self._obs    = gammalib.GObservations()
         self._pntdef = gammalib.GCsv()
         self._tmin   = 0.0
-
-        # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
 
         # Return
         return
