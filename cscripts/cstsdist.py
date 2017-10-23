@@ -227,7 +227,7 @@ class cstsdist(ctools.csobservation):
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write models into logger
-        self._log_models(gammalib.TERSE, self.obs().models(), 'Input model')
+        self._log_models(gammalib.NORMAL, self.obs().models(), 'Input model')
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Generate TS distribution')

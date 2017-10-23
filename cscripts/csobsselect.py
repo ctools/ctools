@@ -26,7 +26,7 @@ import ctools
 # ================= #
 # csobsselect class #
 # ================= #
-class csobsselect(ctools.cscript):
+class csobsselect(ctools.csobservation):
     """
     Selects observations from an observation definition XML file
     """
@@ -36,15 +36,8 @@ class csobsselect(ctools.cscript):
         """
         Constructor
         """
-        # Set name
-        self._name    = 'csobsselect'
-        self._version = ctools.__version__
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
         # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
+        self._init_csobservation('csobsselect', ctools.__version__, argv)
 
         # Return
         return
@@ -57,9 +50,9 @@ class csobsselect(ctools.cscript):
         """
         # If there are no observations in container then query the inobs
         # parameter
-        if self._obs.size() == 0:
+        if self.obs().is_empty():
             self['inobs'].filename()
-        
+
         # Query relevant pointing selection parameters
         pntselect = self['pntselect'].string()
         coordsys  = self['coordsys'].string()
@@ -81,8 +74,8 @@ class csobsselect(ctools.cscript):
 
         # If there are no observations in container then get them from the
         # parameter file
-        if self._obs.size() == 0:
-            self._obs = self._get_observations(False)
+        if self.obs().is_empty():
+            self.obs(self._get_observations(False))
 
         #  Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -280,23 +273,23 @@ class csobsselect(ctools.cscript):
         selected_obs = gammalib.GObservations()
 
         # Write input observation container into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Input observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write header
         self._log_header1(gammalib.TERSE, 'Observation selection')
 
         # Loop over observations
-        for obs in self._obs:
+        for obs in self.obs():
 
             # If observation is selected then append observation
             if self._select_observation(obs):
                 selected_obs.append(obs)
 
         # Copy selected observations into observation
-        self._obs = selected_obs
+        self.obs(selected_obs)
 
         # Write input observation container into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Selected observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Selected observation')
 
         # Return
         return
@@ -324,16 +317,10 @@ class csobsselect(ctools.cscript):
                                              outobs.url())
 
             # Save observations
-            self._obs.save(outobs)
+            self.obs().save(outobs)
 
         # Return
         return
-
-    def obs(self):
-        """
-        Return observation container
-        """
-        return self._obs
 
 
 # ======================== #

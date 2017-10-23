@@ -28,7 +28,7 @@ import sys
 # =============== #
 # csfindobs class #
 # =============== #
-class csphagen(ctools.cscript):
+class csphagen(ctools.csobservation):
     """
     Generate PHA, ARF and RMF files for classical IACT spectral analysis
     """
@@ -38,18 +38,10 @@ class csphagen(ctools.cscript):
         """
         Constructor
         """
-        # Set name, version
-        self._name    = 'csphagen'
-        self._version = ctools.__version__
-
-        # Initialise observation container from constructor arguments
-        self._obs, argv = self._set_input_obs(argv)
-
         # Initialise application by calling the appropriate class constructor
-        self._init_cscript(argv)
+        self._init_csobservation('csphagen', ctools.__version__, argv)
 
         # Initialise other variables
-        self._outobs        = gammalib.GObservations()
         self._ebounds       = gammalib.GEbounds()
         self._src_dir       = gammalib.GSkyDir()
         self._src_reg       = gammalib.GSkyRegions()
@@ -69,7 +61,7 @@ class csphagen(ctools.cscript):
         """
         # Setup observations (require response and allow event list, don't
         # allow counts cube)
-        self._setup_observations(self._obs, True, True, False)
+        self._setup_observations(self.obs(), True, True, False)
 
         # Set energy bounds
         self._ebounds = self._create_ebounds()
@@ -114,8 +106,8 @@ class csphagen(ctools.cscript):
 
         # If there are no observations in container then get them from the
         # parameter file
-        if self._obs.size() == 0:
-            self._obs = self._get_observations(False)
+        if self.obs().is_empty():
+            self.obs(self._get_observations(False))
 
         # Write input parameters into logger
         self._log_parameters(gammalib.TERSE)
@@ -200,18 +192,18 @@ class csphagen(ctools.cscript):
         self._get_parameters()
 
         # Write observation into logger
-        self._log_observations(gammalib.NORMAL, self._obs, 'Observation')
+        self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
         # Write header
         self._log_header1(gammalib.NORMAL,
                           'Generation of source and background spectra')
 
         # Initialise run variables
-        self._outobs   = gammalib.GObservations()
+        outobs         = gammalib.GObservations()
         self._bkg_regs = []
 
         # Loop through observations and generate pha, arf, rmf files
-        for obs in self._obs:
+        for obs in self.obs():
 
             # Initialise background regions for this observation
             bkg_reg = gammalib.GSkyRegions()
@@ -230,25 +222,28 @@ class csphagen(ctools.cscript):
                                                       self._src_reg,
                                                       bkg_reg)
                 onoff.id(obs.id())
-                self._outobs.append(onoff)
+                outobs.append(onoff)
                 self._bkg_regs.append({'regions': bkg_reg, 'id': obs.id()})
             else:
                 self._log_string(gammalib.NORMAL, 'Observation %s not included '
                                  'in spectra generation' % (obs.id()))
 
         # Stack observations
-        if self._outobs.size() > 1 and self['stack'].boolean() == True:
+        if outobs.size() > 1 and self['stack'].boolean() == True:
 
             # Write header
             self._log_header1(gammalib.NORMAL, 'Stacking %d observations' %
-                              (self._outobs.size()))
+                              (outobs.size()))
 
             # Stack observations
-            stacked_obs = gammalib.GCTAOnOffObservation(self._outobs)
+            stacked_obs = gammalib.GCTAOnOffObservation(outobs)
 
             # Put stacked observations in output container
-            self._outobs = gammalib.GObservations()
-            self._outobs.append(stacked_obs)
+            outobs = gammalib.GObservations()
+            outobs.append(stacked_obs)
+
+        # Set observation container
+        self.obs(outobs)
 
         # Return
         return
@@ -266,7 +261,7 @@ class csphagen(ctools.cscript):
         clobber = self['clobber'].boolean()
 
         # Loop over all observation in container
-        for obs in self._outobs:
+        for obs in self.obs():
 
             # Set filenames
             if self['stack'].boolean():
@@ -274,7 +269,7 @@ class csphagen(ctools.cscript):
                 offname = prefix + '_stacked_pha_off.fits'
                 arfname = prefix + '_stacked_arf.fits'
                 rmfname = prefix + '_stacked_rmf.fits'
-            elif self._outobs.size() > 1:
+            elif self.obs().size() > 1:
                 onname  = prefix + '_%s_pha_on.fits' % (obs.id())
                 offname = prefix + '_%s_pha_off.fits' % (obs.id())
                 arfname = prefix + '_%s_arf.fits' % (obs.id())
@@ -298,7 +293,7 @@ class csphagen(ctools.cscript):
             self._log_value(gammalib.NORMAL, 'RMF file', arfname)
 
         # Save observation definition XML file
-        self._outobs.save(outobs)
+        self.obs().save(outobs)
 
         # Log file name
         self._log_value(gammalib.NORMAL, 'Obs. definition XML file', outobs)
@@ -325,12 +320,6 @@ class csphagen(ctools.cscript):
 
         # Return
         return
-
-    def obs(self):
-        """
-        Return observation container
-        """
-        return self._outobs
 
 
 # ======================== #

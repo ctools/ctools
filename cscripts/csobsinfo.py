@@ -26,7 +26,7 @@ import ctools
 # =============== #
 # csobsinfo class #
 # =============== #
-class csobsinfo(ctools.cscript):
+class csobsinfo(ctools.csobservation):
     """
     Shows the content of an observation container
     """
@@ -36,9 +36,8 @@ class csobsinfo(ctools.cscript):
         """
         Constructor.
         """
-        # Set name
-        self._name    = 'csobsinfo'
-        self._version = ctools.__version__
+        # Initialise application by calling the appropriate class constructor
+        self._init_csobservation('csobsinfo', ctools.__version__, argv)
 
         # Initialise class members
         self._obj_dir        = None
@@ -51,13 +50,6 @@ class csobsinfo(ctools.cscript):
         self._ebounds        = gammalib.GEbounds()
         self._gti            = gammalib.GGti()
 
-        # Initialise observation container from constructor arguments.
-        self._obs, argv = self._set_input_obs(argv)
-
-        # Initialise application by calling the appropriate class
-        # constructor.
-        self._init_cscript(argv)
-
         # Return
         return
 
@@ -68,9 +60,9 @@ class csobsinfo(ctools.cscript):
         Get parameters from parfile and setup the observation
         """
         # Get parameters   
-        if self._obs.size() == 0:  
+        if self.obs().size() == 0:
             self._require_inobs('csobsinfo::get_parameters')
-            self._obs = self._get_observations(False)
+            self.obs(self._get_observations(False))
         
         # Initialise object position
         self._obj_dir = gammalib.GSkyDir()
@@ -127,10 +119,10 @@ class csobsinfo(ctools.cscript):
         # Write header
         if self._logTerse():
             self._log('\n')
-            self._log.header1(gammalib.number('Observation', self._obs.size()))
+            self._log.header1(gammalib.number('Observation', self.obs().size()))
         
         # Loop over observations
-        for obs in self._obs:
+        for obs in self.obs():
 
             # Skip non-CTA observations
             if not obs.classname() == 'GCTAObservation':

@@ -596,7 +596,7 @@ class cssens(ctools.csobservation):
         self._log_observations(gammalib.NORMAL, self.obs(), 'Input observation')
 
         # Write models into logger
-        self._log_models(gammalib.TERSE, models, 'Input model')
+        self._log_models(gammalib.NORMAL, models, 'Input model')
 
         # Get sensitivity type
         sensitivity_type = self['type'].string()

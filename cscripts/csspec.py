@@ -66,7 +66,7 @@ class csspec(ctools.csobservation):
         Get parameters from parfile and setup the observation
         """
         # Set observation if not done before
-        if self.obs().size() == 0:
+        if self.obs().is_empty():
             self._require_inobs('csspec::get_parameters()')
             self.obs(self._get_observations())
 
@@ -74,7 +74,7 @@ class csspec(ctools.csobservation):
         self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
         # Set models if we have none
-        if self.obs().models().size() == 0:
+        if self.obs().models().is_empty():
             self.obs().models(self['inmodel'].filename())
 
         # Query source name
