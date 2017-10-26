@@ -54,6 +54,10 @@ General parameters
 ``inmodel [file]``
     Input model XML file.
 
+``srcname [string]``
+    Name of the source in the source model XML file which should be used
+    for spectrum generation.
+
 ``expcube [file]``
     Input exposure cube file.
 
@@ -75,11 +79,10 @@ General parameters
 ``(edisp = no) [boolean]``
     Apply energy dispersion to response computation?
 
-``srcname [string]``
-    Name of the source in the source model XML file which should be used
-    for sensitivity computation.
+``outfile [file]``
+    Output spectrum FITS file.
 
-``outfile <SLICE|NODES|AUTO> [file]``
+``method <SLICE|NODES|AUTO> [string]``
     Spectrum generation method.
     ``SLICE``: Slice energy interval into ``enumbins`` independent bins.
     ``NODES``: Replace spectral model by node function with ``enumbins`` nodes.
