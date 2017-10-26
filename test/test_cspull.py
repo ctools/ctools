@@ -74,7 +74,7 @@ class Test(test):
         cspull = self._script('cspull')
 
         # Setup cspull command
-        cmd = cspull+' inmodel="'+self._model+'" onsrc=""'+ \
+        cmd = cspull+' inmodel="'+self._model+'" onsrc="NONE"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
@@ -95,7 +95,7 @@ class Test(test):
         self._check_pull_file('cspull_cmd1.dat')
 
         # Setup cspull command
-        cmd = cspull+' inmodel="model_that_does_not_exist.xml" onsrc=""'+ \
+        cmd = cspull+' inmodel="model_that_does_not_exist.xml" onsrc="NONE"'+ \
                      ' outfile="cspull_cmd1.dat"'+ \
                      ' ntrials=2'+ \
                      ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
@@ -122,7 +122,7 @@ class Test(test):
         # Set-up unbinned cspull
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
-        pull['onsrc']    = ''
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py1.dat'
         pull['ntrials']  = 2
         pull['caldb']    = self._caldb
@@ -150,7 +150,7 @@ class Test(test):
         # Set-up binned cspull
         pull = cscripts.cspull()
         pull['inmodel']  = self._model
-        pull['onsrc']    = ''
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py2.dat'
         pull['ntrials']  = 1
         pull['caldb']    = self._caldb
@@ -180,7 +180,7 @@ class Test(test):
         # Set-up cspull from event list
         pull = cscripts.cspull()
         pull['inobs']    = self._events
-        pull['onsrc']    = ''
+        pull['onsrc']    = 'NONE'
         pull['inmodel']  = self._model
         pull['outfile']  = 'cspull_py3.dat'
         pull['ntrials']  = 1
@@ -204,7 +204,7 @@ class Test(test):
         # Set-up cspull from observation container with unbinned observation
         pull = cscripts.cspull(obs)
         pull['inmodel']  = self._model
-        pull['onsrc']    = ''
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py4.dat'
         pull['ntrials']  = 1
         pull['caldb']    = self._caldb
@@ -224,7 +224,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inobs']    = self._inobs
         pull['inmodel']  = self._stacked_model
-        pull['onsrc']    = ''
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py5.dat'
         pull['ntrials']  = 1
         pull['enumbins'] = 0
@@ -244,7 +244,7 @@ class Test(test):
         pull = cscripts.cspull()
         pull['inobs']    = self._inobs_two
         pull['inmodel']  = self._model
-        pull['onsrc']    = ''
+        pull['onsrc']    = 'NONE'
         pull['outfile']  = 'cspull_py6.dat'
         pull['ntrials']  = 1
         pull['emin']     = 0.02
