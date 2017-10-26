@@ -155,6 +155,7 @@ class cspull(ctools.csobservation):
         # some parameters
         nbins    = self['enumbins'].integer()
         onsrc    = self['onsrc'].string()
+        edisp    = self['edisp'].boolean()
         emin     = None
         emax     = None
         binsz    = 0.0
@@ -167,6 +168,7 @@ class cspull(ctools.csobservation):
             onrad = self['onrad'].real()
             emin  = self['emin'].real()
             emax  = self['emax'].real()
+            edisp = True   # Use always energy dispersion for On/Off
         else:
 
             # Reset On region source name and radius
@@ -189,8 +191,7 @@ class cspull(ctools.csobservation):
                            onsrc=onsrc, onrad=onrad,
                            addbounds=True, seed=seed,
                            binsz=binsz, npix=npix, proj=proj, coord=coordsys,
-                           edisp=self['edisp'].boolean(),
-                           log=False, debug=self._logDebug(),
+                           edisp=edisp, log=False, debug=self._logDebug(),
                            chatter=self['chatter'].integer())
 
         # Determine number of events in simulation
@@ -214,13 +215,13 @@ class cspull(ctools.csobservation):
             for model in models:
                 like = ctools.cterror(obs)
                 like['srcname'] = model.name()
-                like['edisp']   = self['edisp'].boolean()
+                like['edisp']   = edisp
                 like['debug']   = self._logDebug()
                 like['chatter'] = self['chatter'].integer()
                 like.run()
         else:
             like = ctools.ctlike(obs)
-            like['edisp']   = self['edisp'].boolean()
+            like['edisp']   = edisp
             like['debug']   = self._logDebug()
             like['chatter'] = self['chatter'].integer()
             like.run()
