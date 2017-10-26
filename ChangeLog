@@ -1,8 +1,9 @@
-2017-10-22
+2017-10-26
 
         * Version 1.5.0 released
         ========================
 
+        Handle On/Off observations by cspull (#2260)
         Add "statistic" parameter to all likelihood tools and scripts (#2237)
         Rename ctlike "stat" parameter to "statistic" (#2237)
         Enable handling of On/Off observations in csspec (#2231)

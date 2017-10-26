@@ -20,13 +20,14 @@
 import math
 import gammalib
 import ctools
+import cscripts
 
 
 # ===================== #
 # Simulate observations #
 # ===================== #
 def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
-        emin=None, emax=None, nbins=0, addbounds=False,
+        emin=None, emax=None, nbins=0, onsrc=None, onrad=0.2, addbounds=False,
         binsz=0.05, npix=200, proj='TAN', coord='GAL'):
     """
     Simulate events for all observations in the container
@@ -59,6 +60,10 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
         Maximum energy of counts cube for binned (TeV)
     nbins : int, optional
         Number of energy bins (0=unbinned)
+    onsrc : str, optional
+        Name of source for On region (None if no On/Off obs. is used)
+    onrad : float, optional
+        Radius for On region (deg)
     addbounds : bool, optional
         Add boundaries at observation energies
     binsz : float, optional
@@ -105,61 +110,97 @@ def sim(obs, log=False, debug=False, chatter=2, edisp=False, seed=0,
                 emin = min(run.events().ebounds().emin().TeV(), emin)
                 emax = max(run.events().ebounds().emax().TeV(), emax)
 
-        # Allocate ctbin application and set parameters
-        binning = ctools.ctbin(obssim.obs())
-        binning['ebinalg']  = 'LOG'
-        binning['emin']     = emin
-        binning['emax']     = emax
-        binning['enumbins'] = nbins
-        binning['usepnt']   = True # Use pointing for map centre
-        binning['nxpix']    = npix
-        binning['nypix']    = npix
-        binning['binsz']    = binsz
-        binning['coordsys'] = coord
-        binning['proj']     = proj
-        binning['chatter']  = chatter
-        binning['debug']    = debug
+        # If a On source is specified then create On/Off observations
+        if onsrc != None:
 
-        # Optionally open the log file
-        if log:
-            binning.logFileOpen()
+            # Extract source position from model
+            model = obssim.obs().models()[onsrc]
+            ra    = model['RA'].value()
+            dec   = model['DEC'].value()
 
-        # Run ctbin application. This will loop over all observations in
-        # the container and bin the events in counts maps
-        binning.run()
+            # Allocate csphagen application and set parameters
+            phagen = cscripts.csphagen(obssim.obs())
+            phagen['ebinalg']     = 'LOG'
+            phagen['emin']        = emin
+            phagen['emax']        = emax
+            phagen['enumbins']    = nbins
+            phagen['coordsys']    = 'CEL'
+            phagen['ra']          = ra
+            phagen['dec']         = dec
+            phagen['rad']         = onrad
+            phagen['stack']       = False
+            phagen['inexclusion'] = 'NONE'
 
-        # If we have multiple input observations then create stacked response
-        # cubes and append them to the observation
-        if len(obssim.obs()) > 1:
+            # Optionally open the log file
+            if log:
+                phagen.logFileOpen()
 
-            # Get stacked response (use pointing for map centre)
-            response = get_stacked_response(obssim.obs(), None, None,
-                                            binsz=binsz, nxpix=npix, nypix=npix,
-                                            emin=emin, emax=emax, enumbins=nbins,
-                                            edisp=edisp,
-                                            coordsys=coord, proj=proj,
-                                            addbounds=addbounds,
-                                            log=log, debug=debug,
-                                            chatter=chatter)
+            # Run csphagen application
+            phagen.run()
 
-            # Set stacked response
-            if edisp:
-                binning.obs()[0].response(response['expcube'],
-                                          response['psfcube'],
-                                          response['edispcube'],
-                                          response['bkgcube'])
-            else:
-                binning.obs()[0].response(response['expcube'],
-                                          response['psfcube'],
-                                          response['bkgcube'])
+            # Make a deep copy of the observation that will be returned
+            # (the csphagen object will go out of scope one the function is
+            # left)
+            obs = phagen.obs().copy()
 
-            # Set new models
-            binning.obs().models(response['models'])
+        # ... otherwise use binned observations
+        else:
 
-        # Make a deep copy of the observation that will be returned
-        # (the ctbin object will go out of scope one the function is
-        # left)
-        obs = binning.obs().copy()
+            # Allocate ctbin application and set parameters
+            binning = ctools.ctbin(obssim.obs())
+            binning['ebinalg']  = 'LOG'
+            binning['emin']     = emin
+            binning['emax']     = emax
+            binning['enumbins'] = nbins
+            binning['usepnt']   = True # Use pointing for map centre
+            binning['nxpix']    = npix
+            binning['nypix']    = npix
+            binning['binsz']    = binsz
+            binning['coordsys'] = coord
+            binning['proj']     = proj
+            binning['chatter']  = chatter
+            binning['debug']    = debug
+
+            # Optionally open the log file
+            if log:
+                binning.logFileOpen()
+
+            # Run ctbin application. This will loop over all observations in
+            # the container and bin the events in counts maps
+            binning.run()
+
+            # If we have multiple input observations then create stacked response
+            # cubes and append them to the observation
+            if len(obssim.obs()) > 1:
+
+                # Get stacked response (use pointing for map centre)
+                response = get_stacked_response(obssim.obs(), None, None,
+                                                binsz=binsz, nxpix=npix, nypix=npix,
+                                                emin=emin, emax=emax, enumbins=nbins,
+                                                edisp=edisp,
+                                                coordsys=coord, proj=proj,
+                                                addbounds=addbounds,
+                                                log=log, debug=debug,
+                                                chatter=chatter)
+
+                # Set stacked response
+                if edisp:
+                    binning.obs()[0].response(response['expcube'],
+                                             response['psfcube'],
+                                             response['edispcube'],
+                                             response['bkgcube'])
+                else:
+                    binning.obs()[0].response(response['expcube'],
+                                              response['psfcube'],
+                                              response['bkgcube'])
+
+                # Set new models
+                binning.obs().models(response['models'])
+
+            # Make a deep copy of the observation that will be returned
+            # (the ctbin object will go out of scope one the function is
+            # left)
+            obs = binning.obs().copy()
 
     else:
 

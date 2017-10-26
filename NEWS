@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-21 October 2017
+26 October 2017
 
 
 Introduction
@@ -227,6 +227,10 @@ curve generation (#2237).
 
 cspull - Generate pull distributions
 ------------------------------------
+The script now handles On/Off observation. The parameters "onsrc" and "onrad"
+were added to allow specifying the On region test source and On region radius
+(#2260).
+
 The script now derived from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the pull
 distribution generation (#2237).
