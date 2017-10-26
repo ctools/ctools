@@ -223,8 +223,11 @@ void ctpsfcube::run(void)
     // Write header into logger
     log_header1(TERSE, "Generate PSF cube");
 
+    // Set pointer to logger dependent on chattiness
+    GLog* logger = (logNormal()) ? &log : NULL;    
+
     // Fill PSF cube
-    m_psfcube.fill(m_obs, &log);
+    m_psfcube.fill(m_obs, logger);
 
     // Write PSF cube into logger
     log_string(EXPLICIT, m_psfcube.print(m_chatter));
