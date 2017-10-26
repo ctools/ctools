@@ -65,7 +65,7 @@ class cspull(ctools.csobservation):
         enumbins = self['enumbins'].integer()
 
         # Query parameters for On/Off observation
-        if len(self['onsrc'].string()) > 0:
+        if gammalib.toupper(self['onsrc'].string()) != 'NONE':
             self['onrad'].real()
 
         # Query parameters for binned if requested
@@ -112,7 +112,7 @@ class cspull(ctools.csobservation):
         # Extract information from observation
         if obs.classname() == 'GCTAOnOffObservation':
             emin = obs.on_spec().ebounds().emin().TeV()
-            emax = obs.on_spec().ebounds().emin().TeV()
+            emax = obs.on_spec().ebounds().emax().TeV()
             mode = 'On/Off'
         else:
             emin = obs.events().ebounds().emin().TeV()
@@ -164,7 +164,7 @@ class cspull(ctools.csobservation):
         coordsys = 'CEL'
 
         # If we have a On source name then set On region radius
-        if len(onsrc) > 0:
+        if gammalib.toupper(onsrc) != 'NONE':
             onrad = self['onrad'].real()
             emin  = self['emin'].real()
             emax  = self['emax'].real()

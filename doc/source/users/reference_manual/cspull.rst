@@ -41,6 +41,12 @@ General parameters
 ``inmodel [file]``
     Input model XML file.
 
+``onsrc [string]``
+    Name of On source (only for On/Off analysis; specify ``NONE`` for other analyses).
+
+``onrad [real]``
+    Radius of On region (deg).
+
 ``caldb [string]``
     Calibration database.
 
