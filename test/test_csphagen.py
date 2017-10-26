@@ -339,7 +339,7 @@ class Test(test):
         # Return
         return
 
-    def _check_rmf(self, filename, bins, etruebins=114):
+    def _check_rmf(self, filename, bins, etruebins=102):
         """
         Check RMF file
         """
@@ -386,7 +386,7 @@ class Test(test):
         # OGIP files
         self._check_pha(filenameroot + '_pha_on.fits', bins)
         self._check_pha(filenameroot + '_pha_off.fits', bins)
-        self._check_arf(filenameroot + '_arf.fits', 114)
+        self._check_arf(filenameroot + '_arf.fits', 102)
         self._check_rmf(filenameroot + '_rmf.fits', bins)
 
         # Optionally check for regions

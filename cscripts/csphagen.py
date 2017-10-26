@@ -226,7 +226,7 @@ class csphagen(ctools.csobservation):
         emax = self._ebounds.emax() * 1.2
         if emin.TeV() < self['etruemin'].real():
             emin = gammalib.GEnergy(self['etruemin'].real(), 'TeV')
-        if emax.TeV() < self['etruemax'].real():
+        if emax.TeV() > self['etruemax'].real():
             emax = gammalib.GEnergy(self['etruemax'].real(), 'TeV')
 
         # Determine number of energy bins

@@ -60,6 +60,8 @@ class Test(test):
         self.append(self._test_sim_stacked_edisp,
                     'Test obsutils.sim() function in stacked mode with energy '
                     'dispersion')
+        self.append(self._test_sim_onoff,
+                    'Test obsutils.sim() function in On/Off mode')
         self.append(self._test_sim_log,
                     'Test obsutils.sim() function with logging switched on')
         self.append(self._test_set_obs,
@@ -227,6 +229,68 @@ class Test(test):
         res[0].response().apply_edisp(True)
         self.test_assert(res[0].response().use_edisp(),
                          'Check energy dispersion usage')
+
+        # Return
+        return
+
+    # Test sim() function in On/Off mode
+    def _test_sim_onoff(self):
+        """
+        Test sim() function in On/Off mode
+        """
+        # Set-up observation container
+        pnt = gammalib.GSkyDir()
+        pnt.radec_deg(83.63, 22.51)
+        obs = gammalib.GObservations()
+        run = obsutils.set_obs(pnt, duration=100.0, emin=1.0, emax=10.0, obsid='0')
+        obs.append(run)
+        pnt.radec_deg(83.63, 21.51)
+        run = obsutils.set_obs(pnt, duration=100.0, emin=1.0, emax=10.0, obsid='1')
+        obs.append(run)
+        obs.models(gammalib.GModels(self._model))
+
+        # Simulate stacked observations
+        res = obsutils.sim(obs, onsrc='Crab', nbins=5)
+
+        # Check simulation results
+        self.test_value(res.size(), 2, 'Check number of observations')
+        self.test_value(res.models().size(), 2, 'Check number of models')
+        self.test_value(res.nobserved(), 46, 'Check number of observed events')
+        self.test_value(res.npred(), 0.0, 'Check number of predicted events')
+        self.test_value(res[0].on_spec().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy of On spectrum')
+        self.test_value(res[0].on_spec().ebounds().emax().TeV(), 10.0,
+                        'Check minimum energy of On spectrum')
+        self.test_value(res[0].on_spec().ebounds().size(), 5,
+                        'Check number of energy bins of On spectrum')
+        self.test_value(res[0].on_spec().counts(), 24,
+                        'Check number of events in of On spectrum')
+        self.test_value(res[0].off_spec().ebounds().emin().TeV(), 1.0,
+                        'Check minimum energy of Off spectrum')
+        self.test_value(res[0].off_spec().ebounds().emax().TeV(), 10.0,
+                        'Check minimum energy of Off spectrum')
+        self.test_value(res[0].off_spec().ebounds().size(), 5,
+                        'Check number of energy bins of Off spectrum')
+        self.test_value(res[0].off_spec().counts(), 2,
+                        'Check number of events in of Off spectrum')
+        self.test_value(res[0].arf().ebounds().emin().TeV(), 0.5,
+                        'Check minimum energy of ARF')
+        self.test_value(res[0].arf().ebounds().emax().TeV(), 12.0,
+                        'Check minimum energy of ARF')
+        self.test_value(res[0].arf().ebounds().size(), 42,
+                        'Check number of energy bins of ARF')
+        self.test_value(res[0].rmf().etrue().emin().TeV(), 0.5,
+                        'Check minimum true energy of RMF')
+        self.test_value(res[0].rmf().etrue().emax().TeV(), 12.0,
+                        'Check minimum true energy of RMF')
+        self.test_value(res[0].rmf().etrue().size(), 42,
+                        'Check number of true energy bins of RMF')
+        self.test_value(res[0].rmf().emeasured().emin().TeV(), 1.0,
+                        'Check minimum reconstructed energy of RMF')
+        self.test_value(res[0].rmf().emeasured().emax().TeV(), 10.0,
+                        'Check minimum reconstructed energy of RMF')
+        self.test_value(res[0].rmf().emeasured().size(), 5,
+                        'Check number of reconstructed energy bins of RMF')
 
         # Return
         return
