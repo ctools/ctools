@@ -108,6 +108,12 @@ General parameters
     Specifies whether multiple observations should be stacked (``yes``) or
     whether run-wise PHA, ARF and RMF files should be produced (``no``).
 
+``(etruemin = 0.01) [real]``
+    Minimum true energy (TeV).
+
+``(etruemax = 0.01) [real]``
+    Maximum true energy (TeV).
+
 ``(etruebins = 30) [integer]``
     Number of bins per decade for true energy bins.
 

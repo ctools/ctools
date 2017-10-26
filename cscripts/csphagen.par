@@ -42,6 +42,8 @@ bkgmethod, s, h, REFLECTED,REFLECTED,, "Method for background estimation"
 bkgregmin, i, h, 2,1,1000, "Minimum number of background regions"
 maxoffset, r, h, 4.0,,, "Maximum offset of source from camera center to accept observation"
 stack,     b, a, no,,, "Stack multiple observations into single PHA, ARF and RMF files?"
+etruemin,  r, h, 0.01,,, "Minimum true energy (TeV)"
+etruemax,  r, h, 300.0,,, "Maximum true energy (TeV)"
 etruebins, i, h, 30,,, "Number of bins per decade for true energy bins"
 
 #

@@ -183,6 +183,9 @@ class csphagen(ctools.csobservation):
         """
         Set models in observation container
 
+        The method replaces all "CTA" background models by "CTAOnOff"
+        background models.
+
         Parameters
         ----------
         obs : `~gammalib.GObservations()`
@@ -219,8 +222,12 @@ class csphagen(ctools.csobservation):
             True energy boundaries
         """
         # Determine minimum and maximum energies
-        emin = self._ebounds.emin()
-        emax = self._ebounds.emax()
+        emin = self._ebounds.emin() * 0.5
+        emax = self._ebounds.emax() * 1.2
+        if emin.TeV() < self['etruemin'].real():
+            emin = gammalib.GEnergy(self['etruemin'].real(), 'TeV')
+        if emax.TeV() < self['etruemax'].real():
+            emax = gammalib.GEnergy(self['etruemax'].real(), 'TeV')
 
         # Determine number of energy bins
         n_decades = (emax.log10TeV() - emin.log10TeV())
@@ -228,6 +235,14 @@ class csphagen(ctools.csobservation):
 
         # Set energy boundaries
         ebounds = gammalib.GEbounds(n_bins, emin, emax)
+
+        # Write header
+        self._log_header1(gammalib.TERSE, 'True energy binning')
+
+        # Log true energy bins
+        for i in range(ebounds.size()):
+            value = '%s - %s' % (str(ebounds.emin(i)), str(ebounds.emax(i)))
+            self._log_value(gammalib.TERSE, 'Bin %d' % (i+1), value)
 
         # Return energy boundaries
         return ebounds
@@ -248,6 +263,18 @@ class csphagen(ctools.csobservation):
         # Write observation into logger
         self._log_observations(gammalib.NORMAL, self.obs(), 'Observation')
 
+        # Set true energy bins
+        etrue_ebounds = self._etrue_ebounds()
+
+        # Write header
+        self._log_header1(gammalib.TERSE, 'Spectral binning')
+
+        # Log reconstructed energy bins
+        for i in range(self._ebounds.size()):
+            value = '%s - %s' % (str(self._ebounds.emin(i)),
+                                 str(self._ebounds.emax(i)))
+            self._log_value(gammalib.TERSE, 'Bin %d' % (i+1), value)
+
         # Write header
         self._log_header1(gammalib.NORMAL,
                           'Generation of source and background spectra')
@@ -255,7 +282,6 @@ class csphagen(ctools.csobservation):
         # Initialise run variables
         outobs         = gammalib.GObservations()
         self._bkg_regs = []
-        etrue_ebounds  = self._etrue_ebounds()
 
         # Loop through observations and generate pha, arf, rmf files
         for obs in self.obs():
@@ -313,7 +339,7 @@ class csphagen(ctools.csobservation):
         # Write header
         self._log_header1(gammalib.TERSE, 'Save data')
 
-        # Get XMK output filename, prefix and clobber
+        # Get XML output filename, prefix and clobber
         outobs  = self['outobs'].string()
         prefix  = self['prefix'].string()
         clobber = self['clobber'].boolean()

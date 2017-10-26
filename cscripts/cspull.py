@@ -61,12 +61,15 @@ class cspull(ctools.csobservation):
         # Set observation statistic
         self._set_obs_statistic(gammalib.toupper(self['statistic'].string()))
 
+        # Get number of energy bins
+        enumbins = self['enumbins'].integer()
+
         # Query parameters for On/Off observation
         if len(self['onsrc'].string()) > 0:
             self['onrad'].real()
 
         # Query parameters for binned if requested
-        elif self['enumbins'].integer() > 0:
+        elif enumbins > 0:
             self['npix'].integer()
             self['binsz'].real()
             self['coordsys'].string()
