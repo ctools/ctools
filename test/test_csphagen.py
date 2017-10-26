@@ -339,7 +339,7 @@ class Test(test):
         # Return
         return
 
-    def _check_rmf(self, filename, bins):
+    def _check_rmf(self, filename, bins, etruebins=91):
         """
         Check RMF file
         """
@@ -363,8 +363,8 @@ class Test(test):
         # Check FITS table structure
         self.test_value(table.ncols(), len(cols),
                         'Check for %d columns in RMF table' % len(cols))
-        self.test_value(table.nrows(), bins,
-                        'Check for %d rows in RMF table' % bins)
+        self.test_value(table.nrows(), etruebins,
+                        'Check for %d rows in RMF table' % etruebins)
         for col in cols:
             self.test_assert(table.contains(col),
                              'FITS file contains "' + col + '" column')
@@ -386,7 +386,7 @@ class Test(test):
         # OGIP files
         self._check_pha(filenameroot + '_pha_on.fits', bins)
         self._check_pha(filenameroot + '_pha_off.fits', bins)
-        self._check_arf(filenameroot + '_arf.fits', bins)
+        self._check_arf(filenameroot + '_arf.fits', 91)
         self._check_rmf(filenameroot + '_rmf.fits', bins)
 
         # Optionally check for regions
