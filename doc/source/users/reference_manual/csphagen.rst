@@ -108,6 +108,9 @@ General parameters
     Specifies whether multiple observations should be stacked (``yes``) or
     whether run-wise PHA, ARF and RMF files should be produced (``no``).
 
+``(etruebins = 30) [integer]``
+    Number of bins per decade for true energy bins.
+
 
 Standard parameters
 -------------------

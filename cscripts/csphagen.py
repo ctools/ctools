@@ -121,7 +121,7 @@ class csphagen(ctools.csobservation):
 
         Parameters
         ----------
-        obs : `~gammalib.GObservation()`
+        obs : `~gammalib.GCTAObservation()`
             CTA observation
 
         Returns
@@ -147,7 +147,7 @@ class csphagen(ctools.csobservation):
             if self._srcshape == 'CIRCLE':
                 # angular separation of reflected regions wrt camera center
                 # and number
-                alpha = 1.05 * 2 * self._rad / offset
+                alpha = 1.05 * 2.0 * self._rad / offset
                 # 1.05 ensures background regions do not overlap due to
                 # numerical precision issues
                 N = int(2.0 * math.pi / alpha)
@@ -179,6 +179,60 @@ class csphagen(ctools.csobservation):
         # Return reflected regions
         return regions
 
+    def _set_models(self, obs):
+        """
+        Set models in observation container
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations()`
+            Observation container
+
+        Returns
+        -------
+        obs : `~gammalib.GObservations()`
+            Observation container
+        """
+        # Initialise model container
+        models = gammalib.GModels()
+
+        # Loop over all models and replace CTA background model by CTAOnOff
+        # background model
+        for model in self.obs().models():
+            if 'GCTA' in model.classname() and 'CTA' in model.instruments():
+                model.instruments('CTAOnOff')
+            models.append(model)
+
+        # Append model to observation container
+        obs.models(models)
+
+        # Return observation container
+        return obs
+
+    def _etrue_ebounds(self):
+        """
+        Set true energy boundaries
+
+        Returns
+        -------
+        ebounds : `~gammalib.GEbounds()`
+            True energy boundaries
+        """
+        # Determine minimum and maximum energies
+        emin = self._ebounds.emin()
+        emax = self._ebounds.emax()
+
+        # Determine number of energy bins
+        n_decades = (emax.log10TeV() - emin.log10TeV())
+        n_bins    = int(n_decades * float(self['etruebins'].integer())) + 1
+
+        # Set energy boundaries
+        ebounds = gammalib.GEbounds(n_bins, emin, emax)
+
+        # Return energy boundaries
+        return ebounds
+
+
     # Public methods
     def run(self):
         """
@@ -201,6 +255,7 @@ class csphagen(ctools.csobservation):
         # Initialise run variables
         outobs         = gammalib.GObservations()
         self._bkg_regs = []
+        etrue_ebounds  = self._etrue_ebounds()
 
         # Loop through observations and generate pha, arf, rmf files
         for obs in self.obs():
@@ -217,7 +272,7 @@ class csphagen(ctools.csobservation):
             # and append it to the output container
             if bkg_reg.size() >= self['bkgregmin'].integer():
                 onoff = gammalib.GCTAOnOffObservation(obs, self._src_dir,
-                                                      self._ebounds,
+                                                      etrue_ebounds,
                                                       self._ebounds,
                                                       self._src_reg,
                                                       bkg_reg)
@@ -241,6 +296,9 @@ class csphagen(ctools.csobservation):
             # Put stacked observations in output container
             outobs = gammalib.GObservations()
             outobs.append(stacked_obs)
+
+        # Set models in output container
+        outobs = self._set_models(outobs)
 
         # Set observation container
         self.obs(outobs)
