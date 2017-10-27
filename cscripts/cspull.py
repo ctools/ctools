@@ -153,15 +153,16 @@ class cspull(ctools.csobservation):
 
         # Get number of energy bins and On source name and initialise
         # some parameters
-        nbins    = self['enumbins'].integer()
-        onsrc    = self['onsrc'].string()
-        edisp    = self['edisp'].boolean()
-        emin     = None
-        emax     = None
-        binsz    = 0.0
-        npix     = 0
-        proj     = 'TAN'
-        coordsys = 'CEL'
+        nbins     = self['enumbins'].integer()
+        onsrc     = self['onsrc'].string()
+        edisp     = self['edisp'].boolean()
+        statistic = self['statistic'].string()
+        emin      = None
+        emax      = None
+        binsz     = 0.0
+        npix      = 0
+        proj      = 'TAN'
+        coordsys  = 'CEL'
 
         # If we have a On source name then set On region radius
         if gammalib.toupper(onsrc) != 'NONE':
@@ -214,16 +215,18 @@ class cspull(ctools.csobservation):
             models = self.obs().models()
             for model in models:
                 like = ctools.cterror(obs)
-                like['srcname'] = model.name()
-                like['edisp']   = edisp
-                like['debug']   = self._logDebug()
-                like['chatter'] = self['chatter'].integer()
+                like['srcname']   = model.name()
+                like['edisp']     = edisp
+                like['statistic'] = statistic
+                like['debug']     = self._logDebug()
+                like['chatter']   = self['chatter'].integer()
                 like.run()
         else:
             like = ctools.ctlike(obs)
-            like['edisp']   = edisp
-            like['debug']   = self._logDebug()
-            like['chatter'] = self['chatter'].integer()
+            like['edisp']     = edisp
+            like['statistic'] = statistic
+            like['debug']     = self._logDebug()
+            like['chatter']   = self['chatter'].integer()
             like.run()
 
         # Store results

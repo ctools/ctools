@@ -28,12 +28,9 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-//#include <cstdlib>         // std::getenv() function
-//#include <cstdio>          // std::fopen(), etc. functions
 #include "GammaLib.hpp"
 #include "GCTALib.hpp"
 #include "support.hpp"
-//#include "GTools.hpp"
 
 /* __ Method name definitions ____________________________________________ */
 
