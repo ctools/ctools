@@ -21,6 +21,23 @@ region. You can do this using the :ref:`ctskymap` tool.
 
 .. code-block:: bash
 
+    $ ctskymap
+    Input event list or observation definition XML file [events.fits] obs.xml
+    First coordinate of image center in degrees (RA or galactic l) (0-360) [83.63] 350.85
+    Second coordinate of image center in degrees (DEC or galactic b) (-90-90) [22.01] 58.815
+    Projection method (AIT|AZP|CAR|GLS|MER|MOL|SFL|SIN|STG|TAN) [CAR] TAN
+    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+    Image scale (in degrees/pixel) [0.02]
+    Size of the X axis in pixels [200] 250
+    Size of the Y axis in pixels [200] 250
+    Lower energy limit (TeV) [0.1]
+    Upper energy limit (TeV) [100.0] 50.
+    Background subtraction method (NONE|IRF|RING) [NONE] RING
+    Source region radius for estimating on-counts (degrees) [0.0] 0.2
+    Inner ring radius (degrees) [0.6]
+    Outer ring radius (degrees) [0.8]
+    Output skymap file [skymap.fits]
+
 In the spirit of the classical analysis we have chosen to derive the background
 using the RING method. You need to choose inner/outer radii such that you avoid
 emission from a source when deriving the background. This means that the inner
@@ -30,4 +47,12 @@ three images of the region around the source. The primary image shows the excess
 counts, i.e., the total number of counts minus the estimated background counts.
 The BACKGROUND image shows the number of estimated background counts. Finally,
 the SIGNIFICANCE image shows the significance of the excess, calculated
-according to Li&Ma
+according to Li&Ma Eq. 17.
+
+.. figure:: classic_analysis_skymap.png
+   :width: 400px
+   :align: center
+
+   *Sky map of the significance of a gamma-ray excess around Cas A. The green circle shows a circular region with 0.2 deg radius centered at the source's position.*
+
+Bla bla
