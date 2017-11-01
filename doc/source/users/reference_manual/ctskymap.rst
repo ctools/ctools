@@ -90,7 +90,7 @@ Background subtraction configuration parameters
 ``outradius [real]``
     Outer ring radius for RING subtraction (in degrees).
 
-``(regfile = NONE) [file]``
+``(inexclusion = NONE) [file]``
     Exclusion region file as either a FITS map or DS9 region file.
 
 
