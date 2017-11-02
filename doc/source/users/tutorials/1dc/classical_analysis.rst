@@ -183,8 +183,15 @@ computation.
 
 .. note::
 
+    The parameters specified control the energy binning of the count spectra in
+    *reconstructed* energy. For the computation of the instrument response we
+    need a fine binning, which is controlled by the hidden parameters
+    ``etruemin``, ``etruemax``, and ``etruebins``.
+
+.. note::
+
     The first part of the FITS files names (and a full path to the desired
-    location) can be set using the hiddeg ``prefix`` parameter of
+    location) can be set using the hidden ``prefix`` parameter of
     :ref:`csphagen`. If you decide not to stack multiple observations the string
     ``stacked`` with be replaced by the observation id for each of the original
     observations.
@@ -208,3 +215,108 @@ using the :ref:`csobsinfo` script).
     closer to the source, you can do this either at the observation selection
     level (see :ref:`csobsselect`), or directly in :ref:`csphagen` via the
     hidden ``maxoffset`` parameter.
+
+Next we need a model to fit to the observations. It must contain a model for the
+source, and, optionally, a model for the background. Here is what such a
+model looks like.
+
+.. code-block:: bash
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <source_library title="source library">
+      <source name="Cassiopeia A" type="PointSource">
+        <spectrum type="PowerLaw">
+          <parameter name="Prefactor" value="144.9999950838" error="0" scale="1e-20" min="0" free="1" />
+          <parameter name="Index" value="2.75" error="-0" scale="-1" min="-10" max="10" free="1" />
+          <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
+        </spectrum>
+        <spatialModel type="PointSource">
+          <parameter name="RA" value="350.850006001541" error="0" scale="1" free="0" />
+          <parameter name="DEC" value="58.8150032295771" error="0" scale="1" free="0" />
+        </spatialModel>
+      </source>
+      <source name="Background model" type="CTAIrfBackground" instrument="CTAOnOff">
+        <spectrum type="PowerLaw">
+          <parameter name="Prefactor" value="1" error="0" scale="1" min="0.001" max="1000" free="1" />
+          <parameter name="Index" value="0" error="0" scale="1" min="-5" max="5" free="1" />
+          <parameter name="Scale" value="1" scale="1000000" min="0.01" max="1000" free="0" />
+        </spectrum>
+      </source>
+
+We can now fit the model to the data using :ref:`ctlike`.
+
+.. code-block:: bash
+
+    $ ctlike
+    Input event list, counts cube or observation definition XML file [events.fits] onoff_obs.xml
+    Input model definition XML file [$CTOOLS/share/models/crab.xml] model.xml
+    Output model definition XML file [crab_results.xml] CasA_results.xml
+
+The output file ``CasA_results.xml`` contains the best fit parameter values.
+
+.. code-block:: bash
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <source_library title="source library">
+      <source name="Cassiopeia A" type="PointSource">
+        <spectrum type="PowerLaw">
+          <parameter name="Prefactor" value="147.86715202969" error="4.01233122692211" scale="1e-20" min="0" free="1" />
+          <parameter name="Index" value="2.73053827634155" error="0.0189867116394551" scale="-1" min="-10" max="10" free="1" />
+          <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
+        </spectrum>
+        <spatialModel type="PointSource">
+          <parameter name="RA" value="350.850006001541" scale="1" free="0" />
+          <parameter name="DEC" value="58.8150032295771" scale="1" free="0" />
+        </spatialModel>
+      </source>
+      <source name="Background model" type="CTAIrfBackground" instrument="CTAOnOff">
+        <spectrum type="PowerLaw">
+          <parameter name="Prefactor" value="1.00396014959491" error="0.00554863257799099" scale="1" min="0.001" max="1000" free="1" />
+          <parameter name="Index" value="-0.598672934981114" error="0.00337357936472602" scale="1" min="-5" max="5" free="1" />
+          <parameter name="Scale" value="1" scale="1000000" min="0.01" max="1000" free="0" />
+        </spectrum>
+      </source>
+    </source_library>
+
+.. note::
+
+    Check the :ref:`ctlike` log file (by default ``ctlike.log``) to learn
+    about the fit convergence and investigate any issues.
+
+:ref:`ctlike` has a hidden parameter called ``statistic`` that sets the
+statistic used for the fit.
+
+- The DEFAULT for OnOff osbervations is CSTAT, i.e., Poisson signal and Poisson
+  background. A model for the signal and a model for the background are jointly
+  fit to the On and Off spectra.
+- WSTAT is a special case of CSTAT, Poisson signal with Poisson background, in
+  which you do not need to know a spectral model for the background and to have
+  free parameters associated with it. The background rate in each energy bin is
+  treated as a nuisance parameter, derived from the On and Off counts by
+  profiling the likelihood function. Beware that the profiling may yield
+  unphysical results (negative background counts) if the number of events in the
+  On and Off spectra are very low or zero. In this case a null number of
+  expected background events must be enforced, which can result in a bias on the
+  source's parameters. You can address this issue by stacking
+  multiple observations, using a coarser binning, or using CSTAT instead. See
+  the `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
+  for more information.
+- You can also use CHI2, a classical chi square, i.e., a Gaussian signal and
+  Gaussian background. As for CSTAT, a model for the signal and a model for the
+  background are jointly fit to the On and Off spectra.
+
+The :ref:`ctbutterfly` tool and :ref:`csspec` script can now be used to extract
+the best-fit source spectrum.
+
+.. code-block:: bash
+
+    $ ctbutterfly
+    Input event list, counts cube or observation definition XML file [events.fits] onoff_obs.xml
+    Source of interest [Crab] Cassiopeia A
+    Input model definition XML file [$CTOOLS/share/models/crab.xml] CasA_results.xml
+    Lower energy limit (TeV) [0.1]
+    Upper energy limit (TeV) [100.0] 50.
+    Output ASCII file [butterfly.txt]
+
+.. code-block:: bash
+
