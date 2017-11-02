@@ -85,7 +85,7 @@ In general you will need to iterate until you have found all the significant
 gamma-ray emission regions and added them to the exlusion regions/map, which is
 then necessary for spectral extraction.
 
-We rerun :ref:`ctskymap` with the new parameters.
+We rerun :ref:`ctskymap` with the exclusion region.
 
 .. code-block:: bash
 
@@ -185,8 +185,8 @@ computation.
 
     The parameters specified control the energy binning of the count spectra in
     *reconstructed* energy. For the computation of the instrument response we
-    need a fine binning, which is controlled by the hidden parameters
-    ``etruemin``, ``etruemax``, and ``etruebins``.
+    need a fine binning in *true* energy, which is controlled by the hidden
+    parameters ``etruemin``, ``etruemax``, and ``etruebins``.
 
 .. note::
 
@@ -199,9 +199,9 @@ computation.
 There are also come ancillary `ds9 <http://ds9.si.edu>`_ region files, that show
 the On region and the Off regions for each observation, ``onoff_on.reg`` and
 ``onoff_xxx_off.reg`` (with xxx observation id), respectively. Below there is
-a skymap where you can see the position of the On and Off regions for a few
-observations, along with the pointing directions of the observations (extracted
-using the :ref:`csobsinfo` script).
+a skymap where you can see the pointing directions along with the position of
+the On and Off regions for a few observations (extracted using the
+:ref:`csobsinfo` script).
 
 .. figure:: classic_analysis_skymap_onoff.png
    :width: 400px
@@ -216,7 +216,7 @@ using the :ref:`csobsinfo` script).
     level (see :ref:`csobsselect`), or directly in :ref:`csphagen` via the
     hidden ``maxoffset`` parameter.
 
-Next we need a model to fit to the observations. It must contain a model for the
+Next we need a model to be fit to the observations. It must contain a model for the
 source, and, optionally, a model for the background. Here is what such a
 model looks like.
 
@@ -320,3 +320,22 @@ the best-fit source spectrum.
 
 .. code-block:: bash
 
+    $ csspec
+    Input event list, counts cube, or observation definition XML file [events.fits] onoff_obs.xml
+    Input model definition XML file [$CTOOLS/share/models/crab.xml] CasA_results.xml
+    Source name [Crab] Cassiopeia A
+    Spectrum generation method (SLICE|NODES|AUTO) [AUTO]
+    Binning algorithm (LIN|LOG|FILE) [LOG]
+    Lower energy limit (TeV) [0.1]
+    Upper energy limit (TeV) [100.0] 50.
+    Number of energy bins [20] 30
+    Output spectrum file [spectrum.fits] CasA-spectrum.fits
+
+The plot below displays the derived spectrum (using the python module
+matplotlib).
+
+.. figure:: classic_analysis_SED.png
+   :width: 400px
+   :align: center
+
+   *Spectral Energy Distribution of the source: the best-fit function over the whole energy range and its uncertainty range, along with the spectral points in energy bins.*
