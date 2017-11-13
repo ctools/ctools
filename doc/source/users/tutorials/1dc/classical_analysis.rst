@@ -12,11 +12,28 @@ Performing a classical analysis
      from the source region and from one or more background regions, and perform
      a 1D maximum likelihood analysis to derive the source's spectrum.
 
-We will assume that you have selected the observations available around your
-source of interest. You can do this using the :ref:`csobsselect` script.
-
 We will derive the spectrum of a source with known position, i.e., the supernova
-remnants Cassiopeia A. First, you want to create a skymap to identify the source
+remnants Cassiopeia A. First, you want to use the :ref:`csobsselect` script to
+preselect observations around our source of interest.
+
+.. code-block:: bash
+
+    csobsselect
+    Input event list or observation definition XML file [obs.xml] $CTA_DATA/obs/obs_gps_baseline.xml
+    Pointing selection region shape (CIRCLE|BOX) [CIRCLE]
+    Coordinate system (CEL - celestial, GAL - galactic) (CEL|GAL) [CEL]
+    Right Ascension of selection centre (deg) (0-360) [83.63] 350.85
+    Declination of selection centre (deg) (-90-90) [22.01] 58.815
+    Radius of selection circle (deg) (0-180) [5.0] 2.5
+    Output observation definition XML file [outobs.xml] obs.xml
+
+.. note::
+
+    We are limiting the offset between pointing and source directions to 2.5 deg
+    for the sake of a faster execution time for the tutorial. You can/should all
+    observations for which the source is within the CTA field of view.
+
+Next, you want to create a skymap to identify the source
 region. You can do this using the :ref:`ctskymap` tool.
 
 .. code-block:: bash
@@ -260,8 +277,8 @@ The output file ``CasA_results.xml`` contains the best fit parameter values.
     <source_library title="source library">
       <source name="Cassiopeia A" type="PointSource">
         <spectrum type="PowerLaw">
-          <parameter name="Prefactor" value="147.86715202969" error="4.01233122692211" scale="1e-20" min="0" free="1" />
-          <parameter name="Index" value="2.73053827634155" error="0.0189867116394551" scale="-1" min="-10" max="10" free="1" />
+          <parameter name="Prefactor" value="145.578961369814" error="4.93849616822191" scale="1e-20" min="0" free="1" />
+          <parameter name="Index" value="2.73210299568622" error="0.0232463328680207" scale="-1" min="-10" max="10" free="1" />
           <parameter name="PivotEnergy" value="1" scale="1000000" free="0" />
         </spectrum>
         <spatialModel type="PointSource">
@@ -271,8 +288,8 @@ The output file ``CasA_results.xml`` contains the best fit parameter values.
       </source>
       <source name="Background model" type="CTAIrfBackground" instrument="CTAOnOff">
         <spectrum type="PowerLaw">
-          <parameter name="Prefactor" value="1.00396014959491" error="0.00554863257799099" scale="1" min="0.001" max="1000" free="1" />
-          <parameter name="Index" value="-0.598672934981114" error="0.00337357936472602" scale="1" min="-5" max="5" free="1" />
+          <parameter name="Prefactor" value="1.01524362954036" error="0.0084255502742701" scale="1" min="0.001" max="1000" free="1" />
+          <parameter name="Index" value="0.00464866003911358" error="0.00484378659736716" scale="1" min="-5" max="5" free="1" />
           <parameter name="Scale" value="1" scale="1000000" min="0.01" max="1000" free="0" />
         </spectrum>
       </source>
@@ -287,23 +304,25 @@ The output file ``CasA_results.xml`` contains the best fit parameter values.
 statistic used for the fit.
 
 - The DEFAULT for OnOff osbervations is CSTAT, i.e., Poisson signal and Poisson
-  background. A model for the signal and a model for the background are jointly
-  fit to the On and Off spectra.
+  background. A spectral model for the signal and a spectral model for the
+  background are jointly fit to the On and Off spectra.
 - WSTAT is a special case of CSTAT, Poisson signal with Poisson background, in
-  which you do not need to know a spectral model for the background and to have
-  free parameters associated with it. The background rate in each energy bin is
-  treated as a nuisance parameter, derived from the On and Off counts by
-  profiling the likelihood function. Beware that the profiling may yield
-  unphysical results (negative background counts) if the number of events in the
-  On and Off spectra are very low or zero. In this case a null number of
-  expected background events must be enforced, which can result in a bias on the
-  source's parameters. You can address this issue by stacking
-  multiple observations, using a coarser binning, or using CSTAT instead. See
-  the `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
+  which you do not need to have a spectral model for the background and
+  free parameters associated with it. The number of background counts in each
+  energy bin is treated as a nuisance parameter, derived from the On and Off
+  counts by profiling the likelihood function. In this case the only assumption
+  is that the background rate spectrum is the same in the On and Off regions.
+  Beware that the profiling may yield unphysical results (negative background
+  counts) if the number of events in the Off spectra are zero.
+  In this case a null number of expected background events must be enforced,
+  which can result in a bias on the source's parameters. You can address this
+  issue by stacking multiple observations, using a coarser energy binning, or
+  using CSTAT instead (if you have a spectral model for the background that is
+  good enough). See the `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
   for more information.
 - You can also use CHI2, a classical chi square, i.e., a Gaussian signal and
-  Gaussian background. As for CSTAT, a model for the signal and a model for the
-  background are jointly fit to the On and Off spectra.
+  Gaussian background. As for CSTAT, a spectral model for the signal and a
+  spectral model for the background are jointly fit to the On and Off spectra.
 
 The :ref:`ctbutterfly` tool and :ref:`csspec` script can now be used to extract
 the best-fit source spectrum.
