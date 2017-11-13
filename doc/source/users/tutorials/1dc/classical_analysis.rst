@@ -224,7 +224,7 @@ the On and Off regions for a few observations (extracted using the
    :width: 400px
    :align: center
 
-   *Sky map of the event counts in a larger region around Cas A (not background subtracted). The green crosses show the pointing directions, the magenta circles the Off regions for three of those observations, and the white circle the On region.*
+   *Sky map of the event counts in a larger region around Cas A (not background subtracted). The green crosses show the pointing directions, the magenta circles the Off regions, and the white circle the On region.*
 
 .. note::
 
