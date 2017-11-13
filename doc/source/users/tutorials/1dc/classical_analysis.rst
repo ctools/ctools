@@ -1,11 +1,11 @@
 .. _classical_analysis:
 
-Performing a classical analysis
---------------------------------
+Performing a classical (On/Off) analysis
+----------------------------------------
 
   .. admonition:: What you will learn
 
-     You will learn how to perform a *classical* atmospheric Cherenkov analysis
+     You will learn how to perform a *classical* analysis
      of a source. In thys type of analysis you do not need to have a 3D (spatial
      and spectral) model of the residual hadronic background. First you create a
      skymap to identify a source region. Then, you extract the measured counts
@@ -30,8 +30,8 @@ preselect observations around our source of interest.
 .. note::
 
     We are limiting the offset between pointing and source directions to 2.5 deg
-    for the sake of a faster execution time for the tutorial. You can/should all
-    observations for which the source is within the CTA field of view.
+    for the sake of a faster execution time for the tutorial. You can/should use
+    all observations for which the source is within the CTA field of view.
 
 Next, you want to create a skymap to identify the source
 region. You can do this using the :ref:`ctskymap` tool.
@@ -62,7 +62,7 @@ centered at the same position. The RING method is fast and robust against linear
 gradients of the background rates, but requires a model (from the :ref:`instrument response functions <glossary_irf>`
 ) of the background acceptance as a function of position in the camera. You
 need to choose inner/outer radii such that you avoid emission from a source when
-deriving the background. This means that the inner radius must be much larger
+deriving the background. This means that the inner radius must be larger
 than the source's size, or the instrument PSF for a pointlike source. This has
 produced a FITS file ``skymap.fits`` that contains three images of the region
 around the source. The primary image shows the excess counts, i.e., the total
@@ -87,7 +87,7 @@ We will recompute the skymap addressing this issue. We will provide an input
 exclusion region to avoid Cas A when calculating the background for any trial
 source position. To this end you can use two exclusion formats: a `ds9 <http://ds9.si.edu>`_ region
 file, or a FITS WCS map. For this example we will use a circular region with
-radius 0.25 dec centered on Cas A. This is what the corresponding ds9 region
+radius 0.2 dec centered on Cas A. This is what the corresponding ds9 region
 file looks like.
 
 .. code-block:: bash
@@ -210,8 +210,8 @@ computation.
     The first part of the FITS files names (and a full path to the desired
     location) can be set using the hidden ``prefix`` parameter of
     :ref:`csphagen`. If you decide not to stack multiple observations the string
-    ``stacked`` with be replaced by the observation id for each of the original
-    observations.
+    ``stacked`` with be replaced in the file names by the observation id for
+    each of the original observations.
 
 There are also come ancillary `ds9 <http://ds9.si.edu>`_ region files, that show
 the On region and the Off regions for each observation, ``onoff_on.reg`` and
@@ -224,7 +224,7 @@ the On and Off regions for a few observations (extracted using the
    :width: 400px
    :align: center
 
-   *Sky map of the event counts around Cas A (not background subtracted). The green crosses show the pointing directions, the magenta circles the Off regions for three of those observations, and the white circle the On region.*
+   *Sky map of the event counts in a larger region around Cas A (not background subtracted). The green crosses show the pointing directions, the magenta circles the Off regions for three of those observations, and the white circle the On region.*
 
 .. note::
 
@@ -312,14 +312,17 @@ statistic used for the fit.
   energy bin is treated as a nuisance parameter, derived from the On and Off
   counts by profiling the likelihood function. In this case the only assumption
   is that the background rate spectrum is the same in the On and Off regions.
-  Beware that the profiling may yield unphysical results (negative background
-  counts) if the number of events in the Off spectra are zero.
-  In this case a null number of expected background events must be enforced,
-  which can result in a bias on the source's parameters. You can address this
-  issue by stacking multiple observations, using a coarser energy binning, or
-  using CSTAT instead (if you have a spectral model for the background that is
-  good enough). See the `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
-  for more information.
+
+.. warning::
+    Beware that the profiling may yield unphysical results (negative background
+    counts) if the number of events in the Off spectra are zero. In this case a
+    null number of expected background events must be enforced,
+    which can result in a bias on the source's parameters. You can address this
+    issue by stacking multiple observations, using a coarser energy binning, or
+    using CSTAT instead (if you have a spectral model for the background that is
+    good enough). See the `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
+    for more information.
+
 - You can also use CHI2, a classical chi square, i.e., a Gaussian signal and
   Gaussian background. As for CSTAT, a spectral model for the signal and a
   spectral model for the background are jointly fit to the On and Off spectra.
