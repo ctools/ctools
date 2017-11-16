@@ -265,3 +265,6 @@ texinfo_documents = [
 doxylink = {
         'doxy' : ('doc/html/doxygen/ctools.tag', 'doxygen/'),
 }
+
+# Add extension to generate docs from Jupyter notebooks
+extensions = ['nbsphinx']
