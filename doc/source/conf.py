@@ -35,6 +35,15 @@ except:
           'WARNING: Please install it to get fully-functional Sphinx docs.\n'
           'WARNING: https://pypi.python.org/pypi/sphinxcontrib-doxylink\n')
 
+try:
+    import nbsphinx
+    extensions += ['nbsphinx']
+except:
+    print('WARNING: Python package `nbsphinx` not found.\n'
+          'WARNING: Please install it to get fully-functional Sphinx docs.\n'
+          'WARNING: https://nbsphinx.readthedocs.io/\n')
+
+
 # Raw files to be copied over
 #sys.path.append(os.path.abspath('exts'))
 #extensions = ['rawfiles']
@@ -268,6 +277,3 @@ texinfo_documents = [
 doxylink = {
         'doxy' : ('doc/html/doxygen/ctools.tag', 'doxygen/'),
 }
-
-# Add extension to generate docs from Jupyter notebooks
-extensions = ['nbsphinx']
