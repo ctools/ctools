@@ -31,6 +31,12 @@ pkgconfigdir = $(libdir)/pkgconfig
 # Files to install in Pkgconfig directory
 pkgconfig_DATA = ctools.pc
 
+# Conda activate directory
+condaactivatedir = $(sysconfdir)/conda/activate.d
+condaactivate_DATA = dev/ctools-activate.sh
+condadeactivatedir = $(sysconfdir)/conda/deactivate.d
+condadeactivate_DATA = dev/ctools-deactivate.sh
+
 # Manual pages to install
 man_MANS = 
 
@@ -46,7 +52,12 @@ docdir = ${datadir}/doc/${PACKAGE}
 
 # Extra files to be distributed in the tar file
 EXTRA_DIST = README.md \
-             doc/Doxyfile doc/source
+             doc/Doxyfile doc/source \
+             dev/testreport.py \
+             dev/ctools-activate.sh dev/ctools-deactivate.sh \
+             dev/conda.recipe/build.sh \
+             dev/conda.recipe/conda_build_config.yaml \
+             dev/conda.recipe/meta.yaml.in
 
 #install-data-local: $(HTML_INSTALL_DATA_TARGETS)
 #uninstall-local: $(HTML_UNINSTALL_DATA_TARGETS)

@@ -1047,6 +1047,7 @@ AC_CONFIG_FILES([Makefile
                  pyext/Makefile
                  pyext/setup.py
                  pyext/ctools/__init__.py
+                 dev/conda.recipe/meta.yaml
                  cscripts/__init__.py
                  cscripts/Makefile
                  caldb/Makefile

@@ -46,6 +46,7 @@ coverage-report-python.xml
 coverage-report-cxx.xml
 ctools-*
 
+dev/conda.recipe/meta.yaml
 doc/html
 doc/man
 src/ctools-setup
