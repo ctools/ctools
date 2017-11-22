@@ -18,10 +18,10 @@ requirements:
     - python  
     - setuptools
     - swig
-    - gammalib >=1.5.0.dev1
+    - gammalib >=1.4.3
   run:
     - python
-    - gammalib >=1.5.0.dev1
+    - gammalib >=1.4.3
 
 about:
   home: http://cta.irap.omp.eu/ctools
