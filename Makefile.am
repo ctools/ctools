@@ -33,9 +33,9 @@ pkgconfig_DATA = ctools.pc
 
 # Conda activate directory
 condaactivatedir = $(sysconfdir)/conda/activate.d
-condaactivate_DATA = dev/ctools-activate.sh
+condaactivate_DATA = dev/01-ctools-activate.sh
 condadeactivatedir = $(sysconfdir)/conda/deactivate.d
-condadeactivate_DATA = dev/ctools-deactivate.sh
+condadeactivate_DATA = dev/00-ctools-deactivate.sh
 
 # Manual pages to install
 man_MANS = 
@@ -54,7 +54,7 @@ docdir = ${datadir}/doc/${PACKAGE}
 EXTRA_DIST = README.md \
              doc/Doxyfile doc/source \
              dev/testreport.py \
-             dev/ctools-activate.sh dev/ctools-deactivate.sh \
+             dev/01-ctools-activate.sh dev/00-ctools-deactivate.sh \
              dev/conda.recipe/build.sh \
              dev/conda.recipe/conda_build_config.yaml \
              dev/conda.recipe/meta.yaml.in

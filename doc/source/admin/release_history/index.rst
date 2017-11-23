@@ -20,6 +20,7 @@ Bug fix releases:
 .. toctree::
    :maxdepth: 1
 
+   ctools 1.4.3 <1.4.3>
    ctools 1.4.2 <1.4.2>
    ctools 1.4.1 <1.4.1>
    ctools 1.3.1 <1.3.1>
