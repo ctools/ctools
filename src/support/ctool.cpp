@@ -1193,6 +1193,44 @@ bool ctool::is_stacked(void)
     return stacked;
 }
 
+/***********************************************************************//**
+ * @brief Query user parameters for On/Off analysis
+ *
+ * @return True if an On/Off analysis should be done.
+ *
+ * Queries the parameter "method", and if this is "ONOFF" signal that an On/
+ * Off analysis is requested. In that case, all necessary input parameters of
+ * csphagen are queried: "inexclusion", "srcshape", "rad", "bkgmethod",
+ * "bkgregmin", "maxoffset", "stack", "etruemin", "etruemax", "etruebins"
+ *
+ * Using this method assures that the parameters are always queried in the
+ * same order.
+ ***************************************************************************/
+bool ctool::is_onoff(void)
+{
+    // initialise onoff flag 
+     bool onoff = false;
+    // query analysis method chosen
+     if ((*this)["method"].string() == "ONOFF"){
+       //modify onoff flag
+       onoff = true;
+       //query csphagen parameters
+       (*this)["inexclusion"].filename();
+       if ((*this)["srcshape"].string() == "CIRCLE"){
+	 (*this)["rad"].real();
+       }
+       if ((*this)["bkgmethod"].string() == "REFLECTED"){
+	 (*this)["bkgregmin"].integer();
+       }
+       (*this)["maxoffset"].real();
+       (*this)["etruemin"].real();
+       (*this)["etruemx"].real();
+       (*this)["etruebins"].integer();
+     }
+
+    // Return stacked flag
+    return onoff;
+}
 
 /***********************************************************************//**
  * @brief Set response for all CTA observations in container
