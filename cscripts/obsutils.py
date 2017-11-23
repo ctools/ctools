@@ -760,3 +760,56 @@ def get_stacked_obs(cls, obs):
 
     # Return new oberservation container
     return new_obs
+
+# ================================= #
+# Get On/Off observation container #
+# ================================= #
+def get_onoff_obs(cls, obs):
+    """
+    Create On/Off observations container from given observations
+
+    Parameters
+    ----------
+    cls : `~ctools.cscript`
+        cscript class
+    obs : `~gammalib.GObservations`
+        Observation container
+
+    Returns
+    -------
+    onoff_obs : `~gammalib.GObservations`
+        Observation container with On/Off observations
+    """
+    # Write header
+    if cls._logExplicit():
+        cls._log.header3('Creating On/Off observations')
+
+    phagen = cscripts.csphagen(obs)
+    phagen['inexclusion'] = cls['inexclusion'].filename()
+    phagen['emin'] = cls['emin'].real()
+    phagen['emax'] = cls['emax'].real()
+    phagen['enumbins'] = cls['enumbins'].integer()
+    phagen['ebinalg'] = 'LOG'
+    phagen['srcshape'] = cls['srcshape'].string()
+    coordsys = cls['coordsys'].string()
+    phagen['coordsys'] = coordsys
+    if coordsys == 'CEL':
+        phagen['ra'] = cls['xref'].real()
+        phagen['dec'] = cls['yref'].real()
+    elif coordsys == 'GAL':
+        phagen['glon'] = cls['xref'].real()
+        phagen['glat'] = cls['yref'].real()
+    phagen['rad'] = cls['rad'].real()
+    bkgmethod = cls['bkgmethod'].string()
+    if bkgmethod == 'REFLECTED':
+        phagen['bkgregmin'] = cls['bkgregmin'].string()
+    phagen['maxoffset'] = cls['maxoffset'].string()
+    phagen['stack'] = True
+    phagen['emintrue'] = cls['emintrue'].real()
+    phagen['emaxtrue'] = cls['emaxtrue'].real()
+    phagen['etruebins'] = cls['etruebins'].integer()
+    phagen.run()
+
+    onoff_obs = phagen.obs().copy()
+
+    return onoff_obs
