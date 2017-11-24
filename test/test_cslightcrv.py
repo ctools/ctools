@@ -245,8 +245,8 @@ class Test(test):
         lcrv['inobs']     = self._offaxis_events
         lcrv['inmodel']   = self._model_onoff
         lcrv['srcname']   = 'Crab'
-        lcrv['caldb']    = self._caldb
-        lcrv['irf']      = self._irf
+        lcrv['caldb']     = self._caldb
+        lcrv['irf']       = self._irf
         lcrv['tbinalg']   = 'LIN'
         lcrv['tmin']      = 'MJD 58849.0008'
         lcrv['tmax']      = 'MJD 58849.0112'

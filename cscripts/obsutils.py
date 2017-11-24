@@ -815,6 +815,12 @@ def get_onoff_obs(cls, obs):
 
     onoff_obs = phagen.obs().copy()
 
-    #need to reset statistic for fit???
+    # On/Off observations are created with CSTAT as default statistic
+    # We will change this to the user choice
+    if cls['statistic'].string() == 'DEFAULT':
+        pass
+    else:
+        for observation in onoff_obs:
+            observation.statistic(cls['statistic'].string())
 
     return onoff_obs
