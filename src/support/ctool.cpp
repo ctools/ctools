@@ -1216,6 +1216,12 @@ bool ctool::is_onoff(void)
        onoff = true;
        //query csphagen parameters
        (*this)["inexclusion"].filename();
+       (*this)["emin"].real();
+       (*this)["emax"].real();
+       (*this)["enumbins"].integer();
+       (*this)["coordsys"].string();
+       (*this)["xref"].real();
+       (*this)["yref"].real();
        if ((*this)["srcshape"].string() == "CIRCLE"){
 	 (*this)["rad"].real();
        }

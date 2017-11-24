@@ -75,6 +75,7 @@ class cslightcrv(ctools.csobservation):
         self._srcname = ''
         self._tbins   = gammalib.GGti()
         self._stacked = False
+        self._onoff = False
         self._fits    = gammalib.GFits()
 
         # Return
@@ -103,8 +104,14 @@ class cslightcrv(ctools.csobservation):
         # Get time boundaries
         self._tbins = self._create_tbounds()
 
+        # Set On/Off analysis flag and query relevant user parameters
+        self._onoff = self._is_onoff()
+
+        # If cube analysis is selected
         # Set stacked analysis flag and query relevant user parameters
-        self._stacked = self._is_stacked()
+        if not self._onoff:
+            self._stacked = self._is_stacked()
+
 
         # Query the hidden parameters, just in case
         self['edisp'].boolean()
@@ -390,6 +397,39 @@ class cslightcrv(ctools.csobservation):
         # Return new oberservation container
         return new_obs
 
+    def _gen_onoff(self, obs):
+        """
+        Create On/Off observations if On/Off analysis was requested
+
+        Parameters
+        ----------
+        obs : `~gammalib.GObservations`
+            Observation container
+
+        Returns
+        -------
+        obs : `~gammalib.GObservations`
+            Observation container with On/Off observations
+        """
+        # Get new observation container with binned observation
+        new_obs = obsutils.get_onoff_obs(self, obs)
+
+        # Extract models
+        models = new_obs.models()
+
+        # Fix background models if required
+        if self['fix_bkg'].boolean():
+            for model in models:
+                if model.classname() != 'GModelSky':
+                    for par in model:
+                        par.fix()
+
+        # Put back models
+        new_obs.models(models)
+
+        # Return new oberservation container
+        return new_obs
+
 
     # Public methods
     def run(self):
@@ -488,6 +528,10 @@ class cslightcrv(ctools.csobservation):
             # an observation container with a single stacked observation.
             if self._stacked:
                 obs = self._bin_observation(obs)
+            # Otherwise if On/Off analysis is requested generate
+            # the On/Off observations and response
+            if self._onoff:
+                obs = self._gen_onoff(obs)
 
             # Header
             self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
