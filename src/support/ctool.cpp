@@ -1230,11 +1230,11 @@ bool ctool::is_onoff(void)
        }
        (*this)["maxoffset"].real();
        (*this)["etruemin"].real();
-       (*this)["etruemx"].real();
+       (*this)["etruemax"].real();
        (*this)["etruebins"].integer();
      }
 
-    // Return stacked flag
+    // Return onoff flag
     return onoff;
 }
 

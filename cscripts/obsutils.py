@@ -785,7 +785,7 @@ def get_onoff_obs(cls, obs):
         cls._log.header3('Creating On/Off observations')
 
     phagen = cscripts.csphagen(obs)
-    phagen['inexclusion'] = cls['inexclusion'].filename()
+    phagen['inexclusion'] = cls['inexclusion'].value()
     phagen['emin'] = cls['emin'].real()
     phagen['emax'] = cls['emax'].real()
     phagen['enumbins'] = cls['enumbins'].integer()
@@ -802,11 +802,11 @@ def get_onoff_obs(cls, obs):
     phagen['rad'] = cls['rad'].real()
     bkgmethod = cls['bkgmethod'].string()
     if bkgmethod == 'REFLECTED':
-        phagen['bkgregmin'] = cls['bkgregmin'].string()
-    phagen['maxoffset'] = cls['maxoffset'].string()
+        phagen['bkgregmin'] = cls['bkgregmin'].integer()
+    phagen['maxoffset'] = cls['maxoffset'].real()
     phagen['stack'] = True
-    phagen['emintrue'] = cls['emintrue'].real()
-    phagen['emaxtrue'] = cls['emaxtrue'].real()
+    phagen['etruemin'] = cls['etruemin'].real()
+    phagen['etruemax'] = cls['etruemax'].real()
     phagen['etruebins'] = cls['etruebins'].integer()
     phagen.run()
 
