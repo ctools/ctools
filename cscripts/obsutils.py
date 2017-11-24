@@ -815,4 +815,6 @@ def get_onoff_obs(cls, obs):
 
     onoff_obs = phagen.obs().copy()
 
+    #need to reset statistic for fit???
+
     return onoff_obs

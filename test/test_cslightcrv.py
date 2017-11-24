@@ -43,7 +43,8 @@ class Test(test):
         test.__init__(self)
 
         # Add off-axis events for classical analysis
-        self._myevents1 = self._datadir + '/crab_offaxis1.fits'
+        self._offaxis_events = self._datadir + '/crab_offaxis1.fits'
+        self._model_onoff    = self._datadir + '/crab_onoff.xml'
 
         # Return
         return
@@ -240,24 +241,15 @@ class Test(test):
         self._check_light_curve('cslightcrv_py4.fits', 2)
 
         # cslightcrv with classical analysis
-
-        # first we build an observation container to pass the model
-        # to csphagen that will change the background to OnOff
-        obs = gammalib.GObservations()
-        for s, events in enumerate([self._myevents1]):
-            run = gammalib.GCTAObservation(events)
-            run.id(str(s + 1))
-            run.response(self._irf, gammalib.GCaldb('cta', self._caldb))
-            run.model(gammalib.GModels(self._model))
-            obs.append(run)
-
-        # set up cslightcrv
         lcrv = cscripts.cslightcrv()
-        lcrv['inobs']     = obs
+        lcrv['inobs']     = self._offaxis_events
+        lcrv['inmodel']   = self._model_onoff
         lcrv['srcname']   = 'Crab'
+        lcrv['caldb']    = self._caldb
+        lcrv['irf']      = self._irf
         lcrv['tbinalg']   = 'LIN'
-        lcrv['tmin']      = 6.3110887e8
-        lcrv['tmax']      = 6.3110977e8
+        lcrv['tmin']      = 'MJD 58849.0008'
+        lcrv['tmax']      = 'MJD 58849.0112'
         lcrv['tbins']     = 2
         lcrv['method']    = 'ONOFF'
         lcrv['emin']      = 0.1
