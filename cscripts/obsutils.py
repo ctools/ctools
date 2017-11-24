@@ -808,6 +808,9 @@ def get_onoff_obs(cls, obs):
     phagen['etruemin'] = cls['etruemin'].real()
     phagen['etruemax'] = cls['etruemax'].real()
     phagen['etruebins'] = cls['etruebins'].integer()
+    phagen['chatter'] = cls['chatter'].integer()
+    phagen['clobber'] = cls['clobber'].boolean()
+    phagen['debug'] = cls['debug'].boolean()
     phagen.run()
 
     onoff_obs = phagen.obs().copy()

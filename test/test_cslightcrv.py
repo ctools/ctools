@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Add off-axis events for classical analysis
+        self._myevents1 = self._datadir + '/crab_offaxis1.fits'
+
         # Return
         return
 
@@ -73,7 +76,7 @@ class Test(test):
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
-                         ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbins=3 method="CUBE" enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd1.log" chatter=1'
 
@@ -93,7 +96,7 @@ class Test(test):
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
-                         ' tbins=3 enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbins=3 method="CUBE" enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd2.log" debug=yes'
 
@@ -123,6 +126,7 @@ class Test(test):
         lcrv['tmin']     = 'MJD 51544.50'
         lcrv['tmax']     = 'MJD 51544.53'
         lcrv['tbins']    = 3
+        lcrv['method']   = 'CUBE'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -159,6 +163,7 @@ class Test(test):
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'FILE'
         lcrv['tbinfile'] = 'cslightcrv_py2.dat'
+        lcrv['method']   = 'CUBE'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -188,6 +193,7 @@ class Test(test):
         lcrv['caldb']    = self._caldb
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'GTI'
+        lcrv['method']   = 'CUBE'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -201,7 +207,7 @@ class Test(test):
         # Check light curve
         self._check_light_curve('cslightcrv_py3.fits', 1)
 
-        # Finally we set-up a binned cslightcrv
+        # Binned cslightcrv
         lcrv = cscripts.cslightcrv()
         lcrv['inobs']    = self._events
         lcrv['inmodel']  = self._model
@@ -212,6 +218,7 @@ class Test(test):
         lcrv['tmin']     = 'MJD 51544.50'
         lcrv['tmax']     = 'MJD 51544.53'
         lcrv['tbins']    = 2
+        lcrv['method']   = 'CUBE'
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
         lcrv['enumbins'] = 10
@@ -231,6 +238,45 @@ class Test(test):
 
         # Check light curve
         self._check_light_curve('cslightcrv_py4.fits', 2)
+
+        # cslightcrv with classical analysis
+
+        # first we build an observation container to pass the model
+        # to csphagen that will change the background to OnOff
+        obs = gammalib.GObservations()
+        for s, events in enumerate([self._myevents1]):
+            run = gammalib.GCTAObservation(events)
+            run.id(str(s + 1))
+            run.response(self._irf, gammalib.GCaldb('cta', self._caldb))
+            run.model(gammalib.GModels(self._model))
+            obs.append(run)
+
+        # set up cslightcrv
+        lcrv = cscripts.cslightcrv()
+        lcrv['inobs']     = obs
+        lcrv['srcname']   = 'Crab'
+        lcrv['tbinalg']   = 'LIN'
+        lcrv['tmin']      = 6.3110887e8
+        lcrv['tmax']      = 6.3110977e8
+        lcrv['tbins']     = 2
+        lcrv['method']    = 'ONOFF'
+        lcrv['emin']      = 0.1
+        lcrv['emax']      = 100.0
+        lcrv['enumbins']  = 10
+        lcrv['coordsys']  = 'CEL'
+        lcrv['xref']      = 83.63
+        lcrv['yref']      = 22.01
+        lcrv['rad']       = 0.2
+        lcrv['statistic'] = 'WSTAT'
+        lcrv['outfile']   = 'cslightcrv_py5.fits'
+        lcrv['logfile']   = 'cslightcrv_py5.log'
+        lcrv['chatter']   = 4
+
+        # Execute cslightcrv script
+        lcrv.execute()
+
+        # Check light curve
+        self._check_light_curve('cslightcrv_py5.fits', 2)
 
         # Return
         return
