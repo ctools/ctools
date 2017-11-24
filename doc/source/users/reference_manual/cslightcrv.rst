@@ -42,8 +42,14 @@ General parameters
 ``irf [string]``
     Instrumental response function.
 
+``(inexclusion = NONE) [file]``
+    Optional FITS file containing a WCS map in the first hdu that defines sky
+    regions not to be used for background estimation in On/Off analysis (where
+    map value != 0).
+
 ``(edisp = no) [boolean]``
-    Applies energy dispersion to response computation.
+    Applies energy dispersion to response computation (for Cube analysis only,
+    energy dispersion is always taken into account in On/Off analysis).
 
 ``outfile [file]``
     Name of the light curve output file.
@@ -63,6 +69,10 @@ General parameters
 ``tbinfile [file]``
     File defining the time binning.
 
+``method [string]``
+    Selects between Cube analysis (3D spatial/energy likelihood) and On/Off
+    analysis (1D likelihood with background from Off regions).
+
 ``emin [real]``
     Lower energy limit of events (in TeV).
 
@@ -70,7 +80,7 @@ General parameters
     Upper energy limit of events (in TeV).
 
 ``enumbins [integer]``
-    Number of energy bins per light curve bin (0=unbinned).
+    Number of energy bins per light curve bin (0=unbinned for Cube analysis only).
 
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
@@ -79,26 +89,53 @@ General parameters
     Projection method.
 
 ``xref [real]``
-    Right Ascension / Galactic longitude of image centre (J2000, in degrees).
+    Right Ascension / Galactic longitude of image/On region centre (J2000, in degrees).
 
 ``yref [real]``
-    Declination / Galactic latitude of image centre (J2000, in degrees).
+    Declination / Galactic latitude of image/On region centre (J2000, in degrees).
 
 ``nxpix [integer]``
-    Size of the Right Ascension / Galactic longitude axis (in pixels).
+    Size of the Right Ascension / Galactic longitude axis for Cube analysis (in pixels).
 
 ``nypix [integer]``
-    Size of the Declination / Galactic latitude axis (in pixels).
+    Size of the Declination / Galactic latitude axis for Cube analysis (in pixels).
 
 ``binsz [real]``
-    Pixel size (in degrees/pixel).
+    Pixel size for Cube analysis (in degrees/pixel).
+
+``rad [real]``
+    Radius of source region circle for On/Off analysis (deg)
+
+``(bkgmethod = REFLECTED) [string]``
+    Method for background estimation in On/Off analysis.
+    ``REFLECTED:`` background evaluated in regions with the same shape as
+    source region reflected w.r.t. pointing direction for each observation.
+
+``(bkgregmin = 2) [integer]``
+    Minimum number of background regions that are required for an observation in
+    On/Off analysis. If this number of background regions is not available the observation is
+    skipped.
+
+``(maxoffset = 4.0) [real]``
+    Maximum offset in degrees of source from camera center to accept the
+    observation for On/Off analysis.
+
+``(etruemin = 0.01) [real]``
+    Minimum true energy to evaluate instrumental response in On/Off analysis (TeV).
+
+``(etruemax = 0.01) [real]``
+    Maximum true energy to evaluate instrumental response in On/Off analysis (TeV).
+
+``(etruebins = 30) [integer]``
+    Number of bins per decade for true energy bins to evaluate instrumental
+    response in On/Off analysis.
 
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
     observations, which is ``CSTAT`` or the statistic specified in the
     observation definition XML file. ``CSTAT`` uses the C statistic for
-    all observations, ``WSTAT`` uses the W statistic for all On/Off
-    observations, and ``CHI2`` uses the Chi squared statistic for all
+    all observations, ``WSTAT`` uses the W statistic (for On/Off
+    observations), and ``CHI2`` uses the Chi squared statistic for all
     binned or stacked observations.
 
 ``(calc_ts = yes) [boolean]``
