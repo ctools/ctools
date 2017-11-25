@@ -54,7 +54,7 @@ General parameters
 ``outfile [file]``
     Name of the light curve output file.
 
-``(tbinalg = GTI) <FILE|LIN|GTI> [string]``
+``tbinalg <FILE|LIN|GTI> [string]``
     Algorithm for defining time bins.
 
 ``tmin [time]``
@@ -89,10 +89,10 @@ General parameters
     Projection method.
 
 ``xref [real]``
-    Right Ascension / Galactic longitude of image/On region centre (J2000, in degrees).
+    Right Ascension / Galactic longitude of image / On region centre (J2000, in degrees).
 
 ``yref [real]``
-    Declination / Galactic latitude of image/On region centre (J2000, in degrees).
+    Declination / Galactic latitude of image / On region centre (J2000, in degrees).
 
 ``nxpix [integer]``
     Size of the Right Ascension / Galactic longitude axis for Cube analysis (in pixels).
@@ -134,8 +134,8 @@ General parameters
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
     observations, which is ``CSTAT`` or the statistic specified in the
     observation definition XML file. ``CSTAT`` uses the C statistic for
-    all observations, ``WSTAT`` uses the W statistic (for On/Off
-    observations), and ``CHI2`` uses the Chi squared statistic for all
+    all observations, ``WSTAT`` uses the W statistic for all On/Off
+    observations, and ``CHI2`` uses the Chi squared statistic for all
     binned or stacked observations.
 
 ``(calc_ts = yes) [boolean]``
