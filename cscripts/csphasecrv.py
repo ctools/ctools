@@ -63,6 +63,7 @@ class csphasecrv(ctools.csobservation):
         # [[ph1min,ph1max], [ph2min,ph2max],..]
         self._srcname   = ''
         self._phbins    = [[0.0,1.0]]
+        self._onoff     = False
         self._stacked   = False
         self._fits      = gammalib.GFits()
         self._fitmodels = {}
@@ -92,8 +93,13 @@ class csphasecrv(ctools.csobservation):
         # Get phase boundaries
         self._phbins = self._create_tbounds()
 
+        # Set On/Off analysis flag and query relevant user parameters
+        self._onoff = self._is_onoff()
+
+        # If cube analysis is selected
         # Set stacked analysis flag and query relevant user parameters
-        self._stacked = self._is_stacked()
+        if not self._onoff:
+            self._stacked = self._is_stacked()
 
         # Query the hidden parameters, just in case
         self['edisp'].boolean()
@@ -355,10 +361,13 @@ class csphasecrv(ctools.csobservation):
                 select.obs()[i].id(oldid+'_'+str(phbin[0])+'-'+str(phbin[1]))
             obs = select.obs()
             
-            # If a stacked analysis is requested then bin the events
+            # If an On/Off analysis is requested generate the On/Off observations
+            if self._onoff:
+                obs = obsutils.get_onoff_obs(self, select.obs())
+            # Otherwise, if stacked analysis is requested then bin the events
             # and compute the stacked response functions and setup
             # an observation container with a single stacked observation.
-            if self._stacked:
+            elif self._stacked:
                 obs = obsutils.get_stacked_obs(self, select.obs())
     
             # Header

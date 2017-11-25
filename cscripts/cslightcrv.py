@@ -74,8 +74,8 @@ class cslightcrv(ctools.csobservation):
         # Initialise some members
         self._srcname = ''
         self._tbins   = gammalib.GGti()
+        self._onoff   = False
         self._stacked = False
-        self._onoff = False
         self._fits    = gammalib.GFits()
 
         # Return
