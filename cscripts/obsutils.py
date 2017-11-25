@@ -791,17 +791,17 @@ def get_onoff_obs(cls, obs):
     phagen['enumbins'] = cls['enumbins'].integer()
     phagen['ebinalg'] = 'LOG'
     phagen['srcshape'] = cls['srcshape'].string()
-    coordsys = cls['coordsys'].string()
-    phagen['coordsys'] = coordsys
-    if coordsys == 'CEL':
+    phagen['coordsys'] = cls['coordsys'].string()
+    if cls['coordsys'].string() == 'CEL':
         phagen['ra'] = cls['xref'].real()
         phagen['dec'] = cls['yref'].real()
-    elif coordsys == 'GAL':
+    elif cls['coordsys'].string() == 'GAL':
         phagen['glon'] = cls['xref'].real()
         phagen['glat'] = cls['yref'].real()
-    phagen['rad'] = cls['rad'].real()
-    bkgmethod = cls['bkgmethod'].string()
-    if bkgmethod == 'REFLECTED':
+    if cls['srcshape'].string() == 'CIRCLE':
+        phagen['rad'] = cls['rad'].real()
+    phagen['bkgmethod'] = cls['bkgmethod'].string()
+    if cls['bkgmethod'].string() == 'REFLECTED':
         phagen['bkgregmin'] = cls['bkgregmin'].integer()
     phagen['maxoffset'] = cls['maxoffset'].real()
     phagen['stack'] = True
