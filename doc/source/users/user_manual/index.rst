@@ -10,5 +10,4 @@ User Manual
    response
    models
    plotting
-   ctools-from-python
 
