@@ -69,7 +69,7 @@ General parameters
 ``tbinfile [file]``
     File defining the time binning.
 
-``method [string]``
+``method  <CUBE|ONOFF> [string]``
     Selects between CUBE analysis (3D spatial/energy likelihood) and ONOFF
     analysis (1D likelihood with background from Off regions).
 
@@ -102,6 +102,10 @@ General parameters
 
 ``binsz [real]``
     Pixel size for Cube analysis (in degrees/pixel).
+
+``(srcshape = CIRCLE) [string]``
+    Shape of the source region.
+    ``CIRCLE``: circular region around given position.
 
 ``rad [real]``
     Radius of source region circle for On/Off analysis (deg)
