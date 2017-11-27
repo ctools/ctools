@@ -242,11 +242,17 @@ class csphasecrv(ctools.csobservation):
             
             # Store fit results
             phname = str(phmin)+'-'+str(phmax)
-            source = self._fitmodels[phname][self._srcname]
-            for par in pars:
-                result['values'][par]      = source[par].value()
-                result['values']['e_'+par] = source[par].error()
-            
+            # If the model contains the source of interest fill results
+            try:
+                source = self._fitmodels[phname][self._srcname]
+                for par in pars:
+                    result['values'][par]      = source[par].value()
+                    result['values']['e_'+par] = source[par].error()
+            # Otherwise fills with zeros
+            except:
+                for par in pars:
+                    result['values'][par]      = 0.
+                    result['values']['e_'+par] = 0.
             # Append result to list of dictionaries
             results.append(result)
             
@@ -374,19 +380,30 @@ class csphasecrv(ctools.csobservation):
             self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
     
             # Do maximum likelihood model fitting
-            like = ctools.ctlike(obs)
-            like['edisp'] = self['edisp'].boolean()
-            like.run()
-            
-            # Renormalize models to phase selection
-            # TODO move the scaling from the temporal to the spectral component
-            for model in like.obs().models():
-                scaled_norm = model['Normalization'].value()/(phbin[1]-phbin[0])
-                model['Normalization'].value(scaled_norm)
-            
-            # Store fit model
-            self._fitmodels[str(phbin[0])+'-'+str(phbin[1])] = \
-                            like.obs().models().copy()
+            # The On/Off analysis can produce empty observation containers,
+            # e.g., when on-axis observations are used. To avoid ctlike asking
+            # for a new observations contained (or hang, in on interactive mode)
+            # we'll run ctlike only if the size is >0
+            if obs.size() > 0:
+                like = ctools.ctlike(obs)
+                like['edisp'] = self['edisp'].boolean()
+                like.run()
+
+                # Renormalize models to phase selection
+                # TODO move the scaling from the temporal to the spectral component
+                for model in like.obs().models():
+                    scaled_norm = model['Normalization'].value()/(phbin[1]-phbin[0])
+                    model['Normalization'].value(scaled_norm)
+                # Store fit model
+                self._fitmodels[str(phbin[0])+'-'+str(phbin[1])] = \
+                                like.obs().models().copy()
+            else:
+                self._log_string(gammalib.TERSE,
+                                 'PHASE %f - %f: no observations available'
+                                 ' for fitting' %(phbin[0], phbin[1]))
+                # empty models container
+                self._fitmodels[str(phbin[0]) + '-' + str(phbin[1])] = \
+                    gammalib.GModels()
 
         # Create FITS file
         self._create_fits()

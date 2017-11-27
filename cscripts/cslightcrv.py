@@ -488,69 +488,88 @@ class cslightcrv(ctools.csobservation):
             self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
 
             # Do maximum likelihood model fitting
-            like = ctools.ctlike(obs)
-            like['edisp'] = self['edisp'].boolean()
-            like.run()
+            if obs.size() > 0:
+                like = ctools.ctlike(obs)
+                like['edisp'] = self['edisp'].boolean()
+                like.run()
 
-            # Skip bin if no event was present
-            if like.obs().logL() == 0.0:
+                # Skip bin if no event was present
+                if like.obs().logL() == 0.0:
 
-                # Signal skipping of bin
+                    # Signal skipping of bin
+                    self._log_value(gammalib.TERSE, 'Warning',
+                                    'No event in this time bin, skip bin.')
+
+                    # Set all results to 0
+                    for par in pars:
+                        result['values'][par]      = 0.0
+                        result['values']['e_'+par] = 0.0
+
+                    # Append result
+                    results.append(result)
+
+                    # Continue with next time bin
+                    continue
+
+                # Retrieve model fitting results for source of interest
+                source = like.obs().models()[self._srcname]
+
+                # Extract parameter values
+                for par in pars:
+                    result['values'][par]      = source[par].value()
+                    result['values']['e_'+par] = source[par].error()
+
+                # Calculate upper limit (-1 if not computed)
+                #ul_diff, ul_flux, ul_eflux = self._compute_ulimit(like.obs())
+                ul_diff, ul_flux, ul_eflux = self._compute_ulimit(obs)
+                if ul_diff > 0.0:
+                    result['ul_diff']  = ul_diff
+                    result['ul_flux']  = ul_flux
+                    result['ul_eflux'] = ul_eflux
+
+                # Extract Test Statistic value
+                if self['calc_ts'].boolean():
+                    result['ts'] = source.ts()
+
+                # Append result to list of dictionaries
+                results.append(result)
+
+                # Log results for this time bin
+                self._log.header3('Results')
+                pars = self._get_free_par_names()
+                for par in pars:
+                    value = source[par].value()
+                    error = source[par].error()
+                    unit  = source[par].unit()
+                    self._log_value(gammalib.NORMAL, par,
+                                    str(value)+' +/- '+str(error)+' '+unit)
+                if ul_diff > 0.0:
+                    self._log_value(gammalib.NORMAL, 'Upper flux limit',
+                                    str(result['ul_diff'])+' ph/cm2/s/MeV')
+                    self._log_value(gammalib.NORMAL, 'Upper flux limit',
+                                    str(result['ul_flux'])+' ph/cm2/s')
+                    self._log_value(gammalib.NORMAL, 'Upper flux limit',
+                                    str(result['ul_eflux'])+' erg/cm2/s')
+                if self['calc_ts'].boolean():
+                    self._log_value(gammalib.NORMAL, 'Test Statistic', result['ts'])
+
+            # Otherwise, if observations size is 0, signal bin is skipped and
+            # fill results table with zeros
+            else:
                 self._log_value(gammalib.TERSE, 'Warning',
-                                'No event in this time bin, skip bin.')
+                                'No observations available in this time bin',
+                                'Skip bin.')
 
                 # Set all results to 0
                 for par in pars:
-                    result['values'][par]      = 0.0
-                    result['values']['e_'+par] = 0.0
+                    result['values'][par] = 0.0
+                    result['values']['e_' + par] = 0.0
 
                 # Append result
                 results.append(result)
 
                 # Continue with next time bin
                 continue
-
-            # Retrieve model fitting results for source of interest
-            source = like.obs().models()[self._srcname]
-
-            # Extract parameter values
-            for par in pars:
-                result['values'][par]      = source[par].value()
-                result['values']['e_'+par] = source[par].error()
-
-            # Calculate upper limit (-1 if not computed)
-            #ul_diff, ul_flux, ul_eflux = self._compute_ulimit(like.obs())
-            ul_diff, ul_flux, ul_eflux = self._compute_ulimit(obs)
-            if ul_diff > 0.0:
-                result['ul_diff']  = ul_diff
-                result['ul_flux']  = ul_flux
-                result['ul_eflux'] = ul_eflux
-
-            # Extract Test Statistic value
-            if self['calc_ts'].boolean():
-                result['ts'] = source.ts() 
-
-            # Append result to list of dictionaries
-            results.append(result)
-
-            # Log results for this time bin
-            self._log.header3('Results')
-            pars = self._get_free_par_names()
-            for par in pars:
-                value = source[par].value()
-                error = source[par].error()
-                unit  = source[par].unit()
-                self._log_value(gammalib.NORMAL, par,
-                                str(value)+' +/- '+str(error)+' '+unit)
-            if ul_diff > 0.0:
-                self._log_value(gammalib.NORMAL, 'Upper flux limit',
-                                str(result['ul_diff'])+' ph/cm2/s/MeV')
-                self._log_value(gammalib.NORMAL, 'Upper flux limit',
-                                str(result['ul_flux'])+' ph/cm2/s')
-                self._log_value(gammalib.NORMAL, 'Upper flux limit',
-                                str(result['ul_eflux'])+' erg/cm2/s')
-            if self['calc_ts'].boolean():
-                self._log_value(gammalib.NORMAL, 'Test Statistic', result['ts'])
 
         # Create FITS table from results
         table = self._create_fits_table(results)
