@@ -29,7 +29,7 @@ Improvements
   Handle On/Off observations by :ref:`cspull`
 * [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
   Add ``statistic`` parameters to :ref:`ctbutterfly`, :ref:`cterror`,
-  :ref:`cttsmap`, :ref:`ctulimit`, :ref:`cslightcrv, :ref:`csphasecrv`,
+  :ref:`cttsmap`, :ref:`ctulimit`, :ref:`cslightcrv`, :ref:`csphasecrv`,
   :ref:`cspull`, :ref:`cssens`, :ref:`csspec`, :ref:`cstsdist` and
   :ref:`cstsmapsplit`
 * [`2231 <https://cta-redmine.irap.omp.eu/issues/2231>`_] -
@@ -60,6 +60,6 @@ Clean up
 * [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
   Rename :ref:`ctlike` ``stat`` parameter to ``statistic``
 * [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -
-  Derive :ref:`cslightcrv, :ref:`csphasecrv`, :ref:`cspull`, :ref:`cssens`,
-  :ref:`csspec` and :ref:`cttsdist` scripts from ``cslikelihood`` base
+  Derive :ref:`cslightcrv`, :ref:`csphasecrv`, :ref:`cspull`, :ref:`cssens`,
+  :ref:`csspec` and :ref:`cstsdist` scripts from ``cslikelihood`` base
   class
