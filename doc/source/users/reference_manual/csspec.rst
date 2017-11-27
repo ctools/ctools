@@ -86,9 +86,9 @@ General parameters
     Spectrum generation method.
     ``SLICE``: Slice energy interval into ``enumbins`` independent bins.
     ``NODES``: Replace spectral model by node function with ``enumbins`` nodes.
-    ``AUTO`` : Automatically select method based on input data. Will use ``SLICE``
-               for CTA-only observations and ``NODES`` for observations including
-               non-CTA data.
+    ``AUTO`` : Automatically select method based on input data. Will use
+               ``SLICE`` for CTA-only observations and ``NODES`` for
+               observations including non-CTA data.
 
 ``emin [real]``
     Lower energy limit of events (in TeV).
