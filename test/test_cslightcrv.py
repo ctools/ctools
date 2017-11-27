@@ -90,7 +90,7 @@ class Test(test):
              'Check successful execution from command line')
 
         # Check light curve
-        self._check_light_curve('lightcurve_cmd1.fits', 3)
+        self._check_light_curve('lightcurve_cmd1.fits', 3, 1.6e-16)
 
         # Setup cslightcrv command
         cmd = cslightcrv+' inobs="events_that_do_not_exist.fits"'+ \
@@ -142,7 +142,7 @@ class Test(test):
         lcrv.save()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py1.fits', 3)
+        self._check_light_curve('cslightcrv_py1.fits', 3, 1.6e-16)
 
         # Now use FILE as time bin algorithm. For this we need first to
         # create an ASCII file. We use now 6 time bins. The ASCII file
@@ -177,7 +177,7 @@ class Test(test):
         lcrv.execute()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py2.fits', 2)
+        self._check_light_curve('cslightcrv_py2.fits', 2, 1.6e-16)
 
         # Now we setup an observation container on input. We attached the
         # model to the observation container so that cslightcrv should
@@ -206,7 +206,7 @@ class Test(test):
         lcrv.execute()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py3.fits', 1)
+        self._check_light_curve('cslightcrv_py3.fits', 1, 1.6e-16)
 
         # Binned cslightcrv
         lcrv = cscripts.cslightcrv()
@@ -238,7 +238,7 @@ class Test(test):
         lcrv.execute()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py4.fits', 2)
+        self._check_light_curve('cslightcrv_py4.fits', 2, 1.6e-16)
 
         # cslightcrv with classical analysis
         lcrv = cscripts.cslightcrv()
@@ -268,13 +268,13 @@ class Test(test):
         lcrv.execute()
 
         # Check light curve
-        self._check_light_curve('cslightcrv_py5.fits', 2)
+        self._check_light_curve('cslightcrv_py5.fits', 2, 6.e-16)
 
         # Return
         return
 
     # Check light curve result file
-    def _check_light_curve(self, filename, bins):
+    def _check_light_curve(self, filename, bins,pref):
         """
         Check light curve file
         """
@@ -303,6 +303,13 @@ class Test(test):
         for col in cols:
             self.test_assert(table.contains(col),
                  'FITS file contains "'+col+'" column')
+
+        # Check that table has been filled
+        # Prefactor has right order of magnitude
+        for s in range(table.nrows()):
+            self.test_value(table['Prefactor'][s], pref, 0.2*pref,
+                            'Check prefactor value')
+
 
         # Close FITS file
         fits.close()
