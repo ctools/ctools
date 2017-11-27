@@ -1,8 +1,9 @@
-2017-10-26
+2017-11-27
 
         * Version 1.5.0 released
         ========================
 
+        Fix chatter level handling in ctpsfcube (#2262)
         Handle On/Off observations by cspull (#2260)
         Add "statistic" parameter to all likelihood tools and scripts (#2237)
         Rename ctlike "stat" parameter to "statistic" (#2237)

@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-26 October 2017
+27 November 2017
 
 
 Introduction
@@ -98,7 +98,7 @@ None
 
 ctpsfcube - CTA point spread function cube generation
 -----------------------------------------------------
-None
+The chatter level is now correctly forwarded to the PSF cube fill method (#2262).
 
 
 ctselect - CTA event selection
