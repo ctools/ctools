@@ -364,73 +364,6 @@ class cslightcrv(ctools.csobservation):
         # Return upper limit tuple
         return ul_diff, ul_flux, ul_eflux
 
-    def _bin_observation(self, obs):
-        """
-        Bin an observation if a binned analysis was requested
-
-        Parameters
-        ----------
-        obs : `~gammalib.GObservations`
-            Observation container
-
-        Returns
-        -------
-        obs : `~gammalib.GObservations`
-            Observation container where the first observation is a binned observation
-        """
-        # Get new observation container with binned observation
-        new_obs = obsutils.get_stacked_obs(self, obs)
-        
-        # Extract models
-        models = new_obs.models()
-
-        # Fix background models if required
-        if self['fix_bkg'].boolean():
-            for model in models:
-                if model.classname() != 'GModelSky':
-                    for par in model:
-                        par.fix()
-
-        # Put back models
-        new_obs.models(models)
-
-        # Return new oberservation container
-        return new_obs
-
-    def _gen_onoff(self, obs):
-        """
-        Create On/Off observations if On/Off analysis was requested
-
-        Parameters
-        ----------
-        obs : `~gammalib.GObservations`
-            Observation container
-
-        Returns
-        -------
-        obs : `~gammalib.GObservations`
-            Observation container with On/Off observations
-        """
-        # Get new observation container with binned observation
-        new_obs = obsutils.get_onoff_obs(self, obs)
-
-        # Extract models
-        models = new_obs.models()
-
-        # Fix background models if required
-        if self['fix_bkg'].boolean():
-            for model in models:
-                if model.classname() != 'GModelSky':
-                    for par in model:
-                        par.fix()
-
-        # Put back models
-        new_obs.models(models)
-
-        # Return new oberservation container
-        return new_obs
-
-
     # Public methods
     def run(self):
         """
@@ -523,15 +456,33 @@ class cslightcrv(ctools.csobservation):
             # Retrieve observation
             obs = select.obs()
 
-            # If a stacked analysis is requested then bin the events
-            # and compute the stacked response functions and setup
-            # an observation container with a single stacked observation.
-            if self._stacked:
-                obs = self._bin_observation(obs)
-            # Otherwise if On/Off analysis is requested generate
-            # the On/Off observations and response
-            if self._onoff:
-                obs = self._gen_onoff(obs)
+            # Deal with stacked and On/Off Observations
+            if self._stacked or self._onoff:
+                # If a stacked analysis is requested bin the events
+                # and compute the stacked response functions and setup
+                # an observation container with a single stacked observation.
+                if self._stacked:
+                    new_obs = obsutils.get_stacked_obs(self, obs)
+                # Otherwise if On/Off analysis is requested generate
+                # the On/Off observations and response
+                elif self._onoff:
+                    new_obs = obsutils.get_onoff_obs(self, obs)
+
+                # Extract models
+                models = new_obs.models()
+
+                # Fix background models if required
+                if self['fix_bkg'].boolean():
+                    for model in models:
+                        if model.classname() != 'GModelSky':
+                            for par in model:
+                                par.fix()
+
+                # Put back models
+                new_obs.models(models)
+
+                # Continue with new oberservation container
+                obs = new_obs
 
             # Header
             self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
