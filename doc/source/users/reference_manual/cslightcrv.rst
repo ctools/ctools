@@ -70,7 +70,7 @@ General parameters
     File defining the time binning.
 
 ``method [string]``
-    Selects between Cube analysis (3D spatial/energy likelihood) and On/Off
+    Selects between CUBE analysis (3D spatial/energy likelihood) and ONOFF
     analysis (1D likelihood with background from Off regions).
 
 ``emin [real]``

@@ -10,14 +10,16 @@ Synopsis
 --------
 
 This script computes spectra by performing a maximum likelihood fit using
-:doc:`ctlike` in a series of phase bins for pulsars. The phase bins can be
+:doc:`ctlike` in a series of phase bins for periodic sources. The input event
+list must have a ``PHASE`` column containing the phase values, that can be
+assigned using :doc:`ctphase`. The phase bins can be
 either specified in an ASCII file or as an interval divided into equally sized
 phase bins. The format of the ASCII file is one row per phase bin, each
 specifying the start of stop value of the phase bin, separated by a whitespace.
 The phase goes from 0.0 to 1.0.
 
-On output the script writes the fitting results into a FITS file. The script
-also produces one XML file per phase bin that contains the fitting results for
+The script writes the fit results into a FITS file. The script
+also produces one XML file per phase bin that contains the best-fit model for
 that bin.
 
 
@@ -39,8 +41,14 @@ General parameters
 ``irf [string]``
     Instrumental response function.
 
+``(inexclusion = NONE) [file]``
+    Optional FITS file containing a WCS map in the first hdu that defines sky
+    regions not to be used for background estimation in On/Off analysis (where
+    map value != 0).
+
 ``(edisp = no) [boolean]``
-    Applies energy dispersion to response computation.
+    Applies energy dispersion to response computation (for Cube analysis only,
+    energy dispersion is always taken into account in On/Off analysis).
 
 ``outfile [file]``
     Name of the XML output file. The phase interval will be automatically
@@ -54,6 +62,10 @@ General parameters
 
 ``phbinfile [file]``
     File defining the phase binning.
+
+``method [string]``
+    Selects between CUBE analysis (3D spatial/energy likelihood) and ONOFF
+    analysis (1D likelihood with background from Off regions).
 
 ``emin [real]``
     Lower energy limit of events (in TeV).
@@ -84,6 +96,33 @@ General parameters
 
 ``binsz [real]``
     Pixel size (in degrees/pixel).
+
+``rad [real]``
+    Radius of source region circle for On/Off analysis (deg)
+
+``(bkgmethod = REFLECTED) [string]``
+    Method for background estimation in On/Off analysis.
+    ``REFLECTED:`` background evaluated in regions with the same shape as
+    source region reflected w.r.t. pointing direction for each observation.
+
+``(bkgregmin = 2) [integer]``
+    Minimum number of background regions that are required for an observation in
+    On/Off analysis. If this number of background regions is not available the observation is
+    skipped.
+
+``(maxoffset = 4.0) [real]``
+    Maximum offset in degrees of source from camera center to accept the
+    observation for On/Off analysis.
+
+``(etruemin = 0.01) [real]``
+    Minimum true energy to evaluate instrumental response in On/Off analysis (TeV).
+
+``(etruemax = 0.01) [real]``
+    Maximum true energy to evaluate instrumental response in On/Off analysis (TeV).
+
+``(etruebins = 30) [integer]``
+    Number of bins per decade for true energy bins to evaluate instrumental
+    response in On/Off analysis.
 
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
@@ -129,4 +168,5 @@ Standard parameters
 Related tools or scripts
 ------------------------
 
+:doc:`ctphase`
 :doc:`ctlike`
