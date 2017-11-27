@@ -1,7 +1,7 @@
 /***************************************************************************
  *                  ctpsfcube - PSF cube generation tool                   *
  * ----------------------------------------------------------------------- *
- *  copyright (C) 2014-2016 by Chia-Chun Lu                                *
+ *  copyright (C) 2014-2017 by Chia-Chun Lu                                *
  * ----------------------------------------------------------------------- *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
@@ -223,8 +223,11 @@ void ctpsfcube::run(void)
     // Write header into logger
     log_header1(TERSE, "Generate PSF cube");
 
+    // Set pointer to logger dependent on chattiness
+    GLog* logger = (logNormal()) ? &log : NULL;
+
     // Fill PSF cube
-    m_psfcube.fill(m_obs, &log);
+    m_psfcube.fill(m_obs, logger);
 
     // Write PSF cube into logger
     log_string(EXPLICIT, m_psfcube.print(m_chatter));
