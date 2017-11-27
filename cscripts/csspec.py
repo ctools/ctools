@@ -192,7 +192,7 @@ class csspec(ctools.csobservation):
             if self._binned_mode:
                 cube_ebounds = self.obs()[0].events().ebounds()
             else:
-                cube_ebounds = self.obs()[0].rmf().etrue()
+                cube_ebounds = self.obs()[0].rmf().emeasured()
 
             # Loop over user energy boundaries and collect all energy bins
             # that overlap

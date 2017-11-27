@@ -24,6 +24,8 @@ Bug fixes
 Improvements
 ------------
 
+* [`2267 <https://cta-redmine.irap.omp.eu/issues/2267>`_] -
+  Add tutorial for classical analysis
 * [`2260 <https://cta-redmine.irap.omp.eu/issues/2260>`_] -
   Handle On/Off observations by :ref:`cspull`
 * [`2237 <https://cta-redmine.irap.omp.eu/issues/2237>`_] -

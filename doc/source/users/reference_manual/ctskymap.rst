@@ -22,7 +22,7 @@ Instrument Response Functions will be used for background subtraction.
 
 ctskymap generates a FITS file comprising a sky map as primary extension.
 If a background subtraction method was selected, the FITS file will contain
-the additional extensions ``BACKGRAOUND`` and ``SIGNIFICANCE`` that contain
+the additional extensions ``BACKGROUND`` and ``SIGNIFICANCE`` that contain
 the background map and a significance map, respectively. For the latter, the
 significance of the signal is computed for each sky map pixel.
 
@@ -90,7 +90,7 @@ Background subtraction configuration parameters
 ``outradius [real]``
     Outer ring radius for RING subtraction (in degrees).
 
-``(regfile = NONE) [file]``
+``(inexclusion = NONE) [file]``
     Exclusion region file as either a FITS map or DS9 region file.
 
 
