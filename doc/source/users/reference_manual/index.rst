@@ -47,6 +47,7 @@ cscripts
    csmodelinfo --- Shows model container content <csmodelinfo>
    csmodelmerge --- Merges several model containers into one file <csmodelmerge>
    csmodelselect --- Select models from model definition file <csmodelselect>
+   csmodelsois --- Generate map cube from subset of models <csmodelsois>
    csobsdef --- Generates observation definition file <csobsdef>
    csobsinfo --- Shows observation container content <csobsinfo>
    csobsselect --- Select observations from observation definition file <csobsselect>
