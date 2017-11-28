@@ -56,7 +56,7 @@ region. You can do this using the :ref:`ctskymap` tool.
     Output skymap file [skymap.fits]
 
 In the spirit of the classical analysis we have chosen to derive the background
-using the RING method (e.g., Berge et al. 2007 A&A 466 1219B), in which for each
+using the RING method, in which for each
 point in the map (trial source position) the background is derived from a ring
 centered at the same position. The RING method is fast and robust against linear
 gradients of the background rates, but requires a model (from the :ref:`instrument response functions <glossary_irf>`
@@ -133,22 +133,7 @@ Below you can see the new significance map with the source/exclusion region.
 
 For a classical spectral analysis we need to derive count spectra for the source
 region and for background regions. This is accomplished by the :ref:`csphagen`
-script. This script saves the source (On) and background (Off) count spectra
-in `OGIP format <https://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/spectra/ogip_92_007/node5.html>`_,
-along with the relevant information from the :ref:`instrument response functions <glossary_irf>`
-refashioned according to this format conventions.
-
-:ref:`csphagen` calculates the background counts using the REFLECTED algorithm
-(e.g., Berge et al. 2007 A&A 466 1219B), in which, for each individual
-observation the background regions have the same shape as the source region, and
-are rotated around the center of the camera keeping the same offset. As many
-reflected regions as possible are used, excluding the area of the camera near
-the source position. Since the background rates are expected to be approximately
-radially symmetric in camera coordinates, this method minimizes the impact of
-the background rate modeling from Monte Carlo. An optional exclusion map (in
-FITS WCS format) can be provided as input through the ``inexclusion`` hidden
-parameter if other regions of significant gamma-ray emission ought to be
-excluded from the background computation.
+script.
 
 .. code-block:: bash
 
@@ -183,33 +168,9 @@ looks like.
       </observation>
     </observation_list>
 
-The observation entails four FITS files. ``onoff_stacked_pha_on.fits`` and
-``onoff_stacked_pha_off.fits`` contain the On and Off spectra, respectively.
-These are stored in the SPECTRUM extension of the FITS file, along with ancillary
-information, notably the scaling factor to be applied to the background spectrum,
-BACKSCAL. The third extension, EBOUNDS, contains the boundaries of the energy
-bins, as defined by the binning parameters in input to csphagen. The file
-``onoff_stacked_arf.fits`` contains the spectral response of the instrument
-extracted fromt the :ref:`instrument response functions <glossary_irf>`,
-including effective area for gamma-ray detection and background rates, in the
-SPECRESP extension. The file ``onoff_stacked_rmf.fits`` contains the remaining
-part of the instrument response, i.e., an energy redistribution matrix (MATRIX),
-as well as another instance of the EBOUNDS table. Note that we are performing a
-1D analysis: the effect of the PSF is already folded into the effective area
-computation.
-
 .. note::
 
-    The parameters specified control the energy binning of the count spectra in
-    *reconstructed* energy. For the computation of the instrument response we
-    need a fine binning in *true* energy, which is controlled by the hidden
-    parameters ``etruemin``, ``etruemax``, and ``etruebins``.
-
-.. note::
-
-    The first part of the FITS files names (and a full path to the desired
-    location) can be set using the hidden ``prefix`` parameter of
-    :ref:`csphagen`. If you decide not to stack multiple observations the string
+    If you decide not to stack multiple observations the string
     ``stacked`` with be replaced in the file names by the observation id for
     each of the original observations.
 
@@ -226,12 +187,6 @@ the On and Off regions for a few observations (extracted using the
 
    *Sky map of the event counts in a larger region around Cas A (not background subtracted). The green crosses show the pointing directions, the magenta circles the Off regions, and the white circle the On region.*
 
-.. note::
-
-    If you wish to limit the number of observations considered to those pointed
-    closer to the source, you can do this either at the observation selection
-    level (see :ref:`csobsselect`), or directly in :ref:`csphagen` via the
-    hidden ``maxoffset`` parameter.
 
 Next we need a model to be fit to the observations. It must contain a model for the
 source, and, optionally, a model for the background. Here is what such a
@@ -300,32 +255,9 @@ The output file ``CasA_results.xml`` contains the best fit parameter values.
     Check the :ref:`ctlike` log file (by default ``ctlike.log``) to learn
     about the fit convergence and investigate any issues.
 
-:ref:`ctlike` has a hidden parameter called ``statistic`` that sets the
-statistic used for the fit.
-
-- The DEFAULT for OnOff osbervations is CSTAT, i.e., Poisson signal and Poisson
-  background. A spectral model for the signal and a spectral model for the
-  background are jointly fit to the On and Off spectra.
-- WSTAT is a special case of CSTAT, Poisson signal with Poisson background, in
-  which you do not need to have a spectral model for the background and
-  free parameters associated with it. The number of background counts in each
-  energy bin is treated as a nuisance parameter, derived from the On and Off
-  counts by profiling the likelihood function. In this case the only assumption
-  is that the background rate spectrum is the same in the On and Off regions.
-
-.. warning::
-    Beware that the profiling may yield unphysical results (negative background
-    counts) if the number of events in the Off spectra are zero. In this case a
-    null number of expected background events must be enforced,
-    which can result in a bias on the source's parameters. You can address this
-    issue by stacking multiple observations, using a coarser energy binning, or
-    using CSTAT instead (if you have a spectral model for the background that is
-    good enough). See the `XSPEC manual Appendix B <https://heasarc.gsfc.nasa.gov/xanadu/xspec/manual/XSappendixStatistics.html>`_
-    for more information.
-
-- You can also use CHI2, a classical chi square, i.e., a Gaussian signal and
-  Gaussian background. As for CSTAT, a spectral model for the signal and a
-  spectral model for the background are jointly fit to the On and Off spectra.
+The hidden parameter ``statistic`` in  :ref:`ctlike` can be used to
+set the fit statistic and in particular how the background is treated
+in the fit.
 
 The :ref:`ctbutterfly` tool and :ref:`csspec` script can now be used to extract
 the best-fit source spectrum.
