@@ -16,11 +16,7 @@ Doing an unbinned analysis
 
      An unbinned analysis is generally preferred over a binned analysis for
      short observation times (a few tens of hours) or if you want to assure
-     that the analysis results are not biased by the selected binning. Also
-     the fitting of a light or phase curve is only be possible with an
-     unbinned maximum likelihood analysis
-     (see :ref:`light curve <1dc_howto_ligthcurve>` and
-     :ref:`phase curve <1dc_howto_phasecurve>` fitting).
+     that the analysis results are not biased by the selected binning.
 
 An alternative analysis technique consists of working directly on the event
 list without binning the events in a counts cube.

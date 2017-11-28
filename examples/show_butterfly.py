@@ -84,7 +84,7 @@ def plot_butterfly(filename, plotfile):
     plt.plot(line_x,line_y,color='black',ls='-')
     plt.fill(butterfly_x,butterfly_y,color='green',alpha=0.5)
     plt.xlabel('Energy (TeV)')
-    plt.ylabel(r'E $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
+    plt.ylabel(r'E$^2$ $\times$ dN/dE (erg cm$^{-2}$ s$^{-1}$)')
 
     # Show spectrum or save it into file
     if len(plotfile) > 0:
