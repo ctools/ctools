@@ -44,12 +44,12 @@ General parameters
 
 ``(inexclusion = NONE) [file]``
     Optional FITS file containing a WCS map in the first hdu that defines sky
-    regions not to be used for background estimation in On/Off analysis (where
+    regions not to be used for background estimation in ``ONOFF`` analysis (where
     map value != 0).
 
 ``(edisp = no) [boolean]``
-    Applies energy dispersion to response computation (for Cube analysis only,
-    energy dispersion is always taken into account in On/Off analysis).
+    Applies energy dispersion to response computation (for ``3D`` analysis only,
+    energy dispersion is always taken into account in ``ONOFF`` analysis).
 
 ``outfile [file]``
     Name of the light curve output file.
@@ -70,7 +70,7 @@ General parameters
     File defining the time binning.
 
 ``method  <3D|ONOFF> [string]``
-    Selects between 3D analysis (3D spatial/energy likelihood) and ONOFF
+    Selects between ``3D`` analysis (3D spatial/energy likelihood) and ``ONOFF``
     analysis (1D likelihood with background from Off regions).
 
 ``emin [real]``
@@ -80,7 +80,7 @@ General parameters
     Upper energy limit of events (in TeV).
 
 ``enumbins [integer]``
-    Number of energy bins per light curve bin (0=unbinned for Cube analysis only).
+    Number of energy bins per light curve bin (0=unbinned for ``3D`` analysis only).
 
 ``coordsys <CEL|GAL> [string]``
     Coordinate system (CEL - celestial, GAL - galactic).
@@ -89,50 +89,52 @@ General parameters
     Projection method.
 
 ``xref [real]``
-    Right Ascension / Galactic longitude of image / On region centre (J2000, in degrees).
+    Right Ascension / Galactic longitude of image centre for ``3D`` analysis or
+    source region centre for ``ONOFF`` analysis (J2000, in degrees).
 
 ``yref [real]``
-    Declination / Galactic latitude of image / On region centre (J2000, in degrees).
+    Declination / Galactic latitude of image centre for ``3D`` analysis or
+    source region centre for ``ONOFF`` analysis (J2000, in degrees).
 
 ``nxpix [integer]``
-    Size of the Right Ascension / Galactic longitude axis for Cube analysis (in pixels).
+    Size of the Right Ascension / Galactic longitude axis for ``3D`` analysis (in pixels).
 
 ``nypix [integer]``
-    Size of the Declination / Galactic latitude axis for Cube analysis (in pixels).
+    Size of the Declination / Galactic latitude axis for ``3D`` analysis (in pixels).
 
 ``binsz [real]``
-    Pixel size for Cube analysis (in degrees/pixel).
+    Pixel size for ``3D`` analysis (in degrees/pixel).
 
 ``(srcshape = CIRCLE) [string]``
-    Shape of the source region.
+    Shape of the source region for ``ONOFF`` analysis.
     ``CIRCLE``: circular region around given position.
 
 ``rad [real]``
-    Radius of source region circle for On/Off analysis (deg)
+    Radius of source region circle for ``ONOFF`` analysis (deg)
 
 ``(bkgmethod = REFLECTED) [string]``
-    Method for background estimation in On/Off analysis.
+    Method for background estimation in ``ONOFF`` analysis.
     ``REFLECTED:`` background evaluated in regions with the same shape as
     source region reflected w.r.t. pointing direction for each observation.
 
 ``(bkgregmin = 2) [integer]``
     Minimum number of background regions that are required for an observation in
-    On/Off analysis. If this number of background regions is not available the observation is
-    skipped.
+    ``ONOFF`` analysis. If this number of background regions is not available the
+    observation is skipped.
 
 ``(maxoffset = 4.0) [real]``
     Maximum offset in degrees of source from camera center to accept the
-    observation for On/Off analysis.
+    observation for ``ONOFF`` analysis.
 
 ``(etruemin = 0.01) [real]``
-    Minimum true energy to evaluate instrumental response in On/Off analysis (TeV).
+    Minimum true energy to evaluate instrumental response in ``ONOFF`` analysis (TeV).
 
 ``(etruemax = 0.01) [real]``
-    Maximum true energy to evaluate instrumental response in On/Off analysis (TeV).
+    Maximum true energy to evaluate instrumental response in ``ONOFF`` analysis (TeV).
 
 ``(etruebins = 30) [integer]``
     Number of bins per decade for true energy bins to evaluate instrumental
-    response in On/Off analysis.
+    response in ``ONOFF`` analysis.
 
 ``(statistic = DEFAULT) <DEFAULT|CSTAT|WSTAT|CHI2> [string]``
     Optimization statistic. ``DEFAULT`` uses the default statistic for all
