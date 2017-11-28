@@ -1,5 +1,7 @@
-Basic ctools parameter usage
-============================
+Description of ctools parameters in the reference manual
+=====================================
+
+For a generic introduction to ctools and user parameters see `here <../user_manual/introduction.html>`__.
 
 Automatic parameters
 --------------------
@@ -36,7 +38,7 @@ Examples
  	 	 
 .. note::
 
-  To set hidden parameters at runtime, specify them explicitly at 
+  You can set hidden parameters at runtime by specifying them explicitly on 
   the command line; for example:
 
   ``ctobssim start_time=900``

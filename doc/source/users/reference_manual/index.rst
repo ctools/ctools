@@ -4,10 +4,12 @@ Reference Manual
 ================
 
 This manual provides reference information for all ctools and csripts.
-General information on ctools usage can be found `here <usage.html>`__.
+General information on ctools usage can be found `here
+<../user_manual/introduction.html>`_. The description of user parameters in the reference
+manual is documented `here <usage.html>`__.
 
-Below you find links to the command line reference for the tools and scripts
-that are available.
+
+Below you find links to the command line reference for all available tools and scripts.
 
 ctools
 ------
