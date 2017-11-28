@@ -363,31 +363,36 @@ class csphasecrv(ctools.csobservation):
             select['dec']  = 'UNDEFINED'
             select['expr'] = 'PHASE>'+str(phbin[0])+' && PHASE<'+str(phbin[1])
             select.run()
-            
+
+            # Set phase string
+            phstr = str(phbin[0]) + '-' + str(phbin[1])
+
             # Add phase to observation id
             for i in range(0,select.obs().size()):
                 oldid = select.obs()[i].id()
-                select.obs()[i].id(oldid+'_'+str(phbin[0])+'-'+str(phbin[1]))
+                select.obs()[i].id(oldid+'_'+phstr)
             obs = select.obs()
             
             # If an On/Off analysis is requested generate the On/Off observations
             if self._onoff:
                 obs = obsutils.get_onoff_obs(self, select.obs())
-            # Otherwise, if stacked analysis is requested then bin the events
-            # and compute the stacked response functions and setup
+
+            # ... otherwise, if stacked analysis is requested then bin the
+            # events and compute the stacked response functions and setup
             # an observation container with a single stacked observation.
             elif self._stacked:
                 obs = obsutils.get_stacked_obs(self, select.obs())
-    
+
             # Header
             self._log_header3(gammalib.EXPLICIT, 'Fitting the data')
-    
-            # Do maximum likelihood model fitting
+
             # The On/Off analysis can produce empty observation containers,
             # e.g., when on-axis observations are used. To avoid ctlike asking
-            # for a new observations contained (or hang, in on interactive mode)
+            # for a new observation container (or hang, if in interactive mode)
             # we'll run ctlike only if the size is >0
             if obs.size() > 0:
+
+                # Do maximum likelihood model fitting
                 like = ctools.ctlike(obs)
                 like['edisp'] = self['edisp'].boolean()
                 like.run()
@@ -397,16 +402,18 @@ class csphasecrv(ctools.csobservation):
                 for model in like.obs().models():
                     scaled_norm = model['Normalization'].value()/(phbin[1]-phbin[0])
                     model['Normalization'].value(scaled_norm)
+
                 # Store fit model
-                self._fitmodels[str(phbin[0])+'-'+str(phbin[1])] = \
-                                like.obs().models().copy()
+                self._fitmodels[phstr] = like.obs().models().copy()
+
+            # ... otherwise we set an empty model container
             else:
                 self._log_string(gammalib.TERSE,
                                  'PHASE %f - %f: no observations available'
                                  ' for fitting' %(phbin[0], phbin[1]))
-                # empty models container
-                self._fitmodels[str(phbin[0]) + '-' + str(phbin[1])] = \
-                    gammalib.GModels()
+
+                # Set empty models container
+                self._fitmodels[phstr] = gammalib.GModels()
 
         # Create FITS file
         self._create_fits()

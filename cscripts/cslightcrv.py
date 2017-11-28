@@ -457,12 +457,14 @@ class cslightcrv(ctools.csobservation):
 
             # Deal with stacked and On/Off Observations
             if self._stacked or self._onoff:
+
                 # If a stacked analysis is requested bin the events
                 # and compute the stacked response functions and setup
                 # an observation container with a single stacked observation.
                 if self._stacked:
                     new_obs = obsutils.get_stacked_obs(self, obs)
-                # Otherwise if On/Off analysis is requested generate
+
+                # ... otherwise if On/Off analysis is requested generate
                 # the On/Off observations and response
                 elif self._onoff:
                     new_obs = obsutils.get_onoff_obs(self, obs)
