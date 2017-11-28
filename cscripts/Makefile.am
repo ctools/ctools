@@ -164,6 +164,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/crab_psfcube.fits.gz \
            $(top_srcdir)/test/data/crab_edispcube.fits.gz \
            $(top_srcdir)/test/data/crab_bkgcube.fits.gz \
+           $(top_srcdir)/test/data/crab_onoff.xml \
            $(top_srcdir)/test/data/crab_offaxis1.fits.gz \
            $(top_srcdir)/test/data/crab_offaxis2.fits.gz \
            $(top_srcdir)/test/data/crab_exclusion.fits.gz \

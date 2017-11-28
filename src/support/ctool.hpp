@@ -104,6 +104,7 @@ protected:
 
     // Protected methods that query user parameters
     bool              is_stacked(void);
+    bool              is_onoff(void);
 
     // Protected methods for logging
     void              log_observations(const GChatter&      chatter,
