@@ -34,7 +34,7 @@ You do this with the :ref:`ctlike` tool as follows:
 You will recognise that :ref:`ctlike` runs much faster in unbinned mode
 compared to binned mode.
 This is understandable as the selected event list contains
-only 21991 events, while the binned counts cube you used before had
+only 20877 events, while the binned counts cube you used before had
 200 x 200 x 20 = 800000 bins. As unbinned maximum likelihood fitting loops
 over the events (while binned maximum likelihood loops over the bins),
 there are much less operations to perform in unbinned than in binned mode
@@ -56,63 +56,62 @@ the same events for both analyses.
 
 .. code-block:: none
 
-   2017-08-08T20:56:27: +=================================+
-   2017-08-08T20:56:27: | Maximum likelihood optimisation |
-   2017-08-08T20:56:27: +=================================+
-   2017-08-08T20:56:27:  >Iteration   0: -logL=140091.731, Lambda=1.0e-03
-   2017-08-08T20:56:28:  >Iteration   1: -logL=140089.754, Lambda=1.0e-03, delta=1.977, step=1.0e+00, max(|grad|)=5.681267 [Index:3]
-   2017-08-08T20:56:28:  >Iteration   2: -logL=140089.751, Lambda=1.0e-04, delta=0.003, step=1.0e+00, max(|grad|)=0.255879 [Index:3]
-   2017-08-08T20:56:28:
-   2017-08-08T20:56:28: +=========================================+
-   2017-08-08T20:56:28: | Maximum likelihood optimisation results |
-   2017-08-08T20:56:28: +=========================================+
-   2017-08-08T20:56:28: === GOptimizerLM ===
-   2017-08-08T20:56:28:  Optimized function value ..: 140089.751
-   2017-08-08T20:56:28:  Absolute precision ........: 0.005
-   2017-08-08T20:56:28:  Acceptable value decrease .: 2
-   2017-08-08T20:56:28:  Optimization status .......: converged
-   2017-08-08T20:56:28:  Number of parameters ......: 10
-   2017-08-08T20:56:28:  Number of free parameters .: 4
-   2017-08-08T20:56:28:  Number of iterations ......: 2
-   2017-08-08T20:56:28:  Lambda ....................: 1e-05
-   2017-08-08T20:56:28:  Maximum log likelihood ....: -140089.751
-   2017-08-08T20:56:28:  Observed events  (Nobs) ...: 21991.000
-   2017-08-08T20:56:28:  Predicted events (Npred) ..: 21990.996 (Nobs - Npred = 0.00358908515045187)
-   2017-08-08T20:56:28: === GModels ===
-   2017-08-08T20:56:28:  Number of models ..........: 2
-   2017-08-08T20:56:28:  Number of parameters ......: 10
-   2017-08-08T20:56:28: === GModelSky ===
-   2017-08-08T20:56:28:  Name ......................: Crab
-   2017-08-08T20:56:28:  Instruments ...............: all
-   2017-08-08T20:56:28:  Instrument scale factors ..: unity
-   2017-08-08T20:56:28:  Observation identifiers ...: all
-   2017-08-08T20:56:28:  Model type ................: PointSource
-   2017-08-08T20:56:28:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
-   2017-08-08T20:56:28:  Number of parameters ......: 6
-   2017-08-08T20:56:28:  Number of spatial par's ...: 2
-   2017-08-08T20:56:28:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
-   2017-08-08T20:56:28:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
-   2017-08-08T20:56:28:  Number of spectral par's ..: 3
-   2017-08-08T20:56:28:   Prefactor ................: 5.69800719463692e-16 +/- 9.95311294944208e-18 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
-   2017-08-08T20:56:28:   Index ....................: -2.46101639180337 +/- 0.0145278326558106 [-0,-5]  (free,scale=-1,gradient)
-   2017-08-08T20:56:28:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2017-08-08T20:56:28:  Number of temporal par's ..: 1
-   2017-08-08T20:56:28:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-   2017-08-08T20:56:28: === GCTAModelIrfBackground ===
-   2017-08-08T20:56:28:  Name ......................: CTABackgroundModel
-   2017-08-08T20:56:28:  Instruments ...............: CTA
-   2017-08-08T20:56:28:  Instrument scale factors ..: unity
-   2017-08-08T20:56:28:  Observation identifiers ...: all
-   2017-08-08T20:56:28:  Model type ................: "PowerLaw" * "Constant"
-   2017-08-08T20:56:28:  Number of parameters ......: 4
-   2017-08-08T20:56:28:  Number of spectral par's ..: 3
-   2017-08-08T20:56:28:   Prefactor ................: 1.00310957843794 +/- 0.0134585839142799 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
-   2017-08-08T20:56:28:   Index ....................: 0.00814622034405194 +/- 0.00817635016295375 [-5,5]  (free,scale=1,gradient)
-   2017-08-08T20:56:28:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
-   2017-08-08T20:56:28:  Number of temporal par's ..: 1
-   2017-08-08T20:56:28:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
-
-..
+		2017-11-28T16:26:57: +=================================+
+		2017-11-28T16:26:57: | Maximum likelihood optimisation |
+		2017-11-28T16:26:57: +=================================+
+		2017-11-28T16:26:57:  >Iteration   0: -logL=134457.962, Lambda=1.0e-03
+		2017-11-28T16:26:57:  >Iteration   1: -logL=134437.621, Lambda=1.0e-03, delta=20.342, step=1.0e+00, max(|grad|)=43.475634 [Index:7]
+		2017-11-28T16:26:57:  >Iteration   2: -logL=134437.595, Lambda=1.0e-04, delta=0.026, step=1.0e+00, max(|grad|)=0.121800 [Index:7]
+		2017-11-28T16:26:57:  >Iteration   3: -logL=134437.595, Lambda=1.0e-05, delta=0.000, step=1.0e+00, max(|grad|)=0.001202 [Index:7]
+		2017-11-28T16:26:57: 
+		2017-11-28T16:26:57: +=========================================+
+		2017-11-28T16:26:57: | Maximum likelihood optimisation results |
+		2017-11-28T16:26:57: +=========================================+
+		2017-11-28T16:26:57: === GOptimizerLM ===
+		2017-11-28T16:26:57:  Optimized function value ..: 134437.595
+		2017-11-28T16:26:57:  Absolute precision ........: 0.005
+		2017-11-28T16:26:57:  Acceptable value decrease .: 2
+		2017-11-28T16:26:57:  Optimization status .......: converged
+		2017-11-28T16:26:57:  Number of parameters ......: 10
+		2017-11-28T16:26:57:  Number of free parameters .: 4
+		2017-11-28T16:26:57:  Number of iterations ......: 3
+		2017-11-28T16:26:57:  Lambda ....................: 1e-06
+		2017-11-28T16:26:57:  Maximum log likelihood ....: -134437.595
+		2017-11-28T16:26:57:  Observed events  (Nobs) ...: 20877.000
+		2017-11-28T16:26:57:  Predicted events (Npred) ..: 20877.000 (Nobs - Npred = -1.41397322295234e-07)
+		2017-11-28T16:26:57: === GModels ===
+		2017-11-28T16:26:57:  Number of models ..........: 2
+		2017-11-28T16:26:57:  Number of parameters ......: 10
+		2017-11-28T16:26:57: === GModelSky ===
+		2017-11-28T16:26:57:  Name ......................: Crab
+		2017-11-28T16:26:57:  Instruments ...............: all
+		2017-11-28T16:26:57:  Instrument scale factors ..: unity
+		2017-11-28T16:26:57:  Observation identifiers ...: all
+		2017-11-28T16:26:57:  Model type ................: PointSource
+		2017-11-28T16:26:57:  Model components ..........: "PointSource" * "PowerLaw" * "Constant"
+		2017-11-28T16:26:57:  Number of parameters ......: 6
+		2017-11-28T16:26:57:  Number of spatial par's ...: 2
+		2017-11-28T16:26:57:   RA .......................: 83.6331 [-360,360] deg (fixed,scale=1)
+		2017-11-28T16:26:57:   DEC ......................: 22.0145 [-90,90] deg (fixed,scale=1)
+		2017-11-28T16:26:57:  Number of spectral par's ..: 3
+		2017-11-28T16:26:57:   Prefactor ................: 5.85495471291474e-16 +/- 1.08121595582131e-17 [1e-23,1e-13] ph/cm2/s/MeV (free,scale=1e-16,gradient)
+		2017-11-28T16:26:57:   Index ....................: -2.48742680094013 +/- 0.0155955916697299 [-0,-5]  (free,scale=-1,gradient)
+		2017-11-28T16:26:57:   PivotEnergy ..............: 300000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+		2017-11-28T16:26:57:  Number of temporal par's ..: 1
+		2017-11-28T16:26:57:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
+		2017-11-28T16:26:57: === GCTAModelIrfBackground ===
+		2017-11-28T16:26:57:  Name ......................: CTABackgroundModel
+		2017-11-28T16:26:57:  Instruments ...............: CTA
+		2017-11-28T16:26:57:  Instrument scale factors ..: unity
+		2017-11-28T16:26:57:  Observation identifiers ...: all
+		2017-11-28T16:26:57:  Model type ................: "PowerLaw" * "Constant"
+		2017-11-28T16:26:57:  Number of parameters ......: 4
+		2017-11-28T16:26:57:  Number of spectral par's ..: 3
+		2017-11-28T16:26:57:   Prefactor ................: 0.966210894921824 +/- 0.0131220642906203 [0.001,1000] ph/cm2/s/MeV (free,scale=1,gradient)
+		2017-11-28T16:26:57:   Index ....................: 0.00879946195443994 +/- 0.00825144420159423 [-5,5]  (free,scale=1,gradient)
+		2017-11-28T16:26:57:   PivotEnergy ..............: 1000000 [10000,1000000000] MeV (fixed,scale=1000000,gradient)
+		2017-11-28T16:26:57:  Number of temporal par's ..: 1
+		2017-11-28T16:26:57:   Normalization ............: 1 (relative value) (fixed,scale=1,gradient)
 
   .. note::
 

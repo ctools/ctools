@@ -21,6 +21,6 @@ examples should take about an hour, so grab some coffee before you start.
    butterfly
    spectrum
    unbinned
-   onoff
    energy_dispersion
+   onoff
    ctools-from-python
