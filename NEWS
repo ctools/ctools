@@ -1,6 +1,6 @@
 New Features and Important Changes in ctools 1.5.0
 
-27 November 2017
+28 November 2017
 
 
 Introduction
@@ -164,7 +164,11 @@ None
 
 cslightcrv - Generate light curve
 ---------------------------------
-The script now derived from the csobservation base class. A "statistic"
+The script now also supports the handling of On/Off observations. For that
+purpose parameters were added that are needed for the execution of the
+csphagen script (#2273).
+
+The script now derives from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the light
 curve generation (#2237).
 
@@ -220,7 +224,11 @@ The script was added to allow the generation of PHA, ARF and RMF datasets for cl
 
 csphasecrv - Generate phase curve
 ---------------------------------
-The script now derived from the csobservation base class. A "statistic"
+The script now also supports the handling of On/Off observations. For that
+purpose parameters were added that are needed for the execution of the
+csphagen script (#2273).
+
+The script now derives from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the light
 curve generation (#2237).
 
@@ -231,7 +239,7 @@ The script now handles On/Off observation. The parameters "onsrc" and "onrad"
 were added to allow specifying the On region test source and On region radius
 (#2260).
 
-The script now derived from the csobservation base class. A "statistic"
+The script now derives from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the pull
 distribution generation (#2237).
 
@@ -258,7 +266,7 @@ computation (#2237).
 
 csspec - Generates Spectral Energy Distribution
 -----------------------------------------------
-The script now derived from the csobservation base class. A "statistic"
+The script now derives from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the spectrum
 generation (#2237).
 
@@ -279,7 +287,7 @@ None
 
 cstsdist - Computes Test Statistic distribution
 -----------------------------------------------
-The script now derived from the csobservation base class. A "statistic"
+The script now derives from the csobservation base class. A "statistic"
 parameter was added to allow setting the optimizer statistic for the Test
 Statistic distribution generation (#2237).
 
