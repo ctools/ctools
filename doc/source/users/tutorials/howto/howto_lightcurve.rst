@@ -37,7 +37,7 @@ The time interval is linearly divided into 20 time bins.
    Lightcurve start time (UTC string, JD, MJD or MET in seconds) [MJD 51544.5] MJD 59235.5
    Lightcurve stop time (UTC string, JD, MJD or MET in seconds) [MJD 51544.6] MJD 59236.0
    Number of time bins (1-10000) [5] 20
-   Analysis method (CUBE|ONOFF) [CUBE] CUBE
+   Analysis method (3D|ONOFF) [3D]
    Lower energy limit of events (TeV) [0.1]
    Upper energy limit of events (TeV) [100.0]
    Number of energy bins for binned (0=unbinned for Cube analysis only) (0-100) [0]

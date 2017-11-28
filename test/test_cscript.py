@@ -456,7 +456,7 @@ class Test(test):
         # TODO: implement
 
         # Test is_onoff() method
-        # TODO: implemen
+        # TODO: implement
 
         # Test set_response() method
         # TODO: implement

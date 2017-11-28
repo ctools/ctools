@@ -761,9 +761,10 @@ def get_stacked_obs(cls, obs):
     # Return new oberservation container
     return new_obs
 
-# ================================= #
+
+# ================================ #
 # Get On/Off observation container #
-# ================================= #
+# ================================ #
 def get_onoff_obs(cls, obs):
     """
     Create On/Off observations container from given observations
@@ -784,16 +785,17 @@ def get_onoff_obs(cls, obs):
     if cls._logExplicit():
         cls._log.header3('Creating On/Off observations')
 
+    # Create On/Off observations
     phagen = cscripts.csphagen(obs)
     phagen['inexclusion'] = cls['inexclusion'].value()
-    phagen['emin'] = cls['emin'].real()
-    phagen['emax'] = cls['emax'].real()
-    phagen['enumbins'] = cls['enumbins'].integer()
-    phagen['ebinalg'] = 'LOG'
-    phagen['srcshape'] = cls['srcshape'].string()
-    phagen['coordsys'] = cls['coordsys'].string()
+    phagen['emin']        = cls['emin'].real()
+    phagen['emax']        = cls['emax'].real()
+    phagen['enumbins']    = cls['enumbins'].integer()
+    phagen['ebinalg']     = 'LOG'
+    phagen['srcshape']    = cls['srcshape'].string()
+    phagen['coordsys']    = cls['coordsys'].string()
     if cls['coordsys'].string() == 'CEL':
-        phagen['ra'] = cls['xref'].real()
+        phagen['ra']  = cls['xref'].real()
         phagen['dec'] = cls['yref'].real()
     elif cls['coordsys'].string() == 'GAL':
         phagen['glon'] = cls['xref'].real()
@@ -804,15 +806,16 @@ def get_onoff_obs(cls, obs):
     if cls['bkgmethod'].string() == 'REFLECTED':
         phagen['bkgregmin'] = cls['bkgregmin'].integer()
     phagen['maxoffset'] = cls['maxoffset'].real()
-    phagen['stack'] = True
-    phagen['etruemin'] = cls['etruemin'].real()
-    phagen['etruemax'] = cls['etruemax'].real()
+    phagen['stack']     = True
+    phagen['etruemin']  = cls['etruemin'].real()
+    phagen['etruemax']  = cls['etruemax'].real()
     phagen['etruebins'] = cls['etruebins'].integer()
-    phagen['chatter'] = cls['chatter'].integer()
-    phagen['clobber'] = cls['clobber'].boolean()
-    phagen['debug'] = cls['debug'].boolean()
+    phagen['chatter']   = cls['chatter'].integer()
+    phagen['clobber']   = cls['clobber'].boolean()
+    phagen['debug']     = cls['debug'].boolean()
     phagen.run()
 
+    # Clone resulting observation container
     onoff_obs = phagen.obs().copy()
 
     # On/Off observations are created with CSTAT as default statistic
@@ -823,4 +826,5 @@ def get_onoff_obs(cls, obs):
         for observation in onoff_obs:
             observation.statistic(cls['statistic'].string())
 
+    # Return On/Off oberservation container
     return onoff_obs

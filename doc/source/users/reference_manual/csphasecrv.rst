@@ -63,8 +63,8 @@ General parameters
 ``phbinfile [file]``
     File defining the phase binning.
 
-``method <CUBE|ONOFF> [string]``
-    Selects between CUBE analysis (3D spatial/energy likelihood) and ONOFF
+``method <3D|ONOFF> [string]``
+    Selects between 3D analysis (3D spatial/energy likelihood) and ONOFF
     analysis (1D likelihood with background from Off regions).
 
 ``emin [real]``

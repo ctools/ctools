@@ -77,7 +77,7 @@ class Test(test):
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
-                         ' tbins=3 method="CUBE" enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbins=3 method="3D" enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd1.log" chatter=1'
 
@@ -97,7 +97,7 @@ class Test(test):
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg="LIN" tmin="MJD 51544.50" tmax="MJD 51544.53"'+ \
-                         ' tbins=3 method="CUBE" enumbins=0 emin=0.1 emax=100.0'+ \
+                         ' tbins=3 method="3D" enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd2.log" debug=yes'
 
@@ -127,7 +127,7 @@ class Test(test):
         lcrv['tmin']     = 'MJD 51544.50'
         lcrv['tmax']     = 'MJD 51544.53'
         lcrv['tbins']    = 3
-        lcrv['method']   = 'CUBE'
+        lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -164,7 +164,7 @@ class Test(test):
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'FILE'
         lcrv['tbinfile'] = 'cslightcrv_py2.dat'
-        lcrv['method']   = 'CUBE'
+        lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -194,7 +194,7 @@ class Test(test):
         lcrv['caldb']    = self._caldb
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'GTI'
-        lcrv['method']   = 'CUBE'
+        lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
@@ -219,7 +219,7 @@ class Test(test):
         lcrv['tmin']     = 'MJD 51544.50'
         lcrv['tmax']     = 'MJD 51544.53'
         lcrv['tbins']    = 2
-        lcrv['method']   = 'CUBE'
+        lcrv['method']   = '3D'
         lcrv['emin']     = 0.1
         lcrv['emax']     = 100.0
         lcrv['enumbins'] = 10

@@ -242,17 +242,20 @@ class csphasecrv(ctools.csobservation):
             
             # Store fit results
             phname = str(phmin)+'-'+str(phmax)
+
             # If the model contains the source of interest fill results
             try:
                 source = self._fitmodels[phname][self._srcname]
                 for par in pars:
                     result['values'][par]      = source[par].value()
                     result['values']['e_'+par] = source[par].error()
-            # Otherwise fills with zeros
+
+            # ... otherwise fills with zeros
             except:
                 for par in pars:
                     result['values'][par]      = 0.
                     result['values']['e_'+par] = 0.
+
             # Append result to list of dictionaries
             results.append(result)
             

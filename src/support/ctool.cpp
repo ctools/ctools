@@ -1193,6 +1193,7 @@ bool ctool::is_stacked(void)
     return stacked;
 }
 
+
 /***********************************************************************//**
  * @brief Query user parameters for On/Off analysis
  *
@@ -1200,43 +1201,46 @@ bool ctool::is_stacked(void)
  *
  * Queries the parameter "method", and if this is "ONOFF" signal that an On/
  * Off analysis is requested. In that case, all necessary input parameters of
- * csphagen are queried: "inexclusion", "srcshape", "rad", "bkgmethod",
- * "bkgregmin", "maxoffset", "stack", "etruemin", "etruemax", "etruebins"
+ * csphagen are queried: "inexclusion", "emin", "emax", "enumbins",
+ * "coordsys", "xref", "yref", "srcshape", "rad", "bkgmethod", "bkgregmin",
+ * "maxoffset", "etruemin", "etruemax", and "etruebins".
  *
  * Using this method assures that the parameters are always queried in the
  * same order.
  ***************************************************************************/
 bool ctool::is_onoff(void)
 {
-    // initialise onoff flag 
-     bool onoff = false;
-    // query analysis method chosen
-     if ((*this)["method"].string() == "ONOFF"){
-       //modify onoff flag
-       onoff = true;
-       //query csphagen parameters
-       (*this)["inexclusion"].filename();
-       (*this)["emin"].real();
-       (*this)["emax"].real();
-       (*this)["enumbins"].integer();
-       (*this)["coordsys"].string();
-       (*this)["xref"].real();
-       (*this)["yref"].real();
-       if ((*this)["srcshape"].string() == "CIRCLE"){
-	 (*this)["rad"].real();
-       }
-       if ((*this)["bkgmethod"].string() == "REFLECTED"){
-	 (*this)["bkgregmin"].integer();
-       }
-       (*this)["maxoffset"].real();
-       (*this)["etruemin"].real();
-       (*this)["etruemax"].real();
-       (*this)["etruebins"].integer();
-     }
+    // Set onoff flag
+    bool onoff = ((*this)["method"].string() == "ONOFF");
+    
+    // Query analysis method chosen
+    if (onoff) {
+    
+        // Query csphagen parameters
+        (*this)["inexclusion"].filename();
+        (*this)["emin"].real();
+        (*this)["emax"].real();
+        (*this)["enumbins"].integer();
+        (*this)["coordsys"].string();
+        (*this)["xref"].real();
+        (*this)["yref"].real();
+        if ((*this)["srcshape"].string() == "CIRCLE"){
+            (*this)["rad"].real();
+        }
+        if ((*this)["bkgmethod"].string() == "REFLECTED"){
+            (*this)["bkgregmin"].integer();
+        }
+        (*this)["maxoffset"].real();
+        (*this)["etruemin"].real();
+        (*this)["etruemax"].real();
+        (*this)["etruebins"].integer();
+
+    } // endif: method was ONOFF
 
     // Return onoff flag
     return onoff;
 }
+
 
 /***********************************************************************//**
  * @brief Set response for all CTA observations in container

@@ -112,7 +112,6 @@ class cslightcrv(ctools.csobservation):
         if not self._onoff:
             self._stacked = self._is_stacked()
 
-
         # Query the hidden parameters, just in case
         self['edisp'].boolean()
         self['calc_ulim'].boolean()

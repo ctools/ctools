@@ -77,7 +77,7 @@ class Test(test):
         cmd = csphasecrv+' inobs="'+self._phased_events+'"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' phbinalg="LIN" phbins=5 method="CUBE"'+ \
+                         ' phbinalg="LIN" phbins=5 method="3D"'+ \
                          ' enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="csphasecrv_cmd1.fits"'+ \
                          ' logfile="csphasecrv_cmd1.log" chatter=1'
@@ -97,7 +97,7 @@ class Test(test):
         cmd = csphasecrv+' inobs="events_that_do_not_exist.fits"'+ \
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
-                         ' phbinalg="LIN" phbins=5 method="CUBE"'+ \
+                         ' phbinalg="LIN" phbins=5 method="3D"'+ \
                          ' enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="csphasecrv_cmd2.fits"'+ \
                          ' logfile="csphasecrv_cmd2.log" debug=yes chatter=1'
@@ -126,7 +126,7 @@ class Test(test):
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 5
-        pcrv['method']   = 'CUBE'
+        pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
         pcrv['emin']     = 0.1
         pcrv['emax']     = 100.0
@@ -163,7 +163,7 @@ class Test(test):
         pcrv['irf']       = self._irf
         pcrv['phbinalg']  = 'FILE'
         pcrv['phbinfile'] = 'csphasecrv_py2.dat'
-        pcrv['method']    = 'CUBE'
+        pcrv['method']    = '3D'
         pcrv['enumbins']  = 0
         pcrv['emin']      = 0.1
         pcrv['emax']      = 100.0
@@ -194,7 +194,7 @@ class Test(test):
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 5
-        pcrv['method']   = 'CUBE'
+        pcrv['method']   = '3D'
         pcrv['enumbins'] = 0
         pcrv['emin']     = 0.1
         pcrv['emax']     = 100.0
@@ -218,7 +218,7 @@ class Test(test):
         pcrv['irf']      = self._irf
         pcrv['phbinalg'] = 'LIN'
         pcrv['phbins']   = 2
-        pcrv['method']   = 'CUBE'
+        pcrv['method']   = '3D'
         pcrv['emin']     = 0.1
         pcrv['emax']     = 100.0
         pcrv['enumbins'] = 10
