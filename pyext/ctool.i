@@ -100,6 +100,7 @@ public:
     %rename(_get_skydir)               get_skydir;
     %rename(_set_outfile_name)         set_outfile_name;
     %rename(_is_stacked)               is_stacked;
+    %rename(_is_onoff)                 is_onoff;
     %rename(_set_response)             set_response;
     %rename(_set_edisp)                set_edisp;
     %rename(_restore_edisp)            restore_edisp;
@@ -146,6 +147,7 @@ public:
 
     // Protected methods that query user parameters
     bool              is_stacked(void);
+    bool              is_onoff(void);
 
     // Protected support methods
     void              set_response(GObservations& obs);

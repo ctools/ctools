@@ -455,6 +455,9 @@ class Test(test):
         # Test is_stacked() method
         # TODO: implement
 
+        # Test is_onoff() method
+        # TODO: implement
+
         # Test set_response() method
         # TODO: implement
 
