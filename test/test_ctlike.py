@@ -253,26 +253,30 @@ class Test(test):
 
         # If there are models in the container then check them
         if nmodels > 0:
-            self.test_value(models['Crab']['Prefactor'].value(), 1.58907e-16,
-                            1.0e-3, 'Check fitted Crab Prefactor')
-            self.test_value(models['Crab']['Prefactor'].error(), 0.0526982e-16,
-                            1.0e-3, 'Check Crab Prefactor error')
-            self.test_value(models['Crab']['Index'].value(), -2.43549,
-                            1.0e-3, 'Check fitted Crab Index')
-            self.test_value(models['Crab']['Index'].error(), 0.0248116,
-                            1.0e-3, 'Check Crab Index error')
-            self.test_value(models['Background']['Prefactor'].value(), 61.6919e-6,
-                            1.0e-3, 'Check fitted background Prefactor')
-            self.test_value(models['Background']['Prefactor'].error(), 1.49438e-6,
-                            1.0e-3, 'Check background Prefactor error')
-            self.test_value(models['Background']['Index'].value(), -2.20535,
-                            1.0e-3, 'Check fitted background Index')
-            self.test_value(models['Background']['Index'].error(), 0.0113269,
-                            1.0e-3, 'Check background Index error')
-            self.test_value(models['Background']['Sigma'].value(), 3.04252,
-                            1.0e-3, 'Check fitted background Sigma')
-            self.test_value(models['Background']['Sigma'].error(), 0.0307008,
-                            1.0e-3, 'Check background Sigma error')
+            self.test_value(models['Crab']['Prefactor'].value(),
+                            5.767533e-16, 1.0e-4 * 5.767533e-16,
+                            'Check fitted Crab Prefactor')
+            self.test_value(models['Crab']['Prefactor'].error(),
+                            1.018351e-17, 1.0e-4 * 1.018351e-17,
+                            'Check Crab Prefactor error')
+            self.test_value(models['Crab']['Index'].value(),
+                            -2.462279, 1.0e-4 * 2.462279,
+                            'Check fitted Crab Index')
+            self.test_value(models['Crab']['Index'].error(),
+                            0.0151608, 1.0e-4 * 0.0151608,
+                            'Check Crab Index error')
+            self.test_value(models['CTABackgroundModel']['Prefactor'].value(),
+                            1.0197698, 1.0e-4 * 1.0197698,
+                            'Check fitted background Prefactor')
+            self.test_value(models['CTABackgroundModel']['Prefactor'].error(),
+                            0.013578, 1.0e-4 * 0.013578,
+                            'Check background Prefactor error')
+            self.test_value(models['CTABackgroundModel']['Index'].value(),
+                            0.00836407, 1.0e-4 * 0.00836407,
+                            'Check fitted background Index')
+            self.test_value(models['CTABackgroundModel']['Index'].error(),
+                            0.00811674, 1.0e-4 * 0.00811674,
+                            'Check background Index error')
 
         # Return
         return

@@ -175,7 +175,7 @@ testdata = $(top_srcdir)/test/data/crab.xml \
            $(top_srcdir)/test/data/pntdef_maximal.dat \
            $(top_srcdir)/test/data/models.txt \
            $(top_srcdir)/test/data/tsmaps.txt \
-           $(top_srcdir)/test/data/model_cube_background.xml \
+           $(top_srcdir)/test/data/model_cube_background1.xml \
            $(top_srcdir)/test/data/model_cube_background2.xml \
            $(top_srcdir)/test/data/crab_bkgcube.xml \
            $(top_srcdir)/test/data/irf.root \

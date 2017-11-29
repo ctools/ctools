@@ -149,7 +149,7 @@ class Test(test):
         phase['inobs']   = self._events
         phase['inmodel'] = 'NONE'
         phase['srcname'] = 'NONE'
-        phase['mjd']     = 51544.5
+        phase['mjd']     = 58849.0
         phase['phase']   = 0.0
         phase['f0']      = 1.0
         phase['f1']      = 0.1
@@ -187,7 +187,7 @@ class Test(test):
         phase['inobs']   = self._events
         phase['inmodel'] = 'NONE'
         phase['srcname'] = 'NONE'
-        phase['mjd']     = 51500.0
+        phase['mjd']     = 58860.0
         phase['phase']   = 0.0
         phase['f0']      = 1.0
         phase['f1']      = 0.1
@@ -252,7 +252,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=6141):
+    def _check_result_file(self, filename, nevents=22220):
         """
         Check result file
 

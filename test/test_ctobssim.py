@@ -90,7 +90,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_cmd1.fits')
-        self._test_list(evt, 7105)
+        self._test_list(evt, 23822)
 
         # Setup ctobssim command
         cmd = ctobssim+' inmodel="model_that_does_not_exist.xml"'+ \
@@ -156,14 +156,14 @@ class Test(test):
 
         # Check content of observation
         self._test_observation(sim)
-        self._test_list(sim.obs()[0].events(), 7105)
+        self._test_list(sim.obs()[0].events(), 23822)
 
         # Save events
         sim.save()
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventList('ctobssim_py1.fits')
-        self._test_list(evt, 7105)
+        self._test_list(evt, 23822)
 
         # Set-up observation container
         pnts = [{'ra': 83.63, 'dec': 21.01},
@@ -191,10 +191,10 @@ class Test(test):
 
         # Retrieve observation and check content
         self._test_observation(sim, nobs=4, pnts=pnts)
-        self._test_list(sim.obs()[0].events(), 6199)
-        self._test_list(sim.obs()[1].events(), 6305)
-        self._test_list(sim.obs()[2].events(), 6092)
-        self._test_list(sim.obs()[3].events(), 6192)
+        self._test_list(sim.obs()[0].events(), 22904)
+        self._test_list(sim.obs()[1].events(), 23130)
+        self._test_list(sim.obs()[2].events(), 22672)
+        self._test_list(sim.obs()[3].events(), 22549)
 
         # Save events
         sim.save()
@@ -203,20 +203,20 @@ class Test(test):
         obs = gammalib.GObservations('ctobssim_py2.xml')
 
         # Retrieve observation and check content
-        self._test_list(obs[0].events(), 6199)
-        self._test_list(obs[1].events(), 6305)
-        self._test_list(obs[2].events(), 6092)
-        self._test_list(obs[3].events(), 6192)
+        self._test_list(obs[0].events(), 22904)
+        self._test_list(obs[1].events(), 23130)
+        self._test_list(obs[2].events(), 22672)
+        self._test_list(obs[3].events(), 22549)
 
         # Copy ctobssim tool
         cpy_sim = sim.copy()
 
         # Retrieve observation and check content of copy
         self._test_observation(cpy_sim, nobs=4, pnts=pnts)
-        self._test_list(cpy_sim.obs()[0].events(), 6199)
-        self._test_list(cpy_sim.obs()[1].events(), 6305)
-        self._test_list(cpy_sim.obs()[2].events(), 6092)
-        self._test_list(cpy_sim.obs()[3].events(), 6192)
+        self._test_list(cpy_sim.obs()[0].events(), 22904)
+        self._test_list(cpy_sim.obs()[1].events(), 23130)
+        self._test_list(cpy_sim.obs()[2].events(), 22672)
+        self._test_list(cpy_sim.obs()[3].events(), 22549)
 
         # Execute copy of ctobssim tool again, now with a higher chatter
         # level than before
@@ -230,10 +230,10 @@ class Test(test):
         # Check result file
         obs = gammalib.GObservations('ctobssim_py3.xml')
         self.test_value(obs.size(), 4, 'Check for number of observations')
-        self._test_list(obs[0].events(), 6199)
-        self._test_list(obs[1].events(), 6305)
-        self._test_list(obs[2].events(), 6092)
-        self._test_list(obs[3].events(), 6192)
+        self._test_list(obs[0].events(), 22904)
+        self._test_list(obs[1].events(), 23130)
+        self._test_list(obs[2].events(), 22672)
+        self._test_list(obs[3].events(), 22549)
 
         # Return
         return

@@ -111,11 +111,10 @@ def make_ts_distribution():
 
     # Loop over energy bands. The energy bands are those that are also
     # used for sensitivity computation.
-    for ieng in range(20):
+    for ieng in range(18):
 
         # Set energies
-        loge  = -1.7 + ieng * 0.2
-        #emean = pow(10.0, loge)
+        loge  = -1.3 + ieng * 0.2
         emin  = pow(10.0, loge-0.1)
         emax  = pow(10.0, loge+0.1)
         if loge < 0:

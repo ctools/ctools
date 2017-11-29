@@ -87,7 +87,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd1.fits')
-        self._check_cube(evt, 5542)
+        self._check_cube(evt, 18483)
 
         # Setup ctbin command
         cmd = ctbin+' inobs="events_that_do_not_exist.fits"'+ \
@@ -115,7 +115,7 @@ class Test(test):
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('cntmap_cmd3.fits')
-        self._check_cube(evt, 890)
+        self._check_cube(evt, 3689)
 
         # Check ctbin --help
         self._check_help(ctbin)
@@ -174,15 +174,15 @@ class Test(test):
         binning.run()
 
         # Check content of observation container and counts cube
-        self._check_observation(binning, 5542)
-        self._check_cube(binning.cube(), 5542)
+        self._check_observation(binning, 18483)
+        self._check_cube(binning.cube(), 18483)
 
         # Copy ctbin tool
         cpy_bin = binning.copy()
 
         # Check content of observation container and counts cube
-        self._check_observation(cpy_bin, 5542)
-        self._check_cube(cpy_bin.cube(), 5542)
+        self._check_observation(cpy_bin, 18483)
+        self._check_cube(cpy_bin.cube(), 18483)
 
         # Run copy of ctbin tool again
         cpy_bin['logfile'] = 'ctbin_py2.log'
@@ -201,7 +201,7 @@ class Test(test):
 
         # Load counts cube and check content
         evt = gammalib.GCTAEventCube('ctbin_py1.fits')
-        self._check_cube(evt, 5542)
+        self._check_cube(evt, 18483)
 
         # Now clear ctbin tool
         binning.clear()
@@ -241,12 +241,12 @@ class Test(test):
 
         # Check content of observation and cube (need multiplier=3 since
         # three identical observations have been appended)
-        self._check_observation(binning, 5542, multiplier=3)
-        self._check_cube(binning.cube(), 5542, multiplier=3)
+        self._check_observation(binning, 18483, multiplier=3)
+        self._check_cube(binning.cube(), 18483, multiplier=3)
 
         # Load counts cube and check content.
         evt = gammalib.GCTAEventCube('ctbin_py3.fits')
-        self._check_cube(evt, 5542, multiplier=3)
+        self._check_cube(evt, 18483, multiplier=3)
 
         # And finally go for a fully Pythonic version with all parameters
         # being specified in a dictionary
@@ -262,7 +262,7 @@ class Test(test):
 
         # Load counts cube and check content
         evt = gammalib.GCTAEventCube('ctbin_py4.fits')
-        self._check_cube(evt, 5542)
+        self._check_cube(evt, 18483)
 
         # Return
         return
@@ -290,11 +290,11 @@ class Test(test):
              'Check that the one observation is a CTA observation')
         self.test_value(obs.ontime(), 1800.0*multiplier, 1.0e-6,
              'Check ontime of observation')
-        self.test_value(obs.livetime(), 1710.0*multiplier, 1.0e-6,
+        self.test_value(obs.livetime(), 1764.0*multiplier, 1.0e-6,
              'Check livetime of observation')
         self.test_value(pnt.dir().ra_deg(), 83.63, 1.0e-6,
              'Check pointing Right Ascension of observation')
-        self.test_value(pnt.dir().dec_deg(), 22.01, 1.0e-6,
+        self.test_value(pnt.dir().dec_deg(), 22.51, 1.0e-6,
              'Check pointing Declination of observation')
 
         # Test event cube

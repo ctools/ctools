@@ -49,6 +49,7 @@ class Test(test):
         self._psfcube     = self._datadir + '/crab_psfcube.fits'
         self._edispcube   = self._datadir + '/crab_edispcube.fits'
         self._bkgcube     = self._datadir + '/crab_bkgcube.fits'
+        self._bkgmodel    = self._datadir + '/crab_bkgcube.xml'
         self._onoff_model = self._datadir + '/onoff_model.xml'
 
         # Return
@@ -146,14 +147,14 @@ class Test(test):
         # Check result file
         self._check_result_file('csspec_py1.fits', 5)
 
-        # Set-up binned csspec
+        # Set-up stacked csspec
         spec = cscripts.csspec()
         spec['inobs']     = self._inobs
         spec['expcube']   = self._expcube
         spec['psfcube']   = self._psfcube
         spec['edispcube'] = self._edispcube
         spec['bkgcube']   = self._bkgcube
-        spec['inmodel']   = self._model
+        spec['inmodel']   = self._bkgmodel
         spec['srcname']   = 'Crab'
         spec['method']    = 'AUTO'
         spec['ebinalg']   = 'LOG'

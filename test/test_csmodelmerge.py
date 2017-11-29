@@ -44,7 +44,7 @@ class Test(test):
 
         # Set members
         self._model1  = self._datadir + '/crab.xml'
-        self._model2  = self._datadir + '/model_cube_background.xml'
+        self._model2  = self._datadir + '/model_cube_background1.xml'
         self._model3  = self._datadir + '/model_cube_background*.xml'
         self._model4  = '@' + self._datadir + '/models.txt'
 

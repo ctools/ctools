@@ -145,7 +145,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, ncols=11):
+    def _check_result_file(self, filename, ncols=9):
         """
         Check result file
 

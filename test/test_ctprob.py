@@ -202,7 +202,7 @@ class Test(test):
         return
 
     # Check result file
-    def _check_result_file(self, filename, nevents=6141):
+    def _check_result_file(self, filename, nevents=22220):
         """
         Check result file
 
@@ -220,7 +220,7 @@ class Test(test):
         self._check_events(events, nevents=nevents)
 
         # Check that probability columns exist
-        colname1 = 'PROB_Background'
+        colname1 = 'PROB_CTABackgroundModel'
         colname2 = 'PROB_Crab'
         self._check_column(filename, colname1)
         self._check_column(filename, colname2)        
@@ -232,7 +232,7 @@ class Test(test):
         return
 
     # Check observation and event list
-    def _check_obs(self, obs, nobs=1, nevents=6141):
+    def _check_obs(self, obs, nobs=1, nevents=22220):
         """
         Check observation and event list
 
@@ -257,7 +257,7 @@ class Test(test):
         return
 
     # Check events
-    def _check_events(self, events, nevents=6141):
+    def _check_events(self, events, nevents=22220):
         """
         Check event list
 
