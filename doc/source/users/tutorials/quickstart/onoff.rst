@@ -117,7 +117,7 @@ the On and Off regions.
    :width: 400px
    :align: center
 
-   *Sky map of the events. The cross shows the pointing directions,
+   *Sky map of the events. The cross shows the pointing direction,
    the green circles the Off regions, and the white circle the On
    region.*
 
@@ -152,9 +152,10 @@ At this point we can run an On/Off analysis just by passing the On/Off
 observation container to  :ref:`ctlike`.
 
 .. code-block:: bash
-		Input event list, counts cube or observation definition XML file [selected_events.fits] onoff_obs.xml 
-		Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_onoff.xml 
-		Output model definition XML file [crab_results.xml]
+		
+	Input event list, counts cube or observation definition XML file [selected_events.fits] onoff_obs.xml 
+	Input model definition XML file [$CTOOLS/share/models/crab.xml] crab_onoff.xml 
+	Output model definition XML file [crab_results.xml]
 
 Below you see the corresponding output from the ``ctlike.log``
 file.The fitted parameters are still the same within statistical
