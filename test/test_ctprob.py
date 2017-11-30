@@ -220,7 +220,7 @@ class Test(test):
         self._check_events(events, nevents=nevents)
 
         # Check that probability columns exist
-        colname1 = 'PROB_CTABackgroundModel'
+        colname1 = 'PROB_Background'
         colname2 = 'PROB_Crab'
         self._check_column(filename, colname1)
         self._check_column(filename, colname2)        

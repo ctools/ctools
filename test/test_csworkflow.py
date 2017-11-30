@@ -149,10 +149,10 @@ class Test(test):
         self.test_value(models['Crab'][3].value(),
                         -2.45753747320273, 1.0e-4 * 2.45753747320273,
                         'Check Crab index')
-        self.test_value(models['CTABackgroundModel'][0].value(),
+        self.test_value(models['Background'][0].value(),
                         1.0444753409474, 1.0e-4 * 1.0444753409474,
                         'Check background model prefactor')
-        self.test_value(models['CTABackgroundModel'][1].value(),
+        self.test_value(models['Background'][1].value(),
                         0.0126628793551562, 1.0e-4 * 0.0126628793551562,
                         'Check background model index')
 

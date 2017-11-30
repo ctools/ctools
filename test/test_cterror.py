@@ -275,16 +275,16 @@ class Test(test):
             self.test_value(models['Crab']['Index'].error(),
                             0.0366617454398694, 1.0e-3 * 0.0366617454398694,
                             'Check Crab Index error')
-            self.test_value(models['CTABackgroundModel']['Prefactor'].value(),
+            self.test_value(models['Background']['Prefactor'].value(),
                             1.01525433446138, 1.0e-4 * 1.01525433446138,
                             'Check fitted background Prefactor')
-            self.test_value(models['CTABackgroundModel']['Prefactor'].error(),
+            self.test_value(models['Background']['Prefactor'].error(),
                             0.0334412516391298, 1.0e-4 * 0.0334412516391298,
                             'Check background Prefactor error')
-            self.test_value(models['CTABackgroundModel']['Index'].value(),
+            self.test_value(models['Background']['Index'].value(),
                             -0.005132848897274, 1.0e-3 * 0.005132848897274,
                             'Check fitted background Index')
-            self.test_value(models['CTABackgroundModel']['Index'].error(),
+            self.test_value(models['Background']['Index'].error(),
                             0.0200624490548333, 1.0e-4 * 0.0200624490548333,
                             'Check background Index error')
 

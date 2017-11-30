@@ -43,6 +43,7 @@ class Test(test):
         test.__init__(self)
 
         # Set members
+        self._model         = self._datadir + '/model_crab_radialacceptance.xml'
         self._inobs         = self._datadir + '/obs_stacked.xml'
         self._inobs_two     = self._datadir + '/obs_stacked_two.xml'
         self._stacked_model = self._datadir + '/crab_bkgcube.xml'

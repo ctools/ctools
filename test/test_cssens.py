@@ -42,6 +42,9 @@ class Test(test):
         # Call base class constructor
         test.__init__(self)
 
+        # Set test data
+        self._model = self._datadir + '/model_crab_radialacceptance.xml'
+
         # Return
         return
 
