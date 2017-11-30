@@ -77,7 +77,7 @@ class Test(test):
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg=LIN '+ \
-                         ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:30:00'+ \
+                         ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:05:00'+ \
                          ' tbins=3 method=3D enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd1.log" chatter=1'
@@ -98,7 +98,7 @@ class Test(test):
                          ' inmodel="'+self._model+'" srcname="Crab"'+ \
                          ' caldb="'+self._caldb+'" irf="'+self._irf+'"'+ \
                          ' tbinalg=LIN '+ \
-                         ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:30:00'+ \
+                         ' tmin=2020-01-01T00:00:00 tmax=2020-01-01T00:05:00'+ \
                          ' tbins=3 method=3D enumbins=0 emin=0.1 emax=100.0'+ \
                          ' outfile="lightcurve_cmd1.fits"'+ \
                          ' logfile="cslightcrv_cmd2.log" debug=yes'
@@ -127,7 +127,7 @@ class Test(test):
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
         lcrv['tmin']     = '2020-01-01T00:00:00'
-        lcrv['tmax']     = '2020-01-01T00:30:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
         lcrv['tbins']    = 3
         lcrv['method']   = '3D'
         lcrv['enumbins'] = 0
@@ -151,7 +151,7 @@ class Test(test):
         # is saved into the file "lightcurve_py2.dat".
         csv    = gammalib.GCsv(2,2)
         tmin   = 58849.00
-        tdelta = 0.0104166
+        tdelta = 0.0017361
         for i in range(csv.nrows()):
             csv[i,0] = '%.5f' % (tmin +  i    * tdelta)
             csv[i,1] = '%.5f' % (tmin + (i+1) * tdelta)
@@ -219,7 +219,7 @@ class Test(test):
         lcrv['irf']      = self._irf
         lcrv['tbinalg']  = 'LIN'
         lcrv['tmin']     = '2020-01-01T00:00:00'
-        lcrv['tmax']     = '2020-01-01T00:30:00'
+        lcrv['tmax']     = '2020-01-01T00:05:00'
         lcrv['tbins']    = 2
         lcrv['method']   = '3D'
         lcrv['emin']     = 0.1
@@ -250,8 +250,8 @@ class Test(test):
         lcrv['caldb']     = self._caldb
         lcrv['irf']       = self._irf
         lcrv['tbinalg']   = 'LIN'
-        lcrv['tmin']      = 'MJD 58849.0008'
-        lcrv['tmax']      = 'MJD 58849.0112'
+        lcrv['tmin']      = '2020-01-01T00:00:00'
+        lcrv['tmax']      = '2020-01-01T00:05:00'
         lcrv['tbins']     = 2
         lcrv['method']    = 'ONOFF'
         lcrv['emin']      = 0.1
@@ -261,6 +261,9 @@ class Test(test):
         lcrv['xref']      = 83.63
         lcrv['yref']      = 22.01
         lcrv['rad']       = 0.2
+        lcrv['etruemin']  = 0.05
+        lcrv['etruemax']  = 150.0
+        lcrv['etruebins'] = 5
         lcrv['statistic'] = 'WSTAT'
         lcrv['outfile']   = 'cslightcrv_py5.fits'
         lcrv['logfile']   = 'cslightcrv_py5.log'

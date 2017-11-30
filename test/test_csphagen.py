@@ -49,7 +49,7 @@ class Test(test):
         self._nreg_with_excl = 5
         self._nreg_wo_excl   = 8
         self._nreg_mul       = [self._nreg_with_excl, 6]
-        self._nbins          = 20
+        self._nbins          = 10
         # number of expected background regions with/wo exclusion,
         # and for two different runs
 
@@ -84,6 +84,7 @@ class Test(test):
                          '" caldb="' + self._caldb + '" irf="' + self._irf + \
                          '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
                          str(self._nbins) + \
+                         ' etruemin=0.05 etruemax=150 etruebins=5'+ \
                          ' coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
@@ -107,6 +108,7 @@ class Test(test):
                          'caldb="' + self._caldb + '" irf="' + self._irf + \
                          '" ebinalg="LOG" emin=0.1 emax=100. enumbins=' + \
                          str(self._nbins) + \
+                         ' etruemin=0.05 etruemax=150 etruebins=5'+ \
                          ' coordsys="CEL" ra=83.633 dec=22.0145' + \
                          ' rad=0.2 stack="no" inexclusion="' + \
                          self._exclusion + \
@@ -142,6 +144,9 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = False
         phagen['inexclusion'] = self._exclusion
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
         phagen['outobs']      = 'csphagen_py1.xml'
         phagen['prefix']      = 'csphagen_py1'
         phagen['logfile']     = 'csphagen_py1.log'
@@ -156,22 +161,25 @@ class Test(test):
 
         # Now test without exclusion region
         phagen = cscripts.csphagen()
-        phagen['inobs']    = self._myevents1
-        phagen['caldb']    = self._caldb
-        phagen['irf']      = self._irf
-        phagen['ebinalg']  = 'LOG'
-        phagen['emin']     = 0.1
-        phagen['emax']     = 100.0
-        phagen['enumbins'] = self._nbins
-        phagen['coordsys'] = 'CEL'
-        phagen['ra']       = 83.633
-        phagen['dec']      = 22.0145
-        phagen['rad']      = 0.2
-        phagen['stack']    = False
-        phagen['outobs']   = 'csphagen_py2.xml'
-        phagen['prefix']   = 'csphagen_py2'
-        phagen['logfile']  = 'csphagen_py2.log'
-        phagen['chatter']  = 2
+        phagen['inobs']     = self._myevents1
+        phagen['caldb']     = self._caldb
+        phagen['irf']       = self._irf
+        phagen['ebinalg']   = 'LOG'
+        phagen['emin']      = 0.1
+        phagen['emax']      = 100.0
+        phagen['enumbins']  = self._nbins
+        phagen['coordsys']  = 'CEL'
+        phagen['ra']        = 83.633
+        phagen['dec']       = 22.0145
+        phagen['rad']       = 0.2
+        phagen['stack']     = False
+        phagen['etruemin']  = 0.05
+        phagen['etruemax']  = 150.0
+        phagen['etruebins'] = 5
+        phagen['outobs']    = 'csphagen_py2.xml'
+        phagen['prefix']    = 'csphagen_py2'
+        phagen['logfile']   = 'csphagen_py2.log'
+        phagen['chatter']   = 2
 
         # Run script
         phagen.execute()
@@ -201,6 +209,9 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = False
         phagen['inexclusion'] = self._exclusion
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
         phagen['outobs']      = 'csphagen_py3.xml'
         phagen['prefix']      = 'csphagen_py3'
         phagen['logfile']     = 'csphagen_py3.log'
@@ -228,6 +239,9 @@ class Test(test):
         phagen['rad']         = 0.2
         phagen['stack']       = True
         phagen['inexclusion'] = self._exclusion
+        phagen['etruemin']    = 0.05
+        phagen['etruemax']    = 150.0
+        phagen['etruebins']   = 5
         phagen['outobs']      = 'csphagen_py4.xml'
         phagen['prefix']      = 'csphagen_py4'
         phagen['logfile']     = 'csphagen_py4.log'
@@ -339,7 +353,7 @@ class Test(test):
         # Return
         return
 
-    def _check_rmf(self, filename, bins, etruebins=102):
+    def _check_rmf(self, filename, bins, etruebins=17):
         """
         Check RMF file
         """
@@ -386,7 +400,7 @@ class Test(test):
         # OGIP files
         self._check_pha(filenameroot + '_pha_on.fits', bins)
         self._check_pha(filenameroot + '_pha_off.fits', bins)
-        self._check_arf(filenameroot + '_arf.fits', 102)
+        self._check_arf(filenameroot + '_arf.fits', 17)
         self._check_rmf(filenameroot + '_rmf.fits', bins)
 
         # Optionally check for regions

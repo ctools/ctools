@@ -21,16 +21,7 @@
 
 # Scripts to be install
 scripts = README.md \
-          generate_prod3_irfs.py \
           make_pointings.py \
-          make_spectrum.py \
-          make_ts_distributions.py \
-          pipeline_binned_disk.py \
-          pipeline_binned_mem.py \
-          pipeline_stacked_disk.py \
-          pipeline_stacked_mem.py \
-          pipeline_unbinned_disk.py \
-          pipeline_unbinned_mem.py \
           show_butterfly.py \
           show_irf.py \
           show_model.py \

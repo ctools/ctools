@@ -89,7 +89,7 @@ class Test(test):
         pnt = gammalib.GSkyDir()
         pnt.radec_deg(83.6331, 22.0145)
         obs = gammalib.GObservations()
-        run = obsutils.set_obs(pnt, duration=100.0, emin=1.0, emax=10.0)
+        run = obsutils.set_obs(pnt, duration=20.0, emin=1.0, emax=10.0)
         run.id('0')
         obs.append(run)
         if two:
@@ -113,14 +113,14 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 1, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 48, 'Check number of observed events')
+        self.test_value(res.nobserved(), 6, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
         self.test_value(res[0].eventtype(), 'EventList', 'Check event type')
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().emax().TeV(), 10.0,
                         'Check minimum energy')
-        self.test_value(res[0].events().number(), 48,
+        self.test_value(res[0].events().number(), 6,
                         'Check number of events in list')
 
         # Check energy dispersion flag
@@ -144,7 +144,7 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 1, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 48, 'Check number of observed events')
+        self.test_value(res.nobserved(), 6, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
         self.test_value(res[0].eventtype(), 'CountsCube', 'Check event type')
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
@@ -153,7 +153,7 @@ class Test(test):
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
-        self.test_value(res[0].events().number(), 48,
+        self.test_value(res[0].events().number(), 6,
                         'Check number of events in cube')
 
         # Check energy dispersion flag
@@ -177,7 +177,7 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 1, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 96, 'Check number of observed events')
+        self.test_value(res.nobserved(), 19, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
         self.test_value(res[0].eventtype(), 'CountsCube', 'Check event type')
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
@@ -186,7 +186,7 @@ class Test(test):
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
-        self.test_value(res[0].events().number(), 96,
+        self.test_value(res[0].events().number(), 19,
                         'Check number of events in cube')
 
         # Check energy dispersion flag
@@ -211,7 +211,7 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 1, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 98, 'Check number of observed events')
+        self.test_value(res.nobserved(), 28, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
         self.test_value(res[0].eventtype(), 'CountsCube', 'Check event type')
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
@@ -220,7 +220,7 @@ class Test(test):
                         'Check minimum energy')
         self.test_value(res[0].events().ebounds().size(), 5,
                         'Check number of energy bins')
-        self.test_value(res[0].events().number(), 98,
+        self.test_value(res[0].events().number(), 28,
                         'Check number of events in cube')
 
         # Check energy dispersion flag
@@ -306,7 +306,7 @@ class Test(test):
         # Check simulation results
         self.test_value(res.size(), 1, 'Check number of observations')
         self.test_value(res.models().size(), 2, 'Check number of models')
-        self.test_value(res.nobserved(), 48, 'Check number of observed events')
+        self.test_value(res.nobserved(), 6, 'Check number of observed events')
         self.test_value(res.npred(), 0.0, 'Check number of predicted events')
         self.test_value(res[0].eventtype(), 'EventList', 'Check event type')
         self.test_value(res[0].events().ebounds().emin().TeV(), 1.0,
