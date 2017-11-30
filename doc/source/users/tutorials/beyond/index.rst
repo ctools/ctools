@@ -13,8 +13,8 @@ analyses.
 .. toctree::
    :maxdepth: 1
 
-   beyond_combine
-   beyond_stacked
+   combining-observations
+   stacked-analysis
    beyond_tsmap
    beyond_residual
    beyond_irf
