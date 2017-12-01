@@ -50,6 +50,7 @@ class csphagen(ctools.csobservation):
         self._has_exclusion = False
         self._srcshape      = ''
         self._rad           = 0.0
+        self._bkgregfiles   = {}
 
         # Return
         return
@@ -87,6 +88,30 @@ class csphagen(ctools.csobservation):
         bkgmethod = self['bkgmethod'].string()
         if bkgmethod == 'REFLECTED':
             self['bkgregmin'].integer()
+        elif bkgmethod == 'LOAD':
+            # Extract filepaths to region files from observation definition XML
+            obsfile = self['inobs'].filename()
+
+            # open XML
+            xml = gammalib.GXml()
+            xml.load(obsfile)
+
+            # Go through elements in <observationlist>
+            for elem in xml[0]:
+
+                # Get observation id from <observation> header
+                obsid          = elem.attribute('id')
+
+                # Get region file path from <observation> body
+                offregionsfile = ''
+                for entry in elem:
+
+                    # <parameter name="OffRegions" file=".."/> contains region file
+                    if entry.attribute('name') == 'OffRegions':
+                        offregionsfile = entry.attribute('file')
+
+                self._bkgregfiles[obsid] = gammalib.GFilename(offregionsfile)
+
         self['maxoffset'].real()
 
         # Exclusion map
@@ -177,6 +202,94 @@ class csphagen(ctools.csobservation):
                             regions.append(region)
 
         # Return reflected regions
+        return regions
+
+    def _regions_from_file(self, obs, filePath):
+        """
+        Read list of reflected regions for a single observation (pointing) from file
+
+        Parameters
+        ----------
+        obs : `~gammalib.GCTAObservation()`
+            CTA observation
+        filePath: `~gammalib.GFilename()`
+            File path to region file containing off regions.
+
+        Returns
+        -------
+        regions : `~gammalib.GSkyRegions`
+            List of reflected regions
+        """
+        # Initialise list of reflected regions
+        regions = gammalib.GSkyRegions()
+
+        # Get offset angle of source
+        pnt_dir = obs.pointing().dir()
+        offset  = pnt_dir.dist_deg(self._src_dir)
+
+        # Access region file
+        with open(filePath.url(), 'r') as ds9file:
+
+            # Read every line from file
+            for line in ds9file:
+
+                # Skip comment and empty lines
+                if line.startswith('#') or len(line)<2:
+                    continue
+
+                # Handle multi-lines separated with semicolon
+                for elem in line.split(';'):
+
+                    # Skip fk5 statement
+                    if elem=='fk5':
+                        continue
+
+                    # Process region circle
+                    if elem.startswith('circle'):
+
+                        # Separate arguments in shape definition
+                        try:
+                            args           = elem[ elem.find('(')+1 : elem.find(')') ]
+                            ra,dec,radius  = args.split(',')
+
+                            ra  = float( ra )
+                            dec = float( dec )
+                        except:
+                            self._log_string(gammalib.EXPLICIT, 'Region file line %s not readable.'
+                                             % (elem))
+
+                            # handle next element
+                            continue
+
+                        # Set up position of region
+                        offdir = gammalib.GSkyDir()
+                        offdir.radec_deg(ra, dec)
+
+                        # Calculate offset to pointing direction
+                        regionOffset = pnt_dir.dist_deg(offdir)
+
+                        # Skip and show message in case region is invalid
+                        if regionOffset <= self._rad or regionOffset >= self['maxoffset'].real():
+                            self._log_string(gammalib.EXPLICIT, 'Observation %s pointed at %.3f '
+                                             'deg from source' % ((obs.id(), offset)))
+
+                        # .. otherwise push back region
+                        else:
+                            # Warn if off region has not equal offset like on region
+                            if regionOffset != offset:
+                                self._log_string(gammalib.EXPLICIT, 'Off region offset differs '
+                                                 '%.3f deg from on region offset' % (regionOffset-offset))
+
+                            # Create region
+                            circleRegion = gammalib.GSkyRegionCircle(offdir, self._rad)
+
+                            # Push back in regions list
+                            regions.append(circleRegion)
+
+        # Inform user how many regions were loaded
+        self._log_string(gammalib.NORMAL, 'Read %i circle shaped regions from file %s.' % (regions.size(), filePath.url()))
+
+        # return list of regions
         return regions
 
     def _set_models(self, obs):
@@ -293,6 +406,20 @@ class csphagen(ctools.csobservation):
             # background regions
             if self['bkgmethod'].string() == 'REFLECTED':
                 bkg_reg = self._reflected_regions(obs)
+            elif self['bkgmethod'].string() == 'LOAD':
+                # Get file path of bkg region file from dictionary
+                bkgregfile = self._bkgregfiles[obs.id()]
+
+                # If file is valid load. Else warn and use reflected method.
+                if bkgregfile.exists():
+                    bkg_reg = self._regions_from_file(obs, bkgregfile)
+                else:
+                    self._log_string(gammalib.NORMAL, 'Background method LOAD'
+                                     ' specified but for observation %s no '
+                                     'region file found. Use reflected region '
+                                     'background instead.' % (obs.id()))
+                    bkg_reg = self._reflected_regions(obs)
+
 
             # If there are reflected regions then create On/Off observation
             # and append it to the output container
