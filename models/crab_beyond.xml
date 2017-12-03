@@ -1,0 +1,41 @@
+<?xml version="1.0" standalone="no"?>
+<source_library title="source library">
+  <source name="Crab" type="PointSource">
+    <spectrum type="Composite">
+      <spectrum type="LogParabola">
+	<parameter name="Prefactor"   scale="1e-17" value="3.0"   min="1e-07" max="1000.0" free="1"/>
+	<parameter name="Index"       scale="-1"    value="2.5" min="0.0"   max="+5.0"   free="1"/>
+	<parameter name="Curvature"   scale="-1"    value="0.45"   min="-5.0"  max="+5.0"   free="1"/>
+	<parameter name="PivotEnergy" scale="1e6"   value="1.0"     min="0.01"  max="1000.0" free="0"/>
+      </spectrum>
+      <spectrum type="PowerLaw">
+	<parameter name="Prefactor"   scale="1e-18" value="2.9"  min="1.e-7" max="1000.0" free="1"/>
+	<parameter name="Index"       scale="-1"    value="2.05" min="0.0"   max="+5.0"   free="1"/>
+	<parameter name="PivotEnergy" scale="1e6"   value="1.0"  min="0.01"  max="1000.0" free="0"/>
+      </spectrum>
+     </spectrum>
+    <spatialModel type="PointSource">
+      <parameter name="RA"  scale="1.0" value="83.6331" min="-360" max="360" free="0"/>
+      <parameter name="DEC" scale="1.0" value="22.0145" min="-90"  max="90"  free="0"/>
+    </spatialModel>
+  </source>
+  <source name="Src1" type="PointSource">
+    <spectrum type="ExponentialCutoffPowerLaw">
+      <parameter name="Prefactor"    scale="1e-15" value="1.8"  min="1e-07" max="1000.0" free="1"/>
+      <parameter name="Index"        scale="-1"    value="2.35" min="0.0"   max="+5.0"   free="1"/>
+      <parameter name="CutoffEnergy" scale="1e6"   value="0.3"  min="0.01"  max="1000.0" free="1"/>
+      <parameter name="PivotEnergy"  scale="1e6"   value="0.1" min="0.01"  max="1000.0" free="0"/>
+    </spectrum>
+    <spatialModel type="PointSource">
+      <parameter name="RA"  scale="1.0" value="83.72" min="-360" max="360" free="0"/>
+      <parameter name="DEC" scale="1.0" value="21.93" min="-90"  max="90"  free="0"/>
+    </spatialModel>
+  </source>
+  <source name="CTABackgroundModel" type="CTAIrfBackground" instrument="CTA">
+    <spectrum type="PowerLaw">	
+      <parameter name="Prefactor"   scale="1.0"  value="1.0"  min="1e-3" max="1e+3"   free="1"/>	
+      <parameter name="Index"       scale="1.0"  value="0.0"  min="-5.0" max="+5.0"   free="1"/>
+      <parameter name="PivotEnergy" scale="1e6"  value="1.0"  min="0.01" max="1000.0" free="0"/>
+    </spectrum>
+  </source>
+</source_library>
