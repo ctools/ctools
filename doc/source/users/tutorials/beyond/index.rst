@@ -17,5 +17,6 @@ analyses.
    stacked-analysis
    beyond_tsmap
    beyond_residual
+   advanced-python-fitting
    beyond_irf
    beyond_model

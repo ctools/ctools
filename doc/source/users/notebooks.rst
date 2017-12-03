@@ -17,3 +17,4 @@ this page.
 * :download:`Using ctools from Python <tutorials/quickstart/ctools-from-python.ipynb>`
 * :download:`Combining observations <tutorials/beyond/combining-observations.ipynb>`
 * :download:`Performing a stacked analysis <tutorials/beyond/stacked-analysis.ipynb>`
+  * :download:`Advanced model manipulation and fitting in Python <tutorials/beyond/advanced-python-fitting.ipynb>`
