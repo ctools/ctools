@@ -37,7 +37,7 @@ except:
 
 try:
     import nbsphinx
-    extensions += ['nbsphinx']
+    extensions += ['nbsphinx','IPython.sphinxext.ipython_console_highlighting']
 except:
     print('WARNING: Python package `nbsphinx` not found.\n'
           'WARNING: Please install it to get fully-functional Sphinx docs.\n'
